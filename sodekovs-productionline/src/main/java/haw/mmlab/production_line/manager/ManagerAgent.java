@@ -220,19 +220,28 @@ public class ManagerAgent extends MicroAgent {
 			public void resultAvailable(IComponentManagementService cms) {
 				IExternalAccess parent = ManagerAgent.this.getParent();
 
-				getLogger().info("Manager agent is starting database agent...");
-				cms.createComponent("DatabaseAgent", "haw/mmlab/production_line/logging/database/DatabaseAgent.class", null, null).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
+				// getLogger().info("Manager agent is starting database agent...");
+				// cms.createComponent("DatabaseAgent", "haw/mmlab/production_line/logging/database/DatabaseAgent.class", null, null).addResultListener(new
+				// DefaultResultListener<IComponentIdentifier>() {
+				//
+				// @Override
+				// public void resultAvailable(IComponentIdentifier identifier) {
+				// startedAgents.add(identifier);
+				// getRequiredService("dbService").addResultListener(new DefaultResultListener<IDatabaseService>() {
+				//
+				// @Override
+				// public void resultAvailable(IDatabaseService result) {
+				// dbService = result;
+				// }
+				// });
+				// }
+				// });
+
+				getRequiredService("dbService").addResultListener(new DefaultResultListener<IDatabaseService>() {
 
 					@Override
-					public void resultAvailable(IComponentIdentifier identifier) {
-						startedAgents.add(identifier);
-						getRequiredService("dbService").addResultListener(new DefaultResultListener<IDatabaseService>() {
-
-							@Override
-							public void resultAvailable(IDatabaseService result) {
-								dbService = result;
-							}
-						});
+					public void resultAvailable(IDatabaseService result) {
+						dbService = result;
 					}
 				});
 

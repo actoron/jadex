@@ -8,8 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The work piece that is processed by the robots / transporters. Robots add
- * operations to the work piece.
+ * The work piece that is processed by the robots / transporters. Robots add operations to the work piece.
  * 
  * @author Peter
  */
@@ -49,8 +48,7 @@ public class Workpiece implements Serializable {
 		}
 
 		if (opCount >= task.getOperations().size()) {
-			throw new IllegalStateException(
-					"could not perform another action. All action are already applied to the work piece.");
+			throw new IllegalStateException("could not perform another action. All action are already applied to the work piece.");
 		}
 
 		if (opCount < 0) {
@@ -63,8 +61,7 @@ public class Workpiece implements Serializable {
 			operations.add(operation);
 			opCount++;
 		} else {
-			throw new IllegalArgumentException("Operation (" + operation + ") not allowed. Expected operation: "
-					+ nextOp);
+			throw new IllegalArgumentException("Operation (" + operation + ") not allowed. Expected operation: " + nextOp);
 		}
 	}
 
@@ -131,13 +128,10 @@ public class Workpiece implements Serializable {
 	@Override
 	public String toString() {
 		final int maxLen = 10;
-		return "Workpiece [id="
-				+ id
-				+ ", opCount="
-				+ opCount
-				+ ", "
-				+ (operations != null ? "operations=" + operations.subList(0, Math.min(operations.size(), maxLen))
-						+ ", " : "") + (task != null ? "task=" + task : "") + "]";
+		return "Workpiece [id=" + id + ", opCount=" + opCount /*
+															 * + ", " + (operations != null ? "operations=" + operations.subList(0, Math.min(operations.size(), maxLen)) + ", " : "") + (task != null ?
+															 * "task=" + task : "")
+															 */+ "]";
 	}
 
 	/*

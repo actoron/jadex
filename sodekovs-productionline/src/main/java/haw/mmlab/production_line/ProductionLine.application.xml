@@ -65,6 +65,7 @@
 						<argument name="strategy">"cycleDetectionStrategy"</argument>
 					</arguments>
 				</component>
+				<component type="DatabaseAgent" />
 			</components>
  		</application>
 	</applications>

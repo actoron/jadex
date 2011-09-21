@@ -5,6 +5,7 @@ package haw.mmlab.production_line.service;
 
 import haw.mmlab.production_line.domain.HelpRequest;
 import haw.mmlab.production_line.logging.database.DatabaseAgent;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -13,6 +14,7 @@ import jadex.commons.future.IFuture;
  * @author thomas
  * 
  */
+@Service
 public class DatabaseService implements IDatabaseService {
 
 	@ServiceComponent

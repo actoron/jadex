@@ -52,7 +52,7 @@ import java.util.logging.Level;
 @Arguments({ @Argument(clazz = Robot.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap"), @Argument(clazz = IStrategy.class, name = "strategy") })
 @ProvidedServices(@ProvidedService(implementation = @Implementation(ProcessWorkpieceService.class), type = IProcessWorkpieceService.class))
 @RequiredServices({ @RequiredService(name = "processWorkpieceServices", type = IProcessWorkpieceService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL)),
-		@RequiredService(name = "managerService", type = IManagerService.class) })
+		@RequiredService(name = "managerService", type = IManagerService.class), @RequiredService(name = "dbService", type = IDatabaseService.class) })
 public class RobotAgent extends ProcessWorkpieceAgent {
 
 	/** The output {@link Buffer} */
