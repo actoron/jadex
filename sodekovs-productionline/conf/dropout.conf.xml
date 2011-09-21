@@ -4,16 +4,27 @@
 	<!-- count: this config is repeated x times; set to 0 for infinite loop  -->
 	<configuration rate="1" count="1">
 		<query>
+			<category>ROBOT</category>
+			<random>1</random>
+		</query>
+		<action type="DROP">
+			<mode>ACTIVE_RANDOM</mode>
+		</action>
+	</configuration>
+	<!-- 
+	<configuration rate="1" count="1">
+		<query>
 			<category>NONE</category>
 			<agents>
-				<agent>Robot3</agent>
+				<agent>GRobot53</agent>
 			</agents>
 		</query>
 		<action type="DROP">
 			<mode>STATIC</mode>
 			<capabilities>
-				<capability>C</capability>
+				<capability>Cap53</capability>
 			</capabilities>
 		</action>
 	</configuration>
+	-->
 </dropout_conf>
