@@ -124,7 +124,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 			this.role = role;
 		}
 
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			final Task task = taskMap.get(role.getPrecondition().getTaskId());
 			Integer max = task.getMaxWorkpieceCount();
 			Integer count = wpCount.get(task.getId());
@@ -144,7 +144,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 
 				sendWorkpiece(ia, task, workpiece);
 			}
-			return null;
+			return IFuture.DONE;
 		}
 
 		/**
@@ -236,7 +236,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		}
 
 		@SuppressWarnings("unchecked")
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			final String target = role.getPostcondition().getTargetAgent();
 			getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
 
@@ -270,7 +270,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 				}
 			});
 
-			return role;
+			return IFuture.DONE;
 		}
 	}
 
@@ -349,7 +349,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		}
 
 		@SuppressWarnings("unchecked")
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
 
 				public void resultAvailable(Collection<IProcessWorkpieceService> services) {
@@ -378,7 +378,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 				}
 			});
 
-			return null;
+			return IFuture.DONE;
 		}
 	}
 

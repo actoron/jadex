@@ -142,7 +142,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 					Integer processTime = role.getProcessingTime() == null ? 0 : role.getProcessingTime();
 					waitFor(processTime, new IComponentStep() {
 
-						public Object execute(IInternalAccess ia) {
+						public IFuture<Void> execute(IInternalAccess ia) {
 							setWorkpiece(null);
 							setMainState(MainState.RUNNING_IDLE);
 							return buffer.enqueue(new BufferElement(workpiece, role));
@@ -204,7 +204,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 	 */
 	private class SendWorkpieceStep implements IComponentStep {
 
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			BufferElement element = buffer.peek();
 
 			if (element != null) {
@@ -213,7 +213,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 				waitFor(200, this);
 			}
 
-			return null;
+			return IFuture.DONE;
 		}
 
 		/**

@@ -25,6 +25,7 @@ import jadex.bdi.runtime.interpreter.AgentRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.rules.state.IOAVState;
 
@@ -617,10 +618,10 @@ public class BDIBehaviorObservationComponent extends BehaviorObservationComponen
 	 * definition is satisfied.
 	 */
 	private void checkAndPublishIfApplicable(final AgentEvent ae, final AgentElementType agentElementType) {
-		extAccess.scheduleStep(new IComponentStep() {
+		extAccess.scheduleStep(new IComponentStep<Void>() {
 
 			@Override
-			public Object execute(IInternalAccess ia) {
+			public IFuture<Void> execute(IInternalAccess ia) {
 				IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 				String nameOfElement = getNameOfAgentElement(ae, agentElementType);
 				// get all the DCM Realizations that have the current AgentEvent
@@ -635,7 +636,7 @@ public class BDIBehaviorObservationComponent extends BehaviorObservationComponen
 						System.out.println("#BDIBehaviorObservationComponent# Role inactive. Event not published to medium or direct publish.");
 					}
 				}
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

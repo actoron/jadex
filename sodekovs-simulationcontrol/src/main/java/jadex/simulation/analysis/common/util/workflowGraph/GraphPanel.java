@@ -7,6 +7,7 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.superClasses.service.view.session.subprocess.ASubProcessView;
 import jadex.simulation.analysis.common.util.AConstants;
 
@@ -124,10 +125,10 @@ public class GraphPanel extends mxGraphComponent
 
 	public void initWorkflow(IExternalAccess exta)
 	{
-		exta.scheduleStep(new IComponentStep()
+		exta.scheduleStep(new IComponentStep<Void>()
 		{
 			@Override
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 
 				Map<String, MActivity> allActivities = ((BpmnInterpreter) ia).getModelElement().getAllActivities();
@@ -235,7 +236,7 @@ public class GraphPanel extends mxGraphComponent
 				layout.execute(parent);
 
 				graph.getModel().endUpdate();
-				return new Object();
+				return IFuture.DONE;
 			}
 		});
 

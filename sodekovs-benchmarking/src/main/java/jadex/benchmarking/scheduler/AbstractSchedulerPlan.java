@@ -162,7 +162,7 @@ public abstract class AbstractSchedulerPlan extends Plan {
 	 * @return
 	 */
 	protected long getTimestamp() {
-		long starttime = ((Long) sutSpace.getProperty("BENCHMARK_REAL_START_TIME_OF_SIMULATION")).longValue();
+		long starttime = ((Long) sutSpace.getProperty("REAL_START_TIME_OF_SIMULATION")).longValue();
 		return clockservice.getTime() - starttime;
 	}
 

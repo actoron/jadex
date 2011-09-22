@@ -340,9 +340,9 @@ public class ManagerAgent extends MicroAgent {
 				// restarting new ones.
 				waitFor(5000, new IComponentStep() {
 
-					public Object execute(IInternalAccess ia) {
+					public IFuture<Void> execute(IInternalAccess ia) {
 						executeBody();
-						return null;
+						return IFuture.DONE;
 					}
 				});
 			} else {

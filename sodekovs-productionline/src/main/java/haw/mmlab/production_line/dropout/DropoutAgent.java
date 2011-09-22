@@ -97,7 +97,7 @@ public class DropoutAgent extends MicroAgent {
 			this.configuration = configuration;
 		}
 
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			int rate = configuration.getRate() * 1000;
 			int count = configuration.getCount() != null ? configuration.getCount() : 0;
 
@@ -115,7 +115,7 @@ public class DropoutAgent extends MicroAgent {
 				waitFor(rate, this);
 			}
 
-			return null;
+			return IFuture.DONE;
 		}
 
 		private void executeAction(Action action, List<IProcessWorkpieceService> receiver) {

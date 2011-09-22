@@ -4,6 +4,13 @@
 	Author : vilenica Description: Purpose of the document follows. -->
 
 <Schedule type="Workload" name="W2" warmUpTime="1000">
+
+<Imports>		
+		<Import>jadex.extension.envsupport.evaluation.XYChartDataConsumer</Import>		
+		<Import>jadex.extension.envsupport.environment.*</Import>
+		<Import>jadex.simulation.evaluation.*</Import>
+	</Imports>
+	
 	<TerminateCondition>
 		 <TerminationTime value="20000" />
 		<!-- <SemanticCondition condition="$object.getProperty(&quot;ore&quot;) >= 55">
@@ -59,4 +66,38 @@
 			</Actions>
 		</Sequence>
 	</Sequences>
+	<Evaluation>
+	<Dataproviders>
+		<Dataprovider name="homebaselogger">			
+			<Source name="$homebase" sourcetype="ISpaceObject" objecttype="homebase"/> 						
+			<Data name="ore_amount">$homebase.ore</Data>
+			<Data name="time">$tick</Data>				
+		</Dataprovider>
+	</Dataproviders>
+
+	<Dataconsumers>
+		<Dataconsumer name="homebaseConsumer" clazz="XYChartDataConsumer">
+				<MixedProperty name="dataprovider">"homebaselogger"</MixedProperty>
+				<MixedProperty name="title">"Evaluation of homebase"</MixedProperty>
+				<MixedProperty name="labelx">"Time"</MixedProperty>
+				<MixedProperty name="labely">"Collected Ore"</MixedProperty>							
+				<MixedProperty name="seriesname_0">"Collected Ore"</MixedProperty>
+				<MixedProperty name="valuex_0">"time"</MixedProperty>
+				<MixedProperty name="valuey_0">"ore_amount"</MixedProperty>
+		</Dataconsumer>
+		<Dataconsumer name="homebaseConsumerReloaded" clazz="XYChartDataConsumer">
+				<MixedProperty name="dataprovider">"homebaselogger"</MixedProperty>
+				<MixedProperty name="title">"Evaluation of homebase"</MixedProperty>				
+				<MixedProperty name="labelx">"Collected Ore"</MixedProperty>			
+				<MixedProperty name="labely">"Time"</MixedProperty>				
+				<MixedProperty name="seriesname_0">"Collected Ore"</MixedProperty>				
+				<MixedProperty name="valuex_0">"ore_amount"</MixedProperty>
+				<MixedProperty name="valuey_0">"time"</MixedProperty>
+		</Dataconsumer>
+		<!-- <Dataconsumer name="simConsumer" clazz="SimulationDataConsumer">		
+				<MixedProperty name="dataprovider">"homebaselogger"</MixedProperty>
+				<MixedProperty name="time" filter="last"/>--><!-- HACK: Denotes the filter type ->last= only the last value is of interest. --> 
+		<!-- </Dataconsumer> -->		 		
+	</Dataconsumers>
+	</Evaluation>
 </Schedule>

@@ -27,6 +27,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -132,10 +133,10 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 			IComponentManagementService ams = (IComponentManagementService) SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IComponentManagementService.class).get(
 					new ThreadSuspendable());
 			final IExternalAccess exta = (IExternalAccess) ams.getExternalAccess(agent.getName()).get(new ThreadSuspendable());
-			exta.scheduleStep(new IComponentStep() {
+			exta.scheduleStep(new IComponentStep<Void>() {
 
 				@Override
-				public Object execute(IInternalAccess ia) {
+				public IFuture<Void> execute(IInternalAccess ia) {
 					try {
 						IBDIInternalAccess bia = null;
 						if (ia instanceof IBDIInternalAccess) {
@@ -225,7 +226,7 @@ public class DefaultCoordinationInformationInterpreter extends SimplePropertyObj
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					return null;
+					return IFuture.DONE;
 				}
 			});
 		}

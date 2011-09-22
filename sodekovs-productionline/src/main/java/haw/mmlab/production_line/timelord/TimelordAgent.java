@@ -59,12 +59,12 @@ public class TimelordAgent extends MicroAgent {
 	 */
 	private class LoggingStep implements IComponentStep {
 
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			dbService.setIntervalTime(time);
 			time++;
 
 			IFuture<?> result = waitFor(interval, this);
-			return result;
+			return IFuture.DONE;
 		}
 	}
 }

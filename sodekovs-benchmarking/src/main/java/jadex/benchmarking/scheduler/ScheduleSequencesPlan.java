@@ -16,7 +16,7 @@ public class ScheduleSequencesPlan extends AbstractSchedulerPlan {
 		//init logger
 		scheduleLogger = (ScheduleLogger) getBeliefbase().getBelief(Constants.SCHEDULE_LOGGER).getFact();
 		scheduleLogger.setClockService(clockservice);
-		scheduleLogger.setStarttime(((Long)sutSpace.getProperty("BENCHMARK_REAL_START_TIME_OF_SIMULATION")).longValue());
+		scheduleLogger.setStarttime(((Long)sutSpace.getProperty("REAL_START_TIME_OF_SIMULATION")).longValue());
 		scheduleLogger.init();
 		scheduleLogger.log(Constants.PREPARE_GNUPLOT_PREFIX);
 		

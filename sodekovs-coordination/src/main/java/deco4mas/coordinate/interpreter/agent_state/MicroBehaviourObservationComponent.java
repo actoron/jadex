@@ -107,10 +107,10 @@ public class MicroBehaviourObservationComponent extends BehaviorObservationCompo
 	 * @param nameOfElement
 	 */
 	private void checkAndPublishIfApplicable(final IComponentStep runStep, final AgentElementType agentElementType, final String nameOfElement) {
-		extAccess.scheduleStep(new IComponentStep() {
+		extAccess.scheduleStep(new IComponentStep<Void>() {
 
 			@Override
-			public Object execute(IInternalAccess ia) {
+			public IFuture<Void> execute(IInternalAccess ia) {
 				MicroAgent ma = (MicroAgent) ia;
 
 				// get all the DCM Realizations that have the current AgentEvent
@@ -127,7 +127,7 @@ public class MicroBehaviourObservationComponent extends BehaviorObservationCompo
 					}
 				}
 
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

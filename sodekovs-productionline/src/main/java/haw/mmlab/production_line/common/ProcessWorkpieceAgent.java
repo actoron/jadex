@@ -16,6 +16,7 @@ import haw.mmlab.production_line.state.MainState;
 import haw.mmlab.production_line.transport.TransportAgent;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 
 import java.util.ArrayList;
@@ -181,7 +182,7 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 			this.message = message;
 		}
 
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			if (message instanceof HelpRequest) {
 				HelpRequest request = (HelpRequest) message;
 
@@ -194,7 +195,7 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 				handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_ADAPTIVITY, msg), getLogger());
 			}
 
-			return null;
+			return IFuture.DONE;
 		}
 	}
 
@@ -204,7 +205,7 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 		@CoordinationParameter
 		public MediumMessage message = null;
 
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			if (message instanceof HelpRequest) {
 				HelpRequest request = (HelpRequest) message;
 
@@ -219,7 +220,7 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 				handleHelpReply(reply);
 			}
 
-			return null;
+			return IFuture.DONE;
 		}
 
 	}

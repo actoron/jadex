@@ -1,9 +1,11 @@
 package deco4mas.examples.micro.tspaces;
 
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import deco4mas.coordinate.annotation.CoordinationParameter;
 import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
+import deco4mas.examples.micro.tspaces.ReceiverAgent.InformCounterIncrementStep;
 import deco4mas.examples.micro.tspaces.SenderAgent.CounterIncrementStep;
 
 /**
@@ -26,10 +28,10 @@ public class ReceiverAgent extends MicroAgent {
 		public Integer counter = 0;
 
 		@Override
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			// just print the current value of counter
 			System.out.println("***** InformCounterIncrementStep called: " + counter);
-			return null;
+			return IFuture.DONE;
 		}
 	}
 }

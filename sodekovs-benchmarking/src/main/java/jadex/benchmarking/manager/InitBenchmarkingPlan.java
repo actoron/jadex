@@ -5,12 +5,17 @@ import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.benchmarking.helper.Constants;
 import jadex.benchmarking.helper.Methods;
+import jadex.benchmarking.helper.OnlineVisualisation;
 import jadex.benchmarking.logger.ScheduleLogger;
 import jadex.benchmarking.model.Data;
 import jadex.benchmarking.model.Dataconsumer;
+import jadex.benchmarking.model.Dataconsumers;
 import jadex.benchmarking.model.Dataprovider;
+import jadex.benchmarking.model.Dataproviders;
+import jadex.benchmarking.model.Imports;
 import jadex.benchmarking.model.Property;
 import jadex.benchmarking.model.Schedule;
+import jadex.benchmarking.model.Schedule.Evaluation;
 import jadex.benchmarking.model.SemanticCondition;
 import jadex.benchmarking.model.Sequence;
 import jadex.benchmarking.model.Source;
@@ -68,6 +73,7 @@ public class InitBenchmarkingPlan extends Plan {
 	private IComponentIdentifier schedulerCID = null;
 	// private Log events
 	private ScheduleLogger scheduleLogger = null;
+	private OnlineVisualisation vis = null;
 
 	public void body() {
 		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
@@ -98,9 +104,21 @@ public class InitBenchmarkingPlan extends Plan {
 		// Scheduler is started in suspend mode.
 		startScheduler();
 
-		// init dataprovider, dataconsumer and online visualization
-		addDataConsumerAndProvider();
+		// Check if there are DataConsumer and DataProvider to be added to space
+		if (checkDataConcumerAndProvider(benchConf)) {
+			addDataConsumerAndProvider(benchConf);
 
+			// start Online Visualization
+			startOnlineVisualization(benchConf);
+		}else{
+			System.out.println("#InitBenchmarkingPlan# No DataConsumer and DataProvider to add to space.");
+		}
+		
+		// TODO: Hack: Synchronize start time!
+		long startTime = clockservice.getTime();
+		sutSpace.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
+		
+		
 		// Resume SuT
 		cms.resumeComponent(sutCID).get(this);
 
@@ -115,9 +133,6 @@ public class InitBenchmarkingPlan extends Plan {
 		getBeliefbase().getBelief("benchmarkStatus").setFact(Constants.RUNNING);
 		// myLogger.log("Resumed Scheduler");
 
-		// TODO: Hack: Synchronize start time!
-		long startTime = clockservice.getTime();
-		sutSpace.setProperty("BENCHMARK_REAL_START_TIME_OF_SIMULATION", startTime);
 
 		// Handle termination of benchmark
 		terminateBenchmark(benchConf);
@@ -221,7 +236,7 @@ public class InitBenchmarkingPlan extends Plan {
 	 * @return
 	 */
 	private long getTimestamp() {
-		long starttime = ((Long) sutSpace.getProperty("BENCHMARK_REAL_START_TIME_OF_SIMULATION")).longValue();
+		long starttime = ((Long) sutSpace.getProperty("REAL_START_TIME_OF_SIMULATION")).longValue();
 		return clockservice.getTime() - starttime;
 	}
 
@@ -245,13 +260,12 @@ public class InitBenchmarkingPlan extends Plan {
 
 	private void addDataConsumerAndProvider(Schedule benchConf) {
 
-		IFuture fut = (sutExta).getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));		
-		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
+//		IFuture fut = (sutExta).getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));
+//		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
 
 		// AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getExtension(simConf.getNameOfSpace()));
 		IExpressionParser parser = new JavaCCExpressionParser();
 
-		// add new data provider
 		List<Dataprovider> providers = benchConf.getEvaluation().getDataproviders().getDataprovider();
 		// List tmp = si.getPropertyList("dataproviders");
 
@@ -271,7 +285,7 @@ public class InitBenchmarkingPlan extends Plan {
 					IParsedExpression dataexp = EvaluateExpression.getParsedExpression(source.getContent(), parser);
 					// Hack: Includeconditon is not implemented, yet.
 					IParsedExpression includeexp = null;
-					provs[j] = new SpaceObjectSource(varname, space, objecttype, aggregate, dataexp, includeexp);
+					provs[j] = new SpaceObjectSource(varname, sutSpace, objecttype, aggregate, dataexp, includeexp);
 				}
 
 				String tablename = providers.get(i).getName();
@@ -281,11 +295,11 @@ public class InitBenchmarkingPlan extends Plan {
 				for (int j = 0; j < subdatas.size(); j++) {
 					Data subdata = subdatas.get(j);
 					columnnames[j] = subdata.getName();
-					exps[j] = EvaluateExpression.getParsedExpression((String) subdata.getContent().get(0), parser);
+					exps[j] = EvaluateExpression.getParsedExpression((String) subdata.getContent(), parser);
 				}
 
-				ITableDataProvider tprov = new DefaultDataProvider(space, provs, tablename, columnnames, exps);
-				space.addDataProvider(tablename, tprov);
+				ITableDataProvider tprov = new DefaultDataProvider(sutSpace, provs, tablename, columnnames, exps);
+				sutSpace.addDataProvider(tablename, tprov);
 			}
 		}
 
@@ -301,6 +315,12 @@ public class InitBenchmarkingPlan extends Plan {
 				// Class clazz = (Class)MEnvSpaceInstance.getProperty(dcon,
 				// "clazz");
 				Class clazz = null;
+				
+				//Hack: avoid null pointer exception for imports
+				if(benchConf.getImports() == null){
+					benchConf.setImports(new Imports());
+				}
+				
 				try {
 					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) benchConf.getImports().getImport()),
 							((ILibraryService) SServiceProvider.getService(getScope().getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
@@ -336,22 +356,22 @@ public class InitBenchmarkingPlan extends Plan {
 				}
 				// MEnvSpaceInstance.setProperties(con,
 				// (List)dcon.get("properties"), fetcher);
-				MEnvSpaceType.setProperties(con, tmpPropertyList, space.getFetcher());//
-				con.setProperty("envspace", space);
-				space.addDataConsumer(name, con);
+				MEnvSpaceType.setProperties(con, tmpPropertyList, sutSpace.getFetcher());//
+				con.setProperty("envspace", sutSpace);
+				sutSpace.addDataConsumer(name, con);
 			}
 		}
 		// System.out.println("nnnnnnnnnnneded iterations: " + counterTmp);
 	}
 
 	private void startOnlineVisualization(Schedule benchConf) {
-		
-		IFuture fut = exta.getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));
-		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
+
+//		IFuture fut = sutExta.getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));
+//		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
 
 		// init online visualization
 		ArrayList<AbstractChartDataConsumer> chartDataConsumer = new ArrayList<AbstractChartDataConsumer>();
-		for (Iterator it = space.getDataConsumers().iterator(); it.hasNext();) {
+		for (Iterator it = sutSpace.getDataConsumers().iterator(); it.hasNext();) {
 			Object abstractConsumer = it.next();
 
 			if (abstractConsumer instanceof AbstractChartDataConsumer)
@@ -378,11 +398,39 @@ public class InitBenchmarkingPlan extends Plan {
 
 	private String getProperty(List<Property> properties, String name) {
 		for (Property prop : properties) {
-			if(prop.getName().equalsIgnoreCase(name)){
+			if (prop.getName().equalsIgnoreCase(name)) {
 				return prop.getValue();
 			}
 		}
 		System.err.print("#InitBenchmarkingPlan# Property <" + name + "> not found in propertyList");
 		return null;
+	}
+
+	/**
+	 * Check whether all preconditions are fulfilled to add DataConsumer and DataProvider to space
+	 * 
+	 * @param benchConf
+	 * @return
+	 */
+	private boolean checkDataConcumerAndProvider(Schedule benchConf) {
+		IFuture fut = (sutExta).getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
+
+		if (space == null) {
+			return false;
+		}
+
+		Evaluation eval = benchConf.getEvaluation();
+
+		if (eval == null) {
+			return false;
+		} else {
+			Dataproviders providers = benchConf.getEvaluation().getDataproviders();
+			Dataconsumers consumers = benchConf.getEvaluation().getDataconsumers();
+			if (providers == null || consumers == null) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

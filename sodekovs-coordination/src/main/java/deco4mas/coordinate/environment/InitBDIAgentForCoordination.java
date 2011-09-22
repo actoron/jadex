@@ -4,6 +4,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
@@ -265,13 +266,13 @@ public class InitBDIAgentForCoordination {
 	}
 
 	private void initExternalAccess() {
-		exta.scheduleStep(new IComponentStep() {
+		exta.scheduleStep(new IComponentStep<Void>() {
 			@Override
-			public Object execute(IInternalAccess ia) {
+			public IFuture<Void> execute(IInternalAccess ia) {
 				behObserver = new BDIBehaviorObservationComponent(exta, masDyn);
 				agentType = ai.getLocalType();
 				initPublishAndPercept();
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

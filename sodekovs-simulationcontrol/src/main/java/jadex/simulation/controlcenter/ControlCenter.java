@@ -4,6 +4,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.simulation.model.Dataprovider;
 import jadex.simulation.model.SimulationConfiguration;
@@ -75,13 +76,13 @@ public class ControlCenter extends JFrame {
 //		this.simConf = (SimulationConfiguration) exta.getBeliefbase()
 //				.getBelief("simulationConf").getFact();
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.getBeliefbase().getBelief("simulationConf").getFact();
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		

@@ -3,6 +3,7 @@ package deco4mas.coordinate.environment;
 import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.micro.IMicroExternalAccess;
@@ -100,14 +101,14 @@ public class InitMicroAgentForCoordination {
 	 * Initializes the external access.
 	 */
 	private void initExternalAccess() {
-		extAccess.scheduleStep(new IComponentStep() {
+		extAccess.scheduleStep(new IComponentStep<Void>() {
 			@Override
-			public Object execute(IInternalAccess ia) {
+			public IFuture<Void> execute(IInternalAccess ia) {
 				ArrayList<String> spaces = getSpaces();
 				behaviourObserver = new MicroBehaviourObservationComponent(extAccess, masDyn, spaces);
 				agentType = ai.getLocalType();
 				initPublishAndPercept();
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

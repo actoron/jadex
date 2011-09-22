@@ -41,10 +41,10 @@ public class ExampleMicroAgent extends MicroAgent {
 		}
 
 		@Override
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			System.out.println("ExampleMicroAgent execute() in SayHelloStep called with message:");
 			System.out.println("\t" + message);
-			return null;
+			return IFuture.DONE;
 		}
 	}
 
@@ -55,10 +55,10 @@ public class ExampleMicroAgent extends MicroAgent {
 		public String message = null;
 
 		@Override
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			System.out.println("ExampleMicroAgent execute() in ReceiveHelloStep called with message:");
 			System.out.println("\t" + message);
-			return null;
+			return IFuture.DONE;
 		}
 	}
 }

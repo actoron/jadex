@@ -76,10 +76,10 @@ public class BicyclistAgent extends MicroAgent {
 		}
 
 		@Override
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			mapService.registerComponent(getComponentIdentifier(), position);
 			
-			return null;
+			return IFuture.DONE;
 		}		
 	}
 }

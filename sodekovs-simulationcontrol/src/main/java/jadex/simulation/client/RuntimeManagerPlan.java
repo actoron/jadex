@@ -36,10 +36,8 @@ import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.Source;
 import jadex.simulation.model.TargetFunction;
 import jadex.simulation.model.Time;
-import jadex.simulation.model.result.ExperimentResult;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,7 +47,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import sodekovs.util.misc.AgentMethods;
 import sodekovs.util.misc.EvaluateExpression;
-import sodekovs.util.misc.FileHandler;
 import sodekovs.util.misc.GlobalConstants;
 import sodekovs.util.misc.TimeConverter;
 import sodekovs.util.misc.XMLHandler;

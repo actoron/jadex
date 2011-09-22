@@ -62,14 +62,14 @@ public class ExecuteWorkflowPlan extends Plan
 					// workflow executed -> init InternalEvent
 					try
 					{
-						myExternalAccess.scheduleStep(new IComponentStep() {
+						myExternalAccess.scheduleStep(new IComponentStep<Void>() {
 							
 							@Override
-							public Object execute(IInternalAccess ia) {
+							public IFuture<Void> execute(IInternalAccess ia) {
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 								IInternalEvent workflowExecuted = bia.getEventbase().createInternalEvent("workflowExecuted");
 								bia.getEventbase().dispatchInternalEvent(workflowExecuted);
-								return null;
+								return IFuture.DONE;
 							}
 						});
 						

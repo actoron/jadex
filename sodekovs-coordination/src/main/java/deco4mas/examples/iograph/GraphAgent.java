@@ -49,9 +49,9 @@ public class GraphAgent extends MicroAgent {
 		}
 
 		@Override
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			System.out.println("SendStep called in GraphAgent " + id);
-			return null;
+			return IFuture.DONE;
 		}
 	}
 
@@ -65,10 +65,10 @@ public class GraphAgent extends MicroAgent {
 		public String receivedId = null;
 
 		@Override
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			System.out.println("ReceiveStep called in GraphAgent " + name + " receiving the id from GraphAgent " + receivedId);
 			waitForTick(new SendStep(name));
-			return null;
+			return IFuture.DONE;
 		}
 	}
 }

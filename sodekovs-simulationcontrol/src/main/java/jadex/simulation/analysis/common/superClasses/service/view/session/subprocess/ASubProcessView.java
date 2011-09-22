@@ -7,10 +7,10 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.superClasses.events.IAEvent;
 import jadex.simulation.analysis.common.superClasses.events.IAListener;
-import jadex.simulation.analysis.common.superClasses.events.service.AServiceEvent;
 import jadex.simulation.analysis.common.superClasses.events.task.ATaskEvent;
 import jadex.simulation.analysis.common.superClasses.service.view.session.IASessionView;
 import jadex.simulation.analysis.common.superClasses.service.view.session.SessionProperties;
@@ -63,10 +63,10 @@ public class ASubProcessView extends JDesktopPane implements IASessionView, IALi
 			final GraphPanel graph = new GraphPanel(me,instance);
 			graphPanel = graph;
 
-			instance.scheduleStep(new IComponentStep()
+			instance.scheduleStep(new IComponentStep<Void>()
 			{
 				@Override
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					Map<String, MActivity> allActivities = ((BpmnInterpreter) ia).getModelElement().getAllActivities();
 					for (final MActivity activity : allActivities.values())
@@ -77,7 +77,7 @@ public class ASubProcessView extends JDesktopPane implements IASessionView, IALi
 							tasks.put(activity.getName(), taskColl);
 						}
 					};
-					return new Object();
+					return IFuture.DONE;
 				}
 			});
 
