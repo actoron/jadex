@@ -381,7 +381,7 @@ public class ManagerAgent extends MicroAgent {
 			this.oldConsumedWPs = oldConsumedWPs;
 		}
 
-		public Object execute(IInternalAccess ia) {
+		public IFuture<Void> execute(IInternalAccess ia) {
 			boolean consumed = false;
 
 			for (String taskId : oldConsumedWPs.keySet()) {
@@ -402,7 +402,7 @@ public class ManagerAgent extends MicroAgent {
 				finishRun();
 			}
 
-			return consumed;
+			return IFuture.DONE;
 		}
 	}
 

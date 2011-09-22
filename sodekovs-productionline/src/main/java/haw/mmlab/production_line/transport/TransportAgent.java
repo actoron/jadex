@@ -392,10 +392,6 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	 * @return The role to process the workpiece or <code>null</code>.
 	 */
 	private Role getMatchingRole(Workpiece workpiece, String source) {
-		if (id.equals("Transport27")) {
-			System.out.println("break here");
-		}
-
 		for (Role role : assignedRoles) {
 			Condition preCond = role.getPrecondition();
 			if (taskMap.get(preCond.getTaskId()) != null && taskMap.get(preCond.getTaskId()).equals(workpiece.getTask())) {

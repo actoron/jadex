@@ -125,10 +125,6 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 	 * @return <code>true</code> if the workpiece could be processed else <code>false</code>
 	 */
 	public boolean receiveWorkpiece(final Workpiece workpiece, String agentId) {
-		if (agentId.equals("Transport18") && this.id.equals("Robot3")) {
-			System.out.println("break here!");
-		}
-
 		if (mainState == MainState.RUNNING_IDLE && this.workpiece == null) {
 			final Role role = getMatchingRole(workpiece, agentId);
 			if (role != null) {
@@ -145,7 +141,9 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 						public IFuture<Void> execute(IInternalAccess ia) {
 							setWorkpiece(null);
 							setMainState(MainState.RUNNING_IDLE);
-							return buffer.enqueue(new BufferElement(workpiece, role));
+							buffer.enqueue(new BufferElement(workpiece, role));
+
+							return IFuture.DONE;
 						}
 					});
 
@@ -210,7 +208,8 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 			if (element != null) {
 				sendWorkpiece(element, ia);
 			} else {
-				waitFor(200, this);
+				// waitFor(200, this);
+				waitForTick(this);
 			}
 
 			return IFuture.DONE;
@@ -255,7 +254,8 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 										buffer.enqueue(buffer.dequeue());
 									}
 
-									waitFor(200, SendWorkpieceStep.this);
+									// waitFor(200, SendWorkpieceStep.this);
+									waitForTick(SendWorkpieceStep.this);
 								}
 							});
 						}
