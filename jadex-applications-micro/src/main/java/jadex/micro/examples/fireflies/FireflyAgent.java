@@ -5,6 +5,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IFilter;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
@@ -48,12 +49,12 @@ public class FireflyAgent extends MicroAgent
 			{
 				final ContinuousSpace2D space = (ContinuousSpace2D)result;
 				
-				IComponentStep step = new IComponentStep()
+				IComponentStep step = new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						if(space==null)
-							return null;
+							return IFuture.DONE;
 						
 						ISpaceObject avatar = space.getAvatar(getComponentDescription());
 						IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
@@ -125,7 +126,7 @@ public class FireflyAgent extends MicroAgent
 						space.performSpaceAction("move", params, null);
 						
 						waitForTick(this);
-						return null;
+						return IFuture.DONE;
 					}
 					
 					public String toString()

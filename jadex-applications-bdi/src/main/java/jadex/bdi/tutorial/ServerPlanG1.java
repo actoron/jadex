@@ -7,6 +7,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
 import java.io.IOException;
@@ -105,16 +106,16 @@ public class ServerPlanG1 extends Plan	implements Runnable
 			while(true)
 			{
 				final Socket	client	= server.accept();
-				getExternalAccess().scheduleStep(new IComponentStep()
+				getExternalAccess().scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("translate")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
 						IGoal goal = scope.getGoalbase().createGoal("translate");
 						goal.getParameter("client").setValue(client);
 						scope.getGoalbase().dispatchTopLevelGoal(goal);
-						return null;
+						return IFuture.DONE;
 					}
 				});
 			}

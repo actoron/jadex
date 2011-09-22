@@ -87,14 +87,14 @@ public abstract class ReceiveHandler
 									final Object[] packet = receive();
 									if(packet!=null)
 									{
-										agent.getMicroAgent().scheduleStep(new IComponentStep()
+										agent.getMicroAgent().scheduleStep(new IComponentStep<Void>()
 										{
-											public Object execute(IInternalAccess ia)
+											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												AwarenessInfo info = (AwarenessInfo)DiscoveryState.decodeObject((byte[])packet[2], agent.getMicroAgent().getModel().getClassLoader());
 //												System.out.println("received info: "+info);
 												handleReceivedPacket((InetAddress)packet[0], ((Integer)packet[1]).intValue(), (byte[])packet[2], info);
-												return null;
+												return IFuture.DONE;
 											}
 										});
 									}
@@ -184,10 +184,10 @@ public abstract class ReceiveHandler
 							{
 		//						System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
 								received_self = false;
-								agent.doWaitFor((long)(Math.random()*500), new IComponentStep()
+								agent.doWaitFor((long)(Math.random()*500), new IComponentStep<Void>()
 								{
 									int	cnt;
-									public Object execute(IInternalAccess ia)
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										if(!received_self)
 										{
@@ -196,7 +196,7 @@ public abstract class ReceiveHandler
 											agent.sender.send(agent.createAwarenessInfo());
 											agent.doWaitFor((long)(Math.random()*500*cnt), this);
 										}
-										return null;
+										return IFuture.DONE;
 									}
 								});
 							}

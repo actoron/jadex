@@ -185,10 +185,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	{
 		Future ret = new Future();
 		
-		component.scheduleStep(new IComponentStep()
+		component.scheduleStep(new IComponentStep<Object>()
 		{
 			@XMLClassname("getServiceProxies")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Object> execute(IInternalAccess ia)
 			{
 				RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
 				final Future fut = new Future();
@@ -282,10 +282,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	{
 		final Future ret = new Future();
 		
-		component.scheduleStep(new IComponentStep()
+		component.scheduleStep(new IComponentStep<Object>()
 		{
 			@XMLClassname("getExternalAccessProxy")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Object> execute(IInternalAccess ia)
 			{
 				final Future fut = new Future();
 				RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
@@ -412,10 +412,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public void sendMessage(final IComponentIdentifier receiver, final Object content,
 		final String callid, final long to, final Future future)
 	{
-		component.scheduleStep(new IComponentStep()
+		component.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("sendMessage")
-			public Object execute(final IInternalAccess ia)
+			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				if(content instanceof AbstractRemoteCommand)
 				{
@@ -470,9 +470,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 										{
 											public void run()
 											{
-												ia.getExternalAccess().scheduleStep(new IComponentStep()
+												ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 												{
-													public Object execute(IInternalAccess ia)
+													public IFuture<Void> execute(IInternalAccess ia)
 													{
 														if(!future.isDone())
 														{
@@ -487,7 +487,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 															}
 															);
 														}
-														return null;
+														return IFuture.DONE;
 													}
 												});
 //												System.out.println("timeout triggered: "+msg);
@@ -554,7 +554,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					}
 				}));
 				
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

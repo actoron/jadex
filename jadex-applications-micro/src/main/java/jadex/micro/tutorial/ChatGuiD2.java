@@ -15,6 +15,7 @@ import java.util.Iterator;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -47,7 +48,7 @@ public class ChatGuiD2 extends JFrame
 		panel.add(message, BorderLayout.CENTER);
 		panel.add(send, BorderLayout.EAST);
 		
-		getContentPane().add(received, BorderLayout.CENTER);
+		getContentPane().add(new JScrollPane(received), BorderLayout.CENTER);
 		getContentPane().add(panel, BorderLayout.SOUTH);
 		
 		send.addActionListener(new ActionListener()
@@ -55,9 +56,9 @@ public class ChatGuiD2 extends JFrame
 			public void actionPerformed(ActionEvent e)
 			{
 				final String text = message.getText(); 
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IFuture<Collection<IChatService>>	chatservices	= ia.getServiceContainer().getRequiredServices("chatservices");
 						chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
@@ -67,18 +68,11 @@ public class ChatGuiD2 extends JFrame
 								for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
 								{
 									IChatService cs = it.next();
-									try
-									{
-										cs.message(agent.getComponentIdentifier().getName(), text);
-									}
-									catch(Exception e)
-									{
-										System.out.println("Could not send message to: "+cs);
-									}
+									cs.message(agent.getComponentIdentifier().getName(), text);
 								}
 							}
 						});
-						return null;
+						return IFuture.DONE;
 					}
 				});
 			}

@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.bridge.service.IService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.future.DefaultResultListener;
@@ -75,12 +76,12 @@ public class ChatPanel extends JPanel
 		tf.addActionListener(al);
 		send.addActionListener(al);
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<IService>()
 		{
 			@XMLClassname("addlistener")
-			public Object execute(IInternalAccess ia)
+			public IFuture<IService> execute(IInternalAccess ia)
 			{
-				return ia.getServiceContainer().getProvidedServices(IChatService.class)[0];
+				return new Future<IService>(ia.getServiceContainer().getProvidedServices(IChatService.class)[0]);
 //				final Future ret = new Future();
 //				ia.getServiceContainer().getRequiredService("mychatservice").addResultListener(
 //					ia.createResultListener(new DelegationResultListener(ret)));
@@ -135,10 +136,10 @@ public class ChatPanel extends JPanel
 			}
 		});
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("dispose")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.addComponentListener(new TerminationAdapter()
 				{
@@ -147,7 +148,7 @@ public class ChatPanel extends JPanel
 						f.setVisible(false);
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -171,9 +172,9 @@ public class ChatPanel extends JPanel
 	 */
 	public void tell(final String name, final String text)
 	{
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.getServiceContainer().getRequiredServices("chatservices")
 					.addResultListener(new IIntermediateResultListener<Object>()
@@ -208,7 +209,7 @@ public class ChatPanel extends JPanel
 //						System.out.println("end");
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

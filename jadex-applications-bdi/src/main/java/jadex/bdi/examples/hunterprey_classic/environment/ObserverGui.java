@@ -10,6 +10,7 @@ import jadex.bdi.runtime.IBeliefListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 
@@ -96,10 +97,10 @@ public class ObserverGui	extends EnvironmentGui
 	 */
 	protected void	refreshHighscore(IBDIExternalAccess agent)
 	{
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("highscore")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				String hs = (String)bia.getBeliefbase().getBelief("highscore").getFact();
@@ -136,7 +137,7 @@ public class ObserverGui	extends EnvironmentGui
 						}
 					}
 				}
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -187,10 +188,10 @@ public class ObserverGui	extends EnvironmentGui
 	 */
 	protected void	enableGuiUpdate(final IBDIExternalAccess agent)
 	{
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("update")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				final IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.getBeliefbase().getBelief("vision").addBeliefListener(new IBeliefListener()
@@ -216,7 +217,7 @@ public class ObserverGui	extends EnvironmentGui
 						}
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		

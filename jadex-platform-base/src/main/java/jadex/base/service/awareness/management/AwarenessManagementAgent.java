@@ -487,10 +487,10 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 */
 	protected void startRemoveBehaviour()
 	{
-		scheduleStep(new IComponentStep()
+		scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("rem")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				List todel = autodelete? new ArrayList(): null;
 				synchronized(AwarenessManagementAgent.this)
@@ -526,7 +526,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				}
 				
 				doWaitFor(5000, this);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}
@@ -574,12 +574,12 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	/**
 	 *  Create a proxy using given settings.
 	 */
-	public IFuture createProxy(final IComponentIdentifier cid)
+	public IFuture<IComponentIdentifier> createProxy(final IComponentIdentifier cid)
 	{
 		final Map	args = new HashMap();
 		args.put("component", cid);
 		
-		final Future ret = new Future();
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
 		getServiceContainer().getRequiredService("cms").addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
@@ -605,9 +605,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 							if(dif!=null)
 								dif.setProxy(null);
 						}
-					})).addResultListener(createResultListener(new DelegationResultListener(ret)
+					})).addResultListener(createResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(IComponentIdentifier result)
 						{
 							DiscoveryInfo dif = getDiscoveryInfo(cid);
 							if(dif!=null)
@@ -625,9 +625,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	/**
 	 *  Delete a proxy.
 	 */
-	public IFuture deleteProxy(final DiscoveryInfo dif)
+	public IFuture<Void> deleteProxy(final DiscoveryInfo dif)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		getServiceContainer().getRequiredService("cms").addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
@@ -644,7 +644,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 						public void customResultAvailable(Object result)
 						{
 							dif.setProxy(null);
-							ret.setResult(result);
+							ret.setResult(null);
 						}
 					}));
 				}
@@ -747,9 +747,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 */
 	public IFuture<Void> setProperties(final jadex.commons.Properties props)
 	{
-		return scheduleStep(new IComponentStep()
+		return scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				try
 				{
@@ -773,7 +773,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 						excs[i]	= pexcs[i].getValue();
 					setExcludes(excs);
 					
-					return null;
+					return IFuture.DONE;
 				}
 				catch(Exception e)
 				{
@@ -788,9 +788,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 */
 	public IFuture<jadex.commons.Properties> getProperties()
 	{
-		return scheduleStep(new IComponentStep()
+		return scheduleStep(new IComponentStep<jadex.commons.Properties>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<jadex.commons.Properties> execute(IInternalAccess ia)
 			{
 				jadex.commons.Properties	props	= new jadex.commons.Properties();
 //				props.addProperty(new Property("address", address.getHostAddress()));
@@ -803,7 +803,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 					props.addProperty(new Property("include", includes.get(i).toString()));
 				for(int i=0; i<excludes.size(); i++)
 					props.addProperty(new Property("exclude", excludes.get(i).toString()));
-				return props;
+				return new Future<jadex.commons.Properties>(props);
 			}
 		});		
 	}

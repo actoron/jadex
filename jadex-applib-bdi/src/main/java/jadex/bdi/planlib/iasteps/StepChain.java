@@ -4,8 +4,10 @@ import java.util.Collection;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
-public class StepChain implements IComponentStep
+public class StepChain implements IComponentStep<Object[]>
 {
 	protected IComponentStep[] steps;
 	
@@ -19,12 +21,12 @@ public class StepChain implements IComponentStep
 		this.steps = (IComponentStep[]) steps.toArray(new IComponentStep[steps.size()]);
 	}
 	
-	public Object execute(IInternalAccess ia)
+	public IFuture<Object[]> execute(IInternalAccess ia)
 	{
 		Object[] results = new Object[steps.length];
 		for (int i = 0; i < steps.length; ++i)
 			results[i] = steps[i].execute(ia);
 		
-		return results;
+		return new Future<Object[]>(results);
 	}
 }

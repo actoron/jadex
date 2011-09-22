@@ -235,13 +235,13 @@ public class ClockPanel	extends JPanel
 						public void customResultAvailable(Object result)
 						{
 							IExternalAccess	access	= (IExternalAccess)result;
-							access.scheduleStep(new IComponentStep()
+							access.scheduleStep(new IComponentStep<Void>()
 							{
 								@XMLClassname("setDilation")
-								public Object execute(IInternalAccess ia)
+								public IFuture<Void> execute(IInternalAccess ia)
 								{
 									cs.setDilation(dil);
-									return null;
+									return IFuture.DONE;
 								}
 							});
 						}
@@ -266,13 +266,13 @@ public class ClockPanel	extends JPanel
 						public void customResultAvailable(Object result)
 						{
 							IExternalAccess	access	= (IExternalAccess)result;
-							access.scheduleStep(new IComponentStep()
+							access.scheduleStep(new IComponentStep<Void>()
 							{
 								@XMLClassname("setDilation")
-								public Object execute(IInternalAccess ia)
+								public IFuture<Void> execute(IInternalAccess ia)
 								{
 									cs.setDelta(tick);
-									return null;
+									return IFuture.DONE;
 								}
 							});
 						}
@@ -416,10 +416,10 @@ public class ClockPanel	extends JPanel
 					IExternalAccess	access	= (IExternalAccess)result;
 					final String	id	= "ClockPanel"+ClockPanel.this.hashCode()+"@"+simp.jcc.getJCCAccess().getComponentIdentifier();
 					final ISimulationService	simservice	= simp.getSimulationService();
-					access.scheduleStep(new IComponentStep()
+					access.scheduleStep(new IComponentStep<Void>()
 					{
 						@XMLClassname("addListener")
-						public Object execute(IInternalAccess ia)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							RemoteClockChangeListener	rccl	= new RemoteClockChangeListener(id, ia, rcl, simservice);
 							if(active)
@@ -437,7 +437,7 @@ public class ClockPanel	extends JPanel
 								simservice.getClockService().removeChangeListener(rccl);
 //								System.out.println("deregister listener: "+id);
 							}
-							return null;
+							return IFuture.DONE;
 						}
 					});
 				}

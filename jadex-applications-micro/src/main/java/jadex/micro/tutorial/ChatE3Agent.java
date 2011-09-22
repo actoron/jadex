@@ -61,9 +61,9 @@ public class ChatE3Agent
 			{
 				rs.register(agent.getComponentIdentifier(), nickname);
 				
-				agent.waitFor(10000, new IComponentStep()
+				agent.waitFor(10000, new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						rs.getChatters().addResultListener(new DefaultResultListener<Map<String, IComponentIdentifier>>()
 						{
@@ -72,7 +72,7 @@ public class ChatE3Agent
 								System.out.println("The current chatters: "+result);
 							}
 						});
-						return null;
+						return IFuture.DONE;
 					}
 				});
 			}

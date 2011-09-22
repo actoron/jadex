@@ -23,34 +23,30 @@ public class WorkitemSubscriptionPlan extends Plan
 			
 			public IFuture workitemRemoved(final WorkitemEvent event)
 			{
-				return ea.scheduleStep(new IComponentStep()
+				return ea.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						final Future ret = new Future();
 						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 						IGoal acRemovedGoal = bia.getGoalbase().createGoal("remove_workitem");
 						acRemovedGoal.getParameter("workitem").setValue(event.getWorkitem());
 						bia.getGoalbase().dispatchTopLevelGoal(acRemovedGoal);
-						ret.setResult(null);
-						return ret;
+						return IFuture.DONE;
 					}
 				});
 			}
 			
 			public IFuture workitemAdded(final WorkitemEvent event)
 			{
-				return ea.scheduleStep(new IComponentStep()
+				return ea.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						Future ret = new Future();
 						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 						IGoal acAddedGoal = bia.getGoalbase().createGoal("add_workitem");
 						acAddedGoal.getParameter("workitem").setValue(event.getWorkitem());
 						bia.getGoalbase().dispatchTopLevelGoal(acAddedGoal);
-						ret.setResult(null);
-						return ret;
+						return IFuture.DONE;
 					}
 				});
 			}

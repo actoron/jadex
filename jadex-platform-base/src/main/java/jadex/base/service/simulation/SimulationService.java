@@ -561,16 +561,16 @@ public class SimulationService extends BasicService implements ISimulationServic
 								if(IClock.EVENT_TYPE_TIMER_ADDED.equals(event.getType()))
 								{
 									getClockService().removeChangeListener(this);
-									access.getExternalAccess().scheduleStep(new IComponentStep()
+									access.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 									{
-										public Object execute(IInternalAccess ia)
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											// Resume execution if still executing.
 											if(MODE_NORMAL.equals(mode) && executing)
 											{
 												scheduleAdvanceClock();
 											}
-											return null;
+											return IFuture.DONE;
 										}
 									});
 								}
@@ -649,9 +649,9 @@ public class SimulationService extends BasicService implements ISimulationServic
 	public IFuture<Void> setProperties(Properties props)
 	{
 		final boolean	exe	= props.getBooleanProperty("executing");
-		return access.getExternalAccess().scheduleImmediate(new IComponentStep()
+		return access.getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				// startoninit==false means service already running
 				if(exe && !executing && !startoninit)
@@ -667,7 +667,7 @@ public class SimulationService extends BasicService implements ISimulationServic
 					startoninit	= false;
 				}
 				
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

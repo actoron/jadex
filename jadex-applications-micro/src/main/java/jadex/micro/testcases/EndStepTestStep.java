@@ -4,32 +4,27 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.component.ComponentInterpreter;
 
 /**
  *  Behavior of the component result test.
  */
-public class EndStepTestStep implements IComponentStep
+public class EndStepTestStep implements IComponentStep<Void>
 {
 	/**
 	 *  Execute the test.
 	 */
-	public Object execute(final IInternalAccess ia)
+	public IFuture<Void> execute(final IInternalAccess ia)
 	{
-		final Future	ret	= new Future();
-		
-		((ComponentInterpreter)ia).waitFor(2000, new IComponentStep()
+		return ((ComponentInterpreter)ia).waitFor(2000, new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				((ComponentInterpreter)ia).setResultValue("testresults", new Testcase(1,
 					new TestReport[]{new TestReport("#1", "Test if end step is executed", true, null)}));
-				ret.setResult(null);
-				return null;
+				return IFuture.DONE;
 			}
 		});
-		
-		return ret;
 	}
 }

@@ -4,6 +4,7 @@ import jadex.base.service.awareness.AwarenessInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.Timer;
@@ -50,10 +51,10 @@ public abstract class SendHandler
 		final String sendid = SUtil.createUniqueId(agent.getMicroAgent().getComponentIdentifier().getLocalName());
 		this.sendid = sendid;	
 		
-		agent.getMicroAgent().scheduleStep(new IComponentStep()
+		agent.getMicroAgent().scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("send")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(!agent.isKilled() && sendid.equals(getSendId()))
 				{
@@ -63,7 +64,7 @@ public abstract class SendHandler
 					if(agent.getDelay()>0)
 						agent.doWaitFor(agent.getDelay(), this);
 				}
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

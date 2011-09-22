@@ -11,6 +11,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
@@ -67,12 +68,12 @@ public class ComponentIconCache
 			// Todo: remember ongoing searches for efficiency?
 //			System.out.println("getIcon: "+type);
 			
-			exta.scheduleStep(new IComponentStep()
+			exta.scheduleStep(new IComponentStep<Void>()
 			{
 				@XMLClassname("getFactoryService")
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					final Future ret = new Future();
+					final Future<Void> ret = new Future<Void>();
 					SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type))
 						.addResultListener(new DelegationResultListener(ret));
 					return ret;

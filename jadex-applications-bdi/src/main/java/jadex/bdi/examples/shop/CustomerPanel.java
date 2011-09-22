@@ -105,39 +105,36 @@ public class CustomerPanel extends JPanel
 		    	searchbut.setEnabled(false);
 		    	
 //		    	SServiceProvider.getServices(agent.getServiceProvider(), IShop.class, remote.isSelected(), true)
-				IFuture ret = agent.scheduleStep(new IComponentStep()
+				IFuture<Collection<IShopService>> ret = agent.scheduleStep(new IComponentStep<Collection<IShopService>>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Collection<IShopService>> execute(IInternalAccess ia)
 					{
-						Future ret = new Future();
+						IFuture<Collection<IShopService>>	ret;
 						if(remote.isSelected())
 						{
-							ia.getServiceContainer().getRequiredServices("remoteshopservices")
-								.addResultListener(new DelegationResultListener(ret));
+							ret	= ia.getServiceContainer().getRequiredServices("remoteshopservices");
 						}
 						else
 						{
-							ia.getServiceContainer().getRequiredServices("localshopservices")
-								.addResultListener(new DelegationResultListener(ret));
+							ret	= ia.getServiceContainer().getRequiredServices("localshopservices");
 						}
 						return ret;
 					}
 				});
 				
-				ret.addResultListener(new SwingDefaultResultListener(CustomerPanel.this)
+				ret.addResultListener(new SwingDefaultResultListener<Collection<IShopService>>(CustomerPanel.this)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Collection<IShopService> coll)
 					{
 				    	searchbut.setEnabled(true);
 //						System.out.println("Customer search result: "+result);
-						Collection coll = (Collection)result;
 						((DefaultComboBoxModel)shopscombo.getModel()).removeAllElements();
 						shops.clear();
 						if(coll!=null && coll.size()>0)
 						{
-							for(Iterator it=coll.iterator(); it.hasNext(); )
+							for(Iterator<IShopService> it=coll.iterator(); it.hasNext(); )
 							{
-								IShopService	shop	= (IShopService)it.next();
+								IShopService	shop	= it.next();
 								shops.put(shop.getName(), shop);
 								((DefaultComboBoxModel)shopscombo.getModel()).addElement(shop.getName());
 							}
@@ -163,10 +160,10 @@ public class CustomerPanel extends JPanel
 
 		final JTextField money = new JTextField(5);
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("initialMoney")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				final Object mon = bia.getBeliefbase().getBelief("money").getFact();
@@ -177,15 +174,15 @@ public class CustomerPanel extends JPanel
 						money.setText(df.format(mon));
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		money.setEditable(false);
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("money")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.getBeliefbase().getBelief("money").addBeliefListener(new IBeliefListener()
@@ -201,7 +198,7 @@ public class CustomerPanel extends JPanel
 						});
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -240,10 +237,10 @@ public class CustomerPanel extends JPanel
 		invtable.setPreferredScrollableViewportSize(new Dimension(600, 120));
 		invpanel.add(BorderLayout.CENTER, new JScrollPane(invtable));
 
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("inventory")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.getBeliefbase().getBeliefSet("inventory").addBeliefSetListener(new IBeliefSetListener()
@@ -285,7 +282,7 @@ public class CustomerPanel extends JPanel
 						});
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -307,10 +304,10 @@ public class CustomerPanel extends JPanel
 					final String name = (String)shopmodel.getValueAt(sel, 0);
 					final Double price = (Double)shopmodel.getValueAt(sel, 1);
 					final IShopService shop = (IShopService)shops.get(shopscombo.getSelectedItem());
-					agent.scheduleStep(new IComponentStep()
+					agent.scheduleStep(new IComponentStep<Void>()
 					{
 						@XMLClassname("buy")
-						public Object execute(IInternalAccess ia)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 							final IGoal buy = bia.getGoalbase().createGoal("buy");
@@ -341,7 +338,7 @@ public class CustomerPanel extends JPanel
 								}
 							});
 							bia.getGoalbase().dispatchTopLevelGoal(buy);
-							return null;
+							return IFuture.DONE;
 						}
 					});
 				}

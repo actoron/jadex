@@ -180,9 +180,9 @@ public abstract class RemoteChangeListenerHandler
 				public void run()
 				{
 					// Local step: no XML classname required.
-					access.scheduleImmediate(new IComponentStep()
+					access.scheduleImmediate(new IComponentStep<Void>()
 					{
-						public Object execute(IInternalAccess ia)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							try
 							{
@@ -294,7 +294,7 @@ public abstract class RemoteChangeListenerHandler
 							{
 								e.printStackTrace();
 							}
-							return null;
+							return IFuture.DONE;
 						}
 					});						
 				}

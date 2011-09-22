@@ -9,12 +9,13 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class DispatchGoalStep implements IComponentStep
+public class DispatchGoalStep implements IComponentStep<Map<String, Object>>
 {
 	protected String goaltype;
 	protected Map parameters;
@@ -52,7 +53,7 @@ public class DispatchGoalStep implements IComponentStep
 		this.parameters = parameters;
 	}
 	
-	public Object execute(IInternalAccess ia)
+	public IFuture<Map<String, Object>> execute(IInternalAccess ia)
 	{
 		final IGoal goal = ((IBDIInternalAccess) ia).getGoalbase().createGoal(goaltype);
 		if (parameters != null)
@@ -64,7 +65,7 @@ public class DispatchGoalStep implements IComponentStep
 			}
 		}
 		
-		final Future goalFuture = new Future();
+		final Future<IParameter[]> goalFuture = new Future<IParameter[]>();
 		goal.addGoalListener(new IGoalListener()
 		{
 			public void goalFinished(AgentEvent ae)
@@ -78,13 +79,12 @@ public class DispatchGoalStep implements IComponentStep
 		});
 		((IBDIInternalAccess) ia).getGoalbase().dispatchTopLevelGoal(goal);
 		
-		final Future ret = new Future();
-		goalFuture.addResultListener(new DefaultResultListener()
+		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
+		goalFuture.addResultListener(new DefaultResultListener<IParameter[]>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IParameter[] params)
 			{
-				Map results = new HashMap();
-				IParameter[] params = (IParameter[]) result;
+				Map<String, Object> results = new HashMap<String, Object>();
 				for (int i = 0; i < params.length; ++i)
 				{
 //					String dir = ((IMParameter) params[i].getModelElement()).getDirection();

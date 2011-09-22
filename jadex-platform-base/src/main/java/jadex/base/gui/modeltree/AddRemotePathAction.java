@@ -152,20 +152,20 @@ public class AddRemotePathAction extends ToolTipAction
 //						final String	path	= file.getAbsolutePath();
 						final String	path	= file.getPath();
 						
-						treepanel.getExternalAccess().scheduleStep(new IComponentStep()
+						treepanel.getExternalAccess().scheduleStep(new IComponentStep<FileData>()
 						{
 							@XMLClassname("getRemoteFile")
-							public Object execute(IInternalAccess ia)
+							public IFuture<FileData> execute(IInternalAccess ia)
 							{
-								return new FileData(new File(SUtil.convertPathToRelative(path)));
+								return new Future<FileData>(new FileData(new File(SUtil.convertPathToRelative(path))));
 							}
-						}).addResultListener(new SwingDefaultResultListener()
+						}).addResultListener(new SwingDefaultResultListener<FileData>()
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(FileData result)
 							{
 								if(treepanel.getModel().getNode(result.toString())==null)
 								{
-									treepanel.addTopLevelNode((FileData)result);
+									treepanel.addTopLevelNode(result);
 								}
 								else
 								{

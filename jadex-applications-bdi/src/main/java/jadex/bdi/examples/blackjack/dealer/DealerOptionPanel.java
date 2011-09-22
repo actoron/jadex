@@ -8,6 +8,7 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -112,14 +113,14 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 					stepButton.doClick();
 					stepButton.setEnabled(false);
 				}
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("singleStep")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 						bia.getBeliefbase().getBelief("singleStepMode").setFact(b);
-						return null;
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -130,10 +131,10 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("statistics")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 						final GameStatistics stats = (GameStatistics)bia.getBeliefbase().getBelief("statistics").getFact();
@@ -156,7 +157,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 								}
 							});
 						}
-						return null;
+						return IFuture.DONE;
 					}
 				});
 //				agent.getBeliefbase().getBeliefFact("statistics").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
@@ -188,15 +189,15 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("step")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 						IInternalEvent ie = bia.getEventbase().createInternalEvent("step");
 						bia.getEventbase().dispatchInternalEvent(ie);
-						return null;
+						return IFuture.DONE;
 					}
 				});
 //				agent.createInternalEvent("step").addResultListener(new SwingDefaultResultListener(DealerOptionPanel.this)
@@ -224,14 +225,14 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 					((Integer)cardWaitSpinner.getValue()).intValue())));
 				cardWaitSpinner.setValue(value);
 				
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("stepDelay")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 						bia.getBeliefbase().getBelief("stepdelay").setFact(value);
-						return null;
+						return IFuture.DONE;
 					}
 				});
 //				agent.getBeliefbase().setBeliefFact("stepdelay", value);
@@ -247,14 +248,14 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 					((Integer)restartWaitSpinner.getValue()).intValue()));
 				restartWaitSpinner.setValue(new Integer(value));
 				
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("restartDelay")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 						bia.getBeliefbase().getBelief("restartdelay").setFact(new Integer(value));
-						return null;
+						return IFuture.DONE;
 					}
 				});
 				
@@ -294,10 +295,10 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 		this.add(progressPanel, BorderLayout.CENTER);
 		this.add(buttonPanel, BorderLayout.SOUTH);
 
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("ref")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				Boolean sel = (Boolean)bia.getBeliefbase().getBelief("singleStepMode").getFact();
@@ -306,7 +307,7 @@ public class DealerOptionPanel	extends JPanel	//	implements ActionListener, Chan
 				singleStepCheckBox.setSelected(sel.booleanValue());
 				cardWaitSpinner.setValue(sd);
 				restartWaitSpinner.setValue(rd);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		

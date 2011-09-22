@@ -60,10 +60,10 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 		IFuture	fut	= super.init(jcc, component);
 		assert fut.isDone();
 		
-		component.scheduleStep(new IComponentStep()
+		component.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("createPanels")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
 				String[] subcapnames = (String[])scope.getModel().getProperty(PROPERTY_INCLUDESUBCAPABILITIES);
@@ -72,7 +72,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 					subcapnames = (String[])scope.getSubcapabilityNames();
 				}
 				createPanels(scope, subcapnames, ret);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		

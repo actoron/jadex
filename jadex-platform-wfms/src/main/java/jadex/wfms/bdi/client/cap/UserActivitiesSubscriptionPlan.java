@@ -22,36 +22,32 @@ public class UserActivitiesSubscriptionPlan extends Plan
 		{
 			public IFuture activityRemoved(final ActivityEvent event)
 			{
-				return ea.scheduleStep(new IComponentStep()
+				return ea.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						final Future ret = new Future();
 						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 						IGoal uacRemovedGoal = bia.getGoalbase().createGoal("remove_user_activity");
 						uacRemovedGoal.getParameter("user_name").setValue(event.getUserName());
 						uacRemovedGoal.getParameter("activity").setValue(event.getActivity());
 						bia.getGoalbase().dispatchTopLevelGoal(uacRemovedGoal);
-						ret.setResult(null);
-						return ret;
+						return IFuture.DONE;
 					}
 				});
 			}
 			
 			public IFuture activityAdded(final ActivityEvent event)
 			{
-				return ea.scheduleStep(new IComponentStep()
+				return ea.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						Future ret = new Future();
 						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 						IGoal uacAddedGoal = bia.getGoalbase().createGoal("add_user_activity");
 						uacAddedGoal.getParameter("user_name").setValue(event.getUserName());
 						uacAddedGoal.getParameter("activity").setValue(event.getActivity());
 						bia.getGoalbase().dispatchTopLevelGoal(uacAddedGoal);
-						ret.setResult(null);
-						return ret;
+						return IFuture.DONE;
 					}
 				});
 			}

@@ -533,10 +533,10 @@ public class BDIViewerPanel extends JPanel
 		};
 
 		final IComponentListener lis = listener;
-		access.scheduleImmediate(new IComponentStep()
+		access.scheduleImmediate(new IComponentStep<Void>()
 		{
 			@XMLClassname("installListener")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				BDIInterpreter	interpreter	= BDIInterpreter.getInterpreter(((CapabilityFlyweight)ia).getState());
 				
@@ -546,7 +546,7 @@ public class BDIViewerPanel extends JPanel
 				lis.eventOccured(new BulkComponentChangeEvent((IComponentChangeEvent[])events.toArray(new IComponentChangeEvent[events.size()])));
 				
 				ia.addComponentListener(lis);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}
@@ -623,13 +623,13 @@ public class BDIViewerPanel extends JPanel
 	public IFuture	dispose()
 	{
 		final IComponentListener lis = listener;
-		return access.scheduleImmediate(new IComponentStep()
+		return access.scheduleImmediate(new IComponentStep<Void>()
 		{
 			@XMLClassname("removeListener")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.removeComponentListener(lis);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 

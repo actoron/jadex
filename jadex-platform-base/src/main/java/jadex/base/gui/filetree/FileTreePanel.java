@@ -373,20 +373,19 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		{
 			// Convert path to relative must be done on target platform.
 			final String[] paths	= root.getPathEntries();
-			exta.scheduleStep(new IComponentStep()
+			exta.scheduleStep(new IComponentStep<String[]>()
 			{
 				@XMLClassname("convertPathToRelative")
-				public Object execute(IInternalAccess ia)
+				public IFuture<String[]> execute(IInternalAccess ia)
 				{
 					for(int i=0; i<paths.length; i++)
 						paths[i]	= SUtil.convertPathToRelative(paths[i]);
-					return paths;
+					return new Future<String[]>(paths);
 				}
-			}).addResultListener(new SwingDelegationResultListener(rootdone)
+			}).addResultListener(new SwingDelegationResultListener<String[]>(rootdone)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(String[] paths)
 				{
-					String[]	paths	= (String[])result;
 					mep.setRootPathEntries(paths);
 					rootdone.setResult(null);
 				}
@@ -485,23 +484,22 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 						}
 						else
 						{
-							exta.scheduleStep(new IComponentStep()
+							exta.scheduleStep(new IComponentStep<FileData[]>()
 							{
 								@XMLClassname("createRootEntries")
-								public Object execute(IInternalAccess ia)
+								public IFuture<FileData[]> execute(IInternalAccess ia)
 								{
 									FileData[]	ret	= new FileData[entries.length];
 									for(int i=0; i<entries.length; i++)
 									{
 										ret[i]	= new FileData(new File(entries[i]));
 									}
-									return ret;
+									return new Future<FileData[]>(ret);
 								}
-							}).addResultListener(new SwingDelegationResultListener(rootdone)
+							}).addResultListener(new SwingDelegationResultListener<FileData[]>(rootdone)
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(FileData[] entries)
 								{
-									FileData[]	entries	= (FileData[])result;
 									for(int i=0; i<entries.length; i++)
 									{
 										ITreeNode node = factory.createNode(root, model, tree, entries[i], iconcache, filefilter, exta, factory);

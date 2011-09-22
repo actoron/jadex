@@ -303,9 +303,9 @@ public class ExternalAccess implements IExternalAccess
 	 *  @param action	Code to be executed on the component's thread.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleImmediate(final IComponentStep step)
+	public <T>	IFuture<T> scheduleImmediate(final IComponentStep<T> step)
 	{
-		final Future ret = new Future();
+		final Future<T> ret = new Future<T>();
 		
 		try
 		{
@@ -315,15 +315,8 @@ public class ExternalAccess implements IExternalAccess
 				{
 					try
 					{
-						Object	result	= step.execute(interpreter.getInternalAccess());
-						if(result instanceof IFuture)
-						{
-							((IFuture)result).addResultListener(new DelegationResultListener(ret));
-						}
-						else
-						{
-							ret.setResult(result);
-						}
+						IFuture<T>	result	= step.execute(interpreter.getInternalAccess());
+						result.addResultListener(new DelegationResultListener<T>(ret));
 					}
 					catch(Exception e)
 					{

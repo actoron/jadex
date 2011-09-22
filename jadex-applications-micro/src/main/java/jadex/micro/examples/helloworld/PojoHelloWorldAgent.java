@@ -2,6 +2,7 @@ package jadex.micro.examples.helloworld;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
@@ -39,13 +40,13 @@ public class PojoHelloWorldAgent
 	{
 //		System.out.println(agent.getArgument("welcome text"));
 		System.out.println(text);
-		agent.waitFor(2000, new IComponentStep()
+		agent.waitFor(2000, new IComponentStep<Void>()
 		{			
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				System.out.println("Good bye world.");
 				agent.killAgent();
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

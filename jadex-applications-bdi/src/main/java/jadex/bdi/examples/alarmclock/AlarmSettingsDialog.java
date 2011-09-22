@@ -9,6 +9,7 @@ import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.clock.IClockService;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -181,10 +182,10 @@ public class AlarmSettingsDialog extends JDialog
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("setTime")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 						final Date now = new Date(bia.getTime());
@@ -196,7 +197,7 @@ public class AlarmSettingsDialog extends JDialog
 								time.setValue(now);								
 							}
 						});
-						return null;
+						return IFuture.DONE;
 					}
 				});
 //				agent.getTime().addResultListener(new SwingDefaultResultListener(AlarmSettingsDialog.this)
@@ -242,10 +243,10 @@ public class AlarmSettingsDialog extends JDialog
 						final URL song = new URL("file:///"+alarmtf.getText());
 						//System.out.println("Song is: "+song);
 						
-						agent.scheduleStep(new IComponentStep()
+						agent.scheduleStep(new IComponentStep<Void>()
 						{
 							@XMLClassname("play")
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 								playing = bia.getGoalbase().createGoal("play_song");
@@ -263,7 +264,7 @@ public class AlarmSettingsDialog extends JDialog
 									}
 								});
 								bia.getGoalbase().dispatchTopLevelGoal(playing);
-								return null;
+								return IFuture.DONE;
 							}
 						});
 //						agent.createGoal("play_song").addResultListener(new DefaultResultListener()
@@ -402,9 +403,9 @@ public class AlarmSettingsDialog extends JDialog
 		if(alarm==null)
 		{
 			final Alarm al = new Alarm();
-			agent.scheduleStep(new IComponentStep()
+			agent.scheduleStep(new IComponentStep<Void>()
 			{
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 //					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
 					ia.getServiceContainer().getRequiredService("clockservice")
@@ -417,7 +418,7 @@ public class AlarmSettingsDialog extends JDialog
 							setAlarm(al);
 						}
 					});
-					return null;
+					return IFuture.DONE;
 				}
 			});
 

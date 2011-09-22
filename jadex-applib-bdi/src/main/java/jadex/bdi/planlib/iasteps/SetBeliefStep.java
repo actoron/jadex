@@ -4,12 +4,13 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBeliefbase;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class SetBeliefStep implements IComponentStep
+public class SetBeliefStep implements IComponentStep<Void>
 {
 	protected Map beliefs;
 	
@@ -34,7 +35,7 @@ public class SetBeliefStep implements IComponentStep
 		this.beliefs = beliefs;
 	}
 	
-	public Object execute(IInternalAccess ia)
+	public IFuture<Void> execute(IInternalAccess ia)
 	{
 		IBeliefbase bb = ((IBDIInternalAccess) ia).getBeliefbase();
 		for (Iterator it = beliefs.entrySet().iterator(); it.hasNext(); )
@@ -43,6 +44,6 @@ public class SetBeliefStep implements IComponentStep
 			bb.getBelief((String) entry.getKey()).setFact(entry.getValue());
 		}
 		
-		return null;
+		return IFuture.DONE;
 	}
 }

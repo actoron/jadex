@@ -2,6 +2,7 @@ package jadex.base.service.awareness.discovery;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.ArrayList;
@@ -124,10 +125,10 @@ public class LeaseTimeHandler
 	 */
 	public void startRemoveBehavior()
 	{
-		agent.getMicroAgent().scheduleStep(new IComponentStep()
+		agent.getMicroAgent().scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("rem")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				List todel = new ArrayList();
 				synchronized(LeaseTimeHandler.this)
@@ -159,7 +160,7 @@ public class LeaseTimeHandler
 				}
 				
 				doWaitFor(5000, this);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

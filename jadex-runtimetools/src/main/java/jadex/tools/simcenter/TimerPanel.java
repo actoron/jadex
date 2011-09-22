@@ -236,10 +236,10 @@ public class TimerPanel	extends JPanel
 					IExternalAccess	access	= (IExternalAccess)result;
 					final String	id	= "TimerPanel"+TimerPanel.this.hashCode()+"@"+simp.jcc.getJCCAccess().getComponentIdentifier();
 					final ISimulationService	simservice	= simp.getSimulationService();
-					access.scheduleStep(new IComponentStep()
+					access.scheduleStep(new IComponentStep<Void>()
 					{
 						@XMLClassname("addListener")
-						public Object execute(IInternalAccess ia)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							if(active)
 							{
@@ -256,7 +256,7 @@ public class TimerPanel	extends JPanel
 								simservice.getClockService().removeChangeListener(new RemoteTimerChangeListener(id, ia, rcl, simservice.getClockService()));								
 //								System.out.println("deregister listener: "+id);
 							}
-							return null;
+							return IFuture.DONE;
 						}
 					});
 				}
@@ -392,12 +392,12 @@ public class TimerPanel	extends JPanel
 		public void changeOccurred(ChangeEvent event)
 		{
 			// Use schedule step as clock runs on its own thread. 
-			instance.getExternalAccess().scheduleStep(new IComponentStep()
+			instance.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 			{
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					elementChanged("timers", TimerEntries.getTimerEntries(cs));
-					return null;
+					return IFuture.DONE;
 				}
 			});
 		}

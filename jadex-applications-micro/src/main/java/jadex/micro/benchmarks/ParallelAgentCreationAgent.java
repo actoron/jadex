@@ -10,6 +10,7 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.clock.IClockService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
@@ -54,10 +55,10 @@ public class ParallelAgentCreationAgent extends MicroAgent
 							{
 								public void resultAvailable(Object result)
 								{
-									scheduleStep(new IComponentStep()
+									scheduleStep(new IComponentStep<Void>()
 									{
 										@XMLClassname("destroy1")
-										public Object execute(IInternalAccess ia)
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 											omem[0] = (used-startmem)/1024;
@@ -76,17 +77,17 @@ public class ParallelAgentCreationAgent extends MicroAgent
 												IComponentIdentifier cid = cms.createComponentIdentifier(name, true, null);
 												cms.destroyComponent(cid);	// Kill listener already added on create.
 											}		
-											return null;
+											return IFuture.DONE;
 										}
 									});
 								}
 								
 								public void exceptionOccurred(final Exception exception)
 								{
-									scheduleStep(new IComponentStep()
+									scheduleStep(new IComponentStep<Void>()
 									{
 										@XMLClassname("destroy2")
-										public Object execute(IInternalAccess ia)
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											if(exception instanceof RuntimeException)
 												throw (RuntimeException)exception;
@@ -108,10 +109,10 @@ public class ParallelAgentCreationAgent extends MicroAgent
 							{
 								public void resultAvailable(Object result)
 								{
-									scheduleStep(new IComponentStep()
+									scheduleStep(new IComponentStep<Void>()
 									{
 										@XMLClassname("last")
-										public Object execute(IInternalAccess ia)
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											long killend = clock.getTime();
 											System.out.println("Last peer destroyed. "+num+" agents killed.");
@@ -131,17 +132,17 @@ public class ParallelAgentCreationAgent extends MicroAgent
 									
 											killAgent();
 											
-											return null;
+											return IFuture.DONE;
 										}
 									});
 								}
 								
 								public void exceptionOccurred(final Exception exception)
 								{
-									scheduleStep(new IComponentStep()
+									scheduleStep(new IComponentStep<Void>()
 									{
 										@XMLClassname("destroyMe")
-										public Object execute(IInternalAccess ia)
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											if(exception instanceof RuntimeException)
 												throw (RuntimeException)exception;

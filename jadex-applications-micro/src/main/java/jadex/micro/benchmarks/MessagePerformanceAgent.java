@@ -8,6 +8,7 @@ import jadex.bridge.MessageType;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -48,9 +49,9 @@ public class MessagePerformanceAgent extends MicroAgent
 				final IComponentIdentifier receiver = getComponentIdentifier();
 				final boolean usecodec = ((Boolean)getArgument("codec")).booleanValue();
 				
-				IComponentStep send = new IComponentStep()
+				IComponentStep send = new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						if(current==1)
 						{
@@ -95,7 +96,7 @@ public class MessagePerformanceAgent extends MicroAgent
 							waitFor(0, this);
 						}
 						
-						return null;
+						return IFuture.DONE;
 					}
 				};
 				

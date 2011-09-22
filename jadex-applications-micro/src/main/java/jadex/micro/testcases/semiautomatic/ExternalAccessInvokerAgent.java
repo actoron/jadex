@@ -9,6 +9,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.xml.annotation.XMLClassname;
 
@@ -45,13 +46,13 @@ public class ExternalAccessInvokerAgent extends MicroAgent
 								public void resultAvailable(Object result)
 								{
 									IExternalAccess ea = (IExternalAccess)result;
-									ea.scheduleStep(new IComponentStep()
+									ea.scheduleStep(new IComponentStep<Void>()
 									{
 										@XMLClassname("exe")
-										public Object execute(IInternalAccess ia)
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											System.out.println("Executing step on component: "+ia);
-											return null;
+											return IFuture.DONE;
 										}
 									});
 								}

@@ -781,7 +781,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 
 	/**
 	 *  Convert an URL to a file.
-	 *  @return null, if the URL is neither 'file:' nor 'jar:file:' URL. 
+	 *  @return null, if the URL is neither 'file:' nor 'jar:file:' URL and no path point to an existing file.
 	 */
 	public static File urlToFile(String url)
 	{
@@ -807,6 +807,14 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 			{
 			}
 			file	= new File(url.substring(9));
+		}
+		else
+		{
+			file	= new File(url);
+			if(!file.exists())
+			{
+				file	= null;
+			}
 		}
 		return file;
 	}	

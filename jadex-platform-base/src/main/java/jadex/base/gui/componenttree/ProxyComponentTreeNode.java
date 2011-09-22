@@ -179,13 +179,13 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				public void resultAvailable(Object result)
 				{
 					final IExternalAccess exta = (IExternalAccess)result;
-					exta.scheduleStep(new IComponentStep()
+					exta.scheduleStep(new IComponentStep<IComponentIdentifier>()
 					{
 						@XMLClassname("rem")
-						public Object execute(IInternalAccess ia)
+						public IFuture<IComponentIdentifier> execute(IInternalAccess ia)
 						{
 							ProxyAgent pa = (ProxyAgent)ia;
-							return new Future(pa.getRemotePlatformIdentifier());
+							return new Future<IComponentIdentifier>(pa.getRemotePlatformIdentifier());
 						}
 					}).addResultListener(new DelegationResultListener(ret)
 					{

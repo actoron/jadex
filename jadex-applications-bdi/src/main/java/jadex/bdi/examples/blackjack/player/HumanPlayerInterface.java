@@ -11,6 +11,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.commons.SimplePropertyChangeSupport;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -71,10 +72,10 @@ public class HumanPlayerInterface extends GameStateFrame
 		});
 
 		// Close window on agent death.
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("human")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.addComponentListener(new TerminationAdapter()
@@ -90,7 +91,7 @@ public class HumanPlayerInterface extends GameStateFrame
 						});
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 //		agent.addAgentListener(new IAgentListener()

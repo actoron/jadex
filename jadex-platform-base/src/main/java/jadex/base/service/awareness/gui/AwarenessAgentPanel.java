@@ -323,17 +323,17 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					else
 					{
 						final IComponentIdentifier	cid	= dif.getComponentIdentifier();
-						AwarenessAgentPanel.this.component.scheduleStep(new IComponentStep()
+						AwarenessAgentPanel.this.component.scheduleStep(new IComponentStep<IComponentIdentifier>()
 						{
 							@XMLClassname("createProxy")
-							public Object execute(IInternalAccess ia)
+							public IFuture<IComponentIdentifier> execute(IInternalAccess ia)
 							{
 								AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 								return agent.createProxy(cid);
 							}
-						}).addResultListener(new SwingDefaultResultListener(panel)
+						}).addResultListener(new SwingDefaultResultListener<IComponentIdentifier>(panel)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(IComponentIdentifier result)
 							{
 								updateDiscoveryInfos(jtdis);
 							}
@@ -364,10 +364,10 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					}
 					else
 					{
-						AwarenessAgentPanel.this.component.scheduleStep(new IComponentStep()
+						AwarenessAgentPanel.this.component.scheduleStep(new IComponentStep<Void>()
 						{
 							@XMLClassname("deleteProxy")
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 								return agent.deleteProxy(dif);
@@ -504,13 +504,13 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Get the current settings from the agent and update the GUI.
 	 */
-	protected IFuture	refreshSettings()
+	protected IFuture<Void>	refreshSettings()
 	{
 		final Future	ret	= new Future();
-		component.scheduleStep(new IComponentStep()
+		component.scheduleStep(new IComponentStep<AwarenessSettings>()
 		{
 			@XMLClassname("refreshSettings")
-			public Object execute(IInternalAccess ia)
+			public IFuture<AwarenessSettings> execute(IInternalAccess ia)
 			{
 				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 				AwarenessSettings	ret	= new AwarenessSettings();
@@ -523,13 +523,13 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				ret.autodelete	= agent.isAutoDeleteProxy();
 				ret.includes	= agent.getIncludes();
 				ret.excludes	= agent.getExcludes();
-				return ret;
+				return new Future<AwarenessSettings>(ret);
 			}
-		}).addResultListener(new SwingDelegationResultListener(ret)
+		}).addResultListener(new SwingDelegationResultListener<AwarenessSettings>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(AwarenessSettings result)
 			{
-				updateSettings((AwarenessSettings)result);
+				updateSettings(result);
 				ret.setResult(null);
 			}
 		});
@@ -541,20 +541,18 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	protected void updateDiscoveryInfos(final JTable jtdis)
 	{
-		component.scheduleStep(new IComponentStep()
+		component.scheduleStep(new IComponentStep<DiscoveryInfo[]>()
 		{
 			@XMLClassname("getDiscoveryInfos")
-			public Object execute(IInternalAccess ia)
+			public IFuture<DiscoveryInfo[]> execute(IInternalAccess ia)
 			{
 				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
-				return agent.getDiscoveryInfos();
+				return new Future<DiscoveryInfo[]>(agent.getDiscoveryInfos());
 			}
-		}).addResultListener(new SwingDefaultResultListener(jtdis)
+		}).addResultListener(new SwingDefaultResultListener<DiscoveryInfo[]>(jtdis)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(DiscoveryInfo[] ds)
 			{
-				DiscoveryInfo[] ds = (DiscoveryInfo[])result;
-				
 				int sel = jtdis.getSelectedRow();
 				DiscoveryTableModel dtm = (DiscoveryTableModel)jtdis.getModel();
 				List disinfos = dtm.getList();
@@ -598,10 +596,10 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			settings.includes	= includes.getEntries();
 			settings.excludes	= excludes.getEntries();
 			this.settings	= settings;	// todo: wait for step before setting?
-			component.scheduleStep(new IComponentStep()
+			component.scheduleStep(new IComponentStep<Void>()
 			{
 				@XMLClassname("applySettings")
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					AwarenessManagementAgent agent	= (AwarenessManagementAgent)ia;
 //					agent.setAddressInfo(settings.address, settings.port);
@@ -611,11 +609,11 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					agent.setAutoDeleteProxy(settings.autodelete);
 					agent.setIncludes(settings.includes);
 					agent.setExcludes(settings.excludes);
-					return null;
+					return IFuture.DONE;
 				}
-			}).addResultListener(new SwingDefaultResultListener(panel)
+			}).addResultListener(new SwingDefaultResultListener<Void>(panel)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Void result)
 				{
 					buapply.setEnabled(false);
 					bucancel.setEnabled(false);

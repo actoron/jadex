@@ -7,6 +7,7 @@ import jadex.bdi.runtime.IBeliefListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -30,10 +31,10 @@ public class MessageGui extends JFrame
 		final JLabel sent = new JLabel("Sent: [0]");
 		final JLabel rec = new JLabel("Received: [0]");
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("addListener")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.getBeliefbase().getBelief("sent").addBeliefListener(new IBeliefListener()
@@ -63,62 +64,9 @@ public class MessageGui extends JFrame
 						});
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
-//		agent.getBeliefbase().getBelief("sent").addResultListener(new IResultListener() 
-//		{
-//			public void resultAvailable(Object source, Object result) 
-//			{
-//				((IEABelief)result).addBeliefListener(new IBeliefListener()
-//				{
-//					public void beliefChanged(AgentEvent ae)
-//					{
-//						sent.setText("Sent: ["+ae.getValue()+"]");
-//					}
-//				});
-//			}
-//			
-//			public void exceptionOccurred(Object source, Exception exception) 
-//			{
-//			}
-//		});
-		
-//		agent.getBeliefbase().getBelief("received").addResultListener(new IResultListener() 
-//		{
-//			public void resultAvailable(Object source, Object result) 
-//			{
-//				((IEABelief)result).addBeliefListener(new IBeliefListener()
-//				{
-//					public void beliefChanged(AgentEvent ae)
-//					{
-//						rec.setText("Received: ["+ae.getValue()+"]");
-//					}
-//				});
-//			}
-//			
-//			public void exceptionOccurred(Object source, Exception exception) 
-//			{
-//			}
-//		});
-		
-//		agent.addAgentListener(new IAgentListener()
-//		{
-//			public void agentTerminating(AgentEvent ae)
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{						
-//						MessageGui.this.dispose();	
-//					}
-//				});
-//			}
-//			
-//			public void agentTerminated(AgentEvent ae)
-//			{
-//			}
-//		});
 		
 		JPanel infos = new JPanel(new GridLayout(2,1));
 		infos.add(sent);

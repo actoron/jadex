@@ -240,9 +240,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		this.variables	= new HashMap();
 		construct(model, activityhandlers, stephandlers);
 		
-		scheduleStep(new IComponentStep()
+		scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				executeInitStep2();
 				// Initialize context variables.
@@ -258,7 +258,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 						inited.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(BpmnInterpreter.this, adapter));
 					}
 				}));
-				return null;
+				return IFuture.DONE;
 			}
 		}).addResultListener(new IResultListener()
 		{
@@ -492,9 +492,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		super.startBehavior();
 		
 		// Use step in case agent is started as suspended.
-		scheduleStep(new IComponentStep()
+		scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				// Create initial thread(s). 
 				List startevents	= model.getStartActivities(pool, lane);
@@ -504,7 +504,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 					context.addThread(thread);
 				}
 				started = true;
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

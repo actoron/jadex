@@ -313,10 +313,10 @@ public class StarterPanel extends JLayeredPane
 						rawargs.put(argname, argval);
 					}
 					
-					exta.scheduleStep(new IComponentStep()
+					exta.scheduleStep(new IComponentStep<Map>()
 					{
 						@XMLClassname("start")
-						public Object execute(IInternalAccess ia)
+						public IFuture<Map> execute(IInternalAccess ia)
 						{
 							final Future ret = new Future();
 							SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -1016,10 +1016,10 @@ public class StarterPanel extends JLayeredPane
 		final Future	ret	= new Future();
 		
 		final String	name	= filename.getText();
-		exta.scheduleStep(new IComponentStep()
+		exta.scheduleStep(new IComponentStep<String>()
 		{
 			@XMLClassname("convertPath")
-			public Object execute(IInternalAccess ia)
+			public IFuture<String> execute(IInternalAccess ia)
 			{
 				Future	ret	= new Future();
 				SComponentFactory.loadModel(ia.getExternalAccess(), name)
@@ -1631,10 +1631,10 @@ public class StarterPanel extends JLayeredPane
 		final Boolean master, final Boolean daemon, final Boolean autosd, final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
 	{
 		final Future ret = new Future(); 
-		exta.scheduleStep(new IComponentStep()
+		exta.scheduleStep(new IComponentStep<IComponentManagementService>()
 		{
 			@XMLClassname("create-component")
-			public Object execute(IInternalAccess ia)
+			public IFuture<IComponentManagementService> execute(IInternalAccess ia)
 			{
 				Future ret = new Future();
 				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -1643,11 +1643,10 @@ public class StarterPanel extends JLayeredPane
 				
 				return ret;
 			}
-		}).addResultListener(new SwingDefaultResultListener(panel)
+		}).addResultListener(new SwingDefaultResultListener<IComponentManagementService>(panel)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.createComponent(name, type, new CreationInfo(configname, arguments, parco, suspend, master, daemon, autosd), killlistener)
 					.addResultListener(new IResultListener()
 				{

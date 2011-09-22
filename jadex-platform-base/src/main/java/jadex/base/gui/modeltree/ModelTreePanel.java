@@ -6,8 +6,6 @@ import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.filetree.RootNode;
-import jadex.base.gui.plugin.IControlCenter;
-import jadex.bridge.ComponentResultListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -18,8 +16,8 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.bridge.service.library.LibraryService;
-import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PopupBuilder;
@@ -144,19 +142,19 @@ public class ModelTreePanel extends FileTreePanel
 										filenames.add(filename);
 									}
 									
-									exta.scheduleStep(new IComponentStep()
+									exta.scheduleStep(new IComponentStep<Integer>()
 									{
 										@XMLClassname("findchild")
-										public Object execute(IInternalAccess ia)
+										public IFuture<Integer> execute(IInternalAccess ia)
 										{
 											int ret = LibraryService.indexOfFilename(toremove, filenames);
-											return new Integer(ret);
+											return new Future<Integer>(new Integer(ret));
 										}
-									}).addResultListener(new DefaultResultListener()
+									}).addResultListener(new DefaultResultListener<Integer>()
 									{
-										public void resultAvailable(Object result)
+										public void resultAvailable(Integer result)
 										{
-											final int res = ((Integer)result).intValue();
+											final int res = result.intValue();
 											if(res!=-1)
 											{
 												SwingUtilities.invokeLater(new Runnable()
@@ -220,10 +218,10 @@ public class ModelTreePanel extends FileTreePanel
 							final String filepath = ((IFileNode)node).getFilePath();
 							final String filename = filepath.startsWith("file:") || filepath.startsWith("jar:file:")
 								? filepath : "file:"+filepath;
-							exta.scheduleStep(new IComponentStep()
+							exta.scheduleStep(new IComponentStep<List<Exception>>()
 							{
 								@XMLClassname("fileexists")
-								public Object execute(IInternalAccess ia)
+								public IFuture<List<Exception>> execute(IInternalAccess ia)
 								{
 									List urlstrings	= new ArrayList();
 									List exceptions = new ArrayList();
@@ -256,30 +254,25 @@ public class ModelTreePanel extends FileTreePanel
 										}
 									}
 									
-									return exceptions;//new Boolean(LibraryService.indexOfFilename(filename, urlstrings)!=-1);
+									return new Future<List<Exception>>(exceptions);//new Boolean(LibraryService.indexOfFilename(filename, urlstrings)!=-1);
 								}
-							}).addResultListener(new SwingDefaultResultListener()
+							}).addResultListener(new SwingDefaultResultListener<List<Exception>>()
 							{
-								public void customResultAvailable(final Object result) 
+								public void customResultAvailable(final List<Exception> exs) 
 								{
 									ModelTreePanel.super.addNode(node);
 									
-									if(result instanceof List)
+									localexta.scheduleStep(new IComponentStep<Void>()
 									{
-										localexta.scheduleStep(new IComponentStep()
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
-											public Object execute(IInternalAccess ia)
+											for(int i=0; i<exs.size(); i++)
 											{
-												List exs = (List)result;
-												
-												for(int i=0; i<exs.size(); i++)
-												{
-													ia.getLogger().warning(exs.get(i).toString());
-												}
-												return null;
+												ia.getLogger().warning(exs.get(i).toString());
 											}
-										});
-									}
+											return IFuture.DONE;
+										}
+									});
 								};
 							});
 						}

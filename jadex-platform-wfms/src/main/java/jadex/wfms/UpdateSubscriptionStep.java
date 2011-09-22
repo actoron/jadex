@@ -4,8 +4,9 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 
-public class UpdateSubscriptionStep implements IComponentStep
+public class UpdateSubscriptionStep implements IComponentStep<Void>
 {
 	protected Object subId;
 	protected Object update;
@@ -22,12 +23,12 @@ public class UpdateSubscriptionStep implements IComponentStep
 		this.update = update;
 	}
 	
-	public Object execute(IInternalAccess ia)
+	public IFuture<Void> execute(IInternalAccess ia)
 	{
 		IGoal goal = ((IBDIInternalAccess) ia).getGoalbase().createGoal("subcap.sp_submit_update");
 		goal.getParameter("update").setValue(update);
 		goal.getParameter("subscription_id").setValue(subId);
 		((IBDIInternalAccess) ia).getGoalbase().dispatchTopLevelGoal(goal);
-		return null;
+		return IFuture.DONE;
 	}
 }

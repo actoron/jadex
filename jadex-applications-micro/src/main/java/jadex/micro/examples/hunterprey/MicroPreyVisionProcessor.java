@@ -7,6 +7,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.IPerceptProcessor;
@@ -48,10 +49,10 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 					{
 						final Space2D	space2d	= (Space2D)space;
 						final IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
-						exta.scheduleStep(new IComponentStep()
+						exta.scheduleStep(new IComponentStep<Void>()
 						{
 							@XMLClassname("food")
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								MicroPreyAgent	mp	= (MicroPreyAgent)ia;
 								ISpaceObject	nearfood	= mp.getNearestFood();
@@ -75,7 +76,7 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 									mp.setNearestFood(null);
 								}
 								
-								return null;
+								return IFuture.DONE;
 							}
 						});
 					}

@@ -189,13 +189,13 @@ public class UserInteractionTask implements ITask
 		            {
 		                pane.setValue(null);
 		                
-		                instance.scheduleStep(new IComponentStep()
+		                instance.scheduleStep(new IComponentStep<Void>()
 						{
 		                	@XMLClassname("rem")
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								ia.removeComponentListener(lis);
-								return null;
+								return IFuture.DONE;
 							}
 						});
 		            }

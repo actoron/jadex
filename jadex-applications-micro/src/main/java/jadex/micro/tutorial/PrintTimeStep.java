@@ -11,14 +11,14 @@ import jadex.commons.future.IFuture;
 /**
  *  Component step that prints the time.
  */
-public class PrintTimeStep implements IComponentStep
+public class PrintTimeStep implements IComponentStep<Void>
 {
 	/**
 	 *  Execute the command.
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
-	public Object execute(IInternalAccess ia)
+	public IFuture<Void> execute(IInternalAccess ia)
 	{
 		IFuture<IClockService> fut = ia.getServiceContainer().getRequiredService("clockservice");
 		fut.addResultListener(new DefaultResultListener<IClockService>()
@@ -29,6 +29,6 @@ public class PrintTimeStep implements IComponentStep
 				System.out.println("Time for a chat buddy: "+new Date(cs.getTime()));
 			}
 		});
-		return null;
+		return IFuture.DONE;
 	}
 }

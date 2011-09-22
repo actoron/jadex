@@ -22,9 +22,9 @@ public class LogEventSubscriptionPlan extends Plan
 		{
 			public IFuture logMessage(final IComponentChangeEvent event)
 			{
-				return ea.scheduleStep(new IComponentStep()
+				return ea.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 						IGoal ipfGoal = bia.getGoalbase().createGoal("handle_log_event");

@@ -9,6 +9,7 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -69,10 +70,10 @@ public class DealerFrame extends GameStateFrame
 				DealerFrame.this.agent.killComponent();
 			}
 		});
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("dispose")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.addComponentListener(new TerminationAdapter()
@@ -88,7 +89,7 @@ public class DealerFrame extends GameStateFrame
 						});
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 //		agent.addAgentListener(new IAgentListener()
@@ -115,10 +116,10 @@ public class DealerFrame extends GameStateFrame
 		{
 			public void run()
 			{
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("gamestate")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 						final GameState gs = (GameState)bia.getBeliefbase().getBelief("gamestate").getFact();
@@ -129,7 +130,7 @@ public class DealerFrame extends GameStateFrame
 								DealerFrame.this.setGameState(gs);
 							}
 						});
-						return null;
+						return IFuture.DONE;
 					}
 				});
 //				agent.getBeliefbase().getBeliefFact("gamestate").addResultListener(new SwingDefaultResultListener(DealerFrame.this)

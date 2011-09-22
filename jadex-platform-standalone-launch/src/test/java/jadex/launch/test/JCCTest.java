@@ -41,9 +41,9 @@ public class JCCTest extends TestCase
 		IExternalAccess	jcc	= (IExternalAccess)cms.getExternalAccess(
 			new ComponentIdentifier("jcc", platform.getComponentIdentifier())).get(sus, timeout);
 		
-		jcc.scheduleStep(new IComponentStep()
+		jcc.scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				final JCCAgent	jcca	= (JCCAgent)ia;
 				final ControlCenter	cc	= jcca.getControlCenter();
@@ -68,7 +68,7 @@ public class JCCTest extends TestCase
 	/**
 	 *  Activate all plugins recursively.
 	 */
-	protected IFuture	activatePlugins(final JCCAgent jcca, final PlatformControlCenter pcc, final IControlCenterPlugin[] plugins, final int i)
+	protected IFuture<Void>	activatePlugins(final JCCAgent jcca, final PlatformControlCenter pcc, final IControlCenterPlugin[] plugins, final int i)
 	{
 		IFuture	ret;
 		if(i<plugins.length)
@@ -80,9 +80,9 @@ public class JCCTest extends TestCase
 			{
 				public void customResultAvailable(Object result)
 				{
-					jcca.waitFor(500, new IComponentStep()
+					jcca.waitFor(500, new IComponentStep<Void>()
 					{
-						public Object execute(IInternalAccess ia)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							SwingUtilities.invokeLater(new Runnable()
 							{
@@ -91,7 +91,7 @@ public class JCCTest extends TestCase
 									activatePlugins(jcca, pcc, plugins, i+1).addResultListener(new DelegationResultListener(fut));
 								}
 							});
-							return null;
+							return IFuture.DONE;
 						}
 					});
 				}

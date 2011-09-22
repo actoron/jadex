@@ -19,12 +19,12 @@ import jadex.component.ComponentInterpreter;
 /**
  *  Behavior of the component result test.
  */
-public class ComponentResultTestStep implements IComponentStep
+public class ComponentResultTestStep implements IComponentStep<Void>
 {
 	/**
 	 *  Execute the test.
 	 */
-	public Object execute(final IInternalAccess ia)
+	public IFuture<Void> execute(final IInternalAccess ia)
 	{
 		final TestReport	tr1	= new TestReport("#1", "Default configuration.");
 		testComponentResult(null, "initial1", ia)
@@ -69,7 +69,7 @@ public class ComponentResultTestStep implements IComponentStep
 			}
 		}));
 		
-		return null;
+		return IFuture.DONE;
 	}
 
 	/**

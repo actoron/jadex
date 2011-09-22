@@ -8,6 +8,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.clock.ITimedObject;
 import jadex.bridge.service.clock.ITimer;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
@@ -163,14 +164,14 @@ public class ServicePoolManager
 					{
 						public void timeEventOccurred(long currenttime)
 						{
-							component.getExternalAccess().scheduleStep(new IComponentStep()
+							component.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 							{
-								public Object execute(IInternalAccess ia)
+								public IFuture<Void> execute(IInternalAccess ia)
 								{
 									timer	= null;
 									// Create new services when there are remaining tasks.
 									createServices();
-									return null;
+									return IFuture.DONE;
 								}
 								
 								public String toString()

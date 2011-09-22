@@ -183,14 +183,14 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 		// cannot use scheduleStep as it is not available in init phase of component.
 //		return scheduleStep(new IComponentStep()
-		return getExternalAccess().scheduleImmediate(new IComponentStep()
+		return getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				System.out.println("created: "+desc.getName());
 				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_COMPONENT, model.getFullName(), desc.getName().getName(), getComponentIdentifier(), getCreationTime(), desc);
 				notifyListeners(event);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}
@@ -204,14 +204,14 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	public IFuture	componentDestroyed(final IComponentDescription desc)
 	{
 //		System.out.println("dest: "+desc.getName());
-		return scheduleStep(new IComponentStep()
+		return scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				System.out.println("destroyed: "+desc.getName());
 				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL, TYPE_COMPONENT, desc.getModelName(), desc.getName().getName(), getComponentIdentifier(), getCreationTime(), desc);
 				notifyListeners(event);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}
@@ -342,7 +342,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param step	Code to be executed as a step of the component.
 	 *  @return The result of the step.
 	 */
-	public abstract IFuture scheduleStep(IComponentStep step);
+	public abstract <T> IFuture<T> scheduleStep(IComponentStep<T> step);
 	
 	/**
 	 *  Get a space of the component.

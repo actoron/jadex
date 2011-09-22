@@ -218,10 +218,10 @@ public class ConversationPlugin extends AbstractJCCPlugin
 			}
 		};
 		
-		getJCC().getPlatformAccess().scheduleStep(new IComponentStep()
+		getJCC().getPlatformAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("installListener")
-			public Object execute(final IInternalAccess ia)
+			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(ia.createResultListener(new DefaultResultListener(ia.getLogger())
@@ -253,7 +253,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 						});
 					}
 				}));
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		

@@ -22,10 +22,10 @@ public class STestCenter
 	 */
 	public static IFuture	isTestcase(final String model, IExternalAccess access)
 	{
-		return access.scheduleImmediate(new IComponentStep()
+		return access.scheduleImmediate(new IComponentStep<Boolean>()
 		{
 			@XMLClassname("isTestcase")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Boolean> execute(IInternalAccess ia)
 			{
 				final Future	ret	= new Future();
 				final IExternalAccess access	= ia.getExternalAccess();

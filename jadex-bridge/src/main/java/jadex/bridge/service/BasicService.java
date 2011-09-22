@@ -120,9 +120,9 @@ public class BasicService implements IInternalService
 	 *  
 	 *  todo: why is method synchronized?
 	 */
-	public synchronized IFuture isValid()
+	public synchronized IFuture<Boolean> isValid()
 	{
-		return new Future(started && !shutdowned? Boolean.TRUE: Boolean.FALSE);
+		return new Future<Boolean>(started && !shutdowned? Boolean.TRUE: Boolean.FALSE);
 	}
 	
 	/**

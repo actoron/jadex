@@ -7,7 +7,9 @@ import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.MasterSlaveSendHandler;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.IFilter;
 import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
 import java.net.DatagramPacket;
@@ -39,10 +41,10 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 				.getComponentIdentifier().getLocalName());
 			this.sendid = sendid;	
 			
-			getAgent().getMicroAgent().scheduleStep(new IComponentStep()
+			getAgent().getMicroAgent().scheduleStep(new IComponentStep<Void>()
 			{
 				@XMLClassname("send")
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					if(!getAgent().isKilled() && sendid.equals(getSendId()))
 					{
@@ -67,7 +69,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 						if(getAgent().getDelay()>0)
 							getAgent().doWaitFor(getAgent().getDelay(), this);
 					}
-					return null;
+					return IFuture.DONE;
 				}
 			});
 		}

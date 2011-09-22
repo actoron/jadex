@@ -7,6 +7,7 @@ import jadex.bdi.runtime.IInternalEvent;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -87,10 +88,10 @@ public class BlocksworldGui	extends JFrame
 		setTitle(agent.getComponentIdentifier().getName());
 		final JPanel worlds = new JPanel(new GridLayout(1, 2));
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("start")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				final Block[] blocks = (Block[])bia.getBeliefbase().getBeliefSet("blocks").getFacts();
@@ -180,10 +181,10 @@ public class BlocksworldGui	extends JFrame
 								newtable.clear();
 								// Reset list.
 								newblocks.removeAllElements();
-								agent.scheduleStep(new IComponentStep()
+								agent.scheduleStep(new IComponentStep<Void>()
 								{
 									@XMLClassname("clear")
-									public Object execute(IInternalAccess ia)
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 										final Block[]	blocks = (Block[])bia.getBeliefbase().getBeliefSet("blocks").getFacts();
@@ -198,7 +199,7 @@ public class BlocksworldGui	extends JFrame
 												addblocks.addElement(newtable);
 											}
 										});
-										return null;
+										return IFuture.DONE;
 									}
 								});
 //								agent.getBeliefbase().getBeliefSetFacts("blocks").addResultListener(new SwingDefaultResultListener(BlocksworldGui.this)
@@ -220,10 +221,10 @@ public class BlocksworldGui	extends JFrame
 						{
 							public void	actionPerformed(ActionEvent ae)
 							{
-								agent.scheduleStep(new IComponentStep()
+								agent.scheduleStep(new IComponentStep<Void>()
 								{
 									@XMLClassname("configure")
-									public Object execute(IInternalAccess ia)
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 										IGoal achieve = bia.getGoalbase().createGoal("configure");
@@ -231,7 +232,7 @@ public class BlocksworldGui	extends JFrame
 										// Hack!!! Blocks must be in state directly.
 										achieve.getParameterSet("blocks").addValues(newtable.getAllBlocks());
 										bia.getGoalbase().dispatchTopLevelGoal(achieve);
-										return null;
+										return IFuture.DONE;
 									}
 								});
 										
@@ -283,10 +284,10 @@ public class BlocksworldGui	extends JFrame
 						{
 							public void	actionPerformed(ActionEvent ae)
 							{
-								agent.scheduleStep(new IComponentStep()
+								agent.scheduleStep(new IComponentStep<Void>()
 								{
 									@XMLClassname("createBlock")
-									public Object execute(IInternalAccess ia)
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 										Table table = (Table)bia.getBeliefbase().getBelief("table").getFact();
@@ -301,7 +302,7 @@ public class BlocksworldGui	extends JFrame
 												newblocks.addElement(new Block(block.number, showcol.getBackground(), null));
 											}
 										});
-										return null;
+										return IFuture.DONE;
 									}
 								});
 										
@@ -346,15 +347,15 @@ public class BlocksworldGui	extends JFrame
 									upper.setLower(lower);
 								}
 								delblocks.removeElement(block);
-								agent.scheduleStep(new IComponentStep()
+								agent.scheduleStep(new IComponentStep<Void>()
 								{
 									@XMLClassname("deleteBlock")
-									public Object execute(IInternalAccess ia)
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 										bia.getBeliefbase().getBeliefSet("blocks").removeFact(block);
 										clear.doClick();
-										return null;
+										return IFuture.DONE;
 									}
 								});
 //								agent.getBeliefbase().removeBeliefSetFact("blocks", block);
@@ -381,14 +382,14 @@ public class BlocksworldGui	extends JFrame
 							{
 								step.setEnabled(mode.getSelectedItem().equals(StackBlocksPlan.MODE_STEP));
 								final Object sel = mode.getSelectedItem();
-								agent.scheduleStep(new IComponentStep()
+								agent.scheduleStep(new IComponentStep<Void>()
 								{
 									@XMLClassname("mode")
-									public Object execute(IInternalAccess ia)
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 										bia.getBeliefbase().getBelief("mode").setFact(sel);
-										return null;
+										return IFuture.DONE;
 									}
 								});
 //								agent.getBeliefbase().setBeliefFact("mode", mode.getSelectedItem());
@@ -398,15 +399,15 @@ public class BlocksworldGui	extends JFrame
 						{
 							public void	actionPerformed(ActionEvent ae)
 							{
-								agent.scheduleStep(new IComponentStep()
+								agent.scheduleStep(new IComponentStep<Void>()
 								{
 									@XMLClassname("step")
-									public Object execute(IInternalAccess ia)
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 										IInternalEvent ie = bia.getEventbase().createInternalEvent("step");
 										bia.getEventbase().dispatchInternalEvent(ie);
-										return null;
+										return IFuture.DONE;
 									}
 								});
 								
@@ -478,10 +479,10 @@ public class BlocksworldGui	extends JFrame
 							}
 						});
 						
-						agent.scheduleStep(new IComponentStep()
+						agent.scheduleStep(new IComponentStep<Void>()
 						{
 							@XMLClassname("disp")
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 								bia.addComponentListener(new TerminationAdapter()
@@ -497,7 +498,7 @@ public class BlocksworldGui	extends JFrame
 										});
 									}
 								});
-								return null;
+								return IFuture.DONE;
 							}
 						});
 								
@@ -520,7 +521,7 @@ public class BlocksworldGui	extends JFrame
 //						});
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		

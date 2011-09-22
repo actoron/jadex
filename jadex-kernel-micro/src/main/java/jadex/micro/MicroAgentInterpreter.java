@@ -111,9 +111,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 
 			this.container = createMyServiceContainer(args);
 						
-			addStep((new Object[]{new IComponentStep()
+			addStep((new Object[]{new IComponentStep<Void>()
 			{
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					init(model.getModelInfo(), MicroAgentInterpreter.this.config, args)
 						.addResultListener(createResultListener(new DelegationResultListener(inited)
@@ -145,7 +145,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 						}
 					}));
 					
-					return null;
+					return IFuture.DONE;
 				}
 			}, new Future()}));
 		}
@@ -257,13 +257,13 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	public void startBehavior()
 	{
 //		System.out.println("started: "+getComponentIdentifier());
-		scheduleStep(new IComponentStep()
+		scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				System.out.println("body: "+getComponentAdapter().getComponentIdentifier());
 				microagent.executeBody();
-				return null;
+				return IFuture.DONE;
 			}
 			public String toString()
 			{
@@ -487,7 +487,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public IFuture scheduleStep(final IComponentStep step)
+	public <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
 	{
 		final Future ret = new Future();
 //		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
@@ -693,16 +693,16 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		}
 		if(handler.getTimeout()>0)
 		{
-			microagent.waitFor(handler.getTimeout(), new IComponentStep()
+			microagent.waitFor(handler.getTimeout(), new IComponentStep<Void>()
 			{
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					handler.timeoutOccurred();
 					if(handler.isRemove())
 					{
 						removeMessageHandler(handler);
 					}
-					return null;
+					return IFuture.DONE;
 				}
 			});
 		}
@@ -808,7 +808,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/**
 	 *  Step to handle a message.
 	 */
-	public static class HandleMessageStep implements IComponentStep
+	public static class HandleMessageStep implements IComponentStep<Void>
 	{
 		private final IMessageAdapter message;
 
@@ -819,7 +819,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			this.message = message;
 		}
 
-		public Object execute(IInternalAccess ia)
+		public IFuture<Void> execute(IInternalAccess ia)
 		{
 			MicroAgent	microagent	= (MicroAgent)ia;
 			MicroAgentInterpreter	ip	= microagent.interpreter;
@@ -846,7 +846,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			{
 				microagent.messageArrived(Collections.unmodifiableMap(message.getParameterMap()), message.getMessageType());
 			}
-			return null;
+			return IFuture.DONE;
 		}
 
 		public String toString()

@@ -120,10 +120,10 @@ public class StarterPluginPanel extends JPanel
 				{
 					final String	path	= ((IFileNode)node).getFilePath();
 					final String	model	= spanel.lastfile;
-					jcc.getPlatformAccess().scheduleImmediate(new IComponentStep()
+					jcc.getPlatformAccess().scheduleImmediate(new IComponentStep<Boolean>()
 					{
 						@XMLClassname("matchModel")
-						public Object execute(IInternalAccess ia)
+						public IFuture<Boolean> execute(IInternalAccess ia)
 						{
 							boolean	match	= false;
 							File	pathfile	= LibraryService.urlToFile(path);
@@ -135,7 +135,7 @@ public class StarterPluginPanel extends JPanel
 							catch(IOException e)
 							{
 							}
-							return Boolean.valueOf(match);
+							return new Future(Boolean.valueOf(match));
 						}
 					}).addResultListener(new SwingDefaultResultListener()
 					{
@@ -208,31 +208,33 @@ public class StarterPluginPanel extends JPanel
 					if(e.getClickCount() == 2)
 					{
 						Object	node = mpanel.getTree().getLastSelectedPathComponent();
-						String filename = null;
-						if(node instanceof FileNode)
+						if(node instanceof IFileNode)
 						{
-							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-							filename = ((FileNode)node).getFile().getAbsolutePath();
-						}
-						else if(node instanceof RemoteFileNode)
-						{
-							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-							filename = ((RemoteFileNode)node).getRemoteFile().getPath();
-						}
-//						if(getJCC().getComponent().getPlatform().getComponentFactory().isStartable(type))
-						// todo: resultcollect = false?
-						if(filename!=null)
-						{
-							final String ftype = filename;
-							SComponentFactory.isStartable(jcc.getPlatformAccess(), filename).addResultListener(new SwingDefaultResultListener(spanel)
+							if(((IFileNode)node).isDirectory())
 							{
-								public void customResultAvailable(Object result)
+								if(mpanel.getTree().isExpanded(row))
 								{
-									if(((Boolean)result).booleanValue())
-										StarterPanel.createComponent(jcc.getPlatformAccess(), jcc, ftype, null, null, null, false, null, null, null, null, null, StarterPluginPanel.this);
-									mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+									mpanel.getTree().collapseRow(row);
 								}
-							});
+								else
+								{
+									mpanel.getTree().expandRow(row);									
+								}
+							}
+							else
+							{
+								mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+								final String filename = ((IFileNode)node).getFilePath();
+								SComponentFactory.isStartable(jcc.getPlatformAccess(), filename).addResultListener(new SwingDefaultResultListener(spanel)
+								{
+									public void customResultAvailable(Object result)
+									{
+										if(((Boolean)result).booleanValue())
+											StarterPanel.createComponent(jcc.getPlatformAccess(), jcc, filename, null, null, null, false, null, null, null, null, null, StarterPluginPanel.this);
+										mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+									}
+								});
+							}
 						}
 					}
 				}

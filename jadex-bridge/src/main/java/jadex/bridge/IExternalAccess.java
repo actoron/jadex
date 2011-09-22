@@ -3,7 +3,6 @@ package jadex.bridge;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.annotation.Reference;
-import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
 
 /**
@@ -50,7 +49,7 @@ public interface IExternalAccess //extends IRemotable
 	 *  @param step	Code to be executed as a step of the component.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleStep(IComponentStep step);
+	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step);
 	
 	/**
 	 *  Execute some code on the component's thread.
@@ -59,7 +58,7 @@ public interface IExternalAccess //extends IRemotable
 	 *  @param action	Code to be executed on the component's thread.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleImmediate(IComponentStep step);
+	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step);
 	
 	/**
 	 *  Schedule a step of the component.
@@ -68,7 +67,7 @@ public interface IExternalAccess //extends IRemotable
 	 *  @param delay The delay to wait before step should be done.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleStep(IComponentStep step, long delay);
+	public <T>	IFuture<T> scheduleStep(IComponentStep<T> step, long delay);
 	
 	/**
 	 *  Execute some code on the component's thread.
@@ -78,7 +77,7 @@ public interface IExternalAccess //extends IRemotable
 	 *  @param delay The delay to wait before step should be done.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleImmediate(IComponentStep step, long delay);
+	public <T>	IFuture<T> scheduleImmediate(IComponentStep<T> step, long delay);
 	
 	//-------- normal --------
 	

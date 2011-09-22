@@ -11,6 +11,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.clock.IClockService;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -252,10 +253,10 @@ public class GuiPanel extends JPanel
 		add(BorderLayout.CENTER, splitter);
 		add(BorderLayout.SOUTH, south);
 
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("refresh")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.getBeliefbase().getBeliefSet("orders").addBeliefSetListener(new IBeliefSetListener()
@@ -278,7 +279,7 @@ public class GuiPanel extends JPanel
 						refresh();
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 //		agent.getBeliefbase().addBeliefSetListener("orders", new IBeliefSetListener()
@@ -302,10 +303,10 @@ public class GuiPanel extends JPanel
 //			}
 //		});
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("refreshDetails")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.getBeliefbase().getBeliefSet("negotiation_reports").addBeliefSetListener(new IBeliefSetListener()
@@ -327,7 +328,7 @@ public class GuiPanel extends JPanel
 						//System.out.println("belset changed");
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 //		agent.getBeliefbase().addBeliefSetListener("negotiation_reports", new IBeliefSetListener()
@@ -364,9 +365,9 @@ public class GuiPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 //						SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
 						ia.getServiceContainer().getRequiredService("clockservice")
@@ -385,16 +386,16 @@ public class GuiPanel extends JPanel
 										Date deadline = dformat.parse(dia.deadline.getText());
 										final Order order = new Order(title, deadline, start, limit, buy, cs);
 										
-										agent.scheduleStep(new IComponentStep()
+										agent.scheduleStep(new IComponentStep<Void>()
 										{
 											@XMLClassname("add")
-											public Object execute(IInternalAccess ia)
+											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 												IGoal purchase = bia.getGoalbase().createGoal(goalname);
 												purchase.getParameter("order").setValue(order);
 												bia.getGoalbase().dispatchTopLevelGoal(purchase);
-												return null;
+												return IFuture.DONE;
 											}
 										});
 	//									agent.createGoal(goalname).addResultListener(new DefaultResultListener()
@@ -421,7 +422,7 @@ public class GuiPanel extends JPanel
 								}
 							}
 						});
-						return null;
+						return IFuture.DONE;
 					}
 				});
 				
@@ -450,10 +451,10 @@ public class GuiPanel extends JPanel
 					final Order order = (Order)orders.remove(row);
 					items.fireTableRowsDeleted(row, row);
 					
-					agent.scheduleStep(new IComponentStep()
+					agent.scheduleStep(new IComponentStep<Void>()
 					{
 						@XMLClassname("remove")
-						public Object execute(IInternalAccess ia)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 							IGoal[] goals = bia.getGoalbase().getGoals(goalname);
@@ -467,7 +468,7 @@ public class GuiPanel extends JPanel
 									break;
 								}
 							}
-							return null;
+							return IFuture.DONE;
 						}
 					});
 //					agent.getGoalbase().getGoals(goalname).addResultListener(new DefaultResultListener()
@@ -503,9 +504,9 @@ public class GuiPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 //						SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
 						ia.getServiceContainer().getRequiredService("clockservice")
@@ -538,10 +539,10 @@ public class GuiPanel extends JPanel
 											order.setDeadline(deadline);
 											items.fireTableDataChanged();
 											
-											agent.scheduleStep(new IComponentStep()
+											agent.scheduleStep(new IComponentStep<Void>()
 											{
 												@XMLClassname("drop")
-												public Object execute(IInternalAccess ia)
+												public IFuture<Void> execute(IInternalAccess ia)
 												{
 													IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 													IGoal[] goals = bia.getGoalbase().getGoals(goalname);
@@ -556,7 +557,7 @@ public class GuiPanel extends JPanel
 													IGoal goal = bia.getGoalbase().createGoal(goalname);
 													goal.getParameter("order").setValue(order);
 													bia.getGoalbase().dispatchTopLevelGoal(goal);
-													return null;
+													return IFuture.DONE;
 												}
 											});
 	//										agent.getGoalbase().getGoals(goalname).addResultListener(new DefaultResultListener()
@@ -590,7 +591,7 @@ public class GuiPanel extends JPanel
 								}
 							}
 						});
-						return null;
+						return IFuture.DONE;
 					}
 				});
 				
@@ -631,10 +632,10 @@ public class GuiPanel extends JPanel
 	 */
 	public void refresh()
 	{
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("ref")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				final Object[] aorders = bia.getBeliefbase().getBeliefSet("orders").getFacts();
@@ -652,7 +653,7 @@ public class GuiPanel extends JPanel
 						items.fireTableDataChanged();
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -685,10 +686,10 @@ public class GuiPanel extends JPanel
 		{
 			final Order order = (Order)orders.get(sel);
 			
-			agent.scheduleStep(new IComponentStep()
+			agent.scheduleStep(new IComponentStep<Void>()
 			{
 				@XMLClassname("refD")
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 					IExpression exp = bia.getExpressionbase().getExpression("search_reports");
@@ -707,7 +708,7 @@ public class GuiPanel extends JPanel
 							}
 						}
 					});
-					return null;
+					return IFuture.DONE;
 				}
 			});
 					
@@ -770,9 +771,9 @@ public class GuiPanel extends JPanel
 
 			// Add some default entry for easy testing of the gui.
 			// This order are not added to the agent (see manager.agent.xml).
-			agent.scheduleStep(new IComponentStep()
+			agent.scheduleStep(new IComponentStep<Void>()
 			{
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 //					SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
 					ia.getServiceContainer().getRequiredService("clockservice")
@@ -884,7 +885,7 @@ public class GuiPanel extends JPanel
 							});
 						}
 					});
-					return null;
+					return IFuture.DONE;
 				}
 			});
 			

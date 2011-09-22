@@ -7,6 +7,7 @@ import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.EventQueue;
@@ -69,10 +70,10 @@ public class ManagerGuiUpdatePlan extends Plan
 		// Use invoke later to avoid deadlocks,
 		// when killAgent was issued by AWT thread.
 		
-		getExternalAccess().scheduleStep(new IComponentStep()
+		getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("guidispose")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				final JFrame gui = (JFrame)bia.getBeliefbase().getBelief("GUI").getFact();
@@ -86,7 +87,7 @@ public class ManagerGuiUpdatePlan extends Plan
 						}
 					});
 				}
-				return null;
+				return IFuture.DONE;
 			}
 		});
 //		getExternalAccess().getBeliefbase().getBeliefFact("GUI").addResultListener(new SwingDefaultResultListener(gui)

@@ -156,13 +156,13 @@ public class AgentCreationAgent extends MicroAgent
 									public void resultAvailable(Object result)
 									{
 										IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
-										exta.scheduleStep(new IComponentStep()
+										exta.scheduleStep(new IComponentStep<Void>()
 										{
 											@XMLClassname("deletePeers")
-											public Object execute(IInternalAccess ia)
+											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												((AgentCreationAgent)ia).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);
-												return null;
+												return IFuture.DONE;
 											}
 										});
 									}

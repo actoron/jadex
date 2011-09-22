@@ -298,7 +298,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param time The time.
 	 *  @param run The runnable.
 	 */
-	public IFuture waitFor(final long time, final IComponentStep run)
+	public IFuture<TimerWrapper> waitFor(final long time, final IComponentStep<Void> run)
 	{
 //		longtime	= Math.max(longtime, time);
 		final Future ret = new Future();
@@ -341,7 +341,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Wait for the next tick.
 	 *  @param time The time.
 	 */
-	public IFuture waitForTick(final IComponentStep run)
+	public IFuture<TimerWrapper> waitForTick(final IComponentStep<Void> run)
 	{
 		final Future ret = new Future();
 		
@@ -595,7 +595,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public IFuture scheduleStep(IComponentStep step)
+	public <T> IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
 		return interpreter.scheduleStep(step);		
 	}
@@ -782,7 +782,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	/**
 	 *  Step to execute a wait for entry.
 	 */
-	public static class ExecuteWaitForStep implements IComponentStep
+	public static class ExecuteWaitForStep implements IComponentStep<Void>
 	{
 		//-------- attributes --------
 
@@ -790,7 +790,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		private final ITimer ts;
 
 		/** The component step. */
-		private final IComponentStep run;
+		private final IComponentStep<Void> run;
 
 		//-------- constructors--------
 
@@ -800,7 +800,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		 * @param ts an array of {@link ITimer}s
 		 * @param run the {@link IComponentStep} which is scheduled for execution
 		 */
-		public ExecuteWaitForStep(ITimer ts, IComponentStep run)
+		public ExecuteWaitForStep(ITimer ts, IComponentStep<Void> run)
 		{
 			this.ts = ts;
 			this.run = run;
@@ -812,12 +812,12 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		 * Removes the first entry from the {@link ITimer} array from the micro agents
 		 * {@link MicroAgent#timers} {@link List} and executes the {@link IComponentStep}.
 		 */
-		public Object execute(IInternalAccess ia)
+		public IFuture<Void> execute(IInternalAccess ia)
 		{
 			assert ((MicroAgent)ia).timers!=null;
 			((MicroAgent)ia).timers.remove(ts);
 			run.execute(ia);
-			return null;
+			return IFuture.DONE;
 		}
 
 		/**
@@ -832,7 +832,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		 * Returns the {@link IComponentStep} that is scheduled for execution.
 		 * @return The {@link IComponentStep} that is scheduled for execution
 		 */
-		public IComponentStep getComponentStep()
+		public IComponentStep<Void> getComponentStep()
 		{
 			return run;
 		}

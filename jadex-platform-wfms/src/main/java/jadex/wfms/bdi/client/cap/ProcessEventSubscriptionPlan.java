@@ -22,17 +22,15 @@ public class ProcessEventSubscriptionPlan extends Plan
 		{
 			public IFuture processFinished(final ProcessEvent event)
 			{
-				return ea.scheduleStep(new IComponentStep()
+				return ea.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						Future ret = new Future();
 						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 						IGoal ipfGoal = bia.getGoalbase().createGoal("handle_process_finished");
 						ipfGoal.getParameter("instance_id").setValue(event.getInstanceId());
 						bia.getGoalbase().dispatchTopLevelGoal(ipfGoal);
-						ret.setResult(null);
-						return ret;
+						return IFuture.DONE;
 					}
 				});
 			}

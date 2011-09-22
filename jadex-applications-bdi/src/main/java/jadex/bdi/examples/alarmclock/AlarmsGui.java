@@ -6,6 +6,7 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.clock.IClockService;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.jtable.ObjectTableModel;
 import jadex.xml.annotation.XMLClassname;
 
@@ -80,9 +81,9 @@ public class AlarmsGui extends JFrame
 		tadata.setColumnClass(Boolean.class, 2);
 		tadata.setColumnEditable(true, 2);
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				SServiceProvider.getService(agent.getServiceProvider(), IClockService.class)
 				ia.getServiceContainer().getRequiredService("clockservice")
@@ -184,10 +185,10 @@ public class AlarmsGui extends JFrame
 	//					{
 	//						public void run()
 	//						{
-								agent.scheduleStep(new IComponentStep()
+								agent.scheduleStep(new IComponentStep<Void>()
 								{
 									@XMLClassname("alarms")
-									public Object execute(IInternalAccess ia)
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 										final Alarm[] alarms = (Alarm[])bia.getBeliefbase().getBeliefSet("alarms").getFacts();
@@ -204,7 +205,7 @@ public class AlarmsGui extends JFrame
 												}
 											}
 										});
-										return null;
+										return IFuture.DONE;
 									}
 								});
 	//							agent.getBeliefbase().getBeliefSetFacts("alarms").addResultListener(new SwingDefaultResultListener(AlarmsGui.this)
@@ -227,7 +228,7 @@ public class AlarmsGui extends JFrame
 						pack();
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -270,14 +271,14 @@ public class AlarmsGui extends JFrame
 	{
 //		System.out.println("Adding:"+alarm);
 		alarm.addPropertyChangeListener(plis);
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("addAlarm")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.getBeliefbase().getBeliefSet("alarms").addFact(alarm);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -297,14 +298,14 @@ public class AlarmsGui extends JFrame
 	public void removeRow(final Alarm alarm)
 	{
 //		System.out.println("Removing:"+alarm);
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("removeAlarm")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.getBeliefbase().getBeliefSet("alarms").removeFact(alarm);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 //		agent.getBeliefbase().removeBeliefSetFact("alarms", alarm);

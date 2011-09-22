@@ -4,6 +4,7 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.ServiceNotFoundException;
@@ -19,6 +20,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.swing.Icon;
+
 
 /**
  * Standard meta component factory. Uses several sub factories and uses them
@@ -31,14 +34,12 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return The loaded model.
 	 */
-	public static IFuture loadModel(IExternalAccess exta, final String model)
+	public static IFuture<IModelInfo> loadModel(IExternalAccess exta, final String model)
 	{
-		final Future ret = new Future();
-		
-		exta.scheduleStep(new IComponentStep()
+		return exta.scheduleStep(new IComponentStep<IModelInfo>()
 		{
 			@XMLClassname("loadModel")
-			public Object execute(final IInternalAccess ia)
+			public IFuture<IModelInfo> execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
 				
@@ -76,9 +77,7 @@ public class SComponentFactory
 				
 				return ret;
 			}
-		}).addResultListener(new DelegationResultListener(ret));
-		
-		return ret;
+		});
 	}
 
 	/**
@@ -90,10 +89,10 @@ public class SComponentFactory
 	{
 		Future ret = new Future();
 		
-		exta.scheduleStep(new IComponentStep()
+		exta.scheduleStep(new IComponentStep<Boolean>()
 		{
 			@XMLClassname("isLoadable")
-			public Object execute(final IInternalAccess ia)
+			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
 				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -143,10 +142,10 @@ public class SComponentFactory
 	{
 		Future ret = new Future();
 		
-		exta.scheduleStep(new IComponentStep()
+		exta.scheduleStep(new IComponentStep<Boolean>()
 		{
 			@XMLClassname("isModelType")
-			public Object execute(final IInternalAccess ia)
+			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
 				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -236,10 +235,10 @@ public class SComponentFactory
 	{
 		Future ret = new Future();
 		
-		exta.scheduleStep(new IComponentStep()
+		exta.scheduleStep(new IComponentStep<Boolean>()
 		{
 			@XMLClassname("isStartable")
-			public Object execute(final IInternalAccess ia)
+			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
 				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -283,14 +282,14 @@ public class SComponentFactory
 	/**
 	 * Get a default icon for a file type.
 	 */
-	public static IFuture getFileTypeIcon(IExternalAccess exta, final String type)
+	public static IFuture<Icon> getFileTypeIcon(IExternalAccess exta, final String type)
 	{
-		Future ret = new Future();
+		Future<Icon> ret = new Future<Icon>();
 		
-		exta.scheduleStep(new IComponentStep()
+		exta.scheduleStep(new IComponentStep<Icon>()
 		{
 			@XMLClassname("getFileTypeIcon")
-			public Object execute(final IInternalAccess ia)
+			public IFuture<Icon> execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
 				SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type))
@@ -330,10 +329,10 @@ public class SComponentFactory
 	{
 		final Future ret = new Future();
 		
-		exta.scheduleStep(new IComponentStep()
+		exta.scheduleStep(new IComponentStep<Object>()
 		{
 			@XMLClassname("getProperty")
-			public Object execute(final IInternalAccess ia)
+			public IFuture<Object> execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
 				SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class)
@@ -388,14 +387,14 @@ public class SComponentFactory
 	/**
 	 * Get the file type of a model.
 	 */
-	public static IFuture getFileType(IExternalAccess exta, final String model)
+	public static IFuture<String> getFileType(IExternalAccess exta, final String model)
 	{
 		final Future ret = new Future();
 		
-		exta.scheduleStep(new IComponentStep()
+		exta.scheduleStep(new IComponentStep<String>()
 		{
 			@XMLClassname("getFileType")
-			public Object execute(final IInternalAccess ia)
+			public IFuture<String> execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
 				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)

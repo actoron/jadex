@@ -41,14 +41,14 @@ public class BeliefGetter extends BasicService implements IBeliefGetter
 	public IFuture getFact(final String belname)
 	{
 		final Future ret = new Future();
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("getter")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				ret.setResult(bia.getBeliefbase().getBelief(belname).getFact());
-				return null;
+				return IFuture.DONE;
 			}
 		});
 //		agent.getBeliefbase().getBeliefFact(belname).addResultListener(new DelegationResultListener(ret));

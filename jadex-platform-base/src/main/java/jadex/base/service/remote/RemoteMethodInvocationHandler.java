@@ -110,13 +110,13 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			if(finalize.equals(method))
 			{
 	//			System.out.println("Finalize called on: "+proxy);
-				rsms.component.scheduleStep(new IComponentStep()
+				rsms.component.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("fin")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						rsms.getRemoteReferenceModule().decProxyCount(pr.getRemoteReference());
-						return null;
+						return IFuture.DONE;
 					}
 				});
 				return null;

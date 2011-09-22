@@ -1,7 +1,10 @@
 package jadex.micro.examples.mandelbrot;
 
+import javax.swing.plaf.InternalFrameUI;
+
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -47,9 +50,9 @@ public class CalculateAgent extends MicroAgent
 	public void executeBody()
 	{
 		final long delay = ((Number)getArgument("delay")).longValue();
-		IComponentStep step = new IComponentStep()
+		IComponentStep step = new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(!isHadJob())
 				{
@@ -58,7 +61,7 @@ public class CalculateAgent extends MicroAgent
 				}
 				setHadJob(false);
 				waitFor(delay, this);
-				return null;
+				return IFuture.DONE;
 			}
 		};
 		if(delay>0)

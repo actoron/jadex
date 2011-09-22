@@ -124,10 +124,10 @@ public class ClientSimulator
 							{
 								simWindow = new SimulationWindow(scenarios, libService);
 								
-								agent.scheduleStep(new IComponentStep()
+								agent.scheduleStep(new IComponentStep<Void>()
 								{
 									@XMLClassname("dispose") 
-									public Object execute(IInternalAccess ia)
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										ia.addComponentListener(new TerminationAdapter()
 										{
@@ -142,7 +142,7 @@ public class ClientSimulator
 												});
 											};
 										});
-										return null;
+										return IFuture.DONE;
 									}
 								});
 								

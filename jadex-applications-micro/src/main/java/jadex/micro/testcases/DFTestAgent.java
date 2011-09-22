@@ -167,14 +167,14 @@ public class DFTestAgent extends MicroAgent
 		
 		sendMessage(hlefMessage, SFipa.FIPA_MESSAGE_TYPE);
 		
-		waitFor(1000, new IComponentStep()
+		waitFor(1000, new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				// Set test failure and kill agent.
 				tr.setFailed("No message received.");
 				killAgent();
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 /**
@@ -56,10 +57,10 @@ public class ComponentResultListener<E> implements IResultListener<E>
 	{
 		if(access!=null)
 		{
-			access.scheduleStep(new IComponentStep()
+			access.scheduleStep(new IComponentStep<Void>()
 			{
 				public static final String XML_CLASSNAME = "res";
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					try
 					{
@@ -69,11 +70,11 @@ public class ComponentResultListener<E> implements IResultListener<E>
 					{
 						// always return null to ensure that listener is not invoked twice
 					}
-					return null;
+					return IFuture.DONE;
 				}
-			}).addResultListener(new IResultListener()
+			}).addResultListener(new IResultListener<Void>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Void result)
 				{
 				}
 				public void exceptionOccurred(Exception exception)
@@ -121,10 +122,10 @@ public class ComponentResultListener<E> implements IResultListener<E>
 	{
 		if(access!=null)
 		{
-			access.scheduleStep(new IComponentStep()
+			access.scheduleStep(new IComponentStep<Void>()
 			{
 				public static final String XML_CLASSNAME = "ex";
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					try
 					{
@@ -134,7 +135,7 @@ public class ComponentResultListener<E> implements IResultListener<E>
 					{
 						// always return null to ensure that listener is not invoked twice
 					}
-					return null;
+					return IFuture.DONE;
 				}
 			}).addResultListener(new IResultListener()
 			{

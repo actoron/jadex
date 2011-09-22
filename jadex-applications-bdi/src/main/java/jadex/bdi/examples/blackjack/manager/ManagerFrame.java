@@ -124,10 +124,10 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		dealerpan = new JPanel();
 		dealerpan.setBorder(BorderFactory.createTitledBorder(" Dealer "));
 		dealerpan.setBackground(Color.WHITE);
-		access.scheduleStep(new IComponentStep()
+		access.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("dealerpan")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IFuture<IComponentManagementService>	cms	= ia.getServiceContainer().getRequiredService("cms");
 //				if(cms.isDone() && cms.get(null)==null)
@@ -140,7 +140,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						dealertf.setText(dealeraid.getName());
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -149,10 +149,10 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				access.scheduleStep(new IComponentStep()
+				access.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("dealertf")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ia.getServiceContainer().getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
@@ -162,7 +162,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 								dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
 							}
 						});
-						return null;
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -201,10 +201,10 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		buttonpan.add(localDealerButton);
 		buttonpan.add(exitButton);
 
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("dispose")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.addComponentListener(new TerminationAdapter()
@@ -221,7 +221,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						});
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 //		agent.addAgentListener(new IAgentListener()
@@ -268,10 +268,10 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //			{
 				// create new Player Panels with the properties as specified in the Manager.xml
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("players")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				final Player[] players = (Player[])bia.getBeliefbase().getBeliefSet("players").getFacts();
@@ -293,7 +293,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 						getContentPane().validate();
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 //				access.getBeliefbase().getBeliefSetFacts("players").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
@@ -385,10 +385,10 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			if(n==JOptionPane.YES_OPTION)
 			{
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("close")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ia.getServiceContainer().getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
@@ -399,7 +399,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 							}
 						});
 
-						return null;
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -484,10 +484,10 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	 */
 	protected void startLocalDealer()
 	{
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("startDealer")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				final IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				final IGoal start = bia.getGoalbase().createGoal("cms_create_component");
@@ -509,7 +509,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					}
 				});
 				bia.getGoalbase().dispatchTopLevelGoal(start);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -587,10 +587,10 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //			}
 //		});
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("destroy")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				IComponentIdentifier dealer = (IComponentIdentifier)bia.getBeliefbase().getBelief("localDealerAID").getFact();
@@ -601,7 +601,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					bia.getGoalbase().dispatchTopLevelGoal(destroy);
 					bia.getBeliefbase().getBelief("localDealerAID").setFact(null);
 				}
-				return null;
+				return IFuture.DONE;
 			}
 		});
 //		agent.getBeliefbase().getBeliefFact("localDealerAID").addResultListener(new DefaultResultListener()
@@ -800,10 +800,10 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			// try to start player-Agent.
 			
 //			agent.getLogger().info("starting playerAgent: "+player.getName());
-			agent.scheduleStep(new IComponentStep()
+			agent.scheduleStep(new IComponentStep<Void>()
 			{
 				@XMLClassname("start")
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					try
 					{
@@ -849,7 +849,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					catch(Exception e)
 					{
 					}
-					return null;
+					return IFuture.DONE;
 				}
 			});
 //			agent.getGoalbase().createGoal("cms_create_component").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
@@ -900,16 +900,16 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		 */
 		protected void stopPlayer(final Player player)
 		{
-			agent.scheduleStep(new IComponentStep()
+			agent.scheduleStep(new IComponentStep<Void>()
 			{
 				@XMLClassname("stop")
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 					IGoal destroy = bia.getGoalbase().createGoal("cms_destroy_component");
 					destroy.getParameter("componentidentifier").setValue(player.getAgentID());
 					bia.getGoalbase().dispatchTopLevelGoal(destroy);
-					return null;
+					return IFuture.DONE;
 				}
 			});
 //			agent.getGoalbase().createGoal("cms_destroy_component").addResultListener(new DefaultResultListener()

@@ -500,22 +500,21 @@ public class TestCenterPanel extends JSplitPanel
 		final Future ret	= new Future();
 		
 		final String[]	entries	= teststable.getEntries();
-		plugin.getJCC().getPlatformAccess().scheduleStep(new IComponentStep()
+		plugin.getJCC().getPlatformAccess().scheduleStep(new IComponentStep<String[]>()
 		{
 			@XMLClassname("convertPathToRelative")
-			public Object execute(IInternalAccess ia)
+			public IFuture<String[]> execute(IInternalAccess ia)
 			{
 				for(int i=0; i<entries.length; i++)
 				{
 					entries[i]	= SUtil.convertPathToRelative(entries[i]);
 				}
-				return entries;
+				return new Future<String[]>(entries);
 			}
-		}).addResultListener(new SwingDelegationResultListener(ret)
+		}).addResultListener(new SwingDelegationResultListener<String[]>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(String[] entries)
 			{
-				String[]	entries	= (String[])result;
 				Properties	props	= new Properties();
 				for(int i=0; i<entries.length; i++)
 				{

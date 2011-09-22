@@ -56,15 +56,15 @@ public class GetExternalAccessPlan extends Plan
 				gotexta[0]	= true;
 //				System.out.println("Got external access: "+exta);
 				
-				exta.scheduleStep(new IComponentStep()
+				exta.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("test")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 						Object fact = bia.getBeliefbase().getBelief("test").getFact();
 						gotexta[1]	= "testfact".equals(fact);
-						return null;
+						return IFuture.DONE;
 					}
 				}).addResultListener(new DelegationResultListener(done));
 			}

@@ -34,18 +34,18 @@ public class ChatGuiD3 extends ChatGuiD2
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						IFuture<Collection<IChatService>>	chatservices	= ia.getServiceContainer().getRequiredServices("chatservices");
-						chatservices.addResultListener(new DefaultResultListener<Collection<IChatService>>()
+						IFuture<Collection<IExtendedChatService>>	chatservices	= ia.getServiceContainer().getRequiredServices("chatservices");
+						chatservices.addResultListener(new DefaultResultListener<Collection<IExtendedChatService>>()
 						{
-							public void resultAvailable(Collection<IChatService> result)
+							public void resultAvailable(Collection<IExtendedChatService> result)
 							{
-								for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+								for(Iterator<IExtendedChatService> it=result.iterator(); it.hasNext(); )
 								{
-									IExtendedChatService cs = (IExtendedChatService)it.next();
+									IExtendedChatService cs = it.next();
 									cs.getUserProfile().addResultListener(new DefaultResultListener<UserProfileD3>()
 									{
 										public void resultAvailable(UserProfileD3 result)
@@ -56,7 +56,7 @@ public class ChatGuiD3 extends ChatGuiD2
 								}
 							}
 						});
-						return null;
+						return IFuture.DONE;
 					}
 				});
 			}

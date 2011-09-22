@@ -49,9 +49,9 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 		this.watchdogs	= new LinkedHashMap();
 		final long	delay	= ((Number)getArgument("delay")).longValue();
 		
-		scheduleStep(new IComponentStep()
+		scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				final IComponentStep	step	= this;
 				Object[]	keys	= watchdogs.keySet().toArray();
@@ -115,7 +115,7 @@ public class WatchdogAgent	extends MicroAgent	implements IWatchdogService
 					});
 				}
 				
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		

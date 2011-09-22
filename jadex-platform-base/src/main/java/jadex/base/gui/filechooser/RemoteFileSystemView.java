@@ -74,10 +74,10 @@ public class RemoteFileSystemView extends FileSystemView
 	{
 		final Future	ret	= new Future();
 		
-		exta.scheduleStep(new IComponentStep()
+		exta.scheduleStep(new IComponentStep<Object[]>()
 		{
 			@XMLClassname("init")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Object[]> execute(IInternalAccess ia)
 			{
 				Object[]	ret	= new Object[4];
 				FileSystemView view = FileSystemView.getFileSystemView();
@@ -92,13 +92,12 @@ public class RemoteFileSystemView extends FileSystemView
 				}
 				ret[3]	= new FileData(new File(path));					
 				
-				return ret;
+				return new Future<Object[]>(ret);
 			}
-		}).addResultListener(new SwingDelegationResultListener(ret)
+		}).addResultListener(new SwingDelegationResultListener<Object[]>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Object[] res)
 			{
-				Object[]	res	= (Object[])result;
 				FileData[] remfiles = (FileData[])res[0];
 				File[] files = FileData.convertToFiles(remfiles);
 				children.put("roots", files);
@@ -438,21 +437,20 @@ public class RemoteFileSystemView extends FileSystemView
 		
 		if(ret==null)
 		{
-			exta.scheduleStep(new IComponentStep()
+			exta.scheduleStep(new IComponentStep<FileData[]>()
 			{
 				@XMLClassname("getFiles")
-				public Object execute(IInternalAccess ia)
+				public IFuture<FileData[]> execute(IInternalAccess ia)
 				{
 //					FileSystemView view = FileSystemView.getFileSystemView();
 //					File[] roots = view.getRoots();
 					File[] roots = File.listRoots();
-					return FileData.convertToRemoteFiles(roots);
+					return new Future<FileData[]>(FileData.convertToRemoteFiles(roots));
 				}
-			}).addResultListener(new SwingDefaultResultListener()
+			}).addResultListener(new SwingDefaultResultListener<FileData[]>()
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(FileData[] remfiles)
 				{
-					FileData[] remfiles = (FileData[])result;
 					File[] files = FileData.convertToFiles(remfiles);
 					children.put("roots", files);
 //					System.out.println("roots: "+SUtil.arrayToString(files));
@@ -476,22 +474,21 @@ public class RemoteFileSystemView extends FileSystemView
 	{
 		if(homedir==null)
 		{
-			exta.scheduleStep(new IComponentStep()
+			exta.scheduleStep(new IComponentStep<FileData>()
 			{
 				@XMLClassname("getHomeDirectory")
-				public Object execute(IInternalAccess ia)
+				public IFuture<FileData> execute(IInternalAccess ia)
 				{
 					FileSystemView view = FileSystemView.getFileSystemView();
 					File ret = view.getHomeDirectory();
-					return ret!=null? new FileData(ret): null;
+					return new Future<FileData>(ret!=null? new FileData(ret): null);
 				}
-			}).addResultListener(new SwingDefaultResultListener()
+			}).addResultListener(new SwingDefaultResultListener<FileData>()
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(FileData file)
 				{
-					if(result!=null)
+					if(file!=null)
 					{
-						FileData file = (FileData)result;
 						homedir = new RemoteFile(file);
 					}
 					if(chooser!=null)
@@ -511,27 +508,23 @@ public class RemoteFileSystemView extends FileSystemView
 	{
 		if(currentdir==null)
 		{
-			exta.scheduleStep(new IComponentStep()
+			exta.scheduleStep(new IComponentStep<FileData>()
 			{
 				@XMLClassname("getCurrentDirectory")
-				public Object execute(IInternalAccess ia)
+				public IFuture<FileData> execute(IInternalAccess ia)
 				{
 					String	path	= new File(".").getAbsolutePath();
 					if(path.endsWith("."))
 					{
 						path	= path.substring(0, path.length()-1);
 					}
-					return new FileData(new File(path));					
+					return new Future<FileData>(new FileData(new File(path)));					
 				}
-			}).addResultListener(new SwingDefaultResultListener()
+			}).addResultListener(new SwingDefaultResultListener<FileData>()
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(FileData file)
 				{
-					if(result!=null)
-					{
-						FileData file = (FileData)result;
-						currentdir = new RemoteFile(file);
-					}
+					currentdir = new RemoteFile(file);
 					if(chooser!=null)
 						chooser.setCurrentDirectory(currentdir);
 					System.out.println("currentdir: "+currentdir);
@@ -553,22 +546,21 @@ public class RemoteFileSystemView extends FileSystemView
 	{
 		if(defaultdir==null)
 		{
-			exta.scheduleStep(new IComponentStep()
+			exta.scheduleStep(new IComponentStep<FileData>()
 			{
 				@XMLClassname("getDefaultDirectory")
-				public Object execute(IInternalAccess ia)
+				public IFuture<FileData> execute(IInternalAccess ia)
 				{
 					FileSystemView view = FileSystemView.getFileSystemView();
 					File ret = view.getDefaultDirectory();
-					return ret!=null? new FileData(ret): null;
+					return new Future<FileData>(ret!=null? new FileData(ret): null);
 				}
-			}).addResultListener(new SwingDefaultResultListener()
+			}).addResultListener(new SwingDefaultResultListener<FileData>()
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(FileData file)
 				{
-					if(result!=null)
+					if(file!=null)
 					{
-						FileData file = (FileData)result;
 						defaultdir = new RemoteFile(file);
 					}
 					if(chooser!=null)
@@ -657,10 +649,10 @@ public class RemoteFileSystemView extends FileSystemView
 		if(ret==null)
 		{
 			final FileData mydir = new FileData(dir);
-			exta.scheduleStep(new IComponentStep()
+			exta.scheduleStep(new IComponentStep<FileData[]>()
 			{
 				@XMLClassname("getFiles")
-				public Object execute(IInternalAccess ia)
+				public IFuture<FileData[]> execute(IInternalAccess ia)
 				{
 					File dir = new File(mydir.getPath());
 					File[] files;
@@ -675,13 +667,12 @@ public class RemoteFileSystemView extends FileSystemView
 //						System.out.println("file does not exist: "+dir);
 						files = new File[0];
 					}
-					return FileData.convertToRemoteFiles(files);
+					return new Future<FileData[]>(FileData.convertToRemoteFiles(files));
 				}
-			}).addResultListener(new SwingDefaultResultListener()
+			}).addResultListener(new SwingDefaultResultListener<FileData[]>()
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(FileData[] remfiles)
 				{
-					FileData[] remfiles = (FileData[])result;
 					RemoteFile[] files = FileData.convertToFiles(remfiles);
 //					System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
 					children.put(dir.getAbsolutePath(), files);
@@ -720,22 +711,21 @@ public class RemoteFileSystemView extends FileSystemView
 		if(parent==null)
 		{
 			final String path = dir.getAbsolutePath();
-			exta.scheduleStep(new IComponentStep()
+			exta.scheduleStep(new IComponentStep<FileData>()
 			{
 				@XMLClassname("getParentDirectory")
-				public Object execute(IInternalAccess ia)
+				public IFuture<FileData> execute(IInternalAccess ia)
 				{
 					FileSystemView view = FileSystemView.getFileSystemView();
 					File parent = view.getParentDirectory(new File(path)); // todo: useFileHandling
-					return parent!=null? new FileData(parent): null;
+					return new Future<FileData>(parent!=null? new FileData(parent): null);
 				}
-			}).addResultListener(new SwingDefaultResultListener()
+			}).addResultListener(new SwingDefaultResultListener<FileData>()
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(FileData remfile)
 				{
-					if(result!=null)
+					if(remfile!=null)
 					{
-						FileData remfile = (FileData)result;
 						RemoteFile parent = new RemoteFile(remfile);
 						parents.put(dir.getAbsolutePath(), parent);
 						if(chooser!=null)

@@ -56,23 +56,21 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		IFuture	fut	= super.init(jcc, component);
 		assert fut.isDone();
 		
-		component.scheduleStep(new IComponentStep()
+		component.scheduleStep(new IComponentStep<List>()
 		{
 			@XMLClassname("Step")
 //			public static final String XML_CLASSNAME = "Step"; 
 			
-			public Object execute(final IInternalAccess ia)
+			public IFuture<List> execute(final IInternalAccess ia)
 			{
-				final Future ret = new Future();
-				SServiceProvider.getDeclaredServices(ia.getServiceContainer())
-					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+				IFuture<List> ret = SServiceProvider.getDeclaredServices(ia.getServiceContainer());
 				return ret;
 			}
-		}).addResultListener(new IResultListener()
+		}).addResultListener(new IResultListener<List>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(List result)
 			{
-				createPanels(component, (List)result).addResultListener(new DelegationResultListener(ret));
+				createPanels(component, result).addResultListener(new DelegationResultListener(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception)

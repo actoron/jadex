@@ -33,9 +33,9 @@ public class ImpAgent extends MicroAgent
 	{
 		final Grid2D space = (Grid2D)getProperty("space");
 		
-		IComponentStep com = new IComponentStep()
+		IComponentStep com = new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				final ISpaceObject avatar = space.getAvatar(getComponentDescription());
 				IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
@@ -89,7 +89,7 @@ public class ImpAgent extends MicroAgent
 				
 				waitForTick(this);
 				
-				return null;
+				return IFuture.DONE;
 			}
 			
 			public String toString()

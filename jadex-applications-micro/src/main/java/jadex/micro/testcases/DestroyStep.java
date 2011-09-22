@@ -2,18 +2,20 @@ package jadex.micro.testcases;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.IFilter;
+import jadex.commons.future.IFuture;
 
 /**
  *  Behavior of the component result test.
  */
-public class DestroyStep implements IComponentStep
+public class DestroyStep implements IComponentStep<Void>
 {
 	/**
 	 *  Execute the test.
 	 */
-	public Object execute(final IInternalAccess ia)
+	public IFuture<Void> execute(final IInternalAccess ia)
 	{
 		ia.killComponent();
-		return null;
+		return IFuture.DONE;
 	}
 }

@@ -22,34 +22,30 @@ public class ActivitySubscriptionPlan extends Plan
 		{
 			public IFuture activityRemoved(final ActivityEvent event)
 			{
-				return ea.scheduleStep(new IComponentStep()
+				return ea.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						final Future ret = new Future();
 						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 						IGoal acRemovedGoal = bia.getGoalbase().createGoal("remove_activity");
 						acRemovedGoal.getParameter("activity").setValue(event.getActivity());
 						bia.getGoalbase().dispatchTopLevelGoal(acRemovedGoal);
-						ret.setResult(null);
-						return ret;
+						return IFuture.DONE;
 					}
 				});
 			}
 			
 			public IFuture activityAdded(final ActivityEvent event)
 			{
-				return ea.scheduleStep(new IComponentStep()
+				return ea.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						Future ret = new Future();
 						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 						IGoal acAddedGoal = bia.getGoalbase().createGoal("add_activity");
 						acAddedGoal.getParameter("activity").setValue(event.getActivity());
 						bia.getGoalbase().dispatchTopLevelGoal(acAddedGoal);
-						ret.setResult(null);
-						return ret;
+						return IFuture.DONE;
 					}
 				});
 			}

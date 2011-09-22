@@ -289,10 +289,10 @@ public class MicroAgentViewPanel extends JPanel
 		};
 
 		final IComponentListener lis = listener;
-		agent.scheduleImmediate(new IComponentStep()
+		agent.scheduleImmediate(new IComponentStep<Void>()
 		{
 			@XMLClassname("installListener")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				List	events	= new ArrayList();
 				try
@@ -319,7 +319,7 @@ public class MicroAgentViewPanel extends JPanel
 				lis.eventOccured(new BulkComponentChangeEvent((IComponentChangeEvent[])events.toArray(new IComponentChangeEvent[events.size()])));
 				
 				ia.addComponentListener(lis);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -358,13 +358,13 @@ public class MicroAgentViewPanel extends JPanel
 	public void	dispose()
 	{
 		final IComponentListener lis = listener;
-		agent.scheduleImmediate(new IComponentStep()
+		agent.scheduleImmediate(new IComponentStep<Void>()
 		{
 			@XMLClassname("dispose")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.removeComponentListener(lis);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

@@ -15,6 +15,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.awt.Color;
@@ -209,9 +210,9 @@ class CleanerPanel extends JPanel
 	/**
 	 *  Component step to produce an uptodate draw data.
 	 */
-	public static class UpdateStep implements IComponentStep
+	public static class UpdateStep implements IComponentStep<DrawData>
 	{
-		public Object execute(IInternalAccess ia)
+		public IFuture<DrawData> execute(IInternalAccess ia)
 		{
 			IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 			DrawData	drawdata	= new DrawData();
@@ -234,7 +235,7 @@ class CleanerPanel extends JPanel
 			{
 				drawdata.dests[i] = (Location)goals[i].getParameter("location").getValue();
 			}
-			return drawdata;
+			return new Future<DrawData>(drawdata);
 		}
 	}
 

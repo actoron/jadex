@@ -53,12 +53,12 @@ public class ComponentIntermediateFuture<E> extends IntermediateFuture<E>
 		// Hack!!! Notify multiple listeners at once?
 		if(adapter.isExternalThread())
 		{
-			ea.scheduleStep(new IComponentStep()
+			ea.scheduleStep(new IComponentStep<Void>()
 			{
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					ComponentIntermediateFuture.super.notifyListener(listener);
-					return null;
+					return IFuture.DONE;
 				}
 			});
 		}
@@ -76,12 +76,12 @@ public class ComponentIntermediateFuture<E> extends IntermediateFuture<E>
 		// Hack!!! Notify multiple results at once?
 		if(adapter.isExternalThread())
 		{
-			ea.scheduleStep(new IComponentStep()
+			ea.scheduleStep(new IComponentStep<Void>()
 			{
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					ComponentIntermediateFuture.super.notifyIntermediateResult(listener, result);
-					return null;
+					return IFuture.DONE;
 				}
 			});
 		}

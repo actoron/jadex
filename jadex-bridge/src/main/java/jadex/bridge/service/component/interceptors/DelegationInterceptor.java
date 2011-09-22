@@ -67,20 +67,19 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
-	public IFuture doExecute(final ServiceInvocationContext sic) 	
+	public IFuture<Void> doExecute(final ServiceInvocationContext sic) 	
 	{
-		final Future ret = new Future(); 
 //		System.out.println("Invoked: "+method.getName());
 		
 		// This works because context has not to be transferred remotely.
 		// Ea is the local component and the service is fetched maybe a proxy.
 		// The reult listener is executed locally to ea.
-		ea.scheduleStep(new IComponentStep()
+		return ea.scheduleStep(new IComponentStep<Void>()
 		{
 //			@XMLClassname("invoc")
-			public Object execute(final IInternalAccess ia)
+			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				final Future ret = new Future();
+				final Future<Void> ret = new Future<Void>();
 				fetcher.getService(info, binding, false)
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
@@ -93,9 +92,8 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 				}));
 				return ret;
 			}
-		}).addResultListener(new DelegationResultListener(ret));
+		});
 		
-		return ret;
 	}
 
 	/**

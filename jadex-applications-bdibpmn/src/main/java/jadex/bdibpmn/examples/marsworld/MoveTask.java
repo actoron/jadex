@@ -5,6 +5,7 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.clock.IClockService;
+import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -71,17 +72,17 @@ public class MoveTask extends AbstractTask
 				final ISpaceObject so = (ISpaceObject)it.next();
 				if(so.getType().equals("target"))
 				{
-					scope.scheduleStep(new IComponentStep()
+					scope.scheduleStep(new IComponentStep<Void>()
 					{
 						@XMLClassname("addTarget")
-						public Object execute(IInternalAccess ia)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 							if(!bia.getBeliefbase().getBeliefSet("my_targets").containsFact(so))
 							{
 								bia.getBeliefbase().getBeliefSet("my_targets").addFact(so);
 							}
-							return null;
+							return IFuture.DONE;
 						}
 					});
 //					scope.getBeliefbase().containsBeliefSetFact("my_targets", so).addResultListener(new DefaultResultListener()

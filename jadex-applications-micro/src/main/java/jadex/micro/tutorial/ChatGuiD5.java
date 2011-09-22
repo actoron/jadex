@@ -3,6 +3,8 @@ package jadex.micro.tutorial;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 
 import java.awt.BorderLayout;
@@ -54,18 +56,18 @@ public class ChatGuiD5 extends JFrame
 			public void actionPerformed(ActionEvent e)
 			{
 				final String text = message.getText(); 
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getServiceContainer().getRequiredServices("chatservices")
-							.addResultListener(new IIntermediateResultListener<Object>()
+						IIntermediateFuture<IChatService>	fut	= ia.getServiceContainer().getRequiredServices("chatservices");
+						fut.addResultListener(new IIntermediateResultListener<IChatService>()
 						{
-							public void resultAvailable(Collection result)
+							public void resultAvailable(Collection<IChatService> result)
 							{
-								for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+								for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
 								{
-									IChatService cs = (IChatService)it.next();
+									IChatService cs = it.next();
 									try
 									{
 										cs.message(agent.getComponentIdentifier().getName(), text);
@@ -77,10 +79,9 @@ public class ChatGuiD5 extends JFrame
 								}
 							}
 							
-							public void intermediateResultAvailable(Object result)
+							public void intermediateResultAvailable(IChatService cs)
 							{
-								System.out.println("found: "+result);
-								IChatService cs = (IChatService)result;
+								System.out.println("found: "+cs);
 								cs.message(agent.getComponentIdentifier().getName(), text);
 							}
 							
@@ -93,7 +94,7 @@ public class ChatGuiD5 extends JFrame
 							}
 							
 						});
-						return null;
+						return IFuture.DONE;
 					}
 				});
 			}

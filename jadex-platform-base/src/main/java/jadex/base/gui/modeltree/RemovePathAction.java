@@ -16,6 +16,7 @@ import java.io.File;
 import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.UIDefaults;
+import javax.swing.tree.TreePath;
 
 /**
  *  Action for removing a path. 
@@ -78,32 +79,36 @@ public class RemovePathAction extends ToolTipAction
 			return;
 		}
 		
-		final ITreeNode	node = (ITreeNode)treepanel.getTree().getLastSelectedPathComponent();
-		treepanel.removeTopLevelNode(node);
-		
-		// todo: jars
-		if(treepanel.getExternalAccess()!=null && node instanceof FileNode)
+		TreePath[]	selected	= treepanel.getTree().getSelectionPaths();
+		for(int i=0; selected!=null && i<selected.length; i++)
 		{
-			SServiceProvider.getService(treepanel.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new SwingDefaultResultListener(treepanel)
+			final ITreeNode	node = (ITreeNode)selected[i].getLastPathComponent();
+			treepanel.removeTopLevelNode(node);
+			
+			// todo: jars
+			if(treepanel.getExternalAccess()!=null && node instanceof FileNode)
 			{
-				public void customResultAvailable(Object result)
+				SServiceProvider.getService(treepanel.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new SwingDefaultResultListener(treepanel)
 				{
-					ILibraryService ls = (ILibraryService)result;
-					File file = ((FileNode)node).getFile();
-					file = new File(file.getParentFile(), file.getName());
-					try
+					public void customResultAvailable(Object result)
 					{
-						ls.removeURL(file.toURI().toURL());
+						ILibraryService ls = (ILibraryService)result;
+						File file = ((FileNode)node).getFile();
+						file = new File(file.getParentFile(), file.getName());
+						try
+						{
+							ls.removeURL(file.toURI().toURL());
+						}
+						catch(Exception ex)
+						{
+	//						ex.printStackTrace();
+						}
+	//					resetCrawler();
+	//					((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), node, index);
 					}
-					catch(Exception ex)
-					{
-//						ex.printStackTrace();
-					}
-//					resetCrawler();
-//					((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), node, index);
-				}
-			});
+				});
+			}
 		}
 	}
 	

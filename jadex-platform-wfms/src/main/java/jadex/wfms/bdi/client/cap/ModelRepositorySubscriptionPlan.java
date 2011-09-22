@@ -22,34 +22,30 @@ public class ModelRepositorySubscriptionPlan extends Plan
 		{
 			public IFuture processModelRemoved(final ProcessRepositoryEvent event)
 			{
-				return ea.scheduleStep(new IComponentStep()
+				return ea.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						Future ret = new Future();
 						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 						IGoal pmAddedGoal = bia.getGoalbase().createGoal("remove_process_model");
 						pmAddedGoal.getParameter("model_name").setValue(event.getModelName());
 						bia.getGoalbase().dispatchTopLevelGoal(pmAddedGoal);
-						ret.setResult(null);
-						return ret;
+						return IFuture.DONE;
 					}
 				});
 			}
 			
 			public IFuture processModelAdded(final ProcessRepositoryEvent event)
 			{
-				return ea.scheduleStep(new IComponentStep()
+				return ea.scheduleStep(new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						Future ret = new Future();
 						IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 						IGoal pmRemovedGoal = bia.getGoalbase().createGoal("add_process_model");
 						pmRemovedGoal.getParameter("model_name").setValue(event.getModelName());
 						bia.getGoalbase().dispatchTopLevelGoal(pmRemovedGoal);
-						ret.setResult(null);
-						return ret;
+						return IFuture.DONE;
 					}
 				});
 			}

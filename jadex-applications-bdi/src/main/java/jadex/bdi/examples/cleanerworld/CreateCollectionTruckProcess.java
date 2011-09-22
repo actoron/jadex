@@ -109,10 +109,10 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 									public void resultAvailable(Object result)
 									{
 										IBDIExternalAccess ex = (IBDIExternalAccess)result;
-										ex.scheduleStep(new IComponentStep()
+										ex.scheduleStep(new IComponentStep<Void>()
 										{
 											@XMLClassname("rem")
-											public Object execute(IInternalAccess ia)
+											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 												bia.addComponentListener(new TerminationAdapter()
@@ -122,7 +122,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 														ongoing.removeAll(todo);
 													}
 												});
-												return null;
+												return IFuture.DONE;
 											}
 										});
 //										ex.addAgentListener(new IAgentListener()

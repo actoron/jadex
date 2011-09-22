@@ -230,7 +230,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	 *  Service invocation step.
 	 */
 	// Not anonymous class to avoid dependency to XML required for XMLClassname
-	public static class InvokeMethodStep implements IComponentStep
+	public static class InvokeMethodStep implements IComponentStep<Void>
 	{
 		protected ServiceInvocationContext sic;
 
@@ -239,22 +239,22 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			this.sic = sic;
 		}
 
-		public Object execute(IInternalAccess ia)
+		public IFuture<Void> execute(IInternalAccess ia)
 		{					
-			final Future fut = new Future();
+			IFuture<Void> ret;
 			
 			try
 			{
 //				sic.setObject(service);
-				sic.invoke().addResultListener(new DelegationResultListener(fut));
+				ret	= sic.invoke();
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace();
-				fut.setException(e);
+//				e.printStackTrace();
+				ret	= new Future<Void>(e);
 			}
 			
-			return fut;
+			return ret;
 		}
 
 		public String toString()

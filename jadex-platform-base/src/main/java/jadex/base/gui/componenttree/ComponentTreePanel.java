@@ -22,6 +22,7 @@ import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
@@ -239,10 +240,10 @@ public class ComponentTreePanel extends JSplitPane
 							{
 								final IComponentIdentifier cid = (IComponentIdentifier)result;
 								
-								access.scheduleStep(new IComponentStep()
+								access.scheduleStep(new IComponentStep<Void>()
 								{
 									@XMLClassname("proxykill")
-									public Object	execute(IInternalAccess ia)
+									public IFuture<Void>	execute(IInternalAccess ia)
 									{
 										SServiceProvider.getService(ia.getServiceContainer(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //										ia.getRequiredService("rms")
@@ -278,7 +279,7 @@ public class ComponentTreePanel extends JSplitPane
 												});
 											}
 										});
-										return null;
+										return IFuture.DONE;
 									}
 								});								
 							}
@@ -681,22 +682,22 @@ public class ComponentTreePanel extends JSplitPane
 			}
 		});
 
-		access.scheduleStep(new IComponentStep()
+		access.scheduleStep(new IComponentStep<IComponentManagementService>()
 		{
 			@XMLClassname("init")
-			public Object execute(IInternalAccess ia)
+			public IFuture<IComponentManagementService> execute(IInternalAccess ia)
 			{
-				final Future ret = new Future();
+				final Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
 				SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //				ia.getRequiredService("cms")
 					.addResultListener(new DelegationResultListener(ret));
 				return ret;
 			}
-		}).addResultListener(new DefaultResultListener()
+		}).addResultListener(new DefaultResultListener<IComponentManagementService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(IComponentManagementService result)
 			{
-				cms	= (IComponentManagementService)result;
+				cms	= result;
 				
 				// Hack!!! How to find root node?
 				cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)

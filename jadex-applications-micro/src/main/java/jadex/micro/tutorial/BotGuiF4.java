@@ -4,6 +4,8 @@ import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.IPojoMicroAgent;
 import jadex.xml.annotation.XMLClassname;
 
@@ -50,19 +52,18 @@ public class BotGuiF4 extends AbstractComponentViewerPanel
 		panel.add(tfreply, gbc);
 		
 		// Fetch initial values for text fields.
-		getActiveComponent().scheduleStep(new IComponentStep()
+		getActiveComponent().scheduleStep(new IComponentStep<String[]>()
 		{
 			@XMLClassname("fetch_values")
-			public Object execute(IInternalAccess ia)
+			public IFuture<String[]> execute(IInternalAccess ia)
 			{
 				ChatBotF4Agent	chatbot	= (ChatBotF4Agent)((IPojoMicroAgent)ia).getPojoAgent();
-				return new String[]{chatbot.getKeyword(), chatbot.getReply()};
+				return new Future<String[]>(new String[]{chatbot.getKeyword(), chatbot.getReply()});
 			}
-		}).addResultListener(new SwingDefaultResultListener()
+		}).addResultListener(new SwingDefaultResultListener<String[]>()
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(String[] values)
 			{
-				String[]	values	= (String[])result;
 				tfkeyword.setText(values[0]);
 				tfreply.setText(values[1]);
 			}
@@ -74,14 +75,14 @@ public class BotGuiF4 extends AbstractComponentViewerPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				final String	keyword	= tfkeyword.getText();
-				getActiveComponent().scheduleStep(new IComponentStep()
+				getActiveComponent().scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("set_keyword")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ChatBotF4Agent	chatbot	= (ChatBotF4Agent)((IPojoMicroAgent)ia).getPojoAgent();
 						chatbot.setKeyword(keyword);
-						return null;
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -93,14 +94,14 @@ public class BotGuiF4 extends AbstractComponentViewerPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				final String	reply	= tfreply.getText();
-				getActiveComponent().scheduleStep(new IComponentStep()
+				getActiveComponent().scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("set_reply")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ChatBotF4Agent	chatbot	= (ChatBotF4Agent)((IPojoMicroAgent)ia).getPojoAgent();
 						chatbot.setReply(reply);
-						return null;
+						return IFuture.DONE;
 					}
 				});
 			}

@@ -12,6 +12,7 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -51,10 +52,10 @@ public class PotentialFrame extends JFrame
 			}
 		});
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("dispose")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.addComponentListener(new TerminationAdapter()
@@ -70,7 +71,7 @@ public class PotentialFrame extends JFrame
 						});
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 //		agent.addAgentListener(new IAgentListener()

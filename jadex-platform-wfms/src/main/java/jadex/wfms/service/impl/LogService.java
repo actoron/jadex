@@ -116,9 +116,9 @@ public class LogService implements ILogService
 										};
 										logEvent(ce);
 										
-										ncea.scheduleStep(new IComponentStep()
+										ncea.scheduleStep(new IComponentStep<Void>()
 										{
-											public Object execute(IInternalAccess ia)
+											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												ia.addComponentListener(new ComponentAdapter()
 												{
@@ -129,7 +129,7 @@ public class LogService implements ILogService
 														return IFuture.DONE;
 													}
 												});
-												return null;
+												return IFuture.DONE;
 											}
 										}).addResultListener(ia.createResultListener(new DelegationResultListener(cret)));
 									}

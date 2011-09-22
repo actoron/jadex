@@ -1570,9 +1570,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 										
 										public void exceptionOccurred(final Exception exception)
 										{
-											exta.scheduleStep(new IComponentStep()
+											exta.scheduleStep(new IComponentStep<Void>()
 											{
-												public Object execute(IInternalAccess ia)
+												public IFuture<Void> execute(IInternalAccess ia)
 												{
 													// Propagate exception: kills application!?
 													throw new RuntimeException("Could not create component: "+compotype, exception);
@@ -2687,9 +2687,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 //			space = (ISpace)getClazz().newInstance();
 			initSpace(exta, config, fetcher);
 			
-			exta.scheduleStep(new IComponentStep()
+			exta.scheduleStep(new IComponentStep<Void>()
 			{
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					ia.addComponentListener(new IComponentListener()
 					{
@@ -2721,7 +2721,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 							return IFuture.DONE;
 						}
 					});
-					return null;
+					return IFuture.DONE;
 				}
 			}).addResultListener(new DelegationResultListener(ret)
 			{

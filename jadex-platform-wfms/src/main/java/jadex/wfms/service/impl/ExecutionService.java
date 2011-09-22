@@ -207,12 +207,12 @@ public class ExecutionService implements IExecutionService
 					{
 						public IFuture deauthenticated(final IComponentIdentifier client, ClientInfo info)
 						{
-							return exta.scheduleStep(new IComponentStep()
+							return exta.scheduleStep(new IComponentStep<Void>()
 							{
-								public Object execute(IInternalAccess ia)
+								public IFuture<Void> execute(IInternalAccess ia)
 								{
 									procListeners.remove(client);
-									return null;
+									return IFuture.DONE;
 								}
 							});
 						}

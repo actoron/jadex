@@ -44,6 +44,7 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  *  Basic service invocation interceptor.
@@ -72,6 +73,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/** The service. */
 	protected Object service;
 
+	/** The logger for errors/warnings. */
+	protected Logger logger;
+
 	/** The list of interceptors. */
 	protected List interceptors;
 	
@@ -83,27 +87,30 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public BasicServiceInvocationHandler(IServiceIdentifier sid)
+	public BasicServiceInvocationHandler(IServiceIdentifier sid, Logger logger)
 	{
 		this.sid = sid;
+		this.logger	= logger;
 	}
 	
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public BasicServiceInvocationHandler(IService service)
+	public BasicServiceInvocationHandler(IService service, Logger logger)
 	{
 		this.service = service;
 //		this.sid = service.getServiceIdentifier();
+		this.logger	= logger;
 	}
 	
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public BasicServiceInvocationHandler(ServiceInfo service)
+	public BasicServiceInvocationHandler(ServiceInfo service, Logger logger)
 	{
 		this.service = service;
 //		this.sid = service.getManagementService().getServiceIdentifier();
+		this.logger	= logger;
 	}
 	
 	//-------- methods --------
@@ -163,11 +170,12 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			IFuture	myvoid	= sic.invoke(service, method, myargs);
 			
 			// Check result and propagate exception, if any.
-			if(myvoid.isDone())
-			{
-				myvoid.get(null);	// throws exception, if any.
-			}
-			else
+			// Do not throw exception as user code should not defferentiate between local and remote case.
+//			if(myvoid.isDone())
+//			{
+//				myvoid.get(null);	// throws exception, if any.
+//			}
+//			else
 			{
 				myvoid.addResultListener(new IResultListener()
 				{
@@ -177,7 +185,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						exception.printStackTrace();
+						logger.warning("Exception in void method call: "+method+" "+getServiceIdentifier()+" "+exception);
 					}
 				});
 			}
@@ -191,7 +199,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			}
 			else
 			{
-				System.out.println("Warning, blocking call: "+method.getName()+" "+getServiceIdentifier());
+				logger.warning("Warning, blocking call: "+method.getName()+" "+getServiceIdentifier());
 				ret = fut.get(new ThreadSuspendable());
 			}
 		}
@@ -371,7 +379,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		if(service instanceof IService)
 		{
 			IService ser = (IService)service;
-			handler = new BasicServiceInvocationHandler(ser);
+			handler = new BasicServiceInvocationHandler(ser, ia.getLogger());
 //			if(type==null)
 //			{
 //				type = ser.getServiceIdentifier().getServiceType();
@@ -471,7 +479,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			}
 			
 			ServiceInfo si = new ServiceInfo(service, mgmntservice);
-			handler = new BasicServiceInvocationHandler(si);
+			handler = new BasicServiceInvocationHandler(si, ia.getLogger());
 //			addPojoServiceIdentifier(service, mgmntservice.getServiceIdentifier());
 		}
 		
@@ -515,7 +523,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	public static IInternalService createDelegationProvidedServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IServiceIdentifier sid, 
 		RequiredServiceInfo info, RequiredServiceBinding binding, boolean copy)
 	{
-		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(sid);
+		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(sid, adapter.getLogger());
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 		handler.addFirstServiceInterceptor(new DelegationInterceptor(ea, info, binding, null, copy));
 		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
@@ -532,7 +540,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		if(binding==null || !PROXYTYPE_RAW.equals(binding.getProxytype()))
 		{
 	//		System.out.println("create: "+service.getServiceIdentifier().getServiceType());
-			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service);
+			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service, adapter.getLogger());
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 			if(binding!=null && binding.isRecover())
 				handler.addFirstServiceInterceptor(new RecoveryInterceptor(info, binding, fetcher));

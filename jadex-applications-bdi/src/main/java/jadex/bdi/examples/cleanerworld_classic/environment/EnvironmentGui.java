@@ -11,6 +11,7 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -83,10 +84,10 @@ public class EnvironmentGui	extends JFrame
 	{
 		super(agent.getComponentIdentifier().getLocalName());
 
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("disp")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				
@@ -387,10 +388,10 @@ public class EnvironmentGui	extends JFrame
 									1.0-(double)p.y/(double)bounds.height);
 								final double tol = 7/(double)bounds.height;
 
-								agent.scheduleStep(new IComponentStep()
+								agent.scheduleStep(new IComponentStep<Void>()
 								{
 									@XMLClassname("mouse")
-									public Object execute(IInternalAccess ia)
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 										Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
@@ -421,7 +422,7 @@ public class EnvironmentGui	extends JFrame
 										{
 											env.addWaste(new Waste(mouseloc));
 										}
-										return null;
+										return IFuture.DONE;
 									}
 								});
 							}
@@ -493,7 +494,7 @@ public class EnvironmentGui	extends JFrame
 						timer.start();
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

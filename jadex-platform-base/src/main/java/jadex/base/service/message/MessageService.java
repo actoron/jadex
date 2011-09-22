@@ -641,12 +641,12 @@ public class MessageService extends BasicService implements IMessageService
 							public void exceptionOccurred(final Exception exception)
 							{
 								transports.remove(transport);
-								component.scheduleStep(new IComponentStep()
+								component.scheduleStep(new IComponentStep<Void>()
 								{
-									public Object execute(IInternalAccess ia)
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										ia.getLogger().warning("Could not initialize transport: "+transport+" reason: "+exception);
-										return null;
+										return IFuture.DONE;
 									}
 								});
 							}

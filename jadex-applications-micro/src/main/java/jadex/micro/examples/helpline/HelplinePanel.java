@@ -215,9 +215,9 @@ public class HelplinePanel extends JPanel
 //		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
 //			.addResultListener(new SwingDefaultResultListener(HelplinePanel.this)
 //			(agent.getServiceProvider(), IHelpline.class, remote, true)
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.getServiceContainer().getRequiredServices("localhelplineservices").addResultListener(new SwingDefaultResultListener(HelplinePanel.this) 
 				{
@@ -235,7 +235,7 @@ public class HelplinePanel extends JPanel
 						}
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}
@@ -250,20 +250,18 @@ public class HelplinePanel extends JPanel
 //		SServiceProvider.getServices(agent.getServiceProvider(), IHelpline.class, remote, true)
 		final IntermediateFuture<InformationEntry> ret = new IntermediateFuture<InformationEntry>();
 		
-		IFuture fut = agent.scheduleStep(new IComponentStep()
+		IFuture<Collection<IHelpline>> fut = agent.scheduleStep(new IComponentStep<Collection<IHelpline>>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Collection<IHelpline>> execute(IInternalAccess ia)
 			{
-				Future ret = new Future();
+				IIntermediateFuture<IHelpline> ret;
 				if(remote)
 				{
-					ia.getServiceContainer().getRequiredServices("remotehelplineservices")
-						.addResultListener(new DelegationResultListener(ret));
+					ret	= ia.getServiceContainer().getRequiredServices("remotehelplineservices");
 				}
 				else
 				{
-					ia.getServiceContainer().getRequiredServices("localhelplineservices")
-						.addResultListener(new DelegationResultListener(ret));
+					ret	= ia.getServiceContainer().getRequiredServices("localhelplineservices");
 				}
 				return ret;
 			}

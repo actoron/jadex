@@ -4,6 +4,7 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -65,10 +66,10 @@ public class OptionDialog extends JDialog
 		this.agent = agent;
 		setTitle("Options");
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("create")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				final Settings orig_sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
@@ -247,17 +248,17 @@ public class OptionDialog extends JDialog
 									{
 										File file = filechooser.getSelectedFile();
 										final Settings ns = Settings.loadSettings(file.getAbsolutePath());
-										agent.scheduleStep(new IComponentStep()
+										agent.scheduleStep(new IComponentStep<Void>()
 										{
 											@XMLClassname("alarms")
-											public Object execute(IInternalAccess ia)
+											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 												bia.getBeliefbase().getBelief("settings").setFact(ns);
 												bia.getBeliefbase().getBeliefSet("alarms").removeFacts();
 												bia.getBeliefbase().getBeliefSet("alarms").addFacts(ns.getAlarms());
 		
-												return null;
+												return IFuture.DONE;
 											}
 										});
 		//								agent.getBeliefbase().setBeliefFact("settings", ns);
@@ -330,7 +331,7 @@ public class OptionDialog extends JDialog
 						
 						}
 					});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

@@ -92,10 +92,10 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 				{
 					public IFuture deauthenticated(final IComponentIdentifier client, ClientInfo info)
 					{
-						return exta.scheduleStep(new IComponentStep()
+						return exta.scheduleStep(new IComponentStep<Void>()
 						{
 							
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								processWorkitemListeners.remove(client);
 								workitemQueues.remove(client);
@@ -103,7 +103,7 @@ public class WorkitemHandlerService implements IWorkitemHandlerService
 								workitemQueueListeners.remove(client);
 								activityListeners.remove(client);
 								globalActivityListeners.remove(client);
-								return null;
+								return IFuture.DONE;
 							}
 						});
 					}

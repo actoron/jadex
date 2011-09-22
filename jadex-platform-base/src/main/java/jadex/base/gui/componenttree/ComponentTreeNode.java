@@ -321,19 +321,17 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 //					System.err.println("searchChildren queued4: "+ComponentTreeNode.this);
 				final IExternalAccess	ea	= (IExternalAccess)result;
 				
-				ea.scheduleImmediate(new IComponentStep()
+				ea.scheduleImmediate(new IComponentStep<RequiredServiceInfo[]>()
 				{
 					@XMLClassname("getRequiredServiceInfos")
-					public Object execute(IInternalAccess ia)
+					public IFuture<RequiredServiceInfo[]> execute(IInternalAccess ia)
 					{
-						return ia.getServiceContainer().getRequiredServiceInfos();
+						return new Future<RequiredServiceInfo[]>(ia.getServiceContainer().getRequiredServiceInfos());
 					}
-				}).addResultListener(new SwingDelegationResultListener(ret)
+				}).addResultListener(new SwingDelegationResultListener<RequiredServiceInfo[]>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(final RequiredServiceInfo[] reqs)
 					{
-						final RequiredServiceInfo[] reqs = (RequiredServiceInfo[])result;
-						
 						SServiceProvider.getDeclaredServices(ea.getServiceProvider())
 							.addResultListener(new SwingDefaultResultListener()
 						{

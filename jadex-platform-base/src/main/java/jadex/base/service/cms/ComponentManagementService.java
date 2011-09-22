@@ -219,10 +219,10 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 		else
 		{
-			exta.scheduleStep(new IComponentStep()
+			exta.scheduleStep(new IComponentStep<IModelInfo>()
 			{
 				@XMLClassname("loadModel")
-				public Object execute(final IInternalAccess ia)
+				public IFuture<IModelInfo> execute(final IInternalAccess ia)
 				{
 					final Future<IModelInfo> ret = new Future<IModelInfo>();
 					
@@ -1369,12 +1369,12 @@ public abstract class ComponentManagementService extends BasicService implements
 									try
 									{
 										final IComponentInstance	ci	= instance;
-										instance.getExternalAccess().scheduleImmediate(new IComponentStep()
+										instance.getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
 										{
-											public Object execute(IInternalAccess ia)
+											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												ci.startBehavior();
-												return null;
+												return IFuture.DONE;
 											}
 										});
 									}

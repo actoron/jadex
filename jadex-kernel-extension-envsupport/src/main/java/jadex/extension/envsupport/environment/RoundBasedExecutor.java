@@ -16,6 +16,7 @@ import jadex.bridge.service.clock.ITimer;
 import jadex.commons.ICommand;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 
 import java.util.Comparator;
 import java.util.Iterator;
@@ -139,11 +140,11 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 					process.start(clockservice, space);
 				}
 
-				new IComponentStep()
+				new IComponentStep<Void>()
 				{
 					boolean first = true;
 
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 		//				System.out.println("---+++--- New round: "+currenttime+" ---+++---");
 						
@@ -217,7 +218,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 								}
 							}
 						});
-						return null;
+						return IFuture.DONE;
 					}
 				}.execute(null);				
 			}

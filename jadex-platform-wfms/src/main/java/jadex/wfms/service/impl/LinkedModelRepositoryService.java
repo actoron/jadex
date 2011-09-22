@@ -109,13 +109,13 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 					final IExternalAccess exta = ia.getExternalAccess();
 					public IFuture deauthenticated(final IComponentIdentifier client, ClientInfo info)
 					{
-						return exta.scheduleStep(new IComponentStep()
+						return exta.scheduleStep(new IComponentStep<Void>()
 						{
 							
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								processlisteners.remove(client);
-								return null;
+								return IFuture.DONE;
 							}
 						});
 					}
@@ -139,9 +139,9 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 								{
 									public IFuture urlRemoved(final URL url)
 									{
-										return exta.scheduleStep(new IComponentStep()
+										return exta.scheduleStep(new IComponentStep<Void>()
 										{
-											public Object execute(IInternalAccess ia)
+											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												Set modelSet = (Set) urlentries.remove(url);
 												if (modelSet != null)
@@ -152,16 +152,16 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 														removeModel(path);
 													}
 												}
-												return null;
+												return IFuture.DONE;
 											}
 										});
 									}
 									
 									public IFuture urlAdded(final URL url)
 									{
-										return exta.scheduleStep(new IComponentStep()
+										return exta.scheduleStep(new IComponentStep<Void>()
 										{
-											public Object execute(IInternalAccess ia)
+											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												File dir = new File(url.getFile());
 												Set modelSet = new HashSet();
@@ -173,7 +173,7 @@ public class LinkedModelRepositoryService implements IModelRepositoryService
 													addModel((String) it.next());
 												urlentries.put(url, modelSet);
 												
-												return null;
+												return IFuture.DONE;
 											}
 										});
 									}

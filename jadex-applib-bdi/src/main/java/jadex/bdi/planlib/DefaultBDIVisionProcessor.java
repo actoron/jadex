@@ -127,10 +127,10 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 
 								if(ADD.equals(metainfos[i][0]))
 								{
-									exta.scheduleStep(new IComponentStep()
+									exta.scheduleStep(new IComponentStep<Void>()
 									{
 										@XMLClassname("add")
-										public Object execute(IInternalAccess ia)
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
 											Object[]	facts	= scope.getBeliefbase().getBeliefSet(name).getFacts();
@@ -142,16 +142,16 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 												scope.getBeliefbase().getBeliefSet(name).addFact(percept);
 //												System.out.println("added: "+percept+" to: "+belset);
 											}
-											return null;
+											return IFuture.DONE;
 										}
 									});
 								}
 								else if(REMOVE.equals(metainfos[i][0]))
 								{
-									exta.scheduleStep(new IComponentStep()
+									exta.scheduleStep(new IComponentStep<Void>()
 									{
 										@XMLClassname("remove")
-										public Object execute(IInternalAccess ia)
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
 											Object[]	facts	= scope.getBeliefbase().getBeliefSet(name).getFacts();
@@ -163,16 +163,16 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 												scope.getBeliefbase().getBeliefSet(name).removeFact(percept);
 //												System.out.println("removed: "+percept+" from: "+belset);
 											}
-											return null;
+											return IFuture.DONE;
 										}
 									});
 								}
 								else if(SET.equals(metainfos[i][0]))
 								{
-									exta.scheduleStep(new IComponentStep()
+									exta.scheduleStep(new IComponentStep<Void>()
 									{
 										@XMLClassname("set")
-										public Object execute(IInternalAccess ia)
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
 											Object	fact	= scope.getBeliefbase().getBelief(name).getFact();
@@ -184,16 +184,16 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 												scope.getBeliefbase().getBelief(name).setFact(percept);
 //												System.out.println("set: "+percept+" on: "+belset);
 											}
-											return null;
+											return IFuture.DONE;
 										}
 									});
 								}
 								else if(UNSET.equals(metainfos[i][0]))
 								{
-									exta.scheduleStep(new IComponentStep()
+									exta.scheduleStep(new IComponentStep<Void>()
 									{
 										@XMLClassname("unset")
-										public Object execute(IInternalAccess ia)
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
 											Object	fact	= scope.getBeliefbase().getBelief(name).getFact();
@@ -205,16 +205,16 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 												scope.getBeliefbase().getBelief(name).setFact(null);
 //												System.out.println("unset: "+percept+" on: "+belset);
 											}
-											return null;
+											return IFuture.DONE;
 										}
 									});
 								}
 								else if(REMOVE_OUTDATED.equals(metainfos[i][0]) && percept.equals(avatar))
 								{
-									exta.scheduleStep(new IComponentStep()
+									exta.scheduleStep(new IComponentStep<Void>()
 									{
 										@XMLClassname("removeoutdated")
-										public Object execute(IInternalAccess ia)
+										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
 											Object[]	facts	= scope.getBeliefbase().getBeliefSet(name).getFacts();
@@ -239,7 +239,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 													}
 												}
 											}
-											return null;
+											return IFuture.DONE;
 										}
 									});
 								}

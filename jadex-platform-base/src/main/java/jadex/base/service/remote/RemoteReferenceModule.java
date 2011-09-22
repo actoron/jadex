@@ -897,10 +897,10 @@ public class RemoteReferenceModule
 	{
 		final long renewid = ++this.renewid;
 		
-		rsms.getComponent().scheduleStep(new IComponentStep()
+		rsms.getComponent().scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("startRenewal")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(renewid == RemoteReferenceModule.this.renewid)
 				{
@@ -981,7 +981,7 @@ public class RemoteReferenceModule
 				}
 				
 //				System.out.println("renewal behaviour exit");
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}
@@ -993,10 +993,10 @@ public class RemoteReferenceModule
 	{
 		final long removeid = ++this.removeid;
 		
-		rsms.getComponent().scheduleStep(new IComponentStep()
+		rsms.getComponent().scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("startRemoval")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(removeid == RemoteReferenceModule.this.removeid)
 				{
@@ -1046,7 +1046,7 @@ public class RemoteReferenceModule
 						}, 5000);
 					}
 				}
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

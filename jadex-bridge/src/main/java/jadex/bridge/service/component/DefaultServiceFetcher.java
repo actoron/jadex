@@ -740,12 +740,12 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 //						System.out.println("createProxy 2:"+service);
 						final IExternalAccess ea = (IExternalAccess)result;
 						final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
-						IFuture	fut	= ea.scheduleStep(new IComponentStep()
+						IFuture<IService>	fut	= ea.scheduleStep(new IComponentStep<IService>()
 						{
-							public Object execute(IInternalAccess ia)
+							public IFuture<IService> execute(IInternalAccess ia)
 							{
 //								System.out.println("createProxy 3:"+service);
-								return BasicServiceInvocationHandler.createRequiredServiceProxy(ia, ea, adapter, service, DefaultServiceFetcher.this, info, binding, copy);
+								return new Future<IService>(BasicServiceInvocationHandler.createRequiredServiceProxy(ia, ea, adapter, service, DefaultServiceFetcher.this, info, binding, copy));
 							}
 						});
 //						fut.addResultListener(new IResultListener()

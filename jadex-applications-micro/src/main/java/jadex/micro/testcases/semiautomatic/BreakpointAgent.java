@@ -2,6 +2,7 @@ package jadex.micro.testcases.semiautomatic;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -23,39 +24,39 @@ public class BreakpointAgent extends MicroAgent
 	{
 		step	= "hop";	// first step
 		
-		waitFor(1000, new IComponentStep()
+		waitFor(1000, new IComponentStep<Void>()
 		{			
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				System.out.println("Current step: "+step);
 				
 				step	= "step";	// second step
 
-				waitFor(1000, new IComponentStep()
+				waitFor(1000, new IComponentStep<Void>()
 				{			
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						System.out.println("Current step: "+step);
 
 						step	= "jump";	// third step
 						
-						waitFor(1000, new IComponentStep()
+						waitFor(1000, new IComponentStep<Void>()
 						{			
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								System.out.println("Current step: "+step);
 
 								killAgent();
 								
-								return null;
+								return IFuture.DONE;
 							}
 						});
 						
-						return null;
+						return IFuture.DONE;
 					}
 				});
 				
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

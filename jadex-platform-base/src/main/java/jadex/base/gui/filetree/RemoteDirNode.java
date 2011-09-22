@@ -145,10 +145,10 @@ public class RemoteDirNode extends RemoteFileNode
 		{
 			final FileData myfile = file;
 			final IRemoteFilter myfilter = filter;
-			exta.scheduleStep(new IComponentStep()
+			exta.scheduleStep(new IComponentStep<Collection>()
 			{
 				@XMLClassname("listFiles")
-				public Object execute(IInternalAccess ia)
+				public IFuture<Collection> execute(IInternalAccess ia)
 				{
 					Future ret = new Future();
 					

@@ -403,12 +403,12 @@ public class CMSUpdateHandler
 						final IComponentIdentifier	icid	= cid;	// internal reference to cid, because java compiler stores final references in outmost object (grrr.)
 						final String	id	= buildId(cid);
 						final IRemoteChangeListener	rcl	= CMSUpdateHandler.this.rcl;
-						exta.scheduleStep(new IComponentStep()
+						exta.scheduleStep(new IComponentStep<Void>()
 						{
 							@XMLClassname("installListener")
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								final Future	ret	= new Future();
+								final Future<Void>	ret	= new Future<Void>();
 								SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 									.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 								{
@@ -448,10 +448,10 @@ public class CMSUpdateHandler
 					{
 						IExternalAccess	exta	= (IExternalAccess)result;
 						final String	id	= buildId(cid);
-						exta.scheduleStep(new IComponentStep()
+						exta.scheduleStep(new IComponentStep<Void>()
 						{
 							@XMLClassname("deregisterListener")
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								final Future	ret	= new Future();
 								SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)

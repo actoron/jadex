@@ -171,9 +171,9 @@ public class RemoteComponentListener implements IComponentListener
 			(!removed.isEmpty() || !added.isEmpty() || !changed.isEmpty() || !occurred.isEmpty()))
 		{
 			scheduled = true;
-			access.scheduleImmediate(new IComponentStep()
+			access.scheduleImmediate(new IComponentStep<Void>()
 			{
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					try
 					{
@@ -222,7 +222,7 @@ public class RemoteComponentListener implements IComponentListener
 					{
 						e.printStackTrace();
 					}
-					return null;
+					return IFuture.DONE;
 				}
 			}, UPDATE_DELAY);
 		}

@@ -175,10 +175,10 @@ public class ProcessViewPanel extends JPanel
 		};
 
 		final IComponentListener lis = listener;
-		access.scheduleImmediate(new IComponentStep()
+		access.scheduleImmediate(new IComponentStep<Void>()
 		{
 			@XMLClassname("installListener")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				// Post current state to remote listener
 				BpmnInterpreter	interpreter	= (BpmnInterpreter)ia;
@@ -190,7 +190,7 @@ public class ProcessViewPanel extends JPanel
 				lis.eventOccured(new BulkComponentChangeEvent((IComponentChangeEvent[])events.toArray(new IComponentChangeEvent[events.size()])));
 				
 				ia.addComponentListener(lis);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -305,13 +305,13 @@ public class ProcessViewPanel extends JPanel
 	public void	dispose()
 	{
 		final IComponentListener lis = listener;
-		access.scheduleImmediate(new IComponentStep()
+		access.scheduleImmediate(new IComponentStep<Void>()
 		{
 			@XMLClassname("dispose")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.removeComponentListener(lis);
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

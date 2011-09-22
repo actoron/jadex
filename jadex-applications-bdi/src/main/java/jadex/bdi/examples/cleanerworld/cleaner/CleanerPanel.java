@@ -9,6 +9,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
@@ -60,10 +61,10 @@ class CleanerPanel extends JPanel
 			updating	= true;
 			try
 			{
-				IFuture	fut	= agent.scheduleStep(new IComponentStep()
+				IFuture<DrawData>	fut	= agent.scheduleStep(new IComponentStep<DrawData>()
 				{
 					@XMLClassname("copy")
-					public Object execute(IInternalAccess ia)
+					public IFuture<DrawData> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 						DrawData	drawdata	= new DrawData();
@@ -87,14 +88,14 @@ class CleanerPanel extends JPanel
 						{
 							drawdata.dests[i] = (IVector2)goals[i].getParameter("location").getValue();
 						}
-						return drawdata;
+						return new Future<DrawData>(drawdata);
 					}
 				});
-				fut.addResultListener(new SwingDefaultResultListener()
+				fut.addResultListener(new SwingDefaultResultListener<DrawData>()
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(DrawData result)
 					{
-						CleanerPanel.this.drawdata	= (DrawData)result;
+						CleanerPanel.this.drawdata	= result;
 						updating	= false;
 					}
 					public void customExceptionOccurred(Exception exception)

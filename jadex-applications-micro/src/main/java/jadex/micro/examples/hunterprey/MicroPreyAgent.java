@@ -3,7 +3,9 @@ package jadex.micro.examples.hunterprey;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.IFilter;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -62,10 +64,10 @@ public class MicroPreyAgent extends MicroAgent
 		//				e.printStackTrace();
 						try
 						{
-							getExternalAccess().scheduleStep(new IComponentStep()
+							getExternalAccess().scheduleStep(new IComponentStep<Void>()
 							{
 								@XMLClassname("act")
-								public Object execute(IInternalAccess agent)
+								public IFuture<Void> execute(IInternalAccess agent)
 								{
 									// If move failed, forget about food and turn 90°.
 									food	= null;
@@ -82,7 +84,7 @@ public class MicroPreyAgent extends MicroAgent
 			
 									act();
 									
-									return null;
+									return IFuture.DONE;
 								}
 								
 								public String toString()
@@ -98,13 +100,13 @@ public class MicroPreyAgent extends MicroAgent
 					
 					public void resultAvailable(Object result)
 					{
-						getExternalAccess().scheduleStep(new IComponentStep()
+						getExternalAccess().scheduleStep(new IComponentStep<Void>()
 						{
 							@XMLClassname("act2")
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								act();
-								return null;
+								return IFuture.DONE;
 							}
 							
 							public String toString()

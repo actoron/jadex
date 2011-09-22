@@ -334,9 +334,9 @@ public class DisplayPanel extends JComponent
 						{
 							if(calculating)
 							{
-								agent.scheduleStep(new IComponentStep()
+								agent.scheduleStep(new IComponentStep<Void>()
 								{
-									public Object execute(IInternalAccess ia)
+									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IFuture<IComponentManagementService>	fut	= ia.getServiceContainer().getRequiredService("cmsservice");
 										fut.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(DisplayPanel.this)
@@ -442,7 +442,7 @@ public class DisplayPanel extends JComponent
 												exception.printStackTrace();
 											}
 										});
-										return null;
+										return IFuture.DONE;
 									}
 								});
 							}
@@ -926,9 +926,9 @@ public class DisplayPanel extends JComponent
 		calculating	= true;
 		repaint();
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.getServiceContainer().getRequiredService("generateservice")
 					.addResultListener(new SwingDefaultResultListener()
@@ -952,7 +952,7 @@ public class DisplayPanel extends JComponent
 						});
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

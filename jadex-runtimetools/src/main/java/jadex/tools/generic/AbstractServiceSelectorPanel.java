@@ -52,10 +52,10 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 		// Hack!!! Search locally at (potentially remote) platform, as scope global is set to platform when transferring search request.
 		final Class	type	= servicetype;
 		final String	scope	= isRemote() ? RequiredServiceInfo.SCOPE_GLOBAL: RequiredServiceInfo.SCOPE_PLATFORM;
-		platform.scheduleStep(new IComponentStep()
+		platform.scheduleStep(new IComponentStep<Collection>()
 		{
 			@XMLClassname("search-services")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Collection> execute(IInternalAccess ia)
 			{
 				final Future	ret	= new Future();
 				SServiceProvider.getServices(ia.getServiceContainer(), type, scope)

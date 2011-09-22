@@ -8,6 +8,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -21,10 +22,10 @@ public class StandardClientWindow extends JFrame
 	
 	public StandardClientWindow(final IExternalAccess access)
 	{
-		access.scheduleStep(new IComponentStep()
+		access.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("dispose") 
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.addComponentListener(new TerminationAdapter()
 				{
@@ -41,7 +42,7 @@ public class StandardClientWindow extends JFrame
 					}
 				});
 				
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -50,13 +51,13 @@ public class StandardClientWindow extends JFrame
 			public void windowClosing(WindowEvent e)
 			{
 				app.disconnect();
-				access.scheduleStep(new IComponentStep()
+				access.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("kill") 
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ia.killComponent();
-						return null;
+						return IFuture.DONE;
 					}
 				});
 				dispose();

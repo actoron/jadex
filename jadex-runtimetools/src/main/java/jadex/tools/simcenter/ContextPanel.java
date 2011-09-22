@@ -177,10 +177,10 @@ public class ContextPanel extends JPanel
 				IExternalAccess	access	= (IExternalAccess)result;
 				final String	id	= "ContextPanel"+ContextPanel.this.hashCode()+"@"+simp.jcc.getJCCAccess().getComponentIdentifier();
 				final ISimulationService	simservice	= simp.getSimulationService();
-				access.scheduleStep(new IComponentStep()
+				access.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("addListener")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						RemoteSimServiceChangeListener	rccl	= new RemoteSimServiceChangeListener(id, ia, rcl, simservice);
 						if(active)
@@ -198,7 +198,7 @@ public class ContextPanel extends JPanel
 							simservice.getClockService().addChangeListener(rccl);
 //							System.out.println("deregister listener: "+id);
 						}
-						return null;
+						return IFuture.DONE;
 					}
 				});
 			}

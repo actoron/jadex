@@ -17,6 +17,7 @@ import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
@@ -620,10 +621,10 @@ public class ConversationPanel extends JSplitPane
 		final Map	sendmsg	= new HashMap(msg);
 		final MessageType	mt	= (MessageType)sendmsg.remove(MESSAGE_TYPE);
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("sendM")
-			public Object execute(final IInternalAccess ia)
+			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				final Future	ret	= new Future();
 				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)

@@ -203,9 +203,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				{
 					public IFuture urlRemoved(final URL url)
 					{
-						exta.scheduleStep(new IComponentStep()
+						exta.scheduleStep(new IComponentStep<Void>()
 						{
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								Collection affectedkernels = (Collection) kernelurls.remove(url);
 								if (affectedkernels != null)
@@ -217,7 +217,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 								}
 								potentialurls.remove(url);
 								validurls.remove(url);
-								return null;
+								return IFuture.DONE;
 							}
 						});
 						return IFuture.DONE;
@@ -225,14 +225,14 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 					
 					public IFuture urlAdded(final URL url)
 					{
-						exta.scheduleStep(new IComponentStep()
+						exta.scheduleStep(new IComponentStep<Void>()
 						{
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								extensionblacklist = new HashSet(baseextensionblacklist);
 								validurls.add(url);
 								potentialurls.add(url);
-								return null;
+								return IFuture.DONE;
 							}
 						});
 						return IFuture.DONE;

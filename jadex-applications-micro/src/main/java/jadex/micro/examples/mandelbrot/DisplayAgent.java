@@ -93,10 +93,10 @@ public class DisplayAgent extends MicroAgent
 					}
 				});
 				
-				access.scheduleStep(new IComponentStep()
+				access.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("dispose")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ia.addComponentListener(new TerminationAdapter()
 						{
@@ -112,7 +112,7 @@ public class DisplayAgent extends MicroAgent
 							}
 						});
 						
-						return null;
+						return IFuture.DONE;
 					}
 				});
 				

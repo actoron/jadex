@@ -206,15 +206,15 @@ public class ConsolePanel extends JPanel
 			if(!label.getText().endsWith(" (off)"))
 				label.setText(label.getText()+" (off)");
 			
-			platformaccess.scheduleImmediate(new IComponentStep()
+			platformaccess.scheduleImmediate(new IComponentStep<Void>()
 			{
 				@XMLClassname("removeListener")
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					ConsoleListener	cl	= new ConsoleListener(id, ia, null);
 					SUtil.removeSystemOutListener(cl);
 					SUtil.removeSystemErrListener(cl);
-					return null;
+					return IFuture.DONE;
 				}
 			});
 		}
@@ -261,15 +261,15 @@ public class ConsolePanel extends JPanel
 				}
 			};
 			
-			platformaccess.scheduleImmediate(new IComponentStep()
+			platformaccess.scheduleImmediate(new IComponentStep<Void>()
 			{
 				@XMLClassname("installListener")
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					ConsoleListener	cl	= new ConsoleListener(id, ia, rcl);
 					SUtil.addSystemOutListener(cl);
 					SUtil.addSystemErrListener(cl);
-					return null;
+					return IFuture.DONE;
 				}
 			});
 			
@@ -327,9 +327,9 @@ public class ConsolePanel extends JPanel
 		 */
 		public void changeOccurred(final ChangeEvent event)
 		{
-			instance.getExternalAccess().scheduleImmediate(new IComponentStep()
+			instance.getExternalAccess().scheduleImmediate(new IComponentStep<Void>()
 			{
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					// Merge new output with last output, if not yet sent.
 					boolean	merged	= false;
@@ -348,7 +348,7 @@ public class ConsolePanel extends JPanel
 					if(!merged)
 						occurrenceAppeared(event.getType(), event.getValue());
 					
-					return null;
+					return IFuture.DONE;
 				}
 			});
 		}

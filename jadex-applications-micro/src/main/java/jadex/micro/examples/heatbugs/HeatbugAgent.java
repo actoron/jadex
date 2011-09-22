@@ -2,7 +2,9 @@ package jadex.micro.examples.heatbugs;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.IFilter;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
@@ -57,9 +59,9 @@ public class HeatbugAgent extends MicroAgent
 				ideal_temp = ((Number)avatar.getProperty("ideal_temp")).doubleValue();
 //						System.out.println("ideal_temp: "+ideal_temp+" "+getArgument("ideal_temp"));
 				
-				IComponentStep com = new IComponentStep()
+				IComponentStep com = new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ISpaceObject avatar = grid.getAvatar(getComponentDescription());
 						IVector2 mypos = (IVector2)avatar.getProperty(Space2D.PROPERTY_POSITION);
@@ -130,7 +132,7 @@ public class HeatbugAgent extends MicroAgent
 						}
 						
 						waitForTick(this);
-						return null;
+						return IFuture.DONE;
 					}
 					
 					public String toString()

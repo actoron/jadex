@@ -15,6 +15,7 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 
 import java.util.Iterator;
 
@@ -95,9 +96,9 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 					process.start(clockservice, space);
 				}
 
-				final IComponentStep step = new IComponentStep()
+				final IComponentStep step = new IComponentStep<Void>()
 				{
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						scheduled	= false;
 						long currenttime = clockservice.getTime();
@@ -169,7 +170,7 @@ public class DeltaTimeExecutor extends SimplePropertyObject implements ISpaceExe
 							});
 						}
 						
-						return null;
+						return IFuture.DONE;
 					}
 				};
 

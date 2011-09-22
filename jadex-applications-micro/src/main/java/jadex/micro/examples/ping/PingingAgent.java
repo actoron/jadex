@@ -9,6 +9,7 @@ import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
 
@@ -46,9 +47,9 @@ public class PingingAgent extends MicroAgent
 		final Object content = getArgument("content");
 		sent = new HashSet();
 		
-		final IComponentStep step = new IComponentStep()
+		final IComponentStep step = new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(dif>missed_max)
 				{
@@ -69,7 +70,7 @@ public class PingingAgent extends MicroAgent
 					sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE);
 					waitFor(timeout, this);
 				}
-				return null;
+				return IFuture.DONE;
 			}
 		};
 		

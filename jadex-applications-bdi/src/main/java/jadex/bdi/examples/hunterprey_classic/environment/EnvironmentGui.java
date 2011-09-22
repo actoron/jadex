@@ -10,6 +10,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -132,15 +133,15 @@ public class EnvironmentGui	extends JFrame
 				
 				dispose();
 				
-				agent.scheduleStep(new IComponentStep()
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("end")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 						IGoal goal = bia.getGoalbase().createGoal("end_agent");
 						bia.getGoalbase().dispatchTopLevelGoal(goal);
-						return null;
+						return IFuture.DONE;
 					}
 				});
 //				agent.createGoal("end_agent").addResultListener(new SwingDefaultResultListener(EnvironmentGui.this)
@@ -156,10 +157,10 @@ public class EnvironmentGui	extends JFrame
 			}
 		});
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("dispose")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.addComponentListener(new TerminationAdapter()
@@ -175,7 +176,7 @@ public class EnvironmentGui	extends JFrame
 						});
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -206,10 +207,10 @@ public class EnvironmentGui	extends JFrame
 	{
 		final JPanel options = new JPanel(new GridBagLayout());
 
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("env")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
@@ -233,14 +234,14 @@ public class EnvironmentGui	extends JFrame
 					public void actionPerformed(ActionEvent e)
 					{
 						final Long val = new Long(roundtimetf.getText());
-						agent.scheduleStep(new IComponentStep()
+						agent.scheduleStep(new IComponentStep<Void>()
 						{
 							@XMLClassname("roundtime")
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 								bia.getBeliefbase().getBelief("roundtime").setFact(val);
-								return null;
+								return IFuture.DONE;
 							}
 						});
 //						agent.getBeliefbase().setBeliefFact("roundtime", val);
@@ -295,14 +296,14 @@ public class EnvironmentGui	extends JFrame
 				options.add(hs, new GridBagConstraints(0, 4, 1, 1, 0, 0,
 						GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
 				
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("roundcnt")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
@@ -325,14 +326,14 @@ public class EnvironmentGui	extends JFrame
 					public void actionPerformed(ActionEvent e)
 					{
 						final Long val = new Long(roundtimetf.getText());
-						agent.scheduleStep(new IComponentStep()
+						agent.scheduleStep(new IComponentStep<Void>()
 						{
 							@XMLClassname("rt")
-							public Object execute(IInternalAccess ia)
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 								bia.getBeliefbase().getBelief("roundtime").setFact(val);
-								return null;
+								return IFuture.DONE;
 							}
 						});
 //						agent.getBeliefbase().setBeliefFact("roundtime", val);
@@ -387,7 +388,7 @@ public class EnvironmentGui	extends JFrame
 				options.add(hs, new GridBagConstraints(0, 4, 1, 1, 0, 0,
 						GridBagConstraints.WEST,  GridBagConstraints.NONE, insets, 0 , 0));
 				
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -474,10 +475,10 @@ public class EnvironmentGui	extends JFrame
 	 */
 	protected void	enableGuiUpdate(IBDIExternalAccess agent)
 	{
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("dummy")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				final Environment env = (Environment)bia.getBeliefbase().getBelief("environment").getFact();
@@ -502,7 +503,7 @@ public class EnvironmentGui	extends JFrame
 						highscore.update(env.getHighscore());
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		

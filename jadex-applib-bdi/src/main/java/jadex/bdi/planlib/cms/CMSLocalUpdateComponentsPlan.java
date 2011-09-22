@@ -36,13 +36,13 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 			{
 				try
 				{
-					getExternalAccess().scheduleStep(new IComponentStep()
+					getExternalAccess().scheduleStep(new IComponentStep<Void>()
 					{
 						@XMLClassname("addFact")
-						public Object execute(IInternalAccess ia)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							((IBDIInternalAccess)ia).getBeliefbase().getBeliefSet("components").addFact(desc);
-							return null;
+							return IFuture.DONE;
 						}
 					});
 				}
@@ -57,13 +57,13 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 			{
 				try
 				{
-					getExternalAccess().scheduleStep(new IComponentStep()
+					getExternalAccess().scheduleStep(new IComponentStep<Void>()
 					{
 						@XMLClassname("removeFact")
-						public Object execute(IInternalAccess ia)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							((IBDIInternalAccess)ia).getBeliefbase().getBeliefSet("components").removeFact(desc);
-							return null;
+							return IFuture.DONE;
 						}
 					});
 				}

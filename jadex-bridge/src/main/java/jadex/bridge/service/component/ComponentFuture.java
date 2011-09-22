@@ -53,12 +53,12 @@ public class ComponentFuture<E> extends Future<E>
 		// Hack!!! Notify multiple listeners at once?
 		if(adapter.isExternalThread())
 		{
-			ea.scheduleStep(new IComponentStep()
+			ea.scheduleStep(new IComponentStep<Void>()
 			{
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					ComponentFuture.super.notifyListener(listener);
-					return null;
+					return IFuture.DONE;
 				}
 			});
 		}

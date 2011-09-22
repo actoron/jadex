@@ -6,6 +6,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
@@ -84,9 +85,9 @@ public class GeneratePanel extends JPanel
 					final int par = Integer.parseInt(pp.getTextField("parallel").getText());
 					final int tasksize = Integer.parseInt(pp.getTextField("task size").getText());
 				
-					agent.scheduleStep(new IComponentStep()
+					agent.scheduleStep(new IComponentStep<Void>()
 					{
-						public Object execute(final IInternalAccess ia)
+						public IFuture<Void> execute(final IInternalAccess ia)
 						{
 //							SServiceProvider.getDeclaredService(agent.getServiceProvider(), IGenerateService.class)
 							ia.getServiceContainer().getRequiredService("generateservice")
@@ -124,7 +125,7 @@ public class GeneratePanel extends JPanel
 									});
 								}
 							});
-							return null;
+							return IFuture.DONE;
 						}
 					});
 					
@@ -190,10 +191,10 @@ public class GeneratePanel extends JPanel
 			}
 		});
 		
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("dispose")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.addComponentListener(new TerminationAdapter()
 				{
@@ -209,7 +210,7 @@ public class GeneratePanel extends JPanel
 					}
 				});
 				
-				return null;
+				return IFuture.DONE;
 			}
 		});		
 		

@@ -8,6 +8,7 @@ import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -49,16 +50,16 @@ public class GuiOpenClosePlan extends Plan
 			{
 				try
 				{
-					getExternalAccess().scheduleStep(new IComponentStep()
+					getExternalAccess().scheduleStep(new IComponentStep<Void>()
 					{
 						@XMLClassname("closed")
-						public Object execute(IInternalAccess ia)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
 							IInternalEvent	event	= scope.getEventbase().createInternalEvent("gui_closed");
 							scope.getEventbase().dispatchInternalEvent(event);
 							dispatched	= true;
-							return null;
+							return IFuture.DONE;
 						}
 					});
 				}

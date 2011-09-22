@@ -6,6 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.IMicroExternalAccess;
 
@@ -55,12 +56,12 @@ public class ShopService extends BasicService implements IShopService
 	 */
 	public IFuture<ItemInfo> buyItem(final String item, final double price)
 	{
-		return comp.scheduleStep(new IComponentStep()
+		return comp.scheduleStep(new IComponentStep<ItemInfo>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<ItemInfo> execute(IInternalAccess ia)
 			{
 				ShopAgent agent = (ShopAgent)ia;
-				return agent.buyItem(item, price);
+				return new Future<ItemInfo>(agent.buyItem(item, price));
 			}
 		});
 	}
@@ -71,12 +72,12 @@ public class ShopService extends BasicService implements IShopService
 	 */	
 	public IFuture<ItemInfo[]> getCatalog()
 	{
-		return comp.scheduleStep(new IComponentStep()
+		return comp.scheduleStep(new IComponentStep<ItemInfo[]>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<ItemInfo[]> execute(IInternalAccess ia)
 			{
 				ShopAgent agent = (ShopAgent)ia;
-				return agent.getCatalog();
+				return new Future<ItemInfo[]>(agent.getCatalog());
 			}
 		});
 	}

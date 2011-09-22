@@ -111,9 +111,9 @@ public class AGRSpace	implements IExtensionInstance
 				}
 			}
 			
-			exta.scheduleStep(new IComponentStep()
+			exta.scheduleStep(new IComponentStep<Void>()
 			{
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					ia.addComponentListener(new IComponentListener()
 					{
@@ -145,7 +145,7 @@ public class AGRSpace	implements IExtensionInstance
 							return IFuture.DONE;
 						}
 					});
-					return null;
+					return IFuture.DONE;
 				}
 			}).addResultListener(new DelegationResultListener(ret)
 			{

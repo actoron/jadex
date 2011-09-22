@@ -321,9 +321,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		this.container = createServiceContainer();
 		this.ea = new ExternalAccessFlyweight(state, ragent);
 
-		scheduleStep(new IComponentStep()
+		scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				init(getModel(), config).addResultListener(createResultListener(new DelegationResultListener(inited)
 				{
@@ -333,7 +333,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 						inited.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(BDIInterpreter.this, getAgentAdapter()));
 					}
 				}));
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -348,9 +348,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		assert !isExternalThread();
 
 		// Use step in case agent is started as suspended.
-		scheduleStep(new IComponentStep()
+		scheduleStep(new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_initparents, null);
 				
@@ -360,7 +360,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 					state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_arguments, null);
 
 				rulesystem.init();
-				return null;
+				return IFuture.DONE;
 			}
 		});
 	}

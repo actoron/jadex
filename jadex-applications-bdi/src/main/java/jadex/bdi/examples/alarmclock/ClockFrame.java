@@ -7,6 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.bridge.service.clock.IClockService;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
@@ -171,10 +172,10 @@ public class ClockFrame extends JFrame
 					alarms_gui.dispose();
 				dispose();
 				
-				ClockFrame.this.agent.scheduleStep(new IComponentStep()
+				ClockFrame.this.agent.scheduleStep(new IComponentStep<Void>()
 				{
 					@XMLClassname("settings")
-					public Object execute(IInternalAccess ia)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 						final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
@@ -198,7 +199,7 @@ public class ClockFrame extends JFrame
 								});
 							}
 						}
-						return null;
+						return IFuture.DONE;
 					}
 				});
 				
@@ -321,10 +322,10 @@ public class ClockFrame extends JFrame
 		timer.setRepeats(true);
 		timer.start();
 
-		agent.scheduleStep(new IComponentStep()
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("tray")
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				bia.addComponentListener(new TerminationAdapter()
@@ -343,7 +344,7 @@ public class ClockFrame extends JFrame
 						});
 					}
 				});
-				return null;
+				return IFuture.DONE;
 			}
 		});
 		
@@ -379,10 +380,10 @@ public class ClockFrame extends JFrame
 //		final boolean[] firsttime = new boolean[]{true};
 		try
 		{
-			agent.scheduleStep(new IComponentStep()
+			agent.scheduleStep(new IComponentStep<Void>()
 			{
 				@XMLClassname("refresh")
-				public Object execute(IInternalAccess ia)
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 					final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
@@ -417,7 +418,7 @@ public class ClockFrame extends JFrame
 								ti.setToolTip(format.format(current));
 						}
 					});
-					return null;
+					return IFuture.DONE;
 				}
 			});
 			

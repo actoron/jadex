@@ -56,9 +56,9 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		super(desc, model, config, factory, parent, bindings, copy, inited);
 		this.steps = new ArrayList();
 	
-		addStep((new Object[]{new IComponentStep()
+		addStep((new Object[]{new IComponentStep<Void>()
 		{
-			public Object execute(IInternalAccess ia)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				init(getModel(), ComponentInterpreter.this.config, arguments)
 					.addResultListener(createResultListener(new DelegationResultListener(inited)
@@ -75,7 +75,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 					}
 				}));
 				
-				return null;
+				return IFuture.DONE;
 			}
 		}, new Future()}));
 	}
@@ -290,7 +290,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	/**
 	 *  Wait for some time and execute a component step afterwards.
 	 */
-	public IFuture waitFor(final long delay, final IComponentStep step)
+	public <T> IFuture<T> waitFor(final long delay, final IComponentStep<T> step)
 	{
 		// todo: remember and cleanup timers in case of component removal.
 		

@@ -1,5 +1,6 @@
 package jadex.tools.testcenter;
 
+import jadex.base.SComponentFactory;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.filetree.FileNode;
@@ -20,10 +21,14 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
+import jadex.tools.starter.StarterPanel;
+import jadex.tools.starter.StarterPluginPanel;
 
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -220,32 +225,52 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 //			}
 //		});
 		
-		mpanel.addMouseListener(new MouseAdapter()
+		MouseListener ml = new MouseAdapter()
 		{
-			public void mouseClicked(MouseEvent e)
+			public void mousePressed(MouseEvent e)
 			{
-				if(e.getClickCount()==2)
+				int row = mpanel.getTree().getRowForLocation(e.getX(), e.getY());
+				if(row != -1)
 				{
-					//TreePath	path	= mpanel.getPathForLocation(e.getX(), e.getY());
-					Object	node = mpanel.getTree().getLastSelectedPathComponent();
-					if(node instanceof FileNode)
+					if(e.getClickCount() == 2)
 					{
-						final String model = ((FileNode)node).getRelativePath();
-						STestCenter.isTestcase(model, getJCC().getPlatformAccess())
-							.addResultListener(new SwingDefaultResultListener(mpanel)
+						Object	node = mpanel.getTree().getPathForRow(row).getLastPathComponent();
+						if(node instanceof IFileNode)
 						{
-							public void customResultAvailable(Object result)
+							if(((IFileNode)node).isDirectory())
 							{
-								if(((Boolean)result).booleanValue())
-									tcpanel.getTestList().addEntry(model);
+								if(mpanel.getTree().isExpanded(row))
+								{
+									mpanel.getTree().collapseRow(row);
+								}
 								else
-									jcc.setStatusText("Only agents can be added as testcases.");
+								{
+									mpanel.getTree().expandRow(row);									
+								}
 							}
-						});
+							else
+							{
+								mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+								final String model = ((IFileNode)node).getFilePath();
+								STestCenter.isTestcase(model, getJCC().getPlatformAccess())
+									.addResultListener(new SwingDefaultResultListener(mpanel)
+								{
+									public void customResultAvailable(Object result)
+									{
+										if(((Boolean)result).booleanValue())
+											tcpanel.getTestList().addEntry(model);
+										else
+											jcc.setStatusText("Component is not a testcase: "+model);
+										mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+									}
+								});
+							}
+						}
 					}
 				}
-			}
-		});
+      		}
+  		};
+  		mpanel.getTree().addMouseListener(ml);
 
 //		JPanel	tp	= new JPanel(new GridBagLayout());
 //		//tp.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Known Agents "));
