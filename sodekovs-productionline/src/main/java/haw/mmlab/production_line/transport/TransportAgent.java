@@ -61,6 +61,8 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 
 	private IDatabaseService dbService = null;
 
+	private IManagerService managerService = null;
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public IFuture<Void> agentCreated() {
@@ -116,7 +118,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	 * 
 	 * @author thomas
 	 */
-	private class ProduceStep implements IComponentStep {
+	private class ProduceStep implements IComponentStep<Void> {
 
 		private Role role = null;
 
@@ -137,7 +139,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 				Workpiece workpiece = new Workpiece(Sequencer.getNextNumber());
 				workpiece.setTask(task);
 				String msg = id + " has produced new " + workpiece;
-				getLogger().fine(msg);
+				// getLogger().fine(msg);
 				handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
 
 				informWPProduced(ia, task);
@@ -157,12 +159,17 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		 */
 		@SuppressWarnings("unchecked")
 		private void informWPProduced(final IInternalAccess ia, final Task task) {
-			getRequiredService("managerService").addResultListener(new DefaultResultListener<IManagerService>() {
+			if (managerService == null) {
+				getRequiredService("managerService").addResultListener(new DefaultResultListener<IManagerService>() {
 
-				public void resultAvailable(IManagerService service) {
-					service.informWPProduced(task.getId());
-				}
-			});
+					public void resultAvailable(IManagerService service) {
+						managerService = service;
+						managerService.informWPProduced(task.getId());
+					}
+				});
+			} else {
+				managerService.informWPProduced(task.getId());
+			}
 		}
 
 		/**
@@ -184,8 +191,8 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 						final String target = role.getPostcondition().getTargetAgent();
 
 						if (service.getId().equals(target)) {
-							String msg = id + " tries to send workpieces to " + target;
-							getLogger().fine(msg);
+							String msg = id + " tries to send workpiece to " + target;
+							// getLogger().fine(msg);
 							handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
 							IFuture<Boolean> future = service.process(workpiece, id);
 							future.addResultListener(new DefaultResultListener<Boolean>() {
@@ -193,7 +200,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 								public void resultAvailable(Boolean result) {
 									if (result) {
 										String msg = id + " has successfully sended workpiece to " + target;
-										getLogger().fine(msg);
+										// getLogger().fine(msg);
 										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
 										if (wpCount.get(task.getId()) != null) {
 											wpCount.put(task.getId(), wpCount.get(task.getId()) + 1);
@@ -203,7 +210,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 										waitFor(role.getProcessingTime(), ProduceStep.this);
 									} else {
 										String msg = id + " has failed to send workpiece to " + target;
-										getLogger().fine(msg);
+										// getLogger().fine(msg);
 										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
 										waitForTick(new RetrySendStep(task, role, workpiece));
 									}
@@ -223,7 +230,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	 * 
 	 * @author thomas
 	 */
-	private class RetrySendStep implements IComponentStep {
+	private class RetrySendStep implements IComponentStep<Void> {
 
 		private Task task = null;
 		private Role role = null;
@@ -249,7 +256,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 								public void resultAvailable(Boolean result) {
 									if (result) {
 										String msg = id + " has successfully sended workpiece to " + target;
-										getLogger().fine(msg);
+										// getLogger().fine(msg);
 										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
 										if (wpCount.get(task.getId()) != null) {
 											wpCount.put(task.getId(), wpCount.get(task.getId()) + 1);
@@ -259,7 +266,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 										waitFor(role.getProcessingTime(), new ProduceStep(role));
 									} else {
 										String msg = id + " has failed to send workpiece to " + target;
-										getLogger().fine(msg);
+										// getLogger().fine(msg);
 										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
 										waitForTick(RetrySendStep.this);
 									}
@@ -340,7 +347,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	 * 
 	 * @author thomas
 	 */
-	private class SendWorkpieceStep implements IComponentStep {
+	private class SendWorkpieceStep implements IComponentStep<Void> {
 
 		private Role role = null;
 

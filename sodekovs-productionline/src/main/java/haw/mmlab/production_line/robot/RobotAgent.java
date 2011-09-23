@@ -136,7 +136,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 
 					// wait for simulating the processing time
 					Integer processTime = role.getProcessingTime() == null ? 0 : role.getProcessingTime();
-					waitFor(processTime, new IComponentStep() {
+					waitFor(processTime, new IComponentStep<Void>() {
 
 						public IFuture<Void> execute(IInternalAccess ia) {
 							setWorkpiece(null);
@@ -200,7 +200,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 	 * 
 	 * @author thomas
 	 */
-	private class SendWorkpieceStep implements IComponentStep {
+	private class SendWorkpieceStep implements IComponentStep<Void> {
 
 		public IFuture<Void> execute(IInternalAccess ia) {
 			BufferElement element = buffer.peek();
@@ -242,13 +242,13 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 								public void resultAvailable(Boolean result) {
 									if (result) {
 										String msg = id + " successfully delivered " + wp + " to " + target;
-										getLogger().fine(msg);
+										// getLogger().fine(msg);
 										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
 										// Element aus Puffer entfernen
 										buffer.dequeue();
 									} else {
 										String msg = id + " could not hand over workpiece " + wp + " to " + target;
-										getLogger().fine(msg);
+										// getLogger().fine(msg);
 										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
 										// Element neu queuen
 										buffer.enqueue(buffer.dequeue());

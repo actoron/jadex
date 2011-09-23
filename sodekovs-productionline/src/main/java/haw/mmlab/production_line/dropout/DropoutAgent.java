@@ -87,7 +87,7 @@ public class DropoutAgent extends MicroAgent {
 		}
 	}
 
-	private class QueryStep implements IComponentStep {
+	private class QueryStep implements IComponentStep<Void> {
 
 		private Configuration configuration = null;
 

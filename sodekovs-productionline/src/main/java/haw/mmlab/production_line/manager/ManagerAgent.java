@@ -336,9 +336,9 @@ public class ManagerAgent extends MicroAgent {
 				logManager = new LogManager(plc);
 				finished = false;
 
-				// wait for 5s so the agents could be killed properly before
+				// wait for 10s so the agents could be killed properly before
 				// restarting new ones.
-				waitFor(5000, new IComponentStep() {
+				waitFor(10000, new IComponentStep<Void>() {
 
 					public IFuture<Void> execute(IInternalAccess ia) {
 						executeBody();
@@ -373,7 +373,7 @@ public class ManagerAgent extends MicroAgent {
 	 * 
 	 * @author thomas
 	 */
-	private class WaitForErrorStep implements IComponentStep {
+	private class WaitForErrorStep implements IComponentStep<Void> {
 
 		private Map<String, Integer> oldConsumedWPs = null;
 
