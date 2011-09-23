@@ -174,7 +174,7 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 	}
 
 	@CoordinationStep
-	public class SendMediumMessageStep extends CoordinationComponentStep<Void> {
+	public class SendMediumMessageStep extends CoordinationComponentStep {
 
 		public MediumMessage message = null;
 
@@ -200,7 +200,7 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 	}
 
 	@CoordinationStep
-	public class ReceiveMediumMessageStep extends CoordinationComponentStep<Void> {
+	public class ReceiveMediumMessageStep extends CoordinationComponentStep {
 
 		@CoordinationParameter
 		public MediumMessage message = null;
