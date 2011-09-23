@@ -136,7 +136,8 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 
 					// wait for simulating the processing time
 					Integer processTime = role.getProcessingTime() == null ? 0 : role.getProcessingTime();
-					waitFor(processTime, new IComponentStep<Void>() {
+					// waitFor(processTime, new IComponentStep<Void>() {
+					waitForTick(new IComponentStep<Void>() {
 
 						public IFuture<Void> execute(IInternalAccess ia) {
 							setWorkpiece(null);

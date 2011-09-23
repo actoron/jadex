@@ -207,7 +207,8 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 										} else {
 											wpCount.put(task.getId(), 1);
 										}
-										waitFor(role.getProcessingTime(), ProduceStep.this);
+										// waitFor(role.getProcessingTime(), ProduceStep.this);
+										waitForTick(ProduceStep.this);
 									} else {
 										String msg = id + " has failed to send workpiece to " + target;
 										// getLogger().fine(msg);
@@ -263,7 +264,8 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 										} else {
 											wpCount.put(task.getId(), 1);
 										}
-										waitFor(role.getProcessingTime(), new ProduceStep(role));
+										// waitFor(role.getProcessingTime(), new ProduceStep(role));
+										waitForTick(new ProduceStep(role));
 									} else {
 										String msg = id + " has failed to send workpiece to " + target;
 										// getLogger().fine(msg);
@@ -299,7 +301,8 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 				workpiece.addOperation(role.getCapability());
 				Integer processTime = role.getProcessingTime() == null ? 0 : role.getProcessingTime();
 				if (role.getPostcondition().getTargetAgent() != null) {
-					waitFor(processTime, new SendWorkpieceStep(role));
+					// waitFor(processTime, new SendWorkpieceStep(role));
+					waitForTick(new SendWorkpieceStep(role));
 				} else {
 					// consume
 					consume(workpiece);
