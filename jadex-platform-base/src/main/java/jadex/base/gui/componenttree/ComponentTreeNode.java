@@ -328,17 +328,10 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 					{
 						return new Future<RequiredServiceInfo[]>(ia.getServiceContainer().getRequiredServiceInfos());
 					}
-				}).addResultListener(new IResultListener()
+				}).addResultListener(new SwingDelegationResultListener<RequiredServiceInfo[]>(ret)
 				{
-					public void exceptionOccurred(Exception exception)
+					public void customResultAvailable(final RequiredServiceInfo[] res)
 					{
-						exception.printStackTrace();
-						ret.setException(exception);
-					}
-					public void resultAvailable(final Object res)
-					{
-						if(!(res instanceof RequiredServiceInfo[]))
-							System.out.println("gugu");
 						final RequiredServiceInfo[] reqs = (RequiredServiceInfo[])res;
 						SServiceProvider.getDeclaredServices(ea.getServiceProvider())
 							.addResultListener(new SwingDefaultResultListener()
