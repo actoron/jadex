@@ -254,6 +254,12 @@ public class Future<E> implements IFuture<E>
      */
     public void	setResult(E result)
     {
+    	if(result instanceof IFuture)
+    	{
+    		System.out.println("Internal error, future in future.");
+    		setException(new RuntimeException("Future in future not allowed."));
+    	}
+    	
     	synchronized(this)
 		{
         	if(isDone())

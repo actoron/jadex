@@ -540,7 +540,7 @@ public class RemoteReferenceModule
 				if(handler instanceof BasicServiceInvocationHandler)
 				{
 					BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
-					return getRemoteReference(bsh.getService(), orig);
+					ret = new RemoteReference(rsms.getRMSComponentIdentifier(), bsh.getServiceIdentifier());
 				}
 				else if(handler instanceof RemoteMethodInvocationHandler)
 				{
