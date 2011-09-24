@@ -444,7 +444,8 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ret.setResult(interpreter.addComponentListener(listener));
+						interpreter.addComponentListener(listener)
+							.addResultListener(new DelegationResultListener(ret));
 					}
 				});
 			}
@@ -455,7 +456,8 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(interpreter.addComponentListener(listener));
+			interpreter.addComponentListener(listener)
+				.addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;
@@ -477,7 +479,8 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						ret.setResult(interpreter.removeComponentListener(listener));
+						interpreter.removeComponentListener(listener)
+							.addResultListener(new DelegationResultListener(ret));
 					}
 				});
 			}
@@ -488,7 +491,8 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			ret.setResult(interpreter.removeComponentListener(listener));
+			interpreter.removeComponentListener(listener)
+				.addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;
