@@ -94,7 +94,7 @@
 		<componenttype filename="jadex/component/KernelMulti.component.xml" name="kernel_multi"/>
 		<componenttype filename="jadex/base/service/remote/RemoteServiceManagementAgent.class" name="rms"/>
 <!-- 		<componenttype filename="jadex/base/service/awareness/management/AwarenessManagementAgent.class" name="awa"/> -->
-		<componenttype filename="de/unihamburg/vsis/jadexAndroid_test/AwarenessManagementAgentExtends.class" name="awa"/>
+		<componenttype filename="de/unihamburg/vsis/jadexAndroid_test/AwarenessNotifierAgent.class" name="awa"/>
 		<!-- <componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/> -->
 		<!--<componenttype filename="jadex/tools/jcc/JCCAgent.class" name="jcc"/>-->
 		<componenttype filename="/jadex/tools/jcc/JCCAgent.class" name="jcc"/>
