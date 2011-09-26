@@ -4,12 +4,12 @@ package jadex.commons.future;
 /**
  *  Result listener that delegates calls to a future.
  */
-public class DelegationResultListener<E> implements IResultListener<E>
+public abstract class ExceptionDelegationResultListener<E, T> implements IResultListener<E>
 {
 	//-------- attributes --------
 	
 	/** The future to which calls are delegated. */
-	protected Future<E> future;
+	protected Future<T> future;
 	
 //	protected DebugException	ex;
 	
@@ -18,7 +18,7 @@ public class DelegationResultListener<E> implements IResultListener<E>
 	/**
 	 *  Create a new listener.
 	 */
-	public DelegationResultListener(Future<E> future)
+	public ExceptionDelegationResultListener(Future<T> future)
 	{
 		this.future = future;
 //		this.ex	= new DebugException();
@@ -61,10 +61,10 @@ public class DelegationResultListener<E> implements IResultListener<E>
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
-	public void customResultAvailable(E result)
-	{
-		future.setResult(result);
-	}
+	public abstract void customResultAvailable(E result);
+//	{
+//		future.setResult(result);
+//	}
 
 	/**
 	 *  Called when an exception occurred.

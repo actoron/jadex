@@ -1,6 +1,7 @@
 package jadex.base.gui.asynctree;
 
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 
 import java.util.List;
 
@@ -71,7 +72,7 @@ public interface ITreeNode
 	/**
 	 *  Get the current children, i.e. start a new update process and provide the result as a future.
 	 */
-	public IFuture	getChildren();
+	public IFuture<List<ITreeNode>> getChildren();
 	
 	/**
 	 *  True, if the node has properties that can be displayed.

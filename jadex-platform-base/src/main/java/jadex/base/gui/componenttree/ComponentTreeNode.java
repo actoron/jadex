@@ -1,6 +1,7 @@
 package jadex.base.gui.componenttree;
 
 import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.ExceptionSwingDelegationResultListener;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.AbstractTreeNode;
@@ -19,7 +20,9 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
@@ -139,9 +142,10 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	{
 //		System.out.println("CTN refresh: "+getId());
 		
-		cms.getComponentDescription(desc.getName()).addResultListener(new SwingDefaultResultListener()
+		cms.getComponentDescription(desc.getName())
+			.addResultListener(new SwingDefaultResultListener<IComponentDescription>()
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentDescription result)
 			{
 				ComponentTreeNode.this.desc	= (IComponentDescription)result;
 				broken	= false;
@@ -166,19 +170,20 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 //		if(getComponentIdentifier().getName().indexOf("Garbage")!=-1)
 //			System.out.println("searchChildren: "+getId());
 		searchChildren(cms, getComponentIdentifier())
-			.addResultListener(new IResultListener()
+			.addResultListener(new IResultListener<List<ITreeNode>>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(List<ITreeNode> result)
 			{
 				broken	= false;
 				getModel().fireNodeChanged(ComponentTreeNode.this);
-				setChildren((List)result);
+				setChildren(result);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				broken	= true;
 				getModel().fireNodeChanged(ComponentTreeNode.this);
-				setChildren(Collections.EMPTY_LIST);
+				List<ITreeNode> res = Collections.emptyList();
+				setChildren(res);
 			}
 		});
 	}
@@ -271,21 +276,21 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	/**
 	 *  Asynchronously search for children.
 	 */
-	protected IFuture	searchChildren(final IComponentManagementService cms, final IComponentIdentifier cid)
+	protected IFuture<List<ITreeNode>> searchChildren(final IComponentManagementService cms, final IComponentIdentifier cid)
 	{
-		final Future	ret	= new Future();
-		final List	children	= new ArrayList();
+		final Future<List<ITreeNode>>	ret	= new Future<List<ITreeNode>>();
+		final List<ITreeNode>	children	= new ArrayList<ITreeNode>();
 		final boolean	ready[]	= new boolean[2];	// 0: children, 1: services;
 
 //		if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //			System.err.println("searchChildren queued: "+this);
-		cms.getChildrenDescriptions(cid).addResultListener(new SwingDefaultResultListener()
+		cms.getChildrenDescriptions(cid).addResultListener(new SwingDefaultResultListener<IComponentDescription[]>()
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(final IComponentDescription[] achildren)
 			{
 //				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //					System.err.println("searchChildren queued2: "+ComponentTreeNode.this);
-				final IComponentDescription[] achildren = (IComponentDescription[])result;
+//				final IComponentDescription[] achildren = (IComponentDescription[])result;
 				for(int i=0; i<achildren.length; i++)
 				{
 					ITreeNode	node	= createComponentNode(achildren[i]);
@@ -313,13 +318,13 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		// Search services and only add container node when services are found.
 //		System.out.println("name: "+desc.getName());
 		cms.getExternalAccess(cid)
-			.addResultListener(new SwingDefaultResultListener()
+			.addResultListener(new SwingDefaultResultListener<IExternalAccess>()
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(final IExternalAccess ea)
 			{
 //				if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //					System.err.println("searchChildren queued4: "+ComponentTreeNode.this);
-				final IExternalAccess	ea	= (IExternalAccess)result;
+//				final IExternalAccess	ea	= (IExternalAccess)result;
 				
 				ea.scheduleImmediate(new IComponentStep<RequiredServiceInfo[]>()
 				{
@@ -328,7 +333,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 					{
 						return new Future<RequiredServiceInfo[]>(ia.getServiceContainer().getRequiredServiceInfos());
 					}
-				}).addResultListener(new SwingDelegationResultListener<RequiredServiceInfo[]>(ret)
+				}).addResultListener(new ExceptionSwingDelegationResultListener<RequiredServiceInfo[], List<ITreeNode>>(ret)
 				{
 					public void customResultAvailable(final RequiredServiceInfo[] res)
 					{

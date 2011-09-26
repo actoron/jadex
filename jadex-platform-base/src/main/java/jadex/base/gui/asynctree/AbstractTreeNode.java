@@ -4,6 +4,8 @@ import jadex.base.Starter;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IntermediateFuture;
 import jadex.commons.gui.TreeExpansionHandler;
 
 import java.util.ArrayList;
@@ -35,7 +37,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	protected final JTree	tree;
 	
 	/** The cached children. */
-	private List	children;
+	private List<ITreeNode>	children;
 	
 	/** Flag to indicate search in progress. */
 	protected boolean	searching;
@@ -47,7 +49,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	protected boolean	dirty;
 	
 	/** The children future (result of next search). */
-	protected Future	childrenfuture;
+	protected Future<List<ITreeNode>> childrenfuture;
 	
 	//-------- constructors --------
 	
@@ -165,26 +167,27 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	/**
 	 *  Get the cached children, i.e. do not start any background processes for updating the children.
 	 */
-	public List	getCachedChildren()
+	public List<ITreeNode>	getCachedChildren()
 	{
 		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
-		return children!=null ? children : Collections.EMPTY_LIST;
+		// Conditional does not work with generic Collections.emptyMap() method?
+		return children!=null ? children : (List<ITreeNode>)Collections.EMPTY_LIST;
 	}
 	
 	/**
 	 *  Get the current children, i.e. start a new update process and provide the result as a future.
 	 */
-	public IFuture	getChildren()
+	public IFuture<List<ITreeNode>> getChildren()
 	{
 		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
 		if(childrenfuture==null)
 		{
-			childrenfuture	= new Future();
+			childrenfuture	= new Future<List<ITreeNode>>();
 		}
 		
-		IFuture	ret	= childrenfuture;
+		IFuture<List<ITreeNode>>	ret	= childrenfuture;
 		
 //		System.out.println("searchChildren: "+getId());
 		
@@ -236,12 +239,12 @@ public abstract class AbstractTreeNode	implements ITreeNode
 	 *  No children should be represented as empty list to avoid
 	 *  ongoing search for children.
 	 */
-	protected void	setChildren(List newchildren)
+	protected void	setChildren(List<ITreeNode> newchildren)
 	{
 		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 
-		List	oldcs	= children!=null ? new ArrayList(children) : null;
-		List	newcs	= newchildren!=null ? new ArrayList(newchildren) : null;
+		List<ITreeNode>	oldcs	= children!=null ? new ArrayList<ITreeNode>(children) : null;
+		List<ITreeNode>	newcs	= newchildren!=null ? new ArrayList<ITreeNode>(newchildren) : null;
 		
 		assert false || checkChildren(oldcs, newcs);
 		
@@ -260,7 +263,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 			recurse	= false;
 			
 			if(children==null)
-				children	= new ArrayList();
+				children	= new ArrayList<ITreeNode>();
 			
 			// New update algorithm (can cope with changing orderings)
 			boolean	changed	= false;
@@ -351,7 +354,7 @@ public abstract class AbstractTreeNode	implements ITreeNode
 			
 			if(childrenfuture!=null)
 			{
-				childrenfuture.setResult(new ArrayList(children));
+				childrenfuture.setResult(new ArrayList<ITreeNode>(children));
 				childrenfuture	= null;
 			}
 			
