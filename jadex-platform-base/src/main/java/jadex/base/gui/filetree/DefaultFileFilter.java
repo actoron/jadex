@@ -99,9 +99,9 @@ public class DefaultFileFilter implements IRemoteFilter
 	 *  @param obj The object to filter.
 	 *  @return True, if passes filter.
 	 */
-	public IFuture filter(Object obj)
+	public IFuture<Boolean> filter(Object obj)
 	{
-		Future ret =  new Future();
+		Future<Boolean> ret =  new Future<Boolean>();
 		
 		if(obj instanceof File)
 		{

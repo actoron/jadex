@@ -16,7 +16,7 @@ public interface ISearchManager
 	 *  @param selector	The result selector to select matching services and produce the final result. 
 	 *  @param services	The local services of the provider (class->list of services).
 	 */
-	public IIntermediateFuture	searchServices(IServiceProvider provider, IVisitDecider decider, 
+	public IIntermediateFuture<IService> searchServices(IServiceProvider provider, IVisitDecider decider, 
 		IResultSelector selector, Map services);
 
 	/**

@@ -177,7 +177,7 @@ public class ChatPanel extends JPanel
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.getServiceContainer().getRequiredServices("chatservices")
-					.addResultListener(new IIntermediateResultListener<Object>()
+					.addResultListener(new IIntermediateResultListener<IService>()
 				{
 					public void resultAvailable(Collection result)
 					{
@@ -198,7 +198,7 @@ public class ChatPanel extends JPanel
 						exception.printStackTrace();
 					}
 					
-					public void intermediateResultAvailable(Object result)
+					public void intermediateResultAvailable(IService result)
 					{
 //						System.out.println("intermediate");
 						((IChatService)result).hear(name, text);

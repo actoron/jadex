@@ -64,9 +64,9 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	 *  @return True, if the filter matches.
 	 * @throws Exception
 	 */
-	public IFuture filter(Object object)
+	public IFuture<Boolean> filter(Object object)
 	{
-		final Future ret = new Future();
+		final Future<Boolean> ret = new Future<Boolean>();
 		
 		if(operator==AND)
 		{
@@ -80,11 +80,11 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 		}
 		else if(operator==NOT)
 		{
-			filters[0].filter(object).addResultListener(new DelegationResultListener(ret)
+			filters[0].filter(object).addResultListener(new DelegationResultListener<Boolean>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Boolean result)
 				{
-					ret.setResult(!((Boolean)result).booleanValue());
+					ret.setResult(!result.booleanValue());
 				}
 			});
 		}
@@ -94,19 +94,19 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	/**
 	 *  Check and filter.
 	 */
-	protected IFuture checkAndFilter(final Object object, final IRemoteFilter[] filter, final int i)
+	protected IFuture<Boolean> checkAndFilter(final Object object, final IRemoteFilter[] filter, final int i)
 	{
-		final Future ret = new Future();
-		filters[i].filter(object).addResultListener(new DelegationResultListener(ret)
+		final Future<Boolean> ret = new Future<Boolean>();
+		filters[i].filter(object).addResultListener(new DelegationResultListener<Boolean>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Boolean result)
 			{
-				if(((Boolean)result).booleanValue())
+				if(result.booleanValue())
 				{
 					if(i+1<filter.length)
 					{
 						checkAndFilter(object, filter, i+1)
-							.addResultListener(new DelegationResultListener(ret));
+							.addResultListener(new DelegationResultListener<Boolean>(ret));
 					}
 					else
 					{
@@ -125,14 +125,14 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	/**
 	 *  Check or filter.
 	 */
-	protected IFuture checkOrFilter(final Object object, final IRemoteFilter[] filter, final int i)
+	protected IFuture<Boolean> checkOrFilter(final Object object, final IRemoteFilter[] filter, final int i)
 	{
-		final Future ret = new Future();
-		filters[i].filter(object).addResultListener(new DelegationResultListener(ret)
+		final Future<Boolean> ret = new Future<Boolean>();
+		filters[i].filter(object).addResultListener(new DelegationResultListener<Boolean>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Boolean result)
 			{
-				if(((Boolean)result).booleanValue())
+				if(result.booleanValue())
 				{
 					ret.setResult(Boolean.TRUE);
 				}
@@ -141,7 +141,7 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 					if(i+1<filter.length)
 					{
 						checkOrFilter(object, filter, i+1)
-							.addResultListener(new DelegationResultListener(ret));
+							.addResultListener(new DelegationResultListener<Boolean>(ret));
 					}
 					else
 					{

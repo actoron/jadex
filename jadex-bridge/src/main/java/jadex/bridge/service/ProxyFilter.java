@@ -21,9 +21,9 @@ public class ProxyFilter implements IRemoteFilter
 	/**
 	 *  Test if service is a proxy.
 	 */
-	public IFuture filter(Object obj)
+	public IFuture<Boolean> filter(Object obj)
 	{
-		return new Future(!Proxy.isProxyClass(obj.getClass()) || 
+		return new Future<Boolean>(!Proxy.isProxyClass(obj.getClass()) || 
 			// todo: fix this Hack	
 			!(Proxy.getInvocationHandler(obj).getClass().getName().indexOf("RemoteMethodInvocationHandler")!=-1));
 //			!(Proxy.getInvocationHandler(obj) instanceof RemoteMethodInvocationHandler));

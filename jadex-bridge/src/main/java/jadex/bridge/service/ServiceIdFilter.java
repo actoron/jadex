@@ -54,9 +54,9 @@ public class ServiceIdFilter implements IRemoteFilter
 	/**
 	 *  Test if service is a proxy.
 	 */
-	public IFuture filter(Object obj)
+	public IFuture<Boolean> filter(Object obj)
 	{
-		return new Future(obj instanceof IService && ((IService)obj).getServiceIdentifier().equals(sid));
+		return new Future<Boolean>(obj instanceof IService && ((IService)obj).getServiceIdentifier().equals(sid));
 	}
 	
 	/**

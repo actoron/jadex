@@ -1,5 +1,7 @@
 package jadex.bridge.service;
 
+import java.util.Collection;
+
 import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -14,19 +16,19 @@ public interface IServiceProvider extends IRemotable
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IIntermediateFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector);
+	public IIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector);
 	
 	/**
 	 *  Get the parent service container.
 	 *  @return The parent container.
 	 */
-	public IFuture	getParent();
+	public IFuture<IServiceProvider>	getParent();
 	
 	/**
 	 *  Get the children container.
 	 *  @return The children container.
 	 */
-	public IFuture	getChildren();
+	public IFuture<Collection<IServiceProvider>>	getChildren();
 	
 	/**
 	 *  Get the globally unique id of the provider.

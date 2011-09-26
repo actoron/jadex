@@ -24,14 +24,14 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @return A future that is done when the service has completed starting.  
 	 */
 	// todo: remove, only call from platform
-	public IFuture start();
+	public IFuture<Void> start();
 	
 	/**
 	 *  Shutdown the service.
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
 	// todo: remove, only call from platform
-	public IFuture shutdown();
+	public IFuture<Void> shutdown();
 	
 	
 	
@@ -41,14 +41,14 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param service The service.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture	addService(IInternalService service);
+	public IFuture<Void>	addService(IInternalService service);
 
 	/**
 	 *  Removes a service from the container (shutdowns also the service if the container is running).
 	 *  @param service The service identifier.
 	 *  @return A future that is done when the service has completed its shutdown.  
 	 */
-	public IFuture	removeService(IServiceIdentifier sid);
+	public IFuture<Void>	removeService(IServiceIdentifier sid);
 		
 	/**
 	 *  Get provided (declared) service.
@@ -87,14 +87,14 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param name The service name.
 	 *  @return The service.
 	 */
-	public <T> IFuture<T> getRequiredService(String name);
+	public IFuture getRequiredService(String name);
 	
 	/**
 	 *  Get a required services of a given name.
 	 *  @param name The services name.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public <T> IIntermediateFuture<T> getRequiredServices(String name);
+	public IIntermediateFuture getRequiredServices(String name);
 	
 	/**
 	 *  Get a required service.
@@ -143,14 +143,14 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public IFuture searchService(Class type);
+	public <T> IFuture<T> searchService(Class<T> type);
 	
 	/**
 	 *  Get one service of a type.
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public IFuture searchService(Class type, String scope);
+	public <T> IFuture<T> searchService(Class<T> type, String scope);
 	
 	// todo: remove
 	/**
@@ -158,19 +158,19 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public IFuture searchServiceUpwards(Class type);
+	public <T> IFuture<T> searchServiceUpwards(Class<T> type);
 
 	/**
 	 *  Get all services of a type.
 	 *  @param type The class.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public IIntermediateFuture searchServices(Class type);
+	public <T> IIntermediateFuture<T> searchServices(Class<T> type);
 	
 	/**
 	 *  Get all services of a type.
 	 *  @param type The class.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public IIntermediateFuture searchServices(Class type, String scope);
+	public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope);
 }

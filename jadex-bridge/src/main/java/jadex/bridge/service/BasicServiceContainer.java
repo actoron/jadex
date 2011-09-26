@@ -58,7 +58,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IIntermediateFuture	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
+	public IIntermediateFuture<IService>	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
 	{
 		return manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
 	}
@@ -67,7 +67,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get the parent service container.
 	 *  @return The parent container.
 	 */
-	public abstract IFuture	getParent();
+	public abstract IFuture<IServiceProvider>	getParent();
 //	{
 //		return new Future(null);
 //	}
@@ -76,7 +76,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get the children container.
 	 *  @return The children container.
 	 */
-	public abstract IFuture	getChildren();
+	public abstract IFuture<Collection<IServiceProvider>>	getChildren();
 //	{
 //		return new Future(null);
 //	}
@@ -106,9 +106,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param id The name.
 	 *  @param service The service.
 	 */
-	public IFuture	addService(IInternalService service)
+	public IFuture<Void>	addService(IInternalService service)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 //		System.out.println("Adding service: " + name + " " + type + " " + service);
 		synchronized(this)
@@ -141,9 +141,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param id The name.
 	 *  @param service The service.
 	 */
-	public IFuture removeService(IServiceIdentifier sid)
+	public IFuture<Void> removeService(IServiceIdentifier sid)
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		
 		if(sid==null)
 		{
@@ -195,12 +195,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/**
 	 *  Start the service.
 	 */
-	public IFuture start()
+	public IFuture<Void> start()
 	{
 		assert	!started;
 		started	= true;
 		
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		// Start the services.
 		if(services!=null && services.size()>0)
@@ -235,14 +235,14 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/**
 	 *  Shutdown the service.
 	 */
-	public IFuture shutdown()
+	public IFuture<Void> shutdown()
 	{
 		assert started;
 		
 		started	= false;
 //		Thread.dumpStack();
 //		System.out.println("shutdown called: "+getName());
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		// Stop the services.
 		if(services!=null && services.size()>0)
@@ -302,9 +302,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param cid The component identifier of the target component.
 	 *  @return The corresponding service.
 	 */
-	public IFuture getService(final Class type, final IComponentIdentifier cid)
+	public <T> IFuture<T> getService(final Class<T> type, final IComponentIdentifier cid)
 	{
-		final Future ret = new Future();
+		final Future<T> ret = new Future<T>();
 		SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
 			.addResultListener(new DelegationResultListener(ret)
 		{
@@ -437,7 +437,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding)
+	public IFuture<IService> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
 		return getRequiredService(info, binding, false);
 	}
@@ -446,7 +446,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding)
+	public IIntermediateFuture<IService> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
 		return getRequiredServices(info, binding, false);
 	}
@@ -456,7 +456,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param name The service name.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(String name)
+	public IFuture<IService> getRequiredService(String name)
 	{
 		return getRequiredService(name, false);
 	}
@@ -466,7 +466,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param name The services name.
 	 *  @return The service.
 	 */
-	public IIntermediateFuture getRequiredServices(String name)
+	public IIntermediateFuture<IService> getRequiredServices(String name)
 	{
 		return getRequiredServices(name, false);
 	}
@@ -475,12 +475,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(String name, boolean rebind)
+	public IFuture<IService> getRequiredService(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getRequiredServiceInfo(name);
 		if(info==null)
 		{
-			Future ret = new Future();
+			Future<IService> ret = new Future<IService>();
 			ret.setException(new ServiceNotFoundException(name));
 			return ret;
 		}
@@ -495,12 +495,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public IIntermediateFuture getRequiredServices(String name, boolean rebind)
+	public IIntermediateFuture<IService> getRequiredServices(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getRequiredServiceInfo(name);
 		if(info==null)
 		{
-			IntermediateFuture ret = new IntermediateFuture();
+			IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 			ret.setException(new ServiceNotFoundException(name));
 			return ret;
 		}
@@ -515,11 +515,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	public IFuture<IService> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
 		if(info==null)
 		{
-			Future ret = new Future();
+			Future<IService> ret = new Future<IService>();
 			ret.setException(new IllegalArgumentException("Info must not null."));
 			return ret;
 		}
@@ -532,11 +532,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	public IIntermediateFuture<IService> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
 		if(info==null)
 		{
-			IntermediateFuture ret = new IntermediateFuture();
+			IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 			ret.setException(new IllegalArgumentException("Info must not null."));
 			return ret;
 		}

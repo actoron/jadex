@@ -8,11 +8,14 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -20,6 +23,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Logger;
 
@@ -66,18 +70,18 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	public IFuture<IService> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
-		return new ComponentFuture(instance.getExternalAccess(), adapter, super.getRequiredService(info, binding, rebind), false);
+		return new ComponentFuture<IService>(instance.getExternalAccess(), adapter, super.getRequiredService(info, binding, rebind), false);
 	}
 	
 	/**
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public IIntermediateFuture getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	public IIntermediateFuture<IService> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
-		return new ComponentIntermediateFuture(instance.getExternalAccess(), adapter, super.getRequiredServices(info, binding, rebind), false);
+		return new ComponentIntermediateFuture<IService>(instance.getExternalAccess(), adapter, super.getRequiredServices(info, binding, rebind), false);
 	}
 	
 	/**
@@ -85,17 +89,17 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public IFuture searchService(Class type)
+	public <T> IFuture<T> searchService(Class<T> type)
 	{
-		final Future	fut	= new Future();
+		final Future<T>	fut	= new Future<T>();
 		SServiceProvider.getService(this, type).addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
-				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
+				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentFuture(instance.getExternalAccess(), adapter, fut, false);
+		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut, false);
 	}
 	
 	/**
@@ -103,17 +107,17 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public IFuture searchService(Class type, String scope)
+	public <T> IFuture<T> searchService(Class<T> type, String scope)
 	{
-		final Future	fut	= new Future();
+		final Future<T>	fut	= new Future<T>();
 		SServiceProvider.getService(this, type, scope).addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
-				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
+				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentFuture(instance.getExternalAccess(), adapter, fut, false);
+		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut, false);
 	}
 	
 	// todo: remove
@@ -122,17 +126,17 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public IFuture searchServiceUpwards(Class type)
+	public <T> IFuture<T> searchServiceUpwards(Class<T> type)
 	{
-		final Future	fut	= new Future();
+		final Future<T>	fut	= new Future<T>();
 		SServiceProvider.getServiceUpwards(this, type).addResultListener(new DelegationResultListener(fut)
 		{
 			public void customResultAvailable(Object result)
 			{
-				fut.setResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
+				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentFuture(instance.getExternalAccess(), adapter, fut, false);
+		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut, false);
 	}
 
 	/**
@@ -140,17 +144,17 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IIntermediateFuture searchServices(Class type)
+	public <T> IIntermediateFuture<T> searchServices(Class<T> type)
 	{
-		final IntermediateFuture	fut	= new IntermediateFuture();
+		final IntermediateFuture<T>	fut	= new IntermediateFuture<T>();
 		SServiceProvider.getServices(this, type).addResultListener(new IntermediateDelegationResultListener(fut)
 		{
 			public void customIntermediateResultAvailable(Object result)
 			{
-				fut.addIntermediateResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
+				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentIntermediateFuture(instance.getExternalAccess(), adapter, fut, false);
+		return new ComponentIntermediateFuture<T>(instance.getExternalAccess(), adapter, fut, false);
 	}
 	
 	/**
@@ -158,26 +162,26 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public IIntermediateFuture searchServices(Class type, String scope)
+	public <T> IIntermediateFuture<T> searchServices(Class<T> type, String scope)
 	{
-		final IntermediateFuture	fut	= new IntermediateFuture();
+		final IntermediateFuture<T>	fut	= new IntermediateFuture<T>();
 		SServiceProvider.getServices(this, type, scope).addResultListener(new IntermediateDelegationResultListener(fut)
 		{
 			public void customIntermediateResultAvailable(Object result)
 			{
-				fut.addIntermediateResult(BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
+				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
-		return new ComponentIntermediateFuture(instance.getExternalAccess(), adapter, fut, false);
+		return new ComponentIntermediateFuture<T>(instance.getExternalAccess(), adapter, fut, false);
 	}
 	
 	/**
 	 *  Get the parent service container.
 	 *  @return The parent container.
 	 */
-	public IFuture	getParent()
+	public IFuture<IServiceProvider>	getParent()
 	{
-		final Future ret = new Future();
+		final Future<IServiceProvider> ret = new Future<IServiceProvider>();
 		
 		ret.setResult(adapter.getParent()!=null ? adapter.getParent().getServiceProvider() : null);
 		
@@ -188,9 +192,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  Get the children service containers.
 	 *  @return The children containers.
 	 */
-	public IFuture	getChildren()
+	public IFuture<Collection<IServiceProvider>> getChildren()
 	{
-		final Future ret = new Future();
+		final Future<Collection<IServiceProvider>> ret = new Future<Collection<IServiceProvider>>();
 //		ComponentFuture ret = new ComponentFuture(ea, adapter, oldret);
 		
 		adapter.getChildrenIdentifiers().addResultListener(new IResultListener()
@@ -281,21 +285,22 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  Start the service.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture start()
+	public IFuture<Void> start()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 //		System.out.println("search clock: "+getId());
-		SServiceProvider.getServiceUpwards(ComponentServiceContainer.this, IComponentManagementService.class).addResultListener(new DelegationResultListener(ret)
+		SServiceProvider.getServiceUpwards(ComponentServiceContainer.this, IComponentManagementService.class)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService result)
 			{
-				cms = (IComponentManagementService)result;
+				cms = result;
 //				System.out.println("Has cms: "+getId()+" "+cms);
 
 				// Services may need other services and thus need to be able to search
 				// the container.
-				ComponentServiceContainer.super.start().addResultListener(new DelegationResultListener(ret));
+				ComponentServiceContainer.super.start().addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
 		

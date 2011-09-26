@@ -47,10 +47,10 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public IFuture init(final IControlCenter jcc, final IExternalAccess component)
+	public IFuture<Void> init(final IControlCenter jcc, final IExternalAccess component)
 	{
 		this.panel = new JPanel(new BorderLayout());
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		// Init interface is asynchronous but super implementation is not.
 		IFuture	fut	= super.init(jcc, component);
@@ -63,7 +63,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 			
 			public IFuture<List> execute(final IInternalAccess ia)
 			{
-				IFuture<List> ret = SServiceProvider.getDeclaredServices(ia.getServiceContainer());
+				IFuture ret = SServiceProvider.getDeclaredServices(ia.getServiceContainer());
 				return ret;
 			}
 		}).addResultListener(new IResultListener<List>()
@@ -85,9 +85,9 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 	/**
 	 *  Create the panels.
 	 */
-	protected IFuture createPanels(final IExternalAccess exta, final List services)
+	protected IFuture<Void> createPanels(final IExternalAccess exta, final List services)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		AbstractJCCPlugin.getClassLoader(exta.getComponentIdentifier(), jcc)
 			.addResultListener(new DefaultResultListener()

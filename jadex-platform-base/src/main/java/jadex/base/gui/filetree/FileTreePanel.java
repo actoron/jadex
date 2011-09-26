@@ -636,9 +636,9 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		 *  Test if an object passes the filter.
 		 *  @return True, if passes the filter.
 		 */
-		public IFuture filter(Object obj)
+		public IFuture<Boolean> filter(Object obj)
 		{
-			return filter!=null? filter.filter(obj): new Future(Boolean.TRUE);
+			return filter!=null? filter.filter(obj): new Future<Boolean>(Boolean.TRUE);
 		}
 		
 		/**

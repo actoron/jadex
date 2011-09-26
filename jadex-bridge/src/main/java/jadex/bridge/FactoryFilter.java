@@ -59,9 +59,9 @@ public class FactoryFilter implements IRemoteFilter
 	 *  Test if an object passes the filter.
 	 *  @return True, if passes the filter.
 	 */
-	public IFuture filter(Object obj)
+	public IFuture<Boolean> filter(Object obj)
 	{
-		Future ret =  new Future();
+		Future<Boolean> ret =  new Future<Boolean>();
 		
 		if(obj instanceof IComponentFactory)
 		{
@@ -74,7 +74,7 @@ public class FactoryFilter implements IRemoteFilter
 			else
 			{
 				fac.isLoadable(model, imports, classloader)
-					.addResultListener(new DelegationResultListener(ret));
+					.addResultListener(new DelegationResultListener<Boolean>(ret));
 			}
 		}
 		else

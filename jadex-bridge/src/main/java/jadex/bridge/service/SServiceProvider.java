@@ -125,7 +125,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getService(IServiceProvider provider, Class type)
+	public static <T> IFuture<T> getService(IServiceProvider provider, Class<T> type)
 	{
 		return getService(provider, type, null);
 	}
@@ -191,7 +191,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getService(final IServiceProvider provider, final Class type, final String scope)
+	public static <T> IFuture<T> getService(final IServiceProvider provider, final Class<T> type, final String scope)
 	{
 //		if(type.toString().indexOf("IReg")!=-1 && scope.equals("local"))
 //			System.out.println("here22");
@@ -201,7 +201,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		final Future ret = new Future();
+		final Future<T> ret = new Future<T>();
 		
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
@@ -229,7 +229,9 @@ public class SServiceProvider
 					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()+" scope: "+scope));
 				}
 				else
+				{
 					super.customResultAvailable(res.iterator().next());
+				}
 			}
 		});
 		
@@ -275,7 +277,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static <T> IFuture<T> getService(IServiceProvider provider, final IResultSelector selector)
+	public static IFuture getService(IServiceProvider provider, final IResultSelector selector)
 	{
 //		synchronized(profiling)
 //		{
@@ -309,7 +311,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static IIntermediateFuture getServices(IServiceProvider provider, Class type)
+	public static <T> IIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type)
 	{
 		return getServices(provider, type, null);
 	}
@@ -329,14 +331,14 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
-	public static IIntermediateFuture getServices(IServiceProvider provider, Class type, String scope)
+	public static <T> IIntermediateFuture<T> getServices(IServiceProvider provider, Class<T> type, String scope)
 	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		final IntermediateFuture ret = new IntermediateFuture();
+		final IntermediateFuture<T> ret = new IntermediateFuture<T>();
 		
 		// Hack->remove
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
@@ -362,7 +364,7 @@ public class SServiceProvider
 	 *  @param type The class.
 	 *  @return The corresponding service.
 	 */
-	public static IFuture getServiceUpwards(IServiceProvider provider, Class type)
+	public static <T> IFuture<T> getServiceUpwards(IServiceProvider provider, Class<T> type)
 	{
 		return getService(provider, type, RequiredServiceInfo.SCOPE_UPWARDS);
 	}

@@ -5,6 +5,7 @@ import jadex.commons.ComposedRemoteFilter;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.Tuple;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -75,9 +76,9 @@ public class BasicResultSelector implements IResultSelector
 	 *  @param services	The provided services (class->list of services).
 	 *  @param results	The collection to which results should be added.
 	 */
-	public IFuture selectServices(Map servicemap)
+	public IFuture<List<IService>> selectServices(Map servicemap)
 	{
-		final Future ret = new Future();
+		final Future<List<IService>> ret = new Future<List<IService>>();
 		
 		IRemoteFilter fil = filter;
 		if(!remote)
@@ -101,11 +102,11 @@ public class BasicResultSelector implements IResultSelector
 			if(oneresult)
 			{		
 				getOneResult(fil, services, 0)
-					.addResultListener(new DelegationResultListener(ret)
+					.addResultListener(new ExceptionDelegationResultListener<IService, List<IService>>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(IService result)
 					{
-						List results = new ArrayList();
+						List<IService> results = new ArrayList<IService>();
 						if(result!=null)
 							results.add(result);
 						ret.setResult(results);
@@ -131,14 +132,14 @@ public class BasicResultSelector implements IResultSelector
 	/**
 	 *  Get first result.
 	 */
-	protected IFuture getOneResult(final IRemoteFilter filter, final IService[] services, final int i)
+	protected IFuture<IService> getOneResult(final IRemoteFilter filter, final IService[] services, final int i)
 	{
-		final Future ret = new Future();
-		filter.filter(services[i]).addResultListener(new DelegationResultListener(ret)
+		final Future<IService> ret = new Future<IService>();
+		filter.filter(services[i]).addResultListener(new ExceptionDelegationResultListener<Boolean, IService>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Boolean result)
 			{
-				if(((Boolean)result).booleanValue())
+				if(result.booleanValue())
 				{
 					ret.setResult(services[i]);
 				}
@@ -147,7 +148,7 @@ public class BasicResultSelector implements IResultSelector
 					if(i+1<services.length)
 					{
 						getOneResult(filter, services, i+1)
-							.addResultListener(new DelegationResultListener(ret));
+							.addResultListener(new DelegationResultListener<IService>(ret));
 					}
 					else
 					{
@@ -162,9 +163,9 @@ public class BasicResultSelector implements IResultSelector
 	/**
 	 *  Get all results.
 	 */
-	protected IIntermediateFuture getAllResults(final IRemoteFilter filter, final IService[] services, final int i)
+	protected IIntermediateFuture<IService> getAllResults(final IRemoteFilter filter, final IService[] services, final int i)
 	{
-		final IntermediateFuture ret = new IntermediateFuture();
+		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		filter.filter(services[i]).addResultListener(new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
@@ -193,7 +194,7 @@ public class BasicResultSelector implements IResultSelector
 	 */
 	public IService[] generateServiceArray(Map servicemap)
 	{
-		List ret = new ArrayList();
+		List<IService> ret = new ArrayList<IService>();
 		Object[] keys = servicemap.keySet().toArray();
 		for(int i=0; i<keys.length; i++)
 		{
@@ -203,7 +204,7 @@ public class BasicResultSelector implements IResultSelector
 				Object[] vals = coll.toArray();
 				for(int j=0; j<vals.length; j++)
 				{
-					ret.add(vals[j]);
+					ret.add((IService)vals[j]);
 				}
 			}
 		}

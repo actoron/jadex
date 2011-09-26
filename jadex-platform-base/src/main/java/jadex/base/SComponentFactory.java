@@ -140,9 +140,9 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if model can be loaded.
 	 */
-	public static IFuture isModelType(IExternalAccess exta, final String model, final Collection allowedtypes)
+	public static IFuture<Boolean> isModelType(IExternalAccess exta, final String model, final Collection allowedtypes)
 	{
-		Future ret = new Future();
+		Future<Boolean> ret = new Future<Boolean>();
 		
 		exta.scheduleStep(new IComponentStep<Boolean>()
 		{

@@ -16,9 +16,9 @@ public interface IRemoteFilter
 	/** A filter that always returns true. */
 	public static class AlwaysFilter implements IRemoteFilter
 	{
-		public IFuture filter(Object obj) 
+		public IFuture<Boolean> filter(Object obj) 
 		{
-			return new Future(Boolean.TRUE);
+			return new Future<Boolean>(Boolean.TRUE);
 		}
 	}
 	
@@ -28,9 +28,9 @@ public interface IRemoteFilter
 	/** A filter that always returns false. */
 	public static class NeverFilter implements IRemoteFilter
 	{
-		public IFuture filter(Object obj) 
+		public IFuture<Boolean> filter(Object obj) 
 		{
-			return new Future(Boolean.FALSE);
+			return new Future<Boolean>(Boolean.FALSE);
 		}
 	}
 
@@ -40,5 +40,5 @@ public interface IRemoteFilter
 	 *  Test if an object passes the filter.
 	 *  @return True, if passes the filter.
 	 */
-	public IFuture filter(Object obj);
+	public IFuture<Boolean> filter(Object obj);
 }
