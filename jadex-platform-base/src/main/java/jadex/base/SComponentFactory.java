@@ -20,7 +20,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+/* $if !android $ */
 import javax.swing.Icon;
+/* $endif $ */
 
 
 /**
@@ -282,6 +284,7 @@ public class SComponentFactory
 	/**
 	 * Get a default icon for a file type.
 	 */
+	/* $if !android $ */
 	public static IFuture<Icon> getFileTypeIcon(IExternalAccess exta, final String type)
 	{
 		Future<Icon> ret = new Future<Icon>();
@@ -297,10 +300,8 @@ public class SComponentFactory
 				{
 					public void customResultAvailable(Object result)
 					{
-						/* $if !android $ */
 						IComponentFactory fac = (IComponentFactory)result;
 						fac.getComponentTypeIcon(type).addResultListener(new DelegationResultListener(ret));
-						/* $endif $ */
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -321,6 +322,7 @@ public class SComponentFactory
 		
 		return ret;
 	}
+	/* $endif $ */
 
 	/**
 	 * Get a default icon for a file type.

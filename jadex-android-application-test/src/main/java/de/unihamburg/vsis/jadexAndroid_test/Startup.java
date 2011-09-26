@@ -6,6 +6,11 @@ import jadex.commons.future.IFuture;
 import jadex.standalone.ComponentAdapterFactory;
 
 public class Startup {
+	
+	public static final String platformconfig = "de/unihamburg/vsis/jadexAndroid_test/Platform.component.xml";
+//	public static final String platformconfig = "jadex/standalone/Platform.component.xml";
+	public static final String configname = "android_fixed";
+	
 	public static void main(String[] args) {
 		startNotifyingPlatform("java");
 	}
@@ -13,8 +18,8 @@ public class Startup {
 	public static void micro_test() {
 		Starter.main(new String[] {
 				"-conf",
-				 "de/unihamburg/vsis/jadexAndroid_test/Platform.component.xml",
-				"-configname", "android_fixed", 
+				platformconfig,
+				"-configname", configname, 
 				"-platformname", "testcases",
 				"-saveonexit", "false", 
 				"-gui", "false", 
@@ -23,8 +28,8 @@ public class Startup {
 	
 	public static void bpmn_test() {
 		Starter.main(new String[] {
-				"-conf", "de/unihamburg/vsis/jadexAndroid_test/Platform.component.xml",
-				"-configname", "android_fixed",
+				"-conf", platformconfig,
+				"-configname", configname,
 				"-platformname", "testcases",
 				"-saveonexit", "false",
 				"-gui", "false",
@@ -34,8 +39,8 @@ public class Startup {
 	
 	public static void bdi_test() {
 		Starter.main(new String[] {
-				"-conf", "de/unihamburg/vsis/jadexAndroid_test/Platform.component.xml",
-				"-configname", "allkernels_fixed",
+				"-conf", platformconfig,
+				"-configname", configname,
 				"-platformname", "testcases",
 				"-saveonexit", "false",
 				"-gui", "false",
@@ -45,19 +50,20 @@ public class Startup {
 	
 	public static IFuture startComponent(String component) {
 		return Starter.createPlatform(new String[] {
-				"-conf", "de/unihamburg/vsis/jadexAndroid_test/Platform.component.xml",
-				"-configname", "android_fixed",
+				"-conf", platformconfig,
+				"-configname", configname,
 				"-platformname", "testcases",
 				"-saveonexit", "false",
 				"-gui", "false",
+				"-awareness", "false",
 				"-component", component
 		});
 	}
 	
 	public static IFuture startEmptyPlatform() {
 		IFuture future = Starter.createPlatform(new String[] {
-				"-conf", "de/unihamburg/vsis/jadexAndroid_test/Platform.component.xml",
-				"-configname", "android_fixed",
+				"-conf", platformconfig,
+				"-configname", configname,
 				"-platformname", "testcases",
 				"-saveonexit", "false",
 				"-gui", "false"
@@ -67,11 +73,12 @@ public class Startup {
 	
 	public static IFuture startNotifyingPlatform(String platformname) {
 		IFuture future = Starter.createPlatform(new String[] {
-				"-conf", "de/unihamburg/vsis/jadexAndroid_test/Platform.component.xml",
-				"-configname", "android_fixed",
+				"-conf", platformconfig,
+				"-configname", configname,
 				"-platformname", platformname,
 				"-saveonexit", "false",
 				"-gui", "false",
+				"-awareness", "true"
 		});
 		return future;
 	}

@@ -10,7 +10,9 @@ import jadex.commons.future.IFuture;
 
 import java.util.Map;
 
+/* $if !android $ */
 import javax.swing.Icon;
+/* $endif $ */
 
 
 /**

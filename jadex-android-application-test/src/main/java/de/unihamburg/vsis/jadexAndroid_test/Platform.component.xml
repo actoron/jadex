@@ -37,6 +37,7 @@
 		<import>java.lang.reflect.*</import>
 		<import>jadex.benchmarking.services.*</import>
 		<import>jadex.standalone.*</import>
+		<import>de.unihamburg.vsis.jadexAndroid_test.*</import>
 	</imports>
 	
 	<arguments>
@@ -57,7 +58,7 @@
 		<!-- ======== Arguments used by platform components. ======== -->
 		
 		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
-		<argument name="awareness" class="boolean">true</argument>
+		<argument name="awareness" class="false">true</argument>
 		<!-- Start the JCC agent to open the platform GUI? -->
 		<argument name="gui" class="boolean">false</argument>
 		<!-- Save platform settings on shutdown? -->
@@ -93,7 +94,7 @@
 		<componenttype filename="jadex/component/KernelMulti.component.xml" name="kernel_multi"/>
 		<componenttype filename="jadex/base/service/remote/RemoteServiceManagementAgent.class" name="rms"/>
 <!-- 		<componenttype filename="jadex/base/service/awareness/management/AwarenessManagementAgent.class" name="awa"/> -->
-		<componenttype filename="de/unihamburg/vsis/jadexAndroid_test/AwarenessNotifierAgent.class" name="awa"/>
+		<componenttype filename="de/unihamburg/vsis/jadexAndroid_test/AwarenessManagementAgentExtends.class" name="awa"/>
 		<!-- <componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/> -->
 		<!--<componenttype filename="jadex/tools/jcc/JCCAgent.class" name="jcc"/>-->
 		<componenttype filename="/jadex/tools/jcc/JCCAgent.class" name="jcc"/>
@@ -168,12 +169,6 @@
 				new DeploymentService($component.getServiceProvider())
 			</implementation>		
 		</providedservice>
-<!-- 		<providedservice name="envextension" class="IComponentFactoryExtensionService"> -->
-<!-- 			<implementation class="jadex.extension.envsupport.EnvSupportExtensionService"/> -->
-<!-- 		</providedservice> -->
-<!-- 		<providedservice name="agrextension" class="IComponentFactoryExtensionService"> -->
-<!-- 			<implementation class="jadex.extension.agr.AGRExtensionService"/> -->
-<!-- 		</providedservice> -->
 		
 		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true"/>
 	</services>
@@ -187,84 +182,6 @@
 	</properties>
 	
 	<configurations>
-		<configuration name="auto">
-			<arguments>
-				<argument name="tcpport">0</argument>
-				<argument name="niotcpport">0</argument>
-				<argument name="platformname">null</argument>
-			</arguments>
-			<components>
-				<component name="kernels" type="kernel_multi" daemon="true"/>
-				<component name="rms" type="rms" daemon="true"/>
-				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
-					<arguments>
-						<argument name="includes">$args.awaincludes</argument>
-						<argument name="excludes">$args.awaexcludes</argument>
-					</arguments>
-				</component>
-				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
-			</components>
-		</configuration>
-		
-		<configuration name="fixed">
-			<components>
-				<component name="kernels" type="kernel_multi" daemon="true"/>
-				<component name="rms" type="rms" daemon="true"/>
-				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
-					<arguments>
-						<argument name="includes">$args.awaincludes</argument>
-						<argument name="excludes">$args.awaexcludes</argument>
-					</arguments>
-				</component>
-				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
-			</components>
-		</configuration>
-	
-		<configuration name="allkernels">
-			<arguments>
-				<argument name="tcpport">0</argument>
-				<argument name="niotcpport">0</argument>
-				<argument name="platformname">null</argument>
-			</arguments>
-			<components>
-				<component name="kernel_component" type="kernel_component" daemon="true"/>
-				<component name="kernel_application" type="kernel_application" daemon="true"/>
-				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
-				<!-- <component type="kernel_bdi" daemon="true"/> -->
-				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
-				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
-				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true"/>
-				<component name="rms" type="rms" daemon="true"/>
-				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
-					<arguments>
-						<argument name="includes">$args.awaincludes</argument>
-						<argument name="excludes">$args.awaexcludes</argument>
-					</arguments>
-				</component>
-				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
-			</components>
-		</configuration>
-		
-		<configuration name="allkernels_fixed">
-			<components>
-				<component name="kernel_component" type="kernel_component" daemon="true"/>
-				<component name="kernel_application" type="kernel_application" daemon="true"/>
-				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
-				<!-- <component type="kernel_bdi" daemon="true"/> -->
-				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
-				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
-<!-- 				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true"/> -->
-				<component name="rms" type="rms" daemon="true"/>
-				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
-					<arguments>
-						<argument name="includes">$args.awaincludes</argument>
-						<argument name="excludes">$args.awaexcludes</argument>
-					</arguments>
-				</component>
-				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
-			</components>
-		</configuration>
-		
 		<configuration name="android_fixed">
 			<components>
 				<component name="kernel_component" type="kernel_component" daemon="true"/>
@@ -282,6 +199,5 @@
 				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
 			</components>
 		</configuration>
-		
 	</configurations>
 </componenttype>

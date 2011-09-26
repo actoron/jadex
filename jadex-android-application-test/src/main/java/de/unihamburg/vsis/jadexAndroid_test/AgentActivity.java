@@ -103,7 +103,7 @@ public class AgentActivity extends BaseActivity {
 				IFuture scheduleStep = extAcc
 						.scheduleStep(new IComponentStep() {
 							@XMLClassname("create-component")
-							public Object execute(IInternalAccess ia) {
+							public IFuture execute(IInternalAccess ia) {
 								Future ret = new Future();
 								SServiceProvider.getService(
 										ia.getServiceContainer(),

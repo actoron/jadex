@@ -25,6 +25,9 @@ public class AwarenessActivity extends BaseActivity {
 	public static Handler handler;
 	private ArrayAdapter<RemoteComponentIdentifier> listAdapter;
 
+	private String platformID;
+	
+	
 	public AwarenessActivity() {
 	}
 
@@ -161,5 +164,4 @@ public class AwarenessActivity extends BaseActivity {
 			// });
 		}
 	};
-	private String platformID;
 }

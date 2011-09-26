@@ -22,9 +22,6 @@ import java.util.Map;
 
 import de.unihamburg.vsis.jadexAndroid_test.Helper;
 
-import android.provider.SyncStateContract.Constants;
-import android.util.Log;
-
 /**
  *  Agent creation benchmark. 
  */
@@ -39,12 +36,14 @@ public class AgentCreationAgent extends MicroAgent
 //	protected IFuture	clock;
 	
 	//-------- methods --------
-	
+		
 	/**
 	 *  Execute an agent step.
 	 */
 	public void executeBody()
 	{
+//		System.out.println("body");
+		
 		Map arguments = getArguments();	
 		if(arguments==null)
 			arguments = new HashMap();
@@ -95,7 +94,6 @@ public class AgentCreationAgent extends MicroAgent
 		final int max = ((Integer)args.get("max")).intValue();
 		final boolean nested = ((Boolean)args.get("nested")).booleanValue();
 		
-//		System.out.println("Created peer: "+num);
 		Helper.jLog("Created peer: "+num);
 		
 		if(num<max)
@@ -103,14 +101,14 @@ public class AgentCreationAgent extends MicroAgent
 			args.put("num", new Integer(num+1));
 //			System.out.println("Args: "+num+" "+args);
 
-			getCMS().addResultListener(new DefaultResultListener()
+			getCMS().addResultListener(createResultListener(new DefaultResultListener()
 			{
 				public void resultAvailable(Object result)
 				{
 					((IComponentManagementService)result).createComponent(createPeerName(num+1, getComponentIdentifier()), AgentCreationAgent.this.getClass().getName().replaceAll("\\.", "/")+".class",
 						new CreationInfo(args, nested ? getComponentIdentifier() : null), null);
 				}
-			});
+			}));
 		}
 		else
 		{
@@ -133,13 +131,10 @@ public class AgentCreationAgent extends MicroAgent
 					final Long starttime = (Long)args.get("starttime");
 					final long omem = (used-startmem.longValue())/1024;
 					final double upera = ((long)(1000*(used-startmem.longValue())/max/1024))/1000.0;
-//					System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
-//					System.out.println("Last peer created. "+max+" agents started.");
 					Helper.jLog("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 					Helper.jLog("Last peer created. "+max+" agents started.");
 					final double dur = ((double)end-starttime.longValue())/1000.0;
 					final double pera = dur/max;
-					//System.out.println("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 					Helper.jLog("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 				
 					// Delete prior agents.
@@ -163,13 +158,13 @@ public class AgentCreationAgent extends MicroAgent
 									public void resultAvailable(Object result)
 									{
 										IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
-										exta.scheduleStep(new IComponentStep()
+										exta.scheduleStep(new IComponentStep<Void>()
 										{
 											@XMLClassname("deletePeers")
-											public Object execute(IInternalAccess ia)
+											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												((AgentCreationAgent)ia).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);
-												return null;
+												return IFuture.DONE;
 											}
 										});
 									}
@@ -215,12 +210,11 @@ public class AgentCreationAgent extends MicroAgent
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
 				IComponentIdentifier aid = cms.createComponentIdentifier(name, true, null);
-				cms.destroyComponent(aid).addResultListener(new DefaultResultListener()
+				cms.destroyComponent(aid).addResultListener(createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
-						Helper.jLog("Successfully destroyed peer: " + name);
-//						System.out.println("Successfully destroyed peer: "+name);
+						Helper.jLog("Successfully destroyed peer: "+name);
 						
 						if(cnt-1>(nested?1:1))
 //										if(cnt-1>(nested?1:0))
@@ -237,7 +231,7 @@ public class AgentCreationAgent extends MicroAgent
 							killLastPeer(max, killstarttime, dur, pera, omem, upera);
 						}
 					}
-				});
+				}));
 			}
 		});
 	}
@@ -255,7 +249,6 @@ public class AgentCreationAgent extends MicroAgent
 				IClockService cs = (IClockService)result;
 				long killend = cs.getTime();
 				Helper.jLog("Last peer destroyed. "+(max-1)+" agents killed.");
-//				System.out.println("Last peer destroyed. "+(max-1)+" agents killed.");
 				double killdur = ((double)killend-killstarttime)/1000.0;
 				final double killpera = killdur/(max-1);
 				
@@ -267,18 +260,11 @@ public class AgentCreationAgent extends MicroAgent
 				catch(InterruptedException e){}
 				long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
 				
-//				System.out.println("\nCumulated results:");
-//				System.out.println("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-//				System.out.println("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
-//				System.out.println("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
-//				System.out.println("Still used memory: "+stillused+"kB.");
-				
 				Helper.jLog("\nCumulated results:");
 				Helper.jLog("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 				Helper.jLog("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
 				Helper.jLog("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 				Helper.jLog("Still used memory: "+stillused+"kB.");
-				
 				
 				setResultValue("microcreationtime", new Tuple(""+pera, "s"));
 				setResultValue("microkillingtime", new Tuple(""+killpera, "s"));
@@ -293,7 +279,7 @@ public class AgentCreationAgent extends MicroAgent
 		IFuture ret = null;	// Uncomment for no caching.
 		if(ret==null)
 		{
-			ret	= SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class);  // Raw service
+			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class);  // Raw service
 //			ret	= getServiceContainer().searchServiceUpwards(IComponentManagementService.class); // Decoupled service proxy
 //			cms	= getRequiredService("cmsservice");	// Required service proxy
 		}
@@ -306,7 +292,7 @@ public class AgentCreationAgent extends MicroAgent
 		IFuture ret = null;	// Uncomment for no caching.
 		if(ret==null)
 		{
-			ret	= SServiceProvider.getService(getServiceProvider(), IClockService.class);  // Raw service
+			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IClockService.class);  // Raw service
 //			ret	= getServiceContainer().searchServiceUpwards(IClockService.class); // Decoupled service proxy
 //			clock	= getRequiredService("clockservice");	// Required service proxy
 		}

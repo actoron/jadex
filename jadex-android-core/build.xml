@@ -20,6 +20,13 @@
 	<property name="jadex-applib-bdi" location="../jadex-applib-bdi/src/main/java" />
 
 	<property name="jadex-kernel-extension-agr" location="../jadex-kernel-extension-agr/src/main/java" />
+	
+	<!-- here comes the benchmark -->
+	<property name="jadex-applications-bpmn" location="../jadex-applications-bpmn/src/main/java" />
+	<property name="jadex-applications-bdi" location="../jadex-applications-bdi/src/main/java" />
+	<property name="jadex-applications-micro" location="../jadex-applications-micro/src/main/java" />
+	
+	
 	<!-- this is for fixed source files -->
 	<property name="src-fix" location="./src-fix" />
 
@@ -112,7 +119,9 @@
 		ITreeNode.java,
 		TreePopupListener.java,
 		XMLCodec.java,
-		JavaXMLContentCodec.java
+		JavaXMLContentCodec.java,
+		CollapseAllAction.java,
+		ExceptionSwingDelegationResultListener.java
 		" />
 
 	<property name="exclude-jadex-xml" value="
@@ -157,7 +166,6 @@
 	<property name="exclude-jadex-kernel-extension-agr" value="
 	"/>
 	
-
 	<taskdef name="preprocess" classname="com.objfac.prebop.ant.PreprocessorTask">
 		<classpath>
 			<pathelement location="libs/preprocessor.jar" />
@@ -248,7 +256,7 @@
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess>
-		<echo level="info">preprocessing ${jadex-rules-bpmn}</echo>
+		<echo level="info">preprocessing ${jadex-rules}</echo>
 		<preprocess indir="${jadex-rules}" outdir="${src_android}" out="merge" except="${exclude}">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />
@@ -267,7 +275,6 @@
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess> 
 		
-
 		<echo level="info">preprocessing ${src-fix}</echo>
 		<preprocess indir="${src-fix}" outdir="${src_android}" out="merge">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
