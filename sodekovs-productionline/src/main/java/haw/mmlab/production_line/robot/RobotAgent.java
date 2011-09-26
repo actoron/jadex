@@ -63,6 +63,8 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 
 	private IDatabaseService dbService = null;
 
+	private IManagerService managerService = null;
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public IFuture<Void> agentCreated() {
@@ -71,6 +73,14 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 			@Override
 			public void resultAvailable(IDatabaseService result) {
 				dbService = result;
+			}
+		});
+
+		getRequiredService("managerService").addResultListener(new DefaultResultListener<IManagerService>() {
+
+			@Override
+			public void resultAvailable(IManagerService result) {
+				managerService = result;
 			}
 		});
 
@@ -134,10 +144,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 					setMainState(MainState.RUNNING);
 					workpiece.addOperation(role.getCapability());
 
-					// wait for simulating the processing time
-					Integer processTime = role.getProcessingTime() == null ? 0 : role.getProcessingTime();
-					// waitFor(processTime, new IComponentStep<Void>() {
-					waitForTick(new IComponentStep<Void>() {
+					IComponentStep<Void> sendStep = new IComponentStep<Void>() {
 
 						public IFuture<Void> execute(IInternalAccess ia) {
 							setWorkpiece(null);
@@ -146,7 +153,16 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 
 							return IFuture.DONE;
 						}
-					});
+					};
+
+					// wait for simulating the processing time
+					Integer processTime = role.getProcessingTime() == null ? 0 : role.getProcessingTime();
+					if (processTime.equals(0)) {
+						// optimized for event driven simulation if processing time is 0
+						waitForTick(sendStep);
+					} else {
+						waitFor(processTime, sendStep);
+					}
 
 					return true;
 				}
@@ -209,7 +225,6 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 			if (element != null) {
 				sendWorkpiece(element, ia);
 			} else {
-				// waitFor(200, this);
 				waitForTick(this);
 			}
 
@@ -255,7 +270,6 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 										buffer.enqueue(buffer.dequeue());
 									}
 
-									// waitFor(200, SendWorkpieceStep.this);
 									waitForTick(SendWorkpieceStep.this);
 								}
 							});
@@ -266,6 +280,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void handleHelpRequest(HelpRequest request) {
 		request.incrementHopCount();
@@ -314,10 +329,12 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 			// if the max escalation level is reached and their are still deficient roles, the reconfiguration failed
 			else {
 				handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_ADAPTIVITY, id + ": received its own request. Nothing will be done anymore"), getLogger());
+				managerService.informReconfError();
 			}
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private void answerHelpRequest(List<Role> takeRoles, List<Role> giveAwayRoles, HelpRequest request) {
 		HelpReply reply = new HelpReply();
 		reply.setDefectAgentId(request.getAgentId());

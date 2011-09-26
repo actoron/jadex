@@ -87,13 +87,16 @@ public class LogManager {
 	/** The production line configuration */
 	private ProductionLineConfiguration plc = null;
 
+	/** The name of the reconfiguration strategy */
+	private String strategy = null;
+
 	/**
 	 * Constructor.
 	 * 
 	 * @param plc
 	 *            The production line configuration
 	 */
-	public LogManager(ProductionLineConfiguration plc) {
+	public LogManager(ProductionLineConfiguration plc, String strategy) {
 		this.plc = plc;
 	}
 
@@ -138,7 +141,7 @@ public class LogManager {
 
 		redundancy = redundancy / plc.getRobots().size();
 
-		DatabaseLogger.getInstance().insertMetadata(redundancy, plc.getRobots().size(), plc.getTransports().size(), capCounter.size(), roleCount, "noStrategy", workload);
+		DatabaseLogger.getInstance().insertMetadata(redundancy, plc.getRobots().size(), plc.getTransports().size(), capCounter.size(), roleCount, strategy, workload);
 	}
 
 	/**

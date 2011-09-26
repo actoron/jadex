@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <dropout_conf>
-	<!-- rate: this config is repeated every x seconds  -->
 	<!-- count: this config is repeated x times; set to 0 for infinite loop  -->
-	<configuration rate="1" count="1">
+	<configuration count="1">
 		<query>
 			<category>ROBOT</category>
 			<random>1</random>
@@ -12,7 +11,7 @@
 		</action>
 	</configuration>
 	<!-- 
-	<configuration rate="1" count="1">
+	<configuration count="1">
 		<query>
 			<category>NONE</category>
 			<agents>

@@ -79,9 +79,6 @@ public class ManagerAgent extends MicroAgent {
 	/** The number of runs which should be started */
 	private Integer numberOfRuns = null;
 
-	/** The timeout for an error condition */
-	private Integer errorTimeout = null;
-
 	/** A map with all the tasks and their ids */
 	private Map<String, Task> tasks = null;
 
@@ -126,7 +123,6 @@ public class ManagerAgent extends MicroAgent {
 			strategyName = (String) getArgument("strategy");
 			plc = (ProductionLineConfiguration) deco4mas.util.xml.XmlUtil.retrieveFromXML(ProductionLineConfiguration.class, confFile);
 			numberOfRuns = plc.getRunCount();
-			errorTimeout = plc.getErrorTimeout();
 			run = 1;
 
 			tasks = new HashMap<String, Task>();
@@ -145,7 +141,7 @@ public class ManagerAgent extends MicroAgent {
 			plWriter = new BufferedWriter(new FileWriter("pl_console.log"));
 			adaptivityWriter = new BufferedWriter(new FileWriter("adaptivity_console.log"));
 
-			logManager = new LogManager(plc);
+			logManager = new LogManager(plc, strategyName);
 
 		} catch (Exception e) {
 			getLogger().severe(e.getMessage());
@@ -168,9 +164,6 @@ public class ManagerAgent extends MicroAgent {
 		logManager.beforeSimulation(confFile);
 		getLogger().info("Manager agent is starting the agents");
 		startAgents();
-
-		WaitForErrorStep errorStep = new WaitForErrorStep(new HashMap<String, Integer>(consumedWPs));
-		waitFor(errorTimeout, errorStep);
 	}
 
 	@Override
@@ -220,23 +213,6 @@ public class ManagerAgent extends MicroAgent {
 			public void resultAvailable(IComponentManagementService cms) {
 				IExternalAccess parent = ManagerAgent.this.getParent();
 
-				// getLogger().info("Manager agent is starting database agent...");
-				// cms.createComponent("DatabaseAgent", "haw/mmlab/production_line/logging/database/DatabaseAgent.class", null, null).addResultListener(new
-				// DefaultResultListener<IComponentIdentifier>() {
-				//
-				// @Override
-				// public void resultAvailable(IComponentIdentifier identifier) {
-				// startedAgents.add(identifier);
-				// getRequiredService("dbService").addResultListener(new DefaultResultListener<IDatabaseService>() {
-				//
-				// @Override
-				// public void resultAvailable(IDatabaseService result) {
-				// dbService = result;
-				// }
-				// });
-				// }
-				// });
-
 				getRequiredService("dbService").addResultListener(new DefaultResultListener<IDatabaseService>() {
 
 					@Override
@@ -281,7 +257,10 @@ public class ManagerAgent extends MicroAgent {
 
 				// start the timelord agent
 				getLogger().info("Manager agent is starting the timelord agent...");
-				cms.createComponent("Timelord", "haw/mmlab/production_line/timelord/TimelordAgent.class", null, null).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
+				Map<String, Object> args = new HashMap<String, Object>();
+				args.put("interval", plc.getTimelordInterval());
+				CreationInfo cr = new CreationInfo(args, parent.getComponentIdentifier());
+				cms.createComponent("Timelord", "haw/mmlab/production_line/timelord/TimelordAgent.class", cr, null).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
 
 					public void resultAvailable(IComponentIdentifier identifier) {
 						startedAgents.add(identifier);
@@ -301,6 +280,14 @@ public class ManagerAgent extends MicroAgent {
 		finishRun();
 
 		return true;
+	}
+
+	/**
+	 * This method is called when the reconfiguration process failed. The current run is marked with an error and than finished.
+	 */
+	public void informReconfError() {
+		dbService.setErrorRun();
+		finishRun();
 	}
 
 	/**
@@ -333,12 +320,11 @@ public class ManagerAgent extends MicroAgent {
 					getLogger().severe(e.getMessage());
 				}
 
-				logManager = new LogManager(plc);
+				logManager = new LogManager(plc, strategyName);
 				finished = false;
 
-				// wait for 10s so the agents could be killed properly before
-				// restarting new ones.
-				waitFor(10000, new IComponentStep<Void>() {
+				// start the new run
+				waitForTick(new IComponentStep<Void>() {
 
 					public IFuture<Void> execute(IInternalAccess ia) {
 						executeBody();
@@ -366,44 +352,6 @@ public class ManagerAgent extends MicroAgent {
 				getLogger().info("Manager agent is done killing agents!");
 			}
 		});
-	}
-
-	/**
-	 * Private class which periodically checks if an error occurred in the current run and ends him if necessary.
-	 * 
-	 * @author thomas
-	 */
-	private class WaitForErrorStep implements IComponentStep<Void> {
-
-		private Map<String, Integer> oldConsumedWPs = null;
-
-		public WaitForErrorStep(Map<String, Integer> oldConsumedWPs) {
-			this.oldConsumedWPs = oldConsumedWPs;
-		}
-
-		public IFuture<Void> execute(IInternalAccess ia) {
-			boolean consumed = false;
-
-			for (String taskId : oldConsumedWPs.keySet()) {
-				// check if a workpiece was consumed in at least one of the
-				// tasks
-				if (consumedWPs.get(taskId) > oldConsumedWPs.get(taskId)) {
-					consumed = true;
-					break;
-				}
-			}
-
-			if (consumed) {
-				WaitForErrorStep step = new WaitForErrorStep(new HashMap<String, Integer>(consumedWPs));
-				waitFor(errorTimeout, step);
-			} else {
-				getLogger().warning("Manager agent has detected a error condition timeout");
-				dbService.setErrorRun();
-				finishRun();
-			}
-
-			return IFuture.DONE;
-		}
 	}
 
 	/**

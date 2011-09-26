@@ -13,19 +13,9 @@ import javax.xml.bind.annotation.XmlElement;
  * 
  */
 public class Configuration {
-	private Integer rate;
 	private Integer count;
 	private AgentQuery query;
 	private Action action;
-
-	@XmlAttribute(name = "rate")
-	public Integer getRate() {
-		return rate;
-	}
-
-	public void setRate(Integer rate) {
-		this.rate = rate;
-	}
 
 	@XmlAttribute(name = "count")
 	public Integer getCount() {

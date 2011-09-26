@@ -24,11 +24,6 @@ public class ManagerService implements IManagerService {
 			agent.getProducedWPs().put(taskId, agent.getProducedWPs().get(taskId) + 1);
 		} else {
 			agent.getProducedWPs().put(taskId, 1);
-
-			if (!agent.isFirstWPConsumed()) {
-				agent.setFirstWPConsumed(true);
-				agent.startDropout();
-			}
 		}
 
 		return IFuture.DONE;
@@ -40,6 +35,11 @@ public class ManagerService implements IManagerService {
 			agent.getConsumedWPs().put(taskId, agent.getConsumedWPs().get(taskId) + 1);
 		} else {
 			agent.getConsumedWPs().put(taskId, 1);
+
+			if (!agent.isFirstWPConsumed()) {
+				agent.setFirstWPConsumed(true);
+				agent.startDropout();
+			}
 		}
 
 		return IFuture.DONE;
@@ -54,6 +54,13 @@ public class ManagerService implements IManagerService {
 
 	public IFuture<Void> handleConsoleMsg(ConsoleMessage message) {
 		agent.printConsoleMsg(message);
+
+		return IFuture.DONE;
+	}
+
+	@Override
+	public IFuture<Void> informReconfError() {
+		agent.informReconfError();
 
 		return IFuture.DONE;
 	}

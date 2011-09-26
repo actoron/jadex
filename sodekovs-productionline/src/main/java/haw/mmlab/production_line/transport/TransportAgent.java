@@ -207,8 +207,13 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 										} else {
 											wpCount.put(task.getId(), 1);
 										}
-										// waitFor(role.getProcessingTime(), ProduceStep.this);
-										waitForTick(ProduceStep.this);
+
+										if (role.getProcessingTime().equals(0)) {
+											// optimized for a event driven simulation if processing time is 0
+											waitForTick(ProduceStep.this);
+										} else {
+											waitFor(role.getProcessingTime(), ProduceStep.this);
+										}
 									} else {
 										String msg = id + " has failed to send workpiece to " + target;
 										// getLogger().fine(msg);
@@ -264,8 +269,13 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 										} else {
 											wpCount.put(task.getId(), 1);
 										}
-										// waitFor(role.getProcessingTime(), new ProduceStep(role));
-										waitForTick(new ProduceStep(role));
+
+										if (role.getProcessingTime().equals(0)) {
+											// optimized for a event driven simulation if the processing time is 0
+											waitForTick(new ProduceStep(role));
+										} else {
+											waitFor(role.getProcessingTime(), new ProduceStep(role));
+										}
 									} else {
 										String msg = id + " has failed to send workpiece to " + target;
 										// getLogger().fine(msg);
@@ -301,8 +311,12 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 				workpiece.addOperation(role.getCapability());
 				Integer processTime = role.getProcessingTime() == null ? 0 : role.getProcessingTime();
 				if (role.getPostcondition().getTargetAgent() != null) {
-					// waitFor(processTime, new SendWorkpieceStep(role));
-					waitForTick(new SendWorkpieceStep(role));
+					if (processTime.equals(0)) {
+						// optimized for event driven simulation if processing time is 0
+						waitForTick(new SendWorkpieceStep(role));
+					} else {
+						waitFor(processTime, new SendWorkpieceStep(role));
+					}
 				} else {
 					// consume
 					consume(workpiece);

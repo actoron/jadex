@@ -100,13 +100,6 @@ public class SimulationGenerator {
 			plc.setRunCount(1);
 		}
 
-		count = config.getErrorTimeout();
-		if (count != null && count >= 0) {
-			plc.setErrorTimeout(count);
-		} else {
-			plc.setErrorTimeout(60000);
-		}
-
 		generateRobotsAndTransports();
 		generateCommunicationGraph();
 		plc.setTasks(generateTasks(config.getWorkpieceCount()));

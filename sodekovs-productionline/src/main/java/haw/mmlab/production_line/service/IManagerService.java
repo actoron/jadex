@@ -41,4 +41,9 @@ public interface IManagerService {
 	 *            the given {@link ConsoleMessage}
 	 */
 	public IFuture<Void> handleConsoleMsg(ConsoleMessage message);
+
+	/**
+	 * Inform the manager that the reconfiguration failed.
+	 */
+	public IFuture<Void> informReconfError();
 }

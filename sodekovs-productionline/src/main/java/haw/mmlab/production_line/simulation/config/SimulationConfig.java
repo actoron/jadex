@@ -24,7 +24,7 @@ public class SimulationConfig {
 	private ProcessTime processTime;
 	private BufferSize bufferSize;
 	private Integer runCount;
-	private Integer errorTimeout;
+	private Integer timelordInterval;
 	private List<TaskConf> tasks = new ArrayList<TaskConf>();
 
 	@XmlElement(name = "redundancy")
@@ -100,13 +100,13 @@ public class SimulationConfig {
 		this.runCount = runCount;
 	}
 
-	@XmlElement(name = "error_condition_timeout")
-	public Integer getErrorTimeout() {
-		return errorTimeout;
+	@XmlElement(name = "timelord_interval")
+	public Integer getTimelordInterval() {
+		return timelordInterval;
 	}
 
-	public void setErrorTimeout(Integer errorTimeout) {
-		this.errorTimeout = errorTimeout;
+	public void setTimelordInterval(Integer timelordInterval) {
+		this.timelordInterval = timelordInterval;
 	}
 
 	@XmlElementWrapper(name = "tasks")

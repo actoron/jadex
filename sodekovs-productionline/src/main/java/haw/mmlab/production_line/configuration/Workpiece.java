@@ -127,11 +127,7 @@ public class Workpiece implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		final int maxLen = 10;
-		return "Workpiece [id=" + id + ", opCount=" + opCount /*
-															 * + ", " + (operations != null ? "operations=" + operations.subList(0, Math.min(operations.size(), maxLen)) + ", " : "") + (task != null ?
-															 * "task=" + task : "")
-															 */+ "]";
+		return "Workpiece [id=" + id + ", opCount=" + opCount + "]";
 	}
 
 	/*

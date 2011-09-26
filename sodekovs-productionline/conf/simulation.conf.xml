@@ -6,6 +6,7 @@
 	<!-- The transports between the robots and also the producer and consumer result implicitly -->
 	<!-- from this specification. -->
 	<tasks>
+		<!--
 		<task id="1">
 			<steps>
 				<step robot="Robot1" action="A" />
@@ -59,15 +60,16 @@
 				<step robot="Robot5" action="E" />
 			</steps>
 		</task>
-		<!-- <task id="1" noSteps="10" noCaps="10"/> -->
-		<!-- <task id="2" noSteps="10" noCaps="10"/> -->
+		-->
+		
+		<task id="1" noSteps="1000" noCaps="1000"/>
 	</tasks>
 	
 	<!-- Specifies the amount of different capabilities in each robot. -->
 	<!-- For each robot a random value between min and max is used. -->
 	<!-- min must be greater or equals than 1 and max must be greater or equals than min -->
 	<!-- Default: min=1, max=1 -->
-	<redundancy min="5" max="5" />
+	<redundancy min="100" max="100" />
 	
 	<!-- Specifies the amount of work pieces to be processed by the system in each run. -->
 	<!-- Set to 0 for unlimited amount. -->
@@ -77,8 +79,11 @@
 	<!-- Specifies the processing time in each agent (robot and transporter). -->
 	<!-- For each agent a random value between min and max is used. -->
 	<!-- max must be greater or equals than min. If not, the default is assumed-->
-	<!-- Default: min=500, max=500 -->
-	<processing_time min="150" max="400" />
+	<!-- If the processing time is set to 0 the simulation will be optimized for a event driven simulation -->
+	<!-- using the Event Clock in Jadex. A processing time greater 0 results in a simulation optimized for -->
+	<!-- the System Clock in Jadex. -->
+	<!-- Default: min=0, max=0 -->
+	<processing_time min="0" max="0" />
 	
 	<!-- Specifies the buffer size for each robot. -->
 	<!-- For each robot a random value between min and max is used. -->
@@ -90,9 +95,7 @@
 	<!-- Default: 1 -->
 	<runs>1</runs>
 	
-	<!-- Specifies the timeout (in milliseconds) within workpieces must arrive the storage. -->
-	<!-- If they not arrive within this time an error condition is assumed and the current run is aborted. -->
-	<!-- Note: Make sure, that the first workpiece arrives within this time too. Otherwise an error is detected. -->
-	<!-- Default: 60000 -->
-	<error_condition_timeout>60000</error_condition_timeout>
+	<!-- Specifies the logging interval for the timelord agent. Specify a value of 0 for a event driven simulation. -->
+	<!-- Default: 0 -->
+	<timelord_interval>0</timelord_interval>
 </simulation_configuration>
