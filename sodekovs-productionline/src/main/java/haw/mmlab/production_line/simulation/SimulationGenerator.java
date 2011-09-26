@@ -42,6 +42,7 @@ public class SimulationGenerator {
 	private Map<String, Robot> robots = null;
 	private Map<String, Transport> transports = null;
 	private Integer robotCount = 0;
+	private Integer capNumber = 1;
 
 	/**
 	 * Creates a new SimulationGenerator that works on the given configuration file.
@@ -100,9 +101,9 @@ public class SimulationGenerator {
 			plc.setRunCount(1);
 		}
 
-		generateRobotsAndTransports();
+		generateRobotsAndTransports(config.getRepeatCaps());
 		generateCommunicationGraph();
-		plc.setTasks(generateTasks(config.getWorkpieceCount()));
+		plc.setTasks(generateTasks(config.getWorkpieceCount(), config.getRepeatCaps()));
 
 		Integer procMin = config.getProcTimeMin();
 		Integer procMax = config.getProcTimeMax();
@@ -220,7 +221,7 @@ public class SimulationGenerator {
 	/**
 	 * Generates all the robots and transports with their roles.
 	 */
-	private void generateRobotsAndTransports() {
+	private void generateRobotsAndTransports(Boolean repeatCaps) {
 		int transportId = 1;
 
 		List<TaskConf> tasks = config.getTasks();
@@ -245,9 +246,12 @@ public class SimulationGenerator {
 			Robot lastRobot = null;
 			Condition lastPostcon = null;
 			if (taskConf.getNoSteps() != null) {
-				for (int i = 1; i <= taskConf.getNoSteps(); i++) {
-					List<Capability> capPool = generateCaps(taskConf.getNoCaps());
+				if (repeatCaps) {
+					capNumber = 1;
+				}
+				List<Capability> capPool = generateCaps(taskConf.getNoCaps());
 
+				for (int i = 1; i <= taskConf.getNoSteps(); i++) {
 					postState.add(capPool.get((i - 1) % capPool.size()));
 					String robotId = "GRobot" + ++robotCount;
 					Robot robot = new Robot();
@@ -394,7 +398,7 @@ public class SimulationGenerator {
 		List<Capability> caps = new ArrayList<Capability>();
 
 		for (int i = 1; i <= noCaps; i++) {
-			Capability cap = new Capability("Cap" + String.valueOf(i));
+			Capability cap = new Capability("Cap" + String.valueOf(capNumber++));
 			caps.add(cap);
 		}
 
@@ -459,19 +463,24 @@ public class SimulationGenerator {
 	 * 
 	 * @return The list of tasks.
 	 */
-	private List<Task> generateTasks(Integer maxWPCount) {
+	private List<Task> generateTasks(Integer maxWPCount, Boolean repeatCaps) {
 		List<TaskConf> taskConfs = config.getTasks();
 		List<Task> tasks = new ArrayList<Task>();
 		Set<String> actions = new HashSet<String>();
 
+		int capNumber = 1;
 		for (TaskConf taskConf : taskConfs) {
 			Task task = new Task();
 
 			if (taskConf.getNoSteps() != null) {
 				for (int i = 1; i <= taskConf.getNoCaps(); i++) {
-					task.addOperation("Cap" + String.valueOf(i));
+					task.addOperation("Cap" + String.valueOf(capNumber));
 
-					actions.add("Cap" + String.valueOf(i));
+					actions.add("Cap" + String.valueOf(capNumber));
+					capNumber++;
+				}
+				if (repeatCaps) {
+					capNumber = 1;
 				}
 			} else {
 				List<TaskStep> steps = taskConf.getSteps();

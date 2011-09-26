@@ -98,6 +98,7 @@ public class LogManager {
 	 */
 	public LogManager(ProductionLineConfiguration plc, String strategy) {
 		this.plc = plc;
+		this.strategy = strategy;
 	}
 
 	/**

@@ -48,7 +48,7 @@ import java.util.logging.Level;
 @ProvidedServices(@ProvidedService(type = IManagerService.class, implementation = @Implementation(ManagerService.class)))
 @RequiredServices({ @RequiredService(name = "cmsservice", type = IComponentManagementService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)),
 		@RequiredService(name = "dbService", type = IDatabaseService.class) })
-@Arguments(@Argument(clazz = String.class, name = "configuration_modell"))
+@Arguments({ @Argument(clazz = String.class, name = "configuration_modell"), @Argument(clazz = String.class, name = "dropout_configuration_model"), @Argument(clazz = String.class, name = "strategy") })
 public class ManagerAgent extends MicroAgent {
 
 	/** The path to the configuration file */

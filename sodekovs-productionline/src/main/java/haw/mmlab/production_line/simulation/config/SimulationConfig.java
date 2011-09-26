@@ -25,6 +25,7 @@ public class SimulationConfig {
 	private BufferSize bufferSize;
 	private Integer runCount;
 	private Integer timelordInterval;
+	private Boolean repeatCaps;
 	private List<TaskConf> tasks = new ArrayList<TaskConf>();
 
 	@XmlElement(name = "redundancy")
@@ -107,6 +108,15 @@ public class SimulationConfig {
 
 	public void setTimelordInterval(Integer timelordInterval) {
 		this.timelordInterval = timelordInterval;
+	}
+
+	@XmlElement(name = "repeat_caps")
+	public Boolean getRepeatCaps() {
+		return repeatCaps;
+	}
+
+	public void setRepeatCaps(Boolean repeatCaps) {
+		this.repeatCaps = repeatCaps;
 	}
 
 	@XmlElementWrapper(name = "tasks")
