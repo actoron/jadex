@@ -45,8 +45,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  Reads micro agent classes and generates a model from metainfo and annotations.
@@ -172,96 +175,197 @@ public class MicroClassReader
 	/**
 	 *  Fill the model details using annotation.
 	 */
-	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, Class cma, ClassLoader classloader)
+	protected void fillMicroModelFromAnnotations(MicroModel micromodel, String model, Class clazz, ClassLoader classloader)
 	{
 		ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
 		
-		if(cma.isAnnotationPresent(Imports.class))
-		{
-			String[] tmp = ((Imports)cma.getAnnotation(Imports.class)).value();
-			modelinfo.setImports(tmp);
-		}
+		Class cma = clazz;
+		
 		if(cma.isAnnotationPresent(Description.class))
 		{
 			Description val = (Description)cma.getAnnotation(Description.class);
 			modelinfo.setDescription(val.value());
 		}
-		if(cma.isAnnotationPresent(Properties.class))
+		
+		int cnt = 0;
+		Map toset = new HashMap();
+		while(cma!=null && !cma.equals(Object.class) && !cma.equals(MicroAgent.class))
 		{
-			Properties val = (Properties)cma.getAnnotation(Properties.class);
-			NameValue[] vals = val.value();
-			Map props = new HashMap();
-			for(int i=0; i<vals.length; i++)
+			if(cma.isAnnotationPresent(Imports.class))
 			{
-				// Todo: clazz, language
-				props.put(vals[i].name(), new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].value(), null) );
-			}
-			modelinfo.setProperties(props);
-		}
-		if(cma.isAnnotationPresent(RequiredServices.class))
-		{
-			RequiredServices val = (RequiredServices)cma.getAnnotation(RequiredServices.class);
-			RequiredService[] vals = val.value();
-			RequiredServiceInfo[] rsis = new RequiredServiceInfo[vals.length];
-			for(int i=0; i<vals.length; i++)
-			{
-				RequiredServiceBinding binding = createBinding(vals[i].binding());
-				rsis[i] = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
-					vals[i].multiple(), binding);
-			}
-			modelinfo.setRequiredServices(rsis);
-		}
-		if(cma.isAnnotationPresent(ProvidedServices.class))
-		{
-			ProvidedServices val = (ProvidedServices)cma.getAnnotation(ProvidedServices.class);
-			ProvidedService[] vals = val.value();
-			ProvidedServiceInfo[] psis = new ProvidedServiceInfo[vals.length];
-			for(int i=0; i<vals.length; i++)
-			{
-				Implementation im = vals[i].implementation();
-				Value[] inters = im.interceptors();
-				UnparsedExpression[] interceptors = null;
-				if(inters.length>0)
+				String[] tmp = ((Imports)cma.getAnnotation(Imports.class)).value();
+				Set imports = (Set)toset.get("imports");
+				if(imports==null)
 				{
-					interceptors = new UnparsedExpression[inters.length];
-					for(int j=0; j<inters.length; j++)
+					imports = new LinkedHashSet();
+					toset.put("imports", imports);
+				}
+				for(int i=0; i<tmp.length; i++)
+				{
+					imports.add(tmp[i]);
+				}
+			}
+			
+			if(cma.isAnnotationPresent(Properties.class))
+			{
+				Properties val = (Properties)cma.getAnnotation(Properties.class);
+				NameValue[] vals = val.value();
+				
+				Map props = (Map)toset.get("properties");
+				if(props==null)
+				{
+					props = new LinkedHashMap();
+					toset.put("properties", props);
+				}
+				for(int i=0; i<vals.length; i++)
+				{
+					// Todo: clazz, language
+					props.put(vals[i].name(), new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].value(), null) );
+				}
+			}
+			
+			if(cma.isAnnotationPresent(RequiredServices.class))
+			{
+				RequiredServices val = (RequiredServices)cma.getAnnotation(RequiredServices.class);
+				RequiredService[] vals = val.value();
+				
+				Map rsers = (Map)toset.get("reqservices");
+				if(rsers==null)
+				{
+					rsers = new LinkedHashMap();
+					toset.put("reqservices", rsers);
+				}
+				
+				for(int i=0; i<vals.length; i++)
+				{
+					RequiredServiceBinding binding = createBinding(vals[i].binding());
+					RequiredServiceInfo rsis = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
+						vals[i].multiple(), binding);
+					if(rsers.containsKey(vals[i].name()))
+						throw new RuntimeException("Extension hierarchy contains required service more than once: "+vals[i].name());
+					rsers.put(vals[i].name(), rsis);
+				}
+			}
+			
+			if(cma.isAnnotationPresent(ProvidedServices.class))
+			{
+				ProvidedServices val = (ProvidedServices)cma.getAnnotation(ProvidedServices.class);
+				ProvidedService[] vals = val.value();
+				
+				Map psers = (Map)toset.get("proservices");
+				if(psers==null)
+				{
+					psers = new LinkedHashMap();
+					toset.put("proservices", psers);
+				}
+				
+				for(int i=0; i<vals.length; i++)
+				{
+					Implementation im = vals[i].implementation();
+					Value[] inters = im.interceptors();
+					UnparsedExpression[] interceptors = null;
+					if(inters.length>0)
 					{
-						interceptors[j] = new UnparsedExpression(null, inters[j].clazz(), inters[j].value(), null);
+						interceptors = new UnparsedExpression[inters.length];
+						for(int j=0; j<inters.length; j++)
+						{
+							interceptors[j] = new UnparsedExpression(null, inters[j].clazz(), inters[j].value(), null);
+						}
+					}
+					ProvidedServiceImplementation impl = createImplementation(im);
+					ProvidedServiceInfo psis = new ProvidedServiceInfo(vals[i].name().length()>0? vals[i].name(): null, vals[i].type(), impl);
+				
+					if(vals[i].name().length()==0 || !psers.containsKey(vals[i].name()))
+					{
+						psers.put(vals[i].name().length()==0? ("#"+cnt++): vals[i].name(), psis);
 					}
 				}
-				ProvidedServiceImplementation impl = createImplementation(im);
-				psis[i] = new ProvidedServiceInfo(vals[i].name().length()>0? vals[i].name(): null, vals[i].type(), impl);
 			}
-			modelinfo.setProvidedServices(psis);
-		}
-		if(cma.isAnnotationPresent(Arguments.class))
-		{
-			Arguments val = (Arguments)cma.getAnnotation(Arguments.class);
-			Argument[] vals = val.value();
-			IArgument[] tmpargs = new IArgument[vals.length];
-			for(int i=0; i<vals.length; i++)
+			
+			if(cma.isAnnotationPresent(Arguments.class))
 			{
-//				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
-				tmpargs[i] = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
-					vals[i].description(), SReflect.getClassName(vals[i].clazz()),
-					"".equals(vals[i].defaultvalue()) ? null : new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].defaultvalue(), null));
+				Arguments val = (Arguments)cma.getAnnotation(Arguments.class);
+				Argument[] vals = val.value();
+				
+				Map args = (Map)toset.get("arguments");
+				if(args==null)
+				{
+					args = new LinkedHashMap();
+					toset.put("arguments", args);
+				}
+				
+				for(int i=0; i<vals.length; i++)
+				{
+	//				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
+					IArgument tmparg = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
+						vals[i].description(), SReflect.getClassName(vals[i].clazz()),
+						"".equals(vals[i].defaultvalue()) ? null : new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].defaultvalue(), null));
+					
+					if(!args.containsKey(vals[i].name()))
+					{
+						args.put(vals[i].name(), tmparg);
+					}
+				}
 			}
-			modelinfo.setArguments(tmpargs);
-		}
-		if(cma.isAnnotationPresent(Results.class))
-		{
-			Results val = (Results)cma.getAnnotation(Results.class);
-			Result[] vals = val.value();
-			IArgument[] tmpresults = new IArgument[vals.length];
-			for(int i=0; i<vals.length; i++)
+			
+			if(cma.isAnnotationPresent(Results.class))
 			{
-//				Object res = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
-				tmpresults[i] = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
-					vals[i].description(), SReflect.getClassName(vals[i].clazz()),
-					"".equals(vals[i].defaultvalue()) ? null : new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].defaultvalue(), null));
+				Results val = (Results)cma.getAnnotation(Results.class);
+				Result[] vals = val.value();
+				
+				Map res = (Map)toset.get("results");
+				if(res==null)
+				{
+					res = new LinkedHashMap();
+					toset.put("results", res);
+				}
+				
+				IArgument[] tmpresults = new IArgument[vals.length];
+				for(int i=0; i<vals.length; i++)
+				{
+	//				Object res = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
+					IArgument tmpresult = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
+						vals[i].description(), SReflect.getClassName(vals[i].clazz()),
+						"".equals(vals[i].defaultvalue()) ? null : new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].defaultvalue(), null));
+					
+					if(!res.containsKey(vals[i].name()))
+					{
+						res.put(vals[i].name(), tmpresult);
+					}
+				}
 			}
-			modelinfo.setResults(tmpresults);
+			
+			cma = cma.getSuperclass();
 		}
+		
+		Set imp = (Set)toset.get("imports");
+		if(imp!=null)
+			modelinfo.setImports((String[])imp.toArray(new String[imp.size()]));
+		
+		Map props = (Map)toset.get("properties");
+		if(props!=null)
+			modelinfo.setProperties(props);
+		
+		Map rsers = (Map)toset.get("reqservices");
+		if(rsers!=null)
+			modelinfo.setRequiredServices((RequiredServiceInfo[])rsers.values().toArray(new RequiredServiceInfo[rsers.size()]));
+		
+		Map psers = (Map)toset.get("proservices");
+		if(psers!=null)
+			modelinfo.setProvidedServices((ProvidedServiceInfo[])psers.values().toArray(new ProvidedServiceInfo[psers.size()]));
+//		System.out.println("provided services: "+psers);
+		
+		Map argus = (Map)toset.get("arguments");
+		if(argus!=null)
+			modelinfo.setArguments((IArgument[])argus.values().toArray(new IArgument[argus.size()]));
+		
+		Map res = (Map)toset.get("results");
+		if(res!=null)
+			modelinfo.setResults((IArgument[])res.values().toArray(new IArgument[res.size()]));
+		
+		// todo
+		cma = clazz;
+		
 		Configuration[] configs = null;
 		if(cma.isAnnotationPresent(Configurations.class))
 		{
@@ -411,8 +515,8 @@ public class MicroClassReader
 		if(cma.isAnnotationPresent(GuiClass.class))
 		{
 			GuiClass gui = (GuiClass)cma.getAnnotation(GuiClass.class);
-			Class clazz = gui.value();
-			modelinfo.addProperty("componentviewer.viewerclass", clazz);
+			Class gclazz = gui.value();
+			modelinfo.addProperty("componentviewer.viewerclass", gclazz);
 		}
 		else if(cma.isAnnotationPresent(GuiClassName.class))
 		{
