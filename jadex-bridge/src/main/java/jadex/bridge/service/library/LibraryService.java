@@ -439,10 +439,11 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public static URL toURL(Object url)
 	{
 		URL	ret	= null;
+		boolean	jar	= false;
 		if(url instanceof String)
 		{
 			String	string	= (String) url;
-			if(string.startsWith("file:"))
+			if(string.startsWith("file:") || string.startsWith("jar:file:"))
 			{
 				try
 				{
@@ -450,10 +451,15 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 				}
 				catch(UnsupportedEncodingException e)
 				{
+					e.printStackTrace();
 				}
 			}
 			
-			url	= string.startsWith("file:") ? new File(string.substring(5)) : null;
+			jar	= string.startsWith("jar:file:");
+			url	= jar ? new File(string.substring(9))
+				: string.startsWith("file:") ? new File(string.substring(5)) : null;
+			
+			
 			if(url==null)
 			{
 				File file	= new File(string);
@@ -495,6 +501,13 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 				String	rel	= SUtil.convertPathToRelative(abs);
 				ret	= abs.equals(rel) ? new File(abs).toURI().toURL()
 					: new File(System.getProperty("user.dir"), rel).toURI().toURL();
+				if(jar)
+				{
+					if(ret.toString().endsWith("!"))
+						ret	= new URL("jar:"+ret.toString()+"/");	// Add missing slash in jar url.
+					else
+						ret	= new URL("jar:"+ret.toString());						
+				}
 			}
 			catch (MalformedURLException e)
 			{

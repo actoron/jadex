@@ -1,12 +1,18 @@
 package jadex.base.gui.modeltree;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.FileTreePanel;
+import jadex.base.gui.filetree.IFileNode;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.service.library.LibraryService;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 
@@ -82,30 +88,34 @@ public class RemovePathAction extends ToolTipAction
 		TreePath[]	selected	= treepanel.getTree().getSelectionPaths();
 		for(int i=0; selected!=null && i<selected.length; i++)
 		{
-			final ITreeNode	node = (ITreeNode)selected[i].getLastPathComponent();
+			ITreeNode	node = (ITreeNode)selected[i].getLastPathComponent();
 			treepanel.removeTopLevelNode(node);
 			
-			// todo: jars
-			if(treepanel.getExternalAccess()!=null && node instanceof FileNode)
+			if(treepanel.getExternalAccess()!=null && node instanceof IFileNode)
 			{
-				SServiceProvider.getService(treepanel.getExternalAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new SwingDefaultResultListener(treepanel)
+				final String	path	= ((IFileNode)node).getFilePath();
+				treepanel.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 				{
-					public void customResultAvailable(Object result)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ILibraryService ls = (ILibraryService)result;
-						File file = ((FileNode)node).getFile();
-						file = new File(file.getParentFile(), file.getName());
-						try
+						final Future	ret	= new Future();
+						SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new DelegationResultListener<ILibraryService>(ret)
 						{
-							ls.removeURL(file.toURI().toURL());
-						}
-						catch(Exception ex)
-						{
-	//						ex.printStackTrace();
-						}
-	//					resetCrawler();
-	//					((ModelExplorerTreeModel)getModel()).fireNodeRemoved(getRootNode(), node, index);
+							public void customResultAvailable(ILibraryService ls)
+							{
+								try
+								{
+									ls.removeURL(LibraryService.toURL(path));
+									ret.setResult(null);
+								}
+								catch(Exception ex)
+								{
+									ret.setException(ex);
+								}
+							}
+						});
+						return ret;
 					}
 				});
 			}
