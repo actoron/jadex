@@ -1333,14 +1333,18 @@ public class SUtil
 			{
 				String entry = stok.nextToken();
 				File file = new File(entry);
-				if(file.isDirectory()
-						&& !entry
-								.endsWith(System.getProperty("file.separator")))
-				{
-					// Normalize, that directories end with "/".
-					entry += System.getProperty("file.separator");
-				}
-				cps.add(new URL("file:///" + entry));
+				cps.add(file.toURI().toURL());
+				
+				// Code below does not work for paths with spaces in it.
+				// Todo: is above code correct in all cases? (relative/absolute, local/remote, jar/directory)
+//				if(file.isDirectory()
+//						&& !entry
+//								.endsWith(System.getProperty("file.separator")))
+//				{
+//					// Normalize, that directories end with "/".
+//					entry += System.getProperty("file.separator");
+//				}
+//				cps.add(new URL("file:///" + entry));
 			}
 			catch(MalformedURLException e)
 			{
