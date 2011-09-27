@@ -53,7 +53,7 @@ public class RequiredServiceProperties	extends	PropertiesPanel
 //		IServiceIdentifier	sid	= service.getServiceIdentifier();
 		
 		getTextField("Name").setText(info.getName());
-		getTextField("Type").setText(info.getType().getName());
+		getTextField("Type").setText(info.getTypeName());
 		getTextField("Multiple").setText(""+info.isMultiple());
 		RequiredServiceBinding bind = info.getDefaultBinding();
 		StringBuffer buf = new StringBuffer();
@@ -67,38 +67,44 @@ public class RequiredServiceProperties	extends	PropertiesPanel
 			buf.append(" component type="+bind.getComponentType());
 		getTextField("Binding").setText(buf.toString());
 		
-		JTable	list	= (JTable)getComponent("Methods").getComponent(0);
-		Method[] methods	= info.getType().getMethods();
-		String[] returntypes	= new String[methods.length]; 
-		String[] names	= new String[methods.length]; 
-		String[] parameters	= new String[methods.length];
-		for(int i=0; i<methods.length; i++)
+		try
 		{
-			returntypes[i] = SReflect.getUnqualifiedTypeName(methods[i].getGenericReturnType().toString());
-//			returntypes[i]	= SReflect.getUnqualifiedClassName(methods[i].getReturnType());
-			names[i]	= methods[i].getName();
-			Class[]	params	= methods[i].getParameterTypes();
-			String	pstring	= "";
-			for(int j=0; j<params.length; j++)
+			// Todo: support methods also for remote components.
+			JTable	list	= (JTable)getComponent("Methods").getComponent(0);
+			Method[] methods	= info.getType(null).getMethods();	// NullPointerException for remote
+			String[] returntypes	= new String[methods.length]; 
+			String[] names	= new String[methods.length]; 
+			String[] parameters	= new String[methods.length];
+			for(int i=0; i<methods.length; i++)
 			{
-				if(j==0)
+				returntypes[i] = SReflect.getUnqualifiedTypeName(methods[i].getGenericReturnType().toString());
+	//			returntypes[i]	= SReflect.getUnqualifiedClassName(methods[i].getReturnType());
+				names[i]	= methods[i].getName();
+				Class<?>[]	params	= methods[i].getParameterTypes();
+				String	pstring	= "";
+				for(int j=0; j<params.length; j++)
 				{
-//					pstring	= SReflect.getUnqualifiedClassName(params[j]);
-					pstring	= SReflect.getUnqualifiedTypeName(params[j].toString());
+					if(j==0)
+					{
+	//					pstring	= SReflect.getUnqualifiedClassName(params[j]);
+						pstring	= SReflect.getUnqualifiedTypeName(params[j].toString());
+					}
+					else
+					{
+	//					pstring	+= ", "+SReflect.getUnqualifiedClassName(params[j]);
+						pstring	+= ", "+SReflect.getUnqualifiedTypeName(params[j].toString());
+					}
 				}
-				else
-				{
-//					pstring	+= ", "+SReflect.getUnqualifiedClassName(params[j]);
-					pstring	+= ", "+SReflect.getUnqualifiedTypeName(params[j].toString());
-				}
+				parameters[i]	= pstring;
 			}
-			parameters[i]	= pstring;
+			DefaultTableModel	dtm	= new DefaultTableModel();
+			dtm.addColumn("Return Type", returntypes);
+			dtm.addColumn("Method Name", names);
+			dtm.addColumn("Parameters", parameters);
+			list.setModel(dtm);
 		}
-		DefaultTableModel	dtm	= new DefaultTableModel();
-		dtm.addColumn("Return Type", returntypes);
-		dtm.addColumn("Method Name", names);
-		dtm.addColumn("Parameters", parameters);
-		list.setModel(dtm);
-
+		catch(NullPointerException e)
+		{
+		}
 	}
 }

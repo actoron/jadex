@@ -75,6 +75,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	 */
 	public IFuture getService(final RequiredServiceInfo info, RequiredServiceBinding bd, final boolean rebind)
 	{
+		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
+		final Class	type	= info.getType(null);
+		
 //		if(info.getType().toString().indexOf("IDis")!=-1)
 //			System.out.println("diss" );
 		
@@ -100,7 +103,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 							public void customResultAvailable(Object result)
 							{
 								IExternalAccess ea = (IExternalAccess)result;
-								SServiceProvider.getService(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
+								SServiceProvider.getService(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL)
 									.addResultListener(new StoreDelegationResultListener(ret, provider, info, binding));
 							}
 						});
@@ -116,7 +119,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 								if(coll!=null && coll.size()>0)
 								{
 									IExternalAccess ea = (IExternalAccess)coll.iterator().next();
-									SServiceProvider.getService(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
+									SServiceProvider.getService(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL)
 										.addResultListener(new StoreDelegationResultListener(ret, provider, info, binding));
 								}
 								else
@@ -129,7 +132,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					else
 					{
 						// Search service using search specification.
-						SServiceProvider.getService(provider, info.getType(), binding.getScope())
+						SServiceProvider.getService(provider, type, binding.getScope())
 							.addResultListener(new StoreDelegationResultListener(ret, provider, info, binding)
 						{
 							public void exceptionOccurred(Exception exception)
@@ -139,7 +142,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 									public void customResultAvailable(Object result)
 									{
 										IExternalAccess ea = (IExternalAccess)result;
-										SServiceProvider.getService(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
+										SServiceProvider.getService(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL)
 											.addResultListener(new StoreDelegationResultListener(ret, provider, info, binding));
 									}
 								});
@@ -163,6 +166,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	public IIntermediateFuture getServices(final RequiredServiceInfo info, 
 		final RequiredServiceBinding bd, boolean rebind)
 	{
+		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
+		final Class	type	= info.getType(null);
+		
 		final IntermediateFuture ret = new IntermediateFuture();
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();
 		
@@ -188,7 +194,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 							public void customResultAvailable(Object result)
 							{
 								IExternalAccess ea = (IExternalAccess)result;
-								SServiceProvider.getServices(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
+								SServiceProvider.getServices(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL)
 									.addResultListener(new StoreIntermediateDelegationResultListener(ret, provider, info, binding));
 							}
 						});
@@ -233,7 +239,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 												final IExternalAccess ea = (IExternalAccess)it.next();
 //												final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
 	
-												SServiceProvider.getService(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
+												SServiceProvider.getService(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL)
 													.addResultListener(new IResultListener()
 												{
 													public void resultAvailable(final Object result)
@@ -271,7 +277,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					else
 					{
 						// Search service using search specification.
-						IIntermediateFuture	ifut	= SServiceProvider.getServices(provider, info.getType(), binding.getScope());
+						IIntermediateFuture	ifut	= SServiceProvider.getServices(provider, type, binding.getScope());
 						ifut.addResultListener(new StoreIntermediateDelegationResultListener(ret, provider, info, binding)
 						{
 							public void exceptionOccurred(Exception exception)
@@ -281,7 +287,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 									public void customResultAvailable(Object result)
 									{
 										IExternalAccess ea = (IExternalAccess)result;
-										SServiceProvider.getServices(ea.getServiceProvider(), info.getType(), RequiredServiceInfo.SCOPE_LOCAL)
+										SServiceProvider.getServices(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL)
 											.addResultListener(new StoreIntermediateDelegationResultListener(ret, provider, info, binding));
 									}
 									
@@ -648,7 +654,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		}
 		else
 		{
-			ret.setException(new ServiceNotFoundException("name="+info.getName()+", interface="+info.getType()+", no component creation possible"));
+			ret.setException(new ServiceNotFoundException("name="+info.getName()+", interface="+info.getTypeName()+", no component creation possible"));
 		}
 		
 		return ret;

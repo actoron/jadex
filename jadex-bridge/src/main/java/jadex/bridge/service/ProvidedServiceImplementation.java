@@ -3,6 +3,7 @@ package jadex.bridge.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
 
@@ -18,8 +19,11 @@ public class ProvidedServiceImplementation
 	
 	//-------- attributes --------
 	
+	/** The implementation class name. */
+	protected String	implname;
+
 	/** The implementation class. */
-	protected Class implementation;
+	protected Class<?> implementation;
 
 	/** The creation expression. */
 	protected String expression;
@@ -31,7 +35,7 @@ public class ProvidedServiceImplementation
 	protected String proxytype;
 	
 	/** The list of interceptors. */
-	protected List interceptors;
+	protected List<UnparsedExpression> interceptors;
 	
 	//-------- constructors --------
 	
@@ -46,10 +50,10 @@ public class ProvidedServiceImplementation
 	/**
 	 *  Create a new service implementation.
 	 */
-	public ProvidedServiceImplementation(Class implementation,
+	public ProvidedServiceImplementation(Class<?> implementation,
 		String expression, String proxytype, RequiredServiceBinding binding, UnparsedExpression[] interceptors)
 	{
-		this.implementation = implementation;
+		setImplementation(implementation);
 		this.expression = expression;
 		this.proxytype = proxytype;
 		this.binding = binding;
@@ -67,18 +71,41 @@ public class ProvidedServiceImplementation
 	 */
 	public ProvidedServiceImplementation(ProvidedServiceImplementation prov)
 	{
-		this(prov.getImplementation(), prov.getExpression(), prov.getProxytype(), prov.getBinding()!=null? 
+		this(prov.implementation, prov.getExpression(), prov.getProxytype(), prov.getBinding()!=null? 
 			new RequiredServiceBinding(prov.getBinding()): null, prov.getInterceptors());
+		this.implname	= prov.implname;
 	}
 
 	//-------- methods --------
 	
 	/**
+	 *  Get the implementation name.
+	 *  @return the implementation name.
+	 */
+	public String getImplementationName()
+	{
+		return implname;
+	}
+
+	/**
+	 *  Set the implementation name.
+	 *  @param name The implementation name to set.
+	 */
+	public void setImplementationName(String implname)
+	{
+		this.implname = implname;
+	}
+
+	/**
 	 *  Get the implementation.
 	 *  @return The implementation.
 	 */
-	public Class getImplementation()
+	public Class<?> getImplementation(IModelInfo model)
 	{
+		if(implementation==null && implname!=null)
+		{
+			this.implementation	= SReflect.findClass0(implname, model.getAllImports(), model.getClassLoader());
+		}
 		return implementation;
 	}
 
@@ -86,8 +113,10 @@ public class ProvidedServiceImplementation
 	 *  Set the implementation.
 	 *  @param implementation The implementation to set.
 	 */
-	public void setImplementation(Class implementation)
+	public void setImplementation(Class<?> implementation)
 	{
+		if(implementation!=null)
+			implname	= implementation.getName();
 		this.implementation = implementation;
 	}
 
@@ -152,7 +181,7 @@ public class ProvidedServiceImplementation
 	public void addInterceptor(UnparsedExpression interceptor)
 	{
 		if(interceptors==null)
-			interceptors = new ArrayList();
+			interceptors = new ArrayList<UnparsedExpression>();
 		interceptors.add(interceptor);
 	}
 	
@@ -171,7 +200,7 @@ public class ProvidedServiceImplementation
 	 */
 	public UnparsedExpression[] getInterceptors()
 	{
-		return interceptors==null? new UnparsedExpression[0]: (UnparsedExpression[])
+		return interceptors==null? new UnparsedExpression[0]: 
 			interceptors.toArray(new UnparsedExpression[interceptors.size()]);
 	}
 	

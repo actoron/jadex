@@ -38,7 +38,7 @@ public class RequiredServiceBinding
 	protected boolean recover;
 	
 	/** The interceptors. */
-	protected List interceptors;
+	protected List<UnparsedExpression> interceptors;
 	
 	/** The proxytype. */
 	protected String proxytype;
@@ -238,7 +238,7 @@ public class RequiredServiceBinding
 	public void addInterceptor(UnparsedExpression interceptor)
 	{
 		if(interceptors==null)
-			interceptors = new ArrayList();
+			interceptors = new ArrayList<UnparsedExpression>();
 		interceptors.add(interceptor);
 	}
 	
@@ -257,7 +257,7 @@ public class RequiredServiceBinding
 	 */
 	public UnparsedExpression[] getInterceptors()
 	{
-		return interceptors==null? new UnparsedExpression[0]: (UnparsedExpression[])
+		return interceptors==null? new UnparsedExpression[0]:
 			interceptors.toArray(new UnparsedExpression[interceptors.size()]);
 	}
 	

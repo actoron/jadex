@@ -25,6 +25,7 @@ import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.FixedJComboBox;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
@@ -1465,9 +1466,9 @@ public class StarterPanel extends JLayeredPane
 				for(int i=0; i<required.length; i++)
 				{
 					((DefaultTableModel)requiredt.getModel()).addRow(new Object[]{required[i].getName(), 
-						required[i].getType(), required[i].isMultiple()});
+						SReflect.getUnqualifiedTypeName(required[i].getTypeName()), required[i].isMultiple()});
 				}
-				requiredt.getColumn("Interface").setCellRenderer(new ClassRenderer());
+//				requiredt.getColumn("Interface").setCellRenderer(new ClassRenderer());
 
 			}
 			
@@ -1500,10 +1501,10 @@ public class StarterPanel extends JLayeredPane
 				for(int i=0; i<provided.length; i++)
 				{
 					((DefaultTableModel)providedt.getModel()).addRow(new Object[]{
-						provided[i]!=null? provided[i].getType(): "unknown service type (class definition missing)",
+						provided[i]!=null? SReflect.getUnqualifiedTypeName(provided[i].getTypeName()): "unknown service type (class definition missing)",
 						provided[i]!=null? provided[i].getImplementation(): ""});
 				}
-				providedt.getColumn("Interface").setCellRenderer(new ClassRenderer());
+//				providedt.getColumn("Interface").setCellRenderer(new ClassRenderer());
 			}
 			
 			if(provided.length>0)

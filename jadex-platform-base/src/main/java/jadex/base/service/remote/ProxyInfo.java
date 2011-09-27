@@ -210,9 +210,13 @@ public class ProxyInfo
 	 */
 	public void addTargetInterface(Class targetinterface)
 	{
-		if(targetinterfaces==null)
-			targetinterfaces = new ArrayList();
-		targetinterfaces.add(targetinterface);
+		// Might be null, when class not available locally.
+		if(targetinterface!=null)
+		{
+			if(targetinterfaces==null)
+				targetinterfaces = new ArrayList();
+			targetinterfaces.add(targetinterface);
+		}
 	}
 
 	/**
