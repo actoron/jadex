@@ -3,6 +3,9 @@
  */
 package jadex.editor.bpmn.runtime.task;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Proxy;
+
 import jadex.editor.bpmn.editor.JadexBpmnEditor;
 
 import org.eclipse.core.runtime.IStatus;
@@ -14,7 +17,7 @@ import org.eclipse.core.runtime.IStatus;
 public class TaskMetaInfoProxy implements IEditorTaskMetaInfo
 {
 
-	Object taskMetaInfo;
+	Object metainfo;
 	
 	/**
 	 * 
@@ -22,7 +25,7 @@ public class TaskMetaInfoProxy implements IEditorTaskMetaInfo
 	public TaskMetaInfoProxy(Object taskMetaInfo)
 	{
 		super();
-		this.taskMetaInfo = taskMetaInfo;
+		this.metainfo = taskMetaInfo;
 	}
 
 	/*
@@ -33,8 +36,16 @@ public class TaskMetaInfoProxy implements IEditorTaskMetaInfo
 	@Override
 	public String getDescription()
 	{
-		return WorkspaceClassLoaderHelper.getStringFromMethod(taskMetaInfo,
+		if(metainfo instanceof Annotation)
+		{
+//			AnnotaionInvocationHandler	Proxy.getInvocationHandler(metainfo);
+			return ""+metainfo;
+		}
+		else
+		{
+			return WorkspaceClassLoaderHelper.getStringFromMethod(metainfo,
 				IEditorTaskMetaInfo.METHOD_ITASKMETAINFO_GET_DESCRIPTION);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -45,26 +56,34 @@ public class TaskMetaInfoProxy implements IEditorTaskMetaInfo
 	{
 		try
 		{
-			Object returnValue = WorkspaceClassLoaderHelper
-					.callUnparametrizedReflectionMethod(
-							taskMetaInfo,
-							IEditorTaskMetaInfo.METHOD_ITASKMETAINFO_GET_PARAMETER_METAINFOS);
-			
-			// check the return value
-			if (returnValue instanceof IEditorParameterMetaInfo[])
+			if(metainfo instanceof Annotation)
 			{
-				return (IEditorParameterMetaInfo[]) returnValue;
+//				AnnotaionInvocationHandler	Proxy.getInvocationHandler(metainfo);
+				throw new RuntimeException("Annotation MetaInfo not yet supported.");
 			}
-			else if (returnValue != null && returnValue.getClass().isArray())
+			else
 			{
-				// create proxy objects
-				Object[] objects = (Object[]) returnValue;
-				IEditorParameterMetaInfo[] params = new IEditorParameterMetaInfo[objects.length];
-				for (int i = 0; i < objects.length; i++)
+				Object returnValue = WorkspaceClassLoaderHelper
+						.callUnparametrizedReflectionMethod(
+								metainfo,
+								IEditorTaskMetaInfo.METHOD_ITASKMETAINFO_GET_PARAMETER_METAINFOS);
+				
+				// check the return value
+				if (returnValue instanceof IEditorParameterMetaInfo[])
 				{
-					params[i] = new ParameterMetaInfoProxy(objects[i]);
+					return (IEditorParameterMetaInfo[]) returnValue;
 				}
-				return params;
+				else if (returnValue != null && returnValue.getClass().isArray())
+				{
+					// create proxy objects
+					Object[] objects = (Object[]) returnValue;
+					IEditorParameterMetaInfo[] params = new IEditorParameterMetaInfo[objects.length];
+					for (int i = 0; i < objects.length; i++)
+					{
+						params[i] = new ParameterMetaInfoProxy(objects[i]);
+					}
+					return params;
+				}
 			}
 		}
 		catch (Exception e)

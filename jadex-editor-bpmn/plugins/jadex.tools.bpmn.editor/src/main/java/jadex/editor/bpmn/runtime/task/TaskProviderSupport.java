@@ -5,12 +5,12 @@ package jadex.editor.bpmn.runtime.task;
 
 import jadex.editor.bpmn.editor.JadexBpmnEditor;
 
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.ecore.EModelElement;
-import org.eclipse.stp.bpmn.BpmnDiagram;
 
 /**
  * @author Claas
@@ -164,20 +164,33 @@ public abstract class TaskProviderSupport implements IEditorTaskProvider
 		{
 			Class<?> taskImpl = classLoader.loadClass(className);
 			//Class<?> taskImpl = Class.forName(className, true, classLoader);
-			Object taskInstance = taskImpl.newInstance();
+			Object metainfo	= null;
 			
-			Object returnValue = WorkspaceClassLoaderHelper
-			.callUnparametrizedReflectionMethod(
-				taskInstance,
-				IEditorTask.METHOD_IJADEXTASK_GET_TASK_METAINFO);
-
-			if (returnValue instanceof IEditorTaskMetaInfo)
+			Annotation[]	annos	= taskImpl.getAnnotations();
+			for(int i=0; metainfo==null && i<annos.length; i++)
 			{
-				return (IEditorTaskMetaInfo) returnValue;
+				if("jadex.bpmn.annotation.Task".equals(annos[i].annotationType().getName()))
+				{
+					metainfo	= annos[i];
+				}
 			}
-			else if (returnValue != null)
+			
+			if(metainfo==null)
 			{
-				return new TaskMetaInfoProxy(returnValue);
+				Object taskInstance = taskImpl.newInstance();
+				
+				metainfo = WorkspaceClassLoaderHelper
+					.callUnparametrizedReflectionMethod(taskInstance,
+					IEditorTask.METHOD_IJADEXTASK_GET_TASK_METAINFO);
+			}
+
+			if(metainfo instanceof IEditorTaskMetaInfo)
+			{
+				return (IEditorTaskMetaInfo) metainfo;
+			}
+			else if (metainfo != null)
+			{
+				return new TaskMetaInfoProxy(metainfo);
 			} 
 
 		}

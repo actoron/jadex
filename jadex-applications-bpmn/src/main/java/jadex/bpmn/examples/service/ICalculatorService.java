@@ -10,22 +10,22 @@ public interface ICalculatorService
 	/**
 	 *  Add two values.
 	 */
-	public IFuture	addValues(int a, int b);
+	public IFuture<Integer>	addValues(int a, int b);
 
 	/**
 	 *  Add three values.
 	 */
-	public IFuture	addValues(int a, int b, int c);
+	public IFuture<Integer>	addValues(int a, int b, int c);
 
 	/**
 	 *  Subtract b from a.
 	 *  @param a	The first value.
 	 *  @param b	The value to subtract from the first.
 	 */
-	public IFuture	subtractValues(int a, int b);
+	public IFuture<Integer>	subtractValues(int a, int b);
 	
 	/**
 	 *  Method produces an exception.
 	 */
-	public IFuture	broken(int a);
+	public IFuture<Void>	broken(int a);
 }
