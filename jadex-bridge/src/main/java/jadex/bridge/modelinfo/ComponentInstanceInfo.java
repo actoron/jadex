@@ -26,10 +26,10 @@ public class ComponentInstanceInfo extends Startable
 	protected String number;
 	
 	/** The list of contained arguments. */
-	protected List arguments;
+	protected List<UnparsedExpression> arguments;
 	
 	/** The list of required service binding infos. */
-	protected List bindings;
+	protected List<RequiredServiceBinding> bindings;
 	
 	/** The arguments expression (Hack for 
 	    BPMN Editor that saves args as one string. */
@@ -135,7 +135,7 @@ public class ComponentInstanceInfo extends Startable
 	 */
 	public UnparsedExpression[] getArguments()
 	{
-		return arguments!=null? (UnparsedExpression[])arguments.toArray(new UnparsedExpression[arguments.size()]): new UnparsedExpression[0];
+		return arguments!=null? arguments.toArray(new UnparsedExpression[arguments.size()]): new UnparsedExpression[0];
 	}
 	
 	/**
@@ -154,7 +154,7 @@ public class ComponentInstanceInfo extends Startable
 	public void addArgument(UnparsedExpression argument)
 	{
 		if(arguments==null)
-			arguments = new ArrayList();
+			arguments = new ArrayList<UnparsedExpression>();
 		arguments.add(argument);
 	}
 	
@@ -182,7 +182,7 @@ public class ComponentInstanceInfo extends Startable
 	 */
 	public RequiredServiceBinding[] getBindings()
 	{
-		return bindings!=null? (RequiredServiceBinding[])bindings.toArray(new RequiredServiceBinding[bindings.size()]): new RequiredServiceBinding[0];
+		return bindings!=null? bindings.toArray(new RequiredServiceBinding[bindings.size()]): new RequiredServiceBinding[0];
 	}
 	
 	/**
@@ -201,7 +201,7 @@ public class ComponentInstanceInfo extends Startable
 	public void addBinding(RequiredServiceBinding binding)
 	{
 		if(bindings==null)
-			bindings = new ArrayList();
+			bindings = new ArrayList<RequiredServiceBinding>();
 		bindings.add(binding);
 	}
 	

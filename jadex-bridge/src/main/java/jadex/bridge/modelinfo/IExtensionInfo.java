@@ -24,5 +24,5 @@ public interface IExtensionInfo
 	 *  @param fetcher	The value fetcher of the component to be used for evaluating dynamic expressions. 
 	 *  @return The extension instance object.
 	 */
-	public IFuture createInstance(IExternalAccess access, IValueFetcher fetcher);
+	public IFuture<IExtensionInfo> createInstance(IExternalAccess access, IValueFetcher fetcher);
 }

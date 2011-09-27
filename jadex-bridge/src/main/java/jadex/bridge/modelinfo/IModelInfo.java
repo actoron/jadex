@@ -128,7 +128,7 @@ public interface IModelInfo
 	 *  define model-specific settings to configure tools. 
 	 *  @return The properties.
 	 */
-	public Map	getProperties();
+	public Map<String, Object>	getProperties();
 
 	/**
 	 *  Get a parsed property.

@@ -26,19 +26,19 @@ public class ModelInfo extends Startable implements IModelInfo
 	protected String packagename;
 	
 	/** The imports. */
-	protected List imports;
+	protected List<String> imports;
 	
 	/** The report. */
 	protected IErrorReport report;
 	
 	/** The configurations. */
-	protected List configurations;
+	protected List<ConfigurationInfo> configurations;
 	
 	/** The arguments. */
-	protected List arguments;
+	protected List<IArgument> arguments;
 	
 	/** The results. */
-	protected List results;
+	protected List<IArgument> results;
 	
 	/** Flag if startable. */
 	protected boolean startable;
@@ -50,22 +50,22 @@ public class ModelInfo extends Startable implements IModelInfo
 	protected String fullname;
 	
 	/** The properties. */
-	protected Map properties;
+	protected Map<String, Object> properties;
 	
 	/** The classloader. */
 	protected ClassLoader classloader;
 	
 	/** The required services. */
-	protected Map requiredservices;
+	protected Map<String, RequiredServiceInfo> requiredservices;
 	
 	/** The provided services. */
-	protected List providedservices;
+	protected List<ProvidedServiceInfo> providedservices;
 	
 	/** The subcomponent types. */
-	protected List subcomponents;
+	protected List<SubcomponentTypeInfo> subcomponents;
 	
 	/** The extensions. */
-	protected List extensions;
+	protected List<Object> extensions;
 		
 	//-------- constructors --------
 	
@@ -84,7 +84,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public ModelInfo(String name, String packagename,
 		String description, IErrorReport report,
 		IArgument[] arguments, IArgument[] results, boolean startable,
-		String filename, Map properties, ClassLoader classloader, 
+		String filename, Map<String, Object> properties, ClassLoader classloader, 
 		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices, 
 		ConfigurationInfo[] configurations, SubcomponentTypeInfo[] subcomponents, String[] imports)
 	{
@@ -92,16 +92,22 @@ public class ModelInfo extends Startable implements IModelInfo
 		this.packagename = packagename;
 		this.description = description;
 		this.report = report;//!=null? report: new ErrorReport();
-		this.arguments = arguments!=null? SUtil.arrayToList(arguments): null;
-		this.results = results!=null? SUtil.arrayToList(results): null;
+		if(arguments!=null)
+			this.arguments = SUtil.arrayToList(arguments);
+		if(results!=null)
+			this.results = SUtil.arrayToList(results);
 		this.startable = startable;
 		this.filename = filename;
-		this.properties = properties!=null? properties: new HashMap();
+		this.properties = properties!=null? properties: new HashMap<String, Object>();
 		this.classloader = classloader;
-		this.providedservices = providedservices!=null? SUtil.arrayToList(providedservices): null;
-		this.configurations = configurations!=null? SUtil.arrayToList(configurations): null;
-		this.subcomponents = subcomponents!=null? SUtil.arrayToList(subcomponents): null;
-		this.imports = imports!=null? SUtil.arrayToList(imports): null;
+		if(providedservices!=null)
+			this.providedservices = SUtil.arrayToList(providedservices);
+		if(configurations!=null)
+			this.configurations = SUtil.arrayToList(configurations);
+		if(subcomponents!=null)
+			this.subcomponents = SUtil.arrayToList(subcomponents);
+		if(imports!=null)
+			this.imports = SUtil.arrayToList(imports);
 		setRequiredServices(requiredservices);
 	}
 
@@ -172,7 +178,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void addImport(String imp)
 	{
 		if(imports==null)
-			imports = new ArrayList();
+			imports = new ArrayList<String>();
 		imports.add(imp);
 	}
 	
@@ -213,7 +219,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public ConfigurationInfo[] getConfigurations()
 	{
-		return configurations!=null? (ConfigurationInfo[])configurations.toArray(new ConfigurationInfo[configurations.size()]): new ConfigurationInfo[0];
+		return configurations!=null? configurations.toArray(new ConfigurationInfo[configurations.size()]): new ConfigurationInfo[0];
 	}
 	
 	/**
@@ -246,7 +252,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public IArgument[] getArguments()
 	{
-		return arguments!=null? (IArgument[])arguments.toArray(new IArgument[arguments.size()]): new IArgument[0];
+		return arguments!=null? arguments.toArray(new IArgument[arguments.size()]): new IArgument[0];
 	}
 	
 	/**
@@ -328,7 +334,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  define model-specific settings to configure tools. 
 	 *  @return The properties.
 	 */
-	public Map	getProperties()
+	public Map<String, Object>	getProperties()
 	{
 		return properties;
 	}
@@ -397,7 +403,10 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public void setImports(String[] imports)
 	{
-		this.imports = imports!=null ? SUtil.arrayToList(imports) : null;
+		if(imports!=null)
+			this.imports	= SUtil.arrayToList(imports);
+		else
+			this.imports	= null;
 	}
 
 	/**
@@ -416,7 +425,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void addConfiguration(ConfigurationInfo configuration)
 	{
 		if(configurations==null)
-			configurations = new ArrayList();
+			configurations = new ArrayList<ConfigurationInfo>();
 		configurations.add(configuration);
 	}
 
@@ -426,7 +435,10 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public void setArguments(IArgument[] arguments)
 	{
-		this.arguments = arguments!=null? SUtil.arrayToList(arguments): null;
+		if(arguments!=null)
+			this.arguments	= SUtil.arrayToList(arguments);
+		else
+			this.arguments	= null;
 	}
 	
 	/**
@@ -436,7 +448,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void addArgument(IArgument argument)
 	{
 		if(arguments==null)
-			arguments = new ArrayList();
+			arguments = new ArrayList<IArgument>();
 		arguments.add(argument);
 	}
 
@@ -446,7 +458,10 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public void setResults(IArgument[] results)
 	{
-		this.results = results!=null? SUtil.arrayToList(results): null;
+		if(results!=null)
+			this.results	= SUtil.arrayToList(results);
+		else
+			this.results	= null;
 	}
 	
 	/**
@@ -456,7 +471,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void addResult(IArgument result)
 	{
 		if(results==null)
-			results = new ArrayList();
+			results = new ArrayList<IArgument>();
 		results.add(result);
 	}
 
@@ -482,7 +497,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  Set the properties.
 	 *  @param properties The properties to set.
 	 */
-	public void setProperties(Map properties)
+	public void setProperties(Map<String, Object> properties)
 	{
 		this.properties = properties;
 	}
@@ -493,7 +508,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void	addProperty(String name, Object value)
 	{
 		if(properties==null)
-			properties = new HashMap();
+			properties = new HashMap<String, Object>();
 		properties.put(name, value);
 	}
 	
@@ -503,7 +518,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void	addProperty(UnparsedExpression unexp)
 	{
 		if(properties==null)
-			properties = new HashMap();
+			properties = new HashMap<String, Object>();
 		properties.put(unexp.getName(), unexp);
 	}
 	
@@ -524,7 +539,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public RequiredServiceInfo[] getRequiredServices()
 	{
 		return requiredservices==null? new RequiredServiceInfo[0]: 
-			(RequiredServiceInfo[])requiredservices.values().toArray(new RequiredServiceInfo[requiredservices.size()]);
+			requiredservices.values().toArray(new RequiredServiceInfo[requiredservices.size()]);
 	}
 
 	/**
@@ -535,7 +550,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	{
 		if(requiredservices!=null && requiredservices.length>0)
 		{
-			this.requiredservices = new HashMap();
+			this.requiredservices = new HashMap<String, RequiredServiceInfo>();
 			for(int i=0; i<requiredservices.length; i++)
 			{
 				this.requiredservices.put(requiredservices[i].getName(), requiredservices[i]);
@@ -549,7 +564,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public RequiredServiceInfo getRequiredService(String name)
 	{
-		return requiredservices!=null? (RequiredServiceInfo)requiredservices.get(name): null;
+		return requiredservices!=null? requiredservices.get(name): null;
 	}
 	
 	/**
@@ -559,7 +574,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void addRequiredService(RequiredServiceInfo requiredservice)
 	{
 		if(requiredservices==null)
-			requiredservices = new HashMap();
+			requiredservices = new HashMap<String, RequiredServiceInfo>();
 		requiredservices.put(requiredservice.getName(), requiredservice);
 	}
 
@@ -570,7 +585,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public ProvidedServiceInfo[] getProvidedServices()
 	{
 		return providedservices==null? new ProvidedServiceInfo[0]: 
-			(ProvidedServiceInfo[])providedservices.toArray(new ProvidedServiceInfo[providedservices.size()]);
+			providedservices.toArray(new ProvidedServiceInfo[providedservices.size()]);
 	}
 
 	/**
@@ -589,7 +604,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void addProvidedService(ProvidedServiceInfo providedservice)
 	{
 		if(providedservices==null)
-			providedservices = new ArrayList();
+			providedservices = new ArrayList<ProvidedServiceInfo>();
 		providedservices.add(providedservice);
 	}
 	
@@ -670,7 +685,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public SubcomponentTypeInfo[] getSubcomponentTypes()
 	{
-		return subcomponents!=null? (SubcomponentTypeInfo[])subcomponents.toArray(new SubcomponentTypeInfo[subcomponents.size()]): new SubcomponentTypeInfo[0];
+		return subcomponents!=null? subcomponents.toArray(new SubcomponentTypeInfo[subcomponents.size()]): new SubcomponentTypeInfo[0];
 	}
 	
 	/**
@@ -688,7 +703,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void addSubcomponentType(SubcomponentTypeInfo subcomponent)
 	{
 		if(subcomponents==null)
-			subcomponents = new ArrayList();
+			subcomponents = new ArrayList<SubcomponentTypeInfo>();
 		subcomponents.add(subcomponent);
 	}
 	
@@ -716,7 +731,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void addExtensiontype(Object extension)
 	{
 		if(extensions==null)
-			extensions = new ArrayList();
+			extensions = new ArrayList<Object>();
 		extensions.add(extension);
 	}
 

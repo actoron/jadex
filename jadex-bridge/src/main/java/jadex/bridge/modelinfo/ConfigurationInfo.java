@@ -19,28 +19,28 @@ public class ConfigurationInfo extends Startable
 	protected String name;
 	
 	/** The list of contained components. */
-	protected List components;
+	protected List<ComponentInstanceInfo> components;
 	
 	/** The list of argument default values. */
-	protected List arguments;
+	protected List<UnparsedExpression> arguments;
 	
 	/** The list of result default values. */
-	protected List results;
+	protected List<UnparsedExpression> results;
 	
 	/** The list of extensions. */
-	protected List extensions;
+	protected List<IExtensionInfo> extensions;
 	
 	/** The provided service overridings. */
-	protected List providedservices;
+	protected List<ProvidedServiceInfo> providedservices;
 	
 	/** The required service overridings. */
-	protected List requiredservices;
+	protected List<RequiredServiceInfo> requiredservices;
 	
 	/** The initial steps. */
-	protected List initialsteps;
+	protected List<UnparsedExpression> initialsteps;
 	
 	/** The end steps. */
-	protected List endsteps;
+	protected List<UnparsedExpression> endsteps;
 	
 	//-------- constructors --------
 	
@@ -87,7 +87,7 @@ public class ConfigurationInfo extends Startable
 	public void addComponentInstance(ComponentInstanceInfo component)
 	{
 		if(components==null)
-			components = new ArrayList();
+			components = new ArrayList<ComponentInstanceInfo>();
 		this.components.add(component);
 	}
 	
@@ -97,7 +97,7 @@ public class ConfigurationInfo extends Startable
 	 */
 	public ComponentInstanceInfo[] getComponentInstances()
 	{
-		return components!=null? (ComponentInstanceInfo[])components.toArray(new ComponentInstanceInfo[components.size()]): new ComponentInstanceInfo[0];
+		return components!=null? components.toArray(new ComponentInstanceInfo[components.size()]): new ComponentInstanceInfo[0];
 	}
 	
 	/**
@@ -106,7 +106,7 @@ public class ConfigurationInfo extends Startable
 	 */
 	public UnparsedExpression[] getArguments()
 	{
-		return arguments!=null? (UnparsedExpression[])arguments.toArray(new UnparsedExpression[arguments.size()]): new UnparsedExpression[0];
+		return arguments!=null? arguments.toArray(new UnparsedExpression[arguments.size()]): new UnparsedExpression[0];
 	}
 	
 	/**
@@ -125,7 +125,7 @@ public class ConfigurationInfo extends Startable
 	public void addArgument(UnparsedExpression argument)
 	{
 		if(arguments==null)
-			arguments = new ArrayList();
+			arguments = new ArrayList<UnparsedExpression>();
 		arguments.add(argument);
 	}
 	
@@ -135,7 +135,7 @@ public class ConfigurationInfo extends Startable
 	 */
 	public UnparsedExpression[] getResults()
 	{
-		return results!=null? (UnparsedExpression[])results.toArray(new UnparsedExpression[results.size()]): new UnparsedExpression[0];
+		return results!=null? results.toArray(new UnparsedExpression[results.size()]): new UnparsedExpression[0];
 	}
 	
 	/**
@@ -154,7 +154,7 @@ public class ConfigurationInfo extends Startable
 	public void addResult(UnparsedExpression res)
 	{
 		if(results==null)
-			results = new ArrayList();
+			results = new ArrayList<UnparsedExpression>();
 		results.add(res);
 	}
 	
@@ -163,13 +163,13 @@ public class ConfigurationInfo extends Startable
 	 */
 	public IExtensionInfo[] getExtensions()
 	{
-		return extensions!=null? (IExtensionInfo[])extensions.toArray(new IExtensionInfo[extensions.size()]): new IExtensionInfo[0];
+		return extensions!=null? extensions.toArray(new IExtensionInfo[extensions.size()]): new IExtensionInfo[0];
 	}
 	
 	/**
 	 *  Set the extension types.
 	 */
-	public void setExtensions(Object[] extensions)
+	public void setExtensions(IExtensionInfo[] extensions)
 	{
 		this.extensions = SUtil.arrayToList(extensions);
 	}
@@ -178,10 +178,10 @@ public class ConfigurationInfo extends Startable
 	 *  Add a extension type.
 	 *  @param extension The extension type.
 	 */
-	public void addExtension(Object extension)
+	public void addExtension(IExtensionInfo extension)
 	{
 		if(extensions==null)
-			extensions = new ArrayList();
+			extensions = new ArrayList<IExtensionInfo>();
 		extensions.add(extension);
 	}
 	
@@ -192,7 +192,7 @@ public class ConfigurationInfo extends Startable
 	public ProvidedServiceInfo[] getProvidedServices()
 	{
 		return providedservices==null? new ProvidedServiceInfo[0]: 
-			(ProvidedServiceInfo[])providedservices.toArray(new ProvidedServiceInfo[providedservices.size()]);
+			providedservices.toArray(new ProvidedServiceInfo[providedservices.size()]);
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class ConfigurationInfo extends Startable
 	public void addProvidedService(ProvidedServiceInfo providedservice)
 	{
 		if(providedservices==null)
-			providedservices = new ArrayList();
+			providedservices = new ArrayList<ProvidedServiceInfo>();
 		providedservices.add(providedservice);
 	}
 	
@@ -222,7 +222,7 @@ public class ConfigurationInfo extends Startable
 	public RequiredServiceInfo[] getRequiredServices()
 	{
 		return requiredservices==null? new RequiredServiceInfo[0]: 
-			(RequiredServiceInfo[])requiredservices.toArray(new RequiredServiceInfo[requiredservices.size()]);
+			requiredservices.toArray(new RequiredServiceInfo[requiredservices.size()]);
 	}
 
 	/**
@@ -241,7 +241,7 @@ public class ConfigurationInfo extends Startable
 	public void addRequiredService(RequiredServiceInfo requiredservice)
 	{
 		if(requiredservices==null)
-			requiredservices = new ArrayList();
+			requiredservices = new ArrayList<RequiredServiceInfo>();
 		requiredservices.add(requiredservice);
 	}
 	
@@ -252,7 +252,7 @@ public class ConfigurationInfo extends Startable
 	public UnparsedExpression[] getInitialSteps()
 	{
 		return initialsteps==null? new UnparsedExpression[0]: 
-			(UnparsedExpression[])initialsteps.toArray(new UnparsedExpression[initialsteps.size()]);
+			initialsteps.toArray(new UnparsedExpression[initialsteps.size()]);
 	}
 
 	/**
@@ -271,7 +271,7 @@ public class ConfigurationInfo extends Startable
 	public void addInitialStep(UnparsedExpression initialstep)
 	{
 		if(initialsteps==null)
-			initialsteps = new ArrayList();
+			initialsteps = new ArrayList<UnparsedExpression>();
 		initialsteps.add(initialstep);
 	}
 	
@@ -282,7 +282,7 @@ public class ConfigurationInfo extends Startable
 	public UnparsedExpression[] getEndSteps()
 	{
 		return endsteps==null? new UnparsedExpression[0]: 
-			(UnparsedExpression[])endsteps.toArray(new UnparsedExpression[endsteps.size()]);
+			endsteps.toArray(new UnparsedExpression[endsteps.size()]);
 	}
 
 	/**
@@ -301,7 +301,7 @@ public class ConfigurationInfo extends Startable
 	public void addEndStep(UnparsedExpression endstep)
 	{
 		if(endsteps==null)
-			endsteps = new ArrayList();
+			endsteps = new ArrayList<UnparsedExpression>();
 		endsteps.add(endstep);
 	}
 }

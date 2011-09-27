@@ -20,7 +20,7 @@ public class Argument implements IArgument
 	protected String	classname;
 	
 	/** The class. */
-	protected Class	clazz;
+	protected Class<?>	clazz;
 	
 	/** The default value. */
 	protected Object	defaultvalue;
@@ -115,7 +115,7 @@ public class Argument implements IArgument
 	 *  Get the clazz.
 	 *  @return The clazz.
 	 */
-	public Class getClazz(ClassLoader classloader, String[] imports)
+	public Class<?> getClazz(ClassLoader classloader, String[] imports)
 	{
 		if(clazz==null && classname!=null)
 		{

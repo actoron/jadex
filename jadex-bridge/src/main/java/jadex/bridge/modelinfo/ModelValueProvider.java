@@ -1,6 +1,5 @@
 package jadex.bridge.modelinfo;
 
-import jadex.commons.SUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +17,7 @@ public class ModelValueProvider implements IModelValueProvider
 	//-------- attributes --------
 	
 	/** The values. */
-	protected Map values;
+	protected Map<String, Object> values;
 	
 	//-------- constructors --------
 	
@@ -32,15 +31,7 @@ public class ModelValueProvider implements IModelValueProvider
 	/**
 	 *  Create a new provider.
 	 */
-	public ModelValueProvider(Object value)
-	{
-		this(SUtil.createHashMap(new Object[]{ANY_CONFIG}, new Object[]{value}));
-	}
-	
-	/**
-	 *  Create a new provider.
-	 */
-	public ModelValueProvider(Map values)
+	public ModelValueProvider(Map<String, Object> values)
 	{
 		this.values = values;
 	}
@@ -68,7 +59,7 @@ public class ModelValueProvider implements IModelValueProvider
 	public void setValue(Object value)
 	{
 		if(values==null)
-			values = new HashMap();
+			values = new HashMap<String, Object>();
 		values.put(ANY_CONFIG, value);
 	}
 	
@@ -79,7 +70,7 @@ public class ModelValueProvider implements IModelValueProvider
 	public void setValue(String configname, Object value)
 	{
 		if(values==null)
-			values = new HashMap();
+			values = new HashMap<String, Object>();
 		values.put(configname, value);
 	}
 
@@ -87,7 +78,7 @@ public class ModelValueProvider implements IModelValueProvider
 	 *  Get the values.
 	 *  @return the values.
 	 */
-	public Map getValues()
+	public Map<String, Object> getValues()
 	{
 		return values;
 	}
@@ -96,7 +87,7 @@ public class ModelValueProvider implements IModelValueProvider
 	 *  Set the values.
 	 *  @param values The values to set.
 	 */
-	public void setValues(Map values)
+	public void setValues(Map<String, Object> values)
 	{
 		this.values = values;
 	}

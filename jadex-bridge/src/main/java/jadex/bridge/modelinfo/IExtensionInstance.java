@@ -12,5 +12,5 @@ public interface IExtensionInstance
 	 *  Terminate the extension.
 	 *  Called once, when the extension is terminated.
 	 */
-	public IFuture terminate();
+	public IFuture<Void> terminate();
 }

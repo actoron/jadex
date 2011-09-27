@@ -28,7 +28,7 @@ public interface IArgument
 	 *  Get the clazz.
 	 *  @return The clazz.
 	 */
-	public Class getClazz(ClassLoader classloader, String[] imports);
+	public Class<?> getClazz(ClassLoader classloader, String[] imports);
 	
 	/**
 	 *  Get the default value.

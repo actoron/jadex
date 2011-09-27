@@ -21,7 +21,7 @@ public class UnparsedExpression
 	protected String classname;
 	
 	/** The class. */
-	protected Class clazz;
+	protected Class<?> clazz;
 	
 	/** The value. */
 	protected String value;
@@ -41,7 +41,7 @@ public class UnparsedExpression
 	/**
 	 *  Create a new expression.
 	 */
-	public UnparsedExpression(String name, Class clazz, String value, String language)
+	public UnparsedExpression(String name, Class<?> clazz, String value, String language)
 	{
 		this.name = name;
 		this.clazz = clazz;
@@ -112,7 +112,7 @@ public class UnparsedExpression
 	 *  Get the clazz.
 	 *  @return The clazz.
 	 */
-	public Class getClazz(ClassLoader classloader, String[] imports)
+	public Class<?> getClazz(ClassLoader classloader, String[] imports)
 	{
 		if(clazz==null && classname!=null)
 		{
@@ -176,7 +176,7 @@ public class UnparsedExpression
 	 *  @param	name	The property name.  
 	 *  @return The property value or null if property not defined.
 	 */
-	public static Object	getProperty(Map properties, String name, String[] imports, IValueFetcher fetcher, ClassLoader classloader)
+	public static Object	getProperty(Map<String, Object> properties, String name, String[] imports, IValueFetcher fetcher, ClassLoader classloader)
 	{
 		// Todo: caching of parsed values?
 		Object	ret	= properties!=null ? properties.get(name) : null;

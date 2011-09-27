@@ -278,7 +278,7 @@ public class SUtil
 	 * @param a The array.
 	 * @return The vector for the array.
 	 */
-	public static List arrayToList(Object a)
+	public static <T> List<T> arrayToList(Object a)
 	{
 		int l = Array.getLength(a);
 		ArrayList ret = SCollection.createArrayList();
