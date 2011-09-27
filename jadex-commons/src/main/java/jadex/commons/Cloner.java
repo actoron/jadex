@@ -74,7 +74,15 @@ public class Cloner
 	 */
 	public static Object deepCloneObject(Object object)
 	{
-		return getInstance().deepClone(object, null, new HashMap());
+		return getInstance().deepClone(object, null, new HashMap(), null);
+	}
+	
+	/**
+	 *  Deep clone an object.
+	 */
+	public static Object deepCloneObject(Object object, List processors)
+	{
+		return getInstance().deepClone(object, null, new HashMap(), processors);
 	}
 	
 	/**
@@ -82,13 +90,21 @@ public class Cloner
 	 */
 	public Object deepClone(Object object)
 	{
-		return deepClone(object, null, new HashMap());
+		return deepClone(object, null, new HashMap(), null);
+	}
+	
+	/**
+	 *  Deep clone an object.
+	 */
+	public Object deepClone(Object object, List processors)
+	{
+		return deepClone(object, null, new HashMap(), processors);
 	}
 
 	/**
 	 *  Deep clone an object.
 	 */
-	public Object deepClone(Object object, Class clazz, Map cloned)
+	public Object deepClone(Object object, Class clazz, Map cloned, List processors)
 	{
 		Object ret = null;
 		
@@ -97,93 +113,112 @@ public class Cloner
 			if(clazz==null || SReflect.isSupertype(clazz, object.getClass()))
 				clazz = object.getClass();
 		
+			boolean fin = false;
 			if(isImmutable(clazz))
 			{
 				ret = object;
+				fin = true;
 			}
 			else if(cloned.containsKey(object))
 			{
 				ret = cloned.get(object);
+				fin = true;
 			}
-			else if(clazz.isArray()) 
+			else if(processors!=null)
 			{
-				int length = Array.getLength(object);
-				Class type = clazz.getComponentType();
-				ret = Array.newInstance(type, length);
-				cloned.put(object, ret);
-				for(int i=0; i<length; i++) 
+				for(int i=0; i<processors.size() && !fin; i++)
 				{
-					Object val = Array.get(object, i);
-					Array.set(ret, i, deepClone(val, type, cloned));
-				}
-			}
-			else if(SReflect.isSupertype(Map.class, clazz))
-			{
-				try
-				{
-					ret = clazz.newInstance();
-				}
-				catch(Exception e)
-				{
-					ret = new HashMap();
-				}
-				cloned.put(object, ret);
-				((Map)ret).putAll((Map)object);
-			}
-			else if(SReflect.isSupertype(Collection.class, clazz))
-			{
-				try
-				{
-					ret = clazz.newInstance();
-				}
-				catch(Exception e)
-				{
-					if(SReflect.isSupertype(Set.class, clazz))
+					ICloneProcessor proc = (ICloneProcessor)processors.get(i);
+					if(proc.isApplicable(object))
 					{
-						ret = new HashSet();
-					}
-					else //if(isSupertype(List.class, clazz))
-					{
-						ret = new ArrayList();
+						ret = proc.process(object, processors);
+						fin = true;
 					}
 				}
-				cloned.put(object, ret);
-				((Collection)ret).addAll((Collection)object);
 			}
-			else if(SReflect.isSupertype(Enumeration.class, clazz))
+				
+			if(!fin)
 			{
-				ret = new Vector();
-				cloned.put(object, ret);
-				Vector target = (Vector)ret;
-				for(Enumeration source = (Enumeration)object; source.hasMoreElements(); )
+				if(clazz.isArray()) 
 				{
-					target.add(source.nextElement());
-				}
-				ret = target.elements();
-			}
-			else if(SReflect.isSupertype(Iterator.class, clazz))
-			{
-				ret = new ArrayList();
-				cloned.put(object, ret);
-				List target = (List)ret;
-				for(Iterator source=(Iterator)object; source.hasNext(); )
-				{
-					target.add(source.next());
-				}
-				ret = target.iterator();
-			}
-			else
-			{
-				try
-				{
-//					System.out.println("cloned: "+object.getClass());
-					ret = object.getClass().newInstance();
+					int length = Array.getLength(object);
+					Class type = clazz.getComponentType();
+					ret = Array.newInstance(type, length);
 					cloned.put(object, ret);
-					cloneFields(object, ret, cloned);
+					for(int i=0; i<length; i++) 
+					{
+						Object val = Array.get(object, i);
+						Array.set(ret, i, deepClone(val, type, cloned, processors));
+					}
 				}
-				catch(Exception e)
+				else if(SReflect.isSupertype(Map.class, clazz))
 				{
-					throw new RuntimeException(e);
+					try
+					{
+						ret = clazz.newInstance();
+					}
+					catch(Exception e)
+					{
+						ret = new HashMap();
+					}
+					cloned.put(object, ret);
+					((Map)ret).putAll((Map)object);
+				}
+				else if(SReflect.isSupertype(Collection.class, clazz))
+				{
+					try
+					{
+						ret = clazz.newInstance();
+					}
+					catch(Exception e)
+					{
+						if(SReflect.isSupertype(Set.class, clazz))
+						{
+							ret = new HashSet();
+						}
+						else //if(isSupertype(List.class, clazz))
+						{
+							ret = new ArrayList();
+						}
+					}
+					cloned.put(object, ret);
+					((Collection)ret).addAll((Collection)object);
+				}
+				else if(SReflect.isSupertype(Enumeration.class, clazz))
+				{
+					ret = new Vector();
+					cloned.put(object, ret);
+					Vector target = (Vector)ret;
+					for(Enumeration source = (Enumeration)object; source.hasMoreElements(); )
+					{
+						target.add(source.nextElement());
+					}
+					ret = target.elements();
+				}
+				else if(SReflect.isSupertype(Iterator.class, clazz))
+				{
+					ret = new ArrayList();
+					cloned.put(object, ret);
+					List target = (List)ret;
+					for(Iterator source=(Iterator)object; source.hasNext(); )
+					{
+						target.add(source.next());
+					}
+					ret = target.iterator();
+				}
+				else
+				{
+					try
+					{
+	//					System.out.println("cloned: "+object.getClass());
+						ret = object.getClass().newInstance();
+						cloned.put(object, ret);
+						cloneFields(object, ret, cloned, processors);
+					}
+					catch(Exception e)
+					{
+						throw new RuntimeException(e);
+					}
 				}
 			}
 		}
@@ -223,7 +258,7 @@ public class Cloner
 	/**
 	 *  Clone all fields of an object.
 	 */
-	protected void cloneFields(Object object, Object clone, Map cloned)
+	protected void cloneFields(Object object, Object clone, Map cloned, List processors)
 	{
 		Class clazz = object.getClass();
 		while(clazz!=null && clazz!=Object.class) 
@@ -241,7 +276,7 @@ public class Cloner
 						val = fields[i].get(object);
 						if(val!=null) 
 						{
-							fields[i].set(clone, deepClone(val, fields[i].getType(), cloned));
+							fields[i].set(clone, deepClone(val, fields[i].getType(), cloned, processors));
 						}
 					}
 					catch(Exception e)
@@ -256,7 +291,7 @@ public class Cloner
 	}
 
 	/**
-	 * 
+	 *  Main for testing.
 	 */
 	public static void main(String[] args) throws Exception
 	{

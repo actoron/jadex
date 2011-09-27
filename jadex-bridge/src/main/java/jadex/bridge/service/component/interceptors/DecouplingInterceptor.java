@@ -120,28 +120,28 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		}
 		
 		// Perform pojo service replacement (for local and remote calls).
-		
-		List args = sic.getArguments();
-		if(args!=null)
-		{
-			for(int i=0; i<args.size(); i++)
-			{
-				// Test if it is pojo service impl.
-				// Has to be mapped to new proxy then
-				Object arg = args.get(i);
-				if(arg!=null && !(arg instanceof BasicService) && arg.getClass().isAnnotationPresent(Service.class))
-				{
-					// Check if the argument type refers to the pojo service
-					Service ser = arg.getClass().getAnnotation(Service.class);
-					if(SReflect.isSupertype(ser.value(), sic.getMethod().getParameterTypes()[i]))
-					{
-						Object proxy = BasicServiceInvocationHandler.getPojoServiceProxy(arg);
-//						System.out.println("proxy: "+proxy);
-						args.set(i, proxy);
-					}
-				}
-			}
-		}
+		// Now done in RemoteServiceManagementService in XMLWriter
+//		List args = sic.getArguments();
+//		if(args!=null)
+//		{
+//			for(int i=0; i<args.size(); i++)
+//			{
+//				// Test if it is pojo service impl.
+//				// Has to be mapped to new proxy then
+//				Object arg = args.get(i);
+//				if(arg!=null && !(arg instanceof BasicService) && arg.getClass().isAnnotationPresent(Service.class))
+//				{
+//					// Check if the argument type refers to the pojo service
+//					Service ser = arg.getClass().getAnnotation(Service.class);
+//					if(SReflect.isSupertype(ser.value(), sic.getMethod().getParameterTypes()[i]))
+//					{
+//						Object proxy = BasicServiceInvocationHandler.getPojoServiceProxy(arg);
+////						System.out.println("proxy: "+proxy);
+//						args.set(i, proxy);
+//					}
+//				}
+//			}
+//		}
 		
 		// Perform decoupling
 		

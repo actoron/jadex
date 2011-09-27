@@ -31,6 +31,7 @@ public class SearchServiceProviderAgent implements ISearchService
 	
 	public IFuture searchService(String dummy)
 	{
+		System.out.println("searcher");
 		return agent.getRequiredService("local");
 	}
 }

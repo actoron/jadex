@@ -3,6 +3,7 @@ package jadex.base.service.remote;
 import jadex.base.fipa.SFipa;
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.base.service.remote.commands.RemoteGetExternalAccessCommand;
+import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.base.service.remote.commands.RemoteSearchCommand;
 import jadex.base.service.remote.xml.RMIPostProcessor;
 import jadex.base.service.remote.xml.RMIPreProcessor;
@@ -21,8 +22,11 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.ServiceNotFoundException;
 import jadex.bridge.service.TypeResultSelector;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.IRemotable;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.future.DelegationResultListener;
@@ -155,6 +159,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			public void writeObject(WriteContext wc, Object object, QName tag) throws Exception 
 			{
+//				System.out.println("object: "+object);
+//				if(object instanceof RemoteResultCommand)
+//					System.out.println("huhuhu");
+				
 				if(SServiceProvider.isRemoteReference(object))
 				{
 //					System.out.println("changed: "+object.getClass()+" "+object);
@@ -164,6 +172,23 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //				{
 //					System.out.println("kept: "+object.getClass()+" "+object);
 //				}
+				
+				// Perform pojo service replacement (for local and remote calls).
+				// Test if it is pojo service impl.
+				// Has to be mapped to new proxy then
+				
+				if(object!=null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class))
+				{
+					System.out.println("test");
+					// Check if the argument type refers to the pojo service
+//					Service ser = object.getClass().getAnnotation(Service.class);
+//					if(SReflect.isSupertype(ser.value(), sic.getMethod().getParameterTypes()[i]))
+					{
+						object = BasicServiceInvocationHandler.getPojoServiceProxy(object);
+						System.out.println("proxy: "+object);
+					}
+				}
+				
 				super.writeObject(wc, object, tag);
 			};
 		};

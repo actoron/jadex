@@ -104,8 +104,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					Object content = msg.get(SFipa.CONTENT);
 					final String callid = (String)msg.get(SFipa.CONVERSATION_ID);
 					
-//					System.out.println("received: "+callid);
-					
+//					System.out.println("received: "+rms.getServiceIdentifier()+" "+callid);
+//					
 //					if(((String)content).indexOf("store")!=-1)
 //						System.out.println("store command: "+callid+" "+getComponentIdentifier());
 
@@ -157,6 +157,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						
 //						if(content instanceof RemoteResultCommand && ((RemoteResultCommand)content).getMethodName()!=null && ((RemoteResultCommand)content).getMethodName().indexOf("store")!=-1)
 //							System.out.println("result of command1: "+com+" "+result);
+						
+						System.out.println("received: "+rms.getServiceIdentifier()+" "+content);
 						
 						com.execute((IMicroExternalAccess)getExternalAccess(), rms).addResultListener(createResultListener(new DefaultResultListener()
 						{

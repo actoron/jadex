@@ -16,12 +16,17 @@ import junit.framework.TestCase;
 
 /**
  *  Test if a remote references are correctly transferred and mapped back.
+ *  
+ *  On platform1 there is a serviceA provider.
+ *  On platform2 there is a search component which searches for serviceA and return it as result.
+ *  
+ *  Tests if the result of the remote search yields the same local service proxy.
  */
 public class RemoteReferenceTest extends TestCase
 {
 	public void	testRemoteReference()
 	{
-		long timeout	= 10000;
+		long timeout	= 1000000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		
 		// Start platform1 with local service.
@@ -64,5 +69,14 @@ public class RemoteReferenceTest extends TestCase
 		// Kill platforms and end test case.
 		platform1.killComponent().get(sus, timeout);
 		platform2.killComponent().get(sus, timeout);
+	}
+	
+	/**
+	 *  Execute in main to have no timeouts.
+	 */
+	public static void main(String[] args)
+	{
+		RemoteReferenceTest test = new RemoteReferenceTest();
+		test.testRemoteReference();
 	}
 }

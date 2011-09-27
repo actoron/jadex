@@ -73,7 +73,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	//-------- methods --------
 
 	/**
-	 *  Preprocess command and replace  if they are remote references.
+	 *  Preprocess command and replace if they are remote references.
 	 */
 	public void preprocessCommand(RemoteReferenceModule rrm, IComponentIdentifier target)
 	{

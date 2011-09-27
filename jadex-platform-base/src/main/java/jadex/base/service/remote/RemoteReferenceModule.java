@@ -519,14 +519,14 @@ public class RemoteReferenceModule
 	 */
 	protected RemoteReference getRemoteReference(Object target)
 	{
-		return getRemoteReference(target, target);
+		return getRemoteReference(target, target, true);
 	}
 	
 	/**
 	 *  Get a remote reference.
 	 *  @param target The (local) remote object.
 	 */
-	protected RemoteReference getRemoteReference(Object target, Object orig)
+	protected RemoteReference getRemoteReference(Object target, Object orig, boolean add)
 	{
 		checkThread();
 		RemoteReference ret = (RemoteReference)remoterefs.get(target);
@@ -540,7 +540,16 @@ public class RemoteReferenceModule
 				if(handler instanceof BasicServiceInvocationHandler)
 				{
 					BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
-					ret = new RemoteReference(rsms.getRMSComponentIdentifier(), bsh.getServiceIdentifier());
+					Object ser = bsh.getService();
+					// Has to look into service as could be nested remote handler inside.
+					if(ser instanceof IService)
+					{
+						ret = getRemoteReference(ser, orig, false);
+					}
+					else 
+					{
+						ret = new RemoteReference(rsms.getRMSComponentIdentifier(), bsh.getServiceIdentifier());
+					}
 				}
 				else if(handler instanceof RemoteMethodInvocationHandler)
 				{
@@ -551,15 +560,11 @@ public class RemoteReferenceModule
 			else if(target instanceof IExternalAccess)
 			{
 				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IExternalAccess)target).getComponentIdentifier());
-				remoterefs.put(orig, ret);
-				targetcomps.put(ret, orig);
 //				System.out.println("component ref: "+ret);
 			}
 			else if(target instanceof IService)
 			{
 				ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((IService)target).getServiceIdentifier());
-				remoterefs.put(orig, ret);
-				targetcomps.put(ret, orig);
 //				System.out.println("service ref: "+ret);
 			}
 			else if(target instanceof ServiceInfo)
@@ -567,19 +572,21 @@ public class RemoteReferenceModule
 				ServiceInfo si = (ServiceInfo)target;
 				if(Proxy.isProxyClass(si.getDomainService().getClass()))
 				{
-					return getRemoteReference(si.getDomainService(), orig);
+					ret = getRemoteReference(si.getDomainService(), orig, false);
 				}
 				else
 				{
 					ret = new RemoteReference(rsms.getRMSComponentIdentifier(), ((ServiceInfo)target).getManagementService().getServiceIdentifier());
-					remoterefs.put(orig, ret);
-					targetcomps.put(ret, orig);
 	//				System.out.println("service ref: "+ret);
 				}
 			}
 			else
 			{
 				ret = generateRemoteReference();
+			}
+			
+			if(ret!=null && add)
+			{
 //				System.out.println("Adding rr: "+ret+" "+target);
 				remoterefs.put(orig, ret);
 				targetobjects.put(ret, orig);
