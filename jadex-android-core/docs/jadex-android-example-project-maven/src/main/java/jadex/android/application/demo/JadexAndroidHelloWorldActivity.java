@@ -2,6 +2,7 @@ package jadex.android.application.demo;
 
 import jadex.base.Starter;
 import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -78,38 +79,43 @@ public class JadexAndroidHelloWorldActivity extends Activity {
 
 		public void onClick(View view) {
 			if (view == startPlatformButton) {
-				IFuture future = Starter
-						.createPlatform(new String[] {
-								"-conf",
-								"jadex/android/application/demo/Platform.component.xml",
-								"-configname", "android_fixed",
-								"-platformname", "testcases", "-saveonexit",
-								"false", "-gui", "false" });
-
-				future.addResultListener(platformResultListener);
+				startPlatformButton.setEnabled(false);
+				textView.setText("Starting Jadex Platform...");
+				new Thread(new Runnable() {
+					public void run() {
+						IFuture<IExternalAccess> future = Starter
+								.createPlatform(new String[] {
+										"-conf",
+										"jadex/android/application/demo/Platform.component.xml",
+										"-configname", "android_fixed",
+										"-platformname", "testcases",
+										"-saveonexit", "false", "-gui", "false" });
+						future.addResultListener(platformResultListener);
+					}
+				}).start();
+				
 			} else if (view == startAgentButton) {
 				startAgentButton.setEnabled(false);
 				
-				IFuture scheduleStep = extAcc
+				IFuture<IComponentManagementService> scheduleStep = extAcc
 						.scheduleStep(new IComponentStep() {
 							@XMLClassname("create-component")
-							public Object execute(IInternalAccess ia) {
-								Future ret = new Future();
+							public IFuture<IComponentManagementService> execute(IInternalAccess ia) {
+								Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
 								SServiceProvider.getService(
 										ia.getServiceContainer(),
 										IComponentManagementService.class,
 										RequiredServiceInfo.SCOPE_PLATFORM)
 										.addResultListener(
-												ia.createResultListener(new DelegationResultListener(
+												ia.createResultListener(new DelegationResultListener<IComponentManagementService>(
 														ret)));
 
 								return ret;
 							}
 						});
-				scheduleStep.addResultListener(new DefaultResultListener() {
+				scheduleStep.addResultListener(new DefaultResultListener<IComponentManagementService>() {
 
-					public void resultAvailable(Object arg0) {
-						IComponentManagementService cms = (IComponentManagementService) arg0;
+					public void resultAvailable(IComponentManagementService cms) {
 						HashMap<String, Object> args = new HashMap<String, Object>();
 
 						cms.createComponent(
@@ -125,14 +131,13 @@ public class JadexAndroidHelloWorldActivity extends Activity {
 		}
 	};
 
-	private IResultListener platformResultListener = new DefaultResultListener() {
+	private IResultListener<IExternalAccess> platformResultListener = new DefaultResultListener<IExternalAccess>() {
 
-		public void resultAvailable(Object result) {
-			extAcc = (IExternalAccess) result;
+		public void resultAvailable(IExternalAccess result) {
+			extAcc = result;
 			runOnUiThread(new Runnable() {
 
 				public void run() {
-					startPlatformButton.setEnabled(false);
 					startAgentButton.setEnabled(true);
 					textView.setText("Platform started");
 				}
@@ -140,9 +145,9 @@ public class JadexAndroidHelloWorldActivity extends Activity {
 		}
 	};
 
-	private IResultListener agentCreatedResultListener = new DefaultResultListener() {
+	private IResultListener<IComponentIdentifier> agentCreatedResultListener = new DefaultResultListener<IComponentIdentifier>() {
 
-		public void resultAvailable(Object arg0) {
+		public void resultAvailable(IComponentIdentifier arg0) {
 			runOnUiThread(new Runnable() {
 
 				public void run() {

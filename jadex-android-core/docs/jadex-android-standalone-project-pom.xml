@@ -3,6 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
+	
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex</artifactId>
 	<packaging>pom</packaging>
@@ -16,10 +17,14 @@
 				<finalName>jadex-android-${project.version}</finalName>
 			</build>
 			<modules>
+				<module>jadex-android-parent</module>
 				<module>jadex-android-misc</module>
 				<module>jadex-android-stax</module>
 				<module>jadex-android-core</module>
 				<module>jadex-android-beans</module>
+				<module>jadex-android-bdi</module>
+				<module>jadex-android-bpmn</module>
+				<module>jadex-android-bdibpmn</module>
 			</modules>
 		</profile>
 
@@ -82,10 +87,14 @@
 				</plugins>
 			</build>
 			<modules>
+				<module>jadex-android-parent</module>
 				<module>jadex-android-misc</module>
 				<module>jadex-android-stax</module>
 				<module>jadex-android-core</module>
 				<module>jadex-android-beans</module>
+				<module>jadex-android-bdi</module>
+				<module>jadex-android-bpmn</module>
+				<module>jadex-android-bdibpmn</module>
 			</modules>
 		</profile>
 	</profiles>

@@ -40,12 +40,17 @@
 
 	<files>
 		<file>
-			<source>jadex-android-core/docs/jadex-android-standalone-parent-pom.xml</source>
+			<source>jadex-android-core/docs/jadex-android-parent-standalone-pom.xml</source>
+			<outputDirectory>sources/jadex-android-parent/</outputDirectory>
+			<destName>pom.xml</destName>
+		</file>
+		<file>
+			<source>jadex-android-core/docs/jadex-android-standalone-project-pom.xml</source>
 			<outputDirectory>sources</outputDirectory>
 			<destName>pom.xml</destName>
 		</file>
 		<file>
-			<source>jadex-android-core/docs/jadex-android-core-standalone-pom.xml</source>
+			<source>jadex-android-core/pom.xml</source>
 			<outputDirectory>sources/jadex-android-core/</outputDirectory>
 			<destName>pom.xml</destName>
 		</file>
@@ -62,6 +67,21 @@
 		<file>
 			<source>jadex-android-misc/pom.xml</source>
 			<outputDirectory>sources/jadex-android-misc/</outputDirectory>
+			<destName>pom.xml</destName>
+		</file>
+		<file>
+			<source>jadex-android-bdi/pom.xml</source>
+			<outputDirectory>sources/jadex-android-bdi/</outputDirectory>
+			<destName>pom.xml</destName>
+		</file>
+		<file>
+			<source>jadex-android-bpmn/pom.xml</source>
+			<outputDirectory>sources/jadex-android-bpmn/</outputDirectory>
+			<destName>pom.xml</destName>
+		</file>
+		<file>
+			<source>jadex-android-bdibpmn/pom.xml</source>
+			<outputDirectory>sources/jadex-android-bdibpmn/</outputDirectory>
 			<destName>pom.xml</destName>
 		</file>
 		<file>

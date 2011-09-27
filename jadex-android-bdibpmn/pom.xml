@@ -8,33 +8,34 @@
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../jadex-android-parent/pom.xml</relativePath>
 	</parent>
-
-	<artifactId>jadex-android-core</artifactId>
+	<artifactId>jadex-android-bdibpmn</artifactId>
 	<packaging>jar</packaging>
-	<name>jadex-android-core</name>
+	<name>jadex-android-bdibpmn</name>
 
 	<description>
-	This Project features the core Jadex functionality, including Active Components
-	and Micro Agents.
+	This Project contains the Jadex BDIBPMN Kernel for Jadex-Android.
 	</description>
 
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-stax</artifactId>
+			<artifactId>jadex-android-core</artifactId>
 			<version>${project.version}</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-misc</artifactId>
+			<artifactId>jadex-android-bdi</artifactId>
 			<version>${project.version}</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-beans</artifactId>
+			<artifactId>jadex-android-bpmn</artifactId>
 			<version>${project.version}</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 
@@ -68,5 +69,42 @@
 				</executions>
 			</plugin>
 		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-antrun-plugin
+										</artifactId>
+										<versionRange>
+											[1.3,)
+										</versionRange>
+										<goals>
+											<goal>run</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>

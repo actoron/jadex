@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="jadex-android" default="generateSources" basedir=".">
+<project name="jadex-android-core" default="generateSources" basedir=".">
 	<!-- Sets variables which can later be used. -->
 	<!-- The value of a property is accessed via ${} -->
 	<property name="jadex-bridge" location="../jadex-bridge/src/main/java" />
@@ -12,13 +12,7 @@
 	<property name="jadex-platform-base" location="../jadex-platform-base/src/main/java" />
 	<property name="jadex-platform-standalone" location="../jadex-platform-standalone/src/main/java" />
 	<property name="jadex-xml" location="../jadex-xml/src/main/java" />
-	<property name="jadex-kernel-bpmn" location="../jadex-kernel-bpmn/src/main/java" />
-
-	<property name="jadex-kernel-bdi" location="../jadex-kernel-bdi/src/main/java" />
-	<property name="jadex-kernel-bdibpmn" location="../jadex-kernel-bdibpmn/src/main/java" />
-	<property name="jadex-rules" location="../jadex-rules/src/main/java" />
-	<property name="jadex-applib-bdi" location="../jadex-applib-bdi/src/main/java" />
-
+	
 	<property name="jadex-kernel-extension-agr" location="../jadex-kernel-extension-agr/src/main/java" />
 	
 	<!-- here comes the benchmark -->
@@ -150,25 +144,14 @@
 		SUtil.java,
 		BrowserLauncher2.java" />
 
-	<property name="exclude-jadex-kernel-bpmn" value="
-		ActivityPanel.java,
-		ExecutionControlPanel.java,
-		ProcessViewPanel.java,
-		UserInteractionActivityHandler.java,
-		UserInteractionTask.java
-		"/>
-	<property name="exclude-jadex-kernel-bdibpmn" value="
-		CreateSpaceObjectTaskTask.java,
-		RemoveSpaceObjectTaskTask.java,
-		WaitForSpaceObjectTaskTask.java
-		"/>
+	
 	
 	<property name="exclude-jadex-kernel-extension-agr" value="
 	"/>
 	
 	<taskdef name="preprocess" classname="com.objfac.prebop.ant.PreprocessorTask">
 		<classpath>
-			<pathelement location="libs/preprocessor.jar" />
+			<pathelement location="../jadex-android-misc/libs/preprocessor.jar" />
 		</classpath>
 	</taskdef>
 
@@ -244,30 +227,7 @@
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess>
-		<echo level="info">preprocessing ${jadex-kernel-bpmn}</echo>
-		<preprocess indir="${jadex-kernel-bpmn}" outdir="${src_android}" out="merge" except="${exclude}, ${exclude-jadex-kernel-bpmn}">
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
-			<var name="android" value="${android}" />
-			<var name="androidVersion" value="${androidVersion}" />
-		</preprocess>
-		<echo level="info">preprocessing ${jadex-kernel-bdi}</echo>
-		<preprocess indir="${jadex-kernel-bdi}" outdir="${src_android}" out="merge" except="${exclude}">
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
-			<var name="android" value="${android}" />
-			<var name="androidVersion" value="${androidVersion}" />
-		</preprocess>
-		<echo level="info">preprocessing ${jadex-rules}</echo>
-		<preprocess indir="${jadex-rules}" outdir="${src_android}" out="merge" except="${exclude}">
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
-			<var name="android" value="${android}" />
-			<var name="androidVersion" value="${androidVersion}" />
-		</preprocess> 
-		<echo level="info">preprocessing ${jadex-kernel-bdibpmn}</echo>
-		<preprocess indir="${jadex-kernel-bdibpmn}" outdir="${src_android}" out="merge" except="${exclude}, ${exclude-jadex-kernel-bdibpmn}">
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
-			<var name="android" value="${android}" />
-			<var name="androidVersion" value="${androidVersion}" />
-		</preprocess> 
+		
 		<echo level="info">preprocessing ${jadex-kernel-extension-agr}</echo>
 		<preprocess indir="${jadex-kernel-extension-agr}" outdir="${src_android}" out="merge" except="${exclude}, ${exclude-jadex-kernel-extension-agr}">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
@@ -338,11 +298,6 @@
 			<var name="androidVersion" value="${androidVersion}" />
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 		</preprocess>
-		<preprocess indir="${jadex-kernel-bpmn}" outdir="${jadex-kernel-bpmn}" out="merge" except="${exclude}, ${exclude-jadex-kernel-bpmn}">
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
-			<var name="android" value="${android}" />
-			<var name="androidVersion" value="${androidVersion}" />
-		</preprocess>
 		<preprocess indir="${jadex-kernel-bdi}" outdir="${jadex-kernel-bdi}" out="merge">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />
@@ -353,11 +308,6 @@
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess>
-		<preprocess indir="${jadex-kernel-bdibpmn}" outdir="${jadex-kernel-bdibpmn}" out="merge" except="${exclude}">
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
-			<var name="android" value="${android}" />
-			<var name="androidVersion" value="${androidVersion}" />
-		</preprocess> 
 		<preprocess indir="${jadex-kernel-extension-agr}" outdir="${jadex-kernel-extension-agr}" out="merge" except="${exclude}, ${exclude-jadex-kernel-extension-agr}">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />

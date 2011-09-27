@@ -8,16 +8,28 @@
 	<packaging>apk</packaging>
 	<name>jadex-android-application-test</name>
 
-<!-- 	<parent> -->
-<!-- 		<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 		<artifactId>jadex</artifactId> -->
-<!-- 		<version>2.0-rc7</version> -->
-<!-- 	</parent> -->
-
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-core</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-bdi</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-bpmn</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-bdibpmn</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
@@ -67,17 +79,17 @@
 					</jvmArguments>
 				</configuration>
 				<extensions>true</extensions>
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<id>update-manifest</id> -->
-<!-- 						<goals> -->
-<!-- 							<goal>manifest-update</goal> -->
-<!-- 						</goals> -->
-<!-- 						<configuration> -->
-<!-- 							<debuggable>true</debuggable> -->
-<!-- 						</configuration> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
+				<!-- <executions> -->
+				<!-- <execution> -->
+				<!-- <id>update-manifest</id> -->
+				<!-- <goals> -->
+				<!-- <goal>manifest-update</goal> -->
+				<!-- </goals> -->
+				<!-- <configuration> -->
+				<!-- <debuggable>true</debuggable> -->
+				<!-- </configuration> -->
+				<!-- </execution> -->
+				<!-- </executions> -->
 			</plugin>
 
 			<plugin>
