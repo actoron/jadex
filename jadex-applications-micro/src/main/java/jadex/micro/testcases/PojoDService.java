@@ -103,6 +103,7 @@ public class PojoDService implements IDService
 	 */
 	public IFuture testServiceArgument(IDService service) 
 	{
+		System.out.println("service: "+service.getClass());
 		return new Future(Proxy.isProxyClass(service.getClass()));
 	};
 }

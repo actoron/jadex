@@ -158,7 +158,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 //						if(content instanceof RemoteResultCommand && ((RemoteResultCommand)content).getMethodName()!=null && ((RemoteResultCommand)content).getMethodName().indexOf("store")!=-1)
 //							System.out.println("result of command1: "+com+" "+result);
 						
-						System.out.println("received: "+rms.getServiceIdentifier()+" "+content);
+//						System.out.println("received: "+rms.getServiceIdentifier()+" "+content);
 						
 						com.execute((IMicroExternalAccess)getExternalAccess(), rms).addResultListener(createResultListener(new DefaultResultListener()
 						{

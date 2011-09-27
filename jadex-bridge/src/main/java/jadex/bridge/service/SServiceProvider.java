@@ -646,8 +646,7 @@ public class SServiceProvider
 		boolean ret = object instanceof IRemotable 
 			|| object instanceof IResultListener || object instanceof IIntermediateResultListener
 			|| object instanceof IFuture || object instanceof IIntermediateFuture
-			|| object instanceof IChangeListener || object instanceof IRemoteChangeListener
-			|| (object!=null && object.getClass().isAnnotationPresent(Service.class));
+			|| object instanceof IChangeListener || object instanceof IRemoteChangeListener;
 //			|| object instanceof IService;// || object instanceof IExternalAccess;
 		
 		if(!ret && object!=null)
