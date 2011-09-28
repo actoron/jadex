@@ -1,0 +1,9 @@
+package jadex.android.bluetooth.domain;
+
+option java_package = "jadex.android.bluetooth.domain";
+option java_outer_classname = "MessageProtos";
+option optimize_for = LITE_RUNTIME;
+
+message DeviceList {
+	repeated string device = 1;
+}

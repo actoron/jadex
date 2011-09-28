@@ -46,34 +46,30 @@ import android.os.Message;
 		@Argument(name = "includes", clazz = String.class, defaultvalue = "\"\"", description = "A list of platforms/IPs/hostnames to include (comma separated). Matches start of platform/IP/hostname."),
 		@Argument(name = "excludes", clazz = String.class, defaultvalue = "\"\"", description = "A list of platforms/IPs/hostnames to exclude (comma separated). Matches start of platform/IP/hostname.") })
 @ComponentTypes({
-		@ComponentType(name = "broadcastdis", filename = "jadex/base/service/awareness/discovery/ipbroadcast/BroadcastDiscoveryAgent.class"),
-		@ComponentType(name = "multicastdis", filename = "jadex/base/service/awareness/discovery/ipmulticast/MulticastDiscoveryAgent.class"),
-		@ComponentType(name = "scannerdis", filename = "jadex/base/service/awareness/discovery/ipscanner/ScannerDiscoveryAgent.class"),
-		@ComponentType(name = "registrydis", filename = "jadex/base/service/awareness/discovery/registry/RegistryDiscoveryAgent.class") })
+//		@ComponentType(name = "broadcastdis", filename = "jadex/base/service/awareness/discovery/ipbroadcast/BroadcastDiscoveryAgent.class"),
+//		@ComponentType(name = "multicastdis", filename = "jadex/base/service/awareness/discovery/ipmulticast/MulticastDiscoveryAgent.class"),
+//		@ComponentType(name = "scannerdis", filename = "jadex/base/service/awareness/discovery/ipscanner/ScannerDiscoveryAgent.class"),
+//		@ComponentType(name = "registrydis", filename = "jadex/base/service/awareness/discovery/registry/RegistryDiscoveryAgent.class"),
+		@ComponentType(name = "bluetoothdis", filename = "jadex.base.service.awareness.discovery.bluetoothp2p/BluetoothP2PDiscoveryAgent.class") 
+		})
 @Configurations({
-		@Configuration(name = "Frequent updates (10s)", arguments = @NameValue(name = "delay", value = "10000"), components = { @Component(name = "broadcastdis", type = "broadcastdis")
+		@Configuration(name = "Frequent updates (10s)", arguments = @NameValue(name = "delay", value = "10000"), components = { @Component(name = "bluetoothdis", type = "bluetoothdis")
 		// @Component(name="multicastdis", type="multicastdis")
 		// @Component(name="scannerdis", type="scannerdis")
 		// @Component(name="registrydis", type="registrydis")
 		}),
-		@Configuration(name = "Medium updates (20s)", arguments = @NameValue(name = "delay", value = "20000"), components = { @Component(name = "broadcastdis", type = "broadcastdis")
+		@Configuration(name = "Medium updates (20s)", arguments = @NameValue(name = "delay", value = "20000"), components = { @Component(name = "bluetoothdis", type = "bluetoothdis")
 		// @Component(name="multicastdis", type="multicastdis")
 		// @Component(name="scannerdis", type="scannerdis")
 		// @Component(name="registrydis", type="registrydis")
 		}),
-		@Configuration(name = "Seldom updates (60s)", arguments = @NameValue(name = "delay", value = "60000"), components = { @Component(name = "broadcastdis", type = "broadcastdis")
+		@Configuration(name = "Seldom updates (60s)", arguments = @NameValue(name = "delay", value = "60000"), components = { @Component(name = "bluetoothdis", type = "bluetoothdis")
 		// @Component(name="multicastdis", type="multicastdis")
 		// @Component(name="scannerdis", type="scannerdis")
 		// @Component(name="registrydis", type="registrydis")
 		}) })
 @Properties(@NameValue(name = "componentviewer.viewerclass", value = "\"jadex.base.service.awareness.gui.AwarenessAgentPanel\""))
 @ProvidedServices(@ProvidedService(type = IManagementService.class, implementation = @Implementation(expression = "$component")))
-@RequiredServices({
-		@RequiredService(name = "cms", type = IComponentManagementService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)),
-		// @RequiredService(name="clock", type=IClockService.class,
-		// scope=RequiredServiceInfo.SCOPE_PLATFORM),
-		@RequiredService(name = "settings", type = ISettingsService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)),
-		@RequiredService(name = "discoveries", type = IDiscoveryService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_COMPONENT)) })
 @Service(IManagementService.class)
 public class AwarenessNotifierAgent extends
 		jadex.base.service.awareness.management.AwarenessManagementAgent {

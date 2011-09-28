@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>net.sourceforge.jadex</groupId>
+		<artifactId>jadex-android-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../jadex-android-parent/pom.xml</relativePath>
+	</parent>
+	<artifactId>jadex-android-bluetooth</artifactId>
+	<packaging>apklib</packaging>
+	<name>jadex-android-bluetooth</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>2.4.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
+			<version>2.2.1</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<excludes>
+					<exclude>**/.svn/*</exclude>
+					<exclude>**/*.proto</exclude>
+				</excludes>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>maven-android-plugin</artifactId>
+				<version>3.0.0-alpha-7</version>
+				<configuration>
+					<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
+					<assetsDirectory>${project.basedir}/assets</assetsDirectory>
+					<resourceDirectory>${project.basedir}/res</resourceDirectory>
+					<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
+					<sdk>
+						<path>${project.basedir}/sdktools</path>
+						<platform>2.2</platform>
+					</sdk>
+					<undeployBeforeDeploy>true</undeployBeforeDeploy>
+					<generateApk>false</generateApk>
+					<attachJar>true</attachJar>
+					<jvmArguments>
+						<argument>-Xms256m</argument>
+						<argument>-Xmx512m</argument>
+					</jvmArguments>
+				</configuration>
+				<extensions>true</extensions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<type>jar</type>
+									<file>${build.directory}/${build.finalName}.jar</file>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<aggregate>true</aggregate>
+					<minmemory>128m</minmemory>
+					<maxmemory>1g</maxmemory>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+</project>

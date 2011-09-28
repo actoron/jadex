@@ -1,12 +1,12 @@
 package de.unihamburg.vsis.jadexAndroid_test;
 
-import android.app.Activity;
+import jadex.android.bluetooth.JadexBluetoothActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class BaseActivity extends Activity {
+public class BaseActivity extends JadexBluetoothActivity {
 	
 	protected Button findButtonById(int id){
 		View v = findViewById(id);
