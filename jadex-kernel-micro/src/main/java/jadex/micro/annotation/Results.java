@@ -16,4 +16,9 @@ public @interface Results
 	 *  The results.
 	 */
 	public Result[] value() default {};
+	
+	/**
+	 *  Replace content of the base classes.
+	 */
+	public boolean replace() default false;
 }

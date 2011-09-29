@@ -17,4 +17,9 @@ public @interface Arguments
 	 *  The arguments.
 	 */
 	public Argument[] value() default {};
+	
+	/**
+	 *  Replace content of the base classes.
+	 */
+	public boolean replace() default true;
 }

@@ -181,16 +181,26 @@ public class MicroClassReader
 		
 		Class cma = clazz;
 		
-		if(cma.isAnnotationPresent(Description.class))
-		{
-			Description val = (Description)cma.getAnnotation(Description.class);
-			modelinfo.setDescription(val.value());
-		}
-		
 		int cnt = 0;
 		Map toset = new HashMap();
+		boolean propdone = false;
+		boolean reqsdone = false;
+		boolean prosdone = false;
+		boolean argsdone = false;
+		boolean resudone = false;
+		boolean confdone = false;
+		boolean compdone = false;
+		
 		while(cma!=null && !cma.equals(Object.class) && !cma.equals(MicroAgent.class))
 		{
+			// Description is set only once from upper most element.
+			if(cma.isAnnotationPresent(Description.class) && modelinfo.getDescription()==null)
+			{
+				Description val = (Description)cma.getAnnotation(Description.class);
+				modelinfo.setDescription(val.value());
+			}
+			
+			// Take all, duplicates are eleminated
 			if(cma.isAnnotationPresent(Imports.class))
 			{
 				String[] tmp = ((Imports)cma.getAnnotation(Imports.class)).value();
@@ -206,10 +216,22 @@ public class MicroClassReader
 				}
 			}
 			
-			if(cma.isAnnotationPresent(Properties.class))
+			// Add package of current class to imports.
+			// Is a little hack because getAllImports() of ModelInfo add package again.
+			Set imports = (Set)toset.get("imports");
+			if(imports==null)
+			{
+				imports = new LinkedHashSet();
+				toset.put("imports", imports);
+			}
+			imports.add(cma.getPackage()+".*");
+			
+			// Take all, upper replace lower
+			if(!propdone && cma.isAnnotationPresent(Properties.class))
 			{
 				Properties val = (Properties)cma.getAnnotation(Properties.class);
 				NameValue[] vals = val.value();
+				propdone = val.replace();
 				
 				Map props = (Map)toset.get("properties");
 				if(props==null)
@@ -220,14 +242,57 @@ public class MicroClassReader
 				for(int i=0; i<vals.length; i++)
 				{
 					// Todo: clazz, language
-					props.put(vals[i].name(), new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].value(), null) );
+					if(!props.containsKey(vals[i].name()))
+					{
+						props.put(vals[i].name(), new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].value(), null) );
+					}
 				}
 			}
 			
-			if(cma.isAnnotationPresent(RequiredServices.class))
+			// Take newest version
+			// todo: move to be able to use the constant
+			// jadex.base.gui.componentviewer.IAbstractViewerPanel.PROPERTY_VIEWERCLASS
+			if(cma.isAnnotationPresent(GuiClass.class))
+			{
+				GuiClass gui = (GuiClass)cma.getAnnotation(GuiClass.class);
+				Class gclazz = gui.value();
+				
+				Map props = (Map)toset.get("properties");
+				if(props==null)
+				{
+					props = new LinkedHashMap();
+					toset.put("properties", props);
+				}
+				
+				if(!props.containsKey("componentviewer.viewerclass"))
+				{
+					props.put("componentviewer.viewerclass", gclazz);
+				}
+			}
+			else if(cma.isAnnotationPresent(GuiClassName.class))
+			{
+				GuiClassName gui = (GuiClassName)cma.getAnnotation(GuiClassName.class);
+				String clazzname = gui.value();
+				
+				Map props = (Map)toset.get("properties");
+				if(props==null)
+				{
+					props = new LinkedHashMap();
+					toset.put("properties", props);
+				}
+				
+				if(!props.containsKey("componentviewer.viewerclass"))
+				{
+					props.put("componentviewer.viewerclass", clazzname);
+				}
+			}
+			
+			// Take all but new overrides old
+			if(!reqsdone && cma.isAnnotationPresent(RequiredServices.class))
 			{
 				RequiredServices val = (RequiredServices)cma.getAnnotation(RequiredServices.class);
 				RequiredService[] vals = val.value();
+				reqsdone = val.replace();
 				
 				Map rsers = (Map)toset.get("reqservices");
 				if(rsers==null)
@@ -242,15 +307,21 @@ public class MicroClassReader
 					RequiredServiceInfo rsis = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
 						vals[i].multiple(), binding);
 					if(rsers.containsKey(vals[i].name()))
-						throw new RuntimeException("Extension hierarchy contains required service more than once: "+vals[i].name());
+					{
+						RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(vals[i].name());
+						if(old.isMultiple()!=rsis.isMultiple() || !old.getType().equals(rsis.getType()))
+							throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+vals[i].name());
+					}
 					rsers.put(vals[i].name(), rsis);
 				}
 			}
 			
-			if(cma.isAnnotationPresent(ProvidedServices.class))
+			// Take all but new overrides old
+			if(!prosdone && cma.isAnnotationPresent(ProvidedServices.class))
 			{
 				ProvidedServices val = (ProvidedServices)cma.getAnnotation(ProvidedServices.class);
 				ProvidedService[] vals = val.value();
+				prosdone = val.replace();
 				
 				Map psers = (Map)toset.get("proservices");
 				if(psers==null)
@@ -282,10 +353,12 @@ public class MicroClassReader
 				}
 			}
 			
-			if(cma.isAnnotationPresent(Arguments.class))
+			// Take all but new overrides old
+			if(!argsdone && cma.isAnnotationPresent(Arguments.class))
 			{
 				Arguments val = (Arguments)cma.getAnnotation(Arguments.class);
 				Argument[] vals = val.value();
+				argsdone = val.replace();
 				
 				Map args = (Map)toset.get("arguments");
 				if(args==null)
@@ -308,10 +381,12 @@ public class MicroClassReader
 				}
 			}
 			
-			if(cma.isAnnotationPresent(Results.class))
+			// Take all but new overrides old
+			if(!resudone && cma.isAnnotationPresent(Results.class))
 			{
 				Results val = (Results)cma.getAnnotation(Results.class);
 				Result[] vals = val.value();
+				resudone = val.replace();
 				
 				Map res = (Map)toset.get("results");
 				if(res==null)
@@ -332,6 +407,168 @@ public class MicroClassReader
 					{
 						res.put(vals[i].name(), tmpresult);
 					}
+				}
+			}
+			
+			// Take all but new overrides old
+			if(!compdone && cma.isAnnotationPresent(ComponentTypes.class))
+			{
+				SubcomponentTypeInfo[] subinfos = null;
+				ComponentTypes tmp = (ComponentTypes)cma.getAnnotation(ComponentTypes.class);
+				compdone = tmp.replace();
+				ComponentType[] ctypes = tmp.value();
+				
+				Map res = (Map)toset.get("componenttypes");
+				if(res==null)
+				{
+					res = new LinkedHashMap();
+					toset.put("componenttypes", res);
+				}
+				
+				for(int i=0; i<ctypes.length; i++)
+				{
+					SubcomponentTypeInfo subinfo = new SubcomponentTypeInfo(ctypes[i].name(), ctypes[i].filename());
+					if(!toset.containsKey(ctypes[i].name()))
+					{
+						res.put(ctypes[i].name(), subinfo);
+					}
+				}
+			}
+			
+			if(!confdone && cma.isAnnotationPresent(Configurations.class))
+			{
+				Configurations val = (Configurations)cma.getAnnotation(Configurations.class);
+				Configuration[] configs = val.value();
+				confdone = val.replace();
+				
+				Map confs = (Map)toset.get("configurations");
+				if(confs==null)
+				{
+					confs = new LinkedHashMap();
+					toset.put("configurations", confs);
+				}
+				
+				for(int i=0; i<configs.length; i++)
+				{
+					if(!confs.containsKey(configs[i].name()))
+					{
+						ConfigurationInfo configinfo = new ConfigurationInfo(configs[i].name());
+						confs.put(configs[i].name(), configinfo);
+						
+						configinfo.setMaster(configs[i].master());
+						configinfo.setDaemon(configs[i].daemon());
+						configinfo.setAutoShutdown(configs[i].autoshutdown());
+						configinfo.setSuspend(configs[i].suspend());
+						
+						NameValue[] argvals = configs[i].arguments();
+						for(int j=0; j<argvals.length; j++)
+						{
+							configinfo.addArgument(new UnparsedExpression(argvals[j].name(), argvals[j].clazz(), argvals[j].value(), null));
+						}
+						NameValue[] resvals = configs[i].results();
+						for(int j=0; j<resvals.length; j++)
+						{
+							configinfo.addResult(new UnparsedExpression(resvals[j].name(), resvals[j].clazz(), resvals[j].value(), null));
+						}
+						
+						ProvidedService[] provs = configs[i].providedservices();
+						ProvidedServiceInfo[] psis = new ProvidedServiceInfo[provs.length];
+						for(int j=0; j<provs.length; j++)
+						{
+							Implementation im = provs[j].implementation();
+							Value[] inters = im.interceptors();
+							UnparsedExpression[] interceptors = null;
+							if(inters.length>0)
+							{
+								interceptors = new UnparsedExpression[inters.length];
+								for(int k=0; k<inters.length; k++)
+								{
+									interceptors[k] = new UnparsedExpression(null, inters[k].clazz(), inters[k].value(), null);
+								}
+							}
+							RequiredServiceBinding bind = createBinding(im.binding());
+							ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
+								im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
+							psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl);
+							configinfo.setProvidedServices(psis);
+						}
+						
+						RequiredService[] reqs = configs[i].requiredservices();
+						RequiredServiceInfo[] rsis = new RequiredServiceInfo[reqs.length];
+						for(int j=0; j<reqs.length; j++)
+						{
+							RequiredServiceBinding binding = createBinding(reqs[j].binding());
+							rsis[j] = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), 
+								reqs[j].multiple(), binding);
+							configinfo.setRequiredServices(rsis);
+						}
+						
+						Component[] comps = configs[i].components();
+						for(int j=0; j<comps.length; j++)
+						{
+							ComponentInstanceInfo comp = new ComponentInstanceInfo();
+							
+							comp.setSuspend(comps[j].suspend());
+							comp.setMaster(comps[j].master());
+							comp.setDaemon(comps[j].daemon());
+							comp.setAutoShutdown(comps[j].autoshutdown());
+							
+							if(comps[j].name().length()>0)
+								comp.setName(comps[j].name());
+							if(comps[j].type().length()>0)
+								comp.setTypeName(comps[j].type());
+							if(comps[j].configuration().length()>0)
+								comp.setConfiguration(comps[j].configuration());
+							if(comps[j].number().length()>0)
+								comp.setNumber(comps[j].number());
+							
+							NameValue[] args = comps[j].arguments();
+							if(args.length>0)
+							{
+								UnparsedExpression[] exps = new UnparsedExpression[args.length];
+								for(int k=0; k<args.length; k++)
+								{
+									exps[k] = new UnparsedExpression(args[k].name(), args[k].clazz(), args[k].value(), null);
+								}
+								comp.setArguments(exps);
+							}
+							
+							Binding[] binds = comps[j].bindings();
+							if(binds.length>0)
+							{
+								RequiredServiceBinding[] bds = new RequiredServiceBinding[binds.length];
+								for(int k=0; k<binds.length; k++)
+								{
+									bds[k] = createBinding(binds[k]);
+								}
+								comp.setBindings(bds);
+							}
+							
+							configinfo.addComponentInstance(comp);
+						}
+					}
+				}
+			}
+			
+			// Find injection targets by reflection (agent, arguments, services)
+			Field[] fields = cma.getDeclaredFields();
+			for(int i=0; i<fields.length; i++)
+			{
+				if(fields[i].isAnnotationPresent(Agent.class))
+				{
+					micromodel.addAgentInjection(fields[i]);
+				}
+				else if(fields[i].isAnnotationPresent(AgentArgument.class))
+				{
+					AgentArgument arg = (AgentArgument)fields[i].getAnnotation(AgentArgument.class);
+					String name = arg.value().length()>0? arg.value(): fields[i].getName();
+					micromodel.addArgumentInjection(name, fields[i]);
+				}
+				else if(fields[i].isAnnotationPresent(AgentService.class))
+				{
+					AgentService ser = (AgentService)fields[i].getAnnotation(AgentService.class);
+					String name = ser.name().length()>0? ser.name(): fields[i].getName();
+					micromodel.addServiceInjection(name, fields[i]);
 				}
 			}
 			
@@ -363,194 +600,14 @@ public class MicroClassReader
 		if(res!=null)
 			modelinfo.setResults((IArgument[])res.values().toArray(new IArgument[res.size()]));
 		
-		// todo
-		cma = clazz;
+		Map cts = (Map)toset.get("componenttypes");
+		if(cts!=null)
+			modelinfo.setSubcomponentTypes((SubcomponentTypeInfo[])cts.values().toArray(new SubcomponentTypeInfo[cts.size()]));
+
+		Map cfs = (Map)toset.get("configurations");
+		if(cfs!=null)
+			modelinfo.setConfigurations((ConfigurationInfo[])cfs.values().toArray(new ConfigurationInfo[cfs.size()]));
 		
-		Configuration[] configs = null;
-		if(cma.isAnnotationPresent(Configurations.class))
-		{
-			Configurations val = (Configurations)cma.getAnnotation(Configurations.class);
-			configs = val.value();
-		}
-		else if(cma.isAnnotationPresent(Configuration.class))
-		{
-			Configuration val = (Configuration)cma.getAnnotation(Configuration.class);
-			configs = new Configuration[]{val};
-		}
-		
-		if(configs!=null)
-		{
-			List configinfos = new ArrayList();
-			
-			String[] confignames = new String[configs.length];
-//			Map master = new HashMap();
-//			Map daemon = new HashMap();
-//			Map autosd = new HashMap();
-			for(int i=0; i<configs.length; i++)
-			{
-				confignames[i] = configs[i].name();
-				
-				ConfigurationInfo configinfo = new ConfigurationInfo(confignames[i]);
-				configinfos.add(configinfo);
-				
-				configinfo.setMaster(configs[i].master());
-				configinfo.setDaemon(configs[i].daemon());
-				configinfo.setAutoShutdown(configs[i].autoshutdown());
-				configinfo.setSuspend(configs[i].suspend());
-				
-				NameValue[] argvals = configs[i].arguments();
-				for(int j=0; j<argvals.length; j++)
-				{
-					configinfo.addArgument(new UnparsedExpression(argvals[j].name(), argvals[j].clazz(), argvals[j].value(), null));
-				}
-				NameValue[] resvals = configs[i].results();
-				for(int j=0; j<resvals.length; j++)
-				{
-					configinfo.addResult(new UnparsedExpression(resvals[j].name(), resvals[j].clazz(), resvals[j].value(), null));
-				}
-				
-				ProvidedService[] provs = configs[i].providedservices();
-				ProvidedServiceInfo[] psis = new ProvidedServiceInfo[provs.length];
-				for(int j=0; j<provs.length; j++)
-				{
-					Implementation im = provs[j].implementation();
-					Value[] inters = im.interceptors();
-					UnparsedExpression[] interceptors = null;
-					if(inters.length>0)
-					{
-						interceptors = new UnparsedExpression[inters.length];
-						for(int k=0; k<inters.length; k++)
-						{
-							interceptors[k] = new UnparsedExpression(null, inters[k].clazz(), inters[k].value(), null);
-						}
-					}
-					RequiredServiceBinding bind = createBinding(im.binding());
-					ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
-						im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
-					psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl);
-					configinfo.setProvidedServices(psis);
-				}
-				
-				RequiredService[] reqs = configs[i].requiredservices();
-				RequiredServiceInfo[] rsis = new RequiredServiceInfo[reqs.length];
-				for(int j=0; j<reqs.length; j++)
-				{
-					RequiredServiceBinding binding = createBinding(reqs[j].binding());
-					rsis[j] = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), 
-						reqs[j].multiple(), binding);
-					configinfo.setRequiredServices(rsis);
-				}
-				
-				// todo: store arguments in config not in valueprovider
-				
-				Component[] comps = configs[i].components();
-				for(int j=0; j<comps.length; j++)
-				{
-					ComponentInstanceInfo comp = new ComponentInstanceInfo();
-					
-					comp.setSuspend(comps[j].suspend());
-					comp.setMaster(comps[j].master());
-					comp.setDaemon(comps[j].daemon());
-					comp.setAutoShutdown(comps[j].autoshutdown());
-					
-					if(comps[j].name().length()>0)
-						comp.setName(comps[j].name());
-					if(comps[j].type().length()>0)
-						comp.setTypeName(comps[j].type());
-					if(comps[j].configuration().length()>0)
-						comp.setConfiguration(comps[j].configuration());
-					if(comps[j].number().length()>0)
-						comp.setNumber(comps[j].number());
-					
-					NameValue[] args = comps[j].arguments();
-					if(args.length>0)
-					{
-						UnparsedExpression[] exps = new UnparsedExpression[args.length];
-						for(int k=0; k<args.length; k++)
-						{
-							exps[k] = new UnparsedExpression(args[k].name(), args[k].clazz(), args[k].value(), null);
-						}
-						comp.setArguments(exps);
-					}
-					
-					Binding[] binds = comps[j].bindings();
-					if(binds.length>0)
-					{
-						RequiredServiceBinding[] bds = new RequiredServiceBinding[binds.length];
-						for(int k=0; k<binds.length; k++)
-						{
-							bds[k] = createBinding(binds[k]);
-						}
-						comp.setBindings(bds);
-					}
-					
-					configinfo.addComponentInstance(comp);
-				}
-			}
-			
-//			metainfo.setMaster(new ModelValueProvider(master));
-//			metainfo.setDaemon(new ModelValueProvider(daemon));
-//			metainfo.setAutoShutdown(new ModelValueProvider(autosd));
-//			metainfo.setConfigs(confignames);
-			
-			modelinfo.setConfigurations((ConfigurationInfo[])configinfos.toArray(new ConfigurationInfo[configinfos.size()]));
-		}
-		
-		// Determine subcomponent types
-		if(cma.isAnnotationPresent(ComponentTypes.class))
-		{
-			SubcomponentTypeInfo[] subinfos = null;
-			ComponentTypes tmp = (ComponentTypes)cma.getAnnotation(ComponentTypes.class);
-			ComponentType[] ctypes = tmp.value();
-			subinfos = new SubcomponentTypeInfo[ctypes.length];
-			for(int i=0; i<ctypes.length; i++)
-			{
-				subinfos[i] = new SubcomponentTypeInfo(ctypes[i].name(), ctypes[i].filename());
-			}
-			modelinfo.setSubcomponentTypes(subinfos);
-		}
-		
-		// todo: move to be able to use the constant
-		// jadex.base.gui.componentviewer.IAbstractViewerPanel.PROPERTY_VIEWERCLASS
-		if(cma.isAnnotationPresent(GuiClass.class))
-		{
-			GuiClass gui = (GuiClass)cma.getAnnotation(GuiClass.class);
-			Class gclazz = gui.value();
-			modelinfo.addProperty("componentviewer.viewerclass", gclazz);
-		}
-		else if(cma.isAnnotationPresent(GuiClassName.class))
-		{
-			GuiClassName gui = (GuiClassName)cma.getAnnotation(GuiClassName.class);
-			String clazzname = gui.value();
-			modelinfo.addProperty("componentviewer.viewerclass", clazzname);
-		}
-		
-		// Find injection targets by reflection (agent, arguments, services)
-		Class microclass = cma;
-		while(!Object.class.equals(microclass) && !MicroAgent.class.equals(microclass))
-		{
-			Field[] fields = microclass.getDeclaredFields();
-			for(int i=0; i<fields.length; i++)
-			{
-				if(fields[i].isAnnotationPresent(Agent.class))
-				{
-					micromodel.addAgentInjection(fields[i]);
-				}
-				else if(fields[i].isAnnotationPresent(AgentArgument.class))
-				{
-					AgentArgument arg = (AgentArgument)fields[i].getAnnotation(AgentArgument.class);
-					String name = arg.value().length()>0? arg.value(): fields[i].getName();
-					micromodel.addArgumentInjection(name, fields[i]);
-				}
-				else if(fields[i].isAnnotationPresent(AgentService.class))
-				{
-					AgentService ser = (AgentService)fields[i].getAnnotation(AgentService.class);
-					String name = ser.name().length()>0? ser.name(): fields[i].getName();
-					micromodel.addServiceInjection(name, fields[i]);
-				}
-			}
-			microclass = microclass.getSuperclass();
-		}
 	}
 	
 	/**

@@ -16,4 +16,9 @@ public @interface ComponentTypes
 	 *  The component types.
 	 */
 	public ComponentType[] value() default {};
+	
+	/**
+	 *  Replace content of the base classes.
+	 */
+	public boolean replace() default false;
 }

@@ -16,4 +16,9 @@ public @interface Properties
 	 *  The name value pairs.
 	 */
 	public NameValue[] value();
+	
+	/**
+	 *  Replace content of the base classes.
+	 */
+	public boolean replace() default false;
 }

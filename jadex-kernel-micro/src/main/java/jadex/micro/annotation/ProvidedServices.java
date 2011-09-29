@@ -16,4 +16,9 @@ public @interface ProvidedServices
 	 *  The provided services.
 	 */
 	public ProvidedService[] value();
+	
+	/**
+	 *  Replace content of the base classes.
+	 */
+	public boolean replace() default false;
 }

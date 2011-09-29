@@ -9,7 +9,8 @@ import java.lang.annotation.Target;
 /**
  *  Configuration annotation.
  */
-@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+//@Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+@Target(ElementType.ANNOTATION_TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Configuration
 {	
