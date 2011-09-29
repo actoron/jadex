@@ -35,11 +35,11 @@ public class ManagerService implements IManagerService {
 			agent.getConsumedWPs().put(taskId, agent.getConsumedWPs().get(taskId) + 1);
 		} else {
 			agent.getConsumedWPs().put(taskId, 1);
+		}
 
-			if (!agent.isFirstWPConsumed()) {
-				agent.setFirstWPConsumed(true);
-				agent.startDropout();
-			}
+		if (!agent.isFirstWPConsumed()) {
+			agent.setFirstWPConsumed(true);
+			agent.startDropout();
 		}
 
 		return IFuture.DONE;
