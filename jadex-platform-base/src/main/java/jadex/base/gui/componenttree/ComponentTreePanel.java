@@ -169,7 +169,7 @@ public class ComponentTreePanel extends JSplitPane
 		tree.setShowsRootHandles(true);
 		tree.setToggleClickCount(0);
 		tree.putClientProperty(CMSUpdateHandler.class, cmshandler);
-		final ComponentIconCache	cic	= new ComponentIconCache(access, tree);
+		final ComponentIconCache	cic	= new ComponentIconCache(cmshandler, tree);
 		JScrollPane	scroll	= new JScrollPane(tree);
 		this.add(scroll);
 		// needed to show tooltips: http://info.michael-simons.eu/2008/08/12/enabling-tooltips-on-a-jtree/

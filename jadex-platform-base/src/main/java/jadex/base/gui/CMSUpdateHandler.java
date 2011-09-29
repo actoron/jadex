@@ -264,6 +264,18 @@ public class CMSUpdateHandler
 		return ret;
 	}
 	
+	/**
+	 *  Get the local CMS.
+	 *  @return The local CMS.
+	 */
+	public IFuture<IComponentManagementService>	getLocalCMS()
+	{
+		IFuture<IComponentManagementService>	ret	= SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		return ret;
+	}
+	
+
+	
 	//-------- helper methods --------
 	
 	/**

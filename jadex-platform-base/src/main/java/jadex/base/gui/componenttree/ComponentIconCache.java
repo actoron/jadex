@@ -1,16 +1,15 @@
 package jadex.base.gui.componenttree;
 
+import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.component.ComponentFactorySelector;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
@@ -30,10 +29,10 @@ public class ComponentIconCache
 	//-------- attributes --------
 	
 	/** The icon cache. */
-	private final Map	icons;
+	private final Map<String, Icon>	icons;
 	
-	/** The service provider. */
-	private final IExternalAccess exta;
+	/** The cms handler. */
+	private final CMSUpdateHandler cmshandler;
 	
 	/** The tree. */
 	private final JTree	tree;
@@ -43,10 +42,10 @@ public class ComponentIconCache
 	/**
 	 *  Create an icon cache.
 	 */
-	public ComponentIconCache(IExternalAccess exta, JTree tree)
+	public ComponentIconCache(CMSUpdateHandler cmshandler, JTree tree)
 	{
-		this.icons	= new HashMap();
-		this.exta	= exta;
+		this.icons	= new HashMap<String, Icon>();
+		this.cmshandler	= cmshandler;
 		this.tree	= tree;
 	}
 	
@@ -55,7 +54,7 @@ public class ComponentIconCache
 	/**
 	 *  Get an icon.
 	 */
-	public Icon	getIcon(final ITreeNode node, final String type)
+	public Icon	getIcon(final IActiveComponentTreeNode node, final String type)
 	{
 		Icon	ret	= null;
 		
@@ -68,57 +67,76 @@ public class ComponentIconCache
 			// Todo: remember ongoing searches for efficiency?
 //			System.out.println("getIcon: "+type);
 			
-			exta.scheduleStep(new IComponentStep<Void>()
+			cmshandler.getLocalCMS().addResultListener(new SwingDefaultResultListener<IComponentManagementService>()
 			{
-				@XMLClassname("getFactoryService")
-				public IFuture<Void> execute(IInternalAccess ia)
+				public void customResultAvailable(IComponentManagementService cms)
 				{
-					final Future<Void> ret = new Future<Void>();
-					SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type))
-						.addResultListener(new DelegationResultListener(ret));
-					return ret;
-				}
-			}).addResultListener(new SwingDefaultResultListener()
-			{
-				public void customResultAvailable(Object result)
-				{
-					try
+					cms.getExternalAccess(node.getComponentIdentifier()).addResultListener(new SwingDefaultResultListener<IExternalAccess>()
 					{
-						IComponentFactory	fac	= (IComponentFactory)result;
-						fac.getComponentTypeIcon(type)
-							.addResultListener(new SwingDefaultResultListener()
+						public void customResultAvailable(IExternalAccess exta)
 						{
-							public void customResultAvailable(Object result)
+							exta.scheduleStep(new IComponentStep<IComponentFactory>()
 							{
-								icons.put(type, result);
-								TreeModel	model	= tree.getModel();
-								if(model instanceof AsyncTreeModel)
+								@XMLClassname("getFactoryService")
+								public IFuture<IComponentFactory> execute(IInternalAccess ia)
 								{
-									((AsyncTreeModel)model).fireNodeChanged(node);
+									IFuture<IComponentFactory> ret = SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type));
+									return ret;
 								}
-								else
-								{
-									tree.repaint();
-								}
-							}
-							
-							public void customExceptionOccurred(Exception exception)
+							}).addResultListener(new SwingDefaultResultListener<IComponentFactory>()
 							{
-								// Todo: remember failed searches for efficiency?
-							}
-						});
-					}
-					catch(Exception e)
-					{
-						// could be UnsupportedOpEx in case of remote factory
-					}
+								public void customResultAvailable(IComponentFactory fac)
+								{
+									try
+									{
+										fac.getComponentTypeIcon(type)
+											.addResultListener(new SwingDefaultResultListener<Icon>()
+										{
+											public void customResultAvailable(Icon result)
+											{
+												icons.put(type, result);
+												TreeModel	model	= tree.getModel();
+												if(model instanceof AsyncTreeModel)
+												{
+													((AsyncTreeModel)model).fireNodeChanged(node);
+												}
+												else
+												{
+													tree.repaint();
+												}
+											}
+											
+											public void customExceptionOccurred(Exception exception)
+											{
+												// Todo: remember failed searches for efficiency?
+											}
+										});
+									}
+									catch(Exception e)
+									{
+										// could be UnsupportedOpEx in case of remote factory
+									}
+								}
+								
+								public void customExceptionOccurred(Exception exception)
+								{
+									// Todo: remember failed searches for efficiency?
+								}
+							});
+						}
+						
+						public void customExceptionOccurred(Exception exception)
+						{
+							// Todo: remember failed searches for efficiency?
+						}
+					});
 				}
 				
 				public void customExceptionOccurred(Exception exception)
 				{
 					// Todo: remember failed searches for efficiency?
 				}
-			});
+			});			
 		}
 		
 		return ret;

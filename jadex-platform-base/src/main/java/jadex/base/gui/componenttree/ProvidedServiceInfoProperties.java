@@ -1,7 +1,6 @@
 package jadex.base.gui.componenttree;
 
-import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
@@ -9,6 +8,7 @@ import jadex.commons.gui.jtable.ResizeableTableHeader;
 
 import java.awt.BorderLayout;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,23 +16,24 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *  Panel for showing required service properties.
+ *  Panel for showing service properties.
  */
-public class RequiredServiceProperties	extends	PropertiesPanel
+public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 {
 	//-------- constructors --------
 	
 	/**
 	 *  Create new service properties panel.
 	 */
-	public RequiredServiceProperties()
+	public ProvidedServiceInfoProperties()
 	{
 		super(" Service Properties ");
 
 		createTextField("Name");
 		createTextField("Type");
-		createTextField("Multiple");
-		createTextField("Binding");
+		
+		// todo:
+//		createTextField("Implementation");  
 		
 		addFullLineComponent("Methods_label", new JLabel("Methods"));
 		JTable	table	= SGUI.createReadOnlyTable();
@@ -48,40 +49,27 @@ public class RequiredServiceProperties	extends	PropertiesPanel
 	/**
 	 *  Set the service.
 	 */
-	public void	setService(RequiredServiceInfo info)
+	public void	setService(ProvidedServiceInfo service)
 	{
-//		IServiceIdentifier	sid	= service.getServiceIdentifier();
-		
-		getTextField("Name").setText(info.getName());
-		getTextField("Type").setText(info.getTypeName());
-		getTextField("Multiple").setText(""+info.isMultiple());
-		RequiredServiceBinding bind = info.getDefaultBinding();
-		StringBuffer buf = new StringBuffer();
-		buf.append("scope="+bind.getScope());
-		buf.append(" dynamic="+bind.isDynamic());
-		buf.append(" create="+bind.isCreate());
-		buf.append(" recover="+bind.isRecover());
-		if(bind.getComponentName()!=null)
-			buf.append(" component name="+bind.getComponentName());
-		if(bind.getComponentType()!=null)
-			buf.append(" component type="+bind.getComponentType());
-		getTextField("Binding").setText(buf.toString());
+		getTextField("Name").setText(service.getName());
+		getTextField("Type").setText(service.getTypeName());
+//		getTextField("Implementation").setText();
 		
 		try
 		{
-			// Todo: support methods also for remote components.
 			JTable	list	= (JTable)getComponent("Methods").getComponent(0);
-			Method[] methods	= info.getType(null).getMethods();	// NullPointerException for remote
+			Method[] methods	= service.getType(null).getMethods();
 			String[] returntypes	= new String[methods.length]; 
 			String[] names	= new String[methods.length]; 
 			String[] parameters	= new String[methods.length];
 			for(int i=0; i<methods.length; i++)
 			{
+	//			returntypes[i] = SReflect.getUnqualifiedClassName(methods[i].getReturnType());
 				returntypes[i] = SReflect.getUnqualifiedTypeName(methods[i].getGenericReturnType().toString());
-	//			returntypes[i]	= SReflect.getUnqualifiedClassName(methods[i].getReturnType());
-				names[i]	= methods[i].getName();
-				Class<?>[]	params	= methods[i].getParameterTypes();
-				String	pstring	= "";
+				names[i] = methods[i].getName();
+	//			Class[]	params	= methods[i].getParameterTypes();
+				Type[]	params	= methods[i].getGenericParameterTypes();
+				String pstring	= "";
 				for(int j=0; j<params.length; j++)
 				{
 					if(j==0)
