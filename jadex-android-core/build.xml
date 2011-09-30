@@ -115,7 +115,10 @@
 		XMLCodec.java,
 		JavaXMLContentCodec.java,
 		CollapseAllAction.java,
-		ExceptionSwingDelegationResultListener.java
+		ExceptionSwingDelegationResultListener.java,
+		ProvidedServiceInfoNode.java,
+		ProvidedServiceInfoProperties.java,
+		ProvidedServiceData.java
 		" />
 
 	<property name="exclude-jadex-xml" value="
