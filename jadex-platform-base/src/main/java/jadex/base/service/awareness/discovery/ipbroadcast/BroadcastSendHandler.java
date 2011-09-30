@@ -76,45 +76,70 @@ public class BroadcastSendHandler extends MasterSlaveSendHandler
 	public int sendToDiscover(byte[] data, int maxsend)
 	{
 		int ret = 0;
-		try
+		// Global broadcast address 255.255.255.255 does not work in windows xp/7 :-(
+		// http://serverfault.com/questions/72112/how-to-alter-the-global-broadcast-address-255-255-255-255-behavior-on-windows
+		// Directed broadcast address = !netmask | IP
+//		InetAddress address = InetAddress.getByAddress(new byte[]{(byte)255, (byte)255, (byte)255, (byte)255,});
+		
+		InetAddress address = SUtil.getInet4Address();
+		short prefixlen = SUtil.getNetworkPrefixLength(address);
+		if(prefixlen==-1) // Guess C class if nothing can be determined.
+			prefixlen = 24;
+		
+		if(maxsend==-1 || ret<maxsend)
 		{
-			// Global broadcast address 255.255.255.255 does not work in windows xp/7 :-(
-			// http://serverfault.com/questions/72112/how-to-alter-the-global-broadcast-address-255-255-255-255-behavior-on-windows
-			// Directed broadcast address = !netmask | IP
-	//		InetAddress address = InetAddress.getByAddress(new byte[]{(byte)255, (byte)255, (byte)255, (byte)255,});
-			
-			InetAddress address = SUtil.getInet4Address();
-			short prefixlen = SUtil.getNetworkPrefixLength(address);
-			if(prefixlen==-1) // Guess C class if nothing can be determined.
-				prefixlen = 24;
-			
-			if(maxsend==-1 || ret<maxsend)
+			try
 			{
 				getAgent().getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)24), getAgent().getPort()));
 				ret++;
 			}
-			if(maxsend==-1 || ret<maxsend)
+			catch(Exception e)
+			{
+				// Nop if can't send
+			}
+		}
+		if(maxsend==-1 || ret<maxsend)
+		{
+			try
 			{
 				getAgent().getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)16), getAgent().getPort()));
 				ret++;
 			}
-			if(maxsend==-1 || ret<maxsend)
+			catch(Exception e)
+			{
+				// Nop if can't send
+			}
+		}
+		if(maxsend==-1 || ret<maxsend)
+		{
+			try
 			{
 				getAgent().getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)8), getAgent().getPort()));
 				ret++;
 			}
-			if((maxsend==-1 || ret<maxsend) && prefixlen!=-1 && prefixlen!=24 && prefixlen!=16 && prefixlen!=8)
+			catch(Exception e)
+			{
+				// Nop if can't send
+			}
+		}
+		if((maxsend==-1 || ret<maxsend) && prefixlen!=-1 && prefixlen!=24 && prefixlen!=16 && prefixlen!=8)
+		{
+			try
 			{
 				getAgent().getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, prefixlen), getAgent().getPort()));
 				ret++;
 			}
+			catch(Exception e)
+			{
+				// Nop if can't send
+			}
 		}
-		catch(Exception e)
-		{
-			if(!getAgent().isKilled())
-				getAgent().getMicroAgent().getLogger().warning("Discover error: "+e);
-//			e.printStackTrace();
-		}
+//		catch(Exception e)
+//		{
+//			if(!getAgent().isKilled())
+//				getAgent().getMicroAgent().getLogger().warning("Discover error: "+e);
+////			e.printStackTrace();
+//		}
 		
 		return ret;
 	}

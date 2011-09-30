@@ -5,7 +5,7 @@ import jadex.base.service.awareness.discovery.MasterSlaveReceiveHandler;
 import java.net.DatagramPacket;
 
 /**
- * 
+ *  Receiver handler for broadcast discovery.
  */
 public class BroadcastReceiveHandler extends MasterSlaveReceiveHandler
 {
