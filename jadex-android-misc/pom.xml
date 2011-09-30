@@ -13,7 +13,6 @@
 	<artifactId>jadex-android-misc</artifactId>
 	<name>jadex-android-misc</name>
 	<packaging>jar</packaging>
-	<version>${parent.version}</version>
 
 	<build>
 		<resources>

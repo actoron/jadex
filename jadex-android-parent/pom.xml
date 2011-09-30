@@ -12,8 +12,9 @@
 		<maven-compiler-plugin-version>2.3.2</maven-compiler-plugin-version>
 		<java-version>1.6</java-version>
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-
+	
 	<dependencies>
 		<!-- To get all android-related errors, uncomment the following dependency -->
 		<!-- and remove the JRE from eclipse build path. -->

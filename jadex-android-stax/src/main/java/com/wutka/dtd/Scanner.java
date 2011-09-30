@@ -502,11 +502,11 @@ class Scanner
 //    sub-section delimiters '<![' and ']]>'. These must be balanced,
 //    but no section keyword is required:
 //    Conditional Section
-//[61] conditionalSect ::=  includeSect | ignoreSect
-//[62] includeSect ::=  '<![' S? 'INCLUDE' S? '[' extSubsetDecl ']]>'
-//[63] ignoreSect ::=  '<![' S? 'IGNORE' S? '[' ignoreSectContents* ']]>'
-//[64] ignoreSectContents ::=  Ignore ('<![' ignoreSectContents ']]>' Ignore)*
-//[65] Ignore ::=  Char* - (Char* ('<![' | ']]>') Char*)
+//[61] conditionalSect ::= Â includeSect | ignoreSect
+//[62] includeSect ::= Â '<![' S? 'INCLUDE' S? '[' extSubsetDecl ']]>'
+//[63] ignoreSect ::= Â '<![' S? 'IGNORE' S? '[' ignoreSectContents* ']]>'
+//[64] ignoreSectContents ::= Â Ignore ('<![' ignoreSectContents ']]>' Ignore)*
+//[65] Ignore ::= Â Char* - (Char* ('<![' | ']]>') Char*)
 
         for (;;)
         {
@@ -525,7 +525,7 @@ class Scanner
                         if ( nestingDepth == 0)
                         {
                             // The end of the IGNORE conditional section
-                            // has been found.  Break out of for loop.
+                            // has been found. Â Break out of for loop.
                             break;
                         }
                         else
@@ -548,7 +548,7 @@ class Scanner
                     if ( ch == '[' )
                     {
                         // The beginning of a new ignoreSectContents section
-                        // has been found.  Increment nesting depth.
+                        // has been found. Â Increment nesting depth.
                         nestingDepth++;
                     }
                 }
