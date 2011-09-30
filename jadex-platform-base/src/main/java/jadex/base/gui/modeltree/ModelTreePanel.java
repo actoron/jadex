@@ -202,30 +202,27 @@ public class ModelTreePanel extends FileTreePanel
 	{
 		if(node instanceof IFileNode && node.getParent().equals(getTree().getModel().getRoot()))
 		{
-			SServiceProvider.getService(exta.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DefaultResultListener()
+			// Hack!!! add protocol if not present to allow comparison with library service URLs.
+			final String filepath = ((IFileNode)node).getFilePath();
+			final String filename = filepath.startsWith("file:") || filepath.startsWith("jar:file:")
+				? filepath : "file:"+filepath;
+			exta.scheduleStep(new IComponentStep<List<Exception>>()
 			{
-				public void resultAvailable(Object result)
+				@XMLClassname("maybe_addurl")
+				public IFuture<List<Exception>> execute(IInternalAccess ia)
 				{
-					final ILibraryService ls = (ILibraryService)result;
-					
-					ls.getAllURLs().addResultListener(new DefaultResultListener()
+					final Future<List<Exception>>	ret	= new Future<List<Exception>>();
+					IFuture<ILibraryService>	libfut	= SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+					libfut.addResultListener(new DefaultResultListener<ILibraryService>()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(final ILibraryService ls)
 						{
-							final List urls = (List)result;
-							
-							// Hack!!! add protocol if not present to allow comparison with library service URLs.
-							final String filepath = ((IFileNode)node).getFilePath();
-							final String filename = filepath.startsWith("file:") || filepath.startsWith("jar:file:")
-								? filepath : "file:"+filepath;
-							exta.scheduleStep(new IComponentStep<List<Exception>>()
+							ls.getAllURLs().addResultListener(new DefaultResultListener<List<URL>>()
 							{
-								@XMLClassname("fileexists")
-								public IFuture<List<Exception>> execute(IInternalAccess ia)
+								public void resultAvailable(List<URL> urls)
 								{
-									List urlstrings	= new ArrayList();
-									List exceptions = new ArrayList();
+									List<String> urlstrings	= new ArrayList<String>();
+									List<Exception> exceptions = new ArrayList<Exception>();
 									for(int i=0; i<urls.size(); i++)
 									{
 										try
@@ -238,10 +235,8 @@ public class ModelTreePanel extends FileTreePanel
 //											e.printStackTrace();
 										}
 									}
-									boolean res = LibraryService.indexOfFilename(filename, urlstrings)!=-1;
 									
-//									boolean res = ((Boolean)result).booleanValue();
-									if(!res)
+									if(LibraryService.indexOfFilename(filename, urlstrings)==-1)
 									{
 //										System.out.println("Need to add path: "+filename);
 										try
@@ -255,30 +250,39 @@ public class ModelTreePanel extends FileTreePanel
 										}
 									}
 									
-									return new Future<List<Exception>>(exceptions);//new Boolean(LibraryService.indexOfFilename(filename, urlstrings)!=-1);
+									ret.setResult(exceptions);
 								}
-							}).addResultListener(new SwingDefaultResultListener<List<Exception>>()
-							{
-								public void customResultAvailable(final List<Exception> exs) 
-								{
-									ModelTreePanel.super.addNode(node);
-									
-									localexta.scheduleStep(new IComponentStep<Void>()
-									{
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-											for(int i=0; i<exs.size(); i++)
-											{
-												ia.getLogger().warning(exs.get(i).toString());
-											}
-											return IFuture.DONE;
-										}
-									});
-								};
 							});
 						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							List<Exception> exceptions = new ArrayList<Exception>();
+							exceptions.add(exception);
+							ret.setResult(exceptions);
+						}
 					});
+					
+					return ret;
 				}
+			}).addResultListener(new SwingDefaultResultListener<List<Exception>>()
+			{
+				public void customResultAvailable(final List<Exception> exs) 
+				{
+					ModelTreePanel.super.addNode(node);
+					
+					localexta.scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							for(int i=0; i<exs.size(); i++)
+							{
+								ia.getLogger().warning(exs.get(i).toString());
+							}
+							return IFuture.DONE;
+						}
+					});
+				};
 			});
 		}
 		else
