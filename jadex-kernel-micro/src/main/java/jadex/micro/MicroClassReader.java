@@ -312,7 +312,10 @@ public class MicroClassReader
 						if(old.isMultiple()!=rsis.isMultiple() || !old.getType(modelinfo).equals(rsis.getType(modelinfo)))
 							throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+vals[i].name());
 					}
-					rsers.put(vals[i].name(), rsis);
+					else
+					{
+						rsers.put(vals[i].name(), rsis);
+					}
 				}
 			}
 			

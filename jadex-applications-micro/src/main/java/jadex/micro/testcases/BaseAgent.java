@@ -1,9 +1,13 @@
 package jadex.micro.testcases;
 
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.clock.IClockService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;
@@ -13,18 +17,21 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 
 /**
  *  Base class agent.
  */
 @Agent
 @Description("Base description")
-@Imports({"1", "2"})
-@Properties({@NameValue(name="a", value="a"), @NameValue(name="b", value="b")})
-@RequiredServices(@RequiredService(name="clock", type=IClockService.class))
-@ProvidedServices(@ProvidedService(type=IClockService.class, implementation=@Implementation(expression="$component")))
-@Arguments(@Argument(name="arg1", defaultvalue="val1", clazz=String.class))
+@Imports({"b1", "b2"})
+@Properties({@NameValue(name="a", value="ba"), @NameValue(name="b", value="bb")})
+@RequiredServices(@RequiredService(name="clock", type=IClockService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@ProvidedServices(@ProvidedService(name="myservice", type=IAService.class, implementation=@Implementation(Object.class)))
+@Arguments(@Argument(name="arg1", defaultvalue="bval", clazz=String.class))
+@Results(@Result(name="res1", defaultvalue="bres", clazz=String.class))
+@Configurations({@Configuration(name="config1"), @Configuration(name="config2")})
 public class BaseAgent
 {
-
 }

@@ -207,4 +207,15 @@ public class UnparsedExpression
 		}
 		return value;
 	}
+
+	/**
+	 *  Get the string representation.
+	 */
+	public String toString()
+	{
+		return "UnparsedExpression(name=" + name + ", classname=" + classname
+				+ ", value=" + value + ")";
+	}
+	
+	
 }
