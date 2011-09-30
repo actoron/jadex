@@ -137,6 +137,11 @@ public class FloodingPacketRouter implements IMessageRouter {
 	public Set<String> getReachableDeviceAddresses() {
 		return reachableDevices;
 	}
+	
+	@Override
+	public Set<String> getConnectedDeviceAddresses() {
+		return connectedDevices;
+	}
 
 	@Override
 	public void addReachableDevicesChangeListener(

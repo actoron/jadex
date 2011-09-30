@@ -28,4 +28,6 @@ public interface IMessageRouter {
 	void updateRoutingInformation(IRoutingInformation ri);
 
 	Set<String> getReachableDeviceAddresses();
+
+	Set<String> getConnectedDeviceAddresses();
 }

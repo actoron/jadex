@@ -14,7 +14,7 @@
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-	
+
 	<dependencies>
 		<!-- To get all android-related errors, uncomment the following dependency -->
 		<!-- and remove the JRE from eclipse build path. -->
@@ -32,6 +32,13 @@
 			<artifactId>android</artifactId>
 			<version>2.2.1</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.pivotallabs</groupId>
+			<artifactId>robolectric</artifactId>
+			<version>1.0-RC1</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
