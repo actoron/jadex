@@ -4,7 +4,6 @@
 package jadex.editor.bpmn.runtime.task;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Proxy;
 
 import jadex.editor.bpmn.editor.JadexBpmnEditor;
 
@@ -38,8 +37,7 @@ public class TaskMetaInfoProxy implements IEditorTaskMetaInfo
 	{
 		if(metainfo instanceof Annotation)
 		{
-//			AnnotaionInvocationHandler	Proxy.getInvocationHandler(metainfo);
-			return ""+metainfo;
+			return WorkspaceClassLoaderHelper.getStringFromMethod(metainfo, "description");
 		}
 		else
 		{
@@ -54,45 +52,51 @@ public class TaskMetaInfoProxy implements IEditorTaskMetaInfo
 	@Override
 	public IEditorParameterMetaInfo[] getParameterMetaInfos()
 	{
+		IEditorParameterMetaInfo[]	ret;
 		try
 		{
+			Object	val;
 			if(metainfo instanceof Annotation)
 			{
-//				AnnotaionInvocationHandler	Proxy.getInvocationHandler(metainfo);
-				throw new RuntimeException("Annotation MetaInfo not yet supported.");
+				val = WorkspaceClassLoaderHelper
+					.callUnparametrizedReflectionMethod(metainfo, "parameters");
 			}
 			else
 			{
-				Object returnValue = WorkspaceClassLoaderHelper
-						.callUnparametrizedReflectionMethod(
-								metainfo,
-								IEditorTaskMetaInfo.METHOD_ITASKMETAINFO_GET_PARAMETER_METAINFOS);
+				val = WorkspaceClassLoaderHelper
+					.callUnparametrizedReflectionMethod(metainfo,
+						IEditorTaskMetaInfo.METHOD_ITASKMETAINFO_GET_PARAMETER_METAINFOS);
+			}
 				
-				// check the return value
-				if (returnValue instanceof IEditorParameterMetaInfo[])
+			// check the return value
+			if(val instanceof IEditorParameterMetaInfo[])
+			{
+				ret	= (IEditorParameterMetaInfo[])val;
+			}
+			else if(val!=null && val.getClass().isArray())
+			{
+				// create proxy objects
+				Object[] objects = (Object[])val;
+				IEditorParameterMetaInfo[] params = new IEditorParameterMetaInfo[objects.length];
+				for(int i=0; i<objects.length; i++)
 				{
-					return (IEditorParameterMetaInfo[]) returnValue;
+					params[i]	= new ParameterMetaInfoProxy(objects[i]);
 				}
-				else if (returnValue != null && returnValue.getClass().isArray())
-				{
-					// create proxy objects
-					Object[] objects = (Object[]) returnValue;
-					IEditorParameterMetaInfo[] params = new IEditorParameterMetaInfo[objects.length];
-					for (int i = 0; i < objects.length; i++)
-					{
-						params[i] = new ParameterMetaInfoProxy(objects[i]);
-					}
-					return params;
-				}
+				ret	= params;
+			}
+			else
+			{
+				JadexBpmnEditor.log("Problem during access on TaskmetaInfo in "+this.getClass().getSimpleName(), null, IStatus.ERROR);
+				ret	= new IEditorParameterMetaInfo[0];				
 			}
 		}
 		catch (Exception e)
 		{
 			JadexBpmnEditor.log("Problem during access on TaskmetaInfo in "+this.getClass().getSimpleName(), e, IStatus.ERROR);
+			ret	= new IEditorParameterMetaInfo[0];
 		}
 		
-		// fall through
-		return new IEditorParameterMetaInfo[0];
+		return ret;
 	}
 
 }

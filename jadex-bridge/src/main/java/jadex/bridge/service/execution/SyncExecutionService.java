@@ -27,14 +27,13 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	//-------- attributes --------
 	
 	/** The queue of tasks to be executed. */
-	protected Set queue;
+	protected Set<IExecutable> queue;
 	
 	/** The executor. */
 	protected Executor executor;
 	
-//	/** The idle commands. */
-//	protected Set	idlecommands;
-	protected Future idlefuture;
+	/** The idle future. */
+	protected Future<Void> idlefuture;
 	
 	/** Flag, indicating if executor is running. */
 	protected boolean running;
@@ -49,10 +48,7 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	protected IExecutable removedtask;
 	
 	/** The removed listeners. */
-	protected List removedfut;
-	
-	/** The stop listener. */
-	protected IResultListener stoplistener;
+	protected List<Future<Void>> removedfut;
 	
 	/** The provider. */
 	protected IServiceProvider provider;
@@ -70,14 +66,14 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	/**
 	 *  Create a new synchronous executor service. 
 	 */
-	public SyncExecutionService(IServiceProvider provider, Map properties)
+	public SyncExecutionService(IServiceProvider provider, Map<String, Object> properties)
 	{
 		super(provider.getId(), IExecutionService.class, properties);
 
 		this.provider = provider;
 		this.running	= false;
 		this.queue	= SCollection.createLinkedHashSet();
-		this.removedfut = new ArrayList();
+		this.removedfut = new ArrayList<Future<Void>>();
 	}
 
 	//-------- methods --------
@@ -176,15 +172,16 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 			return ret;
 		}
 		
-		super.startService().addResultListener(new DelegationResultListener(ret)
+		super.startService().addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
-				SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+				SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new IResultListener<IThreadPoolService>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(IThreadPoolService result)
 					{
-						executor = new Executor((IThreadPoolService)result, new IExecutable()
+						executor = new Executor(result, new IExecutable()
 						{
 							public boolean execute()
 							{
@@ -196,15 +193,15 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 									if(running && !queue.isEmpty())
 									{
 										// Hack!!! Is there a better way to get first element from queue without creating iterator?
-										Iterator iterator = queue.iterator();
-										task = (IExecutable)iterator.next();
+										Iterator<IExecutable> iterator = queue.iterator();
+										task = iterator.next();
 										iterator.remove();
 									}
 								}
 								
+								boolean again = false;
 								if(task!=null)
 								{
-									boolean again = false;
 									try
 									{
 //										System.out.println("Executing task: "+task);
@@ -214,72 +211,63 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 									{
 										System.out.println("Exception during executing task: "+task);
 										e.printStackTrace();
-									}
-									
-									synchronized(SyncExecutionService.this)
-									{
-										// assert task!=null;
-										
-										if(removedtask==null)
-										{
-											if(again && running)
-											{
-												queue.add(task);
-											}
-										}
-										else if(removedtask==task)
-										{
-											removedtask = null;
-											for(int i=0; i<removedfut.size(); i++)
-												((Future)removedfut.get(i)).setResult(null);
-											removedfut.clear();
-										}
-										else
-										{
-											throw new RuntimeException("Removedtask!=task: "+task+" "+removedtask);
-										}
-										
-										task = null;
-									}
+									}									
 								}
-								
-								
-								// When no more executables, inform idle commands.
-		//						boolean perform = false;
-								Future ifc = null;
+
+								Future<Void> idf = null;
+								List<Future<Void>>	remfuts	= null;
 								synchronized(SyncExecutionService.this)
 								{
-		//							System.out.println("task finished: "+running+", "+queue.isEmpty());
+									if(removedtask==null)
+									{
+										if(again && running)
+										{
+											queue.add(task);
+										}
+									}
+									else if(removedtask==task)
+									{
+										removedtask = null;
+										remfuts	= new ArrayList<Future<Void>>(removedfut);
+										removedfut.clear();
+									}
+									else
+									{
+										throw new RuntimeException("Removedtask!=task: "+task+" "+removedtask);
+									}
+									
+									task = null;
+//									System.out.println("task finished: "+running+", "+queue.isEmpty());
 									if(running && queue.isEmpty())
 									{
-										ifc = idlefuture;
+										idf = idlefuture;
 										idlefuture = null;
 		//								perform = idlefuture!=null;
 									}
+
+									// Perform next task when queue is not empty and service is running.
+									again	= running && !queue.isEmpty();
 								}
-								if(ifc!=null)
+
+								
+								// When no more executables, inform idle commands.
+								if(idf!=null)
 								{
 		//							System.out.println("Idle");
-									ifc.setResult(null);
+									idf.setResult(null);
 		//							Iterator it	= idlecommands.iterator();
 		//							while(it.hasNext())
 		//							{
 		//								((ICommand)it.next()).execute(null);
 		//							}
 								}
-								
-								// Perform next task when queue is not empty and service is running.
-								synchronized(SyncExecutionService.this)
+								if(remfuts!=null)
 								{
-									// todo: extract call from synchronized block
-									if(stoplistener!=null)
-									{
-										stoplistener.resultAvailable(null);
-										stoplistener = null;
-									}
-									
-									return running && !queue.isEmpty();
+									for(int i=0; i<remfuts.size(); i++)
+										remfuts.get(i).setResult(null);									
 								}
+								
+								return again;
 							}
 						});
 						
@@ -306,34 +294,28 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	/**
 	 *  Shutdown the executor service.
 	 */
-	public IFuture	shutdownService()
+	public IFuture<Void>	shutdownService()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
-		super.shutdownService().addResultListener(new DelegationResultListener(ret)
+		super.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
-				Future idf = null;
+				Future<Void> idf = null;
 				
 				synchronized(this)
 				{
 					if(!customIsValid())
 		//			if(!running || shutdown)
 					{
-						((Future)ret).setException(new RuntimeException("Not running."));
+						ret.setException(new RuntimeException("Not running."));
 					}
 					else
 					{
 						running = false;
 						shutdown = true;
-						executor.shutdown().addResultListener(new DelegationResultListener(ret)
-						{
-							public void customResultAvailable(Object result)
-							{
-								super.customResultAvailable(getServiceIdentifier());
-							}
-						});
+						executor.shutdown().addResultListener(new DelegationResultListener<Void>(ret));
 						queue = null;
 						idf = idlefuture;
 					}
@@ -361,17 +343,17 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 	/**
 	 *  Get the future indicating that executor is idle.
 	 */
-	public synchronized IFuture<IFuture> getNextIdleFuture()
+	public synchronized IFuture<Void> getNextIdleFuture()
 	{
-		Future<IFuture> ret;
+		Future<Void> ret;
 		if(shutdown)
 		{
-			ret = new Future<IFuture>(new RuntimeException("Shutdown"));
+			ret = new Future<Void>(new RuntimeException("Shutdown"));
 		}
 		else
 		{
 			if(idlefuture==null)
-				idlefuture = new Future<IFuture>();
+				idlefuture = new Future<Void>();
 			ret = idlefuture;
 		}
 		return ret;

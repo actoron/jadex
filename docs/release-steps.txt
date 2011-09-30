@@ -1,13 +1,11 @@
 Bump Revision:
 - set release number in poms and in jadex.bridge.IVersionInfo
 - update maven project configuration for all projects in eclipse
-- rebuild applications.jccproject.xml
-	- check that jcc.project does not contain absolute paths
 - Add tag in SVN
+- After release: set revision in poms to <next revision>-SNAPSHOT
 
 Build Distribution:
-(- build jadex maven javadoc) no more!?
-- build jadex distribution with maven
+- build jadex distribution with maven or on hudson/jenkins
 
 Upload stuff:
 - upload distribution to sourceforge

@@ -49,7 +49,7 @@ public interface IExecutionService	extends IService
 	/**
 	 *  Get the future indicating that executor is idle.
 	 */
-	public IFuture<IFuture> getNextIdleFuture();
+	public IFuture<Void> getNextIdleFuture();
 	
 //	/**
 //	 *  Add a command to be executed whenever the executor

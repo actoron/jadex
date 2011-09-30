@@ -17,15 +17,14 @@ public class GetTimeTask	 implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public IFuture execute(final ITaskContext context, final BpmnInterpreter process)
+	public IFuture<Void> execute(final ITaskContext context, final BpmnInterpreter process)
 	{
-		final Future ret = new Future();
-		SServiceProvider.getServiceUpwards(process.getServiceContainer(), IClockService.class)
-			.addResultListener(new IResultListener()
+		final Future<Void> ret = new Future<Void>();
+		IFuture<IClockService> clockfut	= SServiceProvider.getServiceUpwards(process.getServiceContainer(), IClockService.class);
+		clockfut.addResultListener(new IResultListener<IClockService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(final IClockService	clock)
 			{
-				final IClockService	clock	= (IClockService)result;
 				process.getComponentAdapter().invokeLater(new Runnable()
 				{
 					public void run()
@@ -48,7 +47,7 @@ public class GetTimeTask	 implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture compensate(final BpmnInterpreter instance)
+	public IFuture<Void> compensate(final BpmnInterpreter instance)
 	{
 		return IFuture.DONE;
 	}

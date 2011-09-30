@@ -1,8 +1,5 @@
 package jadex.commons.future;
 
-import java.util.Collection;
-
-
 
 /**
  *  Counter result listener for counting a specified number of resultAvailable calls.

@@ -17,9 +17,9 @@ public abstract class AbstractTask implements ITask
 	 *  @param instance	The process instance executing the task.
 	 *  @param listener	To be notified, when the task has completed.
 	 */
-	public IFuture execute(ITaskContext context, BpmnInterpreter instance)
+	public IFuture<Void> execute(ITaskContext context, BpmnInterpreter instance)
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		
 		try
 		{
@@ -38,7 +38,7 @@ public abstract class AbstractTask implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture compensate(final BpmnInterpreter instance)
+	public IFuture<Void> compensate(final BpmnInterpreter instance)
 	{
 		return IFuture.DONE;
 	}

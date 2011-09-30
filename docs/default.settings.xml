@@ -75,10 +75,10 @@
 	<rootPathEntries>
 		<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="29" __len="4">
 			<entries>
-				<p1:String __ID="30">jadex-applications-bdi-2.0-rc10.jar</p1:String>
-				<p1:String __ID="31">jadex-applications-bdibpmn-2.0-rc10.jar</p1:String>
-				<p1:String __ID="32">jadex-applications-bpmn-2.0-rc10.jar</p1:String>
-				<p1:String __ID="34">jadex-applications-micro-2.0-rc10.jar</p1:String>
+				<p1:String __ID="30">jadex-applications-bdi-2.0.jar</p1:String>
+				<p1:String __ID="31">jadex-applications-bdibpmn-2.0.jar</p1:String>
+				<p1:String __ID="32">jadex-applications-bpmn-2.0.jar</p1:String>
+				<p1:String __ID="34">jadex-applications-micro-2.0.jar</p1:String>
 			</entries>
 		</p1:String__1>
 	</rootPathEntries>
@@ -126,10 +126,10 @@
 		<type __ID="37">clockservice</type>
 	</p0:properties>
 	<p0:properties __ID="38">
-		<p0:property __ID="39" type="entry">jar:file:jadex-applications-bdibpmn-2.0-rc10.jar!/</p0:property>
-		<p0:property __ID="40" type="entry">jar:file:jadex-applications-bpmn-2.0-rc10.jar!/</p0:property>
-		<p0:property __ID="42" type="entry">jar:file:jadex-applications-micro-2.0-rc10.jar!/</p0:property>
-		<p0:property __ID="43" type="entry">jar:file:jadex-applications-bdi-2.0-rc10.jar!/</p0:property>
+		<p0:property __ID="39" type="entry">jar:file:jadex-applications-bdibpmn-2.0.jar!/</p0:property>
+		<p0:property __ID="40" type="entry">jar:file:jadex-applications-bpmn-2.0.jar!/</p0:property>
+		<p0:property __ID="42" type="entry">jar:file:jadex-applications-micro-2.0.jar!/</p0:property>
+		<p0:property __ID="43" type="entry">jar:file:jadex-applications-bdi-2.0.jar!/</p0:property>
 		<type __ID="44">library_service</type>
 	</p0:properties>
 </p0:properties>

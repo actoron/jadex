@@ -25,9 +25,9 @@ public class AsynchronousOKTask	 implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public IFuture execute(ITaskContext context, BpmnInterpreter process)
+	public IFuture<Void> execute(ITaskContext context, BpmnInterpreter process)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		String	message	= (String)context.getParameterValue("message");
 		String	title	= (String)context.getParameterValue("title");
@@ -66,9 +66,9 @@ public class AsynchronousOKTask	 implements ITask
 	 *  Compensate in case the task is canceled.
 	 *  @return	To be notified, when the compensation has completed.
 	 */
-	public IFuture compensate(final BpmnInterpreter instance)
+	public IFuture<Void> compensate(final BpmnInterpreter instance)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

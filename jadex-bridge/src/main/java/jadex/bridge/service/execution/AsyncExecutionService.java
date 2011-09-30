@@ -31,11 +31,11 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	protected IThreadPoolService threadpool;
 	
 	/** The currently waiting tasks (task->executor). */
-	protected Map executors;
+	protected Map<IExecutable, Executor> executors;
 		
 	/** The idle commands. */
 //	protected Set idlecommands;
-	protected Future idlefuture;
+	protected Future<Void> idlefuture;
 	
 	/** The state. */
 	protected boolean running;
@@ -73,7 +73,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	/**
 	 *  Create a new asynchronous executor service. 
 	 */
-	public AsyncExecutionService(IServiceProvider provider, Map properties)//, int max)
+	public AsyncExecutionService(IServiceProvider provider, Map<String, Object> properties)//, int max)
 	{
 		super(provider.getId(), IExecutionService.class, properties);
 
@@ -106,7 +106,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 		if(shutdown)
 			throw new RuntimeException("Shutting down: "+task);
 		
-		Executor exe = (Executor)executors.get(task);
+		Executor exe = executors.get(task);
 
 		if(exe==null)
 		{
@@ -145,7 +145,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 						super.run();
 						
 //						ICommand[]	commands	= null;
-						Future idf = null;
+						Future<Void> idf = null;
 						
 						synchronized(AsyncExecutionService.this)
 						{
@@ -155,24 +155,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 								// Do not remove when a new executor has already been added for the task.
 								if(!this.isRunning() && executors!=null && executors.get(task)==this)	
 								{
-//									System.out.println("Removing executor for: "+task+", "+this);
-									executors.remove(task); // weak for testing
-//									setExecutable(null);
-//									if(executorcache.size()<max)
-//										executorcache.add(this);
-			
-									// When no more executables, inform idle commands.				
-									if(AsyncExecutionService.this.running && idlefuture!=null && executors.isEmpty())
-									{
-//										System.out.println("idle");
-//										commands	= (ICommand[])idlecommands.toArray(new ICommand[idlecommands.size()]);
-										idf = idlefuture;
-										idlefuture = null;
-									}
-//									else if(AsyncExecutionService.this.running && idlecommands!=null)
-//									{
-//										System.out.println("not idle: "+executors+", "+idlefuture+", "+AsyncExecutionService.this.running);										
-//									}
+									idf	= removeTask(task);
 								}
 							}
 						}
@@ -211,10 +194,10 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	 *  @param task The task to execute.
 	 *  @param listener The listener.
 	 */
-	public synchronized IFuture cancel(final IExecutable task)
+	public synchronized IFuture<Void> cancel(final IExecutable task)
 	{
 		// todo: repair me: problem is that method can interfere with execute?!
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		if(!customIsValid())
 		{
@@ -225,36 +208,32 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 			final Executor exe = (Executor)executors.get(task);
 			if(exe!=null)
 			{
-				IResultListener lis = new IResultListener()
+				IResultListener<Void> lis = new IResultListener<Void>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Void result)
 					{
+						Future<Void>	idf;
 						// todo: do not call listener with holding lock
 						synchronized(AsyncExecutionService.this)
 						{
 							ret.setResult(result);
-							
-							if(executors!=null)
-							{
-								executors.remove(task);
-//								System.out.println("Removing executor with lis for: "+task+", "+exe);
-							}
+							idf	= removeTask(task);
 						}
+						if(idf!=null)
+							idf.setResult(null);
 					}
 	
 					public void exceptionOccurred(Exception exception)
 					{
+						Future<Void>	idf;
 						// todo: do not call future with holding lock
 						synchronized(AsyncExecutionService.this)
 						{
-							ret.setResult(exception);
-							
-							if(executors!=null)
-							{
-								executors.remove(task);
-//								System.out.println("Removing executor with lis e for: "+task+", "+exe);
-							}
+							ret.setException(exception);
+							idf	= removeTask(task);
 						}
+						if(idf!=null)
+							idf.setResult(null);
 						
 					}
 				};
@@ -286,9 +265,9 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	{
 		final  Future<Void> ret = new Future<Void>();
 		
-		super.startService().addResultListener(new DelegationResultListener(ret)
+		super.startService().addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 				if(shutdown)
 				{
@@ -296,13 +275,14 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 				}
 				else
 				{
-					SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new IResultListener()
+					SServiceProvider.getService(provider, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new IResultListener<IThreadPoolService>()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(IThreadPoolService result)
 						{
 							try
 							{
-								threadpool = (IThreadPoolService)result;
+								threadpool = result;
 								
 								running	= true;
 //								new RuntimeException("AsyncExecustionService.start()").printStackTrace();
@@ -327,7 +307,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 //									}
 //								}
 								
-									Future idf = null;
+									Future<Void> idf = null;
 									synchronized(AsyncExecutionService.this)
 									{
 										idf = idlefuture;
@@ -365,9 +345,9 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	{
 		final Future<Void> ret	= new Future<Void>();
 		
-		super.shutdownService().addResultListener(new DelegationResultListener(ret)
+		super.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 				if(shutdown)
 				{
@@ -383,13 +363,7 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 					if(keys.length>0)
 					{
 						// One listener counts until all executors have shutdowned.
-						IResultListener lis = new CounterResultListener(keys.length, new DelegationResultListener(ret)
-						{
-							public void customResultAvailable(Object result)
-							{
-								super.customResultAvailable(getServiceIdentifier());
-							}
-						});
+						IResultListener<Void> lis = new CounterResultListener<Void>(keys.length, new DelegationResultListener<Void>(ret));
 						for(int i=0; i<keys.length; i++)
 						{
 							Executor exe = (Executor)executors.get(keys[i]);
@@ -432,17 +406,17 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 	/**
 	 *  Get the future indicating that executor is idle.
 	 */
-	public synchronized IFuture<IFuture> getNextIdleFuture()
+	public synchronized IFuture<Void> getNextIdleFuture()
 	{
-		Future<IFuture> ret;
+		Future<Void> ret;
 		if(shutdown)
 		{
-			ret = new Future<IFuture>(new RuntimeException("Shutdown"));
+			ret = new Future<Void>(new RuntimeException("Shutdown"));
 		}
 		else
 		{
 			if(idlefuture==null)
-				idlefuture = new Future<IFuture>();
+				idlefuture = new Future<Void>();
 			ret = idlefuture;
 		}
 		return ret;
@@ -477,5 +451,40 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 //			idlecommands.remove(command);
 //	}
 
+	//-------- helper methods --------
+	
+	/**
+	 *  Remove a task from the execution queue.
+	 *  Must be called while holding service lock.
+	 *  @return	An idle future to be notified (if any) after releasing service lock.
+	 */
+	protected Future<Void>	removeTask(IExecutable task)
+	{
+		Future<Void>	ret	= null;
+		
+//		System.out.println("Removing executor for: "+task+", "+this);
+		if(executors!=null)
+		{
+			executors.remove(task); // weak for testing
+	//		setExecutable(null);
+	//		if(executorcache.size()<max)
+	//			executorcache.add(this);
+	
+			// When no more executables, inform idle commands.				
+			if(AsyncExecutionService.this.running && idlefuture!=null && executors.isEmpty())
+			{
+	//			System.out.println("idle");
+	//			commands	= (ICommand[])idlecommands.toArray(new ICommand[idlecommands.size()]);
+				ret = idlefuture;
+				idlefuture = null;
+			}
+	//		else if(AsyncExecutionService.this.running && idlecommands!=null)
+	//		{
+	//			System.out.println("not idle: "+executors+", "+idlefuture+", "+AsyncExecutionService.this.running);										
+	//		}
+		}
+		
+		return ret;
+	}
 }
 

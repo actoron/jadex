@@ -1,5 +1,11 @@
 Jadex Releases Overview
 
+Release 2.0 (V2 final release 09/2011)
+	- Annotation inheritance for micro agents
+	- Task annotations for BPMN custom tasks
+	- Generics for IFuture return values
+	- Many bug fixes
+
 Release 2.0 rc10 (FedCSIS release 09/2011)
 	- Pojo Micro agents
 	- Pojo service implementations

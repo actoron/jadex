@@ -43,7 +43,7 @@ public class Executor implements Runnable
 	protected IExecutable executable;
 	
 	/** The shutdown futures. */
-	protected List shutdownfutures;
+	protected List<Future<Void>> shutdownfutures;
 		
 	//--------- constructors --------
 
@@ -67,7 +67,7 @@ public class Executor implements Runnable
 		
 		this.threadpool = threadpool;
 		this.executable = executable;
-		this.shutdownfutures = new ArrayList();
+		this.shutdownfutures = new ArrayList<Future<Void>>();
 	}
 		
 	//-------- methods --------
@@ -115,19 +115,19 @@ public class Executor implements Runnable
 		}
 
 		// Notify shutdown listeners when execution has ended.
-		Future[] futures = null;
+		List<Future<Void>> futures = null;
 		synchronized(this)
 		{
 			if(shutdown)
 			{
-				futures = (Future[])shutdownfutures.toArray(new Future[shutdownfutures.size()]);
+				futures = new ArrayList<Future<Void>>(shutdownfutures);
 				shutdownfutures.clear();
 			}
 		}
 		if(futures!=null)
 		{
-			for(int i=0; i<futures.length; i++)
-				futures[i].setResult(null);
+			for(int i=0; i<futures.size(); i++)
+				futures.get(i).setResult(null);
 			
 			synchronized(this)
 			{
@@ -171,9 +171,9 @@ public class Executor implements Runnable
 	/**
 	 *  Shutdown the executor.
 	 */
-	public IFuture	shutdown()
+	public IFuture<Void>	shutdown()
 	{
-		Future	ret	= new Future();
+		Future<Void>	ret	= new Future<Void>();
 		
 		boolean directnotify = false;
 		synchronized(this)

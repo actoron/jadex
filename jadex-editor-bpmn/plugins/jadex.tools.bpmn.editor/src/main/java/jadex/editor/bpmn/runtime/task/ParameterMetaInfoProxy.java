@@ -3,6 +3,8 @@
  */
 package jadex.editor.bpmn.runtime.task;
 
+import java.lang.annotation.Annotation;
+
 /**
  * @author claas
  * 
@@ -10,7 +12,7 @@ package jadex.editor.bpmn.runtime.task;
 public class ParameterMetaInfoProxy implements IEditorParameterMetaInfo
 {
 
-	Object parameterMetaInfo;
+	Object metainfo;
 
 	/**
 	 * 
@@ -18,7 +20,7 @@ public class ParameterMetaInfoProxy implements IEditorParameterMetaInfo
 	public ParameterMetaInfoProxy(Object parameterMetaInfo)
 	{
 		super();
-		this.parameterMetaInfo = parameterMetaInfo;
+		this.metainfo = parameterMetaInfo;
 	}
 
 	/*
@@ -29,9 +31,15 @@ public class ParameterMetaInfoProxy implements IEditorParameterMetaInfo
 	@Override
 	public String getDirection()
 	{
-		return WorkspaceClassLoaderHelper
-				.getStringFromMethod(parameterMetaInfo,
-						METHOD_IJADEXPARAMETERMETAINFO_GET_DIRECTION);
+		if(metainfo instanceof Annotation)
+		{
+			return WorkspaceClassLoaderHelper.getStringFromMethod(metainfo, "direction");
+		}
+		else
+		{
+			return WorkspaceClassLoaderHelper.getStringFromMethod(metainfo,
+				METHOD_IJADEXPARAMETERMETAINFO_GET_DIRECTION);
+		}
 	}
 
 	/*
@@ -42,8 +50,15 @@ public class ParameterMetaInfoProxy implements IEditorParameterMetaInfo
 	@Override
 	public Class<?> getClazz()
 	{
-		return WorkspaceClassLoaderHelper.getClassFromMethod(parameterMetaInfo,
+		if(metainfo instanceof Annotation)
+		{
+			return WorkspaceClassLoaderHelper.getClassFromMethod(metainfo, "clazz");
+		}
+		else
+		{
+			return WorkspaceClassLoaderHelper.getClassFromMethod(metainfo,
 				METHOD_IJADEXPARAMETERMETAINFO_GET_CLAZZ);
+		}
 	}
 
 	/*
@@ -54,8 +69,15 @@ public class ParameterMetaInfoProxy implements IEditorParameterMetaInfo
 	@Override
 	public String getName()
 	{
-		return WorkspaceClassLoaderHelper.getStringFromMethod(
-				parameterMetaInfo, METHOD_IJADEXPARAMETERMETAINFO_GET_NAME);
+		if(metainfo instanceof Annotation)
+		{
+			return WorkspaceClassLoaderHelper.getStringFromMethod(metainfo, "name");
+		}
+		else
+		{
+			return WorkspaceClassLoaderHelper.getStringFromMethod(metainfo,
+				METHOD_IJADEXPARAMETERMETAINFO_GET_NAME);
+		}
 	}
 
 	/*
@@ -66,9 +88,15 @@ public class ParameterMetaInfoProxy implements IEditorParameterMetaInfo
 	@Override
 	public String getInitialValue()
 	{
-		return WorkspaceClassLoaderHelper.getStringFromMethod(
-				parameterMetaInfo,
+		if(metainfo instanceof Annotation)
+		{
+			return WorkspaceClassLoaderHelper.getStringFromMethod(metainfo, "initialvalue");
+		}
+		else
+		{
+			return WorkspaceClassLoaderHelper.getStringFromMethod(metainfo,
 				METHOD_IJADEXPARAMETERMETAINFO_GET_INITIAL_VALUE);
+		}
 	}
 
 	/*
@@ -79,9 +107,15 @@ public class ParameterMetaInfoProxy implements IEditorParameterMetaInfo
 	@Override
 	public String getDescription()
 	{
-		return WorkspaceClassLoaderHelper.getStringFromMethod(
-				parameterMetaInfo,
+		if(metainfo instanceof Annotation)
+		{
+			return WorkspaceClassLoaderHelper.getStringFromMethod(metainfo, "description");
+		}
+		else
+		{
+			return WorkspaceClassLoaderHelper.getStringFromMethod(metainfo,
 				METHOD_IJADEXPARAMETERMETAINFO_GET_DESCRIPTION);
+		}
 	}
 
 }

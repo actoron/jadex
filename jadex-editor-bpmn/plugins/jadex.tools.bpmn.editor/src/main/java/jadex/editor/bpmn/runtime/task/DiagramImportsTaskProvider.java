@@ -8,14 +8,11 @@ import jadex.editor.common.model.properties.table.MultiColumnTable;
 import jadex.editor.common.model.properties.table.MultiColumnTable.MultiColumnTableRow;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.stp.bpmn.BpmnDiagram;
-import org.eclipse.stp.bpmn.Vertex;
-import org.eclipse.swt.widgets.Display;
 
 /**
  * @author Claas
@@ -102,30 +99,31 @@ public class DiagramImportsTaskProvider extends PackageBasedTaskProvider
 	 */
 	protected List<String> parseDiagramImports()
 	{
-
+		List<String>	ret	= new ArrayList<String>();
+		String	pkg	= JadexBpmnPropertiesUtil.getJadexEAnnotationDetail(bpmnDiagram, "jadex", "Package");
+		if(pkg!=null)
+		{
+			ret.add(pkg);
+		}
+		
 		MultiColumnTable table = JadexBpmnPropertiesUtil.getJadexEAnnotationTable(bpmnDiagram,
 			JadexBpmnPropertiesUtil.getTableAnnotationIdentifier(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION,
 			JadexBpmnPropertiesUtil.JADEX_IMPORT_LIST_DETAIL));
 		
-		// exit without annotation table
-		if(table == null)
+		if(table!=null)
 		{
-			return Collections.emptyList();
-		}
-		
-		int uniqueColumnIndex = table.getUniqueColumn();
-		List<String> packageImports = new ArrayList<String>();
-		
-		for(MultiColumnTableRow row : table.getRowList())
-		{
-			String importValue = row.getColumnValueAt(uniqueColumnIndex);
-			if (importValue.endsWith(".*"))
+			int uniqueColumnIndex = table.getUniqueColumn();
+			for(MultiColumnTableRow row : table.getRowList())
 			{
-				packageImports.add(importValue.substring(0, importValue.length() - 2));
+				String importValue = row.getColumnValueAt(uniqueColumnIndex);
+				if (importValue.endsWith(".*"))
+				{
+					ret.add(importValue.substring(0, importValue.length() - 2));
+				}
 			}
 		}
 		
-		return packageImports;
+		return ret;
 	}
 
 }

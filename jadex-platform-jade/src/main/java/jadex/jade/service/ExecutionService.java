@@ -85,9 +85,9 @@ public class ExecutionService extends BasicService implements IExecutionService
 	/**
 	 *  Get the next idle future.
 	 */
-	public IFuture<IFuture> getNextIdleFuture()
+	public IFuture<Void> getNextIdleFuture()
 	{
-		Future<IFuture> ret = new Future<IFuture>();
+		Future<Void> ret = new Future<Void>();
 		ret.setException(new UnsupportedOperationException("Operation unavailable in JADE."));
 		return ret;
 	}

@@ -94,9 +94,9 @@ public class SCollection
 	/**
 	 *  Return a fresh hash map.
 	 */
-	public static HashMap createHashMap()
+	public static <T,E> HashMap<T,E> createHashMap()
 	{
-		HashMap ret = new HashMap();
+		HashMap<T,E> ret = new HashMap<T,E>();
 		if(DEBUG)
 			addCollection(ret);
 		return ret;
@@ -227,10 +227,10 @@ public class SCollection
 	/**
 	 *  Return a linked hash set.
 	 */
-	public static LinkedHashSet createLinkedHashSet()
+	public static <T> LinkedHashSet<T> createLinkedHashSet()
 	{
 		// note for mobile version: completly remove this method
-		LinkedHashSet ret = new LinkedHashSet();
+		LinkedHashSet<T> ret = new LinkedHashSet<T>();
 		if(DEBUG)
 			addCollection(ret);
 		return ret;

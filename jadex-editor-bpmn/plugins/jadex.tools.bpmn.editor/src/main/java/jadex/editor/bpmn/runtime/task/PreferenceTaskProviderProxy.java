@@ -205,6 +205,11 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 				for (int i = 0; i < tasks.length; i++)
 				{
 					fqClassname2providerMap.put(tasks[i], provider);
+					// Insert mapping for unqualified class names (hack???)
+					if(tasks[i].indexOf('.')!=-1)
+					{
+						fqClassname2providerMap.put(tasks[i].substring(tasks[i].lastIndexOf('.')+1), tasks[i]);
+					}
 				}
 			}
 
@@ -221,22 +226,30 @@ public class PreferenceTaskProviderProxy implements IEditorTaskProvider
 	@Override
 	public IEditorTaskMetaInfo getTaskMetaInfo(String fqClassName)
 	{
-
+		IEditorTaskMetaInfo	ret;
+		
 		Object obj = fqClassname2providerMap.get(fqClassName);
-		if (obj != null && obj instanceof IEditorTaskProvider)
+		if(obj instanceof String)
+		{
+			// Call recursively with full name.
+			ret	= getTaskMetaInfo((String)obj);
+		}
+		else if(obj instanceof IEditorTaskProvider)
 		{
 			// use interface if implemented
 			IEditorTaskProvider provider = (IEditorTaskProvider) obj;
-			return provider.getTaskMetaInfo(fqClassName);
+			ret	= provider.getTaskMetaInfo(fqClassName);
 		}
-		else if (obj != null)
+		else if(obj != null)
 		{
 			throw new RuntimeException("Unexpected class in "+this, new InvalidObjectException("Object doesn't implement the IEditorTaskProvider interface nor its a Proxy object!" + obj));
 		}
+		else
+		{
+			ret	= TaskProviderSupport.NO_TASK_META_INFO_PROVIDED;
+		}
 		
-		// fall through
-		return TaskProviderSupport.NO_TASK_META_INFO_PROVIDED;
-
+		return ret;
 	}
 	
 	public static IStatus checkTaskProviderClass(String fullQualifiedClassName)
