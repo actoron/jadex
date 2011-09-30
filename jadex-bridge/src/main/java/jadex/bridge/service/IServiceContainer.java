@@ -87,26 +87,26 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param name The service name.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(String name);
+	public <T> IFuture<T> getRequiredService(String name);
 	
 	/**
 	 *  Get a required services of a given name.
 	 *  @param name The services name.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public IIntermediateFuture getRequiredServices(String name);
+	public <T> IIntermediateFuture<T> getRequiredServices(String name);
 	
 	/**
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(String name, boolean rebind);
+	public <T> IFuture<T> getRequiredService(String name, boolean rebind);
 	
 	/**
 	 *  Get a required services.
 	 *  @return Each service as an intermediate result and a collection of services as final result.
 	 */
-	public IIntermediateFuture getRequiredServices(String name, boolean rebind);
+	public <T> IIntermediateFuture<T> getRequiredServices(String name, boolean rebind);
 	
 	/**
 	 *  Add a service interceptor.

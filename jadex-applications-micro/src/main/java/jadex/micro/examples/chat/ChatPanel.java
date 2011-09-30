@@ -10,6 +10,7 @@ import jadex.commons.IRemoteChangeListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
@@ -176,10 +177,10 @@ public class ChatPanel extends JPanel
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ia.getServiceContainer().getRequiredServices("chatservices")
-					.addResultListener(new IIntermediateResultListener<IService>()
+				IIntermediateFuture<IChatService> fut = ia.getServiceContainer().getRequiredServices("chatservices");
+				fut.addResultListener(new IIntermediateResultListener<IChatService>()
 				{
-					public void resultAvailable(Collection result)
+					public void resultAvailable(Collection<IChatService> result)
 					{
 //						System.out.println("bulk");
 						if(result!=null)
@@ -198,10 +199,10 @@ public class ChatPanel extends JPanel
 						exception.printStackTrace();
 					}
 					
-					public void intermediateResultAvailable(IService result)
+					public void intermediateResultAvailable(IChatService result)
 					{
 //						System.out.println("intermediate");
-						((IChatService)result).hear(name, text);
+						result.hear(name, text);
 					}
 					
 					public void finished()
