@@ -22,7 +22,7 @@ public @interface TaskParameter
 	String direction() default DIRECTION_INOUT;
 	
 	/** The clazz (i.e. type) of the parameter. */
-	Class clazz() default Object.class;
+	Class<?> clazz() default Object.class;
 	
 	/** The parameter name. */
 	String name();
