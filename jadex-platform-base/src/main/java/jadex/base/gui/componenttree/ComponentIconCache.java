@@ -75,12 +75,13 @@ public class ComponentIconCache
 					{
 						public void customResultAvailable(IExternalAccess exta)
 						{
+							final String	remtype	= type;	// inner final variable for remote step.
 							exta.scheduleStep(new IComponentStep<IComponentFactory>()
 							{
 								@XMLClassname("getFactoryService")
 								public IFuture<IComponentFactory> execute(IInternalAccess ia)
 								{
-									IFuture<IComponentFactory> ret = SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(type));
+									IFuture<IComponentFactory> ret = SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(remtype));
 									return ret;
 								}
 							}).addResultListener(new SwingDefaultResultListener<IComponentFactory>()

@@ -472,14 +472,14 @@ public class SServiceProvider
 	 *  Get all declared services of the given provider.
 	 *  @return The corresponding services.
 	 */
-	public static IIntermediateFuture getDeclaredServices(IServiceProvider provider)
+	public static IIntermediateFuture<IService> getDeclaredServices(IServiceProvider provider)
 	{
 //		synchronized(profiling)
 //		{
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		final IntermediateFuture ret = new IntermediateFuture();
+		final IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
 		
 		// Hack->remove
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
@@ -488,7 +488,7 @@ public class SServiceProvider
 //			System.out.println("herere");
 		
 		provider.getServices(getSearchManager(false, RequiredServiceInfo.SCOPE_LOCAL), contdecider, contanyselector)
-			.addResultListener(new IntermediateDelegationResultListener(ret));
+			.addResultListener(new IntermediateDelegationResultListener<IService>(ret));
 		
 		return ret;
 	}

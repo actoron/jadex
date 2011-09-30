@@ -1,7 +1,6 @@
 package jadex.base.gui.componenttree;
 
 import jadex.base.gui.CMSUpdateHandler;
-import jadex.base.gui.ExceptionSwingDelegationResultListener;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
@@ -18,8 +17,6 @@ import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.commons.Tuple2;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -377,7 +374,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 								{
 									try
 									{
-										String id	= ""+cid+":service:"+pros[i].getName();
+										String id	= ProvidedServiceInfoNode.getId(scn, pros[i]);
 										ProvidedServiceInfoNode	sn	= (ProvidedServiceInfoNode)getModel().getNode(id);
 										if(sn==null)
 											sn	= new ProvidedServiceInfoNode(scn, getModel(), getTree(), pros[i]);

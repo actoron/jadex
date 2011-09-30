@@ -4,6 +4,7 @@ import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.gui.SGUI;
@@ -63,8 +64,7 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode
 	 */
 	public Object	getId()
 	{
-		IComponentIdentifier	provider	= (IComponentIdentifier)getParent().getParent().getId();
-		return ""+provider+":service:"+service.getName();
+		return getId(parent, service);
 	}
 
 	/**
@@ -124,5 +124,16 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode
 		}
 		propcomp.setService(service);
 		return propcomp;
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Build the node id.
+	 */
+	protected static String	getId(ITreeNode parent, ProvidedServiceInfo service)
+	{
+		IComponentIdentifier	provider	= (IComponentIdentifier)parent.getParent().getId();
+		return ""+provider+":service:"+service.getName();
 	}
 }
