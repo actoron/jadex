@@ -4,23 +4,23 @@
         <robot id="GRobot7">
             <capabilities>
                 <capability id="Cap7"/>
-                <capability id="Cap20"/>
-                <capability id="Cap2"/>
-                <capability id="Cap8"/>
                 <capability id="Cap13"/>
-                <capability id="Cap18"/>
-                <capability id="Cap3"/>
-                <capability id="Cap15"/>
-                <capability id="Cap11"/>
-                <capability id="Cap17"/>
-                <capability id="Cap5"/>
-                <capability id="Cap6"/>
-                <capability id="Cap19"/>
-                <capability id="Cap9"/>
-                <capability id="Cap4"/>
+                <capability id="Cap40"/>
+                <capability id="Cap21"/>
+                <capability id="Cap25"/>
                 <capability id="Cap14"/>
+                <capability id="Cap9"/>
+                <capability id="Cap31"/>
+                <capability id="Cap5"/>
+                <capability id="Cap33"/>
+                <capability id="Cap16"/>
+                <capability id="Cap32"/>
+                <capability id="Cap38"/>
+                <capability id="Cap22"/>
+                <capability id="Cap30"/>
+                <capability id="Cap18"/>
             </capabilities>
-            <input>Transport17</input>
+            <input>Producer1</input>
             <output>GRobot8</output>
             <roles>
                 <role>
@@ -50,7 +50,7 @@
                         <target_agent>Transport6</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>10</processingtime>
+                    <processingtime>9</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
@@ -58,21 +58,21 @@
         <robot id="GRobot8">
             <capabilities>
                 <capability id="Cap8"/>
-                <capability id="Cap15"/>
-                <capability id="Cap20"/>
-                <capability id="Cap6"/>
-                <capability id="Cap18"/>
-                <capability id="Cap3"/>
+                <capability id="Cap31"/>
+                <capability id="Cap40"/>
                 <capability id="Cap16"/>
-                <capability id="Cap4"/>
+                <capability id="Cap23"/>
                 <capability id="Cap10"/>
-                <capability id="Cap2"/>
-                <capability id="Cap5"/>
-                <capability id="Cap12"/>
-                <capability id="Cap14"/>
-                <capability id="Cap11"/>
                 <capability id="Cap1"/>
-                <capability id="Cap17"/>
+                <capability id="Cap4"/>
+                <capability id="Cap18"/>
+                <capability id="Cap24"/>
+                <capability id="Cap34"/>
+                <capability id="Cap14"/>
+                <capability id="Cap13"/>
+                <capability id="Cap27"/>
+                <capability id="Cap19"/>
+                <capability id="Cap33"/>
             </capabilities>
             <input>GRobot7</input>
             <output>GRobot9</output>
@@ -106,7 +106,7 @@
                         <target_agent>Transport7</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>8</processingtime>
+                    <processingtime>10</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
@@ -114,24 +114,24 @@
         <robot id="GRobot9">
             <capabilities>
                 <capability id="Cap9"/>
-                <capability id="Cap6"/>
-                <capability id="Cap13"/>
-                <capability id="Cap12"/>
-                <capability id="Cap15"/>
-                <capability id="Cap1"/>
-                <capability id="Cap18"/>
-                <capability id="Cap10"/>
                 <capability id="Cap16"/>
-                <capability id="Cap14"/>
-                <capability id="Cap3"/>
-                <capability id="Cap4"/>
+                <capability id="Cap18"/>
+                <capability id="Cap32"/>
+                <capability id="Cap36"/>
+                <capability id="Cap40"/>
+                <capability id="Cap25"/>
+                <capability id="Cap35"/>
                 <capability id="Cap11"/>
-                <capability id="Cap7"/>
-                <capability id="Cap8"/>
-                <capability id="Cap19"/>
+                <capability id="Cap29"/>
+                <capability id="Cap15"/>
+                <capability id="Cap39"/>
+                <capability id="Cap27"/>
+                <capability id="Cap34"/>
+                <capability id="Cap33"/>
+                <capability id="Cap28"/>
             </capabilities>
             <input>GRobot8</input>
-            <output>GRobot19</output>
+            <output>GRobot3</output>
             <roles>
                 <role>
                     <capability id="Cap9"/>
@@ -164,7 +164,53 @@
                         <target_agent>Transport8</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>5</processingtime>
+                    <processingtime>10</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot3">
+            <capabilities>
+                <capability id="Cap3"/>
+                <capability id="Cap36"/>
+                <capability id="Cap17"/>
+                <capability id="Cap14"/>
+                <capability id="Cap4"/>
+                <capability id="Cap35"/>
+                <capability id="Cap2"/>
+                <capability id="Cap38"/>
+                <capability id="Cap18"/>
+                <capability id="Cap32"/>
+                <capability id="Cap28"/>
+                <capability id="Cap30"/>
+                <capability id="Cap21"/>
+                <capability id="Cap10"/>
+                <capability id="Cap31"/>
+                <capability id="Cap8"/>
+            </capabilities>
+            <input>GRobot9</input>
+            <output>GRobot19</output>
+            <roles>
+                <role>
+                    <capability id="Cap3"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap1"/>
+                            <state id="Cap2"/>
+                            <state id="Cap3"/>
+                        </states>
+                        <target_agent>Transport3</target_agent>
+                        <task_id>1</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap1"/>
+                            <state id="Cap2"/>
+                        </states>
+                        <target_agent>Transport2</target_agent>
+                        <task_id>1</task_id>
+                    </precondition>
+                    <processingtime>10</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
@@ -172,24 +218,24 @@
         <robot id="GRobot19">
             <capabilities>
                 <capability id="Cap19"/>
-                <capability id="Cap9"/>
-                <capability id="Cap2"/>
-                <capability id="Cap11"/>
-                <capability id="Cap6"/>
-                <capability id="Cap13"/>
-                <capability id="Cap7"/>
-                <capability id="Cap20"/>
-                <capability id="Cap14"/>
-                <capability id="Cap15"/>
                 <capability id="Cap16"/>
-                <capability id="Cap4"/>
+                <capability id="Cap15"/>
+                <capability id="Cap33"/>
+                <capability id="Cap40"/>
                 <capability id="Cap10"/>
-                <capability id="Cap18"/>
-                <capability id="Cap5"/>
+                <capability id="Cap12"/>
+                <capability id="Cap22"/>
+                <capability id="Cap32"/>
+                <capability id="Cap20"/>
+                <capability id="Cap25"/>
                 <capability id="Cap1"/>
+                <capability id="Cap30"/>
+                <capability id="Cap13"/>
+                <capability id="Cap28"/>
+                <capability id="Cap23"/>
             </capabilities>
-            <input>GRobot9</input>
-            <output>GRobot3</output>
+            <input>GRobot3</input>
+            <output>GRobot4</output>
             <roles>
                 <role>
                     <capability id="Cap19"/>
@@ -242,36 +288,46 @@
                         <target_agent>Transport18</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>10</processingtime>
+                    <processingtime>9</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
         </robot>
-        <robot id="GRobot3">
+        <robot id="GRobot4">
             <capabilities>
-                <capability id="Cap3"/>
-                <capability id="Cap6"/>
-                <capability id="Cap16"/>
-                <capability id="Cap15"/>
-                <capability id="Cap7"/>
-                <capability id="Cap12"/>
-                <capability id="Cap11"/>
-                <capability id="Cap5"/>
-                <capability id="Cap10"/>
-                <capability id="Cap1"/>
+                <capability id="Cap4"/>
+                <capability id="Cap20"/>
+                <capability id="Cap34"/>
+                <capability id="Cap33"/>
+                <capability id="Cap39"/>
+                <capability id="Cap18"/>
+                <capability id="Cap25"/>
+                <capability id="Cap30"/>
                 <capability id="Cap17"/>
                 <capability id="Cap2"/>
-                <capability id="Cap18"/>
-                <capability id="Cap14"/>
-                <capability id="Cap19"/>
-                <capability id="Cap9"/>
+                <capability id="Cap24"/>
+                <capability id="Cap31"/>
+                <capability id="Cap28"/>
+                <capability id="Cap8"/>
+                <capability id="Cap35"/>
+                <capability id="Cap23"/>
             </capabilities>
             <input>GRobot19</input>
             <output>GRobot18</output>
             <roles>
                 <role>
-                    <capability id="Cap3"/>
+                    <capability id="Cap4"/>
                     <postcondition>
+                        <states>
+                            <state id="Cap1"/>
+                            <state id="Cap2"/>
+                            <state id="Cap3"/>
+                            <state id="Cap4"/>
+                        </states>
+                        <target_agent>Transport4</target_agent>
+                        <task_id>1</task_id>
+                    </postcondition>
+                    <precondition>
                         <states>
                             <state id="Cap1"/>
                             <state id="Cap2"/>
@@ -279,16 +335,8 @@
                         </states>
                         <target_agent>Transport3</target_agent>
                         <task_id>1</task_id>
-                    </postcondition>
-                    <precondition>
-                        <states>
-                            <state id="Cap1"/>
-                            <state id="Cap2"/>
-                        </states>
-                        <target_agent>Transport2</target_agent>
-                        <task_id>1</task_id>
                     </precondition>
-                    <processingtime>9</processingtime>
+                    <processingtime>5</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
@@ -296,24 +344,24 @@
         <robot id="GRobot18">
             <capabilities>
                 <capability id="Cap18"/>
-                <capability id="Cap17"/>
-                <capability id="Cap4"/>
-                <capability id="Cap14"/>
-                <capability id="Cap15"/>
-                <capability id="Cap16"/>
-                <capability id="Cap10"/>
-                <capability id="Cap9"/>
-                <capability id="Cap20"/>
-                <capability id="Cap7"/>
-                <capability id="Cap8"/>
-                <capability id="Cap3"/>
-                <capability id="Cap6"/>
-                <capability id="Cap2"/>
-                <capability id="Cap1"/>
+                <capability id="Cap32"/>
+                <capability id="Cap23"/>
+                <capability id="Cap30"/>
                 <capability id="Cap11"/>
+                <capability id="Cap35"/>
+                <capability id="Cap33"/>
+                <capability id="Cap29"/>
+                <capability id="Cap36"/>
+                <capability id="Cap37"/>
+                <capability id="Cap34"/>
+                <capability id="Cap24"/>
+                <capability id="Cap21"/>
+                <capability id="Cap19"/>
+                <capability id="Cap27"/>
+                <capability id="Cap13"/>
             </capabilities>
-            <input>GRobot3</input>
-            <output>GRobot4</output>
+            <input>GRobot4</input>
+            <output>GRobot5</output>
             <roles>
                 <role>
                     <capability id="Cap18"/>
@@ -369,31 +417,42 @@
             </roles>
             <buffer_size>8</buffer_size>
         </robot>
-        <robot id="GRobot4">
+        <robot id="GRobot5">
             <capabilities>
-                <capability id="Cap4"/>
-                <capability id="Cap10"/>
-                <capability id="Cap8"/>
                 <capability id="Cap5"/>
-                <capability id="Cap19"/>
-                <capability id="Cap18"/>
-                <capability id="Cap11"/>
-                <capability id="Cap13"/>
-                <capability id="Cap14"/>
                 <capability id="Cap17"/>
-                <capability id="Cap6"/>
-                <capability id="Cap7"/>
-                <capability id="Cap1"/>
-                <capability id="Cap3"/>
-                <capability id="Cap20"/>
                 <capability id="Cap15"/>
+                <capability id="Cap19"/>
+                <capability id="Cap25"/>
+                <capability id="Cap14"/>
+                <capability id="Cap37"/>
+                <capability id="Cap7"/>
+                <capability id="Cap3"/>
+                <capability id="Cap34"/>
+                <capability id="Cap38"/>
+                <capability id="Cap39"/>
+                <capability id="Cap11"/>
+                <capability id="Cap22"/>
+                <capability id="Cap1"/>
+                <capability id="Cap6"/>
             </capabilities>
             <input>GRobot18</input>
             <output>GRobot17</output>
             <roles>
                 <role>
-                    <capability id="Cap4"/>
+                    <capability id="Cap5"/>
                     <postcondition>
+                        <states>
+                            <state id="Cap1"/>
+                            <state id="Cap2"/>
+                            <state id="Cap3"/>
+                            <state id="Cap4"/>
+                            <state id="Cap5"/>
+                        </states>
+                        <target_agent>Transport5</target_agent>
+                        <task_id>1</task_id>
+                    </postcondition>
+                    <precondition>
                         <states>
                             <state id="Cap1"/>
                             <state id="Cap2"/>
@@ -402,17 +461,8 @@
                         </states>
                         <target_agent>Transport4</target_agent>
                         <task_id>1</task_id>
-                    </postcondition>
-                    <precondition>
-                        <states>
-                            <state id="Cap1"/>
-                            <state id="Cap2"/>
-                            <state id="Cap3"/>
-                        </states>
-                        <target_agent>Transport3</target_agent>
-                        <task_id>1</task_id>
                     </precondition>
-                    <processingtime>6</processingtime>
+                    <processingtime>9</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
@@ -420,24 +470,24 @@
         <robot id="GRobot17">
             <capabilities>
                 <capability id="Cap17"/>
-                <capability id="Cap14"/>
-                <capability id="Cap9"/>
-                <capability id="Cap20"/>
+                <capability id="Cap22"/>
+                <capability id="Cap16"/>
+                <capability id="Cap15"/>
+                <capability id="Cap10"/>
+                <capability id="Cap4"/>
+                <capability id="Cap35"/>
                 <capability id="Cap11"/>
                 <capability id="Cap5"/>
-                <capability id="Cap12"/>
-                <capability id="Cap16"/>
-                <capability id="Cap8"/>
-                <capability id="Cap18"/>
-                <capability id="Cap19"/>
+                <capability id="Cap29"/>
                 <capability id="Cap2"/>
-                <capability id="Cap6"/>
-                <capability id="Cap4"/>
-                <capability id="Cap1"/>
-                <capability id="Cap13"/>
+                <capability id="Cap38"/>
+                <capability id="Cap12"/>
+                <capability id="Cap36"/>
+                <capability id="Cap18"/>
+                <capability id="Cap9"/>
             </capabilities>
-            <input>GRobot4</input>
-            <output>GRobot5</output>
+            <input>GRobot5</input>
+            <output>GRobot6</output>
             <roles>
                 <role>
                     <capability id="Cap17"/>
@@ -486,36 +536,48 @@
                         <target_agent>Transport16</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>9</processingtime>
+                    <processingtime>7</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
         </robot>
-        <robot id="GRobot5">
+        <robot id="GRobot6">
             <capabilities>
-                <capability id="Cap5"/>
-                <capability id="Cap20"/>
-                <capability id="Cap18"/>
-                <capability id="Cap8"/>
-                <capability id="Cap4"/>
-                <capability id="Cap12"/>
-                <capability id="Cap17"/>
-                <capability id="Cap2"/>
-                <capability id="Cap10"/>
-                <capability id="Cap3"/>
-                <capability id="Cap11"/>
                 <capability id="Cap6"/>
-                <capability id="Cap16"/>
-                <capability id="Cap14"/>
-                <capability id="Cap13"/>
-                <capability id="Cap9"/>
+                <capability id="Cap10"/>
+                <capability id="Cap37"/>
+                <capability id="Cap20"/>
+                <capability id="Cap30"/>
+                <capability id="Cap28"/>
+                <capability id="Cap5"/>
+                <capability id="Cap40"/>
+                <capability id="Cap26"/>
+                <capability id="Cap23"/>
+                <capability id="Cap31"/>
+                <capability id="Cap3"/>
+                <capability id="Cap38"/>
+                <capability id="Cap35"/>
+                <capability id="Cap4"/>
+                <capability id="Cap22"/>
             </capabilities>
             <input>GRobot17</input>
             <output>GRobot16</output>
             <roles>
                 <role>
-                    <capability id="Cap5"/>
+                    <capability id="Cap6"/>
                     <postcondition>
+                        <states>
+                            <state id="Cap1"/>
+                            <state id="Cap2"/>
+                            <state id="Cap3"/>
+                            <state id="Cap4"/>
+                            <state id="Cap5"/>
+                            <state id="Cap6"/>
+                        </states>
+                        <target_agent>Transport6</target_agent>
+                        <task_id>1</task_id>
+                    </postcondition>
+                    <precondition>
                         <states>
                             <state id="Cap1"/>
                             <state id="Cap2"/>
@@ -525,18 +587,8 @@
                         </states>
                         <target_agent>Transport5</target_agent>
                         <task_id>1</task_id>
-                    </postcondition>
-                    <precondition>
-                        <states>
-                            <state id="Cap1"/>
-                            <state id="Cap2"/>
-                            <state id="Cap3"/>
-                            <state id="Cap4"/>
-                        </states>
-                        <target_agent>Transport4</target_agent>
-                        <task_id>1</task_id>
                     </precondition>
-                    <processingtime>9</processingtime>
+                    <processingtime>6</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
@@ -544,24 +596,24 @@
         <robot id="GRobot16">
             <capabilities>
                 <capability id="Cap16"/>
-                <capability id="Cap2"/>
-                <capability id="Cap15"/>
-                <capability id="Cap19"/>
-                <capability id="Cap5"/>
-                <capability id="Cap7"/>
-                <capability id="Cap17"/>
-                <capability id="Cap9"/>
-                <capability id="Cap10"/>
-                <capability id="Cap12"/>
-                <capability id="Cap4"/>
-                <capability id="Cap1"/>
-                <capability id="Cap14"/>
-                <capability id="Cap3"/>
-                <capability id="Cap18"/>
+                <capability id="Cap25"/>
+                <capability id="Cap30"/>
+                <capability id="Cap20"/>
+                <capability id="Cap6"/>
                 <capability id="Cap8"/>
+                <capability id="Cap11"/>
+                <capability id="Cap14"/>
+                <capability id="Cap37"/>
+                <capability id="Cap36"/>
+                <capability id="Cap26"/>
+                <capability id="Cap3"/>
+                <capability id="Cap38"/>
+                <capability id="Cap23"/>
+                <capability id="Cap34"/>
+                <capability id="Cap13"/>
             </capabilities>
-            <input>GRobot5</input>
-            <output>GRobot6</output>
+            <input>GRobot6</input>
+            <output>GRobot15</output>
             <roles>
                 <role>
                     <capability id="Cap16"/>
@@ -608,59 +660,7 @@
                         <target_agent>Transport15</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>5</processingtime>
-                </role>
-            </roles>
-            <buffer_size>8</buffer_size>
-        </robot>
-        <robot id="GRobot6">
-            <capabilities>
-                <capability id="Cap6"/>
-                <capability id="Cap7"/>
-                <capability id="Cap17"/>
-                <capability id="Cap4"/>
-                <capability id="Cap18"/>
-                <capability id="Cap14"/>
-                <capability id="Cap5"/>
-                <capability id="Cap13"/>
-                <capability id="Cap16"/>
-                <capability id="Cap15"/>
-                <capability id="Cap3"/>
-                <capability id="Cap12"/>
-                <capability id="Cap9"/>
-                <capability id="Cap1"/>
-                <capability id="Cap11"/>
-                <capability id="Cap8"/>
-            </capabilities>
-            <input>GRobot16</input>
-            <output>GRobot15</output>
-            <roles>
-                <role>
-                    <capability id="Cap6"/>
-                    <postcondition>
-                        <states>
-                            <state id="Cap1"/>
-                            <state id="Cap2"/>
-                            <state id="Cap3"/>
-                            <state id="Cap4"/>
-                            <state id="Cap5"/>
-                            <state id="Cap6"/>
-                        </states>
-                        <target_agent>Transport6</target_agent>
-                        <task_id>1</task_id>
-                    </postcondition>
-                    <precondition>
-                        <states>
-                            <state id="Cap1"/>
-                            <state id="Cap2"/>
-                            <state id="Cap3"/>
-                            <state id="Cap4"/>
-                            <state id="Cap5"/>
-                        </states>
-                        <target_agent>Transport5</target_agent>
-                        <task_id>1</task_id>
-                    </precondition>
-                    <processingtime>5</processingtime>
+                    <processingtime>10</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
@@ -668,23 +668,23 @@
         <robot id="GRobot15">
             <capabilities>
                 <capability id="Cap15"/>
-                <capability id="Cap10"/>
-                <capability id="Cap20"/>
-                <capability id="Cap19"/>
-                <capability id="Cap7"/>
-                <capability id="Cap18"/>
-                <capability id="Cap13"/>
-                <capability id="Cap4"/>
-                <capability id="Cap9"/>
-                <capability id="Cap6"/>
-                <capability id="Cap12"/>
-                <capability id="Cap2"/>
-                <capability id="Cap17"/>
-                <capability id="Cap8"/>
                 <capability id="Cap14"/>
-                <capability id="Cap5"/>
+                <capability id="Cap38"/>
+                <capability id="Cap7"/>
+                <capability id="Cap9"/>
+                <capability id="Cap24"/>
+                <capability id="Cap32"/>
+                <capability id="Cap18"/>
+                <capability id="Cap22"/>
+                <capability id="Cap11"/>
+                <capability id="Cap1"/>
+                <capability id="Cap37"/>
+                <capability id="Cap34"/>
+                <capability id="Cap26"/>
+                <capability id="Cap20"/>
+                <capability id="Cap27"/>
             </capabilities>
-            <input>GRobot6</input>
+            <input>GRobot16</input>
             <output>GRobot14</output>
             <roles>
                 <role>
@@ -730,7 +730,7 @@
                         <target_agent>Transport14</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>5</processingtime>
+                    <processingtime>8</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
@@ -738,21 +738,21 @@
         <robot id="GRobot14">
             <capabilities>
                 <capability id="Cap14"/>
-                <capability id="Cap9"/>
-                <capability id="Cap13"/>
-                <capability id="Cap3"/>
-                <capability id="Cap12"/>
-                <capability id="Cap18"/>
-                <capability id="Cap1"/>
-                <capability id="Cap7"/>
-                <capability id="Cap20"/>
-                <capability id="Cap10"/>
                 <capability id="Cap6"/>
-                <capability id="Cap4"/>
-                <capability id="Cap19"/>
-                <capability id="Cap8"/>
-                <capability id="Cap15"/>
+                <capability id="Cap23"/>
+                <capability id="Cap24"/>
+                <capability id="Cap27"/>
+                <capability id="Cap18"/>
+                <capability id="Cap26"/>
+                <capability id="Cap5"/>
+                <capability id="Cap12"/>
                 <capability id="Cap16"/>
+                <capability id="Cap22"/>
+                <capability id="Cap1"/>
+                <capability id="Cap4"/>
+                <capability id="Cap15"/>
+                <capability id="Cap13"/>
+                <capability id="Cap9"/>
             </capabilities>
             <input>GRobot15</input>
             <output>GRobot13</output>
@@ -798,7 +798,7 @@
                         <target_agent>Transport13</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>9</processingtime>
+                    <processingtime>7</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
@@ -806,21 +806,21 @@
         <robot id="GRobot13">
             <capabilities>
                 <capability id="Cap13"/>
-                <capability id="Cap2"/>
-                <capability id="Cap20"/>
-                <capability id="Cap16"/>
-                <capability id="Cap9"/>
-                <capability id="Cap14"/>
-                <capability id="Cap1"/>
-                <capability id="Cap4"/>
-                <capability id="Cap15"/>
+                <capability id="Cap39"/>
+                <capability id="Cap31"/>
+                <capability id="Cap29"/>
                 <capability id="Cap18"/>
+                <capability id="Cap14"/>
+                <capability id="Cap35"/>
+                <capability id="Cap36"/>
+                <capability id="Cap16"/>
                 <capability id="Cap3"/>
-                <capability id="Cap11"/>
-                <capability id="Cap6"/>
+                <capability id="Cap12"/>
+                <capability id="Cap21"/>
+                <capability id="Cap24"/>
+                <capability id="Cap15"/>
                 <capability id="Cap19"/>
                 <capability id="Cap8"/>
-                <capability id="Cap17"/>
             </capabilities>
             <input>GRobot14</input>
             <output>GRobot12</output>
@@ -864,7 +864,7 @@
                         <target_agent>Transport12</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>8</processingtime>
+                    <processingtime>10</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
@@ -872,24 +872,24 @@
         <robot id="GRobot12">
             <capabilities>
                 <capability id="Cap12"/>
-                <capability id="Cap19"/>
-                <capability id="Cap6"/>
-                <capability id="Cap11"/>
+                <capability id="Cap28"/>
                 <capability id="Cap18"/>
-                <capability id="Cap16"/>
-                <capability id="Cap8"/>
-                <capability id="Cap7"/>
-                <capability id="Cap15"/>
-                <capability id="Cap1"/>
+                <capability id="Cap23"/>
                 <capability id="Cap5"/>
-                <capability id="Cap9"/>
-                <capability id="Cap14"/>
+                <capability id="Cap10"/>
                 <capability id="Cap13"/>
-                <capability id="Cap2"/>
-                <capability id="Cap3"/>
+                <capability id="Cap15"/>
+                <capability id="Cap30"/>
+                <capability id="Cap36"/>
+                <capability id="Cap16"/>
+                <capability id="Cap40"/>
+                <capability id="Cap11"/>
+                <capability id="Cap19"/>
+                <capability id="Cap29"/>
+                <capability id="Cap6"/>
             </capabilities>
             <input>GRobot13</input>
-            <output>GRobot20</output>
+            <output>GRobot11</output>
             <roles>
                 <role>
                     <capability id="Cap12"/>
@@ -928,7 +928,1076 @@
                         <target_agent>Transport11</target_agent>
                         <task_id>1</task_id>
                     </precondition>
+                    <processingtime>8</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot11">
+            <capabilities>
+                <capability id="Cap11"/>
+                <capability id="Cap20"/>
+                <capability id="Cap31"/>
+                <capability id="Cap15"/>
+                <capability id="Cap12"/>
+                <capability id="Cap4"/>
+                <capability id="Cap17"/>
+                <capability id="Cap7"/>
+                <capability id="Cap18"/>
+                <capability id="Cap35"/>
+                <capability id="Cap26"/>
+                <capability id="Cap9"/>
+                <capability id="Cap6"/>
+                <capability id="Cap19"/>
+                <capability id="Cap16"/>
+                <capability id="Cap39"/>
+            </capabilities>
+            <input>GRobot12</input>
+            <output>GRobot10</output>
+            <roles>
+                <role>
+                    <capability id="Cap11"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap1"/>
+                            <state id="Cap2"/>
+                            <state id="Cap3"/>
+                            <state id="Cap4"/>
+                            <state id="Cap5"/>
+                            <state id="Cap6"/>
+                            <state id="Cap7"/>
+                            <state id="Cap8"/>
+                            <state id="Cap9"/>
+                            <state id="Cap10"/>
+                            <state id="Cap11"/>
+                        </states>
+                        <target_agent>Transport11</target_agent>
+                        <task_id>1</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap1"/>
+                            <state id="Cap2"/>
+                            <state id="Cap3"/>
+                            <state id="Cap4"/>
+                            <state id="Cap5"/>
+                            <state id="Cap6"/>
+                            <state id="Cap7"/>
+                            <state id="Cap8"/>
+                            <state id="Cap9"/>
+                            <state id="Cap10"/>
+                        </states>
+                        <target_agent>Transport10</target_agent>
+                        <task_id>1</task_id>
+                    </precondition>
+                    <processingtime>8</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot10">
+            <capabilities>
+                <capability id="Cap10"/>
+                <capability id="Cap36"/>
+                <capability id="Cap40"/>
+                <capability id="Cap34"/>
+                <capability id="Cap12"/>
+                <capability id="Cap13"/>
+                <capability id="Cap15"/>
+                <capability id="Cap37"/>
+                <capability id="Cap32"/>
+                <capability id="Cap5"/>
+                <capability id="Cap38"/>
+                <capability id="Cap4"/>
+                <capability id="Cap23"/>
+                <capability id="Cap27"/>
+                <capability id="Cap25"/>
+                <capability id="Cap18"/>
+            </capabilities>
+            <input>GRobot11</input>
+            <output>GRobot2</output>
+            <roles>
+                <role>
+                    <capability id="Cap10"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap1"/>
+                            <state id="Cap2"/>
+                            <state id="Cap3"/>
+                            <state id="Cap4"/>
+                            <state id="Cap5"/>
+                            <state id="Cap6"/>
+                            <state id="Cap7"/>
+                            <state id="Cap8"/>
+                            <state id="Cap9"/>
+                            <state id="Cap10"/>
+                        </states>
+                        <target_agent>Transport10</target_agent>
+                        <task_id>1</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap1"/>
+                            <state id="Cap2"/>
+                            <state id="Cap3"/>
+                            <state id="Cap4"/>
+                            <state id="Cap5"/>
+                            <state id="Cap6"/>
+                            <state id="Cap7"/>
+                            <state id="Cap8"/>
+                            <state id="Cap9"/>
+                        </states>
+                        <target_agent>Transport9</target_agent>
+                        <task_id>1</task_id>
+                    </precondition>
+                    <processingtime>9</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot2">
+            <capabilities>
+                <capability id="Cap2"/>
+                <capability id="Cap31"/>
+                <capability id="Cap28"/>
+                <capability id="Cap35"/>
+                <capability id="Cap12"/>
+                <capability id="Cap34"/>
+                <capability id="Cap13"/>
+                <capability id="Cap6"/>
+                <capability id="Cap33"/>
+                <capability id="Cap4"/>
+                <capability id="Cap27"/>
+                <capability id="Cap37"/>
+                <capability id="Cap29"/>
+                <capability id="Cap1"/>
+                <capability id="Cap38"/>
+                <capability id="Cap17"/>
+            </capabilities>
+            <input>GRobot10</input>
+            <output>GRobot1</output>
+            <roles>
+                <role>
+                    <capability id="Cap2"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap1"/>
+                            <state id="Cap2"/>
+                        </states>
+                        <target_agent>Transport2</target_agent>
+                        <task_id>1</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap1"/>
+                        </states>
+                        <target_agent>Transport1</target_agent>
+                        <task_id>1</task_id>
+                    </precondition>
                     <processingtime>7</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot1">
+            <capabilities>
+                <capability id="Cap1"/>
+                <capability id="Cap30"/>
+                <capability id="Cap3"/>
+                <capability id="Cap27"/>
+                <capability id="Cap37"/>
+                <capability id="Cap19"/>
+                <capability id="Cap22"/>
+                <capability id="Cap6"/>
+                <capability id="Cap14"/>
+                <capability id="Cap17"/>
+                <capability id="Cap11"/>
+                <capability id="Cap16"/>
+                <capability id="Cap28"/>
+                <capability id="Cap29"/>
+                <capability id="Cap8"/>
+                <capability id="Cap23"/>
+            </capabilities>
+            <input>GRobot2</input>
+            <output>GRobot38</output>
+            <roles>
+                <role>
+                    <capability id="Cap1"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap1"/>
+                        </states>
+                        <target_agent>Transport1</target_agent>
+                        <task_id>1</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states/>
+                        <target_agent>Producer1</target_agent>
+                        <task_id>1</task_id>
+                    </precondition>
+                    <processingtime>9</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot38">
+            <capabilities>
+                <capability id="Cap38"/>
+                <capability id="Cap30"/>
+                <capability id="Cap29"/>
+                <capability id="Cap33"/>
+                <capability id="Cap23"/>
+                <capability id="Cap5"/>
+                <capability id="Cap20"/>
+                <capability id="Cap19"/>
+                <capability id="Cap3"/>
+                <capability id="Cap15"/>
+                <capability id="Cap28"/>
+                <capability id="Cap39"/>
+                <capability id="Cap10"/>
+                <capability id="Cap6"/>
+                <capability id="Cap26"/>
+                <capability id="Cap34"/>
+            </capabilities>
+            <input>GRobot1</input>
+            <output>GRobot28</output>
+            <roles>
+                <role>
+                    <capability id="Cap38"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                            <state id="Cap38"/>
+                        </states>
+                        <target_agent>Transport37</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                        </states>
+                        <target_agent>Transport36</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>9</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot28">
+            <capabilities>
+                <capability id="Cap28"/>
+                <capability id="Cap35"/>
+                <capability id="Cap9"/>
+                <capability id="Cap27"/>
+                <capability id="Cap7"/>
+                <capability id="Cap38"/>
+                <capability id="Cap15"/>
+                <capability id="Cap24"/>
+                <capability id="Cap32"/>
+                <capability id="Cap2"/>
+                <capability id="Cap10"/>
+                <capability id="Cap5"/>
+                <capability id="Cap25"/>
+                <capability id="Cap29"/>
+                <capability id="Cap3"/>
+                <capability id="Cap8"/>
+            </capabilities>
+            <input>GRobot38</input>
+            <output>GRobot39</output>
+            <roles>
+                <role>
+                    <capability id="Cap28"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                        </states>
+                        <target_agent>Transport27</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                        </states>
+                        <target_agent>Transport26</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>5</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot39">
+            <capabilities>
+                <capability id="Cap39"/>
+                <capability id="Cap19"/>
+                <capability id="Cap27"/>
+                <capability id="Cap13"/>
+                <capability id="Cap29"/>
+                <capability id="Cap22"/>
+                <capability id="Cap1"/>
+                <capability id="Cap3"/>
+                <capability id="Cap18"/>
+                <capability id="Cap7"/>
+                <capability id="Cap40"/>
+                <capability id="Cap15"/>
+                <capability id="Cap17"/>
+                <capability id="Cap33"/>
+                <capability id="Cap24"/>
+                <capability id="Cap8"/>
+            </capabilities>
+            <input>GRobot28</input>
+            <output>GRobot27</output>
+            <roles>
+                <role>
+                    <capability id="Cap39"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                            <state id="Cap38"/>
+                            <state id="Cap39"/>
+                        </states>
+                        <target_agent>Transport38</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                            <state id="Cap38"/>
+                        </states>
+                        <target_agent>Transport37</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>9</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot27">
+            <capabilities>
+                <capability id="Cap27"/>
+                <capability id="Cap7"/>
+                <capability id="Cap35"/>
+                <capability id="Cap31"/>
+                <capability id="Cap8"/>
+                <capability id="Cap1"/>
+                <capability id="Cap14"/>
+                <capability id="Cap13"/>
+                <capability id="Cap36"/>
+                <capability id="Cap23"/>
+                <capability id="Cap38"/>
+                <capability id="Cap15"/>
+                <capability id="Cap40"/>
+                <capability id="Cap17"/>
+                <capability id="Cap21"/>
+                <capability id="Cap9"/>
+            </capabilities>
+            <input>GRobot39</input>
+            <output>GRobot29</output>
+            <roles>
+                <role>
+                    <capability id="Cap27"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                        </states>
+                        <target_agent>Transport26</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                        </states>
+                        <target_agent>Transport25</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>6</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot29">
+            <capabilities>
+                <capability id="Cap29"/>
+                <capability id="Cap8"/>
+                <capability id="Cap35"/>
+                <capability id="Cap22"/>
+                <capability id="Cap31"/>
+                <capability id="Cap9"/>
+                <capability id="Cap11"/>
+                <capability id="Cap26"/>
+                <capability id="Cap10"/>
+                <capability id="Cap2"/>
+                <capability id="Cap34"/>
+                <capability id="Cap18"/>
+                <capability id="Cap7"/>
+                <capability id="Cap28"/>
+                <capability id="Cap30"/>
+                <capability id="Cap21"/>
+            </capabilities>
+            <input>GRobot27</input>
+            <output>GRobot34</output>
+            <roles>
+                <role>
+                    <capability id="Cap29"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                        </states>
+                        <target_agent>Transport28</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                        </states>
+                        <target_agent>Transport27</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>10</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot34">
+            <capabilities>
+                <capability id="Cap34"/>
+                <capability id="Cap10"/>
+                <capability id="Cap36"/>
+                <capability id="Cap8"/>
+                <capability id="Cap11"/>
+                <capability id="Cap37"/>
+                <capability id="Cap3"/>
+                <capability id="Cap32"/>
+                <capability id="Cap27"/>
+                <capability id="Cap25"/>
+                <capability id="Cap4"/>
+                <capability id="Cap35"/>
+                <capability id="Cap40"/>
+                <capability id="Cap33"/>
+                <capability id="Cap24"/>
+                <capability id="Cap39"/>
+            </capabilities>
+            <input>GRobot29</input>
+            <output>GRobot24</output>
+            <roles>
+                <role>
+                    <capability id="Cap34"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                        </states>
+                        <target_agent>Transport33</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                        </states>
+                        <target_agent>Transport32</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>7</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot24">
+            <capabilities>
+                <capability id="Cap24"/>
+                <capability id="Cap25"/>
+                <capability id="Cap26"/>
+                <capability id="Cap38"/>
+                <capability id="Cap9"/>
+                <capability id="Cap7"/>
+                <capability id="Cap11"/>
+                <capability id="Cap37"/>
+                <capability id="Cap14"/>
+                <capability id="Cap16"/>
+                <capability id="Cap3"/>
+                <capability id="Cap21"/>
+                <capability id="Cap40"/>
+                <capability id="Cap28"/>
+                <capability id="Cap10"/>
+                <capability id="Cap12"/>
+            </capabilities>
+            <input>GRobot34</input>
+            <output>GRobot35</output>
+            <roles>
+                <role>
+                    <capability id="Cap24"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                        </states>
+                        <target_agent>Transport23</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                        </states>
+                        <target_agent>Transport22</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>6</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot35">
+            <capabilities>
+                <capability id="Cap35"/>
+                <capability id="Cap17"/>
+                <capability id="Cap12"/>
+                <capability id="Cap32"/>
+                <capability id="Cap5"/>
+                <capability id="Cap40"/>
+                <capability id="Cap19"/>
+                <capability id="Cap39"/>
+                <capability id="Cap22"/>
+                <capability id="Cap27"/>
+                <capability id="Cap34"/>
+                <capability id="Cap20"/>
+                <capability id="Cap38"/>
+                <capability id="Cap30"/>
+                <capability id="Cap2"/>
+                <capability id="Cap8"/>
+            </capabilities>
+            <input>GRobot24</input>
+            <output>GRobot23</output>
+            <roles>
+                <role>
+                    <capability id="Cap35"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                        </states>
+                        <target_agent>Transport34</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                        </states>
+                        <target_agent>Transport33</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>9</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot23">
+            <capabilities>
+                <capability id="Cap23"/>
+                <capability id="Cap2"/>
+                <capability id="Cap34"/>
+                <capability id="Cap11"/>
+                <capability id="Cap4"/>
+                <capability id="Cap39"/>
+                <capability id="Cap18"/>
+                <capability id="Cap16"/>
+                <capability id="Cap5"/>
+                <capability id="Cap8"/>
+                <capability id="Cap14"/>
+                <capability id="Cap26"/>
+                <capability id="Cap30"/>
+                <capability id="Cap1"/>
+                <capability id="Cap38"/>
+                <capability id="Cap37"/>
+            </capabilities>
+            <input>GRobot35</input>
+            <output>GRobot36</output>
+            <roles>
+                <role>
+                    <capability id="Cap23"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                        </states>
+                        <target_agent>Transport22</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                        </states>
+                        <target_agent>Transport21</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>5</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot36">
+            <capabilities>
+                <capability id="Cap36"/>
+                <capability id="Cap13"/>
+                <capability id="Cap6"/>
+                <capability id="Cap18"/>
+                <capability id="Cap5"/>
+                <capability id="Cap33"/>
+                <capability id="Cap35"/>
+                <capability id="Cap32"/>
+                <capability id="Cap20"/>
+                <capability id="Cap9"/>
+                <capability id="Cap3"/>
+                <capability id="Cap31"/>
+                <capability id="Cap22"/>
+                <capability id="Cap15"/>
+                <capability id="Cap12"/>
+                <capability id="Cap38"/>
+            </capabilities>
+            <input>GRobot23</input>
+            <output>GRobot26</output>
+            <roles>
+                <role>
+                    <capability id="Cap36"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                        </states>
+                        <target_agent>Transport35</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                        </states>
+                        <target_agent>Transport34</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>8</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot26">
+            <capabilities>
+                <capability id="Cap26"/>
+                <capability id="Cap15"/>
+                <capability id="Cap13"/>
+                <capability id="Cap9"/>
+                <capability id="Cap37"/>
+                <capability id="Cap38"/>
+                <capability id="Cap21"/>
+                <capability id="Cap4"/>
+                <capability id="Cap40"/>
+                <capability id="Cap8"/>
+                <capability id="Cap16"/>
+                <capability id="Cap7"/>
+                <capability id="Cap12"/>
+                <capability id="Cap23"/>
+                <capability id="Cap31"/>
+                <capability id="Cap22"/>
+            </capabilities>
+            <input>GRobot36</input>
+            <output>GRobot37</output>
+            <roles>
+                <role>
+                    <capability id="Cap26"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                        </states>
+                        <target_agent>Transport25</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                        </states>
+                        <target_agent>Transport24</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>6</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot37">
+            <capabilities>
+                <capability id="Cap37"/>
+                <capability id="Cap20"/>
+                <capability id="Cap8"/>
+                <capability id="Cap21"/>
+                <capability id="Cap36"/>
+                <capability id="Cap31"/>
+                <capability id="Cap25"/>
+                <capability id="Cap14"/>
+                <capability id="Cap39"/>
+                <capability id="Cap6"/>
+                <capability id="Cap15"/>
+                <capability id="Cap5"/>
+                <capability id="Cap33"/>
+                <capability id="Cap18"/>
+                <capability id="Cap11"/>
+                <capability id="Cap32"/>
+            </capabilities>
+            <input>GRobot26</input>
+            <output>GRobot25</output>
+            <roles>
+                <role>
+                    <capability id="Cap37"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                        </states>
+                        <target_agent>Transport36</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                        </states>
+                        <target_agent>Transport35</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>7</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot25">
+            <capabilities>
+                <capability id="Cap25"/>
+                <capability id="Cap36"/>
+                <capability id="Cap35"/>
+                <capability id="Cap11"/>
+                <capability id="Cap32"/>
+                <capability id="Cap19"/>
+                <capability id="Cap22"/>
+                <capability id="Cap23"/>
+                <capability id="Cap20"/>
+                <capability id="Cap30"/>
+                <capability id="Cap18"/>
+                <capability id="Cap15"/>
+                <capability id="Cap39"/>
+                <capability id="Cap10"/>
+                <capability id="Cap37"/>
+                <capability id="Cap40"/>
+            </capabilities>
+            <input>GRobot37</input>
+            <output>GRobot30</output>
+            <roles>
+                <role>
+                    <capability id="Cap25"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                        </states>
+                        <target_agent>Transport24</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                        </states>
+                        <target_agent>Transport23</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>8</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot30">
+            <capabilities>
+                <capability id="Cap30"/>
+                <capability id="Cap21"/>
+                <capability id="Cap8"/>
+                <capability id="Cap34"/>
+                <capability id="Cap4"/>
+                <capability id="Cap20"/>
+                <capability id="Cap28"/>
+                <capability id="Cap10"/>
+                <capability id="Cap36"/>
+                <capability id="Cap24"/>
+                <capability id="Cap13"/>
+                <capability id="Cap33"/>
+                <capability id="Cap38"/>
+                <capability id="Cap7"/>
+                <capability id="Cap35"/>
+                <capability id="Cap26"/>
+            </capabilities>
+            <input>GRobot25</input>
+            <output>GRobot20</output>
+            <roles>
+                <role>
+                    <capability id="Cap30"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                        </states>
+                        <target_agent>Transport29</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                        </states>
+                        <target_agent>Transport28</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>9</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
@@ -936,24 +2005,24 @@
         <robot id="GRobot20">
             <capabilities>
                 <capability id="Cap20"/>
-                <capability id="Cap4"/>
-                <capability id="Cap15"/>
-                <capability id="Cap19"/>
-                <capability id="Cap14"/>
-                <capability id="Cap16"/>
-                <capability id="Cap17"/>
-                <capability id="Cap11"/>
+                <capability id="Cap31"/>
+                <capability id="Cap32"/>
+                <capability id="Cap34"/>
                 <capability id="Cap2"/>
-                <capability id="Cap18"/>
-                <capability id="Cap1"/>
-                <capability id="Cap6"/>
-                <capability id="Cap9"/>
+                <capability id="Cap37"/>
                 <capability id="Cap5"/>
-                <capability id="Cap8"/>
-                <capability id="Cap10"/>
+                <capability id="Cap21"/>
+                <capability id="Cap25"/>
+                <capability id="Cap6"/>
+                <capability id="Cap35"/>
+                <capability id="Cap22"/>
+                <capability id="Cap3"/>
+                <capability id="Cap12"/>
+                <capability id="Cap17"/>
+                <capability id="Cap13"/>
             </capabilities>
-            <input>GRobot12</input>
-            <output>GRobot11</output>
+            <input>GRobot30</input>
+            <output>GRobot31</output>
             <roles>
                 <role>
                     <capability id="Cap20"/>
@@ -1008,222 +2077,372 @@
                         <target_agent>Transport19</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>6</processingtime>
+                    <processingtime>9</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
         </robot>
-        <robot id="GRobot11">
+        <robot id="GRobot31">
             <capabilities>
-                <capability id="Cap11"/>
-                <capability id="Cap16"/>
-                <capability id="Cap18"/>
-                <capability id="Cap2"/>
-                <capability id="Cap15"/>
-                <capability id="Cap1"/>
-                <capability id="Cap14"/>
-                <capability id="Cap4"/>
-                <capability id="Cap13"/>
+                <capability id="Cap31"/>
+                <capability id="Cap34"/>
+                <capability id="Cap25"/>
+                <capability id="Cap28"/>
                 <capability id="Cap17"/>
-                <capability id="Cap12"/>
-                <capability id="Cap8"/>
+                <capability id="Cap2"/>
+                <capability id="Cap36"/>
+                <capability id="Cap29"/>
+                <capability id="Cap33"/>
                 <capability id="Cap5"/>
-                <capability id="Cap10"/>
                 <capability id="Cap6"/>
-                <capability id="Cap20"/>
+                <capability id="Cap10"/>
+                <capability id="Cap23"/>
+                <capability id="Cap32"/>
+                <capability id="Cap18"/>
+                <capability id="Cap30"/>
             </capabilities>
             <input>GRobot20</input>
-            <output>GRobot10</output>
+            <output>GRobot32</output>
             <roles>
                 <role>
-                    <capability id="Cap11"/>
+                    <capability id="Cap31"/>
                     <postcondition>
                         <states>
-                            <state id="Cap1"/>
-                            <state id="Cap2"/>
-                            <state id="Cap3"/>
-                            <state id="Cap4"/>
-                            <state id="Cap5"/>
-                            <state id="Cap6"/>
-                            <state id="Cap7"/>
-                            <state id="Cap8"/>
-                            <state id="Cap9"/>
-                            <state id="Cap10"/>
-                            <state id="Cap11"/>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
                         </states>
-                        <target_agent>Transport11</target_agent>
-                        <task_id>1</task_id>
+                        <target_agent>Transport30</target_agent>
+                        <task_id>2</task_id>
                     </postcondition>
                     <precondition>
                         <states>
-                            <state id="Cap1"/>
-                            <state id="Cap2"/>
-                            <state id="Cap3"/>
-                            <state id="Cap4"/>
-                            <state id="Cap5"/>
-                            <state id="Cap6"/>
-                            <state id="Cap7"/>
-                            <state id="Cap8"/>
-                            <state id="Cap9"/>
-                            <state id="Cap10"/>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
                         </states>
-                        <target_agent>Transport10</target_agent>
-                        <task_id>1</task_id>
-                    </precondition>
-                    <processingtime>9</processingtime>
-                </role>
-            </roles>
-            <buffer_size>8</buffer_size>
-        </robot>
-        <robot id="GRobot10">
-            <capabilities>
-                <capability id="Cap10"/>
-                <capability id="Cap7"/>
-                <capability id="Cap16"/>
-                <capability id="Cap2"/>
-                <capability id="Cap11"/>
-                <capability id="Cap4"/>
-                <capability id="Cap14"/>
-                <capability id="Cap20"/>
-                <capability id="Cap5"/>
-                <capability id="Cap8"/>
-                <capability id="Cap1"/>
-                <capability id="Cap12"/>
-                <capability id="Cap19"/>
-                <capability id="Cap13"/>
-                <capability id="Cap15"/>
-                <capability id="Cap9"/>
-            </capabilities>
-            <input>GRobot11</input>
-            <output>GRobot2</output>
-            <roles>
-                <role>
-                    <capability id="Cap10"/>
-                    <postcondition>
-                        <states>
-                            <state id="Cap1"/>
-                            <state id="Cap2"/>
-                            <state id="Cap3"/>
-                            <state id="Cap4"/>
-                            <state id="Cap5"/>
-                            <state id="Cap6"/>
-                            <state id="Cap7"/>
-                            <state id="Cap8"/>
-                            <state id="Cap9"/>
-                            <state id="Cap10"/>
-                        </states>
-                        <target_agent>Transport10</target_agent>
-                        <task_id>1</task_id>
-                    </postcondition>
-                    <precondition>
-                        <states>
-                            <state id="Cap1"/>
-                            <state id="Cap2"/>
-                            <state id="Cap3"/>
-                            <state id="Cap4"/>
-                            <state id="Cap5"/>
-                            <state id="Cap6"/>
-                            <state id="Cap7"/>
-                            <state id="Cap8"/>
-                            <state id="Cap9"/>
-                        </states>
-                        <target_agent>Transport9</target_agent>
-                        <task_id>1</task_id>
-                    </precondition>
-                    <processingtime>9</processingtime>
-                </role>
-            </roles>
-            <buffer_size>8</buffer_size>
-        </robot>
-        <robot id="GRobot2">
-            <capabilities>
-                <capability id="Cap2"/>
-                <capability id="Cap17"/>
-                <capability id="Cap1"/>
-                <capability id="Cap7"/>
-                <capability id="Cap5"/>
-                <capability id="Cap6"/>
-                <capability id="Cap16"/>
-                <capability id="Cap9"/>
-                <capability id="Cap20"/>
-                <capability id="Cap12"/>
-                <capability id="Cap3"/>
-                <capability id="Cap4"/>
-                <capability id="Cap10"/>
-                <capability id="Cap8"/>
-                <capability id="Cap14"/>
-                <capability id="Cap13"/>
-            </capabilities>
-            <input>GRobot10</input>
-            <output>GRobot1</output>
-            <roles>
-                <role>
-                    <capability id="Cap2"/>
-                    <postcondition>
-                        <states>
-                            <state id="Cap1"/>
-                            <state id="Cap2"/>
-                        </states>
-                        <target_agent>Transport2</target_agent>
-                        <task_id>1</task_id>
-                    </postcondition>
-                    <precondition>
-                        <states>
-                            <state id="Cap1"/>
-                        </states>
-                        <target_agent>Transport1</target_agent>
-                        <task_id>1</task_id>
+                        <target_agent>Transport29</target_agent>
+                        <task_id>2</task_id>
                     </precondition>
                     <processingtime>10</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
         </robot>
-        <robot id="GRobot1">
+        <robot id="GRobot32">
             <capabilities>
-                <capability id="Cap1"/>
-                <capability id="Cap17"/>
+                <capability id="Cap32"/>
+                <capability id="Cap30"/>
+                <capability id="Cap19"/>
+                <capability id="Cap21"/>
                 <capability id="Cap13"/>
-                <capability id="Cap11"/>
-                <capability id="Cap12"/>
-                <capability id="Cap5"/>
-                <capability id="Cap6"/>
-                <capability id="Cap7"/>
-                <capability id="Cap4"/>
+                <capability id="Cap27"/>
                 <capability id="Cap10"/>
-                <capability id="Cap8"/>
-                <capability id="Cap16"/>
+                <capability id="Cap34"/>
                 <capability id="Cap2"/>
-                <capability id="Cap15"/>
-                <capability id="Cap18"/>
-                <capability id="Cap20"/>
+                <capability id="Cap29"/>
+                <capability id="Cap5"/>
+                <capability id="Cap17"/>
+                <capability id="Cap28"/>
+                <capability id="Cap24"/>
+                <capability id="Cap33"/>
+                <capability id="Cap14"/>
             </capabilities>
-            <input>GRobot2</input>
-            <output>Transport19</output>
+            <input>GRobot31</input>
+            <output>GRobot22</output>
             <roles>
                 <role>
-                    <capability id="Cap1"/>
+                    <capability id="Cap32"/>
                     <postcondition>
                         <states>
-                            <state id="Cap1"/>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
                         </states>
-                        <target_agent>Transport1</target_agent>
-                        <task_id>1</task_id>
+                        <target_agent>Transport31</target_agent>
+                        <task_id>2</task_id>
                     </postcondition>
                     <precondition>
-                        <states/>
-                        <target_agent>Producer1</target_agent>
-                        <task_id>1</task_id>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                        </states>
+                        <target_agent>Transport30</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>9</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot22">
+            <capabilities>
+                <capability id="Cap22"/>
+                <capability id="Cap19"/>
+                <capability id="Cap3"/>
+                <capability id="Cap33"/>
+                <capability id="Cap23"/>
+                <capability id="Cap6"/>
+                <capability id="Cap28"/>
+                <capability id="Cap16"/>
+                <capability id="Cap24"/>
+                <capability id="Cap17"/>
+                <capability id="Cap38"/>
+                <capability id="Cap35"/>
+                <capability id="Cap12"/>
+                <capability id="Cap20"/>
+                <capability id="Cap5"/>
+                <capability id="Cap39"/>
+            </capabilities>
+            <input>GRobot32</input>
+            <output>GRobot33</output>
+            <roles>
+                <role>
+                    <capability id="Cap22"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                        </states>
+                        <target_agent>Transport21</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                        </states>
+                        <target_agent>Transport20</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>8</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot33">
+            <capabilities>
+                <capability id="Cap33"/>
+                <capability id="Cap31"/>
+                <capability id="Cap13"/>
+                <capability id="Cap4"/>
+                <capability id="Cap1"/>
+                <capability id="Cap5"/>
+                <capability id="Cap38"/>
+                <capability id="Cap23"/>
+                <capability id="Cap18"/>
+                <capability id="Cap7"/>
+                <capability id="Cap27"/>
+                <capability id="Cap40"/>
+                <capability id="Cap17"/>
+                <capability id="Cap29"/>
+                <capability id="Cap11"/>
+                <capability id="Cap6"/>
+            </capabilities>
+            <input>GRobot22</input>
+            <output>GRobot21</output>
+            <roles>
+                <role>
+                    <capability id="Cap33"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                        </states>
+                        <target_agent>Transport32</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                        </states>
+                        <target_agent>Transport31</target_agent>
+                        <task_id>2</task_id>
                     </precondition>
                     <processingtime>6</processingtime>
                 </role>
             </roles>
             <buffer_size>8</buffer_size>
         </robot>
+        <robot id="GRobot21">
+            <capabilities>
+                <capability id="Cap21"/>
+                <capability id="Cap32"/>
+                <capability id="Cap13"/>
+                <capability id="Cap14"/>
+                <capability id="Cap6"/>
+                <capability id="Cap22"/>
+                <capability id="Cap15"/>
+                <capability id="Cap35"/>
+                <capability id="Cap11"/>
+                <capability id="Cap8"/>
+                <capability id="Cap24"/>
+                <capability id="Cap3"/>
+                <capability id="Cap9"/>
+                <capability id="Cap23"/>
+                <capability id="Cap37"/>
+                <capability id="Cap2"/>
+            </capabilities>
+            <input>GRobot33</input>
+            <output>GRobot40</output>
+            <roles>
+                <role>
+                    <capability id="Cap21"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                        </states>
+                        <target_agent>Transport20</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states/>
+                        <target_agent>Producer2</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>10</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
+        <robot id="GRobot40">
+            <capabilities>
+                <capability id="Cap40"/>
+                <capability id="Cap24"/>
+                <capability id="Cap13"/>
+                <capability id="Cap25"/>
+                <capability id="Cap12"/>
+                <capability id="Cap37"/>
+                <capability id="Cap20"/>
+                <capability id="Cap8"/>
+                <capability id="Cap30"/>
+                <capability id="Cap29"/>
+                <capability id="Cap22"/>
+                <capability id="Cap11"/>
+                <capability id="Cap16"/>
+                <capability id="Cap2"/>
+                <capability id="Cap5"/>
+                <capability id="Cap31"/>
+            </capabilities>
+            <input>GRobot21</input>
+            <output>Transport19</output>
+            <roles>
+                <role>
+                    <capability id="Cap40"/>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                            <state id="Cap38"/>
+                            <state id="Cap39"/>
+                            <state id="Cap40"/>
+                        </states>
+                        <target_agent>Consumer2</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                            <state id="Cap38"/>
+                            <state id="Cap39"/>
+                        </states>
+                        <target_agent>Transport38</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>8</processingtime>
+                </role>
+            </roles>
+            <buffer_size>8</buffer_size>
+        </robot>
     </robots>
-    <run_count>1</run_count>
+    <run_count>2</run_count>
     <tasks>
-        <task max_workpiece_count="200" id="1">
+        <task max_workpiece_count="40" id="1">
             <operations>
                 <operation id="Cap1"/>
                 <operation id="Cap2"/>
@@ -1247,13 +2466,37 @@
                 <operation id="Cap20"/>
             </operations>
         </task>
+        <task max_workpiece_count="40" id="2">
+            <operations>
+                <operation id="Cap21"/>
+                <operation id="Cap22"/>
+                <operation id="Cap23"/>
+                <operation id="Cap24"/>
+                <operation id="Cap25"/>
+                <operation id="Cap26"/>
+                <operation id="Cap27"/>
+                <operation id="Cap28"/>
+                <operation id="Cap29"/>
+                <operation id="Cap30"/>
+                <operation id="Cap31"/>
+                <operation id="Cap32"/>
+                <operation id="Cap33"/>
+                <operation id="Cap34"/>
+                <operation id="Cap35"/>
+                <operation id="Cap36"/>
+                <operation id="Cap37"/>
+                <operation id="Cap38"/>
+                <operation id="Cap39"/>
+                <operation id="Cap40"/>
+            </operations>
+        </task>
     </tasks>
     <timelord_interval>1</timelord_interval>
     <transports>
         <transport id="Transport19">
             <capabilities/>
-            <input>GRobot1</input>
-            <output>Transport18</output>
+            <input>GRobot40</input>
+            <output>Transport38</output>
             <roles>
                 <role>
                     <postcondition>
@@ -1306,14 +2549,74 @@
                         <target_agent>GRobot19</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>7</processingtime>
+                    <processingtime>8</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport38">
+            <capabilities/>
+            <input>Transport19</input>
+            <output>Transport18</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                            <state id="Cap38"/>
+                            <state id="Cap39"/>
+                        </states>
+                        <target_agent>GRobot40</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                            <state id="Cap38"/>
+                            <state id="Cap39"/>
+                        </states>
+                        <target_agent>GRobot39</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>9</processingtime>
                 </role>
             </roles>
         </transport>
         <transport id="Transport18">
             <capabilities/>
-            <input>Transport19</input>
-            <output>Consumer1</output>
+            <input>Transport38</input>
+            <output>Transport37</output>
             <roles>
                 <role>
                     <postcondition>
@@ -1364,14 +2667,128 @@
                         <target_agent>GRobot18</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>8</processingtime>
+                    <processingtime>7</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport37">
+            <capabilities/>
+            <input>Transport18</input>
+            <output>Transport36</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                            <state id="Cap38"/>
+                        </states>
+                        <target_agent>GRobot39</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                            <state id="Cap38"/>
+                        </states>
+                        <target_agent>GRobot38</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>10</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport36">
+            <capabilities/>
+            <input>Transport37</input>
+            <output>Consumer1</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                        </states>
+                        <target_agent>GRobot38</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                        </states>
+                        <target_agent>GRobot37</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>5</processingtime>
                 </role>
             </roles>
         </transport>
         <transport id="Consumer1">
             <capabilities/>
-            <input>Transport18</input>
-            <output>Transport9</output>
+            <input>Transport36</input>
+            <output>Consumer2</output>
             <roles>
                 <role>
                     <postcondition>
@@ -1425,13 +2842,387 @@
                         <target_agent>GRobot20</target_agent>
                         <task_id>1</task_id>
                     </precondition>
+                    <processingtime>8</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Consumer2">
+            <capabilities/>
+            <input>Consumer1</input>
+            <output>Transport35</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                            <state id="Cap38"/>
+                            <state id="Cap39"/>
+                            <state id="Cap40"/>
+                        </states>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                            <state id="Cap37"/>
+                            <state id="Cap38"/>
+                            <state id="Cap39"/>
+                            <state id="Cap40"/>
+                        </states>
+                        <target_agent>GRobot40</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
                     <processingtime>7</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport35">
+            <capabilities/>
+            <input>Consumer2</input>
+            <output>Transport34</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                        </states>
+                        <target_agent>GRobot37</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                            <state id="Cap36"/>
+                        </states>
+                        <target_agent>GRobot36</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>10</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport34">
+            <capabilities/>
+            <input>Transport35</input>
+            <output>Producer2</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                        </states>
+                        <target_agent>GRobot36</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                            <state id="Cap35"/>
+                        </states>
+                        <target_agent>GRobot35</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>7</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Producer2">
+            <capabilities/>
+            <input>Transport34</input>
+            <output>Transport33</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states/>
+                        <target_agent>GRobot21</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states/>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>8</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport33">
+            <capabilities/>
+            <input>Producer2</input>
+            <output>Transport32</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                        </states>
+                        <target_agent>GRobot35</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                            <state id="Cap34"/>
+                        </states>
+                        <target_agent>GRobot34</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>8</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport32">
+            <capabilities/>
+            <input>Transport33</input>
+            <output>Transport31</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                        </states>
+                        <target_agent>GRobot34</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                            <state id="Cap33"/>
+                        </states>
+                        <target_agent>GRobot33</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>8</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport31">
+            <capabilities/>
+            <input>Transport32</input>
+            <output>Transport30</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                        </states>
+                        <target_agent>GRobot33</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                            <state id="Cap32"/>
+                        </states>
+                        <target_agent>GRobot32</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>7</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport30">
+            <capabilities/>
+            <input>Transport31</input>
+            <output>Transport9</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                        </states>
+                        <target_agent>GRobot32</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                            <state id="Cap31"/>
+                        </states>
+                        <target_agent>GRobot31</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>9</processingtime>
                 </role>
             </roles>
         </transport>
         <transport id="Transport9">
             <capabilities/>
-            <input>Consumer1</input>
+            <input>Transport30</input>
             <output>Transport1</output>
             <roles>
                 <role>
@@ -1465,7 +3256,7 @@
                         <target_agent>GRobot9</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>6</processingtime>
+                    <processingtime>9</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1543,7 +3334,7 @@
                         <target_agent>GRobot3</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>10</processingtime>
+                    <processingtime>7</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1573,7 +3364,7 @@
                         <target_agent>GRobot4</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>5</processingtime>
+                    <processingtime>9</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1605,7 +3396,7 @@
                         <target_agent>GRobot5</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>8</processingtime>
+                    <processingtime>7</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1675,7 +3466,7 @@
                         <target_agent>GRobot7</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>5</processingtime>
+                    <processingtime>9</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1713,7 +3504,7 @@
                         <target_agent>GRobot8</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>7</processingtime>
+                    <processingtime>5</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1755,7 +3546,7 @@
                         <target_agent>GRobot10</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>6</processingtime>
+                    <processingtime>9</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1799,7 +3590,7 @@
                         <target_agent>GRobot11</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>6</processingtime>
+                    <processingtime>9</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1845,7 +3636,7 @@
                         <target_agent>GRobot12</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>6</processingtime>
+                    <processingtime>5</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1893,7 +3684,7 @@
                         <target_agent>GRobot13</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>7</processingtime>
+                    <processingtime>5</processingtime>
                 </role>
             </roles>
         </transport>
@@ -1950,7 +3741,7 @@
         <transport id="Transport15">
             <capabilities/>
             <input>Transport14</input>
-            <output>Producer1</output>
+            <output>Transport16</output>
             <roles>
                 <role>
                     <postcondition>
@@ -1999,28 +3790,9 @@
                 </role>
             </roles>
         </transport>
-        <transport id="Producer1">
-            <capabilities/>
-            <input>Transport15</input>
-            <output>Transport16</output>
-            <roles>
-                <role>
-                    <postcondition>
-                        <states/>
-                        <target_agent>GRobot1</target_agent>
-                        <task_id>1</task_id>
-                    </postcondition>
-                    <precondition>
-                        <states/>
-                        <task_id>1</task_id>
-                    </precondition>
-                    <processingtime>8</processingtime>
-                </role>
-            </roles>
-        </transport>
         <transport id="Transport16">
             <capabilities/>
-            <input>Producer1</input>
+            <input>Transport15</input>
             <output>Transport17</output>
             <roles>
                 <role>
@@ -2068,14 +3840,14 @@
                         <target_agent>GRobot16</target_agent>
                         <task_id>1</task_id>
                     </precondition>
-                    <processingtime>10</processingtime>
+                    <processingtime>6</processingtime>
                 </role>
             </roles>
         </transport>
         <transport id="Transport17">
             <capabilities/>
             <input>Transport16</input>
-            <output>GRobot7</output>
+            <output>Transport26</output>
             <roles>
                 <role>
                     <postcondition>
@@ -2122,6 +3894,355 @@
                             <state id="Cap17"/>
                         </states>
                         <target_agent>GRobot17</target_agent>
+                        <task_id>1</task_id>
+                    </precondition>
+                    <processingtime>6</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport26">
+            <capabilities/>
+            <input>Transport17</input>
+            <output>Transport25</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                        </states>
+                        <target_agent>GRobot28</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                        </states>
+                        <target_agent>GRobot27</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>8</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport25">
+            <capabilities/>
+            <input>Transport26</input>
+            <output>Transport28</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                        </states>
+                        <target_agent>GRobot27</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                        </states>
+                        <target_agent>GRobot26</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>9</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport28">
+            <capabilities/>
+            <input>Transport25</input>
+            <output>Transport27</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                        </states>
+                        <target_agent>GRobot30</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                        </states>
+                        <target_agent>GRobot29</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>10</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport27">
+            <capabilities/>
+            <input>Transport28</input>
+            <output>Transport22</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                        </states>
+                        <target_agent>GRobot29</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                        </states>
+                        <target_agent>GRobot28</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>7</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport22">
+            <capabilities/>
+            <input>Transport27</input>
+            <output>Transport21</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                        </states>
+                        <target_agent>GRobot24</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                        </states>
+                        <target_agent>GRobot23</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>7</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport21">
+            <capabilities/>
+            <input>Transport22</input>
+            <output>Transport24</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                        </states>
+                        <target_agent>GRobot23</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                        </states>
+                        <target_agent>GRobot22</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>5</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport24">
+            <capabilities/>
+            <input>Transport21</input>
+            <output>Transport23</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                        </states>
+                        <target_agent>GRobot26</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                        </states>
+                        <target_agent>GRobot25</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>9</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport23">
+            <capabilities/>
+            <input>Transport24</input>
+            <output>Transport20</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                        </states>
+                        <target_agent>GRobot25</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                        </states>
+                        <target_agent>GRobot24</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>5</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport20">
+            <capabilities/>
+            <input>Transport23</input>
+            <output>Transport29</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                        </states>
+                        <target_agent>GRobot22</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                        </states>
+                        <target_agent>GRobot21</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>7</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Transport29">
+            <capabilities/>
+            <input>Transport20</input>
+            <output>Producer1</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                        </states>
+                        <target_agent>GRobot31</target_agent>
+                        <task_id>2</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states>
+                            <state id="Cap21"/>
+                            <state id="Cap22"/>
+                            <state id="Cap23"/>
+                            <state id="Cap24"/>
+                            <state id="Cap25"/>
+                            <state id="Cap26"/>
+                            <state id="Cap27"/>
+                            <state id="Cap28"/>
+                            <state id="Cap29"/>
+                            <state id="Cap30"/>
+                        </states>
+                        <target_agent>GRobot30</target_agent>
+                        <task_id>2</task_id>
+                    </precondition>
+                    <processingtime>9</processingtime>
+                </role>
+            </roles>
+        </transport>
+        <transport id="Producer1">
+            <capabilities/>
+            <input>Transport29</input>
+            <output>GRobot7</output>
+            <roles>
+                <role>
+                    <postcondition>
+                        <states/>
+                        <target_agent>GRobot1</target_agent>
+                        <task_id>1</task_id>
+                    </postcondition>
+                    <precondition>
+                        <states/>
                         <task_id>1</task_id>
                     </precondition>
                     <processingtime>7</processingtime>

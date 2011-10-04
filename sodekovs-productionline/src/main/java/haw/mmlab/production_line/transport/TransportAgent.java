@@ -10,7 +10,7 @@ import haw.mmlab.production_line.configuration.Role;
 import haw.mmlab.production_line.configuration.Task;
 import haw.mmlab.production_line.configuration.Transport;
 import haw.mmlab.production_line.configuration.Workpiece;
-import haw.mmlab.production_line.service.IDatabaseService;
+import haw.mmlab.production_line.logging.database.DatabaseLogger;
 import haw.mmlab.production_line.service.IManagerService;
 import haw.mmlab.production_line.service.IProcessWorkpieceService;
 import haw.mmlab.production_line.service.ProcessWorkpieceService;
@@ -39,9 +39,7 @@ import java.util.logging.Level;
  */
 @Description("Transport agent.")
 @Arguments({ @Argument(clazz = Transport.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap") })
-// @ProvidedServices(@ProvidedService(implementation = @Implementation(ProcessWorkpieceService.class), type = IProcessWorkpieceService.class))
-@RequiredServices({ /* @RequiredService(name = "processWorkpieceServices", type = IProcessWorkpieceService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL)), */
-@RequiredService(name = "managerService", type = IManagerService.class), @RequiredService(name = "dbService", type = IDatabaseService.class) })
+@RequiredServices({ @RequiredService(name = "managerService", type = IManagerService.class) })
 public class TransportAgent extends ProcessWorkpieceAgent {
 
 	/**
@@ -53,20 +51,14 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	@SuppressWarnings("unused")
 	private IStrategy strategy = null;
 
-	private IDatabaseService dbService = null;
-
 	private IManagerService managerService = null;
+
+	private DatabaseLogger databaseLogger = null;
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public IFuture<Void> agentCreated() {
-		getRequiredService("dbService").addResultListener(new DefaultResultListener<IDatabaseService>() {
-
-			@Override
-			public void resultAvailable(IDatabaseService result) {
-				dbService = result;
-			}
-		});
+		databaseLogger = new DatabaseLogger();
 
 		Transport conf = (Transport) getArgument("config");
 
@@ -219,51 +211,6 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 					}
 				}
 			});
-
-			// getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
-			//
-			// public void resultAvailable(Collection<IProcessWorkpieceService> services) {
-			// for (final IProcessWorkpieceService service : services) {
-			// final String target = role.getPostcondition().getTargetAgent();
-			//
-			// if (service.getId().equals(target)) {
-			// String msg = id + " tries to send workpiece to " + target;
-			// // getLogger().fine(msg);
-			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-			// IFuture<Boolean> future = service.process(workpiece, id);
-			// future.addResultListener(new DefaultResultListener<Boolean>() {
-			//
-			// public void resultAvailable(Boolean result) {
-			// if (result) {
-			// String msg = id + " has successfully sended workpiece to " + target;
-			// // getLogger().fine(msg);
-			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-			// if (wpCount.get(task.getId()) != null) {
-			// wpCount.put(task.getId(), wpCount.get(task.getId()) + 1);
-			// } else {
-			// wpCount.put(task.getId(), 1);
-			// }
-			//
-			// if (role.getProcessingTime().equals(0)) {
-			// // optimized for a event driven simulation if processing time is 0
-			// waitForTick(ProduceStep.this);
-			// } else {
-			// waitFor(role.getProcessingTime(), ProduceStep.this);
-			// }
-			// } else {
-			// String msg = id + " has failed to send workpiece to " + target;
-			// // getLogger().fine(msg);
-			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-			// waitForTick(new RetrySendStep(task, role, workpiece));
-			// }
-			// }
-			// });
-			//
-			// break;
-			// }
-			// }
-			// }
-			// });
 		}
 	}
 
@@ -322,44 +269,6 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 				}
 			});
 
-			// getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
-			//
-			// @Override
-			// public void resultAvailable(Collection<IProcessWorkpieceService> services) {
-			// for (IProcessWorkpieceService service : services) {
-			// if (service.getId().equals(target)) {
-			// service.process(workpiece, id).addResultListener(new DefaultResultListener<Boolean>() {
-			//
-			// public void resultAvailable(Boolean result) {
-			// if (result) {
-			// String msg = id + " has successfully sended workpiece to " + target;
-			// // getLogger().fine(msg);
-			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-			// if (wpCount.get(task.getId()) != null) {
-			// wpCount.put(task.getId(), wpCount.get(task.getId()) + 1);
-			// } else {
-			// wpCount.put(task.getId(), 1);
-			// }
-			//
-			// if (role.getProcessingTime().equals(0)) {
-			// // optimized for a event driven simulation if the processing time is 0
-			// waitForTick(new ProduceStep(role));
-			// } else {
-			// waitFor(role.getProcessingTime(), new ProduceStep(role));
-			// }
-			// } else {
-			// String msg = id + " has failed to send workpiece to " + target;
-			// // getLogger().fine(msg);
-			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-			// waitForTick(RetrySendStep.this);
-			// }
-			// }
-			// });
-			// }
-			// }
-			// }
-			// });
-
 			return IFuture.DONE;
 		}
 	}
@@ -378,7 +287,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 			Role role = getMatchingRole(workpiece, senderId);
 			if (role != null) {
 				setWorkpiece(workpiece);
-				setMainState(MainState.RUNNING);
+				setStates(MainState.RUNNING, deficientState);
 				workpiece.addOperation(role.getCapability());
 				Integer processTime = role.getProcessingTime() == null ? 0 : role.getProcessingTime();
 				if (role.getPostcondition().getTargetAgent() != null) {
@@ -409,7 +318,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	@SuppressWarnings("unchecked")
 	private void consume(final Workpiece workpiece) {
 		setWorkpiece(null);
-		setMainState(MainState.RUNNING_IDLE);
+		setStates(MainState.RUNNING_IDLE, deficientState);
 
 		getRequiredService("managerService").addResultListener(new DefaultResultListener<IManagerService>() {
 
@@ -458,7 +367,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 									getLogger().fine(msg);
 									handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
 									setWorkpiece(null);
-									setMainState(MainState.RUNNING_IDLE);
+									setStates(MainState.RUNNING_IDLE, deficientState);
 								} else {
 									String msg = id + " could not hand over workpiece to agent " + workpiece + " to " + target;
 									getLogger().fine(msg);
@@ -470,34 +379,6 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 					}
 				}
 			});
-
-			// getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
-			//
-			// public void resultAvailable(Collection<IProcessWorkpieceService> services) {
-			// for (IProcessWorkpieceService service : services) {
-			// final String target = role.getPostcondition().getTargetAgent();
-			// if (service.getId().equals(target)) {
-			// service.process(workpiece, id).addResultListener(new DefaultResultListener<Boolean>() {
-			//
-			// public void resultAvailable(Boolean result) {
-			// if (result) {
-			// String msg = id + " successfully delivered " + workpiece + " to " + target;
-			// getLogger().fine(msg);
-			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-			// setWorkpiece(null);
-			// setMainState(MainState.RUNNING_IDLE);
-			// } else {
-			// String msg = id + " could not hand over workpiece to agent " + workpiece + " to " + target;
-			// getLogger().fine(msg);
-			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-			// waitForTick(SendWorkpieceStep.this);
-			// }
-			// }
-			// });
-			// }
-			// }
-			// }
-			// });
 
 			return IFuture.DONE;
 		}
@@ -525,20 +406,12 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		return null;
 	}
 
-	/**
-	 * @param mainState
-	 *            the mainState to set
-	 */
-	protected void setMainState(final int mainState) {
+	@Override
+	protected void setStates(int mainState, int deficientState) {
 		this.mainState = mainState;
+		this.deficientState = deficientState;
 
-		dbService.getCurrentTime().addResultListener(new DefaultResultListener<Integer>() {
-
-			@Override
-			public void resultAvailable(Integer result) {
-				dbService.insertLog(id, AgentConstants.AGENT_TYPE_TRANSPORT, result, mainState, 0, assignedRoles.size(), 0, 0);
-			}
-		});
-
+		int time = databaseLogger.getCurrentTime();
+		databaseLogger.insertLog(id, AgentConstants.AGENT_TYPE_TRANSPORT, time, mainState, deficientState, assignedRoles.size(), 0, 0);
 	}
 }

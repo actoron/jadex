@@ -90,6 +90,8 @@ public class LogManager {
 	/** The name of the reconfiguration strategy */
 	private String strategy = null;
 
+	private DatabaseLogger databaseLogger = null;
+
 	/**
 	 * Constructor.
 	 * 
@@ -99,6 +101,7 @@ public class LogManager {
 	public LogManager(ProductionLineConfiguration plc, String strategy) {
 		this.plc = plc;
 		this.strategy = strategy;
+		this.databaseLogger = new DatabaseLogger();
 	}
 
 	/**
@@ -142,7 +145,7 @@ public class LogManager {
 
 		redundancy = redundancy / plc.getRobots().size();
 
-		DatabaseLogger.getInstance().insertMetadata(redundancy, plc.getRobots().size(), plc.getTransports().size(), capCounter.size(), roleCount, strategy, workload);
+		databaseLogger.insertMetadata(redundancy, plc.getRobots().size(), plc.getTransports().size(), capCounter.size(), roleCount, strategy, workload);
 	}
 
 	/**
@@ -152,7 +155,7 @@ public class LogManager {
 	 *            - the path to the configuration file
 	 */
 	private void generateLogFiles(String confFile) {
-		int runId = DatabaseLogger.getInstance().getRunId();
+		int runId = databaseLogger.getRunId();
 		backupConfFile(runId, confFile);
 		generateGraph(runId, plc);
 	}
@@ -213,9 +216,7 @@ public class LogManager {
 	private void interpreteData(int runId) {
 		Map<String, Integer> bufferSizes = getBufferSizes(plc);
 
-		DatabaseLogger logger = DatabaseLogger.getInstance();
-
-		if (logger.isLoggingEnabled()) {
+		if (databaseLogger.isLoggingEnabled()) {
 			DatabaseInterpreter interpreter = new DatabaseInterpreter();
 			Run run = interpreter.getRun(runId);
 			InterpretedRun result = interpreter.interpretRun(run);
@@ -262,7 +263,7 @@ public class LogManager {
 	 *            a map with the number of workpieces which were consumed in the tasks
 	 */
 	public void afterSimulation(Map<String, Integer> producedMap, Map<String, Integer> consumedMap) {
-		int runId = DatabaseLogger.getInstance().cleanupDatabase();
+		int runId = databaseLogger.cleanupDatabase();
 
 		interpreteData(runId);
 		writeWorkpieceFile(runId, producedMap, consumedMap);

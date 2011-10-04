@@ -537,5 +537,7 @@ public class SimulationGenerator {
 
 		SimulationGenerator sg = new SimulationGenerator(input);
 		sg.saveProductionLineConfiguration(output);
+
+		System.out.println("SimulationGenerator finished.");
 	}
 }

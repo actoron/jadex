@@ -28,8 +28,7 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 
 /**
- * Utility class for interpreting the logging results in the database and
- * preparing them for plotting.
+ * Utility class for interpreting the logging results in the database and preparing them for plotting.
  * 
  * @author thomas
  * 
@@ -52,16 +51,14 @@ public class DatabaseInterpreter {
 	private static final String MAIN_FILE = DIR + "main.dat";
 
 	/**
-	 * @return - the {@link Connection} to the database from the
-	 *         {@link DatabaseConnection}
+	 * @return - the {@link Connection} to the database from the {@link DatabaseConnection}
 	 */
 	private static Connection getConnection() {
 		return DatabaseConnection.getConnection();
 	}
 
 	/**
-	 * Return all the runs from the Archive_Log table as a {@link List} of
-	 * {@link Run}s.
+	 * Return all the runs from the Archive_Log table as a {@link List} of {@link Run}s.
 	 * 
 	 * @return a {@link List} of {@link Run}s
 	 */
@@ -121,12 +118,10 @@ public class DatabaseInterpreter {
 	 * 
 	 * @param runId
 	 *            - the given Id of the {@link Run}
-	 * @return - the {@link Run} or <code>null</code> if no run for the given id
-	 *         exists.
+	 * @return - the {@link Run} or <code>null</code> if no run for the given id exists.
 	 */
 	public Run getRun(int runId) {
-		String query = "SELECT agentId, agentType, intervalTime, mainState, deficientState, noRoles, bufferLoad, bufferCapacity FROM Log WHERE runid="
-				+ runId;
+		String query = "SELECT agentId, agentType, intervalTime, mainState, deficientState, noRoles, bufferLoad, bufferCapacity FROM Log WHERE runid=" + runId;
 
 		try {
 			Statement stmt = getConnection().createStatement();
@@ -185,7 +180,7 @@ public class DatabaseInterpreter {
 
 			for (Agent agent : run.getAgents()) {
 				LogEntry entry = run.getEntry(agent.getAgentId(), i);
-
+				
 				AgentState agentState = new AgentState();
 				agentState.setAgent(agent);
 
@@ -207,8 +202,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Initializes the Map with the last state entries for all agent in a Run,
-	 * with the start states.
+	 * Initializes the Map with the last state entries for all agent in a Run, with the start states.
 	 * 
 	 * @param agents
 	 *            - a {@link List} of Agents in a Run.
@@ -225,9 +219,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Generates the measurement output file for the given input map as
-	 * interpreted from {@link DatabaseInterpreter#interpretRun(Run)}. Only the
-	 * DeficientStates will be written to the output file.
+	 * Generates the measurement output file for the given input map as interpreted from {@link DatabaseInterpreter#interpretRun(Run)}. Only the DeficientStates will be written to the output file.
 	 * 
 	 * @param input
 	 *            - see above
@@ -275,9 +267,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Generates the measurement output file for the given input map as
-	 * interpreted from {@link DatabaseInterpreter#interpretRun(Run)}. Only the
-	 * DeficientStates will be written to the output file.
+	 * Generates the measurement output file for the given input map as interpreted from {@link DatabaseInterpreter#interpretRun(Run)}. Only the DeficientStates will be written to the output file.
 	 * 
 	 * @param input
 	 *            - see above
@@ -289,9 +279,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Generates the measurement output file for the given input map as
-	 * interpreted from {@link DatabaseInterpreter#interpretRun(Run)}. Only the
-	 * MainStates will be written to the output file.
+	 * Generates the measurement output file for the given input map as interpreted from {@link DatabaseInterpreter#interpretRun(Run)}. Only the MainStates will be written to the output file.
 	 * 
 	 * @param input
 	 *            - see above
@@ -339,9 +327,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Generates the measurement output file for the given input map as
-	 * interpreted from {@link DatabaseInterpreter#interpretRun(Run)}. Only the
-	 * MainStates will be written to the output file.
+	 * Generates the measurement output file for the given input map as interpreted from {@link DatabaseInterpreter#interpretRun(Run)}. Only the MainStates will be written to the output file.
 	 * 
 	 * @param input
 	 *            - see above
@@ -360,8 +346,7 @@ public class DatabaseInterpreter {
 	public static void main(String[] args) {
 		DatabaseInterpreter interpreter = new DatabaseInterpreter();
 
-		System.out
-				.println("Please insert the ids of the runs you would like to interprete (comma separated or hyphen separated for ranges, no spaces):");
+		System.out.println("Please insert the ids of the runs you would like to interprete (comma separated or hyphen separated for ranges, no spaces):");
 
 		try {
 			Scanner s = new Scanner(System.in);
@@ -373,7 +358,7 @@ public class DatabaseInterpreter {
 				while (tok.hasMoreTokens()) {
 					runIds.add(Integer.parseInt(tok.nextToken()));
 				}
-			} else {
+			} else if (input.contains("-")) {
 				StringTokenizer tok = new StringTokenizer(input, "-");
 				Integer min = Integer.parseInt(tok.nextToken());
 				Integer max = Integer.parseInt(tok.nextToken());
@@ -382,6 +367,9 @@ public class DatabaseInterpreter {
 					runIds.add(min);
 					min++;
 				}
+			} else {
+				Integer min = Integer.parseInt(input);
+				runIds.add(min);
 			}
 
 			List<Run> runs = new ArrayList<Run>();
@@ -423,8 +411,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Returns the number of successful reconfigurations in the given
-	 * {@link InterpretedRun}.
+	 * Returns the number of successful reconfigurations in the given {@link InterpretedRun}.
 	 * 
 	 * @param run
 	 *            - the given interpreted run
@@ -448,8 +435,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Returns the number if deficient by change in the given
-	 * {@link InterpretedRun}.
+	 * Returns the number if deficient by change in the given {@link InterpretedRun}.
 	 * 
 	 * @param run
 	 *            - the given interpreted run
@@ -473,8 +459,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Returns the number if deficient by breaks in the given
-	 * {@link InterpretedRun}.
+	 * Returns the number if deficient by breaks in the given {@link InterpretedRun}.
 	 * 
 	 * @param run
 	 *            - the given interpreted run
@@ -498,8 +483,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Writes all overall number of deficients from the given
-	 * {@link InterpretedRun} to the given out {@link File}.
+	 * Writes all overall number of deficients from the given {@link InterpretedRun} to the given out {@link File}.
 	 * 
 	 * @param run
 	 *            - the given {@link InterpretedRun}
@@ -524,8 +508,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Writes all the main data to the given output {@link File} from the given
-	 * {@link List} of {@link InterpretedRun}s.
+	 * Writes all the main data to the given output {@link File} from the given {@link List} of {@link InterpretedRun}s.
 	 * 
 	 * @param runs
 	 *            - the given List of InterpretedRuns
@@ -589,8 +572,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Writes all the deficient data to the given output {@link File} from the
-	 * given {@link List} of {@link InterpretedRun}s.
+	 * Writes all the deficient data to the given output {@link File} from the given {@link List} of {@link InterpretedRun}s.
 	 * 
 	 * @param runs
 	 *            - the given List of InterpretedRuns
@@ -654,8 +636,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Returns a {@link List} of {@link Iterator}s for all the {@link TimeSlot}s
-	 * from the given {@link List} of {@link InterpretedRun}s.
+	 * Returns a {@link List} of {@link Iterator}s for all the {@link TimeSlot}s from the given {@link List} of {@link InterpretedRun}s.
 	 * 
 	 * @param runs
 	 *            - the given List of InterpretedRuns
@@ -672,8 +653,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Returns the size of the smallest {@link InterpretedRun} from the given
-	 * {@link List} of {@link InterpretedRun}s.
+	 * Returns the size of the smallest {@link InterpretedRun} from the given {@link List} of {@link InterpretedRun}s.
 	 * 
 	 * @param runs
 	 *            - the given {@link List} of {@link InterpretedRun}s
@@ -691,8 +671,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Writes the deficient plot file for the given {@link List} of
-	 * {@link InterpretedRun}s and the given def {@link File}.
+	 * Writes the deficient plot file for the given {@link List} of {@link InterpretedRun}s and the given def {@link File}.
 	 * 
 	 * @param runs
 	 *            - the given {@link List} of {@link InterpretedRun}s
@@ -760,8 +739,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Writes the main plot file for the given {@link List} of
-	 * {@link InterpretedRun}s and the given main {@link File}.
+	 * Writes the main plot file for the given {@link List} of {@link InterpretedRun}s and the given main {@link File}.
 	 * 
 	 * @param runs
 	 *            - the given {@link List} of {@link InterpretedRun}s
@@ -863,8 +841,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Calculates the max workload (number of roles divided by the buffer size)
-	 * from all agents to a specific time.
+	 * Calculates the max workload (number of roles divided by the buffer size) from all agents to a specific time.
 	 * 
 	 * @param result
 	 *            the given {@link InterpretedRun}
@@ -896,8 +873,7 @@ public class DatabaseInterpreter {
 	}
 
 	/**
-	 * Gets the max workload (number of roles divided by the buffer size) from
-	 * the given {@link List} of {@link AgentState}s.
+	 * Gets the max workload (number of roles divided by the buffer size) from the given {@link List} of {@link AgentState}s.
 	 * 
 	 * @param agentStates
 	 *            the given {@link List} of {@link AgentState}s

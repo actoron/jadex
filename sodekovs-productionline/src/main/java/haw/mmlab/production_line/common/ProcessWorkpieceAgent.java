@@ -111,8 +111,10 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 	/**
 	 * @param mainState
 	 *            the mainState to set
+	 * @param deficientState
+	 *            the deficientState to set
 	 */
-	protected abstract void setMainState(int mainState);
+	protected abstract void setStates(int mainState, int deficientState);
 
 	/**
 	 * @return the workpiece
@@ -172,7 +174,7 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 			if (!capabilities.contains(role.getCapabilityAsString())) {
 				getLogger().info(id + " is missing the required capability " + role.getCapabilityAsString() + " for " + role);
 				deficientRoles.add(role);
-				setMainState(MainState.WAITING_FOR_RECONF);
+				setStates(MainState.WAITING_FOR_RECONF, DeficientState.DEFICIENT_BY_BREAK);
 			}
 		}
 
@@ -281,11 +283,9 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 					List<Role> defRoles = getDeficientRoles();
 
 					if (defRoles.isEmpty()) {
-						mainState = MainState.RUNNING_IDLE;
-						deficientState = DeficientState.NOT_DEFICIENT;
+						setStates(MainState.RUNNING_IDLE, DeficientState.NOT_DEFICIENT);
 					} else {
-						mainState = MainState.WAITING_FOR_RECONF;
-						deficientState = DeficientState.DEFICIENT_BY_CHANGE;
+						setStates(MainState.WAITING_FOR_RECONF, DeficientState.DEFICIENT_BY_CHANGE);
 
 						sendHelpRequest(defRoles);
 					}

@@ -13,7 +13,7 @@ import haw.mmlab.production_line.configuration.Task;
 import haw.mmlab.production_line.configuration.Workpiece;
 import haw.mmlab.production_line.domain.HelpReply;
 import haw.mmlab.production_line.domain.HelpRequest;
-import haw.mmlab.production_line.service.IDatabaseService;
+import haw.mmlab.production_line.logging.database.DatabaseLogger;
 import haw.mmlab.production_line.service.IManagerService;
 import haw.mmlab.production_line.service.IProcessWorkpieceService;
 import haw.mmlab.production_line.service.ProcessWorkpieceService;
@@ -44,9 +44,7 @@ import java.util.logging.Level;
  */
 @Description("Robot agent.")
 @Arguments({ @Argument(clazz = Robot.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap"), @Argument(clazz = IStrategy.class, name = "strategy") })
-// @ProvidedServices(@ProvidedService(implementation = @Implementation(ProcessWorkpieceService.class), type = IProcessWorkpieceService.class))
-@RequiredServices({ /* @RequiredService(name = "processWorkpieceServices", type = IProcessWorkpieceService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL)), */
-@RequiredService(name = "managerService", type = IManagerService.class), @RequiredService(name = "dbService", type = IDatabaseService.class) })
+@RequiredServices({ @RequiredService(name = "managerService", type = IManagerService.class) })
 public class RobotAgent extends ProcessWorkpieceAgent {
 
 	/** The output {@link Buffer} */
@@ -55,20 +53,14 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 	/** The used reconfiguration strategety */
 	private IStrategy strategy = null;
 
-	private IDatabaseService dbService = null;
-
 	private IManagerService managerService = null;
+
+	private DatabaseLogger databaseLogger = null;
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public IFuture<Void> agentCreated() {
-		getRequiredService("dbService").addResultListener(new DefaultResultListener<IDatabaseService>() {
-
-			@Override
-			public void resultAvailable(IDatabaseService result) {
-				dbService = result;
-			}
-		});
+		this.databaseLogger = new DatabaseLogger();
 
 		getRequiredService("managerService").addResultListener(new DefaultResultListener<IManagerService>() {
 
@@ -137,14 +129,14 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 				int bufferSpace = buffer.getAvailableSlots(role, assignedRoles);
 				if (bufferSpace > 0) {
 					setWorkpiece(workpiece);
-					setMainState(MainState.RUNNING);
+					setStates(MainState.RUNNING, deficientState);
 					workpiece.addOperation(role.getCapability());
 
 					IComponentStep<Void> sendStep = new IComponentStep<Void>() {
 
 						public IFuture<Void> execute(IInternalAccess ia) {
 							setWorkpiece(null);
-							setMainState(MainState.RUNNING_IDLE);
+							setStates(MainState.RUNNING_IDLE, deficientState);
 							buffer.enqueue(new BufferElement(workpiece, role));
 
 							return IFuture.DONE;
@@ -192,20 +184,13 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		return null;
 	}
 
-	/**
-	 * @param mainState
-	 *            the mainState to set
-	 */
-	protected void setMainState(final int mainState) {
+	@Override
+	protected void setStates(int mainState, int deficientState) {
 		this.mainState = mainState;
+		this.deficientState = deficientState;
 
-		dbService.getCurrentTime().addResultListener(new DefaultResultListener<Integer>() {
-
-			@Override
-			public void resultAvailable(Integer result) {
-				dbService.insertLog(id, AgentConstants.AGENT_TYPE_ROBOT, result, mainState, 0, assignedRoles.size(), buffer.size(), buffer.capacity());
-			}
-		});
+		int time = databaseLogger.getCurrentTime();
+		databaseLogger.insertLog(id, AgentConstants.AGENT_TYPE_ROBOT, time, mainState, deficientState, assignedRoles.size(), buffer.size(), buffer.capacity());
 	}
 
 	/**
@@ -270,41 +255,6 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 
 				}
 			});
-
-			// getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
-			//
-			// public void resultAvailable(Collection<IProcessWorkpieceService> services) {
-			// for (IProcessWorkpieceService service : services) {
-			// final String target = role.getPostcondition().getTargetAgent();
-			// if (service.getId().equals(target)) {
-			// // Workpiece aus Pufferelement holen
-			// final Workpiece wp = element.getWorkpiece();
-			//
-			// service.process(wp, id).addResultListener(new DefaultResultListener<Boolean>() {
-			//
-			// public void resultAvailable(Boolean result) {
-			// if (result) {
-			// String msg = id + " successfully delivered " + wp + " to " + target;
-			// // getLogger().fine(msg);
-			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-			// // Element aus Puffer entfernen
-			// buffer.dequeue();
-			// } else {
-			// String msg = id + " could not hand over workpiece " + wp + " to " + target;
-			// // getLogger().fine(msg);
-			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-			// // Element neu queuen
-			// buffer.enqueue(buffer.dequeue());
-			// }
-			//
-			// waitForTick(SendWorkpieceStep.this);
-			// }
-			// });
-			// }
-			// }
-			// }
-			// });
-
 		}
 	}
 
@@ -335,8 +285,8 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 
 				request.getDeficientRoles().removeAll(takeRoles);
 
-				dbService.incrementMessageCountBy(1);
-				dbService.incrementRoleChangeAction(takeRoles.size() + giveAwayRoles.size());
+				databaseLogger.incrementMessageCountBy(1);
+				databaseLogger.incrementRoleChangeAction(takeRoles.size() + giveAwayRoles.size());
 
 				answerHelpRequest(takeRoles, giveAwayRoles, request);
 			}
@@ -344,7 +294,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 			if (!request.getDeficientRoles().isEmpty()) {
 				waitForTick(new SendMediumMessageStep(request));
 			} else {
-				dbService.storeRoleChangeDistance(request);
+				databaseLogger.storeRoleChangeDistance(request);
 			}
 		}
 		// received its own help request
@@ -375,7 +325,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		addReceivers(reply, giveAwayRoles);
 		reply.addReceiver(request.getAgentId());
 
-		dbService.incrementHopCount(1);
+		databaseLogger.incrementHopCount(1);
 
 		waitForTick(new SendMediumMessageStep(reply));
 	}

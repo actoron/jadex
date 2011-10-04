@@ -6,7 +6,7 @@ import haw.mmlab.production_line.configuration.ProductionLineConfiguration;
 import haw.mmlab.production_line.configuration.Robot;
 import haw.mmlab.production_line.configuration.Task;
 import haw.mmlab.production_line.configuration.Transport;
-import haw.mmlab.production_line.service.IDatabaseService;
+import haw.mmlab.production_line.logging.database.DatabaseLogger;
 import haw.mmlab.production_line.service.IManagerService;
 import haw.mmlab.production_line.service.ManagerService;
 import jadex.bridge.CreationInfo;
@@ -46,8 +46,7 @@ import java.util.logging.Level;
  */
 @Description("The Manager Agent who manages the whole application.")
 @ProvidedServices(@ProvidedService(type = IManagerService.class, implementation = @Implementation(ManagerService.class)))
-@RequiredServices({ @RequiredService(name = "cmsservice", type = IComponentManagementService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)),
-		@RequiredService(name = "dbService", type = IDatabaseService.class) })
+@RequiredServices({ @RequiredService(name = "cmsservice", type = IComponentManagementService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)) })
 @Arguments({ @Argument(clazz = String.class, name = "configuration_modell"), @Argument(clazz = String.class, name = "dropout_configuration_model"), @Argument(clazz = String.class, name = "strategy") })
 public class ManagerAgent extends MicroAgent {
 
@@ -103,10 +102,12 @@ public class ManagerAgent extends MicroAgent {
 	/** Flag indicating whether at least one workpiece was consumed */
 	private boolean firstWPConsumed = false;
 
-	private IDatabaseService dbService = null;
+	private DatabaseLogger databaseLogger = null;
 
 	@Override
 	public IFuture<Void> agentCreated() {
+		this.databaseLogger = new DatabaseLogger();
+
 		// initialize the logger
 		getLogger().setLevel(Level.ALL);
 		ConsoleHandler handler = new ConsoleHandler();
@@ -213,14 +214,6 @@ public class ManagerAgent extends MicroAgent {
 			public void resultAvailable(IComponentManagementService cms) {
 				IExternalAccess parent = ManagerAgent.this.getParent();
 
-				getRequiredService("dbService").addResultListener(new DefaultResultListener<IDatabaseService>() {
-
-					@Override
-					public void resultAvailable(IDatabaseService result) {
-						dbService = result;
-					}
-				});
-
 				// start the robot agents
 				getLogger().info("Manager agent is starting robots...");
 				for (Robot robot : plc.getRobots()) {
@@ -286,7 +279,7 @@ public class ManagerAgent extends MicroAgent {
 	 * This method is called when the reconfiguration process failed. The current run is marked with an error and than finished.
 	 */
 	public void informReconfError() {
-		dbService.setErrorRun();
+		databaseLogger.setErrorRun();
 		finishRun();
 	}
 
@@ -322,6 +315,7 @@ public class ManagerAgent extends MicroAgent {
 
 				logManager = new LogManager(plc, strategyName);
 				finished = false;
+				firstWPConsumed = false;
 
 				// start the new run
 				waitForTick(new IComponentStep<Void>() {

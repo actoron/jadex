@@ -18,38 +18,20 @@ import java.util.Properties;
  */
 public class DatabaseLogger {
 
-	/**
-	 * Static instance for singleton pattern.
-	 */
-	private static DatabaseLogger instance = null;
-
 	private boolean loggingEnabled = false;
 
 	private int runId = 0;
 
-	/**
-	 * Singleton pattern for getting the {@link DatabaseLogger} instance.
-	 * 
-	 * @return - the instance.
-	 */
-	public static DatabaseLogger getInstance() {
-		if (instance == null) {
-			instance = new DatabaseLogger();
-
-			Properties properties = new Properties();
-			try {
-				properties.load(new FileInputStream("database.properties"));
-				instance.setLoggingEnabled(Boolean.valueOf(properties.getProperty("logging.enabled")));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	public DatabaseLogger() {
+		Properties properties = new Properties();
+		try {
+			properties.load(new FileInputStream("database.properties"));
+			this.setLoggingEnabled(Boolean.valueOf(properties.getProperty("logging.enabled")));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return instance;
-	}
-
-	private DatabaseLogger() {
 	}
 
 	/**
@@ -67,7 +49,7 @@ public class DatabaseLogger {
 	public static void main(String[] args) {
 		// initialize the connection
 		System.out.println("Initializing the Database Connection.");
-		DatabaseLogger instance = getInstance();
+		DatabaseLogger instance = new DatabaseLogger();
 		if (instance.isLoggingEnabled()) {
 			instance.getConnection();
 
