@@ -10,16 +10,23 @@ import haw.mmlab.production_line.dropout.DropoutAgent;
 import haw.mmlab.production_line.dropout.config.Action;
 import haw.mmlab.production_line.robot.RobotAgent;
 import haw.mmlab.production_line.service.IManagerService;
+import haw.mmlab.production_line.service.IProcessWorkpieceService;
 import haw.mmlab.production_line.service.ManagerService;
 import haw.mmlab.production_line.state.DeficientState;
 import haw.mmlab.production_line.state.MainState;
 import haw.mmlab.production_line.transport.TransportAgent;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.ServiceIdentifier;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -66,6 +73,29 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 
 	/** A map with all the tasks and their ids */
 	protected Map<String, Task> taskMap = null;
+
+	protected Map<Role, IProcessWorkpieceService> processWPServices = new HashMap<Role, IProcessWorkpieceService>();
+
+	protected IFuture<IProcessWorkpieceService> getProcessWPService(final Role role) {
+		IFuture<IProcessWorkpieceService> fut = null;
+
+		if (processWPServices.containsKey(role)) {
+			fut = new Future<IProcessWorkpieceService>(processWPServices.get(role));
+		} else {
+			ComponentIdentifier ci = new ComponentIdentifier(role.getPostcondition().getTargetAgent(), getParent().getComponentIdentifier());
+			IServiceIdentifier sid = new ServiceIdentifier(ci, IProcessWorkpieceService.class, role.getPostcondition().getTargetAgent());
+			fut = SServiceProvider.getService(getServiceProvider(), sid);
+			fut.addResultListener(new DefaultResultListener<IProcessWorkpieceService>() {
+
+				@Override
+				public void resultAvailable(IProcessWorkpieceService result) {
+					processWPServices.put(role, result);
+				}
+			});
+		}
+
+		return fut;
+	}
 
 	/**
 	 * This method is called if the agent receives a new workpieces and tries to process it.
@@ -243,6 +273,8 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 				assignedRoles.removeAll(reply.getTakenRoles());
 				requestedRoles.removeAll(reply.getTakenRoles());
 
+				processWPServices.keySet().removeAll(reply.getTakenRoles());
+
 				assignedRoles.addAll(reply.getVacantRoles());
 
 				if (requestedRoles.isEmpty()) {
@@ -309,6 +341,8 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 							handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_ADAPTIVITY, id + " changes output from " + role.getPostcondition().getTargetAgent() + " to " + newOutput),
 									getLogger());
 							role.getPostcondition().setTargetAgent(newOutput);
+
+							processWPServices.remove(role);
 						}
 						// defect agent was output
 						if (takenInput && reply.getDefectAgentId().equals(role.getPostcondition().getTargetAgent())) {
@@ -317,6 +351,8 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 							handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_ADAPTIVITY, id + " changes output from " + role.getPostcondition().getTargetAgent() + " to " + newOutput),
 									getLogger());
 							role.getPostcondition().setTargetAgent(newOutput);
+
+							processWPServices.remove(role);
 						}
 					}
 				}

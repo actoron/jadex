@@ -1,11 +1,9 @@
 package haw.mmlab.production_line.service;
 
-import haw.mmlab.production_line.common.AgentConstants;
 import haw.mmlab.production_line.common.ConsoleMessage;
 import haw.mmlab.production_line.common.ProcessWorkpieceAgent;
 import haw.mmlab.production_line.configuration.Workpiece;
 import haw.mmlab.production_line.dropout.config.Action;
-import haw.mmlab.production_line.robot.RobotAgent;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.commons.future.Future;
@@ -30,6 +28,17 @@ public class ProcessWorkpieceService implements IProcessWorkpieceService {
 	private String type = null;
 
 	/**
+	 * 
+	 * @param agent
+	 * @param type
+	 */
+	public ProcessWorkpieceService(ProcessWorkpieceAgent agent, String type) {
+		this.agent = agent;
+		this.id = agent.getId();
+		this.type = type;
+	}
+
+	/**
 	 * Get the services id.
 	 * 
 	 * @return the services id
@@ -37,9 +46,6 @@ public class ProcessWorkpieceService implements IProcessWorkpieceService {
 	 * @directcall (Is called on caller thread).
 	 */
 	public String getId() {
-		if (id == null) {
-			id = agent.getId();
-		}
 		return id;
 	}
 
@@ -51,13 +57,6 @@ public class ProcessWorkpieceService implements IProcessWorkpieceService {
 	 * @directcall (Is called on caller thread).
 	 */
 	public String getType() {
-		if (type == null) {
-			if (agent instanceof RobotAgent) {
-				type = AgentConstants.AGENT_TYPE_ROBOT;
-			} else {
-				type = AgentConstants.AGENT_TYPE_TRANSPORT;
-			}
-		}
 		return type;
 	}
 

@@ -7,22 +7,22 @@
 	</p0:properties>
 	<p0:properties __ID="5">
 		<p0:properties __ID="6">
-			<p0:property __ID="7" type="timemode">2</p0:property>
+			<p0:property __ID="7" type="gui-refresh">5</p0:property>
 			<type __ID="8">panelproperties</type>
 		</p0:properties>
-		<type __ID="9">ISimulationService</type>
+		<type __ID="9">Awareness Settings</type>
 	</p0:properties>
 	<p0:properties __ID="10">
 		<p0:properties __ID="11">
-			<p0:property __ID="12" type="gui-refresh">5</p0:property>
-			<type __IDREF="8"></type>
+			<p0:property __ID="12" type="timemode">2</p0:property>
+			<type __ID="13">panelproperties</type>
 		</p0:properties>
-		<type __ID="13">Awareness Settings</type>
+		<type __ID="14">ISimulationService</type>
 	</p0:properties>
-	<p0:properties __ID="14">
-		<p0:property __ID="15" type="perspective">Starter</p0:property>
-		<p0:property __ID="16" type="consoleenabled">false</p0:property>
-		<p0:property __ID="17" type="consoleheights"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+	<p0:properties __ID="15">
+		<p0:property __ID="16" type="perspective">Starter</p0:property>
+		<p0:property __ID="17" type="consoleenabled">false</p0:property>
+		<p0:property __ID="18" type="consoleheights"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
 <p0:HashMap xmlns:p0="typeinfo:java.util" __ID="0">
 	<entries>
 		<entry __ID="1">
@@ -68,21 +68,21 @@
 	</entries>
 </p0:HashMap>
 ]]></p0:property>
-		<type __ID="18">controlcenter</type>
+		<type __ID="19">controlcenter</type>
 	</p0:properties>
-	<p0:properties __ID="19">
-		<p0:property __ID="20" type="leftsplit_location">0.6702290076335878</p0:property>
-		<p0:property __ID="21" type="mainsplit_location">0.27634194831013914</p0:property>
-		<type __ID="22">Starter</type>
+	<p0:properties __ID="20">
+		<p0:property __ID="21" type="leftsplit_location">0.6702290076335878</p0:property>
+		<p0:property __ID="22" type="mainsplit_location">0.27634194831013914</p0:property>
+		<type __ID="23">Starter</type>
 	</p0:properties>
-	<p0:properties __ID="23">
-		<p0:property __ID="24" type="width">1034</p0:property>
-		<p0:property __ID="25" type="height">794</p0:property>
-		<p0:property __ID="26" type="x">829</p0:property>
-		<p0:property __ID="27" type="y">118</p0:property>
-		<p0:property __ID="28" type="extendedState">0</p0:property>
-		<p0:property __ID="29" type="jccexit">shutdown</p0:property>
-		<p0:property __ID="30" type="saveonexit">true</p0:property>
-		<type __ID="31">window</type>
+	<p0:properties __ID="24">
+		<p0:property __ID="25" type="width">1034</p0:property>
+		<p0:property __ID="26" type="height">794</p0:property>
+		<p0:property __ID="27" type="x">1173</p0:property>
+		<p0:property __ID="28" type="y">28</p0:property>
+		<p0:property __ID="29" type="extendedState">0</p0:property>
+		<p0:property __ID="30" type="jccexit">shutdown</p0:property>
+		<p0:property __ID="31" type="saveonexit">true</p0:property>
+		<type __ID="32">window</type>
 	</p0:properties>
 </p0:properties>

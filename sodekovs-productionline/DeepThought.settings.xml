@@ -137,23 +137,23 @@
 		<type __ID="35">StarterServicePanel</type>
 	</p0:properties>
 	<p0:properties __ID="36">
-		<p0:property __ID="37" type="fast">false</p0:property>
-		<p0:property __ID="38" type="autocreate">true</p0:property>
-		<p0:property __ID="39" type="autodelete">true</p0:property>
-		<type __ID="40">awa</type>
+		<p0:property __ID="37" type="entry">file:target/classes</p0:property>
+		<type __ID="38">library_service</type>
 	</p0:properties>
-	<p0:properties __ID="41">
-		<p0:property __ID="42" type="executing">true</p0:property>
-		<type __ID="43">simulationservice</type>
+	<p0:properties __ID="39">
+		<p0:property __ID="40" type="type">system</p0:property>
+		<p0:property __ID="41" type="delta">100</p0:property>
+		<p0:property __ID="42" type="dilation">1.0</p0:property>
+		<type __ID="43">clockservice</type>
 	</p0:properties>
 	<p0:properties __ID="44">
-		<p0:property __ID="45" type="type">system</p0:property>
-		<p0:property __ID="46" type="delta">100</p0:property>
-		<p0:property __ID="47" type="dilation">1.0</p0:property>
-		<type __ID="48">clockservice</type>
+		<p0:property __ID="45" type="executing">true</p0:property>
+		<type __ID="46">simulationservice</type>
 	</p0:properties>
-	<p0:properties __ID="49">
-		<p0:property __ID="50" type="entry">file:target/classes</p0:property>
-		<type __ID="51">library_service</type>
+	<p0:properties __ID="47">
+		<p0:property __ID="48" type="fast">false</p0:property>
+		<p0:property __ID="49" type="autocreate">true</p0:property>
+		<p0:property __ID="50" type="autodelete">true</p0:property>
+		<type __ID="51">awa</type>
 	</p0:properties>
 </p0:properties>

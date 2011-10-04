@@ -101,6 +101,13 @@ public class SimulationGenerator {
 			plc.setRunCount(1);
 		}
 
+		Integer intervalTime = config.getTimelordInterval();
+		if (intervalTime != null && count > 0) {
+			plc.setTimelordInterval(intervalTime);
+		} else {
+			plc.setTimelordInterval(0);
+		}
+
 		generateRobotsAndTransports(config.getRepeatCaps());
 		generateCommunicationGraph();
 		plc.setTasks(generateTasks(config.getWorkpieceCount(), config.getRepeatCaps()));

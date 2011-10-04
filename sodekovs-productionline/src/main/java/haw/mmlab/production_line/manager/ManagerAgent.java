@@ -331,8 +331,6 @@ public class ManagerAgent extends MicroAgent {
 						return IFuture.DONE;
 					}
 				});
-			} else {
-				killAgent();
 			}
 		}
 	}

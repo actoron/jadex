@@ -19,20 +19,14 @@ import haw.mmlab.production_line.strategies.IStrategy;
 import haw.mmlab.production_line.strategies.StrategyFactory;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.ConsoleHandler;
@@ -45,9 +39,9 @@ import java.util.logging.Level;
  */
 @Description("Transport agent.")
 @Arguments({ @Argument(clazz = Transport.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap") })
-@ProvidedServices(@ProvidedService(implementation = @Implementation(ProcessWorkpieceService.class), type = IProcessWorkpieceService.class))
-@RequiredServices({ @RequiredService(name = "processWorkpieceServices", type = IProcessWorkpieceService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL)),
-		@RequiredService(name = "managerService", type = IManagerService.class), @RequiredService(name = "dbService", type = IDatabaseService.class) })
+// @ProvidedServices(@ProvidedService(implementation = @Implementation(ProcessWorkpieceService.class), type = IProcessWorkpieceService.class))
+@RequiredServices({ /* @RequiredService(name = "processWorkpieceServices", type = IProcessWorkpieceService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL)), */
+@RequiredService(name = "managerService", type = IManagerService.class), @RequiredService(name = "dbService", type = IDatabaseService.class) })
 public class TransportAgent extends ProcessWorkpieceAgent {
 
 	/**
@@ -96,6 +90,8 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		getLogger().setUseParentHandlers(false);
 
 		getLogger().info(id + " created");
+
+		addService(id, IProcessWorkpieceService.class, new ProcessWorkpieceService(this, AgentConstants.AGENT_TYPE_TRANSPORT));
 
 		return IFuture.DONE;
 	}
@@ -182,52 +178,92 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		 * @param workpiece
 		 *            the given {@link Workpiece}
 		 */
-		@SuppressWarnings("unchecked")
 		private void sendWorkpiece(final IInternalAccess ia, final Task task, final Workpiece workpiece) {
-			getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
+			getProcessWPService(role).addResultListener(new DefaultResultListener<IProcessWorkpieceService>() {
 
-				public void resultAvailable(Collection<IProcessWorkpieceService> services) {
-					for (final IProcessWorkpieceService service : services) {
+				@Override
+				public void resultAvailable(IProcessWorkpieceService service) {
+					if (service != null) {
 						final String target = role.getPostcondition().getTargetAgent();
+						String msg = id + " tries to send workpiece to " + target;
+						// getLogger().fine(msg);
+						handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+						IFuture<Boolean> future = service.process(workpiece, id);
+						future.addResultListener(new DefaultResultListener<Boolean>() {
 
-						if (service.getId().equals(target)) {
-							String msg = id + " tries to send workpiece to " + target;
-							// getLogger().fine(msg);
-							handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-							IFuture<Boolean> future = service.process(workpiece, id);
-							future.addResultListener(new DefaultResultListener<Boolean>() {
-
-								public void resultAvailable(Boolean result) {
-									if (result) {
-										String msg = id + " has successfully sended workpiece to " + target;
-										// getLogger().fine(msg);
-										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-										if (wpCount.get(task.getId()) != null) {
-											wpCount.put(task.getId(), wpCount.get(task.getId()) + 1);
-										} else {
-											wpCount.put(task.getId(), 1);
-										}
-
-										if (role.getProcessingTime().equals(0)) {
-											// optimized for a event driven simulation if processing time is 0
-											waitForTick(ProduceStep.this);
-										} else {
-											waitFor(role.getProcessingTime(), ProduceStep.this);
-										}
+							public void resultAvailable(Boolean result) {
+								if (result) {
+									String msg = id + " has successfully sended workpiece to " + target;
+									// getLogger().fine(msg);
+									handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+									if (wpCount.get(task.getId()) != null) {
+										wpCount.put(task.getId(), wpCount.get(task.getId()) + 1);
 									} else {
-										String msg = id + " has failed to send workpiece to " + target;
-										// getLogger().fine(msg);
-										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-										waitForTick(new RetrySendStep(task, role, workpiece));
+										wpCount.put(task.getId(), 1);
 									}
-								}
-							});
 
-							break;
-						}
+									if (role.getProcessingTime().equals(0)) {
+										// optimized for a event driven simulation if processing time is 0
+										waitForTick(ProduceStep.this);
+									} else {
+										waitFor(role.getProcessingTime(), ProduceStep.this);
+									}
+								} else {
+									String msg = id + " has failed to send workpiece to " + target;
+									// getLogger().fine(msg);
+									handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+									waitForTick(new RetrySendStep(task, role, workpiece));
+								}
+							}
+						});
 					}
 				}
 			});
+
+			// getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
+			//
+			// public void resultAvailable(Collection<IProcessWorkpieceService> services) {
+			// for (final IProcessWorkpieceService service : services) {
+			// final String target = role.getPostcondition().getTargetAgent();
+			//
+			// if (service.getId().equals(target)) {
+			// String msg = id + " tries to send workpiece to " + target;
+			// // getLogger().fine(msg);
+			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+			// IFuture<Boolean> future = service.process(workpiece, id);
+			// future.addResultListener(new DefaultResultListener<Boolean>() {
+			//
+			// public void resultAvailable(Boolean result) {
+			// if (result) {
+			// String msg = id + " has successfully sended workpiece to " + target;
+			// // getLogger().fine(msg);
+			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+			// if (wpCount.get(task.getId()) != null) {
+			// wpCount.put(task.getId(), wpCount.get(task.getId()) + 1);
+			// } else {
+			// wpCount.put(task.getId(), 1);
+			// }
+			//
+			// if (role.getProcessingTime().equals(0)) {
+			// // optimized for a event driven simulation if processing time is 0
+			// waitForTick(ProduceStep.this);
+			// } else {
+			// waitFor(role.getProcessingTime(), ProduceStep.this);
+			// }
+			// } else {
+			// String msg = id + " has failed to send workpiece to " + target;
+			// // getLogger().fine(msg);
+			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+			// waitForTick(new RetrySendStep(task, role, workpiece));
+			// }
+			// }
+			// });
+			//
+			// break;
+			// }
+			// }
+			// }
+			// });
 		}
 	}
 
@@ -248,46 +284,81 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 			this.workpiece = workpiece;
 		}
 
-		@SuppressWarnings("unchecked")
 		public IFuture<Void> execute(IInternalAccess ia) {
 			final String target = role.getPostcondition().getTargetAgent();
-			getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
+			getProcessWPService(role).addResultListener(new DefaultResultListener<IProcessWorkpieceService>() {
 
 				@Override
-				public void resultAvailable(Collection<IProcessWorkpieceService> services) {
-					for (IProcessWorkpieceService service : services) {
-						if (service.getId().equals(target)) {
-							service.process(workpiece, id).addResultListener(new DefaultResultListener<Boolean>() {
+				public void resultAvailable(IProcessWorkpieceService service) {
+					if (service != null) {
+						service.process(workpiece, id).addResultListener(new DefaultResultListener<Boolean>() {
 
-								public void resultAvailable(Boolean result) {
-									if (result) {
-										String msg = id + " has successfully sended workpiece to " + target;
-										// getLogger().fine(msg);
-										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-										if (wpCount.get(task.getId()) != null) {
-											wpCount.put(task.getId(), wpCount.get(task.getId()) + 1);
-										} else {
-											wpCount.put(task.getId(), 1);
-										}
-
-										if (role.getProcessingTime().equals(0)) {
-											// optimized for a event driven simulation if the processing time is 0
-											waitForTick(new ProduceStep(role));
-										} else {
-											waitFor(role.getProcessingTime(), new ProduceStep(role));
-										}
+							public void resultAvailable(Boolean result) {
+								if (result) {
+									String msg = id + " has successfully sended workpiece to " + target;
+									// getLogger().fine(msg);
+									handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+									if (wpCount.get(task.getId()) != null) {
+										wpCount.put(task.getId(), wpCount.get(task.getId()) + 1);
 									} else {
-										String msg = id + " has failed to send workpiece to " + target;
-										// getLogger().fine(msg);
-										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-										waitForTick(RetrySendStep.this);
+										wpCount.put(task.getId(), 1);
 									}
+
+									if (role.getProcessingTime().equals(0)) {
+										// optimized for a event driven simulation if the processing time is 0
+										waitForTick(new ProduceStep(role));
+									} else {
+										waitFor(role.getProcessingTime(), new ProduceStep(role));
+									}
+								} else {
+									String msg = id + " has failed to send workpiece to " + target;
+									// getLogger().fine(msg);
+									handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+									waitForTick(RetrySendStep.this);
 								}
-							});
-						}
+							}
+						});
 					}
 				}
 			});
+
+			// getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
+			//
+			// @Override
+			// public void resultAvailable(Collection<IProcessWorkpieceService> services) {
+			// for (IProcessWorkpieceService service : services) {
+			// if (service.getId().equals(target)) {
+			// service.process(workpiece, id).addResultListener(new DefaultResultListener<Boolean>() {
+			//
+			// public void resultAvailable(Boolean result) {
+			// if (result) {
+			// String msg = id + " has successfully sended workpiece to " + target;
+			// // getLogger().fine(msg);
+			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+			// if (wpCount.get(task.getId()) != null) {
+			// wpCount.put(task.getId(), wpCount.get(task.getId()) + 1);
+			// } else {
+			// wpCount.put(task.getId(), 1);
+			// }
+			//
+			// if (role.getProcessingTime().equals(0)) {
+			// // optimized for a event driven simulation if the processing time is 0
+			// waitForTick(new ProduceStep(role));
+			// } else {
+			// waitFor(role.getProcessingTime(), new ProduceStep(role));
+			// }
+			// } else {
+			// String msg = id + " has failed to send workpiece to " + target;
+			// // getLogger().fine(msg);
+			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+			// waitForTick(RetrySendStep.this);
+			// }
+			// }
+			// });
+			// }
+			// }
+			// }
+			// });
 
 			return IFuture.DONE;
 		}
@@ -372,35 +443,61 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 			this.role = role;
 		}
 
-		@SuppressWarnings("unchecked")
 		public IFuture<Void> execute(IInternalAccess ia) {
-			getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
+			getProcessWPService(role).addResultListener(new DefaultResultListener<IProcessWorkpieceService>() {
 
-				public void resultAvailable(Collection<IProcessWorkpieceService> services) {
-					for (IProcessWorkpieceService service : services) {
+				@Override
+				public void resultAvailable(IProcessWorkpieceService service) {
+					if (service != null) {
 						final String target = role.getPostcondition().getTargetAgent();
-						if (service.getId().equals(target)) {
-							service.process(workpiece, id).addResultListener(new DefaultResultListener<Boolean>() {
+						service.process(workpiece, id).addResultListener(new DefaultResultListener<Boolean>() {
 
-								public void resultAvailable(Boolean result) {
-									if (result) {
-										String msg = id + " successfully delivered " + workpiece + " to " + target;
-										getLogger().fine(msg);
-										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-										setWorkpiece(null);
-										setMainState(MainState.RUNNING_IDLE);
-									} else {
-										String msg = id + " could not hand over workpiece to agent " + workpiece + " to " + target;
-										getLogger().fine(msg);
-										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-										waitForTick(SendWorkpieceStep.this);
-									}
+							public void resultAvailable(Boolean result) {
+								if (result) {
+									String msg = id + " successfully delivered " + workpiece + " to " + target;
+									getLogger().fine(msg);
+									handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+									setWorkpiece(null);
+									setMainState(MainState.RUNNING_IDLE);
+								} else {
+									String msg = id + " could not hand over workpiece to agent " + workpiece + " to " + target;
+									getLogger().fine(msg);
+									handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+									waitForTick(SendWorkpieceStep.this);
 								}
-							});
-						}
+							}
+						});
 					}
 				}
 			});
+
+			// getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
+			//
+			// public void resultAvailable(Collection<IProcessWorkpieceService> services) {
+			// for (IProcessWorkpieceService service : services) {
+			// final String target = role.getPostcondition().getTargetAgent();
+			// if (service.getId().equals(target)) {
+			// service.process(workpiece, id).addResultListener(new DefaultResultListener<Boolean>() {
+			//
+			// public void resultAvailable(Boolean result) {
+			// if (result) {
+			// String msg = id + " successfully delivered " + workpiece + " to " + target;
+			// getLogger().fine(msg);
+			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+			// setWorkpiece(null);
+			// setMainState(MainState.RUNNING_IDLE);
+			// } else {
+			// String msg = id + " could not hand over workpiece to agent " + workpiece + " to " + target;
+			// getLogger().fine(msg);
+			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+			// waitForTick(SendWorkpieceStep.this);
+			// }
+			// }
+			// });
+			// }
+			// }
+			// }
+			// });
 
 			return IFuture.DONE;
 		}

@@ -63,6 +63,7 @@
 		-->
 		
 		<task id="1" noSteps="20" noCaps="20"/>
+		<!--
 		<task id="2" noSteps="20" noCaps="20"/>
 		<task id="3" noSteps="20" noCaps="20"/>
 		<task id="4" noSteps="20" noCaps="20"/>
@@ -78,40 +79,7 @@
 		<task id="14" noSteps="20" noCaps="20"/>
 		<task id="15" noSteps="20" noCaps="20"/>
 		<task id="16" noSteps="20" noCaps="20"/>
-		<task id="17" noSteps="20" noCaps="20"/>
-		<task id="18" noSteps="20" noCaps="20"/>
-		<task id="19" noSteps="20" noCaps="20"/>
-		<task id="20" noSteps="20" noCaps="20"/>
-		<task id="21" noSteps="20" noCaps="20"/>
-		<task id="22" noSteps="20" noCaps="20"/>
-		<task id="23" noSteps="20" noCaps="20"/>
-		<task id="24" noSteps="20" noCaps="20"/>
-		<task id="25" noSteps="20" noCaps="20"/>
-		<task id="26" noSteps="20" noCaps="20"/>
-		<task id="27" noSteps="20" noCaps="20"/>
-		<task id="28" noSteps="20" noCaps="20"/>
-		<task id="29" noSteps="20" noCaps="20"/>
-		<task id="30" noSteps="20" noCaps="20"/>
-		<task id="31" noSteps="20" noCaps="20"/>
-		<task id="32" noSteps="20" noCaps="20"/>
-		<task id="33" noSteps="20" noCaps="20"/>
-		<task id="34" noSteps="20" noCaps="20"/>
-		<task id="35" noSteps="20" noCaps="20"/>
-		<task id="36" noSteps="20" noCaps="20"/>
-		<task id="37" noSteps="20" noCaps="20"/>
-		<task id="38" noSteps="20" noCaps="20"/>
-		<task id="39" noSteps="20" noCaps="20"/>
-		<task id="40" noSteps="20" noCaps="20"/>
-		<task id="41" noSteps="20" noCaps="20"/>
-		<task id="42" noSteps="20" noCaps="20"/>
-		<task id="43" noSteps="20" noCaps="20"/>
-		<task id="44" noSteps="20" noCaps="20"/>
-		<task id="45" noSteps="20" noCaps="20"/>
-		<task id="46" noSteps="20" noCaps="20"/>
-		<task id="47" noSteps="20" noCaps="20"/>
-		<task id="48" noSteps="20" noCaps="20"/>
-		<task id="49" noSteps="20" noCaps="20"/>
-		<task id="50" noSteps="20" noCaps="20"/>
+		-->
 	</tasks>
 	
 	<!-- Specifies whether the capabilities in the tasks should be repeated if there is more then one task. -->
@@ -122,12 +90,12 @@
 	<!-- For each robot a random value between min and max is used. -->
 	<!-- min must be greater or equals than 1 and max must be greater or equals than min -->
 	<!-- Default: min=1, max=1 -->
-	<redundancy min="100" max="100" />
+	<redundancy min="16" max="16" />
 	
 	<!-- Specifies the amount of work pieces to be processed by the system in each run. -->
 	<!-- Set to 0 for unlimited amount. -->
 	<!-- Default: 0 -->
-	<workpieces>20</workpieces>
+	<workpieces>200</workpieces>
 	
 	<!-- Specifies the processing time in each agent (robot and transporter). -->
 	<!-- For each agent a random value between min and max is used. -->
@@ -136,7 +104,7 @@
 	<!-- using the Event Clock in Jadex. A processing time greater 0 results in a simulation optimized for -->
 	<!-- the System Clock in Jadex. -->
 	<!-- Default: min=0, max=0 -->
-	<processing_time min="0" max="0" />
+	<processing_time min="5" max="10" />
 	
 	<!-- Specifies the buffer size for each robot. -->
 	<!-- For each robot a random value between min and max is used. -->
@@ -150,5 +118,5 @@
 	
 	<!-- Specifies the logging interval for the timelord agent. Specify a value of 0 for a event driven simulation. -->
 	<!-- Default: 0 -->
-	<timelord_interval>0</timelord_interval>
+	<timelord_interval>1</timelord_interval>
 </simulation_configuration>

@@ -24,20 +24,14 @@ import haw.mmlab.production_line.strategies.IStrategy;
 import haw.mmlab.production_line.strategies.StrategyFactory;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.ConsoleHandler;
@@ -50,9 +44,9 @@ import java.util.logging.Level;
  */
 @Description("Robot agent.")
 @Arguments({ @Argument(clazz = Robot.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap"), @Argument(clazz = IStrategy.class, name = "strategy") })
-@ProvidedServices(@ProvidedService(implementation = @Implementation(ProcessWorkpieceService.class), type = IProcessWorkpieceService.class))
-@RequiredServices({ @RequiredService(name = "processWorkpieceServices", type = IProcessWorkpieceService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL)),
-		@RequiredService(name = "managerService", type = IManagerService.class), @RequiredService(name = "dbService", type = IDatabaseService.class) })
+// @ProvidedServices(@ProvidedService(implementation = @Implementation(ProcessWorkpieceService.class), type = IProcessWorkpieceService.class))
+@RequiredServices({ /* @RequiredService(name = "processWorkpieceServices", type = IProcessWorkpieceService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL)), */
+@RequiredService(name = "managerService", type = IManagerService.class), @RequiredService(name = "dbService", type = IDatabaseService.class) })
 public class RobotAgent extends ProcessWorkpieceAgent {
 
 	/** The output {@link Buffer} */
@@ -110,6 +104,8 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		getLogger().setUseParentHandlers(false);
 
 		getLogger().info(id + " created");
+
+		addService(id, IProcessWorkpieceService.class, new ProcessWorkpieceService(this, AgentConstants.AGENT_TYPE_ROBOT));
 
 		return IFuture.DONE;
 	}
@@ -239,44 +235,76 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		 * @param ia
 		 *            the given {@link IInternalAccess}
 		 */
-		@SuppressWarnings("unchecked")
 		private void sendWorkpiece(final BufferElement element, IInternalAccess ia) {
 			// Rolle aus Pufferelement holen
 			final Role role = element.getRole();
 
-			getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
+			getProcessWPService(role).addResultListener(new DefaultResultListener<IProcessWorkpieceService>() {
 
-				public void resultAvailable(Collection<IProcessWorkpieceService> services) {
-					for (IProcessWorkpieceService service : services) {
+				@Override
+				public void resultAvailable(IProcessWorkpieceService service) {
+					if (service != null) {
 						final String target = role.getPostcondition().getTargetAgent();
-						if (service.getId().equals(target)) {
-							// Workpiece aus Pufferelement holen
-							final Workpiece wp = element.getWorkpiece();
+						final Workpiece wp = element.getWorkpiece();
+						service.process(wp, id).addResultListener(new DefaultResultListener<Boolean>() {
 
-							service.process(wp, id).addResultListener(new DefaultResultListener<Boolean>() {
-
-								public void resultAvailable(Boolean result) {
-									if (result) {
-										String msg = id + " successfully delivered " + wp + " to " + target;
-										// getLogger().fine(msg);
-										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-										// Element aus Puffer entfernen
-										buffer.dequeue();
-									} else {
-										String msg = id + " could not hand over workpiece " + wp + " to " + target;
-										// getLogger().fine(msg);
-										handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
-										// Element neu queuen
-										buffer.enqueue(buffer.dequeue());
-									}
-
-									waitForTick(SendWorkpieceStep.this);
+							public void resultAvailable(Boolean result) {
+								if (result) {
+									String msg = id + " successfully delivered " + wp + " to " + target;
+									// getLogger().fine(msg);
+									handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+									// Element aus Puffer entfernen
+									buffer.dequeue();
+								} else {
+									String msg = id + " could not hand over workpiece " + wp + " to " + target;
+									// getLogger().fine(msg);
+									handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+									// Element neu queuen
+									buffer.enqueue(buffer.dequeue());
 								}
-							});
-						}
+
+								waitForTick(SendWorkpieceStep.this);
+							}
+						});
 					}
+
 				}
 			});
+
+			// getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
+			//
+			// public void resultAvailable(Collection<IProcessWorkpieceService> services) {
+			// for (IProcessWorkpieceService service : services) {
+			// final String target = role.getPostcondition().getTargetAgent();
+			// if (service.getId().equals(target)) {
+			// // Workpiece aus Pufferelement holen
+			// final Workpiece wp = element.getWorkpiece();
+			//
+			// service.process(wp, id).addResultListener(new DefaultResultListener<Boolean>() {
+			//
+			// public void resultAvailable(Boolean result) {
+			// if (result) {
+			// String msg = id + " successfully delivered " + wp + " to " + target;
+			// // getLogger().fine(msg);
+			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+			// // Element aus Puffer entfernen
+			// buffer.dequeue();
+			// } else {
+			// String msg = id + " could not hand over workpiece " + wp + " to " + target;
+			// // getLogger().fine(msg);
+			// handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_PRODLINE, msg), getLogger());
+			// // Element neu queuen
+			// buffer.enqueue(buffer.dequeue());
+			// }
+			//
+			// waitForTick(SendWorkpieceStep.this);
+			// }
+			// });
+			// }
+			// }
+			// }
+			// });
+
 		}
 	}
 
@@ -302,6 +330,8 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 
 				assignedRoles.removeAll(giveAwayRoles);
 				assignedRoles.addAll(takeRoles);
+
+				processWPServices.keySet().removeAll(giveAwayRoles);
 
 				request.getDeficientRoles().removeAll(takeRoles);
 

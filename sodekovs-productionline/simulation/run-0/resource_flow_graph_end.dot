@@ -1,0 +1,91 @@
+/* Production Line resource flow graph dot confiuration template */
+
+digraph G {
+	size = "20,100";
+	concentrate = "false";
+	
+/* agent nodes: */
+	Transport19 [shape=ellipse];
+	Transport18 [shape=ellipse];
+	Consumer1 [shape=ellipse];
+	Transport9 [shape=ellipse];
+	Transport1 [shape=ellipse];
+	Transport2 [shape=ellipse];
+	Transport3 [shape=ellipse];
+	Transport4 [shape=ellipse];
+	Transport5 [shape=ellipse];
+	Transport6 [shape=ellipse];
+	Transport7 [shape=ellipse];
+	Transport8 [shape=ellipse];
+	Transport10 [shape=ellipse];
+	Transport11 [shape=ellipse];
+	Transport12 [shape=ellipse];
+	Transport13 [shape=ellipse];
+	Transport14 [shape=ellipse];
+	Transport15 [shape=ellipse];
+	Producer1 [shape=ellipse];
+	Transport16 [shape=ellipse];
+	Transport17 [shape=ellipse];
+	GRobot7 [shape=record];
+	GRobot8 [shape=record];
+	GRobot9 [shape=record];
+	GRobot19 [shape=record];
+	GRobot3 [shape=record];
+	GRobot18 [shape=record];
+	GRobot4 [shape=record];
+	GRobot17 [shape=record];
+	GRobot5 [shape=record];
+	GRobot16 [shape=record];
+	GRobot6 [shape=record];
+	GRobot15 [shape=record];
+	GRobot14 [shape=record];
+	GRobot13 [shape=record];
+	GRobot12 [shape=record];
+	GRobot20 [shape=record];
+	GRobot11 [shape=record];
+	GRobot10 [shape=record];
+	GRobot2 [shape=record];
+	GRobot1 [shape=record];
+
+/* connections: */
+			GRobot19 -> Transport19 [label="1-19"]
+				Transport19 -> GRobot20 [label="1-19"]
+				GRobot18 -> Transport18 [label="1-18"]
+				Transport18 -> GRobot19 [label="1-18"]
+				GRobot20 -> Consumer1 [label="1-20"]
+					GRobot9 -> Transport9 [label="1-9"]
+				Transport9 -> GRobot10 [label="1-9"]
+				GRobot1 -> Transport1 [label="1-1"]
+				Transport1 -> GRobot2 [label="1-1"]
+				GRobot2 -> Transport2 [label="1-2"]
+				Transport2 -> GRobot3 [label="1-2"]
+				GRobot3 -> Transport3 [label="1-3"]
+				Transport3 -> GRobot4 [label="1-3"]
+				GRobot4 -> Transport4 [label="1-4"]
+				Transport4 -> GRobot5 [label="1-4"]
+				GRobot5 -> Transport5 [label="1-5"]
+				Transport5 -> GRobot6 [label="1-5"]
+				GRobot6 -> Transport6 [label="1-6"]
+				Transport6 -> GRobot7 [label="1-6"]
+				GRobot7 -> Transport7 [label="1-7"]
+				Transport7 -> GRobot8 [label="1-7"]
+				GRobot8 -> Transport8 [label="1-8"]
+				Transport8 -> GRobot9 [label="1-8"]
+				GRobot10 -> Transport10 [label="1-10"]
+				Transport10 -> GRobot13 [label="1-10"]
+				GRobot13 -> Transport11 [label="1-11"]
+				Transport11 -> GRobot12 [label="1-11"]
+				GRobot12 -> Transport12 [label="1-12"]
+				Transport12 -> GRobot11 [label="1-12"]
+				GRobot11 -> Transport13 [label="1-13"]
+				Transport13 -> GRobot14 [label="1-13"]
+				GRobot14 -> Transport14 [label="1-14"]
+				Transport14 -> GRobot15 [label="1-14"]
+				GRobot15 -> Transport15 [label="1-15"]
+				Transport15 -> GRobot16 [label="1-15"]
+					Producer1 -> GRobot1 [label="1-0"]
+				GRobot16 -> Transport16 [label="1-16"]
+				Transport16 -> GRobot17 [label="1-16"]
+				GRobot17 -> Transport17 [label="1-17"]
+				Transport17 -> GRobot18 [label="1-17"]
+	}
