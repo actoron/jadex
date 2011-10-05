@@ -67,6 +67,21 @@ public class SimulationGenerator {
 	}
 
 	/**
+	 * Creates a new SimulationGenerator for the given {@link SimulationConfig}.
+	 * 
+	 * @param config
+	 *            the given {@link SimulationConfig}
+	 */
+	public SimulationGenerator(SimulationConfig config) {
+		this.config = config;
+		capCounter = new HashMap<Capability, Integer>();
+		randomizer = new Random();
+		robots = new HashMap<String, Robot>();
+		transports = new HashMap<String, Transport>();
+		generateConfiguration();
+	}
+
+	/**
 	 * Gets the {@link ProductionLineConfiguration} generated out of the configuration.
 	 * 
 	 * @return The {@link ProductionLineConfiguration}

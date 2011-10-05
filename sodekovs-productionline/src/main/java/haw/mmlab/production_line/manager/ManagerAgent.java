@@ -325,6 +325,16 @@ public class ManagerAgent extends MicroAgent {
 						return IFuture.DONE;
 					}
 				});
+			} else {
+				// kill the application
+				waitForTick(new IComponentStep<Void>() {
+
+					@Override
+					public IFuture<Void> execute(IInternalAccess ia) {
+						getParent().killComponent();
+						return IFuture.DONE;
+					}
+				});
 			}
 		}
 	}
