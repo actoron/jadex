@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import sodekovs.util.misc.FileHandler;
+import sodekovs.util.misc.GlobalConstants;
 
 public class StartSimulationExperimentsPlan extends Plan {
 
@@ -44,7 +45,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 		// read the *.application.xml file from the file system
 		clientArgs.put(Constants.APPLICATION_FILE_AS_XML_STRING, FileHandler.readFileAsString(simConf.getApplicationReference()));
 		// read the *.configuration.xml file from the file system
-		clientArgs.put(Constants.CONFIGURATION_FILE_AS_XML_STRING, FileHandler.readFileAsString((String) getBeliefbase().getBelief("simulationDescriptionFile").getFact()));
+		clientArgs.put(GlobalConstants.CONFIGURATION_FILE_AS_XML_STRING, FileHandler.readFileAsString((String) getBeliefbase().getBelief("simulationDescriptionFile").getFact()));
 
 		// prepare object that handles the result
 		RowResult rowResult = new RowResult();
@@ -65,7 +66,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 
 		// store simConf since it contains the current configuration of the parameters that are swept through
 		getBeliefbase().getBelief("simulationConf").setFact(simConf);
-		clientArgs.put(Constants.CURRENT_PARAMETER_CONFIGURATION, simConf.getOptimization().getParameterSweeping().getCurrentConfiguration());
+		clientArgs.put(GlobalConstants.CURRENT_PARAMETER_CONFIGURATION, simConf.getOptimization().getParameterSweeping().getCurrentConfiguration());
 
 		// update GUI: create new panel/table for new ensemble
 		// ControlCenter gui = (ControlCenter)
@@ -78,7 +79,7 @@ public class StartSimulationExperimentsPlan extends Plan {
 			// ObjectCloner.deepCopy(simConf));
 
 			String experimentID = rowCounter + "." + expInRow;
-			clientArgs.put(Constants.EXPERIMENT_ID, experimentID);
+			clientArgs.put(GlobalConstants.EXPERIMENT_ID, experimentID);
 
 			// startApplication(appName, fileName, configName, args);
 			// startApplicationRemotley(applicationArgs,clientArgs);

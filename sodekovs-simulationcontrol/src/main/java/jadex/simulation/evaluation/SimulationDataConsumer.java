@@ -5,12 +5,13 @@ import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.evaluation.DataTable;
 import jadex.extension.envsupport.evaluation.ITableDataConsumer;
 import jadex.extension.envsupport.evaluation.ITableDataProvider;
-import jadex.simulation.helper.Constants;
 import jadex.simulation.model.ObservedEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
+import sodekovs.util.misc.GlobalConstants;
 
 /**
  * Simple consumer that consumes events as "observed events" for processing
@@ -41,7 +42,7 @@ public class SimulationDataConsumer extends SimplePropertyObject implements ITab
 
 		// Things needed for the simulation
 								
-		String experimentId = (String) getSpace().getProperty(Constants.EXPERIMENT_ID);
+		String experimentId = (String) getSpace().getProperty(GlobalConstants.EXPERIMENT_ID);
 		
 //		String experimentId = (String) getSpace().getContext().getArguments().get(Constants.EXPERIMENT_ID);
 //		String appName = getSpace().getContext().getComponentIdentifier().getLocalName();		

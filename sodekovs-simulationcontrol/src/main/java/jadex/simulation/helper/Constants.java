@@ -27,7 +27,7 @@ public class Constants {
 	public static final String ROWS_TO_DO = "Rows_To_Do";
 	
 	//The id of the experiment according to following format: numberOfRow.numberOfExperimentInThisRow
-	public static final String EXPERIMENT_ID = "Experiment_id";
+//	public static final String EXPERIMENT_ID = "Experiment_id";
 	
 	//Containing the facts for a simulation client.
 	public static final String SIMULATION_FACTS_FOR_CLIENT = "Simulation_Facts_For_Client";
@@ -62,13 +62,8 @@ public class Constants {
 
 	// XML file as String
 	public static final String APPLICATION_FILE_AS_XML_STRING = "ApplicationFileAsXMLString";
-	public static final String CONFIGURATION_FILE_AS_XML_STRING = "ConfigurationFileAsXMLString";
+//	public static final String CONFIGURATION_FILE_AS_XML_STRING = "ConfigurationFileAsXMLString";
 
-	// Current Configuration of the parameter values to be iterated
-	public static final String CURRENT_PARAMETER_CONFIGURATION = "CurrentParameterConfiguration";
-	//-- Constants used in the SimulationConfiguration xml file
-	
-	
 	//Denotes that the time expression is given as relative time (= duration)
 	public static final String RELATIVE_TIME_EXPRESSION = "relative";
 	

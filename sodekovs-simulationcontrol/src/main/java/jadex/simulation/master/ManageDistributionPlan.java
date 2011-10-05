@@ -13,6 +13,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import sodekovs.util.misc.GlobalConstants;
+
 public class ManageDistributionPlan extends Plan
 {
 
@@ -52,7 +54,7 @@ public class ManageDistributionPlan extends Plan
 			if (services.size() > 0) {
 
 
-				System.out.println("#ManageDistributionPlan# Distributed new Simulation Experiment remotely. Nr.:" + clientArgs.get(Constants.EXPERIMENT_ID) + "(" + beliefbaseFacts.get(Constants.TOTAL_EXPERIMENT_COUNTER) + ") with Optimization Values: "
+				System.out.println("#ManageDistributionPlan# Distributed new Simulation Experiment remotely. Nr.:" + clientArgs.get(GlobalConstants.EXPERIMENT_ID) + "(" + beliefbaseFacts.get(Constants.TOTAL_EXPERIMENT_COUNTER) + ") with Optimization Values: "
 						+ simConf.getOptimization().getParameterSweeping().getCurrentConfiguration());
 				
 

@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import sodekovs.util.misc.GlobalConstants;
+
 /**
  * Responsible for dealing with the result of one single simulation experiment.
  * 
@@ -111,7 +113,7 @@ public class ComputeSingleResultPlan extends Plan {
 
 		long startTime = ((Long) content.get(Constants.EXPERIMENT_START_TIME)).longValue();
 		long endTime = ((Long) content.get(Constants.EXPERIMENT_END_TIME)).longValue();
-		String experimentId = (String) content.get(Constants.EXPERIMENT_ID);
+		String experimentId = (String) content.get(GlobalConstants.EXPERIMENT_ID);
 
 		// init buckets, in order to filter events, that belong to observers
 		// which only need the last "observedValue".

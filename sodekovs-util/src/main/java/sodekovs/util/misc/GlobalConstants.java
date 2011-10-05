@@ -10,6 +10,13 @@ public class GlobalConstants {
 	public static final String BDI_AGENT = "BDIAgent";
 	public static final String ISPACE_OBJECT = "ISpaceObject";
 	
+	//Simulation.xml
+	public static final String CONFIGURATION_FILE_AS_XML_STRING = "ConfigurationFileAsXMLString";
+	//The id of the experiment according to following format: numberOfRow.numberOfExperimentInThisRow
+	public static final String EXPERIMENT_ID = "Experiment_id";
+	// Current Configuration of the parameter values to be iterated
+	public static final String CURRENT_PARAMETER_CONFIGURATION = "CurrentParameterConfiguration";
+	
 	//GUNPLOT
 	public static final String DB_GNUPLOT_SCHEMA = "Gnuplot";
 	public static final String DB_GNUPLOT_LOGTABLE = "Logs";
