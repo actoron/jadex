@@ -5,7 +5,7 @@ import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.benchmarking.helper.Constants;
 import jadex.benchmarking.helper.Methods;
-import jadex.benchmarking.helper.OnlineVisualisation;
+//import jadex.benchmarking.helper.OnlineVisualisation;
 import jadex.benchmarking.logger.ScheduleLogger;
 import jadex.benchmarking.model.Data;
 import jadex.benchmarking.model.Dataconsumer;
@@ -73,7 +73,7 @@ public class InitBenchmarkingPlan extends Plan {
 	private IComponentIdentifier schedulerCID = null;
 	// private Log events
 	private ScheduleLogger scheduleLogger = null;
-	private OnlineVisualisation vis = null;
+//	private OnlineVisualisation vis = null;
 
 	public void body() {
 		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
@@ -377,7 +377,7 @@ public class InitBenchmarkingPlan extends Plan {
 			if (abstractConsumer instanceof AbstractChartDataConsumer)
 				chartDataConsumer.add((AbstractChartDataConsumer) abstractConsumer);
 		}
-		this.vis = new OnlineVisualisation(chartDataConsumer);
+//		this.vis = new OnlineVisualisation(chartDataConsumer);
 	}
 
 	/***
