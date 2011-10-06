@@ -325,7 +325,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		addReceivers(reply, giveAwayRoles);
 		reply.addReceiver(request.getAgentId());
 
-		databaseLogger.incrementHopCount(1);
+		databaseLogger.incrementHopCount(request.getHopCount());
 
 		waitForTick(new SendMediumMessageStep(reply));
 	}
