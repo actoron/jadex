@@ -34,7 +34,7 @@ public class SimulationManager {
 
 	private static final int NUMBER_OF_ROBOTS = 10;
 
-	private static final int NUMBER_OF_WORKPIECES = 50;
+	private static final int NUMBER_OF_WORKPIECES = 10;
 
 	private static final int TIMELORD_INTERVAL = 1;
 
@@ -76,13 +76,15 @@ public class SimulationManager {
 			public void resultAvailable(Object result) {
 				if (manager.redRate <= STOP_REDUNDANCY_RATE) {
 					if (manager.workload >= STOP_WORKLOAD) {
-						manager.workload = 10;
+						manager.workload = START_WORKLOAD;
 						manager.redRate += 10;
 					} else {
 						manager.workload += 10;
 					}
 
-					manager.startSimulation(cms, this, manager.redRate, manager.workload);
+					if (manager.redRate <= STOP_REDUNDANCY_RATE) {
+						manager.startSimulation(cms, this, manager.redRate, manager.workload);
+					}
 				}
 			}
 		};
@@ -170,8 +172,8 @@ public class SimulationManager {
 			for (int j = 10; j <= workload; j += 10) {
 				for (int k = 1; k <= noRobots; k++) {
 					TaskStep step = new TaskStep();
-					step.setRobot("Robot" + k + "-Task" + i);
-					step.setAction("Cap" + k + "-Task" + i);
+					step.setRobot("Robot" + k + "_Task" + i);
+					step.setAction("Cap" + k + "_Task" + i);
 
 					steps.add(step);
 				}
