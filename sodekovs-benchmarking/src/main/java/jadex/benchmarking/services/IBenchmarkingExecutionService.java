@@ -16,6 +16,16 @@ import java.util.Map;
 public interface IBenchmarkingExecutionService	extends IService
 {
 
+	
+	/**
+	 *  Benchmark an experiment defined as application.xml and configured via a "*.benchmarking.xml" file
+	 *  @param applicationArgs can be defined if service is called by ClientSimulator; null if only benchmark has to be executed without parameter sweeping etc.
+	 *  @param clientArgs can be defined if service is called by ClientSimulator; null if only benchmark has to be executed without parameter sweeping etc.
+	 *  @param benchmarkingDefinitionFile reference to the file with the benchmarking definition
+	 */
+	public IFuture executeBenchmark(Map applicationArgs, HashMap<String,Object> clientArgs, String benchmarkingDefinitionFile);
+	
+	
 	/**
 	 *  Get information about the status of the benchmark.
 	 */

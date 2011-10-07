@@ -23,15 +23,17 @@ public class CheckData {
 		long tmp1 = System.currentTimeMillis();
 		 String cityName = "Washington";
 //		String cityName = "London";
+//		 String cityName = "Rennes";
+//			String cityName = "Brisbane";
 
 		// load all data for this city
 		ArrayList<SystemSnapshot> snapshotList = stationsDAO.loadAllLogsForCity(cityName);
 
 		ArrayList<CheckDataResult> results = new ArrayList<CheckDataResult>();
-		for (int i = 1; i < 32; i++) {
+		for (int i = 1; i < 24; i++) {
 			Calendar day = Calendar.getInstance();
 			day.setTime(new Date(System.currentTimeMillis()));
-			day.set(Calendar.MONTH, Calendar.JULY);
+			day.set(Calendar.MONTH, Calendar.SEPTEMBER);
 			day.set(Calendar.DAY_OF_MONTH, i);
 
 			// System.out.println(new Date(day.getTimeInMillis()).toString());

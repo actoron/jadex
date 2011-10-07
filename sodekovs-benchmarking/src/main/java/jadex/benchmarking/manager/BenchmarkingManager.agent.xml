@@ -8,9 +8,8 @@
 	name="BenchmarkingManager" package="jadex.benchmarking.manager">
 
 	<imports>
-		<!-- <import>jadex.base.contextservice.*</import>
-		<import>jadex.base.appdescriptor.*</import>		
-		<import>jadex.extension.envsupport.math.*</import>-->
+		<!-- <import>jadex.base.contextservice.*</import> <import>jadex.base.appdescriptor.*</import> 
+			<import>jadex.extension.envsupport.math.*</import> -->
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.Map</import>
 		<import>java.util.HashMap</import>
@@ -44,7 +43,8 @@
 			This file is parsed on agent start. The reference to the file is passes by 
 			the surrounding application file description. -->
 		<belief name="scheduleDescriptionFile" class="String">
-			<fact>"../sodekovs-benchmarking/src/main/java/jadex/benchmarking/examples/TestBenchmark2.xml"</fact>
+			<fact>"../sodekovs-benchmarking/src/main/java/jadex/benchmarking/examples/TestBenchmark2.xml"
+			</fact>
 		</belief>
 
 		<!-- Store information about the status of the executed benchmark: preparing_start, 
@@ -58,17 +58,82 @@
 			<fact> String.valueOf(new java.util.Random().nextInt())</fact>
 			<assignto ref="memoryLoggerCap.MemoryLoggerID" />
 		</belief>
+		
+		
+		
+		<!-- NEW ******************************************************************************************************** -->
+		<!-- NEW ******************************************************************************************************** -->
+		<!-- NEW ******************************************************************************************************** -->
+		
+		
+		<!-- Used to manage reference the between calling service and finished benchmark: Which service call corresponds to which benchmark? Caller ID is the time when the benchmark was init. (long); The value (int) is the local benchmark counter. -->
+		<belief name="callerBenchmarkReference" class="Map">
+			<!-- HashMap used as: new HashMap<Long,Integer> -->
+			 <fact>new HashMap()</fact>
+		</belief>
+	
+	<!-- Contains two information for each conducted benchmark: simulationFacts and  observedEventsMap. Key is the benchmarkCounter, which is incremented automatically.-->
+		<belief name="factsAboutAllBenchmarks" class="Map">
+		<!-- HashMap used as: new HashMap<Integer,HashMap> -->
+			<fact>new HashMap()</fact>
+		</belief>
+		
+		
+		<!-- Counts the number of benchmark that have been executed. Is also used as ID for the benchmarks to enable parallel execution. -->
+		<belief name="benchmarkCounter" class="int">
+			<fact>0</fact>
+		</belief>
+		
+		<!-- Returns the number of currently running benchmark on this agent. -->
+		<belief name="numberOfRunningBenchmarks" class="int">
+			<fact>0</fact>
+		</belief>
+		
+		<!-- NEW ******************************************************************************************************** -->
+		<!-- NEW ******************************************************************************************************** -->
+		<!-- NEW ******************************************************************************************************** -->
 
 	</beliefs>
 
 
-	<plans>
-		<!-- Init the benchmark. -->
-		<plan name="init_benchmark">
-			<body class="InitBenchmarkingPlan" />
-		</plan>
+	<goals>
+		<!-- Used to start execution of one benchmark. -->
+		<performgoal name="startExecution" retry="false" exclude="never">
+			<!-- Args required to start application; This arg is optional: only required if called 
+				by an SimulationAgent -->
+			<parameter name="applicationConf" class="Map" />
+			<!-- The name (id) of the application; This arg is optional: only required if called 
+				by an SimulationAgent -->
+			<parameter name="clientConf" class="HashMap" />
+			<!-- Reference to the BenchmarkingReferenceFile; Mandatory -->
+			<parameter name="benchmarkingDefinitionFile" class="String" />
+			<!-- The timestamp which serves as ID for the calling service. -->
+			<parameter name="callerID" class="Long" />
+		</performgoal>
+	</goals>
 
+	<plans>
+		<!-- Responsible to manage execution of benchmark. -->
+		<plan name="runtime_manager">
+			<body class="InitBenchmarkingPlan" />
+			<parameter name="applicationConf" class="Map">
+				<goalmapping ref="startExecution.applicationConf" />
+			</parameter>
+			<parameter name="clientConf" class="HashMap">
+				<goalmapping ref="startExecution.clientConf" />
+			</parameter>
+			<parameter name="benchmarkingDefinitionFile" class="String">
+				<goalmapping ref="startExecution.benchmarkingDefinitionFile" />
+			</parameter>
+			<parameter name="callerID" class="Long">
+				<goalmapping ref="startExecution.callerID" />
+			</parameter>
+			<trigger>
+				<goal ref="startExecution" />
+			</trigger>
+		</plan>
 	</plans>
+
 
 
 	<properties>
@@ -81,19 +146,13 @@
 			IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)</property> -->
 	</properties>
 
-	<configurations>
-		<configuration name="default">
-			<plans>
-				<initialplan ref="init_benchmark" />
-			</plans>
-		</configuration>
-	</configurations>
 
 	<services>
-	<providedservice class="IBenchmarkingExecutionService">
-			<implementation>new BenchmarkingExecutionService($scope)</implementation>
+		<providedservice class="IBenchmarkingExecutionService">
+			<implementation>new BenchmarkingExecutionService($scope)
+			</implementation>
 		</providedservice>
 	</services>
-	
+
 
 </agent>
