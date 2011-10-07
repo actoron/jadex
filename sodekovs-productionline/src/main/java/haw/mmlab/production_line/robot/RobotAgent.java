@@ -43,7 +43,8 @@ import java.util.logging.Level;
  * @author thomas
  */
 @Description("Robot agent.")
-@Arguments({ @Argument(clazz = Robot.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap"), @Argument(clazz = IStrategy.class, name = "strategy") })
+@Arguments({ @Argument(clazz = Robot.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap"), @Argument(clazz = IStrategy.class, name = "strategy"),
+		@Argument(clazz = Integer.class, name = "reconfDelay") })
 @RequiredServices({ @RequiredService(name = "managerService", type = IManagerService.class) })
 public class RobotAgent extends ProcessWorkpieceAgent {
 
@@ -60,6 +61,8 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 	@SuppressWarnings("unchecked")
 	@Override
 	public IFuture<Void> agentCreated() {
+		reconfDelay = (Integer) getArgument("reconfDelay");
+
 		this.databaseLogger = new DatabaseLogger();
 
 		getRequiredService("managerService").addResultListener(new DefaultResultListener<IManagerService>() {
@@ -292,7 +295,11 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 			}
 
 			if (!request.getDeficientRoles().isEmpty()) {
-				waitForTick(new SendMediumMessageStep(request));
+				if (reconfDelay == 0) {
+					waitForTick(new SendMediumMessageStep(request));
+				} else {
+					waitFor(reconfDelay, new SendMediumMessageStep(request));
+				}
 			} else {
 				databaseLogger.storeRoleChangeDistance(request);
 			}
@@ -304,7 +311,11 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 				request.incrementEscalationLevel();
 				handleConsoleMsg(new ConsoleMessage(ConsoleMessage.TYPE_ADAPTIVITY, id + " resends HelpRequest after increment excalation level to " + request.getEscalationLevel() + " for "
 						+ request.getDeficientRoles().size() + " roles: " + request.getDeficientRoles()), getLogger());
-				waitForTick(new SendMediumMessageStep(request));
+				if (reconfDelay == 0) {
+					waitForTick(new SendMediumMessageStep(request));
+				} else {
+					waitFor(reconfDelay, new SendMediumMessageStep(request));
+				}
 			}
 			// if the max escalation level is reached and their are still deficient roles, the reconfiguration failed
 			else {
@@ -327,7 +338,11 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 
 		databaseLogger.incrementHopCount(request.getHopCount());
 
-		waitForTick(new SendMediumMessageStep(reply));
+		if (reconfDelay == 0) {
+			waitForTick(new SendMediumMessageStep(reply));
+		} else {
+			waitFor(reconfDelay, new SendMediumMessageStep(reply));
+		}
 	}
 
 	private void addReceivers(HelpReply reply, List<Role> roles) {

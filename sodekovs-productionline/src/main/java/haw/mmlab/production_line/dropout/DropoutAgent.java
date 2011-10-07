@@ -83,7 +83,11 @@ public class DropoutAgent extends MicroAgent {
 	@Override
 	public void executeBody() {
 		for (Configuration conf : config.getConfigurations()) {
-			waitForTick(new QueryStep(conf));
+			if (conf.getRate() == 0) {
+				waitForTick(new QueryStep(conf));
+			} else {
+				waitFor(conf.getRate() * 1000, new QueryStep(conf));
+			}
 		}
 	}
 
@@ -98,7 +102,12 @@ public class DropoutAgent extends MicroAgent {
 		}
 
 		public IFuture<Void> execute(IInternalAccess ia) {
+			int rate = configuration.getRate() * 1000;
 			int count = configuration.getCount() != null ? configuration.getCount() : 0;
+
+			if (rate < 0) {
+				throw new IllegalStateException("rate must be a positive integer");
+			}
 
 			while (count <= 0 || i < count) {
 				AgentQuery query = configuration.getQuery();
@@ -107,7 +116,11 @@ public class DropoutAgent extends MicroAgent {
 				if (count > 0) {
 					i++;
 				}
-				waitForTick(this);
+				if (rate == 0) {
+					waitForTick(this);
+				} else {
+					waitFor(rate, this);
+				}
 			}
 
 			return IFuture.DONE;

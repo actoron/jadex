@@ -123,6 +123,13 @@ public class SimulationGenerator {
 			plc.setTimelordInterval(0);
 		}
 
+		Integer reconfTime = config.getReconfTime();
+		if (reconfTime != null && reconfTime > 0) {
+			plc.setReconfTime(reconfTime);
+		} else {
+			plc.setReconfTime(0);
+		}
+
 		generateRobotsAndTransports(config.getRepeatCaps());
 		generateCommunicationGraph();
 		plc.setTasks(generateTasks(config.getWorkpieceCount(), config.getRepeatCaps()));

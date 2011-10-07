@@ -50,6 +50,8 @@ public class SimulationManager {
 
 	private static final int STOP_WORKLOAD = 20;
 
+	private static final int RECONF_MSG_DELAY_TIME = 0;
+
 	private static final String OUTPUT_FILE_PATH = "conf/generated.conf.xml";
 
 	private int redRate = START_REDUNDANCY_RATE;
@@ -156,9 +158,12 @@ public class SimulationManager {
 	 *            the number of runs
 	 * @param timelordInterval
 	 *            the length of the timing interval
+	 * @param reconfTime
+	 *            the delay time for the reconfiguration messages
 	 * @return the resulting {@link SimulationConfig}
 	 */
-	private SimulationConfig generateConfig(int noTasks, int noRobots, int workload, int redundancyRate, int noWorkpieces, int minProcessTime, int maxProcessTime, int noRuns, int timelordInterval) {
+	private SimulationConfig generateConfig(int noTasks, int noRobots, int workload, int redundancyRate, int noWorkpieces, int minProcessTime, int maxProcessTime, int noRuns, int timelordInterval,
+			int reconfTime) {
 		// create a new SimulationConfig
 		SimulationConfig config = new SimulationConfig();
 
@@ -214,6 +219,9 @@ public class SimulationManager {
 		redundancy.setMax(noCaps);
 		config.setRedundancy(redundancy);
 
+		// set the reconf delay time
+		config.setReconfTime(reconfTime);
+
 		return config;
 	}
 
@@ -233,7 +241,7 @@ public class SimulationManager {
 	private void startSimulation(IComponentManagementService cms, DefaultResultListener killListener, int redRate, int workload) {
 		// create the config for this redRate and workload parameters
 		SimulationConfig config = generateConfig(NUMBER_OF_TASKS, NUMBER_OF_ROBOTS, workload, redRate, NUMBER_OF_WORKPIECES, MIN_PROCESSING_TIME, MAX_PROCESSING_TIME, NUMBER_OF_RUNS_PER_CONFIG,
-				TIMELORD_INTERVAL);
+				TIMELORD_INTERVAL, RECONF_MSG_DELAY_TIME);
 		SimulationGenerator generator = new SimulationGenerator(config);
 		generator.saveProductionLineConfiguration(OUTPUT_FILE_PATH);
 

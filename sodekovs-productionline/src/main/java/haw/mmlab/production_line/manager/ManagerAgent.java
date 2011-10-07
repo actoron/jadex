@@ -221,6 +221,7 @@ public class ManagerAgent extends MicroAgent {
 					args.put("config", robot);
 					args.put("taskMap", tasks);
 					args.put("strategy", strategyName);
+					args.put("reconfDelay", plc.getReconfTime());
 					CreationInfo cr = new CreationInfo(args, parent.getComponentIdentifier());
 
 					cms.createComponent(robot.getAgentId(), "haw/mmlab/production_line/robot/RobotAgent.class", cr, null).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
@@ -237,6 +238,7 @@ public class ManagerAgent extends MicroAgent {
 					Map<String, Object> args = new HashMap<String, Object>();
 					args.put("config", transport);
 					args.put("taskMap", tasks);
+					args.put("reconfDelay", plc.getReconfTime());
 					CreationInfo cr = new CreationInfo(args, parent.getComponentIdentifier());
 
 					cms.createComponent(transport.getAgentId(), "haw/mmlab/production_line/transport/TransportAgent.class", cr, null).addResultListener(

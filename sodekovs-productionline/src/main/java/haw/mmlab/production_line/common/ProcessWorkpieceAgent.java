@@ -76,6 +76,8 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 
 	protected Map<Role, IProcessWorkpieceService> processWPServices = new HashMap<Role, IProcessWorkpieceService>();
 
+	protected Integer reconfDelay = null;
+
 	protected IFuture<IProcessWorkpieceService> getProcessWPService(final Role role) {
 		IFuture<IProcessWorkpieceService> fut = null;
 
@@ -193,7 +195,11 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 
 		requestedRoles.addAll(deficientRoles);
 
-		waitForTick(new SendMediumMessageStep(request));
+		if (reconfDelay == 0) {
+			waitForTick(new SendMediumMessageStep(request));
+		} else {
+			waitFor(reconfDelay, new SendMediumMessageStep(request));
+		}
 	}
 
 	private List<String> getActiveCaps() {
@@ -260,7 +266,11 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 
 	@SuppressWarnings("unchecked")
 	protected void handleHelpRequest(HelpRequest request) {
-		waitForTick(new SendMediumMessageStep(request));
+		if (reconfDelay == 0) {
+			waitForTick(new SendMediumMessageStep(request));
+		} else {
+			waitFor(reconfDelay, new SendMediumMessageStep(request));
+		}
 	}
 
 	protected void handleHelpReply(HelpReply reply) {
@@ -378,7 +388,11 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 		}
 
 		if (!reply.getReceiverIds().isEmpty()) {
-			waitForTick(new SendMediumMessageStep(reply));
+			if (reconfDelay == 0) {
+				waitForTick(new SendMediumMessageStep(reply));
+			} else {
+				waitFor(reconfDelay, new SendMediumMessageStep(reply));
+			}
 		}
 	}
 

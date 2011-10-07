@@ -38,7 +38,7 @@ import java.util.logging.Level;
  * @author thomas
  */
 @Description("Transport agent.")
-@Arguments({ @Argument(clazz = Transport.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap") })
+@Arguments({ @Argument(clazz = Transport.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap"), @Argument(clazz = Integer.class, name = "reconfDelay") })
 @RequiredServices({ @RequiredService(name = "managerService", type = IManagerService.class) })
 public class TransportAgent extends ProcessWorkpieceAgent {
 
@@ -58,6 +58,8 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	@SuppressWarnings("unchecked")
 	@Override
 	public IFuture<Void> agentCreated() {
+		reconfDelay = (Integer) getArgument("reconfDelay");
+
 		databaseLogger = new DatabaseLogger();
 
 		Transport conf = (Transport) getArgument("config");

@@ -95,7 +95,7 @@
 	<!-- Specifies the amount of work pieces to be processed by the system in each run. -->
 	<!-- Set to 0 for unlimited amount. -->
 	<!-- Default: 0 -->
-	<workpieces>40</workpieces>
+	<workpieces>1</workpieces>
 	
 	<!-- Specifies the processing time in each agent (robot and transporter). -->
 	<!-- For each agent a random value between min and max is used. -->
@@ -119,4 +119,8 @@
 	<!-- Specifies the logging interval for the timelord agent. Specify a value of 0 for a event driven simulation. -->
 	<!-- Default: 0 -->
 	<timelord_interval>1</timelord_interval>
+	
+	<!-- Specifies the time messages are delayed during the reconfiguration process. A value of 0 should be used for -->
+	<!-- an event driven simulation. Else a value greater then 0 should be specified. -->
+	<reconf_time>1</reconf_time>
 </simulation_configuration>

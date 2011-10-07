@@ -33,6 +33,9 @@ public class ProductionLineConfiguration {
 	/** The logging interval for the timelord agent */
 	private int timelordInterval = 0;
 
+	/** The reconfiguration time delay */
+	private int reconfTime = 0;
+
 	@XmlElementWrapper(name = "robots")
 	@XmlElement(name = "robot")
 	public List<Robot> getRobots() {
@@ -99,5 +102,14 @@ public class ProductionLineConfiguration {
 
 	public void setTimelordInterval(int timelordInterval) {
 		this.timelordInterval = timelordInterval;
+	}
+
+	@XmlElement(name = "reconf_time")
+	public int getReconfTime() {
+		return reconfTime;
+	}
+
+	public void setReconfTime(int reconfTime) {
+		this.reconfTime = reconfTime;
 	}
 }
