@@ -5,7 +5,7 @@ import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.benchmarking.helper.Constants;
 import jadex.benchmarking.helper.Methods;
-//import jadex.benchmarking.helper.OnlineVisualisation;
+import jadex.benchmarking.helper.OnlineVisualisation;
 import jadex.benchmarking.logger.ScheduleLogger;
 import jadex.benchmarking.model.Data;
 import jadex.benchmarking.model.Dataconsumer;
@@ -74,8 +74,42 @@ public class InitBenchmarkingPlan extends Plan {
 	// private Log events
 	private ScheduleLogger scheduleLogger = null;
 //	private OnlineVisualisation vis = null;
+	
+	//required for parallel execution of benchmarks
+	private int localBenchmarkingCounter = -1;
 
 	public void body() {
+		
+		//NEW ********************************************
+		
+		//Increment the number of currently running experiments on this agent
+		numberOfRunningBenchmarks(1);
+
+		//Get local id for this benchmark to be conducted and increment counter																	  
+		localBenchmarkingCounter = (Integer) getBeliefbase().getBelief("benchmarkCounter").getFact();
+		getBeliefbase().getBelief("benchmarkCounter").setFact(localBenchmarkingCounter+1);
+			
+		//init mapping between calling service and the executed benchmark. needed in order to be able to execute benchmarks in parallel.
+		HashMap<Long,Integer>callerBenchmarkReference = (HashMap<Long,Integer>)getBeliefbase().getBelief("callerBenchmarkReference").getFact();
+		callerBenchmarkReference.put((Long) getParameter("callerID").getValue(),localBenchmarkingCounter);
+		getBeliefbase().getBelief("callerBenchmarkReference").setFact(callerBenchmarkReference);
+
+		
+		HashMap<String,Object> clientConfMap = (HashMap<String, Object>) getParameter("clientConf").getValue();
+		SimulationConfiguration simConf  = (SimulationConfiguration) XMLHandler.parseXMLFromString((String) clientConfMap.get(GlobalConstants.CONFIGURATION_FILE_AS_XML_STRING), SimulationConfiguration.class);
+		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+				
+		startApplication((Map) getParameter("applicationConf").getValue(), clientConfMap, simConf);
+		System.out.println("#RumtimeManagerPlan# Startet Simulation Experiment Nr.:" + clientConfMap.get(GlobalConstants.EXPERIMENT_ID) + ") with Optimization Values: "
+				+ clientConfMap.get(GlobalConstants.CURRENT_PARAMETER_CONFIGURATION));
+		System.out.println("Number of Exp at this agent: " + (Integer) getBeliefbase().getBelief("numberOfRunningExperiments").getFact());
+		
+		//NEW ********************************************
+		
+		
+		
+		
+		
 		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 
@@ -139,7 +173,7 @@ public class InitBenchmarkingPlan extends Plan {
 		getBeliefbase().getBelief("benchmarkStatus").setFact(Constants.TERMINATED);
 		scheduleLogger.log(Constants.PREPARE_GNUPLOT_SUFFIX);
 		persistLogs(scheduleLogger.getFileName(), benchConf);
-		// ConnectionManager.getInstance().executeStatement("Over and out");
+		// ConnectionManager.getInstance().executeStatement("Over and out");		
 	}
 
 	/*
@@ -432,5 +466,14 @@ public class InitBenchmarkingPlan extends Plan {
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Increment / Decrement the counter which contains the number of currently executed benchmarks
+	 * @param i
+	 */
+	private void numberOfRunningBenchmarks(int i){
+		int n = (Integer) getBeliefbase().getBelief("numberOfRunningBenchmarks").getFact();
+		getBeliefbase().getBelief("numberOfRunningBenchmarks").setFact(n+i);		
 	}
 }
