@@ -25,11 +25,11 @@ public class FloodingPacketRouter implements IMessageRouter {
 	private IMessageSender sender;
 
 	private Set<String> reachableDevices;
-	private String ownAdress;
+	private String ownAddress;
 	private Set<ReachableDevicesChangeListener> listeners;
 	
-	public FloodingPacketRouter(String ownAdress) {
-		this.ownAdress = ownAdress;
+	public FloodingPacketRouter(String ownAddress) {
+		this.ownAddress = ownAddress;
 		connectedDevices = new HashSet<String>();
 		reachableDevices = new HashSet<String>();
 		listeners = new HashSet<IMessageRouter.ReachableDevicesChangeListener>();
@@ -82,7 +82,7 @@ public class FloodingPacketRouter implements IMessageRouter {
 			deviceList = ri.getReachableDeviceList();
 		}
 		for (String address : deviceList) {
-			if (!address.equals(ownAdress)) {
+			if (!address.equals(ownAddress) && (!connectedDevices.contains(address))) {
 				boolean add = reachableDevices.add(address);
 				if (add) {
 					changed = true;
