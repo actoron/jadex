@@ -539,9 +539,20 @@ public class AlarmSettingsDialog extends JDialog
 	 */
 	public synchronized void stopPlaying()
 	{
-		if(playing!=null)
+		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			playing.drop();
+			@XMLClassname("play")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				if(playing!=null && playing.isAdopted())
+				{
+					playing.drop();
+				}
+				playing = null;
+				return IFuture.DONE;
+			}
+		});
+	
 //			playing.isFinished().addResultListener(new IResultListener()
 //			{
 //				public void resultAvailable(Object source, Object result)
@@ -556,7 +567,7 @@ public class AlarmSettingsDialog extends JDialog
 //					playing = null;
 //				}
 //			});
-		}
+//		}
 	}
 
 	/**

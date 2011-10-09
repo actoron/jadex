@@ -45,6 +45,7 @@ public class PlaySongPlan extends Plan
 		
 //		IThreadPoolService tp = (IThreadPoolService)SServiceProvider.getService(getScope().getServiceProvider(), IThreadPoolService.class).get(this);
 		IThreadPoolService tp = (IThreadPoolService)getServiceContainer().getRequiredService("tpservice").get(this);
+		final ClassLoader cl = getScope().getClassLoader();
 		tp.execute(new Runnable()
 		{
 			public void run()
@@ -58,7 +59,7 @@ public class PlaySongPlan extends Plan
 				{
 					try
 					{
-						in = SUtil.getResource(song.getPath(), getScope().getClassLoader());
+						in = SUtil.getResource(song.getPath(), cl);
 					}
 					catch(Exception ex)
 					{
