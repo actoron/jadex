@@ -8,16 +8,14 @@
 	<name>sodekovs-simulationcontrol</name>
 	<!-- <url>http://jadex.sourceforge.net</url> -->
 
-	<!--
-		<parent> <groupId>jadex</groupId>
-		<artifactId>jadex-settings</artifactId> <version>2.0-rc2</version>
-		<relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
-		</parent>
-	-->
-	
+	<!-- <parent> <groupId>jadex</groupId> <artifactId>jadex-settings</artifactId> 
+		<version>2.0-rc2</version> <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath> 
+		</parent> -->
+
 	<properties>
-		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-  	</properties>
+		<project.build.sourceEncoding>ISO-8859-1
+		</project.build.sourceEncoding>
+	</properties>
 
 	<build>
 		<resources>
@@ -27,14 +25,8 @@
 					<exclude>**/*.java</exclude>
 					<exclude>**/.svn/*</exclude>
 				</excludes>
-			</resource><!-- 
-			<resource>
-				<directory>src/test/java</directory>
-				<excludes>
-					<exclude>**/*.java</exclude>
-					<exclude>**/.svn/*</exclude>
-				</excludes>
-			</resource> -->
+			</resource><!-- <resource> <directory>src/test/java</directory> <excludes> 
+				<exclude>**/*.java</exclude> <exclude>**/.svn/*</exclude> </excludes> </resource> -->
 		</resources>
 
 		<plugins>
@@ -75,10 +67,10 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-        		<artifactId>maven-javadoc-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
 				<executions>
 					<execution>
 						<id>attach-javadoc</id>
@@ -87,7 +79,7 @@
 						</goals>
 					</execution>
 				</executions>
-        	</plugin>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -108,11 +100,8 @@
 			<artifactId>jadex-applib-bdi</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
-		<!-- <dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-applications-bdi</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>net.sourceforge.jadex</groupId> <artifactId>jadex-applications-bdi</artifactId> 
+			<version>2.1-SNAPSHOT</version> </dependency> -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools</artifactId>
@@ -142,6 +131,16 @@
 			<groupId>analyse</groupId>
 			<artifactId>jgraph</artifactId>
 			<version>6</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-math</groupId>
+			<artifactId>commons-math</artifactId>
+			<version>3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.collections</groupId>
+			<artifactId>collections-generic</artifactId>
+			<version>4.01</version>
 		</dependency>
 	</dependencies>
 </project>
