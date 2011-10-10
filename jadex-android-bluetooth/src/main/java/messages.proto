@@ -4,6 +4,22 @@ option java_package = "jadex.android.bluetooth.domain";
 option java_outer_classname = "MessageProtos";
 option optimize_for = LITE_RUNTIME;
 
-message DeviceList {
-	repeated string device = 1;
+message RoutingTable {
+	repeated RoutingTableEntry entry = 1;
+}
+
+message RoutingTableEntry {
+	required string device = 1;
+	optional int32 cost = 2 [default = 0];
+}
+
+enum RoutingType {
+	Flooding = 1;
+	DSDV = 2;
+	DSR = 3;
+}
+
+message RoutingInformation {
+	required RoutingType type = 1;
+	optional RoutingTable routingTable = 2;
 }

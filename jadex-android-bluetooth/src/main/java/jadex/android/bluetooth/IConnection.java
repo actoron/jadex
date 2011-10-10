@@ -4,10 +4,6 @@ import jadex.android.bluetooth.device.IBluetoothDevice;
 
 import java.io.IOException;
 
-
-
-import android.bluetooth.BluetoothDevice;
-
 public interface IConnection {
 
 	public boolean isAlive();

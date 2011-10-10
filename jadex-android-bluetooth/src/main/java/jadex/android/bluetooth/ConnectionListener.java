@@ -1,7 +1,6 @@
 package jadex.android.bluetooth;
 
 import jadex.android.bluetooth.device.IBluetoothDevice;
-import android.bluetooth.BluetoothDevice;
 
 
 public interface ConnectionListener {

@@ -1,24 +1,19 @@
 package jadex.android.bluetooth;
 
-import jadex.android.bluetooth.device.AndroidBluetoothDevice;
+import jadex.android.bluetooth.device.IBluetoothAdapter;
 import jadex.android.bluetooth.device.IBluetoothDevice;
+import jadex.android.bluetooth.device.IBluetoothSocket;
 
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
-
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-
 public class ServerConnection extends AConnection {
 
-	private BluetoothSocket socket;
+	private IBluetoothSocket socket;
 	private Timer timer;
 
-	public ServerConnection(BluetoothAdapter adapter, BluetoothSocket socket) {
+	public ServerConnection(IBluetoothAdapter adapter, IBluetoothSocket socket) {
 		super(adapter, socket.getRemoteDevice());
 		this.socket = socket;
 	}
@@ -39,7 +34,7 @@ public class ServerConnection extends AConnection {
 		public void run() {
 			if (isAlive()) {
 				if (lastPongReceived) {
-					DataPacket ping = new DataPacket(new AndroidBluetoothDevice(remoteDevice), null,
+					DataPacket ping = new DataPacket(remoteDevice, null,
 							DataPacket.TYPE_PING);
 					try {
 						addConnectionListener(new ConnectionListener() {

@@ -1,8 +1,6 @@
 package jadex.android.bluetooth.domain;
 
 import jadex.android.bluetooth.device.IBluetoothDevice;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.os.Parcel;
 import android.os.Parcelable;
 

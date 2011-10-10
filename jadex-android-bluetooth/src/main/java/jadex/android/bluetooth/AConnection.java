@@ -1,7 +1,8 @@
 package jadex.android.bluetooth;
 
-import jadex.android.bluetooth.device.AndroidBluetoothDevice;
+import jadex.android.bluetooth.device.IBluetoothAdapter;
 import jadex.android.bluetooth.device.IBluetoothDevice;
+import jadex.android.bluetooth.device.IBluetoothSocket;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,36 +10,30 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-
 public abstract class AConnection implements IConnection {
 
 	protected static final int CONNECTION_TIMEOUT = 2000;
 	
 	public static final int MESSAGE_READ = 0;
-	protected BluetoothAdapter adapter;
-	protected BluetoothDevice remoteDevice;
+	protected IBluetoothAdapter adapter;
+	protected IBluetoothDevice remoteDevice;
 
 	protected ConnectedThread connectedThread;
 
 	protected List<ConnectionListener> listeners;
 
-	public AConnection(BluetoothAdapter adapter, BluetoothDevice remoteDevice) {
+	public AConnection(IBluetoothAdapter adapter, IBluetoothDevice remoteDevice) {
 		this.adapter = adapter;
 		this.remoteDevice = remoteDevice;
 		listeners = new ArrayList<ConnectionListener>();
 	}
 
 	protected class ConnectedThread extends Thread {
-		private final BluetoothSocket mmSocket;
+		private final IBluetoothSocket mmSocket;
 		private final InputStream mmInStream;
 		private final OutputStream mmOutStream;
 
-		public ConnectedThread(BluetoothSocket socket) {
+		public ConnectedThread(IBluetoothSocket socket) {
 			mmSocket = socket;
 			InputStream tmpIn = null;
 			OutputStream tmpOut = null;
@@ -182,7 +177,7 @@ public abstract class AConnection implements IConnection {
 	protected void notifyMessageReceived(DataPacket dataPacket) {
 		synchronized (listeners) {
 			for (ConnectionListener l : listeners) {
-				l.messageReceived(dataPacket, new AndroidBluetoothDevice(this.remoteDevice), this);
+				l.messageReceived(dataPacket, this.remoteDevice, this);
 			}
 		}
 	}
@@ -212,6 +207,6 @@ public abstract class AConnection implements IConnection {
 
 	@Override
 	public IBluetoothDevice getRemoteDevice() {
-		return new AndroidBluetoothDevice(remoteDevice);
+		return remoteDevice;
 	}
 }

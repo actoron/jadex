@@ -1,21 +1,20 @@
 package jadex.android.bluetooth.routing;
 
-import static org.junit.Assert.*;
-
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import jadex.android.bluetooth.DataPacket;
 import jadex.android.bluetooth.domain.MessageProtos;
-import jadex.android.bluetooth.domain.MessageProtos.DeviceList;
-import jadex.android.bluetooth.routing.IRoutingInformation.RoutingType;
+import jadex.android.bluetooth.domain.MessageProtos.RoutingInformation;
+import jadex.android.bluetooth.domain.MessageProtos.RoutingInformation.Builder;
+import jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry;
+import jadex.android.bluetooth.domain.MessageProtos.RoutingType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javassist.bytecode.ByteArray;
-
-import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -86,8 +85,7 @@ public abstract class PacketRouterTest {
 		Set<String> reachableDeviceAddresses = packetRouter
 				.getReachableDeviceAddresses();
 
-		List<String> expectedReachableDeviceList = getSampleRoutingInformation()
-				.getReachableDeviceList();
+		List<String> expectedReachableDeviceList = getDeviceList(getSampleRoutingInformation());
 
 		for (String dev : expectedReachableDeviceList) {
 			assertTrue(reachableDeviceAddresses.contains(dev));
@@ -98,6 +96,15 @@ public abstract class PacketRouterTest {
 		packetRouter.addConnectedDevice(device1);
 		reachableDeviceAddresses = packetRouter.getReachableDeviceAddresses();
 		assertFalse(reachableDeviceAddresses.contains(device1));
+	}
+
+	private List<String> getDeviceList(RoutingInformation routingInformation) {
+		List<RoutingTableEntry> entryList = routingInformation.getRoutingTable().getEntryList();
+		ArrayList<String> result = new ArrayList<String>(entryList.size());
+		for (RoutingTableEntry routingTableEntry : entryList) {
+			result.add(routingTableEntry.getDevice());
+		}
+		return result;
 	}
 
 	@Test
@@ -115,27 +122,15 @@ public abstract class PacketRouterTest {
 		assertFalse(reachableDeviceAddresses.contains(device1));
 	}
 
-	private IRoutingInformation getUnsupportedRoutingInformation() {
-		return new IRoutingInformation() {
-
-			@Override
-			public RoutingType getRoutingType() {
-				for (RoutingType type : RoutingType.values()) {
-					if (type != getRouterRoutingType()) {
-						return type;
-					}
-				}
-				throw new RuntimeException();
+	private RoutingInformation getUnsupportedRoutingInformation() {
+		Builder builder = RoutingInformation.newBuilder();
+		builder.setRoutingTable(getSampleRoutingInformation().getRoutingTable());
+		for (RoutingType type : RoutingType.values()) {
+			if (type != getRouterRoutingType()) {
+				builder.setType(type);
 			}
-
-			@Override
-			public List<String> getReachableDeviceList() {
-				ArrayList<String> list = new ArrayList<String>();
-				list.add(device2);
-				list.add(device3);
-				return list;
-			}
-		};
+		}
+		return builder.build();
 	}
 
 	@Test
@@ -157,8 +152,9 @@ public abstract class PacketRouterTest {
 
 	@Test
 	public void testSendMessageToReachableDevice() {
-		IRoutingInformation sampleRI = getSampleRoutingInformation();
-		String sampleReachableDevice = sampleRI.getReachableDeviceList().get(0);
+		RoutingInformation sampleRI = getSampleRoutingInformation();
+		String sampleReachableDevice = getDeviceList(sampleRI)
+				.get(0);
 		DataPacket dataPacket = new DataPacket(sampleReachableDevice,
 				"data1".getBytes(), DataPacket.TYPE_DATA);
 		packetRouter.updateRoutingInformation(sampleRI);
@@ -181,21 +177,10 @@ public abstract class PacketRouterTest {
 				if ((address.equals(ownAddress))
 						&& (packet.Type == DataPacket.TYPE_ROUTING_INFORMATION)) {
 					try {
-						final DeviceList deviceList = MessageProtos.DeviceList
-								.parseFrom(packet.data);
-						packetRouter
-								.updateRoutingInformation(new IRoutingInformation() {
-
-									@Override
-									public RoutingType getRoutingType() {
-										return getRouterRoutingType();
-									}
-
-									@Override
-									public List<String> getReachableDeviceList() {
-										return deviceList.getDeviceList();
-									}
-								});
+						RoutingInformation ri = MessageProtos.RoutingInformation.parseFrom(packet.data);
+						// final List<String> deviceList =  getDeviceList(ri);
+						
+						packetRouter.updateRoutingInformation(ri);
 					} catch (InvalidProtocolBufferException e) {
 						throw new RuntimeException();
 					}
@@ -204,31 +189,18 @@ public abstract class PacketRouterTest {
 		});
 
 		packetRouter.setPacketSender(new IMessageSender() {
-
 			@Override
 			public void sendMessageToConnectedDevice(DataPacket packet,
 					String address) {
 				if ((address.equals(ownAddress2))
 						&& (packet.Type == DataPacket.TYPE_ROUTING_INFORMATION)) {
-					try {
-						final DeviceList deviceList = MessageProtos.DeviceList
-								.parseFrom(packet.data);
-						packetRouter2
-								.updateRoutingInformation(new IRoutingInformation() {
-
-									@Override
-									public RoutingType getRoutingType() {
-										return getRouterRoutingType();
-									}
-
-									@Override
-									public List<String> getReachableDeviceList() {
-										return deviceList.getDeviceList();
-									}
-								});
-					} catch (InvalidProtocolBufferException e) {
-						throw new RuntimeException();
-					}
+						RoutingInformation ri;
+						try {
+							ri = MessageProtos.RoutingInformation.parseFrom(packet.data);
+							packetRouter2.updateRoutingInformation(ri);
+						} catch (InvalidProtocolBufferException e) {
+							throw new RuntimeException();
+						}
 				}
 			}
 		});
@@ -237,9 +209,11 @@ public abstract class PacketRouterTest {
 		packetRouter2.addConnectedDevice(ownAddress);
 
 		// packetrouters should know each others device as connected now
-		assertTrue(packetRouter.getConnectedDeviceAddresses().contains(ownAddress2));
+		assertTrue(packetRouter.getConnectedDeviceAddresses().contains(
+				ownAddress2));
 		assertTrue(packetRouter.getConnectedDeviceAddresses().size() == 1);
-		assertTrue(packetRouter2.getConnectedDeviceAddresses().contains(ownAddress));
+		assertTrue(packetRouter2.getConnectedDeviceAddresses().contains(
+				ownAddress));
 		assertTrue(packetRouter2.getConnectedDeviceAddresses().size() == 1);
 		// but musnt contain it as reachable
 		assertTrue(packetRouter.getReachableDeviceAddresses().size() == 0);
@@ -247,20 +221,21 @@ public abstract class PacketRouterTest {
 
 		// now we add another device to router2
 		packetRouter2.addConnectedDevice(device1);
-		assertTrue(packetRouter2.getConnectedDeviceAddresses().contains(device1));
+		assertTrue(packetRouter2.getConnectedDeviceAddresses()
+				.contains(device1));
 		assertTrue(packetRouter2.getConnectedDeviceAddresses().size() == 2);
 		assertTrue(packetRouter2.getReachableDeviceAddresses().size() == 0);
 		// this changes should propagate to packet router 1
 		assertTrue(packetRouter.getConnectedDeviceAddresses().size() == 1);
 		assertTrue(packetRouter.getReachableDeviceAddresses().contains(device1));
 		assertTrue(packetRouter.getReachableDeviceAddresses().size() == 1);
-		
+
 	}
 
 	protected abstract IMessageRouter getPacketRouter(String ownAddress);
 
 	protected abstract RoutingType getRouterRoutingType();
 
-	protected abstract IRoutingInformation getSampleRoutingInformation();
+	protected abstract RoutingInformation getSampleRoutingInformation();
 
 }

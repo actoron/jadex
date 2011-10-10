@@ -1,7 +1,8 @@
 package jadex.android.bluetooth;
 
-import jadex.android.bluetooth.device.AndroidBluetoothDevice;
+import jadex.android.bluetooth.device.IBluetoothAdapter;
 import jadex.android.bluetooth.device.IBluetoothDevice;
+import jadex.android.bluetooth.device.IBluetoothSocket;
 import jadex.android.bluetooth.util.Helper;
 import jadex.android.bluetooth.util.ResettableTimer;
 
@@ -9,22 +10,17 @@ import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-
 public class ClientConnection extends AConnection {
 
-	public ClientConnection(BluetoothAdapter adapter, IBluetoothDevice dev) {
-		this(
-				adapter,
-				dev instanceof AndroidBluetoothDevice ? ((AndroidBluetoothDevice) dev)
-						.getDevice() : adapter
-						.getRemoteDevice(dev.getAddress()));
-	}
+//	public ClientConnection(IBluetoothAdapter adapter, IBluetoothDevice dev) {
+//		this(
+//				adapter,
+//				dev instanceof AndroidBluetoothDevice ? ((AndroidBluetoothDevice) dev)
+//						.getDevice() : adapter
+//						.getRemoteDevice(dev.getAddress()));
+//	}
 
-	public ClientConnection(BluetoothAdapter adapter, BluetoothDevice dev) {
+	public ClientConnection(IBluetoothAdapter adapter, IBluetoothDevice dev) {
 		super(adapter, dev);
 	}
 
@@ -49,7 +45,7 @@ public class ClientConnection extends AConnection {
 
 	private ResettableTimer timer;
 
-	public void manageConnectedSocket(BluetoothSocket mmSocket) {
+	public void manageConnectedSocket(IBluetoothSocket mmSocket) {
 		connectedThread = new ConnectedThread(mmSocket);
 		connectedThread.start();
 		timer = new ResettableTimer(
@@ -69,14 +65,14 @@ public class ClientConnection extends AConnection {
 	}
 
 	private class ConnectThread extends Thread {
-		private BluetoothSocket mmSocket;
-		private final BluetoothDevice mmDevice;
+		private IBluetoothSocket mmSocket;
+		private final IBluetoothDevice mmDevice;
 		private int uuidNum;
 
-		public ConnectThread(BluetoothDevice device) {
+		public ConnectThread(IBluetoothDevice device) {
 			// Use a temporary object that is later assigned to mmSocket,
 			// because mmSocket is final
-			BluetoothSocket tmp = null;
+			IBluetoothSocket tmp = null;
 			mmDevice = device;
 
 			// Get a BluetoothSocket to connect with the given BluetoothDevice

@@ -1,14 +1,13 @@
 package jadex.android.bluetooth;
 
 import jadex.android.bluetooth.device.AndroidBluetoothDevice;
+import jadex.android.bluetooth.device.BluetoothAdapterFactory;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.domain.BluetoothMessage;
 
 import java.util.UUID;
 
-
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 
 public class DataPacket {
 	
@@ -58,7 +57,7 @@ public class DataPacket {
 		if (dest != null) {
 			this.Dest = dest;
 		}
-		this.Src = BluetoothAdapter.getDefaultAdapter().getAddress();
+		this.Src = BluetoothAdapterFactory.getBluetoothAdapter().getAddress();
 		newPaketID();
 	}
 

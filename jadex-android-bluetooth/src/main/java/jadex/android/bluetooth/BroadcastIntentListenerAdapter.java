@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 
 public abstract class BroadcastIntentListenerAdapter {
 
+	private boolean oneTime = true;
+	private Context ctx;
 	private BroadcastReceiver receiver = new BroadcastReceiver() {
 
 		@Override
@@ -17,8 +19,6 @@ public abstract class BroadcastIntentListenerAdapter {
 			}
 		}
 	};
-	private Context ctx;
-	private boolean oneTime = true;
 
 	public BroadcastIntentListenerAdapter(Context ctx, IntentFilter filter) {
 		this(ctx, filter, true);

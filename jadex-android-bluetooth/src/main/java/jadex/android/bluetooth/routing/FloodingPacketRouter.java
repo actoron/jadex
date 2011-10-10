@@ -2,11 +2,12 @@ package jadex.android.bluetooth.routing;
 
 import jadex.android.bluetooth.BTP2PConnector;
 import jadex.android.bluetooth.DataPacket;
-import jadex.android.bluetooth.IConnection;
 import jadex.android.bluetooth.domain.MessageProtos;
-import jadex.android.bluetooth.domain.MessageProtos.DeviceList;
-import jadex.android.bluetooth.domain.MessageProtos.DeviceList.Builder;
-import jadex.android.bluetooth.routing.IMessageRouter.ReachableDevicesChangeListener;
+import jadex.android.bluetooth.domain.MessageProtos.RoutingInformation;
+import jadex.android.bluetooth.domain.MessageProtos.RoutingInformation.Builder;
+import jadex.android.bluetooth.domain.MessageProtos.RoutingTable;
+import jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry;
+import jadex.android.bluetooth.domain.MessageProtos.RoutingType;
 import jadex.android.bluetooth.service.Future;
 import jadex.android.bluetooth.service.IFuture;
 
@@ -14,20 +15,17 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Map.Entry;
-
-
-import android.bluetooth.BluetoothDevice;
 
 public class FloodingPacketRouter implements IMessageRouter {
 
+	private static final RoutingType ROUTING_TYPE = RoutingType.Flooding;
 	private Set<String> connectedDevices;
 	private IMessageSender sender;
 
 	private Set<String> reachableDevices;
 	private String ownAddress;
 	private Set<ReachableDevicesChangeListener> listeners;
-	
+
 	public FloodingPacketRouter(String ownAddress) {
 		this.ownAddress = ownAddress;
 		connectedDevices = new HashSet<String>();
@@ -74,18 +72,23 @@ public class FloodingPacketRouter implements IMessageRouter {
 	}
 
 	@Override
-	public void updateRoutingInformation(IRoutingInformation ri) {
+	public void updateRoutingInformation(RoutingInformation ri) {
 		boolean changed = false;
-		List<String> deviceList = Collections.emptyList();
-		if (ri.getRoutingType()
-				.equals(IRoutingInformation.RoutingType.Flooding)) {
-			deviceList = ri.getReachableDeviceList();
-		}
-		for (String address : deviceList) {
-			if (!address.equals(ownAddress) && (!connectedDevices.contains(address))) {
-				boolean add = reachableDevices.add(address);
-				if (add) {
-					changed = true;
+		Set<String> deviceList = Collections.emptySet();
+		if (ri.getType().equals(ROUTING_TYPE)) {
+			RoutingTable routingTable = ri.getRoutingTable();
+			List<RoutingTableEntry> routingEntries = routingTable
+					.getEntryList();
+
+			deviceList = new HashSet<String>(routingEntries.size());
+			for (RoutingTableEntry routingTableEntry : routingEntries) {
+				String address = routingTableEntry.getDevice();
+				if (!address.equals(ownAddress)
+						&& (!connectedDevices.contains(address))) {
+					boolean add = reachableDevices.add(address);
+					if (add) {
+						changed = true;
+					}
 				}
 			}
 		}
@@ -95,17 +98,25 @@ public class FloodingPacketRouter implements IMessageRouter {
 		}
 	}
 
-	private DeviceList createReachableDeviceList() {
-		Builder newBuilder = MessageProtos.DeviceList.newBuilder();
+	private RoutingInformation createRoutingInformation() {
+		Builder riBuilder = MessageProtos.RoutingInformation.newBuilder();
+		jadex.android.bluetooth.domain.MessageProtos.RoutingTable.Builder rtBuilder = MessageProtos.RoutingTable.newBuilder();
+		jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry.Builder entryBuilder = MessageProtos.RoutingTableEntry.newBuilder();
+		
 		for (String s : reachableDevices) {
-			newBuilder.addDevice(s);
+			entryBuilder.setDevice(s);
+			rtBuilder.addEntry(entryBuilder.build());
 		}
 
 		for (String address : connectedDevices) {
-			newBuilder.addDevice(address);
+			entryBuilder.setDevice(address);
+			rtBuilder.addEntry(entryBuilder.build());
 		}
+		
+		riBuilder.setType(ROUTING_TYPE);
+		riBuilder.setRoutingTable(rtBuilder);
+		return riBuilder.build();
 
-		return newBuilder.build();
 	}
 
 	@Override
@@ -116,9 +127,10 @@ public class FloodingPacketRouter implements IMessageRouter {
 
 	private void broadcastRoutingInformation() {
 		notifyListeners();
-		
-		DeviceList list = createReachableDeviceList();
-		DataPacket pkt = new DataPacket("", list.toByteArray(),
+
+		RoutingInformation ri = createRoutingInformation();
+		createRoutingInformation();
+		DataPacket pkt = new DataPacket("", ri.toByteArray(),
 				DataPacket.TYPE_ROUTING_INFORMATION);
 
 		for (String address : connectedDevices) {
@@ -137,7 +149,7 @@ public class FloodingPacketRouter implements IMessageRouter {
 	public Set<String> getReachableDeviceAddresses() {
 		return reachableDevices;
 	}
-	
+
 	@Override
 	public Set<String> getConnectedDeviceAddresses() {
 		return connectedDevices;
@@ -154,7 +166,7 @@ public class FloodingPacketRouter implements IMessageRouter {
 			ReachableDevicesChangeListener l) {
 		return listeners.remove(l);
 	}
-	
+
 	private void notifyListeners() {
 		for (ReachableDevicesChangeListener l : listeners) {
 			l.reachableDevicesChanged();

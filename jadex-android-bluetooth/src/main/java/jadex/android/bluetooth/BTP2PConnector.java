@@ -3,16 +3,16 @@ package jadex.android.bluetooth;
 import jadex.android.bluetooth.BTServer.ConnectionEstablishedListener;
 import jadex.android.bluetooth.ConnectionManager.ConnectionsListener;
 import jadex.android.bluetooth.device.AndroidBluetoothDevice;
+import jadex.android.bluetooth.device.IBluetoothAdapter;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.domain.BluetoothMessage;
 import jadex.android.bluetooth.domain.MessageProtos;
-import jadex.android.bluetooth.domain.MessageProtos.DeviceList;
+import jadex.android.bluetooth.domain.MessageProtos.RoutingInformation;
 import jadex.android.bluetooth.exceptions.AlreadyConnectedToDeviceException;
 import jadex.android.bluetooth.exceptions.DiscoveryAlreadyRunningException;
 import jadex.android.bluetooth.routing.FloodingPacketRouter;
 import jadex.android.bluetooth.routing.IMessageRouter;
 import jadex.android.bluetooth.routing.IMessageSender;
-import jadex.android.bluetooth.routing.IRoutingInformation;
 import jadex.android.bluetooth.service.Future;
 import jadex.android.bluetooth.service.IFuture;
 import jadex.android.bluetooth.service.IResultListener;
@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -63,7 +62,7 @@ public class BTP2PConnector {
 
 	private BTServer btServer;
 
-	private BluetoothAdapter _btAdapter;
+	private IBluetoothAdapter _btAdapter;
 
 	private String ownAdress;
 
@@ -107,7 +106,7 @@ public class BTP2PConnector {
 	private int autoDiscoveryPeriod = 10000;
 
 	public BTP2PConnector(Context ctx, Handler mHandler,
-			BluetoothAdapter btAdapter) {
+			IBluetoothAdapter btAdapter) {
 		_btAdapter = btAdapter;
 		_context = ctx;
 
@@ -119,9 +118,9 @@ public class BTP2PConnector {
 		unbondedDevicesInRange = new HashSet<IBluetoothDevice>();
 		bondedDevicesInRange = new HashSet<IBluetoothDevice>();
 		bondedDevices = new HashSet<IBluetoothDevice>();
-		Set<BluetoothDevice> bondedDevices2 = btAdapter.getBondedDevices();
-		for (BluetoothDevice btd : bondedDevices2) {
-			bondedDevices.add(new AndroidBluetoothDevice(btd));
+		Set<IBluetoothDevice> bondedDevices2 = btAdapter.getBondedDevices();
+		for (IBluetoothDevice btd : bondedDevices2) {
+			bondedDevices.add(btd);
 		}
 
 		btServer = new BTServer(mHandler, btAdapter);
@@ -221,23 +220,22 @@ public class BTP2PConnector {
 	public IFuture sendInitialMessage(final DataPacket msg) {
 		final Future future = new Future();
 		// establish new connection
-		BluetoothDevice nativeDevice;
 		IBluetoothDevice destinationDevice = msg.getDestinationDevice();
 		if (connections.containsKey(destinationDevice.getAddress())) {
 			future.setException(new AlreadyConnectedToDeviceException(
 					destinationDevice));
 			return future;
 		}
-		if (destinationDevice instanceof AndroidBluetoothDevice) {
-			nativeDevice = ((AndroidBluetoothDevice) destinationDevice)
-					.getDevice();
-		} else {
-			nativeDevice = _btAdapter.getRemoteDevice(destinationDevice
-					.getAddress());
-		}
+//		if (destinationDevice instanceof AndroidBluetoothDevice) {
+//			nativeDevice = ((AndroidBluetoothDevice) destinationDevice)
+//					.getDevice();
+//		} else {
+//			nativeDevice = _btAdapter.getRemoteDevice(destinationDevice
+//					.getAddress());
+//		}
 
 		final ClientConnection newConnection = new ClientConnection(_btAdapter,
-				nativeDevice);
+				destinationDevice);
 		newConnection.addConnectionListener(defaultConnectionListener);
 		newConnection.addConnectionListener(new ConnectionListener() {
 
@@ -378,25 +376,8 @@ public class BTP2PConnector {
 						/**
 						 * handle ROUTING INFORMATION
 						 */
-						DeviceList list;
 						try {
-							list = MessageProtos.DeviceList.parseFrom(pkt.data);
-							final List<String> deviceList = list
-									.getDeviceList();
-							// TODO: include IRoutingInformation in
-							// MessageProtos
-							IRoutingInformation ri = new IRoutingInformation() {
-
-								@Override
-								public RoutingType getRoutingType() {
-									return RoutingType.Flooding;
-								}
-
-								@Override
-								public List<String> getReachableDeviceList() {
-									return deviceList;
-								}
-							};
+							RoutingInformation ri = MessageProtos.RoutingInformation.parseFrom(pkt.data);
 							packetRouter.updateRoutingInformation(ri);
 						} catch (InvalidProtocolBufferException e) {
 							e.printStackTrace();

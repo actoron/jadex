@@ -2,10 +2,13 @@ package jadex.android.bluetooth.util;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * This class was created by Jason S.
+ * http://stackoverflow.com/questions/2142287/resettable-timeout-in-java
+ */
 public class ResettableTimer {
     final private ScheduledExecutorService scheduler;
     final private long timeout;

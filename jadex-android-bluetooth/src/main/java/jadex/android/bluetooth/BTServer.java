@@ -1,36 +1,24 @@
 package jadex.android.bluetooth;
 
-import jadex.android.bluetooth.AConnection.ConnectedThread;
-import jadex.android.bluetooth.BTServer.AcceptThread;
-import jadex.android.bluetooth.domain.BluetoothMessage;
+import jadex.android.bluetooth.device.IBluetoothAdapter;
+import jadex.android.bluetooth.device.IBluetoothServerSocket;
+import jadex.android.bluetooth.device.IBluetoothSocket;
 import jadex.android.bluetooth.service.ConnectionService;
 import jadex.android.bluetooth.util.Helper;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-
-
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
-import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.GpsStatus.Listener;
 import android.os.Handler;
-import android.os.Message;
 
 public class BTServer {
-	private BluetoothAdapter adapter;
+	private IBluetoothAdapter adapter;
 
 	private boolean listening;
 
@@ -61,7 +49,7 @@ public class BTServer {
 		void connectionEstablished(IConnection con);
 	}
 	
-	public BTServer(Handler handler, BluetoothAdapter adapter) {
+	public BTServer(Handler handler, IBluetoothAdapter adapter) {
 		this.adapter = adapter;
 		this.guiHandler = handler;
 		listenThreads = new ArrayList<AcceptThread>();
@@ -125,7 +113,7 @@ public class BTServer {
 	}
 
 	class AcceptThread extends Thread {
-		private BluetoothServerSocket mmServerSocket;
+		private IBluetoothServerSocket mmServerSocket;
 		private UUID uuid;
 
 		public AcceptThread(UUID uuid) {
@@ -135,17 +123,18 @@ public class BTServer {
 		}
 
 		public void run() {
-			BluetoothSocket socket = null;
+			IBluetoothSocket socket = null;
 			// Keep listening until exception occurs or a socket is returned
 			while (true) {
 				try {
-					BluetoothServerSocket tmp = null;
+					IBluetoothServerSocket tmp = null;
 					tmp = adapter.listenUsingRfcommWithServiceRecord(SERVICE_NAME, uuid);
 					mmServerSocket = tmp;
 					socket = mmServerSocket.accept();
 				} catch (IOException e) {
-					e.printStackTrace();
-					// break;
+					//e.printStackTrace();
+					Helper.jError("Could not start Bluetooth Server: " + e.getMessage());
+					break;
 				}
 				// If a connection was accepted
 				if (socket != null) {

@@ -3,8 +3,10 @@ package jadex.android.bluetooth.service;
 import jadex.android.bluetooth.BTP2PConnector;
 import jadex.android.bluetooth.ConnectionManager;
 import jadex.android.bluetooth.IConnection;
+import jadex.android.bluetooth.device.BluetoothAdapterFactory;
+import jadex.android.bluetooth.device.BluetoothDeviceFactory;
+import jadex.android.bluetooth.device.IBluetoothAdapter;
 import jadex.android.bluetooth.device.IBluetoothDevice;
-import jadex.android.bluetooth.device.MyBluetoothDevice;
 import jadex.android.bluetooth.domain.BluetoothMessage;
 
 import java.util.ArrayList;
@@ -13,7 +15,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -26,7 +27,7 @@ public class ConnectionService extends Service {
 
 	public static final int SHOW_TOAST = 0;
 
-	private BluetoothAdapter btAdapter;
+	private IBluetoothAdapter btAdapter;
 
 	private IConnectionCallback callback;
 
@@ -41,7 +42,7 @@ public class ConnectionService extends Service {
 		super.onCreate();
 
 		CONTEXT = this;
-		btAdapter = BluetoothAdapter.getDefaultAdapter();
+		btAdapter = BluetoothAdapterFactory.getBluetoothAdapter();
 		if (btAdapter == null) {
 			showToast("No BT Adapter found! This will cause exceptions.");
 		}
@@ -184,7 +185,8 @@ public class ConnectionService extends Service {
 			while (it.hasNext()) {
 				Entry<String, IConnection> next = it.next();
 				if (next.getValue().isAlive()) {
-					result.add(new MyBluetoothDevice(next.getKey()));
+					result.add(BluetoothDeviceFactory
+							.createBluetoothDevice(next.getKey()));
 					i++;
 				}
 			}
@@ -198,7 +200,7 @@ public class ConnectionService extends Service {
 					reachableDevices.size());
 
 			for (String string : reachableDevices) {
-				result.add(new MyBluetoothDevice(string));
+				result.add(BluetoothDeviceFactory.createBluetoothDevice(string));
 			}
 			return result.toArray(new IBluetoothDevice[result.size()]);
 		}

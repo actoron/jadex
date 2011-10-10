@@ -1,7 +1,9 @@
 package jadex.android.bluetooth.device;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -15,7 +17,7 @@ public interface IBluetoothDevice extends Parcelable {
 		public IBluetoothDevice createFromParcel(Parcel in) {
 			String address = in.readString();
 			String name = in.readString();
-			return new MyBluetoothDevice(address);
+			return BluetoothDeviceFactory.createBluetoothDevice(address);
 		}
 
 		@Override
@@ -28,4 +30,6 @@ public interface IBluetoothDevice extends Parcelable {
 	
 	void setName(String name);
 	void setAddress(String address);
+	
+	IBluetoothSocket createRfcommSocketToServiceRecord(UUID uuid) throws IOException;
 }

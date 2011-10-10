@@ -1,6 +1,7 @@
 package jadex.android.bluetooth.routing;
 
 import jadex.android.bluetooth.DataPacket;
+import jadex.android.bluetooth.domain.MessageProtos.RoutingInformation;
 import jadex.android.bluetooth.service.IFuture;
 
 import java.util.Set;
@@ -25,7 +26,7 @@ public interface IMessageRouter {
 
 	void removeConnectedDevice(String device);
 
-	void updateRoutingInformation(IRoutingInformation ri);
+	void updateRoutingInformation(RoutingInformation ri);
 
 	Set<String> getReachableDeviceAddresses();
 

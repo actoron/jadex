@@ -8,54 +8,112 @@ public final class MessageProtos {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistryLite registry) {
   }
-  public interface DeviceListOrBuilder
+  public enum RoutingType
+      implements com.google.protobuf.Internal.EnumLite {
+    Flooding(0, 1),
+    DSDV(1, 2),
+    DSR(2, 3),
+    ;
+    
+    public static final int Flooding_VALUE = 1;
+    public static final int DSDV_VALUE = 2;
+    public static final int DSR_VALUE = 3;
+    
+    
+    public final int getNumber() { return value; }
+    
+    public static RoutingType valueOf(int value) {
+      switch (value) {
+        case 1: return Flooding;
+        case 2: return DSDV;
+        case 3: return DSR;
+        default: return null;
+      }
+    }
+    
+    public static com.google.protobuf.Internal.EnumLiteMap<RoutingType>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static com.google.protobuf.Internal.EnumLiteMap<RoutingType>
+        internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<RoutingType>() {
+            public RoutingType findValueByNumber(int number) {
+              return RoutingType.valueOf(number);
+            }
+          };
+    
+    private final int value;
+    
+    private RoutingType(int index, int value) {
+      this.value = value;
+    }
+    
+    // @@protoc_insertion_point(enum_scope:jadex.android.bluetooth.domain.RoutingType)
+  }
+  
+  public interface RoutingTableOrBuilder
       extends com.google.protobuf.MessageLiteOrBuilder {
     
-    // repeated string device = 1;
-    java.util.List<String> getDeviceList();
-    int getDeviceCount();
-    String getDevice(int index);
+    // repeated .jadex.android.bluetooth.domain.RoutingTableEntry entry = 1;
+    java.util.List<jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry> 
+        getEntryList();
+    jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry getEntry(int index);
+    int getEntryCount();
   }
-  public static final class DeviceList extends
+  public static final class RoutingTable extends
       com.google.protobuf.GeneratedMessageLite
-      implements DeviceListOrBuilder {
-    // Use DeviceList.newBuilder() to construct.
-    private DeviceList(Builder builder) {
+      implements RoutingTableOrBuilder {
+    // Use RoutingTable.newBuilder() to construct.
+    private RoutingTable(Builder builder) {
       super(builder);
     }
-    private DeviceList(boolean noInit) {}
+    private RoutingTable(boolean noInit) {}
     
-    private static final DeviceList defaultInstance;
-    public static DeviceList getDefaultInstance() {
+    private static final RoutingTable defaultInstance;
+    public static RoutingTable getDefaultInstance() {
       return defaultInstance;
     }
     
-    public DeviceList getDefaultInstanceForType() {
+    public RoutingTable getDefaultInstanceForType() {
       return defaultInstance;
     }
     
-    // repeated string device = 1;
-    public static final int DEVICE_FIELD_NUMBER = 1;
-    private com.google.protobuf.LazyStringList device_;
-    public java.util.List<String>
-        getDeviceList() {
-      return device_;
+    // repeated .jadex.android.bluetooth.domain.RoutingTableEntry entry = 1;
+    public static final int ENTRY_FIELD_NUMBER = 1;
+    private java.util.List<jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry> entry_;
+    public java.util.List<jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry> getEntryList() {
+      return entry_;
     }
-    public int getDeviceCount() {
-      return device_.size();
+    public java.util.List<? extends jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntryOrBuilder> 
+        getEntryOrBuilderList() {
+      return entry_;
     }
-    public String getDevice(int index) {
-      return device_.get(index);
+    public int getEntryCount() {
+      return entry_.size();
+    }
+    public jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry getEntry(int index) {
+      return entry_.get(index);
+    }
+    public jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntryOrBuilder getEntryOrBuilder(
+        int index) {
+      return entry_.get(index);
     }
     
     private void initFields() {
-      device_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      entry_ = java.util.Collections.emptyList();
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
       
+      for (int i = 0; i < getEntryCount(); i++) {
+        if (!getEntry(i).isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
       memoizedIsInitialized = 1;
       return true;
     }
@@ -63,8 +121,8 @@ public final class MessageProtos {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
-      for (int i = 0; i < device_.size(); i++) {
-        output.writeBytes(1, device_.getByteString(i));
+      for (int i = 0; i < entry_.size(); i++) {
+        output.writeMessage(1, entry_.get(i));
       }
     }
     
@@ -74,14 +132,9 @@ public final class MessageProtos {
       if (size != -1) return size;
     
       size = 0;
-      {
-        int dataSize = 0;
-        for (int i = 0; i < device_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeBytesSizeNoTag(device_.getByteString(i));
-        }
-        size += dataSize;
-        size += 1 * getDeviceList().size();
+      for (int i = 0; i < entry_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, entry_.get(i));
       }
       memoizedSerializedSize = size;
       return size;
@@ -94,41 +147,41 @@ public final class MessageProtos {
       return super.writeReplace();
     }
     
-    public static jadex.android.bluetooth.domain.MessageProtos.DeviceList parseFrom(
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTable parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static jadex.android.bluetooth.domain.MessageProtos.DeviceList parseFrom(
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTable parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static jadex.android.bluetooth.domain.MessageProtos.DeviceList parseFrom(byte[] data)
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTable parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data).buildParsed();
     }
-    public static jadex.android.bluetooth.domain.MessageProtos.DeviceList parseFrom(
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTable parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return newBuilder().mergeFrom(data, extensionRegistry)
                .buildParsed();
     }
-    public static jadex.android.bluetooth.domain.MessageProtos.DeviceList parseFrom(java.io.InputStream input)
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTable parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static jadex.android.bluetooth.domain.MessageProtos.DeviceList parseFrom(
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTable parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input, extensionRegistry)
                .buildParsed();
     }
-    public static jadex.android.bluetooth.domain.MessageProtos.DeviceList parseDelimitedFrom(java.io.InputStream input)
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTable parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       Builder builder = newBuilder();
       if (builder.mergeDelimitedFrom(input)) {
@@ -137,7 +190,7 @@ public final class MessageProtos {
         return null;
       }
     }
-    public static jadex.android.bluetooth.domain.MessageProtos.DeviceList parseDelimitedFrom(
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTable parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -148,12 +201,12 @@ public final class MessageProtos {
         return null;
       }
     }
-    public static jadex.android.bluetooth.domain.MessageProtos.DeviceList parseFrom(
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTable parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return newBuilder().mergeFrom(input).buildParsed();
     }
-    public static jadex.android.bluetooth.domain.MessageProtos.DeviceList parseFrom(
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTable parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -163,16 +216,16 @@ public final class MessageProtos {
     
     public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(jadex.android.bluetooth.domain.MessageProtos.DeviceList prototype) {
+    public static Builder newBuilder(jadex.android.bluetooth.domain.MessageProtos.RoutingTable prototype) {
       return newBuilder().mergeFrom(prototype);
     }
     public Builder toBuilder() { return newBuilder(this); }
     
     public static final class Builder extends
         com.google.protobuf.GeneratedMessageLite.Builder<
-          jadex.android.bluetooth.domain.MessageProtos.DeviceList, Builder>
-        implements jadex.android.bluetooth.domain.MessageProtos.DeviceListOrBuilder {
-      // Construct using jadex.android.bluetooth.domain.MessageProtos.DeviceList.newBuilder()
+          jadex.android.bluetooth.domain.MessageProtos.RoutingTable, Builder>
+        implements jadex.android.bluetooth.domain.MessageProtos.RoutingTableOrBuilder {
+      // Construct using jadex.android.bluetooth.domain.MessageProtos.RoutingTable.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -185,7 +238,7 @@ public final class MessageProtos {
       
       public Builder clear() {
         super.clear();
-        device_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        entry_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
         return this;
       }
@@ -194,21 +247,21 @@ public final class MessageProtos {
         return create().mergeFrom(buildPartial());
       }
       
-      public jadex.android.bluetooth.domain.MessageProtos.DeviceList getDefaultInstanceForType() {
-        return jadex.android.bluetooth.domain.MessageProtos.DeviceList.getDefaultInstance();
+      public jadex.android.bluetooth.domain.MessageProtos.RoutingTable getDefaultInstanceForType() {
+        return jadex.android.bluetooth.domain.MessageProtos.RoutingTable.getDefaultInstance();
       }
       
-      public jadex.android.bluetooth.domain.MessageProtos.DeviceList build() {
-        jadex.android.bluetooth.domain.MessageProtos.DeviceList result = buildPartial();
+      public jadex.android.bluetooth.domain.MessageProtos.RoutingTable build() {
+        jadex.android.bluetooth.domain.MessageProtos.RoutingTable result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
         return result;
       }
       
-      private jadex.android.bluetooth.domain.MessageProtos.DeviceList buildParsed()
+      private jadex.android.bluetooth.domain.MessageProtos.RoutingTable buildParsed()
           throws com.google.protobuf.InvalidProtocolBufferException {
-        jadex.android.bluetooth.domain.MessageProtos.DeviceList result = buildPartial();
+        jadex.android.bluetooth.domain.MessageProtos.RoutingTable result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(
             result).asInvalidProtocolBufferException();
@@ -216,27 +269,26 @@ public final class MessageProtos {
         return result;
       }
       
-      public jadex.android.bluetooth.domain.MessageProtos.DeviceList buildPartial() {
-        jadex.android.bluetooth.domain.MessageProtos.DeviceList result = new jadex.android.bluetooth.domain.MessageProtos.DeviceList(this);
+      public jadex.android.bluetooth.domain.MessageProtos.RoutingTable buildPartial() {
+        jadex.android.bluetooth.domain.MessageProtos.RoutingTable result = new jadex.android.bluetooth.domain.MessageProtos.RoutingTable(this);
         int from_bitField0_ = bitField0_;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          device_ = new com.google.protobuf.UnmodifiableLazyStringList(
-              device_);
+          entry_ = java.util.Collections.unmodifiableList(entry_);
           bitField0_ = (bitField0_ & ~0x00000001);
         }
-        result.device_ = device_;
+        result.entry_ = entry_;
         return result;
       }
       
-      public Builder mergeFrom(jadex.android.bluetooth.domain.MessageProtos.DeviceList other) {
-        if (other == jadex.android.bluetooth.domain.MessageProtos.DeviceList.getDefaultInstance()) return this;
-        if (!other.device_.isEmpty()) {
-          if (device_.isEmpty()) {
-            device_ = other.device_;
+      public Builder mergeFrom(jadex.android.bluetooth.domain.MessageProtos.RoutingTable other) {
+        if (other == jadex.android.bluetooth.domain.MessageProtos.RoutingTable.getDefaultInstance()) return this;
+        if (!other.entry_.isEmpty()) {
+          if (entry_.isEmpty()) {
+            entry_ = other.entry_;
             bitField0_ = (bitField0_ & ~0x00000001);
           } else {
-            ensureDeviceIsMutable();
-            device_.addAll(other.device_);
+            ensureEntryIsMutable();
+            entry_.addAll(other.entry_);
           }
           
         }
@@ -244,6 +296,12 @@ public final class MessageProtos {
       }
       
       public final boolean isInitialized() {
+        for (int i = 0; i < getEntryCount(); i++) {
+          if (!getEntry(i).isInitialized()) {
+            
+            return false;
+          }
+        }
         return true;
       }
       
@@ -265,8 +323,9 @@ public final class MessageProtos {
               break;
             }
             case 10: {
-              ensureDeviceIsMutable();
-              device_.add(input.readBytes());
+              jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry.Builder subBuilder = jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry.newBuilder();
+              input.readMessage(subBuilder, extensionRegistry);
+              addEntry(subBuilder.buildPartial());
               break;
             }
           }
@@ -275,71 +334,882 @@ public final class MessageProtos {
       
       private int bitField0_;
       
-      // repeated string device = 1;
-      private com.google.protobuf.LazyStringList device_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      private void ensureDeviceIsMutable() {
+      // repeated .jadex.android.bluetooth.domain.RoutingTableEntry entry = 1;
+      private java.util.List<jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry> entry_ =
+        java.util.Collections.emptyList();
+      private void ensureEntryIsMutable() {
         if (!((bitField0_ & 0x00000001) == 0x00000001)) {
-          device_ = new com.google.protobuf.LazyStringArrayList(device_);
+          entry_ = new java.util.ArrayList<jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry>(entry_);
           bitField0_ |= 0x00000001;
          }
       }
-      public java.util.List<String>
-          getDeviceList() {
-        return java.util.Collections.unmodifiableList(device_);
+      
+      public java.util.List<jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry> getEntryList() {
+        return java.util.Collections.unmodifiableList(entry_);
       }
-      public int getDeviceCount() {
-        return device_.size();
+      public int getEntryCount() {
+        return entry_.size();
       }
-      public String getDevice(int index) {
-        return device_.get(index);
+      public jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry getEntry(int index) {
+        return entry_.get(index);
       }
-      public Builder setDevice(
-          int index, String value) {
+      public Builder setEntry(
+          int index, jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureDeviceIsMutable();
-        device_.set(index, value);
+          throw new NullPointerException();
+        }
+        ensureEntryIsMutable();
+        entry_.set(index, value);
         
         return this;
       }
-      public Builder addDevice(String value) {
+      public Builder setEntry(
+          int index, jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry.Builder builderForValue) {
+        ensureEntryIsMutable();
+        entry_.set(index, builderForValue.build());
+        
+        return this;
+      }
+      public Builder addEntry(jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry value) {
         if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureDeviceIsMutable();
-        device_.add(value);
+          throw new NullPointerException();
+        }
+        ensureEntryIsMutable();
+        entry_.add(value);
         
         return this;
       }
-      public Builder addAllDevice(
-          java.lang.Iterable<String> values) {
-        ensureDeviceIsMutable();
-        super.addAll(values, device_);
+      public Builder addEntry(
+          int index, jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        ensureEntryIsMutable();
+        entry_.add(index, value);
         
         return this;
       }
-      public Builder clearDevice() {
-        device_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      public Builder addEntry(
+          jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry.Builder builderForValue) {
+        ensureEntryIsMutable();
+        entry_.add(builderForValue.build());
+        
+        return this;
+      }
+      public Builder addEntry(
+          int index, jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry.Builder builderForValue) {
+        ensureEntryIsMutable();
+        entry_.add(index, builderForValue.build());
+        
+        return this;
+      }
+      public Builder addAllEntry(
+          java.lang.Iterable<? extends jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry> values) {
+        ensureEntryIsMutable();
+        super.addAll(values, entry_);
+        
+        return this;
+      }
+      public Builder clearEntry() {
+        entry_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
         
         return this;
       }
-      void addDevice(com.google.protobuf.ByteString value) {
-        ensureDeviceIsMutable();
-        device_.add(value);
+      public Builder removeEntry(int index) {
+        ensureEntryIsMutable();
+        entry_.remove(index);
         
+        return this;
       }
       
-      // @@protoc_insertion_point(builder_scope:jadex.android.bluetooth.domain.DeviceList)
+      // @@protoc_insertion_point(builder_scope:jadex.android.bluetooth.domain.RoutingTable)
     }
     
     static {
-      defaultInstance = new DeviceList(true);
+      defaultInstance = new RoutingTable(true);
       defaultInstance.initFields();
     }
     
-    // @@protoc_insertion_point(class_scope:jadex.android.bluetooth.domain.DeviceList)
+    // @@protoc_insertion_point(class_scope:jadex.android.bluetooth.domain.RoutingTable)
+  }
+  
+  public interface RoutingTableEntryOrBuilder
+      extends com.google.protobuf.MessageLiteOrBuilder {
+    
+    // required string device = 1;
+    boolean hasDevice();
+    String getDevice();
+    
+    // optional int32 cost = 2 [default = 0];
+    boolean hasCost();
+    int getCost();
+  }
+  public static final class RoutingTableEntry extends
+      com.google.protobuf.GeneratedMessageLite
+      implements RoutingTableEntryOrBuilder {
+    // Use RoutingTableEntry.newBuilder() to construct.
+    private RoutingTableEntry(Builder builder) {
+      super(builder);
+    }
+    private RoutingTableEntry(boolean noInit) {}
+    
+    private static final RoutingTableEntry defaultInstance;
+    public static RoutingTableEntry getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public RoutingTableEntry getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    private int bitField0_;
+    // required string device = 1;
+    public static final int DEVICE_FIELD_NUMBER = 1;
+    private java.lang.Object device_;
+    public boolean hasDevice() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public String getDevice() {
+      java.lang.Object ref = device_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          device_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getDeviceBytes() {
+      java.lang.Object ref = device_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        device_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional int32 cost = 2 [default = 0];
+    public static final int COST_FIELD_NUMBER = 2;
+    private int cost_;
+    public boolean hasCost() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public int getCost() {
+      return cost_;
+    }
+    
+    private void initFields() {
+      device_ = "";
+      cost_ = 0;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      if (!hasDevice()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeBytes(1, getDeviceBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeInt32(2, cost_);
+      }
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(1, getDeviceBytes());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, cost_);
+      }
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageLite.Builder<
+          jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry, Builder>
+        implements jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntryOrBuilder {
+      // Construct using jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private void maybeForceBuilderInitialization() {
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        device_ = "";
+        bitField0_ = (bitField0_ & ~0x00000001);
+        cost_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry getDefaultInstanceForType() {
+        return jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry.getDefaultInstance();
+      }
+      
+      public jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry build() {
+        jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry buildPartial() {
+        jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry result = new jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.device_ = device_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.cost_ = cost_;
+        result.bitField0_ = to_bitField0_;
+        return result;
+      }
+      
+      public Builder mergeFrom(jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry other) {
+        if (other == jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry.getDefaultInstance()) return this;
+        if (other.hasDevice()) {
+          setDevice(other.getDevice());
+        }
+        if (other.hasCost()) {
+          setCost(other.getCost());
+        }
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        if (!hasDevice()) {
+          
+          return false;
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              
+              return this;
+            default: {
+              if (!parseUnknownField(input, extensionRegistry, tag)) {
+                
+                return this;
+              }
+              break;
+            }
+            case 10: {
+              bitField0_ |= 0x00000001;
+              device_ = input.readBytes();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              cost_ = input.readInt32();
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // required string device = 1;
+      private java.lang.Object device_ = "";
+      public boolean hasDevice() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public String getDevice() {
+        java.lang.Object ref = device_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          device_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setDevice(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000001;
+        device_ = value;
+        
+        return this;
+      }
+      public Builder clearDevice() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        device_ = getDefaultInstance().getDevice();
+        
+        return this;
+      }
+      void setDevice(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000001;
+        device_ = value;
+        
+      }
+      
+      // optional int32 cost = 2 [default = 0];
+      private int cost_ ;
+      public boolean hasCost() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public int getCost() {
+        return cost_;
+      }
+      public Builder setCost(int value) {
+        bitField0_ |= 0x00000002;
+        cost_ = value;
+        
+        return this;
+      }
+      public Builder clearCost() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        cost_ = 0;
+        
+        return this;
+      }
+      
+      // @@protoc_insertion_point(builder_scope:jadex.android.bluetooth.domain.RoutingTableEntry)
+    }
+    
+    static {
+      defaultInstance = new RoutingTableEntry(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:jadex.android.bluetooth.domain.RoutingTableEntry)
+  }
+  
+  public interface RoutingInformationOrBuilder
+      extends com.google.protobuf.MessageLiteOrBuilder {
+    
+    // required .jadex.android.bluetooth.domain.RoutingType type = 1;
+    boolean hasType();
+    jadex.android.bluetooth.domain.MessageProtos.RoutingType getType();
+    
+    // optional .jadex.android.bluetooth.domain.RoutingTable routingTable = 2;
+    boolean hasRoutingTable();
+    jadex.android.bluetooth.domain.MessageProtos.RoutingTable getRoutingTable();
+  }
+  public static final class RoutingInformation extends
+      com.google.protobuf.GeneratedMessageLite
+      implements RoutingInformationOrBuilder {
+    // Use RoutingInformation.newBuilder() to construct.
+    private RoutingInformation(Builder builder) {
+      super(builder);
+    }
+    private RoutingInformation(boolean noInit) {}
+    
+    private static final RoutingInformation defaultInstance;
+    public static RoutingInformation getDefaultInstance() {
+      return defaultInstance;
+    }
+    
+    public RoutingInformation getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+    
+    private int bitField0_;
+    // required .jadex.android.bluetooth.domain.RoutingType type = 1;
+    public static final int TYPE_FIELD_NUMBER = 1;
+    private jadex.android.bluetooth.domain.MessageProtos.RoutingType type_;
+    public boolean hasType() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    public jadex.android.bluetooth.domain.MessageProtos.RoutingType getType() {
+      return type_;
+    }
+    
+    // optional .jadex.android.bluetooth.domain.RoutingTable routingTable = 2;
+    public static final int ROUTINGTABLE_FIELD_NUMBER = 2;
+    private jadex.android.bluetooth.domain.MessageProtos.RoutingTable routingTable_;
+    public boolean hasRoutingTable() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public jadex.android.bluetooth.domain.MessageProtos.RoutingTable getRoutingTable() {
+      return routingTable_;
+    }
+    
+    private void initFields() {
+      type_ = jadex.android.bluetooth.domain.MessageProtos.RoutingType.Flooding;
+      routingTable_ = jadex.android.bluetooth.domain.MessageProtos.RoutingTable.getDefaultInstance();
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+      
+      if (!hasType()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (hasRoutingTable()) {
+        if (!getRoutingTable().isInitialized()) {
+          memoizedIsInitialized = 0;
+          return false;
+        }
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+    
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeEnum(1, type_.getNumber());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeMessage(2, routingTable_);
+      }
+    }
+    
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+    
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(1, type_.getNumber());
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, routingTable_);
+      }
+      memoizedSerializedSize = size;
+      return size;
+    }
+    
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+    
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingInformation parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingInformation parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingInformation parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data).buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingInformation parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return newBuilder().mergeFrom(data, extensionRegistry)
+               .buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingInformation parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingInformation parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingInformation parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingInformation parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      Builder builder = newBuilder();
+      if (builder.mergeDelimitedFrom(input, extensionRegistry)) {
+        return builder.buildParsed();
+      } else {
+        return null;
+      }
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingInformation parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input).buildParsed();
+    }
+    public static jadex.android.bluetooth.domain.MessageProtos.RoutingInformation parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return newBuilder().mergeFrom(input, extensionRegistry)
+               .buildParsed();
+    }
+    
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(jadex.android.bluetooth.domain.MessageProtos.RoutingInformation prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+    
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageLite.Builder<
+          jadex.android.bluetooth.domain.MessageProtos.RoutingInformation, Builder>
+        implements jadex.android.bluetooth.domain.MessageProtos.RoutingInformationOrBuilder {
+      // Construct using jadex.android.bluetooth.domain.MessageProtos.RoutingInformation.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+      
+      private void maybeForceBuilderInitialization() {
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+      
+      public Builder clear() {
+        super.clear();
+        type_ = jadex.android.bluetooth.domain.MessageProtos.RoutingType.Flooding;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        routingTable_ = jadex.android.bluetooth.domain.MessageProtos.RoutingTable.getDefaultInstance();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+      
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+      
+      public jadex.android.bluetooth.domain.MessageProtos.RoutingInformation getDefaultInstanceForType() {
+        return jadex.android.bluetooth.domain.MessageProtos.RoutingInformation.getDefaultInstance();
+      }
+      
+      public jadex.android.bluetooth.domain.MessageProtos.RoutingInformation build() {
+        jadex.android.bluetooth.domain.MessageProtos.RoutingInformation result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+      
+      private jadex.android.bluetooth.domain.MessageProtos.RoutingInformation buildParsed()
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        jadex.android.bluetooth.domain.MessageProtos.RoutingInformation result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(
+            result).asInvalidProtocolBufferException();
+        }
+        return result;
+      }
+      
+      public jadex.android.bluetooth.domain.MessageProtos.RoutingInformation buildPartial() {
+        jadex.android.bluetooth.domain.MessageProtos.RoutingInformation result = new jadex.android.bluetooth.domain.MessageProtos.RoutingInformation(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.type_ = type_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.routingTable_ = routingTable_;
+        result.bitField0_ = to_bitField0_;
+        return result;
+      }
+      
+      public Builder mergeFrom(jadex.android.bluetooth.domain.MessageProtos.RoutingInformation other) {
+        if (other == jadex.android.bluetooth.domain.MessageProtos.RoutingInformation.getDefaultInstance()) return this;
+        if (other.hasType()) {
+          setType(other.getType());
+        }
+        if (other.hasRoutingTable()) {
+          mergeRoutingTable(other.getRoutingTable());
+        }
+        return this;
+      }
+      
+      public final boolean isInitialized() {
+        if (!hasType()) {
+          
+          return false;
+        }
+        if (hasRoutingTable()) {
+          if (!getRoutingTable().isInitialized()) {
+            
+            return false;
+          }
+        }
+        return true;
+      }
+      
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        while (true) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              
+              return this;
+            default: {
+              if (!parseUnknownField(input, extensionRegistry, tag)) {
+                
+                return this;
+              }
+              break;
+            }
+            case 8: {
+              int rawValue = input.readEnum();
+              jadex.android.bluetooth.domain.MessageProtos.RoutingType value = jadex.android.bluetooth.domain.MessageProtos.RoutingType.valueOf(rawValue);
+              if (value != null) {
+                bitField0_ |= 0x00000001;
+                type_ = value;
+              }
+              break;
+            }
+            case 18: {
+              jadex.android.bluetooth.domain.MessageProtos.RoutingTable.Builder subBuilder = jadex.android.bluetooth.domain.MessageProtos.RoutingTable.newBuilder();
+              if (hasRoutingTable()) {
+                subBuilder.mergeFrom(getRoutingTable());
+              }
+              input.readMessage(subBuilder, extensionRegistry);
+              setRoutingTable(subBuilder.buildPartial());
+              break;
+            }
+          }
+        }
+      }
+      
+      private int bitField0_;
+      
+      // required .jadex.android.bluetooth.domain.RoutingType type = 1;
+      private jadex.android.bluetooth.domain.MessageProtos.RoutingType type_ = jadex.android.bluetooth.domain.MessageProtos.RoutingType.Flooding;
+      public boolean hasType() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      public jadex.android.bluetooth.domain.MessageProtos.RoutingType getType() {
+        return type_;
+      }
+      public Builder setType(jadex.android.bluetooth.domain.MessageProtos.RoutingType value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        bitField0_ |= 0x00000001;
+        type_ = value;
+        
+        return this;
+      }
+      public Builder clearType() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        type_ = jadex.android.bluetooth.domain.MessageProtos.RoutingType.Flooding;
+        
+        return this;
+      }
+      
+      // optional .jadex.android.bluetooth.domain.RoutingTable routingTable = 2;
+      private jadex.android.bluetooth.domain.MessageProtos.RoutingTable routingTable_ = jadex.android.bluetooth.domain.MessageProtos.RoutingTable.getDefaultInstance();
+      public boolean hasRoutingTable() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public jadex.android.bluetooth.domain.MessageProtos.RoutingTable getRoutingTable() {
+        return routingTable_;
+      }
+      public Builder setRoutingTable(jadex.android.bluetooth.domain.MessageProtos.RoutingTable value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        routingTable_ = value;
+        
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      public Builder setRoutingTable(
+          jadex.android.bluetooth.domain.MessageProtos.RoutingTable.Builder builderForValue) {
+        routingTable_ = builderForValue.build();
+        
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      public Builder mergeRoutingTable(jadex.android.bluetooth.domain.MessageProtos.RoutingTable value) {
+        if (((bitField0_ & 0x00000002) == 0x00000002) &&
+            routingTable_ != jadex.android.bluetooth.domain.MessageProtos.RoutingTable.getDefaultInstance()) {
+          routingTable_ =
+            jadex.android.bluetooth.domain.MessageProtos.RoutingTable.newBuilder(routingTable_).mergeFrom(value).buildPartial();
+        } else {
+          routingTable_ = value;
+        }
+        
+        bitField0_ |= 0x00000002;
+        return this;
+      }
+      public Builder clearRoutingTable() {
+        routingTable_ = jadex.android.bluetooth.domain.MessageProtos.RoutingTable.getDefaultInstance();
+        
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+      
+      // @@protoc_insertion_point(builder_scope:jadex.android.bluetooth.domain.RoutingInformation)
+    }
+    
+    static {
+      defaultInstance = new RoutingInformation(true);
+      defaultInstance.initFields();
+    }
+    
+    // @@protoc_insertion_point(class_scope:jadex.android.bluetooth.domain.RoutingInformation)
   }
   
   
