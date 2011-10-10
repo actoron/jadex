@@ -143,6 +143,7 @@ public class SComponentFactory
 	public static IFuture<Boolean> isModelType(IExternalAccess exta, final String model, final Collection allowedtypes)
 	{
 		Future<Boolean> ret = new Future<Boolean>();
+//		System.out.println("model:"+model);
 		
 		exta.scheduleStep(new IComponentStep<Boolean>()
 		{
@@ -162,6 +163,9 @@ public class SComponentFactory
 						{
 							public void customResultAvailable(Object result)
 							{
+//								if(model==null)
+//									System.out.println("model nulls");
+								
 								Collection facs = (Collection)result;
 								if(facs.size()==0)
 								{

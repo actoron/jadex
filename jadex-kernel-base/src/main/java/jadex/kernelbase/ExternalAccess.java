@@ -267,9 +267,9 @@ public class ExternalAccess implements IExternalAccess
 	 *  @param step	Code to be executed as a step of the agent.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleStep(final IComponentStep step)
+	public <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
 	{
-		final Future ret = new Future();
+		final Future<T> ret = new Future<T>();
 		
 		if(adapter.isExternalThread())
 		{
@@ -279,7 +279,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.scheduleStep(step).addResultListener(new DelegationResultListener(ret));
+						interpreter.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
 					}
 				});
 			}
@@ -290,7 +290,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.scheduleStep(step).addResultListener(new DelegationResultListener(ret));
+			interpreter.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
 		}
 		
 		return ret;
@@ -320,7 +320,15 @@ public class ExternalAccess implements IExternalAccess
 					}
 					catch(Exception e)
 					{
-						ret.setException(e);
+						if(!ret.isDone())
+						{
+							ret.setException(e);
+						}
+						else
+						{
+							adapter.getLogger().warning("Exception occurred: "+e);
+							e.printStackTrace();
+						}
 					}
 				}
 			});

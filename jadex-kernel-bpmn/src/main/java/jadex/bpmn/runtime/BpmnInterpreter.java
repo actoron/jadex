@@ -1142,9 +1142,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	 *  @return The result of the step.
 	 */
 	protected int cnt;
-	public IFuture scheduleStep(final IComponentStep step)
+	public  <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
 	{
-		final Future ret = new Future();
+		final Future<T> ret = new Future<T>();
 		
 		getComponentAdapter().invokeLater(new Runnable()
 		{

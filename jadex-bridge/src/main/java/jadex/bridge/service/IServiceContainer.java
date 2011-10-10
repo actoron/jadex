@@ -34,7 +34,6 @@ public interface IServiceContainer extends IServiceProvider
 	public IFuture<Void> shutdown();
 	
 	
-	
 	/**
 	 *  Add a service to the container.
 	 *  The service is started, if the container is already running.

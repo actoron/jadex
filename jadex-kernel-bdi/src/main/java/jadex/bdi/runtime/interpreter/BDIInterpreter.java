@@ -1262,7 +1262,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param step	Code to be executed as a step of the component.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleStep(IComponentStep step)
+	public <T> IFuture<T> scheduleStep(IComponentStep<T> step)
 	{
 		return scheduleStep(step, ragent);
 	}
@@ -1272,9 +1272,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public IFuture	scheduleStep(final Object step, final Object scope)
+	public <T> IFuture<T> scheduleStep(final Object step, final Object scope)
 	{
-		final Future ret = new Future();
+		final Future<T> ret = new Future<T>();
 		
 		if(adapter.isExternalThread())
 		{

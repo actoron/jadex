@@ -85,9 +85,9 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	 *  May safely be called from external threads.
 	 *  @param step	Code to be executed as a step of the agent.
 	 */
-	public IFuture scheduleStep(final IComponentStep step)
+	public <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
 	{
-		final Future ret = new Future();
+		final Future<T> ret = new Future<T>();
 //		System.out.println("ss: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 		try
 		{

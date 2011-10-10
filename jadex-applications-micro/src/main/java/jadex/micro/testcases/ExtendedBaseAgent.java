@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.clock.IClockService;
