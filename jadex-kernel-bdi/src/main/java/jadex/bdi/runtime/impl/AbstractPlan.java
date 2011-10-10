@@ -1000,7 +1000,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	/**
 	 *  Create a component result listener.
 	 */
-	public IResultListener createResultListener(IResultListener listener)
+	public <T> IResultListener<T> createResultListener(IResultListener<T> listener)
 	{
 		return interpreter.createResultListener(listener);
 	}
@@ -1008,7 +1008,7 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	/**
 	 *  Create a component result listener.
 	 */
-	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
+	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener)
 	{
 		return interpreter.createResultListener(listener);
 	}

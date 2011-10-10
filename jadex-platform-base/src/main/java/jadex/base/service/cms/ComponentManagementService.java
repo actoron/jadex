@@ -977,7 +977,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param cid	The component to destroy.
 	 */
-	public IFuture<Map> destroyComponent(final IComponentIdentifier cid)
+	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
 		boolean contains = false;
 		Future tmp;

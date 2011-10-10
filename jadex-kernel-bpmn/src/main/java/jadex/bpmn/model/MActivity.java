@@ -453,7 +453,7 @@ public class MActivity extends MAssociationTarget
 	 *  Get parameters of specific direction(s).
 	 *  @return The in parameters.
 	 */
-	public List getParameters(String[] dirs)
+	public List<MParameter> getParameters(String[] dirs)
 	{
 		Set test = new HashSet();
 		if(dirs!=null)

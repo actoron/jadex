@@ -29,13 +29,13 @@ public interface IComponentManagementService extends IService
 	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 *  @return The id of the component as future result, when the component has been created and initialized.
 	 */
-	public IFuture<IComponentIdentifier> createComponent(String name, String model, CreationInfo info, IResultListener killlistener);
+	public IFuture<IComponentIdentifier> createComponent(String name, String model, CreationInfo info, IResultListener<Map<String, Object>> killlistener);
 		
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
 	 *  @param componentid	The component to destroy.
 	 */
-	public IFuture<Map> destroyComponent(IComponentIdentifier componentid);
+	public IFuture<Map<String, Object>> destroyComponent(IComponentIdentifier componentid);
 
 	/**
 	 *  Suspend the execution of an component.

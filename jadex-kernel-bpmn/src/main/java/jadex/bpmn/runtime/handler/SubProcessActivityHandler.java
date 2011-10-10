@@ -10,6 +10,7 @@ import jadex.bpmn.runtime.ThreadContext;
 import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentChangeEvent;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -151,90 +152,94 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 
 			thread.setWaiting(true);
 			
-			SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(instance.createResultListener(new DefaultResultListener()
+			IFuture<IComponentManagementService> cmsfut	= SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			cmsfut.addResultListener(instance.createResultListener(new DefaultResultListener<IComponentManagementService>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(IComponentManagementService cms)
 				{
-					IComponentManagementService cms = (IComponentManagementService)result;
-					IFuture ret = cms.createComponent(null, file,
+					IFuture<IComponentIdentifier> ret = cms.createComponent(null, file,
 						new CreationInfo(null, args, instance.getComponentIdentifier(), false, instance.getModelElement().getModelInfo().getAllImports()), 
-						new IResultListener()
+						new IResultListener<Map<String, Object>>()
+					{
+						public void resultAvailable(final Map<String, Object> results)
 						{
-							public void resultAvailable(final Object result)
+							instance.getComponentAdapter().invokeLater(new Runnable()
 							{
-								instance.getComponentAdapter().invokeLater(new Runnable()
+								public void run()
 								{
-									public void run()
+//									System.out.println("end1: "+instance.getComponentIdentifier()+" "+file);
+									
+									// Store results in out parameters.
+									thread.setParameterValue("$results", results);	// Hack???
+									
+									List<MParameter>	params	= activity.getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
+									if(params!=null && !params.isEmpty())
 									{
-//										System.out.println("end1: "+instance.getComponentIdentifier()+" "+file);
-										
-										// Store results in out parameters.
-										Map	results	= (Map)result;
-										thread.setParameterValue("$results", results);	// Hack???
-										
-										List	params	= activity.getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
-										if(params!=null && !params.isEmpty())
+										IValueFetcher fetcher	=null;
+		
+										for(int i=0; i<params.size(); i++)
 										{
-											IValueFetcher fetcher	=null;
-			
-											for(int i=0; i<params.size(); i++)
+											MParameter	param	= params.get(i);
+											if(param.getInitialValue()!=null)
 											{
-												MParameter	param	= (MParameter)params.get(i);
-												if(param.getInitialValue()!=null)
+												if(fetcher==null)
+													fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
+												try
 												{
-													if(fetcher==null)
-														fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
-													try
-													{
-														thread.setParameterValue(param.getName(), param.getInitialValue().getValue(fetcher));
-													}
-													catch(RuntimeException e)
-													{
-														throw new RuntimeException("Error evaluating parameter value: "+instance+", "+activity+", "+param.getName()+", "+param.getInitialValue(), e);
-													}
+													thread.setParameterValue(param.getName(), param.getInitialValue().getValue(fetcher));
 												}
-												else if(results.containsKey(param.getName()))
+												catch(RuntimeException e)
 												{
-													thread.setParameterValue(param.getName(), results.get(param.getName()));
+													throw new RuntimeException("Error evaluating parameter value: "+instance+", "+activity+", "+param.getName()+", "+param.getInitialValue(), e);
 												}
 											}
+											else if(results.containsKey(param.getName()))
+											{
+												thread.setParameterValue(param.getName(), results.get(param.getName()));
+											}
 										}
-										thread.setNonWaiting();
-										instance.step(activity, instance, thread, null);
 									}
-								});
-							}
-							
-							public void exceptionOccurred(final Exception exception)
+									thread.setNonWaiting();
+									instance.step(activity, instance, thread, null);
+								}
+							});
+						}
+						
+						public void exceptionOccurred(final Exception exception)
+						{
+							instance.getComponentAdapter().invokeLater(new Runnable()
 							{
-								instance.getComponentAdapter().invokeLater(new Runnable()
+								public void run()
 								{
-									public void run()
-									{
-//										System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
-										thread.setNonWaiting();
-										thread.setException(exception);
-										instance.step(activity, instance, thread, null);
-									}
-								});
-							}
-							
-							public String toString()
-							{
-								return "lis: "+instance.getComponentIdentifier()+" "+file;
-							}
-						});
+//									System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
+									thread.setNonWaiting();
+									thread.setException(exception);
+									instance.step(activity, instance, thread, null);
+								}
+							});
+						}
+						
+						public String toString()
+						{
+							return "lis: "+instance.getComponentIdentifier()+" "+file;
+						}
+					});
 					
-					IResultListener lis = new IResultListener()
+					IResultListener<IComponentIdentifier> lis = new IResultListener<IComponentIdentifier>()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(IComponentIdentifier result)
 						{
 							// todo: save component id
+//							System.out.println("created: "+result);
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
+							thread.setNonWaiting();
+							thread.setException(exception);
+							instance.step(activity, instance, thread, null);
+//							System.out.println("exception: "+exception);
+//							exception.printStackTrace();
 						}
 					};
 					

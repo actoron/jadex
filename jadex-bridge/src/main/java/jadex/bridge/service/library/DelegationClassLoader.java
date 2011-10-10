@@ -62,7 +62,7 @@ public class DelegationClassLoader extends ClassLoader
 			{
 				try
 				{
-					Class clazz = it.next().loadClass(name);
+					Class<?> clazz = it.next().loadClass(name);
 					return clazz;
 				}
 				catch (ClassNotFoundException e)

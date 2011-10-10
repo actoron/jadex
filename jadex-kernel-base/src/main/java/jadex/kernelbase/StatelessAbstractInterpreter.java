@@ -1166,7 +1166,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param The original listener to be called.
 	 *  @return The listener.
 	 */
-	public IResultListener createResultListener(IResultListener listener)
+	public <T> IResultListener<T> createResultListener(IResultListener<T> listener)
 	{
 		return new ComponentResultListener(listener, getComponentAdapter());
 	}
@@ -1176,7 +1176,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param The original listener to be called.
 	 *  @return The listener.
 	 */
-	public IIntermediateResultListener createResultListener(IIntermediateResultListener listener)
+	public <T> IIntermediateResultListener<T> createResultListener(IIntermediateResultListener<T> listener)
 	{
 		return new IntermediateComponentResultListener(listener, getComponentAdapter());
 	}
