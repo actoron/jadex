@@ -63,6 +63,9 @@ public class DownloadRennesTask extends DownloadCityTask {
 			}
 
 			logger.log(Level.INFO, "Inserted data for Rennes from " + fetchTime);
+
+			baos.close();
+			input.close();
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, e.getMessage());
 		} catch (JAXBException e) {

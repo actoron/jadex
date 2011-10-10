@@ -79,6 +79,9 @@ public class DownloadBrisbaneTask extends DownloadCityTask {
 			}
 
 			logger.log(Level.INFO, "Inserted data for Brisbane from " + fetchTime);
+
+			baos.close();
+			input.close();
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, e.getMessage());
 		} catch (JAXBException e) {

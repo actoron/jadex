@@ -70,6 +70,9 @@ public class DownloadURLTask extends DownloadTask {
 
 			// write all the data to the database
 			writeToDatabase(stations, xml);
+
+			baos.close();
+			input.close();
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, e.getMessage());
 		} catch (JAXBException e) {

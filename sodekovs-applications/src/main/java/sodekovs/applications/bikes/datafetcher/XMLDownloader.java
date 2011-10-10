@@ -1,8 +1,5 @@
 package sodekovs.applications.bikes.datafetcher;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,9 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import javax.xml.bind.JAXBException;
-
-import sodekovs.applications.bikes.datafetcher.brisbane.DownloadBrisbaneTask;
 import sodekovs.applications.bikes.datafetcher.database.DatabaseConnection;
 import sodekovs.applications.bikes.datafetcher.rennes.DownloadRennesTask;
 import sodekovs.applications.bikes.datafetcher.xml.XMLHandler;
@@ -37,14 +31,14 @@ public class XMLDownloader {
 	 */
 	public static void main(String[] args) {
 		if (args.length == 3) {
+			String urlFilePath = args[0];
+			String logFilePath = args[1];
+			DatabaseConnection.DB_FILE = args[2];
+
+			Logger logger = Logger.getLogger("Datafetcher");
+			logger.setLevel(Level.ALL);
+
 			try {
-				String urlFilePath = args[0];
-				String logFilePath = args[1];
-				DatabaseConnection.DB_FILE = args[2];
-
-				Logger logger = Logger.getLogger("Datafetcher");
-				logger.setLevel(Level.ALL);
-
 				FileHandler fh = new FileHandler(logFilePath, true);
 
 				SimpleFormatter formatter = new SimpleFormatter();
@@ -62,20 +56,16 @@ public class XMLDownloader {
 					timer.schedule(new DownloadURLTask(entry.getCity(), new URL(entry.getUrl()), logger), TIME_TO_START, entry.getInterval());
 				}
 
+				// Brisbane is not available any longer :(
 				// start the download task for brisbane
-				Timer timerBrisbane = new Timer();
-				timerBrisbane.schedule(new DownloadBrisbaneTask(logger, "Brisbane"), TIME_TO_START, 180000);
+				// Timer timerBrisbane = new Timer();
+				// timerBrisbane.schedule(new DownloadBrisbaneTask(logger, "Brisbane"), TIME_TO_START, 180000);
 
 				// start the download task for rennes
 				Timer timerRennes = new Timer();
 				timerRennes.schedule(new DownloadRennesTask(logger, "Rennes"), TIME_TO_START, 180000);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (JAXBException e) {
-				e.printStackTrace();
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, e.getMessage());
 				e.printStackTrace();
 			}
 		} else {
