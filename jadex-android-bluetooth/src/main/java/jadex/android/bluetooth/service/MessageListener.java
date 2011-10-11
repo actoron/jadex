@@ -1,6 +1,6 @@
 package jadex.android.bluetooth.service;
 
-import jadex.android.bluetooth.domain.BluetoothMessage;
+import jadex.android.bluetooth.message.BluetoothMessage;
 
 public interface MessageListener {
 
