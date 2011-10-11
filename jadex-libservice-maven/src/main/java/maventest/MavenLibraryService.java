@@ -133,6 +133,8 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		/* $else $
 		this.libcl = new DelegationClassLoader(LibraryService.class.getClassLoader(), urls);
 		$endif $ */
+		
+		System.out.println("update global: "+delegates.length);
 	}
 
 	/**
@@ -367,6 +369,8 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 			{
 				public void resultAvailable(DelegationURLClassLoader result)
 				{
+					updateGlobalClassLoader();
+					
 					for(int i=0; i<lis.length; i++)
 					{
 						final ILibraryServiceListener liscopy = lis[i];

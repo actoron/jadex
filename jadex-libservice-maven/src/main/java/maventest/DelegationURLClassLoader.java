@@ -1,5 +1,7 @@
 package maventest;
 
+import jadex.commons.SUtil;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -32,7 +34,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 	{
 		super(url!=null? new URL[]{url}: new URL[0], basecl);
 		this.delegates = delegates;
-//		System.out.println("d1 : "+this);
+//		System.out.println("d1 : "+url+" "+SUtil.arrayToString(delegates));
 	}
 
 	
