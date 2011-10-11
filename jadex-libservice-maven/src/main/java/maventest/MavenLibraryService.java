@@ -150,7 +150,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		{
 			InputStream pom = null;
 			
-			if(url.getPath().endsWith(".jar"))
+			if(url.getProtocol().equals("jar"))
 			{
 				try
 				{
