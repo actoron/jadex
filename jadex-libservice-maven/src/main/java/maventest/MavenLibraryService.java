@@ -209,6 +209,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		{
 			DelegationURLClassLoader cl = new DelegationURLClassLoader(url, ClassLoader.getSystemClassLoader(), null);
 			classloaders.put(url, cl);
+			updateGlobalClassLoader();
 			ret.setResult(cl);
 		}
 		else
@@ -225,8 +226,9 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 						{
 							DelegationURLClassLoader cl = new DelegationURLClassLoader(url, 
 								ClassLoader.getSystemClassLoader(), result.toArray(new DelegationURLClassLoader[result.size()]));
-							ret.setResult(cl);
 							classloaders.put(url, cl);
+							updateGlobalClassLoader();
+							ret.setResult(cl);
 						}
 					});
 					for(int i=0; i<deps.length; i++)
@@ -288,7 +290,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		
 		synchronized(this)
 		{
-			Integer refcount = (Integer) urlrefcount.get(url);
+			Integer refcount = (Integer)urlrefcount.get(url);
 			if(refcount != null)
 			{
 				urlrefcount.put(url, new Integer(refcount.intValue() + 1));
@@ -308,8 +310,6 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 			{
 				public void resultAvailable(DelegationURLClassLoader result)
 				{
-					updateGlobalClassLoader();
-					
 					// Do not notify listeners with lock held!
 					
 					for(int i=0; i<lis.length; i++)
@@ -367,8 +367,6 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 			{
 				public void resultAvailable(DelegationURLClassLoader result)
 				{
-					updateGlobalClassLoader();
-			
 					for(int i=0; i<lis.length; i++)
 					{
 						final ILibraryServiceListener liscopy = lis[i];
@@ -874,6 +872,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		// Remove existing urls
 //		libcl = new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), initurls);
 		
+		// todo: fix me / does not work getClassLoader is async
 		if(initurls!=null)
 		{
 			for(int i=0; i<initurls.length; i++)
