@@ -571,6 +571,7 @@
 				<module>jadex-bridge</module>
 				<module>jadex-platform-base</module>
 				<module>jadex-nuggets</module>
+				<module>jadex-libservice-maven</module>
 
 				<module>jadex-kernel-base</module>
 				<module>jadex-kernel-component</module>
