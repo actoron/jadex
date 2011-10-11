@@ -1342,9 +1342,9 @@ public abstract class ComponentManagementService extends BasicService implements
 									{
 										InitInfo ii = removeInitInfo(cid);
 			//							System.out.println("removed: "+cid+" "+ii);
-										instance = ii.getInstance();
-										if(ii!=null && instance!=null)
+										if(ii!=null && ii.getInstance()!=null)
 										{
+											instance = ii.getInstance();
 											boolean	suspend = isInitSuspend(ii.getInfo(), ii.getModel());
 											
 											if(suspend)
