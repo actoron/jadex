@@ -188,15 +188,11 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 				}
 			}
 			
-			if(pom!=null)
+			createClassLoader(url, pom).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret));
+
+			if(pom==null)
 			{
-				// Read pom and find dependencies
-				createClassLoader(url, pom)
-					.addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret));
-			}
-			else
-			{
-				ret.setException(new RuntimeException(""));
+				System.out.println("No pom found in: "+url);
 			}
 		}
 		
@@ -210,28 +206,37 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	{
 		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
 		
-		getDependencies(pom).addResultListener(
-			new ExceptionDelegationResultListener<URL[], DelegationURLClassLoader>(ret)
+		if(pom==null)
 		{
-			public void customResultAvailable(URL[] deps)
+			DelegationURLClassLoader cl = new DelegationURLClassLoader(url, ClassLoader.getSystemClassLoader(), null);
+			classloaders.put(url, cl);
+			ret.setResult(cl);
+		}
+		else
+		{
+			getDependencies(pom).addResultListener(
+				new ExceptionDelegationResultListener<URL[], DelegationURLClassLoader>(ret)
 			{
-				CollectionResultListener<DelegationURLClassLoader> lis = new CollectionResultListener<DelegationURLClassLoader>
-					(deps.length, true, new DefaultResultListener<Collection<DelegationURLClassLoader>>()
+				public void customResultAvailable(URL[] deps)
 				{
-					public void resultAvailable(Collection<DelegationURLClassLoader> result) 
+					CollectionResultListener<DelegationURLClassLoader> lis = new CollectionResultListener<DelegationURLClassLoader>
+						(deps.length, true, new DefaultResultListener<Collection<DelegationURLClassLoader>>()
 					{
-						DelegationURLClassLoader cl = new DelegationURLClassLoader(url, 
-							ClassLoader.getSystemClassLoader(), result.toArray(new DelegationURLClassLoader[result.size()]));
-						ret.setResult(cl);
-						classloaders.put(url, cl);
+						public void resultAvailable(Collection<DelegationURLClassLoader> result) 
+						{
+							DelegationURLClassLoader cl = new DelegationURLClassLoader(url, 
+								ClassLoader.getSystemClassLoader(), result.toArray(new DelegationURLClassLoader[result.size()]));
+							ret.setResult(cl);
+							classloaders.put(url, cl);
+						}
+					});
+					for(int i=0; i<deps.length; i++)
+					{
+						getClassLoader(deps[i]).addResultListener(lis);
 					}
-				});
-				for(int i=0; i<deps.length; i++)
-				{
-					getClassLoader(deps[i]).addResultListener(lis);
 				}
-			}
-		});
+			});
+		}
 		
 		return ret;
 	}
