@@ -7,6 +7,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
+import jadex.bridge.service.library.LibraryService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -69,9 +70,6 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	/** URL reference count */
 	protected Map urlrefcount;
 	
-	/** The maven builder. */
-	protected MavenBuilder mb;
-
 	//-------- constructors --------
 	
 	/** 
@@ -103,7 +101,6 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	{
 		super(provider.getId(), ILibraryService.class, properties);
 		
-		this.mb	= new MavenBuilder();
 		this.classloaders = new HashMap();
 		this.initurls = urls;
 		this.provider = provider;
@@ -143,6 +140,8 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	 */
 	public IFuture<DelegationURLClassLoader> getClassLoader(final URL url)
 	{
+		System.out.println("getClassLoader(): "+url);
+		
 		Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
 		DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(url);
 		
@@ -249,13 +248,14 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		URL[] res = new URL[0];
 		try
 		{
+			MavenBuilder	mb	= new MavenBuilder();
 			mb.loadDependenciesFromPom(pomstream, null);
 			File[]	files	= mb.resolveAsFiles();
 			res = new URL[files.length];
 			for(int i=0; i<files.length; i++)
 			{
 				System.out.println("resolved: "+files[i]);
-				res[i] = files[i].toURI().toURL();
+				res[i] = toURL("jar:file:"+files[i].getAbsolutePath()+"!/");
 			}
 		}
 		catch(Exception e)
