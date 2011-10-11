@@ -44,7 +44,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 
 	public static final Integer MESSAGE_SENT = 1;
 
-	protected static final boolean PING_DEBUG = false;
+	private static final boolean PING_DEBUG = false;
 
 	public static final byte MAXHOPS = 4;
 
@@ -52,7 +52,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 
 	private HashMap<String, Long> packetWatcher;
 
-	public ConnectionManager connections;
+	private ConnectionManager connections;
 
 	private IMessageRouter packetRouter;
 
@@ -67,12 +67,12 @@ public class BTP2PConnector implements IBluetoothStateListener {
 	/**
 	 * List of Unbonded devices in range, could be unconnectable
 	 */
-	public Set<IBluetoothDevice> unbondedDevicesInRange;
+	private Set<IBluetoothDevice> unbondedDevicesInRange;
 
 	/**
 	 * List of bonded devices in range, which are connectable
 	 */
-	public Set<IBluetoothDevice> bondedDevicesInRange;
+	private Set<IBluetoothDevice> bondedDevicesInRange;
 
 	/**
 	 * List of all bonded devices
@@ -88,6 +88,8 @@ public class BTP2PConnector implements IBluetoothStateListener {
 	private int autoDiscoveryPeriod = 10000;
 
 	private IBluetoothStateInformer stateInformer;
+	
+	private boolean scanning;
 
 	public BTP2PConnector(IBluetoothStateInformer stateInformer,
 			Handler mHandler, IBluetoothAdapter btAdapter) {
@@ -98,7 +100,8 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		ownAdress = btAdapter.getAddress();
 
 		listeners = new HashMap<IBluetoothDevice, List<MessageListener>>();
-
+		connections = new ConnectionManager();
+		
 		unbondedDevicesInRange = new HashSet<IBluetoothDevice>();
 		bondedDevicesInRange = new HashSet<IBluetoothDevice>();
 		bondedDevices = new HashSet<IBluetoothDevice>();
@@ -112,7 +115,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 			@Override
 			public void connectionEstablished(IConnection con) {
 				con.addConnectionListener(defaultConnectionListener);
-				connections.put(con.getRemoteDevice().getAddress(), con);
+				getConnections().put(con.getRemoteDevice().getAddress(), con);
 			}
 		});
 
@@ -121,7 +124,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 			@Override
 			public void sendMessageToConnectedDevice(DataPacket pkt,
 					String address) {
-				IConnection con = connections.get(address);
+				IConnection con = getConnections().get(address);
 				if (con.isAlive()) {
 					try {
 						con.write(pkt.asByteArray());
@@ -139,8 +142,8 @@ public class BTP2PConnector implements IBluetoothStateListener {
 					}
 				});
 
-		connections = new ConnectionManager();
-		connections.addConnectionsListener(new ConnectionsListener() {
+		
+		getConnections().addConnectionsListener(new ConnectionsListener() {
 
 			@Override
 			public void connectionRemoved(String address) {
@@ -167,15 +170,8 @@ public class BTP2PConnector implements IBluetoothStateListener {
 	}
 
 	public void shutdown() {
-		connections.stopAll();
+		getConnections().stopAll();
 	}
-
-	// public IFuture sendInitialMessage(BluetoothMessage msg,
-	// boolean useControlChannel) {
-	// DataPacket dataPacket = new DataPacket(msg,
-	// useControlChannel ? DataPacket.TYPE_PING : DataPacket.TYPE_DATA);
-	// return sendMessage(dataPacket, true);
-	// }
 
 	public IFuture sendMessage(BluetoothMessage msg) {
 		DataPacket dataPacket = new DataPacket(msg, DataPacket.TYPE_DATA);
@@ -204,7 +200,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		final Future future = new Future();
 		// establish new connection
 		IBluetoothDevice destinationDevice = msg.getDestinationDevice();
-		if (connections.containsKey(destinationDevice.getAddress())) {
+		if (getConnections().containsKey(destinationDevice.getAddress())) {
 			future.setException(new AlreadyConnectedToDeviceException(
 					destinationDevice));
 			return future;
@@ -231,7 +227,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 			public void connectionStateChanged(IConnection connection) {
 				synchronized (future) {
 					if (connection.isAlive()) {
-						connections.put(
+						getConnections().put(
 								msg.getDestinationDevice().getAddress(),
 								newConnection);
 						try {
@@ -253,7 +249,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 						if (!future.resultAvailable) {
 							future.setResult(NOT_CONNECTABLE);
 						}
-						boolean remove = bondedDevicesInRange.remove(connection
+						boolean remove = getBondedDevicesInRange().remove(connection
 								.getRemoteDevice());
 						if (remove) {
 							// proximityDevicesChanged();
@@ -277,7 +273,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		}
 
 		BluetoothMessage bluetoothMessage = new BluetoothMessage(packet.Src,
-				packet.data, packet.Type);
+				packet.getData(), packet.Type);
 		List<MessageListener> list = listeners.get(bluetoothMessage
 				.getRemoteAdress());
 		if (list != null) {
@@ -316,7 +312,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 					Log.i(Helper.LOG_TAG, string);
 					// showToast(string);
 				}
-				IConnection connection = connections.get(pkt.Src);
+				IConnection connection = getConnections().get(pkt.Src);
 				if (connection == null) {
 					connection = incomingConnection;
 				}
@@ -341,7 +337,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 						 */
 						Log.d(Helper.LOG_TAG,"Bonded device in Range: "
 								+ pkt.getSourceDevice());
-						bondedDevicesInRange.add(pkt.getSourceDevice());
+						getBondedDevicesInRange().add(pkt.getSourceDevice());
 						notifyProximityDevicesChanged();
 					} else if (pkt.Type == DataPacket.TYPE_CONNECT_SYN) {
 						/**
@@ -362,7 +358,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 						 */
 						try {
 							RoutingInformation ri = MessageProtos.RoutingInformation
-									.parseFrom(pkt.data);
+									.parseFrom(pkt.getData());
 							packetRouter.updateRoutingInformation(ri);
 						} catch (InvalidProtocolBufferException e) {
 							e.printStackTrace();
@@ -390,7 +386,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 				connection.close();
 				Log.d(Helper.LOG_TAG, "Connection lost: "
 						+ connection.getRemoteDevice().getName());
-				connections.remove(connection.getRemoteDevice().getAddress());
+				getConnections().remove(connection.getRemoteDevice().getAddress());
 				packetRouter.removeConnectedDevice(connection.getRemoteDevice()
 						.getAddress());
 				connection.removeConnectionListener(this);
@@ -411,10 +407,10 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		// Clean up memory
 		// r.gc();
 
-		if (packetWatcher.containsKey(pkt.pktId)) {
+		if (packetWatcher.containsKey(pkt.getPktId())) {
 			return true;
 		} else {
-			packetWatcher.put(pkt.pktId, Calendar.getInstance()
+			packetWatcher.put(pkt.getPktId(), Calendar.getInstance()
 					.getTimeInMillis());
 			return false;
 		}
@@ -425,8 +421,6 @@ public class BTP2PConnector implements IBluetoothStateListener {
 			listener.proximityDevicesChanged();
 		}
 	}
-
-	private boolean scanning;
 
 	public IFuture scanEnvironment(boolean discoverNewDevices) {
 		final Future result = new Future();
@@ -446,11 +440,11 @@ public class BTP2PConnector implements IBluetoothStateListener {
 					// dont try already reachable or connected devices
 					if (packetRouter.getReachableDeviceAddresses().contains(
 							device.getAddress())
-							|| connections.containsKey(device.getAddress())) {
+							|| getConnections().containsKey(device.getAddress())) {
 						if (i == last) {
 							scanning = false;
 							Log.d(Helper.LOG_TAG, "finished pinging known devices");
-							result.setResult(bondedDevicesInRange);
+							result.setResult(getBondedDevicesInRange());
 						}
 						continue;
 					}
@@ -463,8 +457,8 @@ public class BTP2PConnector implements IBluetoothStateListener {
 							if (messageResult != MESSAGE_SENT) {
 								Log.d(Helper.LOG_TAG, "Bonded device not available: "
 										+ device.getName());
-								if (bondedDevicesInRange.contains(device)) {
-									bondedDevicesInRange.remove(device);
+								if (getBondedDevicesInRange().contains(device)) {
+									getBondedDevicesInRange().remove(device);
 									notifyProximityDevicesChanged();
 								}
 							}
@@ -472,9 +466,9 @@ public class BTP2PConnector implements IBluetoothStateListener {
 
 						@Override
 						public void exceptionOccurred(Exception exception) {
-							if (bondedDevicesInRange.contains(device)
+							if (getBondedDevicesInRange().contains(device)
 									&& !(exception instanceof AlreadyConnectedToDeviceException)) {
-								bondedDevicesInRange.remove(device);
+								getBondedDevicesInRange().remove(device);
 								notifyProximityDevicesChanged();
 							}
 						}
@@ -496,7 +490,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 							private void finish() {
 								scanning = false;
 								Log.d(Helper.LOG_TAG,"finished pinging known devices");
-								result.setResult(bondedDevicesInRange);
+								result.setResult(getBondedDevicesInRange());
 							}
 						});
 					}
@@ -518,7 +512,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 						}
 					});
 			// scan new devices
-			unbondedDevicesInRange.clear();
+			getUnbondedDevicesInRange().clear();
 			if (!btAdapter.isEnabled()) {
 				stateInformer
 						.addBluetoothStateListener(new BluetoothStateListenerAdapter() {
@@ -573,7 +567,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 	public void bluetoothDeviceFound(IBluetoothDevice device) {
 		Log.d(Helper.LOG_TAG, "Device found: " + device.getName());
 		if (!btAdapter.isDeviceBonded(device)) {
-			unbondedDevicesInRange
+			getUnbondedDevicesInRange()
 					.add(new AndroidBluetoothDeviceWrapper(device));
 		}
 	};
@@ -584,7 +578,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		Log.d(Helper.LOG_TAG, "bond state changed");
 		if (newState == BluetoothBondState.bonded) {
 			bondedDevices.add(new AndroidBluetoothDeviceWrapper(device));
-			unbondedDevicesInRange.remove(device);
+			getUnbondedDevicesInRange().remove(device);
 			notifyProximityDevicesChanged();
 		}
 	}
@@ -618,11 +612,11 @@ public class BTP2PConnector implements IBluetoothStateListener {
 	}
 
 	public void addConnectionsListener(ConnectionsListener connectionsListener) {
-		connections.addConnectionsListener(connectionsListener);
+		getConnections().addConnectionsListener(connectionsListener);
 	}
 
 	public void removeConnectionsListener(ConnectionsListener l) {
-		connections.removeConnectionsListener(l);
+		getConnections().removeConnectionsListener(l);
 	}
 
 	public void setProximityDeviceChangedListener(
@@ -680,6 +674,18 @@ public class BTP2PConnector implements IBluetoothStateListener {
 				Log.d(Helper.LOG_TAG,"Autoconnect Task Cancelled.");
 			}
 		}
+	}
+
+	public ConnectionManager getConnections() {
+		return connections;
+	}
+
+	public Set<IBluetoothDevice> getBondedDevicesInRange() {
+		return bondedDevicesInRange;
+	}
+
+	public Set<IBluetoothDevice> getUnbondedDevicesInRange() {
+		return unbondedDevicesInRange;
 	}
 
 	public interface ProximityDeviceChangedListener {

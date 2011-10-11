@@ -181,16 +181,16 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 		@Override
 		public IBluetoothDevice[] getUnbondedDevicesInRange()
 				throws RemoteException {
-			return btp2pConnector.unbondedDevicesInRange
-					.toArray(new IBluetoothDevice[btp2pConnector.unbondedDevicesInRange
+			return btp2pConnector.getUnbondedDevicesInRange()
+					.toArray(new IBluetoothDevice[btp2pConnector.getUnbondedDevicesInRange()
 							.size()]);
 		}
 
 		@Override
 		public IBluetoothDevice[] getBondedDevicesInRange()
 				throws RemoteException {
-			return btp2pConnector.bondedDevicesInRange
-					.toArray(new IBluetoothDevice[btp2pConnector.bondedDevicesInRange
+			return btp2pConnector.getBondedDevicesInRange()
+					.toArray(new IBluetoothDevice[btp2pConnector.getBondedDevicesInRange()
 							.size()]);
 		}
 
@@ -218,7 +218,7 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 		public IBluetoothDevice[] getConnectedDevices() throws RemoteException {
 			ArrayList<IBluetoothDevice> result = new ArrayList<IBluetoothDevice>();
 
-			Set<Entry<String, IConnection>> entrySet = btp2pConnector.connections
+			Set<Entry<String, IConnection>> entrySet = btp2pConnector.getConnections()
 					.entrySet();
 			Iterator<Entry<String, IConnection>> it = entrySet.iterator();
 			int i = 0;
