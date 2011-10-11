@@ -1,7 +1,7 @@
 package jadex.android.bluetooth.routing;
 
-import jadex.android.bluetooth.DataPacket;
-import jadex.android.bluetooth.domain.MessageProtos.RoutingInformation;
+import jadex.android.bluetooth.message.DataPacket;
+import jadex.android.bluetooth.message.MessageProtos.RoutingInformation;
 import jadex.android.bluetooth.service.IFuture;
 
 import java.util.Set;

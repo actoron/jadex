@@ -1,8 +1,6 @@
 package jadex.android.bluetooth.routing;
 
-import jadex.android.bluetooth.DataPacket;
-import jadex.android.bluetooth.IConnection;
-import android.bluetooth.BluetoothDevice;
+import jadex.android.bluetooth.message.DataPacket;
 
 public interface IMessageSender {
 	void sendMessageToConnectedDevice(DataPacket packet, String address);

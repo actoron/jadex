@@ -1,6 +1,6 @@
-package jadex.android.bluetooth.domain;
+package jadex.android.bluetooth.message;
 
-option java_package = "jadex.android.bluetooth.domain";
+option java_package = "jadex.android.bluetooth.message";
 option java_outer_classname = "MessageProtos";
 option optimize_for = LITE_RUNTIME;
 

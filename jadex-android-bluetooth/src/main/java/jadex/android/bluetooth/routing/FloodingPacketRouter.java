@@ -1,13 +1,13 @@
 package jadex.android.bluetooth.routing;
 
-import jadex.android.bluetooth.BTP2PConnector;
-import jadex.android.bluetooth.DataPacket;
-import jadex.android.bluetooth.domain.MessageProtos;
-import jadex.android.bluetooth.domain.MessageProtos.RoutingInformation;
-import jadex.android.bluetooth.domain.MessageProtos.RoutingInformation.Builder;
-import jadex.android.bluetooth.domain.MessageProtos.RoutingTable;
-import jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry;
-import jadex.android.bluetooth.domain.MessageProtos.RoutingType;
+import jadex.android.bluetooth.connection.BTP2PConnector;
+import jadex.android.bluetooth.message.DataPacket;
+import jadex.android.bluetooth.message.MessageProtos;
+import jadex.android.bluetooth.message.MessageProtos.RoutingInformation;
+import jadex.android.bluetooth.message.MessageProtos.RoutingInformation.Builder;
+import jadex.android.bluetooth.message.MessageProtos.RoutingTable;
+import jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry;
+import jadex.android.bluetooth.message.MessageProtos.RoutingType;
 import jadex.android.bluetooth.service.Future;
 import jadex.android.bluetooth.service.IFuture;
 
@@ -100,8 +100,8 @@ public class FloodingPacketRouter implements IMessageRouter {
 
 	private RoutingInformation createRoutingInformation() {
 		Builder riBuilder = MessageProtos.RoutingInformation.newBuilder();
-		jadex.android.bluetooth.domain.MessageProtos.RoutingTable.Builder rtBuilder = MessageProtos.RoutingTable.newBuilder();
-		jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry.Builder entryBuilder = MessageProtos.RoutingTableEntry.newBuilder();
+		jadex.android.bluetooth.message.MessageProtos.RoutingTable.Builder rtBuilder = MessageProtos.RoutingTable.newBuilder();
+		jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry.Builder entryBuilder = MessageProtos.RoutingTableEntry.newBuilder();
 		
 		for (String s : reachableDevices) {
 			entryBuilder.setDevice(s);

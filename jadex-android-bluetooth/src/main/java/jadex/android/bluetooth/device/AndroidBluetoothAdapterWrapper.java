@@ -16,7 +16,7 @@ public class AndroidBluetoothAdapterWrapper implements IBluetoothAdapter {
 	public AndroidBluetoothAdapterWrapper(BluetoothAdapter adapter) {
 		mAdapter = adapter;
 	}
-	
+
 	@Override
 	public String getAddress() {
 		return mAdapter.getAddress();
@@ -27,7 +27,7 @@ public class AndroidBluetoothAdapterWrapper implements IBluetoothAdapter {
 		Set<BluetoothDevice> bondedDevices = mAdapter.getBondedDevices();
 		Set<IBluetoothDevice> result = new HashSet<IBluetoothDevice>();
 		for (BluetoothDevice bluetoothDevice : bondedDevices) {
-			result.add(new AndroidBluetoothDevice(bluetoothDevice));
+			result.add(new AndroidBluetoothDeviceWrapper(bluetoothDevice));
 		}
 		return result;
 	}
@@ -45,8 +45,10 @@ public class AndroidBluetoothAdapterWrapper implements IBluetoothAdapter {
 	@Override
 	public IBluetoothServerSocket listenUsingRfcommWithServiceRecord(
 			String serviceName, UUID uuid) throws IOException {
-		BluetoothServerSocket socket = mAdapter.listenUsingRfcommWithServiceRecord(serviceName, uuid);
-		AndroidBluetoothServerSocketWrapper androidSocket = new AndroidBluetoothServerSocketWrapper(socket);
+		BluetoothServerSocket socket = mAdapter
+				.listenUsingRfcommWithServiceRecord(serviceName, uuid);
+		AndroidBluetoothServerSocketWrapper androidSocket = new AndroidBluetoothServerSocketWrapper(
+				socket);
 		return androidSocket;
 	}
 
@@ -59,7 +61,7 @@ public class AndroidBluetoothAdapterWrapper implements IBluetoothAdapter {
 	public void cancelDiscovery() {
 		mAdapter.cancelDiscovery();
 	}
-	
+
 	public BluetoothAdapter getBluetoothAdapter() {
 		return mAdapter;
 	}
@@ -67,12 +69,34 @@ public class AndroidBluetoothAdapterWrapper implements IBluetoothAdapter {
 	@Override
 	public IBluetoothDevice getRemoteDevice(String address) {
 		BluetoothDevice remoteDevice = mAdapter.getRemoteDevice(address);
-		return new AndroidBluetoothDevice(remoteDevice);
+		return new AndroidBluetoothDeviceWrapper(remoteDevice);
 	}
 
 	@Override
 	public void startDiscovery() {
 		mAdapter.startDiscovery();
+	}
+
+	@Override
+	public boolean isDeviceBonded(IBluetoothDevice device) {
+		return (device instanceof AndroidBluetoothDeviceWrapper) 
+				? ((AndroidBluetoothDeviceWrapper) device).getDevice().getBondState() == BluetoothDevice.BOND_BONDED
+				: mAdapter.getBondedDevices().contains(device);
+	}
+	
+	public static BluetoothState convertFromAndroidAdapterState(int androidAdapterState) {
+		switch (androidAdapterState) {
+		case BluetoothAdapter.STATE_ON:
+			return BluetoothState.on;
+		case BluetoothAdapter.STATE_TURNING_ON:
+			return BluetoothState.switching_on;
+		case BluetoothAdapter.STATE_TURNING_OFF:
+			return BluetoothState.switching_off;
+		case BluetoothAdapter.STATE_OFF:
+		default:
+			return BluetoothState.off;
+		}
+		
 	}
 
 }

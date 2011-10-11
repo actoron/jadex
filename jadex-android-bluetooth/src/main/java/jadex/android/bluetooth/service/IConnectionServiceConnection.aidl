@@ -1,7 +1,7 @@
 package jadex.android.bluetooth.service;
 
 import jadex.android.bluetooth.service.IConnectionCallback;
-import jadex.android.bluetooth.domain.BluetoothMessage;
+import jadex.android.bluetooth.message.BluetoothMessage;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 
 // Declare the interface.

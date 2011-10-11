@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.os.RemoteException;
+import android.util.Log;
 
 /**
  * 
@@ -33,7 +34,7 @@ public class BluetoothP2PReceiveHandler extends ReceiveHandler
 			
 			@Override
 			public void deviceListChanged() throws RemoteException {
-				Helper.jLog("BluetoothP2PReceiver: devicelistcahnged!");
+				Log.d(Helper.LOG_TAG, "BluetoothP2PReceiver: devicelistcahnged!");
 			}
 		};
 	}

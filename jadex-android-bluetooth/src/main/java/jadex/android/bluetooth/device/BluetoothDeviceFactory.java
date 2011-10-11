@@ -7,7 +7,7 @@ public class BluetoothDeviceFactory {
 	}
 
 	public static IBluetoothDevice createBluetoothDevice(String address) {
-		return new AndroidBluetoothDevice(BluetoothAdapterFactory
+		return new AndroidBluetoothDeviceWrapper(BluetoothAdapterFactory
 				.getBluetoothAdapter().getRemoteDevice(address));
 	}
 }

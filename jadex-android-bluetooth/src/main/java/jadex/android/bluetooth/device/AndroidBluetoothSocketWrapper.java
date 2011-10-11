@@ -18,7 +18,7 @@ public class AndroidBluetoothSocketWrapper implements IBluetoothSocket {
 	@Override
 	public IBluetoothDevice getRemoteDevice() {
 		BluetoothDevice remoteDevice = mSocket.getRemoteDevice();
-		return new AndroidBluetoothDevice(remoteDevice);
+		return new AndroidBluetoothDeviceWrapper(remoteDevice);
 	}
 
 	@Override

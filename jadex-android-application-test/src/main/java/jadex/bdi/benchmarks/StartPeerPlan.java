@@ -10,6 +10,7 @@ import jadex.commons.future.IFuture;
 
 import java.util.Map;
 
+import android.util.Log;
 import de.unihamburg.vsis.jadexAndroid_test.Helper;
 
 /**
@@ -60,7 +61,7 @@ public class StartPeerPlan extends Plan
 				else
 					aid = capabilityCreateAgent(createPeerName(newnum), args);
 				
-				Helper.jLog("Successfully created peer: "+aid.getLocalName());
+				Log.i(Helper.LOG_TAG, "Successfully created peer: "+aid.getLocalName());
 			}
 			
 			if(parallel)
@@ -83,7 +84,7 @@ public class StartPeerPlan extends Plan
 					else
 						aid = capabilityCreateAgent(createPeerName(newnum), args);
 					
-					Helper.jLog("Successfully created peer: "+aid.getLocalName());
+					Log.i(Helper.LOG_TAG, "Successfully created peer: "+aid.getLocalName());
 				}
 			}
 		}
@@ -94,13 +95,13 @@ public class StartPeerPlan extends Plan
 			long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
 			long omem = (used-startmem.longValue())/1024;
 			long upera = (used-startmem.longValue())/max/1024;
-			Helper.jLog("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+			Log.i(Helper.LOG_TAG, "Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
 
 			long end = getTime();
-			Helper.jLog("Last peer created. "+max+" agents started.");
+			Log.i(Helper.LOG_TAG, "Last peer created. "+max+" agents started.");
 			double dur = ((double)end-starttime.longValue())/1000.0;
 			double pera = dur/max;
-			Helper.jLog("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+			Log.i(Helper.LOG_TAG, "Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 			
 //			waitFor(300000);
 
@@ -116,22 +117,22 @@ public class StartPeerPlan extends Plan
 						serviceDestroyAgent(name);
 					else
 						capabilityDestroyAgent(name);
-					Helper.jLog("Successfully destroyed peer: "+name);
+					Log.i(Helper.LOG_TAG, "Successfully destroyed peer: "+name);
 				}
 			}
 			long killend = getTime();
-			Helper.jLog("Last peer destroyed. "+(max-1)+" agents killed.");
+			Log.i(Helper.LOG_TAG, "Last peer destroyed. "+(max-1)+" agents killed.");
 			double killdur = ((double)killend-killstarttime)/1000.0;
 			double killpera = killdur/(max-1);
 			
 			Runtime.getRuntime().gc();
 			long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
 			
-			Helper.jLog("\nCumulated results:");
-			Helper.jLog("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-			Helper.jLog("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
-			Helper.jLog("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
-			Helper.jLog("Still used memory: "+stillused+"kB.");
+			Log.i(Helper.LOG_TAG, "\nCumulated results:");
+			Log.i(Helper.LOG_TAG, "Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+			Log.i(Helper.LOG_TAG, "Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
+			Log.i(Helper.LOG_TAG, "Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+			Log.i(Helper.LOG_TAG, "Still used memory: "+stillused+"kB.");
 
 			killAgent();
 		}
@@ -221,7 +222,7 @@ public class StartPeerPlan extends Plan
 		IGoal sp = createGoal("cms_destroy_component");
 		sp.getParameter("componentidentifier").setValue(aid);
 		dispatchSubgoalAndWait(sp);
-		Helper.jLog("Successfully destroyed peer: "+name);
+		Log.i(Helper.LOG_TAG, "Successfully destroyed peer: "+name);
 	}
 }
 

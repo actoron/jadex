@@ -34,6 +34,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 
 /**
  *  Agent that sends multicasts to locate other Jadex awareness agents.
@@ -89,7 +90,7 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
 		if (context != null) {
 			//context.startService(intent);
 			intent = new Intent(context, ConnectionService.class);
-			Helper.jLog("Trying to bind BT Service...");
+			Log.d(Helper.LOG_TAG, "Trying to bind BT Service...");
 			context.bindService(intent, sc, Activity.BIND_AUTO_CREATE);
 		}
 	}
@@ -99,13 +100,13 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
 		Context context = JadexBluetoothActivity.application_context;
 		if (binder != null && context != null) {
 			try {
-				Helper.jLog("Stopping autoconnect...");
+				Log.d(Helper.LOG_TAG, "Stopping autoconnect...");
 				binder.stopAutoConnect();
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			} finally {
 				binder = null;
-				Helper.jLog("Unbinding Service...");
+				Log.d(Helper.LOG_TAG, "Unbinding Service...");
 				context.unbindService(sc);
 			}
 		}
@@ -122,7 +123,7 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
 		@Override
 		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
 			binder = IConnectionServiceConnection.Stub.asInterface(arg1);
-			Helper.jLog("Service bound! starting autoconnect...");
+			Log.d(Helper.LOG_TAG, "Service bound! starting autoconnect...");
 			try {
 				binder.registerCallback(((BluetoothP2PReceiveHandler)receiver).callback);
 				binder.startAutoConnect();

@@ -20,6 +20,7 @@ import jadex.xml.annotation.XMLClassname;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.util.Log;
 import de.unihamburg.vsis.jadexAndroid_test.Helper;
 
 /**
@@ -94,7 +95,7 @@ public class AgentCreationAgent extends MicroAgent
 		final int max = ((Integer)args.get("max")).intValue();
 		final boolean nested = ((Boolean)args.get("nested")).booleanValue();
 		
-		Helper.jLog("Created peer: "+num);
+		Log.i(Helper.LOG_TAG, "Created peer: "+num);
 		
 		if(num<max)
 		{
@@ -131,11 +132,11 @@ public class AgentCreationAgent extends MicroAgent
 					final Long starttime = (Long)args.get("starttime");
 					final long omem = (used-startmem.longValue())/1024;
 					final double upera = ((long)(1000*(used-startmem.longValue())/max/1024))/1000.0;
-					Helper.jLog("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
-					Helper.jLog("Last peer created. "+max+" agents started.");
+					Log.i(Helper.LOG_TAG, "Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+					Log.i(Helper.LOG_TAG, "Last peer created. "+max+" agents started.");
 					final double dur = ((double)end-starttime.longValue())/1000.0;
 					final double pera = dur/max;
-					Helper.jLog("Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+					Log.i(Helper.LOG_TAG, "Needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
 				
 					// Delete prior agents.
 //					if(!nested)
@@ -214,7 +215,7 @@ public class AgentCreationAgent extends MicroAgent
 				{
 					public void resultAvailable(Object result)
 					{
-						Helper.jLog("Successfully destroyed peer: "+name);
+						Log.i(Helper.LOG_TAG, "Successfully destroyed peer: "+name);
 						
 						if(cnt-1>(nested?1:1))
 //										if(cnt-1>(nested?1:0))
@@ -248,7 +249,7 @@ public class AgentCreationAgent extends MicroAgent
 			{
 				IClockService cs = (IClockService)result;
 				long killend = cs.getTime();
-				Helper.jLog("Last peer destroyed. "+(max-1)+" agents killed.");
+				Log.i(Helper.LOG_TAG, "Last peer destroyed. "+(max-1)+" agents killed.");
 				double killdur = ((double)killend-killstarttime)/1000.0;
 				final double killpera = killdur/(max-1);
 				
@@ -260,11 +261,11 @@ public class AgentCreationAgent extends MicroAgent
 				catch(InterruptedException e){}
 				long stillused = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory())/1024;
 				
-				Helper.jLog("\nCumulated results:");
-				Helper.jLog("Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
-				Helper.jLog("Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
-				Helper.jLog("Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
-				Helper.jLog("Still used memory: "+stillused+"kB.");
+				Log.i(Helper.LOG_TAG, "\nCumulated results:");
+				Log.i(Helper.LOG_TAG, "Creation needed: "+dur+" secs. Per agent: "+pera+" sec. Corresponds to "+(1/pera)+" agents per sec.");
+				Log.i(Helper.LOG_TAG, "Killing needed:  "+killdur+" secs. Per agent: "+killpera+" sec. Corresponds to "+(1/killpera)+" agents per sec.");
+				Log.i(Helper.LOG_TAG, "Overall memory usage: "+omem+"kB. Per agent: "+upera+" kB.");
+				Log.i(Helper.LOG_TAG, "Still used memory: "+stillused+"kB.");
 				
 				setResultValue("microcreationtime", new Tuple(""+pera, "s"));
 				setResultValue("microkillingtime", new Tuple(""+killpera, "s"));

@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
@@ -52,15 +51,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.michaelrnovak.util.logger.service.ILogProcessor;
 import com.michaelrnovak.util.logger.service.LogProcessor;
-
-import de.unihamburg.vsis.jadexAndroid_test.R;
 
 public class Logger extends ListActivity implements OnClickListener {
 	private ILogProcessor mService;
@@ -115,7 +111,7 @@ public class Logger extends ListActivity implements OnClickListener {
 
 		final String component = getIntent().getExtras().getString("component");
 
-		Helper.jLog("Starting Agent Creation test: " + component);
+		Log.i(Helper.LOG_TAG, "Starting Agent Creation test: " + component);
 
 		new Thread(new Runnable() {
 			public void run() {
@@ -124,7 +120,7 @@ public class Logger extends ListActivity implements OnClickListener {
 
 							public void resultAvailable(Object result) {
 								ExternalAccess extAcc = (ExternalAccess) result;
-								Helper.jLog("result Available:"
+								Log.i(Helper.LOG_TAG, "result Available:"
 										+ result.toString());
 								// exitButton.setEnabled(true);
 							}

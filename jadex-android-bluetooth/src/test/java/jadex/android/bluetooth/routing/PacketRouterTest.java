@@ -3,12 +3,12 @@ package jadex.android.bluetooth.routing;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import jadex.android.bluetooth.DataPacket;
-import jadex.android.bluetooth.domain.MessageProtos;
-import jadex.android.bluetooth.domain.MessageProtos.RoutingInformation;
-import jadex.android.bluetooth.domain.MessageProtos.RoutingInformation.Builder;
-import jadex.android.bluetooth.domain.MessageProtos.RoutingTableEntry;
-import jadex.android.bluetooth.domain.MessageProtos.RoutingType;
+import jadex.android.bluetooth.message.DataPacket;
+import jadex.android.bluetooth.message.MessageProtos;
+import jadex.android.bluetooth.message.MessageProtos.RoutingInformation;
+import jadex.android.bluetooth.message.MessageProtos.RoutingInformation.Builder;
+import jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry;
+import jadex.android.bluetooth.message.MessageProtos.RoutingType;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -6,6 +6,10 @@ import java.util.UUID;
 
 public interface IBluetoothAdapter {
 
+	public enum BluetoothState {
+		discovery_started, discovery_finished, on, off, switching_on, switching_off;
+	}
+	
 	String getAddress();
 
 	Set<IBluetoothDevice> getBondedDevices();
@@ -24,4 +28,6 @@ public interface IBluetoothAdapter {
 	IBluetoothDevice getRemoteDevice(String address);
 
 	void startDiscovery();
+
+	boolean isDeviceBonded(IBluetoothDevice device);
 }

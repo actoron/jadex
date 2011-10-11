@@ -10,6 +10,10 @@ import android.os.Parcelable;
 
 public interface IBluetoothDevice extends Parcelable {
 	
+	public enum BluetoothBondState {
+		bonded, none, bonding
+	}
+	
 	public static Map<String, String> deviceNames = new HashMap<String, String>();
 	
 	public static final Parcelable.Creator<IBluetoothDevice> CREATOR = new Parcelable.Creator<IBluetoothDevice>() {
