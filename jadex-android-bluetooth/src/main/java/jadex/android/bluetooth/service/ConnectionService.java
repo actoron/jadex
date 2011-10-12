@@ -8,13 +8,14 @@ import jadex.android.bluetooth.connection.IConnection;
 import jadex.android.bluetooth.connection.MessageListener;
 import jadex.android.bluetooth.device.AndroidBluetoothAdapterWrapper;
 import jadex.android.bluetooth.device.AndroidBluetoothDeviceWrapper;
-import jadex.android.bluetooth.device.BluetoothAdapterFactory;
-import jadex.android.bluetooth.device.BluetoothDeviceFactory;
 import jadex.android.bluetooth.device.IBluetoothAdapter;
 import jadex.android.bluetooth.device.IBluetoothAdapter.BluetoothState;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.device.IBluetoothDevice.BluetoothBondState;
+import jadex.android.bluetooth.device.factory.AndroidBluetoothAdapterFactory;
+import jadex.android.bluetooth.device.factory.AndroidBluetoothDeviceFactory;
 import jadex.android.bluetooth.message.BluetoothMessage;
+import jadex.android.bluetooth.util.Helper;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -68,7 +69,7 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 		super.onCreate();
 
 		CONTEXT = this;
-		btAdapter = BluetoothAdapterFactory.getBluetoothAdapter();
+		btAdapter = Helper.getBluetoothAdapterFactory().getDefaultBluetoothAdapter();
 		if (btAdapter == null) {
 			showToast("No BT Adapter found! This will cause exceptions.");
 		}
@@ -225,7 +226,7 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 			while (it.hasNext()) {
 				Entry<String, IConnection> next = it.next();
 				if (next.getValue().isAlive()) {
-					result.add(BluetoothDeviceFactory
+					result.add(Helper.getBluetoothDeviceFactory()
 							.createBluetoothDevice(next.getKey()));
 					i++;
 				}
@@ -240,7 +241,7 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 					reachableDevices.size());
 
 			for (String string : reachableDevices) {
-				result.add(BluetoothDeviceFactory.createBluetoothDevice(string));
+				result.add(Helper.getBluetoothDeviceFactory().createBluetoothDevice(string));
 			}
 			return result.toArray(new IBluetoothDevice[result.size()]);
 		}

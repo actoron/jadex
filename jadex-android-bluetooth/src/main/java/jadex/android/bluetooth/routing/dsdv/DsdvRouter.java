@@ -1,0 +1,457 @@
+package jadex.android.bluetooth.routing.dsdv;
+
+import jadex.android.bluetooth.message.DataPacket;
+import jadex.android.bluetooth.message.MessageProtos.RoutingInformation;
+import jadex.android.bluetooth.message.MessageProtos.RoutingTable;
+import jadex.android.bluetooth.message.MessageProtos.RoutingTable.Builder;
+import jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry;
+import jadex.android.bluetooth.message.MessageProtos.RoutingType;
+import jadex.android.bluetooth.routing.IPacketRouter;
+import jadex.android.bluetooth.routing.IPacketSender;
+import jadex.android.bluetooth.routing.dsdv.info.CurrentInfo;
+import jadex.android.bluetooth.routing.dsdv.minders.BroadcastMinder;
+import jadex.android.bluetooth.routing.dsdv.minders.PeriodicBroadcastMinder;
+import jadex.android.bluetooth.routing.dsdv.minders.RouteSender;
+import jadex.android.bluetooth.routing.dsdv.net.LocalRoutingTable;
+import jadex.android.bluetooth.routing.dsdv.net.RoutingTableEntryWrapper;
+import jadex.android.bluetooth.service.Future;
+import jadex.android.bluetooth.service.IFuture;
+import jadex.android.bluetooth.util.Helper;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+
+import android.util.Log;
+
+/**
+ * Implementation of the DSDV routing algorithm
+ * 
+ * @author Arnar http://code.google.com/p/beddernet/
+ */
+public class DsdvRouter implements IPacketRouter {
+
+	private static final RoutingType ROUTING_TYPE = RoutingType.DSDV;
+
+	private String TAG = Helper.LOG_TAG;
+	private static String ownAddress;
+
+	private LocalRoutingTable routeTable;
+	private BroadcastMinder broadcaster;
+	private PeriodicBroadcastMinder periodicBroadcaster;
+	/**
+	 * manages a route dampening time for new or deleted routes
+	 */
+	private RouteSender routeSender;
+	private IPacketSender sender;
+
+	/**
+	 * Class constructor
+	 * 
+	 * @param appMsgListener
+	 *            handles messages
+	 * @param bednetService
+	 *            used to read of the status of the initialization
+	 */
+	public DsdvRouter(String ownAddress) {
+		// create & initialize the route manager
+		DsdvRouter.ownAddress = ownAddress;
+		initRoutingTable();
+		broadcaster = new BroadcastMinder(this, routeTable);
+		periodicBroadcaster = new PeriodicBroadcastMinder(this, routeTable);
+		broadcaster.start();
+		periodicBroadcaster.start();
+	}
+
+	/**
+	 * Method to stop the protocol handler. Does this by stopping all the
+	 * threads that were started start function and cleaning up the routing
+	 * environment
+	 */
+	public synchronized void stopApplication() {
+
+		// stop broadcasting thread
+		broadcaster.abort();
+
+		// stop the periodic broadcaster
+		periodicBroadcaster.abort();
+
+		// start the route deleter
+		// staleRouteDeleter.stop();
+	}
+
+	/**
+	 * Init the environment, for new user, broadcast your routing table i.e. the
+	 * one line table containing yourself
+	 */
+	private void initRoutingTable() {
+		Log.i(TAG, "initializing routing");
+		String dest = ownAddress;
+		String next_hop = dest;
+		int hops = 0;
+		RoutingTableEntryWrapper rte = new RoutingTableEntryWrapper(dest,
+				next_hop, hops, CurrentInfo.incrementOwnSeqNum());
+
+		routeTable = new LocalRoutingTable();
+		routeTable.addRoutingEntry(rte);
+		// Announce arrival on the network
+		BroadcastRouteTableMessage();
+	}
+
+	/**
+	 * The route is down. Reestablish new routes
+	 * 
+	 * @param toNetworkAddresses
+	 *            the addresses to send "rounte down" messages to
+	 */
+	public void BroadcastRouteDown(String[] toNetworkAddresses) {
+		for (String l : toNetworkAddresses) {
+			BroadcastRouteDown(l);
+		}
+	}
+
+	/**
+	 * Broadcasts a route broadcast packet
+	 * 
+	 * @param routes
+	 *            The route to broadcast
+	 * @param routeDown
+	 *            indicates whether the route(s) are down
+	 */
+	private void broadcastRouteBroadcastPacket(
+			Vector<RoutingTableEntryWrapper> routes, boolean routeDown) {
+		Vector<String> neighbors = routeTable.getNeighborAddresses();
+
+		if (neighbors != null) {
+			for (int i = 0; i < neighbors.size(); i++) {
+				try {
+					String dest = neighbors.get(i);
+					Builder rtBuilder = jadex.android.bluetooth.message.MessageProtos.RoutingTable
+							.newBuilder();
+					for (RoutingTableEntryWrapper rtew : routes) {
+						rtBuilder.addEntry(rtew.build());
+					}
+
+					jadex.android.bluetooth.message.MessageProtos.RoutingInformation.Builder riBuilder = RoutingInformation
+							.newBuilder();
+					riBuilder.setRoutingTable(rtBuilder);
+					riBuilder.setRouteDownInformation(routeDown);
+					riBuilder.setType(RoutingType.DSDV);
+
+					DataPacket packet = new DataPacket(dest, riBuilder.build()
+							.toByteArray(), DataPacket.TYPE_ROUTING_INFORMATION);
+					sender.sendMessageToConnectedDevice(packet, dest);
+				} catch (Exception exception) {
+					Log.e(TAG, "Error in BroadcastRouteBroadcastPacket",
+							exception);
+				}
+			}
+		}
+	}
+
+	//
+	/**
+	 * Updates the seq num of the route to an odd number and sends that route
+	 * immediatly to all neighbors. Should send also an updated route concerning
+	 * all routes that have dest as next hop, update those to odd num as well
+	 * and send
+	 * 
+	 * @param dest
+	 *            the destination that is down
+	 */
+
+	public void BroadcastRouteDown(String dest) {
+		RoutingTableEntryWrapper rte = routeTable.getRoutingEntry(dest);
+		if (rte != null) {
+			// get all routes concerning dest, set as invalid
+			Vector<RoutingTableEntryWrapper> route = routeTable
+					.getRoutesAsVectorInvalid(dest);
+
+			broadcastRouteBroadcastPacket(route, true);
+		}
+	}
+
+	/**
+	 * Sends all active routes (routes with even seq nums) to all neighbors
+	 */
+	public void BroadcastRouteTableMessage() {
+		Vector<RoutingTableEntryWrapper> routes = routeTable
+				.getAllRoutesAsVector();
+		broadcastRouteBroadcastPacket(routes, false);
+	}
+
+	/**
+	 * Sends the supplied routes to all neighbors, used to send incremental
+	 * updates as well as immediate changes
+	 * 
+	 * @param Vector
+	 *            routes The vector of RoutingTableEntryWrapper objects to be
+	 *            sent
+	 */
+	public void BroadcastRouteTableMessageInstant(
+			Vector<RoutingTableEntryWrapper> routes) {
+		broadcastRouteBroadcastPacket(routes, false);
+	}
+
+	/**
+	 * Processes a Route Down message, this is sent when sending a packet
+	 * detects a broken link/route
+	 */
+	public void processDSDVRouteDownBroadcast(RoutingInformation rInfo) {
+
+		RoutingTable routingTable = rInfo.getRoutingTable();
+		List<RoutingTableEntry> routes = routingTable.getEntryList();
+		// log.out("Processing down message :"+rBroad.routes.size());
+		for (int i = 0; i < routes.size(); i++) {
+			RoutingTableEntryWrapper rte = new RoutingTableEntryWrapper(
+					routes.get(i));
+			// check if route exists
+			RoutingTableEntryWrapper existing = routeTable.getRoutingEntry(rte
+					.getDestination());
+			// if I use the rte then increase the hop count by one
+			rte.setNumHops(rte.getNumHops() + 1);
+
+			if (existing != null && existing.getSeqNum() < rte.getSeqNum()
+					&& rInfo.getFromAddress().equals(existing.getNextHop())) {
+				routeTable.addRoutingEntry(rte);
+			}
+		}
+	}
+
+	/**
+	 * DSDVBroadcast is a standard broadcast message used to send routing table
+	 * information Processing this message requires going through all routes
+	 * supplied in the package and analyze whether they are better than the
+	 * known routes.
+	 * 
+	 * @param rBroad
+	 *            A broadcast message received and forwarded
+	 */
+
+	public void processDSDVMsgBroadcast(RoutingInformation rBroad) {
+		try {
+			boolean reBroadcast = false;
+			List<RoutingTableEntry> routes = rBroad.getRoutingTable()
+					.getEntryList();
+			// System.out.println("Processing broadcast. :"+rBroad.routes.size());
+			for (int i = 0; i < routes.size(); i++) {
+				RoutingTableEntryWrapper rte = new RoutingTableEntryWrapper(
+						routes.get(i));
+				// check if route exists
+				RoutingTableEntryWrapper existing = routeTable
+						.getRoutingEntry(rte.getDestination());
+				// if I use the rte then increase the hop count by one
+				rte.setNumHops(rte.getNumHops() + 1);
+				// System.out.println("**** Got from " +
+				// rBroad.fromNetAddr.getAddressAsString()+" to "+rte.getDestination().getAddressAsString()
+				// + " with sewnum "+rte.getSeqNum());
+				// assume new node in the network
+				if (existing == null) {// || rte.getSeqNum() == 0) {
+					// System.out.println("Added a route.. not in table");
+					// routeSender.reset();
+					rte.setRouteChanged(true); // mark as sent now
+					routeTable.addRoutingEntry(rte);
+					reBroadcast = true;
+				} else // compare the existing route with the new one
+				{
+					// System.out.println("Route exists");
+					// If the dest is myself and the sequence num is higher and
+					// odd then increment own seq num to one higher then the one
+					// sent
+					if (rte.getDestination().equals(ownAddress)
+							&& rte.getSeqNum() % 2 == 1
+							&& rte.getSeqNum() > CurrentInfo.lastSeqNum) {
+						CurrentInfo.setOwnSeqNum(rte.getSeqNum() + 1);
+						rte.setSeqNum(CurrentInfo.lastSeqNum);
+						rte.setNextHop(ownAddress);
+						rte.setNumHops(0);
+						rte.setRouteChanged(true);
+						routeTable.addRoutingEntry(rte);
+						reBroadcast = true;
+					} else if (existing.getSeqNum() < rte.getSeqNum()) {
+						// System.out.println("Got from " +
+						// rBroad.fromNetAddr.getAddressAsString()+" to "+rte.getDestination().getAddressAsString()
+						// +
+						// " with sewnum "+rte.getSeqNum()+" existing seq is lower");
+						// if there is a newer Seq num and the node I get the
+						// message
+						// from is the next hop for the destination then store
+						// route
+						if (rte.getSeqNum() % 2 == 1
+								&& rBroad.getFromAddress() == existing
+										.getNextHop()) {
+							// System.out.println("Got from " +
+							// rBroad.fromNetAddr.getAddressAsString()+" to "+rte.getDestination().getAddressAsString()
+							// +
+							// " with sewnum "+rte.getSeqNum()+" route is odd num");
+							rte.setRouteChanged(true);
+							routeTable.addRoutingEntry(rte);
+							reBroadcast = true;
+
+						} else if (rte.getSeqNum() % 2 == 0) {
+							// System.out.println("Got from " +
+							// rBroad.fromNetAddr.getAddressAsString()+" to "+rte.getDestination().getAddressAsString()
+							// +
+							// " with sewnum "+rte.getSeqNum()+" route is even num");
+							// routeSender.reset();
+							routeTable.addRoutingEntry(rte);
+							// reBroadcast = true;
+						} else {
+							// System.out.println("Doing nada !! ");
+						}
+					} else if (existing.getSeqNum() == rte.getSeqNum()
+							&& (existing.getNumHops() > rte.getNumHops())) {
+						// System.out.println("Got from " +
+						// rBroad.fromNetAddr.getAddressAsString()+" to "+rte.getDestination().getAddressAsString()
+						// +
+						// " with sewnum "+rte.getSeqNum()+" same seq lower hop");
+						rte.setRouteChanged(true);
+						routeTable.addRoutingEntry(rte);
+					} else {
+						// System.out.println("Do nothing with Route");
+					}
+				}
+			}
+
+			// reBroadcast message since there was a new route or a route with
+			// an odd seq num or fewer hops
+			if (reBroadcast) {
+				routeSender = new RouteSender(this, routeTable);
+				routeSender.start();
+			}
+
+		} catch (Exception exception) {
+			System.out.println("Exception in process : "
+					+ exception.getMessage());
+		}
+
+	}
+
+	/**
+	 * Prints the routing table.
+	 */
+	public void printRouteTable() {
+		Vector<RoutingTableEntryWrapper> v = routeTable.getAllRoutesAsVector();
+		Log.d(TAG, "Routing Table from route manager:");
+
+		for (int i = 0; i < v.size(); i++) {
+			RoutingTableEntryWrapper rte = v.elementAt(i);
+			Log.d(TAG, rte.toString());
+
+		}
+	}
+
+	/**
+	 * 
+	 * @return all entries in the routing table (excluding our own)
+	 */
+	public String[] getAvailableDevices() {
+		// TODO: I hate vectors!
+		Vector<RoutingTableEntryWrapper> routes = routeTable
+				.getRoutesAsVector();
+		String[] connectedDevices = new String[routes.size() - 1];
+		int j = 0; // index of connectedDevices
+		for (int i = 0; i < routes.size(); i++) {
+			String dest = ((RoutingTableEntryWrapper) routes.elementAt(i))
+					.getDestination();
+			if (dest.equals(ownAddress))// own address
+			{
+			} else {
+				connectedDevices[j] = dest;
+				j++;
+			}
+		}
+		return connectedDevices;
+	}
+
+	/**
+	 * Method for sending unicast messages
+	 * 
+	 * @return
+	 */
+	public IFuture routePacket(DataPacket packet, String fromDevice) {
+		IFuture result = new Future();
+		Log.d(TAG, "Message send to DSDVRouter");
+		return result;
+	}
+
+	/**
+	 * @return your network address
+	 */
+	public static String getNetworkAddress() {
+		return ownAddress;
+	}
+
+	@Override
+	public void addReachableDevicesChangeListener(
+			ReachableDevicesChangeListener l) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean removeReachableDevicesChangeListener(
+			ReachableDevicesChangeListener l) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setPacketSender(IPacketSender sender) {
+		this.sender = sender;
+	}
+
+	@Override
+	// this method should not be needed
+	// because every device is sending its own one-line-table around
+	public void addConnectedDevice(String device) {
+		RoutingTableEntryWrapper rte = new RoutingTableEntryWrapper(device,
+				device, 1, CurrentInfo.incrementOwnSeqNum());
+		routeTable.addRoutingEntry(rte);
+	}
+
+	@Override
+	public void removeConnectedDevice(String device) {
+		BroadcastRouteDown(device);
+	}
+
+	@Override
+	public void updateRoutingInformation(RoutingInformation ri) {
+		if (ri.getType() == this.ROUTING_TYPE) {
+			if (ri.getRouteDownInformation()) {
+				processDSDVRouteDownBroadcast(ri);
+			} else {
+				processDSDVMsgBroadcast(ri);
+			}
+		}
+	}
+
+	@Override
+	public Set<String> getReachableDeviceAddresses() {
+		HashSet<String> result = new HashSet<String>();
+		Vector<RoutingTableEntryWrapper> routes = routeTable
+				.getRoutesAsVector();
+		for (int i = 0; i < routes.size(); i++) {
+			RoutingTableEntryWrapper entry = routes.elementAt(i);
+			String dest = entry.getDestination();
+			int hops = entry.getNumHops();
+			if (hops > 1) {
+				// reachable via another node
+				result.add(dest);
+			} else {
+				// directly connected
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public Set<String> getConnectedDeviceAddresses() {
+		HashSet<String> result = new HashSet<String>();
+		Vector<String> neighbours = routeTable.getNeighborAddresses();
+		result.addAll(neighbours);
+		return result;
+	}
+
+}

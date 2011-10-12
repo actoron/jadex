@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import jadex.android.bluetooth.TestConstants;
 import jadex.android.bluetooth.message.DataPacket;
-import jadex.android.bluetooth.message.DataPacketTest;
 import jadex.android.bluetooth.message.MessageProtos;
 import jadex.android.bluetooth.message.MessageProtos.RoutingInformation;
 import jadex.android.bluetooth.message.MessageProtos.RoutingInformation.Builder;
@@ -34,8 +33,8 @@ public abstract class PacketRouterTest {
 	protected static final String device1 = "device1Address";
 	protected static final String device2 = "device2Address";
 	protected static final String device3 = "device3Address";
-
-	protected IMessageRouter packetRouter1;
+	
+	protected IPacketRouter packetRouter1;
 	protected Map<String, DataPacket> sentMessages1;
 	protected Map<String, DataPacket> sentMessages2;
 
@@ -44,7 +43,7 @@ public abstract class PacketRouterTest {
 		packetRouter1 = getPacketRouter(ownAddress);
 		sentMessages1 = new HashMap<String, DataPacket>();
 		sentMessages2 = new HashMap<String, DataPacket>();
-		packetRouter1.setPacketSender(new IMessageSender() {
+		packetRouter1.setPacketSender(new IPacketSender() {
 			@Override
 			public void sendMessageToConnectedDevice(DataPacket packet,
 					String address) {
@@ -90,7 +89,7 @@ public abstract class PacketRouterTest {
 		Set<String> reachableDeviceAddresses = packetRouter1
 				.getReachableDeviceAddresses();
 
-		List<String> expectedReachableDeviceList = getDeviceList(getSampleRoutingInformation());
+		List<String> expectedReachableDeviceList = getSampleExpectedReachableDevices();
 
 		for (String dev : expectedReachableDeviceList) {
 			assertTrue(reachableDeviceAddresses.contains(dev));
@@ -107,7 +106,7 @@ public abstract class PacketRouterTest {
 		List<RoutingTableEntry> entryList = routingInformation.getRoutingTable().getEntryList();
 		ArrayList<String> result = new ArrayList<String>(entryList.size());
 		for (RoutingTableEntry routingTableEntry : entryList) {
-			result.add(routingTableEntry.getDevice());
+			result.add(routingTableEntry.getDestination());
 		}
 		return result;
 	}
@@ -174,8 +173,8 @@ public abstract class PacketRouterTest {
 
 	@Test
 	public void testCommunicatingPacketRouters() {
-		final IMessageRouter packetRouter2 = getPacketRouter(ownAddress2);
-		packetRouter2.setPacketSender(new IMessageSender() {
+		final IPacketRouter packetRouter2 = getPacketRouter(ownAddress2);
+		packetRouter2.setPacketSender(new IPacketSender() {
 
 			@Override
 			public void sendMessageToConnectedDevice(DataPacket packet,
@@ -196,7 +195,7 @@ public abstract class PacketRouterTest {
 			}
 		});
 
-		packetRouter1.setPacketSender(new IMessageSender() {
+		packetRouter1.setPacketSender(new IPacketSender() {
 			@Override
 			public void sendMessageToConnectedDevice(DataPacket packet,
 					String address) {
@@ -259,10 +258,14 @@ public abstract class PacketRouterTest {
 		assertEquals(device1, dataPacket2.Dest);
 	}
 
-	protected abstract IMessageRouter getPacketRouter(String ownAddress);
+	protected abstract IPacketRouter getPacketRouter(String ownAddress);
 
 	protected abstract RoutingType getRouterRoutingType();
 
 	protected abstract RoutingInformation getSampleRoutingInformation();
+	
+	protected abstract List<String> getSampleExpectedReachableDevices();
+	
+	protected abstract List<String> getSampleExpectedConnectedDevices();
 
 }

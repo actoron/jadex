@@ -1,5 +1,7 @@
 package jadex.android.bluetooth.device;
 
+import jadex.android.bluetooth.util.Helper;
+
 import java.io.IOException;
 import java.util.UUID;
 
@@ -29,7 +31,7 @@ public class AndroidBluetoothDeviceWrapper implements IBluetoothDevice {
 	// };
 	
 	public AndroidBluetoothDeviceWrapper(IBluetoothDevice dev) {
-		IBluetoothAdapter bluetoothAdapter = BluetoothAdapterFactory.getBluetoothAdapter();
+		IBluetoothAdapter bluetoothAdapter = Helper.getBluetoothAdapterFactory().getDefaultBluetoothAdapter();
 		if (bluetoothAdapter instanceof AndroidBluetoothAdapterWrapper) {
 			AndroidBluetoothAdapterWrapper androidAdapter = (AndroidBluetoothAdapterWrapper) bluetoothAdapter;
 			BluetoothDevice remoteDevice = androidAdapter.getBluetoothAdapter().getRemoteDevice(dev.getAddress());

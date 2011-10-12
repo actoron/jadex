@@ -9,8 +9,12 @@ message RoutingTable {
 }
 
 message RoutingTableEntry {
-	required string device = 1;
-	optional int32 cost = 2 [default = 0];
+	required string destination = 1;
+	optional string nextHop = 2;
+	optional int32 numHops = 3 [default = 0];
+	optional int32 seqNum = 4;
+	optional int64 routeCreationTime = 5;
+	optional bool routeChanged = 6 [default = false];
 }
 
 enum RoutingType {
@@ -21,5 +25,7 @@ enum RoutingType {
 
 message RoutingInformation {
 	required RoutingType type = 1;
-	optional RoutingTable routingTable = 2;
+	optional string fromAddress = 2;
+	required RoutingTable routingTable = 3;
+	optional bool routeDownInformation = 4 [default = false];
 }

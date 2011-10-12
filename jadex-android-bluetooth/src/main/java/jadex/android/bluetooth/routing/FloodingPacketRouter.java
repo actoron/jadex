@@ -16,11 +16,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class FloodingPacketRouter implements IMessageRouter {
+public class FloodingPacketRouter implements IPacketRouter {
 
 	private static final RoutingType ROUTING_TYPE = RoutingType.Flooding;
 	private Set<String> connectedDevices;
-	private IMessageSender sender;
+	private IPacketSender sender;
 
 	private Set<String> reachableDevices;
 	private String ownAddress;
@@ -30,11 +30,11 @@ public class FloodingPacketRouter implements IMessageRouter {
 		this.ownAddress = ownAddress;
 		connectedDevices = new HashSet<String>();
 		reachableDevices = new HashSet<String>();
-		listeners = new HashSet<IMessageRouter.ReachableDevicesChangeListener>();
+		listeners = new HashSet<IPacketRouter.ReachableDevicesChangeListener>();
 	}
 
 	@Override
-	public void setPacketSender(IMessageSender sender) {
+	public void setPacketSender(IPacketSender sender) {
 		this.sender = sender;
 	}
 
@@ -82,7 +82,7 @@ public class FloodingPacketRouter implements IMessageRouter {
 
 			deviceList = new HashSet<String>(routingEntries.size());
 			for (RoutingTableEntry routingTableEntry : routingEntries) {
-				String address = routingTableEntry.getDevice();
+				String address = routingTableEntry.getDestination();
 				if (!address.equals(ownAddress)
 						&& (!connectedDevices.contains(address))) {
 					boolean add = reachableDevices.add(address);
@@ -104,12 +104,12 @@ public class FloodingPacketRouter implements IMessageRouter {
 		jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry.Builder entryBuilder = MessageProtos.RoutingTableEntry.newBuilder();
 		
 		for (String s : reachableDevices) {
-			entryBuilder.setDevice(s);
+			entryBuilder.setDestination(s);
 			rtBuilder.addEntry(entryBuilder.build());
 		}
 
 		for (String address : connectedDevices) {
-			entryBuilder.setDevice(address);
+			entryBuilder.setDestination(address);
 			rtBuilder.addEntry(entryBuilder.build());
 		}
 		
@@ -129,7 +129,6 @@ public class FloodingPacketRouter implements IMessageRouter {
 		notifyListeners();
 
 		RoutingInformation ri = createRoutingInformation();
-		createRoutingInformation();
 		DataPacket pkt = new DataPacket("", ri.toByteArray(),
 				DataPacket.TYPE_ROUTING_INFORMATION);
 

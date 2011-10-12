@@ -1,12 +1,16 @@
 package jadex.android.bluetooth.connection;
 
+import jadex.android.bluetooth.message.DataPacket;
+import jadex.android.bluetooth.routing.IPacketSender;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-public class ConnectionManager extends HashMap<String, IConnection> {
+public class ConnectionManager extends HashMap<String, IConnection> implements
+		IPacketSender {
 
 	public interface ConnectionsListener {
 		void connectionRemoved(String address);
@@ -29,7 +33,7 @@ public class ConnectionManager extends HashMap<String, IConnection> {
 	@Override
 	public IConnection put(String address, IConnection value) {
 		IConnection put = super.put(address, value);
-			notifyConnectionAdded(address, value);
+		notifyConnectionAdded(address, value);
 		return put;
 	}
 
@@ -41,11 +45,11 @@ public class ConnectionManager extends HashMap<String, IConnection> {
 		}
 		return remove;
 	}
-	
+
 	public boolean containsKey(String deviceID) {
 		return super.containsKey(deviceID);
 	}
-	
+
 	public void addConnectionsListener(ConnectionsListener l) {
 		listeners.add(l);
 	}
@@ -69,14 +73,26 @@ public class ConnectionManager extends HashMap<String, IConnection> {
 	public void stopAll() {
 		for (Entry<String, IConnection> entry : entrySet()) {
 			IConnection value = entry.getValue();
-			//String key = entry.getKey();
+			// String key = entry.getKey();
 			value.close();
 			// send message to inform others of shutdown
 		}
 		clear();
 		for (ConnectionsListener l : listeners) {
-			for (String address: this.keySet()) {
+			for (String address : this.keySet()) {
 				l.connectionRemoved(address);
+			}
+		}
+	}
+
+	@Override
+	public void sendMessageToConnectedDevice(DataPacket packet, String address) {
+		IConnection con = get(address);
+		if (con.isAlive()) {
+			try {
+				con.write(packet.asByteArray());
+			} catch (IOException e) {
+				// handle broke connection
 			}
 		}
 	}

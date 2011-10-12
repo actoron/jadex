@@ -437,13 +437,29 @@ public final class MessageProtos {
   public interface RoutingTableEntryOrBuilder
       extends com.google.protobuf.MessageLiteOrBuilder {
     
-    // required string device = 1;
-    boolean hasDevice();
-    String getDevice();
+    // required string destination = 1;
+    boolean hasDestination();
+    String getDestination();
     
-    // optional int32 cost = 2 [default = 0];
-    boolean hasCost();
-    int getCost();
+    // optional string nextHop = 2;
+    boolean hasNextHop();
+    String getNextHop();
+    
+    // optional int32 numHops = 3 [default = 0];
+    boolean hasNumHops();
+    int getNumHops();
+    
+    // optional int32 seqNum = 4;
+    boolean hasSeqNum();
+    int getSeqNum();
+    
+    // optional int64 routeCreationTime = 5;
+    boolean hasRouteCreationTime();
+    long getRouteCreationTime();
+    
+    // optional bool routeChanged = 6 [default = false];
+    boolean hasRouteChanged();
+    boolean getRouteChanged();
   }
   public static final class RoutingTableEntry extends
       com.google.protobuf.GeneratedMessageLite
@@ -464,14 +480,14 @@ public final class MessageProtos {
     }
     
     private int bitField0_;
-    // required string device = 1;
-    public static final int DEVICE_FIELD_NUMBER = 1;
-    private java.lang.Object device_;
-    public boolean hasDevice() {
+    // required string destination = 1;
+    public static final int DESTINATION_FIELD_NUMBER = 1;
+    private java.lang.Object destination_;
+    public boolean hasDestination() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
-    public String getDevice() {
-      java.lang.Object ref = device_;
+    public String getDestination() {
+      java.lang.Object ref = destination_;
       if (ref instanceof String) {
         return (String) ref;
       } else {
@@ -479,43 +495,109 @@ public final class MessageProtos {
             (com.google.protobuf.ByteString) ref;
         String s = bs.toStringUtf8();
         if (com.google.protobuf.Internal.isValidUtf8(bs)) {
-          device_ = s;
+          destination_ = s;
         }
         return s;
       }
     }
-    private com.google.protobuf.ByteString getDeviceBytes() {
-      java.lang.Object ref = device_;
+    private com.google.protobuf.ByteString getDestinationBytes() {
+      java.lang.Object ref = destination_;
       if (ref instanceof String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8((String) ref);
-        device_ = b;
+        destination_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
     
-    // optional int32 cost = 2 [default = 0];
-    public static final int COST_FIELD_NUMBER = 2;
-    private int cost_;
-    public boolean hasCost() {
+    // optional string nextHop = 2;
+    public static final int NEXTHOP_FIELD_NUMBER = 2;
+    private java.lang.Object nextHop_;
+    public boolean hasNextHop() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
-    public int getCost() {
-      return cost_;
+    public String getNextHop() {
+      java.lang.Object ref = nextHop_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          nextHop_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getNextHopBytes() {
+      java.lang.Object ref = nextHop_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        nextHop_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // optional int32 numHops = 3 [default = 0];
+    public static final int NUMHOPS_FIELD_NUMBER = 3;
+    private int numHops_;
+    public boolean hasNumHops() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    public int getNumHops() {
+      return numHops_;
+    }
+    
+    // optional int32 seqNum = 4;
+    public static final int SEQNUM_FIELD_NUMBER = 4;
+    private int seqNum_;
+    public boolean hasSeqNum() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    public int getSeqNum() {
+      return seqNum_;
+    }
+    
+    // optional int64 routeCreationTime = 5;
+    public static final int ROUTECREATIONTIME_FIELD_NUMBER = 5;
+    private long routeCreationTime_;
+    public boolean hasRouteCreationTime() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    public long getRouteCreationTime() {
+      return routeCreationTime_;
+    }
+    
+    // optional bool routeChanged = 6 [default = false];
+    public static final int ROUTECHANGED_FIELD_NUMBER = 6;
+    private boolean routeChanged_;
+    public boolean hasRouteChanged() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    public boolean getRouteChanged() {
+      return routeChanged_;
     }
     
     private void initFields() {
-      device_ = "";
-      cost_ = 0;
+      destination_ = "";
+      nextHop_ = "";
+      numHops_ = 0;
+      seqNum_ = 0;
+      routeCreationTime_ = 0L;
+      routeChanged_ = false;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
       
-      if (!hasDevice()) {
+      if (!hasDestination()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -527,10 +609,22 @@ public final class MessageProtos {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeBytes(1, getDeviceBytes());
+        output.writeBytes(1, getDestinationBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeInt32(2, cost_);
+        output.writeBytes(2, getNextHopBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeInt32(3, numHops_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeInt32(4, seqNum_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeInt64(5, routeCreationTime_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeBool(6, routeChanged_);
       }
     }
     
@@ -542,11 +636,27 @@ public final class MessageProtos {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, getDeviceBytes());
+          .computeBytesSize(1, getDestinationBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, cost_);
+          .computeBytesSize(2, getNextHopBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, numHops_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, seqNum_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(5, routeCreationTime_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(6, routeChanged_);
       }
       memoizedSerializedSize = size;
       return size;
@@ -650,10 +760,18 @@ public final class MessageProtos {
       
       public Builder clear() {
         super.clear();
-        device_ = "";
+        destination_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
-        cost_ = 0;
+        nextHop_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
+        numHops_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        seqNum_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        routeCreationTime_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        routeChanged_ = false;
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
       
@@ -690,28 +808,56 @@ public final class MessageProtos {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.device_ = device_;
+        result.destination_ = destination_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        result.cost_ = cost_;
+        result.nextHop_ = nextHop_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.numHops_ = numHops_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.seqNum_ = seqNum_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.routeCreationTime_ = routeCreationTime_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.routeChanged_ = routeChanged_;
         result.bitField0_ = to_bitField0_;
         return result;
       }
       
       public Builder mergeFrom(jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry other) {
         if (other == jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry.getDefaultInstance()) return this;
-        if (other.hasDevice()) {
-          setDevice(other.getDevice());
+        if (other.hasDestination()) {
+          setDestination(other.getDestination());
         }
-        if (other.hasCost()) {
-          setCost(other.getCost());
+        if (other.hasNextHop()) {
+          setNextHop(other.getNextHop());
+        }
+        if (other.hasNumHops()) {
+          setNumHops(other.getNumHops());
+        }
+        if (other.hasSeqNum()) {
+          setSeqNum(other.getSeqNum());
+        }
+        if (other.hasRouteCreationTime()) {
+          setRouteCreationTime(other.getRouteCreationTime());
+        }
+        if (other.hasRouteChanged()) {
+          setRouteChanged(other.getRouteChanged());
         }
         return this;
       }
       
       public final boolean isInitialized() {
-        if (!hasDevice()) {
+        if (!hasDestination()) {
           
           return false;
         }
@@ -737,12 +883,32 @@ public final class MessageProtos {
             }
             case 10: {
               bitField0_ |= 0x00000001;
-              device_ = input.readBytes();
+              destination_ = input.readBytes();
               break;
             }
-            case 16: {
+            case 18: {
               bitField0_ |= 0x00000002;
-              cost_ = input.readInt32();
+              nextHop_ = input.readBytes();
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              numHops_ = input.readInt32();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              seqNum_ = input.readInt32();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              routeCreationTime_ = input.readInt64();
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000020;
+              routeChanged_ = input.readBool();
               break;
             }
           }
@@ -751,59 +917,158 @@ public final class MessageProtos {
       
       private int bitField0_;
       
-      // required string device = 1;
-      private java.lang.Object device_ = "";
-      public boolean hasDevice() {
+      // required string destination = 1;
+      private java.lang.Object destination_ = "";
+      public boolean hasDestination() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
-      public String getDevice() {
-        java.lang.Object ref = device_;
+      public String getDestination() {
+        java.lang.Object ref = destination_;
         if (!(ref instanceof String)) {
           String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
-          device_ = s;
+          destination_ = s;
           return s;
         } else {
           return (String) ref;
         }
       }
-      public Builder setDevice(String value) {
+      public Builder setDestination(String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   bitField0_ |= 0x00000001;
-        device_ = value;
+        destination_ = value;
         
         return this;
       }
-      public Builder clearDevice() {
+      public Builder clearDestination() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        device_ = getDefaultInstance().getDevice();
+        destination_ = getDefaultInstance().getDestination();
         
         return this;
       }
-      void setDevice(com.google.protobuf.ByteString value) {
+      void setDestination(com.google.protobuf.ByteString value) {
         bitField0_ |= 0x00000001;
-        device_ = value;
+        destination_ = value;
         
       }
       
-      // optional int32 cost = 2 [default = 0];
-      private int cost_ ;
-      public boolean hasCost() {
+      // optional string nextHop = 2;
+      private java.lang.Object nextHop_ = "";
+      public boolean hasNextHop() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
-      public int getCost() {
-        return cost_;
+      public String getNextHop() {
+        java.lang.Object ref = nextHop_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          nextHop_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
       }
-      public Builder setCost(int value) {
-        bitField0_ |= 0x00000002;
-        cost_ = value;
+      public Builder setNextHop(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        nextHop_ = value;
         
         return this;
       }
-      public Builder clearCost() {
+      public Builder clearNextHop() {
         bitField0_ = (bitField0_ & ~0x00000002);
-        cost_ = 0;
+        nextHop_ = getDefaultInstance().getNextHop();
+        
+        return this;
+      }
+      void setNextHop(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000002;
+        nextHop_ = value;
+        
+      }
+      
+      // optional int32 numHops = 3 [default = 0];
+      private int numHops_ ;
+      public boolean hasNumHops() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      public int getNumHops() {
+        return numHops_;
+      }
+      public Builder setNumHops(int value) {
+        bitField0_ |= 0x00000004;
+        numHops_ = value;
+        
+        return this;
+      }
+      public Builder clearNumHops() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        numHops_ = 0;
+        
+        return this;
+      }
+      
+      // optional int32 seqNum = 4;
+      private int seqNum_ ;
+      public boolean hasSeqNum() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      public int getSeqNum() {
+        return seqNum_;
+      }
+      public Builder setSeqNum(int value) {
+        bitField0_ |= 0x00000008;
+        seqNum_ = value;
+        
+        return this;
+      }
+      public Builder clearSeqNum() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        seqNum_ = 0;
+        
+        return this;
+      }
+      
+      // optional int64 routeCreationTime = 5;
+      private long routeCreationTime_ ;
+      public boolean hasRouteCreationTime() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      public long getRouteCreationTime() {
+        return routeCreationTime_;
+      }
+      public Builder setRouteCreationTime(long value) {
+        bitField0_ |= 0x00000010;
+        routeCreationTime_ = value;
+        
+        return this;
+      }
+      public Builder clearRouteCreationTime() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        routeCreationTime_ = 0L;
+        
+        return this;
+      }
+      
+      // optional bool routeChanged = 6 [default = false];
+      private boolean routeChanged_ ;
+      public boolean hasRouteChanged() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      public boolean getRouteChanged() {
+        return routeChanged_;
+      }
+      public Builder setRouteChanged(boolean value) {
+        bitField0_ |= 0x00000020;
+        routeChanged_ = value;
+        
+        return this;
+      }
+      public Builder clearRouteChanged() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        routeChanged_ = false;
         
         return this;
       }
@@ -826,9 +1091,17 @@ public final class MessageProtos {
     boolean hasType();
     jadex.android.bluetooth.message.MessageProtos.RoutingType getType();
     
-    // optional .jadex.android.bluetooth.message.RoutingTable routingTable = 2;
+    // optional string fromAddress = 2;
+    boolean hasFromAddress();
+    String getFromAddress();
+    
+    // required .jadex.android.bluetooth.message.RoutingTable routingTable = 3;
     boolean hasRoutingTable();
     jadex.android.bluetooth.message.MessageProtos.RoutingTable getRoutingTable();
+    
+    // optional bool routeDownInformation = 4 [default = false];
+    boolean hasRouteDownInformation();
+    boolean getRouteDownInformation();
   }
   public static final class RoutingInformation extends
       com.google.protobuf.GeneratedMessageLite
@@ -859,19 +1132,63 @@ public final class MessageProtos {
       return type_;
     }
     
-    // optional .jadex.android.bluetooth.message.RoutingTable routingTable = 2;
-    public static final int ROUTINGTABLE_FIELD_NUMBER = 2;
+    // optional string fromAddress = 2;
+    public static final int FROMADDRESS_FIELD_NUMBER = 2;
+    private java.lang.Object fromAddress_;
+    public boolean hasFromAddress() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    public String getFromAddress() {
+      java.lang.Object ref = fromAddress_;
+      if (ref instanceof String) {
+        return (String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        String s = bs.toStringUtf8();
+        if (com.google.protobuf.Internal.isValidUtf8(bs)) {
+          fromAddress_ = s;
+        }
+        return s;
+      }
+    }
+    private com.google.protobuf.ByteString getFromAddressBytes() {
+      java.lang.Object ref = fromAddress_;
+      if (ref instanceof String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8((String) ref);
+        fromAddress_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+    
+    // required .jadex.android.bluetooth.message.RoutingTable routingTable = 3;
+    public static final int ROUTINGTABLE_FIELD_NUMBER = 3;
     private jadex.android.bluetooth.message.MessageProtos.RoutingTable routingTable_;
     public boolean hasRoutingTable() {
-      return ((bitField0_ & 0x00000002) == 0x00000002);
+      return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     public jadex.android.bluetooth.message.MessageProtos.RoutingTable getRoutingTable() {
       return routingTable_;
     }
     
+    // optional bool routeDownInformation = 4 [default = false];
+    public static final int ROUTEDOWNINFORMATION_FIELD_NUMBER = 4;
+    private boolean routeDownInformation_;
+    public boolean hasRouteDownInformation() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    public boolean getRouteDownInformation() {
+      return routeDownInformation_;
+    }
+    
     private void initFields() {
       type_ = jadex.android.bluetooth.message.MessageProtos.RoutingType.Flooding;
+      fromAddress_ = "";
       routingTable_ = jadex.android.bluetooth.message.MessageProtos.RoutingTable.getDefaultInstance();
+      routeDownInformation_ = false;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -882,11 +1199,13 @@ public final class MessageProtos {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (hasRoutingTable()) {
-        if (!getRoutingTable().isInitialized()) {
-          memoizedIsInitialized = 0;
-          return false;
-        }
+      if (!hasRoutingTable()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!getRoutingTable().isInitialized()) {
+        memoizedIsInitialized = 0;
+        return false;
       }
       memoizedIsInitialized = 1;
       return true;
@@ -899,7 +1218,13 @@ public final class MessageProtos {
         output.writeEnum(1, type_.getNumber());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, routingTable_);
+        output.writeBytes(2, getFromAddressBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeMessage(3, routingTable_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeBool(4, routeDownInformation_);
       }
     }
     
@@ -915,7 +1240,15 @@ public final class MessageProtos {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, routingTable_);
+          .computeBytesSize(2, getFromAddressBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, routingTable_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, routeDownInformation_);
       }
       memoizedSerializedSize = size;
       return size;
@@ -1021,8 +1354,12 @@ public final class MessageProtos {
         super.clear();
         type_ = jadex.android.bluetooth.message.MessageProtos.RoutingType.Flooding;
         bitField0_ = (bitField0_ & ~0x00000001);
-        routingTable_ = jadex.android.bluetooth.message.MessageProtos.RoutingTable.getDefaultInstance();
+        fromAddress_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
+        routingTable_ = jadex.android.bluetooth.message.MessageProtos.RoutingTable.getDefaultInstance();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        routeDownInformation_ = false;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
       
@@ -1063,7 +1400,15 @@ public final class MessageProtos {
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
+        result.fromAddress_ = fromAddress_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
         result.routingTable_ = routingTable_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.routeDownInformation_ = routeDownInformation_;
         result.bitField0_ = to_bitField0_;
         return result;
       }
@@ -1073,8 +1418,14 @@ public final class MessageProtos {
         if (other.hasType()) {
           setType(other.getType());
         }
+        if (other.hasFromAddress()) {
+          setFromAddress(other.getFromAddress());
+        }
         if (other.hasRoutingTable()) {
           mergeRoutingTable(other.getRoutingTable());
+        }
+        if (other.hasRouteDownInformation()) {
+          setRouteDownInformation(other.getRouteDownInformation());
         }
         return this;
       }
@@ -1084,11 +1435,13 @@ public final class MessageProtos {
           
           return false;
         }
-        if (hasRoutingTable()) {
-          if (!getRoutingTable().isInitialized()) {
-            
-            return false;
-          }
+        if (!hasRoutingTable()) {
+          
+          return false;
+        }
+        if (!getRoutingTable().isInitialized()) {
+          
+          return false;
         }
         return true;
       }
@@ -1120,12 +1473,22 @@ public final class MessageProtos {
               break;
             }
             case 18: {
+              bitField0_ |= 0x00000002;
+              fromAddress_ = input.readBytes();
+              break;
+            }
+            case 26: {
               jadex.android.bluetooth.message.MessageProtos.RoutingTable.Builder subBuilder = jadex.android.bluetooth.message.MessageProtos.RoutingTable.newBuilder();
               if (hasRoutingTable()) {
                 subBuilder.mergeFrom(getRoutingTable());
               }
               input.readMessage(subBuilder, extensionRegistry);
               setRoutingTable(subBuilder.buildPartial());
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              routeDownInformation_ = input.readBool();
               break;
             }
           }
@@ -1158,10 +1521,46 @@ public final class MessageProtos {
         return this;
       }
       
-      // optional .jadex.android.bluetooth.message.RoutingTable routingTable = 2;
+      // optional string fromAddress = 2;
+      private java.lang.Object fromAddress_ = "";
+      public boolean hasFromAddress() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      public String getFromAddress() {
+        java.lang.Object ref = fromAddress_;
+        if (!(ref instanceof String)) {
+          String s = ((com.google.protobuf.ByteString) ref).toStringUtf8();
+          fromAddress_ = s;
+          return s;
+        } else {
+          return (String) ref;
+        }
+      }
+      public Builder setFromAddress(String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        fromAddress_ = value;
+        
+        return this;
+      }
+      public Builder clearFromAddress() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        fromAddress_ = getDefaultInstance().getFromAddress();
+        
+        return this;
+      }
+      void setFromAddress(com.google.protobuf.ByteString value) {
+        bitField0_ |= 0x00000002;
+        fromAddress_ = value;
+        
+      }
+      
+      // required .jadex.android.bluetooth.message.RoutingTable routingTable = 3;
       private jadex.android.bluetooth.message.MessageProtos.RoutingTable routingTable_ = jadex.android.bluetooth.message.MessageProtos.RoutingTable.getDefaultInstance();
       public boolean hasRoutingTable() {
-        return ((bitField0_ & 0x00000002) == 0x00000002);
+        return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       public jadex.android.bluetooth.message.MessageProtos.RoutingTable getRoutingTable() {
         return routingTable_;
@@ -1172,18 +1571,18 @@ public final class MessageProtos {
         }
         routingTable_ = value;
         
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         return this;
       }
       public Builder setRoutingTable(
           jadex.android.bluetooth.message.MessageProtos.RoutingTable.Builder builderForValue) {
         routingTable_ = builderForValue.build();
         
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         return this;
       }
       public Builder mergeRoutingTable(jadex.android.bluetooth.message.MessageProtos.RoutingTable value) {
-        if (((bitField0_ & 0x00000002) == 0x00000002) &&
+        if (((bitField0_ & 0x00000004) == 0x00000004) &&
             routingTable_ != jadex.android.bluetooth.message.MessageProtos.RoutingTable.getDefaultInstance()) {
           routingTable_ =
             jadex.android.bluetooth.message.MessageProtos.RoutingTable.newBuilder(routingTable_).mergeFrom(value).buildPartial();
@@ -1191,13 +1590,34 @@ public final class MessageProtos {
           routingTable_ = value;
         }
         
-        bitField0_ |= 0x00000002;
+        bitField0_ |= 0x00000004;
         return this;
       }
       public Builder clearRoutingTable() {
         routingTable_ = jadex.android.bluetooth.message.MessageProtos.RoutingTable.getDefaultInstance();
         
-        bitField0_ = (bitField0_ & ~0x00000002);
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+      
+      // optional bool routeDownInformation = 4 [default = false];
+      private boolean routeDownInformation_ ;
+      public boolean hasRouteDownInformation() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      public boolean getRouteDownInformation() {
+        return routeDownInformation_;
+      }
+      public Builder setRouteDownInformation(boolean value) {
+        bitField0_ |= 0x00000008;
+        routeDownInformation_ = value;
+        
+        return this;
+      }
+      public Builder clearRouteDownInformation() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        routeDownInformation_ = false;
+        
         return this;
       }
       

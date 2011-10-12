@@ -14,8 +14,7 @@ import jadex.android.bluetooth.message.DataPacket;
 import jadex.android.bluetooth.message.MessageProtos;
 import jadex.android.bluetooth.message.MessageProtos.RoutingInformation;
 import jadex.android.bluetooth.routing.FloodingPacketRouter;
-import jadex.android.bluetooth.routing.IMessageRouter;
-import jadex.android.bluetooth.routing.IMessageSender;
+import jadex.android.bluetooth.routing.IPacketRouter;
 import jadex.android.bluetooth.service.Future;
 import jadex.android.bluetooth.service.IFuture;
 import jadex.android.bluetooth.service.IResultListener;
@@ -54,7 +53,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 
 	private ConnectionManager connections;
 
-	private IMessageRouter packetRouter;
+	private IPacketRouter packetRouter;
 
 	private BTServer btServer;
 
@@ -120,22 +119,9 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		});
 
 		packetRouter = new FloodingPacketRouter(ownAdress);
-		packetRouter.setPacketSender(new IMessageSender() {
-			@Override
-			public void sendMessageToConnectedDevice(DataPacket pkt,
-					String address) {
-				IConnection con = getConnections().get(address);
-				if (con.isAlive()) {
-					try {
-						con.write(pkt.asByteArray());
-					} catch (IOException e) {
-						// handle broke connection
-					}
-				}
-			}
-		});
+		packetRouter.setPacketSender(connections);
 		packetRouter
-				.addReachableDevicesChangeListener(new IMessageRouter.ReachableDevicesChangeListener() {
+				.addReachableDevicesChangeListener(new IPacketRouter.ReachableDevicesChangeListener() {
 					@Override
 					public void reachableDevicesChanged() {
 						notifyProximityDevicesChanged();
@@ -157,12 +143,6 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		});
 
 		discoveryTimer = new Timer();
-
-		// context.registerReceiver(bcReceiver, intentFilter1);
-		// context.registerReceiver(bcReceiver, intentFilter2);
-		// context.registerReceiver(bcReceiver, intentFilter3);
-		// context.registerReceiver(bcReceiver, intentFilter4);
-		// context.registerReceiver(bcReceiver, intentFilter5);
 	}
 
 	public void startBTServer() {

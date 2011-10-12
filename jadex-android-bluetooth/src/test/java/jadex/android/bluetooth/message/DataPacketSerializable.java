@@ -1,9 +1,10 @@
 package jadex.android.bluetooth.message;
 
-import jadex.android.bluetooth.device.BluetoothAdapterFactory;
-import jadex.android.bluetooth.device.BluetoothDeviceFactory;
 import jadex.android.bluetooth.device.IBluetoothDevice;
+import jadex.android.bluetooth.device.factory.AndroidBluetoothAdapterFactory;
+import jadex.android.bluetooth.device.factory.AndroidBluetoothDeviceFactory;
 import jadex.android.bluetooth.exceptions.MessageToLongException;
+import jadex.android.bluetooth.util.Helper;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -66,7 +67,7 @@ public class DataPacketSerializable implements Serializable {
 		if (dest != null) {
 			this.Dest = dest;
 		}
-		this.Src = BluetoothAdapterFactory.getBluetoothAdapter().getAddress();
+		this.Src = Helper.getBluetoothAdapterFactory().getDefaultBluetoothAdapter().getAddress();
 		newPaketID();
 	}
 
@@ -156,11 +157,11 @@ public class DataPacketSerializable implements Serializable {
 	}
 
 	public IBluetoothDevice getDestinationDevice() {
-		return BluetoothDeviceFactory.createBluetoothDevice(Dest);
+		return Helper.getBluetoothDeviceFactory().createBluetoothDevice(Dest);
 	}
 
 	public IBluetoothDevice getSourceDevice() {
-		return BluetoothDeviceFactory.createBluetoothDevice(Src);
+		return Helper.getBluetoothDeviceFactory().createBluetoothDevice(Src);
 	}
 
 	@Override

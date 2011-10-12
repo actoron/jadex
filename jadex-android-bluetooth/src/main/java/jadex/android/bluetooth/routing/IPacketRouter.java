@@ -6,9 +6,7 @@ import jadex.android.bluetooth.service.IFuture;
 
 import java.util.Set;
 
-
-
-public interface IMessageRouter {
+public interface IPacketRouter {
 	
 	interface ReachableDevicesChangeListener {
 		void reachableDevicesChanged();
@@ -18,7 +16,7 @@ public interface IMessageRouter {
 	
 	boolean removeReachableDevicesChangeListener(ReachableDevicesChangeListener l);
 	
-	void setPacketSender(IMessageSender sender);
+	void setPacketSender(IPacketSender sender);
 
 	IFuture routePacket(DataPacket packet, String fromDevice);
 
@@ -27,6 +25,12 @@ public interface IMessageRouter {
 	void removeConnectedDevice(String device);
 
 	void updateRoutingInformation(RoutingInformation ri);
+
+	/**
+	 * 
+	 * @return all entries in the routing table that are reachable via more than
+	 *         zero hops (e.g. not directly connected)
+	 */
 
 	Set<String> getReachableDeviceAddresses();
 

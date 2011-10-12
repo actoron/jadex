@@ -1,5 +1,7 @@
 package jadex.android.bluetooth.device;
 
+import jadex.android.bluetooth.util.Helper;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +23,7 @@ public interface IBluetoothDevice extends Parcelable {
 		public IBluetoothDevice createFromParcel(Parcel in) {
 			String address = in.readString();
 			String name = in.readString();
-			return BluetoothDeviceFactory.createBluetoothDevice(address);
+			return Helper.getBluetoothDeviceFactory().createBluetoothDevice(address);
 		}
 
 		@Override
