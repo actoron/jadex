@@ -9,11 +9,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -32,6 +31,8 @@ public class DatabaseImporter {
 	private static int count = 0;
 
 	private static String password = null;
+
+	private static Connection connection = null;
 
 	/**
 	 * @param args
@@ -87,22 +88,20 @@ public class DatabaseImporter {
 			Integer bikeId = Integer.parseInt(csvReader.get("Bike Id"));
 			// Start Date
 			String startDateString = getMySQLDateString(csvReader.get("Start Date"));
-			Date startDate = Date.valueOf(startDateString);
 			// Start Time
 			String startTimeString = csvReader.get("Start Time");
 			if (startTimeString.length() == 5) {
 				startTimeString += ":00";
 			}
-			Time startTime = Time.valueOf(startTimeString);
+			Timestamp start = Timestamp.valueOf(startDateString + " " + startTimeString);
 			// End Date
 			String endDateString = getMySQLDateString(csvReader.get("End Date"));
-			Date endDate = Date.valueOf(endDateString);
 			// End Time
 			String endTimeString = csvReader.get("End Time");
 			if (endTimeString.length() == 5) {
 				endTimeString += ":00";
 			}
-			Time endTime = Time.valueOf(endTimeString);
+			Timestamp end = Timestamp.valueOf(endDateString + " " + endTimeString);
 			// Start Station
 			String startStation = csvReader.get("Start Station");
 			// Start Station Id
@@ -115,17 +114,15 @@ public class DatabaseImporter {
 			Connection connection = getDatabaseConnection();
 			if (connection != null) {
 				PreparedStatement statement = connection
-						.prepareStatement("INSERT INTO JOURNEYDETAILS(journeyId, bikeId, startDate, startTime, endDate, endTime, startStation, startStationId, endStation, endStationId) VALUES (?, ?, ?, ?, ?, ?, ? ,?, ? ,?)");
+						.prepareStatement("INSERT INTO JOURNEYDETAILS(journeyId, bikeId, start, end, startStation, startStationId, endStation, endStationId) VALUES (?, ?, ?, ?, ?, ?, ? ,?)");
 				statement.setInt(1, journeyId);
 				statement.setInt(2, bikeId);
-				statement.setDate(3, startDate);
-				statement.setTime(4, startTime);
-				statement.setDate(5, endDate);
-				statement.setTime(6, endTime);
-				statement.setString(7, startStation);
-				statement.setInt(8, startStationId);
-				statement.setString(9, endStation);
-				statement.setInt(10, endStationId);
+				statement.setTimestamp(3, start);
+				statement.setTimestamp(4, end);
+				statement.setString(5, startStation);
+				statement.setInt(6, startStationId);
+				statement.setString(7, endStation);
+				statement.setInt(8, endStationId);
 
 				if (statement.executeUpdate() != 0) {
 					count++;
@@ -154,25 +151,25 @@ public class DatabaseImporter {
 	}
 
 	private static Connection getDatabaseConnection() {
-		Connection connection = null;
+		if (connection == null) {
+			if (password == null) {
+				System.out.println("Please insert the password to access " + DB_URL + " as " + DB_USER);
+				Scanner s = new Scanner(System.in);
+				password = s.next();
+			}
 
-		if (password == null) {
-			System.out.println("Please insert the password to access " + DB_URL + " as " + DB_USER);
-			Scanner s = new Scanner(System.in);
-			password = s.next();
-		}
-
-		try {
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-			connection = DriverManager.getConnection(DB_URL, DB_USER, password);
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
+			try {
+				Class.forName("com.mysql.jdbc.Driver").newInstance();
+				connection = DriverManager.getConnection(DB_URL, DB_USER, password);
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 
 		return connection;
