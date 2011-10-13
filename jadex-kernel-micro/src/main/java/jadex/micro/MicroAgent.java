@@ -857,9 +857,9 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	}
 	
 	/**
-	 *  Get the class loader.
+	 *  Get the class loader of the component.
 	 */
-	public ClassLoader getClassLoader()
+	public ClassLoader	getClassLoader()
 	{
 		return interpreter.getClassLoader();
 	}

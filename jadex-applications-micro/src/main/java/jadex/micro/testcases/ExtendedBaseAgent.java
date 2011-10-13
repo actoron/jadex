@@ -119,7 +119,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		tr = new TestReport("#5", "Provided services");
 		ProvidedServiceInfo[] provs = agent.getModel().getProvidedServices();
 //		System.out.println("pro sers: "+SUtil.arrayToString(provs));
-		if(provs[0].getImplementation().getImplementation(agent.getModel()).equals(MyAService.class))
+		if(provs[0].getImplementation().getImplementation(agent.getModel(), agent.getClassLoader()).equals(MyAService.class))
 		{
 			tr.setSucceeded(true);
 		}

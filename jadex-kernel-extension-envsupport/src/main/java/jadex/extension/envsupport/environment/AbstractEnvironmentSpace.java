@@ -181,7 +181,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	/**
 	 *  Create a space.
 	 */
-	public void	initSpace(final IExternalAccess exta, MEnvSpaceInstance config, IValueFetcher pfetcher)
+	public void	initSpace(final IInternalAccess ia, MEnvSpaceInstance config, IValueFetcher pfetcher)
 	{
 		try
 		{
@@ -196,7 +196,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 			List spaceprops = config.getPropertyList("properties");
 			MEnvSpaceType.setProperties(this, spaceprops, fetcher);
 			
-			this.exta = exta;
+			this.exta = ia.getExternalAccess();
 			
 			if(this instanceof Space2D) // Hack?
 			{
@@ -407,7 +407,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					
 					// HACK!!! Do not use ThreadSuspendable
 					IComponentManagementService ces = ((IComponentManagementService)SServiceProvider.getServiceUpwards
-						(exta.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable()));
+						(ia.getServiceContainer(), IComponentManagementService.class).get(new ThreadSuspendable()));
 					if(owner.indexOf("@")!=-1)
 						ownerid	= ces.createComponentIdentifier((String)owner, false);
 					else
@@ -574,9 +574,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					}
 					
 					final ObserverCenter oc = new ObserverCenter(title, AbstractEnvironmentSpace.this,
-						getExternalAccess().getModel().getClassLoader(), plugins,
-						killonexit!=null ? killonexit.booleanValue() : true);
-					observercenters.add(oc);	
+						ia.getClassLoader(), plugins, killonexit!=null ? killonexit.booleanValue() : true);
+					observercenters.add(oc);
 					
 					SServiceProvider.getServiceUpwards(getExternalAccess().getServiceProvider(), IComponentManagementService.class).addResultListener(new DefaultResultListener()
 					{
@@ -2676,67 +2675,59 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	 *  Initialize the extension.
 	 *  Called once, when the extension is created.
 	 */
-	public IFuture init(IExternalAccess exta, MEnvSpaceInstance config, IValueFetcher fetcher)
+	public IFuture init(IExternalAccess exta, final MEnvSpaceInstance config, final IValueFetcher fetcher)
 	{
 		final Future ret = new Future();
 		
 //		System.out.println("init space: "+ia);
 		
-		try
-		{
-//			space = (ISpace)getClazz().newInstance();
-			initSpace(exta, config, fetcher);
+//		space = (ISpace)getClazz().newInstance();
 			
-			exta.scheduleStep(new IComponentStep<Void>()
-			{
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					ia.addComponentListener(new IComponentListener()
-					{
-						IFilter filter = new IFilter()
-						{
-							public boolean filter(Object obj)
-							{
-								IComponentChangeEvent event = (IComponentChangeEvent)obj;
-								return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
-							}
-						};
-						public IFilter getFilter()
-						{
-							return filter;
-						}
-						
-						public IFuture eventOccured(IComponentChangeEvent cce)
-						{
-							if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
-							{
-//								System.out.println("add: "+cce.getDetails());
-								componentAdded((IComponentDescription)cce.getDetails());
-							}
-							else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
-							{
-//								System.out.println("rem: "+cce.getComponent());
-								componentRemoved((IComponentDescription)cce.getDetails());
-							}
-							return IFuture.DONE;
-						}
-					});
-					return IFuture.DONE;
-				}
-			}).addResultListener(new DelegationResultListener(ret)
-			{
-				public void customResultAvailable(Object result)
-				{
-					ret.setResult(AbstractEnvironmentSpace.this);
-				}
-			});
-		}
-		catch(Exception e)
+		exta.scheduleStep(new IComponentStep<Void>()
 		{
-			System.out.println("Exception while creating space: "+config.getName());
-			e.printStackTrace();
-			ret.setException(e);
-		}
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				initSpace(ia, config, fetcher);
+				
+				ia.addComponentListener(new IComponentListener()
+				{
+					IFilter filter = new IFilter()
+					{
+						public boolean filter(Object obj)
+						{
+							IComponentChangeEvent event = (IComponentChangeEvent)obj;
+							return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
+						}
+					};
+					public IFilter getFilter()
+					{
+						return filter;
+					}
+					
+					public IFuture eventOccured(IComponentChangeEvent cce)
+					{
+						if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
+						{
+//							System.out.println("add: "+cce.getDetails());
+							componentAdded((IComponentDescription)cce.getDetails());
+						}
+						else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
+						{
+//							System.out.println("rem: "+cce.getComponent());
+							componentRemoved((IComponentDescription)cce.getDetails());
+						}
+						return IFuture.DONE;
+					}
+				});
+				return IFuture.DONE;
+			}
+		}).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				ret.setResult(AbstractEnvironmentSpace.this);
+			}
+		});
 		
 		return ret;
 	}

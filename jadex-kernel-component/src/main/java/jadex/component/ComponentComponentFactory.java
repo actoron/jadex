@@ -229,6 +229,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	{
 		try
 		{
+			// libservice is null for platform bootstrap factory.
 			ClassLoader cl = libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier());
 			CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl);
 //			List apps = apptype.getConfigurations();

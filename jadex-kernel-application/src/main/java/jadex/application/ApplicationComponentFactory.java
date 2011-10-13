@@ -234,8 +234,10 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	{
 		try
 		{
+			// libservice is null for platform bootstrap factory.
+			ClassLoader cl = libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier());
 			CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier()));
-			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret);
+			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret, cl);
 			
 			// todo: result listener?
 			// todo: create application context as return value?!
