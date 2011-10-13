@@ -140,6 +140,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	
 	/** The observers. */
 	protected List observercenters;
+	
+	/** The class loader. */
+	protected ClassLoader	classloader;
 
 	//-------- constructors --------
 	
@@ -185,6 +188,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	{
 		try
 		{
+			this.classloader	= ia.getClassLoader();
 			final MEnvSpaceType	mspacetype	= (MEnvSpaceType)config.getType();
 			
 			final SimpleValueFetcher fetcher = new SimpleValueFetcher(pfetcher);
@@ -2675,61 +2679,44 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	 *  Initialize the extension.
 	 *  Called once, when the extension is created.
 	 */
-	public IFuture init(IExternalAccess exta, final MEnvSpaceInstance config, final IValueFetcher fetcher)
+	public void	init(IInternalAccess ia, final MEnvSpaceInstance config, final IValueFetcher fetcher)
 	{
-		final Future ret = new Future();
-		
 //		System.out.println("init space: "+ia);
 		
 //		space = (ISpace)getClazz().newInstance();
-			
-		exta.scheduleStep(new IComponentStep<Void>()
+
+		initSpace(ia, config, fetcher);
+		
+		ia.addComponentListener(new IComponentListener()
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			IFilter filter = new IFilter()
 			{
-				initSpace(ia, config, fetcher);
-				
-				ia.addComponentListener(new IComponentListener()
+				public boolean filter(Object obj)
 				{
-					IFilter filter = new IFilter()
-					{
-						public boolean filter(Object obj)
-						{
-							IComponentChangeEvent event = (IComponentChangeEvent)obj;
-							return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
-						}
-					};
-					public IFilter getFilter()
-					{
-						return filter;
-					}
-					
-					public IFuture eventOccured(IComponentChangeEvent cce)
-					{
-						if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
-						{
+					IComponentChangeEvent event = (IComponentChangeEvent)obj;
+					return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
+				}
+			};
+			public IFilter getFilter()
+			{
+				return filter;
+			}
+			
+			public IFuture eventOccured(IComponentChangeEvent cce)
+			{
+				if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
+				{
 //							System.out.println("add: "+cce.getDetails());
-							componentAdded((IComponentDescription)cce.getDetails());
-						}
-						else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
-						{
+					componentAdded((IComponentDescription)cce.getDetails());
+				}
+				else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
+				{
 //							System.out.println("rem: "+cce.getComponent());
-							componentRemoved((IComponentDescription)cce.getDetails());
-						}
-						return IFuture.DONE;
-					}
-				});
+					componentRemoved((IComponentDescription)cce.getDetails());
+				}
 				return IFuture.DONE;
 			}
-		}).addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				ret.setResult(AbstractEnvironmentSpace.this);
-			}
 		});
-		
-		return ret;
 	}
 	
 	/**
@@ -2744,5 +2731,13 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 			oc.dispose();
 		}
 		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Get the class loader.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return classloader;
 	}
 }

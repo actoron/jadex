@@ -63,7 +63,7 @@ public class XYChartDataConsumer extends AbstractChartDataConsumer
 		{
 			try
 			{
-				ClassLoader cl = getSpace().getExternalAccess().getModel().getClassLoader();
+				ClassLoader cl = getSpace().getClassLoader();
 				ResourceInfo rinfo = getResourceInfo(bgimagefn, getSpace().getExternalAccess().getModel().getAllImports(), cl);
 				Image image = ImageIO.read(rinfo.getInputStream());
 				rinfo.getInputStream().close();

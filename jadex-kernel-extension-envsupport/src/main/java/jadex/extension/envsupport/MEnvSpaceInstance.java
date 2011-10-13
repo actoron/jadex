@@ -1,7 +1,10 @@
 package jadex.extension.envsupport;
 
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IExtensionInfo;
+import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
@@ -40,20 +43,27 @@ public class MEnvSpaceInstance	implements IExtensionInfo
 	 *  @param fetcher	The value fetcher of the component to be used for evaluating dynamic expressions. 
 	 *  @return The extension instance object.
 	 */
-	public IFuture createInstance(IExternalAccess access, IValueFetcher fetcher)
+	public IFuture<IExtensionInstance> createInstance(final IExternalAccess access, final IValueFetcher fetcher)
 	{
-		Future	ret	= new Future();
-		try
+		return access.scheduleStep(new IComponentStep<IExtensionInstance>()
 		{
-			Class	clazz	= SReflect.findClass(spacetype.getClassName(), access.getModel().getAllImports(), access.getModel().getClassLoader());
-			AbstractEnvironmentSpace	space	= (AbstractEnvironmentSpace) clazz.newInstance();
-			space.init(access, this, fetcher).addResultListener(new DelegationResultListener(ret));
-		}
-		catch(Exception e)
-		{
-			ret.setException(e);
-		}
-		return ret;
+			public IFuture<IExtensionInstance> execute(IInternalAccess ia)
+			{
+				IFuture<IExtensionInstance>	ret;
+				try
+				{
+					Class<AbstractEnvironmentSpace>	clazz	= SReflect.findClass(spacetype.getClassName(), access.getModel().getAllImports(), ia.getClassLoader());
+					AbstractEnvironmentSpace	space	= clazz.newInstance();
+					space.init(ia, MEnvSpaceInstance.this, fetcher);
+					ret	= new Future<IExtensionInstance>(space);
+				}
+				catch(Exception e)
+				{
+					ret	= new Future<IExtensionInstance>(e);
+				}
+				return ret;
+			}
+		});
 	}
 	
 	//-------- methods --------

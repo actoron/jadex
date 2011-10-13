@@ -786,4 +786,12 @@ public class ObserverCenter
 			plugintimer.stop();
 		mainwindow.dispose();
 	}
+	
+	/**
+	 *  Get the class loader.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return classloader;
+	}
 }

@@ -504,7 +504,7 @@ public class SReflect
 	 *  @param imports	The comma separated list of imported packages.
 	 *  @throws ClassNotFoundException when the class is not found in the imports.
 	 */
-	public static Class	findClass(String clname, String[] imports, ClassLoader classloader)
+	public static <T> Class<T>	findClass(String clname, String[] imports, ClassLoader classloader)
 		throws ClassNotFoundException
 	{
 		Class	clazz	= findClass0(clname, imports, classloader);
