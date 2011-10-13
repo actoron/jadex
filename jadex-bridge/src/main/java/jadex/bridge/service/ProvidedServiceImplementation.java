@@ -100,11 +100,11 @@ public class ProvidedServiceImplementation
 	 *  Get the implementation.
 	 *  @return The implementation.
 	 */
-	public Class<?> getImplementation(IModelInfo model)
+	public Class<?> getImplementation(IModelInfo model, ClassLoader cl)
 	{
 		if(implementation==null && implname!=null)
 		{
-			this.implementation	= SReflect.findClass0(implname, model.getAllImports(), model.getClassLoader());
+			this.implementation	= SReflect.findClass0(implname, model.getAllImports(), cl);
 		}
 		return implementation;
 	}

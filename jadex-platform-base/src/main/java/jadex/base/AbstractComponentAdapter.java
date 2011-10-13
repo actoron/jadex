@@ -21,6 +21,7 @@ import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -28,6 +29,7 @@ import jadex.commons.future.IResultListener;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -105,7 +107,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	protected boolean	again;
 	
 	/** The cached cms. */
-	protected IFuture	cms;
+	protected IFuture<IComponentManagementService>	cms;
 
 	/** The cached clock service. */
 	protected IClockService clock;
@@ -388,21 +390,16 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture getChildrenIdentifiers()
+	public IFuture<IComponentIdentifier[]> getChildrenIdentifiers()
 	{
-		final Future ret = new Future();
+		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
 		
-		getCMS().addResultListener(new IResultListener()
+		getCMS().addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier[]>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getChildren(getComponentIdentifier()).addResultListener(new DelegationResultListener(ret));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
+				cms.getChildren(getComponentIdentifier()).addResultListener(
+					new DelegationResultListener<IComponentIdentifier[]>(ret));
 			}
 		});
 		
@@ -413,26 +410,26 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture getChildrenAccesses()
+	public IFuture<Collection<IExternalAccess>> getChildrenAccesses()
 	{
-		final Future ret = new Future();
+		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
 		
 		SServiceProvider.getServiceUpwards(getServiceContainer(), IComponentManagementService.class)
-			.addResultListener(new DefaultResultListener()
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService result)
 			{
 				final IComponentManagementService cms = (IComponentManagementService)result;
 				
-				cms.getChildren(getComponentIdentifier()).addResultListener(new DefaultResultListener()
+				cms.getChildren(getComponentIdentifier()).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier[], Collection<IExternalAccess>>(ret)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(IComponentIdentifier[] children)
 					{
-						IComponentIdentifier[] childs = (IComponentIdentifier[])result;
-						IResultListener	crl	= new CollectionResultListener(childs.length, true, new DelegationResultListener(ret));
-						for(int i=0; !ret.isDone() && i<childs.length; i++)
+						IResultListener<IExternalAccess>	crl	= new CollectionResultListener<IExternalAccess>(children.length, true,
+							new DelegationResultListener<Collection<IExternalAccess>>(ret));
+						for(int i=0; !ret.isDone() && i<children.length; i++)
 						{
-							cms.getExternalAccess(childs[i]).addResultListener(crl);
+							cms.getExternalAccess(children[i]).addResultListener(crl);
 						}
 					}
 				});
@@ -462,7 +459,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/**
 	 *  Get the (cached) cms.
 	 */
-	protected IFuture getCMS()
+	protected IFuture<IComponentManagementService> getCMS()
 	{
 		// Change comments below to test performance of cached cms vs. direct access.
 		if(getServiceContainer()==null)
@@ -662,7 +659,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			this.componentthread	= Thread.currentThread();
 			
 			ClassLoader	cl	= componentthread.getContextClassLoader();
-			componentthread.setContextClassLoader(model.getClassLoader());
+			componentthread.setContextClassLoader(component.getClassLoader());
 	
 //			getCMS().addResultListener(new DefaultResultListener()
 //			{

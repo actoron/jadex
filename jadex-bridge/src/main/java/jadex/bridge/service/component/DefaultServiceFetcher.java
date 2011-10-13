@@ -19,6 +19,7 @@ import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureFinishChecker;
 import jadex.commons.future.IFuture;
@@ -73,21 +74,21 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get a required service.
 	 */
-	public IFuture getService(final RequiredServiceInfo info, RequiredServiceBinding bd, final boolean rebind)
+	public <T> IFuture<T> getService(final RequiredServiceInfo<T> info, RequiredServiceBinding bd, final boolean rebind)
 	{
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
-		final Class	type	= info.getType(null);
+		final Class<T>	type	= info.getType(null, null);
 		
 //		if(info.getType().toString().indexOf("IDis")!=-1)
 //			System.out.println("diss" );
 		
-		final Future ret = new Future();
+		final Future<T> ret = new Future<T>();
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();
 		
 		if(rebind)
 			result = null;
 		
-		checkResult(result).addResultListener(new DelegationResultListener(ret)
+		checkResult(result).addResultListener(new ExceptionDelegationResultListener<Object, T>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -98,27 +99,25 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					if(binding.getComponentName()!=null)
 					{
 						// Search service by component name.
-						getExternalAccessByName(provider, info, binding).addResultListener(new DelegationResultListener(ret)
+						getExternalAccessByName(provider, info, binding).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(IExternalAccess ea)
 							{
-								IExternalAccess ea = (IExternalAccess)result;
 								SServiceProvider.getService(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL)
-									.addResultListener(new StoreDelegationResultListener(ret, provider, info, binding));
+									.addResultListener(new StoreDelegationResultListener<T>(ret, provider, info, binding));
 							}
 						});
 					}
 					else if(binding.getComponentType()!=null)
 					{
 						// Search service by component type.
-						getExternalAccessesByType(provider, info, binding).addResultListener(new DelegationResultListener(ret)
+						getExternalAccessesByType(provider, info, binding).addResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, T>(ret)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(Collection<IExternalAccess> coll)
 							{
-								Collection coll = (Collection)result;
 								if(coll!=null && coll.size()>0)
 								{
-									IExternalAccess ea = (IExternalAccess)coll.iterator().next();
+									IExternalAccess ea = coll.iterator().next();
 									SServiceProvider.getService(ea.getServiceProvider(), type, RequiredServiceInfo.SCOPE_LOCAL)
 										.addResultListener(new StoreDelegationResultListener(ret, provider, info, binding));
 								}
@@ -152,7 +151,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				}
 				else
 				{
-					ret.setResult(result);
+					ret.setResult((T)result);
 				}
 			}
 		});
@@ -167,7 +166,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		final RequiredServiceBinding bd, boolean rebind)
 	{
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
-		final Class	type	= info.getType(null);
+		final Class	type	= info.getType(null, null);
 		
 		final IntermediateFuture ret = new IntermediateFuture();
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();
@@ -355,18 +354,18 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 * 
 	 */
-	protected IFuture checkResult(Object result)
+	protected IFuture<Object> checkResult(Object result)
 	{
-		Future ret = new Future();
+		final Future<Object> ret = new Future<Object>();
 		final Object res = result;
 		
 		if(result instanceof IService)
 		{
-			((IService)result).isValid().addResultListener(new DelegationResultListener(ret)
+			((IService)result).isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Object>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Boolean result)
 				{
-					super.customResultAvailable(((Boolean)result).booleanValue()? res: null);
+					ret.setResult(result.booleanValue()? res: null);
 				}
 			});
 		}
@@ -381,10 +380,10 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get the external access of a component by its name.
 	 */
-	protected IFuture getExternalAccessByName(final IServiceProvider provider, final RequiredServiceInfo info, 
+	protected IFuture<IExternalAccess> getExternalAccessByName(final IServiceProvider provider, final RequiredServiceInfo<?> info, 
 		final RequiredServiceBinding binding)
 	{
-		final Future ret = new Future();
+		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		IComponentIdentifier parent = RequiredServiceInfo.SCOPE_PARENT.equals(binding.getScope())? ((IComponentIdentifier)provider.getId()).getParent(): (IComponentIdentifier)provider.getId(); 
 		getExternalAccess(provider, binding.getComponentName(), parent).addResultListener(new DelegationResultListener(ret)
@@ -408,24 +407,23 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get the external access of a component by type.
 	 */
-	protected IFuture getExternalAccessesByType(final IServiceProvider provider, final RequiredServiceInfo info, 
+	protected IFuture<Collection<IExternalAccess>> getExternalAccessesByType(final IServiceProvider provider, final RequiredServiceInfo<?> info, 
 		final RequiredServiceBinding binding)
 	{
-		final Future ret = new Future();
+		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
 		
 		if(RequiredServiceInfo.SCOPE_PARENT.equals(binding.getScope()))
 		{
 			SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-				.addResultListener(new DelegationResultListener(ret)
+				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<IExternalAccess>>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(final IComponentManagementService cms)
 				{
-					final IComponentManagementService cms = (IComponentManagementService)result;
-					cms.getParent((IComponentIdentifier)provider.getId()).addResultListener(new DelegationResultListener(ret)
+					cms.getParent((IComponentIdentifier)provider.getId()).addResultListener(
+						new ExceptionDelegationResultListener<IComponentIdentifier, Collection<IExternalAccess>>(ret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(final IComponentIdentifier cid)
 						{
-							final IComponentIdentifier cid = (IComponentIdentifier)result;
 							getChildExternalAccesses(cid, provider, info, binding)
 								.addResultListener(new DelegationResultListener(ret));
 						}
@@ -449,7 +447,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get a fitting (of given type) child component.
 	 */
-	public IFuture getChildExternalAccesses(final IComponentIdentifier cid, final IServiceProvider provider, 
+	public IFuture<Collection<IExternalAccess>> getChildExternalAccesses(final IComponentIdentifier cid, final IServiceProvider provider, 
 		final RequiredServiceInfo info, final RequiredServiceBinding binding)
 	{
 		final Future ret = new Future();
@@ -569,9 +567,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get external access for component name.
 	 */
-	protected IFuture getExternalAccess(final IServiceProvider provider, final String name, IComponentIdentifier parent)
+	protected IFuture<IExternalAccess> getExternalAccess(final IServiceProvider provider, final String name, IComponentIdentifier parent)
 	{
-		final Future ret = new Future();
+		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		createComponentIdentifier(provider, name, parent)
 			.addResultListener(new DelegationResultListener(ret)
@@ -776,7 +774,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Simple listener that can store the result in a member variable.
 	 */
-	public class StoreDelegationResultListener extends DelegationResultListener
+	public class StoreDelegationResultListener<T> extends DelegationResultListener<T>
 	{
 		//-------- attributes --------
 		
@@ -784,7 +782,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		protected IServiceProvider provider;
 		
 		/** The required service info. */
-		protected RequiredServiceInfo info;
+		protected RequiredServiceInfo<T> info;
 		
 		/** The required service binding. */
 		protected RequiredServiceBinding binding;
@@ -794,7 +792,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		/**
 		 *  Create a new listener.
 		 */
-		public StoreDelegationResultListener(Future ret, IServiceProvider provider, RequiredServiceInfo info, RequiredServiceBinding binding)
+		public StoreDelegationResultListener(Future<T> ret, IServiceProvider provider, RequiredServiceInfo<T> info, RequiredServiceBinding binding)
 		{
 			super(ret);
 			this.provider = provider;
@@ -807,9 +805,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		/**
 		 *  Called when result is available.
 		 */
-		public void customResultAvailable(Object result)
+		public void customResultAvailable(T result)
 		{
-			final Object res = result;
+			final T res = result;
 			
 			createProxy((IService)res, info, binding).addResultListener(new DelegationResultListener(future)
 			{

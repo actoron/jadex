@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import jadex.commons.future.IFuture;
 
+import java.util.Collection;
 import java.util.logging.Logger;
 
 
@@ -68,13 +69,13 @@ public interface IComponentAdapter
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture getChildrenIdentifiers();
+	public IFuture<IComponentIdentifier[]> getChildrenIdentifiers();
 	
 	/**
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture getChildrenAccesses();
+	public IFuture<Collection<IExternalAccess>> getChildrenAccesses();
 	
 	/**
 	 *  Get the exception.

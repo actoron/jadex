@@ -93,16 +93,16 @@ public class ProvidedServiceInfo
 	 *  Get the type.
 	 *  @return The type.
 	 */
-	public Class<?> getType(IModelInfo info)
+	public Class<?> getType(IModelInfo info, ClassLoader cl)
 	{
 		if(type==null && typename!=null)
 		{
-			type = SReflect.findClass0(typename, info.getAllImports(), info.getClassLoader());
+			type = SReflect.findClass0(typename, info.getAllImports(), cl);
 		}
-		else if(type==null)
-		{
-			System.out.println("Type is null: "+this);
-		}
+//		else if(type==null)
+//		{
+//			System.out.println("Type is null: "+this);
+//		}
 			
 		
 		return type;

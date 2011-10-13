@@ -119,6 +119,11 @@ public interface IInternalAccess
 	 */
 	public void setResultValue(String name, Object value);
 	
+	/**
+	 *  Get the class loader of the component.
+	 */
+	public ClassLoader	getClassLoader();
+	
 //	/**
 //	 *  Get the model name of a component type.
 //	 *  @param ctype The component type.

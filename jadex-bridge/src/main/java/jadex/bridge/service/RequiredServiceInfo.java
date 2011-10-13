@@ -10,7 +10,7 @@ import java.util.List;
 /**
  *  Struct for information about a required service.
  */
-public class RequiredServiceInfo
+public class RequiredServiceInfo<T>
 {
 	//-------- constants --------
 	
@@ -46,7 +46,7 @@ public class RequiredServiceInfo
 	protected String typename;
 	
 	/** The service interface type. */
-	protected Class<?> type;
+	protected Class<T> type;
 
 	/** Flag if multiple services should be returned. */
 	protected boolean multiple;
@@ -75,7 +75,7 @@ public class RequiredServiceInfo
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class<?> type)
+	public RequiredServiceInfo(String name, Class<T> type)
 	{
 		this(name, type, RequiredServiceInfo.SCOPE_APPLICATION);
 	}
@@ -83,7 +83,7 @@ public class RequiredServiceInfo
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class<?> type, String scope)
+	public RequiredServiceInfo(String name, Class<T> type, String scope)
 	{
 		this(name, type, false, new RequiredServiceBinding(name, scope));
 	}
@@ -91,7 +91,7 @@ public class RequiredServiceInfo
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class<?> type, boolean multiple, RequiredServiceBinding binding)
+	public RequiredServiceInfo(String name, Class<T> type, boolean multiple, RequiredServiceBinding binding)
 	{
 		this.name = name;
 		setType(type);
@@ -141,11 +141,11 @@ public class RequiredServiceInfo
 	 *  Get the type.
 	 *  @return The type.
 	 */
-	public Class<?> getType(IModelInfo info)
+	public Class<T> getType(IModelInfo info, ClassLoader cl)
 	{
 		if(type==null && typename!=null)
 		{
-			type = SReflect.findClass0(typename, info.getAllImports(), info.getClassLoader());
+			type = SReflect.findClass0(typename, info.getAllImports(), cl);
 		}
 		
 		return type;
@@ -155,7 +155,7 @@ public class RequiredServiceInfo
 	 *  Set the type.
 	 *  @param type The type to set.
 	 */
-	public void setType(Class<?> type)
+	public void setType(Class<T> type)
 	{
 		if(type!=null)
 			this.typename	= type.getName();

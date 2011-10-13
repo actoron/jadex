@@ -525,7 +525,7 @@ public class SReflect
 	 *  @param imports	The comma separated list of imported packages.
 	 *  @return null, when the class is not found in the imports.
 	 */
-	public static Class	findClass0(String clname, String[] imports, ClassLoader classloader)
+	public static <T> Class<T>	findClass0(String clname, String[] imports, ClassLoader classloader)
 	{
 		Class	clazz	= null;
 		Map	cache	= (Map)classcache.get(classloader);

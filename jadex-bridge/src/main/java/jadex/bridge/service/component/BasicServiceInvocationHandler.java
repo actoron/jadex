@@ -324,7 +324,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, 
-		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, ClassLoader classloader)
+		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy)
 	{
 		IInternalService	ret;
 		
@@ -342,7 +342,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		{
 			BasicServiceInvocationHandler handler = createHandler(name, ia, type, service);
 			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy);
-			ret	= (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, type}, handler);
+			ret	= (IInternalService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 //				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 			if(!(service instanceof IService))
@@ -535,7 +535,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Static method for creating a standard service proxy for a required service.
 	 */
 	public static IService createRequiredServiceProxy(IInternalAccess ia, IExternalAccess ea, IComponentAdapter adapter, IService service, 
-		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding, boolean copy, ClassLoader classloader)
+		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding, boolean copy)
 	{
 		IService ret = service;
 		
@@ -555,12 +555,12 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				{
 					IServiceInvocationInterceptor interceptor = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(
 //						interceptors[i].getValue(), ea.getModel().getAllImports(), ia.getFetcher(), ea.getModel().getClassLoader());
-						interceptors[i].getValue(), ea.getModel().getAllImports(), ia.getFetcher(), classloader);
+						interceptors[i].getValue(), ea.getModel().getAllImports(), ia.getFetcher(), ia.getClassLoader());
 					handler.addServiceInterceptor(interceptor);
 				}
 			}
 //			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
-			ret = (IService)Proxy.newProxyInstance(classloader, new Class[]{IService.class, 
+			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, 
 				service.getServiceIdentifier().getServiceType()}, handler); 
 		}
 		
