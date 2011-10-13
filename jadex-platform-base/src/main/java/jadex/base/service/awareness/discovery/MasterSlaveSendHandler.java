@@ -33,7 +33,7 @@ public abstract class MasterSlaveSendHandler extends SendHandler
 	{
 		try
 		{
-			byte[] data = DiscoveryState.encodeObject(info, agent.getMyClassLoader());
+			byte[] data = DiscoveryState.encodeObject(info, getAgent().getMicroAgent().getClassLoader());
 	
 //			System.out.println("packet size: "+data.length);
 

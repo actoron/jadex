@@ -39,7 +39,7 @@ public class RMIPostProcessor implements IPostProcessor
 	{
 		try
 		{
-			return rrm.getProxy((ProxyReference)object);
+			return rrm.getProxy((ProxyReference)object, context.getClassLoader());
 		}
 		catch(Exception e)
 		{

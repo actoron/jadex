@@ -125,19 +125,23 @@ public class ComponentTestSuite extends TestSuite
 				}
 				else
 				{
-					if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath).get(ts)).booleanValue())
+					// Should support/use libservice.getClassLoader(abspath) 
+					if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath, rootcomp.getModel().getResourceIdentifier()).get(ts)).booleanValue())
 					{
 						try
 						{
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath).get(ts);
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath, rootcomp.getModel().getResourceIdentifier()).get(ts);
 							boolean istest = false;
 							if(model!=null && model.getReport()==null)
 							{
 								IArgument[]	results	= model.getResults();
 								for(int i=0; !istest && i<results.length; i++)
 								{
-									if(results[i].getName().equals("testresults") && Testcase.class.equals(results[i].getClazz(model.getClassLoader(), model.getAllImports())))
+									if(results[i].getName().equals("testresults") && Testcase.class.equals(
+										results[i].getClazz(libsrv.getClassLoader(model.getResourceIdentifier()), model.getAllImports())))
+									{
 										istest	= true;
+									}
 								}
 							}
 							if(istest)

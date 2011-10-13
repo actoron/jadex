@@ -855,4 +855,12 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 		return interpreter.getFetcher();
 	}
+	
+	/**
+	 *  Get the class loader.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return interpreter.getClassLoader();
+	}
 }

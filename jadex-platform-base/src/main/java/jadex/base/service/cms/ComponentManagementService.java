@@ -234,7 +234,7 @@ public abstract class ComponentManagementService extends BasicService implements
 						{
 							final ILibraryService ls = (ILibraryService)result;
 							
-							SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(filename, null, ls.getClassLoader()))
+							SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(filename, null, rid))
 								.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 							{
 								public void customResultAvailable(Object result)

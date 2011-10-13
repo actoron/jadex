@@ -744,7 +744,7 @@ public class RemoteReferenceModule
 	 *  Get a proxy for a proxy reference.
 	 *  @param pr The proxy reference.
 	 */
-	public Object getProxy(ProxyReference pr)
+	public Object getProxy(ProxyReference pr, ClassLoader classloader)
 	{
 		checkThread();
 		Object ret;
@@ -770,8 +770,19 @@ public class RemoteReferenceModule
 			System.arraycopy(tmp, 0, interfaces, 0, tmp.length);
 			interfaces[tmp.length] = IFinalize.class;
 			
-			ret = Proxy.newProxyInstance(libservice.getClassLoader(), 
+//			ret = Proxy.newProxyInstance(libservice.getClassLoader(), 
+//				interfaces, new RemoteMethodInvocationHandler(rsms, pr));
+			
+			// Which classloader to use for proxy creation?
+			// a) from sender: allows receiver to have all (also implementations) what sender has
+			// b) from receiver: so only interfaces are available but allows compatibility of sender
+			//    and receiver even if they use different versions
+			// c) enhance xml to annotate the resource the classes belong to (best solution)
+			// currently just uses the 'global' platform classloader 
+			
+			ret = Proxy.newProxyInstance(classloader, 
 				interfaces, new RemoteMethodInvocationHandler(rsms, pr));
+
 			
 			incProxyCount(pr.getRemoteReference());
 			

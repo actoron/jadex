@@ -113,7 +113,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 	{
 		try
 		{
-			byte[] data = DiscoveryState.encodeObject(info, agent.getMyClassLoader());
+			byte[] data = DiscoveryState.encodeObject(info, getAgent().getMicroAgent().getClassLoader());
 	
 //			System.out.println("packet size: "+data.length);
 
