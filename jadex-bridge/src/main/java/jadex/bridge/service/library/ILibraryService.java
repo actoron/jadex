@@ -94,6 +94,13 @@ public interface ILibraryService extends IService
 	 */
 	@Excluded()
 	public ClassLoader getClassLoader(IResourceIdentifier rid);
+	
+	/** 
+	 *  Returns the resource identifier.
+	 *  @return The resource identifier.
+	 */
+	@Excluded()
+	public IResourceIdentifier getResourceIdentifier(String filename);
 
 	//-------- listener methods --------
 	

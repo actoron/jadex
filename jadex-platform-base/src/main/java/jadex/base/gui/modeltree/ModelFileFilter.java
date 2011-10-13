@@ -2,8 +2,12 @@ package jadex.base.gui.modeltree;
 
 import jadex.base.SComponentFactory;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -123,19 +127,27 @@ public class ModelFileFilter implements IRemoteFilter
 	 */
 	public IFuture<Boolean> filter(Object obj)
 	{
-		Future<Boolean> ret =  new Future<Boolean>();
+		final Future<Boolean> ret =  new Future<Boolean>();
 		
 		if(obj instanceof File)
 		{
-			File file = (File)obj;
+			final File file = (File)obj;
 			if(isAll() || file.isDirectory())
 			{
 				ret.setResult(Boolean.TRUE);
 			}
 			else
 			{
-				SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents())
-					.addResultListener(new DelegationResultListener(ret));
+				SServiceProvider.getServiceUpwards(exta.getServiceProvider(), ILibraryService.class)
+					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Boolean>(ret)
+				{
+					public void customResultAvailable(ILibraryService libservice)
+					{
+						IResourceIdentifier rid = libservice.getResourceIdentifier(file.getAbsolutePath());
+						SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
+							.addResultListener(new DelegationResultListener<Boolean>(ret));
+					}
+				});
 			}
 		}
 		else

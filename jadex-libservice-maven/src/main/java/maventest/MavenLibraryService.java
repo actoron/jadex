@@ -890,6 +890,16 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		return ret;
 	}
 	
+	/** 
+	 *  Returns the resource identifier.
+	 *  @return The resource identifier.
+	 */
+	@Excluded()
+	public IResourceIdentifier getResourceIdentifier(String filename)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
 	/**
 	 *  Get a class definition.
 	 *  @param name The class name.

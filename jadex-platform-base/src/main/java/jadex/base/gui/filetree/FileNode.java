@@ -3,15 +3,22 @@ package jadex.base.gui.filetree;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.service.library.LibraryService;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 
 import java.io.File;
+import java.net.URL;
 import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.TreePath;
 
 /**
  *  Node object representing a service container.
@@ -245,4 +252,5 @@ public class FileNode	extends AbstractTreeNode	implements IFileNode
 	{
 		return file.isDirectory();
 	}
+
 }

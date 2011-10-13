@@ -693,6 +693,16 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	{
 		return libcl;
 	}
+	
+	/** 
+	 *  Returns the resource identifier.
+	 *  @return The resource identifier.
+	 */
+	@Excluded()
+	public IResourceIdentifier getResourceIdentifier(String filename)
+	{
+		throw new UnsupportedOperationException();
+	}
 
 	
 	//-------- IPropertiesProvider interface --------

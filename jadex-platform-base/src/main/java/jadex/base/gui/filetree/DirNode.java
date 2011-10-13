@@ -3,6 +3,7 @@ package jadex.base.gui.filetree;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.bridge.IResourceIdentifier;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.collection.SortedList;
 import jadex.commons.future.CollectionResultListener;
