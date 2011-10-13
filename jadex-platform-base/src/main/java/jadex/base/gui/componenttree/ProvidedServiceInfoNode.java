@@ -34,7 +34,7 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode
 
 	/** The properties component (if any). */
 	protected ProvidedServiceInfoProperties	propcomp;
-
+	
 	//-------- constructors --------
 	
 	/**

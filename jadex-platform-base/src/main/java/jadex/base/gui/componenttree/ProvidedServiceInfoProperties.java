@@ -58,7 +58,8 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 		try
 		{
 			JTable	list	= (JTable)getComponent("Methods").getComponent(0);
-			Method[] methods	= service.getType(null).getMethods();
+			// remote case not supported yet
+			Method[] methods	= service.getType(null, null).getMethods();
 			String[] returntypes	= new String[methods.length]; 
 			String[] names	= new String[methods.length]; 
 			String[] parameters	= new String[methods.length];

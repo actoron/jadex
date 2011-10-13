@@ -71,7 +71,7 @@ public class RequiredServiceProperties	extends	PropertiesPanel
 		{
 			// Todo: support methods also for remote components.
 			JTable	list	= (JTable)getComponent("Methods").getComponent(0);
-			Method[] methods	= info.getType(null).getMethods();	// NullPointerException for remote
+			Method[] methods	= info.getType(null, null).getMethods();	// NullPointerException for remote
 			String[] returntypes	= new String[methods.length]; 
 			String[] names	= new String[methods.length]; 
 			String[] parameters	= new String[methods.length];

@@ -97,7 +97,7 @@ public class ProvidedServiceInfo
 	{
 		if(type==null && typename!=null)
 		{
-			type = SReflect.findClass0(typename, info.getAllImports(), cl);
+			type = SReflect.findClass0(typename, info!=null? info.getAllImports(): null, cl);
 		}
 //		else if(type==null)
 //		{
