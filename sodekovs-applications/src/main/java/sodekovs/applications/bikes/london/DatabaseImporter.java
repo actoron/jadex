@@ -9,14 +9,17 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Scanner;
+import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
-import com.csvreader.CsvReader;
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * @author thomas
@@ -24,94 +27,113 @@ import com.csvreader.CsvReader;
  */
 public class DatabaseImporter {
 
-	private static final String DB_URL = "jdbc:mysql://192.168.2.104:3306/london";
+	private static final String LOG_FILE_PATH = "importer.log";
 
-	private static final String DB_USER = "root";
+	private Logger logger = null;
 
-	private static int count = 0;
+	private Connection connection = null;
 
-	private static String password = null;
+	public DatabaseImporter() {
+		this.connection = DatabaseConnection.getConnection();
 
-	private static Connection connection = null;
+		this.logger = Logger.getLogger("LondonImporter");
+		this.logger.setLevel(Level.ALL);
+		this.logger.setUseParentHandlers(false);
+
+		FileHandler fh;
+		try {
+			fh = new FileHandler(LOG_FILE_PATH, true);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+
+			logger.addHandler(fh);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void log(String msg) {
+		this.logger.log(Level.INFO, msg);
+	}
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println("London Database Import started.");
-		System.out.println("-------------------------------");
+		DatabaseImporter importer = new DatabaseImporter();
+		importer.log("London Database Import started.");
+		importer.log("-------------------------------");
 
 		for (String arg : args) {
 			File csvFile = new File(arg);
-
-			System.out.println("Started parsing " + csvFile);
 			if (csvFile.exists()) {
+				importer.log("Started parsing " + csvFile);
+
 				try {
 					BufferedReader br = new BufferedReader(new FileReader(csvFile));
-					CsvReader csvReader = new CsvReader(br);
-					csvReader.readHeaders();
+					CSVReader csvReader = new CSVReader(br);
+					List<String[]> lines = csvReader.readAll();
 
-					while (csvReader.readRecord()) {
-						insertLine(csvReader);
+					importer.log("Parsed " + lines.size() + " lines");
+					for (String[] line : lines) {
+						importer.insertLine(line);
 					}
 
-					// while ((line = br.readLine()) != null) {
-					// if (!firstLine) {
-					// insertLine(line);
-					// } else {
-					// firstLine = false;
-					// }
-					// }
+					csvReader.close();
+					br.close();
+
+					importer.log("Finished parsing " + csvFile);
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+
 			}
-			System.out.println("Finished parsing " + csvFile);
 		}
 
-		System.out.println("\nInserted " + count + " lines to the Database.");
-		System.out.println("-------------------------------");
-		System.out.println("London Database Import finished.");
-
-		// Double d = 40321.0;
-		// String s = String.valueOf(d);
-		// System.out.println(s);
+		importer.log("-------------------------------");
+		importer.log("London Database Import finished.");
 	}
 
-	private static void insertLine(CsvReader csvReader) {
-		try {
-			// Journey Id
-			Integer journeyId = Integer.parseInt(csvReader.get("Journey Id"));
-			// Bike Id
-			Integer bikeId = Integer.parseInt(csvReader.get("Bike Id"));
-			// Start Date
-			String startDateString = getMySQLDateString(csvReader.get("Start Date"));
-			// Start Time
-			String startTimeString = csvReader.get("Start Time");
-			if (startTimeString.length() == 5) {
-				startTimeString += ":00";
-			}
-			Timestamp start = Timestamp.valueOf(startDateString + " " + startTimeString);
-			// End Date
-			String endDateString = getMySQLDateString(csvReader.get("End Date"));
-			// End Time
-			String endTimeString = csvReader.get("End Time");
-			if (endTimeString.length() == 5) {
-				endTimeString += ":00";
-			}
-			Timestamp end = Timestamp.valueOf(endDateString + " " + endTimeString);
-			// Start Station
-			String startStation = csvReader.get("Start Station");
-			// Start Station Id
-			Integer startStationId = Integer.parseInt(csvReader.get("Start Station Id"));
-			// End Station
-			String endStation = csvReader.get("End Station");
-			// End Station Id
-			Integer endStationId = Integer.parseInt(csvReader.get("End Station Id"));
+	private void insertLine(String[] line) throws IOException {
+		int i = 0;
+		if (line.length == 11) {
+			i++;
+		}
 
-			Connection connection = getDatabaseConnection();
+		// Journey Id
+		Integer journeyId = Integer.parseInt(line[i++]);
+		// Bike Id
+		Integer bikeId = Integer.parseInt(line[i++]);
+		// Start Date
+		String startDateString = getMySQLDateString(line[i++]);
+		// Start Time
+		String startTimeString = line[i++];
+		if (startTimeString.length() == 5) {
+			startTimeString += ":00";
+		}
+		Timestamp start = Timestamp.valueOf(startDateString + " " + startTimeString);
+		// End Date
+		String endDateString = getMySQLDateString(line[i++]);
+		// End Time
+		String endTimeString = line[i++];
+		if (endTimeString.length() == 5) {
+			endTimeString += ":00";
+		}
+		Timestamp end = Timestamp.valueOf(endDateString + " " + endTimeString);
+		// Start Station
+		String startStation = line[i++];
+		// Start Station Id
+		Integer startStationId = Integer.parseInt(line[i++]);
+		// End Station
+		String endStation = line[i++];
+		// End Station Id
+		Integer endStationId = Integer.parseInt(line[i++]);
+
+		try {
 			if (connection != null) {
 				PreparedStatement statement = connection
 						.prepareStatement("INSERT INTO JOURNEYDETAILS(journeyId, bikeId, start, end, startStation, startStationId, endStation, endStationId) VALUES (?, ?, ?, ?, ?, ?, ? ,?)");
@@ -125,18 +147,14 @@ public class DatabaseImporter {
 				statement.setInt(8, endStationId);
 
 				if (statement.executeUpdate() != 0) {
-					count++;
-					System.out.println(statement);
+					log(statement.toString());
 				}
 			}
 		} catch (NumberFormatException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	private static String getMySQLDateString(String date) {
@@ -148,30 +166,5 @@ public class DatabaseImporter {
 
 		String result = year + "-" + month + "-" + day;
 		return result;
-	}
-
-	private static Connection getDatabaseConnection() {
-		if (connection == null) {
-			if (password == null) {
-				System.out.println("Please insert the password to access " + DB_URL + " as " + DB_USER);
-				Scanner s = new Scanner(System.in);
-				password = s.next();
-			}
-
-			try {
-				Class.forName("com.mysql.jdbc.Driver").newInstance();
-				connection = DriverManager.getConnection(DB_URL, DB_USER, password);
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return connection;
 	}
 }
