@@ -12,7 +12,9 @@ public class MavenTest2
 	{
 //		File	file	= new File("C:\\Users\\Alex\\Desktop\\jadex-bridge-2.0.jar");
 //		File	file	= new File("C:\\Users\\Alex\\Desktop\\jadex-applications-bdi-2.0.jar");
-		File	file	= new File("target/classes");
+		File	file	= new File("../jadex-bridge/target/classes");
+//		File	file	= new File("testproject/testmodule2/target/classes");
+//		File	file	= new File("C:\\Users\\Alex\\.m2\\repository\\net\\sourceforge\\jadex\\jadex-bridge\\2.1-SNAPSHOT\\jadex-bridge-2.1-SNAPSHOT.jar");
 		URL	url	= MavenHandler.getUrl(file);
 		
 		MavenHandler	mh	= new MavenHandler();
