@@ -145,6 +145,10 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	/** The model info. */
 	protected ModelInfo modelinfo;
 	
+	
+	/** The classloader. */
+	protected ClassLoader classloader;
+	
 	//-------- methods --------
 
 	/**
@@ -1087,14 +1091,14 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		modelinfo.addResult(result);
 	}
 	
-	/**
-	 *  Set the classloader.
-	 *  @param classloader The classloader to set.
-	 */
-	public void setClassloader(ClassLoader classloader)
-	{
-		modelinfo.setClassloader(classloader);
-	}
+//	/**
+//	 *  Set the classloader.
+//	 *  @param classloader The classloader to set.
+//	 */
+//	public void setClassloader(ClassLoader classloader)
+//	{
+//		modelinfo.setClassloader(classloader);
+//	}
 	
 	/**
 	 *  Get the model info.
@@ -1122,5 +1126,25 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	{
 		this.keepalive = keepalive;
 	}
+
+	/**
+	 *  Get the classloader.
+	 *  @return the classloader.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return classloader;
+	}
+
+	/**
+	 *  Set the classloader.
+	 *  @param classloader The classloader to set.
+	 */
+	public void setClassLoader(ClassLoader classloader)
+	{
+		this.classloader = classloader;
+	}
+	
+	
 	
 }

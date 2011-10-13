@@ -19,6 +19,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageService;
 import jadex.bridge.IRemoteServiceManagementService;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
@@ -209,7 +210,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param name The component name.
 	 *  @return The model info of the 
 	 */
-	public IFuture<IModelInfo> loadComponentModel(final String filename)
+	public IFuture<IModelInfo> loadComponentModel(final String filename, final IResourceIdentifier rid)
 	{
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		
@@ -239,7 +240,7 @@ public abstract class ComponentManagementService extends BasicService implements
 								public void customResultAvailable(Object result)
 								{
 									IComponentFactory fac = (IComponentFactory)result;
-									fac.loadModel(filename, null, ls.getClassLoader())
+									fac.loadModel(filename, null, rid)
 										.addResultListener(new DelegationResultListener<IModelInfo>(ret));
 								}
 								
@@ -795,13 +796,13 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @return The component factory.
 	 */
 	protected IFuture selectComponentFactory(final IComponentFactory[] factories, 
-		final String model, final CreationInfo cinfo, final ClassLoader cl, final int idx)
+		final String model, final CreationInfo cinfo, final IResourceIdentifier rid, final int idx)
 	{
 		final Future ret = new Future();
 		
 		if(factories!=null && factories.length>0)
 		{
-			factories[idx].isLoadable(model, cinfo.getImports(), cl)
+			factories[idx].isLoadable(model, cinfo.getImports(), rid)
 				.addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
@@ -817,14 +818,14 @@ public abstract class ComponentManagementService extends BasicService implements
 					}
 					else
 					{
-						selectFallbackFactory(model, cinfo, cl).addResultListener(new DelegationResultListener(ret));
+						selectFallbackFactory(model, cinfo, rid).addResultListener(new DelegationResultListener(ret));
 					}
 				}		
 			});
 		}
 		else
 		{
-			selectFallbackFactory(model, cinfo, cl).addResultListener(new DelegationResultListener(ret));
+			selectFallbackFactory(model, cinfo, rid).addResultListener(new DelegationResultListener(ret));
 		}
 		
 		return ret;
@@ -833,13 +834,13 @@ public abstract class ComponentManagementService extends BasicService implements
 	/**
 	 * 
 	 */
-	protected IFuture selectFallbackFactory(final String model, final CreationInfo cinfo, final ClassLoader cl)
+	protected IFuture selectFallbackFactory(final String model, final CreationInfo cinfo, final IResourceIdentifier rid)
 	{
 		final Future ret = new Future();
 		
 		if(componentfactory!=null)
 		{
-			componentfactory.isLoadable(model, cinfo.getImports(), cl)
+			componentfactory.isLoadable(model, cinfo.getImports(), rid)
 				.addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)

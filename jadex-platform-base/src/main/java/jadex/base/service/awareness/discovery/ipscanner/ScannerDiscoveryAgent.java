@@ -222,7 +222,8 @@ public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
 						}
 						InetAddress address = SUtil.getInet4Address();
 						AwarenessInfo info = createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId());
-						byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
+//						byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
+						byte[] data = DiscoveryState.encodeObject(info, classloader);
 						((ScannerSendHandler)sender).send(data, address, port);
 						
 //						System.out.println("local slave at: "+SUtil.getInet4Address()+" "+channel.socket().getLocalPort());

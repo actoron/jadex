@@ -4,12 +4,17 @@ import jadex.base.service.awareness.AwarenessInfo;
 import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
@@ -64,8 +69,29 @@ public abstract class DiscoveryAgent
 	
 	/** Flag indicating that the agent has received its own discovery info. */
 	protected boolean received_self;
+	
+	/** The classloader. */
+	protected ClassLoader classloader;
 
 	//-------- methods --------
+	
+	@AgentCreated
+	public IFuture<Void> agentCreated()
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		SServiceProvider.getServiceUpwards(agent.getServiceProvider(), ILibraryService.class)
+			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
+		{
+			public void customResultAvailable(ILibraryService result)
+			{
+				classloader = result.getClassLoader(getMicroAgent().getModel().getResourceIdentifier());
+				ret.setResult(null);
+			}	
+		});
+		
+		return ret;
+	}
 	
 	/**
 	 *  Execute the functional body of the agent.
@@ -401,6 +427,15 @@ public abstract class DiscoveryAgent
 	public ReceiveHandler getReceiver()
 	{
 		return receiver;
+	}
+
+	/**
+	 *  Get the classloader.
+	 *  @return the classloader.
+	 */
+	public ClassLoader getMyClassLoader()
+	{
+		return classloader;
 	}
 
 	/**

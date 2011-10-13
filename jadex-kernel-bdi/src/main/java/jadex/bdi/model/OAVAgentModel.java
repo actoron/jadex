@@ -33,7 +33,8 @@ public class OAVAgentModel	extends OAVCapabilityModel
 	/**
 	 *  Create a model.
 	 */
-	public OAVAgentModel(IOAVState state, Object handle, ModelInfo modelinfo, Set types, long lastmod, MultiCollection entries)
+	public OAVAgentModel(IOAVState state, Object handle, ModelInfo modelinfo, Set types, 
+		long lastmod, MultiCollection entries)
 	{
 		super(state, handle, modelinfo, types, lastmod, entries);
 	}

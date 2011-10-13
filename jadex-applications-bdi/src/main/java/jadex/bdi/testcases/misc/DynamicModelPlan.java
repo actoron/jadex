@@ -29,7 +29,7 @@ public class DynamicModelPlan extends Plan
 	public void body()
 	{
 		IDynamicBDIFactory	fac	= (IDynamicBDIFactory)getServiceContainer().getRequiredService("factory").get(this);
-		IMECapability agent = fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null);
+		IMECapability agent = fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null, getScope().getModel().getResourceIdentifier());
 			
 		IMEBelief	msgbelief	= agent.createBeliefbase().createBelief("msg");
 		msgbelief.createFact("\"Welcome to editable models!\"", null);

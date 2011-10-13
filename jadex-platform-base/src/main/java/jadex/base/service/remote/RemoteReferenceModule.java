@@ -201,7 +201,7 @@ public class RemoteReferenceModule
 		if(target instanceof IExternalAccess)
 		{
 			imports	= ((IExternalAccess)target).getModel().getAllImports();
-			cl	= ((IExternalAccess)target).getModel().getClassLoader();
+			cl	= libservice.getClassLoader(((IExternalAccess)target).getModel().getResourceIdentifier());
 			properties = ((IExternalAccess)target).getModel().getProperties();		
 		}
 		else if(properties==null && target instanceof IService)
@@ -341,7 +341,8 @@ public class RemoteReferenceModule
 				if(methods[j].isAnnotationPresent(Replacement.class))
 				{
 					Replacement	ra	= methods[j].getAnnotation(Replacement.class);
-					Class	rep	= SReflect.findClass0(ra.value(), null, libservice.getClassLoader());
+//					Class	rep	= SReflect.findClass0(ra.value(), null, libservice.getClassLoader());
+					Class	rep	= SReflect.findClass0(ra.value(), null, cl);
 					if(rep!=null)
 					{
 						try

@@ -29,7 +29,7 @@ public class MulticastSendHandler extends SendHandler
 	{
 		try
 		{
-			byte[] data = DiscoveryState.encodeObject(info, getAgent().getMicroAgent().getModel().getClassLoader());
+			byte[] data = DiscoveryState.encodeObject(info, getAgent().getMyClassLoader());
 			Object[] ai = getAgent().getAddressInfo();
 			send(data, (InetAddress)ai[0], ((Integer)ai[1]).intValue());
 //			System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)"+" "+port+" "+address);

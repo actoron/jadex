@@ -1,9 +1,11 @@
 package jadex.bridge.modelinfo;
 
 import jadex.bridge.IErrorReport;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.library.ILibraryService;
 
 import java.util.Map;
 
@@ -137,13 +139,19 @@ public interface IModelInfo
 	 *  @param	name	The property name.  
 	 *  @return The property value.
 	 */
-	public Object	getProperty(String name);
+	public Object	getProperty(String name, ILibraryService libservice);
 
+//	/**
+//	 *  Return the class loader corresponding to the model.
+//	 *  @return The class loader corresponding to the model.
+//	 */
+//	public ClassLoader getClassLoader();
+	
 	/**
-	 *  Return the class loader corresponding to the model.
-	 *  @return The class loader corresponding to the model.
+	 *  Return the resource identifier.
+	 *  @return The resource identifier.
 	 */
-	public ClassLoader getClassLoader();
+	public IResourceIdentifier getResourceIdentifier();
 	
 	/**
 	 *  Get the required services.

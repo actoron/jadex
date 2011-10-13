@@ -4,6 +4,7 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -36,7 +37,7 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return The loaded model.
 	 */
-	public static IFuture<IModelInfo> loadModel(IExternalAccess exta, final String model)
+	public static IFuture<IModelInfo> loadModel(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
 		return exta.scheduleStep(new IComponentStep<IModelInfo>()
 		{
@@ -45,20 +46,20 @@ public class SComponentFactory
 			{
 				final Future ret = new Future();
 				
-				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						final ILibraryService ls = (ILibraryService)result;
+//				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+//						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
+						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
 								IComponentFactory fac = (IComponentFactory)result;
-								fac.loadModel(model, null, ls.getClassLoader())
+								fac.loadModel(model, null, rid)
 									.addResultListener(new DelegationResultListener(ret));
 							}
 							
@@ -74,8 +75,8 @@ public class SComponentFactory
 								}
 							}
 						}));
-					}
-				}));
+//					}
+//				}));
 				
 				return ret;
 			}
@@ -87,7 +88,7 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if model can be loaded.
 	 */
-	public static IFuture isLoadable(IExternalAccess exta, final String model)
+	public static IFuture isLoadable(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
 		Future ret = new Future();
 		
@@ -97,20 +98,20 @@ public class SComponentFactory
 			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						final ILibraryService ls = (ILibraryService)result;
+//				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+//						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
+						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
 								IComponentFactory fac = (IComponentFactory)result;
-								fac.isLoadable(model, null, ls.getClassLoader())
+								fac.isLoadable(model, null, rid)
 									.addResultListener(new DelegationResultListener(ret));
 							}
 							
@@ -126,8 +127,8 @@ public class SComponentFactory
 								}
 							}
 						}));
-					}
-				}));
+//					}
+//				}));
 				return ret;
 			}
 		}).addResultListener(new DelegationResultListener(ret));
@@ -140,7 +141,7 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if model can be loaded.
 	 */
-	public static IFuture<Boolean> isModelType(IExternalAccess exta, final String model, final Collection allowedtypes)
+	public static IFuture<Boolean> isModelType(IExternalAccess exta, final String model, final Collection allowedtypes, final IResourceIdentifier rid)
 	{
 		Future<Boolean> ret = new Future<Boolean>();
 //		System.out.println("model:"+model);
@@ -173,7 +174,7 @@ public class SComponentFactory
 								}
 								else
 								{
-									checkComponentType(model, (IComponentFactory[])facs.toArray(new IComponentFactory[0]), 0, ia, ls.getClassLoader(), allowedtypes)
+									checkComponentType(model, (IComponentFactory[])facs.toArray(new IComponentFactory[0]), 0, ia, rid, allowedtypes)
 										.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 								}
 							}
@@ -203,7 +204,7 @@ public class SComponentFactory
 	 * 
 	 */
 	protected static IFuture checkComponentType(final String model, final IComponentFactory[] facts, final int i, 
-		final IInternalAccess ia, final ClassLoader cl, final Collection allowedtypes)
+		final IInternalAccess ia, final IResourceIdentifier rid, final Collection allowedtypes)
 	{
 		final Future ret = new Future();
 		if(i>=facts.length)
@@ -212,7 +213,7 @@ public class SComponentFactory
 		}
 		else
 		{
-			facts[i].getComponentType(model, null, cl)
+			facts[i].getComponentType(model, null, rid)
 				.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
@@ -223,7 +224,7 @@ public class SComponentFactory
 					}
 					else
 					{
-						checkComponentType(model, facts, i+1, ia, cl, allowedtypes)
+						checkComponentType(model, facts, i+1, ia, rid, allowedtypes)
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					}
 				}
@@ -237,7 +238,7 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if startable (and should therefore also be loadable).
 	 */
-	public static IFuture isStartable(IExternalAccess exta, final String model)
+	public static IFuture isStartable(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
 		Future ret = new Future();
 		
@@ -247,20 +248,20 @@ public class SComponentFactory
 			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
 				final Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						final ILibraryService ls = (ILibraryService)result;
+//				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+//						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
+						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
 								IComponentFactory fac = (IComponentFactory)result;
-								fac.isStartable(model, null, ls.getClassLoader())
+								fac.isStartable(model, null, rid)
 									.addResultListener(new DelegationResultListener(ret));
 							}
 							
@@ -276,8 +277,8 @@ public class SComponentFactory
 								}
 							}
 						}));
-					}			
-				}));
+//					}			
+//				}));
 				return ret;
 			}
 		}).addResultListener(new DelegationResultListener(ret));
@@ -393,7 +394,7 @@ public class SComponentFactory
 	/**
 	 * Get the file type of a model.
 	 */
-	public static IFuture<String> getFileType(IExternalAccess exta, final String model)
+	public static IFuture<String> getFileType(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
 		final Future ret = new Future();
 		
@@ -410,13 +411,13 @@ public class SComponentFactory
 					{
 						final ILibraryService ls = (ILibraryService)result;
 						
-						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, ls.getClassLoader()))
+						SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(model, null, rid))
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 						{
 							public void customResultAvailable(Object result)
 							{
 								IComponentFactory fac = (IComponentFactory)result;
-								fac.getComponentType(model, null, ls.getClassLoader())
+								fac.getComponentType(model, null, rid)
 									.addResultListener(new DelegationResultListener(ret));
 							}
 							

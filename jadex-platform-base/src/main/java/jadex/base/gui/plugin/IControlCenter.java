@@ -2,6 +2,7 @@ package jadex.base.gui.plugin;
 
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
 
 import javax.swing.JComponent;
 
@@ -70,4 +71,9 @@ public interface IControlCenter
 	 *  @param exception The exception (if any).
 	 */
 	public void displayError(final String errortitle, String errormessage, Exception exception);
+	
+	/**
+	 *  Get the resource identifier.
+	 */
+	public ClassLoader getClassLoader(IResourceIdentifier rid);
 }

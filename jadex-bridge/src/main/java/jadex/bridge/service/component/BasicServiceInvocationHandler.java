@@ -324,7 +324,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, 
-		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy)
+		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, ClassLoader classloader)
 	{
 		IInternalService	ret;
 		
@@ -342,8 +342,9 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		{
 			BasicServiceInvocationHandler handler = createHandler(name, ia, type, service);
 			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy);
-			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
-				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
+			ret	= (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, type}, handler);
+//			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
+//				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 			if(!(service instanceof IService))
 			{
 				if(!service.getClass().isAnnotationPresent(Service.class)
@@ -521,19 +522,20 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  provided service that is not offered by the component itself.
 	 */
 	public static IInternalService createDelegationProvidedServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IServiceIdentifier sid, 
-		RequiredServiceInfo info, RequiredServiceBinding binding, boolean copy)
+		RequiredServiceInfo info, RequiredServiceBinding binding, boolean copy, ClassLoader classloader)
 	{
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(sid, adapter.getLogger());
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 		handler.addFirstServiceInterceptor(new DelegationInterceptor(ea, info, binding, null, copy));
-		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
+//		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
+		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
 	}
 
 	/**
 	 *  Static method for creating a standard service proxy for a required service.
 	 */
 	public static IService createRequiredServiceProxy(IInternalAccess ia, IExternalAccess ea, IComponentAdapter adapter, IService service, 
-		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding, boolean copy)
+		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding, boolean copy, ClassLoader classloader)
 	{
 		IService ret = service;
 		
@@ -552,11 +554,13 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				for(int i=0; i<interceptors.length; i++)
 				{
 					IServiceInvocationInterceptor interceptor = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(
-						interceptors[i].getValue(), ea.getModel().getAllImports(), ia.getFetcher(), ea.getModel().getClassLoader());
+//						interceptors[i].getValue(), ea.getModel().getAllImports(), ia.getFetcher(), ea.getModel().getClassLoader());
+						interceptors[i].getValue(), ea.getModel().getAllImports(), ia.getFetcher(), classloader);
 					handler.addServiceInterceptor(interceptor);
 				}
 			}
-			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
+//			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
+			ret = (IService)Proxy.newProxyInstance(classloader, new Class[]{IService.class, 
 				service.getServiceIdentifier().getServiceType()}, handler); 
 		}
 		

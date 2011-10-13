@@ -1,8 +1,10 @@
 package jadex.bridge.modelinfo;
 
 import jadex.bridge.IErrorReport;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;
@@ -53,7 +55,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	protected Map<String, Object> properties;
 	
 	/** The classloader. */
-	protected ClassLoader classloader;
+//	protected ClassLoader classloader;
 	
 	/** The required services. */
 	protected Map<String, RequiredServiceInfo> requiredservices;
@@ -66,6 +68,9 @@ public class ModelInfo extends Startable implements IModelInfo
 	
 	/** The extensions. */
 	protected List<Object> extensions;
+	
+	/** The resource identifier. */
+	protected IResourceIdentifier rid;
 		
 	//-------- constructors --------
 	
@@ -75,7 +80,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	public ModelInfo()
 	{
 		this(null, null, null, null, null, null, 
-			false, null, null, null, null, null, null, null, null);
+			false, null, null, null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -86,7 +91,8 @@ public class ModelInfo extends Startable implements IModelInfo
 		IArgument[] arguments, IArgument[] results, boolean startable,
 		String filename, Map<String, Object> properties, ClassLoader classloader, 
 		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices, 
-		ConfigurationInfo[] configurations, SubcomponentTypeInfo[] subcomponents, String[] imports)
+		ConfigurationInfo[] configurations, SubcomponentTypeInfo[] subcomponents, String[] imports,
+		IResourceIdentifier rid)
 	{
 		this.name = name;
 		this.packagename = packagename;
@@ -99,7 +105,7 @@ public class ModelInfo extends Startable implements IModelInfo
 		this.startable = startable;
 		this.filename = filename;
 		this.properties = properties!=null? properties: new HashMap<String, Object>();
-		this.classloader = classloader;
+//		this.classloader = classloader;
 		if(providedservices!=null)
 			this.providedservices = SUtil.arrayToList(providedservices);
 		if(configurations!=null)
@@ -109,6 +115,7 @@ public class ModelInfo extends Startable implements IModelInfo
 		if(imports!=null)
 			this.imports = SUtil.arrayToList(imports);
 		setRequiredServices(requiredservices);
+		this.rid = rid;
 	}
 
 	//-------- methods --------
@@ -346,20 +353,30 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  @param	name	The property name.  
 	 *  @return The property value or null if property not defined.
 	 */
-	public Object	getProperty(String name)
+	public Object	getProperty(String name, ILibraryService libservice)
 	{
 		// Todo: caching of parsed values?
-		return UnparsedExpression.getProperty(getProperties(), name, getAllImports(), null, getClassLoader());
+		return UnparsedExpression.getProperty(getProperties(), name, getAllImports(), null, libservice.getClassLoader(rid));
 	}
 
+//	/**
+//	 *  Return the class loader corresponding to the model.
+//	 *  @return The class loader corresponding to the model.
+//	 */
+//	public ClassLoader getClassLoader()
+//	{
+//		return classloader;
+//	}
+	
 	/**
-	 *  Return the class loader corresponding to the model.
-	 *  @return The class loader corresponding to the model.
+	 *  Return the resource identifier.
+	 *  @return The resource identifier.
 	 */
-	public ClassLoader getClassLoader()
+	public IResourceIdentifier getResourceIdentifier()
 	{
-		return classloader;
+		return rid;
 	}
+
 
 	/**
 	 *  Set the name.
@@ -523,15 +540,17 @@ public class ModelInfo extends Startable implements IModelInfo
 	}
 	
 	// Exclude from transfer?!
-	/**
-	 *  Set the classloader.
-	 *  @param classloader The classloader to set.
-	 */
-	public void setClassloader(ClassLoader classloader)
-	{
-		this.classloader = classloader;
-	}
+//	/**
+//	 *  Set the classloader.
+//	 *  @param classloader The classloader to set.
+//	 */
+//	public void setClassloader(ClassLoader classloader)
+//	{
+//		this.classloader = classloader;
+//	}
 
+	
+	
 	/**
 	 *  Get the required services.
 	 *  @return The required services.
@@ -540,6 +559,15 @@ public class ModelInfo extends Startable implements IModelInfo
 	{
 		return requiredservices==null? new RequiredServiceInfo[0]: 
 			requiredservices.values().toArray(new RequiredServiceInfo[requiredservices.size()]);
+	}
+
+	/**
+	 *  Set the resource identifier.
+	 *  @param rid The resource identifier to set.
+	 */
+	public void setResourceIdentifier(IResourceIdentifier rid)
+	{
+		this.rid = rid;
 	}
 
 	/**

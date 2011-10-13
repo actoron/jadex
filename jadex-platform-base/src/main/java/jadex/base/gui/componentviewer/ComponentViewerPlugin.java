@@ -14,6 +14,7 @@ import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
@@ -384,24 +385,34 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 									public void customResultAvailable(Object result)
 									{
 										final IExternalAccess exta = (IExternalAccess)result;
-										final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
-									
-										if(clid instanceof String)
+										
+										SServiceProvider.getServiceUpwards(getJCC().getJCCAccess().getServiceProvider(), ILibraryService.class)
+											.addResultListener(new SwingDefaultResultListener(comptree)
 										{
-											AbstractJCCPlugin.getClassLoader(cid, getJCC()).addResultListener(new SwingDefaultResultListener(comptree)
+											public void customResultAvailable(Object result)
 											{
-												public void customResultAvailable(Object result)
+												final ILibraryService ls = (ILibraryService)result;
+										
+												final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, ls);
+											
+												if(clid instanceof String)
 												{
-													ClassLoader	cl	= (ClassLoader)result;
-													Class clazz	= SReflect.classForName0((String)clid, cl);
-													createPanel(clazz, exta, node);
+													AbstractJCCPlugin.getClassLoader(cid, getJCC()).addResultListener(new SwingDefaultResultListener(comptree)
+													{
+														public void customResultAvailable(Object result)
+														{
+															ClassLoader	cl	= (ClassLoader)result;
+															Class clazz	= SReflect.classForName0((String)clid, cl);
+															createPanel(clazz, exta, node);
+														}
+													});
 												}
-											});
-										}
-										else if(clid instanceof Class)
-										{
-											createPanel((Class)clid, exta, node);
-										}
+												else if(clid instanceof Class)
+												{
+													createPanel((Class)clid, exta, node);
+												}
+											}
+										});
 									}
 								});
 							}
@@ -513,10 +524,19 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 								public void customResultAvailable(Object result)
 								{
 									final IExternalAccess exta = (IExternalAccess)result;
-									final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS);
-									viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
-	//								System.out.println("node: "+viewables.get(cid));
-									node.refresh(false);
+									
+									SServiceProvider.getServiceUpwards(getJCC().getJCCAccess().getServiceProvider(), ILibraryService.class)
+										.addResultListener(new SwingDefaultResultListener(comptree)
+									{
+										public void customResultAvailable(Object result)
+										{
+											final ILibraryService ls = (ILibraryService)result;
+											final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, ls);
+											viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
+			//								System.out.println("node: "+viewables.get(cid));
+											node.refresh(false);
+										}
+									});
 								}
 								
 								public void customExceptionOccurred(Exception exception)

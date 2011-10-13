@@ -32,7 +32,7 @@ public class HelloWorldAgentCreator
 				final IExternalAccess plat = (IExternalAccess)result;
 				
 				// Load dummy model to force loading of bdi kernel.
-				SComponentFactory.isLoadable(plat, "Dummy.agent.xml").addResultListener(new DefaultResultListener()
+				SComponentFactory.isLoadable(plat, "Dummy.agent.xml", null).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
@@ -43,7 +43,7 @@ public class HelloWorldAgentCreator
 							{
 								IDynamicBDIFactory fac = (IDynamicBDIFactory)result;
 								
-								IMECapability agent = fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null);
+								IMECapability agent = fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null, plat.getModel().getResourceIdentifier());
 								
 								IMEBelief	msgbelief	= agent.createBeliefbase().createBelief("msg");
 								msgbelief.createFact("\"Welcome to editable models!\"", null);

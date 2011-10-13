@@ -14,6 +14,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -111,6 +112,7 @@ public class StarterPanel extends JLayeredPane
 
 	/** The last loaded filename. */
 	protected String lastfile;
+	protected IResourceIdentifier lastrid;
 
 	/** The selected parent (if any). */
 	protected IComponentIdentifier	parent;
@@ -217,7 +219,7 @@ public class StarterPanel extends JLayeredPane
 	 * Open the GUI.
 	 * @param starter The starter.
 	 */
-	public StarterPanel(final IExternalAccess exta, IControlCenter jcc)
+	public StarterPanel(final IExternalAccess exta, final IControlCenter jcc)
 	{
 		this.exta = exta;
 		this.jcc = jcc;
@@ -320,13 +322,13 @@ public class StarterPanel extends JLayeredPane
 						public IFuture<Map> execute(IInternalAccess ia)
 						{
 							final Future ret = new Future();
-							SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//							SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //							ia.getRequiredService("libservice")
-								.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-							{
-								public void customResultAvailable(Object result)
+//								.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+//							{
+//								public void customResultAvailable(Object result)
 								{
-									ILibraryService ls = (ILibraryService)result;
+//									ILibraryService ls = (ILibraryService)result;
 									
 									Map args = SCollection.createHashMap();
 									String errortext = null;
@@ -339,7 +341,8 @@ public class StarterPanel extends JLayeredPane
 											Object arg = null;
 											try
 											{
-												arg = new JavaCCExpressionParser().parseExpression(argval, null, null, ls.getClassLoader()).getValue(null);
+//												arg = new JavaCCExpressionParser().parseExpression(argval, null, null, ls.getClassLoader()).getValue(null);
+												arg = new JavaCCExpressionParser().parseExpression(argval, null, null, jcc.getClassLoader(model.getResourceIdentifier())).getValue(null);
 											}
 											catch(Exception e)
 											{
@@ -360,7 +363,7 @@ public class StarterPanel extends JLayeredPane
 										ret.setException(new RuntimeException(errortext));
 									}
 								}
-							}));
+//							}));
 							
 							return ret;
 						}
@@ -757,15 +760,17 @@ public class StarterPanel extends JLayeredPane
 			return;
 		
 		String toload = lastfile;
+		IResourceIdentifier rid = lastrid;
 		lastfile = null;
-		loadModel(toload);
+		lastrid = null;
+		loadModel(toload, lastrid);
 	}
 	
 	/**
 	 *  Load an component model.
 	 *  @param adf The adf to load.
 	 */
-	public IFuture	loadModel(final String adf)
+	public IFuture	loadModel(final String adf, final IResourceIdentifier rid)
 	{
 		final Future	ret	= new Future();
 		
@@ -792,13 +797,13 @@ public class StarterPanel extends JLayeredPane
 			if(adf!=null)
 			{
 				showLoading(ret);
-				SComponentFactory.isLoadable(exta, adf).addResultListener(new SwingDelegationResultListener(ret)
+				SComponentFactory.isLoadable(exta, adf, rid).addResultListener(new SwingDelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						if(((Boolean)result).booleanValue())
 						{
-							SComponentFactory.loadModel(exta, adf).addResultListener(new SwingDelegationResultListener(ret)
+							SComponentFactory.loadModel(exta, adf, rid).addResultListener(new SwingDelegationResultListener(ret)
 							{
 								public void customResultAvailable(Object result)
 								{
@@ -1023,7 +1028,8 @@ public class StarterPanel extends JLayeredPane
 			public IFuture<String> execute(IInternalAccess ia)
 			{
 				Future	ret	= new Future();
-				SComponentFactory.loadModel(ia.getExternalAccess(), name)
+				// lastrid ok?
+				SComponentFactory.loadModel(ia.getExternalAccess(), name, lastrid)
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
@@ -1106,7 +1112,7 @@ public class StarterPanel extends JLayeredPane
 	{
 		loadargs	= null;
 		filename.setText("");
-		loadModel(null);
+		loadModel(null, null);
 		config.removeAllItems();
 		clearArguments();
 		clearResults();
@@ -1370,7 +1376,7 @@ public class StarterPanel extends JLayeredPane
 		final JValidatorTextField valt = new JValidatorTextField(loadargs!=null && loadargs.length>y ? loadargs[y] : "", 15);
 		try
 		{
-			valt.setValidator(new ParserValidator(model.getClassLoader()));
+			valt.setValidator(new ParserValidator(jcc.getClassLoader(model.getResourceIdentifier())));
 		}
 		catch(Exception e)
 		{

@@ -14,6 +14,7 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.RequiredServiceBinding;
@@ -191,7 +192,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 		try
 		{
 	//		OAVAgentModel amodel = (OAVAgentModel)model;
-			OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
+			OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, libservice.getClassLoader(modelinfo.getResourceIdentifier()));
 			
 			// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 			OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
@@ -241,13 +242,14 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(String filename, String[] imports, ClassLoader classloader)
+	public IFuture<IModelInfo> loadModel(String filename, String[] imports, IResourceIdentifier rid)
 	{
 		Future<IModelInfo> ret = new Future<IModelInfo>();
 		try
 		{
 //			System.out.println("loading bdi: "+filename);
-			OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, classloader);
+			OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, 
+				libservice.getClassLoader(rid));
 			ret.setResult(loaded.getModelInfo());
 		}
 		catch(Exception e)
@@ -265,7 +267,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture<Boolean> isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
 //		init();
 		boolean loadable = model.toLowerCase().endsWith(".agent.xml") || model.toLowerCase().endsWith(".capability.xml");
@@ -287,7 +289,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
 	{
 		boolean startable = model!=null && model.toLowerCase().endsWith(".agent.xml");
 		return new Future(startable? Boolean.TRUE: Boolean.FALSE);
@@ -319,7 +321,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public IFuture<String> getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<String>(model.toLowerCase().endsWith(".agent.xml") ? FILETYPE_BDIAGENT
 			: model.toLowerCase().endsWith(".capability.xml") ? FILETYPE_BDICAPABILITY
@@ -340,13 +342,12 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	}
 
 	/**
-	 *  Create a new agent model, which can be manually edited before
-	 *  starting.
+	 *  Create a new agent model, which can be manually edited before starting.
 	 *  @param name	A type name for the agent model.
 	 */
-	public IMECapability	createAgentModel(String name, String pkg, String[] imports)
+	public IMECapability	createAgentModel(String name, String pkg, String[] imports, IResourceIdentifier rid)
 	{
-		OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", libservice.getClassLoader());
+		OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", libservice.getClassLoader(rid));
 		// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
 		typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
 		IOAVState	state	= OAVStateFactory.createOAVState(typemodel);
@@ -413,11 +414,13 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 //		Report	report	= new Report();
 		if(state.getType(handle).isSubtype(OAVBDIMetaModel.agent_type))
 		{
-			ret	=  new OAVAgentModel(state, handle, fw.getModelInfo(), (Set)(types!=null ? types[0] : null), System.currentTimeMillis(), null);
+			ret	=  new OAVAgentModel(state, handle, fw.getModelInfo(), 
+				(Set)(types!=null ? types[0] : null), System.currentTimeMillis(), null);
 		}
 		else
 		{
-			ret	=  new OAVCapabilityModel(state, handle, fw.getModelInfo(), (Set)(types!=null ? types[0] : null), System.currentTimeMillis(), null);
+			ret	=  new OAVCapabilityModel(state, handle, fw.getModelInfo(), (Set)(types!=null ? types[0] : null),
+				System.currentTimeMillis(), null);
 		}
 		
 		try

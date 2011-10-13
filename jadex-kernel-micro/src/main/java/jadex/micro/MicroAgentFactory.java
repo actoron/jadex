@@ -6,6 +6,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
@@ -66,6 +67,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	/** The properties. */
 	protected Map properties;
 	
+	/** The library service. */
+	protected ILibraryService libservice;
+	
 	/** The library service listener */
 	protected ILibraryServiceListener libservicelistener;
 	
@@ -120,7 +124,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		{
 			public void customResultAvailable(Object result)
 			{
-				ILibraryService libservice = (ILibraryService)result;
+				libservice = (ILibraryService)result;
 				libservice.addLibraryServiceListener(libservicelistener);
 				MicroAgentFactory.super.startService().addResultListener(new DelegationResultListener(ret));
 			}
@@ -134,14 +138,15 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public synchronized IFuture<Void>	shutdownService()
 	{
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				ILibraryService libService = (ILibraryService) result;
-				libService.removeLibraryServiceListener(libservicelistener);
-			}
-		});
+		libservice.removeLibraryServiceListener(libservicelistener);
+//		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				ILibraryService libService = (ILibraryService) result;
+//				libService.removeLibraryServiceListener(libservicelistener);
+//			}
+//		});
 		return super.shutdownService();
 	}
 	
@@ -153,13 +158,14 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(String model, String[] imports, ClassLoader classloader)
+	public IFuture<IModelInfo> loadModel(String model, String[] imports, IResourceIdentifier rid)
 	{
 		Future<IModelInfo> ret = new Future<IModelInfo>();
 //		System.out.println("filename: "+filename);
 		try
 		{
-			ret.setResult(loader.loadComponentModel(model, imports, classloader).getModelInfo());
+			ret.setResult(loader.loadComponentModel(model, imports, 
+				libservice.getClassLoader(rid)).getModelInfo());
 		}
 		catch(Exception e)
 		{
@@ -222,7 +228,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture<Boolean> isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
 		if(model==null)
 			System.out.println("test");
@@ -244,9 +250,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
 	{
-		return isLoadable(model, imports, classloader);
+		return isLoadable(model, imports, rid);
 	}
 
 	/**
@@ -272,7 +278,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public IFuture<String> getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<String>(model.toLowerCase().endsWith("agent.class") ? FILETYPE_MICROAGENT: null);
 	}
@@ -292,10 +298,12 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		try
 		{
 			// todo: is model info ok also in remote case?
-			MicroModel mm = loader.loadComponentModel(model.getFilename(), null, model.getClassLoader());
+			ClassLoader cl = libservice.getClassLoader(model.getResourceIdentifier());
+
+			MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl);
 	
 			MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
-				null, model.getClassLoader()), arguments, config, parent, binding, copy, ret);
+				null, cl), arguments, config, parent, binding, copy, ret);
 			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getAgentAdapter()));
 		}
 		catch(Exception e)

@@ -44,6 +44,9 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	// While main is running the root component steps, invoke later must not be called to prevent double execution.
 	protected boolean willdostep;
 	
+	/** The classloader (hack? should be in model). */
+	protected ClassLoader classloader;
+	
 	//-------- constructors --------
 	
 	/**
@@ -51,10 +54,12 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	 */
 	public ComponentInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map arguments, 
-		final RequiredServiceBinding[] bindings, boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> inited)
+		final RequiredServiceBinding[] bindings, boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> inited,
+		ClassLoader classloader)
 	{
 		super(desc, model, config, factory, parent, bindings, copy, inited);
 		this.steps = new ArrayList();
+		this.classloader = classloader;
 	
 		addStep((new Object[]{new IComponentStep<Void>()
 		{
@@ -324,4 +329,14 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	{
 		return this;
 	}
+
+	/**
+	 *  Get the classloader.
+	 *  @return the classloader.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return classloader;
+	}
+	
 }

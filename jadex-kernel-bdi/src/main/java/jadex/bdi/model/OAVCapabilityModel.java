@@ -78,7 +78,8 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	/**
 	 *  Create a model.
 	 */
-	public OAVCapabilityModel(IOAVState state, Object handle, ModelInfo modelinfo, Set types, long lastmod, MultiCollection entries)
+	public OAVCapabilityModel(IOAVState state, Object handle, ModelInfo modelinfo, Set types, 
+		long lastmod, MultiCollection entries)
 	{
 		this.state	= state;
 		this.handle	= handle;
@@ -261,6 +262,8 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 	}
 	
 	//-------- IAgentModel methods --------
+	
+	
 	
 //	/**
 //	 *  Get the name.

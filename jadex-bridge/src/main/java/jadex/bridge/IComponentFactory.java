@@ -19,6 +19,11 @@ import javax.swing.Icon;
  *  A factory is responsible for one or more component types
  *  and is capable of loading component models from files
  *  as well as instantiating components.
+ *  
+ *  The classloader must be part of the loadModel (and other) methods as
+ *  it represents the context. If file names are fully qualified no context
+ *  is needed but if shortcut notations are used it is unknown where the
+ *  file is located.
  */
 public interface IComponentFactory
 {
@@ -37,15 +42,14 @@ public interface IComponentFactory
 	public String[] getComponentTypes();
 
 	//-------- excluded --------
-	
+		
 	/**
 	 *  Load a  model.
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	@Excluded
-	public IFuture<IModelInfo> loadModel(String model, String[] imports, @Reference ClassLoader classloader);
+	public IFuture<IModelInfo> loadModel(String model, String[] imports, IResourceIdentifier rid);
 
 	/**
 	 *  Test if a model can be loaded by the factory.
@@ -53,8 +57,7 @@ public interface IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	@Excluded
-	public IFuture<Boolean> isLoadable(String model, String[] imports, @Reference ClassLoader classloader);
+	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid);
 	
 	/**
 	 *  Test if a model is startable (e.g. an component).
@@ -62,16 +65,14 @@ public interface IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	@Excluded
-	public IFuture<Boolean> isStartable(String model, String[] imports, @Reference ClassLoader classloader);
+	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid);
 
 	/**
 	 *  Get the component type of a model.
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	@Excluded
-	public IFuture<String> getComponentType(String model, String[] imports, @Reference ClassLoader classloader);
+	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid);
 
 	/**
 	 *  Get the properties (name/value pairs).

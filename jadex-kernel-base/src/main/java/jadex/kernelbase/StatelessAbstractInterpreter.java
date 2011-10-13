@@ -234,11 +234,11 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				Object	step;
 				if(upes[i].getValue()!=null)
 				{
-					step	= UnparsedExpression.getParsedValue(upes[i], getModel().getAllImports(), getFetcher(), getModel().getClassLoader());
+					step	= UnparsedExpression.getParsedValue(upes[i], getModel().getAllImports(), getFetcher(), getClassLoader());
 				}
 				else
 				{
-					Class	clazz	= SReflect.findClass0(upes[i].getClassName(), getModel().getAllImports(), getModel().getClassLoader());
+					Class	clazz	= SReflect.findClass0(upes[i].getClassName(), getModel().getAllImports(), getClassLoader());
 					try
 					{
 						step	= clazz.newInstance();
@@ -281,11 +281,11 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				Object	step	= null;
 				if(upes[i].getValue()!=null)
 				{
-					step	= UnparsedExpression.getParsedValue(upes[i], getModel().getAllImports(), getFetcher(), getModel().getClassLoader());
+					step	= UnparsedExpression.getParsedValue(upes[i], getModel().getAllImports(), getFetcher(), getClassLoader());
 				}
 				else
 				{
-					Class	clazz	= SReflect.findClass0(upes[i].getClassName(), getModel().getAllImports(), getModel().getClassLoader());
+					Class	clazz	= SReflect.findClass0(upes[i].getClassName(), getModel().getAllImports(), getClassLoader());
 					try
 					{
 						step	= clazz.newInstance();
@@ -805,8 +805,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				if(value instanceof UnparsedExpression)
 				{
 					final UnparsedExpression unexp = (UnparsedExpression)value;
-					final Object val = SJavaParser.evaluateExpression(unexp.getValue(), model.getAllImports(), getFetcher(), model.getClassLoader());
-					Class clazz = unexp.getClazz(model.getClassLoader(), model.getAllImports());
+					final Object val = SJavaParser.evaluateExpression(unexp.getValue(), model.getAllImports(), getFetcher(), getClassLoader());
+					Class clazz = unexp.getClazz(getClassLoader(), model.getAllImports());
 					if(SReflect.isSupertype(IFuture.class, clazz!=null? clazz: val.getClass()))
 					{
 //						System.out.println("Future property: "+unexp.getName()+", "+val);
@@ -1050,7 +1050,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			if(impl!=null && impl.getExpression()!=null)
 			{
 				// todo: other Class imports, how can be found out?
-				ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), model.getClassLoader());
+				ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), getClassLoader());
 //				System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
 			}
 			else if(impl!=null && impl.getImplementation(model)!=null)
@@ -1073,11 +1073,11 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					{
 						if(ins[i].getValue()!=null && ins[i].getValue().length()>0)
 						{
-							ics[i] = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(ins[i].getValue(), model.getAllImports(), getFetcher(), model.getClassLoader());
+							ics[i] = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(ins[i].getValue(), model.getAllImports(), getFetcher(), getClassLoader());
 						}
 						else
 						{
-							ics[i] = (IServiceInvocationInterceptor)ins[i].getClazz(model.getClassLoader(), model.getAllImports()).newInstance();
+							ics[i] = (IServiceInvocationInterceptor)ins[i].getClazz(getClassLoader(), model.getAllImports()).newInstance();
 						}
 					}
 				}
@@ -1122,10 +1122,10 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  This may occur e.g. when decoding messages and instantiating parameter values.
 	 *  @return	The component class loader. 
 	 */
-	public ClassLoader getClassLoader()
-	{
-		return getModel().getClassLoader();
-	}
+	public abstract ClassLoader getClassLoader();
+//	{
+//		return getModel().getClassLoader();
+//	}
 
 	/**
 	 *  Get the file name for a logical type name of a subcomponent of this application.
@@ -1250,7 +1250,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				// todo: language
 				if(arguments[i].getValue()!=null && arguments[i].getValue().length()>0)
 				{
-					Object val = SJavaParser.evaluateExpression(arguments[i].getValue(), model.getAllImports(), getFetcher(), model.getClassLoader());
+					Object val = SJavaParser.evaluateExpression(arguments[i].getValue(), model.getAllImports(), getFetcher(), getClassLoader());
 					ret.put(arguments[i].getName(), val);
 				}
 			}
@@ -1258,7 +1258,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		else if(argumentsexp!=null && argumentsexp.getValue()!=null && argumentsexp.getValue().length()>0)
 		{
 			// todo: language
-			ret = (Map)SJavaParser.evaluateExpression(argumentsexp.getValue(), model.getAllImports(), getFetcher(), model.getClassLoader());
+			ret = (Map)SJavaParser.evaluateExpression(argumentsexp.getValue(), model.getAllImports(), getFetcher(), getClassLoader());
 		}
 		
 		return ret;
@@ -1272,7 +1272,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		Object ret = component.getNumber()!=null? SJavaParser.evaluateExpression(component.getNumber(), model.getAllImports(), getFetcher(), model.getClassLoader()): null;
+		Object ret = component.getNumber()!=null? SJavaParser.evaluateExpression(component.getNumber(), model.getAllImports(), getFetcher(), getClassLoader()): null;
 		return ret instanceof Integer? ((Integer)ret).intValue(): 1;
 	}
 	
@@ -1291,7 +1291,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			fetcher.setValue("$n", new Integer(cnt));
 			try
 			{
-				ret = (String)SJavaParser.evaluateExpression(component.getName(), model.getAllImports(), fetcher, model.getClassLoader());
+				ret = (String)SJavaParser.evaluateExpression(component.getName(), model.getAllImports(), fetcher, getClassLoader());
 				if(ret==null)
 					ret = component.getName();
 			}
@@ -1449,7 +1449,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				public void customResultAvailable(Object result)
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
-					cms.loadComponentModel(filename).addResultListener(createResultListener(new DelegationResultListener(ret)
+					// Can use the parent resource identifier as child must depend on parent
+					cms.loadComponentModel(filename, getModel().getResourceIdentifier()).addResultListener(createResultListener(new DelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result)
 						{

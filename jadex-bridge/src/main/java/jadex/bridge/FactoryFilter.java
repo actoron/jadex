@@ -26,8 +26,8 @@ public class FactoryFilter implements IRemoteFilter
 	/** The imports (if any). */
 	protected String[]	imports;
 	
-	/** The class loader (if any). */
-	protected ClassLoader	classloader;
+	/** The resource identifier. */
+	protected IResourceIdentifier rid;
 	
 	//-------- constructors --------
 	
@@ -37,11 +37,11 @@ public class FactoryFilter implements IRemoteFilter
 	 *  @param imports	The imports (if any).
 	 *  @param classloader	The class loader (if any).
 	 */
-	public FactoryFilter(String model, String[] imports, ClassLoader classloader)
+	public FactoryFilter(String model, String[] imports, IResourceIdentifier rid)
 	{
 		this.model	= model;
 		this.imports	= imports;
-		this.classloader	= classloader;
+		this.rid = rid;
 	}
 	
 	/**
@@ -73,7 +73,7 @@ public class FactoryFilter implements IRemoteFilter
 			}
 			else
 			{
-				fac.isLoadable(model, imports, classloader)
+				fac.isLoadable(model, imports, rid)
 					.addResultListener(new DelegationResultListener<Boolean>(ret));
 			}
 		}
@@ -92,8 +92,7 @@ public class FactoryFilter implements IRemoteFilter
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((classloader == null) ? 0 : classloader.hashCode());
+		result = prime * result + ((rid == null) ? 0 : rid.hashCode());
 		result = prime * result + FactoryFilter.hashCode(imports);
 		result = prime * result + ((model == null) ? 0 : model.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
@@ -129,7 +128,7 @@ public class FactoryFilter implements IRemoteFilter
 		{
 			FactoryFilter other = (FactoryFilter)obj;
 		
-			ret = SUtil.equals(classloader, other.classloader) && Arrays.equals(imports, other.imports) &&
+			ret = SUtil.equals(rid, other.rid) && Arrays.equals(imports, other.imports) &&
 				SUtil.equals(model, other.model) && SUtil.equals(type, other.type);
 		}
 		return ret;		

@@ -1,10 +1,12 @@
 package jadex.bridge.service.library;
 
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISettingsService;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.Excluded;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -681,6 +683,17 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		
 		return ret;
 	}
+	
+	/** 
+	 *  Returns the current ClassLoader.
+	 *  @return the current ClassLoader
+	 */
+	@Excluded()
+	public ClassLoader getClassLoader(IResourceIdentifier rid)
+	{
+		return libcl;
+	}
+
 	
 	//-------- IPropertiesProvider interface --------
 	

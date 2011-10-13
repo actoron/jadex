@@ -120,7 +120,10 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						{	
 							List	errors	= new ArrayList();
 //							String contentcopy = (String)content;	// for debugging
-							content = Reader.objectFromXML(rms.getReader(), (String)content, ls.getClassLoader(), errors);
+							
+							// todo: use classloader of receiver
+							ClassLoader cl = ls.getClassLoader(rms.getComponent().getModel().getResourceIdentifier());
+							content = Reader.objectFromXML(rms.getReader(), (String)content, cl, errors);
 							
 							// For corrupt result (e.g. if class not found) set exception to clean up waiting call.
 							if(!errors.isEmpty())
@@ -178,7 +181,9 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										{
 											Map reply = (Map)result;
 //											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
-											String content = Writer.objectToXML(rms.getWriter(), repcontent, ls.getClassLoader(), msg.get(SFipa.SENDER));
+											
+											ClassLoader cl = ls.getClassLoader(rms.getComponent().getModel().getResourceIdentifier());
+											String content = Writer.objectToXML(rms.getWriter(), repcontent, cl, msg.get(SFipa.SENDER));
 											reply.put(SFipa.CONTENT, content);
 //											System.out.println("content: "+content);
 											

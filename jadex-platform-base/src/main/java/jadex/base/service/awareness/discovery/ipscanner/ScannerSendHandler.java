@@ -36,7 +36,7 @@ public class ScannerSendHandler extends MasterSlaveSendHandler
 	{
 		try
 		{
-			byte[] data = DiscoveryState.encodeObject(info, getAgent().getMicroAgent().getModel().getClassLoader());
+			byte[] data = DiscoveryState.encodeObject(info, getAgent().getMyClassLoader());
 			
 			int maxsend = getAgent().getChannel().socket().getSendBufferSize()/data.length;
 			int sent = 0;

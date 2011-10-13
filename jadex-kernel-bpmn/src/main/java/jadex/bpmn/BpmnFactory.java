@@ -8,6 +8,7 @@ import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
@@ -63,6 +64,9 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	
 	/** The model loader */
 	protected BpmnModelLoader loader;
+	
+	/** The library service. */
+	protected ILibraryService libservice;
 	
 	/** The library service listener */
 	protected ILibraryServiceListener libservicelistener;
@@ -139,8 +143,8 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 		{
 			public void resultAvailable(Object result)
 			{
-				ILibraryService libService = (ILibraryService) result;
-				libService.removeLibraryServiceListener(libservicelistener);
+				libservice = (ILibraryService)result;
+				libservice.removeLibraryServiceListener(libservicelistener);
 			}
 		});
 		return super.shutdownService();
@@ -152,15 +156,17 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture loadModel(String model, String[] imports, ClassLoader classloader)
+	public IFuture loadModel(String model, String[] imports, IResourceIdentifier rid)
 	{
 		Future ret = new Future();
 //		System.out.println("filename: "+filename);
 		try
 		{
-			ret.setResult(loader.loadBpmnModel(model, imports, classloader).getModelInfo());
-//			ClassLoader	cl = libservice.getClassLoader();
-//			ret.setClassloader(cl);
+			ClassLoader cl = libservice.getClassLoader(rid);
+			MBpmnModel amodel = loader.loadBpmnModel(model, imports, 
+				libservice.getClassLoader(rid));
+			amodel.setClassLoader(cl);
+			ret.setResult(amodel.getModelInfo());
 		}
 		catch(Exception e)
 		{
@@ -176,7 +182,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture<Boolean> isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<Boolean>(model.endsWith(".bpmn")? Boolean.TRUE: Boolean.FALSE);
 	}
@@ -187,7 +193,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<Boolean>(model.endsWith(".bpmn")? Boolean.TRUE: Boolean.FALSE);
 	}
@@ -215,7 +221,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public IFuture<String> getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<String>(model.toLowerCase().endsWith(".bpmn") ? FILETYPE_BPMNPROCESS: null);
 	}
@@ -234,7 +240,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	{
 		try
 		{
-			MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
+			MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier()));
 			BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, inited);
 			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 		}

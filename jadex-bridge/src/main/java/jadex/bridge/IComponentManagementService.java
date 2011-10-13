@@ -19,7 +19,7 @@ public interface IComponentManagementService extends IService
 	 *  @param name The component name.
 	 *  @return The model info of the 
 	 */
-	public IFuture<IModelInfo> loadComponentModel(String filename);
+	public IFuture<IModelInfo> loadComponentModel(String filename, IResourceIdentifier rid);
 
 	/**
 	 *  Create a new component on the platform.

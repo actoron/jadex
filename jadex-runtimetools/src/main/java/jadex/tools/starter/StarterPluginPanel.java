@@ -13,9 +13,13 @@ import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin.ShowRemoteControlCenterHandler;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISettingsService;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -23,6 +27,7 @@ import jadex.bridge.service.library.LibraryService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
@@ -41,6 +46,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -49,6 +55,7 @@ import javax.swing.JSplitPane;
 import javax.swing.UIDefaults;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.TreePath;
 
 /**
  * The starter gui allows for starting components platform independently.
@@ -143,7 +150,7 @@ public class StarterPluginPanel extends JPanel
 						{
 							if(((Boolean)result).booleanValue() && model.equals(spanel.lastfile))
 							{
-								spanel.loadModel(null);
+								spanel.loadModel(null, null);
 							}
 						}
 						public void customExceptionOccurred(Exception exception)
@@ -160,18 +167,26 @@ public class StarterPluginPanel extends JPanel
 			{
 				Object	node = mpanel.getTree().getLastSelectedPathComponent();
 				String filename = null;
-				if(node instanceof FileNode)
+				if(node instanceof IFileNode)
 				{
 					mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-					filename = ((FileNode)node).getFile().getAbsolutePath();
+					filename = ((IFileNode)node).getFilePath();
 				}
-				else if(node instanceof RemoteFileNode)
-				{
-					mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-					filename = ((RemoteFileNode)node).getRemoteFile().getPath();
-				}
+//				if(node instanceof FileNode)
+//				{
+//					mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+//					filename = ((FileNode)node).getFile().getAbsolutePath();
+//				}
+//				else if(node instanceof RemoteFileNode)
+//				{
+//					mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+//					filename = ((RemoteFileNode)node).getRemoteFile().getPath();
+//				}
+				
 				if(filename!=null)
 				{
+					final IResourceIdentifier rid = createResourceIdentifier();
+
 					// Models have to be loaded with absolute path.
 					// An example to facilitate understanding:
 					// root
@@ -181,12 +196,12 @@ public class StarterPluginPanel extends JPanel
 					//  |  +- MyComponent.component.xml
 
 					final String ffilename = filename;
-					SComponentFactory.isLoadable(jcc.getPlatformAccess(), filename).addResultListener(new SwingDefaultResultListener(spanel)
+					SComponentFactory.isLoadable(jcc.getPlatformAccess(), filename, rid).addResultListener(new SwingDefaultResultListener(spanel)
 					{
 						public void customResultAvailable(Object result)
 						{
 							if(((Boolean)result).booleanValue())
-								spanel.loadModel(ffilename);
+								spanel.loadModel(ffilename, rid);
 							mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 					});
@@ -225,7 +240,8 @@ public class StarterPluginPanel extends JPanel
 							{
 								mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 								final String filename = ((IFileNode)node).getFilePath();
-								SComponentFactory.isStartable(jcc.getPlatformAccess(), filename).addResultListener(new SwingDefaultResultListener(spanel)
+								IResourceIdentifier rid = createResourceIdentifier();
+								SComponentFactory.isStartable(jcc.getPlatformAccess(), filename, rid).addResultListener(new SwingDefaultResultListener(spanel)
 								{
 									public void customResultAvailable(Object result)
 									{
@@ -284,6 +300,26 @@ public class StarterPluginPanel extends JPanel
 	}
 	
 	/**
+	 *  Create a resource identifier.
+	 */
+	public IResourceIdentifier createResourceIdentifier()
+	{
+		// Get the first child of selection path as url
+		TreePath selpath = mpanel.getTree().getSelectionModel().getSelectionPath();
+		Object tmp = selpath.getPathComponent(1);
+		Tuple2<IComponentIdentifier, URL> lid = null;
+		if(tmp instanceof IFileNode)
+		{
+			URL url = LibraryService.toURL(((IFileNode)tmp).getFilePath());
+			IComponentIdentifier root = mpanel.getExternalAccess().getComponentIdentifier().getRoot();
+			lid = new Tuple2<IComponentIdentifier, URL>(root, url);
+		}
+		// todo: construct global identifier
+		ResourceIdentifier rid = new ResourceIdentifier(lid, null);
+		return rid;
+	}
+	
+	/**
 	 *  Dynamically create a new menu item structure for starting components.
 	 */
 	class StartComponentMenuItemConstructor implements IMenuItemConstructor
@@ -302,13 +338,14 @@ public class StarterPluginPanel extends JPanel
 				if(node instanceof FileNode)
 				{
 					final String type = ((FileNode)node).getFile().getAbsolutePath();
+					final IResourceIdentifier rid = createResourceIdentifier();
 					
-					if(((Boolean)SComponentFactory.isStartable(jcc.getPlatformAccess(), type).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
+					if(((Boolean)SComponentFactory.isStartable(jcc.getPlatformAccess(), type, rid).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
 					{
 						try
 						{
 //							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(jcc.getPlatformAccess(), type).get(new ThreadSuspendable());
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(jcc.getPlatformAccess(), type, rid).get(new ThreadSuspendable());
 							String[] inistates = model.getConfigurationNames();
 //							IMBDIComponent model = SXML.loadComponentModel(type, null);
 //							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
@@ -381,7 +418,7 @@ public class StarterPluginPanel extends JPanel
 			if(node instanceof FileNode)
 			{
 				String type = ((FileNode)node).getFile().getAbsolutePath();
-				if(((Boolean)SComponentFactory.isStartable(jcc.getPlatformAccess(), type).get(new ThreadSuspendable())))
+				if(((Boolean)SComponentFactory.isStartable(jcc.getPlatformAccess(), type, createResourceIdentifier()).get(new ThreadSuspendable())))
 					ret = true;
 			}
 			return ret;

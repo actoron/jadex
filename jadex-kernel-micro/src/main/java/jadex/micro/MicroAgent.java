@@ -427,7 +427,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 			{
 				IMessageService ms = (IMessageService)result;
 				ms.sendMessage(me, mt, interpreter.getAgentAdapter().getComponentIdentifier(),
-					interpreter.getModel().getClassLoader(), codecids)
+					interpreter.getModel().getResourceIdentifier(), codecids)
 					.addResultListener(createResultListener(new DelegationResultListener(ret)));
 			}
 		}));

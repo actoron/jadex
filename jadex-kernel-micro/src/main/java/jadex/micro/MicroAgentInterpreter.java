@@ -63,7 +63,10 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	
 	/** The list of message handlers. */
 	protected List messagehandlers;
-
+	
+	/** The classloader (hack? should be in model). */
+	protected ClassLoader classloader;
+	
 	//-------- constructors --------
 	
 	/**
@@ -79,6 +82,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		
 		try
 		{
+			this.classloader = model.getClassloader();
 			final Object agent = microclass.newInstance();
 			if(agent instanceof MicroAgent)
 			{
@@ -896,5 +900,17 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		ret = buf.toString();
 			
 		return ret;
+	}
+	
+	/**
+	 *  Get the class loader of the component.
+	 *  The component class loader is required to avoid incompatible class issues,
+	 *  when changing the platform class loader while components are running. 
+	 *  This may occur e.g. when decoding messages and instantiating parameter values.
+	 *  @return	The component class loader. 
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return classloader;
 	}
 }

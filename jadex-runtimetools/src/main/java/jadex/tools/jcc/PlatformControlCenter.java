@@ -6,6 +6,7 @@ import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISettingsService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
@@ -47,13 +48,16 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	
 	/** The settings of the control center and all plugins. */
 	protected Properties	props;
+	
+	/** The library service. */
+	protected ILibraryService libservice;
 
 	//-------- methods called by global control center --------
 
 	/**
 	 *  Initialize a control center.
 	 */
-	public IFuture	init(IExternalAccess platformaccess, ControlCenter controlcenter, final String[] plugin_classes)
+	public IFuture	init(IExternalAccess platformaccess, final ControlCenter controlcenter, final String[] plugin_classes)
 	{
 		this.platformaccess = platformaccess;
 		this.controlcenter	= controlcenter;
@@ -68,7 +72,12 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		{
 			public void customResultAvailable(Object result)
 			{
-				ClassLoader cl = ((ILibraryService)result).getClassLoader();
+				libservice = (ILibraryService)result;
+//				ClassLoader cl = ((ILibraryService)result).getClassLoader();
+				
+				// todo: what about dynamic plugin loading?
+//				ClassLoader cl = controlcenter.getJCCAccess().getModel().getClassLoader();
+				ClassLoader cl = libservice.getClassLoader(controlcenter.getJCCAccess().getModel().getResourceIdentifier());
 				for(int i=0; i<plugin_classes.length; i++)
 				{
 					try
@@ -114,6 +123,14 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 				}
 			}
 		}
+	}
+	
+	/**
+	 *  Get the resource identifier.
+	 */
+	public ClassLoader getClassLoader(IResourceIdentifier rid)
+	{
+		return libservice.getClassLoader(rid==null? getJCCAccess().getModel().getResourceIdentifier(): rid);
 	}
 	
 	/**

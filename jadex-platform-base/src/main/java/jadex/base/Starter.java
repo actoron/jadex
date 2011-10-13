@@ -231,7 +231,8 @@ public class Starter
 			
 			compargs.put(COMPONENT_FACTORY, cfac);
 			
-			cfac.loadModel(configfile, null, cl).addResultListener(new DelegationResultListener(ret)
+			// todo: null as rid?
+			cfac.loadModel(configfile, null, null).addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result) 
 				{
@@ -269,7 +270,8 @@ public class Starter
 					final IComponentIdentifier cid = new ComponentIdentifier(platformname);
 					// Hack!!! Autoshutdown!?
 					
-					cfac.getComponentType(configfile, null, cl).addResultListener(new DelegationResultListener(ret)
+					// todo: null as rid?
+					cfac.getComponentType(configfile, null, null).addResultListener(new DelegationResultListener(ret)
 					{
 						public void customResultAvailable(Object result) 
 						{
@@ -433,7 +435,8 @@ public class Starter
 					val	= arg.getDefaultValue(); 
 				 }
 			}
-			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
+			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, Starter.class.getClassLoader());
+//			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
 		}
 		else if(val instanceof String)
 		{
@@ -468,7 +471,8 @@ public class Starter
 			{
 				val	= arg.getDefaultValue();
 			}
-			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
+			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, Starter.class.getClassLoader());
+//			val	= UnparsedExpression.getParsedValue(val, model.getAllImports(), null, model.getClassLoader());
 			configname	= val!=null ? val.toString() : null;
 		}
 		return configname;

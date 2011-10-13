@@ -14,6 +14,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.IMessageListener;
 import jadex.bridge.IMessageService;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.MessageType;
 import jadex.bridge.ServiceTerminatedException;
@@ -24,6 +25,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.execution.IExecutionService;
+import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -101,6 +103,9 @@ public class MessageService extends BasicService implements IMessageService
 	/** The cashed clock service. */
 	protected IClockService	clockservice;
 	
+	/** The library service. */
+	protected ILibraryService libservice;
+	
 //	/** The cashed clock service. */
 //	protected IComponentManagementService cms;
 	
@@ -161,9 +166,12 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public IFuture<Void> sendMessage(final Map msg, final MessageType type, final IComponentIdentifier sender, final ClassLoader cl, final byte[] codecids)
+	public IFuture<Void> sendMessage(final Map msg, final MessageType type, 
+		final IComponentIdentifier sender, final IResourceIdentifier rid, final byte[] codecids)
 	{
 		final Future<Void> ret = new Future<Void>();
+		
+		final ClassLoader cl = libservice.getClassLoader(rid);
 		
 //		IComponentIdentifier sender = adapter.getComponentIdentifier();
 		if(sender==null)
@@ -348,7 +356,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param props The properties.
 	 *  @return The content codec.
 	 */
-	public static IContentCodec[] getContentCodecs(IModelInfo model)
+	public IContentCodec[] getContentCodecs(IModelInfo model)
 	{
 		List ret = null;
 		Map	props	= model.getProperties();
@@ -361,7 +369,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(ret==null)
 						ret	= new ArrayList();
-					ret.add(model.getProperty(name));
+					ret.add(model.getProperty(name, libservice));
 				}
 			}
 		}
@@ -619,8 +627,14 @@ public class MessageService extends BasicService implements IMessageService
 									public void customResultAvailable(Object result)
 									{
 										clockservice = (IClockService)result;
-										ret.setResult(null);
-//										ret.setResult(getServiceIdentifier());
+										SServiceProvider.getService(component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
+										{
+											public void customResultAvailable(Object result)
+											{
+												libservice = (ILibraryService)result;
+												ret.setResult(null);
+											}
+										});
 									}
 								});
 							}

@@ -11,9 +11,15 @@ import jadex.base.gui.filetree.JarNode;
 import jadex.base.gui.filetree.RemoteDirNode;
 import jadex.base.gui.filetree.RemoteJarNode;
 import jadex.base.gui.filetree.RootNode;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.service.library.LibraryService;
+import jadex.commons.Tuple2;
 import jadex.commons.gui.SGUI;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +27,7 @@ import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.UIDefaults;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 
 /**
  *  Cache for component icons.
@@ -105,7 +112,7 @@ public class ModelIconCache implements IIconCache
 	//			System.out.println("getIcon: "+type);
 				final String file = ((IFileNode)node).getFilePath(); 
 				
-				SComponentFactory.getFileType(exta, file)
+				SComponentFactory.getFileType(exta, file, createResourceIdentifier(node))
 					.addResultListener(new SwingDefaultResultListener(tree)
 				{
 					public void customResultAvailable(Object result)
@@ -156,5 +163,27 @@ public class ModelIconCache implements IIconCache
 		{
 			tree.repaint();
 		}
+	}
+	
+	/**
+	 *  Create a resource identifier.
+	 */
+	public IResourceIdentifier createResourceIdentifier(ITreeNode node)
+	{
+		// Get the first child of selection path as url
+		ITreeNode root = node;
+		while(root.getParent()!=null && root.getParent().getParent()!=null)
+			root = root.getParent();
+		
+		Tuple2<IComponentIdentifier, URL> lid = null;
+		if(root instanceof IFileNode)
+		{
+			URL url = LibraryService.toURL(((IFileNode)root).getFilePath());
+			IComponentIdentifier plat = exta.getComponentIdentifier().getRoot();
+			lid = new Tuple2<IComponentIdentifier, URL>(plat, url);
+		}
+		// todo: construct global identifier
+		ResourceIdentifier rid = new ResourceIdentifier(lid, null);
+		return rid;
 	}
 }

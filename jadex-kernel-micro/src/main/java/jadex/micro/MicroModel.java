@@ -24,6 +24,9 @@ public class MicroModel extends CacheableKernelModel
 
 	/** The service injection targets. */
 	protected Map serviceinjections;
+	
+	/** The class loader. */
+	protected ClassLoader classloader;
 
 	
 	/**
@@ -116,5 +119,23 @@ public class MicroModel extends CacheableKernelModel
 	{
 		return serviceinjections==null? SUtil.EMPTY_STRING_ARRAY: 
 			(String[])serviceinjections.keySet().toArray(new String[serviceinjections.size()]);
+	}
+
+	/**
+	 *  Get the classloader.
+	 *  @return the classloader.
+	 */
+	public ClassLoader getClassloader()
+	{
+		return classloader;
+	}
+
+	/**
+	 *  Set the classloader.
+	 *  @param classloader The classloader to set.
+	 */
+	public void setClassloader(ClassLoader classloader)
+	{
+		this.classloader = classloader;
 	}
 }

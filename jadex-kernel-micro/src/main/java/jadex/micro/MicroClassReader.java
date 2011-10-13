@@ -93,8 +93,8 @@ public class MicroClassReader
 		modelinfo.setName(name);
 		modelinfo.setPackage(packagename);
 		modelinfo.setFilename(model);
-		modelinfo.setClassloader(classloader);
 		modelinfo.setStartable(true);
+		ret.setClassloader(classloader);
 		
 		try
 		{

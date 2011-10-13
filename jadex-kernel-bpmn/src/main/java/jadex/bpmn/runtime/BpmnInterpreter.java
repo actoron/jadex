@@ -1433,4 +1433,14 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		return new ComponentChangeEvent(type, TYPE_ACTIVITY, activity.getName(), 
 			thread.getId(), getComponentIdentifier(), getCreationTime(), createProcessThreadInfo(thread));
 	}
+	
+	/**
+	 *  Get the classloader.
+	 *  @return the classloader.
+	 */
+	public ClassLoader getClassLoader()
+	{
+		return model.getClassLoader();
+	}
+	
 }

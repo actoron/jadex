@@ -16,7 +16,7 @@ public class MultiPlatformsTest2 extends TestCase
 {
 	public void	testMultiplePlatforms()
 	{
-		int number	= 50;
+		int number	= 100;
 		long timeout	= 10000;
 		
 		IFuture[]	futures	= new IFuture[number];
@@ -26,7 +26,8 @@ public class MultiPlatformsTest2 extends TestCase
 				System.out.println("Starting platform "+i);
 			futures[i]	= Starter.createPlatform(new String[]{"-platformname", "testcases", "-niotransport", "false",
 				"-configname", "allkernels",	// Todo: does not work with multi-kernel on Hudson!?
-				"-gui", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"});
+				"-gui", "false", 
+				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"});
 		}
 		
 		IExternalAccess[]	platforms	= new IExternalAccess[futures.length];

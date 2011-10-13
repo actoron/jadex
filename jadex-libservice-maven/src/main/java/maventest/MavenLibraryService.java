@@ -1,18 +1,21 @@
 package maventest;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISettingsService;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
-import jadex.bridge.service.library.LibraryService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -104,7 +107,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		this.classloaders = new HashMap();
 		this.initurls = urls;
 		this.provider = provider;
-		
+
 		if(urls!=null)
 		{
 			for(int i=0; i<urls.length; i++)
@@ -113,29 +116,29 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 			}
 		}
 		
-		updateGlobalClassLoader();
+//		updateGlobalClassLoader();
 		
 		listeners	= Collections.synchronizedSet(new HashSet());
 		urlrefcount = Collections.synchronizedMap(new HashMap());
 	}
 	
-	/**
-	 *  Update the global class loader.
-	 *  
-	 *  hack: should be removed
-	 */
-	public void updateGlobalClassLoader()
-	{
-		DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
-		
-		/* $if !android $ */
-		this.libcl = new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), delegates);
-		/* $else $
-		this.libcl = new DelegationClassLoader(LibraryService.class.getClassLoader(), urls);
-		$endif $ */
-		
-		System.out.println("update global: "+delegates.length);
-	}
+//	/**
+//	 *  Update the global class loader.
+//	 *  
+//	 *  hack: should be removed
+//	 */
+//	public void updateGlobalClassLoader()
+//	{
+//		DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
+//		
+//		/* $if !android $ */
+//		this.libcl = new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), delegates);
+//		/* $else $
+//		this.libcl = new DelegationClassLoader(LibraryService.class.getClassLoader(), urls);
+//		$endif $ */
+//		
+//		System.out.println("update global: "+delegates.length);
+//	}
 
 	/**
 	 *  Get or create a classloader for an url.
@@ -211,7 +214,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		{
 			DelegationURLClassLoader cl = new DelegationURLClassLoader(url, ClassLoader.getSystemClassLoader(), null);
 			classloaders.put(url, cl);
-			updateGlobalClassLoader();
+//			updateGlobalClassLoader();
 			ret.setResult(cl);
 		}
 		else
@@ -229,7 +232,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 							DelegationURLClassLoader cl = new DelegationURLClassLoader(url, 
 								ClassLoader.getSystemClassLoader(), result.toArray(new DelegationURLClassLoader[result.size()]));
 							classloaders.put(url, cl);
-							updateGlobalClassLoader();
+//							updateGlobalClassLoader();
 							ret.setResult(cl);
 						}
 					});
@@ -369,7 +372,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 			{
 				public void resultAvailable(DelegationURLClassLoader result)
 				{
-					updateGlobalClassLoader();
+//					updateGlobalClassLoader();
 					
 					for(int i=0; i<lis.length; i++)
 					{
@@ -405,7 +408,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		{
 			urlrefcount.remove(url);
 			classloaders.remove(url);
-			updateGlobalClassLoader();
+//			updateGlobalClassLoader();
 			lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
 		}
 		
@@ -829,6 +832,64 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 //		return ret;
 	}
 	
+	/** 
+	 *  Returns the current ClassLoader.
+	 *  @return the current ClassLoader
+	 */
+	@Excluded()
+	public ClassLoader getClassLoader(IResourceIdentifier rid)
+	{
+		ClassLoader ret = null;
+		
+		if(rid==null)
+		{
+			DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
+			ret = new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), delegates);
+		}
+		else
+		{
+			Tuple2<IComponentIdentifier, URL> lid = rid.getLocalIdentifier();
+			
+			// Local case
+			IComponentIdentifier root = ((IComponentIdentifier)provider.getId()).getRoot();
+			if(root.equals(lid.getFirstEntity()))
+			{
+				ret = (ClassLoader)classloaders.get(lid.getSecondEntity());
+				
+				if(ret==null)
+				{
+					URL[] urls = (URL[])classloaders.keySet().toArray(new URL[classloaders.size()]);
+					
+					for(int i=0; ret==null && i<urls.length; i++)
+					{
+						File path = urlToFile(urls[i].toString());
+						File file = urlToFile(lid.getSecondEntity().toString());
+						File tmp = file;
+						while(tmp!=null && ret==null)
+						{
+							if(file.equals(path))
+							{
+								ret = (ClassLoader)classloaders.get(urls[i]);
+							}
+							else
+							{
+								tmp = tmp.getParentFile();
+							}
+						}
+					}
+				}
+			}
+			
+			// Global case
+			// todo:
+		}
+		
+		if(ret==null)
+			throw new RuntimeException("No classloader responsible for: "+rid);
+		
+		return ret;
+	}
+	
 	/**
 	 *  Get a class definition.
 	 *  @param name The class name.
@@ -884,7 +945,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 				getClassLoader(toURL(initurls[i]));
 			}
 		}
-		updateGlobalClassLoader();
+//		updateGlobalClassLoader();
 		
 		// Add new urls.
 		Property[]	entries	= props.getProperties("entry");

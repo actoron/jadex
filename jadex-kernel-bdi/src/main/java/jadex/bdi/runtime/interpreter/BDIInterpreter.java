@@ -735,7 +735,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public ClassLoader getClassLoader()
 	{
-		return model.getModelInfo().getClassLoader();
+//		return model.getModelInfo().getClassLoader();
+		return model.getState().getTypeModel().getClassLoader();
 	}
 	
 	/**

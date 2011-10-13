@@ -74,7 +74,7 @@ public class GpmnXMLReader
 		ret.getModelInfo().setStartable(true);
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
-		ret.setClassloader(classloader);
+		ret.setClassLoader(classloader);
 		String name = new File(rinfo.getFilename()).getName();
 		name = name.substring(0, name.length()-5);
 		ret.setName(name);
@@ -100,7 +100,7 @@ public class GpmnXMLReader
 		
 		ret.setLastModified(rinfo.getLastModified());
 		ret.setFilename(rinfo.getFilename());
-		ret.setClassloader(classloader);
+		ret.setClassLoader(classloader);
 		
 		String name = new File(rinfo.getFilename()).getName();
 		name = name.substring(0, name.length()-5);

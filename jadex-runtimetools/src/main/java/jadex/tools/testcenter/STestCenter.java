@@ -5,6 +5,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.future.DelegationResultListener;
@@ -20,7 +21,7 @@ public class STestCenter
 	/**
 	 *  Check if a component model can be started as test case.
 	 */
-	public static IFuture	isTestcase(final String model, IExternalAccess access)
+	public static IFuture	isTestcase(final String model, IExternalAccess access, final IResourceIdentifier rid)
 	{
 		return access.scheduleImmediate(new IComponentStep<Boolean>()
 		{
@@ -29,13 +30,13 @@ public class STestCenter
 			{
 				final Future	ret	= new Future();
 				final IExternalAccess access	= ia.getExternalAccess();
-				SComponentFactory.isLoadable(access, model).addResultListener(new DelegationResultListener(ret)
+				SComponentFactory.isLoadable(access, model, rid).addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						if(((Boolean)result).booleanValue())
 						{
-							SComponentFactory.loadModel(access, model).addResultListener(new DelegationResultListener(ret)
+							SComponentFactory.loadModel(access, model, rid).addResultListener(new DelegationResultListener(ret)
 							{
 								public void customResultAvailable(Object result)
 								{
@@ -46,8 +47,11 @@ public class STestCenter
 										IArgument[]	results	= model.getResults();
 										for(int i=0; !istest && i<results.length; i++)
 										{
-											if(results[i].getName().equals("testresults") && Testcase.class.equals(results[i].getClazz(model.getClassLoader(), model.getAllImports())))
+											if(results[i].getName().equals("testresults") 
+												&& Testcase.class.equals(results[i].getClazz(model.getClassLoader(), model.getAllImports())))
+											{	
 												istest	= true;
+											}
 										}
 									}
 									

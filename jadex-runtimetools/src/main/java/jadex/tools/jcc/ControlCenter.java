@@ -147,15 +147,16 @@ public class ControlCenter
 		final Future	ret	= new Future();
 		
 		// Read project properties
-		SServiceProvider.getService(jccaccess.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
+//		SServiceProvider.getService(jccaccess.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new SwingDelegationResultListener(ret)
+//		{
+//			public void customResultAvailable(Object result)
 			{
 				Properties	props;
 				try
 				{
-					ClassLoader cl = ((ILibraryService)result).getClassLoader();
+//					ClassLoader cl = ((ILibraryService)result).getClassLoader();
+					ClassLoader cl = getPCC().getClassLoader(null);
 					FileInputStream fis = new FileInputStream(file);
 					props	= (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, cl, null);
 					fis.close();
@@ -195,7 +196,7 @@ public class ControlCenter
 				
 				pcc.setProperties(props).addResultListener(new SwingDelegationResultListener(ret));
 			}
-		});
+//		});
 		
 		return ret;
 	}
@@ -252,16 +253,17 @@ public class ControlCenter
 				
 //				System.out.println("Fetching library service.");
 				// Save properties to file.
-				SServiceProvider.getService(jccaccess.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new SwingDelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
+//				SServiceProvider.getService(jccaccess.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					.addResultListener(new SwingDelegationResultListener(ret)
+//				{
+//					public void customResultAvailable(Object result)
 					{
 						try
 						{
 //							System.out.println("Writing properties.");
 							FileOutputStream os = new FileOutputStream(file);
-							PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
+//							PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
+							PropertiesXMLHelper.getPropertyWriter().write(props, os, getPCC().getClassLoader(null), null);
 							os.close();
 							window.getStatusBar().setText("Settings saved successfully: "+ file.getAbsolutePath());
 							ret.setResult(null);
@@ -272,7 +274,7 @@ public class ControlCenter
 							throw new RuntimeException(e);
 						}
 					}
-				});
+//				});
 			}
 		});
 		

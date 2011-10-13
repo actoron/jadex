@@ -214,7 +214,7 @@ public class ComponentXMLReader
 		if(mi!=null)
 		{
 			mi.setFilename(rinfo.getFilename());
-			mi.setClassloader(classloader);
+//			mi.setClassloader(classloader);
 			mi.setStartable(true);
 
 			if(!mi.checkName())

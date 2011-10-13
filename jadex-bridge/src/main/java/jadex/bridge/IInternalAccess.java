@@ -56,7 +56,7 @@ public interface IInternalAccess
 	/**
 	 *  Kill the component.
 	 */
-	public IFuture killComponent();
+	public IFuture<Void> killComponent();
 	
 	/**
 	 *  Create a result listener that is executed on the

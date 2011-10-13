@@ -1492,11 +1492,14 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					message_maps.add(messages[i].getParameters());
 //				}
 
-				SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
-				{
-					public void customResultAvailable(Object result)
-					{
-						ClassLoader cl = ((ILibraryService)result).getClassLoader();
+//				SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+//						ClassLoader cl = ((ILibraryService)result).getClassLoader();
+						
+						// todo: what is the right classloader here?
+						ClassLoader cl = getJCC().getClassLoader(null);
 						String xml = JavaWriter.objectToXML(new Object[]{componentlist.getAgents(), messagelist.getMessages()}, cl);
 
 						byte buffer[] = xml.getBytes();
@@ -1527,8 +1530,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 							{
 							}
 						}
-					}
-				});		
+//					}
+//				});		
 				
 			}
 		}
@@ -1595,11 +1598,14 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					}
 //				}
 				final String sxml = xml;
-				SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
-				{
-					public void customResultAvailable(Object result)
-					{
-						ClassLoader cl = ((ILibraryService)result).getClassLoader();
+//				SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(comptree)
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+						// todo: what is the right classloader here?
+						ClassLoader cl = getJCC().getClassLoader(null);
+
+						//ClassLoader cl = ((ILibraryService)result).getClassLoader();
 						
 						Object[] stored = (Object[])JavaReader.objectFromXML(sxml, cl);
 						
@@ -1614,8 +1620,8 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 							messagelist.addMessage(messages[i]);
 						
 						messagelist.fireMessagesAdded(messages);
-					}
-				});
+//					}
+//				});
 			}
 		}
 	};

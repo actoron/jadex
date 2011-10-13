@@ -1,6 +1,7 @@
 package jadex.bdi;
 
 import jadex.bdi.model.editable.IMECapability;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Reference;
 
@@ -16,7 +17,7 @@ public interface IDynamicBDIFactory
 	 *  @param pkg	Optional package for the model.
 	 *  @param imports	Optional imports for the model.
 	 */
-	public @Reference IMECapability	createAgentModel(String name, String pkg, String[] imports);
+	public @Reference IMECapability	createAgentModel(String name, String pkg, String[] imports, IResourceIdentifier rid);
 
 	/**
 	 *  Register a manually edited agent model in the factory.

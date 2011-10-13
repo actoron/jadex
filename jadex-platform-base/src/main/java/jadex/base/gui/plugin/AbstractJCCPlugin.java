@@ -169,6 +169,54 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 
 	//-------- helper methods --------
 	
+//	/**
+//	 *  Find the class loader for a component.
+//	 *  Use component class loader for local components
+//	 *  and current platform class loader for remote components.
+//	 *  @param cid	The component id.
+//	 *  @return	The class loader.
+//	 */
+//	public static IFuture getClassLoader(final IComponentIdentifier cid, final IControlCenter jcc)
+//	{
+//		final Future	ret	= new Future();
+//		
+//		// Local component when platform name is same as JCC platform name
+//		if(cid.getPlatformName().equals(jcc.getJCCAccess().getComponentIdentifier().getPlatformName()))
+//		{
+//			SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				.addResultListener(new DelegationResultListener(ret)
+//			{
+//				public void customResultAvailable(Object result)
+//				{
+//					IComponentManagementService	cms	= (IComponentManagementService)result;
+//					cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
+//					{
+//						public void customResultAvailable(Object result)
+//						{
+//							IExternalAccess	ea	= (IExternalAccess)result;
+//							ret.setResult(ea.getModel().getClassLoader());
+//						}
+//					});
+//				}
+//			});
+//		}
+//		
+//		// Remote component
+//		else
+//		{
+//			SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				.addResultListener(new DelegationResultListener(ret)
+//			{
+//				public void customResultAvailable(Object result)
+//				{
+//					ILibraryService	ls	= (ILibraryService)result;
+//					ret.setResult(ls.getClassLoader());
+//				}
+//			});
+//		}
+//		return ret;
+//	}
+	
 	/**
 	 *  Find the class loader for a component.
 	 *  Use component class loader for local components
@@ -180,40 +228,28 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	{
 		final Future	ret	= new Future();
 		
-		// Local component when platform name is same as JCC platform name
-		if(cid.getPlatformName().equals(jcc.getJCCAccess().getComponentIdentifier().getPlatformName()))
+		SServiceProvider.getServiceUpwards(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class)
+			.addResultListener(new DelegationResultListener<IComponentManagementService>(ret)
 		{
-			SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DelegationResultListener(ret)
+			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				public void customResultAvailable(Object result)
+				cms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
 				{
-					IComponentManagementService	cms	= (IComponentManagementService)result;
-					cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
+					public void customResultAvailable(final IExternalAccess exta)
 					{
-						public void customResultAvailable(Object result)
+						SServiceProvider.getServiceUpwards(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class)
+							.addResultListener(new DelegationResultListener<ILibraryService>(ret)
 						{
-							IExternalAccess	ea	= (IExternalAccess)result;
-							ret.setResult(ea.getModel().getClassLoader());
-						}
-					});
-				}
-			});
-		}
+							public void customResultAvailable(final ILibraryService libservice)
+							{
+								ret.setResult(libservice.getClassLoader(exta.getModel().getResourceIdentifier()));
+							}
+						});
+					}
+				});
+			}
+		});
 		
-		// Remote component
-		else
-		{
-			SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DelegationResultListener(ret)
-			{
-				public void customResultAvailable(Object result)
-				{
-					ILibraryService	ls	= (ILibraryService)result;
-					ret.setResult(ls.getClassLoader());
-				}
-			});
-		}
 		return ret;
 	}
 	

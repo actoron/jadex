@@ -11,11 +11,13 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.threadpool.IThreadPoolService;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
@@ -25,6 +27,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
+import jadex.gpmn.model.MGpmnModel;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -67,6 +70,9 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	protected BDIAgentFactory factory;
 	//protected IComponentFactory factory;
 	
+	/** The library service. */
+	protected ILibraryService libservice;
+	
 	/** The properties. */
 	protected Map properties;
 	
@@ -87,22 +93,35 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	
 	public IFuture<Void> startService()
 	{
-		final IFuture<Void> sfuture = super.startService();
+//		final IFuture<Void> sfuture = super.startService();
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(ia.getServiceContainer(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DefaultResultListener()
+		
+		SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
-				IThreadPoolService tps = (IThreadPoolService) result;
-				Map bdiprops = new HashMap();
-				bdiprops.put("planexecutor_standard", new JavaStandardPlanExecutor(tps));
-				bdiprops.put("microplansteps", Boolean.TRUE);
-				bdiprops.put("planexecutor_bpmn", new BpmnPlanExecutor());
-				factory = new BDIAgentFactory(bdiprops, ia);
-				factory.startService();
-				sfuture.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+				libservice = (ILibraryService)result;
+//				libservice.addLibraryServiceListener(libservicelistener);
+				
+				SServiceProvider.getService(ia.getServiceContainer(), IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DefaultResultListener()
+				{
+					public void resultAvailable(Object result)
+					{
+						IThreadPoolService tps = (IThreadPoolService) result;
+						Map bdiprops = new HashMap();
+						bdiprops.put("planexecutor_standard", new JavaStandardPlanExecutor(tps));
+						bdiprops.put("microplansteps", Boolean.TRUE);
+						bdiprops.put("planexecutor_bpmn", new BpmnPlanExecutor());
+						factory = new BDIAgentFactory(bdiprops, ia);
+						factory.startService();
+//						sfuture.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+						GpmnFactory.super.startService().addResultListener(new DelegationResultListener(ret));
+					}
+				}));
 			}
-		}));
+		});
+		
 		return ret;
 	}
 	
@@ -121,7 +140,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(String model, String[] imports, ClassLoader classloader)
+	public IFuture<IModelInfo> loadModel(String model, String[] imports, IResourceIdentifier rid)
 	{
 		// Todo: support imports for GPMN models (-> use abstract model loader). 
 		Future<IModelInfo> ret = new Future<IModelInfo>();
@@ -129,10 +148,10 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		{
 //			ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 //			ClassLoader	cl = libservice.getClassLoader();
-			ResourceInfo rinfo = SUtil.getResourceInfo0(model, classloader);
+			ResourceInfo rinfo = SUtil.getResourceInfo0(model, libservice.getClassLoader(rid));
 			BufferedReader br = new BufferedReader(new InputStreamReader(rinfo.getInputStream()));
 			br.readLine();
-			ret.setResult(GpmnXMLReader.read(model, classloader, null).getModelInfo());
+			ret.setResult(GpmnXMLReader.read(model, libservice.getClassLoader(rid), null).getModelInfo());
 		}
 		catch(Exception e)
 		{
@@ -147,7 +166,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture<Boolean> isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<Boolean>(model.endsWith(".gpmn")? Boolean.TRUE: Boolean.FALSE);
 	}
@@ -158,7 +177,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<Boolean>(model.endsWith(".gpmn")? Boolean.TRUE: Boolean.FALSE);
 	}
@@ -184,7 +203,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public IFuture<String> getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<String>(model.toLowerCase().endsWith(".gpmn") ? FILETYPE_GPMNPROCESS: null);
 	}
@@ -203,16 +222,19 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	{
 //		ILibraryService libservice = (ILibraryService)container.getService(ILibraryService.class);
 		System.out.println(factory.getClass().toString());
+		
 		try
 		{
+			MGpmnModel amodel = (MGpmnModel)loader.loadModel(modelinfo.getFilename(), null, libservice.getClassLoader(modelinfo.getResourceIdentifier()));
+
 			Object ret = null;
-			ResourceInfo rinfo = SUtil.getResourceInfo0(modelinfo.getFilename(), modelinfo.getClassLoader());
-			BufferedReader br = new BufferedReader(new InputStreamReader(rinfo.getInputStream()));
-			br.readLine();
+//			ResourceInfo rinfo = SUtil.getResourceInfo0(modelinfo.getFilename(), modelinfo.getClassLoader());
+//			BufferedReader br = new BufferedReader(new InputStreamReader(rinfo.getInputStream()));
+//			br.readLine();
+//			ret = GpmnXMLReader.read(modelinfo.getFilename(), modelinfo.getClassLoader(), null);
 			
-			ret = GpmnXMLReader.read(modelinfo.getFilename(), modelinfo.getClassLoader(), null);
-			
-			ret = converter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)ret, modelinfo.getClassLoader());
+//			ret = converter.convertGpmnModelToBDIAgents((jadex.gpmn.model.MGpmnModel)ret, modelinfo.getClassLoader());
+			ret = converter.convertGpmnModelToBDIAgents(amodel, amodel.getClassLoader());
 	
 			//factory.createComponentAdapter(desc, model, instance, parent);
 			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(this.factory.createComponentInstance(desc, factory, (OAVAgentModel)ret, config, arguments, parent, bindings, copy, inited));

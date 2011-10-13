@@ -7,6 +7,7 @@ import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentFactoryExtensionService;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
@@ -70,6 +71,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	/** The provider. */
 	protected IServiceProvider provider;
 	
+	/** The library service. */
+	protected ILibraryService libservice;
+	
 	/** The library service listener */
 	protected ILibraryServiceListener libservicelistener;
 	
@@ -119,7 +123,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 				{
 					public void customResultAvailable(Object result)
 					{
-						final ILibraryService libservice = (ILibraryService)result;
+						libservice = (ILibraryService)result;
 						
 						SServiceProvider.getServices(provider, IComponentFactoryExtensionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new DelegationResultListener(ret)
@@ -179,14 +183,15 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 */
 	public IFuture<Void> shutdownService()
 	{
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				ILibraryService libService = (ILibraryService) result;
-				libService.removeLibraryServiceListener(libservicelistener);
-			}
-		});
+		libservice.removeLibraryServiceListener(libservicelistener);
+//		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				ILibraryService libService = (ILibraryService) result;
+//				libService.removeLibraryServiceListener(libservicelistener);
+//			}
+//		});
 		return super.shutdownService();
 	}
 	
@@ -198,13 +203,14 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(String model, String[] imports, ClassLoader classloader)
+	public IFuture<IModelInfo> loadModel(String model, String[] imports, IResourceIdentifier rid)
 	{
 		Future<IModelInfo> ret = new Future<IModelInfo>();
 //		System.out.println("filename: "+filename);
 		try
 		{
-			ret.setResult(loader.loadApplicationModel(model, imports, classloader).getModelInfo());
+			ret.setResult(loader.loadApplicationModel(model, imports, 
+				libservice.getClassLoader(rid)).getModelInfo());
 		}
 		catch(Exception e)
 		{
@@ -228,7 +234,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	{
 		try
 		{
-			CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, modelinfo.getClassLoader());
+			CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier()));
 			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret);
 			
 			// todo: result listener?
@@ -249,7 +255,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param The imports (if any).
 	 *  @return True, if model can be loaded.
 	 */
-	public IFuture<Boolean> isLoadable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<Boolean>(model.endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION));
 	}
@@ -260,7 +266,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(String model, String[] imports, ClassLoader classloader)
+	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<Boolean>(model.endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION));
 	}
@@ -288,7 +294,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param model The model (e.g. file name).
 	 *  @param The imports (if any).
 	 */
-	public IFuture<String> getComponentType(String model, String[] imports, ClassLoader classloader)
+	public IFuture<String> getComponentType(String model, String[] imports, IResourceIdentifier rid)
 	{
 		return new Future<String>(model.toLowerCase().endsWith(ApplicationModelLoader.FILE_EXTENSION_APPLICATION)? FILETYPE_APPLICATION: null);
 	}

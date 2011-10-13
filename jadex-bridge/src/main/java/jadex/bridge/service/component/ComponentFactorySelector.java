@@ -2,6 +2,7 @@ package jadex.bridge.service.component;
 
 import jadex.bridge.FactoryFilter;
 import jadex.bridge.IComponentFactory;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.BasicResultSelector;
 import jadex.bridge.service.IService;
 
@@ -21,9 +22,9 @@ public class ComponentFactorySelector extends BasicResultSelector
 	 *  @param imports	The imports (if any).
 	 *  @param classloader	The class loader (if any).
 	 */
-	public ComponentFactorySelector(String model, String[] imports, ClassLoader classloader)
+	public ComponentFactorySelector(String model, String[] imports, IResourceIdentifier rid)
 	{
-		super(new FactoryFilter(model, imports, classloader));
+		super(new FactoryFilter(model, imports, rid));
 	}
 	
 	/**

@@ -37,7 +37,7 @@ public class BroadcastSendHandler extends MasterSlaveSendHandler
 	{
 		try
 		{
-			byte[] data = DiscoveryState.encodeObject(info, getAgent().getMicroAgent().getModel().getClassLoader());
+			byte[] data = DiscoveryState.encodeObject(info, getAgent().getMyClassLoader());
 	
 //			System.out.println("packet size: "+data.length);
 

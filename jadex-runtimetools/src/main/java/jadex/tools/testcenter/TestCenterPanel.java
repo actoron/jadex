@@ -286,10 +286,10 @@ public class TestCenterPanel extends JSplitPanel
 				if(loadsavechooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this)
 					, "Save")==JFileChooser.APPROVE_OPTION)
 				{
-					SServiceProvider.getService(plugin.getJCC().getJCCAccess().getServiceProvider(),
-						ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
-					{
-						public void customResultAvailable(Object result)
+//					SServiceProvider.getService(plugin.getJCC().getJCCAccess().getServiceProvider(),
+//						ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
+//					{
+//						public void customResultAvailable(Object result)
 						{
 							try
 							{
@@ -302,7 +302,8 @@ public class TestCenterPanel extends JSplitPanel
 										loadsavechooser.setSelectedFile(file);
 									}
 									FileWriter fos = new FileWriter(file);
-									fos.write(JavaWriter.objectToXML(teststable.getEntries(), ((ILibraryService)result).getClassLoader()));
+//									fos.write(JavaWriter.objectToXML(teststable.getEntries(), ((ILibraryService)result).getClassLoader()));
+									fos.write(JavaWriter.objectToXML(teststable.getEntries(), plugin.getJCC().getJCCAccess().getModel().getClassLoader()));
 									fos.close();
 								}
 							}
@@ -311,7 +312,7 @@ public class TestCenterPanel extends JSplitPanel
 								e.printStackTrace();
 							}
 						}
-					});
+//					});
 				}
 			}
 		});
@@ -323,10 +324,10 @@ public class TestCenterPanel extends JSplitPanel
 				if(loadsavechooser.showDialog(SGUI.getWindowParent(TestCenterPanel.this)
 					, "Load")==JFileChooser.APPROVE_OPTION)
 				{
-					SServiceProvider.getServiceUpwards(plugin.getJCC().getJCCAccess().getServiceProvider(),
-						ILibraryService.class).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
-					{
-						public void customResultAvailable(Object result) 
+//					SServiceProvider.getServiceUpwards(plugin.getJCC().getJCCAccess().getServiceProvider(),
+//						ILibraryService.class).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
+//					{
+//						public void customResultAvailable(Object result) 
 						{
 							File file = loadsavechooser.getSelectedFile();
 							if(file!=null)
@@ -341,7 +342,8 @@ public class TestCenterPanel extends JSplitPanel
 									{
 										out.append(new String(b, 0, n));
 									}
-									String[] names = (String[])JavaReader.objectFromXML(out.toString(), ((ILibraryService)result).getClassLoader());
+//									String[] names = (String[])JavaReader.objectFromXML(out.toString(), ((ILibraryService)result).getClassLoader());
+									String[] names = (String[])JavaReader.objectFromXML(out.toString(), plugin.getJCC().getJCCAccess().getModel().getClassLoader());
 									teststable.setEntries(names);
 								}
 								catch(Exception e)
@@ -362,7 +364,7 @@ public class TestCenterPanel extends JSplitPanel
 								}
 							}
 						};
-					});
+//					});
 				}
 			}
 		});

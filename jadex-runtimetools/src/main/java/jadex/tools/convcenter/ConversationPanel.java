@@ -12,6 +12,7 @@ import jadex.bridge.MessageType;
 import jadex.bridge.MessageType.ParameterSpecification;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
@@ -627,13 +628,14 @@ public class ConversationPanel extends JSplitPane
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				final Future	ret	= new Future();
+						
 				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						IMessageService	ms	= (IMessageService)result;
-						ms.sendMessage(sendmsg, mt, ia.getComponentIdentifier(), ia.getModel().getClassLoader(), null)
+						ms.sendMessage(sendmsg, mt, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), null)
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					}
 				}));

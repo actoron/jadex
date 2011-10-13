@@ -1,5 +1,6 @@
 package jadex.base.gui.componentviewer;
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentStep;
@@ -7,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -89,89 +91,98 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		AbstractJCCPlugin.getClassLoader(exta.getComponentIdentifier(), jcc)
-			.addResultListener(new DefaultResultListener()
+		SServiceProvider.getServiceUpwards(getJCC().getJCCAccess().getServiceProvider(), ILibraryService.class)
+			.addResultListener(new SwingDefaultResultListener(getComponent())
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
-				final ClassLoader cl = (ClassLoader)result;
+				final ILibraryService ls = (ILibraryService)result;
 		
-				final List panels = new ArrayList();
-				
-				final CollectionResultListener lis = new CollectionResultListener(
-					services.size()+1, true, new DelegationResultListener(ret)
+				AbstractJCCPlugin.getClassLoader(exta.getComponentIdentifier(), jcc)
+					.addResultListener(new DefaultResultListener()
 				{
-					public void customResultAvailable(Object result) 
+					public void resultAvailable(Object result)
 					{
-		//				if(subpanels.size()==1)
-		//				{
-		//					Object[] tmp = (Object[])subpanels.get(0);
-		//					add(((IComponentViewerPanel)tmp[1]).getComponent(), BorderLayout.CENTER);
-		//				}
-		//				else if(subpanels.size()>1)
+						final ClassLoader cl = (ClassLoader)result;
+				
+						final List panels = new ArrayList();
+						
+						final CollectionResultListener lis = new CollectionResultListener(
+							services.size()+1, true, new DelegationResultListener(ret)
 						{
-							JTabbedPane tp = new JTabbedPane();
-							for(int i=0; i<panels.size(); i++)
+							public void customResultAvailable(Object result) 
 							{
-								Object[] tmp = (Object[])panels.get(i);
-								tp.addTab((String)tmp[0], ((IAbstractViewerPanel)tmp[1]).getComponent());
-							}
-							panel.add(tp, BorderLayout.CENTER);
-						}
-						super.customResultAvailable(result);
-					}	
-				});
-				
-				// Component panel.
-				Object clid = exta.getModel().getProperty(PROPERTY_COMPONENTVIEWERCLASS);
-				Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
-				if(clid!=null)
-				{
-					try
-					{
-						IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
-						panels.add(new Object[]{"component", panel});
-						panel.init(jcc, getActiveComponent()).addResultListener(lis);
-					}
-					catch(Exception e)
-					{
-						lis.exceptionOccurred(e);
-					}
-				}
-				else 
-				{
-					lis.exceptionOccurred(new RuntimeException("No viewerclass: "+clid));
-				}
-				
-				// Service panels.
-				if(services!=null)
-				{
-					for(int i=0; i<services.size(); i++)
-					{
-						IService ser = (IService)services.get(i);
-						clid = ser.getPropertyMap()!=null ? ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
-						clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
+				//				if(subpanels.size()==1)
+				//				{
+				//					Object[] tmp = (Object[])subpanels.get(0);
+				//					add(((IComponentViewerPanel)tmp[1]).getComponent(), BorderLayout.CENTER);
+				//				}
+				//				else if(subpanels.size()>1)
+								{
+									JTabbedPane tp = new JTabbedPane();
+									for(int i=0; i<panels.size(); i++)
+									{
+										Object[] tmp = (Object[])panels.get(i);
+										tp.addTab((String)tmp[0], ((IAbstractViewerPanel)tmp[1]).getComponent());
+									}
+									panel.add(tp, BorderLayout.CENTER);
+								}
+								super.customResultAvailable(result);
+							}	
+						});
+						
+						// Component panel.
+						Object clid = exta.getModel().getProperty(PROPERTY_COMPONENTVIEWERCLASS, ls);
+						Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
 						if(clid!=null)
 						{
 							try
 							{
-								IServiceViewerPanel panel = (IServiceViewerPanel)clazz.newInstance();
-								panels.add(new Object[]{SReflect.getInnerClassName(ser.getServiceIdentifier().getServiceType()), panel});
-								panel.init(jcc, ser).addResultListener(lis);
+								IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
+								panels.add(new Object[]{"component", panel});
+								panel.init(jcc, getActiveComponent()).addResultListener(lis);
 							}
 							catch(Exception e)
 							{
-								System.out.println("err: "+clid+" "+clazz);
-								e.printStackTrace();
 								lis.exceptionOccurred(e);
 							}
 						}
-						else
+						else 
 						{
-							lis.exceptionOccurred(null);
+							lis.exceptionOccurred(new RuntimeException("No viewerclass: "+clid));
+						}
+						
+						// Service panels.
+						if(services!=null)
+						{
+							for(int i=0; i<services.size(); i++)
+							{
+								IService ser = (IService)services.get(i);
+								clid = ser.getPropertyMap()!=null ? ser.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
+								clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
+								if(clid!=null)
+								{
+									try
+									{
+										IServiceViewerPanel panel = (IServiceViewerPanel)clazz.newInstance();
+										panels.add(new Object[]{SReflect.getInnerClassName(ser.getServiceIdentifier().getServiceType()), panel});
+										panel.init(jcc, ser).addResultListener(lis);
+									}
+									catch(Exception e)
+									{
+										System.out.println("err: "+clid+" "+clazz);
+										e.printStackTrace();
+										lis.exceptionOccurred(e);
+									}
+								}
+								else
+								{
+									lis.exceptionOccurred(null);
+								}
+							}
 						}
 					}
-				}
+				});
 			}
 		});
 		return ret;
