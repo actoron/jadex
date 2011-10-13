@@ -46,7 +46,7 @@ public interface IComponentInstance
 	 *  @param comp	The newly created component.
 	 */
 	// todo: Use parent->child creation config information instead of model (e.g. role in AGR!?)
-	public IFuture	componentCreated(IComponentDescription desc, IModelInfo model);
+	public IFuture<Void>	componentCreated(IComponentDescription desc, IModelInfo model);
 
 	/**
 	 *  Called when a subcomponent of this component has been destroyed.
@@ -54,7 +54,7 @@ public interface IComponentInstance
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The destroyed component.
 	 */
-	public IFuture	componentDestroyed(IComponentDescription desc);
+	public IFuture<Void>	componentDestroyed(IComponentDescription desc);
 
 	/**
 	 *  Can be called concurrently (also during executeAction()).
@@ -65,7 +65,7 @@ public interface IComponentInstance
 	 *  Can be called concurrently (also during executeAction()).
 	 *  @return When cleanup of the component is finished, the future is notified.
 	 */
-	public IFuture cleanupComponent();
+	public IFuture<Void> cleanupComponent();
 	
 	/**
 	 *  Can be called concurrently (also during executeAction()).
@@ -94,7 +94,7 @@ public interface IComponentInstance
 	 *  terminated (i.e. no invokerLater can be used).
 	 *  @return The results map (name -> value). 
 	 */
-	public Map getResults();
+	public Map<String, Object> getResults();
 	
 	/**
 	 *  Get a property of the component.

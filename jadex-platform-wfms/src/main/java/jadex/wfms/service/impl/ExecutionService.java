@@ -93,7 +93,8 @@ public class ExecutionService implements IExecutionService
 				final IComponentManagementService cms = (IComponentManagementService) result;
 				
 				CreationInfo ci = new CreationInfo(null, arguments, ia.getComponentIdentifier(), true);
-				ci.setPlatformloader(true);
+				// Todo: what is platform loader for!?
+//				ci.setPlatformloader(true);
 				String prefix = modelname.substring(Math.max(modelname.lastIndexOf("/"), 0) + 1);
 				prefix = prefix.substring(0, Math.min(prefix.lastIndexOf("."), prefix.length()));
 				ByteBuffer b = ByteBuffer.allocate(8);

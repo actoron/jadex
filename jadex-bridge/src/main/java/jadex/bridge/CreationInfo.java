@@ -18,10 +18,13 @@ public class CreationInfo
 	protected String	config;
 	
 	/** The arguments (map with name/value pairs). */
-	protected Map	args;
+	protected Map<String, Object>	args;
 	
 	/** The parent component. */
 	protected IComponentIdentifier	parent;
+	
+	/** The resource identifier. */
+	protected IResourceIdentifier	rid;
 	
 	/** The suspend flag (default: false). */
 	protected Boolean suspend;
@@ -35,8 +38,8 @@ public class CreationInfo
 	/** The auto shutdown flag (default: false). */
 	protected Boolean autoshutdown;
 	
-	/** The platform classloader flag (default: false). */
-	protected Boolean platformloader;
+//	/** The platform classloader flag (default: false). */
+//	protected Boolean platformloader;
 	
 	/** The imports. */
 	protected String[] imports;
@@ -70,7 +73,7 @@ public class CreationInfo
 	 *  Create a new creation info.
 	 *  @param args	The arguments.
 	 */
-	public CreationInfo(Map args)
+	public CreationInfo(Map<String, Object> args)
 	{
 		this(null, args);
 	}
@@ -80,7 +83,7 @@ public class CreationInfo
 	 *  @param config	The configuration.
 	 *  @param args	The arguments.
 	 */
-	public CreationInfo(String config, Map args)
+	public CreationInfo(String config, Map<String, Object> args)
 	{
 		this(config, args, null);
 	}
@@ -90,7 +93,7 @@ public class CreationInfo
 	 *  @param args	The arguments.
 	 *  @param parent	The parent of the component to be created.
 	 */
-	public CreationInfo(Map args, IComponentIdentifier parent)
+	public CreationInfo(Map<String, Object> args, IComponentIdentifier parent)
 	{
 		this(null, args, parent);
 	}
@@ -101,7 +104,7 @@ public class CreationInfo
 	 *  @param args	The arguments.
 	 *  @param parent	The parent of the component to be created.
 	 */
-	public CreationInfo(String config, Map args, IComponentIdentifier parent)
+	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent)
 	{
 		this(config, args, parent, null, (String[])null);
 	}
@@ -115,7 +118,7 @@ public class CreationInfo
 	 *  @param master	The master flag.
 	 *  @param imports	The imports.
 	 */
-	public CreationInfo(String config, Map args, IComponentIdentifier parent, boolean suspend)
+	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, boolean suspend)
 	{
 		this(config, args, parent, null, (String[])null);
 	}
@@ -129,7 +132,7 @@ public class CreationInfo
 	 *  @param master	The master flag.
 	 *  @param imports	The imports.
 	 */
-	public CreationInfo(String config, Map args, IComponentIdentifier parent, Boolean suspend, String[] imports)
+	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, String[] imports)
 	{
 		this(config, args, parent, null, null, null, null, imports, null);
 	}
@@ -142,7 +145,7 @@ public class CreationInfo
 	 *  @param suspend	The suspend flag.
 	 *  @param master	The master flag.
 	 */
-	public CreationInfo(String config, Map args, IComponentIdentifier parent, Boolean suspend, Boolean master)
+	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, Boolean master)
 	{
 		this(config, args, parent, suspend, master, null);
 	}
@@ -155,7 +158,7 @@ public class CreationInfo
 	 *  @param suspend	The suspend flag.
 	 *  @param master	The master flag.
 	 */
-	public CreationInfo(String config, Map args, IComponentIdentifier parent, Boolean suspend, Boolean master, Boolean daemon)
+	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, Boolean master, Boolean daemon)
 	{
 		this(config, args, parent, suspend, master, daemon, null);
 	}
@@ -168,7 +171,7 @@ public class CreationInfo
 	 *  @param suspend	The suspend flag.
 	 *  @param master	The master flag.
 	 */
-	public CreationInfo(String config, Map args, IComponentIdentifier parent, Boolean suspend, 
+	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, 
 		Boolean master, Boolean daemon, Boolean autoshutdown)
 	{
 		this(config, args, parent, suspend, master, daemon, autoshutdown, null, null);
@@ -183,7 +186,7 @@ public class CreationInfo
 	 *  @param master	The master flag.
 	 *  @param imports	The imports.
 	 */
-	public CreationInfo(String config, Map args, IComponentIdentifier parent, 
+	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, 
 		Boolean suspend, Boolean master, Boolean daemon, Boolean autoshutdown, 
 		String[] imports, RequiredServiceBinding[] bindings)
 	{
@@ -222,7 +225,7 @@ public class CreationInfo
 	 *  Get the arguments.
 	 *  @return the args.
 	 */
-	public Map getArguments()
+	public Map<String, Object> getArguments()
 	{
 		return args;
 	}
@@ -231,7 +234,7 @@ public class CreationInfo
 	 *  Set the arguments.
 	 *  @param args the args to set
 	 */
-	public void setArguments(Map args)
+	public void setArguments(Map<String, Object> args)
 	{
 		this.args = args;
 	}
@@ -252,6 +255,24 @@ public class CreationInfo
 	public void setParent(IComponentIdentifier parent)
 	{
 		this.parent = parent;
+	}
+
+	/**
+	 *  Get the resource identifier for loading the component model.
+	 *  @return the resource identifier.
+	 */
+	public IResourceIdentifier getResourceIdentifier()
+	{
+		return rid;
+	}
+
+	/**
+	 *  Set the resource identifier for loading the component model.
+	 *  @param rid the resource identifier to set
+	 */
+	public void setResourceIdentifier(IResourceIdentifier rid)
+	{
+		this.rid = rid;
 	}
 
 	/**
@@ -326,15 +347,15 @@ public class CreationInfo
 		this.autoshutdown = autoshutdown;
 	}
 	
-	public Boolean getPlatformloader()
-	{
-		return platformloader;
-	}
-	
-	public void setPlatformloader(Boolean platformloader)
-	{
-		this.platformloader = platformloader;
-	}
+//	public Boolean getPlatformloader()
+//	{
+//		return platformloader;
+//	}
+//	
+//	public void setPlatformloader(Boolean platformloader)
+//	{
+//		this.platformloader = platformloader;
+//	}
 
 	/**
 	 *  Get the imports.
