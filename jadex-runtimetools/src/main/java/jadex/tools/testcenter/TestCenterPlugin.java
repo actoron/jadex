@@ -3,17 +3,23 @@ package jadex.tools.testcenter;
 import jadex.base.SComponentFactory;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
+import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.modeltree.AddPathAction;
 import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.modeltree.RemovePathAction;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISettingsService;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.LibraryService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
@@ -29,6 +35,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,6 +49,7 @@ import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.UIDefaults;
+import javax.swing.tree.TreePath;
 
 /**
  *  Plugin for the test center.
@@ -234,6 +242,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 				{
 					if(e.getClickCount() == 2)
 					{
+						TreePath selpath = mpanel.getTree().getPathForRow(row);
 						Object	node = mpanel.getTree().getPathForRow(row).getLastPathComponent();
 						if(node instanceof IFileNode)
 						{
@@ -252,7 +261,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 							{
 								mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 								final String model = ((IFileNode)node).getFilePath();
-								STestCenter.isTestcase(model, getJCC().getPlatformAccess())
+								STestCenter.isTestcase(model, getJCC().getPlatformAccess(), createResourceIdentifier((IFileNode)selpath.getPathComponent(1)))
 									.addResultListener(new SwingDefaultResultListener(mpanel)
 								{
 									public void customResultAvailable(Object result)
@@ -477,8 +486,13 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 				final int[]	cnt	= new int[1];	
 				for(int i=0; i<leafs.size(); i++)
 				{
-					final String	model	= ((IFileNode)leafs.get(i)).getFilePath();
-					STestCenter.isTestcase(model, getJCC().getPlatformAccess()).addResultListener(new SwingDefaultResultListener(mpanel)
+					IFileNode node = (IFileNode)leafs.get(i);
+					ITreeNode base = node;
+					while(base.getParent()!=null && base.getParent().getParent()!=null)
+						base = base.getParent();
+					final String	model	= node.getFilePath();
+					
+					STestCenter.isTestcase(model, getJCC().getPlatformAccess(), createResourceIdentifier((IFileNode)base)).addResultListener(new SwingDefaultResultListener(mpanel)
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -612,4 +626,21 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 			return node!=null && node.isDirectory();
 		}
 	};
+	
+	/**
+	 *  Create a resource identifier.
+	 */
+	public IResourceIdentifier createResourceIdentifier(IFileNode base)
+	{
+		// Get the first child of selection path as url
+//		TreePath selpath = mpanel.getTree().getSelectionModel().getSelectionPath();
+//		Object tmp = selpath.getPathComponent(1);
+		Tuple2<IComponentIdentifier, URL> lid = null;
+		URL url = LibraryService.toURL(base.getFilePath());
+		IComponentIdentifier root = mpanel.getExternalAccess().getComponentIdentifier().getRoot();
+		lid = new Tuple2<IComponentIdentifier, URL>(root, url);
+		// todo: construct global identifier
+		ResourceIdentifier rid = new ResourceIdentifier(lid, null);
+		return rid;
+	}
 }

@@ -303,7 +303,8 @@ public class TestCenterPanel extends JSplitPanel
 									}
 									FileWriter fos = new FileWriter(file);
 //									fos.write(JavaWriter.objectToXML(teststable.getEntries(), ((ILibraryService)result).getClassLoader()));
-									fos.write(JavaWriter.objectToXML(teststable.getEntries(), plugin.getJCC().getJCCAccess().getModel().getClassLoader()));
+//									fos.write(JavaWriter.objectToXML(teststable.getEntries(), plugin.getJCC().getJCCAccess().getModel().getClassLoader()));
+									fos.write(JavaWriter.objectToXML(teststable.getEntries(), plugin.getJCC().getClassLoader(null)));
 									fos.close();
 								}
 							}
@@ -343,7 +344,8 @@ public class TestCenterPanel extends JSplitPanel
 										out.append(new String(b, 0, n));
 									}
 //									String[] names = (String[])JavaReader.objectFromXML(out.toString(), ((ILibraryService)result).getClassLoader());
-									String[] names = (String[])JavaReader.objectFromXML(out.toString(), plugin.getJCC().getJCCAccess().getModel().getClassLoader());
+//									String[] names = (String[])JavaReader.objectFromXML(out.toString(), plugin.getJCC().getJCCAccess().getModel().getClassLoader());
+									String[] names = (String[])JavaReader.objectFromXML(out.toString(), plugin.getJCC().getClassLoader(null));
 									teststable.setEntries(names);
 								}
 								catch(Exception e)

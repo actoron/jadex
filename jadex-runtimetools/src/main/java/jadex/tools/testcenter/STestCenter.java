@@ -8,6 +8,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -40,22 +42,44 @@ public class STestCenter
 							{
 								public void customResultAvailable(Object result)
 								{
-									boolean	istest	= false;
-									IModelInfo model = (IModelInfo)result;
+									final IModelInfo model = (IModelInfo)result;
+									
 									if(model!=null && model.getReport()==null)
 									{
-										IArgument[]	results	= model.getResults();
-										for(int i=0; !istest && i<results.length; i++)
+										final IArgument[]	results	= model.getResults();
+										access.scheduleStep(new IComponentStep<Void>()
 										{
-											if(results[i].getName().equals("testresults") 
-												&& Testcase.class.equals(results[i].getClazz(model.getClassLoader(), model.getAllImports())))
-											{	
-												istest	= true;
+											public IFuture<Void> execute(IInternalAccess ia)
+											{
+												SServiceProvider.getServiceUpwards(ia.getServiceContainer(), ILibraryService.class)
+													.addResultListener(new DelegationResultListener(ret)
+												{
+													public void customResultAvailable(Object lib)
+													{
+														ILibraryService ls = (ILibraryService)lib;
+														boolean	istest	= false;
+														for(int i=0; !istest && i<results.length; i++)
+														{
+															if(results[i].getName().equals("testresults") 
+																&& Testcase.class.equals(results[i].getClazz(ls.getClassLoader(model.getResourceIdentifier()), model.getAllImports())))
+															{	
+																istest	= true;
+															}
+														}
+														ret.setResult(istest? Boolean.TRUE: Boolean.FALSE);
+													}
+												});
+												
+												return IFuture.DONE;
 											}
-										}
+										});
+									}
+									else
+									{
+										ret.setResult(Boolean.FALSE);
 									}
 									
-									ret.setResult(Boolean.valueOf(istest));
+//									ret.setResult(Boolean.valueOf(istest));
 								}
 							});
 						}
