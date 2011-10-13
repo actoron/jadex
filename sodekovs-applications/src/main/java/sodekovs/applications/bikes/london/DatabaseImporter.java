@@ -76,13 +76,15 @@ public class DatabaseImporter {
 					CSVReader csvReader = new CSVReader(br);
 					List<String[]> lines = csvReader.readAll();
 
-					importer.log("Parsed " + lines.size() + " lines");
-					for (String[] line : lines) {
-						importer.insertLine(line);
-					}
-
 					csvReader.close();
 					br.close();
+
+					importer.log("Parsed " + lines.size() + " lines");
+					// the first line contains the header so we ignore it
+					for (int i = 1; i < lines.size(); i++) {
+						String[] line = lines.get(i);
+						importer.insertLine(line);
+					}
 
 					importer.log("Finished parsing " + csvFile);
 				} catch (FileNotFoundException e) {
