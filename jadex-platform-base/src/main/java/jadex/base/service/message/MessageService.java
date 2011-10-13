@@ -627,7 +627,7 @@ public class MessageService extends BasicService implements IMessageService
 									public void customResultAvailable(Object result)
 									{
 										clockservice = (IClockService)result;
-										SServiceProvider.getService(component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
+										SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
 										{
 											public void customResultAvailable(Object result)
 											{
