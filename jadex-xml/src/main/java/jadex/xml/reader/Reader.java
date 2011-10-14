@@ -443,6 +443,7 @@ public class Reader
 							{
 								StackElement pse = readcontext.getStackElement(i);
 								attrpath.add(pse.getTag());
+								typeinfo = pse.getTypeInfo();
 								object = pse.getObject();
 							}
 						}
