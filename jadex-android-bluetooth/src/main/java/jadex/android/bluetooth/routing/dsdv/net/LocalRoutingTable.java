@@ -5,7 +5,6 @@
 
 package jadex.android.bluetooth.routing.dsdv.net;
 
-import jadex.android.bluetooth.routing.dsdv.DsdvRouter;
 import jadex.android.bluetooth.util.Helper;
 
 import java.util.Enumeration;
@@ -22,11 +21,13 @@ public class LocalRoutingTable {
 
 	private Hashtable<String, RoutingTableEntryWrapper> rTable;
 	private String[] neighbours;
-	
+
 	public final String TAG = Helper.LOG_TAG;
 	public final String TAG2 = "LocalRoutingTable";
+	private String ownAddress;
 
-	public LocalRoutingTable() {
+	public LocalRoutingTable(String ownAddress) {
+		this.ownAddress = ownAddress;
 		Log.d(TAG, "Created a LocalRoutingTable");
 		rTable = new Hashtable<String, RoutingTableEntryWrapper>();
 	}
@@ -34,8 +35,11 @@ public class LocalRoutingTable {
 	/**
 	 * Adds a routing element to the routing table. This is used both for a new
 	 * element as well as an update. It removes the old element if it exists and
-	 * adds the new under the Destination address of the RoutingTableEntryWrapper
-	 * @param rte the routing table entry to add
+	 * adds the new under the Destination address of the
+	 * RoutingTableEntryWrapper
+	 * 
+	 * @param rte
+	 *            the routing table entry to add
 	 */
 	public boolean addRoutingEntry(RoutingTableEntryWrapper rte) {
 
@@ -55,7 +59,9 @@ public class LocalRoutingTable {
 
 	/**
 	 * Does not delete routes .. marks them as invalid
-	 * @param destination the destination to mark as invalid
+	 * 
+	 * @param destination
+	 *            the destination to mark as invalid
 	 */
 	public boolean removeRoutingEntry(String destination) {
 		Log.d(TAG, TAG2 + " Removing entry : " + destination);
@@ -73,7 +79,9 @@ public class LocalRoutingTable {
 
 	/**
 	 * Deletes the route permanently from the routing table
-	 * @param l the destination to mark as invalid
+	 * 
+	 * @param l
+	 *            the destination to mark as invalid
 	 */
 	public void deleteRoutingEntry(String l) {
 		System.out.println("Deleting entry :" + l);
@@ -87,7 +95,9 @@ public class LocalRoutingTable {
 
 	/**
 	 * Gets the routing table entry from an address
-	 * @param destination the address to lookuo
+	 * 
+	 * @param destination
+	 *            the address to lookuo
 	 * @return the routing table entry from the address
 	 */
 	public RoutingTableEntryWrapper getRoutingEntry(String destination) {
@@ -96,12 +106,13 @@ public class LocalRoutingTable {
 			return rte;
 		} else
 			Log.d(TAG, "No entry found in the routing table returning null");
-			return null;
+		return null;
 	}
 
 	/**
 	 * Get all routes that are known to be valid
-	 * @return all routes that are known to be valid 
+	 * 
+	 * @return all routes that are known to be valid
 	 */
 	public Vector<RoutingTableEntryWrapper> getRoutesAsVector() {
 		Vector<RoutingTableEntryWrapper> v = new Vector<RoutingTableEntryWrapper>();
@@ -118,6 +129,7 @@ public class LocalRoutingTable {
 
 	/**
 	 * Get all neighbor RoutingEntries
+	 * 
 	 * @return all neightbors
 	 */
 	public Vector<RoutingTableEntryWrapper> getNeigborRoutesAsVector() {
@@ -132,9 +144,10 @@ public class LocalRoutingTable {
 		}
 		return v;
 	}
-	
+
 	/**
 	 * Get all neighbors
+	 * 
 	 * @return all neightbors
 	 */
 	public Vector<String> getNeighborAddresses() {
@@ -152,6 +165,7 @@ public class LocalRoutingTable {
 
 	/**
 	 * Returns all routes in the routing table as a vector
+	 * 
 	 * @return all routes
 	 */
 	public Vector<RoutingTableEntryWrapper> getAllRoutesAsVector() {
@@ -166,18 +180,21 @@ public class LocalRoutingTable {
 		return v;
 	}
 
-	/** 
+	/**
 	 * Returns all routes that have changed
-	 * @param sendMe adds your own address to the vector
+	 * 
+	 * @param sendMe
+	 *            adds your own address to the vector
 	 * @return all routes that have changed
 	 */
-	public Vector<RoutingTableEntryWrapper> getRoutesAsVectorChanged(boolean sendMe) {
+	public Vector<RoutingTableEntryWrapper> getRoutesAsVectorChanged(
+			boolean sendMe) {
 		Vector<RoutingTableEntryWrapper> v = new Vector<RoutingTableEntryWrapper>();
 		synchronized (rTable) {
 			if (sendMe)
-				v.addElement(rTable.get(DsdvRouter.getNetworkAddress()));// always
-																	// send my
-																	// own info
+				v.addElement(rTable.get(ownAddress));// always
+														// send my
+														// own info
 			for (Enumeration<RoutingTableEntryWrapper> e = rTable.elements(); e
 					.hasMoreElements();) {
 				RoutingTableEntryWrapper rte = e.nextElement();
@@ -194,7 +211,9 @@ public class LocalRoutingTable {
 	/**
 	 * Gets all routes that use dest as the next hop. This is used to invalidate
 	 * all routes going through a known bad node
-	 * @param dest destination
+	 * 
+	 * @param dest
+	 *            destination
 	 * @return the routes to be marked as invalid
 	 */
 	public Vector<RoutingTableEntryWrapper> getRoutesAsVectorInvalid(String dest) {
@@ -202,8 +221,10 @@ public class LocalRoutingTable {
 		synchronized (rTable) {
 			for (Enumeration<RoutingTableEntryWrapper> e = rTable.elements(); e
 					.hasMoreElements();) {
-				RoutingTableEntryWrapper rte = (RoutingTableEntryWrapper) e.nextElement();
-				if (rte.getNextHop().equals(dest))// route is using dest as next hop
+				RoutingTableEntryWrapper rte = (RoutingTableEntryWrapper) e
+						.nextElement();
+				if (rte.getNextHop().equals(dest))// route is using dest as next
+													// hop
 				{
 					rte.setRouteUnvalid();
 					v.addElement(rte);
@@ -212,7 +233,6 @@ public class LocalRoutingTable {
 		}
 		return v;
 	}
-
 
 	/**
 	 * Goes through routing table, adding the entries in "neigbours" that have
@@ -241,7 +261,8 @@ public class LocalRoutingTable {
 			// because that is not in the neighbor table
 			if (!exists) {
 				String dest = neighbours[j];
-				RoutingTableEntryWrapper rt = new RoutingTableEntryWrapper(dest, dest, 1, 0);
+				RoutingTableEntryWrapper rt = new RoutingTableEntryWrapper(
+						dest, dest, 1, 0);
 				addRoutingEntry(rt);
 			}
 		}
@@ -278,41 +299,39 @@ public class LocalRoutingTable {
 
 		}
 	}
-	
-	
 
-//	/**
-//	 * Updates the routing table with new information
-//	 */
-//	public synchronized void update(Object neigbourArray) {
-//
-//		Log.i(TAG, " Routing Table: Update called"
-//				+ ((String[]) neigbourArray).length);
-//		// NetworkAddress[] naUpdated = neigbourArray;
-//
-//		// search for new devices if no connections exist
-//		//
-//		// TODO Might make maintainer do more active discovery if new
-//		// neighbourArray is empty
-//		// if(naUpdated.length == 0){
-//		// new ConnectionMinder(rm,1l).start();
-//		// }
-//		exchangeArrays((String[]) neigbourArray);
-//		updateRouteTable();
-//	}
+	// /**
+	// * Updates the routing table with new information
+	// */
+	// public synchronized void update(Object neigbourArray) {
+	//
+	// Log.i(TAG, " Routing Table: Update called"
+	// + ((String[]) neigbourArray).length);
+	// // NetworkAddress[] naUpdated = neigbourArray;
+	//
+	// // search for new devices if no connections exist
+	// //
+	// // TODO Might make maintainer do more active discovery if new
+	// // neighbourArray is empty
+	// // if(naUpdated.length == 0){
+	// // new ConnectionMinder(rm,1l).start();
+	// // }
+	// exchangeArrays((String[]) neigbourArray);
+	// updateRouteTable();
+	// }
 
-//	private synchronized void exchangeArrays(Object neigbourArray) {
-//		neighbours = null;
-//		neighbours = (String[]) neigbourArray;
-//	}
-//
-//	public synchronized String[] getNeigbourArray() {
-//		if (neighbours == null || neighbours.length == 0)
-//			return null;
-//		
-////TODO: Use clone instead!
-//		String[] nArray = new String[neighbours.length];
-//		System.arraycopy(neighbours, 0, nArray, 0, neighbours.length);
-//		return nArray;
-//	}
+	// private synchronized void exchangeArrays(Object neigbourArray) {
+	// neighbours = null;
+	// neighbours = (String[]) neigbourArray;
+	// }
+	//
+	// public synchronized String[] getNeigbourArray() {
+	// if (neighbours == null || neighbours.length == 0)
+	// return null;
+	//
+	// //TODO: Use clone instead!
+	// String[] nArray = new String[neighbours.length];
+	// System.arraycopy(neighbours, 0, nArray, 0, neighbours.length);
+	// return nArray;
+	// }
 }

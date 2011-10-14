@@ -1,6 +1,5 @@
 package jadex.android.bluetooth.routing.dsdv.minders;
 
-import jadex.android.bluetooth.routing.dsdv.DsdvRouter;
 import jadex.android.bluetooth.routing.dsdv.info.ConfigInfo;
 import jadex.android.bluetooth.routing.dsdv.net.LocalRoutingTable;
 import jadex.android.bluetooth.routing.dsdv.net.RoutingTableEntryWrapper;
@@ -16,9 +15,11 @@ public class StaleRouteMinder extends Thread {
 
 	boolean abort = false;
 	private LocalRoutingTable rt;
+	private String ownAddress;
 
-	public StaleRouteMinder(LocalRoutingTable rt) {
+	public StaleRouteMinder(LocalRoutingTable rt, String ownAddress) {
 		this.rt = rt;
+		this.ownAddress = ownAddress;
 	}
 
 	/**
@@ -32,12 +33,13 @@ public class StaleRouteMinder extends Thread {
 				Vector<RoutingTableEntryWrapper> v = rt.getRoutesAsVector();
 
 				for (int i = 0; i < v.size(); i++) {
-					RoutingTableEntryWrapper rte = (RoutingTableEntryWrapper) v.elementAt(i);
+					RoutingTableEntryWrapper rte = (RoutingTableEntryWrapper) v
+							.elementAt(i);
 					long timeNow = System.currentTimeMillis();
 					long lastRouteRenewTime = rte.getRouteCreationTime();
 
 					// never delete self from routing table
-					if (!(rte.getDestination().equals(DsdvRouter.getNetworkAddress()))
+					if (!(rte.getDestination().equals(ownAddress))
 							&& timeNow - lastRouteRenewTime > ConfigInfo.deleteRouteStaleRoute) {
 						rt.deleteRoutingEntry(rte.getDestination());
 					}

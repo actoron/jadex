@@ -55,8 +55,8 @@ public class BroadcastMinder extends Thread {
 				Thread.sleep(ConfigInfo.periodicRouteBroadcast);
 
 				// increase my seq num everytime I broadcast it
-				RoutingTableEntryWrapper me = rt.getRoutingEntry(DsdvRouter
-						.getNetworkAddress());
+				RoutingTableEntryWrapper me = rt.getRoutingEntry(rm
+						.getOwnAddress());
 				me.increaseSeqNum();
 
 				// send out my routing table

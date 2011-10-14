@@ -67,9 +67,7 @@ public class MessageService extends BasicService implements IMessageService
 	/** The default codecs. */
     public static IContentCodec[] DEFCODECS = new IContentCodec[]
     {
-    	/* $if !android $ */
         new jadex.base.contentcodecs.JavaXMLContentCodec(),
-        /* $endif $ */
         new jadex.base.contentcodecs.JadexXMLContentCodec(),
         new jadex.base.contentcodecs.NuggetsXMLContentCodec()
     };

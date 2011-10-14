@@ -217,7 +217,7 @@ public class DataPacket {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof DataPacket)) {
+		if (obj == null || !(obj instanceof DataPacket)) {
 			return false;
 		}
 		DataPacket other = (DataPacket) obj;

@@ -172,4 +172,14 @@ public class FloodingPacketRouter implements IPacketRouter {
 		}
 	}
 
+	@Override
+	public String getOwnAddress() {
+		return ownAddress;
+	}
+
+	@Override
+	public void setOwnAddress(String address) {
+		ownAddress = address;
+	}
+
 }

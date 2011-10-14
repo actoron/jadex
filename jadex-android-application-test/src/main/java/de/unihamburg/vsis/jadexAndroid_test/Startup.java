@@ -10,9 +10,10 @@ public class Startup {
 	public static final String platformconfig = "de/unihamburg/vsis/jadexAndroid_test/Platform.component.xml";
 //	public static final String platformconfig = "jadex/standalone/Platform.component.xml";
 	public static final String configname = "android_fixed";
+	public static final String configname_bluetooth = "android_bluetooth";
 	
 	public static void main(String[] args) {
-		startNotifyingPlatform("java");
+		startBluetoothPlatform("java");
 	}
 
 	public static void micro_test() {
@@ -64,21 +65,22 @@ public class Startup {
 		IFuture future = Starter.createPlatform(new String[] {
 				"-conf", platformconfig,
 				"-configname", configname,
-				"-platformname", "testcases",
+				"-platformname", "mobile",
 				"-saveonexit", "false",
-				"-gui", "false"
+				"-gui", "false",
+				"-awareness", "true"
 		});
 		return future;
 	}
 	
-	public static IFuture startNotifyingPlatform(String platformname) {
+	public static IFuture startBluetoothPlatform(String platformname) {
 		IFuture future = Starter.createPlatform(new String[] {
 				"-conf", platformconfig,
-				"-configname", configname,
+				"-configname", configname_bluetooth,
 				"-platformname", platformname,
 				"-saveonexit", "false",
 				"-gui", "false",
-				"-awareness", "true"
+				"-awareness", "true",
 		});
 		return future;
 	}

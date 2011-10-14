@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -75,7 +76,7 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 		}
 		btp2pConnector = new BTP2PConnector(this, mHandler, btAdapter);
 
-		stateListeners = new ArrayList<IBluetoothStateListener>();
+		stateListeners = new CopyOnWriteArrayList<IBluetoothStateListener>();
 		addBluetoothStateListener(btp2pConnector);
 
 		uiThread = Thread.currentThread();

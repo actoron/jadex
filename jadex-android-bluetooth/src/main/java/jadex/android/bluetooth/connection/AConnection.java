@@ -8,8 +8,8 @@ import jadex.android.bluetooth.message.DataPacket;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public abstract class AConnection implements IConnection {
 
@@ -26,7 +26,7 @@ public abstract class AConnection implements IConnection {
 	public AConnection(IBluetoothAdapter adapter, IBluetoothDevice remoteDevice) {
 		this.adapter = adapter;
 		this.remoteDevice = remoteDevice;
-		listeners = new ArrayList<IConnectionListener>();
+		listeners = new CopyOnWriteArrayList<IConnectionListener>();
 	}
 
 	protected class ConnectedThread extends Thread {

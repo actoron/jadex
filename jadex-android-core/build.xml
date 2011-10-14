@@ -113,7 +113,6 @@
 		ITreeNode.java,
 		TreePopupListener.java,
 		XMLCodec.java,
-		JavaXMLContentCodec.java,
 		CollapseAllAction.java,
 		ExceptionSwingDelegationResultListener.java,
 		ProvidedServiceInfoNode.java,

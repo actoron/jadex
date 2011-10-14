@@ -35,7 +35,7 @@ public class DsdvRouter implements IPacketRouter {
 	private static final RoutingType ROUTING_TYPE = RoutingType.DSDV;
 
 	private String TAG = Helper.LOG_TAG;
-	private static String ownAddress;
+	private String ownAddress;
 
 	private LocalRoutingTable routeTable;
 	private BroadcastMinder broadcaster;
@@ -56,7 +56,7 @@ public class DsdvRouter implements IPacketRouter {
 	 */
 	public DsdvRouter(String ownAddress) {
 		// create & initialize the route manager
-		DsdvRouter.ownAddress = ownAddress;
+		setOwnAddress(ownAddress);
 		initRoutingTable();
 		broadcaster = new BroadcastMinder(this, routeTable);
 		periodicBroadcaster = new PeriodicBroadcastMinder(this, routeTable);
@@ -87,13 +87,13 @@ public class DsdvRouter implements IPacketRouter {
 	 */
 	private void initRoutingTable() {
 		Log.i(TAG, "initializing routing");
-		String dest = ownAddress;
+		String dest = getOwnAddress();
 		String next_hop = dest;
 		int hops = 0;
 		RoutingTableEntryWrapper rte = new RoutingTableEntryWrapper(dest,
 				next_hop, hops, CurrentInfo.incrementOwnSeqNum());
 
-		routeTable = new LocalRoutingTable();
+		routeTable = new LocalRoutingTable(ownAddress);
 		routeTable.addRoutingEntry(rte);
 		// Announce arrival on the network
 		BroadcastRouteTableMessage();
@@ -259,12 +259,12 @@ public class DsdvRouter implements IPacketRouter {
 					// If the dest is myself and the sequence num is higher and
 					// odd then increment own seq num to one higher then the one
 					// sent
-					if (rte.getDestination().equals(ownAddress)
+					if (rte.getDestination().equals(getOwnAddress())
 							&& rte.getSeqNum() % 2 == 1
 							&& rte.getSeqNum() > CurrentInfo.lastSeqNum) {
 						CurrentInfo.setOwnSeqNum(rte.getSeqNum() + 1);
 						rte.setSeqNum(CurrentInfo.lastSeqNum);
-						rte.setNextHop(ownAddress);
+						rte.setNextHop(getOwnAddress());
 						rte.setNumHops(0);
 						rte.setRouteChanged(true);
 						routeTable.addRoutingEntry(rte);
@@ -355,7 +355,7 @@ public class DsdvRouter implements IPacketRouter {
 		for (int i = 0; i < routes.size(); i++) {
 			String dest = ((RoutingTableEntryWrapper) routes.elementAt(i))
 					.getDestination();
-			if (dest.equals(ownAddress))// own address
+			if (dest.equals(getOwnAddress()))// own address
 			{
 			} else {
 				connectedDevices[j] = dest;
@@ -374,13 +374,6 @@ public class DsdvRouter implements IPacketRouter {
 		IFuture result = new Future();
 		Log.d(TAG, "Message send to DSDVRouter");
 		return result;
-	}
-
-	/**
-	 * @return your network address
-	 */
-	public static String getNetworkAddress() {
-		return ownAddress;
 	}
 
 	@Override
@@ -418,7 +411,7 @@ public class DsdvRouter implements IPacketRouter {
 
 	@Override
 	public void updateRoutingInformation(RoutingInformation ri) {
-		if (ri.getType() == this.ROUTING_TYPE) {
+		if (ri.getType() == DsdvRouter.ROUTING_TYPE) {
 			if (ri.getRouteDownInformation()) {
 				processDSDVRouteDownBroadcast(ri);
 			} else {
@@ -452,6 +445,16 @@ public class DsdvRouter implements IPacketRouter {
 		Vector<String> neighbours = routeTable.getNeighborAddresses();
 		result.addAll(neighbours);
 		return result;
+	}
+
+	@Override
+	public void setOwnAddress(String ownAddress) {
+		this.ownAddress = ownAddress;
+	}
+
+	@Override
+	public String getOwnAddress() {
+		return ownAddress;
 	}
 
 }

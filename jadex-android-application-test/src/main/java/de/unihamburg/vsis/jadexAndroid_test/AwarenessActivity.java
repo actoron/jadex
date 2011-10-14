@@ -106,7 +106,7 @@ public class AwarenessActivity extends BaseActivity {
 		new Thread(new Runnable() {
 			public void run() {
 
-				IFuture future = Startup.startNotifyingPlatform("Platform-" + platformID);
+				IFuture future = Startup.startBluetoothPlatform("Platform-" + platformID);
 				future.addResultListener(platformResultListener);
 			}
 		}).start();

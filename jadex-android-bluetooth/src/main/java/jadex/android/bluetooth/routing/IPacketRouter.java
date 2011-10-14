@@ -25,6 +25,10 @@ public interface IPacketRouter {
 	void removeConnectedDevice(String device);
 
 	void updateRoutingInformation(RoutingInformation ri);
+	
+	String getOwnAddress();
+	
+	void setOwnAddress(String address);
 
 	/**
 	 * 

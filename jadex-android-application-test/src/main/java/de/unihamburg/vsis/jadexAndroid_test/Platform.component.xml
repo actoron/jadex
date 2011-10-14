@@ -58,7 +58,7 @@
 		<!-- ======== Arguments used by platform components. ======== -->
 		
 		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
-		<argument name="awareness" class="false">true</argument>
+		<argument name="awareness" class="boolean">true</argument>
 		<!-- Start the JCC agent to open the platform GUI? -->
 		<argument name="gui" class="boolean">false</argument>
 		<!-- Save platform settings on shutdown? -->
@@ -78,7 +78,7 @@
 		<!-- Flag if copying parameters for local service calls is allowed. -->
 		<argument name="parametercopy" class="boolean">true</argument>
 		<!-- Flag if nio typ or normal tcp transport should be used. -->
-		<argument name="niotransport" class="boolean">false</argument>
+		<argument name="niotransport" class="boolean">true</argument>
 		
 		<!-- <argument name="platform_shutdown_time">1000</argument> -->
 	</arguments>
@@ -93,8 +93,8 @@
 		<componenttype filename="jadex/gpmn/KernelGPMN.component.xml" name="kernel_gpmn"/>
 		<componenttype filename="jadex/component/KernelMulti.component.xml" name="kernel_multi"/>
 		<componenttype filename="jadex/base/service/remote/RemoteServiceManagementAgent.class" name="rms"/>
-<!-- 		<componenttype filename="jadex/base/service/awareness/management/AwarenessManagementAgent.class" name="awa"/> -->
-		<componenttype filename="de/unihamburg/vsis/jadexAndroid_test/AwarenessNotifierAgent.class" name="awa"/>
+		<componenttype filename="jadex/base/service/awareness/management/AwarenessManagementAgent.class" name="awa"/>
+		<componenttype filename="de/unihamburg/vsis/jadexAndroid_test/AwarenessNotifierAgent.class" name="btawa"/>
 		<!-- <componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/> -->
 		<!--<componenttype filename="jadex/tools/jcc/JCCAgent.class" name="jcc"/>-->
 		<componenttype filename="/jadex/tools/jcc/JCCAgent.class" name="jcc"/>
@@ -191,6 +191,24 @@
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
+					<arguments>
+						<argument name="includes">$args.awaincludes</argument>
+						<argument name="excludes">$args.awaexcludes</argument>
+					</arguments>
+				</component>
+				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;)) ? 1 : 0"/>
+			</components>
+		</configuration>
+		
+		<configuration name="android_bluetooth">
+			<components>
+				<component name="kernel_component" type="kernel_component" daemon="true"/>
+				<component name="kernel_application" type="kernel_application" daemon="true"/>
+				<component name="kernel_micro" type="kernel_micro" daemon="true"/>
+				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
+				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
+				<component name="rms" type="rms" daemon="true"/>
+				<component name="awa" type="btawa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
 						<argument name="includes">$args.awaincludes</argument>
 						<argument name="excludes">$args.awaexcludes</argument>
