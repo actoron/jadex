@@ -192,7 +192,8 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 		try
 		{
 	//		OAVAgentModel amodel = (OAVAgentModel)model;
-			OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, libservice.getClassLoader(modelinfo.getResourceIdentifier()));
+			OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, 
+				libservice.getClassLoader(modelinfo.getResourceIdentifier()), modelinfo.getResourceIdentifier());
 			
 			// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 			OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
@@ -249,7 +250,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 		{
 //			System.out.println("loading bdi: "+filename);
 			OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, 
-				libservice.getClassLoader(rid));
+				libservice.getClassLoader(rid), rid);
 			ret.setResult(loaded.getModelInfo());
 		}
 		catch(Exception e)

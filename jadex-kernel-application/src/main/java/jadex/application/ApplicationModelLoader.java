@@ -1,5 +1,6 @@
 package jadex.application;
 
+import jadex.bridge.IResourceIdentifier;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
@@ -40,9 +41,9 @@ public class ApplicationModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public CacheableKernelModel loadApplicationModel(String name, String[] imports, ClassLoader classloader) throws Exception
+	public CacheableKernelModel loadApplicationModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
-		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_APPLICATION, imports, classloader);
+		return (CacheableKernelModel)loadModel(name, FILE_EXTENSION_APPLICATION, imports, classloader, context);
 	}
 	
 	//-------- AbstractModelLoader methods --------
@@ -52,8 +53,8 @@ public class ApplicationModelLoader extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, ClassLoader classloader) throws Exception
+	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, ClassLoader classloader, Object context) throws Exception
 	{
-		return (ICacheableModel)reader.read(info, classloader);
+		return (ICacheableModel)reader.read(info, classloader, (IResourceIdentifier)context);
 	}
 }

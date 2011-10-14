@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
@@ -62,7 +63,7 @@ public class MicroClassReader
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public MicroModel read(String model, String[] imports, ClassLoader classloader)
+	public MicroModel read(String model, String[] imports, ClassLoader classloader, IResourceIdentifier rid)
 	{
 //		System.out.println("loading micro: "+model);
 		String clname = model;
@@ -75,13 +76,13 @@ public class MicroClassReader
 		
 		Class cma = getMicroAgentClass(clname, imports, classloader);
 		
-		return read(model, cma, classloader);
+		return read(model, cma, classloader, rid);
 	}
 	
 	/**
 	 *  Load the model.
 	 */
-	protected MicroModel read(String model, Class cma, ClassLoader classloader)
+	protected MicroModel read(String model, Class cma, ClassLoader classloader, IResourceIdentifier rid)
 	{
 		ModelInfo modelinfo = new ModelInfo();
 		MicroModel ret = new MicroModel(modelinfo);
@@ -94,6 +95,7 @@ public class MicroClassReader
 		modelinfo.setPackage(packagename);
 		modelinfo.setFilename(model);
 		modelinfo.setStartable(true);
+		modelinfo.setResourceIdentifier(rid);
 		ret.setClassloader(classloader);
 		
 		try

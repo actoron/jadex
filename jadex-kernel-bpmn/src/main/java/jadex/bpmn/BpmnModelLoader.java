@@ -1,6 +1,7 @@
 package jadex.bpmn;
 
 import jadex.bpmn.model.MBpmnModel;
+import jadex.bridge.IResourceIdentifier;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
@@ -32,9 +33,9 @@ public class BpmnModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public MBpmnModel	loadBpmnModel(String name, String[] imports, ClassLoader classloader) throws Exception
+	public MBpmnModel	loadBpmnModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
-		return (MBpmnModel)loadModel(name, FILE_EXTENSION_BPMN, imports, classloader);
+		return (MBpmnModel)loadModel(name, FILE_EXTENSION_BPMN, imports, classloader, context);
 	}
 	
 	//-------- AbstractModelLoader methods --------
@@ -44,8 +45,9 @@ public class BpmnModelLoader extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, ClassLoader classloader) throws Exception
+	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, 
+		ClassLoader classloader, Object context) throws Exception
 	{
-		return (ICacheableModel)BpmnXMLReader.read(info, classloader);
+		return (ICacheableModel)BpmnXMLReader.read(info, classloader, (IResourceIdentifier)context);
 	}
 }

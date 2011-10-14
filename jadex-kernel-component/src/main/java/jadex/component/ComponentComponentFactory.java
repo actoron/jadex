@@ -205,7 +205,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 		try
 		{
 			ret.setResult(loader.loadComponentModel(model, imports,
-				libservice==null? getClass().getClassLoader(): libservice.getClassLoader(rid)).getModelInfo());
+				libservice==null? getClass().getClassLoader(): libservice.getClassLoader(rid), rid).getModelInfo());
 		}
 		catch(Exception e)
 		{
@@ -231,7 +231,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 		{
 			// libservice is null for platform bootstrap factory.
 			ClassLoader cl = libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier());
-			CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl);
+			CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
 //			List apps = apptype.getConfigurations();
 					
 //			// Select application instance according to configuration.

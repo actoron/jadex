@@ -59,7 +59,7 @@ public class InterpreterTest
 				jadex.commons.concurrent.ThreadPoolFactory.createThreadPool()));
 			
 			OAVBDIModelLoader loader = new OAVBDIModelLoader(config);
-			OAVAgentModel loaded = loader.loadAgentModel(model, null, null);
+			OAVAgentModel loaded = loader.loadAgentModel(model, null, null, null); // todo: rid?
 			
 			// Initialize agent interpreter.
 			Future ret = new Future();

@@ -225,7 +225,8 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		
 		try
 		{
-			MGpmnModel amodel = (MGpmnModel)loader.loadModel(modelinfo.getFilename(), null, libservice.getClassLoader(modelinfo.getResourceIdentifier()));
+			MGpmnModel amodel = (MGpmnModel)loader.loadModel(modelinfo.getFilename(), null, 
+				libservice.getClassLoader(modelinfo.getResourceIdentifier()), modelinfo.getResourceIdentifier());
 
 			Object ret = null;
 //			ResourceInfo rinfo = SUtil.getResourceInfo0(modelinfo.getFilename(), modelinfo.getClassLoader());

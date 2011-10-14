@@ -1,5 +1,6 @@
 package jadex.gpmn;
 
+import jadex.bridge.IResourceIdentifier;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SUtil;
@@ -45,7 +46,7 @@ public class GpmnXMLReader
 		File file = new File("/home/jander/test.gpmn");
 		InputStream is = new FileInputStream(file);
 		ResourceInfo rinfo = new ResourceInfo(file.getAbsolutePath(), is, 0);
-		MGpmnModel model = read(rinfo, Thread.currentThread().getContextClassLoader());
+		MGpmnModel model = read(rinfo, Thread.currentThread().getContextClassLoader(), null); // rid null??
 		System.out.println(SUtil.arrayToString(model.getActivationEdges().toArray()));
 		System.out.println(((MActivationPlan)model.getActivationPlans().values().toArray()[0]).getMode());
 	}
@@ -68,13 +69,14 @@ public class GpmnXMLReader
 	 *  @param info	The resource info.
 	 *  @param classloader The classloader.
  	 */
-	protected static MGpmnModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
+	protected static MGpmnModel read(ResourceInfo rinfo, ClassLoader classloader, IResourceIdentifier rid) throws Exception
 	{
 		MGpmnModel ret = (MGpmnModel)reader.read(rinfo.getInputStream(), classloader, null);
 		ret.getModelInfo().setStartable(true);
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
 		ret.setClassLoader(classloader);
+		ret.getModelInfo().setResourceIdentifier(rid);
 		String name = new File(rinfo.getFilename()).getName();
 		name = name.substring(0, name.length()-5);
 		ret.setName(name);

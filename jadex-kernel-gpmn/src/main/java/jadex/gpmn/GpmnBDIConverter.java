@@ -300,7 +300,7 @@ public class GpmnBDIConverter
 						MActivationEdge edge = (MActivationEdge)activationedges.get(j);
 						if (model.getGoals().containsKey(edge.getTargetId()))
 							activationtargets.add("new jadex.gpmn.runtime.plan.ActivationTarget(jadex.gpmn.runtime.plan.ActivationTarget.Types.GOAL,"+"\""+
-									((MGoal) model.getGoals().get(edge.getTargetId())).getName()+"\")");
+								((MGoal) model.getGoals().get(edge.getTargetId())).getName()+"\")");
 						else
 						{
 							MSubprocess sprocess = (MSubprocess) model.getSubprocesses().get(edge.getTargetId());
@@ -310,7 +310,8 @@ public class GpmnBDIConverter
 								MGpmnModel submodel = null;
 								try
 								{
-									submodel = (MGpmnModel) loader.loadModel(sprocess.getProcessReference(), null, classloader);
+									// hmm rid of parent ok?
+									submodel = (MGpmnModel) loader.loadModel(sprocess.getProcessReference(), null, classloader, model.getModelInfo().getResourceIdentifier());
 								}
 								catch (Exception e)
 								{

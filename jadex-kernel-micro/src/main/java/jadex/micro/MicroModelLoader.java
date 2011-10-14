@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import jadex.bridge.IResourceIdentifier;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
@@ -38,9 +39,9 @@ public class MicroModelLoader extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public MicroModel loadComponentModel(String name, String[] imports, ClassLoader classloader) throws Exception
+	public MicroModel loadComponentModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
-		return (MicroModel)loadModel(name, FILE_EXTENSION_MICRO, imports, classloader);
+		return (MicroModel)loadModel(name, FILE_EXTENSION_MICRO, imports, classloader, context);
 	}
 	
 	//-------- AbstractModelLoader methods --------
@@ -50,10 +51,11 @@ public class MicroModelLoader extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, ClassLoader classloader) throws Exception
+	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, 
+		ClassLoader classloader, Object context) throws Exception
 	{
 //		System.out.println("cache miss: "+name);
-		return (ICacheableModel)reader.read(name, imports, classloader);
+		return (ICacheableModel)reader.read(name, imports, classloader, (IResourceIdentifier)context);
 	}
 	
 	//-------- constructors --------

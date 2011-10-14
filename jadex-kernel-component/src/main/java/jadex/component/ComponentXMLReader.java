@@ -2,6 +2,7 @@ package jadex.component;
 
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.IErrorReport;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -203,7 +204,7 @@ public class ComponentXMLReader
 	 *  @param info	The resource info.
 	 *  @param classloader The classloader.
  	 */
-	public CacheableKernelModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
+	public CacheableKernelModel read(ResourceInfo rinfo, ClassLoader classloader, IResourceIdentifier rid) throws Exception
 	{
 		Map	user	= new HashMap();
 		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
@@ -216,6 +217,7 @@ public class ComponentXMLReader
 			mi.setFilename(rinfo.getFilename());
 //			mi.setClassloader(classloader);
 			mi.setStartable(true);
+			mi.setResourceIdentifier(rid);
 
 			if(!mi.checkName())
 			{

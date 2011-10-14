@@ -130,8 +130,8 @@
 		</providedservice>
 		<providedservice class="ILibraryService">
 			<implementation proxytype="raw">
-				//new LibraryService($args.libpath, $component.getServiceProvider())
-				new maventest.MavenLibraryService($args.libpath, $component.getServiceProvider())
+				new LibraryService($args.libpath, $component.getServiceProvider())
+				//new maventest.MavenLibraryService($args.libpath, $component.getServiceProvider())
 			</implementation>
 		</providedservice>
 		<providedservice class="IClockService">

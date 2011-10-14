@@ -51,7 +51,7 @@ public abstract class AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected abstract ICacheableModel	doLoadModel(String name, String[] imports, ResourceInfo info, ClassLoader classloader) throws Exception;
+	protected abstract ICacheableModel	doLoadModel(String name, String[] imports, ResourceInfo info, ClassLoader classloader, Object context) throws Exception;
 	
 	/**
 	 *  Find the file for a given name using any supported extension.
@@ -198,9 +198,9 @@ public abstract class AbstractModelLoader
 	 *  @param name	The name of the model (file name or logical name).
 	 *  @param imports	The imports to use when resolving logical names.
 	 */
-	public synchronized ICacheableModel	loadModel(String name, String[] imports, ClassLoader classloader) throws Exception
+	public synchronized ICacheableModel	loadModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
-		return loadModel(name, null, imports, classloader);
+		return loadModel(name, null, imports, classloader, context);
 	}
 
 	/**
@@ -209,7 +209,7 @@ public abstract class AbstractModelLoader
 	 *  @param extension	The specific extension to look for.
 	 *  @param imports	The imports to use when resolving logical names.
 	 */
-	public synchronized ICacheableModel	loadModel(String name, String extension, String[] imports, ClassLoader classloader) throws Exception
+	public synchronized ICacheableModel	loadModel(String name, String extension, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
 //		System.out.println("filename: "+name);
 		
@@ -273,7 +273,7 @@ public abstract class AbstractModelLoader
 		{
 			try
 			{
-				cached	= doLoadModel(name, imports, info, classloader);
+				cached	= doLoadModel(name, imports, info, classloader, context);
 	
 				// Store by filename also, to avoid reloading with different imports.
 				modelcache.put(info.getFilename(), cached);

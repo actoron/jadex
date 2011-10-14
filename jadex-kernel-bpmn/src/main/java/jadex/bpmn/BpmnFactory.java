@@ -164,7 +164,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 		{
 			ClassLoader cl = libservice.getClassLoader(rid);
 			MBpmnModel amodel = loader.loadBpmnModel(model, imports, 
-				libservice.getClassLoader(rid));
+				libservice.getClassLoader(rid), rid);
 			amodel.setClassLoader(cl);
 			ret.setResult(amodel.getModelInfo());
 		}
@@ -240,7 +240,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	{
 		try
 		{
-			MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier()));
+			MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier()), modelinfo.getResourceIdentifier());
 			BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, inited);
 			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 		}

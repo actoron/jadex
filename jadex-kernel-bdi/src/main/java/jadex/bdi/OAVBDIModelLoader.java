@@ -11,6 +11,7 @@ import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.GoalProcessingRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
@@ -114,9 +115,9 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public OAVAgentModel	loadAgentModel(String name, String[] imports, ClassLoader classloader) throws Exception
+	public OAVAgentModel	loadAgentModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
-		return (OAVAgentModel)loadModel(name, FILE_EXTENSION_AGENT, imports, classloader);
+		return (OAVAgentModel)loadModel(name, FILE_EXTENSION_AGENT, imports, classloader, context);
 	}
 
 	/**
@@ -124,9 +125,9 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 *  @param name	The filename or logical name (resolved via imports and extensions).
 	 *  @param imports	The imports, if any.
 	 */
-	public OAVCapabilityModel	loadCapabilityModel(String name, String[] imports, ClassLoader classloader) throws Exception
+	public OAVCapabilityModel	loadCapabilityModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
-		return (OAVCapabilityModel)loadModel(name, FILE_EXTENSION_CAPABILITY, imports, classloader);
+		return (OAVCapabilityModel)loadModel(name, FILE_EXTENSION_CAPABILITY, imports, classloader, (IResourceIdentifier)context);
 	}
 
 	//-------- AbstractModelLoader methods --------
@@ -136,7 +137,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 *  @param name	The original name (i.e. not filename).
 	 *  @param info	The resource info.
 	 */
-	protected ICacheableModel	doLoadModel(String name, String[] imports, ResourceInfo info, ClassLoader classloader)
+	protected ICacheableModel	doLoadModel(String name, String[] imports, ResourceInfo info, ClassLoader classloader, Object context)
 	{
 		OAVCapabilityModel	ret;
 
@@ -199,6 +200,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			// Need to set class loader before create agent model entry to load subcapabilities.
 //			mi.setClassloader(classloader);
 			mi.setFilename(info.getFilename());
+			mi.setResourceIdentifier((IResourceIdentifier)context);
 			if(!mi.checkName())
 			{
 				entries.put(new Tuple(new Object[]{new StackElement(new QName("capability"), handle)}), "Name '"+mi.getName()+"' does not match file name '"+mi.getFilename()+"'.");				
@@ -244,7 +246,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				String	file	= (String)state.getAttributeValue(mcrs[i], OAVBDIMetaModel.capabilityref_has_file);
 				try
 				{
-					OAVCapabilityModel	cmodel	= loadCapabilityModel(file, imports, model.getState().getTypeModel().getClassLoader());
+					OAVCapabilityModel	cmodel	= loadCapabilityModel(file, imports, model.getState().getTypeModel().getClassLoader(), info.getResourceIdentifier());
 					model.addSubcapabilityModel(cmodel);
 					if(cmodel.getModelInfo().getReport()!=null)
 					{

@@ -165,7 +165,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		try
 		{
 			ret.setResult(loader.loadComponentModel(model, imports, 
-				libservice.getClassLoader(rid)).getModelInfo());
+				libservice.getClassLoader(rid), rid).getModelInfo());
 		}
 		catch(Exception e)
 		{
@@ -300,7 +300,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			// todo: is model info ok also in remote case?
 			ClassLoader cl = libservice.getClassLoader(model.getResourceIdentifier());
 
-			MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl);
+			MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, model.getResourceIdentifier());
 	
 			MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
 				null, cl), arguments, config, parent, binding, copy, ret);

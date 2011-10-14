@@ -897,6 +897,8 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	@Excluded()
 	public IResourceIdentifier getResourceIdentifier(String filename)
 	{
+		
+		
 		throw new UnsupportedOperationException();
 	}
 	

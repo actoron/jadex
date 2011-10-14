@@ -16,6 +16,7 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.IErrorReport;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -188,7 +189,7 @@ public class BpmnXMLReader
 	 *  @param info	The resource info.
 	 *  @param classloader The classloader.
  	 */
-	public static MBpmnModel read(ResourceInfo rinfo, ClassLoader classloader) throws Exception
+	public static MBpmnModel read(ResourceInfo rinfo, ClassLoader classloader, IResourceIdentifier rid) throws Exception
 	{
 		Map	user	= new HashMap();
 		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
@@ -197,6 +198,7 @@ public class BpmnXMLReader
 		
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
+		ret.setResourceIdentifier(rid);
 //		ret.setClassloader(classloader);
 		String name = new File(rinfo.getFilename()).getName();
 		name = name.substring(0, name.length()-5);

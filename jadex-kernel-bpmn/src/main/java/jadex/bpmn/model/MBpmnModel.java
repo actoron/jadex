@@ -1,5 +1,6 @@
 package jadex.bpmn.model;
 
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -1145,6 +1146,22 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		this.classloader = classloader;
 	}
 	
+	/**
+	 *  Set the resource identifier.
+	 *  @param rid The resource identifier.
+	 */
+	public void setResourceIdentifier(IResourceIdentifier rid)
+	{
+		modelinfo.setResourceIdentifier(rid);
+	}
 	
+	/**
+	 *  Get the resource identifier.
+	 *  @return The resource identifier.
+	 */
+	public IResourceIdentifier getResourceIdentifier()
+	{
+		return modelinfo.getResourceIdentifier();
+	}
 	
 }
