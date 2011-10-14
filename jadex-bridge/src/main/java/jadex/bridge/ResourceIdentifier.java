@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import java.net.URL;
@@ -9,6 +10,7 @@ import java.net.URL;
  *  Contains a local identifier and a global identifier
  *  that can be used to find the resource.
  */
+@Reference(local=true)
 public class ResourceIdentifier implements IResourceIdentifier
 {
 	//-------- attributes --------
@@ -21,6 +23,14 @@ public class ResourceIdentifier implements IResourceIdentifier
 	
 	//-------- constructors --------
 
+	/**
+	 *  Create a resource identifier.
+	 */
+	public ResourceIdentifier()
+	{
+		// bean constructor
+	}
+	
 	/**
 	 *  Create a resource identifier.
 	 *  @param lid The local identifier.

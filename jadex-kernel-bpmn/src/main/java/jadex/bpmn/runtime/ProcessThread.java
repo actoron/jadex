@@ -378,8 +378,8 @@ public class ProcessThread	implements ITaskContext
 	{
 		if(!getActivity().hasParameter(name))
 		{
-			if(getThreadContext()==null)
-				System.out.println("sdkljl");
+//			if(getThreadContext()==null)
+//				System.out.println("sdkljl");
 			
 			ProcessThread pt = getThreadContext().getInitiator();
 			if(pt!=null)
