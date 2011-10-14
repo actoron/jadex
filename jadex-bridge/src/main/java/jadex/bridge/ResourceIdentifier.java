@@ -95,6 +95,9 @@ public class ResourceIdentifier implements IResourceIdentifier
 
 	/**
 	 *  Test if equals.
+	 *  They are equal when
+	 *  a) global ids are equal
+	 *  b) or global ids are null and local ids are equal.
 	 */
 	public boolean equals(Object obj)
 	{
@@ -102,8 +105,8 @@ public class ResourceIdentifier implements IResourceIdentifier
 		if(obj instanceof IResourceIdentifier)
 		{
 			IResourceIdentifier other = (IResourceIdentifier)obj;
-			ret = SUtil.equals(other.getLocalIdentifier(), getLocalIdentifier()) &&
-				SUtil.equals(other.getGlobalIdentifier(), getGlobalIdentifier());
+			ret = (getGlobalIdentifier()!=null && getGlobalIdentifier().equals(other.getGlobalIdentifier()))
+				|| (getGlobalIdentifier()==null && other.getGlobalIdentifier()==null && SUtil.equals(getLocalIdentifier(), other.getLocalIdentifier()));
 		}
 		return ret;
 	}
