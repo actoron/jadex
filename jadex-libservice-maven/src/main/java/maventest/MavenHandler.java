@@ -53,6 +53,10 @@ public class MavenHandler
 {
 	//-------- attributes --------
 	
+	/** The component identifier to use for creating local resource IDs.
+	 *  The assumption is that URLs are only valid on the local platform. */
+	protected IComponentIdentifier	cid;
+	
 	/** Access to the aether repository system. */
 	protected RepositorySystem	system;
 	
@@ -62,17 +66,15 @@ public class MavenHandler
 	/** The shared repository system session. */
 	protected MavenRepositorySystemSession	session;
 	
-	/** The component identifier. */
-	protected IComponentIdentifier cid;
-	
 	//-------- constructors --------
 
 	/**
-	 * Constructs new maven handler.
+	 *  Constructs new maven handler.
+	 *  @param cid	The component identifier to use for creating local resource IDs.
 	 */
 	public MavenHandler(IComponentIdentifier cid)
 	{
-		this.cid = cid;
+		this.cid	= cid;
 		try
 		{
 			system	= new DefaultPlexusContainer().lookup(RepositorySystem.class);
@@ -90,15 +92,16 @@ public class MavenHandler
 	//-------- methods --------
 
 	/**
-	 *  Load dependencies from a URL.
-	 *  @param url	The url to a maven artifact (e.g. jar or classes directory).
-	 *  @return A map containing the dependencies as mapping (parent url -> list of children urls).
+	 *  Load dependencies from a resource identifier.
+	 *  @param rid	A local or global resource identifier. If both local and global ids are present,
+	 *    local takes precedence, e.g. resolving to workspace urls before fetching an older snapshot from a repository.
+	 *  @return A map containing the dependencies as mapping (parent RID -> list of children RIDs).
 	 */
-	public Map<URL, List<URL>>	loadDependencies(URL url)
+	public Map<ResourceIdentifier, List<ResourceIdentifier>>	loadDependencies(ResourceIdentifier rid)
 	{
-		Map<URL, List<URL>>	urls	= new HashMap<URL, List<URL>>();
-		loadDependencies(url, null, urls);
-		return urls;
+		Map<ResourceIdentifier, List<ResourceIdentifier>>	rids	= new HashMap<ResourceIdentifier, List<ResourceIdentifier>>();
+		loadDependencies(rid, rids);
+		return rids;
 	}
 	
 	/**
@@ -127,14 +130,21 @@ public class MavenHandler
 	//-------- helper methods --------
 	
 	/**
-	 *  Load dependencies from a URL.
-	 *  @param url	The url to a maven artifact (e.g. jar or classes directory).
-	 *  @return A map containing the dependencies as mapping (parent url -> list of children urls).
+	 *  Load dependencies from a resource identifier.
+	 *  @param rid	A local or global resource identifier. If both local and global ids are present,
+	 *    local takes precedence, e.g. resolving to workspace urls before fetching an older snapshot from a repository.
+	 *  @param rids	A map for inserting the dependencies as mapping (parent RID -> list of children RIDs).
 	 */
-	protected void	loadDependencies(final URL url, Artifact art, Map<URL, List<URL>> urls)
+	protected void	loadDependencies(final ResourceIdentifier rid, Map<ResourceIdentifier, List<ResourceIdentifier>> rids)
 	{
-		if(!urls.containsKey(url))
+		if(!rids.containsKey(rid))
 		{
+			// Resolve global RID, if necessary
+			if(rid.getLocalIdentifier()==null)
+			{
+				
+			}
+			
 			ModelSource	pom	= findModelSource(url);
 			
 			if(pom!=null)
@@ -204,13 +214,20 @@ public class MavenHandler
 											}
 										}
 										
-										File	mpom	= new File(new File(parent.getProjectDirectory(), path), "pom.xml");
-										if(mpom.exists())
+										if(path!=null)
 										{
-											Model	mmodel	= loadPom(new FileModelSource(mpom));
-											String	output	= mmodel.getBuild().getOutputDirectory();
-											ret	= new File(output);
+											File	mpom	= new File(new File(parent.getProjectDirectory(), path), "pom.xml");
+											if(mpom.exists())
+											{
+												Model	mmodel	= loadPom(new FileModelSource(mpom));
+												String	output	= mmodel.getBuild().getOutputDirectory();
+												ret	= new File(output);
+											}
 										}
+										// Not found: returns null and causes search in local or global repository.										else
+//										{
+//											System.out.println("No path for module "+artifact.getArtifactId()+"in parent "+parent);
+//										}
 									}
 								}
 								return ret;
@@ -299,7 +316,7 @@ public class MavenHandler
 			ModelBuildingResult	result	= builder.build(request);
 			model	= result.getEffectiveModel();
 			
-			settings.setRemoteRepositories(model);
+//			settings.setRemoteRepositories(model);
 		}
 		catch(ModelBuildingException e)
 		{

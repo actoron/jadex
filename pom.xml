@@ -605,6 +605,8 @@
 				<module>jadex-tools-comanalyzer</module>
 				<module>jadex-platform-standalone</module>
 				<module>jadex-platform-standalone-launch</module>
+				
+				<module>jadex-rules-eca</module>
 
 				<module>jadex-platform-wfms</module>
 				<!-- <module>jadex-wfms-launch</module> -->
