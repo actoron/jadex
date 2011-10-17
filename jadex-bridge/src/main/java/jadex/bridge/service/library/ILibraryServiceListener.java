@@ -1,9 +1,8 @@
 package jadex.bridge.service.library;
 
+import jadex.bridge.IResourceIdentifier;
 import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
-
-import java.net.URL;
 
 
 /** 
@@ -11,16 +10,28 @@ import java.net.URL;
  */
 public interface ILibraryServiceListener extends IRemotable
 {
-	/** 
-	 *  Called when a new url has been added.
-	 *  @param url the url of the new classpath entry.
-	 */
-	public IFuture urlAdded(URL url);
+//	/** 
+//	 *  Called when a new url has been added.
+//	 *  @param url the url of the new classpath entry.
+//	 */
+//	public IFuture urlAdded(URL url);
+//	
+//	/** 
+//	 *  Called when a url has been removed.
+//	 *  @param url the url of the removed classpath entry.
+//	 */
+//	public IFuture urlRemoved(URL url);
 	
 	/** 
-	 *  Called when a url has been removed.
-	 *  @param url the url of the removed classpath entry.
+	 *  Called when a new rid has been added.
+	 *  @param url The rid of the new classpath entry.
 	 */
-	public IFuture urlRemoved(URL url);
+	public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid);
+	
+	/** 
+	 *  Called when a rid has been removed.
+	 *  @param url The rid of the removed classpath entry.
+	 */
+	public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid);
 	
 }

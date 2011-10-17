@@ -40,6 +40,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +49,7 @@ import java.util.Set;
 /**
  *  Library service for loading classpath elements.
  */
-public class MavenLibraryService extends BasicService implements ILibraryService//, IPropertiesProvider
+public class MavenLibraryService extends BasicService implements ILibraryService, IPropertiesProvider
 {
 	//-------- attributes --------
 	
@@ -55,20 +57,14 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	protected IServiceProvider provider;
 	
 	/** LibraryService listeners. */
-	protected Set listeners;
+	protected Set<ILibraryServiceListener> listeners;
 
 	/** The init urls. */
 	protected Object[] initurls;
 
-//	/** Current ClassLoader. */
-//	protected DelegationURLClassLoader	libcl;
-	
 	/** The map of managed resources (url (for local case) -> delegate loader). */
 	protected Map<IResourceIdentifier, DelegationURLClassLoader> classloaders;
 	
-//	/** The map of managed resources (artifact id (for global case) -> delegate loader). */
-//	protected Map classloaders;
-
 	/** Rid support, for a rid all rids are saved that support it. */
 	protected Map<IResourceIdentifier, Set<IResourceIdentifier>> ridsupport;
 	
@@ -109,7 +105,10 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	{
 		super(provider.getId(), ILibraryService.class, properties);
 		
-		this.classloaders = new HashMap();
+		this.classloaders = new HashMap<IResourceIdentifier, DelegationURLClassLoader>();
+		this.listeners	= new LinkedHashSet<ILibraryServiceListener>();
+		this.ridsupport = new LinkedHashMap<IResourceIdentifier, Set<IResourceIdentifier>>();
+		this.managedrids = new LinkedHashMap<IResourceIdentifier, Integer>();
 		this.initurls = urls;
 		this.provider = provider;
 		this.mh = new MavenHandler(((IComponentIdentifier)provider.getId()).getRoot());
@@ -121,31 +120,96 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 				addURL(toURL(urls[i]));
 			}
 		}
-		
-//		updateGlobalClassLoader();
-		
-		listeners	= Collections.synchronizedSet(new HashSet());
-		ridsupport = Collections.synchronizedMap(new HashMap());
-		managedrids = Collections.synchronizedMap(new HashMap());
 	}
 	
-//	/**
-//	 *  Update the global class loader.
-//	 *  
-//	 *  hack: should be removed
-//	 */
-//	public void updateGlobalClassLoader()
-//	{
-//		DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
-//		
-//		/* $if !android $ */
-//		this.libcl = new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), delegates);
-//		/* $else $
-//		this.libcl = new DelegationClassLoader(LibraryService.class.getClassLoader(), urls);
-//		$endif $ */
-//		
-//		System.out.println("update global: "+delegates.length);
-//	}
+	//-------- methods --------
+	
+	/**
+	 *  Add a new resource identifier.
+	 *  @param rid The resource identifier.
+	 */
+	public IFuture<Void> addResourceIdentifier(final IResourceIdentifier rid)
+	{
+		System.out.println("add "+rid);
+		final Future<Void> ret = new Future<Void>();
+		
+		getClassLoader(rid, null, rid).addResultListener(
+			new ExceptionDelegationResultListener<DelegationURLClassLoader, Void>(ret)
+		{
+			public void customResultAvailable(DelegationURLClassLoader result)
+			{
+
+				// Do not notify listeners with lock held!
+				
+				ILibraryServiceListener[] lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
+				for(int i=0; i<lis.length; i++)
+				{
+					final ILibraryServiceListener liscopy = lis[i];
+					lis[i].resourceIdentifierAdded(rid).addResultListener(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+						}
+						public void exceptionOccurred(Exception exception) 
+						{
+							// todo: how to handle timeouts?! allow manual retry?
+//							exception.printStackTrace();
+							removeLibraryServiceListener(liscopy);
+						};
+					});
+				}
+				
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Remove a resource identifier.
+	 *  @param url The resource identifier.
+	 */
+	public IFuture<Void> removeResourceIdentifier(IResourceIdentifier rid)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Remove a resource identifier.
+	 *  @param url The resource identifier.
+	 */
+	public IFuture<Void> removeResourceIdentifierCompletely(IResourceIdentifier rid)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get all managed (directly added i.e. top-level) resource identifiers.
+	 *  @return The list of resource identifiers.
+	 */
+	public IFuture<List<IResourceIdentifier>> getResourceIdentifiers()
+	{
+		return new Future<List<IResourceIdentifier>>(new ArrayList<IResourceIdentifier>(managedrids.keySet()));
+	}
+	
+	/**
+	 *  Get all resource identifiers (also indirectly managed. 
+	 */
+	public IFuture<List<IResourceIdentifier>> getIndirectResourceIdentifiers()
+	{
+		List<IResourceIdentifier> ret = new ArrayList<IResourceIdentifier>();
+		Collection<DelegationURLClassLoader> cls = classloaders.values();
+		for(Iterator<DelegationURLClassLoader> it=cls.iterator(); it.hasNext(); )
+		{
+			IResourceIdentifier rid = it.next().getResourceIdentifier();
+			if(!managedrids.containsKey(rid))
+			{
+				ret.add(rid);
+			}
+		}
+		return new Future<List<IResourceIdentifier>>(ret);
+	}
 	
 	/**
 	 *  Add a new url.
@@ -183,118 +247,22 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		return ret;
 	}
 	
-//	/**
-//	 * 
-//	 */
-//	protected IFuture<IResourceIdentifier> createResourceIdentifier(URL url)
-//	{
-//		Tuple2<IComponentIdentifier, URL> lid = new Tuple2<IComponentIdentifier, URL>(cid, url);
-//		String gid = mh.getArtifactDescription(url);
-//		ResourceIdentifier rid = new ResourceIdentifier(lid, gid);
-//		return new Future<IResourceIdentifier>(rid);
-//	}
-	
 	/**
-	 *  Add a new resource identifier.
-	 *  @param rid The resource identifier.
-	 */
-	public IFuture<Void> addResourceIdentifier(IResourceIdentifier rid)
-	{
-		System.out.println("add "+rid);
-		final Future<Void> ret = new Future<Void>();
-		
-		getClassLoader(rid, null).addResultListener(
-			new ExceptionDelegationResultListener<DelegationURLClassLoader, Void>(ret)
-		{
-			public void customResultAvailable(DelegationURLClassLoader result)
-			{
-				// Increase usage count for classloaders of resource tree
-				// todo:
-				
-				// Notify listeners.
-				// todo:
-				
-				ret.setResult(null);
-			}
-		});
-		
-		return ret;
-		
-//		final URL url = rid.getLocalIdentifier().getSecondEntity();
-		
-//		ILibraryServiceListener[] tmp = null;
-//		synchronized(this)
-//		{
-//			Integer refcount = (Integer)urlrefcount.get(url);
-//			if(refcount != null)
-//			{
-//				urlrefcount.put(url, new Integer(refcount.intValue() + 1));
-//			}
-//			else
-//			{
-//				urlrefcount.put(url, new Integer(1));
-//				tmp = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
-//			}
-//		}
-		
-//		if(tmp != null)
-//		{
-//			final ILibraryServiceListener[] lis = tmp;
-//			
-//			getClassLoader(rid, null).addResultListener(new DefaultResultListener<DelegationURLClassLoader>()
-//			{
-//				public void resultAvailable(DelegationURLClassLoader result)
-//				{
-//					// Do not notify listeners with lock held!
-//					
-//					for(int i=0; i<lis.length; i++)
-//					{
-//						final ILibraryServiceListener liscopy = lis[i];
-//						lis[i].urlAdded(url).addResultListener(new IResultListener()
-//						{
-//							public void resultAvailable(Object result)
-//							{
-//							}
-//							
-//							public void exceptionOccurred(Exception exception)
-//							{
-//								// todo: how to handle timeouts?! allow manual retry?
-////								exception.printStackTrace();
-//								removeLibraryServiceListener(liscopy);
-//							}
-//						});
-//					}
-//				}
-//			});
-//		}
-	}
-	
-	/**
-	 *  Remove a resource identifier.
+	 *  Remove a new url.
 	 *  @param url The resource identifier.
 	 */
-	public IFuture<Void> removeResourceIdentifier(IResourceIdentifier rid)
+	public IFuture<Void> removeURLCompletely(URL url)
 	{
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 *  Get all managed (directly added i.e. top-level) resource identifiers.
-	 *  @return The list of resource identifiers.
-	 */
-	public IFuture<List<IResourceIdentifier>> getResourceIdentifiers()
-	{
-		List<IResourceIdentifier> ret = new ArrayList<IResourceIdentifier>();
-		Collection<DelegationURLClassLoader> cls = classloaders.values();
-		for(Iterator<DelegationURLClassLoader> it=cls.iterator(); it.hasNext(); )
+		final Future<Void> ret = new Future<Void>();
+		mh.getResourceIdentifier(url).addResultListener(
+			new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
 		{
-			IResourceIdentifier rid = it.next().getResourceIdentifier();
-			if(rid!=null)
+			public void customResultAvailable(IResourceIdentifier result)
 			{
-				ret.add(rid);
+				removeResourceIdentifierCompletely(result).addResultListener(new DelegationResultListener<Void>(ret));
 			}
-		}
-		return new Future<List<IResourceIdentifier>>(ret);
+		});
+		return ret;
 	}
 	
 	/**
@@ -307,11 +275,76 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 //		return new Future<List<URL>>(SUtil.getClasspathURLs(libcl));	
 		return new Future<List<URL>>(new ArrayList());
 	}
+		
+	/** 
+	 *  Returns the current ClassLoader.
+	 *  @param rid The resource identifier (null for current global loader).
+	 *  @return the current ClassLoader
+	 */
+	@Excluded()
+	public IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid)
+	{
+		final Future<ClassLoader> ret = new Future<ClassLoader>();
+		
+		if(rid==null)
+		{
+			DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
+			ret.setResult(new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), delegates));
+		}
+		else
+		{
+			getClassLoader(rid, null, null).addResultListener(new ExceptionDelegationResultListener<DelegationURLClassLoader, ClassLoader>(ret)
+			{
+				public void customResultAvailable(DelegationURLClassLoader result)
+				{
+					ret.setResult(result);
+				}
+			});
+		}
+		
+		return ret;
+	}
+	
+	/** 
+	 *  Get the resource identifier for an url.
+	 *  @return The resource identifier.
+	 */
+	@Excluded()
+	public IFuture<IResourceIdentifier> getResourceIdentifier(URL url)
+	{
+		return mh.getResourceIdentifier(url);
+	}
+
+	//-------- listener methods --------
+	
+    /**
+	 *  Add an Library Service listener.
+	 *  The listener is registered for changes in the loaded library states.
+	 *  @param listener The listener to be added.
+	 */
+	public IFuture<Void> addLibraryServiceListener(ILibraryServiceListener listener)
+	{
+		listeners.add(listener);
+		return IFuture.DONE;
+	}
+
+	/**
+	 *  Remove an Library Service listener.
+	 *  @param listener  The listener to be removed.
+	 */
+	public IFuture<Void> removeLibraryServiceListener(ILibraryServiceListener listener)
+	{
+		listeners.remove(listener);
+		return IFuture.DONE;
+	}
+	
+	//-------- internal methods --------
 	
 	/**
 	 *  Get or create a classloader for an url.
 	 */
-	protected IFuture<DelegationURLClassLoader> getClassLoader(final IResourceIdentifier rid, Map<URL, List<URL>> alldeps)
+	protected IFuture<DelegationURLClassLoader> getClassLoader(final IResourceIdentifier rid, 
+		Map<URL, List<URL>> alldeps, final IResourceIdentifier support)
 	{
 		System.out.println("getClassLoader(): "+rid);
 		final URL url = rid.getLocalIdentifier().getSecondEntity();
@@ -321,6 +354,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		
 		if(cl!=null)
 		{
+			addSupport(rid, support);
 			ret.setResult(cl);
 		}
 		else
@@ -332,13 +366,13 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 				{
 					public void customResultAvailable(Map<URL, List<URL>> deps)
 					{
-						createClassLoader(rid, deps).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret));
+						createClassLoader(rid, deps, support).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret));
 					}
 				});
 			}
 			else
 			{
-				createClassLoader(rid, alldeps).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret));
+				createClassLoader(rid, alldeps, support).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret));
 			}
 		}
 		
@@ -348,7 +382,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	/**
 	 *  Create a new classloader.
 	 */
-	protected IFuture<DelegationURLClassLoader> createClassLoader(final IResourceIdentifier rid, Map<URL, List<URL>> alldeps)
+	protected IFuture<DelegationURLClassLoader> createClassLoader(final IResourceIdentifier rid, Map<URL, List<URL>> alldeps, final IResourceIdentifier support)
 	{
 		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
 		final URL url = rid.getLocalIdentifier().getSecondEntity();
@@ -361,6 +395,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])result.toArray(new DelegationURLClassLoader[result.size()]);
 				DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, ClassLoader.getSystemClassLoader(), delegates);
 				classloaders.put(rid, cl);
+				addSupport(rid, support);
 				ret.setResult(cl);
 			}
 		});
@@ -369,7 +404,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 			URL mydep = (URL)deps.get(i);
 			IComponentIdentifier platcid = ((IComponentIdentifier)getServiceIdentifier().getProviderId()).getRoot();
 			IResourceIdentifier myrid = new ResourceIdentifier(new Tuple2<IComponentIdentifier, URL>(platcid, mydep), null);
-			getClassLoader(myrid, alldeps).addResultListener(lis);
+			getClassLoader(myrid, alldeps, support).addResultListener(lis);
 		}
 		return ret;
 	}
@@ -377,13 +412,12 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	/**
 	 *  Get the dependent urls.
 	 */
-	public IFuture<Map<URL, List<URL>>> getDependencies(URL url)
+	protected IFuture<Map<URL, List<URL>>> getDependencies(URL url)
 	{
 		Map<URL, List<URL>> res = null;
 		try
 		{
 			res = mh.loadDependencies(url);
-//			List<URL> mydeps = alldeps.get(url);
 		}
 		catch(Exception e)
 		{
@@ -397,9 +431,91 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	 *  Add a path.
 	 *  @param path The path.
 	 */
-	public void addPath(String path)
+	protected void addPath(String path)
 	{
 		addURL(toURL(path));
+	}
+	
+	/**
+	 *  Add support for a rid.
+	 */
+	protected void addSupport(IResourceIdentifier rid, IResourceIdentifier support)
+	{
+		if(rid!=null && support!=null)
+		{
+			Set<IResourceIdentifier> mysup = ridsupport.get(rid);
+			if(mysup==null)
+			{
+				ridsupport.put(rid, new HashSet<IResourceIdentifier>());
+			}
+			mysup.add(support);
+		}
+	}
+	
+	/**
+	 *  Remove support for a rid.
+	 */
+	protected void removeSupport(IResourceIdentifier rid, IResourceIdentifier support)
+	{
+		if(rid!=null && support!=null)
+		{
+			Set<IResourceIdentifier> mysup = ridsupport.get(rid);
+			if(mysup!=null)
+			{
+				mysup.remove(support);
+				if(mysup.size()==0)
+				ridsupport.remove(rid);
+			}
+			mysup.add(support);
+		}
+	}
+	
+	/**
+	 *  Add primary management entry for a rid.
+	 */
+	protected void addManaged(IResourceIdentifier rid)
+	{
+		if(rid!=null)
+		{
+			Integer num = managedrids.get(rid);
+			if(num==null)
+			{
+				managedrids.put(rid, 1);
+			}
+			else
+			{
+				managedrids.put(rid, new Integer(num.intValue()+1));
+			}
+		}
+	}
+	
+	/**
+	 *  Remove primary management for a rid.
+	 *  @return True, if entry has to be removed.
+	 */
+	protected boolean removeManaged(IResourceIdentifier rid)
+	{
+		boolean ret = false;
+		
+		if(rid!=null)
+		{
+			Integer num = managedrids.get(rid);
+			if(num!=null)
+			{
+				int now = num.intValue()-1;
+				if(now==0)
+				{
+					managedrids.remove(rid);
+					ret = true;
+				}
+				else
+				{
+					managedrids.put(rid, managedrids.put(rid, new Integer(num.intValue()-1)));
+				}
+			}
+		}
+		
+		return ret;
 	}
 
 	//-------- methods --------
@@ -674,26 +790,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		return ret;
 	}
 
-	/**
-	 *  Add an Library Service listener.
-	 *  The listener is registered for changes in the loaded library states.
-	 *  @param listener The listener to be added.
-	 */
-	public void addLibraryServiceListener(ILibraryServiceListener listener)
-	{
-		if(listener==null)
-			System.out.println("here");
-		listeners.add(listener);
-	}
-
-	/**
-	 *  Remove an Library Service listener.
-	 *  @param listener  The listener to be removed.
-	 */
-	public void removeLibraryServiceListener(ILibraryServiceListener listener)
-	{
-		listeners.remove(listener);
-	}
+	
 
 	/** 
 	 *  Helper method for validating jar-files
@@ -951,73 +1048,8 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 ////		return ret;
 //	}
 	
-	/** 
-	 *  Returns the current ClassLoader.
-	 *  @return the current ClassLoader
-	 */
-	@Excluded()
-	public ClassLoader getClassLoader(IResourceIdentifier rid)
-	{
-		ClassLoader ret = null;
-		
-		if(rid==null)
-		{
-			DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
-			ret = new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), delegates);
-		}
-		else
-		{
-			Tuple2<IComponentIdentifier, URL> lid = rid.getLocalIdentifier();
-			
-			// Local case (when platform cid is on this platform)
-			IComponentIdentifier root = ((IComponentIdentifier)provider.getId()).getRoot();
-			if(root.equals(lid.getFirstEntity()))
-			{
-				ret = (ClassLoader)classloaders.get(lid.getSecondEntity());
-				
-				if(ret==null)
-				{
-					URL[] urls = (URL[])classloaders.keySet().toArray(new URL[classloaders.size()]);
-					
-					for(int i=0; ret==null && i<urls.length; i++)
-					{
-						File path = urlToFile(urls[i].toString());
-						File file = urlToFile(lid.getSecondEntity().toString());
-						File tmp = file;
-						while(tmp!=null && ret==null)
-						{
-							if(file.equals(path))
-							{
-								ret = (ClassLoader)classloaders.get(urls[i]);
-							}
-							else
-							{
-								tmp = tmp.getParentFile();
-							}
-						}
-					}
-				}
-			}
-			
-			// Global case
-			// todo:
-		}
-		
-		if(ret==null)
-			throw new RuntimeException("No classloader responsible for: "+rid);
-		
-		return ret;
-	}
-	
-	/** 
-	 *  Get the resource identifier for an url.
-	 *  @return The resource identifier.
-	 */
-	@Excluded()
-	public IFuture<IResourceIdentifier> getResourceIdentifier(URL url)
-	{
-		return mh.getResourceIdentifier(url);
-	}
+
+
 	
 //	/**
 //	 *  Get a class definition.
@@ -1056,11 +1088,11 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	
 	//-------- IPropertiesProvider interface --------
 	
-//	/**
-//	 *  Update from given properties.
-//	 */
-//	public IFuture<Void> setProperties(Properties props)
-//	{
+	/**
+	 *  Update from given properties.
+	 */
+	public IFuture<Void> setProperties(Properties props)
+	{
 //		// Do not remove existing urls?
 //		// todo: treat arguments and 
 //		// Remove existing urls
@@ -1082,15 +1114,15 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 //		{
 //			addPath(entries[i].getValue());
 //		}
-//		
-//		return IFuture.DONE;
-//	}
+		
+		return IFuture.DONE;
+	}
 	
-//	/**
-//	 *  Write current state into properties.
-//	 */
-//	public IFuture<Properties> getProperties()
-//	{
+	/**
+	 *  Write current state into properties.
+	 */
+	public IFuture<Properties> getProperties()
+	{
 //		String[]	entries;
 //		if(libcl != null)
 //		{
@@ -1145,7 +1177,8 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 //			props.addProperty(new Property("entry", entries[i]));
 //		}
 //		return new Future<Properties>(props);		
-//	}
+		return new Future<Properties>(new Properties());
+	}
 
 
 	/**
@@ -1215,5 +1248,34 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		}
 		return file;
 	}	
+	
+//	/**
+//	 *  Update the global class loader.
+//	 *  
+//	 *  hack: should be removed
+//	 */
+//	public void updateGlobalClassLoader()
+//	{
+//		DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
+//		
+//		/* $if !android $ */
+//		this.libcl = new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), delegates);
+//		/* $else $
+//		this.libcl = new DelegationClassLoader(LibraryService.class.getClassLoader(), urls);
+//		$endif $ */
+//		
+//		System.out.println("update global: "+delegates.length);
+//	}
+	
+//	/**
+//	 * 
+//	 */
+//	protected IFuture<IResourceIdentifier> createResourceIdentifier(URL url)
+//	{
+//		Tuple2<IComponentIdentifier, URL> lid = new Tuple2<IComponentIdentifier, URL>(cid, url);
+//		String gid = mh.getArtifactDescription(url);
+//		ResourceIdentifier rid = new ResourceIdentifier(lid, gid);
+//		return new Future<IResourceIdentifier>(rid);
+//	}
 }
 
