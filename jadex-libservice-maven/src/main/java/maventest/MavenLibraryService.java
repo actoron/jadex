@@ -3,6 +3,7 @@ package maventest;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISettingsService;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -26,11 +27,9 @@ import jadex.commons.future.IResultListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -38,20 +37,17 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 /**
  *  Library service for loading classpath elements.
  */
-public class MavenLibraryService extends BasicService implements ILibraryService, IPropertiesProvider
+public class MavenLibraryService extends BasicService implements ILibraryService//, IPropertiesProvider
 {
 	//-------- attributes --------
 	
@@ -64,15 +60,24 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	/** The init urls. */
 	protected Object[] initurls;
 
-	/** Current ClassLoader. */
-	protected DelegationURLClassLoader	libcl;
+//	/** Current ClassLoader. */
+//	protected DelegationURLClassLoader	libcl;
 	
-	/** The map of managed resources (url (or artifact id?) -> delegate loader. */
-	protected Map classloaders;
+	/** The map of managed resources (url (for local case) -> delegate loader). */
+	protected Map<IResourceIdentifier, DelegationURLClassLoader> classloaders;
 	
-	/** URL reference count */
-	protected Map urlrefcount;
+//	/** The map of managed resources (artifact id (for global case) -> delegate loader). */
+//	protected Map classloaders;
+
+	/** Rid support, for a rid all rids are saved that support it. */
+	protected Map<IResourceIdentifier, Set<IResourceIdentifier>> ridsupport;
 	
+	/** The primary managed rids and the number of their support. */
+	protected Map<IResourceIdentifier, Integer> managedrids;
+	
+	/** The maven handler. */
+	protected MavenHandler mh;
+
 	//-------- constructors --------
 	
 	/** 
@@ -107,19 +112,21 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		this.classloaders = new HashMap();
 		this.initurls = urls;
 		this.provider = provider;
+		this.mh = new MavenHandler(((IComponentIdentifier)provider.getId()).getRoot());
 
 		if(urls!=null)
 		{
 			for(int i=0; i<urls.length; i++)
 			{
-				getClassLoader(toURL(urls[i]));
+				addURL(toURL(urls[i]));
 			}
 		}
 		
 //		updateGlobalClassLoader();
 		
 		listeners	= Collections.synchronizedSet(new HashSet());
-		urlrefcount = Collections.synchronizedMap(new HashMap());
+		ridsupport = Collections.synchronizedMap(new HashMap());
+		managedrids = Collections.synchronizedMap(new HashMap());
 	}
 	
 //	/**
@@ -139,64 +146,199 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 //		
 //		System.out.println("update global: "+delegates.length);
 //	}
-
+	
+	/**
+	 *  Add a new url.
+	 *  @param url The resource identifier.
+	 */
+	public IFuture<Void> addURL(URL url)
+	{
+		final Future<Void> ret = new Future<Void>();
+		mh.getResourceIdentifier(url).addResultListener(
+			new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
+		{
+			public void customResultAvailable(IResourceIdentifier result)
+			{
+				addResourceIdentifier(result).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
+		return ret;
+	}
+	
+	/**
+	 *  Remove a new url.
+	 *  @param url The resource identifier.
+	 */
+	public IFuture<Void> removeURL(URL url)
+	{
+		final Future<Void> ret = new Future<Void>();
+		mh.getResourceIdentifier(url).addResultListener(
+			new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
+		{
+			public void customResultAvailable(IResourceIdentifier result)
+			{
+				removeResourceIdentifier(result).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
+		return ret;
+	}
+	
+//	/**
+//	 * 
+//	 */
+//	protected IFuture<IResourceIdentifier> createResourceIdentifier(URL url)
+//	{
+//		Tuple2<IComponentIdentifier, URL> lid = new Tuple2<IComponentIdentifier, URL>(cid, url);
+//		String gid = mh.getArtifactDescription(url);
+//		ResourceIdentifier rid = new ResourceIdentifier(lid, gid);
+//		return new Future<IResourceIdentifier>(rid);
+//	}
+	
+	/**
+	 *  Add a new resource identifier.
+	 *  @param rid The resource identifier.
+	 */
+	public IFuture<Void> addResourceIdentifier(IResourceIdentifier rid)
+	{
+		System.out.println("add "+rid);
+		final Future<Void> ret = new Future<Void>();
+		
+		getClassLoader(rid, null).addResultListener(
+			new ExceptionDelegationResultListener<DelegationURLClassLoader, Void>(ret)
+		{
+			public void customResultAvailable(DelegationURLClassLoader result)
+			{
+				// Increase usage count for classloaders of resource tree
+				// todo:
+				
+				// Notify listeners.
+				// todo:
+				
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
+		
+//		final URL url = rid.getLocalIdentifier().getSecondEntity();
+		
+//		ILibraryServiceListener[] tmp = null;
+//		synchronized(this)
+//		{
+//			Integer refcount = (Integer)urlrefcount.get(url);
+//			if(refcount != null)
+//			{
+//				urlrefcount.put(url, new Integer(refcount.intValue() + 1));
+//			}
+//			else
+//			{
+//				urlrefcount.put(url, new Integer(1));
+//				tmp = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
+//			}
+//		}
+		
+//		if(tmp != null)
+//		{
+//			final ILibraryServiceListener[] lis = tmp;
+//			
+//			getClassLoader(rid, null).addResultListener(new DefaultResultListener<DelegationURLClassLoader>()
+//			{
+//				public void resultAvailable(DelegationURLClassLoader result)
+//				{
+//					// Do not notify listeners with lock held!
+//					
+//					for(int i=0; i<lis.length; i++)
+//					{
+//						final ILibraryServiceListener liscopy = lis[i];
+//						lis[i].urlAdded(url).addResultListener(new IResultListener()
+//						{
+//							public void resultAvailable(Object result)
+//							{
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								// todo: how to handle timeouts?! allow manual retry?
+////								exception.printStackTrace();
+//								removeLibraryServiceListener(liscopy);
+//							}
+//						});
+//					}
+//				}
+//			});
+//		}
+	}
+	
+	/**
+	 *  Remove a resource identifier.
+	 *  @param url The resource identifier.
+	 */
+	public IFuture<Void> removeResourceIdentifier(IResourceIdentifier rid)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Get all managed (directly added i.e. top-level) resource identifiers.
+	 *  @return The list of resource identifiers.
+	 */
+	public IFuture<List<IResourceIdentifier>> getResourceIdentifiers()
+	{
+		List<IResourceIdentifier> ret = new ArrayList<IResourceIdentifier>();
+		Collection<DelegationURLClassLoader> cls = classloaders.values();
+		for(Iterator<DelegationURLClassLoader> it=cls.iterator(); it.hasNext(); )
+		{
+			IResourceIdentifier rid = it.next().getResourceIdentifier();
+			if(rid!=null)
+			{
+				ret.add(rid);
+			}
+		}
+		return new Future<List<IResourceIdentifier>>(ret);
+	}
+	
+	/**
+	 *  Get other contained (but not directly managed) urls from parent classloaders.
+	 *  @return The list of urls.
+	 */
+	public IFuture<List<URL>> getNonManagedURLs()
+	{
+//		classloaders.values
+//		return new Future<List<URL>>(SUtil.getClasspathURLs(libcl));	
+		return new Future<List<URL>>(new ArrayList());
+	}
+	
 	/**
 	 *  Get or create a classloader for an url.
 	 */
-	public IFuture<DelegationURLClassLoader> getClassLoader(final URL url)
+	protected IFuture<DelegationURLClassLoader> getClassLoader(final IResourceIdentifier rid, Map<URL, List<URL>> alldeps)
 	{
-		System.out.println("getClassLoader(): "+url);
+		System.out.println("getClassLoader(): "+rid);
+		final URL url = rid.getLocalIdentifier().getSecondEntity();
 		
-		Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
+		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
 		DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(url);
 		
-		if(cl==null)
+		if(cl!=null)
 		{
-			InputStream pom = null;
-			
-			if(url.getProtocol().equals("jar"))
+			ret.setResult(cl);
+		}
+		else
+		{
+			if(alldeps==null)
 			{
-				try
+				getDependencies(url).addResultListener(
+					new ExceptionDelegationResultListener<Map<URL, List<URL>>, DelegationURLClassLoader>(ret)
 				{
-					JarURLConnection con = (JarURLConnection)url.openConnection();
-					JarFile jarfile = con.getJarFile();
-					
-					for(Enumeration<JarEntry> files =jarfile.entries(); files.hasMoreElements(); )
+					public void customResultAvailable(Map<URL, List<URL>> deps)
 					{
-						JarEntry entry = files.nextElement();
-						String name = entry.getName();
-						if(name.endsWith("pom.xml"))
-						{
-							pom = jarfile.getInputStream(entry);
-							break;
-						}
+						createClassLoader(rid, deps).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret));
 					}
-				}
-				catch(Exception e)
-				{
-				}
+				});
 			}
 			else
 			{
-				// move up from classes to root (root/target/classes)
-				try
-				{
-					File dir = urlToFile(url.toString());
-					dir = dir.getParentFile();
-					dir = dir.getParentFile();
-					File pomfile = new File(dir, "pom.xml");
-					pom = new FileInputStream(pomfile);
-				}
-				catch(Exception e)
-				{
-				}
-			}
-			
-			createClassLoader(url, pom).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret));
-
-			if(pom==null)
-			{
-				System.out.println("No pom found in: "+url);
+				createClassLoader(rid, alldeps).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret));
 			}
 		}
 		
@@ -204,73 +346,51 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	}
 	
 	/**
-	 *  Create a class loader based on pom dependencies.
+	 *  Create a new classloader.
 	 */
-	public IFuture<DelegationURLClassLoader> createClassLoader(final URL url, InputStream pom)
+	protected IFuture<DelegationURLClassLoader> createClassLoader(final IResourceIdentifier rid, Map<URL, List<URL>> alldeps)
 	{
 		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
-		
-		if(pom==null)
+		final URL url = rid.getLocalIdentifier().getSecondEntity();
+		final List<URL> deps = alldeps.get(url);
+		CollectionResultListener<DelegationURLClassLoader> lis = new CollectionResultListener<DelegationURLClassLoader>
+			(deps.size(), true, new ExceptionDelegationResultListener<Collection<DelegationURLClassLoader>, DelegationURLClassLoader>(ret)
 		{
-			DelegationURLClassLoader cl = new DelegationURLClassLoader(url, ClassLoader.getSystemClassLoader(), null);
-			classloaders.put(url, cl);
-//			updateGlobalClassLoader();
-			ret.setResult(cl);
-		}
-		else
-		{
-			getDependencies(pom).addResultListener(
-				new ExceptionDelegationResultListener<URL[], DelegationURLClassLoader>(ret)
+			public void customResultAvailable(Collection<DelegationURLClassLoader> result)
 			{
-				public void customResultAvailable(URL[] deps)
-				{
-					CollectionResultListener<DelegationURLClassLoader> lis = new CollectionResultListener<DelegationURLClassLoader>
-						(deps.length, true, new DefaultResultListener<Collection<DelegationURLClassLoader>>()
-					{
-						public void resultAvailable(Collection<DelegationURLClassLoader> result) 
-						{
-							DelegationURLClassLoader cl = new DelegationURLClassLoader(url, 
-								ClassLoader.getSystemClassLoader(), result.toArray(new DelegationURLClassLoader[result.size()]));
-							classloaders.put(url, cl);
-//							updateGlobalClassLoader();
-							ret.setResult(cl);
-						}
-					});
-					for(int i=0; i<deps.length; i++)
-					{
-						getClassLoader(deps[i]).addResultListener(lis);
-					}
-				}
-			});
+				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])result.toArray(new DelegationURLClassLoader[result.size()]);
+				DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, ClassLoader.getSystemClassLoader(), delegates);
+				classloaders.put(rid, cl);
+				ret.setResult(cl);
+			}
+		});
+		for(int i=0; i<deps.size(); i++)
+		{
+			URL mydep = (URL)deps.get(i);
+			IComponentIdentifier platcid = ((IComponentIdentifier)getServiceIdentifier().getProviderId()).getRoot();
+			IResourceIdentifier myrid = new ResourceIdentifier(new Tuple2<IComponentIdentifier, URL>(platcid, mydep), null);
+			getClassLoader(myrid, alldeps).addResultListener(lis);
 		}
-		
 		return ret;
 	}
 	
 	/**
 	 *  Get the dependent urls.
 	 */
-	public IFuture<URL[]> getDependencies(InputStream pomstream)
+	public IFuture<Map<URL, List<URL>>> getDependencies(URL url)
 	{
-		URL[] res = new URL[0];
+		Map<URL, List<URL>> res = null;
 		try
 		{
-			MavenBuilder	mb	= new MavenBuilder();
-			mb.loadDependenciesFromPom(pomstream, null);
-			File[]	files	= mb.resolveAsFiles();
-			res = new URL[files.length];
-			for(int i=0; i<files.length; i++)
-			{
-				System.out.println("resolved: "+files[i]);
-				res[i] = toURL("jar:file:"+files[i].getAbsolutePath()+"!/");
-			}
+			res = mh.loadDependencies(url);
+//			List<URL> mydeps = alldeps.get(url);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
 		
-		return new Future<URL[]>(res);
+		return new Future<Map<URL, List<URL>>>(res);
 	}
 	
 	/**
@@ -284,196 +404,196 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 
 	//-------- methods --------
 
-	/**
-	 *  Add a new url.
-	 *  @param url The url.
-	 */
-	public void addURL(final URL url)
-	{
-//		System.out.println("add "+url);
-		ILibraryServiceListener[] tmp = null;
-		
-		synchronized(this)
-		{
-			Integer refcount = (Integer)urlrefcount.get(url);
-			if(refcount != null)
-			{
-				urlrefcount.put(url, new Integer(refcount.intValue() + 1));
-			}
-			else
-			{
-				urlrefcount.put(url, new Integer(1));
-				tmp = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
-			}
-		}
-		
-		if(tmp != null)
-		{
-			final ILibraryServiceListener[] lis = tmp;
-			
-			getClassLoader(url).addResultListener(new DefaultResultListener<DelegationURLClassLoader>()
-			{
-				public void resultAvailable(DelegationURLClassLoader result)
-				{
-					// Do not notify listeners with lock held!
-					
-					for(int i=0; i<lis.length; i++)
-					{
-						final ILibraryServiceListener liscopy = lis[i];
-						lis[i].urlAdded(url).addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								// todo: how to handle timeouts?! allow manual retry?
-//								exception.printStackTrace();
-								removeLibraryServiceListener(liscopy);
-							}
-						});
-					}
-				}
-			});
-		}
-	}
+//	/**
+//	 *  Add a new url.
+//	 *  @param url The url.
+//	 */
+//	public void addURL(final URL url)
+//	{
+////		System.out.println("add "+url);
+//		ILibraryServiceListener[] tmp = null;
+//		
+//		synchronized(this)
+//		{
+//			Integer refcount = (Integer)urlrefcount.get(url);
+//			if(refcount != null)
+//			{
+//				urlrefcount.put(url, new Integer(refcount.intValue() + 1));
+//			}
+//			else
+//			{
+//				urlrefcount.put(url, new Integer(1));
+//				tmp = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
+//			}
+//		}
+//		
+//		if(tmp != null)
+//		{
+//			final ILibraryServiceListener[] lis = tmp;
+//			
+//			getClassLoader(url).addResultListener(new DefaultResultListener<DelegationURLClassLoader>()
+//			{
+//				public void resultAvailable(DelegationURLClassLoader result)
+//				{
+//					// Do not notify listeners with lock held!
+//					
+//					for(int i=0; i<lis.length; i++)
+//					{
+//						final ILibraryServiceListener liscopy = lis[i];
+//						lis[i].urlAdded(url).addResultListener(new IResultListener()
+//						{
+//							public void resultAvailable(Object result)
+//							{
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								// todo: how to handle timeouts?! allow manual retry?
+////								exception.printStackTrace();
+//								removeLibraryServiceListener(liscopy);
+//							}
+//						});
+//					}
+//				}
+//			});
+//		}
+//	}
 	
-	/**
-	 *  Remove a url.
-	 *  @param url The url.
-	 */
-	public void removeURL(final URL url)
-	{
-//		System.out.println("remove "+url);
-		ILibraryServiceListener[] tmp = null;
-		
-		synchronized(this)
-		{
-			Integer refcount = (Integer)urlrefcount.get(url);
-			if(refcount == null)
-				throw new RuntimeException("Unknown URL: "+url);
-			refcount = new Integer(refcount.intValue() - 1);
-			urlrefcount.put(url, refcount);
-			if(refcount.intValue() < 1)
-			{
-				classloaders.remove(url);
-				tmp = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
-			}
-		}
-		
-		// Do not notify listeners with lock held!
-		
-		if(tmp != null)
-		{
-			final ILibraryServiceListener[] lis = tmp;
-			
-			getClassLoader(url).addResultListener(new DefaultResultListener<DelegationURLClassLoader>()
-			{
-				public void resultAvailable(DelegationURLClassLoader result)
-				{
-//					updateGlobalClassLoader();
-					
-					for(int i=0; i<lis.length; i++)
-					{
-						final ILibraryServiceListener liscopy = lis[i];
-						lis[i].urlRemoved(url).addResultListener(new IResultListener()
-						{
-							public void resultAvailable(Object result)
-							{
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								// todo: how to handle timeouts?! allow manual retry?
-		//						exception.printStackTrace();
-								removeLibraryServiceListener(liscopy);
-							}
-						});
-					}
-				}
-			});
-		}
-	}
+//	/**
+//	 *  Remove a url.
+//	 *  @param url The url.
+//	 */
+//	public void removeURL(final URL url)
+//	{
+////		System.out.println("remove "+url);
+//		ILibraryServiceListener[] tmp = null;
+//		
+//		synchronized(this)
+//		{
+//			Integer refcount = (Integer)urlrefcount.get(url);
+//			if(refcount == null)
+//				throw new RuntimeException("Unknown URL: "+url);
+//			refcount = new Integer(refcount.intValue() - 1);
+//			urlrefcount.put(url, refcount);
+//			if(refcount.intValue() < 1)
+//			{
+//				classloadersbyname.remove(url);
+//				tmp = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
+//			}
+//		}
+//		
+//		// Do not notify listeners with lock held!
+//		
+//		if(tmp != null)
+//		{
+//			final ILibraryServiceListener[] lis = tmp;
+//			
+//			getClassLoader(url).addResultListener(new DefaultResultListener<DelegationURLClassLoader>()
+//			{
+//				public void resultAvailable(DelegationURLClassLoader result)
+//				{
+////					updateGlobalClassLoader();
+//					
+//					for(int i=0; i<lis.length; i++)
+//					{
+//						final ILibraryServiceListener liscopy = lis[i];
+//						lis[i].urlRemoved(url).addResultListener(new IResultListener()
+//						{
+//							public void resultAvailable(Object result)
+//							{
+//							}
+//							
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								// todo: how to handle timeouts?! allow manual retry?
+//		//						exception.printStackTrace();
+//								removeLibraryServiceListener(liscopy);
+//							}
+//						});
+//					}
+//				}
+//			});
+//		}
+//	}
 	
-	/**
-	 *  Remove a url completely (all references).
-	 *  @param url The url.
-	 */
-	public void removeURLCompletely(URL url)
-	{
-//		System.out.println("rem all "+url);
-		ILibraryServiceListener[] lis = null;
-		synchronized(this)
-		{
-			urlrefcount.remove(url);
-			classloaders.remove(url);
-//			updateGlobalClassLoader();
-			lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
-		}
-		
-		// Do not notify listeners with lock held!
-		if(lis != null)
-		{
-			for(int i=0; i<lis.length; i++)
-			{
-				final ILibraryServiceListener liscopy = lis[i];
-				lis[i].urlRemoved(url).addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						// todo: how to handle timeouts?! allow manual retry?
-//						exception.printStackTrace();
-						removeLibraryServiceListener(liscopy);
-					}
-				});
-			}
-		}
-	}
+//	/**
+//	 *  Remove a url completely (all references).
+//	 *  @param url The url.
+//	 */
+//	public void removeURLCompletely(URL url)
+//	{
+////		System.out.println("rem all "+url);
+//		ILibraryServiceListener[] lis = null;
+//		synchronized(this)
+//		{
+//			urlrefcount.remove(url);
+//			classloadersbyname.remove(url);
+////			updateGlobalClassLoader();
+//			lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
+//		}
+//		
+//		// Do not notify listeners with lock held!
+//		if(lis != null)
+//		{
+//			for(int i=0; i<lis.length; i++)
+//			{
+//				final ILibraryServiceListener liscopy = lis[i];
+//				lis[i].urlRemoved(url).addResultListener(new IResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						// todo: how to handle timeouts?! allow manual retry?
+////						exception.printStackTrace();
+//						removeLibraryServiceListener(liscopy);
+//					}
+//				});
+//			}
+//		}
+//	}
 	
-	/**
-	 *  Get all managed entries as URLs.
-	 *  @return url The urls.
-	 */
-	public synchronized IFuture<List<URL>> getURLs()
-	{
-		return new Future<List<URL>>(new ArrayList<URL>(libcl.getAllURLs()));
-	}
-
-	/**
-	 *  Get other contained (but not directly managed) URLs.
-	 *  @return The list of urls.
-	 */
-	public synchronized IFuture<List<URL>> getNonManagedURLs()
-	{
-		return new Future<List<URL>>(SUtil.getClasspathURLs(libcl));	
-	}
-	
-	/**
-	 *  Get all urls (managed and non-managed).
-	 *  @return The list of urls.
-	 */
-	public IFuture<List<URL>> getAllURLs()
-	{
-		List<URL> ret = new ArrayList<URL>();
-		ret.addAll(libcl.getAllURLs());
-		ret.addAll(SUtil.getClasspathURLs(libcl));
-		ret.addAll(SUtil.getClasspathURLs(null));
-		return new Future<List<URL>>(ret);
-	}
-	
-	/** 
-	 *  Returns the current ClassLoader
-	 *  @return the current ClassLoader
-	 */
-	public ClassLoader getClassLoader()
-	{
-		return libcl;
-	}
+//	/**
+//	 *  Get all managed entries as URLs.
+//	 *  @return url The urls.
+//	 */
+//	public synchronized IFuture<List<URL>> getURLs()
+//	{
+//		return new Future<List<URL>>(new ArrayList<URL>(libcl.getAllURLs()));
+//	}
+//
+//	/**
+//	 *  Get other contained (but not directly managed) URLs.
+//	 *  @return The list of urls.
+//	 */
+//	public synchronized IFuture<List<URL>> getNonManagedURLs()
+//	{
+//		return new Future<List<URL>>(SUtil.getClasspathURLs(libcl));	
+//	}
+//	
+//	/**
+//	 *  Get all urls (managed and non-managed).
+//	 *  @return The list of urls.
+//	 */
+//	public IFuture<List<URL>> getAllURLs()
+//	{
+//		List<URL> ret = new ArrayList<URL>();
+//		ret.addAll(libcl.getAllURLs());
+//		ret.addAll(SUtil.getClasspathURLs(libcl));
+//		ret.addAll(SUtil.getClasspathURLs(null));
+//		return new Future<List<URL>>(ret);
+//	}
+//	
+//	/** 
+//	 *  Returns the current ClassLoader
+//	 *  @return the current ClassLoader
+//	 */
+//	public ClassLoader getClassLoader()
+//	{
+//		return libcl;
+//	}
 
 	/**
 	 *  Start the service.
@@ -544,7 +664,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 			{
 				synchronized(this)
 				{
-					libcl = null;
+//					libcl = null;
 					listeners.clear();
 					MavenLibraryService.super.shutdownService().addResultListener(new DelegationResultListener(ret));
 				}
@@ -705,132 +825,131 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		return ret;
 	}
 	
-	/**
-	 *  Get the non-managed classpath entries as strings.
-	 *  @return Classpath entries as a list of strings.
-	 */
-	public IFuture<List<String>> getURLStrings()
-	{
-		final Future<List<String>> ret = new Future<List<String>>();
-		
-		getURLs().addResultListener(new IResultListener<List<URL>>()
-		{
-			public void resultAvailable(List<URL> result)
-			{
-//				List urls = (List)result;
-				// TODO Auto-generated method stub
-				List<String> tmp = new ArrayList<String>();
-				// todo: hack!!!
-				
-				for(Iterator<URL> it=result.iterator(); it.hasNext(); )
-				{
-					URL	url	= it.next();
-					tmp.add(url.toString());
-					
-//					String file = url.getFile();
-//					File f = new File(file);
-//					
-//					// Hack!!! Above code doesnt handle relative url paths. 
-//					if(!f.exists())
-//					{
-//						File	newfile	= new File(new File("."), file);
-//						if(newfile.exists())
-//						{
-//							f	= newfile;
-//						}
-//					}
-//					ret.add(f.getAbsolutePath());
-				}
-				
-				ret.setResult(tmp);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 *  Get the non-managed classpath entries.
-	 *  @return Classpath entries as a list of strings.
-	 */
-	public IFuture<List<String>> getNonManagedURLStrings()
-	{
-		final Future<List<String>> ret = new Future<List<String>>();
-		
-		getNonManagedURLs().addResultListener(new IResultListener<List<URL>>()
-		{
-			public void resultAvailable(List<URL> result)
-			{
-//				List urls = (List)result;
-				List<String> tmp = new ArrayList<String>();
-				// todo: hack!!!
-				
-				for(Iterator<URL> it=result.iterator(); it.hasNext(); )
-				{
-					URL	url	= it.next();
-					tmp.add(url.toString());
-					
-//					String file = url.getFile();
-//					File f = new File(file);
-//					
-//					// Hack!!! Above code doesnt handle relative url paths. 
-//					if(!f.exists())
-//					{
-//						File	newfile	= new File(new File("."), file);
-//						if(newfile.exists())
-//						{
-//							f	= newfile;
-//						}
-//					}
-//					ret.add(f.getAbsolutePath());
-				}
-				
-				ret.setResult(tmp);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
-		
-		return ret;
-		
-//		java.util.List	ret	= new ArrayList();
-//
-////		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
-//		// todo: hack
-////		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class).get(new ThreadSuspendable());
-//		ClassLoader	cl	= ls.getClassLoader();
+//	/**
+//	 *  Get the non-managed classpath entries as strings.
+//	 *  @return Classpath entries as a list of strings.
+//	 */
+//	public IFuture<List<String>> getURLStrings()
+//	{
+//		final Future<List<String>> ret = new Future<List<String>>();
 //		
-//		List cps = SUtil.getClasspathURLs(cl!=null ? cl.getParent() : null);	// todo: classpath?
-//		for(int i=0; i<cps.size(); i++)
+//		getURLs().addResultListener(new IResultListener<List<URL>>()
 //		{
-//			URL	url	= (URL)cps.get(i);
-//			ret.add(url.toString());
+//			public void resultAvailable(List<URL> result)
+//			{
+////				List urls = (List)result;
+//				List<String> tmp = new ArrayList<String>();
+//				// todo: hack!!!
+//				
+//				for(Iterator<URL> it=result.iterator(); it.hasNext(); )
+//				{
+//					URL	url	= it.next();
+//					tmp.add(url.toString());
+//					
+////					String file = url.getFile();
+////					File f = new File(file);
+////					
+////					// Hack!!! Above code doesnt handle relative url paths. 
+////					if(!f.exists())
+////					{
+////						File	newfile	= new File(new File("."), file);
+////						if(newfile.exists())
+////						{
+////							f	= newfile;
+////						}
+////					}
+////					ret.add(f.getAbsolutePath());
+//				}
+//				
+//				ret.setResult(tmp);
+//			}
 //			
-////			String file = url.getFile();
-////			File f = new File(file);
-////			
-////			// Hack!!! Above code doesnt handle relative url paths. 
-////			if(!f.exists())
-////			{
-////				File	newfile	= new File(new File("."), file);
-////				if(newfile.exists())
-////				{
-////					f	= newfile;
-////				}
-////			}
-////			ret.add(f.getAbsolutePath());
-//		}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
 //		
 //		return ret;
-	}
+//	}
+//	
+//	/**
+//	 *  Get the non-managed classpath entries.
+//	 *  @return Classpath entries as a list of strings.
+//	 */
+//	public IFuture<List<String>> getNonManagedURLStrings()
+//	{
+//		final Future<List<String>> ret = new Future<List<String>>();
+//		
+//		getNonManagedURLs().addResultListener(new IResultListener<List<URL>>()
+//		{
+//			public void resultAvailable(List<URL> result)
+//			{
+////				List urls = (List)result;
+//				List<String> tmp = new ArrayList<String>();
+//				// todo: hack!!!
+//				
+//				for(Iterator<URL> it=result.iterator(); it.hasNext(); )
+//				{
+//					URL	url	= it.next();
+//					tmp.add(url.toString());
+//					
+////					String file = url.getFile();
+////					File f = new File(file);
+////					
+////					// Hack!!! Above code doesnt handle relative url paths. 
+////					if(!f.exists())
+////					{
+////						File	newfile	= new File(new File("."), file);
+////						if(newfile.exists())
+////						{
+////							f	= newfile;
+////						}
+////					}
+////					ret.add(f.getAbsolutePath());
+//				}
+//				
+//				ret.setResult(tmp);
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				ret.setException(exception);
+//			}
+//		});
+//		
+//		return ret;
+//		
+////		java.util.List	ret	= new ArrayList();
+////
+//////		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class);
+////		// todo: hack
+//////		ILibraryService ls = (ILibraryService)getJCC().getServiceContainer().getService(ILibraryService.class).get(new ThreadSuspendable());
+////		ClassLoader	cl	= ls.getClassLoader();
+////		
+////		List cps = SUtil.getClasspathURLs(cl!=null ? cl.getParent() : null);	// todo: classpath?
+////		for(int i=0; i<cps.size(); i++)
+////		{
+////			URL	url	= (URL)cps.get(i);
+////			ret.add(url.toString());
+////			
+//////			String file = url.getFile();
+//////			File f = new File(file);
+//////			
+//////			// Hack!!! Above code doesnt handle relative url paths. 
+//////			if(!f.exists())
+//////			{
+//////				File	newfile	= new File(new File("."), file);
+//////				if(newfile.exists())
+//////				{
+//////					f	= newfile;
+//////				}
+//////			}
+//////			ret.add(f.getAbsolutePath());
+////		}
+////		
+////		return ret;
+//	}
 	
 	/** 
 	 *  Returns the current ClassLoader.
@@ -850,7 +969,7 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 		{
 			Tuple2<IComponentIdentifier, URL> lid = rid.getLocalIdentifier();
 			
-			// Local case
+			// Local case (when platform cid is on this platform)
 			IComponentIdentifier root = ((IComponentIdentifier)provider.getId()).getRoot();
 			if(root.equals(lid.getFirstEntity()))
 			{
@@ -891,144 +1010,142 @@ public class MavenLibraryService extends BasicService implements ILibraryService
 	}
 	
 	/** 
-	 *  Returns the resource identifier.
+	 *  Get the resource identifier for an url.
 	 *  @return The resource identifier.
 	 */
 	@Excluded()
-	public IResourceIdentifier getResourceIdentifier(String filename)
+	public IFuture<IResourceIdentifier> getResourceIdentifier(URL url)
 	{
-		
-		
-		throw new UnsupportedOperationException();
+		return mh.getResourceIdentifier(url);
 	}
 	
-	/**
-	 *  Get a class definition.
-	 *  @param name The class name.
-	 *  @return The class definition as byte array.
-	 */
-	public IFuture<byte[]> getClassDefinition(String name)
-	{
-		Future<byte[]> ret = new Future<byte[]>();
-		
-		Class clazz = SReflect.findClass0(name, null, libcl);
-		if(clazz!=null)
-		{
-			try
-			{
-				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-				ObjectOutputStream oos = new ObjectOutputStream(bos);
-				oos.writeObject(clazz);
-				oos.close();
-				bos.close();
-				byte[] data = bos.toByteArray();
-				ret.setResult(data);
-			}
-			catch(Exception e)
-			{
-				ret.setResult(null);
-			}
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-		
-		return ret;
-	}
+//	/**
+//	 *  Get a class definition.
+//	 *  @param name The class name.
+//	 *  @return The class definition as byte array.
+//	 */
+//	public IFuture<byte[]> getClassDefinition(String name)
+//	{
+//		Future<byte[]> ret = new Future<byte[]>();
+//		
+//		Class clazz = SReflect.findClass0(name, null, libcl);
+//		if(clazz!=null)
+//		{
+//			try
+//			{
+//				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//				ObjectOutputStream oos = new ObjectOutputStream(bos);
+//				oos.writeObject(clazz);
+//				oos.close();
+//				bos.close();
+//				byte[] data = bos.toByteArray();
+//				ret.setResult(data);
+//			}
+//			catch(Exception e)
+//			{
+//				ret.setResult(null);
+//			}
+//		}
+//		else
+//		{
+//			ret.setResult(null);
+//		}
+//		
+//		return ret;
+//	}
 	
 	//-------- IPropertiesProvider interface --------
 	
-	/**
-	 *  Update from given properties.
-	 */
-	public IFuture<Void> setProperties(Properties props)
-	{
-		// Do not remove existing urls?
-		// todo: treat arguments and 
-		// Remove existing urls
-//		libcl = new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), initurls);
-		
-		// todo: fix me / does not work getClassLoader is async
-		if(initurls!=null)
-		{
-			for(int i=0; i<initurls.length; i++)
-			{
-				getClassLoader(toURL(initurls[i]));
-			}
-		}
-//		updateGlobalClassLoader();
-		
-		// Add new urls.
-		Property[]	entries	= props.getProperties("entry");
-		for(int i=0; i<entries.length; i++)
-		{
-			addPath(entries[i].getValue());
-		}
-		
-		return IFuture.DONE;
-	}
+//	/**
+//	 *  Update from given properties.
+//	 */
+//	public IFuture<Void> setProperties(Properties props)
+//	{
+//		// Do not remove existing urls?
+//		// todo: treat arguments and 
+//		// Remove existing urls
+////		libcl = new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), initurls);
+//		
+//		// todo: fix me / does not work getClassLoader is async
+//		if(initurls!=null)
+//		{
+//			for(int i=0; i<initurls.length; i++)
+//			{
+//				addURL(toURL(initurls[i]));
+//			}
+//		}
+////		updateGlobalClassLoader();
+//		
+//		// Add new urls.
+//		Property[]	entries	= props.getProperties("entry");
+//		for(int i=0; i<entries.length; i++)
+//		{
+//			addPath(entries[i].getValue());
+//		}
+//		
+//		return IFuture.DONE;
+//	}
 	
-	/**
-	 *  Write current state into properties.
-	 */
-	public IFuture<Properties> getProperties()
-	{
-		String[]	entries;
-		if(libcl != null)
-		{
-			synchronized(this)
-			{
-				List urls = new ArrayList(libcl.getAllURLs());
-				entries	= new String[urls.size()];
-				for(int i=0; i<entries.length; i++)
-				{
-					
-					String	url	= urls.get(i).toString();
-					File	file	= urlToFile(url.toString());
-					if(file!=null)
-					{
-						String	filename	= SUtil.convertPathToRelative(file.getAbsolutePath());
-						String fileurl;
-						try
-						{
-							// URI wouldn't allow relative names, so pretend its an absolute path.
-							fileurl = "file:"+new URI("file", null, "/"+filename.replace('\\', '/'), null).toURL().toString().substring(6);
-						}
-						catch(Exception e)
-						{
-							fileurl	= "file:"+filename.replace('\\', '/');
-						}
-						if(url.startsWith("jar:file:"))
-						{
-							entries[i]	= "jar:" + fileurl;
-						}
-						else
-						{
-							entries[i]	= fileurl;
-						}
-						if(url.endsWith("!/") && entries[i].endsWith("!"))
-							entries[i]	+= "/";	// Stripped by new File(...).
-					}
-					else
-					{
-						entries[i]	= url;
-					}
-				}
-			}
-		}
-		else
-		{
-			entries = new String[0];
-		}
-		
-		Properties props	= new Properties();
-		for(int i=0; i<entries.length; i++)
-		{
-			props.addProperty(new Property("entry", entries[i]));
-		}
-		return new Future<Properties>(props);		
-	}
+//	/**
+//	 *  Write current state into properties.
+//	 */
+//	public IFuture<Properties> getProperties()
+//	{
+//		String[]	entries;
+//		if(libcl != null)
+//		{
+//			synchronized(this)
+//			{
+//				List urls = new ArrayList(libcl.getAllURLs());
+//				entries	= new String[urls.size()];
+//				for(int i=0; i<entries.length; i++)
+//				{
+//					
+//					String	url	= urls.get(i).toString();
+//					File	file	= urlToFile(url.toString());
+//					if(file!=null)
+//					{
+//						String	filename	= SUtil.convertPathToRelative(file.getAbsolutePath());
+//						String fileurl;
+//						try
+//						{
+//							// URI wouldn't allow relative names, so pretend its an absolute path.
+//							fileurl = "file:"+new URI("file", null, "/"+filename.replace('\\', '/'), null).toURL().toString().substring(6);
+//						}
+//						catch(Exception e)
+//						{
+//							fileurl	= "file:"+filename.replace('\\', '/');
+//						}
+//						if(url.startsWith("jar:file:"))
+//						{
+//							entries[i]	= "jar:" + fileurl;
+//						}
+//						else
+//						{
+//							entries[i]	= fileurl;
+//						}
+//						if(url.endsWith("!/") && entries[i].endsWith("!"))
+//							entries[i]	+= "/";	// Stripped by new File(...).
+//					}
+//					else
+//					{
+//						entries[i]	= url;
+//					}
+//				}
+//			}
+//		}
+//		else
+//		{
+//			entries = new String[0];
+//		}
+//		
+//		Properties props	= new Properties();
+//		for(int i=0; i<entries.length; i++)
+//		{
+//			props.addProperty(new Property("entry", entries[i]));
+//		}
+//		return new Future<Properties>(props);		
+//	}
 
 
 	/**

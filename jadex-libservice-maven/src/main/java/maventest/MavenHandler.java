@@ -1,5 +1,12 @@
 package maventest;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
+import jadex.commons.Tuple2;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,13 +62,17 @@ public class MavenHandler
 	/** The shared repository system session. */
 	protected MavenRepositorySystemSession	session;
 	
+	/** The component identifier. */
+	protected IComponentIdentifier cid;
+	
 	//-------- constructors --------
 
 	/**
 	 * Constructs new maven handler.
 	 */
-	public MavenHandler()
+	public MavenHandler(IComponentIdentifier cid)
 	{
+		this.cid = cid;
 		try
 		{
 			system	= new DefaultPlexusContainer().lookup(RepositorySystem.class);
@@ -88,6 +99,29 @@ public class MavenHandler
 		Map<URL, List<URL>>	urls	= new HashMap<URL, List<URL>>();
 		loadDependencies(url, null, urls);
 		return urls;
+	}
+	
+	/**
+	 *  Get the artifact description for an url.
+	 *  @param url The url.
+	 *  @return The artifact description including all details.
+	 */
+	public String getArtifactDescription(URL url)
+	{
+		// todo:
+		return null;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<IResourceIdentifier> getResourceIdentifier(URL url)
+	{
+		// todo: get stored rid for url?!
+		Tuple2<IComponentIdentifier, URL> lid = new Tuple2<IComponentIdentifier, URL>(cid, url);
+		String gid = getArtifactDescription(url);
+		ResourceIdentifier rid = new ResourceIdentifier(lid, gid);
+		return new Future<IResourceIdentifier>(rid);
 	}
 
 	//-------- helper methods --------

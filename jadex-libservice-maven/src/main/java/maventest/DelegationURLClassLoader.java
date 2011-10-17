@@ -1,5 +1,6 @@
 package maventest;
 
+import jadex.bridge.IResourceIdentifier;
 import jadex.commons.SUtil;
 
 import java.io.IOException;
@@ -16,6 +17,9 @@ import java.util.Set;
  */
 public class DelegationURLClassLoader extends URLClassLoader
 {
+	/** The resource identifier. */
+	protected IResourceIdentifier rid;
+	
 	/** The delegation classloader. */
 	protected DelegationURLClassLoader[] delegates;
 	
@@ -30,9 +34,10 @@ public class DelegationURLClassLoader extends URLClassLoader
 	/**
 	 *  Create a new classloader.
 	 */
-	public DelegationURLClassLoader(URL url, ClassLoader basecl, DelegationURLClassLoader[] delegates)
+	public DelegationURLClassLoader(IResourceIdentifier rid, ClassLoader basecl, DelegationURLClassLoader[] delegates)
 	{
-		super(url!=null? new URL[]{url}: new URL[0], basecl);
+		super(rid!=null && rid.getLocalIdentifier()!=null? new URL[]{rid.getLocalIdentifier().getSecondEntity()}: new URL[0], basecl);
+		this.rid = rid;
 		this.delegates = delegates;
 //		System.out.println("d1 : "+url+" "+SUtil.arrayToString(delegates));
 	}
@@ -55,6 +60,15 @@ public class DelegationURLClassLoader extends URLClassLoader
 	{
 		URL[] urls = getURLs();
 		return urls!=null && urls.length>0? urls[0]: null; 
+	}
+	
+	/**
+	 *  Get the resource identifier.
+	 *  @return The resource identifier.
+	 */
+	public IResourceIdentifier getResourceIdentifier()
+	{
+		return rid;
 	}
 	
 	/**
