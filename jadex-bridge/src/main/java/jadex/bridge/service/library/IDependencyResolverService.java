@@ -1,7 +1,6 @@
 package jadex.bridge.service.library;
 
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ResourceIdentifier;
 import jadex.commons.future.IFuture;
 
 import java.net.URL;

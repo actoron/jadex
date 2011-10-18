@@ -1,14 +1,18 @@
 package maventest;
 
+import jadex.base.service.dependency.maven.MavenDependencyResolverService;
+import jadex.base.service.dependency.maven.MavenResourceIdentifier;
+import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
+
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class MavenTest2
 {
-	public static void main(String[] args)
+	public static void main(String[] args) throws Exception
 	{
 		File[]	files	= new File[]{
 			new File("C:\\Users\\Alex\\Desktop\\jadex-bridge-2.0.jar"),
@@ -19,17 +23,21 @@ public class MavenTest2
 			new File("C:\\Users\\Alex\\.m2\\repository\\net\\sourceforge\\jadex\\jadex-bridge\\2.1-SNAPSHOT\\jadex-bridge-2.1-SNAPSHOT.jar"),
 			new File("C:\\Users\\Alex\\.m2\\repository\\net\\sourceforge\\jadex\\jadex-bridge\\2.0-rc10\\jadex-bridge-2.0-rc10.jar")
 		};
+		String[]	gids	= new String[]{
+			"de.huxhorn.sulky:de.huxhorn.sulky.3rdparty.jlayer:1.0",
+			"net.sourceforge.jadex:jadex-applications-bdi:2.0"
+		};
+		
+		MavenDependencyResolverService	mh	= new MavenDependencyResolverService(new ComponentIdentifier("dummy"));
 		
 		for(int i=0; i<files.length; i++)
 		{
 			try
 			{
 				System.out.println("\nDependencies for: "+files[i]);
-				URL	url	= MavenHandler.getUrl(files[i]);
-				
-				MavenHandler	mh	= new MavenHandler();
-				Map<URL, List<URL>>	dependencies	= mh.loadDependencies(url);
-				printDependencies(url, dependencies, 0, new ArrayList<Boolean>());
+				IResourceIdentifier	rid	= mh.getResourceIdentifier(MavenDependencyResolverService.getUrl(files[i])).get(null);
+				Map<IResourceIdentifier, List<IResourceIdentifier>>	dependencies	= mh.loadDependencies(rid).get(null);
+				printDependencies(rid, dependencies, 0, new ArrayList<Boolean>());
 			}
 			catch(Exception e)
 			{
@@ -37,9 +45,25 @@ public class MavenTest2
 				e.printStackTrace();
 			}
 		}
+		
+		for(int i=0; i<gids.length; i++)
+		{
+			try
+			{
+				System.out.println("\nDependencies for: "+gids[i]);
+				IResourceIdentifier	rid	= new MavenResourceIdentifier(null, gids[i]);
+				Map<IResourceIdentifier, List<IResourceIdentifier>>	dependencies	= mh.loadDependencies(rid).get(null);
+				printDependencies(rid, dependencies, 0, new ArrayList<Boolean>());
+			}
+			catch(Exception e)
+			{
+				System.err.println("Error getting dependencies for: "+gids[i]);
+				e.printStackTrace();
+			}
+		}
 	}
 	
-	public static void	printDependencies(URL parent, Map<URL, List<URL>> dependencies, int indent, List<Boolean> has_children)
+	public static void	printDependencies(IResourceIdentifier parent, Map<IResourceIdentifier, List<IResourceIdentifier>> dependencies, int indent, List<Boolean> has_children)
 	{
 		for(int i=0; i<indent; i++)
 		{
@@ -54,12 +78,19 @@ public class MavenTest2
 		}
 		System.out.println("+-"+parent);
 		
-		List<URL>	children	= dependencies.get(parent);
-		for(int i=0; i<children.size(); i++)
+		if(dependencies.containsKey(parent))
 		{
-			has_children.add(i==children.size()-1 ? Boolean.FALSE : Boolean.TRUE);
-			printDependencies(children.get(i), dependencies, indent+1, has_children);
-			has_children.remove(indent);
+			List<IResourceIdentifier>	children	= dependencies.get(parent);
+			for(int i=0; i<children.size(); i++)
+			{
+				has_children.add(i==children.size()-1 ? Boolean.FALSE : Boolean.TRUE);
+				printDependencies(children.get(i), dependencies, indent+1, has_children);
+				has_children.remove(indent);
+			}
+		}
+		else
+		{
+			System.err.print("Missing dependencies for: "+parent);
 		}
 	}
 }
