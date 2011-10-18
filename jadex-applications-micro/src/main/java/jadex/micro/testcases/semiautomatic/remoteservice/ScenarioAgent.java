@@ -1,6 +1,7 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;
@@ -22,11 +23,18 @@ public class ScenarioAgent extends MicroAgent
 			public void resultAvailable(Object result)
 			{
 				ILibraryService libservice = (ILibraryService)result;
-				libservice.getURLStrings().addResultListener(createResultListener(new DefaultResultListener()
+//				libservice.getURLStrings().addResultListener(createResultListener(new DefaultResultListener()
+				libservice.getAllResourceIdentifiers().addResultListener(createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
-						String[] libpaths = (String[])((List)result).toArray(new String[0]);
+						List<IResourceIdentifier> libs = (List<IResourceIdentifier>)result;
+						String[] libpaths = new String[libs.size()];
+						for(int i=0; i<libpaths.length; i++)
+						{
+							libpaths[i] = libs.get(i).getLocalIdentifier().getSecondEntity().toString();
+						}
+//						String[] libpaths = (String[])((List)result).toArray(new String[0]);
 						StartScenario.startScenario(libpaths).addResultListener(
 							createResultListener(new DefaultResultListener()
 						{

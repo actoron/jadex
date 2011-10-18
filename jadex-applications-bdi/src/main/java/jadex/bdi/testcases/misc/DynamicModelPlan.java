@@ -8,6 +8,8 @@ import jadex.bdi.model.editable.IMEConfiguration;
 import jadex.bdi.model.editable.IMEPlan;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 
@@ -29,7 +31,7 @@ public class DynamicModelPlan extends Plan
 	public void body()
 	{
 		IDynamicBDIFactory	fac	= (IDynamicBDIFactory)getServiceContainer().getRequiredService("factory").get(this);
-		IMECapability agent = fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null, getScope().getModel().getResourceIdentifier());
+		IMECapability agent = fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null, getScope().getClassLoader());
 			
 		IMEBelief	msgbelief	= agent.createBeliefbase().createBelief("msg");
 		msgbelief.createFact("\"Welcome to editable models!\"", null);

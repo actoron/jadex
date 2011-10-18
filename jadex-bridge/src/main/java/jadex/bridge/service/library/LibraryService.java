@@ -372,9 +372,9 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 */
 	public IFuture<List<URL>> getNonManagedURLs()
 	{
-//		classloaders.values
-//		return new Future<List<URL>>(SUtil.getClasspathURLs(libcl));	
-		return new Future<List<URL>>(new ArrayList());
+//		return new Future<List<URL>>(SUtil.getClasspathURLs(libcl));
+		List<URL> nonurls = new ArrayList<URL>(SUtil.getClasspathURLs(getClass().getClassLoader()));
+		return new Future<List<URL>>(nonurls);
 	}
 		
 	/** 
