@@ -19,7 +19,6 @@ import jadex.commons.future.IResultListener;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -252,7 +251,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 *  Get all managed (directly added i.e. top-level) resource identifiers.
 	 *  @return The list of resource identifiers.
 	 */
-	public IFuture<List<IResourceIdentifier>> getResourceIdentifiers()
+	public IFuture<List<IResourceIdentifier>> getManagedResourceIdentifiers()
 	{
 		return new Future<List<IResourceIdentifier>>(new ArrayList<IResourceIdentifier>(managedrids.keySet()));
 	}
@@ -263,14 +262,28 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public IFuture<List<IResourceIdentifier>> getIndirectResourceIdentifiers()
 	{
 		List<IResourceIdentifier> ret = new ArrayList<IResourceIdentifier>();
-		Collection<DelegationURLClassLoader> cls = classloaders.values();
-		for(Iterator<DelegationURLClassLoader> it=cls.iterator(); it.hasNext(); )
+		for(Iterator<DelegationURLClassLoader> it=classloaders.values().iterator(); it.hasNext(); )
 		{
 			IResourceIdentifier rid = it.next().getResourceIdentifier();
 			if(!managedrids.containsKey(rid))
 			{
 				ret.add(rid);
 			}
+		}
+		return new Future<List<IResourceIdentifier>>(ret);
+	}
+	
+	/**
+	 *  Get all resource identifiers (does not include urls of parent loader).
+	 *  @return The list of resource identifiers.
+	 */
+	public IFuture<List<IResourceIdentifier>> getAllResourceIdentifiers()
+	{
+		List<IResourceIdentifier> ret = new ArrayList<IResourceIdentifier>();
+		for(Iterator<DelegationURLClassLoader> it=classloaders.values().iterator(); it.hasNext(); )
+		{
+			IResourceIdentifier rid = it.next().getResourceIdentifier();
+			ret.add(rid);
 		}
 		return new Future<List<IResourceIdentifier>>(ret);
 	}

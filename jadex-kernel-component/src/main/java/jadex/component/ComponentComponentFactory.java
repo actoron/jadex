@@ -225,20 +225,13 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 		{
 			try
 			{
-				try
-				{
-					ClassLoader cl = getClass().getClassLoader();
-					ret.setResult(loader.loadComponentModel(model, imports, cl, rid).getModelInfo());
-				}
-				catch(Exception e)
-				{
-					ret.setException(e);
-				}			
+				ClassLoader cl = getClass().getClassLoader();
+				ret.setResult(loader.loadComponentModel(model, imports, cl, rid).getModelInfo());
 			}
 			catch(Exception e)
 			{
 				ret.setException(e);
-			}
+			}			
 		}
 		
 		return ret;

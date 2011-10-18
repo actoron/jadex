@@ -185,21 +185,15 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 		{
 			try
 			{
-				try
-				{
-					ClassLoader cl = getClass().getClassLoader();
-					MBpmnModel amodel = loader.loadBpmnModel(model, imports, cl, rid);
-					amodel.setClassLoader(cl);
-					ret.setResult(amodel.getModelInfo());
-				}
-				catch(Exception e)
-				{
-					ret.setException(e);
-				}			}
+				ClassLoader cl = getClass().getClassLoader();
+				MBpmnModel amodel = loader.loadBpmnModel(model, imports, cl, rid);
+				amodel.setClassLoader(cl);
+				ret.setResult(amodel.getModelInfo());
+			}
 			catch(Exception e)
 			{
 				ret.setException(e);
-			}
+			}			
 		}
 		
 		return ret;

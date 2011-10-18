@@ -47,12 +47,18 @@ public interface ILibraryService extends IService
 	 *  Get all managed (directly added i.e. top-level) resource identifiers.
 	 *  @return The list of resource identifiers.
 	 */
-	public IFuture<List<IResourceIdentifier>> getResourceIdentifiers();
+	public IFuture<List<IResourceIdentifier>> getManagedResourceIdentifiers();
 	
 	/**
 	 *  Get all resource identifiers (also indirectly managed. 
 	 */
 	public IFuture<List<IResourceIdentifier>> getIndirectResourceIdentifiers();
+	
+	/**
+	 *   Get all resource identifiers (does not include rids (urls) of parent loader).
+	 *  @return The list of resource identifiers.
+	 */
+	public IFuture<List<IResourceIdentifier>> getAllResourceIdentifiers();
 	
 	
 	/**

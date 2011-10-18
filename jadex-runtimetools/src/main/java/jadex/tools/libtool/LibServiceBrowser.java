@@ -76,7 +76,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		// Create class paths view.
 		final JPanel classview = new JPanel(new BorderLayout());
 		this.classpaths = new EditableList("Class Paths", true);
-		libservice.getResourceIdentifiers().addResultListener(new SwingDefaultResultListener<List<IResourceIdentifier>>(LibServiceBrowser.this)
+		libservice.getManagedResourceIdentifiers().addResultListener(new SwingDefaultResultListener<List<IResourceIdentifier>>(LibServiceBrowser.this)
 		{
 			public void customResultAvailable(List<IResourceIdentifier> result)
 			{
@@ -174,7 +174,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				libservice.getResourceIdentifiers().addResultListener(new SwingDefaultResultListener<List<IResourceIdentifier>>(LibServiceBrowser.this)
+				libservice.getManagedResourceIdentifiers().addResultListener(new SwingDefaultResultListener<List<IResourceIdentifier>>(LibServiceBrowser.this)
 				{
 					public void customResultAvailable(List<IResourceIdentifier> result)
 					{

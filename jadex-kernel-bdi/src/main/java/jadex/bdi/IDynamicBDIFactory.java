@@ -17,7 +17,7 @@ public interface IDynamicBDIFactory
 	 *  @param pkg	Optional package for the model.
 	 *  @param imports	Optional imports for the model.
 	 */
-	public @Reference IMECapability	createAgentModel(String name, String pkg, String[] imports, IResourceIdentifier rid);
+	public @Reference IMECapability	createAgentModel(String name, String pkg, String[] imports, ClassLoader cl);
 
 	/**
 	 *  Register a manually edited agent model in the factory.

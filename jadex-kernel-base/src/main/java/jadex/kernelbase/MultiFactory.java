@@ -205,13 +205,14 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				final IExternalAccess exta = ia.getExternalAccess();
 				liblistener = new ILibraryServiceListener()
 				{
-					public IFuture urlRemoved(final URL url)
+					public IFuture resourceIdentifierRemoved(final IResourceIdentifier rid)
 					{
 						exta.scheduleStep(new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								Collection affectedkernels = (Collection) kernelurls.remove(url);
+								URL url = rid.getLocalIdentifier().getSecondEntity();
+								Collection affectedkernels = (Collection)kernelurls.remove(url);
 								if (affectedkernels != null)
 								{
 									String[] keys = (String[]) kernellocationcache.keySet().toArray(new String[0]);
@@ -227,8 +228,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 						return IFuture.DONE;
 					}
 					
-					public IFuture urlAdded(final URL url)
+					public IFuture resourceIdentifierAdded(final IResourceIdentifier rid)
 					{
+						final URL url = rid.getLocalIdentifier().getSecondEntity();
 						exta.scheduleStep(new IComponentStep<Void>()
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
@@ -245,12 +247,55 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				
 				libservice.addLibraryServiceListener(liblistener);
 				
-				libservice.getAllURLs().addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+//				libservice.getAllURLs().addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+//				{
+//					public void customResultAvailable(Object result)
+//					{
+//						potentialurls.addAll((Collection) result);
+//						validurls.addAll((Collection) result);
+//						
+//						if(kerneldefaultlocations.isEmpty())
+//							ret.setResult(null);
+//						else
+//						{
+//							// Initialize default locations
+//							String[] dl = (String[])kerneldefaultlocations.keySet().toArray(new String[kerneldefaultlocations.size()]);
+//							kerneldefaultlocations.clear();
+//							IResultListener loccounter = ia.createResultListener(new CounterResultListener(dl.length, ia.createResultListener(new DelegationResultListener(ret)
+//							{
+//								public void customResultAvailable(Object result)
+//								{
+//									ret.setResult(null);
+//								}
+//							}))
+//							{
+//								public void intermediateResultAvailable(Object result)
+//								{
+//									IModelInfo kernel = (IModelInfo) result;
+//									String[] exts = (String[])kernel.getProperty(KERNEL_EXTENSIONS, libservice);
+//									if (exts != null)
+//										for (int i = 0; i < exts.length; ++i)
+//											kerneldefaultlocations.put(exts[i], kernel.getFilename());
+//								}
+//							});
+//							
+//							for(int i = 0; i < dl.length; ++i)
+//								loadModel(dl[i], null, null).addResultListener(loccounter);
+//						}
+//					}
+//				}));
+				
+				libservice.getAllResourceIdentifiers().addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						potentialurls.addAll((Collection) result);
-						validurls.addAll((Collection) result);
+						List col = new ArrayList();
+						for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+						{
+							col.add(((IResourceIdentifier)it.next()).getLocalIdentifier().getSecondEntity());
+						}
+						potentialurls.addAll(col);
+						validurls.addAll(col);
 						
 						if(kerneldefaultlocations.isEmpty())
 							ret.setResult(null);
