@@ -20,6 +20,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 /* $if !android $ */
@@ -138,13 +139,13 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 										
 										libservicelistener = new ILibraryServiceListener()
 										{
-											public IFuture urlRemoved(URL url)
+											public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
 											{
 												loader.clearModelCache();
 												return IFuture.DONE;
 											}
 											
-											public IFuture urlAdded(URL url)
+											public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
 											{
 												loader.clearModelCache();
 												return IFuture.DONE;
@@ -198,21 +199,63 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
-		Future<IModelInfo> ret = new Future<IModelInfo>();
-//		System.out.println("filename: "+filename);
-		try
+		final Future<IModelInfo> ret = new Future<IModelInfo>();
+		
+		if(libservice!=null)
 		{
-			ret.setResult(loader.loadComponentModel(model, imports,
-				libservice==null? getClass().getClassLoader(): libservice.getClassLoader(rid), rid).getModelInfo());
+			libservice.getClassLoader(rid).addResultListener(
+				new ExceptionDelegationResultListener<ClassLoader, IModelInfo>(ret)
+			{
+				public void customResultAvailable(ClassLoader cl)
+				{
+					try
+					{
+						ret.setResult(loader.loadComponentModel(model, imports, cl, rid).getModelInfo());
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
+				}
+			});
 		}
-		catch(Exception e)
+		else
 		{
-			ret.setException(e);
+			try
+			{
+				try
+				{
+					ClassLoader cl = getClass().getClassLoader();
+					ret.setResult(loader.loadComponentModel(model, imports, cl, rid).getModelInfo());
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}			
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
 		}
 		
 		return ret;
+		
+		
+//		System.out.println("filename: "+filename);
+//		try
+//		{
+//			ret.setResult(loader.loadComponentModel(model, imports,
+//				libservice==null? getClass().getClassLoader(): libservice.getClassLoader(rid), rid).getModelInfo());
+//		}
+//		catch(Exception e)
+//		{
+//			ret.setException(e);
+//		}
+//		
+//		return ret;
 	}
 	
 	/**
@@ -224,46 +267,46 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
+	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
+		final IModelInfo modelinfo, final String config, final Map arguments, final IExternalAccess parent, 
+		final RequiredServiceBinding[] bindings, final boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
 	{
-		try
+		if(libservice!=null)
 		{
-			// libservice is null for platform bootstrap factory.
-			ClassLoader cl = libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier());
-			CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
-//			List apps = apptype.getConfigurations();
-					
-//			// Select application instance according to configuration.
-//			MConfiguration app = null;
-//			if(config!=null)
-//			{
-//				for(int i=0; app==null && i<apps.size(); i++)
-//				{
-//					MConfiguration tmp = (MConfiguration)apps.get(i);
-//					if(config.equals(tmp.getName()))
-//						app = tmp;
-//				}
-//			}
-//			if(app==null && apps.size()>0)
-//			{
-//				app = (MConfiguration)apps.get(0);
-//			}
-//			if(app==null)
-//				app = new MConfiguration("default");
-	
-			// Create context for application.
-			ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret, cl);
-			
-			// todo: result listener?
-			// todo: create application context as return value?!
-					
-			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
+				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(ret)
+			{
+				public void customResultAvailable(ClassLoader cl)
+				{
+					try
+					{
+						CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
+						ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret, cl);
+						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
+				}
+			});
 		}
-		catch(Exception e)
+		else
 		{
-			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(e);
+			try
+			{
+				ClassLoader cl = getClass().getClassLoader();
+				CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
+				ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret, cl);
+				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
 		}
+		
+		return ret;
 	}
 		
 	/**

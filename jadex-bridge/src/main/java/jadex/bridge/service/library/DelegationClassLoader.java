@@ -1,5 +1,7 @@
 package jadex.bridge.service.library;
 
+import jadex.commons.SUtil;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -40,7 +42,7 @@ public class DelegationClassLoader extends ClassLoader
 		{
 			for (int i = 0; i < urls.length; ++i)
 			{
-				URL url = LibraryService.toURL(urls[i]);
+				URL url = SUtil.toURL(urls[i]);
 				delegates.put(url, new URLClassLoader(new URL[] {url}));
 			}
 		}

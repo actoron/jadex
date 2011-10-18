@@ -236,8 +236,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		final IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
+	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
+		final IModelInfo modelinfo, final String config, final Map arguments, final IExternalAccess parent, 
+		final RequiredServiceBinding[] bindings, final boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
 	{
 		if(libservice!=null)
 		{
@@ -246,31 +247,53 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			{
 				public void customResultAvailable(ClassLoader cl)
 				{
-					CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
-					ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret, cl);
-					
+					try
+					{
+						CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
+						ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret, cl);
+						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
 				}
 			});
 		}
+		else
+		{
+			try
+			{
+				ClassLoader cl = getClass().getClassLoader();
+				CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
+				ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret, cl);
+				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
+		}
 		
-		try
-		{
-			// libservice is null for platform bootstrap factory.
-			ClassLoader cl = libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier());
-			CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, 
-				libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier()), modelinfo.getResourceIdentifier());
-			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret, cl);
-			
-			// todo: result listener?
-			// todo: create application context as return value?!
-					
-			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+//		try
+//		{
+//			// libservice is null for platform bootstrap factory.
+//			ClassLoader cl = libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier());
+//			CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, 
+//				libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier()), modelinfo.getResourceIdentifier());
+//			ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret, cl);
+//			
+//			// todo: result listener?
+//			// todo: create application context as return value?!
+//					
+//			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+//		}
+//		catch(Exception e)
+//		{
+//			throw new RuntimeException(e);
+//		}
 
+		return ret;
 	}
 		
 	/**

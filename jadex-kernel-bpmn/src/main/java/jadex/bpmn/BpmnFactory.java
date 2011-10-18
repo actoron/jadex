@@ -19,13 +19,13 @@ import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 /* $if !android $ */
 import jadex.commons.gui.SGUI;
 /* $endif $ */
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,13 +90,13 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 		
 		this.libservicelistener = new ILibraryServiceListener()
 		{
-			public IFuture urlRemoved(URL url)
+			public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
 			{
 				loader.clearModelCache();
 				return IFuture.DONE;
 			}
 			
-			public IFuture urlAdded(URL url)
+			public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
 			{
 				loader.clearModelCache();
 				return IFuture.DONE;
@@ -156,24 +156,69 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture loadModel(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
-		Future ret = new Future();
+		final Future<IModelInfo> ret = new Future<IModelInfo>();
 //		System.out.println("filename: "+filename);
-		try
+		
+		if(libservice!=null)
 		{
-			ClassLoader cl = libservice.getClassLoader(rid);
-			MBpmnModel amodel = loader.loadBpmnModel(model, imports, 
-				libservice.getClassLoader(rid), rid);
-			amodel.setClassLoader(cl);
-			ret.setResult(amodel.getModelInfo());
+			libservice.getClassLoader(rid).addResultListener(
+				new ExceptionDelegationResultListener<ClassLoader, IModelInfo>(ret)
+			{
+				public void customResultAvailable(ClassLoader cl)
+				{
+					try
+					{
+						MBpmnModel amodel = loader.loadBpmnModel(model, imports, cl, rid);
+						amodel.setClassLoader(cl);
+						ret.setResult(amodel.getModelInfo());
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
+				}
+			});
 		}
-		catch(Exception e)
+		else
 		{
-			ret.setException(e);
+			try
+			{
+				try
+				{
+					ClassLoader cl = getClass().getClassLoader();
+					MBpmnModel amodel = loader.loadBpmnModel(model, imports, cl, rid);
+					amodel.setClassLoader(cl);
+					ret.setResult(amodel.getModelInfo());
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
 		}
 		
 		return ret;
+		
+		
+//		try
+//		{
+//			ClassLoader cl = libservice.getClassLoader(rid);
+//			MBpmnModel amodel = loader.loadBpmnModel(model, imports, 
+//				libservice.getClassLoader(rid), rid);
+//			amodel.setClassLoader(cl);
+//			ret.setResult(amodel.getModelInfo());
+//		}
+//		catch(Exception e)
+//		{
+//			ret.setException(e);
+//		}
+//		
+//		return ret;
 	}
 	
 	/**
@@ -235,19 +280,58 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 * @param parent The parent component (if any).
 	 * @return An instance of a component.
 	 */
-	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> inited)
+	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
+		final IModelInfo modelinfo, final String config, final Map arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, 
+		final boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> inited)
 	{
-		try
+		final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
+		
+		if(libservice!=null)
 		{
-			MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier()), modelinfo.getResourceIdentifier());
-			BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, inited);
-			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
+				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(ret)
+			{
+				public void customResultAvailable(ClassLoader cl)
+				{
+					try
+					{
+						MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
+						BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, inited);
+						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
+				}
+			});
 		}
-		catch(Exception e)
+		else
 		{
-			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(e);
+			try
+			{
+				ClassLoader cl = getClass().getClassLoader();
+				MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
+				BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, inited);
+				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
 		}
+		
+		return ret;
+//		try
+//		{
+//			MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, libservice==null? getClass().getClassLoader(): libservice.getClassLoader(modelinfo.getResourceIdentifier()), modelinfo.getResourceIdentifier());
+//			BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, inited);
+//			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
+//		}
+//		catch(Exception e)
+//		{
+//			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(e);
+//		}
 	}
 	
 	/**
