@@ -470,92 +470,111 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						{
 							public void resultAvailable(Object result)
 							{
-								// Hack!!! Manual encoding for using custom class loader at receiver side.
-//								msg.put(SFipa.CONTENT, JavaWriter.objectToXML(content, ls.getClassLoader()));
-								
-//								System.out.println("sent: "+callid);
-//								System.out.println("RMS sending to: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
-								
-								// todo: use rid of sender?! (not important as writer does not use classloader, only nuggets)
-								ClassLoader cl = ls.getClassLoader(component.getModel().getResourceIdentifier());
-								String cont = Writer.objectToXML(getWriter(), content, cl, receiver);
-								msg.put(SFipa.CONTENT, cont);
-								
-//								if(cont.indexOf("getServices")!=-1)
-//								{
-//									interestingcalls.put(callid, cont);
-//								}
-								
-								IMessageService ms = (IMessageService)result;
-								ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), component.getModel().getResourceIdentifier(), null)
-									.addResultListener(ia.createResultListener(new IResultListener()
+								ls.getClassLoader(component.getModel().getResourceIdentifier()).addResultListener(new IResultListener()
 								{
 									public void resultAvailable(Object result)
 									{
-										// ok message could be sent.
-										timer.schedule(new TimerTask()
-										{
-											public void run()
-											{
-												ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-												{
-													public IFuture<Void> execute(IInternalAccess ia)
-													{
-														if(!future.isDone())
-														{
-															removeWaitingCall(callid);
-															future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid)
-															{
-																public void printStackTrace()
-																{
-																	Thread.dumpStack();
-																	super.printStackTrace();
-																}
-															}
-															);
-														}
-														return IFuture.DONE;
-													}
-												});
-//												System.out.println("timeout triggered: "+msg);
-											}
-										}, timeout);
+										ClassLoader cl = (ClassLoader)result;
 										
-
-										future.addResultListener(ia.createResultListener(new IResultListener()
+										// todo: use rid of sender?! (not important as writer does not use classloader, only nuggets)
+//										ClassLoader cl = ls.getClassLoader(component.getModel().getResourceIdentifier());
+										
+										// Hack!!! Manual encoding for using custom class loader at receiver side.
+//										msg.put(SFipa.CONTENT, JavaWriter.objectToXML(content, ls.getClassLoader()));
+										
+//										System.out.println("sent: "+callid);
+//										System.out.println("RMS sending to: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
+										
+										
+										String cont = Writer.objectToXML(getWriter(), content, cl, receiver);
+										msg.put(SFipa.CONTENT, cont);
+										
+//										if(cont.indexOf("getServices")!=-1)
+//										{
+//											interestingcalls.put(callid, cont);
+//										}
+										
+										IMessageService ms = (IMessageService)result;
+										ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), component.getModel().getResourceIdentifier(), null)
+											.addResultListener(ia.createResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
 											{
-												removeWaitingCall(callid);
-//												System.out.println("Waitingcalls: "+waitingcalls.size());
-//												System.out.println("Cancel timeout (res): "+callid+" "+future);
-//												errors.put(callid, new Object[]{"Cancel timeout (res)", result});
+												// ok message could be sent.
+												timer.schedule(new TimerTask()
+												{
+													public void run()
+													{
+														ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+														{
+															public IFuture<Void> execute(IInternalAccess ia)
+															{
+																if(!future.isDone())
+																{
+																	removeWaitingCall(callid);
+																	future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid)
+																	{
+																		public void printStackTrace()
+																		{
+																			Thread.dumpStack();
+																			super.printStackTrace();
+																		}
+																	}
+																	);
+																}
+																return IFuture.DONE;
+															}
+														});
+//														System.out.println("timeout triggered: "+msg);
+													}
+												}, timeout);
+												
+
+												future.addResultListener(ia.createResultListener(new IResultListener()
+												{
+													public void resultAvailable(Object result)
+													{
+														removeWaitingCall(callid);
+//														System.out.println("Waitingcalls: "+waitingcalls.size());
+//														System.out.println("Cancel timeout (res): "+callid+" "+future);
+//														errors.put(callid, new Object[]{"Cancel timeout (res)", result});
+													}
+																	
+													public void exceptionOccurred(Exception exception)
+													{
+//														exception.printStackTrace();
+														removeWaitingCall(callid);
+//														System.out.println("Waitingcalls: "+waitingcalls.size());
+//														System.out.println("Cancel timeout (ex): "+callid+" "+future);
+//														errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
+//														ia.getLogger().warning("Remote request failed: "+content);
+														ia.getLogger().info("Remote exception occurred: "+exception.toString());
+													}
+												}));
 											}
-															
+											
 											public void exceptionOccurred(Exception exception)
 											{
-//												exception.printStackTrace();
+												// message could not be sent -> fail immediately.
+//												System.out.println("Callee could not be reached: "+exception);
+//												errors.put(callid, new Object[]{"Callee could not be reached", exception});
+												future.setException(exception);
 												removeWaitingCall(callid);
+//												waitingcalls.remove(callid);
 //												System.out.println("Waitingcalls: "+waitingcalls.size());
-//												System.out.println("Cancel timeout (ex): "+callid+" "+future);
-//												errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
-//												ia.getLogger().warning("Remote request failed: "+content);
-												ia.getLogger().info("Remote exception occurred: "+exception.toString());
 											}
 										}));
 									}
-									
 									public void exceptionOccurred(Exception exception)
 									{
-										// message could not be sent -> fail immediately.
-//										System.out.println("Callee could not be reached: "+exception);
-//										errors.put(callid, new Object[]{"Callee could not be reached", exception});
-										future.setException(exception);
+//										System.out.println("Classlooder not found: "+exception);
+//										errors.put(callid, new Object[]{"No msg service", exception});
 										removeWaitingCall(callid);
 //										waitingcalls.remove(callid);
 //										System.out.println("Waitingcalls: "+waitingcalls.size());
+										future.setException(exception);
 									}
-								}));
+								});
 							}
 							
 							public void exceptionOccurred(Exception exception)

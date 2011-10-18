@@ -101,121 +101,131 @@ public class RemoteServiceManagementAgent extends MicroAgent
 				{
 					// Hack!!! Manual decoding for using custom class loader.
 					final ILibraryService ls = (ILibraryService)result;
-					Object content = msg.get(SFipa.CONTENT);
-					final String callid = (String)msg.get(SFipa.CONVERSATION_ID);
 					
-//					System.out.println("received: "+rms.getServiceIdentifier()+" "+callid);
-//					
-//					if(((String)content).indexOf("store")!=-1)
-//						System.out.println("store command: "+callid+" "+getComponentIdentifier());
-
-//					// For debugging.
-					final String orig = (String)content;
-
-					if(content instanceof String)
+					// todo: use classloader of receiver
+					// currently just uses the 'global' platform classloader 
+//					ClassLoader cl = ls.getClassLoader(null);//rms.getComponent().getModel().getResourceIdentifier());
+					ls.getClassLoader(null).addResultListener(new DefaultResultListener()
 					{
-						// Catch decode problems.
-						// Should be ignored or be a warning.
-						try
-						{	
-							List	errors	= new ArrayList();
-//							String contentcopy = (String)content;	// for debugging
-							
-							// todo: use classloader of receiver
-							// currently just uses the 'global' platform classloader 
-							ClassLoader cl = ls.getClassLoader(null);//rms.getComponent().getModel().getResourceIdentifier());
-							content = Reader.objectFromXML(rms.getReader(), (String)content, cl, errors);
-							
-							// For corrupt result (e.g. if class not found) set exception to clean up waiting call.
-							if(!errors.isEmpty())
-							{
-//								System.out.println("Error: "+contentcopy);
-								if(content instanceof RemoteResultCommand)
-								{
-//									System.out.println("corrupt content: "+content);
-//									System.out.println("errors: "+errors);
-									((RemoteResultCommand)content).setExceptionInfo(new ExceptionInfo(new RuntimeException("Errors during XML decoding: "+errors)));
-								}
-								else
-								{
-//									content	= null;
-									content = new RemoteResultCommand(null, new RuntimeException("Errors during XML decoding: "+errors), callid, false);
-								}
-								getLogger().info("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
-//								getLogger().warning("Remote service management service could not decode message."+orig+"\n"+errors);
-							}
-						}
-						catch(Exception e)
+						public void resultAvailable(Object result) 
 						{
-//							content	= null;
-							content = new RemoteResultCommand(null, e, callid, false);
-							getLogger().info("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
-//							getLogger().warning("Remote service management service could not decode message."+orig);
-//							e.printStackTrace();
-						}
-					}
+							final ClassLoader cl = (ClassLoader)result;
 					
-					if(content instanceof IRemoteCommand)
-					{
-						final IRemoteCommand com = (IRemoteCommand)content;
-						
-//						if(content instanceof RemoteResultCommand && ((RemoteResultCommand)content).getMethodName()!=null && ((RemoteResultCommand)content).getMethodName().indexOf("store")!=-1)
-//							System.out.println("result of command1: "+com+" "+result);
-						
-//						System.out.println("received: "+rms.getServiceIdentifier()+" "+content);
-						
-						com.execute((IMicroExternalAccess)getExternalAccess(), rms).addResultListener(createResultListener(new DefaultResultListener()
-						{
-							public void resultAvailable(Object result)
+							Object content = msg.get(SFipa.CONTENT);
+							final String callid = (String)msg.get(SFipa.CONVERSATION_ID);
+							
+		//					System.out.println("received: "+rms.getServiceIdentifier()+" "+callid);
+		//					
+		//					if(((String)content).indexOf("store")!=-1)
+		//						System.out.println("store command: "+callid+" "+getComponentIdentifier());
+		
+		//					// For debugging.
+							final String orig = (String)content;
+		
+							if(content instanceof String)
 							{
-//								if(((String)orig).indexOf("store")!=-1)
-//									System.out.println("result of command2: "+com+" "+result);
-								if(result!=null)
-								{
-									final Object repcontent = result;
-									if(repcontent instanceof AbstractRemoteCommand)
-										((AbstractRemoteCommand)repcontent).preprocessCommand(rms.getRemoteReferenceModule(), (IComponentIdentifier)msg.get(SFipa.SENDER));
+								
+								// Catch decode problems.
+								// Should be ignored or be a warning.
+								try
+								{	
+									List	errors	= new ArrayList();
+		//								String contentcopy = (String)content;	// for debugging
 									
-									createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener()
+									content = Reader.objectFromXML(rms.getReader(), (String)content, cl, errors);
+									
+									// For corrupt result (e.g. if class not found) set exception to clean up waiting call.
+									if(!errors.isEmpty())
 									{
-										public void resultAvailable(Object result)
+		//									System.out.println("Error: "+contentcopy);
+										if(content instanceof RemoteResultCommand)
 										{
-											Map reply = (Map)result;
-//											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
-											
-											ClassLoader cl = ls.getClassLoader(null);//rms.getComponent().getModel().getResourceIdentifier());
-											String content = Writer.objectToXML(rms.getWriter(), repcontent, cl, msg.get(SFipa.SENDER));
-											reply.put(SFipa.CONTENT, content);
-//											System.out.println("content: "+content);
-											
-//											System.out.println("reply: "+callid);
-											sendMessage(reply, mt);
+		//										System.out.println("corrupt content: "+content);
+		//										System.out.println("errors: "+errors);
+											((RemoteResultCommand)content).setExceptionInfo(new ExceptionInfo(new RuntimeException("Errors during XML decoding: "+errors)));
 										}
-										public void exceptionOccurred(Exception exception)
+										else
 										{
-											// Terminated, when rms killed in mean time
-											if(!(exception instanceof ComponentTerminatedException))
-											{
-												super.exceptionOccurred(exception);
-											}
+		//										content	= null;
+											content = new RemoteResultCommand(null, new RuntimeException("Errors during XML decoding: "+errors), callid, false);
 										}
-									}));
+										getLogger().info("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
+		//									getLogger().warning("Remote service management service could not decode message."+orig+"\n"+errors);
+									}
 								}
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-								// Terminated, when rms killed in mean time
-								if(!(exception instanceof ComponentTerminatedException))
+								catch(Exception e)
 								{
-									super.exceptionOccurred(exception);
+		//								content	= null;
+									content = new RemoteResultCommand(null, e, callid, false);
+									getLogger().info("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
+		//								getLogger().warning("Remote service management service could not decode message."+orig);
+		//								e.printStackTrace();
 								}
 							}
-						}));
-					}
-					else if(content!=null)
-					{
-						getLogger().info("RMS unexpected message content: "+content);
-					}
+							
+							if(content instanceof IRemoteCommand)
+							{
+								final IRemoteCommand com = (IRemoteCommand)content;
+								
+		//						if(content instanceof RemoteResultCommand && ((RemoteResultCommand)content).getMethodName()!=null && ((RemoteResultCommand)content).getMethodName().indexOf("store")!=-1)
+		//							System.out.println("result of command1: "+com+" "+result);
+								
+		//						System.out.println("received: "+rms.getServiceIdentifier()+" "+content);
+								
+								com.execute((IMicroExternalAccess)getExternalAccess(), rms).addResultListener(createResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object result)
+									{
+		//								if(((String)orig).indexOf("store")!=-1)
+		//									System.out.println("result of command2: "+com+" "+result);
+										if(result!=null)
+										{
+											final Object repcontent = result;
+											if(repcontent instanceof AbstractRemoteCommand)
+												((AbstractRemoteCommand)repcontent).preprocessCommand(rms.getRemoteReferenceModule(), (IComponentIdentifier)msg.get(SFipa.SENDER));
+											
+											createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener()
+											{
+												public void resultAvailable(Object result)
+												{
+													Map reply = (Map)result;
+		//											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
+													
+//													ClassLoader cl = ls.getClassLoader(null);//rms.getComponent().getModel().getResourceIdentifier());
+													String content = Writer.objectToXML(rms.getWriter(), repcontent, cl, msg.get(SFipa.SENDER));
+													reply.put(SFipa.CONTENT, content);
+		//											System.out.println("content: "+content);
+													
+		//											System.out.println("reply: "+callid);
+													sendMessage(reply, mt);
+												}
+												public void exceptionOccurred(Exception exception)
+												{
+													// Terminated, when rms killed in mean time
+													if(!(exception instanceof ComponentTerminatedException))
+													{
+														super.exceptionOccurred(exception);
+													}
+												}
+											}));
+										}
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										// Terminated, when rms killed in mean time
+										if(!(exception instanceof ComponentTerminatedException))
+										{
+											super.exceptionOccurred(exception);
+										}
+									}
+								}));
+							}
+							else if(content!=null)
+							{
+								getLogger().info("RMS unexpected message content: "+content);
+							}
+						}
+					});
 				}
 			}));
 		}

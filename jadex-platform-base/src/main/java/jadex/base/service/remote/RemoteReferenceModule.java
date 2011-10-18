@@ -131,7 +131,8 @@ public class RemoteReferenceModule
 	 *  Get a remote reference for a component for transport. 
 	 *  (Called during marshalling from writer).
 	 */
-	public ProxyReference getProxyReference(Object target, Class[] remoteinterfaces, IComponentIdentifier tmpholder)
+	public ProxyReference getProxyReference(Object target, Class[] remoteinterfaces, 
+		IComponentIdentifier tmpholder, final ClassLoader cl)
 	{
 		checkThread();
 		
@@ -157,7 +158,7 @@ public class RemoteReferenceModule
 		ProxyInfo pi = (ProxyInfo)proxyinfos.get(tcid);
 		if(pi==null)
 		{
-			pi = createProxyInfo(target, remoteinterfaces);
+			pi = createProxyInfo(target, remoteinterfaces, cl);
 			proxyinfos.put(tcid, pi);
 //			System.out.println("add: "+tcid+" "+pi);
 		}
@@ -187,7 +188,7 @@ public class RemoteReferenceModule
 	/**
 	 *  Create a proxy info for a service. 
 	 */
-	protected ProxyInfo createProxyInfo(Object target, Class[] remoteinterfaces)
+	protected ProxyInfo createProxyInfo(Object target, Class[] remoteinterfaces, ClassLoader cl)
 	{
 		checkThread();
 		// todo: dgc, i.e. remember that target is a remote object (for which a proxyinfo is sent away).
@@ -197,11 +198,11 @@ public class RemoteReferenceModule
 		
 		// Hack! as long as registry is not there
 		String[]	imports	= null;
-		ClassLoader	cl	= null;
+//		ClassLoader	cl	= null;
 		if(target instanceof IExternalAccess)
 		{
 			imports	= ((IExternalAccess)target).getModel().getAllImports();
-			cl	= libservice.getClassLoader(((IExternalAccess)target).getModel().getResourceIdentifier());
+//			cl	= libservice.getClassLoader(((IExternalAccess)target).getModel().getResourceIdentifier());
 			properties = ((IExternalAccess)target).getModel().getProperties();		
 		}
 		else if(properties==null && target instanceof IService)
