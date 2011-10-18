@@ -1,5 +1,6 @@
 package jadex.android.bluetooth.connection;
 
+import jadex.android.bluetooth.exceptions.MessageNotSendException;
 import jadex.android.bluetooth.message.DataPacket;
 import jadex.android.bluetooth.routing.IPacketSender;
 
@@ -86,14 +87,16 @@ public class ConnectionManager extends HashMap<String, IConnection> implements
 	}
 
 	@Override
-	public void sendMessageToConnectedDevice(DataPacket packet, String address) {
+	public void sendMessageToConnectedDevice(DataPacket packet, String address) throws MessageNotSendException {
 		IConnection con = get(address);
 		if (con.isAlive()) {
 			try {
 				con.write(packet.asByteArray());
 			} catch (IOException e) {
-				// handle broke connection
+				throw new MessageNotSendException();
 			}
+		} else {
+			throw new MessageNotSendException();
 		}
 	}
 }

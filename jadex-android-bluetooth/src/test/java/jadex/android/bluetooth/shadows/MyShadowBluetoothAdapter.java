@@ -1,4 +1,4 @@
-package jadex.android.bluetooth.routing;
+package jadex.android.bluetooth.shadows;
 
 import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 import jadex.android.bluetooth.TestConstants;

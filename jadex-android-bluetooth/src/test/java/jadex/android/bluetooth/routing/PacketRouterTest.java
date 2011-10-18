@@ -42,9 +42,9 @@ public abstract class PacketRouterTest {
 	protected static final String device1 = "device1Address";
 	protected static final String device2 = "device2Address";
 	protected static final String device3 = "device3Address";
-	
+
 	protected IPacketRouter packetRouter1;
-	
+
 	protected HashMap<String, Map<String, Queue<DataPacket>>> sentMessages;
 
 	@Before
@@ -65,10 +65,12 @@ public abstract class PacketRouterTest {
 		packetRouter1.setPacketSender(null);
 		try {
 			packetRouter1.addConnectedDevice(device1);
+			packetRouter1.routePacket(new DataPacket(device1, "uhh".getBytes(),
+					DataPacket.TYPE_DATA), packetRouter1.getOwnAddress());
 			fail("Should throw exception when no sender is set");
 		} catch (Exception e) {
 		}
-		
+
 		packetRouter1.setOwnAddress("testAddress");
 		assertEquals("testAddress", packetRouter1.getOwnAddress());
 	}
@@ -88,6 +90,40 @@ public abstract class PacketRouterTest {
 		packetRouter1.addConnectedDevice(device1);
 		assertTrue(connectedDeviceAddresses.contains(device1));
 		assertTrue(connectedDeviceAddresses.size() == 1);
+	}
+
+	@Test
+	public void testRemoveConnectedDevice() throws InterruptedException {
+		packetRouter1.addConnectedDevice(device1);
+		packetRouter1.removeConnectedDevice(device1);
+		Set<String> reachableDeviceAddresses = packetRouter1
+				.getReachableDeviceAddresses();
+		assertTrue(reachableDeviceAddresses.isEmpty());
+
+		Set<String> connectedDeviceAddresses = packetRouter1
+				.getConnectedDeviceAddresses();
+		assertTrue(connectedDeviceAddresses.isEmpty());
+	}
+	
+	@Test
+	public void testRemoveReachableDevice() throws InterruptedException {
+		IPacketRouter packetRouter2 = getPacketRouter(ownAddress2);
+		connectPacketRouters(packetRouter1, packetRouter2);
+		connectPacketRouters(packetRouter2, packetRouter1);
+		
+		packetRouter1.addConnectedDevice(device1);
+		Thread.sleep(getBroadcastWaitTime());
+		assertTrue(packetRouter2.getReachableDeviceAddresses().contains(device1));
+
+		// now remove device1 from router 1
+		packetRouter1.removeConnectedDevice(device1);
+		
+		Thread.sleep(getBroadcastWaitTime());
+		
+		// should be removed from router 2 now, too
+		Set<String> reachableDeviceAddresses = packetRouter2
+				.getReachableDeviceAddresses();
+		assertTrue(reachableDeviceAddresses.isEmpty());
 	}
 
 	@Test
@@ -111,7 +147,8 @@ public abstract class PacketRouterTest {
 	}
 
 	private List<String> getDeviceList(RoutingInformation routingInformation) {
-		List<RoutingTableEntry> entryList = routingInformation.getRoutingTable().getEntryList();
+		List<RoutingTableEntry> entryList = routingInformation
+				.getRoutingTable().getEntryList();
 		ArrayList<String> result = new ArrayList<String>(entryList.size());
 		for (RoutingTableEntry routingTableEntry : entryList) {
 			result.add(routingTableEntry.getDestination());
@@ -157,74 +194,85 @@ public abstract class PacketRouterTest {
 	public void testSendMessageToConnectedDevice() {
 		DataPacket dataPacket = new DataPacket(device2, "data1".getBytes(),
 				DataPacket.TYPE_DATA);
-		dataPacket.Src = TestConstants.sampleAddress;
+		dataPacket.Src = packetRouter1.getOwnAddress();
 		packetRouter1.addConnectedDevice(device2);
-		packetRouter1.routePacket(dataPacket, ownAddress);
+		packetRouter1.routePacket(dataPacket, packetRouter1.getOwnAddress());
 		assertEquals(dataPacket, getSentPackages(ownAddress, device2).peek());
 	}
 
 	@Test
 	public void testSendMessageToReachableDevice() {
 		RoutingInformation sampleRI = getSampleRoutingInformation();
-		String sampleReachableDevice = getDeviceList(sampleRI)
-				.get(0);
+		String sampleReachableDevice = getDeviceList(sampleRI).get(0);
 		DataPacket dataPacket = new DataPacket(sampleReachableDevice,
 				"data1".getBytes(), DataPacket.TYPE_DATA);
-		packetRouter1.updateRoutingInformation(sampleRI);
-		packetRouter1.routePacket(dataPacket, ownAddress);
+		packetRouter1.routePacket(dataPacket, packetRouter1.getOwnAddress());
 		assertTrue(sentMessages.isEmpty());
-		packetRouter1.addConnectedDevice(device1);
-		packetRouter1.routePacket(dataPacket, ownAddress);
-		DataPacket sentPacket = getSentPackages(ownAddress, device1).peek();
+
+		packetRouter1.updateRoutingInformation(sampleRI);
+		packetRouter1.addConnectedDevice(sampleReachableDevice);
+		packetRouter1.routePacket(dataPacket, packetRouter1.getOwnAddress());
+		DataPacket sentPacket = getSentPackages(packetRouter1.getOwnAddress(),
+				sampleReachableDevice).peek();
 		assertTrue(sentPacket.getDataAsString().equals("data1"));
 	}
 
 	@Test
-	public void test2CommunicatingPacketRouters() {
+	public void test2CommunicatingPacketRouters() throws InterruptedException {
 		final IPacketRouter packetRouter2 = getPacketRouter(ownAddress2);
 		connectPacketRouters(packetRouter1, packetRouter2);
 		connectPacketRouters(packetRouter2, packetRouter1);
 
-		packetRouter1.addConnectedDevice(ownAddress2);
-		packetRouter2.addConnectedDevice(ownAddress);
+		// packetRouter1.addConnectedDevice(ownAddress2);
+		// packetRouter2.addConnectedDevice(ownAddress);
 
 		// packetrouters should know each others device as connected now
 		assertTrue(packetRouter1.getConnectedDeviceAddresses().contains(
 				ownAddress2));
-		assertTrue(packetRouter1.getConnectedDeviceAddresses().size() == 1);
+		assertEquals(1, packetRouter1.getConnectedDeviceAddresses().size());
 		assertTrue(packetRouter2.getConnectedDeviceAddresses().contains(
 				ownAddress));
-		assertTrue(packetRouter2.getConnectedDeviceAddresses().size() == 1);
+		assertEquals(1, packetRouter2.getConnectedDeviceAddresses().size());
 		// but musnt contain it as reachable
-		assertTrue(packetRouter1.getReachableDeviceAddresses().size() == 0);
-		assertTrue(packetRouter2.getReachableDeviceAddresses().size() == 0);
+		assertEquals(0, packetRouter1.getReachableDeviceAddresses().size());
+		assertEquals(0, packetRouter2.getReachableDeviceAddresses().size());
 
 		// now we add another device to router2
 		packetRouter2.addConnectedDevice(device1);
 		assertTrue(packetRouter2.getConnectedDeviceAddresses()
 				.contains(device1));
-		assertTrue(packetRouter2.getConnectedDeviceAddresses().size() == 2);
-		assertTrue(packetRouter2.getReachableDeviceAddresses().size() == 0);
+		Thread.sleep(getBroadcastWaitTime());
+
+		assertEquals(2, packetRouter2.getConnectedDeviceAddresses().size());
+		assertEquals(0, packetRouter2.getReachableDeviceAddresses().size());
 		// this changes should propagate to packet router 1
-		assertTrue(packetRouter1.getConnectedDeviceAddresses().size() == 1);
-		assertTrue(packetRouter1.getReachableDeviceAddresses().contains(device1));
-		assertTrue(packetRouter1.getReachableDeviceAddresses().size() == 1);
-		
-		
-		// now we try to address a packet to device1 and send it via router 1, which is not directly connected.
-		DataPacket dataPacket = new DataPacket(device1, "testData 1234".getBytes(), DataPacket.TYPE_DATA);
+
+		assertEquals(1, packetRouter1.getConnectedDeviceAddresses().size());
+
+		assertEquals(1, packetRouter1.getConnectedDeviceAddresses().size());
+		assertEquals(1, packetRouter1.getReachableDeviceAddresses().size());
+		assertTrue(packetRouter1.getReachableDeviceAddresses()
+				.contains(device1));
+
+		// now we try to address a packet to device1 and send it via router 1,
+		// which is not directly connected.
+		DataPacket dataPacket = new DataPacket(device1,
+				"testData 1234".getBytes(), DataPacket.TYPE_DATA);
 		dataPacket.Src = TestConstants.sampleAddress;
-		packetRouter1.routePacket(dataPacket, ownAddress);
-		DataPacket dataPacket2 = getSentPackages(packetRouter1.getOwnAddress(), packetRouter2.getOwnAddress()).peek();
+
+		packetRouter1.routePacket(dataPacket, packetRouter1.getOwnAddress());
+
+		DataPacket dataPacket2 = getSentPackages(packetRouter1.getOwnAddress(),
+				packetRouter2.getOwnAddress()).peek();
 		// packet should have been sent by router 1
 		assertEquals("testData 1234", dataPacket2.getDataAsString());
 		assertEquals(TestConstants.sampleAddress, dataPacket2.Src);
 		assertEquals(device1, dataPacket2.Dest);
-		
+
 		// now route the package to target by router2:
 		packetRouter2.routePacket(dataPacket2, ownAddress);
 		Queue<DataPacket> sentPackages = getSentPackages(ownAddress2, device1);
-		//dataPacket2 = sentMessages2.get(device1);
+		// dataPacket2 = sentMessages2.get(device1);
 		dataPacket2 = sentPackages.peek();
 		assertEquals("testData 1234", dataPacket2.getDataAsString());
 		assertEquals(TestConstants.sampleAddress, dataPacket2.Src);
@@ -233,20 +281,22 @@ public abstract class PacketRouterTest {
 
 	@Test
 	public void test3CommunicatingPacketRouters() {
-		
 	}
-	
-	private void connectPacketRouters(final IPacketRouter packetRouter1, final IPacketRouter packetRouter2) {
+
+	protected void connectPacketRouters(final IPacketRouter packetRouter1,
+			final IPacketRouter packetRouter2) {
 		packetRouter1.setPacketSender(new IPacketSender() {
 			@Override
 			public void sendMessageToConnectedDevice(DataPacket packet,
 					String address) {
-				if ((packetRouter2 != null) && (address.equals(packetRouter2.getOwnAddress()))
+				if ((packetRouter2 != null)
+						&& (address.equals(packetRouter2.getOwnAddress()))
 						&& (packet.Type == DataPacket.TYPE_ROUTING_INFORMATION)) {
 					try {
-						RoutingInformation ri = MessageProtos.RoutingInformation.parseFrom(packet.getData());
-						// final List<String> deviceList =  getDeviceList(ri);
-						
+						RoutingInformation ri = MessageProtos.RoutingInformation
+								.parseFrom(packet.getData());
+						// final List<String> deviceList = getDeviceList(ri);
+
 						if (packetRouter2 != null) {
 							packetRouter2.updateRoutingInformation(ri);
 						}
@@ -254,11 +304,15 @@ public abstract class PacketRouterTest {
 						throw new RuntimeException();
 					}
 				} else if (packet.Type == DataPacket.TYPE_DATA) {
-					putSentPacket(packetRouter1.getOwnAddress(), address, packet);
-					//sentMessages2.put(address, packet);
+					putSentPacket(packetRouter1.getOwnAddress(), address,
+							packet);
+					// sentMessages2.put(address, packet);
 				}
 			}
 		});
+		if (packetRouter2 != null) {
+			packetRouter1.addConnectedDevice(packetRouter2.getOwnAddress());
+		}
 	}
 
 	private void putSentPacket(String source, String target, DataPacket packet) {
@@ -267,17 +321,17 @@ public abstract class PacketRouterTest {
 			sourceMap = new HashMap<String, Queue<DataPacket>>();
 			sentMessages.put(source, sourceMap);
 		}
-		
+
 		Queue<DataPacket> targetPacketList = sourceMap.get(target);
-		
+
 		if (targetPacketList == null) {
 			targetPacketList = new LinkedBlockingQueue<DataPacket>();
 			sourceMap.put(target, targetPacketList);
 		}
-		
+
 		targetPacketList.add(packet);
 	}
-	
+
 	private Queue<DataPacket> getSentPackages(String source, String target) {
 		Map<String, Queue<DataPacket>> sourceMap = sentMessages.get(source);
 		if (sourceMap == null) {
@@ -290,15 +344,17 @@ public abstract class PacketRouterTest {
 			return sourceMap.get(target);
 		}
 	}
-	
+
+	protected abstract int getBroadcastWaitTime();
+
 	protected abstract IPacketRouter getPacketRouter(String ownAddress);
 
 	protected abstract RoutingType getRouterRoutingType();
 
 	protected abstract RoutingInformation getSampleRoutingInformation();
-	
+
 	protected abstract List<String> getSampleExpectedReachableDevices();
-	
+
 	protected abstract List<String> getSampleExpectedConnectedDevices();
 
 }

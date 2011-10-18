@@ -156,7 +156,7 @@ public class LocalRoutingTable {
 			for (Enumeration<RoutingTableEntryWrapper> e = rTable.elements(); e
 					.hasMoreElements();) {
 				RoutingTableEntryWrapper rte = e.nextElement();
-				if (rte.getNumHops() == 1)
+				if (rte.getNumHops() == 1 && rte.isValid())
 					v.addElement(rte.getDestination());
 			}
 		}

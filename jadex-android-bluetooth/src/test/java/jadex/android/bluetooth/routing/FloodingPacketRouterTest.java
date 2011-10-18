@@ -51,4 +51,11 @@ public class FloodingPacketRouterTest extends PacketRouterTest {
 		List<String> list = new ArrayList<String>();
 		return list;
 	}
+
+	@Override
+	protected int getBroadcastWaitTime() {
+		return 0;
+	}
+	
+	
 }

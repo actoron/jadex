@@ -60,7 +60,7 @@ public class BroadcastMinder extends Thread {
 				me.increaseSeqNum();
 
 				// send out my routing table
-				rm.BroadcastRouteTableMessage();
+				rm.broadcastRouteTableMessage();
 
 				// logRouteTable();
 			} catch (InterruptedException ex) {

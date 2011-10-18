@@ -8,6 +8,10 @@ public class BluetoothMessage implements Parcelable {
 	private String remoteAdress;
 	private byte[] data;
 	private byte type;
+	
+	public static final Integer NOT_CONNECTABLE = -1;
+
+	public static final Integer MESSAGE_SENT = 1;
 
 	public static final Parcelable.Creator<BluetoothMessage> CREATOR = new Parcelable.Creator<BluetoothMessage>() {
 

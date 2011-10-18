@@ -1,5 +1,8 @@
 package jadex.android.bluetooth.routing.dsdv;
 
+import jadex.android.bluetooth.exceptions.MessageNotSendException;
+import jadex.android.bluetooth.exceptions.RoutingTableException;
+import jadex.android.bluetooth.message.BluetoothMessage;
 import jadex.android.bluetooth.message.DataPacket;
 import jadex.android.bluetooth.message.MessageProtos.RoutingInformation;
 import jadex.android.bluetooth.message.MessageProtos.RoutingTable;
@@ -96,7 +99,7 @@ public class DsdvRouter implements IPacketRouter {
 		routeTable = new LocalRoutingTable(ownAddress);
 		routeTable.addRoutingEntry(rte);
 		// Announce arrival on the network
-		BroadcastRouteTableMessage();
+		broadcastRouteTableMessage();
 	}
 
 	/**
@@ -138,6 +141,7 @@ public class DsdvRouter implements IPacketRouter {
 					riBuilder.setRoutingTable(rtBuilder);
 					riBuilder.setRouteDownInformation(routeDown);
 					riBuilder.setType(RoutingType.DSDV);
+					riBuilder.setFromAddress(getOwnAddress());
 
 					DataPacket packet = new DataPacket(dest, riBuilder.build()
 							.toByteArray(), DataPacket.TYPE_ROUTING_INFORMATION);
@@ -175,7 +179,7 @@ public class DsdvRouter implements IPacketRouter {
 	/**
 	 * Sends all active routes (routes with even seq nums) to all neighbors
 	 */
-	public void BroadcastRouteTableMessage() {
+	public void broadcastRouteTableMessage() {
 		Vector<RoutingTableEntryWrapper> routes = routeTable
 				.getAllRoutesAsVector();
 		broadcastRouteBroadcastPacket(routes, false);
@@ -243,6 +247,10 @@ public class DsdvRouter implements IPacketRouter {
 						.getRoutingEntry(rte.getDestination());
 				// if I use the rte then increase the hop count by one
 				rte.setNumHops(rte.getNumHops() + 1);
+				if (rBroad.getFromAddress() == null) {
+					throw new RoutingTableException("No 'from' address specified for Routing Entry: " + rte.getDestination());
+				}
+				rte.setNextHop(rBroad.getFromAddress());
 				// System.out.println("**** Got from " +
 				// rBroad.fromNetAddr.getAddressAsString()+" to "+rte.getDestination().getAddressAsString()
 				// + " with sewnum "+rte.getSeqNum());
@@ -331,15 +339,20 @@ public class DsdvRouter implements IPacketRouter {
 	/**
 	 * Prints the routing table.
 	 */
-	public void printRouteTable() {
+	public String printRouteTable() {
 		Vector<RoutingTableEntryWrapper> v = routeTable.getAllRoutesAsVector();
-		Log.d(TAG, "Routing Table from route manager:");
-
+		//Log.d(TAG, "Routing Table from route manager:");
+		StringBuilder sb = new StringBuilder("RoutingTable for ");
+		sb.append(ownAddress);
+		sb.append("\n");
+		
 		for (int i = 0; i < v.size(); i++) {
 			RoutingTableEntryWrapper rte = v.elementAt(i);
-			Log.d(TAG, rte.toString());
-
+			sb.append(rte.toString());
+			sb.append("\n");
 		}
+		
+		return sb.toString();
 	}
 
 	/**
@@ -347,7 +360,6 @@ public class DsdvRouter implements IPacketRouter {
 	 * @return all entries in the routing table (excluding our own)
 	 */
 	public String[] getAvailableDevices() {
-		// TODO: I hate vectors!
 		Vector<RoutingTableEntryWrapper> routes = routeTable
 				.getRoutesAsVector();
 		String[] connectedDevices = new String[routes.size() - 1];
@@ -371,8 +383,23 @@ public class DsdvRouter implements IPacketRouter {
 	 * @return
 	 */
 	public IFuture routePacket(DataPacket packet, String fromDevice) {
+		// TODO: do some queueing here
 		IFuture result = new Future();
-		Log.d(TAG, "Message send to DSDVRouter");
+		RoutingTableEntryWrapper routingEntry = routeTable.getRoutingEntry(packet.Dest);
+		
+		if (routingEntry != null && routingEntry.isValid()) {
+			String nextHop = routingEntry.getNextHop();
+			packet.HopCount++;
+			try {
+				sender.sendMessageToConnectedDevice(packet, nextHop);
+				Log.d(TAG, "Message routed to " + nextHop);
+				result.setResult(BluetoothMessage.MESSAGE_SENT);
+			} catch (MessageNotSendException e) {
+				Log.e(TAG, "Could not send Message to: " + nextHop + ", see Stacktrace");
+				e.printStackTrace();
+				result.setException(e);
+			}
+		}
 		return result;
 	}
 
@@ -401,7 +428,22 @@ public class DsdvRouter implements IPacketRouter {
 	public void addConnectedDevice(String device) {
 		RoutingTableEntryWrapper rte = new RoutingTableEntryWrapper(device,
 				device, 1, CurrentInfo.incrementOwnSeqNum());
-		routeTable.addRoutingEntry(rte);
+//		routeTable.addRoutingEntry(rte);
+//		broadcastRouteTableMessage();
+		
+		Builder rtbuilder = RoutingTable.newBuilder();
+		RoutingTableEntryWrapper rtew = new RoutingTableEntryWrapper();
+		rtew.setDestination(device);
+		rtew.setNextHop(device);
+		rtew.setNumHops(0);
+		rtew.setSeqNum(0);
+		rtbuilder.addEntry(rtew.build());
+		jadex.android.bluetooth.message.MessageProtos.RoutingInformation.Builder riBuilder = RoutingInformation.newBuilder();
+		riBuilder.setFromAddress(device);
+		riBuilder.setRoutingTable(rtbuilder);
+		riBuilder.setRouteDownInformation(false);
+		riBuilder.setType(RoutingType.DSDV);
+		updateRoutingInformation(riBuilder.build());
 	}
 
 	@Override
@@ -455,6 +497,11 @@ public class DsdvRouter implements IPacketRouter {
 	@Override
 	public String getOwnAddress() {
 		return ownAddress;
+	}
+	
+	@Override
+	public String toString() {
+		return printRouteTable();
 	}
 
 }

@@ -1,5 +1,7 @@
 package jadex.android.bluetooth.routing;
 
+import static org.junit.Assert.*;
+import jadex.android.bluetooth.TestConstants;
 import jadex.android.bluetooth.message.MessageProtos;
 import jadex.android.bluetooth.message.MessageProtos.RoutingInformation;
 import jadex.android.bluetooth.message.MessageProtos.RoutingInformation.Builder;
@@ -7,13 +9,33 @@ import jadex.android.bluetooth.message.MessageProtos.RoutingTable;
 import jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry;
 import jadex.android.bluetooth.message.MessageProtos.RoutingType;
 import jadex.android.bluetooth.routing.dsdv.DsdvRouter;
+import jadex.android.bluetooth.routing.dsdv.info.ConfigInfo;
 import jadex.android.bluetooth.routing.dsdv.info.CurrentInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
 public class DsdvPacketRouterTest extends PacketRouterTest {
 
+	@Test
+	public void testDSDVStaleRoutingEntryDeletion() throws InterruptedException {
+		IPacketRouter packetRouter2 = getPacketRouter(TestConstants.adapterAddress2);
+		
+		connectPacketRouters(packetRouter1, packetRouter2);
+		connectPacketRouters(packetRouter2, packetRouter1);
+		
+		Thread.sleep(ConfigInfo.periodicRouteBroadcastIncremental*2);
+		
+		packetRouter1.setPacketSender(null);
+		packetRouter2.setPacketSender(null);
+		
+		Thread.sleep(ConfigInfo.deleteRouteStaleRoute + 1000);
+		assertTrue(packetRouter2.getReachableDeviceAddresses().isEmpty());
+	}
+	
+	
 	@Override
 	protected IPacketRouter getPacketRouter(String ownAddress) {
 		return new DsdvRouter(ownAddress);
@@ -63,4 +85,8 @@ public class DsdvPacketRouterTest extends PacketRouterTest {
 		return list;
 	}
 
+	@Override
+	protected int getBroadcastWaitTime() {
+		return ConfigInfo.changedRouteDampening * 2;
+	}
 }

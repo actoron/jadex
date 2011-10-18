@@ -15,10 +15,11 @@ public class ConfigInfo {
 	public static int deleteRouteSleepVal = 20000;
 	// FIXME: This was changed by us? We need maintenance protocols, this could
 	// be a part of that
-	public static int deleteRouteStaleRoute = 900000000;
+	public static int deleteRouteStaleRoute = 10000;
 
 	// Used to indicate how often to broadcast routing table to neighbors
-	public static int periodicRouteBroadcast = 15000;
+//	public static int periodicRouteBroadcast = 15000;
+	public static int periodicRouteBroadcast = 5000;
 	// Used to indicate how often to broadcast routing table to neighbors
 	public static int periodicRouteBroadcastIncremental = 2000;
 

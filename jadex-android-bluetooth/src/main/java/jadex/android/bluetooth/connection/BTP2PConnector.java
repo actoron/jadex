@@ -39,10 +39,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 public class BTP2PConnector implements IBluetoothStateListener {
 
-	public static final Integer NOT_CONNECTABLE = -1;
-
-	public static final Integer MESSAGE_SENT = 1;
-
 	private static final boolean PING_DEBUG = false;
 
 	public static final byte MAXHOPS = 4;
@@ -213,7 +209,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 						try {
 							connection.write(msg.asByteArray());
 							if (!future.resultAvailable) {
-								future.setResult(MESSAGE_SENT);
+								future.setResult(BluetoothMessage.MESSAGE_SENT);
 							}
 							connection.removeConnectionListener(this);
 						} catch (IOException e) {
@@ -221,13 +217,13 @@ public class BTP2PConnector implements IBluetoothStateListener {
 							connection.close();
 							connection.removeConnectionListener(this);
 							if (!future.resultAvailable) {
-								future.setResult(NOT_CONNECTABLE);
+								future.setResult(BluetoothMessage.NOT_CONNECTABLE);
 							}
 						}
 					} else {
 						connection.removeConnectionListener(this);
 						if (!future.resultAvailable) {
-							future.setResult(NOT_CONNECTABLE);
+							future.setResult(BluetoothMessage.NOT_CONNECTABLE);
 						}
 						boolean remove = getBondedDevicesInRange().remove(connection
 								.getRemoteDevice());
@@ -434,7 +430,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 					future.addResultListener(new IResultListener() {
 						@Override
 						public void resultAvailable(Object messageResult) {
-							if (messageResult != MESSAGE_SENT) {
+							if (messageResult != BluetoothMessage.MESSAGE_SENT) {
 								Log.d(Helper.LOG_TAG, "Bonded device not available: "
 										+ device.getName());
 								if (getBondedDevicesInRange().contains(device)) {

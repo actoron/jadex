@@ -86,7 +86,7 @@ public abstract class AConnection implements IConnection {
 		}
 
 		/* Call this from the main Activity to send data to the remote device */
-		public void write(byte[] bytes) throws IOException {
+		public synchronized void write(byte[] bytes) throws IOException {
 			try {
 				mmOutStream.write(bytes);
 			} catch (IOException e) {
