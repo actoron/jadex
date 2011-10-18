@@ -661,65 +661,69 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			public void customResultAvailable(ILibraryService libservice)
 			{
-				ClassLoader	cl	= libservice.getClassLoader(rid);
-				
-				String	filename	= modelname;
-				
-				if(cinfo.getParent()!=null)
+				libservice.getClassLoader(rid).addResultListener(new ExceptionDelegationResultListener<ClassLoader, String>(ret)
 				{
-					// Try to find file for local type.
-					String	localtype	= modelname!=null ? modelname : cinfo.getLocalType();
-					filename	= null;
-					IComponentAdapter pad = getParentAdapter(cinfo);
-					IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
-					final SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
-					for(int i=0; filename==null && i<subcomps.length; i++)
+					public void customResultAvailable(ClassLoader cl)
 					{
-						if(subcomps[i].getName().equals(localtype))
+						String	filename	= modelname;
+						
+						if(cinfo.getParent()!=null)
 						{
-							filename = subcomps[i].getFilename();
-							cinfo.setLocalType(localtype);
-						}
-					}
-					if(filename==null)
-					{
-						filename	= modelname;
-					}
-					
-					// Try to find local type for file
-					if(cinfo.getLocalType()==null && subcomps.length>0)
-					{
-						Tuple	key	= new Tuple(parent.getModel().getFullName(), filename);
-						if(localtypes.containsKey(key))
-						{
-							cinfo.setLocalType((String)localtypes.get(key));
-						}
-						else
-						{
-							ResourceInfo	info	= SUtil.getResourceInfo0(filename, cl);
-							if(info!=null)
+							// Try to find file for local type.
+							String	localtype	= modelname!=null ? modelname : cinfo.getLocalType();
+							filename	= null;
+							IComponentAdapter pad = getParentAdapter(cinfo);
+							IExternalAccess parent = getComponentInstance(pad).getExternalAccess();
+							final SubcomponentTypeInfo[] subcomps = parent.getModel().getSubcomponentTypes();
+							for(int i=0; filename==null && i<subcomps.length; i++)
 							{
-								for(int i=0; cinfo.getLocalType()==null && i<subcomps.length; i++)
+								if(subcomps[i].getName().equals(localtype))
 								{
-									ResourceInfo	info1	= SUtil.getResourceInfo0(subcomps[i].getFilename(), cl);
-									if(info1!=null)
-									{
-										if(info.getFilename().equals(info1.getFilename()))
-										{
-											cinfo.setLocalType(subcomps[i].getName());
-										}
-										info1.cleanup();
-									}
+									filename = subcomps[i].getFilename();
+									cinfo.setLocalType(localtype);
 								}
-								info.cleanup();
 							}
-							localtypes.put(key, cinfo.getLocalType());
-			//				System.out.println("Local type: "+cinfo.getLocalType()+", "+pad.getComponentIdentifier());
+							if(filename==null)
+							{
+								filename	= modelname;
+							}
+							
+							// Try to find local type for file
+							if(cinfo.getLocalType()==null && subcomps.length>0)
+							{
+								Tuple	key	= new Tuple(parent.getModel().getFullName(), filename);
+								if(localtypes.containsKey(key))
+								{
+									cinfo.setLocalType((String)localtypes.get(key));
+								}
+								else
+								{
+									ResourceInfo	info	= SUtil.getResourceInfo0(filename, cl);
+									if(info!=null)
+									{
+										for(int i=0; cinfo.getLocalType()==null && i<subcomps.length; i++)
+										{
+											ResourceInfo	info1	= SUtil.getResourceInfo0(subcomps[i].getFilename(), cl);
+											if(info1!=null)
+											{
+												if(info.getFilename().equals(info1.getFilename()))
+												{
+													cinfo.setLocalType(subcomps[i].getName());
+												}
+												info1.cleanup();
+											}
+										}
+										info.cleanup();
+									}
+									localtypes.put(key, cinfo.getLocalType());
+					//				System.out.println("Local type: "+cinfo.getLocalType()+", "+pad.getComponentIdentifier());
+								}
+							}
 						}
+						
+						ret.setResult(filename);
 					}
-				}
-				
-				ret.setResult(filename);
+				});
 			}
 		});
 		

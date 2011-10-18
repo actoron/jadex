@@ -3,6 +3,7 @@ package jadex.tools.libtool;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
@@ -75,14 +76,14 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		// Create class paths view.
 		final JPanel classview = new JPanel(new BorderLayout());
 		this.classpaths = new EditableList("Class Paths", true);
-		libservice.getURLStrings().addResultListener(new SwingDefaultResultListener(LibServiceBrowser.this)
+		libservice.getResourceIdentifiers().addResultListener(new SwingDefaultResultListener<List<IResourceIdentifier>>(LibServiceBrowser.this)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(List<IResourceIdentifier> result)
 			{
-				List entries = (List)result;
-				for(int i=0; i<entries.size(); i++)
+//				List entries = (List)result;
+				for(int i=0; i<result.size(); i++)
 				{
-					classpaths.addEntry((String)entries.get(i));
+					classpaths.addEntry(result.get(i).toString());
 				}
 			}
 		});			
@@ -173,15 +174,15 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				libservice.getURLStrings().addResultListener(new SwingDefaultResultListener(LibServiceBrowser.this)
+				libservice.getResourceIdentifiers().addResultListener(new SwingDefaultResultListener<List<IResourceIdentifier>>(LibServiceBrowser.this)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(List<IResourceIdentifier> result)
 					{
 						classpaths.removeEntries();
-						List entries = (List)result;
-						for(int i=0; i<entries.size(); i++)
+//						List entries = (List)result;
+						for(int i=0; i<result.size(); i++)
 						{
-							classpaths.addEntry((String)entries.get(i));
+							classpaths.addEntry(result.get(i).toString());
 						}
 					}
 				});	
@@ -266,18 +267,18 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		// Add a library service listener to be informed about library changes.
 		this.listener	= new ILibraryServiceListener()
 		{
-			public IFuture urlAdded(URL url)
+			public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
 			{
 				// todo: make synchronized
-				if(!classpaths.containsEntry(url.toString()))
-					classpaths.addEntry(url.toString());
+				if(!classpaths.containsEntry(rid.toString()))
+					classpaths.addEntry(rid.toString());
 				return IFuture.DONE;
 			}
-			public IFuture urlRemoved(URL url)
+			public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
 			{
 				// todo: make synchronized
-				if(classpaths.containsEntry(url.toString()))
-					classpaths.removeEntry(url.toString());
+				if(classpaths.containsEntry(rid.toString()))
+					classpaths.removeEntry(rid.toString());
 				return IFuture.DONE;
 			}
 		};
@@ -291,7 +292,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	/**
 	 *  Informs the plugin that it should stop all its computation
 	 */
-	public IFuture shutdown()
+	public IFuture<Void> shutdown()
 	{
 		try
 		{

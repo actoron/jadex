@@ -347,7 +347,8 @@ public class SelectorThread implements Runnable
 					{
 						ICodec codec = codecfac.getCodec(codecs[i]);
 						// todo: which resource identifier to use for incoming connections?
-						enc_msg	= codec.encode(enc_msg, libservice.getClassLoader(null));
+						ClassLoader cl = getClass().getClassLoader(); // libservice.getClassLoader(null)
+						enc_msg	= codec.encode(enc_msg, cl);
 					}
 					byte[] data = (byte[])enc_msg;
 					
@@ -412,7 +413,8 @@ public class SelectorThread implements Runnable
 			// we'd like to be notified when there's data waiting to be read
 			
 			// todo: which resource identifier to use for outgoing connections?
-			sc.register(this.selector, SelectionKey.OP_READ, new NIOTCPInputConnection(sc, codecfac, libservice.getClassLoader(null)));
+			ClassLoader cl = getClass().getClassLoader(); // libservice.getClassLoader(null)
+			sc.register(this.selector, SelectionKey.OP_READ, new NIOTCPInputConnection(sc, codecfac, cl));
 			
 			logger.info("Accepted connection from: "+sc.socket().getRemoteSocketAddress());
 		}

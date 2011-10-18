@@ -10,6 +10,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.LibraryService;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -108,7 +109,7 @@ public class RemovePathAction extends ToolTipAction
 							{
 								try
 								{
-									ls.removeURL(LibraryService.toURL(path));
+									ls.removeURL(SUtil.toURL(path));
 									ret.setResult(null);
 								}
 								catch(Exception ex)

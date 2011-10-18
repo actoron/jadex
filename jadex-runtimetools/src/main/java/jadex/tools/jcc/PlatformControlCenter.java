@@ -15,6 +15,7 @@ import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -57,7 +58,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 *  Initialize a control center.
 	 */
-	public IFuture	init(IExternalAccess platformaccess, final ControlCenter controlcenter, final String[] plugin_classes)
+	public IFuture<Void>	init(IExternalAccess platformaccess, final ControlCenter controlcenter, final String[] plugin_classes)
 	{
 		this.platformaccess = platformaccess;
 		this.controlcenter	= controlcenter;
@@ -66,7 +67,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		this.pccpanel	= new PlatformControlCenterPanel(this);
 		
 		// Load plugins.
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		SServiceProvider.getService(controlcenter.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDelegationResultListener(ret)
 		{
@@ -77,22 +78,28 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 				
 				// todo: what about dynamic plugin loading?
 //				ClassLoader cl = controlcenter.getJCCAccess().getModel().getClassLoader();
-				ClassLoader cl = libservice.getClassLoader(controlcenter.getJCCAccess().getModel().getResourceIdentifier());
-				for(int i=0; i<plugin_classes.length; i++)
+				libservice.getClassLoader(controlcenter.getJCCAccess().getModel().getResourceIdentifier())
+					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 				{
-					try
+					public void customResultAvailable(ClassLoader cl)
 					{
-						Class plugin_class = SReflect.classForName(plugin_classes[i], cl);
-						IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
-						plugins.put(p, null);
-						setStatusText("Plugin loaded successfully: "+ p.getName());
+						for(int i=0; i<plugin_classes.length; i++)
+						{
+							try
+							{
+								Class plugin_class = SReflect.classForName(plugin_classes[i], cl);
+								IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
+								plugins.put(p, null);
+								setStatusText("Plugin loaded successfully: "+ p.getName());
+							}
+							catch(Exception e)
+							{
+								setStatusText("Plugin error: "+plugin_classes[i]);
+							}
+						}
+						ret.setResult(null);
 					}
-					catch(Exception e)
-					{
-						setStatusText("Plugin error: "+plugin_classes[i]);
-					}
-				}
-				ret.setResult(null);
+				});
 			}
 		});
 		

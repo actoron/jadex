@@ -1,4 +1,4 @@
-package maventest;
+package jadex.bridge.service.library;
 
 import jadex.bridge.IResourceIdentifier;
 import jadex.commons.SUtil;
@@ -9,6 +9,7 @@ import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -71,22 +72,41 @@ public class DelegationURLClassLoader extends URLClassLoader
 		return rid;
 	}
 	
+//	/**
+//	 *  Get all managed urls inlcuding all subdependencies.
+//	 *  @return The urls.
+//	 */
+//	public Set<URL> getAllURLs()
+//	{
+//		Set<URL> ret = new HashSet<URL>();
+//		if(delegates!=null)
+//		{
+//			for(int i=0; i<delegates.length; i++)
+//			{
+//				ret.addAll(delegates[i].getAllURLs());
+//			}
+//		}
+//		if(getURL()!=null)
+//			ret.add(getURL());
+//		return ret;
+//	}
+	
 	/**
-	 *  Get all managed urls inlcuding all subdependencies.
-	 *  @return The urls.
+	 *  Get all managed resource identifiers inlcuding all subdependencies.
+	 *  @return The resource identifiers.
 	 */
-	public Set<URL> getAllURLs()
+	public Set<IResourceIdentifier> getAllResourceIdentifiers()
 	{
-		Set<URL> ret = new HashSet<URL>();
+		Set<IResourceIdentifier> ret = new LinkedHashSet<IResourceIdentifier>();
 		if(delegates!=null)
 		{
 			for(int i=0; i<delegates.length; i++)
 			{
-				ret.addAll(delegates[i].getAllURLs());
+				ret.addAll(delegates[i].getAllResourceIdentifiers());
 			}
 		}
-		if(getURL()!=null)
-			ret.add(getURL());
+		if(getResourceIdentifier()!=null)
+			ret.add(getResourceIdentifier());
 		return ret;
 	}
 	

@@ -20,6 +20,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 /* $if !android $ */
@@ -143,13 +144,13 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 										
 										libservicelistener = new ILibraryServiceListener()
 										{
-											public IFuture urlRemoved(URL url)
+											public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
 											{
 												loader.clearModelCache();
 												return IFuture.DONE;
 											}
 											
-											public IFuture urlAdded(URL url)
+											public IFuture resourceIdentifierAdded(IResourceIdentifier rid)
 											{
 												loader.clearModelCache();
 												return IFuture.DONE;
@@ -203,19 +204,25 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public IFuture<IModelInfo> loadModel(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<IModelInfo> loadModel(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
-		Future<IModelInfo> ret = new Future<IModelInfo>();
+		final Future<IModelInfo> ret = new Future<IModelInfo>();
 //		System.out.println("filename: "+filename);
-		try
+		
+		libservice.getClassLoader(rid).addResultListener(new ExceptionDelegationResultListener<ClassLoader, IModelInfo>(ret)
 		{
-			ret.setResult(loader.loadApplicationModel(model, imports, 
-				libservice.getClassLoader(rid), rid).getModelInfo());
-		}
-		catch(Exception e)
-		{
-			ret.setException(e);
-		}
+			public void customResultAvailable(ClassLoader cl)
+			{
+				try
+				{
+					ret.setResult(loader.loadApplicationModel(model, imports, cl, rid).getModelInfo());
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
+		});
 		
 		return ret;
 	}
@@ -230,8 +237,22 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 * @return An instance of a component.
 	 */
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
+		final IModelInfo modelinfo, String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
 	{
+		if(libservice!=null)
+		{
+			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
+				new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(ret)
+			{
+				public void customResultAvailable(ClassLoader cl)
+				{
+					CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
+					ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret, cl);
+					
+				}
+			});
+		}
+		
 		try
 		{
 			// libservice is null for platform bootstrap factory.

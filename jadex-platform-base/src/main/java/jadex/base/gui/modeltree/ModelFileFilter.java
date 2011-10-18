@@ -5,7 +5,9 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.service.library.LibraryService;
 import jadex.commons.IRemoteFilter;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -143,9 +145,17 @@ public class ModelFileFilter implements IRemoteFilter
 				{
 					public void customResultAvailable(ILibraryService libservice)
 					{
-						IResourceIdentifier rid = libservice.getResourceIdentifier(file.getAbsolutePath());
-						SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
-							.addResultListener(new DelegationResultListener<Boolean>(ret));
+						libservice.getResourceIdentifier(SUtil.toURL(file.getAbsolutePath())).addResultListener(
+							new ExceptionDelegationResultListener<IResourceIdentifier, Boolean>(ret)
+						{
+							public void customResultAvailable(IResourceIdentifier rid)
+							{
+//								IResourceIdentifier rid = libservice.getResourceIdentifier(file.getAbsolutePath());
+								SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
+									.addResultListener(new DelegationResultListener<Boolean>(ret));
+							}
+						});
+						
 					}
 				});
 			}

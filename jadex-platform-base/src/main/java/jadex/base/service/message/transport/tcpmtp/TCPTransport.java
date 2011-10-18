@@ -247,7 +247,8 @@ public class TCPTransport implements ITransport
 		//											System.out.println("accepting");
 													
 													// todo: which resource identifier to use for incoming connections?
-													final TCPInputConnection con = new TCPInputConnection(serversocket.accept(), codecfac, libservice.getClassLoader(null));
+													ClassLoader cl = getClass().getClassLoader(); // libservice.getClassLoader(null)
+													final TCPInputConnection con = new TCPInputConnection(serversocket.accept(), codecfac, cl);
 													openincons.add(con);
 													if(!async)
 													{
@@ -467,7 +468,8 @@ public class TCPTransport implements ITransport
 //				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
 				
 				// todo: which resource identifier to use for outgoing connections?
-				ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, codecfac, new Cleaner(address), libservice.getClassLoader(null));
+				ClassLoader cl = getClass().getClassLoader(); // libservice.getClassLoader(null)
+				ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, codecfac, new Cleaner(address), cl);
 				connections.put(address, ret);
 			}
 			catch(Exception e)

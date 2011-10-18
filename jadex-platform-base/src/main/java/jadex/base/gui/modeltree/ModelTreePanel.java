@@ -11,11 +11,13 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMultiKernelListener;
 import jadex.bridge.IMultiKernelNotifierService;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.ILibraryService;
 import jadex.bridge.service.library.ILibraryServiceListener;
 import jadex.bridge.service.library.LibraryService;
+import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -117,12 +119,13 @@ public class ModelTreePanel extends FileTreePanel
 				ILibraryService ls = (ILibraryService)result;
 				libservicelistener = new ILibraryServiceListener()
 				{
-					public IFuture urlRemoved(final URL url)
+					public IFuture resourceIdentifierRemoved(final IResourceIdentifier rid)
 					{
 						SwingUtilities.invokeLater(new Runnable()
 						{
 							public void run()
 							{
+								URL url = rid.getLocalIdentifier().getSecondEntity();
 								try
 								{
 									// Comparison of file/urls is hard.
@@ -178,7 +181,7 @@ public class ModelTreePanel extends FileTreePanel
 						return IFuture.DONE;
 					}
 					
-					public IFuture urlAdded(URL url)
+					public IFuture resourceIdentifierAdded(IResourceIdentifier rid)
 					{
 						return IFuture.DONE;
 					}
@@ -241,7 +244,7 @@ public class ModelTreePanel extends FileTreePanel
 //										System.out.println("Need to add path: "+filename);
 										try
 										{
-											ls.addURL(LibraryService.toURL(filepath));
+											ls.addURL(SUtil.toURL(filepath));
 										}
 										catch(Exception e)
 										{

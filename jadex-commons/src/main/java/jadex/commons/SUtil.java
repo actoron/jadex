@@ -1619,6 +1619,91 @@ public class SUtil
 
 		return ret;
 	}
+	
+	/**
+	 *  Convert a file/string/url.
+	 */
+	public static URL toURL(Object url)
+	{
+		URL	ret	= null;
+		boolean	jar	= false;
+		if(url instanceof String)
+		{
+			String	string	= (String) url;
+			if(string.startsWith("file:") || string.startsWith("jar:file:"))
+			{
+				try
+				{
+					string	= URLDecoder.decode(string, "UTF-8");
+				}
+				catch(UnsupportedEncodingException e)
+				{
+					e.printStackTrace();
+				}
+			}
+			
+			jar	= string.startsWith("jar:file:");
+			url	= jar ? new File(string.substring(9))
+				: string.startsWith("file:") ? new File(string.substring(5)) : null;
+			
+			
+			if(url==null)
+			{
+				File file	= new File(string);
+				if(file.exists())
+				{
+					url	= file;
+				}
+				else
+				{
+					file	= new File(System.getProperty("user.dir"), string);
+					if(file.exists())
+					{
+						url	= file;
+					}
+					else
+					{
+						try
+						{
+							url	= new URL(string);
+						}
+						catch (MalformedURLException e)
+						{
+							throw new RuntimeException(e);
+						}
+					}
+				}
+			}
+		}
+		
+		if(url instanceof URL)
+		{
+			ret	= (URL)url;
+		}
+		else if(url instanceof File)
+		{
+			try
+			{
+				String	abs	= ((File)url).getAbsolutePath();
+				String	rel	= SUtil.convertPathToRelative(abs);
+				ret	= abs.equals(rel) ? new File(abs).toURI().toURL()
+					: new File(System.getProperty("user.dir"), rel).toURI().toURL();
+				if(jar)
+				{
+					if(ret.toString().endsWith("!"))
+						ret	= new URL("jar:"+ret.toString()+"/");	// Add missing slash in jar url.
+					else
+						ret	= new URL("jar:"+ret.toString());						
+				}
+			}
+			catch (MalformedURLException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+		return ret;
+	}
 
 	/**
 	 * Main method for testing. / public static void main(String[] args) {

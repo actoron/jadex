@@ -38,41 +38,22 @@ public interface ILibraryService extends IService
 	public IFuture<Void> removeResourceIdentifier(IResourceIdentifier rid);
 	
 	/**
+	 *  Remove a resource identifier.
+	 *  @param url The resource identifier.
+	 */
+	public IFuture<Void> removeResourceIdentifierCompletely(IResourceIdentifier rid);
+	
+	/**
 	 *  Get all managed (directly added i.e. top-level) resource identifiers.
 	 *  @return The list of resource identifiers.
 	 */
 	public IFuture<List<IResourceIdentifier>> getResourceIdentifiers();
 	
 	/**
-	 *  Get other contained (but not directly managed) urls from parent classloaders.
-	 *  @return The list of urls.
+	 *  Get all resource identifiers (also indirectly managed. 
 	 */
-	public IFuture<List<URL>> getNonManagedURLs();
+	public IFuture<List<IResourceIdentifier>> getIndirectResourceIdentifiers();
 	
-//	/**
-//	 *  Remove a url completely (all references).
-//	 *  @param url The url.
-//	 */
-//	public void removeURLCompletely(URL url);
-
-	
-//	/**
-//	 *  Get all urls (managed and non-managed).
-//	 *  @return The list of urls.
-//	 */
-//	public IFuture<List<URL>> getAllURLs();
-	
-//	/**
-//	 *  Get the non-managed classpath entries as strings.
-//	 *  @return Classpath entries as a list of strings.
-//	 */
-//	public IFuture<List<String>> getURLStrings();
-//	
-//	/**
-//	 *  Get the non-managed classpath entries.
-//	 *  @return Classpath entries as a list of strings.
-//	 */
-//	public IFuture<List<String>> getNonManagedURLStrings();
 	
 	/**
 	 *  Add a new url.
@@ -85,63 +66,25 @@ public interface ILibraryService extends IService
 	 *  @param url The url.
 	 */
 	public IFuture<Void> removeURL(URL url);
-//	
-//	/**
-//	 *  Remove a url completely (all references).
-//	 *  @param url The url.
-//	 */
-//	public void removeURLCompletely(URL url);
-//	
-//	/**
-//	 *  Get all managed entries as URLs.
-//	 *  @return The list of urls.
-//	 */
-//	public IFuture<List<URL>> getURLs();
-//	
-//	/**
-//	 *  Get other contained (but not directly managed) URLs.
-//	 *  @return The list of urls.
-//	 */
-//	public IFuture<List<URL>> getNonManagedURLs();
-//	
-//	/**
-//	 *  Get all urls (managed and non-managed).
-//	 *  @return The list of urls.
-//	 */
-//	public IFuture<List<URL>> getAllURLs();
-//	
-//	/**
-//	 *  Get the non-managed classpath entries as strings.
-//	 *  @return Classpath entries as a list of strings.
-//	 */
-//	public IFuture<List<String>> getURLStrings();
-//	
-//	/**
-//	 *  Get the non-managed classpath entries.
-//	 *  @return Classpath entries as a list of strings.
-//	 */
-//	public IFuture<List<String>> getNonManagedURLStrings();
 	
-//	/**
-//	 *  Get a class definition.
-//	 *  @param name The class name.
-//	 *  @return The class definition as byte array.
-//	 */
-//	public IFuture<byte[]> getClassDefinition(String name);
+	/**
+	 *  Remove a url completely (all references).
+	 *  @param url The url.
+	 */
+	public IFuture<Void> removeURLCompletely(URL url);
 	
-//	/** 
-//	 *  Returns the current ClassLoader.
-//	 *  @return the current ClassLoader
-//	 */
-//	@Excluded()
-//	public ClassLoader getClassLoader();
-	
+	/**
+	 *  Get other contained (but not directly managed) urls from parent classloaders.
+	 *  @return The list of urls.
+	 */
+	public IFuture<List<URL>> getNonManagedURLs();	
+		
 	/** 
 	 *  Returns the current ClassLoader.
 	 *  @return the current ClassLoader
 	 */
 	@Excluded()
-	public ClassLoader getClassLoader(IResourceIdentifier rid);
+	public IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid);
 	
 	/** 
 	 *  Returns the resource identifier.
@@ -157,11 +100,53 @@ public interface ILibraryService extends IService
      *  The listener is registered for changes in the loaded library states.
      *  @param listener The listener to be added.
      */
-    public void addLibraryServiceListener(ILibraryServiceListener listener);
+    public IFuture<Void> addLibraryServiceListener(ILibraryServiceListener listener);
     
     /**
      *  Remove an Library Service listener.
      *  @param listener  The listener to be removed.
      */
-    public void removeLibraryServiceListener(ILibraryServiceListener listener);
+    public IFuture<Void> removeLibraryServiceListener(ILibraryServiceListener listener);
+
+
+	
+//	/**
+//	 *  Get all urls (managed and non-managed).
+//	 *  @return The list of urls.
+//	 */
+//	public IFuture<List<URL>> getAllURLs();
+	
+//	/**
+//	 *  Get the non-managed classpath entries as strings.
+//	 *  @return Classpath entries as a list of strings.
+//	 */
+//	public IFuture<List<String>> getURLStrings();
+//	
+//	/**
+//	 *  Get the non-managed classpath entries.
+//	 *  @return Classpath entries as a list of strings.
+//	 */
+//	public IFuture<List<String>> getNonManagedURLStrings();
+//	
+//	/**
+//	 *  Get all managed entries as URLs.
+//	 *  @return The list of urls.
+//	 */
+//	public IFuture<List<URL>> getURLs();
+//	
+
+
+//	/**
+//	 *  Get a class definition.
+//	 *  @param name The class name.
+//	 *  @return The class definition as byte array.
+//	 */
+//	public IFuture<byte[]> getClassDefinition(String name);
+	
+//	/** 
+//	 *  Returns the current ClassLoader.
+//	 *  @return the current ClassLoader
+//	 */
+//	@Excluded()
+//	public ClassLoader getClassLoader();
 }

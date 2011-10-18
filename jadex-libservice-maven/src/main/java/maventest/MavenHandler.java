@@ -97,9 +97,9 @@ public class MavenHandler
 	 *    local takes precedence, e.g. resolving to workspace urls before fetching an older snapshot from a repository.
 	 *  @return A map containing the dependencies as mapping (parent RID -> list of children RIDs).
 	 */
-	public Map<ResourceIdentifier, List<ResourceIdentifier>>	loadDependencies(ResourceIdentifier rid)
+	public Map<IResourceIdentifier, List<IResourceIdentifier>>	loadDependencies(IResourceIdentifier rid)
 	{
-		Map<ResourceIdentifier, List<ResourceIdentifier>>	rids	= new HashMap<ResourceIdentifier, List<ResourceIdentifier>>();
+		Map<IResourceIdentifier, List<IResourceIdentifier>>	rids	= new HashMap<IResourceIdentifier, List<IResourceIdentifier>>();
 		loadDependencies(rid, rids);
 		return rids;
 	}

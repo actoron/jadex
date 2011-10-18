@@ -37,6 +37,7 @@ import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -169,51 +170,55 @@ public class MessageService extends BasicService implements IMessageService
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		final ClassLoader cl = libservice.getClassLoader(rid);
-		
-//		IComponentIdentifier sender = adapter.getComponentIdentifier();
-		if(sender==null)
+		libservice.getClassLoader(rid)
+			.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 		{
-			ret.setException(new RuntimeException("Sender must not be null: "+msg));
-			return ret;
-		}
-	
-		// Automatically add optional meta information.
-		String senid = type.getSenderIdentifier();
-		Object sen = msg.get(senid);
-		if(sen==null)
-			msg.put(senid, sender);
-		
-		final String idid = type.getIdIdentifier();
-		Object id = msg.get(idid);
-		if(id==null)
-			msg.put(idid, SUtil.createUniqueId(sender.getLocalName()));
-
-		final String sd = type.getTimestampIdentifier();
-		final Object senddate = msg.get(sd);
-		if(senddate==null)
-		{
-			msg.put(sd, ""+clockservice.getTime());
-		}
-		
-		// External access of sender required for content encoding etc.
-		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(final ClassLoader cl)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getExternalAccess(sender).addResultListener(new DelegationResultListener(ret)
+//				IComponentIdentifier sender = adapter.getComponentIdentifier();
+				if(sender==null)
+				{
+					ret.setException(new RuntimeException("Sender must not be null: "+msg));
+					return;
+				}
+			
+				// Automatically add optional meta information.
+				String senid = type.getSenderIdentifier();
+				Object sen = msg.get(senid);
+				if(sen==null)
+					msg.put(senid, sender);
+				
+				final String idid = type.getIdIdentifier();
+				Object id = msg.get(idid);
+				if(id==null)
+					msg.put(idid, SUtil.createUniqueId(sender.getLocalName()));
+
+				final String sd = type.getTimestampIdentifier();
+				final Object senddate = msg.get(sd);
+				if(senddate==null)
+				{
+					msg.put(sd, ""+clockservice.getTime());
+				}
+				
+				// External access of sender required for content encoding etc.
+				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+					.addResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-						IExternalAccess exta = (IExternalAccess)result;
-						doSendMessage(msg, type, exta, cl, ret, codecids);
+						IComponentManagementService cms = (IComponentManagementService)result;
+						cms.getExternalAccess(sender).addResultListener(new DelegationResultListener(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								IExternalAccess exta = (IExternalAccess)result;
+								doSendMessage(msg, type, exta, cl, ret, codecids);
+							}
+						});
 					}
 				});
 			}
 		});
-		
 		
 		return ret;
 	}

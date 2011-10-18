@@ -16,6 +16,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.library.LibraryService;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.gui.SGUI;
 
@@ -178,7 +179,7 @@ public class ModelIconCache implements IIconCache
 		Tuple2<IComponentIdentifier, URL> lid = null;
 		if(root instanceof IFileNode)
 		{
-			URL url = LibraryService.toURL(((IFileNode)root).getFilePath());
+			URL url = SUtil.toURL(((IFileNode)root).getFilePath());
 			IComponentIdentifier plat = exta.getComponentIdentifier().getRoot();
 			lid = new Tuple2<IComponentIdentifier, URL>(plat, url);
 		}
