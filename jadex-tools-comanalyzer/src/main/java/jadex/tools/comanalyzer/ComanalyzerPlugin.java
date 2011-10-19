@@ -1499,37 +1499,42 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //						ClassLoader cl = ((ILibraryService)result).getClassLoader();
 						
 						// todo: what is the right classloader here?
-						ClassLoader cl = getJCC().getClassLoader(null);
-						String xml = JavaWriter.objectToXML(new Object[]{componentlist.getAgents(), messagelist.getMessages()}, cl);
-
-						byte buffer[] = xml.getBytes();
-						File f = new File(fileName);
-						FileOutputStream out = null;
-
-						try
+						getJCC().getClassLoader(null).addResultListener(new SwingDefaultResultListener<ClassLoader>()
 						{
-							out = new FileOutputStream(f);
-							out.write(buffer);
-						}
-						catch(FileNotFoundException e1)
-						{
-							e1.printStackTrace();
-						}
-						catch(IOException e1)
-						{
-							e1.printStackTrace();
-						}
-						finally
-						{
-							try
+							public void customResultAvailable(ClassLoader cl)
 							{
-								if(out != null)
-									out.close();
+								String xml = JavaWriter.objectToXML(new Object[]{componentlist.getAgents(), messagelist.getMessages()}, cl);
+
+								byte buffer[] = xml.getBytes();
+								File f = new File(fileName);
+								FileOutputStream out = null;
+
+								try
+								{
+									out = new FileOutputStream(f);
+									out.write(buffer);
+								}
+								catch(FileNotFoundException e1)
+								{
+									e1.printStackTrace();
+								}
+								catch(IOException e1)
+								{
+									e1.printStackTrace();
+								}
+								finally
+								{
+									try
+									{
+										if(out != null)
+											out.close();
+									}
+									catch(IOException e1)
+									{
+									}
+								}
 							}
-							catch(IOException e1)
-							{
-							}
-						}
+						});
 //					}
 //				});		
 				
@@ -1603,23 +1608,27 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 //					public void customResultAvailable(Object result)
 //					{
 						// todo: what is the right classloader here?
-						ClassLoader cl = getJCC().getClassLoader(null);
-
-						//ClassLoader cl = ((ILibraryService)result).getClassLoader();
-						
-						Object[] stored = (Object[])JavaReader.objectFromXML(sxml, cl);
-						
-						componentlist.removeAllAgents();
-						Component[] agents = (Component[])stored[0];
-						for(int i=0; i<agents.length; i++)
-							componentlist.addAgent(agents[i]);
-						
-						messagelist.removeAllMessages();
-						Message[] messages = (Message[])stored[1];
-						for(int i=0; i<messages.length; i++)
-							messagelist.addMessage(messages[i]);
-						
-						messagelist.fireMessagesAdded(messages);
+						getJCC().getClassLoader(null).addResultListener(new SwingDefaultResultListener<ClassLoader>()
+						{
+							public void customResultAvailable(ClassLoader cl)
+							{
+								//ClassLoader cl = ((ILibraryService)result).getClassLoader();
+								
+								Object[] stored = (Object[])JavaReader.objectFromXML(sxml, cl);
+								
+								componentlist.removeAllAgents();
+								Component[] agents = (Component[])stored[0];
+								for(int i=0; i<agents.length; i++)
+									componentlist.addAgent(agents[i]);
+								
+								messagelist.removeAllMessages();
+								Message[] messages = (Message[])stored[1];
+								for(int i=0; i<messages.length; i++)
+									messagelist.addMessage(messages[i]);
+								
+								messagelist.fireMessagesAdded(messages);
+							}
+						});
 //					}
 //				});
 			}

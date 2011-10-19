@@ -135,7 +135,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 *  Get the resource identifier.
 	 */
-	public ClassLoader getClassLoader(IResourceIdentifier rid)
+	public IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid)
 	{
 		return libservice.getClassLoader(rid==null? getJCCAccess().getModel().getResourceIdentifier(): rid);
 	}

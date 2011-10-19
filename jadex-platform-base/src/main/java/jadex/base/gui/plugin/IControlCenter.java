@@ -3,6 +3,7 @@ package jadex.base.gui.plugin;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.commons.future.IFuture;
 
 import javax.swing.JComponent;
 
@@ -75,5 +76,5 @@ public interface IControlCenter
 	/**
 	 *  Get the resource identifier.
 	 */
-	public ClassLoader getClassLoader(IResourceIdentifier rid);
+	public IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid);
 }
