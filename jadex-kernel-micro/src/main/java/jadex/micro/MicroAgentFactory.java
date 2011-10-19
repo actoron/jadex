@@ -322,6 +322,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 						MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, model.getResourceIdentifier());
 						MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
 							null, cl), arguments, config, parent, binding, copy, ret);
+						res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));
 					}
 					catch(Exception e)
 					{
@@ -340,6 +341,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 				MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, model.getResourceIdentifier());
 				MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
 					null, cl), arguments, config, parent, binding, copy, ret);
+				res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));
 			}
 			catch(Exception e)
 			{
