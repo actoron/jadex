@@ -60,13 +60,11 @@ public class ExtensionLoaderService implements IExtensionLoaderService
 							{
 								public void resultAvailable(IComponentIdentifier result)
 								{
-									System.out.println("resu: "+result);
 									customResultAvailable(cms);	// Continue with next token.
 								}
 								
 								public void exceptionOccurred(Exception exception)
 								{
-									System.out.println("ex: "+exception);
 									component.getLogger().warning("Extension '"+model+"' could not be loaded: "+exception);
 									customResultAvailable(cms);	// Continue with next token.
 								}
