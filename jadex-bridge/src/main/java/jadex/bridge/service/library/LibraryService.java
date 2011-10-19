@@ -295,7 +295,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public IFuture<Void> addURL(final URL url)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(provider, IDependencyResolverService.class)
+		SServiceProvider.getService(provider, IDependencyResolverService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyResolverService, Void>(ret)
 		{
 			public void customResultAvailable(IDependencyResolverService drs)
@@ -321,7 +321,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public IFuture<Void> removeURL(final URL url)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(provider, IDependencyResolverService.class)
+		SServiceProvider.getService(provider, IDependencyResolverService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyResolverService, Void>(ret)
 		{
 			public void customResultAvailable(IDependencyResolverService drs)
@@ -347,7 +347,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public IFuture<Void> removeURLCompletely(final URL url)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(provider, IDependencyResolverService.class)
+		SServiceProvider.getService(provider, IDependencyResolverService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyResolverService, Void>(ret)
 		{
 			public void customResultAvailable(IDependencyResolverService drs)
@@ -438,7 +438,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
-		SServiceProvider.getService(provider, IDependencyResolverService.class)
+		SServiceProvider.getService(provider, IDependencyResolverService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyResolverService, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(IDependencyResolverService drs)
@@ -553,7 +553,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	{
 		final Future<Map<IResourceIdentifier, List<IResourceIdentifier>>> ret = new Future<Map<IResourceIdentifier, List<IResourceIdentifier>>>();
 		
-		SServiceProvider.getService(provider, IDependencyResolverService.class)
+		SServiceProvider.getService(provider, IDependencyResolverService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyResolverService, Map<IResourceIdentifier, List<IResourceIdentifier>>>(ret)
 		{
 			public void customResultAvailable(IDependencyResolverService drs)

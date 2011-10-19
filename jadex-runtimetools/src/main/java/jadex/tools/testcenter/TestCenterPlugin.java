@@ -1,35 +1,30 @@
 package jadex.tools.testcenter;
 
-import jadex.base.SComponentFactory;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.modeltree.AddPathAction;
 import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.modeltree.RemovePathAction;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISettingsService;
-import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.library.LibraryService;
+import jadex.bridge.service.library.IDependencyResolverService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
-import jadex.tools.starter.StarterPanel;
-import jadex.tools.starter.StarterPluginPanel;
 
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
@@ -262,16 +257,23 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 							{
 								mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 								final String model = ((IFileNode)node).getFilePath();
-								STestCenter.isTestcase(model, getJCC().getPlatformAccess(), createResourceIdentifier((IFileNode)selpath.getPathComponent(1)))
-									.addResultListener(new SwingDefaultResultListener(mpanel)
+								createResourceIdentifier((IFileNode)selpath.getPathComponent(1))
+									.addResultListener(new SwingDefaultResultListener<IResourceIdentifier>(mpanel)
 								{
-									public void customResultAvailable(Object result)
+									public void customResultAvailable(IResourceIdentifier rid)
 									{
-										if(((Boolean)result).booleanValue())
-											tcpanel.getTestList().addEntry(model);
-										else
-											jcc.setStatusText("Component is not a testcase: "+model);
-										mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+										STestCenter.isTestcase(model, getJCC().getPlatformAccess(), rid)
+											.addResultListener(new SwingDefaultResultListener(mpanel)
+										{
+											public void customResultAvailable(Object result)
+											{
+												if(((Boolean)result).booleanValue())
+													tcpanel.getTestList().addEntry(model);
+												else
+													jcc.setStatusText("Component is not a testcase: "+model);
+												mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+											}
+										});
 									}
 								});
 							}
@@ -493,17 +495,25 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 						base = base.getParent();
 					final String	model	= node.getFilePath();
 					
-					STestCenter.isTestcase(model, getJCC().getPlatformAccess(), createResourceIdentifier((IFileNode)base)).addResultListener(new SwingDefaultResultListener(mpanel)
+					createResourceIdentifier((IFileNode)base)
+						.addResultListener(new SwingDefaultResultListener<IResourceIdentifier>(mpanel)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(IResourceIdentifier rid)
 						{
-							cnt[0]++;
-							String	text	= "Scanned file "+cnt[0]+" of "+leafs.size()+" ("+(cnt[0]*100/leafs.size())+"%): "+model;
-							getJCC().setStatusText(text);
-							if(((Boolean)result).booleanValue())
+							STestCenter.isTestcase(model, getJCC().getPlatformAccess(), rid)
+								.addResultListener(new SwingDefaultResultListener(mpanel)
 							{
-								tcpanel.getTestList().addEntry(model);
-							}
+								public void customResultAvailable(Object result)
+								{
+									cnt[0]++;
+									String	text	= "Scanned file "+cnt[0]+" of "+leafs.size()+" ("+(cnt[0]*100/leafs.size())+"%): "+model;
+									getJCC().setStatusText(text);
+									if(((Boolean)result).booleanValue())
+									{
+										tcpanel.getTestList().addEntry(model);
+									}
+								}
+							});
 						}
 					});
 				}
@@ -628,20 +638,46 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		}
 	};
 	
+//	/**
+//	 *  Create a resource identifier.
+//	 */
+//	public IResourceIdentifier createResourceIdentifier(IFileNode base)
+//	{
+//		// Get the first child of selection path as url
+////		TreePath selpath = mpanel.getTree().getSelectionModel().getSelectionPath();
+////		Object tmp = selpath.getPathComponent(1);
+//		Tuple2<IComponentIdentifier, URL> lid = null;
+//		URL url = SUtil.toURL(base.getFilePath());
+//		IComponentIdentifier root = mpanel.getExternalAccess().getComponentIdentifier().getRoot();
+//		lid = new Tuple2<IComponentIdentifier, URL>(root, url);
+//		// todo: construct global identifier
+//		ResourceIdentifier rid = new ResourceIdentifier(lid, null);
+//		return rid;
+//	}
+	
 	/**
 	 *  Create a resource identifier.
 	 */
-	public IResourceIdentifier createResourceIdentifier(IFileNode base)
+	public IFuture<IResourceIdentifier> createResourceIdentifier(IFileNode node)
 	{
 		// Get the first child of selection path as url
 //		TreePath selpath = mpanel.getTree().getSelectionModel().getSelectionPath();
-//		Object tmp = selpath.getPathComponent(1);
-		Tuple2<IComponentIdentifier, URL> lid = null;
-		URL url = SUtil.toURL(base.getFilePath());
-		IComponentIdentifier root = mpanel.getExternalAccess().getComponentIdentifier().getRoot();
-		lid = new Tuple2<IComponentIdentifier, URL>(root, url);
-		// todo: construct global identifier
-		ResourceIdentifier rid = new ResourceIdentifier(lid, null);
-		return rid;
+		ITreeNode root = node;
+		while(root.getParent()!=null && root.getParent().getParent()!=null)
+			root = root.getParent();
+		
+		final URL url = SUtil.toURL(((IFileNode)root).getFilePath());
+		
+		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
+		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), IDependencyResolverService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IDependencyResolverService, IResourceIdentifier>(ret)
+		{
+			public void customResultAvailable(IDependencyResolverService deps)
+			{
+				deps.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+			}
+		});
+		
+		return ret;
 	}
 }
