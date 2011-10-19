@@ -238,8 +238,10 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 */
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
 		final IModelInfo modelinfo, final String config, final Map arguments, final IExternalAccess parent, 
-		final RequiredServiceBinding[] bindings, final boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
+		final RequiredServiceBinding[] bindings, final boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> init)
 	{
+		final Future<Tuple2<IComponentInstance, IComponentAdapter>>	ret	= new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
+		
 		if(libservice!=null)
 		{
 			libservice.getClassLoader(modelinfo.getResourceIdentifier()).addResultListener(
@@ -250,7 +252,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 					try
 					{
 						CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
-						ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret, cl);
+						ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, init, cl);
 						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 					}
 					catch(Exception e)
@@ -260,13 +262,15 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 				}
 			});
 		}
+		
+		// for platform bootstrapping
 		else
 		{
 			try
 			{
 				ClassLoader cl = getClass().getClassLoader();
 				CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
-				ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, ret, cl);
+				ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, init, cl);
 				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 			}
 			catch(Exception e)

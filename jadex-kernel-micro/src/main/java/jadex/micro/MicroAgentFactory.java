@@ -308,25 +308,44 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>> res = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		
-		// todo: is model info ok also in remote case?
-//		ClassLoader cl = libservice.getClassLoader(model.getResourceIdentifier());
-		libservice.getClassLoader(model.getResourceIdentifier())
-			.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(ret)
+		if(libservice!=null)
 		{
-			public void customResultAvailable(ClassLoader cl)
+			// todo: is model info ok also in remote case?
+	//		ClassLoader cl = libservice.getClassLoader(model.getResourceIdentifier());
+			libservice.getClassLoader(model.getResourceIdentifier())
+				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Tuple2<IComponentInstance, IComponentAdapter>>(ret)
 			{
-				try
+				public void customResultAvailable(ClassLoader cl)
 				{
-					MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, model.getResourceIdentifier());
-					MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
-						null, cl), arguments, config, parent, binding, copy, ret);
+					try
+					{
+						MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, model.getResourceIdentifier());
+						MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
+							null, cl), arguments, config, parent, binding, copy, ret);
+					}
+					catch(Exception e)
+					{
+						res.setException(e);
+					}
 				}
-				catch(Exception e)
-				{
-					res.setException(e);
-				}
+			});
+		}
+		
+		// For platform bootstrapping
+		else
+		{
+			try
+			{
+				ClassLoader	cl	= getClass().getClassLoader();
+				MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, model.getResourceIdentifier());
+				MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
+					null, cl), arguments, config, parent, binding, copy, ret);
 			}
-		});
+			catch(Exception e)
+			{
+				res.setException(e);
+			}
+		}
 
 		return res;
 //		return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getAgentAdapter()));

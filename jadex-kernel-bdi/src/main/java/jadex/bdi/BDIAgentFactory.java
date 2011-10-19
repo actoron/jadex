@@ -223,6 +223,8 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 				}
 			});
 		}
+		
+		// For platform bootstrapping
 		else
 		{
 			try

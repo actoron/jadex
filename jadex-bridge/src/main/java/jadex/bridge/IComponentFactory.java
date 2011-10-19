@@ -96,7 +96,7 @@ public interface IComponentFactory
 	@Excluded
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference IComponentDescription desc, IComponentAdapterFactory factory, 
 		IModelInfo model, String config, Map arguments, IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, 
-		boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> ret);
+		boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> init);
 
 }
 
