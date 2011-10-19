@@ -19,6 +19,7 @@ import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.library.LibraryService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.CounterResultListener;
@@ -636,7 +637,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 //		TreePath selpath = mpanel.getTree().getSelectionModel().getSelectionPath();
 //		Object tmp = selpath.getPathComponent(1);
 		Tuple2<IComponentIdentifier, URL> lid = null;
-		URL url = LibraryService.toURL(base.getFilePath());
+		URL url = SUtil.toURL(base.getFilePath());
 		IComponentIdentifier root = mpanel.getExternalAccess().getComponentIdentifier().getRoot();
 		lid = new Tuple2<IComponentIdentifier, URL>(root, url);
 		// todo: construct global identifier

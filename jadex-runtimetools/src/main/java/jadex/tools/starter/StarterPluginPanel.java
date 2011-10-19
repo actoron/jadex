@@ -310,7 +310,7 @@ public class StarterPluginPanel extends JPanel
 		Tuple2<IComponentIdentifier, URL> lid = null;
 		if(tmp instanceof IFileNode)
 		{
-			URL url = LibraryService.toURL(((IFileNode)tmp).getFilePath());
+			URL url = SUtil.toURL(((IFileNode)tmp).getFilePath());
 			IComponentIdentifier root = mpanel.getExternalAccess().getComponentIdentifier().getRoot();
 			lid = new Tuple2<IComponentIdentifier, URL>(root, url);
 		}

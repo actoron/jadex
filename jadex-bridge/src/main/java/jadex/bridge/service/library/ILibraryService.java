@@ -115,12 +115,11 @@ public interface ILibraryService extends IService
     public IFuture<Void> removeLibraryServiceListener(ILibraryServiceListener listener);
 
 
-	
-//	/**
-//	 *  Get all urls (managed and non-managed).
-//	 *  @return The list of urls.
-//	 */
-//	public IFuture<List<URL>> getAllURLs();
+	/**
+	 *  Get all urls (managed and non-managed).
+	 *  @return The list of urls.
+	 */
+	public IFuture<List<URL>> getAllURLs();
 	
 //	/**
 //	 *  Get the non-managed classpath entries as strings.

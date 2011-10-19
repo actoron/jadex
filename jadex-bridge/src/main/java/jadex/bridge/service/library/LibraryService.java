@@ -376,6 +376,28 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		List<URL> nonurls = new ArrayList<URL>(SUtil.getClasspathURLs(getClass().getClassLoader()));
 		return new Future<List<URL>>(nonurls);
 	}
+	
+	/**
+	 *  Get all urls (managed , indirect and non-managed from parent loader).
+	 *  @return The list of urls.
+	 */
+	public IFuture<List<URL>> getAllURLs()
+	{
+		final Future<List<URL>> ret = new Future<List<URL>>();
+		getAllResourceIdentifiers().addResultListener(new ExceptionDelegationResultListener<List<IResourceIdentifier>, List<URL>>(ret)
+		{
+			public void customResultAvailable(List<IResourceIdentifier> result)
+			{
+				List<URL> res = new ArrayList<URL>();
+				for(int i=0; i<result.size(); i++)
+				{
+					res.add(result.get(i).getLocalIdentifier().getSecondEntity());
+				}
+				ret.setResult(res);
+			}
+		});
+		return ret;
+	}
 		
 	/** 
 	 *  Returns the current ClassLoader.
