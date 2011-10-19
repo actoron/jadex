@@ -1,17 +1,18 @@
 package jadex.standalone.extensions;
 
-import java.util.StringTokenizer;
-
 import jadex.bridge.CreationInfo;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+
+import java.util.StringTokenizer;
 
 /**
  *  Load extensions at startup.
@@ -43,27 +44,29 @@ public class ExtensionLoaderService implements IExtensionLoaderService
 			final StringTokenizer	stok	= new StringTokenizer(extensions, ", ");
 			if(stok.hasMoreTokens())
 			{
-				final Future	fut	= new Future();
+				final Future<Void>	fut	= new Future<Void>();
 				ret	= fut;
-				component.getServiceContainer().getRequiredService("cms")
-					.addResultListener(new DelegationResultListener(fut)
+				IFuture<IComponentManagementService> rsfut = component.getServiceContainer().getRequiredService("cms");
+				rsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(final IComponentManagementService cms)
 					{
 						if(stok.hasMoreTokens())
 						{
 							final String	model	= stok.nextToken();
-							final IComponentManagementService	cms	= (IComponentManagementService)result;
+//							final IComponentManagementService	cms	= (IComponentManagementService)result;
 							cms.createComponent(null, model, new CreationInfo(component.getComponentIdentifier()), null)
-								.addResultListener(new IResultListener()
+								.addResultListener(new IResultListener<IComponentIdentifier>()
 							{
-								public void resultAvailable(Object result)
+								public void resultAvailable(IComponentIdentifier result)
 								{
+									System.out.println("resu: "+result);
 									customResultAvailable(cms);	// Continue with next token.
 								}
 								
 								public void exceptionOccurred(Exception exception)
 								{
+									System.out.println("resu: "+exception);
 									component.getLogger().warning("Extension '"+model+"' could not be loaded: "+exception);
 									customResultAvailable(cms);	// Continue with next token.
 								}

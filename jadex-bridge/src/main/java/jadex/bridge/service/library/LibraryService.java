@@ -393,6 +393,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 				{
 					res.add(result.get(i).getLocalIdentifier().getSecondEntity());
 				}
+				res.addAll(SUtil.getClasspathURLs(getClass().getClassLoader()));
 				ret.setResult(res);
 			}
 		});
