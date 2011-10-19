@@ -84,6 +84,8 @@
 	</arguments>
 	
 	<componenttypes>
+		<componenttype filename="jadex/standalone/extensions/Extensions.component.xml" name="extensions"/>
+		
 		<componenttype filename="jadex/component/KernelComponent.component.xml" name="kernel_component"/>
 		<componenttype filename="jadex/application/KernelApplication.component.xml" name="kernel_application"/>
 		<componenttype filename="jadex/micro/KernelMicro.component.xml" name="kernel_micro"/>

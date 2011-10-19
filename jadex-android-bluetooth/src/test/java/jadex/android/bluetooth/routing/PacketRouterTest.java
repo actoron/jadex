@@ -112,12 +112,14 @@ public abstract class PacketRouterTest {
 		connectPacketRouters(packetRouter2, packetRouter1);
 		
 		packetRouter1.addConnectedDevice(device1);
+		System.out.println("Waiting " + getBroadcastWaitTime() + "ms for Message Propagation...");
 		Thread.sleep(getBroadcastWaitTime());
 		assertTrue(packetRouter2.getReachableDeviceAddresses().contains(device1));
 
 		// now remove device1 from router 1
 		packetRouter1.removeConnectedDevice(device1);
 		
+		System.out.println("Waiting " + getBroadcastWaitTime() + "ms for Message Propagation...");
 		Thread.sleep(getBroadcastWaitTime());
 		
 		// should be removed from router 2 now, too
@@ -241,6 +243,7 @@ public abstract class PacketRouterTest {
 		packetRouter2.addConnectedDevice(device1);
 		assertTrue(packetRouter2.getConnectedDeviceAddresses()
 				.contains(device1));
+		System.out.println("Waiting " + getBroadcastWaitTime() + "ms for Message Propagation...");
 		Thread.sleep(getBroadcastWaitTime());
 
 		assertEquals(2, packetRouter2.getConnectedDeviceAddresses().size());

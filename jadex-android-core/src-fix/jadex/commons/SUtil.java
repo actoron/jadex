@@ -40,6 +40,8 @@ import java.util.UUID;
 import java.util.Vector;
 import java.util.jar.JarFile;
 
+import android.net.NetworkInfo;
+
 
 /**
  * This class provides several useful static util methods.
@@ -103,47 +105,47 @@ public class SUtil
 		htmlwraps.put("ö", "&ouml;");
 		htmlwraps.put("Ö", "&Ouml;");
 
-		htmlwraps.put("�", "&acute;");
-		htmlwraps.put("�", "&agrave;");
-		htmlwraps.put("�", "&aring;");
-		htmlwraps.put("�", "&acirc;");
-		htmlwraps.put("�", "&Acute;");
-		htmlwraps.put("�", "&Agrave;");
-		htmlwraps.put("�", "&Aring;");
-		htmlwraps.put("�", "&Acirc;");
+		htmlwraps.put("ï¿½", "&acute;");
+		htmlwraps.put("ï¿½", "&agrave;");
+		htmlwraps.put("ï¿½", "&aring;");
+		htmlwraps.put("ï¿½", "&acirc;");
+		htmlwraps.put("ï¿½", "&Acute;");
+		htmlwraps.put("ï¿½", "&Agrave;");
+		htmlwraps.put("ï¿½", "&Aring;");
+		htmlwraps.put("ï¿½", "&Acirc;");
 
-		htmlwraps.put("�", "&ecute;");
-		htmlwraps.put("�", "&egrave;");
-		htmlwraps.put("�", "&ecirc;");
-		htmlwraps.put("�", "&Ecute;");
-		htmlwraps.put("�", "&Egrave;");
-		htmlwraps.put("�", "&Ecirc;");
+		htmlwraps.put("ï¿½", "&ecute;");
+		htmlwraps.put("ï¿½", "&egrave;");
+		htmlwraps.put("ï¿½", "&ecirc;");
+		htmlwraps.put("ï¿½", "&Ecute;");
+		htmlwraps.put("ï¿½", "&Egrave;");
+		htmlwraps.put("ï¿½", "&Ecirc;");
 
-		htmlwraps.put("�", "&icute;");
-		htmlwraps.put("�", "&igrave;");
-		htmlwraps.put("�", "&icirc;");
-		htmlwraps.put("�", "&Icute;");
-		htmlwraps.put("�", "&Igrave;");
-		htmlwraps.put("�", "&Icirc;");
+		htmlwraps.put("ï¿½", "&icute;");
+		htmlwraps.put("ï¿½", "&igrave;");
+		htmlwraps.put("ï¿½", "&icirc;");
+		htmlwraps.put("ï¿½", "&Icute;");
+		htmlwraps.put("ï¿½", "&Igrave;");
+		htmlwraps.put("ï¿½", "&Icirc;");
 
-		htmlwraps.put("�", "&ocute;");
-		htmlwraps.put("�", "&ograve;");
-		htmlwraps.put("�", "&ocirc;");
-		htmlwraps.put("�", "&otilde;");
-		htmlwraps.put("�", "&Ocute;");
-		htmlwraps.put("�", "&Ograve;");
-		htmlwraps.put("�", "&Ocirc;");
-		htmlwraps.put("�", "&Otilde;");
+		htmlwraps.put("ï¿½", "&ocute;");
+		htmlwraps.put("ï¿½", "&ograve;");
+		htmlwraps.put("ï¿½", "&ocirc;");
+		htmlwraps.put("ï¿½", "&otilde;");
+		htmlwraps.put("ï¿½", "&Ocute;");
+		htmlwraps.put("ï¿½", "&Ograve;");
+		htmlwraps.put("ï¿½", "&Ocirc;");
+		htmlwraps.put("ï¿½", "&Otilde;");
 
-		htmlwraps.put("�", "&ucute;");
-		htmlwraps.put("�", "&ugrave;");
-		htmlwraps.put("�", "&ucirc;");
-		htmlwraps.put("�", "&Ucute;");
-		htmlwraps.put("�", "&Ugrave;");
-		htmlwraps.put("�", "&Ucirc;");
+		htmlwraps.put("ï¿½", "&ucute;");
+		htmlwraps.put("ï¿½", "&ugrave;");
+		htmlwraps.put("ï¿½", "&ucirc;");
+		htmlwraps.put("ï¿½", "&Ucute;");
+		htmlwraps.put("ï¿½", "&Ugrave;");
+		htmlwraps.put("ï¿½", "&Ucirc;");
 
-		htmlwraps.put("�", "&cccedil;");
-		htmlwraps.put("�", "&Ccedil;");
+		htmlwraps.put("ï¿½", "&cccedil;");
+		htmlwraps.put("ï¿½", "&Ccedil;");
 
 		seps = "";
 		Iterator it = htmlwraps.keySet().iterator();
@@ -277,7 +279,7 @@ public class SUtil
 	 * @param a The array.
 	 * @return The vector for the array.
 	 */
-	public static List arrayToList(Object a)
+	public static <T> List<T> arrayToList(Object a)
 	{
 		int l = Array.getLength(a);
 		ArrayList ret = SCollection.createArrayList();
@@ -1332,14 +1334,18 @@ public class SUtil
 			{
 				String entry = stok.nextToken();
 				File file = new File(entry);
-				if(file.isDirectory()
-						&& !entry
-								.endsWith(System.getProperty("file.separator")))
-				{
-					// Normalize, that directories end with "/".
-					entry += System.getProperty("file.separator");
-				}
-				cps.add(new URL("file:///" + entry));
+				cps.add(file.toURI().toURL());
+				
+				// Code below does not work for paths with spaces in it.
+				// Todo: is above code correct in all cases? (relative/absolute, local/remote, jar/directory)
+//				if(file.isDirectory()
+//						&& !entry
+//								.endsWith(System.getProperty("file.separator")))
+//				{
+//					// Normalize, that directories end with "/".
+//					entry += System.getProperty("file.separator");
+//				}
+//				cps.add(new URL("file:///" + entry));
 			}
 			catch(MalformedURLException e)
 			{
@@ -1614,6 +1620,91 @@ public class SUtil
 
 		return ret;
 	}
+	
+	/**
+	 *  Convert a file/string/url.
+	 */
+	public static URL toURL(Object url)
+	{
+		URL	ret	= null;
+		boolean	jar	= false;
+		if(url instanceof String)
+		{
+			String	string	= (String) url;
+			if(string.startsWith("file:") || string.startsWith("jar:file:"))
+			{
+				try
+				{
+					string	= URLDecoder.decode(string, "UTF-8");
+				}
+				catch(UnsupportedEncodingException e)
+				{
+					e.printStackTrace();
+				}
+			}
+			
+			jar	= string.startsWith("jar:file:");
+			url	= jar ? new File(string.substring(9))
+				: string.startsWith("file:") ? new File(string.substring(5)) : null;
+			
+			
+			if(url==null)
+			{
+				File file	= new File(string);
+				if(file.exists())
+				{
+					url	= file;
+				}
+				else
+				{
+					file	= new File(System.getProperty("user.dir"), string);
+					if(file.exists())
+					{
+						url	= file;
+					}
+					else
+					{
+						try
+						{
+							url	= new URL(string);
+						}
+						catch (MalformedURLException e)
+						{
+							throw new RuntimeException(e);
+						}
+					}
+				}
+			}
+		}
+		
+		if(url instanceof URL)
+		{
+			ret	= (URL)url;
+		}
+		else if(url instanceof File)
+		{
+			try
+			{
+				String	abs	= ((File)url).getAbsolutePath();
+				String	rel	= SUtil.convertPathToRelative(abs);
+				ret	= abs.equals(rel) ? new File(abs).toURI().toURL()
+					: new File(System.getProperty("user.dir"), rel).toURI().toURL();
+				if(jar)
+				{
+					if(ret.toString().endsWith("!"))
+						ret	= new URL("jar:"+ret.toString()+"/");	// Add missing slash in jar url.
+					else
+						ret	= new URL("jar:"+ret.toString());						
+				}
+			}
+			catch (MalformedURLException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+		return ret;
+	}
 
 	/**
 	 * Main method for testing. / public static void main(String[] args) {
@@ -1805,8 +1896,10 @@ public class SUtil
 	{
 		short ret = -1;
 		/* $if !android $ */
-		
+
 		/* $endif $ */
+		
+	
 		
 		return ret;
 	}
