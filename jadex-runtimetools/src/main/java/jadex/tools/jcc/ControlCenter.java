@@ -143,7 +143,7 @@ public class ControlCenter
 	/**
 	 *  Load the settings.
 	 */
-	public IFuture<P>	loadSettings(final File file)
+	public IFuture	loadSettings(final File file)
 	{
 		final Future	ret	= new Future();
 		
@@ -153,7 +153,7 @@ public class ControlCenter
 //		{
 //			public void customResultAvailable(Object result)
 			{
-				getPCC().getClassLoader(null).addResultListener(new SwingDelegationResultListener()
+				getPCC().getClassLoader(null).addResultListener(new SwingDelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -266,13 +266,19 @@ public class ControlCenter
 //					.addResultListener(new SwingDelegationResultListener(ret)
 //				{
 //					public void customResultAvailable(Object result)
+				
+				getPCC().getClassLoader(null).addResultListener(new SwingDelegationResultListener(ret)
+				{
+					public void customResultAvailable(Object result)
 					{
+						ClassLoader cl = (ClassLoader)result;
 						try
 						{
 //							System.out.println("Writing properties.");
 							FileOutputStream os = new FileOutputStream(file);
 //							PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
-							PropertiesXMLHelper.getPropertyWriter().write(props, os, getPCC().getClassLoader(null), null);
+//							PropertiesXMLHelper.getPropertyWriter().write(props, os, getPCC().getClassLoader(null), null);
+							PropertiesXMLHelper.getPropertyWriter().write(props, os, cl, null);
 							os.close();
 							window.getStatusBar().setText("Settings saved successfully: "+ file.getAbsolutePath());
 							ret.setResult(null);
@@ -283,7 +289,7 @@ public class ControlCenter
 							throw new RuntimeException(e);
 						}
 					}
-//				});
+				});
 			}
 		});
 		
