@@ -322,48 +322,54 @@ public class StarterPanel extends JLayeredPane
 						public IFuture<Map> execute(IInternalAccess ia)
 						{
 							final Future ret = new Future();
-//							SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//							ia.getRequiredService("libservice")
-//								.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-//							{
-//								public void customResultAvailable(Object result)
+							jcc.getClassLoader(model.getResourceIdentifier()).addResultListener(new SwingDefaultResultListener<ClassLoader>()
+							{
+								public void customResultAvailable(ClassLoader cl)
 								{
-//									ILibraryService ls = (ILibraryService)result;
-									
-									Map args = SCollection.createHashMap();
-									String errortext = null;
-									for(Iterator it = rawargs.keySet().iterator(); it.hasNext(); )
-									{
-										String argname = (String)it.next();
-										String argval = (String)rawargs.get(argname);
-										if(argval.length()>0)
+//									SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//									ia.getRequiredService("libservice")
+//										.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+//									{
+//										public void customResultAvailable(Object result)
 										{
-											Object arg = null;
-											try
-											{
-//												arg = new JavaCCExpressionParser().parseExpression(argval, null, null, ls.getClassLoader()).getValue(null);
-												arg = new JavaCCExpressionParser().parseExpression(argval, null, null, jcc.getClassLoader(model.getResourceIdentifier())).getValue(null);
-											}
-											catch(Exception e)
-											{
-												if(errortext==null)
-													errortext = "Error within argument expressions:\n";
-												errortext += argname+" "+e.getMessage()+"\n";
-											}
-											args.put(argname, arg);
+//											ILibraryService ls = (ILibraryService)result;
 											
+											Map args = SCollection.createHashMap();
+											String errortext = null;
+											for(Iterator it = rawargs.keySet().iterator(); it.hasNext(); )
+											{
+												String argname = (String)it.next();
+												String argval = (String)rawargs.get(argname);
+												if(argval.length()>0)
+												{
+													Object arg = null;
+													try
+													{
+//														arg = new JavaCCExpressionParser().parseExpression(argval, null, null, ls.getClassLoader()).getValue(null);
+														arg = new JavaCCExpressionParser().parseExpression(argval, null, null, cl).getValue(null);
+													}
+													catch(Exception e)
+													{
+														if(errortext==null)
+															errortext = "Error within argument expressions:\n";
+														errortext += argname+" "+e.getMessage()+"\n";
+													}
+													args.put(argname, arg);
+													
+												}
+											}
+											if(errortext==null)
+											{
+												ret.setResult(args);
+											}
+											else
+											{
+												ret.setException(new RuntimeException(errortext));
+											}
 										}
-									}
-									if(errortext==null)
-									{
-										ret.setResult(args);
-									}
-									else
-									{
-										ret.setException(new RuntimeException(errortext));
-									}
+//									}));
 								}
-//							}));
+							});
 							
 							return ret;
 						}
@@ -1374,14 +1380,22 @@ public class StarterPanel extends JLayeredPane
 		
 		JLabel namel = new JLabel(arg.getName());
 		final JValidatorTextField valt = new JValidatorTextField(loadargs!=null && loadargs.length>y ? loadargs[y] : "", 15);
-		try
+		
+		jcc.getClassLoader(model.getResourceIdentifier()).addResultListener(new SwingDefaultResultListener<ClassLoader>()
 		{
-			valt.setValidator(new ParserValidator(jcc.getClassLoader(model.getResourceIdentifier())));
-		}
-		catch(Exception e)
-		{
-			// ignore, currently validator does not work remotely
-		}
+			public void customResultAvailable(ClassLoader result)
+			{
+				try
+				{
+					valt.setValidator(new ParserValidator(result));
+				}
+				catch(Exception e)
+				{
+					// ignore, currently validator does not work remotely
+				}
+			}
+		});
+	
 		String configname = (String)config.getSelectedItem();
 		JTextField mvalt = new JTextField(getDefaultValue(model, arg.getName(), configname));
 		// Java JTextField bug: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4247013
