@@ -353,10 +353,10 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  @param	name	The property name.  
 	 *  @return The property value or null if property not defined.
 	 */
-	public Object	getProperty(String name, ILibraryService libservice)
+	public Object	getProperty(String name, ClassLoader cl)
 	{
 		// Todo: caching of parsed values?
-		return UnparsedExpression.getProperty(getProperties(), name, getAllImports(), null, libservice.getClassLoader(rid));
+		return UnparsedExpression.getProperty(getProperties(), name, getAllImports(), null, cl);
 	}
 
 //	/**

@@ -314,11 +314,22 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 							{
 								public void intermediateResultAvailable(Object result)
 								{
-									IModelInfo kernel = (IModelInfo) result;
-									String[] exts = (String[])kernel.getProperty(KERNEL_EXTENSIONS, libservice);
-									if (exts != null)
-										for (int i = 0; i < exts.length; ++i)
-											kerneldefaultlocations.put(exts[i], kernel.getFilename());
+									final IModelInfo kernel = (IModelInfo) result;
+									libservice.getClassLoader(kernel.getResourceIdentifier())
+										.addResultListener(new IResultListener<ClassLoader>()
+									{
+										public void resultAvailable(ClassLoader result)
+										{
+											String[] exts = (String[])kernel.getProperty(KERNEL_EXTENSIONS, result);
+											if (exts != null)
+												for (int i = 0; i < exts.length; ++i)
+													kerneldefaultlocations.put(exts[i], kernel.getFilename());
+										}
+										public void exceptionOccurred(Exception exception)
+										{
+											// Todo: log warning!?
+										}
+									});
 								}
 							});
 							
@@ -856,104 +867,111 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 									{
 //										System.out.println("Starting kernel3: " + kernelmodel);
 										final IComponentManagementService cms = (IComponentManagementService) result;										
-										CreationInfo ci = new CreationInfo(ia.getComponentIdentifier());
+										final CreationInfo ci = new CreationInfo(ia.getComponentIdentifier());
 										String	name	= info.getName().toLowerCase();
 										if(name.startsWith("kernel"))
 											name	= name.substring(6);
-										name	= "kernel_"+name;
+										final String fname	= "kernel_"+name;
 										
-										final String[] kexts = (String[]) info.getProperty(KERNEL_EXTENSIONS, libservice) == null? new String[0] : (String[]) info.getProperty(KERNEL_EXTENSIONS, libservice);
-										cms.createComponent(name, kernelmodel, ci, ia.createResultListener(new IResultListener()
+										libservice.getClassLoader(info.getResourceIdentifier())
+											.addResultListener(new DelegationResultListener<ClassLoader>(ret)
 										{
-											public void resultAvailable(Object result)
+											public void customResultAvailable(ClassLoader result)
 											{
-//												System.out.println("Starting kernel4: " + kernelmodel);
-												for (int i = 0; i < kexts.length; ++i)
-													factorycache.remove(kexts[i]);
-											}
-											
-											public void exceptionOccurred(Exception exception)
-											{
-//												System.out.println("Starting kernel5: " + kernelmodel);
-//												exception.printStackTrace();
-												resultAvailable(null);
-											}
-										})).addResultListener(ia.createResultListener(new IResultListener()
-										{
-											public void resultAvailable(Object result)
-											{
-//												System.out.println("Starting kernel6: " + kernelmodel);
-												findActiveKernel(model, imports, rid).addResultListener(ia.createResultListener(new DefaultResultListener()
+												final String[] kexts = (String[]) info.getProperty(KERNEL_EXTENSIONS, result) == null? new String[0] : (String[]) info.getProperty(KERNEL_EXTENSIONS, result);
+												cms.createComponent(fname, kernelmodel, ci, ia.createResultListener(new IResultListener()
 												{
 													public void resultAvailable(Object result)
 													{
-														final IComponentFactory kernel = (IComponentFactory) result;
-														if (kernel == null)
-														{
-															ret.setResult(null);
-															return;
-														}
+//														System.out.println("Starting kernel4: " + kernelmodel);
 														for (int i = 0; i < kexts.length; ++i)
+															factorycache.remove(kexts[i]);
+													}
+													
+													public void exceptionOccurred(Exception exception)
+													{
+//														System.out.println("Starting kernel5: " + kernelmodel);
+//														exception.printStackTrace();
+														resultAvailable(null);
+													}
+												})).addResultListener(ia.createResultListener(new IResultListener()
+												{
+													public void resultAvailable(Object result)
+													{
+//														System.out.println("Starting kernel6: " + kernelmodel);
+														findActiveKernel(model, imports, rid).addResultListener(ia.createResultListener(new DefaultResultListener()
 														{
-															factorycache.put(kexts[i], kernel);
-														}
-														
-														// If this is a new kernel, gather types and icons
-														if (!activatedkernels.contains(kernelmodel))
-														{
-															final String[] types = kernel.getComponentTypes();
-															componenttypes.addAll(Arrays.asList(types));
-															
-															activatedkernels.add(kernelmodel);
-															
-															/* $if !android $ */
-															if (SGUI.HAS_GUI)
+															public void resultAvailable(Object result)
 															{
-																IResultListener typecounter = ia.createResultListener(new CounterResultListener(types.length, true, ia.createResultListener(new DelegationResultListener(ret)
+																final IComponentFactory kernel = (IComponentFactory) result;
+																if (kernel == null)
 																{
-																	public void customResultAvailable(Object result)
+																	ret.setResult(null);
+																	return;
+																}
+																for (int i = 0; i < kexts.length; ++i)
+																{
+																	factorycache.put(kexts[i], kernel);
+																}
+																
+																// If this is a new kernel, gather types and icons
+																if (!activatedkernels.contains(kernelmodel))
+																{
+																	final String[] types = kernel.getComponentTypes();
+																	componenttypes.addAll(Arrays.asList(types));
+																	
+																	activatedkernels.add(kernelmodel);
+																	
+																	/* $if !android $ */
+																	if (SGUI.HAS_GUI)
 																	{
-																		SServiceProvider.getService(ia.getServiceContainer(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+																		IResultListener typecounter = ia.createResultListener(new CounterResultListener(types.length, true, ia.createResultListener(new DelegationResultListener(ret)
 																		{
 																			public void customResultAvailable(Object result)
 																			{
-																				MultiFactory.this.fireTypesAdded(types).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+																				SServiceProvider.getService(ia.getServiceContainer(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 																				{
 																					public void customResultAvailable(Object result)
 																					{
-																						ret.setResult(kernel);
+																						MultiFactory.this.fireTypesAdded(types).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+																						{
+																							public void customResultAvailable(Object result)
+																							{
+																								ret.setResult(kernel);
+																							};
+																						}));
 																					};
 																				}));
 																			};
-																		}));
-																	};
-																}))
-																{
-																	public void intermediateResultAvailable(Object result)
-																	{
-																		iconcache.put(types[getCnt() - 1], result);
-																	};
-																});
-																for (int i = 0; i < types.length; ++i)
-																	kernel.getComponentTypeIcon(types[i]).addResultListener(typecounter);
+																		}))
+																		{
+																			public void intermediateResultAvailable(Object result)
+																			{
+																				iconcache.put(types[getCnt() - 1], result);
+																			};
+																		});
+																		for (int i = 0; i < types.length; ++i)
+																			kernel.getComponentTypeIcon(types[i]).addResultListener(typecounter);
+																	}
+																	else
+																		/* $endif $ */
+																		ret.setResult(kernel);
+																}
+																else
+																	ret.setResult(kernel);
 															}
-															else
-																/* $endif $ */
-																ret.setResult(kernel);
-														}
-														else
-															ret.setResult(kernel);
+														}));
+													}
+													
+													public void exceptionOccurred(Exception exception)
+													{
+//														System.out.println("Starting kernel7: " + kernelmodel);
+//														exception.printStackTrace();
+														ret.setException(exception);
 													}
 												}));
 											}
-											
-											public void exceptionOccurred(Exception exception)
-											{
-//												System.out.println("Starting kernel7: " + kernelmodel);
-//												exception.printStackTrace();
-												ret.setException(exception);
-											}
-										}));
+										});
 									}
 								}));
 							}
@@ -1107,20 +1125,25 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public void intermediateResultAvailable(Object result)
 			{
-				IModelInfo kernelmodel = (IModelInfo) result;
-				try
+				final IModelInfo kernelmodel = (IModelInfo) result;
+				libservice.getClassLoader(kernelmodel.getResourceIdentifier())
+					.addResultListener(new IResultListener<ClassLoader>()
 				{
-					String[] exts = (String[])kernelmodel.getProperty(KERNEL_EXTENSIONS, libservice);
-					if(exts!=null)
+					public void resultAvailable(ClassLoader result)
 					{
-						for (int i = 0; i < exts.length; ++i)
-							kernellocs.put(exts[i], kernelmodel.getFilename());
+						String[] exts = (String[])kernelmodel.getProperty(KERNEL_EXTENSIONS, result);
+						if(exts!=null)
+						{
+							for (int i = 0; i < exts.length; ++i)
+								kernellocs.put(exts[i], kernelmodel.getFilename());
+						}
 					}
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// Todo: log warning!?
+					}
+				});
 			}
 		});
 

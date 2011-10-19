@@ -44,8 +44,8 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 	/** The panel. */
 	protected JPanel panel;
 	
-	/** The library service. */
-	protected ILibraryService libservice;
+	/** The classloader for the component. */
+	protected ClassLoader cl;
 	
 	//-------- methods --------
 	
@@ -55,7 +55,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public IFuture init(final IControlCenter jcc, IExternalAccess component)
+	public IFuture init(final IControlCenter jcc, final IExternalAccess component)
 	{
 		final Future ret = new Future();
 		
@@ -65,30 +65,28 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 		IFuture	fut	= super.init(jcc, component);
 		assert fut.isDone();
 		
-		component.scheduleStep(new IComponentStep<Void>()
+		jcc.getClassLoader(component.getModel().getResourceIdentifier())
+			.addResultListener(new DelegationResultListener<ClassLoader>(ret)
 		{
-			@XMLClassname("createPanels")
-			public IFuture<Void> execute(IInternalAccess ia)
+			public void customResultAvailable(ClassLoader result)
 			{
-				final Future ret = new Future();
-				final IBDIInternalAccess scope	= (IBDIInternalAccess)ia;
-				ia.getServiceContainer().searchService(ILibraryService.class)
-					.addResultListener(new DelegationResultListener<ILibraryService>(ret)
+				cl	= result;
+				component.scheduleStep(new IComponentStep<Void>()
 				{
-					public void customResultAvailable(ILibraryService result)
+					@XMLClassname("createPanels")
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						libservice = result;
-						String[] subcapnames = (String[])scope.getModel().getProperty(PROPERTY_INCLUDESUBCAPABILITIES, result);
+						final IBDIInternalAccess scope	= (IBDIInternalAccess)ia;
+						String[] subcapnames = (String[])scope.getModel().getProperty(PROPERTY_INCLUDESUBCAPABILITIES, cl);
 						if(subcapnames==null)
 						{
 							subcapnames = (String[])scope.getSubcapabilityNames();
 						}
 						createPanels(scope, subcapnames, ret);
-						ret.setResult(null);
+					
+						return IFuture.DONE;
 					}
-				});
-			
-				return ret;
+				}).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
 		
@@ -127,7 +125,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 		});
 		
 		// Agent panel.
-		String clname = (String)scope.getModel().getProperty(PROPERTY_AGENTVIEWERCLASS, libservice);
+		String clname = (String)scope.getModel().getProperty(PROPERTY_AGENTVIEWERCLASS, cl);
 		if(clname!=null)
 		{
 			try
@@ -153,7 +151,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 			for(int i=0; i<subcapnames.length; i++)
 			{
 				ICapability subcap = (ICapability)scope.getSubcapability(subcapnames[i]);
-				Object clid = subcap.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, libservice);
+				Object clid = subcap.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
 				Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, subcap.getClassLoader()): null;
 				try
 				{

@@ -224,7 +224,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	 *  @param cid	The component id.
 	 *  @return	The class loader.
 	 */
-	public static IFuture getClassLoader(final IComponentIdentifier cid, final IControlCenter jcc)
+	public static IFuture<ClassLoader> getClassLoader(final IComponentIdentifier cid, final IControlCenter jcc)
 	{
 		final Future	ret	= new Future();
 		

@@ -386,26 +386,17 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 									{
 										final IExternalAccess exta = (IExternalAccess)result;
 										
-										SServiceProvider.getServiceUpwards(getJCC().getJCCAccess().getServiceProvider(), ILibraryService.class)
-											.addResultListener(new SwingDefaultResultListener(comptree)
+										AbstractJCCPlugin.getClassLoader(cid, getJCC())
+											.addResultListener(new SwingDefaultResultListener<ClassLoader>(comptree)
 										{
-											public void customResultAvailable(Object result)
+											public void customResultAvailable(ClassLoader cl)
 											{
-												final ILibraryService ls = (ILibraryService)result;
-										
-												final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, ls);
-											
+												final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+												
 												if(clid instanceof String)
 												{
-													AbstractJCCPlugin.getClassLoader(cid, getJCC()).addResultListener(new SwingDefaultResultListener(comptree)
-													{
-														public void customResultAvailable(Object result)
-														{
-															ClassLoader	cl	= (ClassLoader)result;
-															Class clazz	= SReflect.classForName0((String)clid, cl);
-															createPanel(clazz, exta, node);
-														}
-													});
+													Class clazz	= SReflect.classForName0((String)clid, cl);
+													createPanel(clazz, exta, node);
 												}
 												else if(clid instanceof Class)
 												{
@@ -524,6 +515,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 								public void customResultAvailable(Object result)
 								{
 									final IExternalAccess exta = (IExternalAccess)result;
+									getJCC().getClassLoader(rid);
 									
 									SServiceProvider.getServiceUpwards(getJCC().getJCCAccess().getServiceProvider(), ILibraryService.class)
 										.addResultListener(new SwingDefaultResultListener(comptree)
