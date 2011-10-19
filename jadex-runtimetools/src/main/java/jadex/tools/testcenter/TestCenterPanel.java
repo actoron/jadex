@@ -290,6 +290,9 @@ public class TestCenterPanel extends JSplitPanel
 //						ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 //					{
 //						public void customResultAvailable(Object result)
+					plugin.getJCC().getClassLoader(null).addResultListener(new SwingDefaultResultListener<ClassLoader>(TestCenterPanel.this)
+					{
+						public void customResultAvailable(final ClassLoader cl)
 						{
 							try
 							{
@@ -304,7 +307,7 @@ public class TestCenterPanel extends JSplitPanel
 									FileWriter fos = new FileWriter(file);
 //									fos.write(JavaWriter.objectToXML(teststable.getEntries(), ((ILibraryService)result).getClassLoader()));
 //									fos.write(JavaWriter.objectToXML(teststable.getEntries(), plugin.getJCC().getJCCAccess().getModel().getClassLoader()));
-									fos.write(JavaWriter.objectToXML(teststable.getEntries(), plugin.getJCC().getClassLoader(null)));
+									fos.write(JavaWriter.objectToXML(teststable.getEntries(), cl));//plugin.getJCC().getClassLoader(null)));
 									fos.close();
 								}
 							}
@@ -313,7 +316,7 @@ public class TestCenterPanel extends JSplitPanel
 								e.printStackTrace();
 							}
 						}
-//					});
+					});
 				}
 			}
 		});
@@ -329,6 +332,10 @@ public class TestCenterPanel extends JSplitPanel
 //						ILibraryService.class).addResultListener(new SwingDefaultResultListener(TestCenterPanel.this)
 //					{
 //						public void customResultAvailable(Object result) 
+						
+					plugin.getJCC().getClassLoader(null).addResultListener(new SwingDefaultResultListener<ClassLoader>(TestCenterPanel.this)
+					{
+						public void customResultAvailable(final ClassLoader cl)
 						{
 							File file = loadsavechooser.getSelectedFile();
 							if(file!=null)
@@ -345,7 +352,7 @@ public class TestCenterPanel extends JSplitPanel
 									}
 //									String[] names = (String[])JavaReader.objectFromXML(out.toString(), ((ILibraryService)result).getClassLoader());
 //									String[] names = (String[])JavaReader.objectFromXML(out.toString(), plugin.getJCC().getJCCAccess().getModel().getClassLoader());
-									String[] names = (String[])JavaReader.objectFromXML(out.toString(), plugin.getJCC().getClassLoader(null));
+									String[] names = (String[])JavaReader.objectFromXML(out.toString(), cl);//plugin.getJCC().getClassLoader(null));
 									teststable.setEntries(names);
 								}
 								catch(Exception e)
@@ -366,7 +373,7 @@ public class TestCenterPanel extends JSplitPanel
 								}
 							}
 						};
-//					});
+					});
 				}
 			}
 		});
