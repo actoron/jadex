@@ -61,7 +61,8 @@ public class STestCenter
 														for(int i=0; !istest && i<results.length; i++)
 														{
 															if(results[i].getName().equals("testresults") 
-																&& Testcase.class.equals(results[i].getClazz(ls.getClassLoader(model.getResourceIdentifier()), model.getAllImports())))
+																&& results[i].getClassname().equals("jadex.base.test.Testcase"))
+//																&& Testcase.class.equals(results[i].getClazz(ls.getClassLoader(model.getResourceIdentifier()), model.getAllImports())))
 															{	
 																istest	= true;
 															}
