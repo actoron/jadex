@@ -66,7 +66,7 @@ public class ExtensionLoaderService implements IExtensionLoaderService
 								
 								public void exceptionOccurred(Exception exception)
 								{
-									System.out.println("resu: "+exception);
+									System.out.println("ex: "+exception);
 									component.getLogger().warning("Extension '"+model+"' could not be loaded: "+exception);
 									customResultAvailable(cms);	// Continue with next token.
 								}

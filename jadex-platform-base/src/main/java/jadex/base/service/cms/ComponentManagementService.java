@@ -1799,6 +1799,16 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IFuture getExternalAccess(final IComponentIdentifier cid)
 	{
+		return getExternalAccess(cid, false);
+	}
+	
+	/**
+	 *  Get the external access of a component.
+	 *  @param cid The component identifier.
+	 *  @param listener The result listener.
+	 */
+	protected IFuture getExternalAccess(final IComponentIdentifier cid, boolean internal)
+	{
 		final Future ret = new Future();
 		
 		if(cid==null)
@@ -1832,7 +1842,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					InitInfo ii = getInitInfo(cid);
 					if(ii!=null)
 					{
-						if(ii.getAdapter()==null || ii.getAdapter().isExternalThread())
+						if(!internal && (ii.getAdapter()==null || ii.getAdapter().isExternalThread()))
 						{
 //							System.out.println("delayed");
 							delayed = true;
@@ -1906,7 +1916,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //			&& !Boolean.TRUE.equals(ci.getPlatformloader()))
 			)
 		{
-			getExternalAccess(ci.getParent()).addResultListener(new DelegationResultListener(ret)
+			getExternalAccess(ci.getParent(), true).addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
