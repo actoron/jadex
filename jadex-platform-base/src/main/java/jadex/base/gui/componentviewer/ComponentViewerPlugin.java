@@ -515,19 +515,16 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 								public void customResultAvailable(Object result)
 								{
 									final IExternalAccess exta = (IExternalAccess)result;
-									getJCC().getClassLoader(rid);
-									
-									SServiceProvider.getServiceUpwards(getJCC().getJCCAccess().getServiceProvider(), ILibraryService.class)
-										.addResultListener(new SwingDefaultResultListener(comptree)
+									getJCC().getClassLoader(exta.getModel().getResourceIdentifier())
+										.addResultListener(new SwingDefaultResultListener<ClassLoader>(comptree)
 									{
-										public void customResultAvailable(Object result)
+										public void customResultAvailable(ClassLoader cl)
 										{
-											final ILibraryService ls = (ILibraryService)result;
-											final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, ls);
+											final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
 											viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
 			//								System.out.println("node: "+viewables.get(cid));
 											node.refresh(false);
-										}
+										}										
 									});
 								}
 								

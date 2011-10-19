@@ -248,7 +248,7 @@ public class MessageService extends BasicService implements IMessageService
 		}
 
 		// Conversion via platform specific codecs
-		IContentCodec[] compcodecs = getContentCodecs(comp.getModel());
+		IContentCodec[] compcodecs = getContentCodecs(comp.getModel(), cl);
 		for(Iterator it=msgcopy.keySet().iterator(); it.hasNext(); )
 		{
 			String	name	= (String)it.next();
@@ -359,7 +359,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param props The properties.
 	 *  @return The content codec.
 	 */
-	public IContentCodec[] getContentCodecs(IModelInfo model)
+	public IContentCodec[] getContentCodecs(IModelInfo model, ClassLoader cl)
 	{
 		List ret = null;
 		Map	props	= model.getProperties();
@@ -372,7 +372,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(ret==null)
 						ret	= new ArrayList();
-					ret.add(model.getProperty(name, libservice));
+					ret.add(model.getProperty(name, cl));
 				}
 			}
 		}
@@ -877,7 +877,7 @@ public class MessageService extends BasicService implements IMessageService
 							}
 
 							// Conversion via platform specific codecs
-							IContentCodec[] compcodecs = getContentCodecs(component.getModel());
+							IContentCodec[] compcodecs = getContentCodecs(component.getModel(), cl);
 							for(Iterator it=message.keySet().iterator(); it.hasNext(); )
 							{
 								String name = (String)it.next();
