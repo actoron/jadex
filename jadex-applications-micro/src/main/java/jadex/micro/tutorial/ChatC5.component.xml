@@ -9,7 +9,7 @@
 	name="ChatC5" package="jadex.micro.tutorial">
 	
 	<imports>
-		<import>jadex.bridge.service.clock.IClockService</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
 	</imports>
 	
 	<services>
