@@ -1995,7 +1995,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	public IServiceContainer createServiceContainer()
 	{
 		assert container==null;
-		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), copy, this);
+		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), copy, getInternalAccess());
 	}
 	
 }

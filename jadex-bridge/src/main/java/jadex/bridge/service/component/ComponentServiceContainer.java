@@ -1,8 +1,8 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
@@ -37,8 +37,11 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
 	
-	/** The external access. */
-	protected IComponentInstance instance;
+//	/** The external access. */
+//	protected IComponentInstance instance;
+	
+	/** The internal access. */
+	protected IInternalAccess instance;
 	
 	/** The cms. */
 	protected IComponentManagementService cms;
@@ -55,7 +58,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  Create a new service container.
 	 */
 //	public ComponentServiceContainer(IExternalAccess ea, IComponentAdapter adapter, String type)
-	public ComponentServiceContainer(IComponentAdapter adapter, String type, boolean copy, IComponentInstance instance)
+	public ComponentServiceContainer(IComponentAdapter adapter, String type, boolean copy, IInternalAccess instance)//IComponentInstance instance)
 	{
 		super(adapter.getComponentIdentifier());
 		this.adapter = adapter;
@@ -96,7 +99,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customResultAvailable(Object result)
 			{
-				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
+				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, 
+					instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
 		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut, false);
@@ -114,7 +118,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customResultAvailable(Object result)
 			{
-				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
+				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, 
+					instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
 		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut, false);
@@ -133,7 +138,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customResultAvailable(Object result)
 			{
-				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
+				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, 
+					instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
 		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut, false);
@@ -151,7 +157,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customIntermediateResultAvailable(Object result)
 			{
-				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
+				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
+					adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
 		return new ComponentIntermediateFuture<T>(instance.getExternalAccess(), adapter, fut, false);
@@ -169,7 +176,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		{
 			public void customIntermediateResultAvailable(Object result)
 			{
-				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(null, instance.getExternalAccess(), adapter, (IInternalService)result, null, null, null, copy));
+				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
+					adapter, (IInternalService)result, null, null, null, copy));
 			}
 		});
 		return new ComponentIntermediateFuture<T>(instance.getExternalAccess(), adapter, fut, false);
