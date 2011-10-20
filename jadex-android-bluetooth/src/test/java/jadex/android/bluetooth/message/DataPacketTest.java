@@ -1,6 +1,8 @@
 package jadex.android.bluetooth.message;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import jadex.android.bluetooth.CustomTestRunner;
 import jadex.android.bluetooth.TestConstants;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.device.IBluetoothSocket;
@@ -20,7 +22,7 @@ import android.os.Parcel;
 
 import com.xtremelabs.robolectric.RobolectricTestRunner;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(CustomTestRunner.class)
 public class DataPacketTest {
 	private IBluetoothDevice dev;
 	private BluetoothMessage btmsg;
@@ -87,6 +89,36 @@ public class DataPacketTest {
 		System.out.println("Custom Byte Array Building took: "
 				+ elapsedTimeInSec);
 		assertEquals(dataPacket, dataPacket2);
+	}
+	
+	@Test
+	public void testDataPacketCreation() {
+		DataPacket packet = new DataPacket(TestConstants.sampleAddress, "".getBytes(), DataPacket.TYPE_BROADCAST);
+		byte[] asByteArray = packet.asByteArray();
+		assertNotNull(asByteArray);
+		
+		BluetoothMessage btMsg = new BluetoothMessage(TestConstants.sampleAddress, "test".getBytes(), DataPacket.TYPE_CONNECT_SYN);
+		packet = new DataPacket(btMsg, btMsg.getType());
+		asByteArray = packet.asByteArray();
+		assertNotNull(asByteArray);
+		
+		packet = new DataPacket(asByteArray);
+		assertEquals("test", packet.getDataAsString());
+		asByteArray = packet.asByteArray();
+		assertNotNull(asByteArray);
+	}
+	
+	@Test
+	public void testDataPacketCreationWithEmptyData() {
+		DataPacket packet = new DataPacket(TestConstants.sampleAddress, null, DataPacket.TYPE_BROADCAST);
+		byte[] asByteArray = packet.asByteArray();
+		assertNotNull(asByteArray);
+		
+		packet = new DataPacket(asByteArray);
+		assertNull(packet.getData());
+		assertEquals("", packet.getDataAsString());
+		asByteArray = packet.asByteArray();
+		assertNotNull(asByteArray);
 	}
 
 	

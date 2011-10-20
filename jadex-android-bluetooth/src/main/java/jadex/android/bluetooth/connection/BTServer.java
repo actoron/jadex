@@ -2,8 +2,10 @@ package jadex.android.bluetooth.connection;
 
 import jadex.android.bluetooth.device.IBluetoothAdapter;
 import jadex.android.bluetooth.device.IBluetoothAdapter.BluetoothState;
+import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.device.IBluetoothServerSocket;
 import jadex.android.bluetooth.device.IBluetoothSocket;
+import jadex.android.bluetooth.message.DataPacket;
 import jadex.android.bluetooth.service.ConnectionService;
 import jadex.android.bluetooth.util.Helper;
 
@@ -127,25 +129,57 @@ public class BTServer {
 		public void run() {
 			IBluetoothSocket socket = null;
 			// Keep listening until exception occurs or a socket is returned
-			while (true) {
+//			while (true) {
 				try {
 					IBluetoothServerSocket tmp = null;
 					tmp = adapter.listenUsingRfcommWithServiceRecord(SERVICE_NAME, uuid);
 					mmServerSocket = tmp;
+					Log.d(Helper.LOG_TAG, "Socket listening with uuid: " + uuid.toString());
 					socket = mmServerSocket.accept();
-					Log.d(Helper.LOG_TAG, "Socket listening with uuid: " + uuid);
 				} catch (IOException e) {
 					//e.printStackTrace();
 					Log.e(Helper.LOG_TAG,"Could not start Bluetooth Server: " + e.getMessage());
-					break;
+//					break;
+					return;
 				}
 				// If a connection was accepted
 				if (socket != null) {
 					// Do work to manage the connection (in a separate thread)
-					ServerConnection connection = new ServerConnection(adapter, socket);
-					connectedThreads.add(connection);
-					estListener.connectionEstablished(connection);
-					connection.connect();
+					if (uuid.equals(UUIDS[0])) {
+						try {
+							Log.d(Helper.LOG_TAG, "Incoming Connection on first UUID. Dropping...");
+							Thread.sleep(500);
+							socket.close();
+						} catch (IOException e) {
+						} catch (InterruptedException e) {
+							try {
+								socket.close();
+							} catch (IOException e1) {
+							}
+						} finally {
+							run();
+						}
+					} else {
+						Log.d(Helper.LOG_TAG, "Incoming Connection accepted.");
+						ServerConnection connection = new ServerConnection(adapter, socket);
+						connectedThreads.add(connection);
+						estListener.connectionEstablished(connection);
+						connection.addConnectionListener(new IConnectionListener() {
+							
+							@Override
+							public void messageReceived(DataPacket pkt, IBluetoothDevice fromDevice,
+									IConnection incomingConnection) {
+							}
+							
+							@Override
+							public void connectionStateChanged(IConnection connection) {
+								if (!connection.isAlive()) {
+									run();
+								}
+							}
+						});
+						connection.connect();
+					}
 					
 					try {
 						mmServerSocket.close();
@@ -154,7 +188,7 @@ public class BTServer {
 					}
 					// break;
 				}
-			}
+//			}
 		}
 
 		/** Will cancel the listening socket, and cause the thread to finish */

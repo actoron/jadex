@@ -4,12 +4,15 @@ import jadex.android.bluetooth.device.IBluetoothAdapter;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.device.IBluetoothSocket;
 import jadex.android.bluetooth.message.DataPacket;
+import jadex.android.bluetooth.util.Helper;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import android.util.Log;
 
 public abstract class AConnection implements IConnection {
 
@@ -77,6 +80,7 @@ public abstract class AConnection implements IConnection {
 							}
 						} catch (IOException e) {
 							// maybe remove connection from list here?
+							Log.e(Helper.LOG_TAG, e.getMessage());
 							setConnectionAlive(false);
 							break;
 						}
@@ -90,6 +94,7 @@ public abstract class AConnection implements IConnection {
 			try {
 				mmOutStream.write(bytes);
 			} catch (IOException e) {
+				Log.e(Helper.LOG_TAG, e.getMessage());
 				setConnectionAlive(false);
 				throw e;
 			}

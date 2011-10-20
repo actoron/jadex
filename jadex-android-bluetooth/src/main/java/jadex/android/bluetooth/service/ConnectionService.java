@@ -15,6 +15,7 @@ import jadex.android.bluetooth.device.IBluetoothDevice.BluetoothBondState;
 import jadex.android.bluetooth.device.factory.AndroidBluetoothAdapterFactory;
 import jadex.android.bluetooth.device.factory.AndroidBluetoothDeviceFactory;
 import jadex.android.bluetooth.message.BluetoothMessage;
+import jadex.android.bluetooth.message.DataPacket;
 import jadex.android.bluetooth.util.Helper;
 
 import java.util.ArrayList;
@@ -91,30 +92,38 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 					@Override
 					public void connectionAdded(String address,
 							IConnection connection) {
-						proximityDevicesChanged();
+//						knownDevicesChanged();
 					}
 
 					@Override
 					public void connectionRemoved(String address) {
-						proximityDevicesChanged();
-
+//						knownDevicesChanged();
 					}
 				});
 
 		btp2pConnector.addMessageListener(null, new MessageListener() {
 
 			@Override
-			public void messageReceived(BluetoothMessage msg) {
-				showToast(msg.getDataAsString());
+			public synchronized void messageReceived(BluetoothMessage msg) {
+				try {
+					if (msg.getType() == DataPacket.TYPE_AWARENESS_INFO) {
+						callback.awarenessInfoReceived(msg.getData());
+					} else {
+//						showToast(msg.getDataAsString());
+						callback.messageReceived(msg.getData());
+					}
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 
 		btp2pConnector
-				.setProximityDeviceChangedListener(new BTP2PConnector.ProximityDeviceChangedListener() {
+				.setKnownDevicesChangedListener(new BTP2PConnector.ProximityDeviceChangedListener() {
 
 					@Override
 					public void proximityDevicesChanged() {
-						ConnectionService.this.proximityDevicesChanged();
+						ConnectionService.this.knownDevicesChanged();
 					}
 				});
 
@@ -237,14 +246,15 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 
 		@Override
 		public IBluetoothDevice[] getReachableDevices() throws RemoteException {
-			Set<String> reachableDevices = btp2pConnector.getReachableDevices();
-			ArrayList<IBluetoothDevice> result = new ArrayList<IBluetoothDevice>(
-					reachableDevices.size());
-
-			for (String string : reachableDevices) {
-				result.add(Helper.getBluetoothDeviceFactory().createBluetoothDevice(string));
-			}
-			return result.toArray(new IBluetoothDevice[result.size()]);
+//			Set<String> reachableDevices = btp2pConnector.getReachableDevices();
+//			ArrayList<IBluetoothDevice> result = new ArrayList<IBluetoothDevice>(
+//					reachableDevices.size());
+//
+//			for (String string : reachableDevices) {
+//				result.add(Helper.getBluetoothDeviceFactory().createBluetoothDevice(string));
+//			}
+//			return result.toArray(new IBluetoothDevice[result.size()]);
+			return btp2pConnector.getKnownDevices();
 		}
 
 		@Override
@@ -334,15 +344,15 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 		}
 	}
 
-	protected void proximityDevicesChanged() {
+	protected void knownDevicesChanged() {
 		if (callback != null) {
 			try {
-				callback.deviceListChanged();
+//				callback.deviceListChanged();
+				callback.knownDevicesChanged(btp2pConnector.getKnownDevices());
 			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
-
+	
 }

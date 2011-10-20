@@ -11,6 +11,7 @@ import jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry;
 import jadex.android.bluetooth.message.MessageProtos.RoutingType;
 import jadex.android.bluetooth.routing.IPacketRouter;
 import jadex.android.bluetooth.routing.IPacketSender;
+import jadex.android.bluetooth.routing.dsdv.info.ConfigInfo;
 import jadex.android.bluetooth.routing.dsdv.info.CurrentInfo;
 import jadex.android.bluetooth.routing.dsdv.minders.BroadcastMinder;
 import jadex.android.bluetooth.routing.dsdv.minders.PeriodicBroadcastMinder;
@@ -436,7 +437,14 @@ public class DsdvRouter implements IPacketRouter {
 		rtew.setDestination(device);
 		rtew.setNextHop(device);
 		rtew.setNumHops(0);
+		RoutingTableEntryWrapper existing = routeTable.getRoutingEntry(device);
+		
 		rtew.setSeqNum(0);
+		if (existing != null) {
+			int seqNum = existing.getSeqNum();
+			rtew.setSeqNum(seqNum % 2 == 0 ? seqNum +2 : seqNum + 1);
+		} 
+		
 		rtbuilder.addEntry(rtew.build());
 		jadex.android.bluetooth.message.MessageProtos.RoutingInformation.Builder riBuilder = RoutingInformation.newBuilder();
 		riBuilder.setFromAddress(device);

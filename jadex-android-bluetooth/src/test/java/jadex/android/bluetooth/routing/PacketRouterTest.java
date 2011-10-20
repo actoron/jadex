@@ -126,6 +126,17 @@ public abstract class PacketRouterTest {
 		Set<String> reachableDeviceAddresses = packetRouter2
 				.getReachableDeviceAddresses();
 		assertTrue(reachableDeviceAddresses.isEmpty());
+		
+		//re-add
+		packetRouter1.addConnectedDevice(device1);
+		System.out.println("Waiting " + getBroadcastWaitTime() + "ms for Message Propagation...");
+		Thread.sleep(getBroadcastWaitTime());
+		assertTrue(packetRouter2.getReachableDeviceAddresses().contains(device1));
+		//disconnect routers:
+//		packetRouter1.setPacketSender(null);
+//		packetRouter2.setPacketSender(null);
+//		Thread.sleep(getBroadcastWaitTime() * 2);
+//		assertFalse(packetRouter2.getReachableDeviceAddresses().contains(device1));
 	}
 
 	@Test
@@ -172,7 +183,7 @@ public abstract class PacketRouterTest {
 		reachableDeviceAddresses = packetRouter1.getReachableDeviceAddresses();
 		assertFalse(reachableDeviceAddresses.contains(device1));
 	}
-
+	
 	private RoutingInformation getUnsupportedRoutingInformation() {
 		Builder builder = RoutingInformation.newBuilder();
 		builder.setRoutingTable(getSampleRoutingInformation().getRoutingTable());

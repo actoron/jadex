@@ -89,7 +89,7 @@ public class ConnectionManager extends HashMap<String, IConnection> implements
 	@Override
 	public void sendMessageToConnectedDevice(DataPacket packet, String address) throws MessageNotSendException {
 		IConnection con = get(address);
-		if (con.isAlive()) {
+		if (con != null && con.isAlive()) {
 			try {
 				con.write(packet.asByteArray());
 			} catch (IOException e) {

@@ -41,12 +41,14 @@ public class ClientConnection extends AConnection {
 		@Override
 		public void run() {
 			Log.d(Helper.LOG_TAG, "Connection to " + remoteDevice.getAddress()
-					+ " timed out.");
+					+ " timed out after " + (System.currentTimeMillis() - lastPingReceivedTime) + "ms");
 			close();
 		}
 	};
 
 	private ResettableTimer timer;
+
+	private long lastPingReceivedTime;
 
 	public void manageConnectedSocket(IBluetoothSocket mmSocket) {
 		connectedThread = new ConnectedThread(mmSocket);
@@ -62,6 +64,7 @@ public class ClientConnection extends AConnection {
 		// listener only, we get called after writing the response - which could
 		// take forever on dead connections.
 		if (dataPacket.Type == DataPacket.TYPE_PING && timer != null) {
+			lastPingReceivedTime = System.currentTimeMillis();
 			timer.reset(false);
 		}
 		super.notifyMessageReceived(dataPacket);
@@ -105,6 +108,7 @@ public class ClientConnection extends AConnection {
 						// close the socket and connect using another UUID.
 						mmSocket.close();
 						uuidNum++;
+						Log.d(Helper.LOG_TAG, "Device " + mmDevice.getName() + " seems to be available. Trying to connect on UUID #" + uuidNum);
 						mmSocket = mmDevice
 								.createRfcommSocketToServiceRecord(BTServer.UUIDS[uuidNum]);
 						mmSocket.connect();
@@ -120,7 +124,7 @@ public class ClientConnection extends AConnection {
 							mmSocket.close();
 							mmSocket = mmDevice
 									.createRfcommSocketToServiceRecord(BTServer.UUIDS[uuidNum]);
-
+							Log.d(Helper.LOG_TAG, "Device " + mmDevice.getName() + " seems to be available. Trying to connect on UUID #" + uuidNum);
 						} catch (IOException e2) {
 							try {
 								mmSocket.close();

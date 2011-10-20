@@ -1,11 +1,17 @@
 package jadex.base.service.awareness.discovery.bluetoothp2p;
 
 import jadex.android.bluetooth.JadexBluetoothActivity;
+import jadex.android.bluetooth.device.IBluetoothDevice;
+import jadex.android.bluetooth.message.BluetoothMessage;
+import jadex.android.bluetooth.message.DataPacket;
 import jadex.android.bluetooth.service.ConnectionService;
+import jadex.android.bluetooth.service.IConnectionCallback;
 import jadex.android.bluetooth.service.IConnectionServiceConnection;
 import jadex.android.bluetooth.util.Helper;
+import jadex.base.service.awareness.AwarenessInfo;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.DiscoveryService;
+import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.IDiscoveryService;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
@@ -66,9 +72,11 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
 
 	private Intent intent;
 	private IConnectionServiceConnection binder;
+	protected IBluetoothDevice[] _knownDevices;
 	
 	public BluetoothP2PDiscoveryAgent() {
 		intent = new Intent();
+		_knownDevices = new IBluetoothDevice[0];
 		//intent.setClassName("jadex.android.bluetooth.service", "jadex.android.bluetooth.service.ConnectionService");
 	}
 
@@ -112,8 +120,30 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
 		}
 	}
 	
-	private ServiceConnection sc = new ServiceConnection() {
+	private IConnectionCallback.Stub callback = new IConnectionCallback.Stub() {
+		
+		@Override
+		public void knownDevicesChanged(IBluetoothDevice[] knownDevices)
+		throws RemoteException {
+			_knownDevices = knownDevices;
+		}
+		
+		@Override
+		public void deviceListChanged() throws RemoteException {
+		}
 
+		@Override
+		public void messageReceived(byte[] data) throws RemoteException {
+		}
+
+		@Override
+		public void awarenessInfoReceived(byte[] data) throws RemoteException {
+			BluetoothP2PReceiveHandler btrec = (BluetoothP2PReceiveHandler) receiver;
+			btrec.addReceivedAwarenessInfo(data);
+		}
+	};
+	
+	private ServiceConnection sc = new ServiceConnection() {
 
 		@Override
 		public void onServiceDisconnected(ComponentName arg0) {
@@ -125,7 +155,8 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
 			binder = IConnectionServiceConnection.Stub.asInterface(arg1);
 			Log.d(Helper.LOG_TAG, "Service bound! starting autoconnect...");
 			try {
-				binder.registerCallback(((BluetoothP2PReceiveHandler)receiver).callback);
+				
+				binder.registerCallback(callback);
 				binder.startAutoConnect();
 			} catch (RemoteException e) {
 				e.printStackTrace();
@@ -133,7 +164,14 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
 		}
 	};
 	
-	public void send(DatagramPacket p) {
-		
+	public void sendAwarenessInfo(byte[] data) {
+		BluetoothMessage btMsg = new BluetoothMessage("", data, DataPacket.TYPE_AWARENESS_INFO);
+		for (IBluetoothDevice d : _knownDevices) {
+			btMsg.setRemoteAddress(d.getAddress());
+			try {
+				binder.sendMessage(btMsg);
+			} catch (RemoteException e) {
+			}
+		} 
 	}
 }

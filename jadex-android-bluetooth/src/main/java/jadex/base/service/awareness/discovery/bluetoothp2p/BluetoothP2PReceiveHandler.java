@@ -1,12 +1,18 @@
 package jadex.base.service.awareness.discovery.bluetoothp2p;
 
+import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.service.IConnectionCallback;
 import jadex.android.bluetooth.util.Helper;
+import jadex.base.service.awareness.AwarenessInfo;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
+import jadex.commons.collection.ArrayBlockingQueue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import android.os.RemoteException;
 import android.util.Log;
@@ -14,77 +20,85 @@ import android.util.Log;
 /**
  * 
  */
-public class BluetoothP2PReceiveHandler extends ReceiveHandler
-{
+public class BluetoothP2PReceiveHandler extends ReceiveHandler {
 	/** The receive buffer. */
 	protected byte[] buffer;
-	
+
 	protected IConnectionCallback callback;
-	
-	private List<String> deviceList;
-	
+
+	private BlockingQueue<byte[]> awarenessQueue;
+
 	/**
-	 *  Create a new receive handler.
+	 * Create a new receive handler.
 	 */
-	public BluetoothP2PReceiveHandler(DiscoveryAgent agent)
-	{
+	public BluetoothP2PReceiveHandler(DiscoveryAgent agent) {
 		super(agent);
-		deviceList = new ArrayList<String>();
-		callback = new IConnectionCallback.Stub() {
-			
-			@Override
-			public void deviceListChanged() throws RemoteException {
-				Log.d(Helper.LOG_TAG, "BluetoothP2PReceiver: devicelistcahnged!");
-			}
-		};
+		awarenessQueue = new LinkedBlockingQueue<byte[]>();
 	}
-	
+
 	/**
-	 *  Receive a packet.
+	 * Receive a packet.
 	 */
-	public Object[] receive()
-	{
-		
-		while (deviceList.isEmpty()) {
-			try {
-				synchronized (this) {
-					this.wait();
-				}
-			} catch (InterruptedException e) {
-			}
+	@Override
+	public Object[] receive() {
+
+		try {
+			Log.i(Helper.LOG_TAG, "BTP2PRecHandler: activating blocking queue...");
+			byte[] take = awarenessQueue.take();
+			Log.i(Helper.LOG_TAG, "BTP2PRecHandler: RECIEVED SOME MESSAGE");
+
+			Object[] ret = new Object[3];
+			//address:
+			ret[0] = null;
+			//port:
+			ret[1] = 0;
+			ret[2] = take;
+			
+			return ret;
+		} catch (InterruptedException e) {
+			return receive();
 		}
 		
+
 		
-		Object[] ret = null;
-//		try
-//		{
-//
-//			if(buffer==null)
-//			{
-//				// todo: max ip datagram length (is there a better way to determine length?)
-//				buffer = new byte[8192];
-//			}
-//
-//			final DatagramPacket pack = new DatagramPacket(buffer, buffer.length);
-//			getAgent().getSocket().receive(pack);
-//			byte[] data = new byte[pack.getLength()];
-//			System.arraycopy(buffer, 0, data, 0, pack.getLength());
-//			ret = new Object[]{pack.getAddress(), new Integer(pack.getPort()), data};
-//		}
-//		catch(Exception e)
-//		{
-////			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
-//		}
-//		
-		return ret;
+		// try
+		// {
+		//
+		// if(buffer==null)
+		// {
+		// // todo: max ip datagram length (is there a better way to determine
+		// length?)
+		// buffer = new byte[8192];
+		// }
+		//
+		// final DatagramPacket pack = new DatagramPacket(buffer,
+		// buffer.length);
+		// getAgent().getSocket().receive(pack);
+		// byte[] data = new byte[pack.getLength()];
+		// System.arraycopy(buffer, 0, data, 0, pack.getLength());
+		// ret = new Object[]{pack.getAddress(), new Integer(pack.getPort()),
+		// data};
+		// }
+		// catch(Exception e)
+		// {
+		// //
+		// getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
+		// }
+		//
 	}
-	
+
 	/**
-	 *  Get the agent.
+	 * Get the agent.
 	 */
-	public BluetoothP2PDiscoveryAgent getAgent()
-	{
-		return (BluetoothP2PDiscoveryAgent)agent;
+	public BluetoothP2PDiscoveryAgent getAgent() {
+		return (BluetoothP2PDiscoveryAgent) agent;
+	}
+
+	public void addReceivedAwarenessInfo(byte[] data) {
+		Log.i(Helper.LOG_TAG, "AwarenessInfo received. Adding to Queue...");
+		awarenessQueue.add(data);
+//		synchronized (awarenessQueue) {
+//			awarenessQueue.notifyAll();
+//		}
 	}
 }
-

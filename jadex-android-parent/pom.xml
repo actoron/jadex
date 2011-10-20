@@ -12,6 +12,7 @@
 		<maven-compiler-plugin-version>2.3.2</maven-compiler-plugin-version>
 		<java-version>1.6</java-version>
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
+		<maven-android-plugin-version>3.0.0-alpha-13</maven-android-plugin-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -65,6 +66,28 @@
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>
+											com.jayway.maven.plugins.android.generation2
+										</groupId>
+										<artifactId>
+											android-maven-plugin
+										</artifactId>
+										<versionRange>
+											[3.0.0-alpha-13,)
+										</versionRange>
+										<goals>
+											<goal>run</goal>
+											<goal>unpack</goal>
+											<goal>generate-sources</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+								
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
 											org.apache.maven.plugins
 										</groupId>
 										<artifactId>
@@ -111,6 +134,63 @@
 					<configuration>
 						<source>${java-version}</source>
 						<target>${java-version}</target>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+					<artifactId>android-maven-plugin</artifactId>
+					<version>${maven-android-plugin-version}</version>
+					<configuration>
+						<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
+						<assetsDirectory>${project.basedir}/assets</assetsDirectory>
+						<resourceDirectory>${project.basedir}/res</resourceDirectory>
+						<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
+						<sdk>
+							<path>${env.ANDROID_HOME}</path>
+							<platform>2.2</platform>
+						</sdk>
+						<undeployBeforeDeploy>true</undeployBeforeDeploy>
+						<generateApk>true</generateApk>
+						<dex>
+							<jvmArguments>
+								<jvmArgument>-Xms256m</jvmArgument>
+								<jvmArgument>-Xmx512m</jvmArgument>
+							</jvmArguments>
+							<coreLibrary>true|false</coreLibrary>
+							<noLocals>false</noLocals>
+							<optimize>true</optimize>
+						</dex>
+
+						<!-- <test> -->
+						<!-- <skip>true|false|auto</skip> -->
+						<!-- <instrumentationPackage>packageName</instrumentationPackage> -->
+						<!-- <instrumentationRunner>className</instrumentationRunner> -->
+						<!-- <debug>true|false</debug> -->
+						<!-- <coverage>true|false</coverage> -->
+						<!-- <logonly>true|false</logonly> -->
+						<!-- avd -->
+						<!-- <testsize>small|medium|large</testsize> -->
+						<!-- <createreport>true|false</createreport> -->
+						<!-- <classes> -->
+						<!-- <class>your.package.name.YourTestClass</class> -->
+						<!-- </classes> -->
+						<!-- <packages> -->
+						<!-- <package>your.package.name</package> -->
+						<!-- </packages> -->
+						<!-- </test> -->
+
+						<!-- <manifest> -->
+						<!-- <versionName></versionName> -->
+						<!-- <versionCode>123</versionCode> -->
+						<!-- <versionCodeAutoIncrement>true|false</versionCodeAutoIncrement> -->
+						<!-- <versionCodeUpdateFromVersion>true|false</versionCodeUpdateFromVersion> -->
+						<!-- <sharedUserId>anId</sharedUserId> -->
+						<!-- <debuggable>true|false</debuggable> -->
+						<!-- </manifest> -->
+
+
+
 					</configuration>
 				</plugin>
 			</plugins>

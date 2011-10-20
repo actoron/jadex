@@ -54,7 +54,11 @@ public class BluetoothMessage implements Parcelable {
 	}
 
 	public String getDataAsString() {
-		return new String(data).trim();
+		return (data == null) ? "" : new String(data).trim();
+	}
+	
+	public void setRemoteAddress(String adr) {
+		this.remoteAdress = adr;
 	}
 
 	@Override
