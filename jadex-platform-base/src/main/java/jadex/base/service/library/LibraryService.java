@@ -60,6 +60,10 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	/** The primary managed rids and the number of their support. */
 	protected Map<IResourceIdentifier, Integer> managedrids;
 	
+	/** The global class loader (cached for speed). */
+	// todo: remove!?
+	protected ClassLoader	globalcl;
+	
 	//-------- constructors --------
 	
 	/** 
@@ -415,8 +419,12 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		
 		if(rid==null)
 		{
-			DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
-			ret.setResult(new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), delegates));
+			if(globalcl==null)
+			{
+				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
+				globalcl	= new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), delegates);
+			}
+			ret.setResult(globalcl);
 		}
 		else
 		{
@@ -533,6 +541,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])result.toArray(new DelegationURLClassLoader[result.size()]);
 				DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, ClassLoader.getSystemClassLoader(), delegates);
 				classloaders.put(rid, cl);
+				globalcl	= null;
 				addSupport(rid, support);
 				ret.setResult(cl);
 			}
