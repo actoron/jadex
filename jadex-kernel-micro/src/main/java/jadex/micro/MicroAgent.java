@@ -400,7 +400,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 				{
 					public void	customResultAvailable(Map<String, Object> result)
 					{
-						super.resultAvailable(null);
+						ret.setResult(null);
 					}
 				});
 			}

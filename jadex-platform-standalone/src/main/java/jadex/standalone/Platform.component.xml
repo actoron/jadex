@@ -53,6 +53,7 @@
 		<import>jadex.base.service.settings.*</import>
 		<import>jadex.base.service.simulation.*</import>
 		<import>jadex.base.service.threadpool.*</import>
+		<import>jadex.base.service.dependency.maven.*</import>
 		
 		<import>jadex.base.service.message.transport.*</import>
 		<import>jadex.base.service.message.transport.localmtp.*</import>
@@ -153,7 +154,7 @@
 			<providedservice class="IDependencyService">
 			<implementation>
 				new BasicDependencyService()
-				//new MavenDependencyService()
+				//new MavenDependencyResolverService()
 			</implementation>
 		</providedservice>
 		<providedservice class="ILibraryService">
