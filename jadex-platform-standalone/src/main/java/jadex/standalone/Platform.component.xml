@@ -13,30 +13,52 @@
 		<import>jadex.commons.future.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.bridge.service.*</import>
-		<import>jadex.bridge.service.clock.*</import>
-		<import>jadex.bridge.service.execution.*</import>
-		<import>jadex.bridge.service.library.*</import>
-		<import>jadex.bridge.service.threadpool.*</import>
 		<import>jadex.commons.concurrent.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.base.*</import>
 		<import>jadex.base.service.simulation.*</import>
 		<import>jadex.base.service.remote.*</import>
 		<import>jadex.standalone.service.*</import>
-		<import>jadex.base.service.message.*</import>
-		<import>jadex.base.service.message.transport.*</import>
-		<import>jadex.base.service.message.transport.localmtp.*</import>
-		<import>jadex.base.service.message.transport.tcpmtp.*</import>
-		<import>jadex.base.service.message.transport.niotcpmtp.*</import>
-		<import>jadex.base.service.message.transport.codecs.*</import>
-		<import>jadex.base.service.deployment.*</import>
-		<import>jadex.base.service.settings.*</import>
 		<import>jadex.component.*</import>
 		<import>jadex.application.*</import>
 		<import>java.util.*</import>
 		<import>java.util.logging.Level</import>
 		<import>java.lang.reflect.*</import>
 		<import>jadex.benchmarking.services.*</import>
+		
+		<import>jadex.bridge.service.types.awareness.*</import>
+		<import>jadex.bridge.service.types.clock.*</import>
+		<import>jadex.bridge.service.types.cms.*</import>
+		<import>jadex.bridge.service.types.deployment.*</import>
+		<import>jadex.bridge.service.types.df.*</import>
+		<import>jadex.bridge.service.types.execution.*</import>
+		<import>jadex.bridge.service.types.factory.*</import>
+		<import>jadex.bridge.service.types.library.*</import>
+		<import>jadex.bridge.service.types.message.*</import>
+		<import>jadex.bridge.service.types.remote.*</import>
+		<import>jadex.bridge.service.types.settings.*</import>
+		<import>jadex.bridge.service.types.simulation.*</import>
+		<import>jadex.bridge.service.types.threadpool.*</import>
+		
+		<import>jadex.base.service.awareness.*</import>
+		<import>jadex.base.service.clock.*</import>
+		<import>jadex.base.service.cms.*</import>
+		<import>jadex.base.service.deployment.*</import>
+		<import>jadex.base.service.df.*</import>
+		<import>jadex.base.service.execution.*</import>
+		<import>jadex.base.service.factory.*</import>
+		<import>jadex.base.service.library.*</import>
+		<import>jadex.base.service.message.*</import>
+		<import>jadex.base.service.remote.*</import>
+		<import>jadex.base.service.settings.*</import>
+		<import>jadex.base.service.simulation.*</import>
+		<import>jadex.base.service.threadpool.*</import>
+		
+		<import>jadex.base.service.message.transport.*</import>
+		<import>jadex.base.service.message.transport.localmtp.*</import>
+		<import>jadex.base.service.message.transport.tcpmtp.*</import>
+		<import>jadex.base.service.message.transport.niotcpmtp.*</import>
+		<import>jadex.base.service.message.transport.codecs.*</import>
 	</imports>
 	
 	<arguments>
@@ -90,7 +112,7 @@
 	</arguments>
 	
 	<componenttypes>
-		<componenttype filename="jadex/standalone/extensions/Extensions.component.xml" name="extensions"/>
+		<componenttype filename="jadex/base/service/extensions/Extensions.component.xml" name="extensions"/>
 		
 		<componenttype filename="jadex/component/KernelComponent.component.xml" name="kernel_component"/>
 		<componenttype filename="jadex/application/KernelApplication.component.xml" name="kernel_application"/>

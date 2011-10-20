@@ -15,7 +15,7 @@
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_gRV529-eEeCA_-WKWefa3g" source="jadex_arguments_table_Initial-Value_3a286cee-eb90-41d4-a17c-01a86a789b1b_complex"/>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_jkcpUN-eEeCA_-WKWefa3g" source="jadex">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_jkcpUd-eEeCA_-WKWefa3g" key="description" value="Container component for extension components (to avoid having all extensions in main tree)."/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fn_nMN-fEeCA_-WKWefa3g" key="package" value="jadex.standalone.extensions"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Fn_nMN-fEeCA_-WKWefa3g" key="package" value="jadex.base.service.extensions"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_UJYNAN-fEeCA_-WKWefa3g" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HfTuIN-fEeCA_-WKWefa3g" source="jadex_imports_table">
