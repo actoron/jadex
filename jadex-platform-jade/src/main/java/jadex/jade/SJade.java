@@ -11,9 +11,9 @@ import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.MessageType;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.collection.SCollection;
 
 import java.util.Collection;
@@ -381,7 +381,7 @@ public class SJade
 	/**
 	 *  Convert a Jade AID to a Fipa aid.
 	 */
-	public static DFAgentDescription convertAgentDescriptiontoJade(jadex.base.fipa.IDFComponentDescription desc)
+	public static DFAgentDescription convertAgentDescriptiontoJade(jadex.bridge.service.types.df.IDFComponentDescription desc)
 	{
 		DFAgentDescription ret = new DFAgentDescription();
 		if(desc.getName()!=null)
@@ -395,7 +395,7 @@ public class SJade
 		String[] prots = desc.getProtocols();
 		for(int i=0; i<prots.length; i++)
 			ret.addProtocols(prots[i]);
-		jadex.base.fipa.IDFServiceDescription[] servs = desc.getServices();
+		jadex.bridge.service.types.df.IDFServiceDescription[] servs = desc.getServices();
 		for(int i=0; i<servs.length; i++)
 			ret.addServices(SJade.convertServiceDescriptiontoJade(servs[i]));
 		ret.setLeaseTime(desc.getLeaseTime());
@@ -433,7 +433,7 @@ public class SJade
 	 *  Convert a Jade AID to a Fipa aid.
 	 */
 	public static ServiceDescription
-		convertServiceDescriptiontoJade(jadex.base.fipa.IDFServiceDescription desc)
+		convertServiceDescriptiontoJade(jadex.bridge.service.types.df.IDFServiceDescription desc)
 	{
 		ServiceDescription ret = new ServiceDescription();
 		ret.setName(desc.getName());
@@ -449,7 +449,7 @@ public class SJade
 		String[] prots = desc.getProtocols();
 		for(int i=0; i<prots.length; i++)
 			ret.addProtocols(prots[i]);
-		jadex.base.fipa.IProperty[] props = desc.getProperties();
+		jadex.bridge.service.types.df.IProperty[] props = desc.getProperties();
 		for(int i=0; i<props.length; i++)
 			ret.addProperties(new jade.domain.FIPAAgentManagement.Property(props[i].getName(), props[i].getValue()));
 		return ret;
@@ -458,7 +458,7 @@ public class SJade
 	/**
 	 *  Convert an AMS AD to JADE.
 	 */
-	public static AMSAgentDescription convertAMSAgentDescriptiontoJade(jadex.bridge.IComponentDescription desc)
+	public static AMSAgentDescription convertAMSAgentDescriptiontoJade(jadex.bridge.service.types.cms.IComponentDescription desc)
 	{
 		AMSAgentDescription ret = new AMSAgentDescription();
 		if(desc.getName()!=null)

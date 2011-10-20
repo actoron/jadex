@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
 
 import java.util.Map;

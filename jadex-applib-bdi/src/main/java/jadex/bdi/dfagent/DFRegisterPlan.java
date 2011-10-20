@@ -2,9 +2,9 @@ package jadex.bdi.dfagent;
 
 import jadex.base.fipa.DFRegister;
 import jadex.base.fipa.Done;
-import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.service.types.df.IDFComponentDescription;
 
 /**
  *  The df register plan has the task to receive a message

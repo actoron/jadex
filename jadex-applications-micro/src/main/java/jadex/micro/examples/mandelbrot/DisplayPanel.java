@@ -1,11 +1,11 @@
 package jadex.micro.examples.mandelbrot;
 
 import jadex.base.gui.SwingDefaultResultListener;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 
 import java.awt.Color;

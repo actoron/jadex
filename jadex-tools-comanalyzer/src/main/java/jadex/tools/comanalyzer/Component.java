@@ -1,6 +1,6 @@
 package jadex.tools.comanalyzer;
 
-import jadex.bridge.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
 

@@ -1,8 +1,5 @@
 package jadex.micro.testcases;
 
-import jadex.base.fipa.IDF;
-import jadex.base.fipa.IDFComponentDescription;
-import jadex.base.fipa.IDFServiceDescription;
 import jadex.base.fipa.SFipa;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
@@ -10,9 +7,12 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISearchConstraints;
-import jadex.bridge.MessageType;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.service.types.df.IDF;
+import jadex.bridge.service.types.df.IDFComponentDescription;
+import jadex.bridge.service.types.df.IDFServiceDescription;
+import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;

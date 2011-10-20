@@ -1,13 +1,13 @@
 package jadex.base.service.awareness.discovery.registry;
 
 import jadex.base.service.awareness.discovery.DiscoveryService;
-import jadex.base.service.awareness.discovery.IDiscoveryService;
 import jadex.base.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
-import jadex.base.service.awareness.management.IManagementService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.threadpool.IThreadPoolService;
+import jadex.bridge.service.types.awareness.IDiscoveryService;
+import jadex.bridge.service.types.awareness.IManagementService;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;

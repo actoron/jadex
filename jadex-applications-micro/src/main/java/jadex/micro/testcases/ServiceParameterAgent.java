@@ -2,7 +2,7 @@ package jadex.micro.testcases;
 
 
 import jadex.base.test.Testcase;
-import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;

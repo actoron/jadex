@@ -4,7 +4,7 @@ import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import jadex.base.fipa.SFipa;
 import jadex.bridge.IMessageAdapter;
-import jadex.bridge.MessageType;
+import jadex.bridge.service.types.message.MessageType;
 
 import java.util.HashMap;
 import java.util.Iterator;

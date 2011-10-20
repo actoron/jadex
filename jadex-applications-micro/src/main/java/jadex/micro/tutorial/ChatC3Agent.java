@@ -1,7 +1,7 @@
 package jadex.micro.tutorial;
 
-import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;

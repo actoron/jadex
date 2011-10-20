@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import jadex.bridge.service.types.message.MessageType;
+
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Map;

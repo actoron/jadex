@@ -1,15 +1,16 @@
 package jadex.base.service.awareness.management;
 
-import jadex.base.service.awareness.AwarenessInfo;
-import jadex.base.service.awareness.discovery.IDiscoveryService;
-import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ISettingsService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.bridge.service.types.awareness.IDiscoveryService;
+import jadex.bridge.service.types.awareness.IManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Property;
 import jadex.commons.future.DefaultResultListener;

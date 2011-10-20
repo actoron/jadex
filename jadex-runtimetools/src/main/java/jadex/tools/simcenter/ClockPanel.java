@@ -1,13 +1,13 @@
 package jadex.tools.simcenter;
 
 import jadex.base.gui.SwingDefaultResultListener;
-import jadex.base.service.simulation.ISimulationService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.RemoteChangeListenerHandler;
-import jadex.bridge.service.clock.IClock;
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.types.clock.IClock;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;

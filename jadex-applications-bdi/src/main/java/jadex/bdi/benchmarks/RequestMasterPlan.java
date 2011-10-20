@@ -1,8 +1,8 @@
 package jadex.bdi.benchmarks;
 
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.CreationInfo;
-import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 
 import java.util.HashMap;
 import java.util.Map;

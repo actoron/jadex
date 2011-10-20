@@ -1,6 +1,6 @@
 package jadex.base.service.awareness.discovery;
 
-import jadex.base.service.awareness.AwarenessInfo;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
 
 /**
  *  Simple data struct for saving discovery info.

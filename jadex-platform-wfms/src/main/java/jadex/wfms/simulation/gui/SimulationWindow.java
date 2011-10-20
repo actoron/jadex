@@ -2,7 +2,7 @@ package jadex.wfms.simulation.gui;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MParameter;
-import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.collection.TreeNode;
 import jadex.commons.gui.SGUI;
 import jadex.wfms.gui.images.SImage;

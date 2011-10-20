@@ -1,7 +1,7 @@
 package jadex.micro.testcases;
 
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;

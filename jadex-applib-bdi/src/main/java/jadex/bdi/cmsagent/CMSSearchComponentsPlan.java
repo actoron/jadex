@@ -4,7 +4,7 @@ import jadex.base.fipa.CMSSearchComponents;
 import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentDescription;
 
 /**
  *  Search for components.

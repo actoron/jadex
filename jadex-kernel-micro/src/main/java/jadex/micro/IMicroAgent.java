@@ -1,6 +1,6 @@
 package jadex.micro;
 
-import jadex.bridge.MessageType;
+import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.IFuture;
 
 import java.util.Map;

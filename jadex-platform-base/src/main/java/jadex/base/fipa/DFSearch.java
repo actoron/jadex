@@ -2,6 +2,7 @@ package jadex.base.fipa;
 
 
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.service.types.df.IDFComponentDescription;
 
 import java.util.ArrayList;
 import java.util.List;

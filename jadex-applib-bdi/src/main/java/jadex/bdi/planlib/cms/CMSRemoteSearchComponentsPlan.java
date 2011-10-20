@@ -5,8 +5,8 @@ import jadex.base.fipa.Done;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.service.types.cms.IComponentDescription;
 
 /**
  *  Search for components on a remote platform.

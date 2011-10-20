@@ -1,8 +1,8 @@
 package jadex.base.service.awareness.discovery;
 
-import jadex.base.service.awareness.AwarenessInfo;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;

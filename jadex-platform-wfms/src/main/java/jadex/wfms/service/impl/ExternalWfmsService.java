@@ -2,9 +2,9 @@ package jadex.wfms.service.impl;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.ICommand;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;

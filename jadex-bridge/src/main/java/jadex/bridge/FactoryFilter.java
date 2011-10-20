@@ -1,5 +1,6 @@
 package jadex.bridge;
 
+import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;

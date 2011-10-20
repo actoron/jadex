@@ -1,7 +1,7 @@
 package jadex.tools.libtool;
 
 import jadex.bridge.service.IService;
-import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

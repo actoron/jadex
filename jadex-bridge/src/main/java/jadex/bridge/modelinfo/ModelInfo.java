@@ -4,7 +4,6 @@ import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.library.ILibraryService;
 import jadex.commons.SUtil;
 
 import java.util.ArrayList;

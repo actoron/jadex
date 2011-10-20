@@ -2,7 +2,7 @@ package jadex.wfms.guicomponents;
 
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.IFuture;
 import jadex.wfms.service.IExternalWfmsService;
 

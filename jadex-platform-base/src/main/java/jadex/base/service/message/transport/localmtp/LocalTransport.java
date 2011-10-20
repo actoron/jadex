@@ -2,10 +2,10 @@ package jadex.base.service.message.transport.localmtp;
 
 import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IMessageService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

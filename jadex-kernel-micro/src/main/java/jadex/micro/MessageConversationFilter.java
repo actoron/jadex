@@ -1,8 +1,8 @@
 package jadex.micro;
 
 import jadex.bridge.IMessageAdapter;
-import jadex.bridge.MessageType;
-import jadex.bridge.MessageType.ParameterSpecification;
+import jadex.bridge.service.types.message.MessageType;
+import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
 import jadex.commons.IFilter;
 
 import java.util.Map;

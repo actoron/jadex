@@ -1,16 +1,16 @@
 package jadex.standalone;
 
-import jadex.base.fipa.IDF;
-import jadex.base.service.deployment.IDeploymentService;
-import jadex.base.service.simulation.ISimulationService;
-import jadex.bridge.IComponentFactory;
-import jadex.bridge.IComponentFactoryExtensionService;
-import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IMessageService;
-import jadex.bridge.ISettingsService;
-import jadex.bridge.service.clock.IClockService;
-import jadex.bridge.service.execution.IExecutionService;
-import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.deployment.IDeploymentService;
+import jadex.bridge.service.types.df.IDF;
+import jadex.bridge.service.types.execution.IExecutionService;
+import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.IComponentFactoryExtensionService;
+import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.concurrent.IThreadPool;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;

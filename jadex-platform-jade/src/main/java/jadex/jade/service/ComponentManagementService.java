@@ -1,12 +1,12 @@
 package jadex.jade.service;
 
-import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentAdapterFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

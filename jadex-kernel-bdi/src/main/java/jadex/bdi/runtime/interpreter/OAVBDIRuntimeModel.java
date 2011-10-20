@@ -5,7 +5,7 @@ import jadex.bdi.runtime.IExternalCondition;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.clock.ITimer;
+import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.IResultCommand;
 import jadex.commons.future.IResultListener;
 import jadex.rules.state.OAVAttributeType;
@@ -13,11 +13,7 @@ import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 
-/* $if !android $ */
 import java.beans.PropertyChangeListener;
-/* $else $
-import javaa.beans.PropertyChangeListener;
-$endif $ */
 import java.util.HashMap;
 import java.util.Map;
 

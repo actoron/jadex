@@ -1,6 +1,6 @@
 package jadex.micro;
 
-import jadex.bridge.IComponentFactory;
+import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.NameValue;

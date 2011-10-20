@@ -2,10 +2,10 @@ package jadex.base.gui.filechooser;
 
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
-import jadex.base.gui.filetree.FileData;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -99,7 +99,7 @@ public class RemoteFileSystemView extends FileSystemView
 			public void customResultAvailable(Object[] res)
 			{
 				FileData[] remfiles = (FileData[])res[0];
-				File[] files = FileData.convertToFiles(remfiles);
+				File[] files = RemoteFile.convertToFiles(remfiles);
 				children.put("roots", files);
 				homedir = new RemoteFile((FileData)res[1]);
 				defaultdir = new RemoteFile((FileData)res[2]);
@@ -451,7 +451,7 @@ public class RemoteFileSystemView extends FileSystemView
 			{
 				public void customResultAvailable(FileData[] remfiles)
 				{
-					File[] files = FileData.convertToFiles(remfiles);
+					File[] files = RemoteFile.convertToFiles(remfiles);
 					children.put("roots", files);
 //					System.out.println("roots: "+SUtil.arrayToString(files));
 					if(chooser!=null)
@@ -673,7 +673,7 @@ public class RemoteFileSystemView extends FileSystemView
 			{
 				public void customResultAvailable(FileData[] remfiles)
 				{
-					RemoteFile[] files = FileData.convertToFiles(remfiles);
+					RemoteFile[] files = RemoteFile.convertToFiles(remfiles);
 //					System.out.println("children: "+dir+" "+SUtil.arrayToString(files));
 					children.put(dir.getAbsolutePath(), files);
 					for(int i=0; i<files.length; i++)

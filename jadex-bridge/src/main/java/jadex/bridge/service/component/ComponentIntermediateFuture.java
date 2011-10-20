@@ -2,13 +2,13 @@ package jadex.bridge.service.component;
 
 import java.util.Collection;
 
-import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.JadexCloner;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;

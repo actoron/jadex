@@ -1,13 +1,13 @@
 package jadex.tools.dfbrowser;
 
 import jadex.base.fipa.DFComponentDescription;
-import jadex.base.fipa.IDF;
-import jadex.base.fipa.IDFComponentDescription;
-import jadex.base.fipa.IDFServiceDescription;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.types.df.IDF;
+import jadex.bridge.service.types.df.IDFComponentDescription;
+import jadex.bridge.service.types.df.IDFServiceDescription;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.Future;

@@ -1,18 +1,18 @@
 package jadex.wfms.service.impl;
 
+import jadex.base.service.library.LibraryService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.library.ILibraryService;
-import jadex.bridge.service.library.ILibraryServiceListener;
-import jadex.bridge.service.library.LibraryService;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;

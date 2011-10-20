@@ -2,13 +2,13 @@ package jadex.base.service.remote.commands;
 
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.IResultSelector;
-import jadex.bridge.service.ISearchManager;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IVisitDecider;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.IResultSelector;
+import jadex.bridge.service.search.ISearchManager;
+import jadex.bridge.service.search.IVisitDecider;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;

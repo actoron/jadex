@@ -4,9 +4,9 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
-import jadex.base.service.awareness.AwarenessInfo;
 import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.MasterSlaveSendHandler;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
 
 /**

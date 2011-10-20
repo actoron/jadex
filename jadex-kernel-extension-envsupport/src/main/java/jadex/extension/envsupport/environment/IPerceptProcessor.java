@@ -1,6 +1,6 @@
 package jadex.extension.envsupport.environment;
 
-import jadex.bridge.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.IPropertyObject;
 
 /**

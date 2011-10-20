@@ -1,12 +1,12 @@
 package jadex.extension.agr;
 
 import jadex.bridge.IComponentChangeEvent;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IExtensionInstance;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.DelegationResultListener;

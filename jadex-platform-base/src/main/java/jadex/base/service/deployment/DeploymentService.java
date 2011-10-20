@@ -1,8 +1,10 @@
 package jadex.base.service.deployment;
 
-import jadex.base.gui.filetree.FileData;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.types.deployment.FileContent;
+import jadex.bridge.service.types.deployment.FileData;
+import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
@@ -180,8 +182,8 @@ public class DeploymentService extends BasicService implements IDeploymentServic
 				len = ((Integer)ws[1]).intValue();
 			}
 			
-			len += filecontent.data.length;
-			fos.write(filecontent.data);
+			len += filecontent.getData().length;
+			fos.write(filecontent.getData());
 			
 			writestreams.put(fileid, new Object[]{fos, new Integer(len)});
 			

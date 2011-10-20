@@ -1,6 +1,6 @@
 package jadex.base.contentcodecs;
 
-import jadex.bridge.IContentCodec;
+import jadex.bridge.service.types.message.IContentCodec;
 /* $if !android $ */
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;

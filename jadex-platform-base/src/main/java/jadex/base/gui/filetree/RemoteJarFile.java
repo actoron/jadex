@@ -1,5 +1,7 @@
 package jadex.base.gui.filetree;
 
+import jadex.bridge.service.types.deployment.FileData;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;

@@ -1,6 +1,6 @@
 package jadex.base.gui.componenttree;
 
-import jadex.bridge.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SUtil;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;

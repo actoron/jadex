@@ -1,8 +1,12 @@
 package jadex.bridge.service;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.clock.IClockService;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
+import jadex.bridge.service.search.IResultSelector;
+import jadex.bridge.service.search.ISearchManager;
+import jadex.bridge.service.search.IVisitDecider;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.Tuple;
 import jadex.commons.collection.Cache;
 import jadex.commons.future.CounterResultListener;

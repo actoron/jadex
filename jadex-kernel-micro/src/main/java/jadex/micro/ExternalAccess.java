@@ -1,7 +1,7 @@
 package jadex.micro;
 
 import jadex.bridge.IComponentStep;
-import jadex.bridge.MessageType;
+import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

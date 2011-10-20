@@ -1,7 +1,7 @@
 package jadex.base.fipa;
 
-import jadex.base.fipa.IDFServiceDescription;
-import jadex.base.fipa.IProperty;
+import jadex.bridge.service.types.df.IDFServiceDescription;
+import jadex.bridge.service.types.df.IProperty;
 
 import java.io.Serializable;
 import java.util.ArrayList;

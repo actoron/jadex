@@ -1,6 +1,6 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.bridge.IContentCodec;
+import jadex.bridge.service.types.message.IContentCodec;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;

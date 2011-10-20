@@ -1,6 +1,6 @@
 package jadex.micro.examples.hunterprey;
 
-import jadex.bridge.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.extension.envsupport.environment.ComponentActionList;
 import jadex.extension.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;

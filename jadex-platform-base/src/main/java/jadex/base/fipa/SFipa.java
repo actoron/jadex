@@ -3,8 +3,11 @@ package jadex.base.fipa;
 import jadex.base.contentcodecs.JadexXMLContentCodec;
 import jadex.base.contentcodecs.NuggetsXMLContentCodec;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
-import jadex.bridge.MessageType;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.df.IDF;
+import jadex.bridge.service.types.df.IDFComponentDescription;
+import jadex.bridge.service.types.df.IDFServiceDescription;
+import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 

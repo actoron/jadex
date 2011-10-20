@@ -1,11 +1,11 @@
 package jadex.bdi.runtime;
 
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.IFuture;
 
 import java.util.logging.Logger;

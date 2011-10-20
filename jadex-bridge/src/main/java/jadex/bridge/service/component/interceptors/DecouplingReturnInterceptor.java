@@ -1,12 +1,12 @@
 package jadex.bridge.service.component.interceptors;
 
-import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.ComponentFuture;
 import jadex.bridge.service.component.ComponentIntermediateFuture;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

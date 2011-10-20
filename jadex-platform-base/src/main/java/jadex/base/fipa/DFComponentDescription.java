@@ -1,8 +1,8 @@
 package jadex.base.fipa;
 
-import jadex.base.fipa.IDFComponentDescription;
-import jadex.base.fipa.IDFServiceDescription;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.df.IDFComponentDescription;
+import jadex.bridge.service.types.df.IDFServiceDescription;
 
 import java.io.Serializable;
 import java.util.ArrayList;

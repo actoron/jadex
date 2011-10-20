@@ -1,21 +1,21 @@
 package jadex.bdi.runtime.impl;
 
-import java.util.Collection;
-
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IInternalService;
-import jadex.bridge.service.IResultSelector;
-import jadex.bridge.service.ISearchManager;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.IVisitDecider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
+import jadex.bridge.service.search.IResultSelector;
+import jadex.bridge.service.search.ISearchManager;
+import jadex.bridge.service.search.IVisitDecider;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+
+import java.util.Collection;
 
 /**
  *  For prefixed access of required services in capability.

@@ -9,6 +9,7 @@ import jadex.base.gui.asynctree.TreePopupListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.Properties;

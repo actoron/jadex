@@ -1,11 +1,11 @@
 package jadex.base.service.awareness.discovery;
 
-import jadex.base.service.awareness.AwarenessInfo;
-import jadex.base.service.awareness.management.IManagementService;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.threadpool.IThreadPoolService;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.bridge.service.types.awareness.IManagementService;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

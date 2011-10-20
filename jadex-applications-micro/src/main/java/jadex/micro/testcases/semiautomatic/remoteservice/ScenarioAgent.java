@@ -2,7 +2,7 @@ package jadex.micro.testcases.semiautomatic.remoteservice;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;
 

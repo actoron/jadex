@@ -1,32 +1,32 @@
 package jadex.kernelbase;
 
-import jadex.bridge.CreationInfo;
-import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentAdapterFactory;
-import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMultiKernelListener;
-import jadex.bridge.IMultiKernelNotifierService;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.library.ILibraryService;
-import jadex.bridge.service.library.ILibraryServiceListener;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
+import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.IFilter;
 import jadex.commons.IResultCommand;
 import jadex.commons.Tuple2;
@@ -39,9 +39,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-/* $if !android $ */
 import jadex.commons.gui.SGUI;
-/* $endif $ */
 
 import java.io.File;
 import java.io.IOException;

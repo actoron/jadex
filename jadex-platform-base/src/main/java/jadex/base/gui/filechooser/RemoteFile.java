@@ -1,6 +1,6 @@
 package jadex.base.gui.filechooser;
 
-import jadex.base.gui.filetree.FileData;
+import jadex.bridge.service.types.deployment.FileData;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -339,6 +339,18 @@ public class RemoteFile extends File
 		return "RemoteFile(filedata="+filedata+")";
 	}
 	
+	/**
+	 *  Convert remote files to files.
+	 */
+	public static RemoteFile[] convertToFiles(FileData[] remfiles)
+	{
+		RemoteFile[] ret = remfiles==null? new RemoteFile[0]: new RemoteFile[remfiles.length];
+		for(int i=0; i<ret.length; i++)
+		{
+			ret[i] = new RemoteFile(remfiles[i]);
+		}
+		return ret;
+	}
 	
 	/**
 	 *  Main for testing.

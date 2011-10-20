@@ -1,6 +1,6 @@
 package jadex.extension.envsupport.environment.space2d;
 
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.IFilter;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.meta.IPropertyMetaDataSet;

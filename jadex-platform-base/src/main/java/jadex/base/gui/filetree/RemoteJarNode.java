@@ -5,6 +5,7 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.CollectionResultListener;

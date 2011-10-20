@@ -1,11 +1,11 @@
 package jadex.base.service.awareness.discovery;
 
-import jadex.base.service.awareness.AwarenessInfo;
 import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

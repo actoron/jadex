@@ -1,5 +1,7 @@
 package jadex.base.fipa;
 
+import jadex.bridge.service.types.df.IDFComponentDescription;
+
 
 
 /**

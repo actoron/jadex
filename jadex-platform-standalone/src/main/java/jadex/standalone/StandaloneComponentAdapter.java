@@ -1,14 +1,14 @@
 package jadex.standalone;
 
 import jadex.base.AbstractComponentAdapter;
-import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.execution.IExecutionService;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.execution.IExecutionService;
+import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;

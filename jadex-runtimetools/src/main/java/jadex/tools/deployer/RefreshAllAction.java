@@ -3,12 +3,12 @@ package jadex.tools.deployer;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.base.gui.filetree.FileData;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.filetree.RootNode;
-import jadex.base.service.deployment.IDeploymentService;
+import jadex.bridge.service.types.deployment.FileData;
+import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.commons.future.Future;
 import jadex.commons.gui.SGUI;
 

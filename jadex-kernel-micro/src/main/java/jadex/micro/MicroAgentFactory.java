@@ -1,9 +1,5 @@
 package jadex.micro;
 
-import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentAdapterFactory;
-import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentFactory;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -12,32 +8,28 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.library.ILibraryService;
-import jadex.bridge.service.library.ILibraryServiceListener;
-import jadex.commons.ICacheableModel;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-/* $if !android $ */
 import jadex.commons.gui.SGUI;
-/* $endif $ */
-import jadex.kernelbase.CacheableKernelModel;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/* $if !android $ */
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
-/* $endif $ */
 
 /**
  *  Factory for creating micro agents.

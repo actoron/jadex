@@ -1,7 +1,6 @@
 package jadex.bdi;
 
 import jadex.bdi.model.editable.IMECapability;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Reference;
 

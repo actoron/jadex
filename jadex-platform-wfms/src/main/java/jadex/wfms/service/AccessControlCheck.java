@@ -2,7 +2,7 @@ package jadex.wfms.service;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceContainer;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.ICommand;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;

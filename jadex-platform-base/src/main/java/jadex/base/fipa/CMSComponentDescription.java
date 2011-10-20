@@ -1,8 +1,8 @@
 package jadex.base.fipa;
 
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.cms.IComponentDescription;
 
 import java.io.Serializable;
 import java.util.LinkedHashSet;

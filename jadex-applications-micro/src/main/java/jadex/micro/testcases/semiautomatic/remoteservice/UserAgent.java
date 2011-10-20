@@ -1,9 +1,9 @@
 package jadex.micro.testcases.semiautomatic.remoteservice;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
-import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;

@@ -1,8 +1,5 @@
 package jadex.kernelbase;
 
-import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentAdapterFactory;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
@@ -12,6 +9,9 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.component.ComponentServiceContainer;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;

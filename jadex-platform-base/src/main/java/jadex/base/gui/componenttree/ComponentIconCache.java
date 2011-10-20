@@ -3,13 +3,13 @@ package jadex.base.gui.componenttree;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.bridge.IComponentFactory;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.component.ComponentFactorySelector;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 

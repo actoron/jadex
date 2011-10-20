@@ -1,11 +1,11 @@
 package jadex.standalone;
 
-import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentAdapterFactory;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 
 /**
  *  Standalone version of the adapter factory.

@@ -3,7 +3,7 @@ package jadex.base.service.message;
 import jadex.base.service.message.MessageService.SendManager;
 import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.MessageType;
+import jadex.bridge.service.types.message.MessageType;
 
 import java.util.ArrayList;
 import java.util.Arrays;

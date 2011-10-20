@@ -1,8 +1,8 @@
 package jadex.base.gui.componenttree;
 
 import jadex.base.gui.asynctree.ITreeNode;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.cms.IComponentDescription;
 
 /**
  *  Interface for all active component tree nodes.

@@ -1,11 +1,11 @@
 package jadex.base.gui.modeltree;
 
 import jadex.base.SComponentFactory;
+import jadex.base.service.library.LibraryService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.library.ILibraryService;
-import jadex.bridge.service.library.LibraryService;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;

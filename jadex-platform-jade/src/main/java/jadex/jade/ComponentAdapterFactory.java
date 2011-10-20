@@ -7,12 +7,12 @@ import jade.wrapper.ControllerException;
 import jade.wrapper.PlatformController;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentAdapter;
-import jadex.bridge.IComponentAdapterFactory;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.jade.service.message.JadexMessageTransportProtocol;
 import jadex.kernelbase.AbstractInterpreter;
 

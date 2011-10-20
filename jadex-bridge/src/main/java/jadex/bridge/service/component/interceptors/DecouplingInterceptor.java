@@ -1,17 +1,17 @@
 package jadex.bridge.service.component.interceptors;
 
-import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.JadexCloner;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;

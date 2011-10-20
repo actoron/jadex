@@ -1,7 +1,7 @@
 package jadex.tools.dfbrowser;
 
-import jadex.base.fipa.IDF;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.types.df.IDF;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

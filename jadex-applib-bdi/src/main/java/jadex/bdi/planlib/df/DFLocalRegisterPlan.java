@@ -1,9 +1,9 @@
 package jadex.bdi.planlib.df;
 
-import jadex.base.fipa.IDF;
-import jadex.base.fipa.IDFComponentDescription;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.df.IDF;
+import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.commons.future.IFuture;
 
 import java.util.Date;

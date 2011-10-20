@@ -1,6 +1,6 @@
 package jadex.base.contentcodecs;
 
-import jadex.bridge.IContentCodec;
+import jadex.bridge.service.types.message.IContentCodec;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 

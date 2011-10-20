@@ -3,6 +3,7 @@ package jadex.base.gui.filetree;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.SUtil;
 
 import java.io.File;

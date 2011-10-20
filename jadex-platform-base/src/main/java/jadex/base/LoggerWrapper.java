@@ -1,6 +1,6 @@
 package jadex.base;
 
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.types.clock.IClockService;
 
 import java.util.Locale;
 import java.util.MissingResourceException;

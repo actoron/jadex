@@ -1,5 +1,7 @@
 package jadex.base.fipa;
 
+import jadex.bridge.service.types.df.IDFComponentDescription;
+
 /**
  * Java class for concept DFRegister of beanynizer_beans_fipa_default ontology.
  */

@@ -1,17 +1,17 @@
 package jadex.base.service.remote;
 
-import jadex.bridge.IComponentAdapter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IRemoteServiceManagementService;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IRequiredServiceFetcher;
-import jadex.bridge.service.IResultSelector;
-import jadex.bridge.service.ISearchManager;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.IVisitDecider;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.IResultSelector;
+import jadex.bridge.service.search.ISearchManager;
+import jadex.bridge.service.search.IVisitDecider;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;

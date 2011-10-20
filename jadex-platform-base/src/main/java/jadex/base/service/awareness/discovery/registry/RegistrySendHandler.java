@@ -1,12 +1,12 @@
 package jadex.base.service.awareness.discovery.registry;
 
-import jadex.base.service.awareness.AwarenessInfo;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.DiscoveryEntry;
 import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.MasterSlaveSendHandler;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;

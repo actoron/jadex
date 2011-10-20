@@ -1,10 +1,10 @@
 package jadex.base.service.awareness.discovery;
 
-import jadex.base.service.awareness.AwarenessInfo;
 import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 

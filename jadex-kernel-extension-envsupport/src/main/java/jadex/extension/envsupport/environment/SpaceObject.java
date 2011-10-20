@@ -2,7 +2,7 @@ package jadex.extension.envsupport.environment;
 
 import jadex.extension.envsupport.MObjectType;
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.IResultListener;

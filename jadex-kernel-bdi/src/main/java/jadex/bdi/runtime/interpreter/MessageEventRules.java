@@ -2,13 +2,13 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bridge.DefaultMessageAdapter;
-import jadex.bridge.IContentCodec;
 import jadex.bridge.IMessageAdapter;
-import jadex.bridge.IMessageService;
-import jadex.bridge.MessageType;
-import jadex.bridge.MessageType.ParameterSpecification;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.message.IContentCodec;
+import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.message.MessageType;
+import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;

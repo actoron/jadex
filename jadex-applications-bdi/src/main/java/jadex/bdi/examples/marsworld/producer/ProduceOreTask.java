@@ -1,7 +1,7 @@
 package jadex.bdi.examples.marsworld.producer;
 
 import jadex.bdi.examples.marsworld.sentry.AnalyzeTargetTask;
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;

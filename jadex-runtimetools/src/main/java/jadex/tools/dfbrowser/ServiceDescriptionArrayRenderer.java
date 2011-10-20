@@ -1,6 +1,6 @@
 package jadex.tools.dfbrowser;
 
-import jadex.base.fipa.IDFServiceDescription;
+import jadex.bridge.service.types.df.IDFServiceDescription;
 
 import java.awt.Component;
 

@@ -1,6 +1,6 @@
 package jadex.bdi.examples.marsworld_classic;
 
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SReflect;
 
 /**

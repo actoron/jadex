@@ -2,8 +2,8 @@ package jadex.micro;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.MessageType;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.IFuture;
 
 import java.util.Map;

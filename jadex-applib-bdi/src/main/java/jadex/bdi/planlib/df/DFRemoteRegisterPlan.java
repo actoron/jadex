@@ -3,11 +3,11 @@ package jadex.bdi.planlib.df;
 import jadex.base.fipa.DFComponentDescription;
 import jadex.base.fipa.DFRegister;
 import jadex.base.fipa.Done;
-import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.df.IDFComponentDescription;
 
 import java.util.Date;
 

@@ -9,10 +9,10 @@ import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.modeltree.RemovePathAction;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ISettingsService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.library.IDependencyResolverService;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
@@ -669,12 +669,12 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		final URL url = SUtil.toURL(((IFileNode)root).getFilePath());
 		
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), IDependencyResolverService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IDependencyResolverService, IResourceIdentifier>(ret)
+		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
 		{
-			public void customResultAvailable(IDependencyResolverService deps)
+			public void customResultAvailable(ILibraryService ls)
 			{
-				deps.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+				ls.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
 			}
 		});
 		

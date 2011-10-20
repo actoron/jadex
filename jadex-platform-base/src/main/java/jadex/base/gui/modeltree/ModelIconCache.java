@@ -15,8 +15,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.library.IDependencyResolverService;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.library.IDependencyService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -217,10 +217,10 @@ public class ModelIconCache implements IIconCache
 //		}
 		
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-		SServiceProvider.getService(exta.getServiceProvider(), IDependencyResolverService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IDependencyResolverService, IResourceIdentifier>(ret)
+		SServiceProvider.getService(exta.getServiceProvider(), IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 		{
-			public void customResultAvailable(IDependencyResolverService deps)
+			public void customResultAvailable(IDependencyService deps)
 			{
 				deps.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
 			}

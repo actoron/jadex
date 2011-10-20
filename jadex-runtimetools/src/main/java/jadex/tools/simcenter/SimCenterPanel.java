@@ -1,11 +1,11 @@
 package jadex.tools.simcenter;
 
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.base.service.simulation.ISimulationService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.TimeFormat;

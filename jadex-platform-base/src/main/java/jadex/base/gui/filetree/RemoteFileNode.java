@@ -5,6 +5,7 @@ import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.deployment.FileData;
 
 import java.util.List;
 

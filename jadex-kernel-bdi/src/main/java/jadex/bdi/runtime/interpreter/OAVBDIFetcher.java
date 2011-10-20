@@ -14,8 +14,8 @@ import jadex.bdi.runtime.impl.flyweights.InternalEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.MessageEventFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanFlyweight;
 import jadex.bdi.runtime.impl.flyweights.PlanbaseFlyweight;
-import jadex.bridge.IComponentAdapter;
-import jadex.bridge.MessageType;
+import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.message.MessageType;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.rules.state.IOAVState;
 

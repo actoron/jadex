@@ -3,6 +3,7 @@ package jadex.base.service.awareness.discovery;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.micro.IPojoMicroAgent;
 
 /**

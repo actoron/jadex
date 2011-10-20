@@ -9,9 +9,9 @@ import javax.xml.namespace.QName;
 import javaxx.xml.namespace.QName;
 $endif $ */
 
-import jadex.bridge.IComponentFactoryExtensionService;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.factory.IComponentFactoryExtensionService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.xml.AccessInfo;

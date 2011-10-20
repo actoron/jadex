@@ -2,7 +2,7 @@ package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bridge.CheckedAction;
-import jadex.bridge.service.clock.ITimedObject;
+import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.commons.SReflect;
 import jadex.rules.rulesystem.IAction;
 import jadex.rules.rulesystem.ICondition;
@@ -19,11 +19,7 @@ import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
 
-/* $if !android $ */
 import java.beans.PropertyChangeListener;
-/* $else $
-import javaa.beans.PropertyChangeListener;
-$endif $ */
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;

@@ -6,7 +6,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.bridge.service.library.IDependencyResolverService;
+import jadex.bridge.service.types.library.IDependencyService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -63,7 +63,7 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
  *  Handler for retrieving dependency information from maven artifacts.
  */
 @Service
-public class MavenDependencyResolverService	implements IDependencyResolverService
+public class MavenDependencyResolverService	implements IDependencyService
 {
 	//-------- attributes --------
 	

@@ -1,9 +1,9 @@
 package jadex.tools.dfbrowser;
 
-import jadex.base.fipa.IDFComponentDescription;
-import jadex.base.fipa.IDFServiceDescription;
-import jadex.base.fipa.IProperty;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.df.IDFComponentDescription;
+import jadex.bridge.service.types.df.IDFServiceDescription;
+import jadex.bridge.service.types.df.IProperty;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;

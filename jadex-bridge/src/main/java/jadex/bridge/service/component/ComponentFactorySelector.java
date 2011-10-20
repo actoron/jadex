@@ -1,10 +1,10 @@
 package jadex.bridge.service.component;
 
 import jadex.bridge.FactoryFilter;
-import jadex.bridge.IComponentFactory;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.BasicResultSelector;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.search.BasicResultSelector;
+import jadex.bridge.service.types.factory.IComponentFactory;
 
 import java.util.Collection;
 import java.util.Map;

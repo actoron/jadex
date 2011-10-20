@@ -3,7 +3,7 @@ package jadex.bdi.testcases.service;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.SServiceProvider;
 
 import java.util.Collection;
 import java.util.Iterator;

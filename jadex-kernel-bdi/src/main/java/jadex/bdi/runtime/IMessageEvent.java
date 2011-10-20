@@ -1,6 +1,6 @@
 package jadex.bdi.runtime;
 
-import jadex.bridge.MessageType;
+import jadex.bridge.service.types.message.MessageType;
 
 
 /**

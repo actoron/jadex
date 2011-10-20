@@ -1,7 +1,7 @@
 package jadex.base.fipa;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.MessageType;
+import jadex.bridge.service.types.message.MessageType;
 
 import java.util.Date;
 import java.util.Map;

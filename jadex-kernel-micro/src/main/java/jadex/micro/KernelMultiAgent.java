@@ -1,7 +1,7 @@
 package jadex.micro;
 
-import jadex.bridge.IComponentFactory;
-import jadex.bridge.IMultiKernelNotifierService;
+import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Component;

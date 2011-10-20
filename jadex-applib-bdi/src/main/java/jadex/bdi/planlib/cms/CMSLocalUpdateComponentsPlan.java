@@ -3,12 +3,12 @@ package jadex.bdi.planlib.cms;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.ICMSComponentListener;
-import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.bridge.service.types.cms.ICMSComponentListener;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 

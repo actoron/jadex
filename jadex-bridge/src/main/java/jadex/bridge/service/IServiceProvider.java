@@ -2,6 +2,9 @@ package jadex.bridge.service;
 
 import java.util.Collection;
 
+import jadex.bridge.service.search.IResultSelector;
+import jadex.bridge.service.search.ISearchManager;
+import jadex.bridge.service.search.IVisitDecider;
 import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;

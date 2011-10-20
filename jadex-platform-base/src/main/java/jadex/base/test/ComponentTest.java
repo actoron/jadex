@@ -1,7 +1,7 @@
 package jadex.base.test;
 
 
-import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 

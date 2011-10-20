@@ -2,6 +2,7 @@ package jadex.base.gui.filetree;
 
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filechooser.RemoteFile;
+import jadex.bridge.service.types.deployment.FileData;
 import jadex.commons.SUtil;
 
 import java.io.File;

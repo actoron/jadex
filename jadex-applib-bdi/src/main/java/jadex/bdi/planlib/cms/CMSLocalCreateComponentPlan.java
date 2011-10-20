@@ -1,9 +1,9 @@
 package jadex.bdi.planlib.cms;
 
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 
 import java.util.Map;

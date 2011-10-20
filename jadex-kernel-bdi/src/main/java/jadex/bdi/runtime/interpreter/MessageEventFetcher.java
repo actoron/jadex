@@ -1,7 +1,7 @@
 package jadex.bdi.runtime.interpreter;
 
 import jadex.bridge.IMessageAdapter;
-import jadex.bridge.MessageType;
+import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
 import jadex.rules.state.IOAVState;
 

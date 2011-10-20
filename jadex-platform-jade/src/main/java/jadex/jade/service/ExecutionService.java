@@ -2,7 +2,7 @@ package jadex.jade.service;
 
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.execution.IExecutionService;
+import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;

@@ -1,8 +1,8 @@
 package jadex.base.service.settings;
 
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.ISettingsService;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.future.CounterResultListener;
