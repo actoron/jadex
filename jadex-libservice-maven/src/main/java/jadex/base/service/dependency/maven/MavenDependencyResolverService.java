@@ -290,7 +290,12 @@ public class MavenDependencyResolverService	implements IDependencyService
 					}
 					catch(Exception e)
 					{
-						logger.warning("Unable to resolve artifact for Dependency: "+model+", "+deps.get(i));
+						Artifact	art	= SMaven.convertDependency(deps.get(i));
+						IResourceIdentifier	deprid	= new ResourceIdentifier(null,
+							getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion()));	
+						deprid	= loadDependenciesWithAether(deprid, rids);
+						deprids.add(deprid);
+//						logger.warning("Unable to resolve artifact for Dependency: "+model+", "+deps.get(i));
 					}
 				}
 			}
@@ -317,7 +322,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 *  @param rid	The resource identifier containing only a global resource id.
 	 *  @param rids	A map for inserting the dependencies as mapping (parent RID -> list of children RIDs).
 	 */
-	protected void	loadDependenciesWithAether(IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> rids)	throws Exception
+	protected IResourceIdentifier	loadDependenciesWithAether(IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> rids)	throws Exception
 	{
 		Artifact	art	= new DefaultArtifact(rid.getGlobalIdentifier());
 		// Todo: use remote repositories from settings.
@@ -327,6 +332,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 		File	file	= result.getRoot().getDependency().getArtifact().getFile();
 		rid	= new ResourceIdentifier(new Tuple2<IComponentIdentifier, URL>(cid, getUrl(file)), rid.getGlobalIdentifier());
 		processAetherDependencies(rid, rids, result.getRoot());
+		return rid;
 	}
 	
 	/**
