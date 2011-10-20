@@ -586,7 +586,8 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 			Set<IResourceIdentifier> mysup = ridsupport.get(rid);
 			if(mysup==null)
 			{
-				ridsupport.put(rid, new HashSet<IResourceIdentifier>());
+				mysup = new HashSet<IResourceIdentifier>();
+				ridsupport.put(rid, mysup);
 			}
 			mysup.add(support);
 		}
@@ -610,7 +611,6 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 			{
 				throw new RuntimeException("No support found: "+ridsupport);
 			}
-			mysup.add(support);
 		}
 	}
 	

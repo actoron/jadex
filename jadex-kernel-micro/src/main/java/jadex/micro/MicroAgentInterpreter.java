@@ -130,7 +130,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 											{
 												public void customResultAvailable(Object result)
 												{
-		//											System.out.println("initend: "+getComponentAdapter().getComponentIdentifier());
+//													System.out.println("initend: "+getComponentAdapter().getComponentIdentifier());
 													// Init is now finished. Notify cms.
 													inited.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(MicroAgentInterpreter.this, adapter));
 												}
