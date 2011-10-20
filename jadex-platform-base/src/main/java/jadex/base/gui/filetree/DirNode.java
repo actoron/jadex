@@ -30,9 +30,6 @@ public class DirNode extends FileNode
 {
 	//-------- attributes --------
 	
-	/** The filter. */
-	protected IRemoteFilter filter;
-	
 	// hack: should belong to the model
 	/** The factory. */
 	protected INodeFactory factory;
@@ -43,12 +40,11 @@ public class DirNode extends FileNode
 	 *  Create a new service container node.
 	 */
 	public DirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, 
-		IIconCache iconcache, IRemoteFilter filter, INodeFactory factory)
+		IIconCache iconcache, INodeFactory factory)
 	{
 		super(parent, model, tree, file, iconcache);
 		
 //		assert file.isDirectory(): file;
-		this.filter = filter;
 		this.factory = factory;
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 	}
@@ -89,7 +85,7 @@ public class DirNode extends FileNode
 					else
 					{
 //						lis.resultAvailable(ModelTreePanel.createNode(DirNode.this, model, tree, file, iconcache, filter, null));
-						nodes.add(factory.createNode(DirNode.this, model, tree, file, iconcache, filter, null, factory));
+						nodes.add(factory.createNode(DirNode.this, model, tree, file, iconcache, null, factory));
 					}
 				}
 
@@ -112,6 +108,7 @@ public class DirNode extends FileNode
 //			System.out.println("name: "+toString()+" files length: "+files.length);
 			for(int i=0; i<files.length; i++)
 			{
+				IRemoteFilter	filter	= factory.getFileFilter();
 				if(filter==null)
 				{
 					lis.resultAvailable(files[i]);

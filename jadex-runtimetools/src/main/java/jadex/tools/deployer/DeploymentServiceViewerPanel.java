@@ -4,10 +4,12 @@ import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.base.gui.filetree.DefaultFileFilter;
 import jadex.base.gui.filetree.DefaultFileFilterMenuItemConstructor;
+import jadex.base.gui.filetree.DefaultNodeFactory;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.deployment.IDeploymentService;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.Properties;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.PopupBuilder;
@@ -48,11 +50,16 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 		
 		ftp = new FileTreePanel(exta, remote, true);
 		RefreshAllAction	ra	= new RefreshAllAction(ftp, service);
-		DefaultFileFilterMenuItemConstructor mic = new DefaultFileFilterMenuItemConstructor(ftp.getModel());
+		final DefaultFileFilterMenuItemConstructor mic = new DefaultFileFilterMenuItemConstructor(ftp.getModel());
 		ftp.setPopupBuilder(new PopupBuilder(new Object[]{ra, mic}));
 		ftp.setMenuItemConstructor(mic);
-		DefaultFileFilter ff = new DefaultFileFilter(mic);
-		ftp.setFileFilter(ff);
+		ftp.setNodeFactory(new DefaultNodeFactory()
+		{
+			public IRemoteFilter getFileFilter()
+			{
+				return new DefaultFileFilter(mic);
+			}
+		});
 		ftp.addNodeHandler(new DefaultNodeHandler(ftp.getTree()));
 		if(nodehandler!=null)
 			ftp.addNodeHandler(nodehandler);

@@ -15,6 +15,11 @@ public interface INodeFactory
 	/**
 	 *  Create a new component node.
 	 */
-	public ITreeNode createNode(ITreeNode parent, AsyncTreeModel model, JTree tree, Object value, 
-		IIconCache iconcache, IRemoteFilter filter, IExternalAccess exta, INodeFactory factory);
+	public ITreeNode	createNode(ITreeNode parent, AsyncTreeModel model, JTree tree, Object value, 
+		IIconCache iconcache, IExternalAccess exta, INodeFactory factory);
+	
+	/**
+	 *  Get the current file filter.
+	 */
+	public IRemoteFilter	getFileFilter();
 }

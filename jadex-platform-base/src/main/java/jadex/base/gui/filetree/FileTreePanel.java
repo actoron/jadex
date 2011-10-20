@@ -72,13 +72,9 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	/** The iconcache. */
 	protected DelegationIconCache iconcache;
 	
-	
 	/** The node factory. */
 	protected INodeFactory factory;
 	
-	/** The filter. */
-	protected DelegationFilter filefilter;
-
 	/** Popup rightclick. */
 	protected PopupBuilder pubuilder;
 	
@@ -108,9 +104,14 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		this.model	= new AsyncTreeModel();
 		this.tree	= new JTree(model);
 		this.expansionhandler = new ExpansionHandler(tree);
-		this.filefilter = new DelegationFilter();
 		this.iconcache = new DelegationIconCache();
-		this.factory = new DefaultNodeFactory();
+		setNodeFactory(new DefaultNodeFactory()
+		{
+			public IRemoteFilter getFileFilter()
+			{
+				return IRemoteFilter.ALWAYS;
+			}
+		});
 		
 		tree.setCellRenderer(new AsyncTreeCellRenderer());
 		tree.addMouseListener(new TreePopupListener());
@@ -202,15 +203,6 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	public boolean isRemote()
 	{
 		return remote;
-	}
-
-	/**
-	 *  Set the file filter.
-	 *  @param filefilter The file filter.
-	 */
-	public void setFileFilter(IRemoteFilter filefilter)
-	{
-		this.filefilter.setFilter(filefilter);
 	}
 	
 	/**
@@ -325,7 +317,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		
 		RootNode root = (RootNode)getModel().getRoot();
 		ITreeNode node = factory.createNode(root, model, tree, file, 
-			iconcache, filefilter, exta, factory);
+			iconcache, exta, factory);
 		addNode(node);
 	}
 	
@@ -338,7 +330,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 		
 		final RootNode root = (RootNode)getModel().getRoot();
 		ITreeNode node = factory.createNode(root, model, tree, file, 
-			iconcache, filefilter, exta, factory);
+			iconcache, exta, factory);
 		addNode(node);
 	}
 	
@@ -478,7 +470,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 						{
 							for(int i=0; i<entries.length; i++)
 							{
-								ITreeNode node = factory.createNode(root, model, tree, new File(entries[i]), iconcache, filefilter, exta, factory);
+								ITreeNode node = factory.createNode(root, model, tree, new File(entries[i]), iconcache, exta, factory);
 								addNode(node);
 							}
 							rootdone.setResult(null);
@@ -503,7 +495,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 								{
 									for(int i=0; i<entries.length; i++)
 									{
-										ITreeNode node = factory.createNode(root, model, tree, entries[i], iconcache, filefilter, exta, factory);
+										ITreeNode node = factory.createNode(root, model, tree, entries[i], iconcache, exta, factory);
 										addNode(node);
 									}
 									rootdone.setResult(null);
@@ -609,10 +601,15 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 	{
 		JFrame f =  new JFrame();
 		FileTreePanel ftp = new FileTreePanel(null);
-		DefaultFileFilterMenuItemConstructor mic = new DefaultFileFilterMenuItemConstructor(new String[]{".doc"}, ftp.getModel());
+		final DefaultFileFilterMenuItemConstructor mic = new DefaultFileFilterMenuItemConstructor(new String[]{".doc"}, ftp.getModel());
 		ftp.setPopupBuilder(new PopupBuilder(new Object[]{mic}));
-		DefaultFileFilter ff = new DefaultFileFilter(mic);
-		ftp.setFileFilter(ff);
+		ftp.setNodeFactory(new DefaultNodeFactory()
+		{
+			public IRemoteFilter getFileFilter()
+			{
+				return new DefaultFileFilter(mic);
+			}
+		});
 		ftp.addNodeHandler(new DefaultNodeHandler(ftp.getTree()));
 		ftp.addTopLevelNode(new File("c:/"));
 		f.add(new JScrollPane(ftp), BorderLayout.CENTER);

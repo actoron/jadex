@@ -32,9 +32,6 @@ public class RemoteDirNode extends RemoteFileNode
 {
 	//-------- attributes --------
 	
-	/** The filter. */
-	protected IRemoteFilter filter;
-	
 	// hack: should belong to the model
 	/** The factory. */
 	protected INodeFactory factory;
@@ -45,10 +42,9 @@ public class RemoteDirNode extends RemoteFileNode
 	 *  Create a new service container node.
 	 */
 	public RemoteDirNode(ITreeNode parent, AsyncTreeModel model, JTree tree, FileData file, 
-		IIconCache iconcache, IRemoteFilter filter, IExternalAccess exta, INodeFactory factory)
+		IIconCache iconcache, IExternalAccess exta, INodeFactory factory)
 	{
 		super(parent, model, tree, file, iconcache, exta);
-		this.filter = filter;
 		this.factory = factory;
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 	}
@@ -88,7 +84,7 @@ public class RemoteDirNode extends RemoteFileNode
 						else
 						{
 							lis.resultAvailable(factory.createNode(RemoteDirNode.this, model, tree, 
-								file, iconcache, filter, exta, factory));
+								file, iconcache, exta, factory));
 						}
 					}
 				}
@@ -145,7 +141,7 @@ public class RemoteDirNode extends RemoteFileNode
 		else
 		{
 			final FileData myfile = file;
-			final IRemoteFilter myfilter = filter;
+			final IRemoteFilter myfilter = factory.getFileFilter();
 			exta.scheduleStep(new IComponentStep<Collection>()
 			{
 				@XMLClassname("listFiles")

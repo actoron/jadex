@@ -1,20 +1,19 @@
 package jadex.base.gui.modeltree;
 
 import jadex.base.SComponentFactory;
-import jadex.base.service.library.LibraryService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.io.File;
+import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Filter for Jadex component models. 
@@ -29,10 +28,10 @@ public class ModelFileFilter implements IRemoteFilter
 	protected boolean all;
 	
 	/** The list of selected component names. */
-	protected List selectedcomponents;
+	protected List<String> selectedcomponents;
 	
-	/** The menu item constructor. */
-	protected ModelFileFilterMenuItemConstructor filtercon;
+	/** The resource identifiers of the tree's root entries. */
+	protected Map<URL, IResourceIdentifier>	rids;
 	
 	/** The external access. */
 	protected IExternalAccess exta;
@@ -50,9 +49,11 @@ public class ModelFileFilter implements IRemoteFilter
 	/**
 	 *  Create a new filter.
 	 */
-	public ModelFileFilter(ModelFileFilterMenuItemConstructor filtercon, IExternalAccess exta)
+	public ModelFileFilter(ModelFileFilterMenuItemConstructor filtercon, Map<URL, IResourceIdentifier> rids, IExternalAccess exta)
 	{
-		this.filtercon = filtercon;
+		this.all	= filtercon.isAll();
+		this.selectedcomponents	=  filtercon.getSelectedComponentTypes();
+		this.rids	= rids;
 		this.exta = exta;
 	}
 
@@ -73,33 +74,23 @@ public class ModelFileFilter implements IRemoteFilter
 	 */
 	public boolean isAll()
 	{
-		boolean ret;
-		if(filtercon!=null)
-			ret = filtercon.isAll();
-		else
-			ret = all;
-		return ret;
+		return all;
 	}
 
 	/**
 	 *  Get the list of selected components.
 	 *  @return The list of components.
 	 */
-	public List getSelectedComponents()
+	public List<String> getSelectedComponents()
 	{
-		List ret;
-		if(filtercon!=null)
-			ret = filtercon.getSelectedComponentTypes();
-		else
-			ret = selectedcomponents;
-		return ret;
+		return selectedcomponents;
 	}
 
 	/**
 	 *  Set the list of selected components.
 	 *  @param selectedcomponents The list of selcted components.
 	 */
-	public void setSelectedComponents(List selectedcomponents)
+	public void setSelectedComponents(List<String> selectedcomponents)
 	{
 		this.selectedcomponents = selectedcomponents;
 	}
@@ -140,24 +131,25 @@ public class ModelFileFilter implements IRemoteFilter
 			}
 			else
 			{
-				SServiceProvider.getServiceUpwards(exta.getServiceProvider(), ILibraryService.class)
-					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Boolean>(ret)
+				URL	furl	= SUtil.toURL(file.getAbsolutePath());
+				IResourceIdentifier	rid	= null;
+				for(Iterator<URL> it=rids.keySet().iterator(); rid==null && it.hasNext(); )
 				{
-					public void customResultAvailable(ILibraryService libservice)
+					URL	url	= it.next();
+					if(furl.toString().startsWith(url.toString()))
 					{
-						libservice.getResourceIdentifier(SUtil.toURL(file.getAbsolutePath())).addResultListener(
-							new ExceptionDelegationResultListener<IResourceIdentifier, Boolean>(ret)
-						{
-							public void customResultAvailable(IResourceIdentifier rid)
-							{
-//								IResourceIdentifier rid = libservice.getResourceIdentifier(file.getAbsolutePath());
-								SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
-									.addResultListener(new DelegationResultListener<Boolean>(ret));
-							}
-						});
-						
+						rid	= rids.get(url);
 					}
-				});
+				}
+				
+				if(rid==null)
+				{
+					// Shouldn't happen!?
+					System.out.println("no rid fur url: "+furl+", "+rids);
+				}
+				
+				SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
+					.addResultListener(new DelegationResultListener<Boolean>(ret));
 			}
 		}
 		else

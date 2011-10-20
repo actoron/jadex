@@ -5,6 +5,7 @@ import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentFactory;
@@ -18,6 +19,7 @@ import jadex.commons.gui.IMenuItemConstructor;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -106,9 +108,9 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 	 *  Get all selected component types.
 	 *  @return A list of component types.
 	 */
-	public List getSelectedComponentTypes()
+	public List<String> getSelectedComponentTypes()
 	{
-		List ret = new ArrayList();
+		List<String> ret = new ArrayList<String>();
 		
 //		if(!isAll())
 		{
@@ -338,4 +340,6 @@ public class ModelFileFilterMenuItemConstructor implements IMenuItemConstructor,
 		}
 		return IFuture.DONE;
 	}
+	
+	
 }

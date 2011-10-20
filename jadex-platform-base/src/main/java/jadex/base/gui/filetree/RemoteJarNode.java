@@ -33,9 +33,9 @@ public class RemoteJarNode extends RemoteDirNode
 	 *  Create a new jar node.
 	 */
 	public RemoteJarNode(ITreeNode parent, AsyncTreeModel model, JTree tree, FileData file, 
-		IIconCache iconcache, IRemoteFilter filter, IExternalAccess exta, INodeFactory factory)
+		IIconCache iconcache, IExternalAccess exta, INodeFactory factory)
 	{
-		super(parent, model, tree, file, iconcache, filter, exta, factory);
+		super(parent, model, tree, file, iconcache, exta, factory);
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 	}
 	
@@ -49,7 +49,7 @@ public class RemoteJarNode extends RemoteDirNode
 		Future ret = new Future();
 		
 		final FileData myfile = file;
-		final IRemoteFilter myfilter = filter;
+		final IRemoteFilter myfilter = factory.getFileFilter();
 		exta.scheduleStep(new IComponentStep<Collection>()
 		{
 			@XMLClassname("listFiles")

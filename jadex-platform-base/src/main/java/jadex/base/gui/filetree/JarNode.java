@@ -18,9 +18,9 @@ public class JarNode extends DirNode
 	/**
 	 *  Create a new service container node.
 	 */
-	public JarNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, IIconCache iconcache, IRemoteFilter filter, INodeFactory factory)
+	public JarNode(ITreeNode parent, AsyncTreeModel model, JTree tree, File file, IIconCache iconcache, INodeFactory factory)
 	{
-		super(parent, model, tree, file instanceof JarAsDirectory? file: new JarAsDirectory(file.getPath()), iconcache, filter, factory);
+		super(parent, model, tree, file instanceof JarAsDirectory? file: new JarAsDirectory(file.getPath()), iconcache, factory);
 //		System.out.println("node: "+getClass()+" "+desc.getName());
 	}
 	

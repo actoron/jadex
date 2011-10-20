@@ -4,7 +4,6 @@ import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.deployment.FileData;
-import jadex.commons.IRemoteFilter;
 import jadex.commons.SUtil;
 
 import java.io.File;
@@ -14,7 +13,7 @@ import javax.swing.JTree;
 /** 
  *  Default factory for creating nodes.
  */
-public class DefaultNodeFactory implements INodeFactory
+public abstract class DefaultNodeFactory implements INodeFactory
 {
 	//-------- methods --------
 	
@@ -22,7 +21,7 @@ public class DefaultNodeFactory implements INodeFactory
 	 *  Create a new component node.
 	 */
 	public ITreeNode createNode(ITreeNode parent, AsyncTreeModel model, JTree tree,
-		Object value, IIconCache iconcache, IRemoteFilter filter, IExternalAccess exta, INodeFactory factory)
+		Object value, IIconCache iconcache, IExternalAccess exta, INodeFactory factory)
 	{
 		ITreeNode ret = null;
 		
@@ -31,11 +30,11 @@ public class DefaultNodeFactory implements INodeFactory
 			File file = (File)value;
 			if(SUtil.arrayToSet(File.listRoots()).contains(file) || file.isDirectory())
 			{
-				ret = new DirNode(parent, model, tree, file, iconcache, filter, factory);
+				ret = new DirNode(parent, model, tree, file, iconcache, factory);
 			}
 			else if(file.getName().endsWith(".jar") || file.getName().endsWith(".zip"))
 			{
-				ret = new JarNode(parent, model, tree, file, iconcache, filter, factory);
+				ret = new JarNode(parent, model, tree, file, iconcache, factory);
 			}
 			else
 			{
@@ -47,11 +46,11 @@ public class DefaultNodeFactory implements INodeFactory
 			FileData file = (FileData)value;
 			if(file.isDirectory())
 			{
-				ret = new RemoteDirNode(parent, model, tree, file, iconcache, filter, exta, factory);
+				ret = new RemoteDirNode(parent, model, tree, file, iconcache, exta, factory);
 			}
 			else if(file.getFilename().endsWith(".jar") || file.getFilename().endsWith(".zip"))
 			{
-				ret = new RemoteJarNode(parent, model, tree, file, iconcache, filter, exta, factory);
+				ret = new RemoteJarNode(parent, model, tree, file, iconcache, exta, factory);
 			}
 			else
 			{

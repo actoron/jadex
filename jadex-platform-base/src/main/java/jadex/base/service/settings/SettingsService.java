@@ -87,13 +87,7 @@ public class SettingsService extends BasicService implements ISettingsService
 		{
 			public void customResultAvailable(Object result)
 			{
-				loadProperties().addResultListener(access.createResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						super.customResultAvailable(getServiceIdentifier());
-					}
-				}));
+				loadProperties().addResultListener(access.createResultListener(new DelegationResultListener(ret)));
 			}
 		}));
 		return ret;

@@ -15,6 +15,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 import java.lang.reflect.Proxy;
@@ -215,18 +216,24 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			{
 				allservices.addAll((Collection)it.next());
 			}
-			CounterResultListener	crl	= new CounterResultListener(allservices.size(), new DelegationResultListener(ret))
-			{
-				public void intermediateResultAvailable(Object result)
-				{
-					getLogger().info("Started service: "+result);
-				}
-			};
+			final CounterResultListener	crl	= new CounterResultListener(allservices.size(), new DelegationResultListener(ret));
 			for(Iterator it=allservices.iterator(); it.hasNext(); )
 			{
-				IInternalService	is	= (IInternalService)it.next();
+				final IInternalService	is	= (IInternalService)it.next();
 				getLogger().info("Starting service: "+is.getServiceIdentifier());
-				is.startService().addResultListener(crl);
+				is.startService().addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						getLogger().info("Started service: "+is.getServiceIdentifier());
+						crl.resultAvailable(result);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						crl.exceptionOccurred(exception);
+					}
+				});
 			}
 		}
 		else

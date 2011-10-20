@@ -273,13 +273,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 							{
 								ISettingsService	settings	= (ISettingsService)result;
 								settings.registerPropertiesProvider("clockservice", ClockService.this)
-									.addResultListener(new DelegationResultListener(ret)
-								{
-									public void customResultAvailable(Object result)
-									{
-										super.customResultAvailable(getServiceIdentifier());
-									}
-								});
+									.addResultListener(new DelegationResultListener(ret));
 							}
 							
 							public void exceptionOccurred(Exception exception)

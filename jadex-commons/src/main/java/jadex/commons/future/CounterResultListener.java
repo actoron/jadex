@@ -3,7 +3,6 @@ package jadex.commons.future;
 
 /**
  *  Counter result listener for counting a specified number of resultAvailable calls.
- *  On each call the custom
  */
 public class CounterResultListener<E> implements IResultListener<E>
 {
@@ -16,7 +15,7 @@ public class CounterResultListener<E> implements IResultListener<E>
 	protected int cnt;
 	
 	/** The delegate result listener. */
-	protected IResultListener<E> delegate;
+	protected IResultListener<Void> delegate;
 	
 	/** Flag to indicate that the delegate already has been notified. */
 	protected boolean notified;
@@ -30,7 +29,7 @@ public class CounterResultListener<E> implements IResultListener<E>
 	 *  Create a new counter listener.
 	 *  @param num The number of sub callbacks.
 	 */
-	public CounterResultListener(int num, IResultListener<E> delegate)
+	public CounterResultListener(int num, IResultListener<Void> delegate)
 	{
 		this(num, false, delegate);
 	}
@@ -39,7 +38,7 @@ public class CounterResultListener<E> implements IResultListener<E>
 	 *  Create a new counter listener.
 	 *  @param num The number of sub callbacks.
 	 */
-	public CounterResultListener(int num, boolean ignorefailures, IResultListener<E> delegate)
+	public CounterResultListener(int num, boolean ignorefailures, IResultListener<Void> delegate)
 	{
 		this.num = num;
 		this.ignorefailures = ignorefailures;
@@ -76,7 +75,7 @@ public class CounterResultListener<E> implements IResultListener<E>
 		{
 //			System.out.println("!!!");
 			intermediateResultAvailable(result);
-			delegate.resultAvailable(result);
+			delegate.resultAvailable(null);
 		}
 		else if(!notified)
 		{

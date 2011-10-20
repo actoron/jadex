@@ -2,6 +2,7 @@ package jadex.base.gui.modeltree;
 
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.filetree.DefaultNodeFactory;
 import jadex.base.gui.filetree.DefaultNodeHandler;
 import jadex.base.gui.filetree.FileTreePanel;
 import jadex.base.gui.filetree.IFileNode;
@@ -17,8 +18,11 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IMultiKernelNotifierService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.commons.IRemoteFilter;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -28,6 +32,7 @@ import jadex.xml.annotation.XMLClassname;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +60,9 @@ public class ModelTreePanel extends FileTreePanel
 	/** The local external access. */
 	protected IExternalAccess localexta;
 	
+	/** The root entries. */
+	protected Map<URL, IResourceIdentifier>	rootentries;
+	
 //	/** The jcc. */
 //	protected IControlCenter jcc;
 	
@@ -77,12 +85,17 @@ public class ModelTreePanel extends FileTreePanel
 		super(exta, remote, false);
 		this.localexta = localexta;
 		actions = new HashMap();
+		this.rootentries	= new LinkedHashMap<URL, IResourceIdentifier>();
 		
-		ModelFileFilterMenuItemConstructor mic = new ModelFileFilterMenuItemConstructor(getModel(), exta);
-		ModelFileFilter ff = new ModelFileFilter(mic, exta);
+		final ModelFileFilterMenuItemConstructor mic = new ModelFileFilterMenuItemConstructor(getModel(), exta);
+		setNodeFactory(new DefaultNodeFactory()
+		{
+			public IRemoteFilter getFileFilter()
+			{
+				return new ModelFileFilter(mic, getRootEntries(), exta);
+			}
+		});
 		ModelIconCache ic = new ModelIconCache(exta, getTree());
-		
-		setFileFilter(ff);
 		setMenuItemConstructor(mic);
 		actions.put(CollapseAllAction.getName(), new CollapseAllAction(this));
 		actions.put(AddPathAction.getName(), remote ? new AddRemotePathAction(this) : new AddPathAction(this));
@@ -209,83 +222,43 @@ public class ModelTreePanel extends FileTreePanel
 			final String filepath = ((IFileNode)node).getFilePath();
 			final String filename = filepath.startsWith("file:") || filepath.startsWith("jar:file:")
 				? filepath : "file:"+filepath;
-			exta.scheduleStep(new IComponentStep<List<Exception>>()
+			final URL	url	= SUtil.toURL(filepath);
+			exta.scheduleStep(new IComponentStep<IResourceIdentifier>()
 			{
-				@XMLClassname("maybe_addurl")
-				public IFuture<List<Exception>> execute(IInternalAccess ia)
+				@XMLClassname("addurl")
+				public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
 				{
-					final Future<List<Exception>>	ret	= new Future<List<Exception>>();
+					final Future<IResourceIdentifier>	ret	= new Future<IResourceIdentifier>();
 					IFuture<ILibraryService>	libfut	= SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-					libfut.addResultListener(new DefaultResultListener<ILibraryService>()
+					libfut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
 					{
-						public void resultAvailable(final ILibraryService ls)
+						public void customResultAvailable(final ILibraryService ls)
 						{
-							ls.getAllURLs().addResultListener(new DefaultResultListener<List<URL>>()
-							{
-								public void resultAvailable(List<URL> urls)
-								{
-									List<String> urlstrings	= new ArrayList<String>();
-									List<Exception> exceptions = new ArrayList<Exception>();
-									for(int i=0; i<urls.size(); i++)
-									{
-										try
-										{
-											urlstrings.add(((URL)urls.get(i)).toURI().toString());
-										}
-										catch(Exception e)
-										{
-											exceptions.add(e);
-//											e.printStackTrace();
-										}
-									}
-									
-									if(LibraryService.indexOfFilename(filename, urlstrings)==-1)
-									{
-//										System.out.println("Need to add path: "+filename);
-										try
-										{
-											ls.addURL(SUtil.toURL(filepath));
-										}
-										catch(Exception e)
-										{
-											exceptions.add(e);
-//											e.printStackTrace();
-										}
-									}
-									
-									ret.setResult(exceptions);
-								}
-							});
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							List<Exception> exceptions = new ArrayList<Exception>();
-							exceptions.add(exception);
-							ret.setResult(exceptions);
+							ls.addURL(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
 						}
 					});
 					
 					return ret;
 				}
-			}).addResultListener(new SwingDefaultResultListener<List<Exception>>()
+			}).addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
 			{
-				public void customResultAvailable(final List<Exception> exs) 
+				public void customResultAvailable(IResourceIdentifier rid) 
 				{
 					ModelTreePanel.super.addNode(node);
-					
+					// Todo: remove entries on remove.
+					rootentries.put(url, rid);
+				}
+				public void customExceptionOccurred(final Exception exception)
+				{
 					localexta.scheduleStep(new IComponentStep<Void>()
 					{
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							for(int i=0; i<exs.size(); i++)
-							{
-								ia.getLogger().warning(exs.get(i).toString());
-							}
+							ia.getLogger().warning(exception.toString());
 							return IFuture.DONE;
 						}
-					});
-				};
+					});					
+				}
 			});
 		}
 		else
@@ -342,5 +315,13 @@ public class ModelTreePanel extends FileTreePanel
 			});
 		}
 		super.dispose();
+	}
+	
+	/**
+	 *  Get the root entries of the tree.
+	 */
+	public Map<URL, IResourceIdentifier>	getRootEntries()
+	{
+		return rootentries;
 	}
 }

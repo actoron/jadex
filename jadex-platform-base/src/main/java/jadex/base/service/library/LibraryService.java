@@ -5,7 +5,6 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Excluded;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -293,20 +292,27 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 *  Add a new url.
 	 *  @param url The resource identifier.
 	 */
-	public IFuture<Void> addURL(final URL url)
+	public IFuture<IResourceIdentifier> addURL(final URL url)
 	{
-		final Future<Void> ret = new Future<Void>();
+		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		SServiceProvider.getService(provider, IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, Void>(ret)
+			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
 			{
 				drs.getResourceIdentifier(url).addResultListener(
-					new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
+					new DelegationResultListener<IResourceIdentifier>(ret)
 				{
-					public void customResultAvailable(IResourceIdentifier result)
+					public void customResultAvailable(final IResourceIdentifier rid)
 					{
-						addResourceIdentifier(result).addResultListener(new DelegationResultListener<Void>(ret));
+						addResourceIdentifier(rid).addResultListener(
+							new ExceptionDelegationResultListener<Void, IResourceIdentifier>(ret)
+						{
+							public void customResultAvailable(Void result)
+							{
+								ret.setResult(rid);
+							}
+						});
 					}
 				});
 			}
@@ -876,30 +882,24 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public IFuture<Void>	startService()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		super.startService().addResultListener(new DelegationResultListener(ret)
+		super.startService().addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 				if(initurls!=null)
 				{
-					CounterResultListener<Void> lis = new CounterResultListener<Void>(initurls.length, new DelegationResultListener(ret)
+					CounterResultListener<IResourceIdentifier> lis = new CounterResultListener<IResourceIdentifier>(initurls.length,
+						new DelegationResultListener<Void>(ret)
 					{
-						public void customResultAvailable(Object result) 
+						public void customResultAvailable(Void result) 
 						{
 							SServiceProvider.getService(provider,ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-								.addResultListener(new DelegationResultListener(ret)
+								.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(ISettingsService settings)
 								{
-									ISettingsService	settings	= (ISettingsService)result;
 									settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
-										.addResultListener(new DelegationResultListener(ret)
-									{
-										public void customResultAvailable(Object result)
-										{
-											super.customResultAvailable(getServiceIdentifier());
-										}
-									});
+										.addResultListener(new DelegationResultListener<Void>(ret));
 								}
 								public void exceptionOccurred(Exception exception)
 								{

@@ -65,7 +65,7 @@ public interface ILibraryService extends IService
 	 *  Add a new url.
 	 *  @param url The url.
 	 */
-	public IFuture<Void> addURL(URL url);
+	public IFuture<IResourceIdentifier> addURL(URL url);
 	
 	/**
 	 *  Remove a url.
