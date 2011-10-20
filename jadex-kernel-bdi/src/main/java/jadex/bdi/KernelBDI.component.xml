@@ -12,6 +12,8 @@
 		<import>jadex.commons.*</import>
 		<import>jadex.commons.future.*</import>
 		<import>jadex.bridge.*</import>
+		<import>jadex.bridge.service.types.factory.*</import>
+		<import>jadex.bridge.service.search.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.bridge.service.threadpool.*</import>
