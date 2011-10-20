@@ -10,7 +10,6 @@ import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -216,31 +215,65 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			{
 				allservices.addAll((Collection)it.next());
 			}
-			final CounterResultListener	crl	= new CounterResultListener(allservices.size(), new DelegationResultListener(ret));
-			for(Iterator it=allservices.iterator(); it.hasNext(); )
-			{
-				final IInternalService	is	= (IInternalService)it.next();
-				getLogger().info("Starting service: "+is.getServiceIdentifier());
-				is.startService().addResultListener(new IResultListener<Void>()
-				{
-					public void resultAvailable(Void result)
-					{
-						getLogger().info("Started service: "+is.getServiceIdentifier());
-						crl.resultAvailable(result);
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						crl.exceptionOccurred(exception);
-					}
-				});
-			}
+			initServices(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
+			
+//			final CounterResultListener	crl	= new CounterResultListener(allservices.size(), new DelegationResultListener(ret));
+//			for(Iterator it=allservices.iterator(); it.hasNext(); )
+//			{
+//				final IInternalService	is	= (IInternalService)it.next();
+//				getLogger().info("Starting service: "+is.getServiceIdentifier());
+//				is.startService().addResultListener(new IResultListener<Void>()
+//				{
+//					public void resultAvailable(Void result)
+//					{
+//						getLogger().info("Started service: "+is.getServiceIdentifier());
+//						crl.resultAvailable(result);
+//					}
+//					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						crl.exceptionOccurred(exception);
+//					}
+//				});
+//			}
 		}
 		else
 		{
 			ret.setResult(null);
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Init the services one by one.
+	 */
+	protected IFuture<Void> initServices(final Iterator<IInternalService> services)
+	{
+		final Future<Void> ret = new Future<Void>();
+		if(services.hasNext())
+		{
+			final IInternalService	is	= services.next();
+			getLogger().info("Starting service: "+is.getServiceIdentifier());
+			is.startService().addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+					getLogger().info("Started service: "+is.getServiceIdentifier());
+					initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					getLogger().warning("Exception in service init : "+is.getServiceIdentifier());
+					initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 		return ret;
 	}
 	
