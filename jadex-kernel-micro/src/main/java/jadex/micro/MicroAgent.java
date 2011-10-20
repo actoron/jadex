@@ -26,6 +26,7 @@ import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -386,16 +387,22 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	/**
 	 *  Kill the agent.
 	 */
-	public IFuture killAgent()
+	public IFuture<Void> killAgent()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DefaultResultListener()
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				cms.destroyComponent(getComponentIdentifier()).addResultListener(new DelegationResultListener(ret));
+				cms.destroyComponent(getComponentIdentifier())
+					.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+				{
+					public void	customResultAvailable(Map<String, Object> result)
+					{
+						super.resultAvailable(null);
+					}
+				});
 			}
 		});
 		return ret;
