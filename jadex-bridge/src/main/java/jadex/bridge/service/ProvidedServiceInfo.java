@@ -115,7 +115,7 @@ public class ProvidedServiceInfo
 	public void setType(Class<?> type)
 	{
 		this.type = type;
-		this.typename	= type.getName();
+		this.typename	= type!=null? type.getName(): null;
 	}
 
 	/**
