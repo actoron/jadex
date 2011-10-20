@@ -1,7 +1,5 @@
-package jadex.base.service.dependency.maven;
+package jadex.bridge;
 
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -14,7 +12,7 @@ import java.net.URL;
  *  that can be used to find the resource.
  */
 @Reference(local=true)
-public class MavenResourceIdentifier implements IResourceIdentifier
+public class ResourceIdentifier implements IResourceIdentifier
 {
 	//-------- attributes --------
 	
@@ -29,7 +27,7 @@ public class MavenResourceIdentifier implements IResourceIdentifier
 	/**
 	 *  Create a resource identifier.
 	 */
-	public MavenResourceIdentifier()
+	public ResourceIdentifier()
 	{
 		// bean constructor
 	}
@@ -39,7 +37,7 @@ public class MavenResourceIdentifier implements IResourceIdentifier
 	 *  @param lid The local identifier.
 	 *  @param gid The global idenfifier.
 	 */
-	public MavenResourceIdentifier(Tuple2<IComponentIdentifier, URL> lid, String gid)
+	public ResourceIdentifier(Tuple2<IComponentIdentifier, URL> lid, String gid)
 	{
 		this.lid = lid;
 		this.gid = gid;
@@ -120,6 +118,6 @@ public class MavenResourceIdentifier implements IResourceIdentifier
 	 */
 	public String	toString()
 	{
-		return "MavenResourceIdentifier("+gid+", "+(lid!=null?lid.getSecondEntity()+" @"+lid.getFirstEntity(): "")+")";
+		return "ResourceIdentifier("+gid+", "+(lid!=null?lid.getSecondEntity()+" @"+lid.getFirstEntity(): "")+")";
 	}
 }

@@ -150,8 +150,14 @@
 				: new AsyncExecutionService($component.getServiceProvider())
 			</implementation>
 		</providedservice>
+			<providedservice class="IDependencyService">
+			<implementation>
+				new BasicDependencyService()
+				//new MavenDependencyService()
+			</implementation>
+		</providedservice>
 		<providedservice class="ILibraryService">
-			<implementation proxytype="raw">
+			<implementation> <!-- proxytype="raw" -->
 				new LibraryService($args.libpath, $component.getServiceProvider())
 				//new maventest.MavenLibraryService($args.libpath, $component.getServiceProvider())
 			</implementation>

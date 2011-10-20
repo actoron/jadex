@@ -1,9 +1,9 @@
 package maventest;
 
 import jadex.base.service.dependency.maven.MavenDependencyResolverService;
-import jadex.base.service.dependency.maven.MavenResourceIdentifier;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class MavenTest2
 			try
 			{
 				System.out.println("\nDependencies for: "+gids[i]);
-				IResourceIdentifier	rid	= new MavenResourceIdentifier(null, gids[i]);
+				IResourceIdentifier	rid	= new ResourceIdentifier(null, gids[i]);
 				Map<IResourceIdentifier, List<IResourceIdentifier>>	dependencies	= mh.loadDependencies(rid).get(null);
 				printDependencies(rid, dependencies, 0, new ArrayList<Boolean>());
 			}
