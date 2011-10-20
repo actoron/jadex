@@ -5,6 +5,7 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -14,6 +15,7 @@ import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.SUtil;
 import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -101,14 +103,6 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		this.managedrids = new LinkedHashMap<IResourceIdentifier, Integer>();
 		this.initurls = urls;
 		this.provider = provider;
-
-		if(urls!=null)
-		{
-			for(int i=0; i<urls.length; i++)
-			{
-				addURL(SUtil.toURL(urls[i]));
-			}
-		}
 	}
 	
 	//-------- methods --------
@@ -886,28 +880,43 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		{
 			public void customResultAvailable(Object result)
 			{
-				SServiceProvider.getService(provider,ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new DelegationResultListener(ret)
+				if(initurls!=null)
 				{
-					public void customResultAvailable(Object result)
+					CounterResultListener<Void> lis = new CounterResultListener<Void>(initurls.length, new DelegationResultListener(ret)
 					{
-						ISettingsService	settings	= (ISettingsService)result;
-						settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
-							.addResultListener(new DelegationResultListener(ret)
+						public void customResultAvailable(Object result) 
 						{
-							public void customResultAvailable(Object result)
+							SServiceProvider.getService(provider,ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								.addResultListener(new DelegationResultListener(ret)
 							{
-								super.customResultAvailable(getServiceIdentifier());
-							}
-						});
-					}
-					public void exceptionOccurred(Exception exception)
+								public void customResultAvailable(Object result)
+								{
+									ISettingsService	settings	= (ISettingsService)result;
+									settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
+										.addResultListener(new DelegationResultListener(ret)
+									{
+										public void customResultAvailable(Object result)
+										{
+											super.customResultAvailable(getServiceIdentifier());
+										}
+									});
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									// No settings service: ignore
+									ret.setResult(null);
+	//								ret.setResult(getServiceIdentifier());
+								}
+							});
+						};
+					});
+					for(int i=0; i<initurls.length; i++)
 					{
-						// No settings service: ignore
-						ret.setResult(null);
-//						ret.setResult(getServiceIdentifier());
+						addURL(SUtil.toURL(initurls[i])).addResultListener(lis);
 					}
-				});
+				}
+				
+				
 			}
 		});
 		return ret;
