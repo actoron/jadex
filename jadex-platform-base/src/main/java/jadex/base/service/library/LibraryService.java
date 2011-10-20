@@ -908,15 +908,17 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	//								ret.setResult(getServiceIdentifier());
 								}
 							});
-						};
+						}
 					});
 					for(int i=0; i<initurls.length; i++)
 					{
 						addURL(SUtil.toURL(initurls[i])).addResultListener(lis);
 					}
 				}
-				
-				
+				else
+				{
+					ret.setResult(null);
+				}
 			}
 		});
 		return ret;
