@@ -115,7 +115,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 */
 	public IFuture<Void> addResourceIdentifier(final IResourceIdentifier rid)
 	{
-		System.out.println("add "+rid);
+//		System.out.println("add "+rid);
 		final Future<Void> ret = new Future<Void>();
 		
 		getClassLoader(rid, null, rid).addResultListener(
@@ -483,7 +483,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	protected IFuture<DelegationURLClassLoader> getClassLoader(final IResourceIdentifier rid, 
 		Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support)
 	{
-		System.out.println("getClassLoader(): "+rid);
+//		System.out.println("getClassLoader(): "+rid);
 //		final URL url = rid.getLocalIdentifier().getSecondEntity();
 		
 		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();

@@ -470,6 +470,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						{
 							public void resultAvailable(Object result)
 							{
+								final IMessageService ms = (IMessageService)result;
+								
 								ls.getClassLoader(component.getModel().getResourceIdentifier()).addResultListener(new IResultListener()
 								{
 									public void resultAvailable(Object result)
@@ -494,7 +496,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //											interestingcalls.put(callid, cont);
 //										}
 										
-										IMessageService ms = (IMessageService)result;
 										ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), component.getModel().getResourceIdentifier(), null)
 											.addResultListener(ia.createResultListener(new IResultListener()
 										{
