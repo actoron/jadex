@@ -9,11 +9,7 @@
 	name="KernelApplication" package="jadex.application">
 	
 	<imports>
-		<import>jadex.commons.*</import>
-		<import>jadex.bridge.*</import>
-		<import>jadex.application.space.envsupport.*</import>
-		<import>jadex.application.space.agr.*</import>
-		<import>java.util.*</import>
+		<import>jadex.bridge.service.types.factory.*</import>
 	</imports>
 	
 	<properties>
@@ -25,14 +21,7 @@
 	<services>
 		<providedservice class="IComponentFactory">
 			<implementation proxytype="raw">
-				new ApplicationComponentFactory(
-					//new Set[]
-					//{
-					//	MEnvSpaceType.getXMLMapping(),
-					//	MAGRSpaceType.getXMLMapping()
-					//}, 
-					$component.getServiceProvider()
-				)	
+				new ApplicationComponentFactory($component.getServiceProvider())	
 			</implementation>
 		</providedservice>
 	</services>

@@ -109,7 +109,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	/** Kernel blacklist */
 	protected Set kernelblacklist;
 	
-	/** Unloadable kernel locations that may become loadable later */
+	/** Unloadable kernel locations that may become loadable later. */
 	protected Set potentialkernellocations;
 	
 	/** Call Multiplexer */
@@ -483,6 +483,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture<String> getComponentType(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
+//		if(model.endsWith("application.xml"))
+//			System.out.println("model:"+model);
 		final Future<String> ret = new Future<String>();
 		findKernel(model, imports, null).addResultListener(ia.createResultListener(new IResultListener()
 		{
@@ -1006,7 +1008,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture searchPotentialUrls(final IResourceIdentifier rid)
 	{
-//		System.out.println("searchPotentialURLs: "+extension+", "+potentialurls);
+//		System.out.println("searchPotentialURLs: "+rid+", "+potentialurls);
 		
 		final Future ret = new Future();
 		examineKernelModels(new ArrayList(potentialkernellocations), rid).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
@@ -1016,15 +1018,15 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				Map kernellocs = (Map) result;
 				if (kernellocs != null && !kernellocs.isEmpty())
 				{
-//							System.out.println("searchPotentialURLs1: "+kernellocs);
+//					System.out.println("searchPotentialURLs1: "+kernellocs);
 					kernellocationcache.putAll(kernellocs);
 					ret.setResult(null);
 				}
 				else
 				{
 					final URL url = (URL) potentialurls.iterator().next();
-//							if(url.toString().indexOf("bdi")!=-1)
-//								System.out.println("searchPotentialURLs2: "+url);
+//					if(url.toString().indexOf("bdi")!=-1)
+//						System.out.println("searchPotentialURLs2: "+url);
 					quickKernelSearch(url, rid).addResultListener(ia.createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)
@@ -1120,16 +1122,19 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture examineKernelModels(final List modellocs, IResourceIdentifier rid)
 	{
-//		System.out.println("examineKernelModels0: "+modellocs);
+//		if(modellocs.toString().indexOf("KernelApplication.component.xml")!=-1)
+//			System.out.println("examineKernelModels0: "+modellocs);
 		final Map kernellocs = new HashMap();
 		if (modellocs.isEmpty())
 			return new Future(kernellocs);
 		final Future ret = new Future();
-		final IResultListener kernelCounter = ia.createResultListener(new CounterResultListener(modellocs.size(), true, new DelegationResultListener(ret)
+		final IResultListener kernelCounter = ia.createResultListener(new CounterResultListener(modellocs.size(), true,
+			new DelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-//				System.out.println("examineKernelModels: "+modellocs+", "+kernellocs);
+//				if(modellocs.toString().indexOf("KernelApplication.component.xml")!=-1)
+//					System.out.println("examineKernelModels1: "+modellocs+", "+kernellocs);
 				super.customResultAvailable(kernellocs);
 			}
 			public void exceptionOccurred(Exception e)
@@ -1137,45 +1142,42 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 //				e.printStackTrace();
 				super.exceptionOccurred(e);
 			}
-			
-		})
-		{
-			public void intermediateResultAvailable(Object result)
-			{
-				final IModelInfo kernelmodel = (IModelInfo) result;
-				libservice.getClassLoader(kernelmodel.getResourceIdentifier())
-					.addResultListener(new IResultListener<ClassLoader>()
-				{
-					public void resultAvailable(ClassLoader result)
-					{
-						String[] exts = (String[])kernelmodel.getProperty(KERNEL_EXTENSIONS, result);
-						if(exts!=null)
-						{
-							for (int i = 0; i < exts.length; ++i)
-								kernellocs.put(exts[i], kernelmodel.getFilename());
-						}
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						// Todo: log warning!?
-					}
-				});
-			}
-		});
+		}));
 
 		for(Iterator it2 = modellocs.iterator(); it2.hasNext();)
 		{
 			final String kernelloc = (String)it2.next();
 			loadModel(kernelloc, null, rid, true)
-				.addResultListener(ia.createResultListener(new IResultListener()
+				.addResultListener(ia.createResultListener(new IResultListener<IModelInfo>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(final IModelInfo modelinfo)
 				{
-					if (result != null)
+					if(modelinfo!=null)
 					{
 						potentialkernellocations.remove(kernelloc);
-						kernelCounter.resultAvailable(result);
+						libservice.getClassLoader(modelinfo.getResourceIdentifier())
+							.addResultListener(new IResultListener<ClassLoader>()
+						{
+							public void resultAvailable(ClassLoader result)
+							{
+//								if(modellocs.toString().indexOf("KernelApplication.component.xml")!=-1)
+//									System.out.println("examineKernelModels2: "+modellocs);
+								String[] exts = (String[])modelinfo.getProperty(KERNEL_EXTENSIONS, result);
+								if(exts!=null)
+								{
+									for (int i = 0; i < exts.length; ++i)
+										kernellocs.put(exts[i], modelinfo.getFilename());
+								}
+								kernelCounter.resultAvailable(result);
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								// Todo: log warning!?
+								potentialkernellocations.add(kernelloc);
+								kernelCounter.exceptionOccurred(new RuntimeException());
+							}
+						});
 					}
 					else
 					{

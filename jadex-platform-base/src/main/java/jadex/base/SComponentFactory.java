@@ -13,6 +13,7 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
@@ -144,53 +145,45 @@ public class SComponentFactory
 	public static IFuture<Boolean> isModelType(IExternalAccess exta, final String model, final Collection allowedtypes, final IResourceIdentifier rid)
 	{
 		Future<Boolean> ret = new Future<Boolean>();
-//		System.out.println("model:"+model);
+//		if(model.endsWith("application.xml"))
+//			System.out.println("model1:"+model);
 		
 		exta.scheduleStep(new IComponentStep<Boolean>()
 		{
 			@XMLClassname("isModelType")
 			public IFuture<Boolean> execute(final IInternalAccess ia)
 			{
-				final Future ret = new Future();
-				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+//				if(model.endsWith("application.xml"))
+//					System.out.println("model2:"+model);
+				final Future<Boolean> ret = new Future<Boolean>();
+				SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, Boolean>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Collection<IComponentFactory> facs)
 					{
-						final ILibraryService ls = (ILibraryService)result;
-						
-						SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+//						if(model.endsWith("application.xml"))
+//							System.out.println("model3:"+model);
+						if(facs.size()==0)
 						{
-							public void customResultAvailable(Object result)
-							{
-//								if(model==null)
-//									System.out.println("model nulls");
-								
-								Collection facs = (Collection)result;
-								if(facs.size()==0)
-								{
-									ret.setResult(Boolean.FALSE);
-								}
-								else
-								{
-									checkComponentType(model, (IComponentFactory[])facs.toArray(new IComponentFactory[0]), 0, ia, rid, allowedtypes)
-										.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
-								}
-							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								if(exception instanceof ServiceNotFoundException)
-								{
-									ret.setResult(Boolean.FALSE);
-								}
-								else
-								{
-									super.exceptionOccurred(exception);
-								}
-							}
-						}));
+							ret.setResult(Boolean.FALSE);
+						}
+						else
+						{
+							checkComponentType(model, facs.toArray(new IComponentFactory[0]), 0, ia, rid, allowedtypes)
+								.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(exception instanceof ServiceNotFoundException)
+						{
+							ret.setResult(Boolean.FALSE);
+						}
+						else
+						{
+							super.exceptionOccurred(exception);
+						}
 					}
 				}));
 				return ret;
