@@ -9,7 +9,7 @@
 	name="AGR" package="jadex.extension.agr">
 	
 	<imports>
-		<import>jadex.bridge.*</import>
+		<import>jadex.bridge.service.types.factory.*</import>
 	</imports>
 			
 	<services>

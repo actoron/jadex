@@ -9,8 +9,7 @@
 	name="KernelMulti" package="jadex.component">
 	
 	<imports>
-		<import>jadex.bridge.*</import>
-		<import>jadex.commons.future.ThreadSuspendable</import>
+		<import>jadex.bridge.service.types.factory.*</import>
 	</imports>
 	
 	<arguments>
@@ -43,7 +42,7 @@
 			</implementation>
 		</providedservice>
 	</services>
-	<!-- new jadex.kernelbase.MultiKernelNotifierService($component)  -->
+	
 	<configurations>
 		<configuration name="component_kernel">
 			<components>
