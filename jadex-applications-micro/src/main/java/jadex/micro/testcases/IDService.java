@@ -10,5 +10,5 @@ public interface IDService
 	/**
 	 * 
 	 */
-	public IFuture testServiceArgument(IDService service);
+	public IFuture<Boolean> testServiceArgument(IDService service);
 }
