@@ -52,7 +52,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public String	getLifecycleState()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -75,7 +75,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public IWaitqueue getWaitqueue()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -98,7 +98,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public IElement getReason()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -121,7 +121,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public Object getBody()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -146,7 +146,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 		// what about when the plan is handling a goal.
 		// is the goal properly executed?
 		
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -170,7 +170,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public void addPlanListener(final IPlanListener listener)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -194,7 +194,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	{
 		// Todo: safe removal when plan is already finished.
 		
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -218,7 +218,7 @@ public class PlanFlyweight extends ParameterElementFlyweight implements IPlan
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

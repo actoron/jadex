@@ -126,4 +126,10 @@ public interface IComponentInstance
 	 *  @return Future when behavior is started.
 	 */
 	public void startBehavior();
+	
+	/**
+	 *  Check if the external thread is accessing.
+	 *  @return True, if called from an external (i.e. non-synchronized) thread.
+	 */
+	public boolean isExternalThread();
 }

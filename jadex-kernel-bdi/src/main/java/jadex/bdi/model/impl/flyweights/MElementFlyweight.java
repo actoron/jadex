@@ -420,7 +420,7 @@ public class MElementFlyweight implements IMElement, IMEElement
 		boolean	ret	= false;	// Default for models during creation.
 		if(getInterpreter()!=null)
 		{
-			ret	= getInterpreter().isExternalThread();
+			ret	= getInterpreter().getComponentAdapter().isExternalThread();
 		}
 		return ret;
 	}

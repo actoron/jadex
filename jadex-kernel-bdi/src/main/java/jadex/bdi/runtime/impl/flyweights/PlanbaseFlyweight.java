@@ -53,7 +53,7 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 	 */
 	public IPlan[] getPlans()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -77,7 +77,7 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 	 */
 	public IPlan[] getPlans(final String type)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -131,7 +131,7 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 	 */
 	public void addPlanListener(final String type, final IPlanListener listener)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -156,7 +156,7 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 	 */
 	public void removePlanListener(final String type, final IPlanListener listener)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -182,7 +182,7 @@ public class PlanbaseFlyweight extends ElementFlyweight implements IPlanbase
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

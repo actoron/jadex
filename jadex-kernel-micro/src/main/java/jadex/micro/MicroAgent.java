@@ -68,7 +68,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	/**
 	 *  Called once after agent creation.
 	 */
-	public IFuture agentCreated()
+	public IFuture<Void> agentCreated()
 	{
 		return IFuture.DONE;
 	}

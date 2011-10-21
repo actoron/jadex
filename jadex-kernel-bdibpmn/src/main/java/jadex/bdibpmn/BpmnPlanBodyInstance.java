@@ -1472,13 +1472,13 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 		}
 	}
 	
-	/**
-	 *  Delegate synchronization to agent.
-	 */
-	public boolean isAgentThread()
-	{
-		return interpreter.isAgentThread();
-	}
+//	/**
+//	 *  Delegate synchronization to agent.
+//	 */
+//	public boolean isAgentThread()
+//	{
+//		return interpreter.isAgentThread();
+//	}
 	
 	/**
 	 *  Delegate synchronization to agent.

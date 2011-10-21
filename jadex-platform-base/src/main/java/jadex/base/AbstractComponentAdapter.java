@@ -869,7 +869,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public boolean isExternalThread()
 	{
-		return Thread.currentThread()!=componentthread;
+		boolean ret = Thread.currentThread()!=componentthread;
+		if(ret)
+			ret = getComponentInstance().isExternalThread();
+		return ret;
 	}
 	
 	//-------- external access --------

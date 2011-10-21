@@ -52,7 +52,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public IBelief getBelief(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -75,7 +75,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public IBeliefSet getBeliefSet(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -102,7 +102,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public boolean containsBelief(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -129,7 +129,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public boolean containsBeliefSet(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -152,7 +152,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public String[] getBeliefNames()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -175,7 +175,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public String[] getBeliefSetNames()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -321,7 +321,7 @@ public class BeliefbaseFlyweight extends ElementFlyweight implements IBeliefbase
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

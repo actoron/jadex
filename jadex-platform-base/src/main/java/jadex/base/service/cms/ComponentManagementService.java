@@ -1305,6 +1305,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IFuture<Void> resumeComponent(final IComponentIdentifier cid, final boolean initresume)
 	{
+//		System.out.println("resume: "+cid);
 		final Future<Void> ret = new Future<Void>();
 		
 		if(isRemoteComponent(cid))

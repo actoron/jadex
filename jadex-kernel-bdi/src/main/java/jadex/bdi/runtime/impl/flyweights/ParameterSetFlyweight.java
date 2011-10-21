@@ -72,7 +72,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public void addValue(final Object value)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -134,7 +134,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public void removeValue(final Object value)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -191,7 +191,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 		if(values==null)
 			return;
 	
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -255,7 +255,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public void removeValues()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -323,7 +323,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 * /
 	public Object	getValue(final Object oldval)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -381,7 +381,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public boolean containsValue(final Object value)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -434,7 +434,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public Object[]	getValues()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -484,7 +484,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public int size()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -532,7 +532,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public String getName()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -557,7 +557,7 @@ public class ParameterSetFlyweight extends ElementFlyweight implements IParamete
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

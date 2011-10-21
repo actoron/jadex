@@ -44,7 +44,8 @@ public abstract class ElementFlyweight implements IElement
 	public ElementFlyweight(IOAVState state, Object scope, Object handle)
 	{
 		assert !(scope instanceof ElementFlyweight);
-		assert !BDIInterpreter.getInterpreter(state).isExternalThread();
+//		assert !BDIInterpreter.getInterpreter(state).isExternalThread();
+		assert !BDIInterpreter.getInterpreter(state).getComponentAdapter().isExternalThread();
 //		if(handle==null && !(this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight))
 //			Thread.dumpStack();
 		assert handle!=null || this instanceof ParameterFlyweight || this instanceof ParameterSetFlyweight
@@ -242,7 +243,7 @@ public abstract class ElementFlyweight implements IElement
 			string	= string.substring(0, string.length()-9);
 		return string;
 		
-//		if(getInterpreter().isExternalThread())
+//		if(getInterpreter().getComponentAdapter().isExternalThread())
 //		{
 //			AgentInvocation	invoc	= new AgentInvocation()
 //			{

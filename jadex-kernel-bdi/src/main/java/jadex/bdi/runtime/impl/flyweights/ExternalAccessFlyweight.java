@@ -207,7 +207,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	{
 		final Future ret = new Future();
 		
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
 			{
@@ -357,7 +357,7 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

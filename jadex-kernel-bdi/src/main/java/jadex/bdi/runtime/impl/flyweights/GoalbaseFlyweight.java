@@ -67,7 +67,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public boolean containsGoal(final IGoal goal)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -93,7 +93,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public IGoal[] getGoals(final String type)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -116,7 +116,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public IGoal[] getGoals()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -142,7 +142,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public IGoal createGoal(final String type)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -165,7 +165,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public void	dispatchTopLevelGoal(final IGoal goal)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -228,7 +228,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public void addGoalListener(final String type, final IGoalListener listener)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -254,7 +254,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public void removeGoalListener(final String type, final IGoalListener listener)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -280,7 +280,7 @@ public class GoalbaseFlyweight extends ElementFlyweight implements IGoalbase
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

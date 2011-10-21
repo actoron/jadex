@@ -52,7 +52,7 @@ public class BeliefFlyweight extends ElementFlyweight implements IBelief
 	 */
 	public void setFact(final Object fact)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -76,7 +76,7 @@ public class BeliefFlyweight extends ElementFlyweight implements IBelief
 	 */
 	public Object getFact()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -100,7 +100,7 @@ public class BeliefFlyweight extends ElementFlyweight implements IBelief
 	 */
 	public void modified()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -124,7 +124,7 @@ public class BeliefFlyweight extends ElementFlyweight implements IBelief
 	 */
 	public Class getClazz()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -149,7 +149,7 @@ public class BeliefFlyweight extends ElementFlyweight implements IBelief
 	 */
 	public void addBeliefListener(final IBeliefListener listener)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -171,7 +171,7 @@ public class BeliefFlyweight extends ElementFlyweight implements IBelief
 	 */
 	public void removeBeliefListener(final IBeliefListener listener)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -195,7 +195,7 @@ public class BeliefFlyweight extends ElementFlyweight implements IBelief
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

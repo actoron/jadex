@@ -56,7 +56,7 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 	// changed signature for javaflow, removed final
 	public IExpression	getExpression(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -92,7 +92,7 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 	 */
 	public IExpression	createExpression(final String expression, final String[] paramnames, final Class[] paramtypes)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -207,7 +207,7 @@ public class ExpressionbaseFlyweight extends ElementFlyweight implements IExpres
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

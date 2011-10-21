@@ -1521,4 +1521,17 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		}
 	}
 	
+	/**
+	 *  Test if is external thread.
+	 *  @return True if is not agent thread.
+	 *  Note: Should not be called directly. 
+	 *  Will be called from adapter.
+	 */
+	public boolean isExternalThread()
+	{
+		// Per default just returns false and lets the adapter decide.
+		// Can be overridden to ensure that the interpreter has the last word.
+		return true;
+	}
+	
 }

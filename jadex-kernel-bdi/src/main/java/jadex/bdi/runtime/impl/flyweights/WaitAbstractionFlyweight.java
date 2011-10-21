@@ -55,7 +55,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public IWaitAbstraction addMessageEvent(final String type)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -81,7 +81,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public IWaitAbstraction addReply(final IMessageEvent me)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -107,7 +107,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public IWaitAbstraction addInternalEvent(final String type)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -133,7 +133,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public IWaitAbstraction addGoal(final String type)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -159,7 +159,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public IWaitAbstraction addGoal(final IGoal goal)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -184,7 +184,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public IWaitAbstraction addFactChanged(final String type)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -209,7 +209,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public IWaitAbstraction addFactAdded(final String type)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -235,7 +235,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public IWaitAbstraction addFactRemoved(final String type)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -261,7 +261,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public IWaitAbstraction addCondition(final String condition)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -288,7 +288,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public IWaitAbstraction addExternalCondition(final IExternalCondition condition)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -316,7 +316,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public void removeMessageEvent(final String type)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -338,7 +338,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public void removeReply(final IMessageEvent me)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -360,7 +360,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public void removeInternalEvent(final String type)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -384,7 +384,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public void removeGoal(final String type)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -408,7 +408,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public void removeGoal(final IGoal goal)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -432,7 +432,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public void removeFactChanged(final String belief)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -456,7 +456,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public void removeFactAdded(final String beliefset)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -481,7 +481,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public void removeFactRemoved(final String beliefset)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -505,7 +505,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public void removeCondition(final String type)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -529,7 +529,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public void removeExternalCondition(final IExternalCondition condition)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -588,7 +588,7 @@ public class WaitAbstractionFlyweight extends ElementFlyweight implements IWaitA
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

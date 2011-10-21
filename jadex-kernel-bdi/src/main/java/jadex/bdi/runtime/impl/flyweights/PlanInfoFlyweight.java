@@ -41,7 +41,7 @@ public class PlanInfoFlyweight extends ElementFlyweight implements ICandidateInf
 	 */
 	public IPlan getPlan()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -81,7 +81,7 @@ public class PlanInfoFlyweight extends ElementFlyweight implements ICandidateInf
 	 */
 	public IElement getElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

@@ -31,7 +31,7 @@ public abstract class ProcessableElementFlyweight extends ParameterElementFlywei
 	 */
 	public boolean isPostToAll()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -56,7 +56,7 @@ public abstract class ProcessableElementFlyweight extends ParameterElementFlywei
 	 */
 	public boolean isRandomSelection()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

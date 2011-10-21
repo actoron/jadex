@@ -60,7 +60,7 @@ public class InternalEventFlyweight extends ProcessableElementFlyweight implemen
 	 * /
 	public void addInternalEventListener(final IInternalEventListener listener)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -82,7 +82,7 @@ public class InternalEventFlyweight extends ProcessableElementFlyweight implemen
 	 * /
 	public void removeInternalEventListener(final IInternalEventListener listener)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -106,7 +106,7 @@ public class InternalEventFlyweight extends ProcessableElementFlyweight implemen
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

@@ -52,7 +52,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	 */
 	public Object getValue()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -84,7 +84,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	// changed signature for javaflow, removed 2 final
 	public void setParameter(String name, Object value)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation(new Object[]{name, value})
 			{
@@ -108,7 +108,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	// changed signature for javaflow, removed final
 	public Object getParameter(String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(name)
 			{
@@ -131,7 +131,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	 */
 	public Object	execute()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -159,7 +159,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	{
 		// todo: remove values after call
 		
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation(new Object[]{name, value})
 			{
@@ -186,7 +186,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	{
 		// todo: remove values after call
 		
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -211,7 +211,7 @@ public class ExpressionFlyweight extends ElementFlyweight implements IExpression
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

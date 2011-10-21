@@ -53,7 +53,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public boolean	isRetry()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -78,7 +78,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public long	getRetryDelay()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -103,7 +103,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public String	getExcludeMode()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -127,7 +127,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public boolean	isRecur()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -151,7 +151,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public long	getRecurDelay()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -178,7 +178,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public boolean	isActive()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -203,7 +203,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public boolean	isAdopted()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -226,7 +226,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public String	getLifecycleState()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -249,7 +249,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public boolean isFinished()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -273,7 +273,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public boolean isSucceeded()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -297,7 +297,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 * /
 	public boolean isFailed()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -323,7 +323,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public void drop()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -349,7 +349,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public Exception	getException()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -409,7 +409,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public void addGoalListener(final IGoalListener listener)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -431,7 +431,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	 */
 	public void removeGoalListener(final IGoalListener listener)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation()
 			{
@@ -458,7 +458,7 @@ public class GoalFlyweight extends ProcessableElementFlyweight implements IGoal
 	public IMElement getModelElement()
 	{
 		
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

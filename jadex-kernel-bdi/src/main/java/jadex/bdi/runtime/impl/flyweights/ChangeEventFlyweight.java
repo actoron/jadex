@@ -31,7 +31,7 @@ public class ChangeEventFlyweight extends ElementFlyweight implements IChangeEve
 	 */
 	public ElementFlyweight getElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -54,7 +54,7 @@ public class ChangeEventFlyweight extends ElementFlyweight implements IChangeEve
 	 */
 	public Object getValue()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -77,7 +77,7 @@ public class ChangeEventFlyweight extends ElementFlyweight implements IChangeEve
 	 */
 	public String getType()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{

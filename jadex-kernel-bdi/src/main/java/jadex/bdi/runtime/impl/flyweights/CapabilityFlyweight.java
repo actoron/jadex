@@ -75,7 +75,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IBDIExternalAccess getExternalAccess()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -98,7 +98,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IExternalAccess getParent()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -121,7 +121,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IBeliefbase getBeliefbase()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -144,7 +144,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IGoalbase getGoalbase()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -167,7 +167,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IPlanbase getPlanbase()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -190,7 +190,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IEventbase getEventbase()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -213,7 +213,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IExpressionbase getExpressionbase()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -236,7 +236,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 //	 */
 //	public IPropertybase getPropertybase()
 //	{
-//		if(getInterpreter().isExternalThread())
+//		if(getInterpreter().getComponentAdapter().isExternalThread())
 //		{
 //			AgentInvocation invoc = new AgentInvocation()
 //			{
@@ -277,7 +277,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public Logger getLogger()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -300,7 +300,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public String getAgentName()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -333,7 +333,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public String getConfigurationName()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -384,7 +384,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IServiceProvider getServiceProvider()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -407,7 +407,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IServiceContainer getServiceContainer()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -435,7 +435,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public long getTime()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -458,7 +458,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public ClassLoader getClassLoader()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -481,7 +481,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	public IFuture killAgent()
 	{
 		IFuture ret = null;
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -525,7 +525,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	public IFuture addComponentListener(IComponentListener listener)
 	{
 		final Future ret = new Future();
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation(listener)
 			{
@@ -551,7 +551,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	public IFuture removeComponentListener(IComponentListener listener)
 	{
 		final Future ret = new Future();
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			new AgentInvocation(listener)
 			{
@@ -602,7 +602,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 //	 */
 //	public IApplicationContext getApplicationContext()
 //	{
-//		if(getInterpreter().isExternalThread())
+//		if(getInterpreter().getComponentAdapter().isExternalThread())
 //		{
 //			AgentInvocation invoc = new AgentInvocation()
 //			{
@@ -641,7 +641,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IMElement getModelElement()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -666,7 +666,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public IFuture getChildren()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -706,7 +706,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public String[]	getSubcapabilityNames()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -756,7 +756,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public ICapability	getSubcapability(final String name)
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -840,7 +840,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public Map getArguments()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -863,7 +863,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public Map getResults()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -890,7 +890,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		if(!getHandle().equals(getInterpreter().getAgent()))
 			throw new RuntimeException("Set result only allowed in agent, not in capabilities.");
 		
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -960,7 +960,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 */
 	public String getConfiguration()
 	{
-		if(getInterpreter().isExternalThread())
+		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
 			AgentInvocation invoc = new AgentInvocation()
 			{
@@ -1001,7 +1001,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 //	 */
 //	public IFuture getRequiredService(final String name, final boolean rebind)
 //	{
-//		if(getInterpreter().isExternalThread())
+//		if(getInterpreter().getComponentAdapter().isExternalThread())
 //		{
 //			AgentInvocation invoc = new AgentInvocation()
 //			{
@@ -1048,7 +1048,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 //	 */
 //	public IIntermediateFuture getRequiredServices(final String name, final boolean rebind)
 //	{
-//		if(getInterpreter().isExternalThread())
+//		if(getInterpreter().getComponentAdapter().isExternalThread())
 //		{
 //			AgentInvocation invoc = new AgentInvocation()
 //			{

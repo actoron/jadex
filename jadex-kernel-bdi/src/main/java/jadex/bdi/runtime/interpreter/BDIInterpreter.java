@@ -256,7 +256,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		{
 			public boolean isExternalThread()
 			{
-				return BDIInterpreter.this.isExternalThread();
+				return BDIInterpreter.this.getComponentAdapter().isExternalThread();
 			}
 			
 			public void invokeSynchronized(Runnable code)
@@ -336,7 +336,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				return IFuture.DONE;
 			}
 		});
-		
+
 		this.initthread = null;
 	}
 	
@@ -345,7 +345,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public void startBehavior()
 	{
-		assert !isExternalThread();
+		assert !getComponentAdapter().isExternalThread();
 
 		// Use step in case agent is started as suspended.
 		scheduleStep(new IComponentStep<Void>()
@@ -370,7 +370,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public IFuture init(IModelInfo model,String config)
 	{
-		assert isAgentThread();
+//		assert isAgentThread();
+		assert !getAgentAdapter().isExternalThread();
 		
 		return initCapability(this.model, config);
 	}
@@ -380,7 +381,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	protected IFuture	initCapability(final OAVCapabilityModel oavmodel, final String config)
 	{
-		assert isAgentThread();
+//		assert isAgentThread();
+		assert !getAgentAdapter().isExternalThread();
 		
 		final Future	ret	= new Future();
 		initcapa	= oavmodel.getHandle();
@@ -438,7 +440,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public IFuture initServices(final IModelInfo model, final String config)
 	{
-		assert isAgentThread();
+//		assert isAgentThread();
+		assert !getAgentAdapter().isExternalThread();
 		
 		IFuture	ret;
 		if(model==getModel())
@@ -485,7 +488,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	protected IFuture	init0()
 	{
-		assert isAgentThread();
+//		assert isAgentThread();
+		assert !getAgentAdapter().isExternalThread();
 		
 		final Future	ret	= new Future();
 		
@@ -558,7 +562,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	protected IFuture	init1()
 	{
-		assert isAgentThread();
+//		assert isAgentThread();
+		assert !getAgentAdapter().isExternalThread();
 		
 		return AgentRules.initializeCapabilityInstance(state, ragent);
 	}
@@ -803,7 +808,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public boolean isAtBreakpoint(String[] breakpoints)
 	{
-		assert isAgentThread();
+//		assert isAgentThread();
+		assert !getAgentAdapter().isExternalThread();
 		
 		boolean	isatbreakpoint	= false;
 		
@@ -1170,7 +1176,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public void invokeSynchronized(final Runnable code)
 	{
-		if(isExternalThread())
+		if(getComponentAdapter().isExternalThread())
 		{
 			System.err.println("Unsynchronized internal thread.");
 			Thread.dumpStack();
@@ -1277,7 +1283,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	{
 		final Future<T> ret = new Future<T>();
 		
-		if(adapter.isExternalThread())
+		if(getComponentAdapter().isExternalThread())
 		{
 			try
 			{
@@ -1396,14 +1402,14 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		this.planthread = planthread;
 	}
 	
-	/**
-	 *  Check if the agent thread is accessing.
-	 *  @return True, if access is ok.
-	 */ 
-	public boolean isAgentThread()
-	{
-		return !adapter.isExternalThread();
-	}
+//	/**
+//	 *  Check if the agent thread is accessing.
+//	 *  @return True, if access is ok.
+//	 */ 
+//	public boolean isAgentThread()
+//	{
+//		return initthread==Thread.currentThread();
+//	}
 	
 	/**
 	 *  Check if the agent thread is accessing.
@@ -1420,7 +1426,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */ 
 	public boolean isExternalThread()
 	{
-		return initthread!=Thread.currentThread() && !isAgentThread() && !isPlanThread();
+		return initthread!=Thread.currentThread() && !isPlanThread();
 	}
 
 	/**
