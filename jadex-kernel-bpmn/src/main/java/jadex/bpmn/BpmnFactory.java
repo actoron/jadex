@@ -19,6 +19,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -98,14 +99,25 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 				return IFuture.DONE;
 			}
 		};
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+	}
+	
+	/**
+	 *  Start the service.
+	 */
+	public IFuture<Void> startService()
+	{
+		final Future<Void> ret = new Future<Void>();
+		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
-				ILibraryService libService = (ILibraryService) result;
-				libService.addLibraryServiceListener(libservicelistener);
+				libservice = (ILibraryService)result;
+				libservice.addLibraryServiceListener(libservicelistener);
+				BpmnFactory.super.startService().addResultListener(new DelegationResultListener(ret));
 			}
 		});
+		return ret;
 	}
 	
 	/**
