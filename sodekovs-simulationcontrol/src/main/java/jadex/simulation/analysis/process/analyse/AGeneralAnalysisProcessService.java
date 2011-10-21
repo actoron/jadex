@@ -1,7 +1,6 @@
 package jadex.simulation.analysis.process.analyse;
 
 import jadex.bridge.IExternalAccess;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ASubProcessService;
 import jadex.simulation.analysis.service.highLevel.IAGeneralAnalysisProcessService;

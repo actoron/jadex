@@ -4,7 +4,7 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
@@ -15,15 +15,8 @@ import jadex.simulation.analysis.common.data.parameter.IASummaryParameter;
 import jadex.simulation.analysis.common.superClasses.events.task.ATaskEvent;
 import jadex.simulation.analysis.common.superClasses.tasks.ATask;
 import jadex.simulation.analysis.common.superClasses.tasks.user.AServiceCallUserTask2OptionView;
-import jadex.simulation.analysis.common.superClasses.tasks.user.AServiceCallUserTaskView;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.service.continuative.computation.IAConfidenceService;
-
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import java.util.UUID;
-
-import javax.swing.JComponent;
 
 public class AConfidenceTask extends ATask
 {

@@ -1,9 +1,9 @@
 package jadex.simulation.analysis.process.analyse;
 
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.GuiClass;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;

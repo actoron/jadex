@@ -1,7 +1,5 @@
 package jadex.simulation.analysis.process.optimisation.tasks;
 
-import java.util.UUID;
-
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
@@ -14,6 +12,8 @@ import jadex.simulation.analysis.common.superClasses.tasks.ATask;
 import jadex.simulation.analysis.common.superClasses.tasks.user.AServiceCallUserTaskView;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
+
+import java.util.UUID;
 
 public class OptimisationStepTask extends ATask
 {

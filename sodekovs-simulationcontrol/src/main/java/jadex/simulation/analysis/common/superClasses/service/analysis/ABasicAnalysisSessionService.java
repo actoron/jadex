@@ -16,8 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.swing.JComponent;
-
 public class ABasicAnalysisSessionService extends ABasicAnalysisService implements IAnalysisSessionService
 {
 	//TODO: IMPLEMENT concurrent boolean

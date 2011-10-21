@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.application.standalone;
 
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IAExperiment;
@@ -9,7 +9,6 @@ import jadex.simulation.analysis.common.data.IAExperimentBatch;
 import jadex.simulation.analysis.common.data.allocation.IAllocationStrategy;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.common.superClasses.service.analysis.IAnalysisService;
-import jadex.simulation.analysis.common.superClasses.service.view.session.IASessionView;
 import jadex.simulation.analysis.service.simulation.allocation.IAAllocateExperimentsService;
 import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 

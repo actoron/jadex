@@ -1,22 +1,19 @@
 package jadex.simulation.analysis.process.optimisation.tasks;
 
-import java.util.UUID;
-
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITaskContext;
 import jadex.bpmn.runtime.task.ParameterMetaInfo;
 import jadex.bpmn.runtime.task.TaskMetaInfo;
-import jadex.bridge.service.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.simulation.analysis.common.data.IAExperimentBatch;
-import jadex.simulation.analysis.common.data.optimisation.IAObjectiveFunction;
-import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.superClasses.events.task.ATaskEvent;
 import jadex.simulation.analysis.common.superClasses.tasks.ATask;
 import jadex.simulation.analysis.common.superClasses.tasks.user.AServiceCallUserTaskView;
 import jadex.simulation.analysis.common.util.AConstants;
 import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
+
+import java.util.UUID;
 
 public class OptimisationInitTask extends ATask
 {

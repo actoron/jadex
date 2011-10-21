@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.application.opt4j;
 
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.GuiClass;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;

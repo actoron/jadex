@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.process.optimisation;
 
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.GuiClass;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;

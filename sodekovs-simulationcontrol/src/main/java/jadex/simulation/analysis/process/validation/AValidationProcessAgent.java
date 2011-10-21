@@ -1,7 +1,7 @@
 package jadex.simulation.analysis.process.validation;
 
-import jadex.bridge.service.SServiceProvider;
 import jadex.bridge.service.annotation.GuiClass;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;
@@ -11,8 +11,6 @@ import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.simulation.analysis.common.util.controlComponentJadexPanel.ComponentServiceViewerPanel;
-import jadex.simulation.analysis.service.highLevel.IAGeneralAnalysisProcessService;
-import jadex.simulation.analysis.service.highLevel.IAOptimisationProcessService;
 import jadex.simulation.analysis.service.highLevel.IAValidationProcessService;
 
 @Description("Agent just offer the IAValidationProcessService")

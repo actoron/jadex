@@ -1,17 +1,14 @@
 package jadex.simulation.analysis.application.jadex.model.disastermanagement;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.collections15.map.HashedMap;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.xy.VectorSeries;
-import org.jfree.data.xy.VectorSeriesCollection;
-
 import jadex.extension.envsupport.evaluation.DataTable;
 import jadex.extension.envsupport.evaluation.XYChartDataConsumer;
 import jadex.simulation.analysis.common.data.parameter.statistics.Mean;
 import jadex.simulation.analysis.common.data.parameter.statistics.Variance;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.collections15.map.HashedMap;
 
 public class XYMeanChartDataConsumer extends XYChartDataConsumer
 {

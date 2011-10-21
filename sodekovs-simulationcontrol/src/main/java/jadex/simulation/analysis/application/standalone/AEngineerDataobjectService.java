@@ -3,18 +3,13 @@ package jadex.simulation.analysis.application.standalone;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.simulation.analysis.common.data.ADataObject;
-import jadex.simulation.analysis.common.data.IADataView;
 import jadex.simulation.analysis.common.data.IAModel;
 import jadex.simulation.analysis.common.data.factories.AExperimentFactory;
 import jadex.simulation.analysis.common.data.factories.AModelFactory;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.data.simulation.Modeltype;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
-import jadex.simulation.analysis.common.superClasses.service.view.session.IASessionView;
 import jadex.simulation.analysis.service.dataBased.engineering.IAEngineerDataobjectService;
-
-import java.util.UUID;
 
 public class AEngineerDataobjectService extends ABasicAnalysisSessionService implements IAEngineerDataobjectService
 {

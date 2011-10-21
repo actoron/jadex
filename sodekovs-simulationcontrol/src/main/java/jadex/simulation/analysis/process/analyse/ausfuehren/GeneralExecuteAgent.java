@@ -1,8 +1,8 @@
 package jadex.simulation.analysis.process.analyse.ausfuehren;
 
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.GuiClass;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;

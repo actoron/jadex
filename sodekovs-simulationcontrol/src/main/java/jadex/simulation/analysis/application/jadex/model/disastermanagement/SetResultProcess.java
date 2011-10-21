@@ -1,6 +1,6 @@
 package jadex.simulation.analysis.application.jadex.model.disastermanagement;
 
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.component.ComponentInterpreter;
 import jadex.extension.envsupport.environment.DefaultObjectCreationProcess;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
