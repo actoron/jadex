@@ -1,6 +1,6 @@
 package antworld;
 
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -90,7 +90,8 @@ public class ManagePheromonesProcess extends SimplePropertyObject implements ISp
 	}
 
 	/**
-	 * Responsible for updating the image size and responsible property of the trace routes according to their age. If the object is too old, if will be destroyed. In fact in manages the evaporation process of the pheromones.
+	 * Responsible for updating the image size and responsible property of the trace routes according to their age. If the object is too old, if will be destroyed. In fact in manages the evaporation
+	 * process of the pheromones.
 	 * 
 	 * @param objects
 	 * @param space
@@ -103,7 +104,7 @@ public class ManagePheromonesProcess extends SimplePropertyObject implements ISp
 			double reductionRate = 0.50;
 			int roundInt = new Integer((int) Math.round(round.intValue() * reductionRate)).intValue();
 			if (roundInt <= 1) {
-				System.out.println("1Destroying SpaceObject: "  + objects[i].getId());
+				System.out.println("1Destroying SpaceObject: " + objects[i].getId());
 				space.destroySpaceObject(objects[i].getId());
 			} else {
 				// roundInt--;
@@ -115,7 +116,8 @@ public class ManagePheromonesProcess extends SimplePropertyObject implements ISp
 	}
 
 	/**
-	 * Responsible for updating the image size and responsible property of the trace routes according to their age. If the object is too old, if will be destroyed. In fact in manages the evaporation process of the pheromones.
+	 * Responsible for updating the image size and responsible property of the trace routes according to their age. If the object is too old, if will be destroyed. In fact in manages the evaporation
+	 * process of the pheromones.
 	 * 
 	 * @param objects
 	 * @param space
@@ -201,12 +203,12 @@ public class ManagePheromonesProcess extends SimplePropertyObject implements ISp
 		if (pheromone != null) {
 			int oldPheromoneStrength = new Integer(pheromone.getProperty(ProducePheromoneAction.STRENGTH).toString()).intValue();
 			props.put(ProducePheromoneAction.STRENGTH, new Integer(pheromoneStrength + oldPheromoneStrength));
-//			System.out.println("Destroying SpaceObject: "  + pheromone);
+			// System.out.println("Destroying SpaceObject: " + pheromone);
 			space.destroySpaceObject(pheromone.getId());
 		} else {
 			props.put(ProducePheromoneAction.STRENGTH, new Integer(pheromoneStrength));
 		}
-//		System.out.println("Creating SpaceObject: "  + props);
+		// System.out.println("Creating SpaceObject: " + props);
 		space.createSpaceObject("pheromone", props, null);
 		// System.out.println("#ManagePheromonesProcess# Created new Propagation Pheromone: "
 		// + pos.toString() + ", " + pheromoneStrength);

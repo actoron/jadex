@@ -5,15 +5,15 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.bridge.service.SServiceProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,15 +26,12 @@ import deco4mas.examples.agentNegotiation.evaluate.ValueLogger;
 /**
  * Creates a workflow and init the necessary negotiations
  */
-public class ExecuteWorkflowPlan extends Plan
-{
+public class ExecuteWorkflowPlan extends Plan {
 	/* id of the workflow */
 	private static Integer workflowID = new Integer(0);
 
-	public void body()
-	{
-		try
-		{
+	public void body() {
+		try {
 			// name of new workflow
 			final String workflowName = "workflowNet" + workflowID + "(" + getComponentName() + ")";
 
@@ -46,45 +43,38 @@ public class ExecuteWorkflowPlan extends Plan
 			// create workflow
 			Map workflowArgs = new HashMap();
 			workflowArgs.put("sma", getComponentIdentifier());
-			
-			
 
 			// listener at component kill / workflow execution
 			final IBDIExternalAccess myExternalAccess = this.getExternalAccess();
-			IResultListener killListener = new IResultListener()
-			{
+			IResultListener killListener = new IResultListener() {
 				/** called when workflow is executed */
 				@Override
-				public void resultAvailable(Object result)
-				{
+				public void resultAvailable(Object result) {
 					System.out.println("*** workflow executed ***");
 
 					// workflow executed -> init InternalEvent
-					try
-					{
+					try {
 						myExternalAccess.scheduleStep(new IComponentStep<Void>() {
-							
+
 							@Override
 							public IFuture<Void> execute(IInternalAccess ia) {
-								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+								IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 								IInternalEvent workflowExecuted = bia.getEventbase().createInternalEvent("workflowExecuted");
 								bia.getEventbase().dispatchInternalEvent(workflowExecuted);
 								return IFuture.DONE;
 							}
 						});
-						
-					} catch (Exception e)
-					{
-						//omit
-						//exception, when terminated
+
+					} catch (Exception e) {
+						// omit
+						// exception, when terminated
 					}
-					
+
 				}
 
 				/** called when workflow throw exception */
 				@Override
-				public void exceptionOccurred(Exception exception)
-				{
+				public void exceptionOccurred(Exception exception) {
 					// normally not called / just log
 					workflowLogger.severe("workflow not finished");
 					providerLogger.severe("workflow not finished");
@@ -93,25 +83,22 @@ public class ExecuteWorkflowPlan extends Plan
 				}
 			};
 			// now create workflow component
-			String workflowType = "deco4mas/examples/agentNegotiation/sma/application/workflow/implementation/"
-				+ (String) getBeliefbase().getBelief("workflowName").getFact() + ".bpmn";
-			
-			IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-					interpreter.getServiceProvider(), IComponentManagementService.class).get(new ThreadSuspendable());
-			
-			IFuture workflowFuture = cms.createComponent(workflowName, workflowType, new CreationInfo(null, workflowArgs, this
-					.getComponentIdentifier(), true, false), killListener);
-						
-//			IFuture workflowFuture = ((IComponentManagementService) interpreter.getAgentAdapter().getServiceContainer().getService(
-//					IComponentManagementService.class)).createComponent(workflowName, workflowType, new CreationInfo(null, workflowArgs, this
-//					.getComponentIdentifier(), true, false), killListener);
-			
+			String workflowType = "deco4mas/examples/agentNegotiation/sma/application/workflow/implementation/" + (String) getBeliefbase().getBelief("workflowName").getFact() + ".bpmn";
+
+			IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getServiceUpwards(interpreter.getServiceProvider(), IComponentManagementService.class).get(
+					new ThreadSuspendable());
+
+			IFuture workflowFuture = cms.createComponent(workflowName, workflowType, new CreationInfo(null, workflowArgs, this.getComponentIdentifier(), true, false), killListener);
+
+			// IFuture workflowFuture = ((IComponentManagementService) interpreter.getAgentAdapter().getServiceContainer().getService(
+			// IComponentManagementService.class)).createComponent(workflowName, workflowType, new CreationInfo(null, workflowArgs, this
+			// .getComponentIdentifier(), true, false), killListener);
+
 			IComponentIdentifier workflowIdentifier = (IComponentIdentifier) workflowFuture.get(this);
 			getBeliefbase().getBelief("workflow").setFact(workflowIdentifier);
 			getBeliefbase().getBelief("workflowData").setFact(
-				new WorkflowData(workflowIdentifier, (Long) getBeliefbase().getBelief("workflowIntendedTime").getFact(),
-					(Double) getBeliefbase().getBelief("workflowProfit").getFact(), (Double) getBeliefbase().getBelief("negotiationCosts")
-						.getFact()));
+					new WorkflowData(workflowIdentifier, (Long) getBeliefbase().getBelief("workflowIntendedTime").getFact(), (Double) getBeliefbase().getBelief("workflowProfit").getFact(),
+							(Double) getBeliefbase().getBelief("negotiationCosts").getFact()));
 			// LOG
 			providerLogger.info("workflow [" + workflowName + "] created");
 			workflowLogger.info("workflow created");
@@ -123,7 +110,7 @@ public class ExecuteWorkflowPlan extends Plan
 			workflowID++;
 
 			waitForInternalEvent("workflowExecuted");
-			
+
 			// LOG
 			workflowLogger.info("workflow executed");
 			providerLogger.info("*** workflow executed ***");
@@ -133,13 +120,12 @@ public class ExecuteWorkflowPlan extends Plan
 			ValueLogger.addValue("workflowTime", data.getCompleteTime().doubleValue());
 			workflowTimeLogger.info("Complete time: " + data.getExecutionTime().toString());
 			workflowTimeLogger.info("---");
-			
+
 			dispatchSubgoalAndWait(createGoal("evaluateWorkflow"));
 
 			IGoal restartWorkflow = createGoal("restartWorkflow");
 			dispatchTopLevelGoal(restartWorkflow);
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e);
 		}

@@ -1,8 +1,10 @@
 package deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOfferer.trustOwner;
 
 import jadex.bdi.runtime.Plan;
+
 import java.util.HashMap;
 import java.util.Map;
+
 import deco4mas.examples.agentNegotiation.common.trustInformation.TrustEvent;
 import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 import deco4mas.examples.agentNegotiation.evaluate.ClockTime;
@@ -13,14 +15,11 @@ import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.S
 /**
  * Init capability beliefs
  */
-public class InitCapabilityPlan extends Plan
-{
+public class InitCapabilityPlan extends Plan {
 	final ParameterLogger trustLogger = (ParameterLogger) AgentLogger.getTimeDiffEventForSa("TrustChange_" + this.getComponentName());
 
-	public void body()
-	{
-		try
-		{
+	public void body() {
+		try {
 			// history
 			ServiceAgentHistory history = new ServiceAgentHistory(this.getComponentIdentifier(), ClockTime.getStartTime(getClock()));
 			getBeliefbase().getBelief("history").setFact(history);
@@ -32,9 +31,8 @@ public class InitCapabilityPlan extends Plan
 			eventWeight.put(TrustEvent.CancelContract, -1.0);
 			HistorytimeTrustFunction trustFunction = new HistorytimeTrustFunction(this.getComponentIdentifier(), history, eventWeight);
 			getBeliefbase().getBelief("trustFunction").setFact(trustFunction);
-			
-		} catch (Exception e)
-		{
+
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e);
 		}

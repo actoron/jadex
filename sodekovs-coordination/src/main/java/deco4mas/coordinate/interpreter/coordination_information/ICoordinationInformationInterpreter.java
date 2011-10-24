@@ -1,6 +1,6 @@
 package deco4mas.coordinate.interpreter.coordination_information;
 
-import jadex.bridge.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.IPerceptProcessor;
 import jadex.extension.envsupport.environment.ISpaceObject;

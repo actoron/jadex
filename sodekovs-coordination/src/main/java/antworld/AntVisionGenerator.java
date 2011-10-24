@@ -1,7 +1,6 @@
 package antworld;
 
-import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.EnvironmentEvent;
@@ -74,10 +73,7 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 	 * Test if an event is relevant for the percept generator.
 	 * 
 	 * @param event
-	 *            The event. / public boolean isRelevant(EnvironmentEvent event)
-	 *            { return agents!=null &&
-	 *            "garbage".equals(event.getSpaceObject().getType()) &&
-	 *            EnvironmentEvent
+	 *            The event. / public boolean isRelevant(EnvironmentEvent event) { return agents!=null && "garbage".equals(event.getSpaceObject().getType()) && EnvironmentEvent
 	 *            .OBJECT_POSITION_CHANGED.equals(event.getType()); }
 	 */
 
@@ -93,8 +89,8 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 		// event.getSpaceObject().getType());
 		if (agents != null && "ant".equals(event.getSpaceObject().getType())) {
 			for (int i = 0; i < agents.size(); i++) {
-				IComponentDescription agent = (IComponentDescription) agents.get(i);				
-				if(EnvironmentEvent.OBJECT_PROPERTY_CHANGED.equals(event.getType()) && Space2D.PROPERTY_POSITION.equals(event.getProperty())) {
+				IComponentDescription agent = (IComponentDescription) agents.get(i);
+				if (EnvironmentEvent.OBJECT_PROPERTY_CHANGED.equals(event.getType()) && Space2D.PROPERTY_POSITION.equals(event.getProperty())) {
 					IVector2 pos = (IVector2) event.getSpaceObject().getProperty(Space2D.PROPERTY_POSITION);
 					// IVector2 oldpos = (IVector2) event.getInfo();
 					ISpaceObject agentobj = event.getSpace().getAvatar(agent);
@@ -134,8 +130,7 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 	}
 
 	/**
-	 * Checks whether the position has gravitation. If yes, then the position of
-	 * the gravitation center is returned. Otherwise null.
+	 * Checks whether the position has gravitation. If yes, then the position of the gravitation center is returned. Otherwise null.
 	 * 
 	 * @param space
 	 * @param pos
@@ -152,16 +147,14 @@ public class AntVisionGenerator extends SimplePropertyObject implements IPercept
 	}
 
 	@Override
-	public void componentAdded(IComponentDescription component,
-			IEnvironmentSpace space) {
+	public void componentAdded(IComponentDescription component, IEnvironmentSpace space) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void componentRemoved(IComponentDescription component,
-			IEnvironmentSpace space) {
+	public void componentRemoved(IComponentDescription component, IEnvironmentSpace space) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

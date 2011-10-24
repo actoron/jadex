@@ -1,6 +1,6 @@
 package antworld;
 
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -63,7 +63,7 @@ public class ManageFoodSourcesProcess extends SimplePropertyObject implements IS
 	 * @param space
 	 *            The space this process is running in.
 	 */
-	public void execute(IClockService clock, IEnvironmentSpace space) {		
+	public void execute(IClockService clock, IEnvironmentSpace space) {
 		Grid2D grid = (Grid2D) space;
 
 		double delta = clock.getTick() - lasttick;
@@ -83,33 +83,33 @@ public class ManageFoodSourcesProcess extends SimplePropertyObject implements IS
 					System.out.println("#ManageFoodSourceProcess# Food Source empty. Will be destroyed: " + foodSource);
 				}
 			}
-			
-//			if(tmp){
-//			Map props = new HashMap();
-//			props.put(Space2D.PROPERTY_POSITION, new Vector2Int(4, 4));			
-//			space.createSpaceObject("food", props, null);
-//			System.out.println("#ManageFoodSourceProcess# Created food..." + props);
-//			
-//			Map props2 = new HashMap();
-//			props2.put(Space2D.PROPERTY_POSITION, new Vector2Int(5, 5));			
-//			space.createSpaceObject("food", props2, null);
-//			System.out.println("#ManageFoodSourceProcess# Created food..." + props2);
-//
-////			System.out.println("*******************");
-////			ISpaceObject[] tt = (grid.getSpaceObjectsByType("food"));
-////			for(int i=0; i < tt.length; i++){
-////				System.out.println(tt[i]);	
-////			}
-//			
-////			System.out.println("*******************");
-//				tmp = false;
-//			}else if(tmpCount == 105){
-//				Map props = new HashMap();
-//				props.put(Space2D.PROPERTY_POSITION, new Vector2Int(6, 6));			
-//				space.createSpaceObject("food", props, null);
-//				System.out.println("#ManageFoodSourceProcess# Created food..." + props);
-//			}
-//			tmpCount++;
+
+			// if(tmp){
+			// Map props = new HashMap();
+			// props.put(Space2D.PROPERTY_POSITION, new Vector2Int(4, 4));
+			// space.createSpaceObject("food", props, null);
+			// System.out.println("#ManageFoodSourceProcess# Created food..." + props);
+			//
+			// Map props2 = new HashMap();
+			// props2.put(Space2D.PROPERTY_POSITION, new Vector2Int(5, 5));
+			// space.createSpaceObject("food", props2, null);
+			// System.out.println("#ManageFoodSourceProcess# Created food..." + props2);
+			//
+			// // System.out.println("*******************");
+			// // ISpaceObject[] tt = (grid.getSpaceObjectsByType("food"));
+			// // for(int i=0; i < tt.length; i++){
+			// // System.out.println(tt[i]);
+			// // }
+			//
+			// // System.out.println("*******************");
+			// tmp = false;
+			// }else if(tmpCount == 105){
+			// Map props = new HashMap();
+			// props.put(Space2D.PROPERTY_POSITION, new Vector2Int(6, 6));
+			// space.createSpaceObject("food", props, null);
+			// System.out.println("#ManageFoodSourceProcess# Created food..." + props);
+			// }
+			// tmpCount++;
 		}
 	}
 }

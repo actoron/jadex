@@ -1,7 +1,7 @@
 package deco4mas.examples.agentNegotiation.deco.media;
 
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.util.Collections;
@@ -31,9 +31,8 @@ import deco4mas.mechanism.ICoordinationMechanism;
 /**
  * Implements a negotiation coordination mechanism.
  */
-public class NegotiationMechanism extends ICoordinationMechanism
-{
-	/* Logger for the medium*/
+public class NegotiationMechanism extends ICoordinationMechanism {
+	/* Logger for the medium */
 	private Logger mediumLogger = AgentLogger.getTimeEvent("NegSpaceMedium");
 
 	/* name for the medium */
@@ -57,28 +56,21 @@ public class NegotiationMechanism extends ICoordinationMechanism
 	 * @param the
 	 *            space for the mechanism
 	 */
-	public NegotiationMechanism(CoordinationSpace space)
-	{
+	public NegotiationMechanism(CoordinationSpace space) {
 		super(space);
 	}
 
 	/**
-	 * Called for every {@link CoordinationInformation} by
-	 * {@link CoordinationSpace} implements the method in the interface
-	 * {@link ICoordinationMechanism}
+	 * Called for every {@link CoordinationInformation} by {@link CoordinationSpace} implements the method in the interface {@link ICoordinationMechanism}
 	 * 
 	 * @param obj
-	 *            The fired envirement Event (should be a
-	 *            {@link CoordinationInformation})
+	 *            The fired envirement Event (should be a {@link CoordinationInformation})
 	 */
-	public void perceiveCoordinationEvent(Object obj)
-	{
-		if (obj instanceof CoordinationInformation)
-		{
+	public void perceiveCoordinationEvent(Object obj) {
+		if (obj instanceof CoordinationInformation) {
 			CoordinationInformation ci = (CoordinationInformation) obj;
 			NegotiationInformation info = (NegotiationInformation) ((Map) ci.getValueByName("parameterDataMapping")).get("information");
-			if (info.getMediumType().equals(NAME))
-			{
+			if (info.getMediumType().equals(NAME)) {
 				if (info instanceof DirectNegotiationInitatorInformation)
 					newInitiatiorRequest(info);
 				else if (info instanceof DirectNegotiationParticipantInformation)
@@ -90,22 +82,19 @@ public class NegotiationMechanism extends ICoordinationMechanism
 	}
 
 	/**
-	 * Init a negotiation for given {@link DirectNegotiationInitatorInformation}
-	 * (synchronized)
+	 * Init a negotiation for given {@link DirectNegotiationInitatorInformation} (synchronized)
 	 * 
 	 * @param info
 	 *            received {@link NegotiationInformation}
 	 */
-	private synchronized void newInitiatiorRequest(NegotiationInformation info)
-	{
+	private synchronized void newInitiatiorRequest(NegotiationInformation info) {
 		DirectNegotiationInitatorInformation initiatorInfo = (DirectNegotiationInitatorInformation) info;
-		//System.out.println("#perceiveCoordinationEvent " + initiatorInfo);
+		// System.out.println("#perceiveCoordinationEvent " + initiatorInfo);
 		mediumLogger.info("New request: " + initiatorInfo);
 
 		// create NegotiationInitiatorObject
 		NegotiationInitiator negotiation = null;
-		synchronized (id)
-		{
+		synchronized (id) {
 			negotiation = new NegotiationInitiator(id, initiatorInfo);
 			negotiation.setState(NegotiationInitiator.EXPLORATORY_PHASE, clock.getTime() + negotiation.getDeadline());
 			negotiations.put(id, negotiation);
@@ -116,31 +105,25 @@ public class NegotiationMechanism extends ICoordinationMechanism
 	}
 
 	/**
-	 * (De)register a participant for given
-	 * {@link DirectNegotiationParticipantInformation}
+	 * (De)register a participant for given {@link DirectNegotiationParticipantInformation}
 	 * 
 	 * @param info
 	 *            received {@link NegotiationInformation}
 	 */
-	private synchronized void participantRegister(NegotiationInformation info)
-	{
+	private synchronized void participantRegister(NegotiationInformation info) {
 		DirectNegotiationParticipantInformation participantInfo = (DirectNegotiationParticipantInformation) info;
-//		System.out.println("#perceiveCoordinationEvent " + participantInfo);
+		// System.out.println("#perceiveCoordinationEvent " + participantInfo);
 		mediumLogger.info("participant: " + participantInfo);
 
 		boolean found = false;
-		synchronized (participants)
-		{
-			for (NegotiationParticipant participant : participants)
-			{
-				if (participant.getParticipant().getLocalName().equals(participantInfo.getParticipant().getLocalName()))
-				{
+		synchronized (participants) {
+			for (NegotiationParticipant participant : participants) {
+				if (participant.getParticipant().getLocalName().equals(participantInfo.getParticipant().getLocalName())) {
 					participant.setBlackout(participantInfo.getBlackout());
 					found = true;
 				}
 			}
-			if (!found)
-			{
+			if (!found) {
 				participants.add(new NegotiationParticipant(participantInfo));
 			}
 		}
@@ -152,60 +135,45 @@ public class NegotiationMechanism extends ICoordinationMechanism
 	 * @param info
 	 *            received {@link NegotiationInformation}
 	 */
-	private void contractReply(NegotiationInformation info)
-	{
+	private void contractReply(NegotiationInformation info) {
 		NegotiationContractInformation contractInfo = (NegotiationContractInformation) info;
-//		System.out.println("#perceiveCoordinationEvent " + contractInfo);
+		// System.out.println("#perceiveCoordinationEvent " + contractInfo);
 		mediumLogger.info("New Answer: " + contractInfo);
 
 		NegotiationInitiator negotiation = negotiations.get(contractInfo.getId());
-		if (negotiation.getState().equals(NegotiationInitiator.FINAL_PHASE))
-		{
+		if (negotiation.getState().equals(NegotiationInitiator.FINAL_PHASE)) {
 			Boolean[] answers = contractInfo.getAnswers();
 			// initiator
-			if (answers[0] != null)
-			{
-				if (answers[0])
-				{
+			if (answers[0] != null) {
+				if (answers[0]) {
 					negotiation.acceptReward(contractInfo.getContract().getInitiator());
-				} else
-				{
-					if (negotiation.setState(NegotiationInitiator.INTERMEDIATE_PHASE, clock.getTime() + negotiation.getDeadline()))
-					{
-						sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation
-							.getServiceType(), negotiation.getSelected().getBid(), negotiation.getInitiator(), negotiation.getSelected()
-							.getOwner()), NegotiationContractInformation.CANCELED_REWARD));
+				} else {
+					if (negotiation.setState(NegotiationInitiator.INTERMEDIATE_PHASE, clock.getTime() + negotiation.getDeadline())) {
+						sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation.getServiceType(), negotiation.getSelected().getBid(),
+								negotiation.getInitiator(), negotiation.getSelected().getOwner()), NegotiationContractInformation.CANCELED_REWARD));
 						performNegotiation(negotiation);
 					}
 				}
 			}
 
 			// participant
-			if (answers[1] != null)
-			{
-				if (answers[1])
-				{
+			if (answers[1] != null) {
+				if (answers[1]) {
 					negotiation.acceptReward(contractInfo.getContract().getParticipant());
-				} else
-				{
-					if (negotiation.setState(NegotiationInitiator.INTERMEDIATE_PHASE, clock.getTime() + negotiation.getDeadline()))
-					{
-						sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation
-							.getServiceType(), negotiation.getSelected().getBid(), negotiation.getInitiator(), negotiation.getSelected()
-							.getOwner()), NegotiationContractInformation.CANCELED_REWARD));
+				} else {
+					if (negotiation.setState(NegotiationInitiator.INTERMEDIATE_PHASE, clock.getTime() + negotiation.getDeadline())) {
+						sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation.getServiceType(), negotiation.getSelected().getBid(),
+								negotiation.getInitiator(), negotiation.getSelected().getOwner()), NegotiationContractInformation.CANCELED_REWARD));
 						performNegotiation(negotiation);
 					}
 				}
 			}
 
 			// check if we can proceed
-			if (negotiation.areRewardsAccepted())
-			{
-				if (negotiation.setState(NegotiationInitiator.CLOSED, Long.MAX_VALUE))
-				{
-					sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation.getServiceType(),
-						negotiation.getSelected().getBid(), negotiation.getInitiator(), negotiation.getSelected().getOwner()),
-						NegotiationContractInformation.FINAL_REWARD));
+			if (negotiation.areRewardsAccepted()) {
+				if (negotiation.setState(NegotiationInitiator.CLOSED, Long.MAX_VALUE)) {
+					sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation.getServiceType(), negotiation.getSelected().getBid(),
+							negotiation.getInitiator(), negotiation.getSelected().getOwner()), NegotiationContractInformation.FINAL_REWARD));
 					negotiations.remove(negotiation);
 				}
 			}
@@ -215,39 +183,29 @@ public class NegotiationMechanism extends ICoordinationMechanism
 	/**
 	 * Called by MediumTimeProcess for deadline check
 	 */
-	public void nextTick()
-	{
-		for (NegotiationInitiator negotiation : negotiations.values())
-		{
+	public void nextTick() {
+		for (NegotiationInitiator negotiation : negotiations.values()) {
 			if (negotiation.getPhaseEnd() < clock.getTime()
-				&& (negotiation.getState().equals(NegotiationInitiator.EXPLORATORY_PHASE) || negotiation.getState().equals(
-					NegotiationInitiator.INTERMEDIATE_PHASE)))
-			{
-//				System.out.println("#tick " + negotiation + " at deadline");
+					&& (negotiation.getState().equals(NegotiationInitiator.EXPLORATORY_PHASE) || negotiation.getState().equals(NegotiationInitiator.INTERMEDIATE_PHASE))) {
+				// System.out.println("#tick " + negotiation + " at deadline");
 				mediumLogger.info(negotiation + ") at deadline");
 
 				// go next round
 				performNegotiation(negotiation);
 			}
 
-			if (negotiation.getPhaseEnd() < clock.getTime() && negotiation.getState().equals(NegotiationInitiator.FINAL_PHASE))
-			{
-//				System.out.println("#tick " + negotiation + " at deadline");
+			if (negotiation.getPhaseEnd() < clock.getTime() && negotiation.getState().equals(NegotiationInitiator.FINAL_PHASE)) {
+				// System.out.println("#tick " + negotiation + " at deadline");
 				mediumLogger.info(negotiation + ") at deadline");
 
-				if (negotiation.areRewardsAccepted())
-				{
-					if (negotiation.setState(NegotiationInitiator.CLOSED, Long.MAX_VALUE))
-					{
+				if (negotiation.areRewardsAccepted()) {
+					if (negotiation.setState(NegotiationInitiator.CLOSED, Long.MAX_VALUE)) {
 						negotiations.remove(negotiation);
-						sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation
-							.getServiceType(), negotiation.getSelected().getBid(), negotiation.getInitiator(), negotiation.getSelected()
-							.getOwner()), NegotiationContractInformation.FINAL_REWARD));
+						sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation.getServiceType(), negotiation.getSelected().getBid(),
+								negotiation.getInitiator(), negotiation.getSelected().getOwner()), NegotiationContractInformation.FINAL_REWARD));
 					}
-				} else
-				{
-					if (negotiation.setState(NegotiationInitiator.INTERMEDIATE_PHASE, clock.getTime() + negotiation.getDeadline()))
-					{
+				} else {
+					if (negotiation.setState(NegotiationInitiator.INTERMEDIATE_PHASE, clock.getTime() + negotiation.getDeadline())) {
 						performNegotiation(negotiation);
 					}
 				}
@@ -257,10 +215,11 @@ public class NegotiationMechanism extends ICoordinationMechanism
 
 	/**
 	 * Send a reward to sa / sma for the given {@link NegotiationContractInformation}
-	 * @param info the given {@link NegotiationContractInformation}
+	 * 
+	 * @param info
+	 *            the given {@link NegotiationContractInformation}
 	 */
-	private void sendReward(NegotiationContractInformation info)
-	{
+	private void sendReward(NegotiationContractInformation info) {
 		// get Space
 		CoordinationSpace env = (CoordinationSpace) space;
 
@@ -279,50 +238,44 @@ public class NegotiationMechanism extends ICoordinationMechanism
 
 		// publish
 		mediumLogger.info("sendContract " + info);
-//		System.out.println("#publish " + info);
+		// System.out.println("#publish " + info);
 		env.publishCoordinationEvent(coordInfo);
 	}
 
 	/**
 	 * Perform the negotiation for the given {@link NegotiationInformation}
 	 * 
-	 * @param the given {@link NegotiationInformation}
+	 * @param the
+	 *            given {@link NegotiationInformation}
 	 */
-	private void performNegotiation(NegotiationInitiator negotiation)
-	{
-//		System.out.println("#bidRound " + negotiation);
+	private void performNegotiation(NegotiationInitiator negotiation) {
+		// System.out.println("#bidRound " + negotiation);
 		mediumLogger.info("bid round " + negotiation);
 
 		ServiceOffer offer = new ServiceOffer(negotiation.getId(), negotiation.getServiceType());
-		for (NegotiationParticipant participant : participants)
-		{
-			if (!participant.isBlackout())
-			{
+		for (NegotiationParticipant participant : participants) {
+			if (!participant.isBlackout()) {
 				negotiation.addProposal(participant.deliverProposal(offer));
 			}
 
 		}
 
 		// return false if a proposal is accepted
-		if (negotiation.evaluateRound(clock.getTime()))
-		{
-//			System.out.println("#noSaFound " + negotiation);
+		if (negotiation.evaluateRound(clock.getTime())) {
+			// System.out.println("#noSaFound " + negotiation);
 			mediumLogger.info("no sa found " + negotiation);
 
 			// wait 1 deadline and then try again
 			negotiation.setState(NegotiationInitiator.INTERMEDIATE_PHASE, clock.getTime() + negotiation.getDeadline());
 
-		} else
-		{
-//			System.out.println("#saFound " + negotiation);
+		} else {
+			// System.out.println("#saFound " + negotiation);
 			mediumLogger.info("sa found " + negotiation);
 
 			// send rewards
-			if (negotiation.setState(NegotiationInitiator.FINAL_PHASE, clock.getTime() + negotiation.getDeadline()))
-			{
-				sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation.getServiceType(),
-					negotiation.getSelected().getBid(), negotiation.getInitiator(), negotiation.getSelected().getOwner()),
-					NegotiationContractInformation.TENTATIVE_REWARD));
+			if (negotiation.setState(NegotiationInitiator.FINAL_PHASE, clock.getTime() + negotiation.getDeadline())) {
+				sendReward(new NegotiationContractInformation(negotiation.getId(), NAME, new ServiceContract(negotiation.getServiceType(), negotiation.getSelected().getBid(),
+						negotiation.getInitiator(), negotiation.getSelected().getOwner()), NegotiationContractInformation.TENTATIVE_REWARD));
 			}
 		}
 	}
@@ -331,29 +284,23 @@ public class NegotiationMechanism extends ICoordinationMechanism
 	 * ------------ Interface for ICoordinationMechanism ------------ /*
 	 */
 
-	public void start()
-	{
+	public void start() {
 		System.out.println("#StartMechanismNegotiation");
-		clock = (IClockService)SServiceProvider.getServiceUpwards(
-				space.getExternalAccess().getServiceProvider(), IClockService.class).get(new ThreadSuspendable());	
-	
+		clock = (IClockService) SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IClockService.class).get(new ThreadSuspendable());
+
 		// clock.reset();
 	}
 
-	public void stop()
-	{
+	public void stop() {
 	}
 
-	public void suspend()
-	{
+	public void suspend() {
 	}
 
-	public void restart()
-	{
+	public void restart() {
 	}
 
-	public String getRealisationName()
-	{
+	public String getRealisationName() {
 		return NAME;
 	}
 

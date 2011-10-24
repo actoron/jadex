@@ -1,7 +1,7 @@
 package sodekovs.util.misc;
 
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 
 /**

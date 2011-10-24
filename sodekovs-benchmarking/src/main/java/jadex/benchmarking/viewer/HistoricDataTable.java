@@ -1,7 +1,7 @@
 package jadex.benchmarking.viewer;
 
-import jadex.base.fipa.IProperty;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.df.IProperty;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.gui.jtable.TableSorter;
@@ -11,22 +11,20 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import sodekovs.util.model.benchmarking.description.IBenchmarkingDescription;
 import sodekovs.util.model.benchmarking.description.IHistoricDataDescription;
 
 /**
- *  Table showing historic data found in a db.
+ * Table showing historic data found in a db.
  */
-public class HistoricDataTable extends JTable//JScrollPane
+public class HistoricDataTable extends JTable// JScrollPane
 {
 	/**
 	 * Constructor.
 	 */
-	public HistoricDataTable()
-	{
+	public HistoricDataTable() {
 		super(new TableSorter(new HistoricDataTableModel()));
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		TableSorter sorter = (TableSorter)getModel();
+		TableSorter sorter = (TableSorter) getModel();
 		sorter.setTableHeader(getTableHeader());
 		setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer());
 		setDefaultRenderer(String[].class, new StringArrayRenderer());
@@ -34,69 +32,69 @@ public class HistoricDataTable extends JTable//JScrollPane
 	}
 
 	/**
-	 *  Get the selected history description.
-	 *  @return The currently selected history description.
+	 * Get the selected history description.
+	 * 
+	 * @return The currently selected history description.
 	 */
-	public IHistoricDataDescription getSelectedHistoricDataDescription()
-	{
-//		Object[] ret = new Object[]{null, null};
+	public IHistoricDataDescription getSelectedHistoricDataDescription() {
+		// Object[] ret = new Object[]{null, null};
 		IHistoricDataDescription ret = null;
 		int sel = getSelectedRow();
-		
-		//Hack: somehow sel is sometimes -1 : avoid nullpointer-exception with this hack.
-		if(sel < 0){
+
+		// Hack: somehow sel is sometimes -1 : avoid nullpointer-exception with this hack.
+		if (sel < 0) {
 			sel = 0;
 		}
-		
-//		if(sel>=0)
-//		{
-			TableSorter sorter = (TableSorter)getModel();
-			HistoricDataTableModel model = (HistoricDataTableModel)sorter.getTableModel();
-			sel = sorter.modelIndex(sel);			
-			ret = model.getHistoricDataDescription(sel);
-//		}else if(sel == -1){
-//			sel=0;
-//			System.out.println("YYYYYYYYYYYYYYES");
-//			TableSorter sorter = (TableSorter)getModel();
-//			HistoricDataTableModel model = (HistoricDataTableModel)sorter.getTableModel();
-//			sel = sorter.modelIndex(sel);			
-//			ret = model.getHistoricDataDescription(sel);
-//		}
+
+		// if(sel>=0)
+		// {
+		TableSorter sorter = (TableSorter) getModel();
+		HistoricDataTableModel model = (HistoricDataTableModel) sorter.getTableModel();
+		sel = sorter.modelIndex(sel);
+		ret = model.getHistoricDataDescription(sel);
+		// }else if(sel == -1){
+		// sel=0;
+		// System.out.println("YYYYYYYYYYYYYYES");
+		// TableSorter sorter = (TableSorter)getModel();
+		// HistoricDataTableModel model = (HistoricDataTableModel)sorter.getTableModel();
+		// sel = sorter.modelIndex(sel);
+		// ret = model.getHistoricDataDescription(sel);
+		// }
 		return ret;
 	}
-	
+
 	/**
 	 * Sets descriptions for this element
+	 * 
 	 * @param ad
 	 */
-	public void setComponentDescriptions(IHistoricDataDescription[] histDataDesc)
-	{
-		TableSorter sorter = (TableSorter)getModel();
-		HistoricDataTableModel model = (HistoricDataTableModel)sorter.getTableModel();
-//		model.setComponentDescriptions(ad);
+	public void setComponentDescriptions(IHistoricDataDescription[] histDataDesc) {
+		TableSorter sorter = (TableSorter) getModel();
+		HistoricDataTableModel model = (HistoricDataTableModel) sorter.getTableModel();
+		// model.setComponentDescriptions(ad);
 		model.setHistoricDataDescriptions(histDataDesc);
 	}
 
-//	/**
-//	 * @param componentDescription
-//	 */
-//	public void setComponentDescription(IBenchmarkingDescription ad)
-//	{
-//		TableSorter sorter = (TableSorter)getModel();
-//		BenchmarkingTableModel model = (BenchmarkingTableModel)sorter.getTableModel();
-////		model.setComponentDescription(ad);
-//	}
+	// /**
+	// * @param componentDescription
+	// */
+	// public void setComponentDescription(IBenchmarkingDescription ad)
+	// {
+	// TableSorter sorter = (TableSorter)getModel();
+	// BenchmarkingTableModel model = (BenchmarkingTableModel)sorter.getTableModel();
+	// // model.setComponentDescription(ad);
+	// }
 
 	/**
-	 *  Get the properties.
-	 *  @param props The properties.
+	 * Get the properties.
+	 * 
+	 * @param props
+	 *            The properties.
 	 */
-	public Properties	getProperties()
-	{
-		Properties	props	= new Properties();
+	public Properties getProperties() {
+		Properties props = new Properties();
 		TableColumnModel cm = getColumnModel();
-		for(int i=0; i<cm.getColumnCount(); i++)
-		{
+		for (int i = 0; i < cm.getColumnCount(); i++) {
 			TableColumn column = cm.getColumn(i);
 			props.addProperty(new Property("columnwidth", Integer.toString(column.getWidth())));
 		}
@@ -104,15 +102,15 @@ public class HistoricDataTable extends JTable//JScrollPane
 	}
 
 	/**
-	 *  Set the properties.
-	 *  @param props The properties.
+	 * Set the properties.
+	 * 
+	 * @param props
+	 *            The properties.
 	 */
-	public void setProperties(Properties props)
-	{
-		Property[]	columnprops	= props.getProperties("columnwidth");
+	public void setProperties(Properties props) {
+		Property[] columnprops = props.getProperties("columnwidth");
 		TableColumnModel cm = getColumnModel();
-		for(int i=0; i<cm.getColumnCount() && i<columnprops.length; i++)
-		{
+		for (int i = 0; i < cm.getColumnCount() && i < columnprops.length; i++) {
 			cm.getColumn(i).setPreferredWidth(Integer.parseInt(columnprops[i].getValue()));
 		}
 	}

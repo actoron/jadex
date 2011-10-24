@@ -1,6 +1,6 @@
 package antworld;
 
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SimplePropertyObject;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceProcess;
@@ -14,8 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Process creates and manages gravitation centers and associated gravitation
- * lines.
+ * Process creates and manages gravitation centers and associated gravitation lines.
  */
 public class ManageGravitationProcess extends SimplePropertyObject implements ISpaceProcess {
 	// -------- attributes --------
@@ -30,7 +29,7 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 	public final static String GRAVITATION_STRENGTH = "gravitation strength";
 	public final static String GRAVITATION_FIELD = "gravitationField";
 	public final static String ABSORBED_OBJECTS = "absorbedObjects";
-	
+
 	// int roundCounter = 0;
 
 	// -------- constructors --------
@@ -45,8 +44,7 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 	// -------- ISpaceProcess interface --------
 
 	/**
-	 * This method will be executed by the object before the process gets added
-	 * to the execution queue.
+	 * This method will be executed by the object before the process gets added to the execution queue.
 	 * 
 	 * @param clock
 	 *            The clock.
@@ -59,8 +57,7 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 	}
 
 	/**
-	 * This method will be executed by the object before the process is removed
-	 * from the execution queue.
+	 * This method will be executed by the object before the process is removed from the execution queue.
 	 * 
 	 * @param clock
 	 *            The clock.
@@ -92,11 +89,11 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 			// lasttick = clock.getTick();
 			// add gravitation center
 			Vector2Int pos = new Vector2Int(4, 5);
-//			IVector2 pos = grid.getRandomPosition(new Vector2Int(1,1));
+			// IVector2 pos = grid.getRandomPosition(new Vector2Int(1,1));
 			int gravitationDistance = 1;
 
 			Map props = new HashMap();
-			props.put(Space2D.PROPERTY_POSITION, (IVector2)pos);
+			props.put(Space2D.PROPERTY_POSITION, (IVector2) pos);
 			props.put(GRAVITATION_DISTANCE, new Integer(gravitationDistance));
 			props.put(GRAVITATION_CENTER_ID, "ABC");
 			props.put(ABSORBED_OBJECTS, new Integer(0));
@@ -107,7 +104,7 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 			int xPos = pos.getXAsInteger();
 			int yPos = pos.getYAsInteger();
 			ArrayList gravitationField = getGravitationField(xPos, yPos);
-			for(int i=0; i < gravitationField.size(); i++){
+			for (int i = 0; i < gravitationField.size(); i++) {
 				props = new HashMap();
 				props.put(Space2D.PROPERTY_POSITION, gravitationField.get(i));
 				props.put(GRAVITATION_CENTER_ID, "ABC");
@@ -115,13 +112,14 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 				props.put(GRAVITATION_STRENGTH, new Integer(10));
 				grid.createSpaceObject(GRAVITATION_FIELD, props, null);
 			}
-			firstTime = false; 
+			firstTime = false;
 		}
 
 	}
 
 	/**
 	 * Compute the 8 surrounding fields of the gravitation center
+	 * 
 	 * @param xPos
 	 * @param yPos
 	 * @return
@@ -136,7 +134,7 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 		// -/+
 		res.add(new Vector2Int(xPos - 1, yPos + 1));
 		// 0/-
-		res.add(new Vector2Int(xPos, yPos -1));
+		res.add(new Vector2Int(xPos, yPos - 1));
 		// 0/+
 		res.add(new Vector2Int(xPos, yPos + 1));
 		// +/-
@@ -145,7 +143,7 @@ public class ManageGravitationProcess extends SimplePropertyObject implements IS
 		res.add(new Vector2Int(xPos + 1, yPos));
 		// +/+
 		res.add(new Vector2Int(xPos + 1, yPos + 1));
-		
+
 		return res;
 	}
 }

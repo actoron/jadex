@@ -1,10 +1,11 @@
 package deco4mas.coordinate.environment;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
-import jadex.bridge.IComponentDescription;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
@@ -70,8 +71,8 @@ public class CoordinationSpace extends Grid2D {
 	}
 
 	@Override
-	public void initSpace(IExternalAccess exta, MEnvSpaceInstance config, IValueFetcher fetcher) {
-		super.initSpace(exta, config, fetcher);
+	public void initSpace(IInternalAccess ia, MEnvSpaceInstance config, IValueFetcher fetcher) {
+		super.initSpace(ia, config, fetcher);
 
 		initSpaces();
 		initDeco4mas();
@@ -190,7 +191,6 @@ public class CoordinationSpace extends Grid2D {
 				new ThreadSuspendable());
 
 		// get the external access for the agent
-		@SuppressWarnings("unchecked")
 		IFuture<IExternalAccess> fut = cms.getExternalAccess(ai.getName());
 		fut.addResultListener(new DefaultResultListener<IExternalAccess>() {
 

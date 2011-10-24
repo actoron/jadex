@@ -2,8 +2,8 @@ package deco4mas.examples.agentNegotiation.sma.coordination.capability.serviceOf
 
 import jadex.bdi.runtime.IInternalEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 
 import java.util.Iterator;
@@ -18,12 +18,9 @@ import deco4mas.examples.agentNegotiation.sma.coordination.negotiationStrategy.S
 /**
  * adapt the trust
  */
-public class TrustAdaptPlan extends Plan
-{
-	public void body()
-	{
-		try
-		{
+public class TrustAdaptPlan extends Plan {
+	public void body() {
+		try {
 			// get Logger
 			Logger smaLogger = AgentLogger.getTimeEvent(this.getComponentName());
 
@@ -36,33 +33,31 @@ public class TrustAdaptPlan extends Plan
 
 			// more/less trust to Sa
 			ServiceAgentHistory history = (ServiceAgentHistory) getBeliefbase().getBelief("history").getFact();
-			smaLogger.info("history: "+ exe);
+			smaLogger.info("history: " + exe);
 			history.addEvent(exe.getSa().getLocalName(), getClock().getTime(), exe.getEvent());
 			ValueLogger.addValue(exe.getEvent() + "_" + exe.getSa(), 1.0);
 			((HistorytimeTrustFunction) getBeliefbase().getBelief("trustFunction").getFact()).logTrust(getTime());
-			
-			//Hack for this special Negotation.application.xml
+
+			// Hack for this special Negotation.application.xml
 			AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) getScope().getParent().getExtension("mycoordspace"));
 			HistorytimeTrustFunction trustFunction = (HistorytimeTrustFunction) getBeliefbase().getBelief("trustFunction").getFact();
 			Iterator<String> it = trustFunction.getHistory().getSas().iterator();
-			IClockService clock = (IClockService)SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IClockService.class).get(this);
-			while (it.hasNext()) {				
+			IClockService clock = (IClockService) SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IClockService.class).get(this);
+			while (it.hasNext()) {
 				String saId = it.next();
-				double trust = trustFunction.getTrust(saId, clock.getTime());				
-				//substring: geht the "right" part of the id -> only the type: billig, normal, teuer
-				String keyOfSA = saId.substring(saId.indexOf("(")+1, saId.lastIndexOf(")"));
-				keyOfSA = keyOfSA.replace("-", "");																
-				space.getSpaceObjectsByType("KIVSeval")[0].setProperty(keyOfSA + "TrustValue", trust);				
+				double trust = trustFunction.getTrust(saId, clock.getTime());
+				// substring: geht the "right" part of the id -> only the type: billig, normal, teuer
+				String keyOfSA = saId.substring(saId.indexOf("(") + 1, saId.lastIndexOf(")"));
+				keyOfSA = keyOfSA.replace("-", "");
+				space.getSpaceObjectsByType("KIVSeval")[0].setProperty(keyOfSA + "TrustValue", trust);
 			}
 
-//			trustFunction.getTrust(serviceProposal.getOwner().getLocalName(), ((IClockService)space.getContext().getServiceContainer().getService(IClockService.class)).getTime());
-			
-			
-//			final IClockService clockservice = (IClockService) container.getService(IClockService.class);
-			
-//			bid.put("trust", trustFunction.getTrust(serviceProposal.getOwner().getLocalName(), thetime));
-		} catch (Exception e)
-		{
+			// trustFunction.getTrust(serviceProposal.getOwner().getLocalName(), ((IClockService)space.getContext().getServiceContainer().getService(IClockService.class)).getTime());
+
+			// final IClockService clockservice = (IClockService) container.getService(IClockService.class);
+
+			// bid.put("trust", trustFunction.getTrust(serviceProposal.getOwner().getLocalName(), thetime));
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e);
 		}

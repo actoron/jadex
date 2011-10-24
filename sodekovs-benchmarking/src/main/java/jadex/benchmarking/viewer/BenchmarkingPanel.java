@@ -1,6 +1,5 @@
 package jadex.benchmarking.viewer;
 
-import jadex.base.fipa.IDFComponentDescription;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
@@ -8,13 +7,13 @@ import jadex.benchmarking.helper.CheckFileThread;
 import jadex.benchmarking.helper.Constants;
 import jadex.benchmarking.services.IBenchmarkingManagementService;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -526,7 +525,7 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 			}
 		}
 	}
-	
+
 	/**
 	 * Called when a currently running benchmark is selected.
 	 */
@@ -542,7 +541,7 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 				benchmarkingDetailsMainPnl.remove(0);
 				benchmarkingDetailsMainPnl.remove(1);
 			}
-			
+
 			// Create the EditableComponentsBox: Show components of the SuT that can be manipulated.
 			editableComponentsBox = new JComboBox();
 			editableComponentsBox.addItem(new String(benchDesc.getName()));
@@ -577,7 +576,7 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 			benchmarkingDetailsNorthPnl.add(testLbl);
 			benchmarkingDetailsNorthPnl.add(perform_manual_injection);
 			benchmarkingDetailsMainPnl.add(benchmarkingDetailsNorthPnl, BorderLayout.NORTH);
-			
+
 			benchmarkingDetailsMainPnl.add(new JLabel("SuT will be displayed shortly :-\')"), BorderLayout.CENTER);
 
 		} else {
@@ -586,7 +585,7 @@ public class BenchmarkingPanel extends JPanel implements IServiceViewerPanel {
 				benchmarkingDetailsMainPnl.remove(0);
 			}
 			benchmarkingDetailsMainPnl.add(new JLabel("Benchmark has already terminated. Please use the history function."), BorderLayout.CENTER);
-		}		
+		}
 
 		benchmarkingDetailsMainPnl.revalidate();
 	}

@@ -5,7 +5,6 @@ import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import deco4mas.coordinate.annotation.CoordinationParameter;
 import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
-import deco4mas.examples.micro.tspaces.SenderAgent.CounterIncrementStep;
 
 /**
  * This class is under observation by the coordination framework. Whenever the {@link CounterIncrementStep} is started this is event is observed by the coordination framework and the attribute

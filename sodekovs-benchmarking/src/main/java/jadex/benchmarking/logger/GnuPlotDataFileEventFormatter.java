@@ -1,7 +1,7 @@
 package jadex.benchmarking.logger;
 
 import jadex.benchmarking.helper.Constants;
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.types.clock.IClockService;
 
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;

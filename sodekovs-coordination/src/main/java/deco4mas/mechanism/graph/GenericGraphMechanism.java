@@ -1,7 +1,7 @@
 package deco4mas.mechanism.graph;
 
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.cms.IComponentDescription;
 
 import java.util.ArrayList;
 import java.util.List;

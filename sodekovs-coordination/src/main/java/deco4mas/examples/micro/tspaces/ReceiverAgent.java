@@ -5,7 +5,6 @@ import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import deco4mas.coordinate.annotation.CoordinationParameter;
 import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
-import deco4mas.examples.micro.tspaces.ReceiverAgent.InformCounterIncrementStep;
 import deco4mas.examples.micro.tspaces.SenderAgent.CounterIncrementStep;
 
 /**

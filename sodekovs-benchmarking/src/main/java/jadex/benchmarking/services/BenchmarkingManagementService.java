@@ -1,11 +1,11 @@
 package jadex.benchmarking.services;
 
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.clock.IClockService;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.Future;
@@ -17,8 +17,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import sodekovs.util.gnuplot.CreateImagesThread;
-import sodekovs.util.gnuplot.persistence.LogDAO;
 import sodekovs.util.misc.GlobalConstants;
 import sodekovs.util.model.benchmarking.description.BenchmarkingDescription;
 import sodekovs.util.model.benchmarking.description.HistoricDataDescription;
@@ -72,7 +70,7 @@ public class BenchmarkingManagementService extends BasicService implements IBenc
 
 		SServiceProvider.getServices(provider, IBenchmarkingExecutionService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener() {
 			public void resultAvailable(Object result) {
-				Collection coll = (Collection) result;				
+				Collection coll = (Collection) result;
 				System.out.println("#BenchmarkingManagementService# Number of found IBenchmarkingExecutionService(s) : " + coll.size());
 				// Ignore search failures of remote dfs
 				CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener() {
@@ -113,7 +111,7 @@ public class BenchmarkingManagementService extends BasicService implements IBenc
 				// open.remove(fut);
 				fut.setResult(benchmarks.toArray(new BenchmarkingExecutionService[benchmarks.size()]));
 			}
-		});		
+		});
 		return fut;
 	}
 
@@ -121,20 +119,20 @@ public class BenchmarkingManagementService extends BasicService implements IBenc
 	 * Retrieve results from database about results of performed benchmarks
 	 */
 	public IFuture getHistoryOfBenchmarkExperiments() {
-		
-		/*******************************************************************
-			//Hack: LOCAL SEARCH: using search of this service class
-		/*******************************************************************/ 
-		//			Future ret = new Future();
-//			IHistoricDataDescription[] tmp = LogDAO.getInstance().loadAllLogs();
-////			new CreateImagesThread(tmp).run();
-//			ret.setResult(tmp);
-//			
-//			return ret;
 
-		/*************************GLOBAL SEARCH*****************************************/					
-			
-//		Using local service of each found agent				
+		/*******************************************************************
+		 * //Hack: LOCAL SEARCH: using search of this service class /
+		 *******************************************************************/
+		// Future ret = new Future();
+		// IHistoricDataDescription[] tmp = LogDAO.getInstance().loadAllLogs();
+		// // new CreateImagesThread(tmp).run();
+		// ret.setResult(tmp);
+		//
+		// return ret;
+
+		/************************* GLOBAL SEARCH *****************************************/
+
+		// Using local service of each found agent
 		final Future fut = new Future();
 		final ArrayList<IHistoricDataDescription> historicData = new ArrayList<IHistoricDataDescription>();
 
@@ -145,12 +143,12 @@ public class BenchmarkingManagementService extends BasicService implements IBenc
 				// Ignore search failures of remote dfs
 				CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener() {
 					public void resultAvailable(Object res) {
-						 System.out.println("Part 2 length: "+ ((Collection)res).size());
+						System.out.println("Part 2 length: " + ((Collection) res).size());
 						// Add all services of all remote dfs
 						for (Iterator it = ((Collection) res).iterator(); it.hasNext();) {
 							IHistoricDataDescription[] histDataDesc = (IHistoricDataDescription[]) it.next();
 							if (histDataDesc != null) {
-								for (IHistoricDataDescription desc : histDataDesc) {									
+								for (IHistoricDataDescription desc : histDataDesc) {
 									checkLocalPaths(desc);
 									historicData.add(desc);
 								}
@@ -188,14 +186,14 @@ public class BenchmarkingManagementService extends BasicService implements IBenc
 
 		return fut;
 	}
-	
+
 	/**
-	 * Check if path to PNG points to local directory and change if not
-	 * May happen, if data is received from remote benchmark experiments.
+	 * Check if path to PNG points to local directory and change if not May happen, if data is received from remote benchmark experiments.
+	 * 
 	 * @param desc
 	 */
-	private void checkLocalPaths(IHistoricDataDescription desc){
-		if(!desc.getLogAsPNG().startsWith(GlobalConstants.LOGGING_DIRECTORY)){
+	private void checkLocalPaths(IHistoricDataDescription desc) {
+		if (!desc.getLogAsPNG().startsWith(GlobalConstants.LOGGING_DIRECTORY)) {
 			desc.setLogAsPNG(GlobalConstants.LOGGING_DIRECTORY + "\\" + desc.getTimestamp() + ".png");
 		}
 	}

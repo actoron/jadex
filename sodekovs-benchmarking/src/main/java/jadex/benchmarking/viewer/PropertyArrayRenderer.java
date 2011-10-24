@@ -1,14 +1,13 @@
 package jadex.benchmarking.viewer;
 
-import jadex.base.fipa.IProperty;
+import jadex.bridge.service.types.df.IProperty;
 
 import java.awt.Component;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-class PropertyArrayRenderer extends DefaultTableCellRenderer
-{
+class PropertyArrayRenderer extends DefaultTableCellRenderer {
 
 	/**
 	 * @param table
@@ -20,23 +19,18 @@ class PropertyArrayRenderer extends DefaultTableCellRenderer
 	 * @return this
 	 * @see javax.swing.table.DefaultTableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, Object, boolean, boolean, int, int)
 	 */
-	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
-	{
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 		super.getTableCellRendererComponent(table, null, isSelected, hasFocus, row, column);
-		IProperty[] sa = (IProperty[])value;
+		IProperty[] sa = (IProperty[]) value;
 		String content;
 		String tooltip;
-		if(sa == null || sa.length == 0)
-		{
+		if (sa == null || sa.length == 0) {
 			content = "";
 			setToolTipText(null);
-		}
-		else
-		{
+		} else {
 			content = sa[0].getName() + "=" + sa[0].getValue();
 			tooltip = content;
-			for(int i = 1; i < sa.length; i++)
-			{
+			for (int i = 1; i < sa.length; i++) {
 				content += ", " + sa[i].getName() + "=" + sa[i].getValue();
 				tooltip += "<br>" + sa[i].getName() + "=" + sa[i].getValue();
 			}

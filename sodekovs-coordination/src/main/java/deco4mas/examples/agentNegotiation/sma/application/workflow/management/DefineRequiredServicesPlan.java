@@ -7,9 +7,9 @@ import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.ExternalAccess;
@@ -30,26 +30,22 @@ import deco4mas.examples.agentNegotiation.evaluate.AgentLogger;
 /**
  * define services for the workflow
  */
-public class DefineRequiredServicesPlan extends Plan
-{
-	public void body()
-	{
-		try
-		{
+public class DefineRequiredServicesPlan extends Plan {
+	public void body() {
+		try {
 			// get Logger
 			Logger smaLogger = AgentLogger.getTimeEvent(this.getComponentName());
 
 			// get Cms
-			IComponentManagementService cms = ((IComponentManagementService)SServiceProvider.getService(
-					getScope().getServiceContainer(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this));
+			IComponentManagementService cms = ((IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class,
+					RequiredServiceInfo.SCOPE_PLATFORM).get(this));
 
 			// workflow Access
 			IFuture workflowFuture = cms.getExternalAccess((IComponentIdentifier) ((IGoal) getReason()).getParameter("workflow").getValue());
-			
+
 			// get the BPMN(!) ExternalAccess and Interpreter
 			ExternalAccess exta = ((ExternalAccess) workflowFuture.get(this));
 			BpmnInterpreter workflow = (BpmnInterpreter) exta.getInterpreter();
-
 
 			// LOG
 			smaLogger.info("Add new needed Services for " + workflow.getComponentIdentifier().getLocalName());
@@ -62,34 +58,28 @@ public class DefineRequiredServicesPlan extends Plan
 			Map allActivities = model.getAllActivities();
 
 			List<MActivity> activities = new ArrayList<MActivity>();
-			for (Iterator<MActivity> it = model.getAllActivities().values().iterator(); it.hasNext();)
-			{
+			for (Iterator<MActivity> it = model.getAllActivities().values().iterator(); it.hasNext();) {
 				activities.add(it.next());
 			}
 
 			List<MActivity> taskList = new ArrayList<MActivity>();
-			for (MActivity activity : activities)
-			{
+			for (MActivity activity : activities) {
 				if (activity.getActivityType().equals("Task"))
 					taskList.add(activity);
 			}
-			for (MActivity task : taskList)
-			{
+			for (MActivity task : taskList) {
 
 				MParameter taskParam = ((MParameter) task.getParameters().get("serviceType"));
 				ServiceType taskType = (ServiceType) taskParam.getInitialValue().getValue(new SimpleValueFetcher());
 
 				Boolean newService = true;
 				// add all new services
-				for (RequiredService nService : serviceSet)
-				{
-					if (nService.getServiceType().getName().equals(taskType))
-					{
+				for (RequiredService nService : serviceSet) {
+					if (nService.getServiceType().getName().equals(taskType)) {
 						newService = false;
 					}
 				}
-				if (newService)
-				{
+				if (newService) {
 					RequiredService needService = new RequiredService(this.getComponentIdentifier(), taskType);
 					serviceSet.add(needService);
 					smaLogger.info("Add Service " + taskType);
@@ -97,15 +87,14 @@ public class DefineRequiredServicesPlan extends Plan
 				getBeliefbase().getBeliefSet("requiredServices").addFacts(serviceSet.toArray());
 
 				// LOG
-				((WorkflowData)getBeliefbase().getBelief("workflowData").getFact()).setStartTime(this.getTime());
+				((WorkflowData) getBeliefbase().getBelief("workflowData").getFact()).setStartTime(this.getTime());
 				System.out.println();
 				System.out.println("---- negotiation phase " + this.getComponentName() + " started! ----");
 				System.out.println();
 				smaLogger.info("--- negotiation phase ---");
 
 			}
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e);
 		}

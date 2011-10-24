@@ -5,7 +5,6 @@ import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.benchmarking.helper.Constants;
 import jadex.benchmarking.helper.Methods;
-import jadex.benchmarking.helper.OnlineVisualisation;
 import jadex.benchmarking.logger.ScheduleLogger;
 import jadex.benchmarking.model.Data;
 import jadex.benchmarking.model.Dataconsumer;
@@ -20,14 +19,14 @@ import jadex.benchmarking.model.SemanticCondition;
 import jadex.benchmarking.model.Sequence;
 import jadex.benchmarking.model.Source;
 import jadex.benchmarking.model.SuTinfo;
-import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.clock.IClockService;
-import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.MEnvSpaceType;
@@ -73,43 +72,39 @@ public class InitBenchmarkingPlan extends Plan {
 	private IComponentIdentifier schedulerCID = null;
 	// private Log events
 	private ScheduleLogger scheduleLogger = null;
-//	private OnlineVisualisation vis = null;
-	
-	//required for parallel execution of benchmarks
+	// private OnlineVisualisation vis = null;
+
+	// required for parallel execution of benchmarks
 	private int localBenchmarkingCounter = -1;
 
 	public void body() {
-		
-		//NEW ********************************************
-		
-		//Increment the number of currently running experiments on this agent
+
+		// NEW ********************************************
+
+		// Increment the number of currently running experiments on this agent
 		numberOfRunningBenchmarks(1);
 
-		//Get local id for this benchmark to be conducted and increment counter																	  
+		// Get local id for this benchmark to be conducted and increment counter
 		localBenchmarkingCounter = (Integer) getBeliefbase().getBelief("benchmarkCounter").getFact();
-		getBeliefbase().getBelief("benchmarkCounter").setFact(localBenchmarkingCounter+1);
-			
-		//init mapping between calling service and the executed benchmark. needed in order to be able to execute benchmarks in parallel.
-		HashMap<Long,Integer>callerBenchmarkReference = (HashMap<Long,Integer>)getBeliefbase().getBelief("callerBenchmarkReference").getFact();
-		callerBenchmarkReference.put((Long) getParameter("callerID").getValue(),localBenchmarkingCounter);
+		getBeliefbase().getBelief("benchmarkCounter").setFact(localBenchmarkingCounter + 1);
+
+		// init mapping between calling service and the executed benchmark. needed in order to be able to execute benchmarks in parallel.
+		HashMap<Long, Integer> callerBenchmarkReference = (HashMap<Long, Integer>) getBeliefbase().getBelief("callerBenchmarkReference").getFact();
+		callerBenchmarkReference.put((Long) getParameter("callerID").getValue(), localBenchmarkingCounter);
 		getBeliefbase().getBelief("callerBenchmarkReference").setFact(callerBenchmarkReference);
 
-		
-		HashMap<String,Object> clientConfMap = (HashMap<String, Object>) getParameter("clientConf").getValue();
-		SimulationConfiguration simConf  = (SimulationConfiguration) XMLHandler.parseXMLFromString((String) clientConfMap.get(GlobalConstants.CONFIGURATION_FILE_AS_XML_STRING), SimulationConfiguration.class);
-		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
-				
+		HashMap<String, Object> clientConfMap = (HashMap<String, Object>) getParameter("clientConf").getValue();
+		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXMLFromString((String) clientConfMap.get(GlobalConstants.CONFIGURATION_FILE_AS_XML_STRING),
+				SimulationConfiguration.class);
+		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+
 		startApplication((Map) getParameter("applicationConf").getValue(), clientConfMap, simConf);
 		System.out.println("#RumtimeManagerPlan# Startet Simulation Experiment Nr.:" + clientConfMap.get(GlobalConstants.EXPERIMENT_ID) + ") with Optimization Values: "
 				+ clientConfMap.get(GlobalConstants.CURRENT_PARAMETER_CONFIGURATION));
 		System.out.println("Number of Exp at this agent: " + (Integer) getBeliefbase().getBelief("numberOfRunningExperiments").getFact());
-		
-		//NEW ********************************************
-		
-		
-		
-		
-		
+
+		// NEW ********************************************
+
 		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 
@@ -144,15 +139,14 @@ public class InitBenchmarkingPlan extends Plan {
 
 			// start Online Visualization
 			startOnlineVisualization(benchConf);
-		}else{
+		} else {
 			System.out.println("#InitBenchmarkingPlan# No DataConsumer and DataProvider to add to space.");
 		}
-		
+
 		// TODO: Hack: Synchronize start time!
 		long startTime = clockservice.getTime();
 		sutSpace.setProperty("REAL_START_TIME_OF_SIMULATION", startTime);
-		
-		
+
 		// Resume SuT
 		cms.resumeComponent(sutCID).get(this);
 
@@ -167,13 +161,12 @@ public class InitBenchmarkingPlan extends Plan {
 		getBeliefbase().getBelief("benchmarkStatus").setFact(Constants.RUNNING);
 		// myLogger.log("Resumed Scheduler");
 
-
 		// Handle termination of benchmark
 		terminateBenchmark(benchConf);
 		getBeliefbase().getBelief("benchmarkStatus").setFact(Constants.TERMINATED);
 		scheduleLogger.log(Constants.PREPARE_GNUPLOT_SUFFIX);
 		persistLogs(scheduleLogger.getFileName(), benchConf);
-		// ConnectionManager.getInstance().executeStatement("Over and out");		
+		// ConnectionManager.getInstance().executeStatement("Over and out");
 	}
 
 	/*
@@ -294,8 +287,8 @@ public class InitBenchmarkingPlan extends Plan {
 
 	private void addDataConsumerAndProvider(Schedule benchConf) {
 
-//		IFuture fut = (sutExta).getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));
-//		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
+		// IFuture fut = (sutExta).getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));
+		// AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
 
 		// AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getExtension(simConf.getNameOfSpace()));
 		IExpressionParser parser = new JavaCCExpressionParser();
@@ -349,12 +342,12 @@ public class InitBenchmarkingPlan extends Plan {
 				// Class clazz = (Class)MEnvSpaceInstance.getProperty(dcon,
 				// "clazz");
 				Class clazz = null;
-				
-				//Hack: avoid null pointer exception for imports
-				if(benchConf.getImports() == null){
+
+				// Hack: avoid null pointer exception for imports
+				if (benchConf.getImports() == null) {
 					benchConf.setImports(new Imports());
 				}
-				
+
 				try {
 					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) benchConf.getImports().getImport()),
 							((ILibraryService) SServiceProvider.getService(getScope().getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
@@ -400,8 +393,8 @@ public class InitBenchmarkingPlan extends Plan {
 
 	private void startOnlineVisualization(Schedule benchConf) {
 
-//		IFuture fut = sutExta.getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));
-//		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
+		// IFuture fut = sutExta.getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));
+		// AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
 
 		// init online visualization
 		ArrayList<AbstractChartDataConsumer> chartDataConsumer = new ArrayList<AbstractChartDataConsumer>();
@@ -411,7 +404,7 @@ public class InitBenchmarkingPlan extends Plan {
 			if (abstractConsumer instanceof AbstractChartDataConsumer)
 				chartDataConsumer.add((AbstractChartDataConsumer) abstractConsumer);
 		}
-//		this.vis = new OnlineVisualisation(chartDataConsumer);
+		// this.vis = new OnlineVisualisation(chartDataConsumer);
 	}
 
 	/***
@@ -467,13 +460,14 @@ public class InitBenchmarkingPlan extends Plan {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Increment / Decrement the counter which contains the number of currently executed benchmarks
+	 * 
 	 * @param i
 	 */
-	private void numberOfRunningBenchmarks(int i){
+	private void numberOfRunningBenchmarks(int i) {
 		int n = (Integer) getBeliefbase().getBelief("numberOfRunningBenchmarks").getFact();
-		getBeliefbase().getBelief("numberOfRunningBenchmarks").setFact(n+i);		
+		getBeliefbase().getBelief("numberOfRunningBenchmarks").setFact(n + i);
 	}
 }

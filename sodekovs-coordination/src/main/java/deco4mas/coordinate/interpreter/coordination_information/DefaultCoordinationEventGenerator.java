@@ -8,7 +8,7 @@ package deco4mas.coordinate.interpreter.coordination_information;
  *
  */
 
-import jadex.bridge.IComponentDescription;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.collection.MultiCollection;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
@@ -119,7 +119,7 @@ public class DefaultCoordinationEventGenerator extends SimplePropertyObject impl
 						space.createPercept(percepttype, event.getSpaceObject(), receiverDescription, space.getAvatar(receiverDescription));
 					}
 				}
-				
+
 				space.getReceiverData().remove(event.getType());
 			}
 		}
@@ -224,13 +224,11 @@ public class DefaultCoordinationEventGenerator extends SimplePropertyObject impl
 	}
 
 	@Override
-	public void componentAdded(IComponentDescription component,
-			IEnvironmentSpace space) {
+	public void componentAdded(IComponentDescription component, IEnvironmentSpace space) {
 	}
 
 	@Override
-	public void componentRemoved(IComponentDescription component,
-			IEnvironmentSpace space) {
+	public void componentRemoved(IComponentDescription component, IEnvironmentSpace space) {
 	}
 
 	/**
