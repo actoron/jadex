@@ -31,7 +31,9 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+/* $if !android $ */
 import jadex.commons.gui.SGUI;
+/* $endif $ */
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
@@ -45,8 +47,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+/* $if !android $ */
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
+/* $endif $ */
 
 /**
  *  Factory for creating Jadex V2 BDI agents.

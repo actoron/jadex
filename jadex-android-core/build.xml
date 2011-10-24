@@ -300,16 +300,6 @@
 			<var name="androidVersion" value="${androidVersion}" />
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 		</preprocess>
-		<preprocess indir="${jadex-kernel-bdi}" outdir="${jadex-kernel-bdi}" out="merge">
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
-			<var name="android" value="${android}" />
-			<var name="androidVersion" value="${androidVersion}" />
-		</preprocess>
-		<preprocess indir="${jadex-rules}" outdir="${jadex-rules}" out="merge">
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
-			<var name="android" value="${android}" />
-			<var name="androidVersion" value="${androidVersion}" />
-		</preprocess>
 		<preprocess indir="${jadex-kernel-extension-agr}" outdir="${jadex-kernel-extension-agr}" out="merge" except="${exclude}, ${exclude-jadex-kernel-extension-agr}">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />

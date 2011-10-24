@@ -39,7 +39,9 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+/* $if !android $ */
 import jadex.commons.gui.SGUI;
+/* $endif $ */
 
 import java.io.File;
 import java.io.IOException;

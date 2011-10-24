@@ -48,14 +48,6 @@
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess>
-
-	<!--	<echo level="info">preprocessing ${src-fix}</echo>
-		<preprocess indir="${src-fix}" outdir="${src_android}" out="merge">
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
-			<var name="android" value="${android}" />
-			<var name="androidVersion" value="${androidVersion}" />
-		</preprocess>
-		-->
 	</target>
 
 	<!-- This target preprocesses and applies changes IN-PLACE. 
@@ -64,5 +56,11 @@
 		<property name="android" value="false" />
 		<property name="androidVersion" value="8" />
 		
+		<echo level="info">preprocessing ${jadex-kernel-bpmn}</echo>
+		<preprocess indir="${jadex-kernel-bpmn}" outdir="${jadex-kernel-bpmn}" out="merge" except="${exclude}, ${exclude-jadex-kernel-bpmn}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
 	</target>
 </project>

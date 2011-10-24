@@ -1,20 +1,12 @@
 package jadex.base.service.awareness.discovery.bluetoothp2p;
 
-import jadex.android.bluetooth.device.IBluetoothDevice;
-import jadex.android.bluetooth.service.IConnectionCallback;
 import jadex.android.bluetooth.util.Helper;
-import jadex.base.service.awareness.AwarenessInfo;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
-import jadex.commons.collection.ArrayBlockingQueue;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import android.os.RemoteException;
 import android.util.Log;
 
 /**

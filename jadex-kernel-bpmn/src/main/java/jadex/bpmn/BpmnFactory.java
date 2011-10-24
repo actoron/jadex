@@ -23,7 +23,9 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+/* $if !android $ */
 import jadex.commons.gui.SGUI;
+/* $endif $ */
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,15 +1,10 @@
 package jadex.base.service.awareness.discovery.bluetoothp2p;
 
 import jadex.android.bluetooth.util.Helper;
-import jadex.base.service.awareness.AwarenessInfo;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.SendHandler;
-
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-
+import jadex.bridge.service.types.awareness.AwarenessInfo;
 import android.util.Log;
 
 /**
