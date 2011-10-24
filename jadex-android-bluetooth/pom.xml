@@ -39,17 +39,18 @@
 		</resources>
 
 		<plugins>
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.eclipse.m2e</groupId> -->
-<!-- 				<artifactId>lifecycle-mapping</artifactId> -->
-<!-- 			</plugin> -->
-
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
-				<artifactId>android-maven-plugin</artifactId>
+				<artifactId>maven-android-plugin</artifactId>
+				<version>3.0.0-alpha-7</version>
 				<configuration>
 					<generateApk>false</generateApk>
 					<attachJar>true</attachJar>
+					<sdk>
+						<path>${project.basedir}/sdktools</path>
+						<platform>2.2</platform>
+					</sdk>
+					<genDirectory>${project.basedir}/gen</genDirectory>
 				</configuration>
 				<extensions>true</extensions>
 			</plugin>
