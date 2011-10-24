@@ -2,6 +2,8 @@ package jadex.tools.jcc;
 
 import jadex.base.Starter;
 import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.ExceptionSwingDelegationResultListener;
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
@@ -15,9 +17,11 @@ import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,7 +43,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	protected IExternalAccess	platformaccess;
 	
 	/** The plugins (plugin->panel). */
-	protected Map	plugins;
+	protected Map<IControlCenterPlugin, JComponent>	plugins;
 
 	/** The global control center. */
 	protected ControlCenter	controlcenter;
@@ -62,18 +66,18 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	{
 		this.platformaccess = platformaccess;
 		this.controlcenter	= controlcenter;
-		this.plugins = new LinkedHashMap();
+		this.plugins = new LinkedHashMap<IControlCenterPlugin, JComponent>();
 		this.props	= new Properties();
 		this.pccpanel	= new PlatformControlCenterPanel(this);
 		
 		// Load plugins.
 		final Future<Void>	ret	= new Future<Void>();
 		SServiceProvider.getService(controlcenter.getJCCAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDelegationResultListener(ret)
+			.addResultListener(new ExceptionSwingDelegationResultListener<ILibraryService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(ILibraryService result)
 			{
-				libservice = (ILibraryService)result;
+				libservice = result;
 //				ClassLoader cl = ((ILibraryService)result).getClassLoader();
 				
 				// todo: what about dynamic plugin loading?
@@ -109,11 +113,15 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 * Close all active plugins. Called when the JCC exits.
 	 */
-	public void	dispose()
+	public IFuture<Void>	dispose()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		// Close all plugins, which have a panel associated.
+		CounterResultListener<Void> lis = new CounterResultListener<Void>(plugins.size(), true,
+			new SwingDelegationResultListener<Void>(ret));
 		for(Iterator it=plugins.keySet().iterator(); it.hasNext();)
 		{
 			IControlCenterPlugin plugin = (IControlCenterPlugin)it.next();
@@ -121,15 +129,18 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			{
 				try
 				{
-					plugin.shutdown();
+					plugin.shutdown().addResultListener(lis);
 				}
 				catch(Exception e)
 				{
 					System.err.println("Exception while closing JCC-Plug-In " + plugin.getName());
 					e.printStackTrace();
+					lis.exceptionOccurred(e);
 				}
 			}
 		}
+		
+		return ret;
 	}
 	
 	/**
@@ -151,25 +162,26 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 *  Push plugin settings to platform and save platform properties.
 	 */
-	public IFuture	savePlatformProperties()
+	public IFuture<Void>	savePlatformProperties()
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		
 		IControlCenterPlugin[]	aplugins	= getPlugins();
 //		System.out.println("Pushing platform settings: "+aplugins.length);
-		CounterResultListener	crl	= new CounterResultListener(aplugins.length, new SwingDelegationResultListener(ret)
+		CounterResultListener<Void>	crl	= new CounterResultListener<Void>(aplugins.length, 
+			new SwingDelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 //				System.out.println("Pushed platform settings");
 				SServiceProvider.getService(getPlatformAccess().getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new SwingDelegationResultListener(ret)
+					.addResultListener(new ExceptionSwingDelegationResultListener<ISettingsService, Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(ISettingsService settings)
 					{
 //						System.out.println("Fetched settings service");
-						ISettingsService	settings	= (ISettingsService)result;
-						settings.saveProperties().addResultListener(new SwingDelegationResultListener(ret));
+//						ISettingsService	settings	= (ISettingsService)result;
+						settings.saveProperties().addResultListener(new SwingDelegationResultListener<Void>(ret));
 					}
 					
 					public void customExceptionOccurred(Exception exception)
@@ -248,34 +260,57 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 *  Activate a plugin.
 	 */
-	public IFuture	activatePlugin(IControlCenterPlugin plugin)
+	public IFuture<Void> activatePlugin(final IControlCenterPlugin plugin)
 	{
 //		System.out.println("activate plugin: "+plugin);
 		
 		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
-		Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
+//		ret.addResultListener(new DefaultResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				System.out.println("fin: "+plugin);
+//			}
+//		});
 		
 		if(plugins.get(plugin) == null)
 		{
 			try
 			{
-				plugin.init(this);
-				JComponent comp = plugin.getView();
-				plugins.put(plugin, comp);
+				plugin.init(this).addResultListener(new SwingDelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						JComponent comp = plugin.getView();
+						plugins.put(plugin, comp);
+						if(props.getSubproperty(plugin.getName())!=null)
+						{
+							plugin.setProperties(props.getSubproperty(plugin.getName()))
+								.addResultListener(new SwingDelegationResultListener<Void>(ret));
+						}
+						else
+						{
+							ret.setResult(null);
+						}
+					}
+				});
+				
 			}
 			catch(Exception e)
 			{
 				ret.setException(e);
 			}
 		}
-		
-		if(!ret.isDone())
+		else
 		{
+			JComponent comp = plugin.getView();
+			plugins.put(plugin, comp);
 			if(props.getSubproperty(plugin.getName())!=null)
 			{
 				plugin.setProperties(props.getSubproperty(plugin.getName()))
-					.addResultListener(new SwingDelegationResultListener(ret));
+					.addResultListener(new SwingDelegationResultListener<Void>(ret));
 			}
 			else
 			{

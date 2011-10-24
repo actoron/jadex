@@ -28,12 +28,12 @@ public class CleanerViewerPanel extends AbstractComponentViewerPanel
 	/**
 	 *  Called to initialize the panel.
 	 */
-	public IFuture init(IControlCenter jcc, final IExternalAccess component)
+	public IFuture<Void> init(IControlCenter jcc, final IExternalAccess component)
 	{
-		IFuture	fut	= super.init(jcc, component);
+		IFuture<Void>	fut	= super.init(jcc, component);
 		assert fut.isDone();
 		
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

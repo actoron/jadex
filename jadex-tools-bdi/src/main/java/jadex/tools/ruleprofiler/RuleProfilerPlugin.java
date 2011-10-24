@@ -297,7 +297,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 	 *  Called when an component has died.
 	 *  @param ad The component description.
 	 */
-	public IFuture componentRemoved(final IComponentDescription ad, Map results)
+	public IFuture<Void> componentRemoved(final IComponentDescription ad, Map results)
 	{
 		// Update components on awt thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -320,7 +320,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 	 *  Called when an component is born.
 	 *  @param ad the component description.
 	 */
-	public IFuture componentAdded(final IComponentDescription ad)
+	public IFuture<Void> componentAdded(final IComponentDescription ad)
 	{
 		return IFuture.DONE;
 	}
@@ -329,7 +329,7 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 	 *  Called when an component changed.
 	 *  @param ad the component description.
 	 */
-	public IFuture componentChanged(final IComponentDescription ad)
+	public IFuture<Void> componentChanged(final IComponentDescription ad)
 	{
 		return IFuture.DONE;
 	}
@@ -337,9 +337,10 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 	/**
 	 *  Shutdown the plugin.
 	 */
-	public void shutdown()
+	public IFuture<Void> shutdown()
 	{
 		comptree.dispose();
+		return IFuture.DONE;
 	}
 	
 	final AbstractAction	START_PROFILER	= new AbstractAction("Profile Agent", icons.getIcon("profile_agent"))

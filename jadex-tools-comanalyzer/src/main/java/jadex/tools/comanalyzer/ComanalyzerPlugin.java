@@ -1,6 +1,7 @@
 package jadex.tools.comanalyzer;
 
 import jadex.base.fipa.CMSComponentDescription;
+import jadex.base.gui.ExceptionSwingDelegationResultListener;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.INodeHandler;
@@ -9,6 +10,7 @@ import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
+import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageAdapter;
@@ -19,7 +21,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageListener;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
@@ -28,9 +29,9 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.gui.SGUI;
 import jadex.tools.comanalyzer.chart.ChartPanel;
 import jadex.tools.comanalyzer.diagram.DiagramPanel;
@@ -191,6 +192,9 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	/** The message service listener. */
 	protected IMessageListener	listener;
 	
+	/** The clock service. */
+	protected IClockService clockservice;
+	
 	//-------- constructors --------
 
 	/**
@@ -224,16 +228,48 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	}
 	
 	/** 
+	 *  Initialize the plugin.
+	 */
+	public IFuture<Void> init(IControlCenter jcc)
+	{
+		final Future<Void> ret = new Future<Void>();
+		super.init(jcc).addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				// Todo: use remote access for clock !?
+				SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionSwingDelegationResultListener<IClockService, Void>(ret)
+				{
+					public void customResultAvailable(IClockService result)
+					{
+						clockservice = result;
+						ret.setResult(null);
+					}
+				});
+			}
+		});
+		return ret;
+	}
+	
+	/** 
 	 *  Shutdown the plugin.
 	 */
-	public void shutdown()
+	public IFuture<Void> shutdown()
 	{
+		final Future<Void> ret = new Future<Void>();
 		comptree.dispose();
+		
+		CounterResultListener<Void> lis = new CounterResultListener<Void>(msgservices.values().size(), 
+			true, new SwingDelegationResultListener<Void>(ret));
+		
 		for(Iterator it=msgservices.values().iterator(); it.hasNext(); )
 		{
 			Object[]	entry	= (Object[])it.next();
-			((IMessageService)entry[0]).removeMessageListener(listener);
+			((IMessageService)entry[0]).removeMessageListener(listener).addResultListener(lis);
 		}
+		
+		return ret;
 	}
 
 	//-------- IControlCenterPlugin interface --------
@@ -1103,9 +1139,6 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	 */
 	protected boolean isDuplicate(IMessageAdapter newmsg, IComponentIdentifier rec)
 	{
-		// Todo: use remote access for clock !?
-		IClockService cs = (IClockService)SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(new ThreadSuspendable());
-		
 		boolean ret = false;
 		Message[] messages = messagelist.getMessages();
 		for(int i=0; i<messages.length && !ret; i++)
@@ -1121,7 +1154,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 					String start = (String)messages[i].getParameter(Message.DATE);
 					if(start!=null)
 					{
-						long duration = cs.getTime() - new Long(start).longValue();
+						long duration = clockservice.getTime() - new Long(start).longValue();
 //						long duration = ((AgentControlCenter)getJCC()).getAgent().getTime() - new Long(start).longValue();
 //						long duration = getJCC().getAgent().getTime() - start.getTime();
 						messages[i].setDuration(duration);

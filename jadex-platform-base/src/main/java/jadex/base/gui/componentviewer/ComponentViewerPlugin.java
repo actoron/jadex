@@ -14,7 +14,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
@@ -545,14 +544,17 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	/** 
 	 *  Shutdown the plugin.
 	 */
-	public void shutdown()
+	public IFuture<Void> shutdown()
 	{
+		final Future<Void> ret = new Future<Void>();
 		comptree.dispose();
+		CounterResultListener<Void> lis = new CounterResultListener<Void>(panels.size(), 
+			true, new SwingDelegationResultListener<Void>(ret));
 		for(Iterator it=panels.values().iterator(); it.hasNext(); )
 		{
-			// Todo: should wait for shutdown!!!
-			((IAbstractViewerPanel)it.next()).shutdown();
+			((IAbstractViewerPanel)it.next()).shutdown().addResultListener(lis);
 		}
+		return ret;
 	}
 	
 	//-------- loading / saving --------
@@ -560,23 +562,23 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	/**
 	 *  Return properties to be saved in project.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
 		storeCurrentPanelSettings();
 		
-		return new Future(props);
+		return new Future<Properties>(props);
 	}
 	
 	/**
 	 *  Set properties loaded from project.
 	 */
-	public IFuture setProperties(Properties ps)
+	public IFuture<Void> setProperties(Properties ps)
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		this.props	=	ps;
 		
 		IAbstractViewerPanel[] pans = (IAbstractViewerPanel[])panels.values().toArray(new IAbstractViewerPanel[0]);
-		CounterResultListener lis = new CounterResultListener(pans.length, new SwingDelegationResultListener(ret));
+		CounterResultListener<Void> lis = new CounterResultListener<Void>(pans.length, true, new SwingDelegationResultListener(ret));
 		
 		for(int i=0; i<pans.length; i++)
 		{
@@ -590,9 +592,9 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	/**
 	 *  Store settings of current panel.
 	 */
-	protected IFuture storeCurrentPanelSettings()
+	protected IFuture<Properties> storeCurrentPanelSettings()
 	{
-		final Future ret = new Future();
+		final Future<Properties> ret = new Future<Properties>();
 		
 		Object	old	= cards.getCurrentKey();
 		if(old!=null)
@@ -602,11 +604,11 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 			{
 				if(props==null)
 					props	= new Properties();
-				panel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
+				panel.getProperties().addResultListener(new SwingDelegationResultListener<Properties>(ret)
 				{
-					public void customResultAvailable(Object result) 
+					public void customResultAvailable(Properties sub) 
 					{
-						Properties sub = (Properties)result;
+//						Properties sub = (Properties)result;
 						props.removeSubproperties(panel.getId());
 						if(sub!=null)
 						{

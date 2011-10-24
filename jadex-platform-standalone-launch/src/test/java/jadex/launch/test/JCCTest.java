@@ -103,4 +103,13 @@ public class JCCTest extends TestCase
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args)
+	{
+		JCCTest test = new JCCTest();
+		test.testJCC();
+	}
 }

@@ -69,7 +69,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 	 *  Create main panel.
 	 *  @return The main panel.
 	 */
-	public IFuture init(final IControlCenter jcc, IService service)
+	public IFuture<Void> init(final IControlCenter jcc, IService service)
 	{
 		this.libservice	= (ILibraryService)service;
 		

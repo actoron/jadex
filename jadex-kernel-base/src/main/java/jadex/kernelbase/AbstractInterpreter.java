@@ -425,8 +425,6 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public IServiceContainer getServiceContainer()
 	{
-		if(container==null)
-			System.out.println("here");
 		assert container!=null;
 //		if(container==null)
 //			container = createServiceContainer();

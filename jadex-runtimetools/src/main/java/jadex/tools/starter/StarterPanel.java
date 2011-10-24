@@ -1339,7 +1339,7 @@ public class StarterPanel extends JLayeredPane
 	//					{
 	//						public void itemStateChanged(ItemEvent e)
 	//						{
-	//							System.out.println("here: "+resultsets);
+	//							System.out.println("item: "+resultsets);
 	//							refreshResults();
 	//						}
 	//					});

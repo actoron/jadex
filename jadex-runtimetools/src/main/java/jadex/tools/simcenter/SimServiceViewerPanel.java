@@ -29,12 +29,12 @@ public class SimServiceViewerPanel extends AbstractServiceViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public IFuture init(final IControlCenter jcc, final IService service)
+	public IFuture<Void> init(final IControlCenter jcc, final IService service)
 	{
-		final Future ret = new Future();
-		super.init(jcc, service).addResultListener(new SwingDelegationResultListener(ret)
+		final Future<Void> ret = new Future<Void>();
+		super.init(jcc, service).addResultListener(new SwingDelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 				panel = new SimCenterPanel(jcc, (ISimulationService)service);
 				ret.setResult(null);
@@ -46,7 +46,7 @@ public class SimServiceViewerPanel extends AbstractServiceViewerPanel
 	/**
 	 *  Informs the panel that it should stop all its computation
 	 */
-	public IFuture shutdown()
+	public IFuture<Void> shutdown()
 	{
 		return panel.shutdown();
 	}
@@ -63,7 +63,7 @@ public class SimServiceViewerPanel extends AbstractServiceViewerPanel
 	/**
 	 *  Advices the the panel to restore its properties from the argument
 	 */
-	public IFuture setProperties(Properties props)
+	public IFuture<Void> setProperties(Properties props)
 	{
 		return panel.setProperties(props);
 	}
@@ -72,7 +72,7 @@ public class SimServiceViewerPanel extends AbstractServiceViewerPanel
 	 *  Advices the panel provide its setting as properties (if any).
 	 *  This is done on project close or save.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
 		return panel.getProperties();
 	}

@@ -60,20 +60,21 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	/** 
 	 *  Initialize the plugin.
 	 */
-	public void init(IControlCenter jcc)
+	public IFuture<Void> init(IControlCenter jcc)
 	{
 		this.jcc = jcc;
 		this.main_panel = createView();
 		this.menu_bar = createMenuBar();
 		this.tool_bar = createToolBar();
+		return IFuture.DONE;
 	}
 	
 	/** 
 	 *  Shutdown the plugin.
 	 */
-	public void shutdown()
+	public IFuture<Void> shutdown()
 	{
-		
+		return IFuture.DONE;
 	}
 	
 	//-------- methods --------

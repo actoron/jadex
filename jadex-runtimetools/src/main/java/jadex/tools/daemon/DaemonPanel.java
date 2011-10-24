@@ -4,9 +4,9 @@ import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.jtable.ObjectTableModel;
@@ -149,15 +149,15 @@ public class DaemonPanel extends JPanel
 	/**
 	 *  Informs the panel that it should stop all its computation
 	 */
-	public IFuture shutdown()
+	public IFuture<Void> shutdown()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		SServiceProvider.getService(agent.getServiceProvider(), IDaemonService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener()
+			.addResultListener(new ExceptionDelegationResultListener<IDaemonService, Void>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IDaemonService ds)
 			{
-				IDaemonService ds = (IDaemonService)result;
+//				IDaemonService ds = (IDaemonService)result;
 				ds.removeChangeListener(listener);
 				ret.setResult(null);
 			}

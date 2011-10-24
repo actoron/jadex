@@ -213,9 +213,10 @@ public class StarterPlugin extends AbstractJCCPlugin
 	/**
 	 *  Shutdown the plugin.
 	 */
-	public void shutdown()
+	public IFuture<Void> shutdown()
 	{
 		((StarterPluginPanel)getView()).dispose();
+		return super.shutdown();
 	}
 
 	

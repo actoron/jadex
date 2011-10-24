@@ -95,7 +95,7 @@ public class DeploymentServiceViewerPanel	implements IAbstractViewerPanel
 	/**
 	 *  Shutdown the panel.
 	 */ 
-	public IFuture shutdown()
+	public IFuture<Void> shutdown()
 	{
 		return IFuture.DONE;
 	}

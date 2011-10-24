@@ -2,6 +2,7 @@ package jadex.tools.simcenter;
 
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -10,6 +11,7 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.TimeFormat;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -111,24 +113,18 @@ public class SimCenterPanel extends JPanel
 	/**
 	 *  Get the host component of a service. 
 	 */
-	public IFuture getComponentForService()
+	public IFuture<IExternalAccess> getComponentForService()
 	{
-		final Future ret = new Future();
+		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DelegationResultListener(ret)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				IComponentManagementService	cms	= (IComponentManagementService)result;
+//				IComponentManagementService	cms	= (IComponentManagementService)result;
 				cms.getExternalAccess((IComponentIdentifier)simservice.getServiceIdentifier().getProviderId())
-					.addResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						ret.setResult(result);
-					}
-				});
+					.addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 			}
 		});
 		
@@ -183,7 +179,7 @@ public class SimCenterPanel extends JPanel
 	/**
 	 *  Set properties loaded from project.
 	 */
-	public IFuture setProperties(Properties ps)
+	public IFuture<Void> setProperties(Properties ps)
 	{
 		int	timemode	= ps.getProperty("timemode")!=null
 			? ps.getIntProperty("timemode") : 2;
@@ -195,17 +191,17 @@ public class SimCenterPanel extends JPanel
 	/**
 	 *  Return properties to be saved in project.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
 		Properties	props	= new Properties();
 		props.addProperty(new Property("timemode", Integer.toString(getTimeMode())));
-		return new Future(props);
+		return new Future<Properties>(props);
 	}
 
 	/**
 	 *  Informs the panel that it should stop all its computation
 	 */
-	public IFuture shutdown()
+	public IFuture<Void> shutdown()
 	{
 		clockp.setActive(false);
 		timerp.setActive(false);

@@ -31,7 +31,7 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public IFuture init(IControlCenter jcc, IService service)
+	public IFuture<Void> init(IControlCenter jcc, IService service)
 	{
 		this.jcc = jcc;
 		this.service = service;
@@ -41,7 +41,7 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	/**
 	 *  Informs the panel that it should stop all its computation
 	 */
-	public IFuture shutdown()
+	public IFuture<Void> shutdown()
 	{
 		return IFuture.DONE;
 	}

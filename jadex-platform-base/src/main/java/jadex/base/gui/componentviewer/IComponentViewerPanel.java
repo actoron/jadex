@@ -15,5 +15,5 @@ public interface IComponentViewerPanel extends IAbstractViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public IFuture init(IControlCenter jcc, IExternalAccess component);
+	public IFuture<Void> init(IControlCenter jcc, IExternalAccess component);
 }

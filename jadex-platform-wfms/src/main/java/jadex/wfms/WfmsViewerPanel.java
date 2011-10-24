@@ -14,15 +14,15 @@ public class WfmsViewerPanel extends AbstractComponentViewerPanel
 {
 	protected StandardClientApplication app;
 	
-	public IFuture init(IControlCenter jcc, IExternalAccess component)
+	public IFuture<Void> init(IControlCenter jcc, IExternalAccess component)
 	{
 		app = new StandardClientApplication(component);
 		return IFuture.DONE;
 	}
 	
-	public IFuture shutdown()
+	public IFuture<Void> shutdown()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		SwingUtilities.invokeLater(new Runnable()
 		{

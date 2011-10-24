@@ -7,7 +7,6 @@ import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
-import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin.ShowRemoteControlCenterHandler;
@@ -16,7 +15,6 @@ import jadex.base.service.library.LibraryService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -28,8 +26,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
-import jadex.commons.gui.IMenuItemConstructor;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
@@ -37,8 +33,6 @@ import jadex.xml.annotation.XMLClassname;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -46,8 +40,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.UIDefaults;
@@ -354,111 +346,111 @@ public class StarterPluginPanel extends JPanel
 		return ret;
 	}
 	
-	/**
-	 *  Dynamically create a new menu item structure for starting components.
-	 */
-	class StartComponentMenuItemConstructor implements IMenuItemConstructor
-	{
-		/**
-		 *  Get or create a new menu item (struture).
-		 *  @return The menu item (structure).
-		 */
-		public JMenuItem getMenuItem()
-		{
-			JMenuItem ret = null;
-
-			if(isEnabled())
-			{
-				ITreeNode node = (ITreeNode)mpanel.getTree().getLastSelectedPathComponent();
-				if(node instanceof FileNode)
-				{
-					final String type = ((FileNode)node).getFile().getAbsolutePath();
-					final IResourceIdentifier rid = createResourceIdentifier().get(new ThreadSuspendable());
-					
-					if(((Boolean)SComponentFactory.isStartable(jcc.getPlatformAccess(), type, rid).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
-					{
-						try
-						{
-//							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(jcc.getPlatformAccess(), type, rid).get(new ThreadSuspendable());
-							String[] inistates = model.getConfigurationNames();
-//							IMBDIComponent model = SXML.loadComponentModel(type, null);
-//							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
-							
-							if(inistates.length>1)
-							{
-								JMenu re = new JMenu("Start Component");
-								re.setIcon(icons.getIcon("start_component"));
-								for(int i=0; i<inistates.length; i++)
-								{
-									final String config = inistates[i];
-									JMenuItem me = new JMenuItem(config);
-									re.add(me);
-									me.addActionListener(new ActionListener()
-									{
-										public void actionPerformed(ActionEvent e)
-										{
-											// todo: collectresults = false?
-											StarterPanel.createComponent(jcc.getPlatformAccess(), jcc, type, null, config, null, false, null, null, null, null, null, spanel);
-										}
-									});
-									me.setToolTipText("Start in configuration: "+config);
-
-								}
-								ret = re;
-								ret.setToolTipText("Start component in selectable configuration");
-							}
-							else
-							{
-								if(inistates.length==1)
-								{
-									ret = new JMenuItem("Start Component ("+inistates[0]+")");
-									ret.setToolTipText("Start component in configuration:"+inistates[0]);
-								}
-								else
-								{
-									ret = new JMenuItem("Start Component");
-									ret.setToolTipText("Start component without explicit initial state");
-								}
-								ret.setIcon(icons.getIcon("start_component"));
-								ret.addActionListener(new ActionListener()
-								{
-									public void actionPerformed(ActionEvent e)
-									{
-										// todo: collectresults = false?
-										StarterPanel.createComponent(jcc.getPlatformAccess(), jcc, type, null, null, null, false, null, null, null, null, null, spanel);
-									}
-								});
-							}
-						}
-						catch(Exception e)
-						{
-							// NOP
-						}
-					}
-				}
-			}
-
-			return ret;
-		}
-
-		/**
-		 *  Test if action is available in current context.
-		 *  @return True, if available.
-		 */
-		public boolean isEnabled()
-		{
-			boolean ret = false;
-			Object	node	= mpanel.getTree().getLastSelectedPathComponent();
-			if(node instanceof FileNode)
-			{
-				String type = ((FileNode)node).getFile().getAbsolutePath();
-				if(((Boolean)SComponentFactory.isStartable(jcc.getPlatformAccess(), type, createResourceIdentifier().get(new ThreadSuspendable())).get(new ThreadSuspendable())))
-					ret = true;
-			}
-			return ret;
-		}
-	}
+//	/**
+//	 *  Dynamically create a new menu item structure for starting components.
+//	 */
+//	class StartComponentMenuItemConstructor implements IMenuItemConstructor
+//	{
+//		/**
+//		 *  Get or create a new menu item (struture).
+//		 *  @return The menu item (structure).
+//		 */
+//		public JMenuItem getMenuItem()
+//		{
+//			JMenuItem ret = null;
+//
+//			if(isEnabled())
+//			{
+//				ITreeNode node = (ITreeNode)mpanel.getTree().getLastSelectedPathComponent();
+//				if(node instanceof FileNode)
+//				{
+//					final String type = ((FileNode)node).getFile().getAbsolutePath();
+//					final IResourceIdentifier rid = createResourceIdentifier().get(new ThreadSuspendable());
+//					
+//					if(((Boolean)SComponentFactory.isStartable(jcc.getPlatformAccess(), type, rid).get(new ThreadSuspendable())).booleanValue())//&& ((FileNode)node).isValid())
+//					{
+//						try
+//						{
+////							IComponentFactory componentfactory = getJCC().getComponent().getPlatform().getComponentFactory();
+//							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(jcc.getPlatformAccess(), type, rid).get(new ThreadSuspendable());
+//							String[] inistates = model.getConfigurationNames();
+////							IMBDIComponent model = SXML.loadComponentModel(type, null);
+////							final IMConfiguration[] inistates = model.getConfigurationbase().getConfigurations();
+//							
+//							if(inistates.length>1)
+//							{
+//								JMenu re = new JMenu("Start Component");
+//								re.setIcon(icons.getIcon("start_component"));
+//								for(int i=0; i<inistates.length; i++)
+//								{
+//									final String config = inistates[i];
+//									JMenuItem me = new JMenuItem(config);
+//									re.add(me);
+//									me.addActionListener(new ActionListener()
+//									{
+//										public void actionPerformed(ActionEvent e)
+//										{
+//											// todo: collectresults = false?
+//											StarterPanel.createComponent(jcc.getPlatformAccess(), jcc, type, null, config, null, false, null, null, null, null, null, spanel);
+//										}
+//									});
+//									me.setToolTipText("Start in configuration: "+config);
+//
+//								}
+//								ret = re;
+//								ret.setToolTipText("Start component in selectable configuration");
+//							}
+//							else
+//							{
+//								if(inistates.length==1)
+//								{
+//									ret = new JMenuItem("Start Component ("+inistates[0]+")");
+//									ret.setToolTipText("Start component in configuration:"+inistates[0]);
+//								}
+//								else
+//								{
+//									ret = new JMenuItem("Start Component");
+//									ret.setToolTipText("Start component without explicit initial state");
+//								}
+//								ret.setIcon(icons.getIcon("start_component"));
+//								ret.addActionListener(new ActionListener()
+//								{
+//									public void actionPerformed(ActionEvent e)
+//									{
+//										// todo: collectresults = false?
+//										StarterPanel.createComponent(jcc.getPlatformAccess(), jcc, type, null, null, null, false, null, null, null, null, null, spanel);
+//									}
+//								});
+//							}
+//						}
+//						catch(Exception e)
+//						{
+//							// NOP
+//						}
+//					}
+//				}
+//			}
+//
+//			return ret;
+//		}
+//
+//		/**
+//		 *  Test if action is available in current context.
+//		 *  @return True, if available.
+//		 */
+//		public boolean isEnabled()
+//		{
+//			boolean ret = false;
+//			Object	node	= mpanel.getTree().getLastSelectedPathComponent();
+//			if(node instanceof FileNode)
+//			{
+//				String type = ((FileNode)node).getFile().getAbsolutePath();
+//				if(((Boolean)SComponentFactory.isStartable(jcc.getPlatformAccess(), type, createResourceIdentifier().get(new ThreadSuspendable())).get(new ThreadSuspendable())))
+//					ret = true;
+//			}
+//			return ret;
+//		}
+//	}
 	
 //	/**
 //	 *  Dynamically create a new menu item structure for starting components.

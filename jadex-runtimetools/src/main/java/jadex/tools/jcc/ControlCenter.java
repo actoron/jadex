@@ -11,6 +11,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -213,18 +214,18 @@ public class ControlCenter
 	/**
 	 * Save settings of JCC and all plugins in current project.
 	 */
-	public IFuture	saveSettings()
+	public IFuture<Void>	saveSettings()
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 //		System.out.println("Saving JCC settings");
 		// Save settings of GUI and currently selected platform (todo: all platforms?)
 		saveSettings(new File(jccaccess.getComponentIdentifier().getLocalName() + SETTINGS_EXTENSION))
-			.addResultListener(new SwingDelegationResultListener(ret)
+			.addResultListener(new SwingDelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 //				System.out.println("Saving platform settings");
-				pcc.savePlatformProperties().addResultListener(new SwingDelegationResultListener(ret));
+				pcc.savePlatformProperties().addResultListener(new SwingDelegationResultListener<Void>(ret));
 			}
 		});
 		
@@ -234,9 +235,9 @@ public class ControlCenter
 	/**
 	 * Save settings of JCC and all plugins in current project.
 	 */
-	public IFuture	saveSettings(final File file)
+	public IFuture<Void>	saveSettings(final File file)
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 //		System.out.println("Fetching JCC properties.");
 		
 		// Get properties of latest platform panel.
@@ -347,10 +348,10 @@ public class ControlCenter
 	/**
 	 *  Do any required cleanup on exit.
 	 */
-	public IFuture	shutdown()
+	public IFuture<Void>	shutdown()
 	{
 //		System.out.println("Control Center shutdown A.");
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		
 		Runnable	runnable	= new Runnable()
 		{
@@ -360,43 +361,49 @@ public class ControlCenter
 				assert !killed;
 				killed = true;
 				
-				IFuture	saved;
+				IFuture<Void>	saved;
 				if(saveonexit)
 					saved	= saveSettings();
 				else
 					saved	= IFuture.DONE;
 				
-				saved.addResultListener(new SwingDelegationResultListener(ret)
+				saved.addResultListener(new SwingDelegationResultListener<Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Void result)
 					{
 //						System.out.println("JCC settings saved.");
 						
 						// Todo: pcc dispose with future?
-						for(Iterator it=pccs.keySet().iterator(); it.hasNext(); )
+						CounterResultListener<Void> lis = new CounterResultListener<Void>(pccs.size(), true, 
+							new SwingDelegationResultListener<Void>(ret)
 						{
-							((PlatformControlCenter)pccs.get(it.next())).dispose();
-						}
-						
-						IFuture	handlerdisposed;
-						if(cmshandler!=null)
-							handlerdisposed	= cmshandler.dispose();
-						else
-							handlerdisposed	= IFuture.DONE;
-
-						handlerdisposed.addResultListener(new SwingDelegationResultListener(ret)
-						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(Void result)
 							{
-//								System.out.println("CMS handlers disposed.");
-								if(!Starter.isShutdown())
+								IFuture<Void>	handlerdisposed;
+								if(cmshandler!=null)
+									handlerdisposed	= cmshandler.dispose();
+								else
+									handlerdisposed	= IFuture.DONE;
+
+								handlerdisposed.addResultListener(new SwingDelegationResultListener<Void>(ret)
 								{
-									window.setVisible(false);
-									window.dispose();
-								}
-								ret.setResult(null);
+									public void customResultAvailable(Void result)
+									{
+//										System.out.println("CMS handlers disposed.");
+										if(!Starter.isShutdown())
+										{
+											window.setVisible(false);
+											window.dispose();
+										}
+										ret.setResult(null);
+									}
+								});
 							}
 						});
+						for(Iterator it=pccs.keySet().iterator(); it.hasNext(); )
+						{
+							((PlatformControlCenter)pccs.get(it.next())).dispose().addResultListener(lis);
+						}
 					}
 				});
 			}

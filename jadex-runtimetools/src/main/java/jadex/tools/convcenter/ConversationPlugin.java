@@ -299,8 +299,9 @@ public class ConversationPlugin extends AbstractJCCPlugin
 	/**
 	 *  Shutdown the plugin.
 	 */
-	public void shutdown()
+	public IFuture<Void> shutdown()
 	{
 		comptree.dispose();
+		return super.shutdown();
 	}
 }

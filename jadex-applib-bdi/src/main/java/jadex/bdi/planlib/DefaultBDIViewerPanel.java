@@ -9,13 +9,12 @@ import jadex.bdi.runtime.ICapability;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
@@ -55,18 +54,18 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public IFuture init(final IControlCenter jcc, final IExternalAccess component)
+	public IFuture<Void> init(final IControlCenter jcc, final IExternalAccess component)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		this.panel = new JPanel(new BorderLayout());
 		
 		// Init interface is asynchronous but super implementation is not.
-		IFuture	fut	= super.init(jcc, component);
+		IFuture<Void>	fut	= super.init(jcc, component);
 		assert fut.isDone();
 		
 		jcc.getClassLoader(component.getModel().getResourceIdentifier())
-			.addResultListener(new DelegationResultListener<ClassLoader>(ret)
+			.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 		{
 			public void customResultAvailable(ClassLoader result)
 			{

@@ -28,12 +28,12 @@ public class ChatViewerPanel extends AbstractComponentViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public IFuture init(IControlCenter jcc, final IExternalAccess component)
+	public IFuture<Void> init(IControlCenter jcc, final IExternalAccess component)
 	{
-		final Future ret = new Future();
-		super.init(jcc, component).addResultListener(new IResultListener()
+		final Future<Void> ret = new Future<Void>();
+		super.init(jcc, component).addResultListener(new IResultListener<Void>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Void result)
 			{
 				panel = new ChatPanel((IExternalAccess)component);
 				ret.setResult(result);

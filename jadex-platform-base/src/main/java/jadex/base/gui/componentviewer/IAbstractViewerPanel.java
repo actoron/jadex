@@ -20,7 +20,7 @@ public interface IAbstractViewerPanel extends IPropertiesProvider
 	/**
 	 *  Informs the panel that it should stop all its computation
 	 */
-	public IFuture shutdown();
+	public IFuture<Void> shutdown();
 
 	/**
 	 *  The id used for mapping properties.

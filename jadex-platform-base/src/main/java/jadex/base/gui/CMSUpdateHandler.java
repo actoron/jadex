@@ -15,6 +15,7 @@ import jadex.commons.IRemoteChangeListener;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
@@ -107,15 +108,15 @@ public class CMSUpdateHandler
 	/**
 	 *  Dispose the handler for triggering remote listener removal.
 	 */
-	public IFuture	dispose()
+	public IFuture<Void>	dispose()
 	{
 		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
-		IFuture	ret;
+		IFuture<Void>	ret;
 		if(listeners!=null)
 		{
-			Future	fut	= new Future();
-			CounterResultListener	crl	= new CounterResultListener(listeners.keySet().size(), true, new DelegationResultListener(fut));
+			Future<Void>	fut	= new Future<Void>();
+			CounterResultListener<Void>	crl	= new CounterResultListener<Void>(listeners.keySet().size(), true, new DelegationResultListener(fut));
 			for(Iterator it=listeners.keySet().iterator(); it.hasNext(); )
 			{
 				IComponentIdentifier	cid	= (IComponentIdentifier)it.next();
@@ -358,15 +359,15 @@ public class CMSUpdateHandler
 	 *  Install a local listener.
 	 *  @param listener	The local listener.
 	 */
-	protected IFuture	installLocalCMSListener(final ICMSComponentListener listener)
+	protected IFuture<Void>	installLocalCMSListener(final ICMSComponentListener listener)
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDelegationResultListener(ret)
+			.addResultListener(new ExceptionSwingDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				IComponentManagementService	cms	= (IComponentManagementService)result;
+//				IComponentManagementService	cms	= (IComponentManagementService)result;
 				cms.addComponentListener(null, listener);
 				ret.setResult(null);
 			}
@@ -378,15 +379,15 @@ public class CMSUpdateHandler
 	 *  Remove a local listener.
 	 *  @param listener	The local listener.
 	 */
-	protected IFuture	removeLocalCMSListener(final ICMSComponentListener listener)
+	protected IFuture<Void>	removeLocalCMSListener(final ICMSComponentListener listener)
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDelegationResultListener(ret)
+			.addResultListener(new ExceptionSwingDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				IComponentManagementService	cms	= (IComponentManagementService)result;
+//				IComponentManagementService	cms	= (IComponentManagementService)result;
 				cms.removeComponentListener(null, listener);
 				ret.setResult(null);
 			}
@@ -398,20 +399,20 @@ public class CMSUpdateHandler
 	 *  Install the remote listener.
 	 *  @param cid	The remote component id.
 	 */
-	protected IFuture	installRemoteCMSListener(final IComponentIdentifier cid)
+	protected IFuture<Void>	installRemoteCMSListener(final IComponentIdentifier cid)
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDelegationResultListener(ret)
+			.addResultListener(new ExceptionSwingDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService	cms)
 			{
-				IComponentManagementService	cms	= (IComponentManagementService)result;
-				cms.getExternalAccess(cid).addResultListener(new SwingDelegationResultListener(ret)
+//				IComponentManagementService	cms	= (IComponentManagementService)result;
+				cms.getExternalAccess(cid).addResultListener(new ExceptionSwingDelegationResultListener<IExternalAccess, Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(IExternalAccess exta)
 					{
-						IExternalAccess	exta	= (IExternalAccess)result;
+//						IExternalAccess	exta	= (IExternalAccess)result;
 						final IComponentIdentifier	icid	= cid;	// internal reference to cid, because java compiler stores final references in outmost object (grrr.)
 						final String	id	= buildId(cid);
 						final IRemoteChangeListener	rcl	= CMSUpdateHandler.this.rcl;
@@ -422,11 +423,11 @@ public class CMSUpdateHandler
 							{
 								final Future<Void>	ret	= new Future<Void>();
 								SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+									.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 								{
-									public void customResultAvailable(Object result)
+									public void customResultAvailable(IComponentManagementService cms)
 									{
-										IComponentManagementService	cms	= (IComponentManagementService)result;
+//										IComponentManagementService	cms	= (IComponentManagementService)result;
 										RemoteCMSListener	rcmsl	= new RemoteCMSListener(icid, id, cms, rcl);
 										cms.addComponentListener(null, rcmsl);
 										ret.setResult(null);
@@ -434,7 +435,7 @@ public class CMSUpdateHandler
 								}));
 								return ret;
 							}
-						}).addResultListener(new SwingDelegationResultListener(ret));
+						}).addResultListener(new SwingDelegationResultListener<Void>(ret));
 					}
 				});
 			}
@@ -445,34 +446,34 @@ public class CMSUpdateHandler
 	/**
 	 *  Deregister the remote listener.
 	 */
-	protected IFuture	deregisterRemoteCMSListener(final IComponentIdentifier cid)
+	protected IFuture<Void>	deregisterRemoteCMSListener(final IComponentIdentifier cid)
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDelegationResultListener(ret)
+			.addResultListener(new ExceptionSwingDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				IComponentManagementService	cms	= (IComponentManagementService)result;
-				cms.getExternalAccess(cid).addResultListener(new SwingDelegationResultListener(ret)
+//				IComponentManagementService	cms	= (IComponentManagementService)result;
+				cms.getExternalAccess(cid).addResultListener(new ExceptionSwingDelegationResultListener<IExternalAccess, Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(IExternalAccess exta)
 					{
-						IExternalAccess	exta	= (IExternalAccess)result;
+//						IExternalAccess	exta	= (IExternalAccess)result;
 						final String	id	= buildId(cid);
 						exta.scheduleStep(new IComponentStep<Void>()
 						{
 							@XMLClassname("deregisterListener")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								final Future	ret	= new Future();
+								final Future<Void>	ret	= new Future<Void>();
 								SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+									.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 								{
-									public void customResultAvailable(Object result)
+									public void customResultAvailable(IComponentManagementService cms)
 									{
 //										System.out.println("Removing listener: "+id);
-										IComponentManagementService	cms	= (IComponentManagementService)result;
+//										IComponentManagementService	cms	= (IComponentManagementService)result;
 										try
 										{
 											cms.removeComponentListener(null, new RemoteCMSListener(cid, id, cms, null));
@@ -486,7 +487,7 @@ public class CMSUpdateHandler
 								}));
 								return ret;
 							}
-						}).addResultListener(new DelegationResultListener(ret));
+						}).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 			}

@@ -128,7 +128,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public IFuture init(final IControlCenter jcc, IExternalAccess component)
+	public IFuture<Void> init(final IControlCenter jcc, IExternalAccess component)
 	{
 		this.jcc = jcc;
 		this.component = component;
@@ -451,7 +451,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  Informs the panel that it should stop all its computation
 	 */
-	public IFuture shutdown()
+	public IFuture<Void> shutdown()
 	{
 		if(timer.isRunning())
 			timer.stop();

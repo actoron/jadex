@@ -83,9 +83,10 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 	/** 
 	 *  Shutdown the plugin.
 	 */
-	public void shutdown()
+	public IFuture<Void> shutdown()
 	{
 		selectorpanel.shutdown();
+		return super.shutdown();
 	}
 	
 	/**

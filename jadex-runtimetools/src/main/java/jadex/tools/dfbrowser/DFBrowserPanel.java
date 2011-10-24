@@ -103,7 +103,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param service	The service.
 	 */
-	public IFuture init(IControlCenter jcc, IService service)
+	public IFuture<Void> init(IControlCenter jcc, IService service)
 	{
 		this.df	= (IDF)service;
 		service_panel = new ServiceDescriptionPanel();
@@ -223,7 +223,7 @@ public class DFBrowserPanel	extends JPanel implements IServiceViewerPanel
 	/**
 	 *  Informs the plugin that it should stop all its computation
 	 */
-	public IFuture shutdown()
+	public IFuture<Void> shutdown()
 	{
 		if(timer.isRunning())
 			timer.stop();

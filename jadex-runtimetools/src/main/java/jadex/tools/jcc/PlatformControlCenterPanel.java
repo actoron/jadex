@@ -6,6 +6,7 @@ import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.JSplitPanel;
@@ -215,7 +216,15 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	// return future only used for testing
 	public IFuture<Void>	setPerspective(final IControlCenterPlugin plugin)
 	{
+//		System.out.println("setPerspective start: "+plugin);
 		final Future	ret	= new Future();
+//		ret.addResultListener(new DefaultResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				System.out.println("setPerspective end: "+plugin);
+//			}
+//		});
 		controlcenter.getControlCenter().getWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		
 		controlcenter.activatePlugin(plugin).addResultListener(new SwingDefaultResultListener()
@@ -251,7 +260,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 						content.add(plugin.getView(), plugin.getName());
 //						if(controlcenter.props.getSubproperty(plugin.getName())!=null)
 //						{
-//							System.out.println("here: "+controlcenter.props.getSubproperty(plugin.getName()));
+//							System.out.println("plugins: "+controlcenter.props.getSubproperty(plugin.getName()));
 //							plugin.setProperties(controlcenter.props.getSubproperty(plugin.getName()))
 //								.addResultListener(new DefaultResultListener()
 //								{

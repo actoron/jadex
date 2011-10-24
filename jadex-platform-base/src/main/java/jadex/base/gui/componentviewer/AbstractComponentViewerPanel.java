@@ -29,7 +29,7 @@ public abstract class AbstractComponentViewerPanel implements IComponentViewerPa
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public IFuture init(IControlCenter jcc, IExternalAccess component)
+	public IFuture<Void> init(IControlCenter jcc, IExternalAccess component)
 	{
 		this.jcc = jcc;
 		this.component = component;
@@ -39,7 +39,7 @@ public abstract class AbstractComponentViewerPanel implements IComponentViewerPa
 	/**
 	 *  Informs the panel that it should stop all its computation
 	 */
-	public IFuture shutdown()
+	public IFuture<Void> shutdown()
 	{
 		return IFuture.DONE;
 	}

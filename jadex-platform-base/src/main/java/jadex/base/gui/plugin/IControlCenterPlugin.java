@@ -16,12 +16,12 @@ public interface IControlCenterPlugin extends IPropertiesProvider
 	/**
 	 *  This initializes a plugin and is done in context of a swing thread.
 	 */
-	public void init(IControlCenter main);
+	public IFuture<Void> init(IControlCenter main);
 
 	/**
 	 *  Informs the plugin that it should stop all its computation
 	 */
-	public void shutdown();
+	public IFuture<Void> shutdown();
 		
 	/**
 	 *  Return the unique name of this plugin.
@@ -55,5 +55,5 @@ public interface IControlCenterPlugin extends IPropertiesProvider
 	/**
 	 *  Store settings if any in platform settings service.
 	 */
-	public IFuture pushPlatformSettings();
+	public IFuture<Void> pushPlatformSettings();
 }
