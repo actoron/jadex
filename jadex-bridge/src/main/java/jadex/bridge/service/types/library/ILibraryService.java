@@ -4,6 +4,7 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
+import jadex.bridge.service.annotation.Reference;
 import jadex.commons.future.IFuture;
 
 import java.net.URL;
@@ -90,7 +91,7 @@ public interface ILibraryService extends IService
 	 *  @return the current ClassLoader
 	 */
 	@Excluded()
-	public IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid);
+	public @Reference IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid);
 	
 	/** 
 	 *  Returns the resource identifier.

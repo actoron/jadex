@@ -431,52 +431,69 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 *  Create a new agent model, which can be manually edited before starting.
 	 *  @param name	A type name for the agent model.
 	 */
-	public IMECapability	createAgentModel(String name, String pkg, String[] imports, ClassLoader cl)
+	public IFuture<IMECapability>	createAgentModel(final String name, final String pkg, final String[] imports, final IResourceIdentifier rid)
 	{
-		OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", cl);
-		// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
-		typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-		IOAVState	state	= OAVStateFactory.createOAVState(typemodel);
+		final Future<IMECapability>	ret	= new Future<IMECapability>();
 		
-		final Set	types	= new HashSet();
-		IOAVStateListener	listener	= new IOAVStateListener()
+		component.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IMECapability>(ret)
 		{
-			public void objectAdded(Object id, OAVObjectType type, boolean root)
+			public void customResultAvailable(ILibraryService libservice)
 			{
-				// Add the type and its supertypes (if not already contained).
-				while(type!=null && types.add(type))
-					type	= type.getSupertype();
-			}
-			
-			public void objectModified(Object id, OAVObjectType type, OAVAttributeType attr, Object oldvalue, Object newvalue)
-			{
-			}
-			
-			public void objectRemoved(Object id, OAVObjectType type)
-			{
-			}
-		};
-		state.addStateListener(listener, false);
-		
-		Object	handle	= state.createRootObject(OAVBDIMetaModel.agent_type);
-		state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name, name);
-//		state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_package, pkg);
-//		if(imports!=null)
-//		{
-//			for(int i=0; i<imports.length; i++)
-//			{
-//				state.addAttributeValue(handle, OAVBDIMetaModel.capability_has_imports, imports[i]);
-//			}
-//		}
-		
-		mtypes.put(handle, new Object[]{types, listener});
-		
-		ModelInfo	info	= new ModelInfo();
-		info.setName(name);
-		info.setPackage(pkg);
-		info.setImports(imports);
+				libservice.getClassLoader(rid).addResultListener(new ExceptionDelegationResultListener<ClassLoader, IMECapability>(ret)
+				{
+					public void customResultAvailable(ClassLoader cl)
+					{
+						OAVTypeModel	typemodel	= new OAVTypeModel(name+"_typemodel", cl);
+						// Requires runtime meta model, because e.g. user conditions can refer to runtime elements (belief, goal, etc.) 
+						typemodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
+						IOAVState	state	= OAVStateFactory.createOAVState(typemodel);
+						
+						final Set	types	= new HashSet();
+						IOAVStateListener	listener	= new IOAVStateListener()
+						{
+							public void objectAdded(Object id, OAVObjectType type, boolean root)
+							{
+								// Add the type and its supertypes (if not already contained).
+								while(type!=null && types.add(type))
+									type	= type.getSupertype();
+							}
+							
+							public void objectModified(Object id, OAVObjectType type, OAVAttributeType attr, Object oldvalue, Object newvalue)
+							{
+							}
+							
+							public void objectRemoved(Object id, OAVObjectType type)
+							{
+							}
+						};
+						state.addStateListener(listener, false);
+						
+						Object	handle	= state.createRootObject(OAVBDIMetaModel.agent_type);
+						state.setAttributeValue(handle, OAVBDIMetaModel.modelelement_has_name, name);
+//						state.setAttributeValue(handle, OAVBDIMetaModel.capability_has_package, pkg);
+//						if(imports!=null)
+//						{
+//							for(int i=0; i<imports.length; i++)
+//							{
+//								state.addAttributeValue(handle, OAVBDIMetaModel.capability_has_imports, imports[i]);
+//							}
+//						}
+						
+						mtypes.put(handle, new Object[]{types, listener});
+						
+						ModelInfo	info	= new ModelInfo();
+						info.setName(name);
+						info.setPackage(pkg);
+						info.setImports(imports);
 
-		return new MCapabilityFlyweight(state, handle, info);
+						ret.setResult(new MCapabilityFlyweight(state, handle, info));
+					}
+				});
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**
@@ -485,8 +502,9 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 *  @param filename	The filename for accessing the model.
 	 *  @return	The startable agent model.
 	 */
-	public IModelInfo	registerAgentModel(IMECapability model, String filename)
+	public IFuture<IModelInfo>	registerAgentModel(IMECapability model, String filename)
 	{
+		Future<IModelInfo>	fut	= new Future<IModelInfo>();
 		OAVCapabilityModel	ret;
 		MCapabilityFlyweight	fw	= (MCapabilityFlyweight)model;
 		IOAVState	state	= fw.getState();
@@ -512,18 +530,15 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 		try
 		{
 			loader.createAgentModelEntry(ret, (ModelInfo)ret.getModelInfo());
+			((ModelInfo)ret.getModelInfo()).setFilename(filename);
+			loader.registerModel(filename, ret);
+			fut.setResult(ret.getModelInfo());
 		}
 		catch(Exception e)
 		{
-			if(e instanceof RuntimeException)
-				throw (RuntimeException)e;
-			else
-				throw new RuntimeException(e);
+			fut.setException(e);
 		}
 		
-		((ModelInfo)ret.getModelInfo()).setFilename(filename);
-		loader.registerModel(filename, ret);
-		
-		return ret.getModelInfo();
+		return fut;
 	}
 }

@@ -11,8 +11,9 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.DefaultResultListener;
+
+import java.util.Map;
 
 /**
  *  Example that shows how an agent model can be created via the editable model api.
@@ -26,67 +27,52 @@ public class HelloWorldAgentCreator
 	 */
 	public static void main(String[] args)
 	{
-		Starter.createPlatform(args).addResultListener(new DefaultResultListener()
+		Starter.createPlatform(args).addResultListener(new DefaultResultListener<IExternalAccess>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(final IExternalAccess plat)
 			{
-				final IExternalAccess plat = (IExternalAccess)result;
-				
 				// Load dummy model to force loading of bdi kernel.
-				SComponentFactory.isLoadable(plat, "Dummy.agent.xml", null).addResultListener(new DefaultResultListener()
+				SComponentFactory.isLoadable(plat, "Dummy.agent.xml", null).addResultListener(new DefaultResultListener<Boolean>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Boolean result)
 					{
-						SServiceProvider.getService(plat.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new DefaultResultListener()
+						SServiceProvider.getService(plat.getServiceProvider(), IDynamicBDIFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new DefaultResultListener<IDynamicBDIFactory>()
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(final IDynamicBDIFactory fac)
 							{
-								final ILibraryService libser = (ILibraryService)result;
-								libser.getClassLoader(plat.getModel().getResourceIdentifier())
-									.addResultListener(new DefaultResultListener()
+								fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null, null)
+									.addResultListener(new DefaultResultListener<IMECapability>()
 								{
-									public void resultAvailable(Object result)
+									public void resultAvailable(IMECapability agent)
 									{
-										SServiceProvider.getService(plat.getServiceProvider(), IDynamicBDIFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
-											.addResultListener(new DefaultResultListener()
+										IMEBelief	msgbelief	= agent.createBeliefbase().createBelief("msg");
+										msgbelief.createFact("\"Welcome to editable models!\"", null);
+										
+										IMEPlan helloplan = agent.createPlanbase().createPlan("hello");
+										helloplan.createBody("HelloWorldPlan", null);
+										IMEConfiguration conf = agent.createConfiguration("default");
+										conf.createInitialPlan("hello");
+										
+										fac.registerAgentModel(agent, "helloagent.agent.xml");
+										
+										SServiceProvider.getServiceUpwards(plat.getServiceProvider(), IComponentManagementService.class)
+											.addResultListener(new DefaultResultListener<IComponentManagementService>()
 										{
-											public void resultAvailable(Object result)
+											public void resultAvailable(IComponentManagementService cms)
 											{
-												IDynamicBDIFactory fac = (IDynamicBDIFactory)result;
-												ClassLoader cl = (ClassLoader)result;
-												
-												IMECapability agent = fac.createAgentModel("HelloWorld", "jadex.bdi.examples.helloworld", null, cl);
-												
-												IMEBelief	msgbelief	= agent.createBeliefbase().createBelief("msg");
-												msgbelief.createFact("\"Welcome to editable models!\"", null);
-												
-												IMEPlan helloplan = agent.createPlanbase().createPlan("hello");
-												helloplan.createBody("HelloWorldPlan", null);
-												IMEConfiguration conf = agent.createConfiguration("default");
-												conf.createInitialPlan("hello");
-												
-												fac.registerAgentModel(agent, "helloagent.agent.xml");
-												
-												SServiceProvider.getServiceUpwards(plat.getServiceProvider(), IComponentManagementService.class)
-													.addResultListener(new DefaultResultListener()
+												cms.createComponent("hw1", "helloagent.agent.xml", null,
+													new DefaultResultListener<Map<String, Object>>()
 												{
-													public void resultAvailable(Object result)
+													public void resultAvailable(Map<String, Object> result)
 													{
-														IComponentManagementService cms = (IComponentManagementService)result;
-														cms.createComponent("hw1", "helloagent.agent.xml", null, new DefaultResultListener()
-														{
-															public void resultAvailable(Object result)
-															{
-																System.out.println("finished.");
-															}
-														});
+														System.out.println("finished.");
 													}
 												});
 											}
 										});
 									}
-								});
+								});								
 							}
 						});
 					}

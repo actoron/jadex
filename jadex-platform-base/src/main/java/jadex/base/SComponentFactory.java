@@ -89,7 +89,7 @@ public class SComponentFactory
 	 * @param model The model.
 	 * @return True, if model can be loaded.
 	 */
-	public static IFuture isLoadable(IExternalAccess exta, final String model, final IResourceIdentifier rid)
+	public static IFuture<Boolean> isLoadable(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
 		Future ret = new Future();
 		
