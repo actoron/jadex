@@ -29,9 +29,10 @@ public class SearchServiceProviderAgent implements ISearchService
 	@Agent
 	protected MicroAgent	agent;
 	
-	public IFuture searchService(String dummy)
+	public IFuture<ILocalService> searchService(String dummy)
 	{
 //		System.out.println("searcher");
-		return agent.getRequiredService("local");
+		IFuture<ILocalService>	ret	= agent.getRequiredService("local");
+		return ret;
 	}
 }

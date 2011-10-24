@@ -7,11 +7,11 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Mse9kJwHEeCTM9TB44euIw" key="keep alive" value="true"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_XTbR4JaHEeCrd4zl1z0lzA" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LOETUN-pEeCuL5wLZq-Bwg" key="dimension" value="2:1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LOETUd-pEeCuL5wLZq-Bwg" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LOETUt-pEeCuL5wLZq-Bwg" key="complexColumns" value=""/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LOETU9-pEeCuL5wLZq-Bwg" key="0:0" value="jadex.commons.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LOE6YN-pEeCuL5wLZq-Bwg" key="1:0" value="jadex.bridge.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hPDFcP4tEeCPEIwlbR2FIA" key="dimension" value="2:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hPDFcf4tEeCPEIwlbR2FIA" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hPDFcv4tEeCPEIwlbR2FIA" key="complexColumns" value=""/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hPDFc_4tEeCPEIwlbR2FIA" key="0:0" value="jadex.commons.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_hPDFdP4tEeCPEIwlbR2FIA" key="1:0" value="jadex.bridge.service.types.factory.*"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_azL9UJaHEeCrd4zl1z0lzA" source="jadex_providedservices_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_e3wUEJaJEeCj2rAtY6yqkw" key="dimension" value="1:4"/>

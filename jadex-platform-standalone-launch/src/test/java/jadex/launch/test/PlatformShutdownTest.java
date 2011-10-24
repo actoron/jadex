@@ -6,7 +6,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
@@ -30,25 +30,24 @@ public class PlatformShutdownTest extends TestCase
 		final IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "testcases",
 			"-configname", "allkernels",	// Todo: does not work with multi-kernel on Hudson!?
 			"-niotransport", "false", "-gui", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}).get(sus, timeout);
-		final Future	fut	= new Future();
+		final Future<Void>	fut	= new Future<Void>();
 		SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(new DelegationResultListener(fut)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService	cms)
 			{
-				IComponentManagementService	cms	= (IComponentManagementService)result;
 				cms.addComponentListener(platform.getComponentIdentifier(), new ICMSComponentListener()
 				{
-					public IFuture componentRemoved(IComponentDescription desc, Map results)
+					public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
 					{
 						fut.setResult(null);
 						return IFuture.DONE;
 					}
-					public IFuture componentAdded(IComponentDescription desc)
+					public IFuture<Void> componentAdded(IComponentDescription desc)
 					{
 						return IFuture.DONE;
 					}
-					public IFuture componentChanged(IComponentDescription desc)
+					public IFuture<Void> componentChanged(IComponentDescription desc)
 					{
 						return IFuture.DONE;
 					}

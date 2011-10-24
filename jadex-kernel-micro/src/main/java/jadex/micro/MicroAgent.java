@@ -11,7 +11,6 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -24,7 +23,6 @@ import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
 import jadex.commons.ComposedFilter;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -34,6 +32,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -49,7 +48,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	protected MicroAgentInterpreter interpreter;
 	
 	/** The current timer. */
-	protected List timers;
+	protected List<ITimer> timers;
 	
 	//-------- constructors --------
 	
@@ -86,7 +85,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param msg The message.
 	 *  @param mt The message type.
 	 */
-	public void messageArrived(Map msg, MessageType mt)
+	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
 	}
 
@@ -94,7 +93,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Called just before the agent is removed from the platform.
 	 *  @return The result of the component.
 	 */
-	public IFuture agentKilled()
+	public IFuture<Void> agentKilled()
 	{
 		return IFuture.DONE;
 	}
@@ -194,7 +193,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Get the arguments.
 	 *  @return The arguments.
 	 */
-	public Map getArguments()
+	public Map<String, Object> getArguments()
 	{
 		return interpreter.getArguments();
 	}
@@ -203,7 +202,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Get the component results.
 	 *  @return The results.
 	 */
-	public Map getResults()
+	public Map<String, Object> getResults()
 	{
 		return interpreter.getResults();
 	}
@@ -240,7 +239,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	/**
 	 *  Get a raw reference to a provided service implementation.
 	 */
-	public Object getRawService(Class type)
+	public Object getRawService(Class<?> type)
 	{
 		return interpreter.getRawService(type);
 	}
@@ -248,7 +247,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	/**
 	 *  Get a raw reference to a provided service implementation.
 	 */
-	public Object[] getRawServices(Class type)
+	public Object[] getRawServices(Class<?> type)
 	{
 		return interpreter.getRawServices(type);
 	}
@@ -275,16 +274,15 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Get the current time.
 	 *  @return The current time.
 	 */
-	public IFuture getTime()
+	public IFuture<Long> getTime()
 	{
-		final Future ret = new Future();
+		final Future<Long> ret = new Future<Long>();
 		
 		getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DefaultResultListener()
+			.addResultListener(new ExceptionDelegationResultListener<IClockService, Long>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IClockService cs)
 			{
-				IClockService cs = (IClockService)result;
 				ret.setResult(new Long(cs.getTime()));
 			}
 		});
@@ -302,14 +300,13 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IFuture<TimerWrapper> waitFor(final long time, final IComponentStep<Void> run)
 	{
 //		longtime	= Math.max(longtime, time);
-		final Future ret = new Future();
+		final Future<TimerWrapper> ret = new Future<TimerWrapper>();
 		
 		getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener()
+			.addResultListener(new ExceptionDelegationResultListener<IClockService, TimerWrapper>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IClockService cs)
 			{
-				IClockService cs = (IClockService)result;
 				final ITimer[] ts = new ITimer[1];
 				ts[0] = cs.createTimer(time, new ITimedObject()
 				{
@@ -324,14 +321,9 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 					}
 				});
 				if(timers==null)
-					timers	= new ArrayList();
+					timers	= new ArrayList<ITimer>();
 				timers.add(ts[0]);
 				ret.setResult(new TimerWrapper(ts[0]));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
 			}
 		});
 		
@@ -344,14 +336,13 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IFuture<TimerWrapper> waitForTick(final IComponentStep<Void> run)
 	{
-		final Future ret = new Future();
+		final Future<TimerWrapper> ret = new Future<TimerWrapper>();
 		
 		getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener()
+			.addResultListener(new ExceptionDelegationResultListener<IClockService, TimerWrapper>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IClockService cs)
 			{
-				IClockService cs = (IClockService)result;
 				final ITimer[] ts = new ITimer[1];
 				ts[0] = cs.createTickTimer(new ITimedObject()
 				{
@@ -361,7 +352,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 					}
 				});
 				if(timers==null)
-					timers	= new ArrayList();
+					timers	= new ArrayList<ITimer>();
 				timers.add(ts[0]);
 				ret.setResult(new TimerWrapper(ts[0]));
 			}
@@ -413,7 +404,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param me	The message content (name value pairs).
 	 *  @param mt	The message type describing the content.
 	 */
-	public IFuture sendMessage(final Map me, final MessageType mt)
+	public IFuture<Void> sendMessage(Map<String, Object> me, MessageType mt)
 	{
 		return sendMessage(me, mt, null);
 	}
@@ -423,21 +414,20 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param me	The message content (name value pairs).
 	 *  @param mt	The message type describing the content.
 	 */
-	public IFuture sendMessage(final Map me, final MessageType mt, final byte[] codecids)
+	public IFuture<Void> sendMessage(final Map<String, Object> me, final MessageType mt, final byte[] codecids)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DefaultResultListener()
+		getServiceContainer().searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IMessageService ms)
 			{
-				IMessageService ms = (IMessageService)result;
 				ms.sendMessage(me, mt, interpreter.getAgentAdapter().getComponentIdentifier(),
 					interpreter.getModel().getResourceIdentifier(), codecids)
-					.addResultListener(createResultListener(new DelegationResultListener(ret)));
+					.addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -447,7 +437,8 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param me	The message content (name value pairs).
 	 *  @param mt	The message type describing the content.
 	 */
-	public IFuture sendMessageAndWait(final Map me, final MessageType mt, final IMessageHandler handler)
+	// Todo: supply reply message as future return value?
+	public IFuture<Void> sendMessageAndWait(final Map<String, Object> me, final MessageType mt, final IMessageHandler handler)
 	{
 		boolean hasconvid = false;
 		ParameterSpecification[] ps = mt.getConversationIdentifiers();
@@ -475,7 +466,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 				return handler.isRemove();
 			}
 			
-			public void handleMessage(Map msg, MessageType type)
+			public void handleMessage(Map<String, Object> msg, MessageType type)
 			{
 				handler.handleMessage(msg, type);
 			}
@@ -518,7 +509,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
 	 */
-	public IFuture createComponentIdentifier(String name)
+	public IFuture<IComponentIdentifier> createComponentIdentifier(String name)
 	{
 		return createComponentIdentifier(name, true, null);
 	}
@@ -530,7 +521,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
 	 */
-	public IFuture createComponentIdentifier(String name, boolean local)
+	public IFuture<IComponentIdentifier> createComponentIdentifier(String name, boolean local)
 	{
 		return createComponentIdentifier(name, local, null);
 	}
@@ -542,19 +533,18 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param addresses The addresses.
 	 *  @return The new component identifier.
 	 */
-	public IFuture createComponentIdentifier(final String name, final boolean local, final String[] addresses)
+	public IFuture<IComponentIdentifier> createComponentIdentifier(final String name, final boolean local, final String[] addresses)
 	{
-		final Future ret = new Future();
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		SServiceProvider.getService(getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DefaultResultListener()
+		getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
 				ret.setResult(cms.createComponentIdentifier(name, local, addresses));
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -564,9 +554,9 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param msgeventtype	The message event type.
 	 *  @return The reply event.
 	 */
-	public IFuture createReply(Map msg, MessageType mt)
+	public IFuture<Map<String, Object>> createReply(Map<String, Object> msg, MessageType mt)
 	{
-		return new Future(mt.createReply(msg));
+		return new Future<Map<String, Object>>(mt.createReply(msg));
 	}
 	
 	/**
@@ -615,7 +605,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param service The service.
 	 *  @param type The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public IFuture	addService(String name, Class type, Object service, String proxytype)
+	public IFuture<Void>	addService(String name, Class<?> type, Object service, String proxytype)
 	{
 		return interpreter.addService(name, type, proxytype, null, service);
 	}
@@ -627,7 +617,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param type The public service interface.
 	 *  @param service The service.
 	 */
-	public IFuture	addService(String name, Class type, Object service)
+	public IFuture<Void>	addService(String name, Class<?> type, Object service)
 	{
 		return interpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service);
 	}
@@ -636,7 +626,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Removes a service from the platform (shutdowns also the service).
 	 *  @param service The service.
 	 */
-	public IFuture	removeService(IServiceIdentifier sid)
+	public IFuture<Void>	removeService(IServiceIdentifier sid)
 	{
 		return ((IServiceContainer)interpreter.getServiceProvider()).removeService(sid);
 	}
@@ -673,7 +663,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture getChildren()
+	public IFuture<Collection<IExternalAccess>> getChildren()
 	{
 		return interpreter.getAgentAdapter().getChildrenAccesses();
 	}
@@ -681,7 +671,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	/**
 	 *  Kill the component.
 	 */
-	public IFuture killComponent()
+	public IFuture<Void> killComponent()
 	{
 		return killAgent();
 	}
@@ -690,7 +680,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
-	public IFuture addComponentListener(IComponentListener listener)
+	public IFuture<Void> addComponentListener(IComponentListener listener)
 	{
 		return interpreter.addComponentListener(listener);
 	}
@@ -699,7 +689,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Remove a component listener.
 	 *  @param listener The listener.
 	 */
-	public IFuture removeComponentListener(IComponentListener listener)
+	public IFuture<Void> removeComponentListener(IComponentListener listener)
 	{
 		return interpreter.removeComponentListener(listener);
 	}
@@ -709,7 +699,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param name The service name.
 	 *  @return The service.
 	 */
-	public IFuture getRequiredService(String name)
+	public <T> IFuture<T> getRequiredService(String name)
 	{
 		return getServiceContainer().getRequiredService(name);
 	}
@@ -719,7 +709,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  @param name The services name.
 	 *  @return The service.
 	 */
-	public IIntermediateFuture getRequiredServices(String name)
+	public <T> IIntermediateFuture<T> getRequiredServices(String name)
 	{
 		return getServiceContainer().getRequiredServices(name);
 	}
@@ -849,7 +839,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  May be overriden to provide a custom service container implementations.
 	 */
 	// Only needed for ProxyAgent. Todo: remove
-	public IServiceContainer createServiceContainer(Map args)
+	public IServiceContainer createServiceContainer(Map<String, Object> args)
 	{
 		return null;
 	}

@@ -19,10 +19,11 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_UJYNAN-fEeCA_-WKWefa3g" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_HfTuIN-fEeCA_-WKWefa3g" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_H1xtYN-fEeCA_-WKWefa3g" key="dimension" value="1:1"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_H1xtYd-fEeCA_-WKWefa3g" key="uniqueColumnIndex" value="0"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_H1xtYt-fEeCA_-WKWefa3g" key="complexColumns" value="false"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_H1xtY9-fEeCA_-WKWefa3g" key="0:0" value="jadex.bridge.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0COmsP4kEeCPEIwlbR2FIA" key="dimension" value="2:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0COmsf4kEeCPEIwlbR2FIA" key="uniqueColumnIndex" value="0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0COmsv4kEeCPEIwlbR2FIA" key="complexColumns" value="false"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0COms_4kEeCPEIwlbR2FIA" key="0:0" value="jadex.bridge.service.types.cms.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_0COmtP4kEeCPEIwlbR2FIA" key="1:0" value="jadex.bridge.service.types.factory.*"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_KP5mcN-fEeCA_-WKWefa3g" source="jadex_providedservices_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LfpXEN-fEeCA_-WKWefa3g" key="dimension" value="1:5"/>

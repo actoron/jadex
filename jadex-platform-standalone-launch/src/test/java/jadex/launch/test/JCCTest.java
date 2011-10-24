@@ -48,14 +48,14 @@ public class JCCTest extends TestCase
 				final JCCAgent	jcca	= (JCCAgent)ia;
 				final ControlCenter	cc	= jcca.getControlCenter();
 				
-				final Future	ret	= new Future();
+				final Future<Void>	ret	= new Future<Void>();
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
 					{
 						PlatformControlCenter	pcc	= cc.getPCC();
 						IControlCenterPlugin[]	plugins	= pcc.getPlugins();
-						activatePlugins(jcca, pcc, plugins, 0).addResultListener(new DelegationResultListener(ret));
+						activatePlugins(jcca, pcc, plugins, 0).addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 				return ret;
@@ -70,15 +70,15 @@ public class JCCTest extends TestCase
 	 */
 	protected IFuture<Void>	activatePlugins(final JCCAgent jcca, final PlatformControlCenter pcc, final IControlCenterPlugin[] plugins, final int i)
 	{
-		IFuture	ret;
+		IFuture<Void>	ret;
 		if(i<plugins.length)
 		{
-			final Future	fut	= new Future();
+			final Future<Void>	fut	= new Future<Void>();
 			ret	= fut;
 //			System.out.println("Activating plugin: "+plugins[i]);
-			pcc.getPanel().setPerspective(plugins[i]).addResultListener(new SwingDelegationResultListener(fut)
+			pcc.getPanel().setPerspective(plugins[i]).addResultListener(new SwingDelegationResultListener<Void>(fut)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Void result)
 				{
 					jcca.waitFor(500, new IComponentStep<Void>()
 					{
@@ -88,7 +88,7 @@ public class JCCTest extends TestCase
 							{
 								public void run()
 								{
-									activatePlugins(jcca, pcc, plugins, i+1).addResultListener(new DelegationResultListener(fut));
+									activatePlugins(jcca, pcc, plugins, i+1).addResultListener(new DelegationResultListener<Void>(fut));
 								}
 							});
 							return IFuture.DONE;

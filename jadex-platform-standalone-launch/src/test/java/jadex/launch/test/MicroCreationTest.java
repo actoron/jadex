@@ -1,6 +1,7 @@
 package jadex.launch.test;
 
 import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -9,6 +10,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
@@ -49,24 +51,24 @@ public class MicroCreationTest extends TestCase
 			throw new RuntimeException(e);
 		}
 		
-		final Future	fut	= new Future();
-		Map	args	= new HashMap();
+		final Future<Map<String, Object>>	fut	= new Future<Map<String, Object>>();
+		Map<String, Object>	args	= new HashMap<String, Object>();
 		args.put("max", new Integer(10000));
-		cms.createComponent(null, "jadex/micro/benchmarks/AgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener(fut))
-			.addResultListener(new DelegationResultListener(fut)
+		cms.createComponent(null, "jadex/micro/benchmarks/AgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Map<String, Object>>(fut))
+			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Map<String, Object>>(fut)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentIdentifier result)
 			{
 				// Agent created. Kill listener waits for result.
 			}
 		});
 		
 		// Write values to property files for hudson plot plugin.
-		Map	results	= (Map) fut.get(sus, timeout);
-		for(Iterator it=results.keySet().iterator(); it.hasNext(); )
+		Map<String, Object>	results	= fut.get(sus, timeout);
+		for(Iterator<String> it=results.keySet().iterator(); it.hasNext(); )
 		{
-			String	key	= (String) it.next();
-			Tuple	value	= (Tuple) results.get(key);
+			String	key	= it.next();
+			Tuple	value	= (Tuple)results.get(key);
 			try
 			{
 				FileWriter	fw	= new FileWriter(new File("../"+key+".properties"));

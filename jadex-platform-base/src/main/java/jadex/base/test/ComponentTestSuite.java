@@ -67,7 +67,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final long timeout) throws Exception
 	{
-		super(path.getName());
+		super(path.toString());
 		
 		if(timeout>0)
 		{
@@ -146,7 +146,7 @@ public class ComponentTestSuite extends TestSuite
 							}
 							if(istest)
 							{
-								addTest(new ComponentTest(cms, abspath));
+								addTest(new ComponentTest(cms, model));
 							}
 							else if(model.getReport()!=null)
 							{

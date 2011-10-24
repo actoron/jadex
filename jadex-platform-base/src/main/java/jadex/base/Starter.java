@@ -4,6 +4,7 @@ import jadex.base.fipa.CMSComponentDescription;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -179,7 +180,7 @@ public class Starter
 	 *  @param args The command line arguments.
 	 *  @return The external access of the root component.
 	 */
-	public static IFuture createPlatform(String[] args)
+	public static IFuture<IExternalAccess> createPlatform(String[] args)
 	{
 		final Future ret = new Future();
 		try

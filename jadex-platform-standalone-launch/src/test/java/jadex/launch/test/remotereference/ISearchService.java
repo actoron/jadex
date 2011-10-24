@@ -10,5 +10,5 @@ public interface ISearchService
 	/**
 	 *  Search for a service.
 	 */
-	IFuture	searchService(String dummy);
+	IFuture<ILocalService>	searchService(String dummy);
 }

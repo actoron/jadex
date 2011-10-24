@@ -34,7 +34,7 @@ public interface IMessageHandler
 	 *  @param msg The message.
 	 *  @param type The message type.
 	 */
-	public void handleMessage(Map msg, MessageType type);
+	public void handleMessage(Map<String, Object> msg, MessageType type);
 	
 	/**
 	 *  Timeout occurred.

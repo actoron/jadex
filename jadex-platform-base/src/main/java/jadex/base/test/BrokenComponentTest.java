@@ -2,6 +2,7 @@ package jadex.base.test;
 
 
 import jadex.bridge.IErrorReport;
+import jadex.bridge.modelinfo.IModelInfo;
 import junit.framework.Test;
 import junit.framework.TestResult;
 
@@ -13,7 +14,10 @@ public class BrokenComponentTest implements	Test
 	//-------- attributes --------
 	
 	/** The component. */
-	protected String	comp;
+	protected IModelInfo	comp;
+	
+	/** The filename (if model could not be loaded). */
+	protected String	filename;
 	
 	/** The error. */
 	protected IErrorReport	error;
@@ -23,9 +27,18 @@ public class BrokenComponentTest implements	Test
 	/**
 	 *  Create a component test.
 	 */
-	public BrokenComponentTest(String comp, IErrorReport error)
+	public BrokenComponentTest(IModelInfo comp, IErrorReport error)
 	{
 		this.comp	= comp;
+		this.error	= error;
+	}
+	
+	/**
+	 *  Create a component test.
+	 */
+	public BrokenComponentTest(String filename, IErrorReport error)
+	{
+		this.filename	= filename;
 		this.error	= error;
 	}
 	
@@ -56,6 +69,6 @@ public class BrokenComponentTest implements	Test
 	 */
 	public String toString()
 	{
-		return comp;
+		return comp!=null ? comp.getFullName() : filename;
 	}
 }

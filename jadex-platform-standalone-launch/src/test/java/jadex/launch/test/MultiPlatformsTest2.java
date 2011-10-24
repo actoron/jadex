@@ -5,6 +5,10 @@ import jadex.bridge.IExternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 /**
@@ -19,24 +23,24 @@ public class MultiPlatformsTest2 extends TestCase
 		int number	= 100;
 		long timeout	= 10000;
 		
-		IFuture[]	futures	= new IFuture[number];
-		for(int i=0; i<futures.length; i++)
+		List<IFuture<IExternalAccess>>	futures	= new ArrayList<IFuture<IExternalAccess>>();
+		for(int i=0; i<number; i++)
 		{
 			if(i%10==0)
 				System.out.println("Starting platform "+i);
-			futures[i]	= Starter.createPlatform(new String[]{"-platformname", "testcases", "-niotransport", "false",
+			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases", "-niotransport", "false",
 				"-configname", "allkernels",	// Todo: does not work with multi-kernel on Hudson!?
 				"-gui", "false", 
-				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"});
+				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}
 		
-		IExternalAccess[]	platforms	= new IExternalAccess[futures.length];
+		IExternalAccess[]	platforms	= new IExternalAccess[number];
 		ISuspendable	sus	= 	new ThreadSuspendable();
-		for(int i=0; i<futures.length; i++)
+		for(int i=0; i<number; i++)
 		{
 			if(i%10==0)
 				System.out.println("Waiting for platform "+i);
-			platforms[i]	= (IExternalAccess)futures[i].get(sus, timeout);
+			platforms[i]	= futures.get(i).get(sus, timeout);
 		}
 		
 //		try
@@ -47,7 +51,7 @@ public class MultiPlatformsTest2 extends TestCase
 //		{
 //		}
 		
-		for(int i=0; i<futures.length; i++)
+		for(int i=0; i<number; i++)
 		{
 			if(i%10==0)
 				System.out.println("Killing platform "+i);

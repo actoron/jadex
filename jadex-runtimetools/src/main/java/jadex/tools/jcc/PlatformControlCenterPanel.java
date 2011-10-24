@@ -213,7 +213,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	 * This method may only be called from the swing thread
 	 */
 	// return future only used for testing
-	public IFuture	setPerspective(final IControlCenterPlugin plugin)
+	public IFuture<Void>	setPerspective(final IControlCenterPlugin plugin)
 	{
 		final Future	ret	= new Future();
 		controlcenter.getControlCenter().getWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));

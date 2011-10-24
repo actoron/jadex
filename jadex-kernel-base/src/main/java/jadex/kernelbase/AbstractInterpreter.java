@@ -137,7 +137,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  Get the arguments.
 	 *  @return The arguments.
 	 */
-	public Map getArguments()
+	public Map<String, Object> getArguments()
 	{
 		return arguments;
 	}
@@ -149,7 +149,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  terminated (i.e. no invokerLater can be used).
 	 *  @return The results map (name -> value). 
 	 */
-	public Map getResults()
+	public Map<String, Object> getResults()
 	{
 		return results!=null? Collections.unmodifiableMap(results): Collections.EMPTY_MAP;
 	}
@@ -181,7 +181,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
-	public IFuture addComponentListener(IComponentListener listener)
+	public IFuture<Void> addComponentListener(IComponentListener listener)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
@@ -200,7 +200,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  Remove a component listener.
 	 *  @param listener The listener.
 	 */
-	public IFuture removeComponentListener(IComponentListener listener)
+	public IFuture<Void> removeComponentListener(IComponentListener listener)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		

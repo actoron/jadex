@@ -17,7 +17,7 @@ public interface IMicroAgent
 	 *  Called once after agent creation.
 	 *  Creation is considered done when the returned future is finished.
 	 */
-	public IFuture	agentCreated();
+	public IFuture<Void>	agentCreated();
 	
 	/**
 	 *  Called once after agent has been started.
@@ -29,13 +29,13 @@ public interface IMicroAgent
 	 *  @param msg The message map.
 	 *  @param mt The message type.
 	 */
-	public void messageArrived(Map msg, MessageType mt);
+	public void messageArrived(Map<String, Object> msg, MessageType mt);
 
 	/**
 	 *  Called just before the agent is removed from the platform.
 	 *  Deletion is considered done when the returned future is finished.
 	 */
-	public IFuture	agentKilled();
+	public IFuture<Void>	agentKilled();
 	
 }
 

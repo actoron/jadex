@@ -5,6 +5,7 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
+import jadex.gpmn.model.MGpmnModel;
 
 /**
  *  Loader for eclipse STP GPMN models (.gpmn files).
@@ -35,7 +36,7 @@ public class GpmnModelLoader extends AbstractModelLoader
 	 */
 	public IModelInfo	loadGpmnModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
-		return (IModelInfo)loadModel(name, FILE_EXTENSION_GPMN, imports, classloader, context);
+		return ((MGpmnModel)loadModel(name, FILE_EXTENSION_GPMN, imports, classloader, context)).getModelInfo();
 	}
 	
 	//-------- AbstractModelLoader methods --------

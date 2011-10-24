@@ -1025,7 +1025,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param service The service.
 	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public IFuture	addService(String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, Object service)
+	public IFuture<Void>	addService(String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, Object service)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
@@ -1050,7 +1050,14 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			if(impl!=null && impl.getExpression()!=null)
 			{
 				// todo: other Class imports, how can be found out?
-				ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), getClassLoader());
+				try
+				{
+					ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), getClassLoader());
+				}
+				catch(RuntimeException e)
+				{
+					throw new RuntimeException("Service creation error: "+info, e);
+				}
 //				System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
 			}
 			else if(impl!=null && impl.getImplementation(model, getClassLoader())!=null)

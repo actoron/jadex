@@ -742,14 +742,14 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		}
 	}*/
 	
-	/**
-	 *  Check if the external thread is accessing.
-	 *  @return True, if access is ok.
-	 */ 
-	public boolean isExternalThread()
-	{
-		return adapter.isExternalThread();
-	}
+//	/**
+//	 *  Check if the external thread is accessing.
+//	 *  @return True, if access is ok.
+//	 */ 
+//	public boolean isExternalThread()
+//	{
+//		return adapter.isExternalThread();
+//	}
 	
 //	/**
 //	 *  Create the service container.

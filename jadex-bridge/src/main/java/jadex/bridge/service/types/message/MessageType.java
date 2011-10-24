@@ -269,7 +269,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	 *  @param mag	The message.
 	 *  @return The reply.
 	 */
-	public Map createReply(Map msg)
+	public Map<String, Object> createReply(Map<String, Object> msg)
 	{
 		Map reply = new HashMap();
 		

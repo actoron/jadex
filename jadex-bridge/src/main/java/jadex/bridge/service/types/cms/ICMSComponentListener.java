@@ -1,7 +1,6 @@
 package jadex.bridge.service.types.cms;
 
 import jadex.bridge.service.annotation.Reference;
-import jadex.commons.IRemotable;
 import jadex.commons.future.IFuture;
 
 import java.util.Map;
@@ -17,17 +16,17 @@ public interface ICMSComponentListener //extends IRemotable
 	 *  Called when a new element has been added.
 	 *  @param id The identifier.
 	 */
-	public IFuture componentAdded(IComponentDescription desc);
+	public IFuture<Void> componentAdded(IComponentDescription desc);
 	
 	/**
 	 *  Called when a component has changed its state.
 	 *  @param id The identifier.
 	 */
-	public IFuture componentChanged(IComponentDescription desc);
+	public IFuture<Void> componentChanged(IComponentDescription desc);
 	
 	/**
 	 *  Called when a new element has been removed.
 	 *  @param id The identifier.
 	 */
-	public IFuture componentRemoved(IComponentDescription desc, Map results);
+	public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results);
 }

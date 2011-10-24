@@ -1,6 +1,7 @@
 package jadex.base.test;
 
 
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
@@ -22,14 +23,14 @@ public class ComponentTest implements	Test
 	protected IComponentManagementService	cms;
 	
 	/** The component. */
-	protected String	comp;
+	protected IModelInfo	comp;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a component test.
 	 */
-	public ComponentTest(IComponentManagementService cms, String comp)
+	public ComponentTest(IComponentManagementService cms, IModelInfo comp)
 	{
 		this.cms	= cms;
 		this.comp	= comp;
@@ -62,7 +63,7 @@ public class ComponentTest implements	Test
 		// Evaluate the results.
 		try
 		{
-			cms.createComponent(null, comp, null, trl).get(new ThreadSuspendable(), 300000);
+			cms.createComponent(null, comp.getFilename(), null, trl).get(new ThreadSuspendable(), 300000);
 			Testcase	tc	= trl.waitForResult();
 			TestReport[]	reports	= tc.getReports();
 			if(tc.getTestCount()!=reports.length)
@@ -90,7 +91,7 @@ public class ComponentTest implements	Test
 	 */
 	public String toString()
 	{
-		return comp;
+		return comp.getFullName();
 	}
 	
 	//-------- helper classes --------
@@ -98,15 +99,18 @@ public class ComponentTest implements	Test
 	/**
 	 *  Listener to capture component execution results.
 	 */
-	class TestResultListener implements IResultListener
+	class TestResultListener implements IResultListener<Map<String, Object>>
 	{
 		//-------- attributes --------
 		
 		/** Flag to check if execution is finished. */
 		protected boolean	finished;
 		
-		/** The result or exception of the execution. */
-		protected Object	result;
+		/** The result of the execution (if not exception). */
+		protected Map<String, Object>	result;
+		
+		/** The exception of the execution (if any). */
+		protected Exception	exception;
 
 		//-------- IResultListener interface --------
 		
@@ -118,7 +122,7 @@ public class ComponentTest implements	Test
 			synchronized(this)
 			{
 //				System.out.println("Test execution error: "+comp);
-				result	= exception;
+				this.exception	= exception;
 				finished	= true;
 				notify();
 			}
@@ -127,12 +131,12 @@ public class ComponentTest implements	Test
 		/**
 		 *  Called when the component has terminated.
 		 */
-		public void resultAvailable(Object res)
+		public void resultAvailable(Map<String, Object> res)
 		{
 			synchronized(this)
 			{
 //				System.out.println("Test finished: "+comp);
-				result	= res;
+				this.result	= res;
 				finished	= true;
 				notify();
 			}
@@ -157,13 +161,13 @@ public class ComponentTest implements	Test
 			}
 			
 			// Fetch the result.
-			if(result instanceof Exception)
+			if(exception!=null)
 			{
-				throw (Exception)result;
+				throw exception;
 			}
 			else
 			{
-				ret	= (Testcase)((Map)result).get("testresults");
+				ret	= (Testcase)result.get("testresults");
 			}
 
 			return ret;
