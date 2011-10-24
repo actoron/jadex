@@ -69,7 +69,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
 		final MicroModel model, Class microclass, final Map args, final String config, 
-		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> inited)
+		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, final Future<Void> inited)
 	{
 		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, inited);
 		
@@ -126,15 +126,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 										public void customResultAvailable(Object result)
 										{
 											// Call user code init.
-											microagent.agentCreated().addResultListener(new DelegationResultListener(inited)
-											{
-												public void customResultAvailable(Object result)
-												{
-//													System.out.println("initend: "+getComponentAdapter().getComponentIdentifier());
-													// Init is now finished. Notify cms.
-													inited.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(MicroAgentInterpreter.this, adapter));
-												}
-											});
+											microagent.agentCreated().addResultListener(new DelegationResultListener(inited));
 										}
 									});
 								}

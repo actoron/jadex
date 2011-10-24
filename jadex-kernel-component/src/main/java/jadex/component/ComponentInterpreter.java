@@ -53,8 +53,8 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	 *  Create a new interpreter.
 	 */
 	public ComponentInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
-		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map arguments, 
-		final RequiredServiceBinding[] bindings, boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> inited,
+		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map<String, Object> arguments, 
+		final RequiredServiceBinding[] bindings, boolean copy, final Future<Void> inited,
 		ClassLoader classloader)
 	{
 		super(desc, model, config, factory, parent, bindings, copy, inited);
@@ -66,19 +66,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				init(getModel(), ComponentInterpreter.this.config, arguments)
-					.addResultListener(createResultListener(new DelegationResultListener(inited)
-				{
-					public void customResultAvailable(Object result)
-					{
-						inited.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(ComponentInterpreter.this, adapter));
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						// Hack!!! May be set already when component terminated during init.
-						if(!future.isDone())
-							super.exceptionOccurred(exception);
-					}
-				}));
+					.addResultListener(createResultListener(new DelegationResultListener<Void>(inited)));
 				
 				return IFuture.DONE;
 			}

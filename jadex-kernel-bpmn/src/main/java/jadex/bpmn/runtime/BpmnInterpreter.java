@@ -185,7 +185,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	protected List messages;
 	
 	/** The inited future. */
-	protected Future<Tuple2<IComponentInstance, IComponentAdapter>> inited;
+	protected Future<Void> inited;
 	
 	/** The started flag. */
 	protected boolean started;
@@ -205,7 +205,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		IValueFetcher fetcher, IComponentManagementService cms, IClockService cs, IMessageService ms,
 		IServiceContainer container)
 	{
-		super(null, model.getModelInfo(), config, null, parent, null, true, new Future<Tuple2<IComponentInstance, IComponentAdapter>>());
+		super(null, model.getModelInfo(), config, null, parent, null, true, new Future<Void>());
 		construct(model, activityhandlers, stephandlers);		
 		this.fetcher = fetcher!=null? new BpmnInstanceFetcher(this, fetcher) :null;
 		this.adapter = adapter;
@@ -233,7 +233,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	// Constructor for self-contained bpmn components
 	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, final Map arguments, 
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
-		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> inited)
+		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, final Future<Void> inited)
 	{
 		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, inited);
 		this.inited = inited;
@@ -255,7 +255,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 						// Notify cms that init is finished.
 						initContextVariables();
 
-						inited.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(BpmnInterpreter.this, adapter));
+						inited.setResult(null);
 					}
 				}));
 				return IFuture.DONE;

@@ -11,9 +11,9 @@
 	name="DF">
 
 	<imports>
-		<import>jadex.base.fipa.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 		<import>jadex.bridge.*</import>
+		<import>jadex.bridge.service.types.df.*</import>
 	</imports>
 
 	<capabilities>

@@ -12,6 +12,7 @@
 	package="jadex.bdi.testcases.misc">
 
 	<imports>
+		<import>jadex.bridge.service.types.df.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.logging.*</import>
 	</imports>

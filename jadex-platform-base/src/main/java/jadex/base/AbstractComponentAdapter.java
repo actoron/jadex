@@ -67,8 +67,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/** Flag to indicate a fatal error (component termination will not be passed to instance) */
 	protected Exception exception;
 	
-	/** Flag to indicate that the initial step was performed. */
-	protected boolean	inited;
+	/** Flag to indicate that the component instance is created. */
+	protected boolean	instantiated;
 	
 	/** The kill future to be notified in case of fatal error during shutdown. */
 	protected Future	killfuture;
@@ -141,7 +141,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public void wakeup()
 	{
-		if(!inited)
+		// Do not wake up until component instance is completely instantiated by factory
+		// (to avoid double execution between constructor and executor)
+		if(!instantiated)
 			return;
 //		System.err.println("wakeup: "+getComponentIdentifier());
 //		Thread.dumpStack();
@@ -481,7 +483,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	public void	setInited(boolean inited)
 	{
-		this.inited	= inited;
+		this.instantiated	= inited;
 	}
 	
 	/**

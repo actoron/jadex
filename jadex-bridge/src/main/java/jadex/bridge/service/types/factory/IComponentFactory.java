@@ -86,7 +86,7 @@ public interface IComponentFactory
 	 *  @return The properties or null, if the component type is not supported by this factory.
 	 */
 	@Excluded
-	public Map	getProperties(String type);
+	public Map<String, Object>	getProperties(String type);
 	
 	/**
 	 * Create a component instance.
@@ -99,8 +99,8 @@ public interface IComponentFactory
 	 */
 	@Excluded
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo model, String config, Map arguments, IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, 
-		boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> init);
+		IModelInfo model, String config, Map<String, Object> arguments, IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, 
+		boolean copy, Future<Void> init);
 
 }
 

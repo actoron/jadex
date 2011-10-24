@@ -562,8 +562,8 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	@Excluded
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc,
 			final IComponentAdapterFactory factory, final IModelInfo model, final String config,
-			final Map arguments, final IExternalAccess parent,
-			final RequiredServiceBinding[] bindings, final boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
+			final Map<String, Object> arguments, final IExternalAccess parent,
+			final RequiredServiceBinding[] bindings, final boolean copy, final Future<Void> ret)
 	{
 //		System.out.println("createComponentInstance: "+model.getName());
 		

@@ -227,8 +227,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 *  @param arguments	The arguments for the agent as name/value pairs.
 	 */
 	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
-		final String config, final Map arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, 
-		final Map kernelprops, boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> inited)
+		final String config, final Map<String, Object> arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, 
+		final Map kernelprops, boolean copy, final Future<Void> inited)
 	{	
 		this.initthread = Thread.currentThread();
 		
@@ -325,14 +325,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				init(getModel(), config).addResultListener(createResultListener(new DelegationResultListener(inited)
-				{
-					public void customResultAvailable(Object result)
-					{
-						// When init has finished -> notify cms.
-						inited.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(BDIInterpreter.this, getAgentAdapter()));
-					}
-				}));
+				init(getModel(), config).addResultListener(createResultListener(new DelegationResultListener(inited)));
 				return IFuture.DONE;
 			}
 		});
@@ -1283,7 +1276,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	{
 		final Future<T> ret = new Future<T>();
 		
-		if(getComponentAdapter().isExternalThread())
+		if(getComponentAdapter().isExternalThread()
+			|| getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
 		{
 			try
 			{
@@ -1296,7 +1290,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 						{
 							if(getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
 							{
-								// Hack!!! During init phase use invokeLater() as rule engine isn't running.
+								// Hack!!! During init phase execute directly as rule engine isn't running.
 								try
 								{
 									((IComponentStep)step).execute(getInternalAccess())
@@ -1326,34 +1320,10 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		}
 		else
 		{
-			if(getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
-			{
-				// Hack!!! During init phase use invokeLater() as rule engine isn't running.
-				try
-				{
-					((IComponentStep)step).execute(getInternalAccess()).addResultListener(new DelegationResultListener(ret));
-				}
-				catch(Exception e)
-				{
-					ret.setException(e);
-				}
-			}
-			else
-			{
-				getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
-			}
+			getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
 		}
 
-		return ret;
-		
-//		adapter.invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
-////				System.out.println("Scheduling step: "+step);
-//				state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, step);
-//			}
-//		});
+		return ret;		
 	}
 	
 	/**

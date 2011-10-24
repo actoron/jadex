@@ -13,6 +13,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Properties;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
@@ -133,7 +134,7 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	/**
 	 *  Store settings if any in platform settings service.
 	 */
-	public IFuture pushPlatformSettings()
+	public IFuture<Void> pushPlatformSettings()
 	{
 		return IFuture.DONE;
 	}
@@ -226,23 +227,24 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	 */
 	public static IFuture<ClassLoader> getClassLoader(final IComponentIdentifier cid, final IControlCenter jcc)
 	{
-		final Future	ret	= new Future();
+		final Future<ClassLoader>	ret	= new Future<ClassLoader>();
 		
 		SServiceProvider.getServiceUpwards(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(new DelegationResultListener<IComponentManagementService>(ret)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, ClassLoader>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				cms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret)
+				cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, ClassLoader>(ret)
 				{
 					public void customResultAvailable(final IExternalAccess exta)
 					{
 						SServiceProvider.getServiceUpwards(jcc.getJCCAccess().getServiceProvider(), ILibraryService.class)
-							.addResultListener(new DelegationResultListener<ILibraryService>(ret)
+							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
 						{
 							public void customResultAvailable(final ILibraryService libservice)
 							{
-								ret.setResult(libservice.getClassLoader(exta.getModel().getResourceIdentifier()));
+								libservice.getClassLoader(exta.getModel().getResourceIdentifier())
+									.addResultListener(new DelegationResultListener<ClassLoader>(ret));
 							}
 						});
 					}
@@ -323,16 +325,16 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 							{
 								final IComponentIdentifier	cid	= ((ProxyComponentTreeNode)nodes[i]).getComponentIdentifier();
 								SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(new SwingDefaultResultListener(panel)
+									.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(panel)
 								{
-									public void customResultAvailable(Object result)
+									public void customResultAvailable(IComponentManagementService cms)
 									{
-										((IComponentManagementService)result).getExternalAccess(cid)
-											.addResultListener(new SwingDefaultResultListener(panel)
+										cms.getExternalAccess(cid)
+											.addResultListener(new SwingDefaultResultListener<IExternalAccess>(panel)
 										{
-											public void customResultAvailable(Object result)
+											public void customResultAvailable(IExternalAccess ea)
 											{
-												jcc.showPlatform((IExternalAccess)result);
+												jcc.showPlatform(ea);
 											}
 										});
 									}

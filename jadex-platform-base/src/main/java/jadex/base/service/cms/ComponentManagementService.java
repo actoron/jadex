@@ -286,7 +286,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 //		System.out.println("create component: "+modelname+" "+name);
 		final Future<IComponentIdentifier> inited = new Future<IComponentIdentifier>();
-		final Future<Tuple2<IComponentInstance,IComponentAdapter>> resfut = new Future<Tuple2<IComponentInstance,IComponentAdapter>>();
+		final Future<Void> resfut = new Future<Void>();
 		
 		final CreationInfo cinfo = info!=null? info: new CreationInfo();	// Dummy default info, if null.
 		
@@ -395,9 +395,9 @@ public abstract class ComponentManagementService extends BasicService implements
 															logger.info("Starting component: "+cid.getName());
 					//										System.err.println("Pre-Init: "+cid);
 															
-															resfut.addResultListener(new IResultListener<Tuple2<IComponentInstance,IComponentAdapter>>()
+															resfut.addResultListener(new IResultListener<Void>()
 															{
-																public void resultAvailable(Tuple2<IComponentInstance,IComponentAdapter> result)
+																public void resultAvailable(Void result)
 																{
 																	logger.info("Started component: "+cid.getName());
 					//												System.err.println("Post-Init: "+cid);
@@ -410,7 +410,8 @@ public abstract class ComponentManagementService extends BasicService implements
 	//																	System.out.println("created: "+ad);
 																		
 																		// Init successfully finished. Add description and adapter.
-																		adapter = result.getSecondEntity();
+																		InitInfo	info	= initinfos.get(cid);
+																		adapter = info.getAdapter();
 																		
 																		// Init finished. Set to suspended until parent registration is finished.
 																		// not set to suspend to allow other initing sibling components invoking services
@@ -3026,7 +3027,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		protected IModelInfo model;
 		
 		/** The init future. */
-		protected Future initfuture;
+		protected Future<Void> initfuture;
 		
 		/** The component instance. */
 		protected IComponentInstance instance;
@@ -3036,7 +3037,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		 */
 		public InitInfo(IComponentDescription description,
 			IComponentAdapter adapter, CreationInfo info, IModelInfo model,
-			Future initfuture, IComponentInstance instance)
+			Future<Void> initfuture, IComponentInstance instance)
 		{
 			this.description = description;
 			this.adapter = adapter;
@@ -3122,7 +3123,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		 *  Get the initfuture.
 		 *  @return The initfuture.
 		 */
-		public Future getInitFuture()
+		public Future<Void> getInitFuture()
 		{
 			return initfuture;
 		}
@@ -3131,7 +3132,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		 *  Set the initfuture.
 		 *  @param initfuture The initfuture to set.
 		 */
-		public void setInitFuture(Future initfuture)
+		public void setInitFuture(Future<Void> initfuture)
 		{
 			this.initfuture = initfuture;
 		}

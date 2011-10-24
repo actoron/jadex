@@ -1,6 +1,5 @@
 package jadex.kernelbase;
 
-import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.RemoteComponentListener;
@@ -13,7 +12,6 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.IValueFetcher;
-import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -85,26 +83,19 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, 
-		final RequiredServiceBinding[] bindings, boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> inited)
+		final RequiredServiceBinding[] bindings, boolean copy, final Future<Void> inited)
 	{
-		try
-		{
-			this.config = config!=null? config: model.getConfigurationNames().length>0? 
-				model.getConfigurationNames()[0]: null;
-			this.model = model;
-			this.parent = parent;
-			this.bindings = bindings;
-			this.copy = copy;
-			if(factory != null)
-				this.adapter = factory.createComponentAdapter(desc, model, this, parent);
-			this.container = createServiceContainer();
-			this.creationtime = System.currentTimeMillis();
-//			this.arguments = arguments!=null? new HashMap(arguments): null; // clone arguments
-		}
-		catch(Exception e)
-		{
-			inited.setException(e);
-		}
+		this.config = config!=null? config: model.getConfigurationNames().length>0? 
+			model.getConfigurationNames()[0]: null;
+		this.model = model;
+		this.parent = parent;
+		this.bindings = bindings;
+		this.copy = copy;
+		if(factory != null)
+			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
+		this.container = createServiceContainer();
+		this.creationtime = System.currentTimeMillis();
+//		this.arguments = arguments!=null? new HashMap(arguments): null; // clone arguments
 	}
 	
 	//-------- methods to be called by adapter --------

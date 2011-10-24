@@ -18,11 +18,11 @@
 		<import>jadex.bdi.examples.booktrading.common.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>java.util.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.service.types.df.*</import>
 		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>jadex.bdi.runtime.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
-		<import>jadex.bridge.service.clock.*</import>
+		<import>jadex.bridge.service.types.clock.*</import>
 	</imports>
 
 	<capabilities>

@@ -13,8 +13,8 @@
 		<import>java.net.URL</import>
 		<import>java.util.*</import>
 		<import>jadex.bridge.*</import>
-		<import>jadex.bridge.service.clock.IClockService</import>
-		<import>jadex.bridge.service.threadpool.IThreadPoolService</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
+		<import>jadex.bridge.service.types.threadpool.IThreadPoolService</import>
 	</imports>
 
 	<capabilities>

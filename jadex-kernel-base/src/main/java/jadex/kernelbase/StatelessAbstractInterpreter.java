@@ -480,12 +480,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  - init required and provided services
 	 *  - init subcomponents
 	 */
-	public IFuture init(final IModelInfo model, final String config, final Map arguments)
+	public IFuture<Void> init(final IModelInfo model, final String config, final Map<String, Object> arguments)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		final Future fut = new Future();
-		IFuture	ret	= fut;
+		final Future<Void> fut = new Future<Void>();
+		IFuture<Void>	ret	= fut;
 		
 		if(config!=null && model.getConfiguration(config)==null)
 		{
@@ -494,34 +494,28 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		else
 		{
 			initArguments(model, config, arguments).addResultListener(
-				createResultListener(new DelegationResultListener(fut)
+				createResultListener(new DelegationResultListener<Void>(fut)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Void result)
 				{
 					// properties depend on arguments (e.g. logging_level in Platform.component.xml)
 					initFutureProperties(model).addResultListener(
-						createResultListener(new DelegationResultListener(fut)
+						createResultListener(new DelegationResultListener<Void>(fut)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(Void result)
 						{
 							initExtensions(model, config).addResultListener(
-								createResultListener(new DelegationResultListener(fut)
+								createResultListener(new DelegationResultListener<Void>(fut)
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(Void result)
 								{
 									initServices(model, config).addResultListener(
-										createResultListener(new DelegationResultListener(fut)
+										createResultListener(new DelegationResultListener<Void>(fut)
 									{
-										public void customResultAvailable(Object result)
+										public void customResultAvailable(Void result)
 										{
 											initComponents(model, config).addResultListener(
-												createResultListener(new DelegationResultListener(fut)
-											{
-												public void customResultAvailable(Object result)
-												{
-													super.customResultAvailable(new Object[]{StatelessAbstractInterpreter.this, getComponentAdapter()});
-												}		
-											}));
+												createResultListener(new DelegationResultListener<Void>(fut)));
 										}
 									}));
 								}
@@ -532,14 +526,14 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			}));
 			
 			// Terminate extensions on error.
-			final Future iret = new Future();
-			fut.addResultListener(createResultListener(new DelegationResultListener(iret)
+			final Future<Void> iret = new Future<Void>();
+			fut.addResultListener(createResultListener(new DelegationResultListener<Void>(iret)
 			{
 				public void exceptionOccurred(final Exception exception)
 				{
-					terminateExtensions().addResultListener(new DelegationResultListener(iret)
+					terminateExtensions().addResultListener(new DelegationResultListener<Void>(iret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(Void result)
 						{
 							super.exceptionOccurred(exception);
 						}
@@ -555,14 +549,14 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Init the arguments and results.
 	 */
-	public IFuture initArguments(IModelInfo model, final String config, Map arguments)
+	public IFuture<Void> initArguments(IModelInfo model, final String config, Map<String, Object> arguments)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
 		// Call add default argument also for passed arguments.
 		if(arguments!=null)
 		{
-			for(Iterator it=arguments.keySet().iterator(); it.hasNext(); )
+			for(Iterator<String> it=arguments.keySet().iterator(); it.hasNext(); )
 			{
 				String key = (String)it.next();
 				addArgument(key, arguments.get(key));
@@ -572,7 +566,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		ConfigurationInfo	ci	= config!=null ? model.getConfiguration(config) : null;
 		
 		// Init the arguments with initial or default values.
-		Set	done	= new HashSet();
+		Set<String>	done	= new HashSet<String>();
 		if(ci!=null)
 		{
 			UnparsedExpression[]	upes	= ci.getArguments();
@@ -593,7 +587,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		}
 		
 		// Init the results with default values.
-		done	= new HashSet();
+		done	= new HashSet<String>();
 		if(ci!=null)
 		{
 			UnparsedExpression[]	upes	= ci.getResults();
@@ -619,11 +613,11 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Init the services.
 	 */
-	public IFuture initServices(final IModelInfo model, final String config)
+	public IFuture<Void> initServices(final IModelInfo model, final String config)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		
 		try
 		{
@@ -631,7 +625,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 //			System.out.println("init sers: "+services);
 			ProvidedServiceInfo[] ps = model.getProvidedServices();
 			
-			Map sermap = new LinkedHashMap();
+			Map<Object, ProvidedServiceInfo> sermap = new LinkedHashMap<Object, ProvidedServiceInfo>();
 			for(int i=0; i<ps.length; i++)
 			{
 				Object key = ps[i].getName()!=null? ps[i].getName(): ps[i].getType(model, getClassLoader());
@@ -650,14 +644,14 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				}
 			}
 			ProvidedServiceInfo[] services = (ProvidedServiceInfo[])sermap.values().toArray(new ProvidedServiceInfo[sermap.size()]);
-			initProvidedServices(0, services, model).addResultListener(createResultListener(new DelegationResultListener(ret)
+			initProvidedServices(0, services, model).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Void result)
 				{
 					// Required services.
-					RequiredServiceInfo[] ms = model.getRequiredServices();
+					RequiredServiceInfo<?>[] ms = model.getRequiredServices();
 					
-					Map	sermap = new LinkedHashMap();
+					Map<String, RequiredServiceInfo<?>>	sermap = new LinkedHashMap<String, RequiredServiceInfo<?>>();
 					for(int i=0; i<ms.length; i++)
 					{
 						ms[i]	= new RequiredServiceInfo(getServicePrefix()+ms[i].getName(), ms[i].getType(model, getClassLoader()), ms[i].isMultiple(), ms[i].getDefaultBinding());
@@ -707,7 +701,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Init provided services.
 	 */
-	protected IFuture	initProvidedServices(final int i, final ProvidedServiceInfo[] services, final IModelInfo model)
+	protected IFuture<Void>	initProvidedServices(final int i, final ProvidedServiceInfo[] services, final IModelInfo model)
 	{
 		final IFuture	ret;
 		
@@ -787,7 +781,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Init the future properties.
 	 */
-	public IFuture initFutureProperties(IModelInfo model)
+	public IFuture<Void> initFutureProperties(IModelInfo model)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
@@ -855,7 +849,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Init the subcomponents.
 	 */
-	public IFuture initComponents(final IModelInfo model, String config)
+	public IFuture<Void> initComponents(final IModelInfo model, String config)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
@@ -898,7 +892,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Init the extensions.
 	 */
-	public IFuture initExtensions(IModelInfo model, String config)
+	public IFuture<Void> initExtensions(IModelInfo model, String config)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
@@ -944,13 +938,13 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Terminate all extensions.
 	 */
-	public IFuture terminateExtensions()
+	public IFuture<Void> terminateExtensions()
 	{
 		// Hack!!! When init fails , terminateExtensions() can not be called on component thread
 		// as component already terminated.
 		assert !getComponentAdapter().isExternalThread() || IComponentDescription.STATE_TERMINATED.equals(getComponentDescription().getState());
 		
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		IExtensionInstance[] exts = getExtensions();
 		CounterResultListener lis = new CounterResultListener(exts.length, false, new DelegationResultListener(ret));
 		for(int i=0; i<exts.length; i++)

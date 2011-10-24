@@ -260,8 +260,8 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 * @return An instance of a component.
 	 */
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
-		final IModelInfo modelinfo, final String config, final Map arguments, final IExternalAccess parent, 
-		final RequiredServiceBinding[] bindings, final boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> init)
+		final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, final IExternalAccess parent, 
+		final RequiredServiceBinding[] bindings, final boolean copy, final Future<Void> init)
 	{
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>>	ret	= new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		

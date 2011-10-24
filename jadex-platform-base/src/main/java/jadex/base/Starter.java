@@ -20,7 +20,7 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
@@ -81,11 +81,11 @@ public class Starter
 
 	
 	/** The reserved platform parameters. */
-	public static final Set RESERVED;
+	public static final Set<String> RESERVED;
 	
 	static
 	{
-		RESERVED = new HashSet();
+		RESERVED = new HashSet<String>();
 		RESERVED.add(CONFIGURATION_FILE);
 		RESERVED.add(CONFIGURATION_NAME);
 		RESERVED.add(PLATFORM_NAME);
@@ -117,11 +117,10 @@ public class Starter
 	 */
 	public static void main(String[] args)
 	{
-		createPlatform(args).addResultListener(new DefaultResultListener()
+		createPlatform(args).addResultListener(new DefaultResultListener<IExternalAccess>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(final IExternalAccess access)
 			{
-//				final IExternalAccess	access	= (IExternalAccess)result;
 //				Runtime.getRuntime().addShutdownHook(new Thread()
 //				{
 //					public void run()
@@ -182,15 +181,15 @@ public class Starter
 	 */
 	public static IFuture<IExternalAccess> createPlatform(String[] args)
 	{
-		final Future ret = new Future();
+		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		try
 		{
 			// Absolute start time (for testing and benchmarking).
 			final long starttime = System.currentTimeMillis();
 		
-			final Map cmdargs = new HashMap();	// Starter arguments (required for instantiation of root component)
-			final Map compargs = new HashMap();	// Arguments of root component (platform)
-			final List components = new ArrayList();	// Additional components to start
+			final Map<String, Object> cmdargs = new HashMap<String, Object>();	// Starter arguments (required for instantiation of root component)
+			final Map<String, Object> compargs = new HashMap<String, Object>();	// Arguments of root component (platform)
+			final List<String> components = new ArrayList<String>();	// Additional components to start
 			for(int i=0; args!=null && i<args.length; i+=2)
 			{
 				String key = args[i].substring(1);
@@ -210,7 +209,7 @@ public class Starter
 				
 				if(COMPONENT.equals(key))
 				{
-					components.add(val);
+					components.add((String)val);
 				}
 				else
 				{
@@ -224,21 +223,20 @@ public class Starter
 				(String)cmdargs.get(CONFIGURATION_FILE): FALLBACK_PLATFORM_CONFIGURATION;
 			String cfclname = (String)cmdargs.get(COMPONENT_FACTORY)!=null? 
 				(String)cmdargs.get(COMPONENT_FACTORY): FALLBACK_COMPONENT_FACTORY;
-			Class cfclass = SReflect.findClass(cfclname, null, cl);
+			Class<IComponentFactory> cfclass = SReflect.findClass(cfclname, null, cl);
 			// The providerid for this service is not important as it will be thrown away 
 			// after loading the first component model.
-			final IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{String.class})
+			final IComponentFactory cfac = cfclass.getConstructor(new Class[]{String.class})
 				.newInstance(new Object[]{"rootid"});
 			
 			compargs.put(COMPONENT_FACTORY, cfac);
 			
 			// todo: null as rid?
-			cfac.loadModel(configfile, null, null).addResultListener(new DelegationResultListener(ret)
+			cfac.loadModel(configfile, null, null)
+				.addResultListener(new ExceptionDelegationResultListener<IModelInfo, IExternalAccess>(ret)
 			{
-				public void customResultAvailable(Object result) 
+				public void customResultAvailable(final IModelInfo model) 
 				{
-					final IModelInfo model = (IModelInfo)result;
-					
 					if(model.getReport()!=null)
 						throw new RuntimeException("Error loading model:\n"+model.getReport().getErrorText());
 					
@@ -272,13 +270,13 @@ public class Starter
 					// Hack!!! Autoshutdown!?
 					
 					// todo: null as rid?
-					cfac.getComponentType(configfile, null, null).addResultListener(new DelegationResultListener(ret)
+					cfac.getComponentType(configfile, null, null)
+						.addResultListener(new ExceptionDelegationResultListener<String, IExternalAccess>(ret)
 					{
-						public void customResultAvailable(Object result) 
+						public void customResultAvailable(String ctype) 
 						{
 							try
 							{
-								String ctype = (String)result;
 								Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
 								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, autosd, model.getFullName(), null);
 								
@@ -287,84 +285,85 @@ public class Starter
 								{
 									ret.setException(new RuntimeException("No adapterfactory found."));
 								}
-								Class afclass = af instanceof Class ? (Class)af : SReflect.findClass(af.toString(), null, cl);
+								Class<?> afclass = af instanceof Class ? (Class<?>)af : SReflect.findClass(af.toString(), null, cl);
 								final IComponentAdapterFactory afac = (IComponentAdapterFactory)afclass.newInstance();
 								
-								Future future = new Future();
-								future.addResultListener(new DelegationResultListener(ret)
+								final Future<IComponentInstance>	instancefut	= new Future<IComponentInstance>();
+								Future<Void> future = new Future<Void>();
+								future.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 								{
-									public void customResultAvailable(Object result)
+									public void customResultAvailable(Void result)
 									{
-										Tuple2<IComponentInstance,IComponentAdapter> root = (Tuple2<IComponentInstance,IComponentAdapter>)result;
-										final IComponentInstance instance = root.getFirstEntity();
-			//							final IComponentAdapter adapter = (IComponentAdapter)root[1];
-			//							System.out.println("Instance: "+instance);
-										
-										final CounterResultListener	crl	= new CounterResultListener(components.size(), new DelegationResultListener(ret)
+										instancefut.addResultListener(new ExceptionDelegationResultListener<IComponentInstance, IExternalAccess>(ret)
 										{
-											public void customResultAvailable(Object result)
+											public void customResultAvailable(final IComponentInstance instance)
 											{
-												if(Boolean.TRUE.equals(getArgumentValue(WELCOME, model, cmdargs, compargs)))
-												{
-													long startup = System.currentTimeMillis() - starttime;
-													// platform.logger.info("Platform startup time: " + startup + " ms.");
-													System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
-												}
-												ret.setResult(instance.getExternalAccess());
+												final CounterResultListener<IComponentIdentifier>	crl	= new CounterResultListener<IComponentIdentifier>(
+														components.size(), new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+													{
+														public void customResultAvailable(Void result)
+														{
+															if(Boolean.TRUE.equals(getArgumentValue(WELCOME, model, cmdargs, compargs)))
+															{
+																long startup = System.currentTimeMillis() - starttime;
+																// platform.logger.info("Platform startup time: " + startup + " ms.");
+																System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
+															}
+															ret.setResult(instance.getExternalAccess());
+														}
+													});
+													
+													// Start additional components.
+													if(!components.isEmpty())
+													{
+														SServiceProvider.getServiceUpwards(instance.getServiceContainer(), IComponentManagementService.class)
+															.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+														{
+															public void customResultAvailable(IComponentManagementService cms)
+															{
+																for(int i=0; i<components.size(); i++)
+																{
+																	String	name	= null;
+																	String	config	= null;
+																	String	comp	= (String)components.get(i);
+																	int	i1	= comp.indexOf(':');
+																	if(i1!=-1)
+																	{
+																		name	= comp.substring(0, i1);
+																		comp	= comp.substring(i1+1);
+																	}
+																	int	i2	= comp.indexOf('(');
+																	if(i2!=-1)
+																	{
+																		if(comp.endsWith("("))
+																		{
+																			config	= comp.substring(i2+1, comp.length()-1);
+																			comp	= comp.substring(0, i2);
+																		}
+																		else
+																		{
+																			throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)] : "+components.get(i));
+																		}
+																	}
+																	
+																	cms.createComponent(name, comp, new CreationInfo(config, null), null)
+																		.addResultListener(crl);
+																}
+															}
+														});
+													}
 											}
 										});
-										
-										// Start additional components.
-										if(!components.isEmpty())
-										{
-											SServiceProvider.getServiceUpwards(instance.getServiceContainer(), IComponentManagementService.class)
-												.addResultListener(new DelegationResultListener(ret)
-											{
-												public void customResultAvailable(Object result)
-												{
-													IComponentManagementService	cms	= (IComponentManagementService)result;
-													for(int i=0; i<components.size(); i++)
-													{
-														String	name	= null;
-														String	config	= null;
-														String	comp	= (String)components.get(i);
-														int	i1	= comp.indexOf(':');
-														if(i1!=-1)
-														{
-															name	= comp.substring(0, i1);
-															comp	= comp.substring(i1+1);
-														}
-														int	i2	= comp.indexOf('(');
-														if(i2!=-1)
-														{
-															if(comp.endsWith("("))
-															{
-																config	= comp.substring(i2+1, comp.length()-1);
-																comp	= comp.substring(0, i2);
-															}
-															else
-															{
-																throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)] : "+components.get(i));
-															}
-														}
-														
-														cms.createComponent(name, comp, new CreationInfo(config, null), null)
-															.addResultListener(crl);
-													}
-												}
-											});
-										}
 									}
 								});
 								
 								boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
-								cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs),
-									compargs, null, null, copy, future).addResultListener(new DelegationResultListener(ret)
+								cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs), compargs, null, null, copy, future)
+									.addResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInstance, IComponentAdapter>, IExternalAccess>(ret)
 								{
-									public void customResultAvailable(Object result)
+									public void customResultAvailable(Tuple2<IComponentInstance, IComponentAdapter> root)
 									{
-										Tuple2<IComponentInstance, IComponentAdapter> root = (Tuple2<IComponentInstance, IComponentAdapter>)result;
-										
+										instancefut.setResult(root.getFirstEntity());
 										IComponentAdapter adapter = root.getSecondEntity();
 										
 										// Execute init steps of root component on main thread (i.e. platform).
@@ -405,7 +404,7 @@ public class Starter
 	 *  Get an argument value from the command line or the model.
 	 *  Also puts parsed value into component args to be available at instance.
 	 */
-	protected static Object getArgumentValue(String name, IModelInfo model, Map cmdargs, Map compargs)
+	protected static Object getArgumentValue(String name, IModelInfo model, Map<String, Object> cmdargs, Map<String, Object> compargs)
 	{
 		String	configname	= getConfigurationName(model, cmdargs);
 		ConfigurationInfo	config	= configname!=null
@@ -461,7 +460,7 @@ public class Starter
 	/**
 	 * Get the configuration name.
 	 */
-	protected static String	getConfigurationName(IModelInfo model,	Map cmdargs)
+	protected static String	getConfigurationName(IModelInfo model,	Map<String, Object> cmdargs)
 	{
 		String	configname	= (String)cmdargs.get(CONFIGURATION_NAME);
 		if(configname==null)

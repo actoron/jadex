@@ -187,9 +187,9 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 * @return An instance of a component.
 	 */
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, final IModelInfo modelinfo, 
-		final String config, final Map arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, final boolean copy, final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
+		final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, final boolean copy, final Future<Void> init)
 	{
-		final Future<Tuple2<IComponentInstance, IComponentAdapter>> res = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
+		final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		
 		if(libservice!=null)
 		{
@@ -212,12 +212,12 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 						IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 						state.addSubstate(amodel.getState());
 						
-						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, copy, ret);
-						res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
+						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, copy, init);
+						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
 					}
 					catch(Exception e)
 					{
-						res.setException(e);
+						ret.setException(e);
 					}
 				}
 			});
@@ -241,8 +241,8 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 				IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 				state.addSubstate(amodel.getState());
 				
-				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, copy, ret);
-				res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
+				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, copy, init);
+				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
 			}
 			catch(Exception e)
 			{
@@ -251,28 +251,6 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 		}
 		
 		return ret;
-		
-//		try
-//		{
-//	//		OAVAgentModel amodel = (OAVAgentModel)model;
-//			OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, 
-//				libservice.getClassLoader(modelinfo.getResourceIdentifier()), modelinfo.getResourceIdentifier());
-//			
-//			// Create type model for agent instance (e.g. holding dynamically loaded java classes).
-//			OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
-//	//		OAVTypeModel tmodel	= new OAVTypeModel(model.getName()+"_typemodel", ((OAVAgentModel)model).getTypeModel().getClassLoader());
-//			tmodel.addTypeModel(amodel.getState().getTypeModel());
-//			tmodel.addTypeModel(OAVBDIRuntimeModel.bdi_rt_model);
-//			IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
-//			state.addSubstate(amodel.getState());
-//			
-//			BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, copy, ret);
-//			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
-//		}
-//		catch(Exception e)
-//		{
-//			return new Future<Tuple2<IComponentInstance, IComponentAdapter>>(e);
-//		}
 	}
 	
 	// Needed for gpmn factory
@@ -286,7 +264,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 * @return An instance of a component.
 	 */
 	public Tuple2<IComponentInstance, IComponentAdapter> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, OAVAgentModel amodel, 
-		String config, Map arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future<Tuple2<IComponentInstance, IComponentAdapter>> ret)
+		String config, Map<String, Object> arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, Future<Void> ret)
 	{
 		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 		OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
