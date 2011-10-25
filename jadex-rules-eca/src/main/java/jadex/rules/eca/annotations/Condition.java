@@ -4,13 +4,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- *  Representation of an event that causes the evaluation of a condition.
+ *  Representation of a condition.
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Event
+public @interface Condition
 {
 	/**
-	 *  The event content.
+	 *  The condition name.
 	 */
-	public String value() default "";
+	public String value();
 }

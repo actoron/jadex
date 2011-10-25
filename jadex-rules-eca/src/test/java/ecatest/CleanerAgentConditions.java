@@ -1,13 +1,73 @@
 package ecatest;
 
+import jadex.rules.eca.RuleSystem;
+import jadex.rules.eca.annotations.Action;
+import jadex.rules.eca.annotations.Condition;
 import jadex.rules.eca.annotations.Event;
 
 public class CleanerAgentConditions
 {
-	public boolean	batteryLoadedTarget(@Event double chargestate)
+	protected double chargestate = 1.0;
+	
+	/**
+	 *  Get the chargestate.
+	 *  @return the chargestate.
+	 */
+	public double getChargeState()
 	{
-		return chargestate > 0.2;
+		return chargestate;
 	}
+
+	@Event("chargestate")
+	public void decreaseChargeState()
+	{
+		chargestate -= 0.01;
+//		new Event(new Double(chargestate));
+	}
+	
+	@Condition("battery")
+	public boolean	batteryLoadCondition(@Event("chargestate") double chargestate)
+	{
+		return chargestate < 0.2;
+	}
+	
+	@Action("battery")
+	public void	loadBatteryAction()
+	{
+		System.out.println("loading");
+	}
+	
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args)
+	{
+		RuleSystem rs = new RuleSystem();
+		CleanerAgentConditions cac = new CleanerAgentConditions();
+		CleanerAgentConditions proxy = (CleanerAgentConditions)rs.monitorObject(cac);
+		
+		for(int i=0; i<100; i++)
+		{
+			proxy.decreaseChargeState();
+			System.out.println("Current charge state: "+cac.getChargeState());
+		}
+	}
+	
+//	@MaintainGoal
+//	class MaintainBatteryLoadedGoal
+//	{
+//		@MaintainCondition
+//		public boolean	batteryLoadedTarget(@Event double chargestate)
+//		{
+//			return chargestate > 0.2;
+//		}
+//		
+//		@TargetCondition
+//		public boolean	batteryLoadedTarget(@Event double chargestate)
+//		{
+//			return chargestate >= 1.0;
+//		}
+//	}
 }
 
 //
