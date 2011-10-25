@@ -2,10 +2,10 @@ package jadex.simulation.master;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentManagementService;
-import jadex.commons.collection.SCollection;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.collection.SCollection;
 import jadex.simulation.helper.Constants;
 import jadex.simulation.model.SimulationConfiguration;
 import jadex.simulation.model.StartTime;

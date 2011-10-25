@@ -5,14 +5,13 @@ import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IChangeEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
-import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.math.IVector2;
 import jadex.bridge.IExternalAccess;
 import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;
+import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
+import jadex.extension.envsupport.math.IVector2;
 
 /**
  *  Inform the sentry agent about a new target.

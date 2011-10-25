@@ -8,7 +8,7 @@
 	name="RemoteTestApplication" package="jadex.simulation.remote.test">
 
 	<imports>
-		<import>jadex.bridge.service.clock.IClockService</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
 		<import>jadex.bridge.service.SServiceProvider</import>
 		<import>jadex.commons.future.*</import>
 	</imports>

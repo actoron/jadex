@@ -20,8 +20,8 @@ public class Methods {
 	 * @param list
 	 * @return
 	 */
-	public static HashMap<String,String> propertyListToHashMap(List<Property> list){
-		HashMap<String,String> map = new HashMap<String,String>();
+	public static HashMap<String,Object> propertyListToHashMap(List<Property> list){
+		HashMap<String,Object> map = new HashMap<String,Object>();
 		
 		for(Property property : list){
 			map.put(property.getName(), property.getValue());

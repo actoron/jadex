@@ -3,14 +3,16 @@ package jadex.simulation.client;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
-import jadex.bridge.CreationInfo;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
-import jadex.bridge.service.clock.IClockService;
-import jadex.bridge.service.library.ILibraryService;
+import jadex.bridge.service.component.ComponentFactorySelector;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.MEnvSpaceType;
@@ -24,6 +26,7 @@ import jadex.extension.envsupport.evaluation.SpaceObjectSource;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
+import jadex.micro.MicroAgentFactory;
 import jadex.rules.state.IOAVState;
 import jadex.simulation.controlcenter.OnlineVisualisation;
 import jadex.simulation.evaluation.SimulationDataConsumer;
@@ -364,8 +367,14 @@ public class RuntimeManagerPlan extends Plan {
 				// "clazz");
 				Class clazz = null;
 				try {
-					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()),
-							((ILibraryService) SServiceProvider.getService(getScope().getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
+//					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()),
+//							((ILibraryService) SServiceProvider.getService(getScope().getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
+					
+//					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()),
+//							((ILibraryService) SServiceProvider.getService(getScope().getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
+					
+					//TODO: Check, if works!
+					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) simConf.getImports().getImport()),getState().getTypeModel().getClassLoader());								
 
 					// clazz = SReflect.findClass0(classname, imports, classloader);
 

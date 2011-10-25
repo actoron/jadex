@@ -48,7 +48,7 @@ public abstract class AbstractSchedulerPlan extends Plan {
 	 * Create and start a component.
 	 */
 	protected void createComponent(final Action action) {
-		HashMap<String, String> componentProperties = Methods.propertyListToHashMap(action.getProperties().getProperty());
+		HashMap<String, Object> componentProperties = Methods.propertyListToHashMap(action.getProperties().getProperty());
 
 		if (action.getComponenttype() == null) {
 			System.out.println("Error: ComponentType not set!");
@@ -84,7 +84,7 @@ public abstract class AbstractSchedulerPlan extends Plan {
 	 * Delete (kill) and a component.
 	 */
 	protected void deleteComponent(final Action action) {
-		HashMap<String, String> componentProperties = Methods.propertyListToHashMap(action.getProperties().getProperty());
+		HashMap<String, Object> componentProperties = Methods.propertyListToHashMap(action.getProperties().getProperty());
 
 		if (action.getComponenttype() == null) {
 			System.out.println("Error: ComponentType not set!");

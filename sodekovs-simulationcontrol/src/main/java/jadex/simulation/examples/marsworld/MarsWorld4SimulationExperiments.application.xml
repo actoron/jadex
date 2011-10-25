@@ -32,7 +32,7 @@
 		<import>jadex.simulation.examples.marsworld.producer.*</import>
 		<import>jadex.simulation.examples.marsworld.sentry.*</import>
 		<import>jadex.simulation.examples.marsworld.movement.*</import>		
-		<import>jadex.bridge.service.clock.IClockService</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
 		<import>jadex.simulation.environment.*</import>		

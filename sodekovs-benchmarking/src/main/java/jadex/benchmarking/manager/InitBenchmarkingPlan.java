@@ -349,10 +349,13 @@ public class InitBenchmarkingPlan extends Plan {
 				}
 
 				try {
-					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) benchConf.getImports().getImport()),
-							((ILibraryService) SServiceProvider.getService(getScope().getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
+//					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) benchConf.getImports().getImport()),
+//							((ILibraryService) SServiceProvider.getService(getScope().getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this)).getClassLoader());
+					
+					//TODO: Check, if works!
+					clazz = SReflect.findClass(dcon.getClazz(), toStringArray((ArrayList<String>) benchConf.getImports().getImport()),getState().getTypeModel().getClassLoader());
 
-					// clazz = SReflect.findClass0(classname, imports, classloader);
+					// clazz = SReflect.findClass0(classname, imports, classloader);					
 
 				} catch (ClassNotFoundException e) {
 					// TODO Auto-generated catch block

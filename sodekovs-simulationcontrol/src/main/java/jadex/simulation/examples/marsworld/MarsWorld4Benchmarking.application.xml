@@ -32,7 +32,7 @@
 		<import>jadex.extension.envsupport.evaluation.*</import>
 		<import>jadex.extension.envsupport.evaluation.XYChartDataConsumer</import>		
 		<import>jadex.extension.envsupport.observer.gui.plugin.*</import>
-		<import>jadex.bridge.service.clock.IClockService</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
 		<import>jadex.simulation.environment.*</import>		
