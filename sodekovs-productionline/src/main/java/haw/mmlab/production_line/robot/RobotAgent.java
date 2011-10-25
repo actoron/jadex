@@ -343,7 +343,6 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		} else {
 			waitFor(reconfDelay, new SendMediumMessageStep(reply));
 		}
-		System.out.println("reconfDelay:" + reconfDelay);
 	}
 
 	private void addReceivers(HelpReply reply, List<Role> roles) {

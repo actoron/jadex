@@ -288,6 +288,7 @@ public class ManagerAgent extends MicroAgent {
 	/**
 	 * Finishes the current run and starts the next runs if specified.
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void finishRun() {
 		if (!finished) {
 			finished = true;
@@ -328,13 +329,11 @@ public class ManagerAgent extends MicroAgent {
 					}
 				});
 			} else {
-				// kill the application
-				waitForTick(new IComponentStep<Void>() {
+				this.killComponent().addResultListener(new DefaultResultListener() {
 
 					@Override
-					public IFuture<Void> execute(IInternalAccess ia) {
+					public void resultAvailable(Object result) {
 						getParent().killComponent();
-						return IFuture.DONE;
 					}
 				});
 			}
@@ -432,7 +431,7 @@ public class ManagerAgent extends MicroAgent {
 				getLogger().info("Manager agent is starting the dropout agent...");
 				Map<String, Object> args = new HashMap<String, Object>();
 				args.put("configuration_model", dropOutConfFile);
-				CreationInfo ci = new CreationInfo(args);
+				CreationInfo ci = new CreationInfo(args, ManagerAgent.this.getParent().getComponentIdentifier());
 
 				cms.createComponent("Dropout", "haw/mmlab/production_line/dropout/DropoutAgent.class", ci, null).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
 

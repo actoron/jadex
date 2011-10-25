@@ -28,13 +28,13 @@ import java.util.List;
  */
 public class SimulationManager {
 
-	private static final int NUMBER_OF_RUNS_PER_CONFIG = 2;
+	private static final int NUMBER_OF_RUNS_PER_CONFIG = 1;
 
-	private static final int NUMBER_OF_TASKS = 100;
+	private static final int NUMBER_OF_TASKS = 10;
 
 	private static final int NUMBER_OF_ROBOTS = 10;
 
-	private static final int NUMBER_OF_WORKPIECES = 3000;
+	private static final int NUMBER_OF_WORKPIECES = 100;
 
 	private static final int TIMELORD_INTERVAL = 0;
 
@@ -46,9 +46,9 @@ public class SimulationManager {
 
 	private static final int START_WORKLOAD = 10;
 
-	private static final int STOP_REDUNDANCY_RATE = 20;
+	private static final int STOP_REDUNDANCY_RATE = 100;
 
-	private static final int STOP_WORKLOAD = 20;
+	private static final int STOP_WORKLOAD = 100;
 
 	private static final int RECONF_MSG_DELAY_TIME = 0;
 
@@ -57,8 +57,6 @@ public class SimulationManager {
 	private int redRate = START_REDUNDANCY_RATE;
 
 	private int workload = START_WORKLOAD;
-
-	private int run = 1;
 
 	/**
 	 * @param args
@@ -78,12 +76,7 @@ public class SimulationManager {
 
 			@Override
 			public void resultAvailable(Object result) {
-				if (manager.run <= NUMBER_OF_RUNS_PER_CONFIG) {
-					manager.startSimulation(cms, this, manager.redRate, manager.workload);
-					manager.run++;
-				} else if (manager.redRate <= STOP_REDUNDANCY_RATE) {
-					manager.run = 1;
-
+				if (manager.redRate <= STOP_REDUNDANCY_RATE) {
 					if (manager.workload >= STOP_WORKLOAD) {
 						manager.workload = START_WORKLOAD;
 						manager.redRate += 10;
@@ -138,7 +131,7 @@ public class SimulationManager {
 	 *            the {@link DefaultResultListener} who should be called when the application was killed
 	 * @return the applications {@link IComponentIdentifier}
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private IComponentIdentifier startApplication(IComponentManagementService cms, DefaultResultListener killListener) {
 		IComponentIdentifier ci = cms.createComponent("ProductionLine", "haw/mmlab/production_line/ProductionLine.application.xml", null, killListener).get(new ThreadSuspendable());
 		return ci;
@@ -247,8 +240,8 @@ public class SimulationManager {
 	@SuppressWarnings("rawtypes")
 	private void startSimulation(IComponentManagementService cms, DefaultResultListener killListener, int redRate, int workload) {
 		// create the config for this redRate and workload parameters
-		SimulationConfig config = generateConfig(NUMBER_OF_TASKS, NUMBER_OF_ROBOTS, workload, redRate, NUMBER_OF_WORKPIECES, MIN_PROCESSING_TIME, MAX_PROCESSING_TIME, 1, TIMELORD_INTERVAL,
-				RECONF_MSG_DELAY_TIME);
+		SimulationConfig config = generateConfig(NUMBER_OF_TASKS, NUMBER_OF_ROBOTS, workload, redRate, NUMBER_OF_WORKPIECES, MIN_PROCESSING_TIME, MAX_PROCESSING_TIME, NUMBER_OF_RUNS_PER_CONFIG,
+				TIMELORD_INTERVAL, RECONF_MSG_DELAY_TIME);
 		SimulationGenerator generator = new SimulationGenerator(config);
 		generator.saveProductionLineConfiguration(OUTPUT_FILE_PATH);
 
