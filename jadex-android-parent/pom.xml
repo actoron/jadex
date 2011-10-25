@@ -12,7 +12,7 @@
 		<maven-compiler-plugin-version>2.3.2</maven-compiler-plugin-version>
 		<java-version>1.6</java-version>
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
-		<maven-android-plugin-version>3.0.0-alpha-13</maven-android-plugin-version>
+		<maven-android-plugin-version>3.0.0-alpha-7</maven-android-plugin-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -63,27 +63,27 @@
 					<configuration>
 						<lifecycleMappingMetadata>
 							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											com.jayway.maven.plugins.android.generation2
-										</groupId>
-										<artifactId>
-											android-maven-plugin
-										</artifactId>
-										<versionRange>
-											[3.0.0-alpha-13,)
-										</versionRange>
-										<goals>
-											<goal>run</goal>
-											<goal>unpack</goal>
-											<goal>generate-sources</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute />
-									</action>
-								</pluginExecution>
+<!-- 								<pluginExecution> -->
+<!-- 									<pluginExecutionFilter> -->
+<!-- 										<groupId> -->
+<!-- 											com.jayway.maven.plugins.android.generation2 -->
+<!-- 										</groupId> -->
+<!-- 										<artifactId> -->
+<!-- 											android-maven-plugin -->
+<!-- 										</artifactId> -->
+<!-- 										<versionRange> -->
+<!-- 											[3.0.0-alpha-13,) -->
+<!-- 										</versionRange> -->
+<!-- 										<goals> -->
+<!-- 											<goal>run</goal> -->
+<!-- 											<goal>unpack</goal> -->
+<!-- 											<goal>generate-sources</goal> -->
+<!-- 										</goals> -->
+<!-- 									</pluginExecutionFilter> -->
+<!-- 									<action> -->
+<!-- 										<execute /> -->
+<!-- 									</action> -->
+<!-- 								</pluginExecution> -->
 								
 								<pluginExecution>
 									<pluginExecutionFilter>
@@ -139,7 +139,7 @@
 
 				<plugin>
 					<groupId>com.jayway.maven.plugins.android.generation2</groupId>
-					<artifactId>android-maven-plugin</artifactId>
+					<artifactId>maven-android-plugin</artifactId>
 					<version>${maven-android-plugin-version}</version>
 					<configuration>
 						<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>

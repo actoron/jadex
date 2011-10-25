@@ -5,6 +5,8 @@ import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.message.BluetoothMessage;
 import jadex.android.bluetooth.message.DataPacket;
 import jadex.android.bluetooth.service.ConnectionService;
+import jadex.android.bluetooth.service.IConnectionCallback;
+import jadex.android.bluetooth.service.IConnectionServiceConnection;
 import jadex.android.bluetooth.util.Helper;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.DiscoveryService;
