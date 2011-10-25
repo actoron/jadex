@@ -486,16 +486,17 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	 */
 	public void startBehavior()
 	{
-		assert !isExternalThread();
+		assert !adapter.isExternalThread();
 		
 		// Start initial steps (if any).
 		super.startBehavior();
 		
 		// Use step in case agent is started as suspended.
-		scheduleStep(new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
+		// Todo: Better to create steps directly as they immediately appear in debugger!? 
+//		scheduleStep(new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
 				// Create initial thread(s). 
 				List startevents	= model.getStartActivities(pool, lane);
 				for(int i=0; startevents!=null && i<startevents.size(); i++)
@@ -504,9 +505,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 					context.addThread(thread);
 				}
 				started = true;
-				return IFuture.DONE;
-			}
-		});
+//				return IFuture.DONE;
+//			}
+//		});
 	}
 	
 	/**
@@ -887,7 +888,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	 */
 	public void	notify(final MActivity activity, final ProcessThread thread, final Object event)
 	{
-		if(isExternalThread())
+		if(adapter.isExternalThread())
 		{
 			getComponentAdapter().invokeLater(new Runnable()
 			{
