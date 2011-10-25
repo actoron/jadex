@@ -44,7 +44,9 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 
 	private IBluetoothAdapter btAdapter;
 
-	private IConnectionCallback callback;
+	private IBTP2PMessageCallback msgCallback;
+	
+	private IBTP2PAwarenessInfoCallback awarenessCallback;
 
 	public static Context CONTEXT = null;
 
@@ -107,10 +109,10 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 			public synchronized void messageReceived(BluetoothMessage msg) {
 				try {
 					if (msg.getType() == DataPacket.TYPE_AWARENESS_INFO) {
-						callback.awarenessInfoReceived(msg.getData());
+						awarenessCallback.awarenessInfoReceived(msg.getData());
 					} else {
 //						showToast(msg.getDataAsString());
-						callback.messageReceived(msg.getData());
+						msgCallback.messageReceived(msg.getData());
 					}
 				} catch (RemoteException e) {
 					e.printStackTrace();
@@ -176,7 +178,7 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 
 		@Override
 		public void stopBTServer() throws RemoteException {
-
+			onDestroy();
 		};
 
 		public void scanEnvironment() throws RemoteException {
@@ -184,9 +186,15 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 		}
 
 		@Override
-		public void registerCallback(IConnectionCallback callback)
+		public void registerAwarenessInfoCallback(IBTP2PAwarenessInfoCallback callback)
 				throws RemoteException {
-			ConnectionService.this.callback = callback;
+			ConnectionService.this.awarenessCallback = callback;
+		}
+		
+		@Override
+		public void registerMessageCallback(IBTP2PMessageCallback callback)
+				throws RemoteException {
+			ConnectionService.this.msgCallback = callback;
 		}
 
 		@Override
@@ -267,6 +275,11 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 		public void stopAutoConnect() throws RemoteException {
 			btp2pConnector.setAutoConnect(false);
 		}
+
+		@Override
+		public String getBTAddress() throws RemoteException {
+			return btAdapter.getAddress();
+		}
 	};
 
 	private BroadcastReceiver bcReceiver = new BroadcastReceiver() {
@@ -345,10 +358,10 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 	}
 
 	protected void knownDevicesChanged() {
-		if (callback != null) {
+		if (awarenessCallback != null) {
 			try {
-//				callback.deviceListChanged();
-				callback.knownDevicesChanged(btp2pConnector.getKnownDevices());
+//				msgCallback.deviceListChanged();
+				awarenessCallback.knownDevicesChanged(btp2pConnector.getKnownDevices());
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}

@@ -1,6 +1,7 @@
 package de.unihamburg.vsis.jadexAndroid_test;
 
 import jadex.base.Starter;
+import jadex.bridge.IExternalAccess;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.standalone.ComponentAdapterFactory;
@@ -49,7 +50,7 @@ public class Startup {
 		});
 	}
 	
-	public static IFuture startComponent(String component) {
+	public static IFuture<IExternalAccess> startComponent(String component) {
 		return Starter.createPlatform(new String[] {
 				"-conf", platformconfig,
 				"-configname", configname,
@@ -61,20 +62,20 @@ public class Startup {
 		});
 	}
 	
-	public static IFuture startEmptyPlatform() {
-		IFuture future = Starter.createPlatform(new String[] {
+	public static IFuture<IExternalAccess> startEmptyPlatform() {
+		IFuture<IExternalAccess> future = Starter.createPlatform(new String[] {
 				"-conf", platformconfig,
 				"-configname", configname,
 				"-platformname", "mobile",
 				"-saveonexit", "false",
 				"-gui", "false",
-				"-awareness", "true"
+				"-awareness", "false"
 		});
 		return future;
 	}
 	
-	public static IFuture startBluetoothPlatform(String platformname) {
-		IFuture future = Starter.createPlatform(new String[] {
+	public static IFuture<IExternalAccess> startBluetoothPlatform(String platformname) {
+		IFuture<IExternalAccess> future = Starter.createPlatform(new String[] {
 				"-conf", platformconfig,
 				"-configname", configname_bluetooth,
 				"-platformname", platformname,

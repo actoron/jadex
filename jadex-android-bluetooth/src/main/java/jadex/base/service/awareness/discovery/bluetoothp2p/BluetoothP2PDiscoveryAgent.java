@@ -5,7 +5,7 @@ import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.message.BluetoothMessage;
 import jadex.android.bluetooth.message.DataPacket;
 import jadex.android.bluetooth.service.ConnectionService;
-import jadex.android.bluetooth.service.IConnectionCallback;
+import jadex.android.bluetooth.service.IBTP2PAwarenessInfoCallback;
 import jadex.android.bluetooth.service.IConnectionServiceConnection;
 import jadex.android.bluetooth.util.Helper;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
@@ -105,6 +105,7 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
 			try {
 				Log.d(Helper.LOG_TAG, "Stopping autoconnect...");
 				binder.stopAutoConnect();
+				binder.stopBTServer();
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			} finally {
@@ -115,7 +116,7 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
 		}
 	}
 	
-	private IConnectionCallback.Stub callback = new IConnectionCallback.Stub() {
+	private IBTP2PAwarenessInfoCallback.Stub awarenessCallback = new IBTP2PAwarenessInfoCallback.Stub() {
 		
 		@Override
 		public void knownDevicesChanged(IBluetoothDevice[] knownDevices)
@@ -123,14 +124,6 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
 			_knownDevices = knownDevices;
 		}
 		
-		@Override
-		public void deviceListChanged() throws RemoteException {
-		}
-
-		@Override
-		public void messageReceived(byte[] data) throws RemoteException {
-		}
-
 		@Override
 		public void awarenessInfoReceived(byte[] data) throws RemoteException {
 			BluetoothP2PReceiveHandler btrec = (BluetoothP2PReceiveHandler) receiver;
@@ -151,7 +144,7 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
 			Log.d(Helper.LOG_TAG, "Service bound! starting autoconnect...");
 			try {
 				
-				binder.registerCallback(callback);
+				binder.registerAwarenessInfoCallback(awarenessCallback);
 				binder.startAutoConnect();
 			} catch (RemoteException e) {
 				e.printStackTrace();

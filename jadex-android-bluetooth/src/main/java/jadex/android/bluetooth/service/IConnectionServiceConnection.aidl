@@ -1,6 +1,7 @@
 package jadex.android.bluetooth.service;
 
-import jadex.android.bluetooth.service.IConnectionCallback;
+import jadex.android.bluetooth.service.IBTP2PMessageCallback;
+import jadex.android.bluetooth.service.IBTP2PAwarenessInfoCallback;
 import jadex.android.bluetooth.message.BluetoothMessage;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 
@@ -17,7 +18,9 @@ interface IConnectionServiceConnection {
 	
 	void stopAutoConnect();
 	
-	void registerCallback(IConnectionCallback callback);
+	void registerMessageCallback(IBTP2PMessageCallback callback);
+	
+	void registerAwarenessInfoCallback(IBTP2PAwarenessInfoCallback callback);
 	
 	IBluetoothDevice[] getUnbondedDevicesInRange();
 	
@@ -26,6 +29,8 @@ interface IConnectionServiceConnection {
 	IBluetoothDevice[] getConnectedDevices();
 	
 	IBluetoothDevice[] getReachableDevices();
+	
+	String getBTAddress();
 	
 	void connectToDevice(in IBluetoothDevice dev);
 	

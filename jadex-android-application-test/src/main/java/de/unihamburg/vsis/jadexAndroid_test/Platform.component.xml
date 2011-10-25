@@ -59,6 +59,7 @@
 		<import>jadex.base.service.message.transport.localmtp.*</import>
 		<import>jadex.base.service.message.transport.tcpmtp.*</import>
 		<import>jadex.base.service.message.transport.niotcpmtp.*</import>
+		<import>jadex.base.service.message.transport.btmtp.*</import>
 		<import>jadex.base.service.message.transport.codecs.*</import>
 		
 		<import>jadex.standalone.*</import>
@@ -163,6 +164,7 @@
 				new MessageService($component.getExternalAccess(), $component.getLogger(),
 				new ITransport[]
 				{
+					new BTTransport($component.getServiceProvider()),
 					//new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, java.util.logging.Logger.getLogger("test"))
 					new LocalTransport($component.getServiceProvider()),
 					$args.niotransport? new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())

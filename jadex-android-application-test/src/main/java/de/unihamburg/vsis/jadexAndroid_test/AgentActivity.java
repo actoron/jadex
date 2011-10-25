@@ -19,6 +19,7 @@ import java.util.HashMap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -70,7 +71,7 @@ public class AgentActivity extends BaseActivity {
 
 		new Thread(new Runnable() {
 			public void run() {
-				IFuture future = Startup.startEmptyPlatform();
+				IFuture<IExternalAccess> future = Startup.startEmptyPlatform();
 				future.addResultListener(platformResultListener);
 			}
 		}).start();
@@ -146,10 +147,10 @@ public class AgentActivity extends BaseActivity {
 		}
 	};
 
-	private IResultListener platformResultListener = new DefaultResultListener() {
+	private IResultListener<IExternalAccess> platformResultListener = new DefaultResultListener<IExternalAccess>() {
 
-		public void resultAvailable(Object result) {
-			extAcc = (IExternalAccess) result;
+		public void resultAvailable(IExternalAccess result) {
+			extAcc = result;
 			runOnUiThread(new Runnable() {
 
 				public void run() {
@@ -157,8 +158,14 @@ public class AgentActivity extends BaseActivity {
 					createAgentButton.setEnabled(true);
 				}
 			});
-
 		}
+
+		@Override
+		public void exceptionOccurred(Exception exception) {
+			Log.e(Helper.LOG_TAG, exception.getMessage());
+		}
+		
+		
 	};
 
 	private IResultListener agentCreatedResultListener = new DefaultResultListener() {

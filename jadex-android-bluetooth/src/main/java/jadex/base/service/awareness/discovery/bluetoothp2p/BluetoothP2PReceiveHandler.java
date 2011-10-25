@@ -1,6 +1,6 @@
 package jadex.base.service.awareness.discovery.bluetoothp2p;
 
-import jadex.android.bluetooth.service.IConnectionCallback;
+import jadex.android.bluetooth.service.IBTP2PAwarenessInfoCallback;
 import jadex.android.bluetooth.util.Helper;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
@@ -17,7 +17,7 @@ public class BluetoothP2PReceiveHandler extends ReceiveHandler {
 	/** The receive buffer. */
 	protected byte[] buffer;
 
-	protected IConnectionCallback callback;
+	protected IBTP2PAwarenessInfoCallback awarenessCallback;
 
 	private BlockingQueue<byte[]> awarenessQueue;
 
@@ -36,24 +36,23 @@ public class BluetoothP2PReceiveHandler extends ReceiveHandler {
 	public Object[] receive() {
 
 		try {
-			Log.i(Helper.LOG_TAG, "BTP2PRecHandler: activating blocking queue...");
+			Log.i(Helper.LOG_TAG,
+					"BTP2PRecHandler: activating blocking queue...");
 			byte[] take = awarenessQueue.take();
 			Log.i(Helper.LOG_TAG, "BTP2PRecHandler: RECIEVED SOME MESSAGE");
 
 			Object[] ret = new Object[3];
-			//address:
+			// address:
 			ret[0] = null;
-			//port:
+			// port:
 			ret[1] = 0;
 			ret[2] = take;
-			
+
 			return ret;
 		} catch (InterruptedException e) {
 			return receive();
 		}
-		
 
-		
 		// try
 		// {
 		//
@@ -90,8 +89,8 @@ public class BluetoothP2PReceiveHandler extends ReceiveHandler {
 	public void addReceivedAwarenessInfo(byte[] data) {
 		Log.i(Helper.LOG_TAG, "AwarenessInfo received. Adding to Queue...");
 		awarenessQueue.add(data);
-//		synchronized (awarenessQueue) {
-//			awarenessQueue.notifyAll();
-//		}
+		// synchronized (awarenessQueue) {
+		// awarenessQueue.notifyAll();
+		// }
 	}
 }
