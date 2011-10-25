@@ -192,8 +192,8 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		this.mainState = mainState;
 		this.deficientState = deficientState;
 
-		int time = databaseLogger.getCurrentTime();
-		databaseLogger.insertLog(id, AgentConstants.AGENT_TYPE_ROBOT, time, mainState, deficientState, assignedRoles.size(), buffer.size(), buffer.capacity());
+		// int time = databaseLogger.getCurrentTime();
+		// databaseLogger.insertLog(id, AgentConstants.AGENT_TYPE_ROBOT, time, mainState, deficientState, assignedRoles.size(), buffer.size(), buffer.capacity());
 	}
 
 	/**
@@ -343,6 +343,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		} else {
 			waitFor(reconfDelay, new SendMediumMessageStep(reply));
 		}
+		System.out.println("reconfDelay:" + reconfDelay);
 	}
 
 	private void addReceivers(HelpReply reply, List<Role> roles) {

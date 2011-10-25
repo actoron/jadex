@@ -1,7 +1,7 @@
 /* Production Line communication graph dot confiuration template */
 
 digraph G {
-	size = "20,100";
+	/* size = "20,100"; */
 	concentrate = "true";
 	
 /* transporter nodes: */

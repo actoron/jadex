@@ -265,7 +265,7 @@ public class LogManager {
 	public void afterSimulation(Map<String, Integer> producedMap, Map<String, Integer> consumedMap) {
 		int runId = databaseLogger.cleanupDatabase();
 
-		interpreteData(runId);
+		// interpreteData(runId);
 		writeWorkpieceFile(runId, producedMap, consumedMap);
 		copyPlotFiles(runId);
 		generateResourceFlowGraph(runId);

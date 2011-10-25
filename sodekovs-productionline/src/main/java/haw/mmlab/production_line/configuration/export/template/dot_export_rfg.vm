@@ -1,7 +1,7 @@
 /* Production Line resource flow graph dot confiuration template */
 
 digraph G {
-	size = "20,100";
+	/* size = "20,100"; */
 	concentrate = "false";
 	
 /* agent nodes: */

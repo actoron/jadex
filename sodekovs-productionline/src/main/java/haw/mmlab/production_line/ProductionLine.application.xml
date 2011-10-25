@@ -61,7 +61,7 @@
 					<arguments>
 						<argument name="configuration_model">"conf/generated.conf.xml"</argument>
 						<argument name="dropout_configuration_model">"conf/dropout.conf.xml"</argument>
-						<argument name="strategy">"cycleDetectionStrategy"</argument>
+						<argument name="strategy">"hybridStrategy"</argument>
 					</arguments>
 				</component>
 			</components>

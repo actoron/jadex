@@ -413,7 +413,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		this.mainState = mainState;
 		this.deficientState = deficientState;
 
-		int time = databaseLogger.getCurrentTime();
-		databaseLogger.insertLog(id, AgentConstants.AGENT_TYPE_TRANSPORT, time, mainState, deficientState, assignedRoles.size(), 0, 0);
+		// int time = databaseLogger.getCurrentTime();
+		// databaseLogger.insertLog(id, AgentConstants.AGENT_TYPE_TRANSPORT, time, mainState, deficientState, assignedRoles.size(), 0, 0);
 	}
 }
