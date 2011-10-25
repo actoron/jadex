@@ -1,23 +1,21 @@
 package de.unihamburg.vsis.jadexAndroid_test;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import jadex.bridge.CreationInfo;
-import jadex.bridge.IComponentManagementService;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.SServiceProvider;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.micro.benchmarks.AgentCreationAgent;
 import jadex.xml.annotation.XMLClassname;
-import android.app.Activity;
+
+import java.util.HashMap;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;

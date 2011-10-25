@@ -422,7 +422,11 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 			if(globalcl==null)
 			{
 				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
+				/* $if !android $ */
 				globalcl	= new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), delegates);
+				/* $else $
+				globalcl	= new DelegationURLClassLoader(LibraryService.class.getClassLoader(), delegates);
+				$endif $ */
 			}
 			ret.setResult(globalcl);
 		}
@@ -539,7 +543,11 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 			public void customResultAvailable(Collection<DelegationURLClassLoader> result)
 			{
 				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])result.toArray(new DelegationURLClassLoader[result.size()]);
+				/* $if !android $ */
 				DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, ClassLoader.getSystemClassLoader(), delegates);
+				/* $else $
+				DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, LibraryService.class.getClassLoader(), delegates);
+				$endif $ */
 				classloaders.put(rid, cl);
 				globalcl	= null;
 				addSupport(rid, support);

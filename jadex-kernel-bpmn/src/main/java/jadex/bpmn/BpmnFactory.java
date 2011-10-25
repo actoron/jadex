@@ -30,8 +30,10 @@ import jadex.commons.gui.SGUI;
 import java.util.HashMap;
 import java.util.Map;
 
+/* $if !android $ */
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
+/* $endif $ */
 
 /**
  *  Foctory for loading bpmn processes.

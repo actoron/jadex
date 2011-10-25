@@ -1,17 +1,12 @@
 package de.unihamburg.vsis.jadexAndroid_test;
 
-import jadex.base.service.awareness.discovery.IDiscoveryService;
 import jadex.base.service.awareness.management.DiscoveryInfo;
-import jadex.base.service.awareness.management.IManagementService;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentManagementService;
-import jadex.bridge.ISettingsService;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.awareness.IManagementService;
 import jadex.commons.future.IFuture;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -23,8 +18,6 @@ import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 import android.os.Bundle;
 import android.os.Message;
 
