@@ -94,6 +94,8 @@
 		<argument name="simulation" class="boolean">false</argument>
 		<!-- Additional library paths (classpath entries) for loading agent models and classes. -->
 		<argument name="libpath" class="String"></argument>
+		<!-- The base classloader. -->
+		<argument name="baseclassloader" class="ClassLoader"></argument>
 		<!-- Port for TCP transport. -->
 		<argument name="tcpport" class="int">9876</argument>
 		<!-- Port for NIOTCP transport. -->
@@ -159,7 +161,7 @@
 		</providedservice>
 		<providedservice class="ILibraryService">
 			<implementation> <!-- proxytype="raw" -->
-				new LibraryService($args.libpath, $component.getServiceProvider())
+				new LibraryService($args.libpath, $component.getServiceProvider(), $args.baseclassloader)
 			</implementation>
 		</providedservice>
 		<providedservice class="IClockService">

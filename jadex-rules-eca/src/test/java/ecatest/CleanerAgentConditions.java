@@ -44,11 +44,11 @@ public class CleanerAgentConditions
 	{
 		RuleSystem rs = new RuleSystem();
 		CleanerAgentConditions cac = new CleanerAgentConditions();
-		CleanerAgentConditions proxy = (CleanerAgentConditions)rs.monitorObject(cac);
+		cac = (CleanerAgentConditions)rs.monitorObject(cac);
 		
 		for(int i=0; i<100; i++)
 		{
-			proxy.decreaseChargeState();
+			cac.decreaseChargeState();
 			System.out.println("Current charge state: "+cac.getChargeState());
 		}
 	}

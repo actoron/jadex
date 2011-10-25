@@ -65,6 +65,9 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	// todo: remove!?
 	protected ClassLoader	globalcl;
 	
+	/** The base classloader. */
+	protected ClassLoader baseloader;
+	
 	//-------- constructors --------
 	
 	/** 
@@ -92,7 +95,18 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 *  	Strings are interpreted as relative files (relative to current directory),
 	 *  	absolute files or URLs (whatever can be found). 
 	 */ 
-	public LibraryService(Object[] urls, IServiceProvider provider, Map properties)
+	public LibraryService(Object[] urls, IServiceProvider provider, ClassLoader baseloader)
+	{
+		this(urls, provider, baseloader, null);
+	}
+	
+	/** 
+	 *  Creates a new LibraryService.
+	 *  @param urls	Urls may be specified as java.net.URLs, java.io.Files or java.lang.Strings.
+	 *  	Strings are interpreted as relative files (relative to current directory),
+	 *  	absolute files or URLs (whatever can be found). 
+	 */ 
+	public LibraryService(Object[] urls, IServiceProvider provider, ClassLoader baseloader, Map properties)
 	{
 		super(provider.getId(), ILibraryService.class, properties);
 		
@@ -102,7 +116,9 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		this.managedrids = new LinkedHashMap<IResourceIdentifier, Integer>();
 		this.initurls = urls;
 		this.provider = provider;
+		this.baseloader = baseloader!=null? baseloader: getClass().getClassLoader();
 	}
+	
 	
 	//-------- methods --------
 	
@@ -543,11 +559,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 			public void customResultAvailable(Collection<DelegationURLClassLoader> result)
 			{
 				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])result.toArray(new DelegationURLClassLoader[result.size()]);
-				/* $if !android $ */
-				DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, ClassLoader.getSystemClassLoader(), delegates);
-				/* $else $
-				DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, LibraryService.class.getClassLoader(), delegates);
-				$endif $ */
+				DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, baseloader, delegates);
 				classloaders.put(rid, cl);
 				globalcl	= null;
 				addSupport(rid, support);
