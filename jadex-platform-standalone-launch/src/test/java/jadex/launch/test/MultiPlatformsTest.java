@@ -16,7 +16,7 @@ import junit.framework.TestCase;
  */
 // Todo: Doesn't work on hudson server
 // (race condition in init leads to micro factory not being found?)
-public class MultiPlatformsTest2 extends TestCase
+public class MultiPlatformsTest extends TestCase
 {
 	public void	testMultiplePlatforms()
 	{
@@ -29,7 +29,7 @@ public class MultiPlatformsTest2 extends TestCase
 			if(i%10==0)
 				System.out.println("Starting platform "+i);
 			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases", "-niotransport", "false",
-				"-configname", "allkernels",	// Todo: does not work with multi-kernel on Hudson!?
+//				"-configname", "allkernels",	// Todo: does not work with multi-kernel on Hudson!?
 				"-gui", "false", 
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}

@@ -21,7 +21,7 @@ import junit.framework.TestCase;
  */
 //Todo: Doesn't work on hudson server
 //(race condition in init leads to micro factory not being found?)
-public class BPMNPlatformTest2 extends TestCase
+public class BPMNPlatformTest extends TestCase
 {
 	public void	testBPMNPlatform()
 	{
