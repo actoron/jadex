@@ -183,7 +183,6 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 					try
 					{
 						MBpmnModel amodel = loader.loadBpmnModel(model, imports, cl, rid);
-						amodel.setClassLoader(cl);
 						ret.setResult(amodel.getModelInfo());
 					}
 					catch(Exception e)
@@ -199,7 +198,6 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 			{
 				ClassLoader cl = getClass().getClassLoader();
 				MBpmnModel amodel = loader.loadBpmnModel(model, imports, cl, rid);
-				amodel.setClassLoader(cl);
 				ret.setResult(amodel.getModelInfo());
 			}
 			catch(Exception e)
@@ -209,22 +207,6 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 		}
 		
 		return ret;
-		
-		
-//		try
-//		{
-//			ClassLoader cl = libservice.getClassLoader(rid);
-//			MBpmnModel amodel = loader.loadBpmnModel(model, imports, 
-//				libservice.getClassLoader(rid), rid);
-//			amodel.setClassLoader(cl);
-//			ret.setResult(amodel.getModelInfo());
-//		}
-//		catch(Exception e)
-//		{
-//			ret.setException(e);
-//		}
-//		
-//		return ret;
 	}
 	
 	/**

@@ -35,7 +35,9 @@ public class BpmnModelLoader extends AbstractModelLoader
 	 */
 	public MBpmnModel	loadBpmnModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
-		return (MBpmnModel)loadModel(name, FILE_EXTENSION_BPMN, imports, classloader, context);
+		MBpmnModel	ret	= (MBpmnModel)loadModel(name, FILE_EXTENSION_BPMN, imports, classloader, context);
+		ret.setClassLoader(classloader);
+		return ret;
 	}
 	
 	//-------- AbstractModelLoader methods --------
