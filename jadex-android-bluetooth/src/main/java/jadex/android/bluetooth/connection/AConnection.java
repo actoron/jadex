@@ -91,13 +91,14 @@ public abstract class AConnection implements IConnection {
 			packetQueue.add(bytes);
 		}
 
-		public void cancel() {
+		public synchronized void cancel() {
 			if (running) {
+				running = false;
+				writer.running = false;
+				reader.running = false;
 				try {
 					// this wakes up the writer thread
 					// which will then terminate
-					writer.running = false;
-					reader.running = false;
 					packetQueue.add(new byte[0]);
 					mmOutStream.close();
 					mmInStream.close();
@@ -123,10 +124,10 @@ public abstract class AConnection implements IConnection {
 					try {
 						byte[] take = packetQueue.take();
 						_write(take);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
+					} catch (Exception e) {
+						if (running) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -160,10 +161,12 @@ public abstract class AConnection implements IConnection {
 						}
 					} catch (IOException e) {
 						// maybe remove connection from list here?
+						if (running) {
 						Log.e(Helper.LOG_TAG,
 								"catched IOException while reading from Stream:"
 										+ e.toString() + "\n "
 										+ Helper.stackTraceToString(e.getStackTrace()));
+						}
 						setConnectionAlive(false);
 						break;
 					}

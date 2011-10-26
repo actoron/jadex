@@ -36,10 +36,7 @@ public class BluetoothP2PReceiveHandler extends ReceiveHandler {
 	public Object[] receive() {
 
 		try {
-			Log.i(Helper.LOG_TAG,
-					"BTP2PRecHandler: activating blocking queue...");
 			byte[] take = awarenessQueue.take();
-			Log.i(Helper.LOG_TAG, "BTP2PRecHandler: RECIEVED SOME MESSAGE");
 
 			Object[] ret = new Object[3];
 			// address:
@@ -87,7 +84,7 @@ public class BluetoothP2PReceiveHandler extends ReceiveHandler {
 	}
 
 	public void addReceivedAwarenessInfo(byte[] data) {
-		Log.i(Helper.LOG_TAG, "AwarenessInfo received. Adding to Queue...");
+		Log.i(Helper.LOG_TAG, "AwarenessInfo received.");
 		awarenessQueue.add(data);
 		// synchronized (awarenessQueue) {
 		// awarenessQueue.notifyAll();
