@@ -28,19 +28,19 @@ import java.util.List;
  */
 public class SimulationManager {
 
-	private static final int NUMBER_OF_RUNS_PER_CONFIG = 1;
+	private static final int NUMBER_OF_RUNS_PER_CONFIG = 10;
 
 	private static final int NUMBER_OF_TASKS = 10;
 
 	private static final int NUMBER_OF_ROBOTS = 10;
 
-	private static final int NUMBER_OF_WORKPIECES = 100;
+	private static final int NUMBER_OF_WORKPIECES = 300;
 
-	private static final int TIMELORD_INTERVAL = 0;
+	private static final int TIMELORD_INTERVAL = 1;
 
-	private static final int MIN_PROCESSING_TIME = 0;
+	private static final int MIN_PROCESSING_TIME = 1;
 
-	private static final int MAX_PROCESSING_TIME = 0;
+	private static final int MAX_PROCESSING_TIME = 1;
 
 	private static final int START_REDUNDANCY_RATE = 10;
 
@@ -50,7 +50,7 @@ public class SimulationManager {
 
 	private static final int STOP_WORKLOAD = 100;
 
-	private static final int RECONF_MSG_DELAY_TIME = 0;
+	private static final int RECONF_MSG_DELAY_TIME = 1;
 
 	private static final String OUTPUT_FILE_PATH = "conf/generated.conf.xml";
 
@@ -63,12 +63,6 @@ public class SimulationManager {
 	 */
 	public static void main(String[] args) {
 		final SimulationManager manager = new SimulationManager();
-
-		// start the jadex platform
-		IExternalAccess platform = manager.startJadexPlatform();
-
-		// get the CMS
-		final IComponentManagementService cms = manager.getCMS(platform);
 
 		// start the simulation
 		@SuppressWarnings("rawtypes")
@@ -85,12 +79,12 @@ public class SimulationManager {
 					}
 
 					if (manager.redRate <= STOP_REDUNDANCY_RATE) {
-						manager.startSimulation(cms, this, manager.redRate, manager.workload);
+						manager.startSimulation(this, manager.redRate, manager.workload);
 					}
 				}
 			}
 		};
-		manager.startSimulation(cms, killListener, manager.redRate, manager.workload);
+		manager.startSimulation(killListener, manager.redRate, manager.workload);
 	}
 
 	/**
@@ -228,8 +222,6 @@ public class SimulationManager {
 	/**
 	 * Starts a simulation run for the given redundancy rate and workload.
 	 * 
-	 ** @param cms
-	 *            the {@link IComponentManagementService} who should start the application
 	 * @param killListener
 	 *            the {@link DefaultResultListener} who should be called when the application was killed
 	 * @param redRate
@@ -238,7 +230,13 @@ public class SimulationManager {
 	 *            the given workload
 	 */
 	@SuppressWarnings("rawtypes")
-	private void startSimulation(IComponentManagementService cms, DefaultResultListener killListener, int redRate, int workload) {
+	private void startSimulation(DefaultResultListener killListener, int redRate, int workload) {
+		// start the jadex platform
+		IExternalAccess platform = startJadexPlatform();
+
+		// get the CMS
+		IComponentManagementService cms = getCMS(platform);
+
 		// create the config for this redRate and workload parameters
 		SimulationConfig config = generateConfig(NUMBER_OF_TASKS, NUMBER_OF_ROBOTS, workload, redRate, NUMBER_OF_WORKPIECES, MIN_PROCESSING_TIME, MAX_PROCESSING_TIME, NUMBER_OF_RUNS_PER_CONFIG,
 				TIMELORD_INTERVAL, RECONF_MSG_DELAY_TIME);

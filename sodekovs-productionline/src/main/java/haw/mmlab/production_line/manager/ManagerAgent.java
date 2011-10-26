@@ -329,11 +329,16 @@ public class ManagerAgent extends MicroAgent {
 					}
 				});
 			} else {
-				this.killComponent().addResultListener(new DefaultResultListener() {
+				// kill the platform
+				IExternalAccess application = getParent();
+				application.scheduleImmediate(new IComponentStep() {
 
 					@Override
-					public void resultAvailable(Object result) {
-						getParent().killComponent();
+					public IFuture execute(IInternalAccess ia) {
+						IExternalAccess platform = ia.getParent();
+						platform.killComponent();
+
+						return IFuture.DONE;
 					}
 				});
 			}
