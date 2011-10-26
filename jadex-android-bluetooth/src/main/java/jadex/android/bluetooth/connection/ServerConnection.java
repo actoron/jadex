@@ -51,8 +51,12 @@ public class ServerConnection extends AConnection {
 							public void connectionStateChanged(
 									IConnection connection) {
 							}
+
+							@Override
+							public void messageNotSent(DataPacket pkt) {
+							}
 						});
-						write(ping.asByteArray());
+						write(ping);
 						lastPongReceived = false;
 					} catch (IOException e) {
 						// TODO Auto-generated catch block

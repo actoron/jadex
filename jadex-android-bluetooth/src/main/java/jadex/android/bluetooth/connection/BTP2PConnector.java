@@ -208,7 +208,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 								newConnection);
 						newConnection.addConnectionListener(defaultConnectionListener);
 						try {
-							connection.write(msg.asByteArray());
+							connection.write(msg);
 							if (!future.resultAvailable) {
 								future.setResult(BluetoothMessage.MESSAGE_SENT);
 							}
@@ -235,19 +235,27 @@ public class BTP2PConnector implements IBluetoothStateListener {
 					}
 				}
 			}
+
+			@Override
+			public void messageNotSent(DataPacket pkt) {
+			}
 		});
 		newConnection.connect();
 		return future;
 	}
 
 	private void handleDataPacketReceived(DataPacket packet) {
-		String dataString = packet.getDataAsString();
+//		String dataString = packet.getDataAsString();
 //		if ("foo".equals(dataString)) {
 //			DataPacket reply = new DataPacket(packet.Src, "bar".getBytes(),
 //					DataPacket.TYPE_DATA);
 //			reply.Src = ownAdress;
 //			sendMessage(reply);
 //		}
+		
+		if (packet.getData() == null) {
+			Log.e(Helper.LOG_TAG, "received packet with data=null, type was: " + DataPacket.TYPE_DESCRIPTIONS[packet.Type]);
+		}
 
 		BluetoothMessage bluetoothMessage = new BluetoothMessage(packet.Src,
 				packet.getData(), packet.Type);
@@ -285,9 +293,8 @@ public class BTP2PConnector implements IBluetoothStateListener {
 				// handle messages directed to us
 				if (!(pkt.Type == DataPacket.TYPE_PING || pkt.Type == DataPacket.TYPE_PONG)
 						|| PING_DEBUG) {
-					String string = "[Received] " + pkt.toString();
-					Log.i(Helper.LOG_TAG, string);
-					// showToast(string);
+//					String string = "[Received] " + pkt.toString();
+//					Log.d(Helper.LOG_TAG, string);
 				}
 				IConnection connection = getConnections().get(pkt.Src);
 				if (connection == null) {
@@ -303,7 +310,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 						pkt.Src = ownAdress;
 						pkt.newPaketID();
 						try {
-							connection.write(pkt.asByteArray());
+							connection.write(pkt);
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -344,9 +351,8 @@ public class BTP2PConnector implements IBluetoothStateListener {
 					}
 				}
 
-				if (pkt.Type == DataPacket.TYPE_DATA) {
-					handleDataPacketReceived(pkt);
-				} else {
+				if (pkt.Type == DataPacket.TYPE_DATA ||
+						pkt.Type == DataPacket.TYPE_AWARENESS_INFO) {
 					handleDataPacketReceived(pkt);
 				}
 				notifyKnownDevicesChanged();
@@ -372,6 +378,10 @@ public class BTP2PConnector implements IBluetoothStateListener {
 				connection.removeConnectionListener(this);
 				connection = null;
 			}
+		}
+
+		@Override
+		public void messageNotSent(DataPacket pkt) {
 		}
 	};
 

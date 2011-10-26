@@ -8,4 +8,6 @@ public interface IConnectionListener {
 	void connectionStateChanged(IConnection connection);
 	
 	void messageReceived(DataPacket pkt, IBluetoothDevice fromDevice, IConnection incomingConnection);
+	
+	void messageNotSent(DataPacket pkt);
 }

@@ -91,7 +91,7 @@ public class ConnectionManager extends HashMap<String, IConnection> implements
 		IConnection con = get(address);
 		if (con != null && con.isAlive()) {
 			try {
-				con.write(packet.asByteArray());
+				con.write(packet);
 			} catch (IOException e) {
 				throw new MessageNotSendException();
 			}

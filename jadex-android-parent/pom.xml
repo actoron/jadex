@@ -38,7 +38,7 @@
 		<dependency>
 			<groupId>com.pivotallabs</groupId>
 			<artifactId>robolectric</artifactId>
-			<version>1.0-RC1</version>
+			<version>1.0</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -63,28 +63,28 @@
 					<configuration>
 						<lifecycleMappingMetadata>
 							<pluginExecutions>
-<!-- 								<pluginExecution> -->
-<!-- 									<pluginExecutionFilter> -->
-<!-- 										<groupId> -->
-<!-- 											com.jayway.maven.plugins.android.generation2 -->
-<!-- 										</groupId> -->
-<!-- 										<artifactId> -->
-<!-- 											android-maven-plugin -->
-<!-- 										</artifactId> -->
-<!-- 										<versionRange> -->
-<!-- 											[3.0.0-alpha-13,) -->
-<!-- 										</versionRange> -->
-<!-- 										<goals> -->
-<!-- 											<goal>run</goal> -->
-<!-- 											<goal>unpack</goal> -->
-<!-- 											<goal>generate-sources</goal> -->
-<!-- 										</goals> -->
-<!-- 									</pluginExecutionFilter> -->
-<!-- 									<action> -->
-<!-- 										<execute /> -->
-<!-- 									</action> -->
-<!-- 								</pluginExecution> -->
-								
+								<!-- <pluginExecution> -->
+								<!-- <pluginExecutionFilter> -->
+								<!-- <groupId> -->
+								<!-- com.jayway.maven.plugins.android.generation2 -->
+								<!-- </groupId> -->
+								<!-- <artifactId> -->
+								<!-- android-maven-plugin -->
+								<!-- </artifactId> -->
+								<!-- <versionRange> -->
+								<!-- [3.0.0-alpha-13,) -->
+								<!-- </versionRange> -->
+								<!-- <goals> -->
+								<!-- <goal>run</goal> -->
+								<!-- <goal>unpack</goal> -->
+								<!-- <goal>generate-sources</goal> -->
+								<!-- </goals> -->
+								<!-- </pluginExecutionFilter> -->
+								<!-- <action> -->
+								<!-- <execute /> -->
+								<!-- </action> -->
+								<!-- </pluginExecution> -->
+
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>

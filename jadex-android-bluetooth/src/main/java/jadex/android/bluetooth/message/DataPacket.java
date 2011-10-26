@@ -15,20 +15,27 @@ public class DataPacket {
 	public final static byte TYPE_PING = 0;
 	public final static byte TYPE_PONG = 1;
 
-	public final static byte TYPE_DATA = 2;
-	public final static byte TYPE_BROADCAST = 3;
+	public final static byte TYPE_CONNECT_SYN = 2;
+	public final static byte TYPE_CONNECT_ACK = 3;
+	public final static byte TYPE_ROUTING_INFORMATION = 4;
 
-	public final static byte TYPE_CONNECT_SYN = 4;
-	public final static byte TYPE_CONNECT_ACK = 5;
+	public final static byte TYPE_BROADCAST = 5;
 
-	public final static byte TYPE_ROUTING_INFORMATION = 6;
 	
+	public final static byte TYPE_DATA = 6;
 	public final static byte TYPE_AWARENESS_INFO = 7;
 
 	public byte Type;
 	
-	public final static String[] TYPE_DESCRIPTIONS = {"PING", "PONG", "DATA", "BROADCAST", "SYN",
-		"ACK", "ROUTING_INFORMATION", "AWARENESS_INFO"};
+	public final static String[] TYPE_DESCRIPTIONS = {
+		"PING", 
+		"PONG", 
+		"SYN", 
+		"ACK", 
+		"ROUTING_INFORMATION", 
+		"BROADCAST", 
+		"DATA", 
+		"AWARENESS_INFO"};
 	
 	public String Src;
 	public String Dest;

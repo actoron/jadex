@@ -138,7 +138,7 @@ public class BTServer {
 					socket = mmServerSocket.accept();
 				} catch (IOException e) {
 					//e.printStackTrace();
-					Log.e(Helper.LOG_TAG,"Could not start Bluetooth Server: " + e.getMessage());
+					Log.e(Helper.LOG_TAG,"Could not start Bluetooth Server: " + e.toString());
 //					break;
 					return;
 				}
@@ -176,6 +176,10 @@ public class BTServer {
 								if (!connection.isAlive()) {
 									run();
 								}
+							}
+
+							@Override
+							public void messageNotSent(DataPacket pkt) {
 							}
 						});
 						connection.connect();

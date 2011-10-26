@@ -86,9 +86,6 @@ public class BTTransport implements ITransport {
 	/** Maximum number of outgoing connections */
 	protected final static int MAX_CONNECTIONS = 20;
 
-	/** Default port. */
-	protected final static int DEFAULT_PORT = 9876;
-
 	// -------- attributes --------
 
 	/** The platform. */
@@ -264,7 +261,7 @@ public class BTTransport implements ITransport {
 
 	}
 
-	private byte[] encodeMessage(MessageEnvelope msg, byte[] codecids) {
+	protected byte[] encodeMessage(MessageEnvelope msg, byte[] codecids) {
 
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		if (codecids == null || codecids.length == 0)
@@ -287,7 +284,7 @@ public class BTTransport implements ITransport {
 			os.write(res);
 			os.flush();
 		} catch (IOException e) {
-			Log.e(Helper.LOG_TAG, e.getMessage());
+			Log.e(Helper.LOG_TAG, "Could not encode Message: " + e.toString());
 		}
 
 		return os.toByteArray();
@@ -331,15 +328,18 @@ public class BTTransport implements ITransport {
 		// Calculate message size by reading the first 4 bytes
 		// Read here is always a blocking call.
 		int msg_size;
+		int pos = 0;
 		byte[] codec_ids = new byte[(int) data[0] & 0xFF];
-		int pos = 1;
 
+		pos++;
+		
 		for (int i = 0; i < codec_ids.length; i++) {
-			codec_ids[i] = data[i + pos];
+			codec_ids[i] = data[pos];
+			pos++;
 		}
 
-		msg_size = SUtil.bytesToInt(new byte[] { data[pos + 1], data[pos + 2],
-				data[pos + 3], data[pos + 4] });
+		msg_size = SUtil.bytesToInt(new byte[] { data[pos], data[pos + 1],
+				data[pos + 2], data[pos + 3] });
 
 		pos += 4;
 
@@ -348,8 +348,14 @@ public class BTTransport implements ITransport {
 		msg_size = msg_size - BTTransport.PROLOG_SIZE - codec_ids.length - 1; // Remove
 																				// prolog.
 		if (msg_size > 0) {
-			byte[] rawMsg = Arrays.copyOfRange(data, pos, data.length - 1);
-
+//			byte[] rawMsg = Arrays.copyOfRange(data, pos, data.length - 1);
+			byte[] rawMsg = new byte[data.length - pos];
+			System.out.println("Messagelength: " + msg_size);
+			System.out.println("rawMsglength: " + rawMsg.length);
+			for (int i = 0; i < msg_size; pos++, i++ ) {
+				rawMsg[i] = data[pos];
+			}
+			
 			Object tmp = rawMsg;
 			for (int i = codec_ids.length - 1; i > -1; i--) {
 				ICodec dec = codecfac.getCodec(codec_ids[i]);
@@ -369,6 +375,7 @@ public class BTTransport implements ITransport {
 	 *            The connection.
 	 */
 	protected IFuture deliverMessage(final MessageEnvelope msg) {
+		Log.i(Helper.LOG_TAG, "(BTTransport) deliverMessage called");
 		final Future ret = new Future();
 		SServiceProvider.getService(container, IMessageService.class,
 				RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(

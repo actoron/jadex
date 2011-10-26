@@ -105,8 +105,9 @@ public abstract class XMLOutputFactory {
   public static XMLOutputFactory newInstance() 
     throws FactoryConfigurationError
   {
-    return (XMLOutputFactory) FactoryFinder.find("javax.xml.stream.XMLOutputFactory",
+    Object find = FactoryFinder.find("javaxx.xml.stream.XMLOutputFactory",
                                                  "com.bea.xml.stream.XMLOutputFactoryBase");
+	return (XMLOutputFactory) find;
   }
 
   /**
