@@ -21,22 +21,14 @@ public class DataPacket {
 
 	public final static byte TYPE_BROADCAST = 5;
 
-	
 	public final static byte TYPE_DATA = 6;
 	public final static byte TYPE_AWARENESS_INFO = 7;
 
 	public byte Type;
-	
-	public final static String[] TYPE_DESCRIPTIONS = {
-		"PING", 
-		"PONG", 
-		"SYN", 
-		"ACK", 
-		"ROUTING_INFORMATION", 
-		"BROADCAST", 
-		"DATA", 
-		"AWARENESS_INFO"};
-	
+
+	public final static String[] TYPE_DESCRIPTIONS = { "PING", "PONG", "SYN",
+			"ACK", "ROUTING_INFORMATION", "BROADCAST", "DATA", "AWARENESS_INFO" };
+
 	public String Src;
 	public String Dest;
 	public byte SeqNo;
@@ -49,7 +41,7 @@ public class DataPacket {
 	private byte[] data;
 
 	// this is copied from BTClick. Setting higher values should work just fine.
-	public static final int PACKET_SIZE = 1024;
+	public static final int PACKET_SIZE = 2048;
 	public static final int HEADER_SIZE = 1 + 17 + 17 + 1 + 21 + 2 + 1;
 	public static final int DATA_MAX_SIZE = PACKET_SIZE - HEADER_SIZE;
 
@@ -63,16 +55,9 @@ public class DataPacket {
 
 	public DataPacket(String dest, byte[] data, byte type) {
 		this.Type = type;
-		this.data = data;
-		if (data != null) {
-			int length = data.length;
-			if (length > Short.MAX_VALUE || length > DATA_MAX_SIZE) {
-				throw new MessageToLongException(data, data.length);
-			}
-			this.dataSize = (short) length;
-		} else {
-			this.dataSize = 0;
-		}
+		checkType();
+		this.data = data == null ? new byte[0] : data;
+		checkDataSize();
 		if (dest != null) {
 			this.Dest = dest;
 		}
@@ -83,6 +68,7 @@ public class DataPacket {
 
 	public DataPacket(byte[] buffer) {
 		this.Type = buffer[0];
+		checkType();
 		this.Src = new String(buffer, 1, 17);
 		this.Dest = new String(buffer, 18, 17);
 		this.pktId = new String(buffer, 35, 21);
@@ -91,9 +77,16 @@ public class DataPacket {
 
 		this.dataSize = readShort(dataSize, 0);
 		this.SeqNo = buffer[59];
-		if (this.dataSize > 0) {
-			this.data = new byte[this.dataSize];
 
+		if (buffer.length < this.dataSize+60) {
+			throw new MessageConvertException("Could not read packet from byte Array. Buffer length is " +
+					buffer.length + " and dataSize is " +
+					this.dataSize + " (plus header)!\n"
+					+ this.toString());
+		}
+		
+		this.data = new byte[this.dataSize];
+		if (this.dataSize > 0) {
 			for (int i = 0; i < this.dataSize; i++) {
 				this.data[i] = buffer[i + 60];
 			}
@@ -103,83 +96,82 @@ public class DataPacket {
 		buffer = null;
 	}
 
-	// public byte[] asByteArray() {
-	// byte header[] = new byte[1];
-	// header[0] = this.Type;
-	// byte packetAsBytes[] = joinByteArray(header, this.Src.getBytes());
-	// packetAsBytes = joinByteArray(packetAsBytes, this.Dest.getBytes());
-	//
-	// packetAsBytes = joinByteArray(packetAsBytes, this.pktId.getBytes());
-	// byte hop[] = new byte[1];
-	// hop[0] = this.HopCount;
-	// packetAsBytes = joinByteArray(packetAsBytes, hop);
-	//
-	// byte[] shortToByteArray = shortToByteArray(this.dataSize);
-	// packetAsBytes = joinByteArray(packetAsBytes, shortToByteArray);
-	//
-	// byte seq[] = new byte[1];
-	// seq[0] = this.SeqNo;
-	// packetAsBytes = joinByteArray(packetAsBytes, seq);
-	//
-	// packetAsBytes = joinByteArray(packetAsBytes, this.data);
-	// // //add a stop
-	// // packetAsBytes = joinByteArray(packetAsBytes," ".getBytes());
-	// // packetAsBytes[packetAsBytes.length-1] = 0;
-	//
-	// header = null;
-	// hop = null;
-	// seq = null;
-	//
-	// return packetAsBytes;
-	// }
+
 
 	public byte[] asByteArray() {
 		if (Src == null || Dest == null || pktId == null) {
 			throw new MessageConvertException(
 					"Message was underspecified. Dest, pktId are required.");
 		}
-
+		checkDataSize();
 		byte[] packet = new byte[HEADER_SIZE + dataSize];
 		packet[0] = this.Type;
+		checkAddresses();
 		int pos = insertByteArrayFromPosition(1, packet, this.Src.getBytes());
 		pos = insertByteArrayFromPosition(pos, packet, this.Dest.getBytes());
 		pos = insertByteArrayFromPosition(pos, packet, this.pktId.getBytes());
 		packet[pos] = this.HopCount;
+		
+		
 		pos = insertByteArrayFromPosition(pos + 1, packet,
 				shortToByteArray(this.dataSize));
 		packet[pos] = this.SeqNo;
+		
+		if (pos != 59) {
+			throw new MessageConvertException("Something went wrong while encoding this message.\n" + this.toString());
+		}
 		if (dataSize != 0) {
 			pos = insertByteArrayFromPosition(pos + 1, packet, this.data);
 		}
 		return packet;
 	}
 
+	private void checkAddresses() {
+		if (Src.length() != 17) {
+			if (Src.matches("bt-mtp://.*")) {
+				Src = Src.substring(9);
+				checkAddresses();
+			} else {
+				throw new MessageConvertException("Could not encode Message: SRC must be a valid Bluetooth Address (17 byte)");
+			}
+		}
+		
+		if (Dest.length() != 17) {
+			if (Dest.matches("bt-mtp://.*")) {
+				Dest = Dest.substring(9);
+				checkAddresses();
+			} else {
+				throw new MessageConvertException("Could not encode Message: DEST must be a valid Bluetooth Address (17 byte)");
+			}
+		}
+	}
+	
+	private void checkType() {
+		if (this.Type > TYPE_DESCRIPTIONS.length) {
+			throw new MessageConvertException("Could not encode Message: Type must be valid!");
+		}
+	}
+	
+	private void checkDataSize() {
+		int length = data.length;
+		if (length > Short.MAX_VALUE || length > DATA_MAX_SIZE) {
+			throw new MessageToLongException(data, DATA_MAX_SIZE);
+		}
+		this.dataSize = (short) length;
+}
+
 	private int insertByteArrayFromPosition(int pos, byte[] baseArr,
 			byte[] toInsert) {
 		int i;
-		for (i = 0; i < toInsert.length; i++) {
-			baseArr[pos + i] = toInsert[i];
+		try {
+			for (i = 0; i < toInsert.length; i++) {
+				baseArr[pos + i] = toInsert[i];
+			}
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return pos;
 		}
 		return pos + i;
 	}
-
-//	private byte[] joinByteArray(byte[] a, byte[] b) {
-//		if (a == null) {
-//			return b;
-//		} else if (b == null) {
-//			return a;
-//		}
-//		int count = a.length + b.length;
-//		byte[] result = new byte[count];
-//		for (int i = 0; i < a.length; i++) {
-//			result[i] = a[i];
-//		}
-//		for (int i = 0; i < b.length; i++) {
-//			result[a.length + i] = b[i];
-//		}
-//
-//		return result;
-//	}
 
 	public void newPaketID() {
 		this.pktId = UUID.randomUUID().toString();
@@ -195,7 +187,7 @@ public class DataPacket {
 	}
 
 	public String getDataAsString() {
-		return (data != null) ? new String(data) : new String();
+		return new String(data);
 	}
 
 	public IBluetoothDevice getDestinationDevice() {
@@ -215,8 +207,8 @@ public class DataPacket {
 		s.append(Dest);
 		s.append("\nType: ");
 		s.append(type);
-		if (data != null || dataSize < 100) {
-			s.append("\nContent: ");
+		if (dataSize < 100) {
+			s.append("\nContent (size" + dataSize + "/" + data.length + "): ");
 			s.append(getDataAsString());
 		}
 		return s.toString();

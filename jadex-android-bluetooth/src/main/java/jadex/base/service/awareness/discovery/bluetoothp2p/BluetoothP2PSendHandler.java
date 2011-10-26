@@ -27,7 +27,7 @@ public class BluetoothP2PSendHandler extends SendHandler
 	@Override
 	public void send(AwarenessInfo info)
 	{
-		Log.d(Helper.LOG_TAG, "BluetoothP2PSendHandler: sending Awareness Info");
+//		Log.d(Helper.LOG_TAG, "BluetoothP2PSendHandler: sending Awareness Info");
 		byte[] data = DiscoveryState.encodeObject(createAwarenessInfo(), getAgent().getMicroAgent().getClassLoader());
 		getAgent().sendAwarenessInfo(data);
 	}

@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -73,8 +72,7 @@ public abstract class AConnection implements IConnection {
 			reader.start();
 			writer.start();
 		}
-
-		/* Call this from the main Activity to send data to the remote device */
+		
 		private synchronized void _write(byte[] bytes) throws IOException {
 			try {
 				mmOutStream.write(bytes);
@@ -86,9 +84,12 @@ public abstract class AConnection implements IConnection {
 				throw e;
 			}
 		}
-
+		
+		/* Call this from the main Activity to send data to the remote device */
 		public void write(byte[] bytes) {
-			packetQueue.add(bytes);
+			if (running) {
+				packetQueue.add(bytes);
+			}
 		}
 
 		public synchronized void cancel() {
@@ -140,7 +141,7 @@ public abstract class AConnection implements IConnection {
 			@Override
 			public void run() {
 				setConnectionAlive(true);
-				byte[] buffer = new byte[1024]; // buffer store for the
+				byte[] buffer = new byte[DataPacket.PACKET_SIZE + 1]; // buffer store for the
 												// stream
 				int bytes; // bytes returned from read()
 				// Keep listening to the InputStream until an exception
@@ -149,6 +150,11 @@ public abstract class AConnection implements IConnection {
 					try {
 						// Read from the InputStream
 						bytes = mmInStream.read(buffer);
+						if (bytes > DataPacket.PACKET_SIZE) {
+							mmInStream.skip(mmInStream.available());
+							Log.e(Helper.LOG_TAG, "Received a DataPacket which is too big for the receivebuffer! Dropping.");
+							continue;
+						}
 						// Send the obtained bytes to the UI Activity
 						DataPacket dataPacket = new DataPacket(buffer);
 						// BluetoothMessage bluetoothMessage = new

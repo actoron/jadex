@@ -40,7 +40,7 @@ public class DataPacketSerializable implements Serializable {
 	private byte[] data;
 
 	// this is copied from BTClick. Setting higher values should work just fine.
-	public static final int PACKET_SIZE = 1024;
+	public static final int PACKET_SIZE = DataPacket.PACKET_SIZE;
 	public static final int HEADER_SIZE = 1 + 17 + 17 + 1 + 2 + 1;
 	public static final int DATA_MAX_SIZE = PACKET_SIZE - HEADER_SIZE;
 
@@ -58,7 +58,7 @@ public class DataPacketSerializable implements Serializable {
 		if (data != null) {
 			int length = data.length;
 			if (length > Short.MAX_VALUE || length > DATA_MAX_SIZE) {
-				throw new MessageToLongException(data, data.length);
+				throw new MessageToLongException(data, DATA_MAX_SIZE);
 			}
 			this.dataSize = (short) length;
 		} else {

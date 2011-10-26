@@ -1,18 +1,31 @@
 package de.unihamburg.vsis.jadexAndroid_test;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.xml.annotation.XMLClassname;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -26,8 +39,7 @@ public class AwarenessActivity extends BaseActivity {
 	private ArrayAdapter<RemoteComponentIdentifier> listAdapter;
 
 	private String platformID;
-	
-	
+
 	public AwarenessActivity() {
 	}
 
@@ -42,7 +54,8 @@ public class AwarenessActivity extends BaseActivity {
 		platformID = randomUUID.toString().substring(0, 5);
 
 		ListView listView = findListViewById(R.id.awareness_activity_listView1);
-		listAdapter = new ArrayAdapter<RemoteComponentIdentifier>(this, R.layout.componentidentifier_listitem);
+		listAdapter = new ArrayAdapter<RemoteComponentIdentifier>(this,
+				R.layout.componentidentifier_listitem);
 
 		Button exitButton = findButtonById(R.id.awareness_activity_button1);
 		exitButton.setOnClickListener(new OnClickListener() {
@@ -51,27 +64,30 @@ public class AwarenessActivity extends BaseActivity {
 			public void onClick(View arg0) {
 				if (extAcc != null) {
 					IFuture killComponent = extAcc.killComponent();
-					killComponent.addResultListener(new DefaultResultListener() {
+					killComponent
+							.addResultListener(new DefaultResultListener() {
 
-						@Override
-						public void resultAvailable(Object result) {
-							runOnUiThread(new Runnable() {
 								@Override
-								public void run() {
-									AwarenessActivity.this.finish();
+								public void resultAvailable(Object result) {
+									runOnUiThread(new Runnable() {
+										@Override
+										public void run() {
+											AwarenessActivity.this.finish();
+										}
+									});
+								}
+
+								@Override
+								public void exceptionOccurred(
+										Exception exception) {
+									Message message = handler.obtainMessage();
+									Bundle data = new Bundle();
+									data.putString("text",
+											"Platform already stopped. (why?)");
+									message.setData(data);
+									message.sendToTarget();
 								}
 							});
-						}
-
-						@Override
-						public void exceptionOccurred(Exception exception) {
-								Message message = handler.obtainMessage();
-								Bundle data = new Bundle();
-								data.putString("text", "Platform already stopped. (why?)");
-								message.setData(data);
-								message.sendToTarget();
-						}
-					});
 				}
 			}
 		});
@@ -85,11 +101,12 @@ public class AwarenessActivity extends BaseActivity {
 				runOnUiThread(new Runnable() {
 
 					public void run() {
-						Toast makeText = Toast.makeText(AwarenessActivity.this, msg.getData().getString("text"),
+						Toast makeText = Toast.makeText(AwarenessActivity.this,
+								msg.getData().getString("text"),
 								Toast.LENGTH_SHORT);
 						makeText.show();
-						RemoteComponentIdentifier id = (RemoteComponentIdentifier) msg.getData().getSerializable(
-								"identifier");
+						RemoteComponentIdentifier id = (RemoteComponentIdentifier) msg
+								.getData().getSerializable("identifier");
 						if (id != null) {
 							String method = msg.getData().getString("method");
 							if ("add".equals(method)) {
@@ -106,62 +123,86 @@ public class AwarenessActivity extends BaseActivity {
 		new Thread(new Runnable() {
 			public void run() {
 
-				IFuture future = Startup.startBluetoothPlatform("Platform-" + platformID);
+				IFuture future = Startup.startBluetoothPlatform("Platform-"
+						+ platformID);
 				future.addResultListener(platformResultListener);
 			}
 		}).start();
+		
+		listView.setOnItemClickListener(remotePlattformOnClickListener);
 	}
 
-	private IResultListener platformResultListener = new DefaultResultListener() {
+	private IResultListener<IExternalAccess> platformResultListener = new DefaultResultListener<IExternalAccess>() {
 
 		@Override
-		public void resultAvailable(Object result) {
+		public void resultAvailable(IExternalAccess result) {
 			extAcc = (IExternalAccess) result;
 			runOnUiThread(new Runnable() {
 
 				public void run() {
-					IComponentIdentifier componentIdentifier = extAcc.getComponentIdentifier();
+					IComponentIdentifier componentIdentifier = extAcc
+							.getComponentIdentifier();
 					textView.setText("Platform started: Platform-" + platformID);
 				}
 			});
 
-			// IFuture scheduleStep = extAcc.scheduleStep(new IComponentStep() {
-			// @XMLClassname("create-component")
-			// public Object execute(IInternalAccess ia) {
-			// Future ret = new Future();
-			// SServiceProvider.getService(ia.getServiceContainer(),
-			// IComponentManagementService.class,
-			// RequiredServiceInfo.SCOPE_PLATFORM)
-			// .addResultListener(
-			// ia.createResultListener(new DelegationResultListener(
-			// ret)));
-			//
-			// return ret;
-			// }
-			// });
-			// scheduleStep.addResultListener(new DefaultResultListener() {
-			//
-			// public void resultAvailable(Object arg0) {
-			// IComponentManagementService cms = (IComponentManagementService)
-			// arg0;
-			// HashMap<String, Object> args = new HashMap<String, Object>();
-			// // args.put("num", new Integer(1));
-			// // args.put("max", new Integer(2));
-			//
-			// args.put("context", AwarenessActivity.this);
-			//
-			// runOnUiThread(new Runnable() {
-			//
-			// public void run() {
-			// }
-			// });
-			// cms.createComponent(
-			// "notifierAgent",
-			// AwarenessNotifierAgent.class.getName().replaceAll(
-			// "\\.", "/")
-			// + ".class", new CreationInfo(args), null);
-			// }
-			// });
+			IFuture<IComponentManagementService> scheduleStep = extAcc
+					.scheduleStep(new IComponentStep<IComponentManagementService>() {
+						@XMLClassname("create-component")
+						public IFuture<IComponentManagementService> execute(
+								IInternalAccess ia) {
+							Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
+							SServiceProvider.getService(
+									ia.getServiceContainer(),
+									IComponentManagementService.class,
+									RequiredServiceInfo.SCOPE_PLATFORM)
+									// ia.getRequiredService("cms")
+									.addResultListener(
+											ia.createResultListener(new DelegationResultListener<IComponentManagementService>(
+													ret)));
+							return ret;
+						}
+					});
+
+			scheduleStep
+					.addResultListener(new DefaultResultListener<IComponentManagementService>() {
+						@XMLClassname("create-awarenessactivityagent")
+						public void resultAvailable(
+								IComponentManagementService arg0) {
+							IComponentManagementService cms = (IComponentManagementService) arg0;
+							HashMap<String, Object> args = new HashMap<String, Object>();
+							Log.i(Helper.LOG_TAG, "Starting AwarenessActivityAgent...");
+							cms.createComponent("AwarenessActivityAgent",
+									AwarenessActivityAgent.class.getName()
+											.replaceAll("\\.", "/") + ".class",
+									new CreationInfo(args), null).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
+										@Override
+										public void resultAvailable(
+												IComponentIdentifier result) {
+											// agent created!
+											Log.i(Helper.LOG_TAG, "AwarenessActivityAgent created!");
+										}
+									});
+						}
+					});
 		}
 	};
+
+	private OnItemClickListener remotePlattformOnClickListener = new OnItemClickListener() {
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			RemoteComponentIdentifier item = (RemoteComponentIdentifier) parent.getItemAtPosition(position);
+			IFuture ret = AwarenessActivityAgent.instance.getRemoteComponents(item);
+			ret.addResultListener(new DefaultResultListener() {
+				@Override
+				public void resultAvailable(Object result) {
+					Log.i(Helper.LOG_TAG, "AwarenessActivity: received result from Agent!");					
+				}
+			});
+		}
+	};
+
 }
