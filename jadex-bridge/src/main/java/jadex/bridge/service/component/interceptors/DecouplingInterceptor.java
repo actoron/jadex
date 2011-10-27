@@ -3,17 +3,17 @@ package jadex.bridge.service.component.interceptors;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.JadexCloner;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.commons.SReflect;
+import jadex.bridge.service.types.marshal.IMarshalService;
+import jadex.commons.Cloner;
+import jadex.commons.IFilter;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -71,6 +71,12 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	/** The argument copy allowed flag. */
 	protected boolean copy;
 	
+	/** The marshal service. */
+	protected IMarshalService marshal;
+	
+	/** The clone filter (fascade for marshal). */
+	protected IFilter filter;
+	
 	//-------- constructors --------
 	
 	/**
@@ -90,14 +96,50 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	 *  @param args The argument(s) for the call.
 	 *  @return The result of the command.
 	 */
-	public IFuture doExecute(ServiceInvocationContext sic)
+	public IFuture<Void> doExecute(final ServiceInvocationContext sic)
 	{
-		Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
+		
+		// Fetch marshal service first time.
+		
+		if(marshal==null)
+		{
+			SServiceProvider.getService(ea.getServiceProvider(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
+			{
+				public void customResultAvailable(IMarshalService result)
+				{
+					marshal = result;
+					filter = new IFilter()
+					{
+						public boolean filter(Object object)
+						{
+							return marshal.isLocalReference(object);
+						}
+					}; 
+					internalDoExecute(sic).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
+		else
+		{
+			internalDoExecute(sic).addResultListener(new DelegationResultListener<Void>(ret));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Internal do execute.
+	 */
+	public IFuture<Void> internalDoExecute(final ServiceInvocationContext sic)
+	{
+		final Future<Void> ret = new Future<Void>();
 		
 		// Perform argument copy
 		
 		// In case of remote call parameters are copied as part of marshalling.
-		if(copy && !SServiceProvider.isRemoteObject(sic.getObject()))
+		if(copy && !marshal.isRemoteObject(sic.getObject()))
 		{
 			Method method = sic.getMethod();
 			boolean[] refs = SServiceProvider.getLocalReferenceInfo(method, !copy);
@@ -108,11 +150,11 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			{
 				for(int i=0; i<args.length; i++)
 				{
-					boolean ref = refs[i] || SServiceProvider.isLocalReference(args[i]);
+					boolean ref = refs[i] || marshal.isLocalReference(args[i]);
 					
 //					if(!ref && args[i]!=null)
 //						System.out.println("copy arg: "+args[i]);
-					copyargs.add(ref? args[i]: JadexCloner.deepCloneObject(args[i]));
+					copyargs.add(ref? args[i]: Cloner.deepCloneObject(args[i], marshal.getCloneProcessors(), filter));
 				}
 //				System.out.println("call: "+method.getName()+" "+notcopied+" "+SUtil.arrayToString(method.getParameterTypes()));//+" "+SUtil.arrayToString(args));
 				sic.setArguments(copyargs);

@@ -9,10 +9,11 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.IMicroExternalAccess;
@@ -41,18 +42,26 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	public IFuture	agentCreated()
+	public IFuture<Void>	agentCreated()
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		SServiceProvider.getService(getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DelegationResultListener(ret)
+			.addResultListener(createResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(final ILibraryService libservice)
 			{
-				final ILibraryService libservice = (ILibraryService)result;
-				rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), libservice);
-				addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
-				ret.setResult(null);
+//				final ILibraryService libservice = (ILibraryService)result;
+				
+				SServiceProvider.getService(getServiceContainer(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
+				{
+					public void customResultAvailable(final IMarshalService marshalservice)
+					{
+						rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), libservice, marshalservice);
+						addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+						ret.setResult(null);
+					}
+				}));
 			}
 		}));
 		return ret;

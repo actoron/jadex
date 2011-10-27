@@ -15,7 +15,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.
 	 */
-	public IFuture execute(ServiceInvocationContext sic)
+	public IFuture<Void> execute(ServiceInvocationContext sic)
 	{
 		try
 		{
@@ -50,6 +50,7 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 //				};
 			}
 		}
+		
 		return IFuture.DONE;
 	}
 }

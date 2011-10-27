@@ -57,9 +57,9 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.
 	 */
-	public IFuture execute(final ServiceInvocationContext sic)
+	public IFuture<Void> execute(final ServiceInvocationContext sic)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		Object service = sic.getObject();
 		if(service instanceof ServiceInfo)

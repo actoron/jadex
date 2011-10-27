@@ -3,7 +3,7 @@ package jadex.commons;
 import java.util.List;
 
 /**
- *  Processor for intercepting 
+ *  Processor for customizing the object cloner.
  */
 public interface ICloneProcessor
 {

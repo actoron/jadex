@@ -8,6 +8,7 @@ import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -84,7 +85,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			WriteContext context = new WriteContext(null, target, null, null);
 			for(int i=0; i<parametertypes.length; i++)
 			{
-				if(refs[i] || SServiceProvider.isRemoteReference(parametervalues[i]))
+				if(refs[i] || rrm.getMarshalService().isRemoteReference(parametervalues[i]))
 				{
 //					System.out.println("found ref: "+parametervalues[i]);
 					parametervalues[i] = preproc.preProcess(context, parametervalues[i]);

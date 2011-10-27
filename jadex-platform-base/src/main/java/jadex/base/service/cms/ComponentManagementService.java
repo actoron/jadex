@@ -29,6 +29,7 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.ResourceInfo;
@@ -103,6 +104,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	
 	/** The message service (cached to avoid using futures). */
 	protected IMessageService	msgservice;
+	
+	/** The marshal service (cached to avoid using futures). */
+	protected IMarshalService	marshalservice;
 	
 	/** The root component. */
 	protected IComponentAdapter root;
@@ -293,7 +297,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		if(cinfo.getParent()!=null && isRemoteComponent(cinfo.getParent()))
 		{
 			final IResultListener<Map<String, Object>>	rkilllis;
-			if(killlistener!=null && !SServiceProvider.isRemoteReference(killlistener))//(killlistener instanceof IRemotable))
+			if(killlistener!=null && !marshalservice.isRemoteReference(killlistener))//(killlistener instanceof IRemotable))
 			{
 				Future<Map<String, Object>>	kill	= new Future<Map<String, Object>>();
 				rkilllis	= new RemoteDelegationResultListener<Map<String, Object>>(kill);
@@ -2541,75 +2545,85 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			public void customResultAvailable(Object result)
 			{
-				final boolean[]	services = new boolean[2];
-				
+//				final boolean[]	services = new boolean[2];
 				SServiceProvider.getService(exta.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
 						exeservice	= (IExecutionService)result;
-						boolean	setresult;
-						synchronized(services)
+						
+						SServiceProvider.getService(exta.getServiceProvider(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 						{
-							services[0]	= true;
-							setresult	= services[0] && services[1];
-						}
-						if(setresult)
-							ret.setResult(null);
+							public void resultAvailable(Object result)
+							{
+								marshalservice	= (IMarshalService)result;
+						
+								SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
+								{
+									public void customResultAvailable(Object result)
+									{
+										msgservice	= (IMessageService)result;
+										
+		//								boolean	setresult;
+		//								synchronized(services)
+		//								{
+		//									services[1]	= true;
+		//									setresult	= services[0] && services[1];
+		//								}
+										
+										// add root adapter and register root component
+										if(root!=null)
+										{
+											if(msgservice!=null)
+											{
+		//										msgservice.signalStarted().addResultListener(new IResultListener()
+		//										{
+		//											public void resultAvailable(Object result)
+		//											{
+														synchronized(adapters)
+														{
+															// Hack?! Need to set transport addresses on root id.
+															((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(msgservice.getAddresses());
+		//													System.out.println("root: "+SUtil.arrayToString(msgservice.getAddresses())+" "+root.getComponentIdentifier().hashCode());
+															adapters.put(root.getComponentIdentifier(), root);
+														}
+		//											}
+													
+		//											public void exceptionOccurred(Exception exception)
+		//											{
+		//											}
+		//										});
+											}
+											else
+											{
+												synchronized(adapters)
+												{
+													adapters.put(root.getComponentIdentifier(), root);
+												}
+											}
+										}
+										
+		//								if(setresult)
+		//									ret.setResult(null);
+		//									ret.setResult(getServiceIdentifier());
+										ret.setResult(null);
+									}
+								});
+							}
+						});
+//						boolean	setresult;
+//						synchronized(services)
+//						{
+//							services[0]	= true;
+//							setresult	= services[0] && services[1];
+//						}
+//						if(setresult)
+//							ret.setResult(null);
 //							ret.setResult(getServiceIdentifier());
 					}
 				});
 				
-				SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
-				{
-					public void customResultAvailable(Object result)
-					{
-						msgservice	= (IMessageService)result;
-						
-						boolean	setresult;
-						synchronized(services)
-						{
-							services[1]	= true;
-							setresult	= services[0] && services[1];
-						}
-						
-						// add root adapter and register root component
-						if(root!=null)
-						{
-							if(msgservice!=null)
-							{
-//								msgservice.signalStarted().addResultListener(new IResultListener()
-//								{
-//									public void resultAvailable(Object result)
-//									{
-										synchronized(adapters)
-										{
-											// Hack?! Need to set transport addresses on root id.
-											((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(msgservice.getAddresses());
-//											System.out.println("root: "+SUtil.arrayToString(msgservice.getAddresses())+" "+root.getComponentIdentifier().hashCode());
-											adapters.put(root.getComponentIdentifier(), root);
-										}
-//									}
-									
-//									public void exceptionOccurred(Exception exception)
-//									{
-//									}
-//								});
-							}
-							else
-							{
-								synchronized(adapters)
-								{
-									adapters.put(root.getComponentIdentifier(), root);
-								}
-							}
-						}
-						
-						if(setresult)
-							ret.setResult(null);
-//							ret.setResult(getServiceIdentifier());
-					}
-				});
+			
 			}
 		});
 		

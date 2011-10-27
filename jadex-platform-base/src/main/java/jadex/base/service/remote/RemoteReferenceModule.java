@@ -21,6 +21,7 @@ import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
@@ -95,6 +96,9 @@ public class RemoteReferenceModule
 	/** The library service. */
 	protected ILibraryService libservice;
 	
+	/** The marshal service. */
+	protected IMarshalService marshalservice;
+	
 	/** The renew behaviour id. */
 	protected long renewid;
 	
@@ -109,10 +113,11 @@ public class RemoteReferenceModule
 	/**
 	 *  Create a new remote reference module.
 	 */
-	public RemoteReferenceModule(RemoteServiceManagementService rsms, ILibraryService libservice)
+	public RemoteReferenceModule(RemoteServiceManagementService rsms, ILibraryService libservice, IMarshalService marshalservice)
 	{
 		this.rsms = rsms;
 		this.libservice = libservice;
+		this.marshalservice = marshalservice;
 		this.timer	= new Timer(true);
 		
 		this.proxyinfos = new LRU(200);
@@ -616,9 +621,9 @@ public class RemoteReferenceModule
 	 *  Shutdown the module.
 	 *  Sends notifications to all 
 	 */
-	protected IFuture	shutdown()
+	protected IFuture<Void>	shutdown()
 	{
-		Future	ret	= new Future();
+		Future<Void>	ret	= new Future<Void>();
 		checkThread();
 		timer.cancel();
 		
@@ -1237,6 +1242,15 @@ public class RemoteReferenceModule
 				Thread.dumpStack();
 			}
 		}
+	}
+
+	/**
+	 *  Get the marshalservice.
+	 *  @return the marshalservice.
+	 */
+	public IMarshalService getMarshalService()
+	{
+		return marshalservice;
 	}
 	
 //	Code for retrying a command

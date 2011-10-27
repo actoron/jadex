@@ -3,9 +3,6 @@ package jadex.commons;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -18,14 +15,20 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
 
+/**
+ *  The cloner is able to clone Java objects by field copying.
+ *  
+ *  Extension points:
+ *  - ICloneProcessors: allow perform cloning by hand for certain objects
+ *  - IFilter: allow keeping objects with reference semantics (filter out objects from cloning)
+ */
 public class Cloner
 {
+	//-------- static attributes --------
+	
 	/** The static immutable types. */
 	protected static final Set immutabletypes;
 	
-	/** The immutable types. */
-	protected Set myimmutabletypes;
-
 	/** The default cloner. */
 	protected static Cloner instance;
 	
@@ -51,6 +54,13 @@ public class Cloner
 		immutabletypes.add(String.class);
 	}
 	
+	//-------- attributes --------
+	
+//	/** The immutable types. */
+//	protected Set myimmutabletypes;
+
+	//-------- methods --------
+
 	/**
 	 *  Get the default cloner instance.
 	 */
@@ -74,7 +84,7 @@ public class Cloner
 	 */
 	public static Object deepCloneObject(Object object)
 	{
-		return getInstance().deepClone(object, null, new HashMap(), null);
+		return getInstance().deepClone(object, null, new HashMap(), null, null);
 	}
 	
 	/**
@@ -82,7 +92,15 @@ public class Cloner
 	 */
 	public static Object deepCloneObject(Object object, List processors)
 	{
-		return getInstance().deepClone(object, null, new HashMap(), processors);
+		return getInstance().deepClone(object, null, new HashMap(), processors, null);
+	}
+	
+	/**
+	 *  Deep clone an object.
+	 */
+	public static Object deepCloneObject(Object object, List processors, IFilter filter)
+	{
+		return getInstance().deepClone(object, null, new HashMap(), processors, filter);
 	}
 	
 	/**
@@ -90,7 +108,7 @@ public class Cloner
 	 */
 	public Object deepClone(Object object)
 	{
-		return deepClone(object, null, new HashMap(), null);
+		return deepClone(object, null, new HashMap(), null, null);
 	}
 	
 	/**
@@ -98,13 +116,21 @@ public class Cloner
 	 */
 	public Object deepClone(Object object, List processors)
 	{
-		return deepClone(object, null, new HashMap(), processors);
+		return deepClone(object, null, new HashMap(), processors, null);
+	}
+	
+	/**
+	 *  Deep clone an object.
+	 */
+	public Object deepClone(Object object, List processors, IFilter filter)
+	{
+		return deepClone(object, null, new HashMap(), processors, filter);
 	}
 
 	/**
 	 *  Deep clone an object.
 	 */
-	public Object deepClone(Object object, Class clazz, Map cloned, List processors)
+	public Object deepClone(Object object, Class clazz, Map cloned, List processors, IFilter filter)
 	{
 		Object ret = null;
 		
@@ -114,7 +140,7 @@ public class Cloner
 				clazz = object.getClass();
 		
 			boolean fin = false;
-			if(isImmutable(clazz))
+			if(isImmutable(clazz) || (filter!=null && filter.filter(object)))
 			{
 				ret = object;
 				fin = true;
@@ -148,7 +174,7 @@ public class Cloner
 					for(int i=0; i<length; i++) 
 					{
 						Object val = Array.get(object, i);
-						Array.set(ret, i, deepClone(val, type, cloned, processors));
+						Array.set(ret, i, deepClone(val, type, cloned, processors, filter));
 					}
 				}
 				else if(SReflect.isSupertype(Map.class, clazz))
@@ -213,7 +239,7 @@ public class Cloner
 	//					System.out.println("cloned: "+object.getClass());
 						ret = object.getClass().newInstance();
 						cloned.put(object, ret);
-						cloneFields(object, ret, cloned, processors);
+						cloneFields(object, ret, cloned, processors, filter);
 					}
 					catch(Exception e)
 					{
@@ -234,31 +260,31 @@ public class Cloner
 	public boolean isImmutable(Class clazz)
 	{
 		boolean ret = immutabletypes.contains(clazz);
-		if(!ret)
-		{
-			synchronized(this)
-			{
-				ret = myimmutabletypes!=null && myimmutabletypes.contains(clazz);
-			}
-		}
+//		if(!ret)
+//		{
+//			synchronized(this)
+//			{
+//				ret = myimmutabletypes!=null && myimmutabletypes.contains(clazz);
+//			}
+//		}
 		return ret;
 	}
 	
-	/**
-	 *  Add an immutable type.
-	 *  @param clazz The class.
-	 */
-	public synchronized void addImmutableType(Class clazz)
-	{
-		if(myimmutabletypes==null)
-			myimmutabletypes = new HashSet();
-		myimmutabletypes.add(clazz);
-	}
+//	/**
+//	 *  Add an immutable type.
+//	 *  @param clazz The class.
+//	 */
+//	public synchronized void addImmutableType(Class clazz)
+//	{
+//		if(myimmutabletypes==null)
+//			myimmutabletypes = new HashSet();
+//		myimmutabletypes.add(clazz);
+//	}
 	
 	/**
 	 *  Clone all fields of an object.
 	 */
-	protected void cloneFields(Object object, Object clone, Map cloned, List processors)
+	protected void cloneFields(Object object, Object clone, Map cloned, List processors, IFilter filter)
 	{
 		Class clazz = object.getClass();
 		while(clazz!=null && clazz!=Object.class) 
@@ -276,7 +302,7 @@ public class Cloner
 						val = fields[i].get(object);
 						if(val!=null) 
 						{
-							fields[i].set(clone, deepClone(val, fields[i].getType(), cloned, processors));
+							fields[i].set(clone, deepClone(val, fields[i].getType(), cloned, processors, filter));
 						}
 					}
 					catch(Exception e)

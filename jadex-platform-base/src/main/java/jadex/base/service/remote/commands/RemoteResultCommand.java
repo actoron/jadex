@@ -7,6 +7,7 @@ import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.IMicroExternalAccess;
@@ -74,7 +75,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	{
 		if(result!=null)
 		{
-			if(isref || SServiceProvider.isRemoteReference(result))
+			if(isref || rrm.getMarshalService().isRemoteReference(result))
 			{
 				RMIPreProcessor preproc = new RMIPreProcessor(rrm);
 				WriteContext context = new WriteContext(null, target, null, null);

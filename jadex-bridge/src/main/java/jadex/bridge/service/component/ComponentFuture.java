@@ -3,9 +3,10 @@ package jadex.bridge.service.component;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.JadexCloner;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.marshal.IMarshalService;
+import jadex.commons.Cloner;
+import jadex.commons.IFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -28,20 +29,31 @@ public class ComponentFuture<E> extends Future<E>
 	/** The result copy flag. */
 	protected boolean copy;
 	
-	/** The source. */
-//	protected IFuture source;
+	/** The marshal manager. */
+	protected IMarshalService marshal;
+	
+	/** The clone filter. */
+	protected IFilter filter;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new future.
 	 */
-	public ComponentFuture(IExternalAccess ea, IComponentAdapter adapter, IFuture source, boolean copy)
+	public ComponentFuture(IExternalAccess ea, IComponentAdapter adapter, IFuture source, 
+		boolean copy, final IMarshalService marshal)
 	{
 		this.ea	= ea;
 		this.adapter	= adapter;
 		this.copy = copy;
-//		this.source = source;
+		this.marshal = marshal;
+		this.filter = new IFilter()
+		{
+			public boolean filter(Object object)
+			{
+				return marshal.isLocalReference(object);
+			}
+		};
 		source.addResultListener(new DelegationResultListener<E>(this));
 	}
 	
@@ -80,11 +92,11 @@ public class ComponentFuture<E> extends Future<E>
 		// - and result is not a reference object
     	if(copy && result!=null)
 		{
-			boolean copy = !SServiceProvider.isLocalReference(result);
+			boolean copy = !marshal.isLocalReference(result);
 			if(copy)
 			{
 //				System.out.println("copy result: "+result);
-				result = (E)JadexCloner.deepCloneObject(result);
+				result = (E)Cloner.deepCloneObject(result, marshal.getCloneProcessors(), filter);
 			}
 		}
 		super.setResult(result);

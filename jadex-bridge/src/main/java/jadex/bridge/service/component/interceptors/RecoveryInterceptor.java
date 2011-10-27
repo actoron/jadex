@@ -60,12 +60,12 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.
 	 */
-	public IFuture execute(final ServiceInvocationContext sic)
+	public IFuture<Void> execute(final ServiceInvocationContext sic)
 	{
-		final Future ret = new Future();
-		sic.invoke().addResultListener(new IResultListener()
+		final Future<Void> ret = new Future<Void>();
+		sic.invoke().addResultListener(new IResultListener<Void>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Void result)
 			{
 				Object res = sic.getResult();
 				if(res instanceof IFuture)

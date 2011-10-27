@@ -5,6 +5,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceInvalidException;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -46,28 +47,28 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 	 *  Execute the interceptor.
 	 *  @param context The invocation context.
 	 */
-	public IFuture execute(final ServiceInvocationContext sic)
+	public IFuture<Void> execute(final ServiceInvocationContext sic)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
 		|| sic.getMethod().getReturnType().equals(void.class);
 
 		if(!scheduleable || ALWAYSOK.contains(sic.getMethod()))
 		{
-			sic.invoke().addResultListener(new DelegationResultListener(ret));
+			sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
 		{
 			// Call isValid() on proxy to execute full interceptor chain.
 			IService ser = (IService)sic.getProxy();
-			ser.isValid().addResultListener(new DelegationResultListener(ret)
+			ser.isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Boolean result)
 				{
-					if(((Boolean)result).booleanValue())
+					if(result.booleanValue())
 					{
-						sic.invoke().addResultListener(new DelegationResultListener(ret));
+						sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
 					}
 					else
 					{

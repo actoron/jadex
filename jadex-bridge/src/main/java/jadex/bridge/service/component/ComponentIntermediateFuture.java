@@ -1,19 +1,19 @@
 package jadex.bridge.service.component;
 
-import java.util.Collection;
-
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.JadexCloner;
-import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.marshal.IMarshalService;
+import jadex.commons.Cloner;
+import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+
+import java.util.Collection;
 
 /**
  *  The component future ensures that intermediate future notifications
@@ -32,16 +32,32 @@ public class ComponentIntermediateFuture<E> extends IntermediateFuture<E>
 	/** The parameter copy flag. */
 	protected boolean copy;
 	
+	/** The marshal manager. */
+	protected IMarshalService marshal;
+	
+	/** The clone filter. */
+	protected IFilter filter;
+
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new future.
 	 */
-	public ComponentIntermediateFuture(IExternalAccess ea, IComponentAdapter adapter, IFuture source, boolean copy)
+	public ComponentIntermediateFuture(IExternalAccess ea, IComponentAdapter adapter, IFuture source, 
+		boolean copy, final IMarshalService marshal)
 	{
 		this.ea	= ea;
 		this.adapter	= adapter;
 		this.copy = copy;
+		this.marshal = marshal;
+		this.filter = new IFilter()
+		{
+			public boolean filter(Object object)
+			{
+				return marshal.isLocalReference(object);
+			}
+		};
 		source.addResultListener(new IntermediateDelegationResultListener<E>(this));
 	}
 		
@@ -101,11 +117,11 @@ public class ComponentIntermediateFuture<E> extends IntermediateFuture<E>
 		// - and result is not a reference object
 		if(copy && result!=null)
 		{
-			boolean copy = !SServiceProvider.isLocalReference(result);
+			boolean copy = !marshal.isLocalReference(result);
 			if(copy)
 			{
 //				System.out.println("copy result: "+result);
-				result = (E)JadexCloner.deepCloneObject(result);
+				result = (E)Cloner.deepCloneObject(result, marshal.getCloneProcessors(), filter);
 			}
 		}
 		super.addIntermediateResult(result);

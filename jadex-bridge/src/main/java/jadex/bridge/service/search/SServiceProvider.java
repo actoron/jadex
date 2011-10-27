@@ -66,8 +66,8 @@ public class SServiceProvider
 	public static Map avisitdeciders;
 	public static Map visitdeciders;
 	
-	/** The reference class cache (clazz->boolean (is reference)). */
-	public static Map references;
+//	/** The reference class cache (clazz->boolean (is reference)). */
+//	public static Map references;
 	
 	/** The reference method cache (method -> boolean[] (is reference)). */
 	public static Map methodreferences;
@@ -88,7 +88,7 @@ public class SServiceProvider
 		visitdeciders.put(RequiredServiceInfo.SCOPE_PLATFORM, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_PLATFORM));
 		visitdeciders.put(RequiredServiceInfo.SCOPE_GLOBAL, new DefaultVisitDecider(false, RequiredServiceInfo.SCOPE_GLOBAL));
 
-		references = Collections.synchronizedMap(new LRU(500));
+//		references = Collections.synchronizedMap(new LRU(500));
 		methodreferences = Collections.synchronizedMap(new LRU(500));
 	}
 	
@@ -617,91 +617,91 @@ public class SServiceProvider
 		return ret;
 	}
 	
-	/**
-	 *  Test if an object has reference semantics. It is a reference when:
-	 *  - it implements IRemotable
-	 *  - it is an IService, IExternalAccess or IFuture
-	 *  - if the object has used an @Reference annotation at type level
-	 */
-	public static boolean isLocalReference(Object object)
-	{
-		return isReference(object, true);
-	}
-	
-	/**
-	 *  Test if an object has reference semantics. It is a reference when:
-	 *  - it implements IRemotable
-	 *  - it is an IService, IExternalAccess or IFuture
-	 *  - if the object has used an @Reference annotation at type level
-	 */
-	public static boolean isRemoteReference(Object object)
-	{
-		return isReference(object, false);
-	}
-		
-	/**
-	 *  Test if an object has reference semantics. It is a reference when:
-	 *  - it implements IRemotable
-	 *  - it is an IService, IExternalAccess or IFuture
-	 *  - if the object has used an @Reference annotation at type level
-	 */
-	public static boolean isReference(Object object, boolean local)
-	{
-		boolean ret = object instanceof IRemotable 
-			|| object instanceof IResultListener || object instanceof IIntermediateResultListener
-			|| object instanceof IFuture || object instanceof IIntermediateFuture
-			|| object instanceof IChangeListener || object instanceof IRemoteChangeListener;
-//			|| object instanceof IService;// || object instanceof IExternalAccess;
-		
-		if(!ret && object!=null)
-		{
-			boolean localret = ret;
-			boolean remoteret = ret;
-			
-			Class cl = object.getClass();
-			boolean[] isref = (boolean[])references.get(cl);
-			if(isref!=null)
-			{
-				ret = local? isref[0]: isref[1]; 
-			}
-			else
-			{
-				List todo = new ArrayList();
-				todo.add(cl);
-				
-				while(todo.size()>0)
-				{
-					Class clazz = (Class)todo.remove(0);
-					Reference ref = (Reference)clazz.getAnnotation(Reference.class);
-					if(ref!=null)
-					{
-						localret = ref.local();
-						remoteret = ref.remote();
-						break;
-					}
-					else
-					{
-						Class superclazz = clazz.getSuperclass();
-						if(superclazz!=null && !superclazz.equals(Object.class))
-							todo.add(superclazz);
-						Class[] interfaces = clazz.getInterfaces();
-						for(int i=0; i<interfaces.length; i++)
-						{
-							todo.add(interfaces[i]);
-						}
-					}
-				}
-				
-				references.put(cl, new boolean[]{localret, remoteret});
-				ret = local? localret: remoteret;
-//				System.out.println("refsize: "+references.size());
-			}
-		}
-		
-//		System.out.println("object ref? "+ret+" "+object.getClass()+" "+object);
-		
-		return ret;
-	}
+//	/**
+//	 *  Test if an object has reference semantics. It is a reference when:
+//	 *  - it implements IRemotable
+//	 *  - it is an IService, IExternalAccess or IFuture
+//	 *  - if the object has used an @Reference annotation at type level
+//	 */
+//	public static boolean isLocalReference(Object object)
+//	{
+//		return isReference(object, true);
+//	}
+//	
+//	/**
+//	 *  Test if an object has reference semantics. It is a reference when:
+//	 *  - it implements IRemotable
+//	 *  - it is an IService, IExternalAccess or IFuture
+//	 *  - if the object has used an @Reference annotation at type level
+//	 */
+//	public static boolean isRemoteReference(Object object)
+//	{
+//		return isReference(object, false);
+//	}
+//		
+//	/**
+//	 *  Test if an object has reference semantics. It is a reference when:
+//	 *  - it implements IRemotable
+//	 *  - it is an IService, IExternalAccess or IFuture
+//	 *  - if the object has used an @Reference annotation at type level
+//	 */
+//	public static boolean isReference(Object object, boolean local)
+//	{
+//		boolean ret = object instanceof IRemotable 
+//			|| object instanceof IResultListener || object instanceof IIntermediateResultListener
+//			|| object instanceof IFuture || object instanceof IIntermediateFuture
+//			|| object instanceof IChangeListener || object instanceof IRemoteChangeListener;
+////			|| object instanceof IService;// || object instanceof IExternalAccess;
+//		
+//		if(!ret && object!=null)
+//		{
+//			boolean localret = ret;
+//			boolean remoteret = ret;
+//			
+//			Class cl = object.getClass();
+//			boolean[] isref = (boolean[])references.get(cl);
+//			if(isref!=null)
+//			{
+//				ret = local? isref[0]: isref[1]; 
+//			}
+//			else
+//			{
+//				List todo = new ArrayList();
+//				todo.add(cl);
+//				
+//				while(todo.size()>0)
+//				{
+//					Class clazz = (Class)todo.remove(0);
+//					Reference ref = (Reference)clazz.getAnnotation(Reference.class);
+//					if(ref!=null)
+//					{
+//						localret = ref.local();
+//						remoteret = ref.remote();
+//						break;
+//					}
+//					else
+//					{
+//						Class superclazz = clazz.getSuperclass();
+//						if(superclazz!=null && !superclazz.equals(Object.class))
+//							todo.add(superclazz);
+//						Class[] interfaces = clazz.getInterfaces();
+//						for(int i=0; i<interfaces.length; i++)
+//						{
+//							todo.add(interfaces[i]);
+//						}
+//					}
+//				}
+//				
+//				references.put(cl, new boolean[]{localret, remoteret});
+//				ret = local? localret: remoteret;
+////				System.out.println("refsize: "+references.size());
+//			}
+//		}
+//		
+////		System.out.println("object ref? "+ret+" "+object.getClass()+" "+object);
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Get the copy info for method parameters.
@@ -783,36 +783,36 @@ public class SServiceProvider
 		return ret;
 	}
 	
-	/**
-	 *  Test if a call is remote.
-	 *  @param sic The service invocation context.
-	 */
-	public static boolean isRemoteObject(Object target)
-	{
-		boolean ret = false;
-		if(Proxy.isProxyClass(target.getClass()))
-		{
-			Object handler = Proxy.getInvocationHandler(target);
-			if(handler instanceof BasicServiceInvocationHandler)
-			{
-				BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
-				// Hack! Needed for dynamically bound delegation services of composites (virtual)
-				ret = bsh.getDomainService()==null;
-				if(!ret)
-					return isRemoteObject(bsh.getDomainService());
-			}
-			else 
-			{
-				// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.base.service.remote
-				ret = Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
-			}
-		}
-		return ret;
-//		Object target = getObject();
+//	/**
+//	 *  Test if a call is remote.
+//	 *  @param sic The service invocation context.
+//	 */
+//	public static boolean isRemoteObject(Object target)
+//	{
+//		boolean ret = false;
 //		if(Proxy.isProxyClass(target.getClass()))
-//			System.out.println("blubb "+Proxy.getInvocationHandler(target).getClass().getName());
-//		return Proxy.isProxyClass(target.getClass()) && Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
-	}
+//		{
+//			Object handler = Proxy.getInvocationHandler(target);
+//			if(handler instanceof BasicServiceInvocationHandler)
+//			{
+//				BasicServiceInvocationHandler bsh = (BasicServiceInvocationHandler)handler;
+//				// Hack! Needed for dynamically bound delegation services of composites (virtual)
+//				ret = bsh.getDomainService()==null;
+//				if(!ret)
+//					return isRemoteObject(bsh.getDomainService());
+//			}
+//			else 
+//			{
+//				// todo: remove string based remote check! RemoteMethodInvocationHandler is in package jadex.base.service.remote
+//				ret = Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
+//			}
+//		}
+//		return ret;
+////		Object target = getObject();
+////		if(Proxy.isProxyClass(target.getClass()))
+////			System.out.println("blubb "+Proxy.getInvocationHandler(target).getClass().getName());
+////		return Proxy.isProxyClass(target.getClass()) && Proxy.getInvocationHandler(target).getClass().getName().indexOf("Remote")!=-1;
+//	}
 	
 //	/**
 //	 *  Get the copy info for method parameters.

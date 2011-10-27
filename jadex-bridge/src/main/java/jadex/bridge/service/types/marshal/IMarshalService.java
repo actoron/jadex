@@ -1,0 +1,91 @@
+package jadex.bridge.service.types.marshal;
+
+import jadex.bridge.service.annotation.Excluded;
+import jadex.bridge.service.annotation.Reference;
+import jadex.commons.ICloneProcessor;
+
+import java.util.List;
+
+/**
+ *  Interface for marshalling functionalities.
+ */
+public interface IMarshalService
+{
+	//-------- class reference management --------
+
+	/**
+	 *  Test if is local reference.
+	 */
+	@Excluded
+	public boolean isLocalReference(Object object);
+	
+	/**
+	 *  Test if is remote reference.
+	 */
+	@Excluded
+	public boolean isRemoteReference(Object object);
+	
+	/**
+	 *  Register a class with reference values for local and remote.
+	 */
+	@Excluded
+	public void setReferenceProperties(Class clazz, boolean localref, boolean remoteref);
+	
+	/**
+	 *  Test if an object is a remote object.
+	 */
+	@Excluded
+	public boolean isRemoteObject(Object object);
+	
+	//-------- local clone processors --------
+	
+	/**
+	 *  Get the clone processors.
+	 */
+	@Excluded
+	public List<ICloneProcessor> getCloneProcessors();
+	
+	/**
+	 *  Add a clone processor.
+	 */
+	@Excluded
+	public void addCloneProcessor(@Reference ICloneProcessor proc);
+		
+	/**
+	 *  Remove a clone processor.
+	 */
+	@Excluded
+	public void removeCloneProcessor(@Reference ICloneProcessor proc);
+
+	//-------- remote clone processors --------
+
+//	/**
+//	 *  Add a rmi preprocessor.
+//	 */
+//	public IFuture<Void> addRMIPreProcessor(@Reference IRMIPreprocessor proc);
+//		
+//	/**
+//	 *  Remove a rmi postprocessor.
+//	 */
+//	public IFuture<Void> removeRMIPreProcessor(@Reference IRMIPreprocessor proc);
+//	
+//	/**
+//	 *  Add a rmi postprocessor.
+//	 */
+//	public IFuture<Void> addRMIPostProcessor(@Reference IRMIPostprocessor proc);
+//		
+//	/**
+//	 *  Remove a rmi postprocessor.
+//	 */
+//	public IFuture<Void> removeRMIPostProcessor(@Reference IRMIPostprocessor proc);
+//	
+//	/**
+//	 *  Get the rmi preprocessors.
+//	 */
+//	public IIntermediateFuture<IRMIPreProcessor> getRMIPreProcessors();
+//	
+//	/**
+//	 *  Get the rmi postprocessors.
+//	 */
+//	public IIntermediateFuture<IRMIPostProcessor> getRMIPostProcessors();
+}

@@ -1,5 +1,6 @@
 package jadex.base.service.remote.commands;
 
+import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteReference;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
@@ -51,9 +52,9 @@ public class RemoteDGCAddReferenceCommand extends AbstractRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
+	public IFuture<IRemoteCommand> execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
-		final Future ret = new Future();
+		final Future<IRemoteCommand> ret = new Future<IRemoteCommand>();
 		try
 		{
 			rsms.getRemoteReferenceModule().addRemoteReference(rr, holder);

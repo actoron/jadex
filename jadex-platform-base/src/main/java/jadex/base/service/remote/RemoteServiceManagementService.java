@@ -23,6 +23,7 @@ import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.TypeResultSelector;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IRemotable;
@@ -119,19 +120,24 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** The timer. */
 	protected Timer	timer;
 	
+	/** The marshal service. */
+	protected IMarshalService marshal;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new remote service management service.
 	 */
-	public RemoteServiceManagementService(IMicroExternalAccess component,ILibraryService libservice)
+	public RemoteServiceManagementService(IMicroExternalAccess component, 
+		ILibraryService libservice, final IMarshalService marshal)
 	{
 		super(component.getServiceProvider().getId(), IRemoteServiceManagementService.class, null);
 
 		this.component = component;
-		this.rrm = new RemoteReferenceModule(this, libservice);
+		this.rrm = new RemoteReferenceModule(this, libservice, marshal);
 		this.waitingcalls = new HashMap();
 		this.timer	= new Timer(true);
+		this.marshal = marshal;
 		
 		QName[] pr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyReference")};
 		
@@ -163,7 +169,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //				if(object instanceof RemoteResultCommand)
 //					System.out.println("huhuhu");
 				
-				if(SServiceProvider.isRemoteReference(object))
+				if(marshal.isRemoteReference(object))
 				{
 //					System.out.println("changed: "+object.getClass()+" "+object);
 					object = preproc.preProcess(wc, object);
@@ -179,13 +185,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				
 				if(object!=null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class))
 				{
-					System.out.println("test");
+//					System.out.println("test");
 					// Check if the argument type refers to the pojo service
 //					Service ser = object.getClass().getAnnotation(Service.class);
 //					if(SReflect.isSupertype(ser.value(), sic.getMethod().getParameterTypes()[i]))
 					{
 						object = BasicServiceInvocationHandler.getPojoServiceProxy(object);
-						System.out.println("proxy: "+object);
+//						System.out.println("proxy: "+object);
 					}
 				}
 				
