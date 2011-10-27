@@ -627,7 +627,7 @@
 		<profile>
 			<id>jadex-android-artifacts</id>
 			<build>
-				<finalName>jadex-android-${project.version}</finalName>
+				<finalName>jadex-android-0.0.2-SNAPSHOT</finalName>
 			</build>
 			<modules>
 				<module>jadex-android-parent</module>
@@ -645,7 +645,7 @@
 		<profile>
 			<id>jadex-android-dist</id>
 			<build>
-			<finalName>jadex-android-0.0.1</finalName>
+			<finalName>jadex-android-0.0.2-SNAPSHOT</finalName>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
