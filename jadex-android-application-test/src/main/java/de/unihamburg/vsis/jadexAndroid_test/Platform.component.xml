@@ -80,8 +80,8 @@
 		<argument name="adapterfactory" class="Class">ComponentAdapterFactory.class</argument>
 		<!-- Tell starter to print welcome message. -->
 		<argument name="welcome" class="boolean">true</argument>
-		
-		<!-- ======== Arguments used by platform components. ======== -->
+	
+				<!-- ======== Arguments used by platform components. ======== -->
 		
 		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
 		<argument name="awareness" class="boolean">true</argument>
@@ -93,6 +93,8 @@
 		<argument name="simulation" class="boolean">false</argument>
 		<!-- Additional library paths (classpath entries) for loading agent models and classes. -->
 		<argument name="libpath" class="String"></argument>
+		<!-- The base classloader. -->
+		<argument name="baseclassloader" class="ClassLoader"></argument>
 		<!-- Port for TCP transport. -->
 		<argument name="tcpport" class="int">9876</argument>
 		<!-- Port for NIOTCP transport. -->
@@ -103,8 +105,10 @@
 		<argument name="awaexcludes" class="String">""</argument>
 		<!-- Flag if copying parameters for local service calls is allowed. -->
 		<argument name="parametercopy" class="boolean">true</argument>
-		<!-- Flag if nio typ or normal tcp transport should be used. -->
+		<!-- Flag if nio type or normal tcp transport should be used. -->
 		<argument name="niotransport" class="boolean">true</argument>
+		<!-- Logging level for platform (default SEVERE). -->
+		<argument name="logging_level" class="Level">Level.SEVERE</argument>
 		
 		<!-- <argument name="platform_shutdown_time">1000</argument> -->
 	</arguments>
@@ -149,6 +153,7 @@
 		</providedservice>
 		<providedservice class="ILibraryService">
 			<implementation proxytype="raw">
+				//new LibraryService($args.libpath, $args.baseclassloader)
 				new LibraryService($args.libpath, $component.getServiceProvider())
 			</implementation>
 		</providedservice>

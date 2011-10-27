@@ -78,4 +78,19 @@ public class BluetoothMessage implements Parcelable {
 	public byte getType() {
 		return type;
 	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("BluetoothMessage\n");
+		sb.append("Receiver: ");
+		sb.append(remoteAdress);
+		sb.append(", Type: " );
+		sb.append(type);
+		sb.append("\nData (first 20 bytes):\n");
+		for (int i = 0; i < 20 && i < data.length; i++) {
+			sb.append(data[i]);
+		}
+		return sb.toString();
+	}
 }

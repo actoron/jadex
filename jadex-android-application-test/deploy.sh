@@ -14,6 +14,7 @@ skip_build=false
 adb_device=""
 remove_app=false
 clean=false
+clearlog=true
 
 function echo_green {
 	echo -en '\E[1;32m'"\033[1m$1\033[0m"
@@ -54,6 +55,7 @@ function display_help () {
 	echo 	"  -d, --device=DEVICE  deploys/removes only on DEVICE, see 'adb devices' for device ID"
 	echo 	"  -r, --remove         remove app from devices"
     	echo    "  -c, --clean          clean before build"
+	echo	"  -kl, --keeplog	keep logcat log while deploying instead of clearing it"
 	echo	""
 }
 
@@ -109,6 +111,10 @@ while [ "${1+isset}" ]; do
       ;;
     -c|--clean)
       clean=true
+      shift
+      ;;
+    -kl|--keeplog)
+      clearlog=false
       shift
       ;;
     *)
@@ -230,9 +236,15 @@ if [ ! -z $adb_device ]; then
 	DEVICES=$adb_device
 fi
 
+	
 e $(echo_bold "Deploying...")
 e "Deploying to $(echo_bold $(echo $DEVICES | awk '{print NF;}')) devices"
 for d in $DEVICES; do
+	if [ $clearlog == true ]; then
+		e "Clearing logcat of device $(echo_bold $d)"
+		$ADB_PATH -s $d logcat -c
+	fi
+
 	e "Transferring file to device: $(echo_bold $d)"
 	$ADB_PATH -s $d install -r $APKFILE
 	if [ ! "$?" -eq "0" ]; then

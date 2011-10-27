@@ -3,6 +3,7 @@ package jadex.android.bluetooth.connection;
 import jadex.android.bluetooth.device.IBluetoothAdapter;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.device.IBluetoothSocket;
+import jadex.android.bluetooth.exceptions.MessageConvertException;
 import jadex.android.bluetooth.message.DataPacket;
 
 import java.io.IOException;
@@ -35,9 +36,10 @@ public class ServerConnection extends AConnection {
 		public void run() {
 			if (isAlive()) {
 				if (lastPongReceived) {
-					DataPacket ping = new DataPacket(remoteDevice, null,
-							DataPacket.TYPE_PING);
+					DataPacket ping;
 					try {
+						ping = new DataPacket(remoteDevice, null,
+								DataPacket.TYPE_PING);
 						addConnectionListener(new IConnectionListener() {
 							@Override
 							public void messageReceived(DataPacket pkt,
@@ -61,6 +63,8 @@ public class ServerConnection extends AConnection {
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+					} catch (MessageConvertException e) {
+						e.logThisException();
 					}
 				} else {
 					close();

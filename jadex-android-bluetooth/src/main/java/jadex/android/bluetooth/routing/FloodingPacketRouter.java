@@ -1,6 +1,7 @@
 package jadex.android.bluetooth.routing;
 
 import jadex.android.bluetooth.connection.BTP2PConnector;
+import jadex.android.bluetooth.exceptions.MessageConvertException;
 import jadex.android.bluetooth.exceptions.MessageNotSendException;
 import jadex.android.bluetooth.message.BluetoothMessage;
 import jadex.android.bluetooth.message.DataPacket;
@@ -12,10 +13,13 @@ import jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry;
 import jadex.android.bluetooth.message.MessageProtos.RoutingType;
 import jadex.android.bluetooth.service.Future;
 import jadex.android.bluetooth.service.IFuture;
+import jadex.android.bluetooth.util.Helper;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import android.util.Log;
 
 public class FloodingPacketRouter implements IPacketRouter {
 
@@ -150,16 +154,20 @@ public class FloodingPacketRouter implements IPacketRouter {
 	private void broadcastRoutingInformation(RoutingInformation ri) {
 		notifyListeners();
 
-		DataPacket pkt = new DataPacket("", ri.toByteArray(),
-				DataPacket.TYPE_ROUTING_INFORMATION);
-
-		for (String address : connectedDevices) {
-			pkt.Dest = address;
-			try {
-				sender.sendMessageToConnectedDevice(pkt, address);
-			} catch (MessageNotSendException e) {
-				e.printStackTrace();
+		DataPacket pkt;
+		try {
+			pkt = new DataPacket("", ri.toByteArray(),
+					DataPacket.TYPE_ROUTING_INFORMATION);
+			for (String address : connectedDevices) {
+				pkt.Dest = address;
+				try {
+					sender.sendMessageToConnectedDevice(pkt, address);
+				} catch (MessageNotSendException e) {
+					e.printStackTrace();
+				}
 			}
+		} catch (MessageConvertException e1) {
+			e1.logThisException();
 		}
 	}
 

@@ -12,7 +12,7 @@
 	package="jadex.bdi.benchmarks">
 
 	<imports>
-		<import>jadex.bridge.*</import>
+		<import>jadex.bridge.service.types.cms.*</import>
 	</imports>
 <!--
  	<capabilities>

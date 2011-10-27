@@ -1,7 +1,6 @@
 package de.unihamburg.vsis.jadexAndroid_test;
 
-import java.lang.reflect.Method;
-
+import de.unihamburg.vsis.jadexAndroid_test.chat.ChatActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -19,6 +18,8 @@ public class MainMenu extends Activity implements OnClickListener {
 	private Button exitButton;
 	private Button startPlatformButton;
 	private Spinner configurationSpinner;
+	
+	public ConfigurationItem[] configurations;
 
 	/**
 	 * Called when the activity is first created.
@@ -32,35 +33,34 @@ public class MainMenu extends Activity implements OnClickListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.i(TAG, "onCreate");
 		setContentView(R.layout.main);
 		exitButton = (Button) findViewById(R.id.main_exitButton);
 		exitButton.setOnClickListener(this);
 		startPlatformButton = (Button) findViewById(R.id.main_startPlatformButton);
 		startPlatformButton.setOnClickListener(this);
 		configurationSpinner = (Spinner) findViewById(R.id.configurationDropDown);
-
-		// ArrayAdapter<CharSequence> adapter =
-		// ArrayAdapter.createFromResource(this, R.array.configurations,
-		// android.R.layout.simple_spinner_item);
+		
 		ArrayAdapter<ConfigurationItem> adapter = new ArrayAdapter<ConfigurationItem>(
 				this, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-		adapter.add(new ConfigurationItem("Micro Agent Creation Test",
-				"jadex/micro/benchmarks/AgentCreationAgent.class"));
-		adapter.add(new ConfigurationItem("BPMN Creation Test",
-				"jadex/bpmn/benchmarks/AgentCreation2.bpmn"));
+		configurations = new ConfigurationItem[] {
+				new ConfigurationItem("Chat Example", "chat"),
+				new ConfigurationItem("Micro Agent Creation Test",
+				"jadex/micro/benchmarks/AgentCreationAgent.class"),
+				new ConfigurationItem("BPMN Creation Test",
+				"jadex/bpmn/benchmarks/AgentCreation2.bpmn"),
+				new ConfigurationItem("BDI Creation Test",
+				"jadex/bdi/benchmarks/AgentCreation.agent.xml"),
+				new ConfigurationItem("Awareness Notifier", "awareness"),
+				new ConfigurationItem("Interactive Platform", "interactive")
+		};
 
-		adapter.add(new ConfigurationItem("BDI Creation Test",
-				"jadex/bdi/benchmarks/AgentCreation.agent.xml"));
+		for (ConfigurationItem item : configurations) {
+			adapter.add(item);
+		}
 		
-		adapter.add(new ConfigurationItem("Awareness Notifier", "awareness"));
-		
-		adapter.add(new ConfigurationItem("Interactive Platform", "interactive"));
-
 		configurationSpinner.setAdapter(adapter);
-
 		configurationSpinner.setSelection(-1);
 	}
 
@@ -77,6 +77,9 @@ public class MainMenu extends Activity implements OnClickListener {
 				}
 				else if (conf.get_configFile().equals("awareness")) {
 					Intent i = new Intent(this, AwarenessActivity.class);
+					MainMenu.this.startActivity(i);
+				} else if (conf.get_configFile().equals("chat")) {
+					Intent i = new Intent(this, ChatActivity.class);
 					MainMenu.this.startActivity(i);
 				}
 				else {

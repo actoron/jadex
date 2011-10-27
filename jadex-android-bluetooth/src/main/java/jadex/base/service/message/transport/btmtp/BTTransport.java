@@ -350,8 +350,8 @@ public class BTTransport implements ITransport {
 		if (msg_size > 0) {
 //			byte[] rawMsg = Arrays.copyOfRange(data, pos, data.length - 1);
 			byte[] rawMsg = new byte[data.length - pos];
-			System.out.println("Messagelength: " + msg_size);
-			System.out.println("rawMsglength: " + rawMsg.length);
+//			System.out.println("rawMsglength: " + rawMsg.length);
+			Log.d(Helper.LOG_TAG, "Decoded content length: " + msg_size);
 			for (int i = 0; i < msg_size; pos++, i++ ) {
 				rawMsg[i] = data[pos];
 			}

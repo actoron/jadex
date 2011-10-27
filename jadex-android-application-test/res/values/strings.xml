@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">This is jadex-android-application-test.
-    					Please choose a configuration to launch.
-    					Then click on the start Platform Button!</string>
-    <string name="main_startButton">start Platform</string>
+    <string name="hello">This Application is capable of starting different 
+    					Test Applications for jadex-android.
+    					Choose one from the list and click the start button!</string>
+    					
+    					<string name="jadex_head">Jadex-Android Test Application</string>
+    <string name="main_startButton">start Application</string>
     <string name="log_clearLogButton">clear log</string>
     <string name="log_exitButton">exit</string>
-        <string name="main_exitButton">exit</string>
+        <string name="main_exitButton">Quit</string>
     <string name="app_name">jadexAndroid-test</string>
     <string name="configurationSpinnerPrompt">Please choose a configuration</string>
 
 	<string name="agent_activity:launchAgent">launch Agent</string>
 
+
+	<string name="chat_activity:sendButtonLabel">send</string>
 </resources>

@@ -93,10 +93,10 @@ public class ConnectionManager extends HashMap<String, IConnection> implements
 			try {
 				con.write(packet);
 			} catch (IOException e) {
-				throw new MessageNotSendException();
+				throw new MessageNotSendException(e.getMessage());
 			}
 		} else {
-			throw new MessageNotSendException();
+			throw new MessageNotSendException("connection was not alive");
 		}
 	}
 }

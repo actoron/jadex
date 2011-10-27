@@ -84,7 +84,7 @@ public class BluetoothP2PReceiveHandler extends ReceiveHandler {
 	}
 
 	public void addReceivedAwarenessInfo(byte[] data) {
-		Log.i(Helper.LOG_TAG, "AwarenessInfo received.");
+		Log.d(Helper.LOG_TAG, "AwarenessInfo received.");
 		awarenessQueue.add(data);
 		// synchronized (awarenessQueue) {
 		// awarenessQueue.notifyAll();

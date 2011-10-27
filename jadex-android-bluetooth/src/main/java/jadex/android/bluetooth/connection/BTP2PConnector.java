@@ -10,6 +10,7 @@ import jadex.android.bluetooth.device.IBluetoothDevice.BluetoothBondState;
 import jadex.android.bluetooth.device.factory.AndroidBluetoothDeviceFactory;
 import jadex.android.bluetooth.exceptions.AlreadyConnectedToDeviceException;
 import jadex.android.bluetooth.exceptions.DiscoveryAlreadyRunningException;
+import jadex.android.bluetooth.exceptions.MessageConvertException;
 import jadex.android.bluetooth.message.BluetoothMessage;
 import jadex.android.bluetooth.message.DataPacket;
 import jadex.android.bluetooth.message.MessageProtos;
@@ -151,8 +152,15 @@ public class BTP2PConnector implements IBluetoothStateListener {
 	}
 
 	public IFuture sendMessage(BluetoothMessage msg) {
-		DataPacket dataPacket = new DataPacket(msg, msg.getType());
-		return sendMessage(dataPacket);
+		DataPacket dataPacket;
+		try {
+			dataPacket = new DataPacket(msg, msg.getType());
+			return sendMessage(dataPacket);
+		} catch (MessageConvertException e) {
+			Future ret = new Future();
+			ret.setException(e);
+			return ret;
+		}
 	}
 
 	public IFuture sendMessage(final DataPacket msg) {
@@ -164,13 +172,27 @@ public class BTP2PConnector implements IBluetoothStateListener {
 	}
 
 	public IFuture connect(String address) {
-		DataPacket dataPacket = new DataPacket(address, null,
-				DataPacket.TYPE_CONNECT_SYN);
-		return sendInitialMessage(dataPacket);
+		DataPacket dataPacket;
+		try {
+			dataPacket = new DataPacket(address, null,
+					DataPacket.TYPE_CONNECT_SYN);
+			return sendInitialMessage(dataPacket);
+		} catch (MessageConvertException e) {
+			//e.logThisException();
+			Future ret = new Future();
+			ret.setException(e);
+			return ret;
+		}
 	}
 
 	public IFuture sendInitialMessage(BluetoothMessage msg) {
-		return sendInitialMessage(new DataPacket(msg, msg.getType()));
+		try {
+			return sendInitialMessage(new DataPacket(msg, msg.getType()));
+		} catch (MessageConvertException e) {
+			Future ret = new Future();
+			ret.setException(e);
+			return ret;
+		}
 	}
 
 	public IFuture sendInitialMessage(final DataPacket msg) {
@@ -329,9 +351,14 @@ public class BTP2PConnector implements IBluetoothStateListener {
 						 */
 						// proximityDevicesChanged();
 						Log.d(Helper.LOG_TAG, "SYN received from: " + pkt.Src);
-						DataPacket ack = new DataPacket(pkt.getSourceDevice(),
-								null, DataPacket.TYPE_CONNECT_ACK);
-						sendMessage(ack);
+						DataPacket ack;
+						try {
+							ack = new DataPacket(pkt.getSourceDevice(),
+									null, DataPacket.TYPE_CONNECT_ACK);
+							sendMessage(ack);
+						} catch (MessageConvertException e) {
+							e.logThisException();
+						}
 					} else if (pkt.Type == DataPacket.TYPE_CONNECT_ACK) {
 						/**
 						 * handle ACK

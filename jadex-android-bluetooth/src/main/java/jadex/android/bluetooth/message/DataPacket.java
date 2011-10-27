@@ -41,19 +41,20 @@ public class DataPacket {
 	private byte[] data;
 
 	// this is copied from BTClick. Setting higher values should work just fine.
+//	public static final int PACKET_SIZE = 1008;
 	public static final int PACKET_SIZE = 2048;
 	public static final int HEADER_SIZE = 1 + 17 + 17 + 1 + 21 + 2 + 1;
 	public static final int DATA_MAX_SIZE = PACKET_SIZE - HEADER_SIZE;
 
-	public DataPacket(BluetoothMessage msg, byte type) {
+	public DataPacket(BluetoothMessage msg, byte type) throws MessageConvertException {
 		this(msg.getRemoteAdress(), msg.getData(), type);
 	}
 
-	public DataPacket(IBluetoothDevice dev, byte[] data, byte type) {
+	public DataPacket(IBluetoothDevice dev, byte[] data, byte type) throws MessageConvertException {
 		this(dev.getAddress(), data, type);
 	}
 
-	public DataPacket(String dest, byte[] data, byte type) {
+	public DataPacket(String dest, byte[] data, byte type) throws MessageConvertException {
 		this.Type = type;
 		checkType();
 		this.data = data == null ? new byte[0] : data;
@@ -66,7 +67,7 @@ public class DataPacket {
 		newPaketID();
 	}
 
-	public DataPacket(byte[] buffer) {
+	public DataPacket(byte[] buffer) throws MessageConvertException {
 		this.Type = buffer[0];
 		checkType();
 		this.Src = new String(buffer, 1, 17);
@@ -76,6 +77,14 @@ public class DataPacket {
 		byte[] dataSize = new byte[] { buffer[57], buffer[58] };
 
 		this.dataSize = readShort(dataSize, 0);
+		
+		if (this.dataSize < 0) {
+			throw new MessageConvertException("Could not read packet from byte Array. Buffer length is " +
+					buffer.length + " and dataSize is " +
+					this.dataSize + " (plus header)!\n"
+					+ this.toString());
+		}
+		
 		this.SeqNo = buffer[59];
 
 		if (buffer.length < this.dataSize+60) {
@@ -98,7 +107,7 @@ public class DataPacket {
 
 
 
-	public byte[] asByteArray() {
+	public byte[] asByteArray() throws MessageConvertException {
 		if (Src == null || Dest == null || pktId == null) {
 			throw new MessageConvertException(
 					"Message was underspecified. Dest, pktId are required.");
@@ -126,13 +135,13 @@ public class DataPacket {
 		return packet;
 	}
 
-	private void checkAddresses() {
+	private void checkAddresses() throws MessageConvertException {
 		if (Src.length() != 17) {
 			if (Src.matches("bt-mtp://.*")) {
 				Src = Src.substring(9);
 				checkAddresses();
 			} else {
-				throw new MessageConvertException("Could not encode Message: SRC must be a valid Bluetooth Address (17 byte)");
+				throw new MessageConvertException("Could not encode/decode Message: SRC must be a valid Bluetooth Address (17 byte), but was: " + Src);
 			}
 		}
 		
@@ -141,14 +150,14 @@ public class DataPacket {
 				Dest = Dest.substring(9);
 				checkAddresses();
 			} else {
-				throw new MessageConvertException("Could not encode Message: DEST must be a valid Bluetooth Address (17 byte)");
+				throw new MessageConvertException("Could not encode/decode Message: DEST must be a valid Bluetooth Address (17 byte), but was: " + Dest);
 			}
 		}
 	}
 	
-	private void checkType() {
-		if (this.Type > TYPE_DESCRIPTIONS.length) {
-			throw new MessageConvertException("Could not encode Message: Type must be valid!");
+	private void checkType() throws MessageConvertException {
+		if (this.Type < -1 || this.Type > TYPE_DESCRIPTIONS.length) {
+			throw new MessageConvertException("Could not encode/decode Message: Type must be valid! (was " + this.Type);
 		}
 	}
 	

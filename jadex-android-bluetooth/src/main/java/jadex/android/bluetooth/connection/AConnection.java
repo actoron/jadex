@@ -3,6 +3,7 @@ package jadex.android.bluetooth.connection;
 import jadex.android.bluetooth.device.IBluetoothAdapter;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.device.IBluetoothSocket;
+import jadex.android.bluetooth.exceptions.MessageConvertException;
 import jadex.android.bluetooth.message.DataPacket;
 import jadex.android.bluetooth.util.Helper;
 
@@ -76,6 +77,7 @@ public abstract class AConnection implements IConnection {
 		private synchronized void _write(byte[] bytes) throws IOException {
 			try {
 				mmOutStream.write(bytes);
+				mmOutStream.flush();
 			} catch (IOException e) {
 				Log.e(Helper.LOG_TAG,
 						"catched Exception while writing to Stream: "
@@ -141,7 +143,7 @@ public abstract class AConnection implements IConnection {
 			@Override
 			public void run() {
 				setConnectionAlive(true);
-				byte[] buffer = new byte[DataPacket.PACKET_SIZE + 1]; // buffer store for the
+				byte[] buffer;  // buffer store for the
 												// stream
 				int bytes; // bytes returned from read()
 				// Keep listening to the InputStream until an exception
@@ -149,7 +151,9 @@ public abstract class AConnection implements IConnection {
 				while (running) {
 					try {
 						// Read from the InputStream
+						buffer = new byte[DataPacket.PACKET_SIZE + 1];
 						bytes = mmInStream.read(buffer);
+						Log.i(Helper.LOG_TAG, "(Connection) received a packet of size: " + bytes);
 						if (bytes > DataPacket.PACKET_SIZE) {
 							mmInStream.skip(mmInStream.available());
 							Log.e(Helper.LOG_TAG, "Received a DataPacket which is too big for the receivebuffer! Dropping.");
@@ -175,6 +179,8 @@ public abstract class AConnection implements IConnection {
 						}
 						setConnectionAlive(false);
 						break;
+					} catch (MessageConvertException e) {
+						e.logThisException();
 					}
 				}
 			}
@@ -189,7 +195,11 @@ public abstract class AConnection implements IConnection {
 	@Override
 	public void write(DataPacket pkt) throws IOException {
 		if (isAlive()) {
-			connectedThread.write(pkt.asByteArray());
+			try {
+				connectedThread.write(pkt.asByteArray());
+			} catch (MessageConvertException e) {
+				e.logThisException();
+			}
 		} else {
 			throw new IOException("Not Connected.");
 		}

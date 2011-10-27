@@ -87,7 +87,7 @@ public class DataPacketTest {
 	}
 
 	@Test
-	public void testCustomSerialisation() {
+	public void testCustomSerialisation() throws MessageConvertException {
 		long start = System.nanoTime(); // requires java 1.5
 		DataPacket dataPacket = new DataPacket(btmsg, btmsg.getType());
 		DataPacket dataPacket2 = null;
@@ -105,7 +105,7 @@ public class DataPacketTest {
 	}
 
 	@Test
-	public void testDataPacketCreation() {
+	public void testDataPacketCreation() throws MessageConvertException {
 		DataPacket packet = new DataPacket(TestConstants.sampleAddress,
 				"".getBytes(), DataPacket.TYPE_BROADCAST);
 		byte[] asByteArray = packet.asByteArray();
@@ -125,7 +125,7 @@ public class DataPacketTest {
 	}
 
 	@Test
-	public void testBigDataPacket() {
+	public void testBigDataPacket() throws MessageConvertException {
 
 		DataPacket packet = new DataPacket(TestConstants.sampleAddress,
 				maxDataString.getBytes(), DataPacket.TYPE_DATA);
@@ -162,7 +162,7 @@ public class DataPacketTest {
 	}
 
 	@Test
-	public void testDataPacketFromTooBigBuffer() {
+	public void testDataPacketFromTooBigBuffer() throws MessageConvertException {
 
 		DataPacket packet = new DataPacket(TestConstants.sampleAddress,
 				maxDataString.getBytes(), DataPacket.TYPE_DATA);
@@ -175,7 +175,7 @@ public class DataPacketTest {
 	}
 
 	@Test
-	public void testDataPacketWithWrongAddressFormat() {
+	public void testDataPacketWithWrongAddressFormat() throws MessageConvertException {
 		BluetoothMessage btmsg = new BluetoothMessage("bt-mtp://"
 				+ getBTDummyDevice().getAddress(), "".getBytes(),
 				DataPacket.TYPE_DATA);
@@ -189,7 +189,7 @@ public class DataPacketTest {
 	@Test
 	public void testDataPacketWithWrongType() {
 		BluetoothMessage btmsg = new BluetoothMessage(getBTDummyDevice()
-				.getAddress(), "".getBytes(), (byte) 100);
+				.getAddress(), "".getBytes(), (byte) DataPacket.TYPE_DESCRIPTIONS.length);
 
 		try {
 			DataPacket dataPacket = new DataPacket(btmsg, btmsg.getType());
@@ -198,9 +198,22 @@ public class DataPacketTest {
 		} catch (MessageConvertException e) {
 		}
 	}
+	
+	@Test
+	public void testDataPacketWithRightType() {
+		BluetoothMessage btmsg = new BluetoothMessage(getBTDummyDevice()
+				.getAddress(), "".getBytes(), (byte) (DataPacket.TYPE_DESCRIPTIONS.length-1));
+
+		try {
+			DataPacket dataPacket = new DataPacket(btmsg, btmsg.getType());
+			byte[] bytes = dataPacket.asByteArray();
+		} catch (MessageConvertException e) {
+			fail("no exception expected");
+		}
+	}
 
 	@Test
-	public void testDataPacketCreationWithEmptyData() {
+	public void testDataPacketCreationWithEmptyData() throws MessageConvertException {
 		DataPacket packet = new DataPacket(TestConstants.sampleAddress, null,
 				DataPacket.TYPE_BROADCAST);
 		byte[] asByteArray = packet.asByteArray();

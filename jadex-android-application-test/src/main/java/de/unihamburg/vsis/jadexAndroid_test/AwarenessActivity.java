@@ -50,8 +50,7 @@ public class AwarenessActivity extends BaseActivity {
 		textView = findTextViewById(R.id.awareness_activity_textView1);
 		textView.setText("starting Platform...");
 
-		UUID randomUUID = UUID.randomUUID();
-		platformID = randomUUID.toString().substring(0, 5);
+		platformID = createRandomPlattformID();
 
 		ListView listView = findListViewById(R.id.awareness_activity_listView1);
 		listAdapter = new ArrayAdapter<RemoteComponentIdentifier>(this,
@@ -129,7 +128,7 @@ public class AwarenessActivity extends BaseActivity {
 			}
 		}).start();
 		
-		listView.setOnItemClickListener(remotePlattformOnClickListener);
+		listView.setOnItemClickListener(onItemClickListener);
 	}
 
 	private IResultListener<IExternalAccess> platformResultListener = new DefaultResultListener<IExternalAccess>() {
@@ -188,7 +187,7 @@ public class AwarenessActivity extends BaseActivity {
 		}
 	};
 
-	private OnItemClickListener remotePlattformOnClickListener = new OnItemClickListener() {
+	private OnItemClickListener onItemClickListener = new OnItemClickListener() {
 
 		@SuppressWarnings("unchecked")
 		@Override

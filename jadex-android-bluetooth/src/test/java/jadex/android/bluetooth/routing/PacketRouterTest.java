@@ -7,6 +7,7 @@ import static org.junit.Assert.fail;
 import jadex.android.bluetooth.CustomTestRunner;
 import jadex.android.bluetooth.TestConstants;
 import jadex.android.bluetooth.device.IBluetoothDevice;
+import jadex.android.bluetooth.exceptions.MessageConvertException;
 import jadex.android.bluetooth.message.DataPacket;
 import jadex.android.bluetooth.message.MessageProtos;
 import jadex.android.bluetooth.message.MessageProtos.RoutingInformation;
@@ -196,7 +197,7 @@ public abstract class PacketRouterTest {
 	}
 
 	@Test
-	public void testDoNotSendMessageToUnknownDevice() {
+	public void testDoNotSendMessageToUnknownDevice() throws MessageConvertException {
 		DataPacket dataPacket = new DataPacket(device2, "data1".getBytes(),
 				DataPacket.TYPE_DATA);
 		packetRouter1.routePacket(dataPacket, ownAddress);
@@ -204,7 +205,7 @@ public abstract class PacketRouterTest {
 	}
 
 	@Test
-	public void testSendMessageToConnectedDevice() {
+	public void testSendMessageToConnectedDevice() throws MessageConvertException {
 		DataPacket dataPacket = new DataPacket(device2, "data1".getBytes(),
 				DataPacket.TYPE_DATA);
 		dataPacket.Src = packetRouter1.getOwnAddress();
@@ -214,7 +215,7 @@ public abstract class PacketRouterTest {
 	}
 
 	@Test
-	public void testSendMessageToReachableDevice() {
+	public void testSendMessageToReachableDevice() throws MessageConvertException {
 		RoutingInformation sampleRI = getSampleRoutingInformation();
 		String sampleReachableDevice = getDeviceList(sampleRI).get(0);
 		DataPacket dataPacket = new DataPacket(sampleReachableDevice,
@@ -231,7 +232,7 @@ public abstract class PacketRouterTest {
 	}
 
 	@Test
-	public void test2CommunicatingPacketRouters() throws InterruptedException {
+	public void test2CommunicatingPacketRouters() throws InterruptedException, MessageConvertException {
 		final IPacketRouter packetRouter2 = getPacketRouter(ownAddress2);
 		connectPacketRouters(packetRouter1, packetRouter2);
 		connectPacketRouters(packetRouter2, packetRouter1);
