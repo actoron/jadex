@@ -1491,7 +1491,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		Set<URL>	ret	= new LinkedHashSet<URL>();
 		collectClasspathURLs(classloader, ret);
-		System.out.println("Classpath URLs: "+ret);
+//		System.out.println("Classpath URLs: "+ret);
 		return ret;
 	}
 	
