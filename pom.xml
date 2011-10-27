@@ -501,6 +501,24 @@
 			</modules>
 		</profile>
 
+		<!-- WebApps -->
+
+		<profile>
+			<id>jadex-applications-web-package</id>
+			<modules>
+				<module>jadex-commons</module>
+				<module>jadex-bridge</module>
+				<module>jadex-javaparser</module>
+				<module>jadex-platform-base</module>
+				<module>jadex-platform-standalone</module>
+				<module>jadex-kernel-base</module>
+				<module>jadex-kernel-component</module>
+				<module>jadex-kernel-micro</module>
+				<module>jadex-xml</module>
+				<module>jadex-applications-web</module>
+			</modules>
+		</profile>
+		
 		<!-- WfMS -->
 
 		<profile>
