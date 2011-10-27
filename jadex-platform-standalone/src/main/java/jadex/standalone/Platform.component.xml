@@ -161,7 +161,7 @@
 		</providedservice>
 		<providedservice class="ILibraryService">
 			<implementation> <!-- proxytype="raw" -->
-				new LibraryService($args.libpath, $component.getServiceProvider(), $args.baseclassloader)
+				new LibraryService($args.libpath, $args.baseclassloader)
 			</implementation>
 		</providedservice>
 		<providedservice class="IClockService">

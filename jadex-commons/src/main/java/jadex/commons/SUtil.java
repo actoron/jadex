@@ -1246,60 +1246,60 @@ public class SUtil
 		return ret.toString();
 	}
 
-	/**
-	 * Find a package name from a path. Searches the most specific classpath and
-	 * uses the rest of the pathname as package name.
-	 * 
-	 * @param path The directory.
-	 * @return The package.
-	 */
-	public static String convertPathToPackage(String path,
-			ClassLoader classloader)
-	{
-		String ret = null;
-		File fpath = new File(path);
-		if(!fpath.isDirectory())
-			path = fpath.getParent();
-
-		List cps = getClasspathURLs(classloader);
-
-		java.util.List toks = SCollection.createArrayList();
-		StringTokenizer stok = new StringTokenizer(path, File.separator);
-		while(stok.hasMoreTokens())
-			toks.add(stok.nextToken());
-
-		int quality = 0;
-		for(int i = 0; i < cps.size(); i++)
-		{
-			String cp = ((URL)cps.get(i)).getFile();
-			stok = new StringTokenizer(cp, "/!"); // Exclamation mark to support
-													// jar files.
-
-			int cplen = stok.countTokens();
-			if(cplen <= toks.size())
-			{
-				int j = 0;
-				for(; stok.hasMoreTokens(); j++)
-				{
-					if(!stok.nextToken().equals(toks.get(j)))
-						break;
-				}
-
-				if(j == cplen && cplen > quality)
-				{
-					ret = "";
-					for(int k = j; k < toks.size(); k++)
-					{
-						if(k > j && k < toks.size())
-							ret += ".";
-						ret += "" + toks.get(k);
-					}
-					quality = cplen;
-				}
-			}
-		}
-		return ret;
-	}
+//	/**
+//	 * Find a package name from a path. Searches the most specific classpath and
+//	 * uses the rest of the pathname as package name.
+//	 * 
+//	 * @param path The directory.
+//	 * @return The package.
+//	 */
+//	public static String convertPathToPackage(String path,
+//			ClassLoader classloader)
+//	{
+//		String ret = null;
+//		File fpath = new File(path);
+//		if(!fpath.isDirectory())
+//			path = fpath.getParent();
+//
+//		List cps = getClasspathURLs(classloader);
+//
+//		java.util.List toks = SCollection.createArrayList();
+//		StringTokenizer stok = new StringTokenizer(path, File.separator);
+//		while(stok.hasMoreTokens())
+//			toks.add(stok.nextToken());
+//
+//		int quality = 0;
+//		for(int i = 0; i < cps.size(); i++)
+//		{
+//			String cp = ((URL)cps.get(i)).getFile();
+//			stok = new StringTokenizer(cp, "/!"); // Exclamation mark to support
+//													// jar files.
+//
+//			int cplen = stok.countTokens();
+//			if(cplen <= toks.size())
+//			{
+//				int j = 0;
+//				for(; stok.hasMoreTokens(); j++)
+//				{
+//					if(!stok.nextToken().equals(toks.get(j)))
+//						break;
+//				}
+//
+//				if(j == cplen && cplen > quality)
+//				{
+//					ret = "";
+//					for(int k = j; k < toks.size(); k++)
+//					{
+//						if(k > j && k < toks.size())
+//							ret += ".";
+//						ret += "" + toks.get(k);
+//					}
+//					quality = cplen;
+//				}
+//			}
+//		}
+//		return ret;
+//	}
 
 	// /**
 	// * Get the classloader.
@@ -1315,53 +1315,53 @@ public class SUtil
 	// return ret;
 	// }
 
-	/**
-	 * Get the current classpath as a list of URLs
-	 */
-	public static List getClasspathURLs(ClassLoader classloader)
-	{
-		if(classloader == null)
-			classloader = SUtil.class.getClassLoader();
-
-		List cps = SCollection.createArrayList();
-		StringTokenizer stok = new StringTokenizer(
-				System.getProperty("java.class.path"),
-				System.getProperty("path.separator"));
-		while(stok.hasMoreTokens())
-		{
-			try
-			{
-				String entry = stok.nextToken();
-				File file = new File(entry);
-				cps.add(file.toURI().toURL());
-				
-				// Code below does not work for paths with spaces in it.
-				// Todo: is above code correct in all cases? (relative/absolute, local/remote, jar/directory)
-//				if(file.isDirectory()
-//						&& !entry
-//								.endsWith(System.getProperty("file.separator")))
-//				{
-//					// Normalize, that directories end with "/".
-//					entry += System.getProperty("file.separator");
-//				}
-//				cps.add(new URL("file:///" + entry));
-			}
-			catch(MalformedURLException e)
-			{
-				// Maybe invalid classpath entries --> just ignore.
-				// Hack!!! Print warning?
-				// e.printStackTrace();
-			}
-		}
-
-		if(classloader instanceof URLClassLoader)
-		{
-			URL[] urls = ((URLClassLoader)classloader).getURLs();
-			for(int i = 0; i < urls.length; i++)
-				cps.add(urls[i]);
-		}
-		return cps;
-	}
+//	/**
+//	 * Get the current classpath as a list of URLs
+//	 */
+//	public static List<URL> getClasspathURLs(ClassLoader classloader)
+//	{
+//		if(classloader == null)
+//			classloader = SUtil.class.getClassLoader();
+//
+//		List cps = SCollection.createArrayList();
+//		StringTokenizer stok = new StringTokenizer(
+//				System.getProperty("java.class.path"),
+//				System.getProperty("path.separator"));
+//		while(stok.hasMoreTokens())
+//		{
+//			try
+//			{
+//				String entry = stok.nextToken();
+//				File file = new File(entry);
+//				cps.add(file.toURI().toURL());
+//				
+//				// Code below does not work for paths with spaces in it.
+//				// Todo: is above code correct in all cases? (relative/absolute, local/remote, jar/directory)
+////				if(file.isDirectory()
+////						&& !entry
+////								.endsWith(System.getProperty("file.separator")))
+////				{
+////					// Normalize, that directories end with "/".
+////					entry += System.getProperty("file.separator");
+////				}
+////				cps.add(new URL("file:///" + entry));
+//			}
+//			catch(MalformedURLException e)
+//			{
+//				// Maybe invalid classpath entries --> just ignore.
+//				// Hack!!! Print warning?
+//				// e.printStackTrace();
+//			}
+//		}
+//
+//		if(classloader instanceof URLClassLoader)
+//		{
+//			URL[] urls = ((URLClassLoader)classloader).getURLs();
+//			for(int i = 0; i < urls.length; i++)
+//				cps.add(urls[i]);
+//		}
+//		return cps;
+//	}
 
 	/**
 	 * Calculate the cartesian product of parameters. Example: names = {"a",

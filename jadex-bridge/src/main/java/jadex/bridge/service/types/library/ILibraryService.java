@@ -1,7 +1,6 @@
 package jadex.bridge.service.types.library;
 
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.Reference;
@@ -15,15 +14,8 @@ import java.util.List;
  *  for dynamic loading and unloading of classes, libraries and resources.
  */
 @GuiClassName("jadex.tools.libtool.LibServiceBrowser")
-public interface ILibraryService extends IService
+public interface ILibraryService
 {
-	//-------- constants --------
-	
-	/** 
-	 * The (standard) Library service name.
-	 */
-	public static final String LIBRARY_SERVICE = "library_service";
-	
 	//-------- methods --------
 	
 	/**

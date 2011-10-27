@@ -1,11 +1,13 @@
 package jadex.base.service.library;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Excluded;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceShutdown;
+import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
@@ -24,6 +26,7 @@ import jadex.commons.future.IResultListener;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,16 +38,29 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 /**
  *  Library service for loading classpath elements.
  */
-public class LibraryService extends BasicService implements ILibraryService, IPropertiesProvider
+@Service(ILibraryService.class)
+public class LibraryService	implements ILibraryService, IPropertiesProvider
 {
+	//-------- constants --------
+	
+	/** 
+	 * The (standard) Library service name.
+	 */
+	public static final String LIBRARY_SERVICE = "library_service";
+	
 	//-------- attributes --------
 	
-	/** The provider. */
-	protected IServiceProvider provider;
+	/** The component. */
+	@ServiceComponent
+	protected IInternalAccess	component;
 	
 	/** LibraryService listeners. */
 	protected Set<ILibraryServiceListener> listeners;
@@ -73,9 +89,9 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	/** 
 	 *  Creates a new LibraryService.
 	 */ 
-	public LibraryService(IServiceProvider provider)
+	public LibraryService()
 	{
-		this(null, provider);
+		this(null);
 	}
 	
 	/** 
@@ -84,9 +100,9 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 *  	Strings are interpreted as relative files (relative to current directory),
 	 *  	absolute files or URLs (whatever can be found). 
 	 */ 
-	public LibraryService(Object[] urls, IServiceProvider provider)
+	public LibraryService(Object[] urls)
 	{
-		this(urls, provider, null);
+		this(urls, null);
 	}
 	
 	/** 
@@ -95,9 +111,9 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 *  	Strings are interpreted as relative files (relative to current directory),
 	 *  	absolute files or URLs (whatever can be found). 
 	 */ 
-	public LibraryService(Object[] urls, IServiceProvider provider, ClassLoader baseloader)
+	public LibraryService(Object[] urls, ClassLoader baseloader)
 	{
-		this(urls, provider, baseloader, null);
+		this(urls, baseloader, null);
 	}
 	
 	/** 
@@ -106,16 +122,13 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 *  	Strings are interpreted as relative files (relative to current directory),
 	 *  	absolute files or URLs (whatever can be found). 
 	 */ 
-	public LibraryService(Object[] urls, IServiceProvider provider, ClassLoader baseloader, Map properties)
+	public LibraryService(Object[] urls, ClassLoader baseloader, Map<String, Object> properties)
 	{
-		super(provider.getId(), ILibraryService.class, properties);
-		
 		this.classloaders = new HashMap<IResourceIdentifier, DelegationURLClassLoader>();
 		this.listeners	= new LinkedHashSet<ILibraryServiceListener>();
 		this.ridsupport = new LinkedHashMap<IResourceIdentifier, Set<IResourceIdentifier>>();
 		this.managedrids = new LinkedHashMap<IResourceIdentifier, Integer>();
 		this.initurls = urls;
-		this.provider = provider;
 		this.baseloader = baseloader!=null? baseloader: getClass().getClassLoader();
 	}
 	
@@ -311,7 +324,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public IFuture<IResourceIdentifier> addURL(final URL url)
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-		SServiceProvider.getService(provider, IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getServiceContainer().searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
@@ -344,7 +357,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public IFuture<Void> removeURL(final URL url)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(provider, IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getServiceContainer().searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, Void>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
@@ -370,7 +383,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	public IFuture<Void> removeURLCompletely(final URL url)
 	{
 		final Future<Void> ret = new Future<Void>();
-		SServiceProvider.getService(provider, IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getServiceContainer().searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, Void>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
@@ -395,13 +408,12 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 */
 	public IFuture<List<URL>> getNonManagedURLs()
 	{
-//		return new Future<List<URL>>(SUtil.getClasspathURLs(libcl));
-		List<URL> nonurls = new ArrayList<URL>(SUtil.getClasspathURLs(getClass().getClassLoader()));
+		List<URL> nonurls = new ArrayList<URL>(getClasspathURLs(baseloader));
 		return new Future<List<URL>>(nonurls);
 	}
 	
 	/**
-	 *  Get all urls (managed , indirect and non-managed from parent loader).
+	 *  Get all urls (managed, indirect and non-managed from parent loader).
 	 *  @return The list of urls.
 	 */
 	public IFuture<List<URL>> getAllURLs()
@@ -411,13 +423,19 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		{
 			public void customResultAvailable(List<IResourceIdentifier> result)
 			{
-				List<URL> res = new ArrayList<URL>();
+				final List<URL> res = new ArrayList<URL>();
 				for(int i=0; i<result.size(); i++)
 				{
 					res.add(result.get(i).getLocalIdentifier().getSecondEntity());
 				}
-				res.addAll(SUtil.getClasspathURLs(getClass().getClassLoader()));
-				ret.setResult(res);
+				getNonManagedURLs().addResultListener(new DelegationResultListener<List<URL>>(ret)
+				{
+					public void customResultAvailable(List<URL> result)
+					{
+						res.addAll(result);
+						ret.setResult(res);
+					}
+				});
 			}
 		});
 		return ret;
@@ -468,7 +486,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
-		SServiceProvider.getService(provider, IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getServiceContainer().searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
@@ -584,7 +602,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	{
 		final Future<Map<IResourceIdentifier, List<IResourceIdentifier>>> ret = new Future<Map<IResourceIdentifier, List<IResourceIdentifier>>>();
 		
-		SServiceProvider.getService(provider, IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		component.getServiceContainer().searchService(IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, Map<IResourceIdentifier, List<IResourceIdentifier>>>(ret)
 		{
 			public void customResultAvailable(IDependencyService drs)
@@ -899,48 +917,43 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	/**
 	 *  Start the service.
 	 */
+	@ServiceStart
 	public IFuture<Void>	startService()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		super.startService().addResultListener(new DelegationResultListener<Void>(ret)
+		if(initurls!=null)
 		{
-			public void customResultAvailable(Void result)
+			CounterResultListener<IResourceIdentifier> lis = new CounterResultListener<IResourceIdentifier>(initurls.length,
+				new DelegationResultListener<Void>(ret)
 			{
-				if(initurls!=null)
+				public void customResultAvailable(Void result) 
 				{
-					CounterResultListener<IResourceIdentifier> lis = new CounterResultListener<IResourceIdentifier>(initurls.length,
-						new DelegationResultListener<Void>(ret)
+					component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
 					{
-						public void customResultAvailable(Void result) 
+						public void customResultAvailable(ISettingsService settings)
 						{
-							SServiceProvider.getService(provider,ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-								.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
-							{
-								public void customResultAvailable(ISettingsService settings)
-								{
-									settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
-										.addResultListener(new DelegationResultListener<Void>(ret));
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									// No settings service: ignore
-									ret.setResult(null);
-	//								ret.setResult(getServiceIdentifier());
-								}
-							});
+							settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
+								.addResultListener(new DelegationResultListener<Void>(ret));
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+							// No settings service: ignore
+							ret.setResult(null);
+//								ret.setResult(getServiceIdentifier());
 						}
 					});
-					for(int i=0; i<initurls.length; i++)
-					{
-						addURL(SUtil.toURL(initurls[i])).addResultListener(lis);
-					}
 				}
-				else
-				{
-					ret.setResult(null);
-				}
+			});
+			for(int i=0; i<initurls.length; i++)
+			{
+				addURL(SUtil.toURL(initurls[i])).addResultListener(lis);
 			}
-		});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 		return ret;
 	}
 
@@ -949,18 +962,18 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	 *  Releases all cached resources and shuts down the library service.
 	 *  @param listener The listener.
 	 */
+	@ServiceShutdown
 	public IFuture<Void>	shutdownService()
 	{
 //		System.out.println("shut");
-		final Future	saved	= new Future();
-		SServiceProvider.getService(provider,ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DelegationResultListener(saved)
+		final Future<Void>	saved	= new Future<Void>();
+		component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(saved)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(ISettingsService settings)
 			{
-				ISettingsService	settings	= (ISettingsService)result;
 				settings.deregisterPropertiesProvider(LIBRARY_SERVICE)
-					.addResultListener(new DelegationResultListener(saved));
+					.addResultListener(new DelegationResultListener<Void>(saved));
 			}
 			public void exceptionOccurred(Exception exception)
 			{
@@ -970,15 +983,15 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 		});
 		
 		final Future<Void>	ret	= new Future<Void>();
-		saved.addResultListener(new DelegationResultListener(ret)
+		saved.addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 				synchronized(this)
 				{
 //					libcl = null;
 					listeners.clear();
-					LibraryService.super.shutdownService().addResultListener(new DelegationResultListener(ret));
+					ret.setResult(null);
 				}
 			}
 		});
@@ -1380,7 +1393,7 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 	/**
 	 *  Test if a file name is contained.
 	 */
-	public static int indexOfFilename(String url, List urlstrings)
+	public static int indexOfFilename(String url, List<String> urlstrings)
 	{
 		int ret = -1;
 		try
@@ -1473,5 +1486,103 @@ public class LibraryService extends BasicService implements ILibraryService, IPr
 //		ResourceIdentifier rid = new ResourceIdentifier(lid, gid);
 //		return new Future<IResourceIdentifier>(rid);
 //	}
+
+	/**
+	 *  Get all URLs belonging to a class loader.
+	 *  @return A sorted set with the urls in order of precedence regarding Java class loading (i.e. parent class loaders first).
+	 */
+	public Set<URL>	getClasspathURLs(ClassLoader classloader)
+	{
+		Set<URL>	ret	= new LinkedHashSet<URL>();
+		collectClasspathURLs(classloader, ret);
+//		System.out.println("Classpath URLs: "+ret);
+		return ret;
+	}
+	
+	/**
+	 *  Collect all URLs belonging to a class loader.
+	 */
+	protected void	collectClasspathURLs(ClassLoader classloader, Set<URL> set)
+	{
+		assert classloader!=null;
+		
+		if(classloader.getParent()!=null)
+		{
+			collectClasspathURLs(classloader.getParent(), set);
+		}
+		
+		if(classloader instanceof URLClassLoader)
+		{
+			URL[] urls = ((URLClassLoader)classloader).getURLs();
+			for(int i = 0; i < urls.length; i++)
+			{
+				set.add(urls[i]);
+				collectManifestURLs(urls[i], set);
+			}
+		}
+	}
+	
+	/**
+	 *  Collect all URLs as specified in a manifest.
+	 */
+	protected void	collectManifestURLs(URL url, Set<URL> set)
+	{
+        try 
+        {
+    		File	file	= urlToFile(url.toString());
+            JarFile	jarfile	= new JarFile(file);
+            Manifest manifest = jarfile.getManifest();
+            if(manifest!=null)
+            {
+                String	classpath	= manifest.getMainAttributes().getValue(new Attributes.Name("Class-Path"));
+                if(classpath!=null)
+                {
+                	StringTokenizer	tok	= new StringTokenizer(classpath, " ");
+            		while(tok.hasMoreElements())
+            		{
+            			String path = tok.nextToken();
+            			File	urlfile;
+            			
+            			// Search in directory of original jar (todo: also search in local dir!?)
+            			urlfile = new File(file.getParentFile(), path);
+            			
+            			// Try as absolute path
+            			if(!urlfile.exists())
+            			{
+            				urlfile	= new File(path);
+            			}
+            			
+            			// Try as url
+            			if(!urlfile.exists())
+            			{
+            				urlfile	= urlToFile(path);
+            			}
+
+            			if(urlfile.exists())
+            			{
+	            			try
+		                	{
+	            				URL depurl = urlfile.toURI().toURL();
+	            				set.add(depurl);
+	            				collectManifestURLs(depurl, set);
+	            			}
+	                    	catch (Exception e)
+	                    	{
+	                    		component.getLogger().warning("Error collecting manifest URLs for "+urlfile+": "+e);
+	                    	}
+                    	}
+            			else
+            			{
+            				component.getLogger().warning("Jar not found: "+urlfile);
+            			}
+               		}
+                }
+            }
+        }
+        catch(Exception e)
+        {
+    		component.getLogger().warning("Error collection manifest URLs for "+url+": "+e);
+        }
+	}	
 }
 
