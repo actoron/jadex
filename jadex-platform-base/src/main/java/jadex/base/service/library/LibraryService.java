@@ -456,11 +456,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			if(globalcl==null)
 			{
 				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
-				/* $if !android $ */
-				globalcl	= new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), delegates);
-				/* $else $
-				globalcl	= new DelegationURLClassLoader(LibraryService.class.getClassLoader(), delegates);
-				$endif $ */
+				globalcl	= new DelegationURLClassLoader(baseloader, delegates);
 			}
 			ret.setResult(globalcl);
 		}
@@ -1495,7 +1491,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	{
 		Set<URL>	ret	= new LinkedHashSet<URL>();
 		collectClasspathURLs(classloader, ret);
-//		System.out.println("Classpath URLs: "+ret);
+		System.out.println("Classpath URLs: "+ret);
 		return ret;
 	}
 	
