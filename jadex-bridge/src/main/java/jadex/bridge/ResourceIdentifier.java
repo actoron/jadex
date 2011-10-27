@@ -11,7 +11,7 @@ import java.net.URL;
  *  Contains a local identifier and a global identifier
  *  that can be used to find the resource.
  */
-@Reference(local=true)
+@Reference(local=true, remote=false)
 public class ResourceIdentifier implements IResourceIdentifier
 {
 	//-------- attributes --------
