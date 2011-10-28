@@ -1,5 +1,6 @@
 package jadex.base.service.awareness.discovery;
 
+import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -101,7 +102,8 @@ public abstract class ReceiveHandler
 												}
 												catch(Exception e)
 												{
-													ia.getLogger().warning("Could not decode discovery message: "+e+"\n"+new String((byte[])packet[2]));
+													ia.getLogger().warning("Could not decode discovery message: "+e);//+"\n"+new String(GZIPCodec.decodeBytes((byte[])packet[2], 
+														//agent.getMicroAgent().getClassLoader())));
 												}
 												return IFuture.DONE;
 											}
