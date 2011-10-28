@@ -43,6 +43,7 @@ import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -896,20 +897,20 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		if(config!=null)
 		{
 			ConfigurationInfo conf = model.getConfiguration(config);
 			final IExtensionInfo[] exts = conf.getExtensions();
-			IResultListener	rl	= new DelegationResultListener(ret)
+			IResultListener	rl	= new ExceptionDelegationResultListener<IExtensionInstance, Void>(ret)
 			{
 				int	i=0;
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IExtensionInstance result)
 				{
 					if(i>0)
 					{
-						addExtension(exts[i-1].getName(), (IExtensionInstance)result);
+						addExtension(exts[i-1].getName(), result);
 					}
 					
 					if(i<exts.length)
@@ -920,7 +921,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					}
 					else
 					{
-						super.customResultAvailable(result);
+						ret.setResult(null);
 					}
 				}
 			};

@@ -39,9 +39,10 @@
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
 		<import>jadex.extension.envsupport.evaluation.*</import>
 		<import>jadex.extension.envsupport.observer.gui.plugin.*</import>
-		<import>jadex.bridge.service.clock.IClockService</import>
 		<import>jadex.commons.future.*</import>
 		<import>jadex.bridge.service.*</import>
+		<import>jadex.bridge.service.search.*</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
 	</imports>
 	
 	<extensiontypes>
