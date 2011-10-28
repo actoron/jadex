@@ -6,7 +6,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
 /**
- * 
+ *  Receiver handler for scanner.
  */
 public class ScannerReceiveHandler extends MasterSlaveReceiveHandler
 {

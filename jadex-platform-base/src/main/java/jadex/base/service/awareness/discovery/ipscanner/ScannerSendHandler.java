@@ -129,7 +129,7 @@ public class ScannerSendHandler extends MasterSlaveSendHandler
 			}
 			else if(iadr instanceof Inet6Address)
 			{
-				getAgent().getMicroAgent().getLogger().warning("Scanning not yet supported for IPV6");
+				getAgent().getMicroAgent().getLogger().info("Scanning not yet supported for IPV6");
 			}
 		}
 		catch(Exception e)

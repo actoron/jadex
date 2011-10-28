@@ -1620,7 +1620,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			synchronized(adapters)
 			{
 				logger.info("Terminated component: "+cid.getName());
-//					System.out.println("CleanupCommand: "+cid);
+//				System.out.println("CleanupCommand: "+cid);
 	//			boolean shutdown = false;
 	
 //					System.out.println("CleanupCommand remove called for: "+cid);

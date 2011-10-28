@@ -138,6 +138,10 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 					lis.exceptionOccurred(e);
 				}
 			}
+			else
+			{
+				lis.resultAvailable(null);
+			}
 		}
 		
 		return ret;

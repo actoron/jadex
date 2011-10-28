@@ -66,7 +66,7 @@ public class BroadcastSendHandler extends MasterSlaveSendHandler
 		}
 		catch(Exception e)
 		{
-			agent.getMicroAgent().getLogger().warning("Could not send awareness message: "+e);
+			agent.getMicroAgent().getLogger().info("Could not send awareness message: "+e);
 //			e.printStackTrace();
 		}	
 	}

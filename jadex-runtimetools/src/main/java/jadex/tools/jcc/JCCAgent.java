@@ -4,6 +4,7 @@ import jadex.base.gui.componentviewer.ComponentViewerPlugin;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
@@ -74,6 +75,17 @@ public class JCCAgent extends MicroAgent
 //		System.out.println("JCC agent killed");
 		Future	ret	= new Future();
 		cc.shutdown().addResultListener(createResultListener(new DelegationResultListener(ret)));
+//		ret.addResultListener(new IResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				System.out.println("r1");
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("r2");
+//			}
+//		});
 		return ret;
 	}
 	
