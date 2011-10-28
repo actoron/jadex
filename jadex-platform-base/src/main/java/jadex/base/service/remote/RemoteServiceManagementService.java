@@ -165,6 +165,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			public void writeObject(WriteContext wc, Object object, QName tag) throws Exception 
 			{
+				// todo: cleanup rmi pre/postprocessing 
+				// extra preprocessing of commands should be removed
+				// should instead use ifReference() with context information (how/where to express?)
+				
 //				System.out.println("object: "+object);
 //				if(object instanceof RemoteResultCommand)
 //					System.out.println("huhuhu");

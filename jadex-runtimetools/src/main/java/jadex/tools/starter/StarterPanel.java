@@ -1028,6 +1028,7 @@ public class StarterPanel extends JLayeredPane
 		final Future	ret	= new Future();
 		
 		final String	name	= filename.getText();
+		final IResourceIdentifier rid = lastrid;
 		exta.scheduleStep(new IComponentStep<String>()
 		{
 			@XMLClassname("convertPath")
@@ -1035,7 +1036,7 @@ public class StarterPanel extends JLayeredPane
 			{
 				Future	ret	= new Future();
 				// lastrid ok?
-				SComponentFactory.loadModel(ia.getExternalAccess(), name, lastrid)
+				SComponentFactory.loadModel(ia.getExternalAccess(), name, rid)
 					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
