@@ -1554,7 +1554,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
             				urlfile	= urlToFile(path);
             			}
 
-            			if(urlfile.exists())
+            			if(urlfile!=null && urlfile.exists())
             			{
 	            			try
 		                	{
