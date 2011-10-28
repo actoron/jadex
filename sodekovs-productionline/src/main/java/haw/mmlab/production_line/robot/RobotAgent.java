@@ -42,6 +42,7 @@ import java.util.logging.Level;
  * 
  * @author thomas
  */
+@SuppressWarnings("unchecked")
 @Description("Robot agent.")
 @Arguments({ @Argument(clazz = Robot.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap"), @Argument(clazz = IStrategy.class, name = "strategy"),
 		@Argument(clazz = Integer.class, name = "reconfDelay") })
@@ -58,7 +59,6 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 
 	private DatabaseLogger databaseLogger = null;
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public IFuture<Void> agentCreated() {
 		reconfDelay = (Integer) getArgument("reconfDelay");
@@ -110,7 +110,6 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		waitForTick(new SendWorkpieceStep());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public IFuture<Void> agentKilled() {
 		return super.agentKilled();
@@ -126,6 +125,10 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 	 * @return <code>true</code> if the workpiece could be processed else <code>false</code>
 	 */
 	public boolean receiveWorkpiece(final Workpiece workpiece, String agentId) {
+		if (workpiece == null) {
+			throw new RuntimeException("Workpiece should not be null");
+		}
+
 		if (mainState == MainState.RUNNING_IDLE && this.workpiece == null) {
 			final Role role = getMatchingRole(workpiece, agentId);
 			if (role != null) {
@@ -209,7 +212,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 			if (element != null) {
 				sendWorkpiece(element, ia);
 			} else {
-				waitForTick(this);
+				waitForTick(new SendWorkpieceStep());
 			}
 
 			return IFuture.DONE;
@@ -251,7 +254,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 									buffer.enqueue(buffer.dequeue());
 								}
 
-								waitForTick(SendWorkpieceStep.this);
+								waitForTick(new SendWorkpieceStep());
 							}
 						});
 					}
@@ -261,7 +264,6 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void handleHelpRequest(HelpRequest request) {
 		request.incrementHopCount();
@@ -325,7 +327,6 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void answerHelpRequest(List<Role> takeRoles, List<Role> giveAwayRoles, HelpRequest request) {
 		HelpReply reply = new HelpReply();
 		reply.setDefectAgentId(request.getAgentId());

@@ -15,7 +15,7 @@ public class Sequencer {
 	private Sequencer() {
 	}
 
-	public static int getNextNumber() {
-		return value++;
+	public synchronized static int getNextNumber() {
+		return ++value;
 	}
 }

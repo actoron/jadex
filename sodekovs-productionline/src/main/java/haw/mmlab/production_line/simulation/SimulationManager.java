@@ -36,11 +36,11 @@ public class SimulationManager {
 
 	private static final int NUMBER_OF_WORKPIECES = 300;
 
-	private static final int TIMELORD_INTERVAL = 1;
+	private static final int TIMELORD_INTERVAL = 0;
 
-	private static final int MIN_PROCESSING_TIME = 1;
+	private static final int MIN_PROCESSING_TIME = 0;
 
-	private static final int MAX_PROCESSING_TIME = 1;
+	private static final int MAX_PROCESSING_TIME = 0;
 
 	private static final int START_REDUNDANCY_RATE = 10;
 
@@ -50,13 +50,15 @@ public class SimulationManager {
 
 	private static final int STOP_WORKLOAD = 100;
 
-	private static final int RECONF_MSG_DELAY_TIME = 1;
+	private static final int RECONF_MSG_DELAY_TIME = 0;
 
 	private static final String OUTPUT_FILE_PATH = "conf/generated.conf.xml";
 
 	private int redRate = START_REDUNDANCY_RATE;
 
 	private int workload = START_WORKLOAD;
+
+	private static int run = 1;
 
 	/**
 	 * @param args
@@ -70,16 +72,21 @@ public class SimulationManager {
 
 			@Override
 			public void resultAvailable(Object result) {
-				if (manager.redRate <= STOP_REDUNDANCY_RATE) {
-					if (manager.workload >= STOP_WORKLOAD) {
-						manager.workload = START_WORKLOAD;
-						manager.redRate += 10;
-					} else {
-						manager.workload += 10;
-					}
-
+				if (run < NUMBER_OF_RUNS_PER_CONFIG) {
+					run++;
+					manager.startSimulation(this, manager.redRate, manager.workload);
+				} else {
 					if (manager.redRate <= STOP_REDUNDANCY_RATE) {
-						manager.startSimulation(this, manager.redRate, manager.workload);
+						if (manager.workload >= STOP_WORKLOAD) {
+							manager.workload = START_WORKLOAD;
+							manager.redRate += 10;
+						} else {
+							manager.workload += 10;
+						}
+
+						if (manager.redRate <= STOP_REDUNDANCY_RATE) {
+							manager.startSimulation(this, manager.redRate, manager.workload);
+						}
 					}
 				}
 			}
@@ -238,8 +245,8 @@ public class SimulationManager {
 		IComponentManagementService cms = getCMS(platform);
 
 		// create the config for this redRate and workload parameters
-		SimulationConfig config = generateConfig(NUMBER_OF_TASKS, NUMBER_OF_ROBOTS, workload, redRate, NUMBER_OF_WORKPIECES, MIN_PROCESSING_TIME, MAX_PROCESSING_TIME, NUMBER_OF_RUNS_PER_CONFIG,
-				TIMELORD_INTERVAL, RECONF_MSG_DELAY_TIME);
+		SimulationConfig config = generateConfig(NUMBER_OF_TASKS, NUMBER_OF_ROBOTS, workload, redRate, NUMBER_OF_WORKPIECES, MIN_PROCESSING_TIME, MAX_PROCESSING_TIME, 1, TIMELORD_INTERVAL,
+				RECONF_MSG_DELAY_TIME);
 		SimulationGenerator generator = new SimulationGenerator(config);
 		generator.saveProductionLineConfiguration(OUTPUT_FILE_PATH);
 

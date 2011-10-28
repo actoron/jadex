@@ -12,17 +12,17 @@
 		</action>
 	</configuration>
 	<!-- 
-	<configuration rate="1" count="1">
+	<configuration rate="0" count="1">
 		<query>
 			<category>NONE</category>
 			<agents>
-				<agent>GRobot53</agent>
+				<agent>Robot5_Task4</agent>
 			</agents>
 		</query>
 		<action type="DROP">
 			<mode>STATIC</mode>
 			<capabilities>
-				<capability>Cap53</capability>
+				<capability>Cap5_Task4</capability>
 			</capabilities>
 		</action>
 	</configuration>

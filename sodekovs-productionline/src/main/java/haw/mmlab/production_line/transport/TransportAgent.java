@@ -10,7 +10,6 @@ import haw.mmlab.production_line.configuration.Role;
 import haw.mmlab.production_line.configuration.Task;
 import haw.mmlab.production_line.configuration.Transport;
 import haw.mmlab.production_line.configuration.Workpiece;
-import haw.mmlab.production_line.logging.database.DatabaseLogger;
 import haw.mmlab.production_line.service.IManagerService;
 import haw.mmlab.production_line.service.IProcessWorkpieceService;
 import haw.mmlab.production_line.service.ProcessWorkpieceService;
@@ -37,6 +36,7 @@ import java.util.logging.Level;
  * 
  * @author thomas
  */
+@SuppressWarnings("unchecked")
 @Description("Transport agent.")
 @Arguments({ @Argument(clazz = Transport.class, name = "config"), @Argument(clazz = Map.class, name = "taskMap"), @Argument(clazz = Integer.class, name = "reconfDelay") })
 @RequiredServices({ @RequiredService(name = "managerService", type = IManagerService.class) })
@@ -53,14 +53,11 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 
 	private IManagerService managerService = null;
 
-	private DatabaseLogger databaseLogger = null;
-
-	@SuppressWarnings("unchecked")
 	@Override
 	public IFuture<Void> agentCreated() {
 		reconfDelay = (Integer) getArgument("reconfDelay");
 
-		databaseLogger = new DatabaseLogger();
+		// databaseLogger = new DatabaseLogger();
 
 		Transport conf = (Transport) getArgument("config");
 
@@ -147,7 +144,6 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		 * @param task
 		 *            the given {@link Task}
 		 */
-		@SuppressWarnings("unchecked")
 		private void informWPProduced(final IInternalAccess ia, final Task task) {
 			if (managerService == null) {
 				getRequiredService("managerService").addResultListener(new DefaultResultListener<IManagerService>() {
@@ -285,9 +281,19 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	 * @return <code>true</code> if the workpiece could be processed else <code>false</code>
 	 */
 	public boolean receiveWorkpiece(Workpiece workpiece, String senderId) {
+		if (workpiece == null) {
+			throw new RuntimeException("Workpiece should not be null");
+		}
+
 		if (mainState == MainState.RUNNING_IDLE && this.workpiece == null) {
 			Role role = getMatchingRole(workpiece, senderId);
 			if (role != null) {
+				String taskId = workpiece.getTask().getId();
+				if (wpCount.containsKey(taskId)) {
+					wpCount.put(taskId, wpCount.get(taskId) + 1);
+				} else {
+					wpCount.put(taskId, 1);
+				}
 				setWorkpiece(workpiece);
 				setStates(MainState.RUNNING, deficientState);
 				workpiece.addOperation(role.getCapability());
@@ -317,28 +323,37 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	 * @param workpiece
 	 *            the given {@link Workpiece}
 	 */
-	@SuppressWarnings("unchecked")
 	private void consume(final Workpiece workpiece) {
 		setWorkpiece(null);
 		setStates(MainState.RUNNING_IDLE, deficientState);
 
-		getRequiredService("managerService").addResultListener(new DefaultResultListener<IManagerService>() {
+		final String taskId = workpiece.getTask().getId();
+		if (wpCount.containsKey(taskId)) {
+			wpCount.put(taskId, wpCount.get(taskId) + 1);
+		} else {
+			wpCount.put(taskId, 1);
+		}
 
-			public void resultAvailable(IManagerService service) {
-				service.informWPConsumed(workpiece.getTask().getId());
+		if (managerService == null) {
+			getRequiredService("managerService").addResultListener(new DefaultResultListener<IManagerService>() {
 
-				String taskId = workpiece.getTask().getId();
-				if (wpCount.containsKey(taskId)) {
-					wpCount.put(taskId, wpCount.get(taskId) + 1);
-				} else {
-					wpCount.put(taskId, 1);
+				@Override
+				public void resultAvailable(IManagerService result) {
+					managerService = result;
+					managerService.informWPConsumed(workpiece.getTask().getId());
+
+					if (wpCount.get(taskId) >= workpiece.getTask().getMaxWorkpieceCount()) {
+						managerService.informFinished(taskId);
+					}
 				}
+			});
+		} else {
+			managerService.informWPConsumed(workpiece.getTask().getId());
 
-				if (wpCount.get(taskId) >= workpiece.getTask().getMaxWorkpieceCount()) {
-					service.informFinished(taskId);
-				}
+			if (wpCount.get(taskId) >= workpiece.getTask().getMaxWorkpieceCount()) {
+				managerService.informFinished(taskId);
 			}
-		});
+		}
 	}
 
 	/**

@@ -213,6 +213,7 @@ public class LogManager {
 	 * @param runId
 	 *            - the run id.
 	 */
+	@SuppressWarnings("unused")
 	private void interpreteData(int runId) {
 		Map<String, Integer> bufferSizes = getBufferSizes(plc);
 

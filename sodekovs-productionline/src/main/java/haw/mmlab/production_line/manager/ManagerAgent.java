@@ -44,6 +44,7 @@ import java.util.logging.Level;
  * 
  * @author thomas
  */
+@SuppressWarnings("unchecked")
 @Description("The Manager Agent who manages the whole application.")
 @ProvidedServices(@ProvidedService(type = IManagerService.class, implementation = @Implementation(ManagerService.class)))
 @RequiredServices({ @RequiredService(name = "cmsservice", type = IComponentManagementService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)) })
@@ -207,7 +208,6 @@ public class ManagerAgent extends MicroAgent {
 	/**
 	 * Starts all the participating agents.
 	 */
-	@SuppressWarnings("unchecked")
 	private void startAgents() {
 		this.getRequiredService("cmsservice").addResultListener(new DefaultResultListener<IComponentManagementService>() {
 
@@ -288,11 +288,13 @@ public class ManagerAgent extends MicroAgent {
 	/**
 	 * Finishes the current run and starts the next runs if specified.
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
 	private void finishRun() {
+		System.out.println("finishRun in Manager called.");
+
 		if (!finished) {
 			finished = true;
-			getLogger().info("Manager agent is finishing run " + run);
+			System.out.println("Manager agent is finishing run " + run);
 			killAgents();
 
 			logManager.afterSimulation(producedWPs, consumedWPs);
@@ -321,14 +323,22 @@ public class ManagerAgent extends MicroAgent {
 				firstWPConsumed = false;
 
 				// start the new run
-				waitForTick(new IComponentStep<Void>() {
+				getExternalAccess().scheduleImmediate(new IComponentStep<Void>() {
 
 					public IFuture<Void> execute(IInternalAccess ia) {
 						executeBody();
 						return IFuture.DONE;
 					}
 				});
+				// waitForTick(new IComponentStep<Void>() {
+				//
+				// public IFuture<Void> execute(IInternalAccess ia) {
+				// executeBody();
+				// return IFuture.DONE;
+				// }
+				// });
 			} else {
+				System.out.println("Manager is killing the platform.");
 				// kill the platform
 				IExternalAccess application = getParent();
 				application.scheduleImmediate(new IComponentStep() {
@@ -348,7 +358,6 @@ public class ManagerAgent extends MicroAgent {
 	/**
 	 * Kills all the started agents.
 	 */
-	@SuppressWarnings("unchecked")
 	private void killAgents() {
 		this.getRequiredService("cmsservice").addResultListener(new DefaultResultListener<IComponentManagementService>() {
 
@@ -427,7 +436,6 @@ public class ManagerAgent extends MicroAgent {
 	/**
 	 * Starts the Dropout Agent
 	 */
-	@SuppressWarnings("unchecked")
 	public void startDropout() {
 		this.getRequiredService("cmsservice").addResultListener(new DefaultResultListener<IComponentManagementService>() {
 

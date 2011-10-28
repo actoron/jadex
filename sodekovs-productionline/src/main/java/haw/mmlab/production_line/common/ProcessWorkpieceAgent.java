@@ -42,6 +42,7 @@ import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
  * 
  * @author thomas
  */
+@SuppressWarnings("unchecked")
 public abstract class ProcessWorkpieceAgent extends MicroAgent {
 
 	/** The agents id */
@@ -183,7 +184,6 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 		sendHelpRequest(deficientRoles);
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void sendHelpRequest(List<Role> deficientRoles) {
 		HelpRequest request = new HelpRequest();
 		request.setAgentId(id);
@@ -264,7 +264,6 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void handleHelpRequest(HelpRequest request) {
 		if (reconfDelay == 0) {
 			waitForTick(new SendMediumMessageStep(request));
@@ -381,7 +380,6 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 	 * @param reply
 	 *            the given {@link HelpReply}
 	 */
-	@SuppressWarnings("unchecked")
 	private void forwardHelpReply(HelpReply reply) {
 		if (reply.getReceiverIds().contains(id)) {
 			reply.getReceiverIds().remove(id);
@@ -420,7 +418,6 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 	 *            the given {@link ConsoleMessage}
 	 * @param logger
 	 */
-	@SuppressWarnings("unchecked")
 	public void handleConsoleMsg(final ConsoleMessage msg, final Logger logger) {
 		logger.info(msg.getOutMsg());
 

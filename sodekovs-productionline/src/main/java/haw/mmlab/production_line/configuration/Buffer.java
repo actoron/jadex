@@ -50,10 +50,12 @@ public class Buffer {
 	 * 
 	 * @param element
 	 *            the given {@link BufferElement}
-	 * @return <code>true</code> if the given {@link BufferElement} was
-	 *         enqueued, else (if the buffer was full) <code>false</code>.
+	 * @return <code>true</code> if the given {@link BufferElement} was enqueued, else (if the buffer was full) <code>false</code>.
 	 */
-	public boolean enqueue(BufferElement element) {
+	public synchronized boolean enqueue(BufferElement element) {
+		if (element == null) {
+			throw new RuntimeException("Element should not be null");
+		}
 		if (n == elements.length) {
 			return false;
 		} else {
@@ -67,29 +69,26 @@ public class Buffer {
 	/**
 	 * Removes and returns the least recently added {@link BufferElement}.
 	 * 
-	 * @return the least recently added {@link BufferElement} or
-	 *         <code>null</code> if the buffer is empty.
+	 * @return the least recently added {@link BufferElement} or <code>null</code> if the buffer is empty.
 	 */
-	public BufferElement dequeue() {
+	public synchronized BufferElement dequeue() {
 		if (isEmpty()) {
 			return null;
 		} else {
 			BufferElement element = elements[first];
 			elements[first] = null; // to help with garbage collection
-			n--;
 			first = (first + 1) % elements.length; // wrap-around
+			n--;
 			return element;
 		}
 	}
 
 	/**
-	 * Returns the least recently added {@link BufferElement} without removing
-	 * it from the buffer.
+	 * Returns the least recently added {@link BufferElement} without removing it from the buffer.
 	 * 
-	 * @return the least recently added {@link BufferElement} or
-	 *         <code>null</code> if the buffer is empty.
+	 * @return the least recently added {@link BufferElement} or <code>null</code> if the buffer is empty.
 	 */
-	public BufferElement peek() {
+	public synchronized BufferElement peek() {
 		if (isEmpty()) {
 			return null;
 		} else {
@@ -108,15 +107,13 @@ public class Buffer {
 	}
 
 	/**
-	 * Returns the number of available slots in the buffer for the given
-	 * {@link Role}.
+	 * Returns the number of available slots in the buffer for the given {@link Role}.
 	 * 
 	 * @param role
 	 *            - the given {@link Role}
 	 * @param roles
 	 *            - all the roles the agent currently has
-	 * @return the number of available slots in the buffer for the given
-	 *         {@link Role}
+	 * @return the number of available slots in the buffer for the given {@link Role}
 	 */
 	public int getAvailableSlots(Role role, List<Role> roles) {
 		Map<Role, Integer> occurrence = new HashMap<Role, Integer>();
