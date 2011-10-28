@@ -108,7 +108,7 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	 */
 	protected String createMasterId()
 	{
-		return isMaster()? createMasterId(SUtil.getInet4Address(),
+		return isMaster()? createMasterId(SUtil.getInetAddress(),
 			getSocket().getLocalPort()): null;
 	}
 	
@@ -117,7 +117,7 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	 */
 	protected String getMyMasterId()
 	{
-		return createMasterId(SUtil.getInet4Address(), port);
+		return createMasterId(SUtil.getInetAddress(), port);
 	}
 	
 	/**
@@ -178,7 +178,7 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 					socket = new DatagramSocket(port);
 					socket.setBroadcast(true);
 //					System.out.println("local master at: "+SUtil.getInet4Address()+" "+port);
-					getMicroAgent().getLogger().info("local master at: "+SUtil.getInet4Address()+" "+port);
+					getMicroAgent().getLogger().info("local master at: "+SUtil.getInetAddress()+" "+port);
 				}
 				catch(Exception e)
 				{
@@ -189,13 +189,13 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 						// and send this port to the master.
 						socket = new DatagramSocket();
 						socket.setBroadcast(true);
-						InetAddress address = SUtil.getInet4Address();
+						InetAddress address = SUtil.getInetAddress();
 						AwarenessInfo info = createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId());
 //						byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
 						byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getClassLoader());
 						((BroadcastSendHandler)sender).send(data, address, port);
 //						System.out.println("local slave at: "+SUtil.getInet4Address()+" "+socket.getLocalPort());
-						getMicroAgent().getLogger().info("local slave at: "+SUtil.getInet4Address()+" "+socket.getLocalPort());
+						getMicroAgent().getLogger().info("local slave at: "+SUtil.getInetAddress()+" "+socket.getLocalPort());
 					}
 					catch(Exception e2)
 					{

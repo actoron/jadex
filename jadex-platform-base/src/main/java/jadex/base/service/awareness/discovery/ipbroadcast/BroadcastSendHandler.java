@@ -1,6 +1,8 @@
 package jadex.base.service.awareness.discovery.ipbroadcast;
 
 import java.net.DatagramPacket;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
@@ -76,70 +78,79 @@ public class BroadcastSendHandler extends MasterSlaveSendHandler
 	public int sendToDiscover(byte[] data, int maxsend)
 	{
 		int ret = 0;
-		// Global broadcast address 255.255.255.255 does not work in windows xp/7 :-(
-		// http://serverfault.com/questions/72112/how-to-alter-the-global-broadcast-address-255-255-255-255-behavior-on-windows
-		// Directed broadcast address = !netmask | IP
-//		InetAddress address = InetAddress.getByAddress(new byte[]{(byte)255, (byte)255, (byte)255, (byte)255,});
 		
-		InetAddress address = SUtil.getInet4Address();
-		short prefixlen = SUtil.getNetworkPrefixLength(address);
-		if(prefixlen==-1) // Guess C class if nothing can be determined.
-			prefixlen = 24;
+		InetAddress address = SUtil.getInetAddress();
 		
-		if(maxsend==-1 || ret<maxsend)
+		if(address instanceof Inet4Address)
 		{
-			try
+			// Global broadcast address 255.255.255.255 does not work in windows xp/7 :-(
+			// http://serverfault.com/questions/72112/how-to-alter-the-global-broadcast-address-255-255-255-255-behavior-on-windows
+			// Directed broadcast address = !netmask | IP
+//			InetAddress address = InetAddress.getByAddress(new byte[]{(byte)255, (byte)255, (byte)255, (byte)255,});
+			
+			short prefixlen = SUtil.getNetworkPrefixLength(address);
+			if(prefixlen==-1) // Guess C class if nothing can be determined.
+				prefixlen = 24;
+			
+			if(maxsend==-1 || ret<maxsend)
 			{
-				getAgent().getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)24), getAgent().getPort()));
-				ret++;
+				try
+				{
+					getAgent().getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)24), getAgent().getPort()));
+					ret++;
+				}
+				catch(Exception e)
+				{
+					// Nop if can't send
+				}
 			}
-			catch(Exception e)
+			if(maxsend==-1 || ret<maxsend)
 			{
-				// Nop if can't send
+				try
+				{
+					getAgent().getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)16), getAgent().getPort()));
+					ret++;
+				}
+				catch(Exception e)
+				{
+					// Nop if can't send
+				}
 			}
+			if(maxsend==-1 || ret<maxsend)
+			{
+				try
+				{
+					getAgent().getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)8), getAgent().getPort()));
+					ret++;
+				}
+				catch(Exception e)
+				{
+					// Nop if can't send
+				}
+			}
+			if((maxsend==-1 || ret<maxsend) && prefixlen!=-1 && prefixlen!=24 && prefixlen!=16 && prefixlen!=8)
+			{
+				try
+				{
+					getAgent().getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, prefixlen), getAgent().getPort()));
+					ret++;
+				}
+				catch(Exception e)
+				{
+					// Nop if can't send
+				}
+			}
+	//		catch(Exception e)
+	//		{
+	//			if(!getAgent().isKilled())
+	//				getAgent().getMicroAgent().getLogger().warning("Discover error: "+e);
+	////			e.printStackTrace();
+	//		}
 		}
-		if(maxsend==-1 || ret<maxsend)
+		else if(address instanceof Inet6Address)
 		{
-			try
-			{
-				getAgent().getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)16), getAgent().getPort()));
-				ret++;
-			}
-			catch(Exception e)
-			{
-				// Nop if can't send
-			}
+			getAgent().getMicroAgent().getLogger().warning("No IPV4 address available, cannot use broadcast. Should use multicast discovery instead.");
 		}
-		if(maxsend==-1 || ret<maxsend)
-		{
-			try
-			{
-				getAgent().getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, (short)8), getAgent().getPort()));
-				ret++;
-			}
-			catch(Exception e)
-			{
-				// Nop if can't send
-			}
-		}
-		if((maxsend==-1 || ret<maxsend) && prefixlen!=-1 && prefixlen!=24 && prefixlen!=16 && prefixlen!=8)
-		{
-			try
-			{
-				getAgent().getSocket().send(new DatagramPacket(data, data.length, createBroadcastAddress(address, prefixlen), getAgent().getPort()));
-				ret++;
-			}
-			catch(Exception e)
-			{
-				// Nop if can't send
-			}
-		}
-//		catch(Exception e)
-//		{
-//			if(!getAgent().isKilled())
-//				getAgent().getMicroAgent().getLogger().warning("Discover error: "+e);
-////			e.printStackTrace();
-//		}
 		
 		return ret;
 	}
@@ -150,7 +161,7 @@ public class BroadcastSendHandler extends MasterSlaveSendHandler
 	 */
 	public void sendToMaster(byte[] data)
 	{
-		send(data, SUtil.getInet4Address(), getAgent().getPort());
+		send(data, SUtil.getInetAddress(), getAgent().getPort());
 	}
 	
 	/**

@@ -57,7 +57,7 @@ public abstract class MasterSlaveReceiveHandler extends ReceiveHandler
 		
 		if(getAgent().isMaster())
 		{
-			if(address.equals(SUtil.getInet4Address()))
+			if(address.equals(SUtil.getInetAddress()))
 			{
 				// If awareness message comes from local slave.
 				getAgent().getLocals().addOrUpdateEntry(new DiscoveryEntry(info, getAgent().getClockTime(), sa));

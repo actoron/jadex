@@ -157,7 +157,7 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 			if(s!=null)
 			{
 //				System.out.println("a: "+s.getLocalPort()+" "+port+" "+address+" "+SUtil.getInet4Address());
-				ret = isRegistry(SUtil.getInet4Address(), s.getLocalPort());
+				ret = isRegistry(SUtil.getInetAddress(), s.getLocalPort());
 			}
 		}
 		catch(Exception e) 
@@ -188,7 +188,7 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	 */
 	protected String createMasterId()
 	{
-		return isMaster()? createMasterId(SUtil.getInet4Address(),
+		return isMaster()? createMasterId(SUtil.getInetAddress(),
 			getSocket().getLocalPort()): null;
 	}
 	
@@ -197,7 +197,7 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	 */
 	protected String getMyMasterId()
 	{
-		return createMasterId(SUtil.getInet4Address(), port);
+		return createMasterId(SUtil.getInetAddress(), port);
 	}
 	
 	/**
@@ -257,8 +257,8 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 				{
 					// First one on dest ip becomes master.
 					socket = new DatagramSocket(port);
-					getMicroAgent().getLogger().info((address.equals(SUtil.getInet4Address())? 
-						"registry: ": "master: ")+SUtil.getInet4Address()+" "+port);
+					getMicroAgent().getLogger().info((address.equals(SUtil.getInetAddress())? 
+						"registry: ": "master: ")+SUtil.getInetAddress()+" "+port);
 				}
 				catch(Exception e)
 				{

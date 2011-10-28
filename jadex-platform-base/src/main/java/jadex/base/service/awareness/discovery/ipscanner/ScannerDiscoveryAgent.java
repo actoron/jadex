@@ -123,7 +123,7 @@ public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	 */
 	protected String createMasterId()
 	{
-		return isMaster()? createMasterId(SUtil.getInet4Address(),
+		return isMaster()? createMasterId(SUtil.getInetAddress(),
 			getChannel().socket().getLocalPort()): null;
 	}
 	
@@ -132,7 +132,7 @@ public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	 */
 	protected String getMyMasterId()
 	{
-		return createMasterId(SUtil.getInet4Address(), port);
+		return createMasterId(SUtil.getInetAddress(), port);
 	}
 	
 	/**
@@ -220,7 +220,7 @@ public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
 							selector.wakeup();
 							channel.register(selector, SelectionKey.OP_READ);
 						}
-						InetAddress address = SUtil.getInet4Address();
+						InetAddress address = SUtil.getInetAddress();
 						AwarenessInfo info = createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId());
 //						byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
 						byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getClassLoader());

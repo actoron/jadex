@@ -28,7 +28,6 @@ public class BroadcastReceiveHandler extends MasterSlaveReceiveHandler
 		Object[] ret = null;
 		try
 		{
-
 			if(buffer==null)
 			{
 				// todo: max ip datagram length (is there a better way to determine length?)

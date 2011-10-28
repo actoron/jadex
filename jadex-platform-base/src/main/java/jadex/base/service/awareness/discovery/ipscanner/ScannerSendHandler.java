@@ -6,6 +6,8 @@ import jadex.base.service.awareness.discovery.MasterSlaveSendHandler;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
 
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -94,33 +96,41 @@ public class ScannerSendHandler extends MasterSlaveSendHandler
 		int ret = 0;
 		try
 		{
-			InetAddress iadr = SUtil.getInet4Address();
-			short sublen = SUtil.getNetworkPrefixLength(iadr);
-			if(sublen==-1) // Guess C class if nothing can be determined.
-				sublen = 24;
-			byte[] byinet = SUtil.getInet4Address().getAddress();
-			int hostbits = 32-sublen;
-			int numips = (int)Math.pow(2, hostbits);
+			InetAddress iadr = SUtil.getInetAddress();
 			
-			int mask = ~(numips-1);
-			int iinet = SUtil.bytesToInt(byinet);
-			int prefix = iinet & mask;
-			
-			int ipnum = currentip;
-			for(; ret<numips && (maxsend==-1 || ret<maxsend); ret++)
+			if(iadr instanceof Inet4Address)
 			{
-				int iip = prefix | ipnum; 
-				byte[] bip = SUtil.intToBytes(iip);
-				InetAddress address = InetAddress.getByAddress(bip);
-				if(!send(data, address, getAgent().getPort()))
-					break;
+				short sublen = SUtil.getNetworkPrefixLength(iadr);
+				if(sublen==-1) // Guess C class if nothing can be determined.
+					sublen = 24;
+				byte[] byinet = SUtil.getInetAddress().getAddress();
+				int hostbits = 32-sublen;
+				int numips = (int)Math.pow(2, hostbits);
 				
-				ipnum = (ipnum+1)%numips;
+				int mask = ~(numips-1);
+				int iinet = SUtil.bytesToInt(byinet);
+				int prefix = iinet & mask;
+				
+				int ipnum = currentip;
+				for(; ret<numips && (maxsend==-1 || ret<maxsend); ret++)
+				{
+					int iip = prefix | ipnum; 
+					byte[] bip = SUtil.intToBytes(iip);
+					InetAddress address = InetAddress.getByAddress(bip);
+					if(!send(data, address, getAgent().getPort()))
+						break;
+					
+					ipnum = (ipnum+1)%numips;
+				}
+				currentip = ipnum;
+				
+	//			System.out.println("sent to discover: "+ret+" "+currentip);
+				getAgent().getMicroAgent().getLogger().info("sent to discover: "+ret+" "+currentip);
 			}
-			currentip = ipnum;
-			
-//			System.out.println("sent to discover: "+ret+" "+currentip);
-			getAgent().getMicroAgent().getLogger().info("sent to discover: "+ret+" "+currentip);
+			else if(iadr instanceof Inet6Address)
+			{
+				getAgent().getMicroAgent().getLogger().warning("Scanning not yet supported for IPV6");
+			}
 		}
 		catch(Exception e)
 		{
@@ -137,7 +147,7 @@ public class ScannerSendHandler extends MasterSlaveSendHandler
 	 */
 	public void sendToMaster(byte[] data)
 	{
-		send(data, SUtil.getInet4Address(), getAgent().getPort());
+		send(data, SUtil.getInetAddress(), getAgent().getPort());
 	}
 	
 	/**
