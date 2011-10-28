@@ -160,24 +160,39 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 //		System.out.println("filename: "+filename);
 		
-		libservice.getClassLoader(rid)
-			.addResultListener(new ExceptionDelegationResultListener<ClassLoader, IModelInfo>(ret)
+		if(libservice!=null)
 		{
-			public void customResultAvailable(ClassLoader cl)
+			libservice.getClassLoader(rid)
+				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, IModelInfo>(ret)
 			{
-				try
+				public void customResultAvailable(ClassLoader cl)
 				{
-					IModelInfo mi = loader.loadComponentModel(model, imports, cl, rid).getModelInfo();
-					ret.setResult(mi);
+					try
+					{
+						IModelInfo mi = loader.loadComponentModel(model, imports, cl, rid).getModelInfo();
+						ret.setResult(mi);
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
 				}
-				catch(Exception e)
-				{
-					ret.setException(e);
-				}
+			});		
+		}
+		else
+		{
+			try
+			{
+				ClassLoader cl = getClass().getClassLoader();
+				IModelInfo mi = loader.loadComponentModel(model, imports, cl, rid).getModelInfo();
+				ret.setResult(mi);
 			}
-		});
-		
-		
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}			
+		}
+
 		
 		return ret;
 	}

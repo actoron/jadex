@@ -26,13 +26,11 @@ public class RemoteReference2Test extends TestCase
 		
 		// Start platform1 used for remote access.
 		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases1",
-//			"-configname", "allkernels",	// Todo: does not work with multi-kernel on Hudson!?
 			"-niotransport", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false"
 			}).get(sus, timeout);
 		
 		// Start platform2 with services.
 		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", "testcases2",
-//			"-configname", "allkernels",	// Todo: does not work with multi-kernel on Hudson!?
 			"-niotransport", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false",
 			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class",
 			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(sus, timeout);

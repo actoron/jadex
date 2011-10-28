@@ -12,6 +12,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 
 /**
  * 
@@ -91,9 +93,16 @@ public abstract class ReceiveHandler
 										{
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
-												AwarenessInfo info = (AwarenessInfo)DiscoveryState.decodeObject((byte[])packet[2], agent.getMicroAgent().getClassLoader());
-//												System.out.println("received info: "+info);
-												handleReceivedPacket((InetAddress)packet[0], ((Integer)packet[1]).intValue(), (byte[])packet[2], info);
+												try
+												{
+													AwarenessInfo info = (AwarenessInfo)DiscoveryState.decodeObject((byte[])packet[2], agent.getMicroAgent().getClassLoader());
+//													System.out.println("received info: "+info);
+													handleReceivedPacket((InetAddress)packet[0], ((Integer)packet[1]).intValue(), (byte[])packet[2], info);
+												}
+												catch(Exception e)
+												{
+													ia.getLogger().warning("Could not decode discovery message: "+e+"\n"+new String((byte[])packet[2]));
+												}
 												return IFuture.DONE;
 											}
 										});

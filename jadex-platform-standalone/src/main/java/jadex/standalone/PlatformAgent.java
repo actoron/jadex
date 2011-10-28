@@ -8,6 +8,7 @@ import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IComponentFactoryExtensionService;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.bridge.service.types.simulation.ISimulationService;
@@ -30,14 +31,17 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 @Imports({
+	"jadex.base.service.marshal.*",
 	"jadex.base.service.settings.*",
-	"jadex.bridge.service.threadpool.*",
+	"jadex.base.service.threadpool.*",
+	"jadex.bridge.service.types.clock.*",
+	"jadex.bridge.service.types.message.*",
 	"jadex.commons.concurrent.*",
-	"jadex.bridge.service.execution.*",
-	"jadex.bridge.service.library.*",
+	"jadex.base.service.execution.*",
+	"jadex.base.service.library.*",
 	"jadex.commons.*",
 	"jadex.base.service.remote.*",
-	"jadex.bridge.service.clock.*",
+	"jadex.base.service.clock.*",
 	"jadex.base.service.message.*",
 	"jadex.base.service.message.transport.*",
 	"jadex.base.service.message.transport.localmtp.*",
@@ -83,11 +87,12 @@ import jadex.micro.annotation.RequiredServices;
 	@ComponentType(name="kernel_bpmn", filename="jadex/bpmn/KernelBPMN.component.xml"),
 	@ComponentType(name="kernel_multi", filename="jadex/micro/KernelMultiAgent.class"),
 	@ComponentType(name="rms", filename="jadex/base/service/remote/RemoteServiceManagementAgent.class"),
-	@ComponentType(name="awa", filename="jadex/base/service/awareness/AwarenessAgent.class"),
+	@ComponentType(name="awa", filename="jadex/base/service/awareness/management/AwarenessManagementAgent.class"),
 	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class")
 })
 
 @ProvidedServices({
+	@ProvidedService(type=IMarshalService.class, implementation=@Implementation(expression="new MarshalService($component.getExternalAccess())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=ISettingsService.class, implementation=@Implementation(expression="new SettingsService($args.platformname, $component, $args.saveonexit)")),
 	@ProvidedService(type=IThreadPool.class, implementation=@Implementation(expression="new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IExecutionService.class, implementation=@Implementation(expression="$args.simulation? new SyncExecutionService($component.getServiceProvider()): new AsyncExecutionService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
