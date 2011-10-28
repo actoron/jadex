@@ -84,9 +84,9 @@ public class ControlCenter
 	/**
 	 *  Create a control center.
 	 */
-	public IFuture	init(IExternalAccess jccaccess, final String[] plugin_classes, boolean saveonexit)
+	public IFuture<Void>	init(IExternalAccess jccaccess, final String[] plugin_classes, boolean saveonexit)
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		
 		this.jccaccess = jccaccess;
 		this.plugin_classes	= plugin_classes;
@@ -95,7 +95,7 @@ public class ControlCenter
 		this.window = new ControlCenterWindow(this);
 		
 		// Default platform control center for local platform.
-		final Future	inited	= new Future();
+		final Future<Void>	inited	= new Future<Void>();
 		this.pcc	= new PlatformControlCenter();
 		
 		SJCC.getRootAccess(jccaccess).addResultListener(new SwingDelegationResultListener(inited)

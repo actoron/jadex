@@ -42,9 +42,9 @@ public class JCCAgent extends MicroAgent
 	/**
 	 *  Open the gui on agent startup.
 	 */
-	public IFuture	agentCreated()
+	public IFuture<Void>	agentCreated()
 	{
-		Future	ret	= new Future();
+		Future<Void>	ret	= new Future<Void>();
 		this.cc	= new ControlCenter();
 		cc.init(getExternalAccess(),
 			new String[]{
@@ -63,18 +63,18 @@ public class JCCAgent extends MicroAgent
 				ComponentViewerPlugin.class.getName(),
 				DeployerPlugin.class.getName()
 			},
-		saveonexit).addResultListener(createResultListener(new DelegationResultListener(ret)));
+		saveonexit).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 		return ret;
 	}
 	
 	/**
 	 *  Close the gui on agent shutdown.
 	 */
-	public IFuture	agentKilled()
+	public IFuture<Void>	agentKilled()
 	{
 //		System.out.println("JCC agent killed");
-		Future	ret	= new Future();
-		cc.shutdown().addResultListener(createResultListener(new DelegationResultListener(ret)));
+		Future<Void>	ret	= new Future<Void>();
+		cc.shutdown().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 //		ret.addResultListener(new IResultListener()
 //		{
 //			public void resultAvailable(Object result)
