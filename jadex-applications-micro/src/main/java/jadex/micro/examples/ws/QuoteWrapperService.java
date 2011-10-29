@@ -6,64 +6,83 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.math.BigDecimal;
-
-import com.gama_system.webservices.StockQuotes;
-import com.gama_system.webservices.StockQuotesSoap;
-
 /**
- * 
+ *  Wrapper service implementation.
+ *  Implements the asynchronous service version of the web service
+ *  and redirects calls to the web service using an invocation agent.
+ *  The invocation agent is blocked during the call is running.
  */
 @Service
 public class QuoteWrapperService implements IQuoteService
 {
+	//-------- attributes --------
+	
 	/** The agent. */
 	@ServiceComponent
 	protected IInternalAccess agent;
 	
+	//-------- methods --------
+
 	/**
 	 *  Get a quote.
 	 */
-	public IFuture<BigDecimal> getQuote(String exchange, String stock, String time)
+	public IFuture<String> getQuote(String stock)
 	{
-		final Future<BigDecimal> ret = new Future<BigDecimal>();
+		final Future<String> ret = new Future<String>();
+//		ret.addResultListener(new IResultListener<String>()
+//		{
+//			public void resultAvailable(String result)
+//			{
+//				System.out.println("res: "+result);
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ex: "+exception);
+//				exception.printStackTrace();
+//			}
+//		});
 		
 		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, BigDecimal>(ret)
+		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, String>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				cms.createComponent(null, "invocation", null, null)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, BigDecimal>(ret)
+				CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
+				cms.createComponent(null, "invocation", ci, null)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, String>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier cid) 
 					{
-						cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, BigDecimal>(ret)
+						cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, String>(ret)
 						{
 							public void customResultAvailable(IExternalAccess exta) 
 							{
-								exta.scheduleStep(new IComponentStep<BigDecimal>()
+								exta.scheduleStep(new IComponentStep<String>()
 								{
-									public IFuture<BigDecimal> execute(IInternalAccess ia)
+									public IFuture<String> execute(IInternalAccess ia)
 									{
-										Future<BigDecimal> re = new Future<BigDecimal>();
+										Future<String> re = new Future<String>();
 										try
 										{
-											System.out.println("1");
-											StockQuotes sq = new StockQuotes();
-											System.out.println("2");
-											StockQuotesSoap sqs = sq.getStockQuotesSoap();
-											System.out.println("3");
-											BigDecimal res = sqs.getStockValue("Frankfurt", "F", null);
-											System.out.println("4");
-											System.out.println("quote is: "+res);
+//											System.out.println("1");
+//											StockQuotes sq = new StockQuotes();
+//											System.out.println("2");
+//											StockQuotesSoap sqs = sq.getStockQuotesSoap();
+//											System.out.println("3");
+//											BigDecimal res = sqs.getStockValue("Frankfurt", "F", null);
+//											System.out.println("4");
+											String res = "33";
+//											System.out.println("quote is: "+res);
 											re.setResult(res);
+											ia.killComponent();
 										}
 										catch(Exception e)
 										{
@@ -71,7 +90,7 @@ public class QuoteWrapperService implements IQuoteService
 										}
 										return re;
 									}
-								}).addResultListener(new DelegationResultListener<BigDecimal>(ret));
+								}).addResultListener(new DelegationResultListener<String>(ret));
 							}
 						});
 					}

@@ -1,11 +1,14 @@
 package jadex.micro.examples.ws;
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.SGUI;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -16,7 +19,6 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -24,18 +26,25 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 /**
- * 
+ *  Agent that lets a user interact with the web service offering a user interface. 
  */
 @Agent
 @RequiredServices(@RequiredService(name="quoteservice", type=IQuoteService.class))
 public class UserAgent
 {
+	//-------- attributes --------
+	
 	/** The agent. */
 	@Agent
 	protected MicroAgent agent;
 	
-	/** The text field. */
-	protected JTextField tf;
+	/** The text field for the symbol. */
+	protected JTextField tfsymbol;
+	
+	/** The text field for the result. */
+	protected JTextField tfresult;
+
+	//-------- methods --------
 	
 	/**
 	 *  Called when agent is born.
@@ -46,12 +55,16 @@ public class UserAgent
 		JFrame f = new JFrame();
 		f.setLayout(new BorderLayout());
 		JPanel p = new JPanel(new FlowLayout());
-		tf = new JTextField(10);
+		tfsymbol = new JTextField(10);
+		tfsymbol.setText("Google");
 		JButton b = new JButton("get");
-		p.add(tf);
+		tfresult = new JTextField(10);
+		p.add(tfsymbol);
 		p.add(b);
+		p.add(tfresult);
 		f.add(p, BorderLayout.CENTER);
 		f.pack();
+		f.setLocation(SGUI.calculateMiddlePosition(f));
 		f.setVisible(true);
 
 		final IExternalAccess exta = agent.getExternalAccess();
@@ -60,36 +73,40 @@ public class UserAgent
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				final String exchange = null;
-				final String stock = tf.getText();
-				final String time = null;
+				final String stock = tfsymbol.getText();
+//				System.out.println("stock is: "+stock);
 				
-				exta.scheduleStep(new IComponentStep<Void>()
+				exta.scheduleStep(new IComponentStep<Object>()
 				{
-					public IFuture<Void> execute(IInternalAccess ia)
+					public IFuture<Object> execute(IInternalAccess ia)
 					{
-						final Future<Void> ret = new Future<Void>();
+						final Future<Object> ret = new Future<Object>();
 						IFuture<IQuoteService> fut = ia.getServiceContainer().getRequiredService("quoteservice");
-						fut.addResultListener(new ExceptionDelegationResultListener<IQuoteService, Void>(ret)
+						fut.addResultListener(new ExceptionDelegationResultListener<IQuoteService, Object>(ret)
 						{
 							public void customResultAvailable(IQuoteService qs)
 							{
-								qs.getQuote(exchange, stock, time)
-									.addResultListener(new ExceptionDelegationResultListener<BigDecimal, Void>(ret)
+								qs.getQuote(stock)
+									.addResultListener(new ExceptionDelegationResultListener<String, Object>(ret)
 								{
-									public void customResultAvailable(BigDecimal result) 
+									public void customResultAvailable(String result) 
 									{
-										System.out.println("quote: "+result);
+										ret.setResult(result);
+//										System.out.println("quote: "+result);
 									};
 								});
 							}
 						});
 						return ret;
 					}
+				}).addResultListener(new SwingDefaultResultListener<Object>()
+				{
+					public void customResultAvailable(Object result)
+					{
+						tfresult.setText(""+result);
+					}
 				});
 			}
 		});
 	}
 }
-
-
