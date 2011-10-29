@@ -14,6 +14,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
@@ -1882,6 +1883,59 @@ public class SUtil
 //			e.printStackTrace();
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Get a IPV4 address of the local host.
+	 *  Ignores loopback address and V4 addresses.
+	 *  @return First found IPV4 address.
+	 */
+	public static InetAddress getInet6Address()
+	{
+		InetAddress ret = null;
+		
+		try
+		{
+			Enumeration e = NetworkInterface.getNetworkInterfaces();
+			while(e.hasMoreElements() && ret==null)
+			{
+				NetworkInterface ni = (NetworkInterface)e.nextElement();
+				Enumeration e2 = ni.getInetAddresses();
+				while(e2.hasMoreElements() && ret==null)
+				{
+					InetAddress tmp = (InetAddress)e2.nextElement();
+					if(tmp instanceof Inet6Address && !tmp.isLoopbackAddress())
+						ret = (InetAddress)tmp;
+				}
+			}
+			
+			if(ret==null)
+			{
+				InetAddress tmp = InetAddress.getLocalHost();
+				if(tmp instanceof Inet6Address && !tmp.isLoopbackAddress())
+					ret = (InetAddress)tmp;
+			}
+		}
+		catch(Exception e)
+		{
+//			e.printStackTrace();
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get an address of the local host.
+	 *  Tries to get a IPV4 address and if not available 
+	 *  tries to get a IPV6 address.
+	 *  @return First found IPV4 or IPV6 address.
+	 */
+	public static InetAddress getInetAddress()
+	{
+		InetAddress ret = getInet4Address();
+		if(ret==null)
+			ret = getInet6Address();
 		return ret;
 	}
 	

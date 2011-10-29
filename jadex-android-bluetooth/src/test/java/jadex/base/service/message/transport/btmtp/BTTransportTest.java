@@ -82,33 +82,11 @@ public class BTTransportTest extends TestCase {
 		{
 			public void writeObject(WriteContext wc, Object object, QName tag) throws Exception 
 			{
-//				System.out.println("object: "+object);
-//				if(object instanceof RemoteResultCommand)
-//					System.out.println("huhuhu");
-				
-				if(SServiceProvider.isRemoteReference(object))
-				{
-//					System.out.println("changed: "+object.getClass()+" "+object);
-					//object = preproc.preProcess(wc, object);
-				}
-//				else
-//				{
-//					System.out.println("kept: "+object.getClass()+" "+object);
-//				}
-				
-				// Perform pojo service replacement (for local and remote calls).
-				// Test if it is pojo service impl.
-				// Has to be mapped to new proxy then
 				
 				if(object!=null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class))
 				{
-					System.out.println("test");
-					// Check if the argument type refers to the pojo service
-//					Service ser = object.getClass().getAnnotation(Service.class);
-//					if(SReflect.isSupertype(ser.value(), sic.getMethod().getParameterTypes()[i]))
 					{
 						object = BasicServiceInvocationHandler.getPojoServiceProxy(object);
-						System.out.println("proxy: "+object);
 					}
 				}
 				

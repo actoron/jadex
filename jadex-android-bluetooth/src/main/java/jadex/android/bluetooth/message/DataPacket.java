@@ -156,7 +156,7 @@ public class DataPacket {
 	}
 	
 	private void checkType() throws MessageConvertException {
-		if (this.Type < -1 || this.Type > TYPE_DESCRIPTIONS.length) {
+		if (this.Type < 0 || this.Type >= TYPE_DESCRIPTIONS.length) {
 			throw new MessageConvertException("Could not encode/decode Message: Type must be valid! (was " + this.Type);
 		}
 	}
