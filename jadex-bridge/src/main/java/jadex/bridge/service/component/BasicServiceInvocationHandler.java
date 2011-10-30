@@ -350,7 +350,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				if(!service.getClass().isAnnotationPresent(Service.class)
 					// Hack!!! BPMN uses a proxy as service implementation.
 					&& !(Proxy.isProxyClass(service.getClass())
-							&& Proxy.getInvocationHandler(service).getClass().isAnnotationPresent(Service.class)))
+					&& Proxy.getInvocationHandler(service).getClass().isAnnotationPresent(Service.class)))
 				{
 					throw new RuntimeException("Pojo service must declare @Service annotation: "+service.getClass());
 				}

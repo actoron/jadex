@@ -16,6 +16,7 @@ import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
@@ -23,7 +24,9 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
+import jadex.kernelbase.InterpreterFetcher;
 import jadex.micro.annotation.Agent;
 
 import java.io.PrintWriter;
@@ -259,6 +262,25 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				return "microagent.executeBody()_#"+this.hashCode();
 			}
 		});
+	}
+	
+	/**
+	 *  Get the value fetcher.
+	 */
+	public IValueFetcher getFetcher()
+	{
+		assert !getComponentAdapter().isExternalThread();
+		
+		if(fetcher==null)
+		{
+			SimpleValueFetcher fetcher = new SimpleValueFetcher(super.getFetcher());
+			if(microagent instanceof IPojoMicroAgent)
+			{
+				fetcher.setValue("$pojoagent", ((IPojoMicroAgent)microagent).getPojoAgent());
+			}
+			this.fetcher = fetcher;
+		}
+		return fetcher;
 	}
 	
 //	/**
