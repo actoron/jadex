@@ -11,5 +11,4 @@ import jadex.micro.annotation.Agent;
 @Agent
 public class InvocationAgent
 {
-
 }
