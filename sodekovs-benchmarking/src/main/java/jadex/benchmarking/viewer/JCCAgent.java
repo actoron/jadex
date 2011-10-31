@@ -40,9 +40,9 @@ public class JCCAgent extends MicroAgent {
 	/**
 	 * Open the gui on agent startup.
 	 */
-	public IFuture agentCreated() {
+	public IFuture<Void> agentCreated() {
 		// this.saveonexit = ((Boolean)getArgument("saveonexit")).booleanValue();		
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		this.cc = new ControlCenter();
 		cc.init(getExternalAccess(), new String[] { StarterPlugin.class.getName(),
 				// StarterServicePlugin.class.getName(),
@@ -53,16 +53,16 @@ public class JCCAgent extends MicroAgent {
 				LibraryServicePlugin.class.getName(), AwarenessComponentPlugin.class.getName(), ComponentViewerPlugin.class.getName(), 
 				BenchmarkingPlugin.class.getName(),
 				DeployerPlugin.class.getName() }, saveonexit).addResultListener(
-				createResultListener(new DelegationResultListener(ret)));
+				createResultListener(new DelegationResultListener<Void>(ret)));
 		return ret;
 	}
 
 	/**
 	 * Close the gui on agent shutdown.
 	 */
-	public IFuture agentKilled() {
-		Future ret = new Future();
-		cc.shutdown().addResultListener(createResultListener(new DelegationResultListener(ret)));
+	public IFuture<Void> agentKilled() {
+		Future<Void> ret = new Future<Void>();
+		cc.shutdown().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 		return ret;
 	}
 
