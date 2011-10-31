@@ -10,6 +10,8 @@ import jadex.android.bluetooth.util.Helper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.Buffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -29,10 +31,17 @@ public abstract class AConnection implements IConnection {
 
 	protected List<IConnectionListener> listeners;
 
+	private int lastPacketBytesRead;
+	private byte[] lastReceivedPacket;
+	private boolean lastPacketComplete;
+
 	public AConnection(IBluetoothAdapter adapter, IBluetoothDevice remoteDevice) {
 		this.adapter = adapter;
 		this.remoteDevice = remoteDevice;
 		listeners = new CopyOnWriteArrayList<IConnectionListener>();
+		lastReceivedPacket = new byte[DataPacket.PACKET_SIZE];
+		lastPacketBytesRead = 0;
+		lastPacketComplete = true;
 	}
 
 	protected class ConnectedThread extends Thread {
@@ -73,7 +82,7 @@ public abstract class AConnection implements IConnection {
 			reader.start();
 			writer.start();
 		}
-		
+
 		private synchronized void _write(byte[] bytes) throws IOException {
 			try {
 				mmOutStream.write(bytes);
@@ -81,12 +90,13 @@ public abstract class AConnection implements IConnection {
 			} catch (IOException e) {
 				Log.e(Helper.LOG_TAG,
 						"catched Exception while writing to Stream: "
-								+ e.toString() + "\n " + Helper.stackTraceToString(e.getStackTrace()));
+								+ e.toString() + "\n "
+								+ Helper.stackTraceToString(e.getStackTrace()));
 				setConnectionAlive(false);
 				throw e;
 			}
 		}
-		
+
 		/* Call this from the main Activity to send data to the remote device */
 		public void write(byte[] bytes) {
 			if (running) {
@@ -143,39 +153,35 @@ public abstract class AConnection implements IConnection {
 			@Override
 			public void run() {
 				setConnectionAlive(true);
-				byte[] buffer;  // buffer store for the
-												// stream
-				int bytes; // bytes returned from read()
+				byte[] buffer; // buffer store for the
+								// stream
+
+				// hardcoded value because android seems to use this value as internal buffer, too.
+				// InputStream.read() doesn't return more than 1008 bytes at once.
+				buffer = new byte[1024];
+
 				// Keep listening to the InputStream until an exception
 				// occurs
+
 				while (running) {
 					try {
 						// Read from the InputStream
-						buffer = new byte[DataPacket.PACKET_SIZE + 1];
-						bytes = mmInStream.read(buffer);
-						Log.i(Helper.LOG_TAG, "(Connection) received a packet of size: " + bytes);
-						if (bytes > DataPacket.PACKET_SIZE) {
-							mmInStream.skip(mmInStream.available());
-							Log.e(Helper.LOG_TAG, "Received a DataPacket which is too big for the receivebuffer! Dropping.");
-							continue;
-						}
-						// Send the obtained bytes to the UI Activity
-						DataPacket dataPacket = new DataPacket(buffer);
-						// BluetoothMessage bluetoothMessage = new
-						// BluetoothMessage(
-						// mmSocket.getRemoteDevice(), buffer);
-						// mHandler.obtainMessage(MESSAGE_READ, bytes, -1,
-						// bluetoothMessage).sendToTarget();
+						List<DataPacket> packets = readPacketFromStream(
+								mmInStream, buffer);
 						synchronized (ConnectedThread.this) {
-							notifyMessageReceived(dataPacket);
+							for (DataPacket dataPacket : packets) {
+								notifyMessageReceived(dataPacket);
+							}
 						}
 					} catch (IOException e) {
 						// maybe remove connection from list here?
 						if (running) {
-						Log.e(Helper.LOG_TAG,
-								"catched IOException while reading from Stream:"
-										+ e.toString() + "\n "
-										+ Helper.stackTraceToString(e.getStackTrace()));
+							Log.e(Helper.LOG_TAG,
+									"catched IOException while reading from Stream:"
+											+ e.toString()
+											+ "\n "
+											+ Helper.stackTraceToString(e
+													.getStackTrace()));
 						}
 						setConnectionAlive(false);
 						break;
@@ -185,6 +191,87 @@ public abstract class AConnection implements IConnection {
 				}
 			}
 		}
+
+	}
+
+	/**
+	 * Reads {@link DataPacket}s from an Input Stream.
+	 * 
+	 * @param inputStream The Input stream to read from.
+	 * @param buffer The Buffer to use while reading.
+	 * @return List of received {@link DataPacket}s.
+	 * @throws IOException this exception is passed through from InputStream.read().
+	 * @throws MessageConvertException thrown if data contains invalid {@link DataPacket}. 
+	 */
+	protected List<DataPacket> readPacketFromStream(InputStream inputStream,
+			byte[] buffer) throws IOException, MessageConvertException {
+		int bytes; // bytes returned from read()
+		ArrayList<DataPacket> receivedPackets = new ArrayList<DataPacket>();
+		DataPacket dataPacket = null;
+
+		while (dataPacket == null) { // read at least one full packet
+			bytes = inputStream.read(buffer);
+			Log.d(Helper.LOG_TAG,
+					"(Connection) received a stream chunk of size: " + bytes);
+			short totalSize;
+
+			int byteIndexInPacket = 0;
+			int byteIndexInBuffer = 0;
+			int missingBytes = 0;
+
+			if (lastPacketComplete) {
+				totalSize = (short) (DataPacket
+						.getDataSizeFromPacketByteArray(buffer,0) + DataPacket.HEADER_SIZE);
+				byteIndexInPacket = 0;
+				lastPacketBytesRead = 0;
+				lastPacketComplete = false;
+			} else {
+				// Resuming packet receiption from earlier read()
+				byteIndexInPacket = lastPacketBytesRead;
+				totalSize = (short) (DataPacket
+						.getDataSizeFromPacketByteArray(lastReceivedPacket,0) + DataPacket.HEADER_SIZE);
+			}
+
+			missingBytes = totalSize - lastPacketBytesRead;
+			byteIndexInBuffer = 0;
+			while (byteIndexInBuffer < bytes - 1) { 
+				// continue as long as we're not finished interpreting the whole buffer
+
+				// read one Packet, or, the most of the Packet we can get:
+				for (; byteIndexInBuffer < missingBytes
+						&& byteIndexInBuffer < bytes; byteIndexInBuffer++, byteIndexInPacket++) {
+					lastReceivedPacket[byteIndexInPacket] = buffer[byteIndexInBuffer];
+				}
+				lastPacketBytesRead = byteIndexInPacket;
+
+				if (lastPacketBytesRead >= totalSize && totalSize != 0) {
+					// read one packet successfully
+					dataPacket = new DataPacket(lastReceivedPacket);
+					Log.d(Helper.LOG_TAG,
+							"(Connection) received a DataPacket of Size: " + totalSize);
+					receivedPackets.add(dataPacket);
+					if (bytes > missingBytes) {
+						// received more than one packet.
+						// the while-loop will continue to read the input buffer and
+						// build more packets
+						byteIndexInPacket = 0;
+						// next packet starts at byteIndexInBuffer
+						// TODO: this will fail if the first 58 bytes of the next packet are not transmitted yet!!
+						totalSize = DataPacket.getDataSizeFromPacketByteArray(buffer,byteIndexInBuffer);
+						// add the current buffer index to missing size
+						missingBytes = totalSize + byteIndexInBuffer;
+						lastPacketBytesRead = 0;
+						lastPacketComplete = false;
+					} else {
+						lastPacketComplete = true;
+					}
+				} else {
+					// need more data to complete the packet
+					lastPacketComplete = false;
+				}
+			}
+		}
+		return receivedPackets;
 	}
 
 	/*

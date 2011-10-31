@@ -237,7 +237,7 @@ public class DataPacketTest {
 		assertNotNull(asByteArray);
 	}
 
-	private IBluetoothDevice getBTDummyDevice() {
+	public static IBluetoothDevice getBTDummyDevice() {
 		return new IBluetoothDevice() {
 			@Override
 			public void writeToParcel(Parcel dest, int flags) {

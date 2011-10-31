@@ -42,9 +42,9 @@ public class DataPacket {
 
 	// this is copied from BTClick. Setting higher values should work just fine.
 //	public static final int PACKET_SIZE = 1008;
-	public static final int PACKET_SIZE = 2048;
-	public static final int HEADER_SIZE = 1 + 17 + 17 + 1 + 21 + 2 + 1;
-	public static final int DATA_MAX_SIZE = PACKET_SIZE - HEADER_SIZE;
+	public static final short PACKET_SIZE = 2048;
+	public static final short HEADER_SIZE = 1 + 17 + 17 + 1 + 21 + 2 + 1;
+	public static final short DATA_MAX_SIZE = PACKET_SIZE - HEADER_SIZE;
 
 	public DataPacket(BluetoothMessage msg, byte type) throws MessageConvertException {
 		this(msg.getRemoteAdress(), msg.getData(), type);
@@ -74,9 +74,8 @@ public class DataPacket {
 		this.Dest = new String(buffer, 18, 17);
 		this.pktId = new String(buffer, 35, 21);
 		this.HopCount = buffer[56];
-		byte[] dataSize = new byte[] { buffer[57], buffer[58] };
 
-		this.dataSize = readShort(dataSize, 0);
+		this.dataSize = getDataSizeFromPacketByteArray(buffer, 0);
 		
 		if (this.dataSize < 0) {
 			throw new MessageConvertException("Could not read packet from byte Array. Buffer length is " +
@@ -101,8 +100,11 @@ public class DataPacket {
 			}
 		}
 
-		dataSize = null;
 		buffer = null;
+	}
+
+	public static short getDataSizeFromPacketByteArray(byte[] buffer, int offset) {
+		return readShortFromBytes(buffer[57 + offset], buffer[58 + offset]);
 	}
 
 
@@ -187,8 +189,8 @@ public class DataPacket {
 		this.pktId = this.pktId.substring(pktId.length() - 21, pktId.length());
 	}
 
-	public short readShort(byte[] data, int offset) {
-		return (short) (((data[offset] << 8)) | ((data[offset + 1] & 0xff)));
+	private static short readShortFromBytes(byte byte1, byte byte2) {
+		return (short) (((byte1 << 8)) | ((byte2 & 0xff)));
 	}
 
 	public byte[] shortToByteArray(short s) {
