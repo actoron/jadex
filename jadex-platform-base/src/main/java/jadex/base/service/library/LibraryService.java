@@ -1523,62 +1523,65 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	protected void	collectManifestURLs(URL url, Set<URL> set)
 	{
-        try 
-        {
-    		File	file	= urlToFile(url.toString());
-            JarFile	jarfile	= new JarFile(file);
-            Manifest manifest = jarfile.getManifest();
-            if(manifest!=null)
-            {
-                String	classpath	= manifest.getMainAttributes().getValue(new Attributes.Name("Class-Path"));
-                if(classpath!=null)
-                {
-                	StringTokenizer	tok	= new StringTokenizer(classpath, " ");
-            		while(tok.hasMoreElements())
-            		{
-            			String path = tok.nextToken();
-            			File	urlfile;
-            			
-            			// Search in directory of original jar (todo: also search in local dir!?)
-            			urlfile = new File(file.getParentFile(), path);
-            			
-            			// Try as absolute path
-            			if(!urlfile.exists())
-            			{
-            				urlfile	= new File(path);
-            			}
-            			
-            			// Try as url
-            			if(!urlfile.exists())
-            			{
-            				urlfile	= urlToFile(path);
-            			}
-
-            			if(urlfile!=null && urlfile.exists())
-            			{
-	            			try
-		                	{
-	            				URL depurl = urlfile.toURI().toURL();
-	            				set.add(depurl);
-	            				collectManifestURLs(depurl, set);
+		File	file	= urlToFile(url.toString());
+		if(file!=null && file.exists() && !file.isDirectory())	// Todo: load manifest also from directories!?
+		{
+	        try 
+	        {
+	            JarFile	jarfile	= new JarFile(file);
+	            Manifest manifest = jarfile.getManifest();
+	            if(manifest!=null)
+	            {
+	                String	classpath	= manifest.getMainAttributes().getValue(new Attributes.Name("Class-Path"));
+	                if(classpath!=null)
+	                {
+	                	StringTokenizer	tok	= new StringTokenizer(classpath, " ");
+	            		while(tok.hasMoreElements())
+	            		{
+	            			String path = tok.nextToken();
+	            			File	urlfile;
+	            			
+	            			// Search in directory of original jar (todo: also search in local dir!?)
+	            			urlfile = new File(file.getParentFile(), path);
+	            			
+	            			// Try as absolute path
+	            			if(!urlfile.exists())
+	            			{
+	            				urlfile	= new File(path);
 	            			}
-	                    	catch (Exception e)
-	                    	{
-	                    		component.getLogger().warning("Error collecting manifest URLs for "+urlfile+": "+e);
+	            			
+	            			// Try as url
+	            			if(!urlfile.exists())
+	            			{
+	            				urlfile	= urlToFile(path);
+	            			}
+	
+	            			if(urlfile!=null && urlfile.exists())
+	            			{
+		            			try
+			                	{
+		            				URL depurl = urlfile.toURI().toURL();
+		            				set.add(depurl);
+		            				collectManifestURLs(depurl, set);
+		            			}
+		                    	catch (Exception e)
+		                    	{
+		                    		component.getLogger().warning("Error collecting manifest URLs for "+urlfile+": "+e);
+		                    	}
 	                    	}
-                    	}
-            			else
-            			{
-            				component.getLogger().warning("Jar not found: "+urlfile);
-            			}
-               		}
-                }
-            }
-        }
-        catch(Exception e)
-        {
-    		component.getLogger().warning("Error collection manifest URLs for "+url+": "+e);
-        }
+	            			else
+	            			{
+	            				component.getLogger().warning("Jar not found: "+urlfile);
+	            			}
+	               		}
+	                }
+	            }
+		    }
+		    catch(Exception e)
+		    {
+				component.getLogger().warning("Error collecting manifest URLs for "+url+": "+e);
+		    }
+		}
 	}	
 }
 

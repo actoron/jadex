@@ -2127,7 +2127,7 @@ public abstract class OAVAbstractState	implements IOAVState
 										}
 										catch(Exception e)
 										{
-											// Todo: use customizsble logger supplied from external.
+											// Todo: use customizable logger supplied from external.
 											e.printStackTrace();
 										}
 									}

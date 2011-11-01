@@ -51,18 +51,4 @@ public class JadexDispatcherServlet extends HttpServlet
 		RequestDispatcher	rd	= getServletContext().getRequestDispatcher("/WEB-INF/index.jsp");
 		rd.forward(request, response);
 	}
-	
-	//-------- main for testing --------
-//	
-//	public static void	main(String[] args)
-//	{
-//		args	= new String[]
-//		{
-//			"-gui", "false",
-//			"-extensions", "null"
-//		};
-//		ThreadSuspendable	sus	= new ThreadSuspendable();
-//		IExternalAccess	platform	= Starter.createPlatform(args).get(sus, 30000);
-//		System.out.println("Platform is "+platform.getComponentIdentifier());	
-//	}
 }

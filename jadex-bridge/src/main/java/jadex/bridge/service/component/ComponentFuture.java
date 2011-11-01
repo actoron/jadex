@@ -85,21 +85,32 @@ public class ComponentFuture<E> extends Future<E>
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
      */
-    public void	setResult(E result)
+    public void	setResult(final E result)
     {
-		// Copy result if
-		// - copy flag is true
-		// - and result is not a reference object
-    	if(copy && result!=null)
+    	E	res	= result;
+    	if(result!=null)
 		{
-			boolean copy = !marshal.isLocalReference(result);
-			if(copy)
-			{
-//				System.out.println("copy result: "+result);
-				result = (E)Cloner.deepCloneObject(result, marshal.getCloneProcessors(), filter);
-			}
+    		// Hack!!! Should copy in any case to apply processors
+    		// (e.g. for proxy replacement of service references).
+    		// Does not work, yet as service object might have wrong interface
+    		// (e.g. service interface instead of listener interface --> settings properties provider)
+    		if(copy && !marshal.isLocalReference(result))
+    		{
+	//			System.out.println("copy result: "+result);
+	    		// Copy result if
+	    		// - copy flag is true (use custom filter)
+	    		// - or result is not a reference object (default filter)
+	    		IFilter	filter	= copy ? new IFilter()
+				{
+					public boolean filter(Object obj)
+					{
+						return obj==result ? false : ComponentFuture.this.filter.filter(obj);
+					}
+				} : this.filter;
+				res = Cloner.deepCloneObject(result, marshal.getCloneProcessors(), filter);
+    		}
 		}
-		super.setResult(result);
+		super.setResult(res);
     }
  
 //    /**

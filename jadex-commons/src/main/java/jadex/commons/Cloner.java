@@ -2,6 +2,7 @@ package jadex.commons;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -98,9 +99,9 @@ public class Cloner
 	/**
 	 *  Deep clone an object.
 	 */
-	public static Object deepCloneObject(Object object, List processors, IFilter filter)
+	public static <T> T deepCloneObject(T object, List processors, IFilter filter)
 	{
-		return getInstance().deepClone(object, null, new HashMap(), processors, filter);
+		return (T)getInstance().deepClone(object, null, new HashMap(), processors, filter);
 	}
 	
 	/**
@@ -130,7 +131,7 @@ public class Cloner
 	/**
 	 *  Deep clone an object.
 	 */
-	public Object deepClone(Object object, Class clazz, Map cloned, List processors, IFilter filter)
+	public Object deepClone(Object object, Class<?> clazz, Map cloned, List processors, IFilter filter)
 	{
 		Object ret = null;
 		
@@ -150,16 +151,34 @@ public class Cloner
 				ret = cloned.get(object);
 				fin = true;
 			}
-			else if(processors!=null)
+			
+			if(processors!=null)
 			{
-				for(int i=0; i<processors.size() && !fin; i++)
+				// Todo: apply all or only first matching processor!?
+				Object	processed	= object;
+				for(int i=0; i<processors.size()/* && !fin*/; i++)
 				{
 					ICloneProcessor proc = (ICloneProcessor)processors.get(i);
-					if(proc.isApplicable(object))
+					if(proc.isApplicable(processed))
 					{
-						ret = proc.process(object, processors);
+						processed = proc.process(processed, processors);
+						ret	= processed;
 						fin = true;
 					}
+				}
+			}
+			
+			if(!fin && object instanceof Cloneable && !object.getClass().isArray())
+			{
+				try
+				{
+					Method	clone	= clazz.getMethod("clone", new Class[0]);
+					ret	= clone.invoke(object, new Object[0]);
+					fin	= true;
+				}
+				catch(Exception e)
+				{
+					throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
 				}
 			}
 				
@@ -243,7 +262,7 @@ public class Cloner
 					}
 					catch(Exception e)
 					{
-						throw new RuntimeException(e);
+						throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
 					}
 				}
 			}
@@ -307,7 +326,7 @@ public class Cloner
 					}
 					catch(Exception e)
 					{
-						throw new RuntimeException(e);
+						throw (e instanceof RuntimeException) ? (RuntimeException)e : new RuntimeException(e);
 					}
 				}
 			}

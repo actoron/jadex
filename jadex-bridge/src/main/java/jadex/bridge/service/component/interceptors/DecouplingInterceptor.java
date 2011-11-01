@@ -150,11 +150,30 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			{
 				for(int i=0; i<args.length; i++)
 				{
-					boolean ref = refs[i] || marshal.isLocalReference(args[i]);
-					
-//					if(!ref && args[i]!=null)
-//						System.out.println("copy arg: "+args[i]);
-					copyargs.add(ref? args[i]: Cloner.deepCloneObject(args[i], marshal.getCloneProcessors(), filter));
+		    		// Hack!!! Should copy in any case to apply processors
+		    		// (e.g. for proxy replacement of service references).
+		    		// Does not work, yet as service object might have wrong interface
+		    		// (e.g. service interface instead of listener interface --> settings properties provider)
+					if(!refs[i] && !marshal.isLocalReference(args[i]))
+					{
+			    		// Pass arg as reference if
+			    		// - refs[i] flag is true (use custom filter)
+			    		// - or result is a reference object (default filter)
+						final Object arg	= args[i];
+			    		IFilter	filter	= refs[i] ? new IFilter()
+						{
+							public boolean filter(Object obj)
+							{
+								return obj==arg ? true : DecouplingInterceptor.this.filter.filter(obj);
+							}
+						} : this.filter;
+						
+						copyargs.add(Cloner.deepCloneObject(args[i], marshal.getCloneProcessors(), filter));
+					}
+					else
+					{
+						copyargs.add(args[i]);
+					}
 				}
 //				System.out.println("call: "+method.getName()+" "+notcopied+" "+SUtil.arrayToString(method.getParameterTypes()));//+" "+SUtil.arrayToString(args));
 				sic.setArguments(copyargs);

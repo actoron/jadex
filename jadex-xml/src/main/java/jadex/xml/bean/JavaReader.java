@@ -713,9 +713,9 @@ public class JavaReader
 	 *  @param val The string value.
 	 *  @return The decoded object.
 	 */
-	public static Object objectFromXML(String val, ClassLoader classloader)
+	public static <T> T objectFromXML(String val, ClassLoader classloader)
 	{
-		return Reader.objectFromXML(getInstance(), val, classloader);
+		return (T)Reader.objectFromXML(getInstance(), val, classloader);
 	}
 	
 	/**

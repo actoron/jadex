@@ -16,7 +16,7 @@
 		<import>jadex.bridge.service.search.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.bridge.service.*</import>
-		<import>jadex.bridge.service.threadpool.*</import>
+		<import>jadex.bridge.service.types.threadpool.*</import>
 		<import>jadex.bdi.runtime.impl.*</import>
 	</imports>
 	

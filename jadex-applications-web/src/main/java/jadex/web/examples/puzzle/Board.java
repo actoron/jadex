@@ -1,17 +1,13 @@
 package jadex.web.examples.puzzle;
 
-import java.beans.ExceptionListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  The board containing places, pieces and played moves.
@@ -21,10 +17,10 @@ public class Board implements Serializable, Cloneable
 	//-------- attributes --------
 
 	/** The moves. */
-	protected ArrayList moves;
+	protected List<Move> moves;
 
 	/** The pieces. */
-	protected HashMap pieces;
+	protected Map<Position, Piece> pieces;
 
 	/** The size. */
 	protected int size;
@@ -33,7 +29,6 @@ public class Board implements Serializable, Cloneable
 	protected Position hole_pos;
 
 	/** The helper object for bean events. */
-	//public ConcurrentPropertyChangeSupport pcs;
 	public PropertyChangeSupport pcs;
 
 	//-------- constructors --------
@@ -51,8 +46,8 @@ public class Board implements Serializable, Cloneable
 	 */
 	public Board(int size)
 	{
-		this.moves = new ArrayList();
-		this.pieces = new HashMap();
+		this.moves = new ArrayList<Move>();
+		this.pieces = new HashMap<Position, Piece>();
 		this.size = size;
 		//this.pcs = new ConcurrentPropertyChangeSupport(this);
 		this.pcs = new PropertyChangeSupport(this);
@@ -84,18 +79,18 @@ public class Board implements Serializable, Cloneable
 	/**
 	 *  Get a piece for a location.
 	 */
-	public synchronized Piece getPiece(Position pos)
+	public Piece getPiece(Position pos)
 	{
-		return (Piece)pieces.get(pos);
+		return pieces.get(pos);
 	}
 
 	/**
 	 *  Get possible moves.
 	 *  @return Get all possible move.
 	 */
-	public synchronized List getPossibleMoves()
+	public List<Move> getPossibleMoves()
 	{
-		List ret = new ArrayList();
+		List<Move> ret = new ArrayList<Move>();
 
 		int hx = hole_pos.getX();
 		int hy = hole_pos.getY();
@@ -149,7 +144,7 @@ public class Board implements Serializable, Cloneable
 	 *  Do a move.
 	 *  @param move The move.
 	 */
-	public synchronized boolean move(Move move)
+	public boolean move(Move move)
 	{
 		if (!isPossibleMove(move))
 		{
@@ -161,27 +156,27 @@ public class Board implements Serializable, Cloneable
 		pieces.put(move.getEnd(), piece);
 		moves.add(move);
 		hole_pos = move.getStart();
-		pcs.firePropertyChange("move", null, move);
+		pcs.firePropertyChange("solution", null, move);
 		return true;
 	}
 
 	/**
 	 *  Takeback a move.
 	 */
-	public synchronized boolean takeback()
+	public boolean takeback()
 	{
 		if (moves.size() == 0)
 		{
 			return false;
 		}
 
-		Move move = (Move)moves.get(moves.size()-1);
+		Move move = moves.get(moves.size()-1);
 		Piece piece = getPiece(move.getEnd());
 		pieces.remove(move.getEnd());
 		pieces.put(move.getStart(), piece);
 		moves.remove(moves.size()-1);
 		hole_pos = move.getEnd();
-		pcs.firePropertyChange("takeback", null, move);
+		pcs.firePropertyChange("solution", null, move);
 		return true;
 	}
 
@@ -189,7 +184,7 @@ public class Board implements Serializable, Cloneable
 	 *  Test if it is a solution.
 	 *  @return True, if solution.
 	 */
-	public synchronized boolean isSolution()
+	public boolean isSolution()
 	{
 		int middle = size/2;
 		if (!isFreePosition(new Position(middle, middle)))
@@ -231,7 +226,7 @@ public class Board implements Serializable, Cloneable
 	 */
 	public synchronized Move getLastMove()
 	{
-		return moves.size()>0? (Move)moves.get(moves.size()-1): null;
+		return moves.size()>0? moves.get(moves.size()-1): null;
 	}
 
 	/**
@@ -244,7 +239,7 @@ public class Board implements Serializable, Cloneable
 		boolean ret = true;
 		if(moves.size()>0)
 		{
-			Move last = (Move)moves.get(moves.size()-1);
+			Move last = moves.get(moves.size()-1);
 			ret = getPiece(last.getEnd()).isWhite();
 		}
 		return ret;
@@ -312,9 +307,9 @@ public class Board implements Serializable, Cloneable
 	/**
 	 *  Get the current board position.
 	 */
-	public synchronized List getCurrentPosition()
+	public List<Piece> getCurrentPosition()
 	{
-		List ret = new ArrayList();
+		List<Piece> ret = new ArrayList<Piece>();
 		for(int y=0; y<size; y++)
 		{
 			for(int x=0; x<size; x++)
@@ -351,14 +346,14 @@ public class Board implements Serializable, Cloneable
 		try
 		{
 			Board clone = (Board)super.clone();
-			clone.moves = new ArrayList();
-			clone.pieces = new HashMap();
+			clone.moves = new ArrayList<Move>();
+			clone.pieces = new HashMap<Position, Piece>();
 			clone.pcs = new PropertyChangeSupport(this);
 			for(int i=0; i<moves.size(); i++)
-				clone.moves.add(((Move)moves.get(i)).clone());
+				clone.moves.add((Move)moves.get(i).clone());
 			Position[] pos = (Position[])pieces.keySet().toArray(new Position[pieces.size()]);
 			for(int i=0; i<pos.length; i++)
-				clone.pieces.put(pos[i].clone(), ((Piece)pieces.get(pos[i])).clone());
+				clone.pieces.put((Position)pos[i].clone(), (Piece)pieces.get(pos[i]).clone());
 			return clone;
 		}
 		catch(CloneNotSupportedException e)
@@ -399,7 +394,7 @@ public class Board implements Serializable, Cloneable
 	{
 		Board board = new Board(5);
 		//System.out.println(board);
-		List moves = board.getPossibleMoves();
+		List<Move> moves = board.getPossibleMoves();
 		System.out.println(moves);
 		board.move((Move)moves.get(0));
 

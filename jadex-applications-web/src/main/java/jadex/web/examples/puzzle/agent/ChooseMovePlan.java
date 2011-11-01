@@ -1,6 +1,7 @@
 package jadex.web.examples.puzzle.agent;
 
 import jadex.bdi.runtime.ICandidateInfo;
+import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.commons.SUtil;
 import jadex.web.examples.puzzle.Board;
@@ -22,11 +23,12 @@ public class ChooseMovePlan extends Plan
 	{
 		//System.out.println("Meta");
 		ICandidateInfo[] apps = (ICandidateInfo[])getParameterSet("applicables").getValues();
+		IGoal	movegoal	= (IGoal)apps[0].getElement();
 
 		assert apps.length>0;
 
 		ICandidateInfo sel = null;
-		Board board = (Board)getParameter("board").getValue();
+		Board board = (Board)movegoal.getParameter("board").getValue();
 		String ml = (String)getBeliefbase().getBelief("ml").getFact();
 		if(ml.equals("none"))
 			sel = apps[0];

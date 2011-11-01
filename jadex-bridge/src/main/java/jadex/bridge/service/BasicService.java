@@ -4,7 +4,7 @@ import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.SReflect;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -216,19 +216,19 @@ public class BasicService implements IInternalService
 		// Deregister pojo->sid mapping in shutdown.
 		BasicServiceInvocationHandler.removePojoServiceProxy(sid);
 		
-		final Future ret = new Future();
-		isValid().addResultListener(new DelegationResultListener(ret)
+		final Future<Void> ret = new Future<Void>();
+		isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Boolean result)
 			{
-				if(!((Boolean)result).booleanValue())
+				if(!result.booleanValue())
 				{
 					ret.setException(new RuntimeException("Not running."));
 				}
 				else
 				{
 					shutdowned = true;
-					ret.setResult(getServiceIdentifier());
+					ret.setResult(null);
 				}
 			}
 		});

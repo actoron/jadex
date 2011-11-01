@@ -265,8 +265,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					getLogger().warning("Exception in service init : "+is.getServiceIdentifier());
-					initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
+					ret.setException(exception);
+//					getLogger().warning("Exception in service init : "+is.getServiceIdentifier());
+//					initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -299,20 +300,22 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			}
 			
 			// Shutdown services in reverse order as later services might depend on earlier ones.
-			final IInternalService	service	= (IInternalService)allservices.remove(allservices.size()-1);
-			getLogger().info("Terminating service: "+service.getServiceIdentifier());
+			final IInternalService[]	service	= new IInternalService[1];	// one element array for final variable.
+			service[0]	= (IInternalService)allservices.remove(allservices.size()-1);
+			getLogger().info("Terminating service: "+service[0].getServiceIdentifier());
 //			System.out.println("shutdown start: "+service.getServiceIdentifier());
-			service.shutdownService().addResultListener(new DelegationResultListener(ret)
+			service[0].shutdownService().addResultListener(new DelegationResultListener(ret)
 			{
 				public void customResultAvailable(Object result)
 				{
-					getLogger().info("Terminated service: "+service.getServiceIdentifier());
+					getLogger().info("Terminated service: "+service[0].getServiceIdentifier());
 //					System.out.println("shutdown end: "+result);
 					if(!allservices.isEmpty())
 					{
-						IInternalService service = (IInternalService)allservices.remove(allservices.size()-1);
+						service[0] = (IInternalService)allservices.remove(allservices.size()-1);
+						getLogger().info("Terminating service: "+service[0].getServiceIdentifier());
 //						System.out.println("shutdown start: "+service.getServiceIdentifier());
-						service.shutdownService().addResultListener(this);
+						service[0].shutdownService().addResultListener(this);
 					}
 					else
 					{

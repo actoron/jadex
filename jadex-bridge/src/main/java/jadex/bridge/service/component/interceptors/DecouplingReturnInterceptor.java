@@ -9,7 +9,6 @@ import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.marshal.IMarshalService;
-import jadex.commons.IFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -38,10 +37,6 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 	
 	/** The marshal service. */
 	protected IMarshalService marshal;
-	
-	/** The clone filter (fascade for marshal). */
-	protected IFilter filter;
-
 	
 	//-------- constructors --------
 	
@@ -77,13 +72,6 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				public void customResultAvailable(IMarshalService result)
 				{
 					marshal = result;
-					filter = new IFilter()
-					{
-						public boolean filter(Object object)
-						{
-							return marshal.isLocalReference(object);
-						}
-					}; 
 					internalExecute(sic).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});

@@ -18,8 +18,8 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -298,60 +298,27 @@ public class Starter
 										{
 											public void customResultAvailable(final IComponentInstance instance)
 											{
-												final CounterResultListener<IComponentIdentifier>	crl	= new CounterResultListener<IComponentIdentifier>(
-														components.size(), new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+												startComponents(0, components, instance)
+													.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
+												{
+													public void customResultAvailable(Void result)
 													{
-														public void customResultAvailable(Void result)
+														if(Boolean.TRUE.equals(getArgumentValue(WELCOME, model, cmdargs, compargs)))
 														{
-															if(Boolean.TRUE.equals(getArgumentValue(WELCOME, model, cmdargs, compargs)))
-															{
-																long startup = System.currentTimeMillis() - starttime;
-																// platform.logger.info("Platform startup time: " + startup + " ms.");
-																System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
-															}
-															ret.setResult(instance.getExternalAccess());
+															long startup = System.currentTimeMillis() - starttime;
+															// platform.logger.info("Platform startup time: " + startup + " ms.");
+															System.out.println(desc.getName()+" platform startup time: " + startup + " ms.");
 														}
-													});
-													
-													// Start additional components.
-													if(!components.isEmpty())
-													{
-														SServiceProvider.getServiceUpwards(instance.getServiceContainer(), IComponentManagementService.class)
-															.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
-														{
-															public void customResultAvailable(IComponentManagementService cms)
-															{
-																for(int i=0; i<components.size(); i++)
-																{
-																	String	name	= null;
-																	String	config	= null;
-																	String	comp	= (String)components.get(i);
-																	int	i1	= comp.indexOf(':');
-																	if(i1!=-1)
-																	{
-																		name	= comp.substring(0, i1);
-																		comp	= comp.substring(i1+1);
-																	}
-																	int	i2	= comp.indexOf('(');
-																	if(i2!=-1)
-																	{
-																		if(comp.endsWith("("))
-																		{
-																			config	= comp.substring(i2+1, comp.length()-1);
-																			comp	= comp.substring(0, i2);
-																		}
-																		else
-																		{
-																			throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)] : "+components.get(i));
-																		}
-																	}
-																	
-																	cms.createComponent(name, comp, new CreationInfo(config, null), null)
-																		.addResultListener(crl);
-																}
-															}
-														});
+														ret.setResult(instance.getExternalAccess());
 													}
+													
+													public void exceptionOccurred(Exception exception)
+													{
+														// On exception in init: kill platform.
+														instance.getExternalAccess().killComponent();
+														super.exceptionOccurred(exception);
+													}
+												});
 											}
 										});
 									}
@@ -476,6 +443,60 @@ public class Starter
 			configname	= val!=null ? val.toString() : null;
 		}
 		return configname;
+	}
+
+	protected static IFuture<Void> startComponents(final int i, final List<String> components, final IComponentInstance instance)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		
+		if(i<components.size())
+		{
+			SServiceProvider.getServiceUpwards(instance.getServiceContainer(), IComponentManagementService.class)
+				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			{
+				public void customResultAvailable(IComponentManagementService cms)
+				{
+					String	name	= null;
+					String	config	= null;
+					String	comp	= (String)components.get(i);
+					int	i1	= comp.indexOf(':');
+					if(i1!=-1)
+					{
+						name	= comp.substring(0, i1);
+						comp	= comp.substring(i1+1);
+					}
+					int	i2	= comp.indexOf('(');
+					if(i2!=-1)
+					{
+						if(comp.endsWith("("))
+						{
+							config	= comp.substring(i2+1, comp.length()-1);
+							comp	= comp.substring(0, i2);
+						}
+						else
+						{
+							throw new RuntimeException("Component specification does not match scheme [<name>:]<type>[(<config>)] : "+components.get(i));
+						}
+					}
+					
+					cms.createComponent(name, comp, new CreationInfo(config, null), null)
+						.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+					{
+						public void customResultAvailable(IComponentIdentifier result)
+						{
+							startComponents(i+1, components, instance)
+								.addResultListener(new DelegationResultListener<Void>(ret));
+						}
+					});
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 }
 

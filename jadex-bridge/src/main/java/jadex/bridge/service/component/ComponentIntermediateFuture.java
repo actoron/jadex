@@ -110,20 +110,31 @@ public class ComponentIntermediateFuture<E> extends IntermediateFuture<E>
 	/**
 	 *  Add an intermediate result.
 	 */
-	public void	addIntermediateResult(E result)
+	public void	addIntermediateResult(final E result)
 	{
-		// Copy result if
-		// - copy flag is true
-		// - and result is not a reference object
-		if(copy && result!=null)
+    	E	res	= result;
+    	if(result!=null)
 		{
-			boolean copy = !marshal.isLocalReference(result);
-			if(copy)
-			{
-//				System.out.println("copy result: "+result);
-				result = (E)Cloner.deepCloneObject(result, marshal.getCloneProcessors(), filter);
-			}
+    		// Hack!!! Should copy in any case to apply processors
+    		// (e.g. for proxy replacement of service references).
+    		// Does not work, yet as service object might have wrong interface
+    		// (e.g. service interface instead of listener interface --> settings properties provider)
+    		if(copy && !marshal.isLocalReference(result))
+    		{
+	//			System.out.println("copy result: "+result);
+	    		// Copy result if
+	    		// - copy flag is true (use custom filter)
+	    		// - and result is not a reference object (default filter)
+	    		IFilter	filter	= copy ? new IFilter()
+				{
+					public boolean filter(Object obj)
+					{
+						return obj==result ? false : ComponentIntermediateFuture.this.filter.filter(obj);
+					}
+				} : this.filter;
+				res = Cloner.deepCloneObject(result, marshal.getCloneProcessors(), filter);
+    		}
 		}
-		super.addIntermediateResult(result);
+		super.addIntermediateResult(res);
 	}
 }
