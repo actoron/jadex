@@ -14,6 +14,10 @@
 	<imports>
 		<import>jadex.bdi.runtime.*</import>
 		<import>jadex.web.examples.puzzle.*</import>
+		<import>jadex.commons.future.*</import>
+		<import>jadex.bridge.service.types.clock.*</import>
+		<import>jadex.bridge.service.search.*</import>
+		<import>jadex.bridge.service.*</import>
 	</imports>
 
 	<beliefs>
@@ -24,12 +28,26 @@
 		<belief name="ml" class="String" exported="true">
 			<fact>"same_long"</fact>
 		</belief>
+		<!-- 
+		<belief name="clock" class="IClockService">
+			<fact class="IFuture">
+				SServiceProvider.getService($scope.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			</fact>
+		</belief>
+		<belief name="time" class="long" updaterate="1000">
+			<fact>$beliefbase.clock.getTime()</fact>
+		</belief>
+		 -->
 	</beliefs>
 
 	<goals>
 		<!-- The goal to make a move on the board that is the solution. -->
 		<achievegoal name="makemove" recalculate="false">
 			<parameter name="board" class="Board"/>
+			<parameter name="deadline" class="long"/>
+			<!-- <dropcondition>
+				$goal.deadline>$beliefbase.time
+			</dropcondition> -->
 			<targetcondition language="jcl">
 				$goal.board.isSolution()
 			</targetcondition>
@@ -79,6 +97,9 @@
 		<providedservice class="IPuzzleService">
 			<implementation class="PuzzleService"/>
 		</providedservice>
+		<requiredservice name="clock" class="IClockService">
+			<binding scope="platform"/>
+		</requiredservice>
 	</services>
 	
 	<properties>

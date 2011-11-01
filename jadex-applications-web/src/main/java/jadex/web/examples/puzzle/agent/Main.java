@@ -28,16 +28,16 @@ public class Main
 			"-extensions", "null",
 			"-component", "jadex/web/examples/puzzle/agent/Sokrates.agent.xml"
 		};
-		int	timeout	= 300000;
+		int	timeout	= 30000;
 		ThreadSuspendable	sus	= new ThreadSuspendable();
 		IExternalAccess	platform	= Starter.createPlatform(args).get(sus, timeout);
 		IPuzzleService	puzzle	= SServiceProvider.getService(platform.getServiceProvider(), IPuzzleService.class).get(sus, timeout);
 		
-		Board	board	= new Board(5);
+		Board	board	= new Board(11);
 		int	hints	= 0;
 		while( !board.isSolution())
 		{
-			Move	move	= puzzle.hint(board).get(sus, timeout);
+			Move	move	= puzzle.hint(board, 5000).get(sus, timeout);
 			hints++;
 			System.out.println("Move "+hints+": "+move);
 			board.move(move);

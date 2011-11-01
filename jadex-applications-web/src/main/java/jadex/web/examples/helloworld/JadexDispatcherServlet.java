@@ -32,6 +32,7 @@ public class JadexDispatcherServlet extends HttpServlet
 	{
 		String[]	args	= new String[]
 		{
+			"-awareness", "false",
 			"-gui", "false",
 			"-extensions", "null"
 		};
@@ -48,7 +49,7 @@ public class JadexDispatcherServlet extends HttpServlet
 	{
 		HttpSession	session	= request.getSession();
 		session.setAttribute("platform", platform);
-		RequestDispatcher	rd	= getServletContext().getRequestDispatcher("/WEB-INF/index.jsp");
+		RequestDispatcher	rd	= getServletContext().getRequestDispatcher("/WEB-INF/jsp/helloworld/index.jsp");
 		rd.forward(request, response);
 	}
 }

@@ -12,11 +12,13 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -117,31 +119,40 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	/**
 	 *  Solve the game and give a hint on the next move.
 	 *  @param board	The current board state.
+	 *  @param timeout	A timeout to stop, when no solution is found in time (-1 for no timeout).
 	 *  @return The tile to move next.
-	 *  @throws Exception in future, when puzzle can not be solved.
+	 *  @throws Exception in future, when puzzle can not be solved in time.
 	 */
-	public IFuture<Move> hint(final Board board)
+	public IFuture<Move>	hint(final Board board, final long timeout)
 	{
-		final int depth	= board.getMoves().size();
 		final Future<Move>	ret	= new Future<Move>();
-		final IGoal	goal	= agent.getGoalbase().createGoal("makemove");
-		goal.getParameter("board").setValue(board);
-		goal.addGoalListener(new IGoalListener()
+		IFuture<IClockService>	clockfut	= agent.getServiceContainer().getRequiredService("clock");
+		clockfut.addResultListener(new ExceptionDelegationResultListener<IClockService, Move>(ret)
 		{
-			public void goalFinished(AgentEvent ae)
+			public void customResultAvailable(IClockService clock)
 			{
-				if(board.isSolution())
+				final int depth	= board.getMoves().size();
+				final IGoal	goal	= agent.getGoalbase().createGoal("makemove");
+				goal.getParameter("board").setValue(board);
+				goal.getParameter("deadline").setValue(timeout!=-1 ? clock.getTime()+timeout : -1);
+				goal.addGoalListener(new IGoalListener()
 				{
-					ret.setResult(board.getMoves().get(depth));
-				}
-			}
-			
-			public void goalAdded(AgentEvent ae)
-			{
-				// ignore
+					public void goalFinished(AgentEvent ae)
+					{
+						if(board.isSolution())
+						{
+							ret.setResult(board.getMoves().get(depth));
+						}
+					}
+					
+					public void goalAdded(AgentEvent ae)
+					{
+						// ignore
+					}
+				});
+				agent.getGoalbase().dispatchTopLevelGoal(goal);
 			}
 		});
-		agent.getGoalbase().dispatchTopLevelGoal(goal);
 		return ret;
 	}
 

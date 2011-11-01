@@ -40,6 +40,9 @@ public class MovePlan extends Plan
 		// Make the move.
 		board.move(move);
 		
+		IGoal	goal	= (IGoal)getReason();
+		System.out.println("deadline: "+(((Long)goal.getParameter("deadline").getValue()).longValue() - getScope().getTime()));
+		
 		// Plan will be aborted when board is solution,
 		// otherwise continue with next move
 		IGoal mm = createGoal("makemove");

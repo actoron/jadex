@@ -12,10 +12,11 @@ public interface IPuzzleService
 	/**
 	 *  Solve the game and give a hint on the next move.
 	 *  @param board	The current board state.
+	 *  @param timeout	A timeout to stop, when no solution is found in time (-1 for no timeout).
 	 *  @return The tile to move next.
-	 *  @throws Exception in future, when puzzle can not be solved.
+	 *  @throws Exception in future, when puzzle can not be solved in time.
 	 */
-	public IFuture<Move>	hint(Board board);
+	public IFuture<Move>	hint(Board board, long timeout);
 	
 	/**
 	 *  Add a highscore entry and save the highscore list.

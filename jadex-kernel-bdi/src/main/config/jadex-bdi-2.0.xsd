@@ -630,11 +630,6 @@
 							<xs:documentation>The target condition can be used to specify a desired world state representing goal success.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element name="failurecondition" type="MInternalCondition" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>Can be used to explicitly state when a goal cannot be pursued any longer and is failed. </xs:documentation>
-						</xs:annotation>
-					</xs:element>
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
@@ -649,11 +644,6 @@
 					<xs:element name="targetcondition" type="MInternalCondition" minOccurs="0">
 						<xs:annotation>
 							<xs:documentation>A query goal has the implicit target condition that none of its out parameters may null.</xs:documentation>
-						</xs:annotation>
-					</xs:element>
-					<xs:element name="failurecondition" type="MInternalCondition" minOccurs="0">
-						<xs:annotation>
-							<xs:documentation>Can be used to explicitly state when a goal cannot be pursued any longer and is failed. </xs:documentation>
 						</xs:annotation>
 					</xs:element>
 				</xs:sequence>
@@ -744,11 +734,6 @@
 						<xs:element name="targetcondition" type="MInternalCondition" minOccurs="0">
 							<xs:annotation>
 								<xs:documentation>A query goal has the implicit target condition that none of its out parameters may null.</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="failurecondition" type="MInternalCondition" minOccurs="0">
-							<xs:annotation>
-								<xs:documentation>Can be used to explicitly state when a goal cannot be pursued any longer and is failed. </xs:documentation>
 							</xs:annotation>
 						</xs:element>
 					</xs:sequence>
