@@ -19,6 +19,7 @@
     <activity android:name=".Logger"></activity>
     <activity android:name=".AgentActivity"></activity>
     <activity android:name=".AwarenessActivity"></activity>
+    <activity android:label="ChatActivity" android:name=".chat.ChatActivity"></activity>
     
     <service android:name="jadex.android.bluetooth.service.ConnectionService"/>
   </application>

@@ -27,7 +27,6 @@ public class ChatService implements IChatService
 	protected List listeners;
 	
 	/** The chat gui. */
-	protected ChatActivity chatActivity;
 	
 	//-------- methods --------
 	
@@ -38,8 +37,7 @@ public class ChatService implements IChatService
 	public void start()
 	{
 		this.listeners = new ArrayList();
-		ChatActivity.chatService = this;
-		//this.chatActivity = ChatPanel.createGui(agent.getExternalAccess());
+		ChatActivity.chatAgent = this.agent.getExternalAccess();
 	}
 	
 	/**

@@ -127,7 +127,7 @@ public class AwarenessActivity extends BaseActivity {
 				future.addResultListener(platformResultListener);
 			}
 		}).start();
-		
+
 		listView.setOnItemClickListener(onItemClickListener);
 	}
 
@@ -170,18 +170,23 @@ public class AwarenessActivity extends BaseActivity {
 								IComponentManagementService arg0) {
 							IComponentManagementService cms = (IComponentManagementService) arg0;
 							HashMap<String, Object> args = new HashMap<String, Object>();
-							Log.i(Helper.LOG_TAG, "Starting AwarenessActivityAgent...");
-							cms.createComponent("AwarenessActivityAgent",
+							Log.i(Helper.LOG_TAG,
+									"Starting AwarenessActivityAgent...");
+							cms.createComponent(
+									"AwarenessActivityAgent",
 									AwarenessActivityAgent.class.getName()
 											.replaceAll("\\.", "/") + ".class",
-									new CreationInfo(args), null).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
-										@Override
-										public void resultAvailable(
-												IComponentIdentifier result) {
-											// agent created!
-											Log.i(Helper.LOG_TAG, "AwarenessActivityAgent created!");
-										}
-									});
+									new CreationInfo(args), null)
+									.addResultListener(
+											new DefaultResultListener<IComponentIdentifier>() {
+												@Override
+												public void resultAvailable(
+														IComponentIdentifier result) {
+													// agent created!
+													Log.i(Helper.LOG_TAG,
+															"AwarenessActivityAgent created!");
+												}
+											});
 						}
 					});
 		}
@@ -193,12 +198,15 @@ public class AwarenessActivity extends BaseActivity {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			RemoteComponentIdentifier item = (RemoteComponentIdentifier) parent.getItemAtPosition(position);
-			IFuture ret = AwarenessActivityAgent.instance.getRemoteComponents(item);
+			RemoteComponentIdentifier item = (RemoteComponentIdentifier) parent
+					.getItemAtPosition(position);
+			IFuture ret = AwarenessActivityAgent.instance
+					.getRemoteComponents(item);
 			ret.addResultListener(new DefaultResultListener() {
 				@Override
 				public void resultAvailable(Object result) {
-					Log.i(Helper.LOG_TAG, "AwarenessActivity: received result from Agent!");					
+					Log.i(Helper.LOG_TAG,
+							"AwarenessActivity: received result from Agent!");
 				}
 			});
 		}

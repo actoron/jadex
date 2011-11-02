@@ -276,7 +276,6 @@ public class BTTransport implements ITransport {
 
 		int dynlen = BTTransport.PROLOG_SIZE + 1 + codecids.length;
 		int size = res.length + dynlen;
-		// System.out.println("len: "+size);
 		try {
 			os.write((byte) codecids.length);
 				os.write(codecids);
@@ -287,6 +286,7 @@ public class BTTransport implements ITransport {
 			Log.e(Helper.LOG_TAG, "Could not encode Message: " + e.toString());
 		}
 
+		Log.i(Helper.LOG_TAG, "Encoded message byte array is: " + os.size());
 		return os.toByteArray();
 	}
 
@@ -323,6 +323,8 @@ public class BTTransport implements ITransport {
 	}
 
 	protected MessageEnvelope decodeMessage(byte[] data) {
+		
+		Log.i(Helper.LOG_TAG, "Received message byte array is: " + data.length);
 		MessageEnvelope ret = null;
 
 		// Calculate message size by reading the first 4 bytes
@@ -351,7 +353,6 @@ public class BTTransport implements ITransport {
 //			byte[] rawMsg = Arrays.copyOfRange(data, pos, data.length - 1);
 			byte[] rawMsg = new byte[data.length - pos];
 //			System.out.println("rawMsglength: " + rawMsg.length);
-			Log.d(Helper.LOG_TAG, "Decoded content length: " + msg_size);
 			for (int i = 0; i < msg_size; pos++, i++ ) {
 				rawMsg[i] = data[pos];
 			}
@@ -386,7 +387,6 @@ public class BTTransport implements ITransport {
 						ret.setResult(null);
 					}
 				});
-
 		return ret;
 	}
 

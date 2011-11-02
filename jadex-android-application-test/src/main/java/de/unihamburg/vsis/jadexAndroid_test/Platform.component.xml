@@ -34,6 +34,7 @@
 		<import>jadex.bridge.service.types.execution.*</import>
 		<import>jadex.bridge.service.types.factory.*</import>
 		<import>jadex.bridge.service.types.library.*</import>
+		<import>jadex.bridge.service.types.marshal.*</import>
 		<import>jadex.bridge.service.types.message.*</import>
 		<import>jadex.bridge.service.types.remote.*</import>
 		<import>jadex.bridge.service.types.settings.*</import>
@@ -48,6 +49,7 @@
 		<import>jadex.base.service.execution.*</import>
 		<import>jadex.base.service.factory.*</import>
 		<import>jadex.base.service.library.*</import>
+		<import>jadex.base.service.marshal.*</import>
 		<import>jadex.base.service.message.*</import>
 		<import>jadex.base.service.remote.*</import>
 		<import>jadex.base.service.settings.*</import>
@@ -64,6 +66,7 @@
 		
 		<import>jadex.standalone.*</import>
 		<import>de.unihamburg.vsis.jadexAndroid_test.*</import>
+		<import>de.unihamburg.vsis.jadexAndroid_test.chat.*</import>
 	</imports>
 	
 	<arguments>
@@ -133,6 +136,11 @@
 	</componenttypes>
 	
 	<services>
+		<providedservice class="IMarshalService">
+			<implementation proxytype="raw">
+				new MarshalService($component.getExternalAccess())
+			</implementation>
+		</providedservice>
 		<providedservice class="ISettingsService">
 			<implementation>
 				new SettingsService($args.platformname, $component, $args.saveonexit)
@@ -151,10 +159,15 @@
 				: new AsyncExecutionService($component.getServiceProvider())
 			</implementation>
 		</providedservice>
+		<providedservice class="IDependencyService">
+			<implementation>
+				new BasicDependencyService()
+				//new MavenDependencyResolverService()
+			</implementation>
+		</providedservice>
 		<providedservice class="ILibraryService">
-			<implementation proxytype="raw">
-				//new LibraryService($args.libpath, $args.baseclassloader)
-				new LibraryService($args.libpath, $component.getServiceProvider())
+<implementation> <!-- proxytype="raw" -->
+				new LibraryService($args.libpath, $args.baseclassloader)
 			</implementation>
 		</providedservice>
 		<providedservice class="IClockService">

@@ -36,6 +36,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.util.Log;
 import android.widget.Toast;
 
 public class ConnectionService extends Service implements IBluetoothStateInformer {
@@ -67,6 +68,8 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 			BluetoothDevice.ACTION_FOUND);
 	private IntentFilter intentFilter5 = new IntentFilter(
 			BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+
+	private boolean receiverRegistered;
 
 	@Override
 	public void onCreate() {
@@ -134,6 +137,7 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 		this.registerReceiver(bcReceiver, intentFilter3);
 		this.registerReceiver(bcReceiver, intentFilter4);
 		this.registerReceiver(bcReceiver, intentFilter5);
+		this.receiverRegistered = true;
 	}
 
 	private Handler mHandler = new Handler() {
@@ -165,7 +169,11 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 	@Override
 	public void onDestroy() {
 		btp2pConnector.shutdown();
-		this.unregisterReceiver(bcReceiver);
+		if (this.receiverRegistered) {
+			this.unregisterReceiver(bcReceiver);
+		} else {
+			Log.e(Helper.LOG_TAG, "(ConnectionService) Didn't unregister BroadcastIntentReceiver: was not registered"); 
+		}
 		super.onDestroy();
 	}
 

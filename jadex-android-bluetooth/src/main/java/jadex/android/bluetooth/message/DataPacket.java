@@ -24,19 +24,39 @@ public class DataPacket {
 	public final static byte TYPE_DATA = 6;
 	public final static byte TYPE_AWARENESS_INFO = 7;
 
-	public byte Type;
 
 	public final static String[] TYPE_DESCRIPTIONS = { "PING", "PONG", "SYN",
 			"ACK", "ROUTING_INFORMATION", "BROADCAST", "DATA", "AWARENESS_INFO" };
 
+	public byte Type;
+	public final static int INDEX_Type = 0;
+	
 	public String Src;
+	public final static int INDEX_Src_START = 1;
+	public final static int INDEX_Src_END = 17;
+	public final static int INDEX_Src_SIZE = INDEX_Src_END - INDEX_Src_START + 1;
+	
 	public String Dest;
+	public final static int INDEX_Dest_START = 18;
+	public final static int INDEX_Dest_END = 34;
+	public final static int INDEX_Dest_SIZE = INDEX_Dest_END - INDEX_Dest_START + 1;
+	
+	private String pktId;
+	public final static int INDEX_pktId_START = 35;
+	public final static int INDEX_pktId_END = 55;
+	public final static int INDEX_pktId_SIZE = INDEX_pktId_END - INDEX_pktId_START + 1;
+	
+	public byte HopCount;
+	public final static int INDEX_HopCount = 56;
+	
+	public final static int INDEX_dataSize_START = 57;
+	public final static int INDEX_dataSize_END = 58;
+	private short dataSize;
+
+	public final static int INDEX_SeqNo = 59;
 	public byte SeqNo;
 
-	private String pktId;
-	public byte HopCount;
 
-	private short dataSize;
 
 	private byte[] data;
 
@@ -70,10 +90,10 @@ public class DataPacket {
 	public DataPacket(byte[] buffer) throws MessageConvertException {
 		this.Type = buffer[0];
 		checkType();
-		this.Src = new String(buffer, 1, 17);
-		this.Dest = new String(buffer, 18, 17);
-		this.pktId = new String(buffer, 35, 21);
-		this.HopCount = buffer[56];
+		this.Src = new String(buffer, INDEX_Src_START, INDEX_Src_SIZE);
+		this.Dest = new String(buffer, INDEX_Dest_START, INDEX_Dest_SIZE);
+		this.pktId = new String(buffer, INDEX_pktId_START, INDEX_pktId_SIZE);
+		this.HopCount = buffer[INDEX_HopCount];
 
 		this.dataSize = getDataSizeFromPacketByteArray(buffer, 0);
 		
@@ -84,9 +104,9 @@ public class DataPacket {
 					+ this.toString());
 		}
 		
-		this.SeqNo = buffer[59];
+		this.SeqNo = buffer[INDEX_SeqNo];
 
-		if (buffer.length < this.dataSize+60) {
+		if (buffer.length < this.dataSize+HEADER_SIZE) {
 			throw new MessageConvertException("Could not read packet from byte Array. Buffer length is " +
 					buffer.length + " and dataSize is " +
 					this.dataSize + " (plus header)!\n"
@@ -96,7 +116,7 @@ public class DataPacket {
 		this.data = new byte[this.dataSize];
 		if (this.dataSize > 0) {
 			for (int i = 0; i < this.dataSize; i++) {
-				this.data[i] = buffer[i + 60];
+				this.data[i] = buffer[i + HEADER_SIZE];
 			}
 		}
 
@@ -104,7 +124,7 @@ public class DataPacket {
 	}
 
 	public static short getDataSizeFromPacketByteArray(byte[] buffer, int offset) {
-		return readShortFromBytes(buffer[57 + offset], buffer[58 + offset]);
+		return readShortFromBytes(buffer[INDEX_dataSize_START + offset], buffer[INDEX_dataSize_END + offset]);
 	}
 
 

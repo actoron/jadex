@@ -156,8 +156,10 @@ public abstract class AConnection implements IConnection {
 				byte[] buffer; // buffer store for the
 								// stream
 
-				// hardcoded value because android seems to use this value as internal buffer, too.
-				// InputStream.read() doesn't return more than 1008 bytes at once.
+				// hardcoded value because android seems to use this value as
+				// internal buffer, too.
+				// InputStream.read() doesn't return more than 1008 bytes at
+				// once.
 				buffer = new byte[1024];
 
 				// Keep listening to the InputStream until an exception
@@ -197,71 +199,117 @@ public abstract class AConnection implements IConnection {
 	/**
 	 * Reads {@link DataPacket}s from an Input Stream.
 	 * 
-	 * @param inputStream The Input stream to read from.
-	 * @param buffer The Buffer to use while reading.
+	 * @param inputStream
+	 *            The Input stream to read from.
+	 * @param buffer
+	 *            The Buffer to use while reading.
 	 * @return List of received {@link DataPacket}s.
-	 * @throws IOException this exception is passed through from InputStream.read().
-	 * @throws MessageConvertException thrown if data contains invalid {@link DataPacket}. 
+	 * @throws IOException
+	 *             this exception is passed through from InputStream.read().
+	 * @throws MessageConvertException
+	 *             thrown if data contains invalid {@link DataPacket}.
 	 */
-	protected List<DataPacket> readPacketFromStream(InputStream inputStream,
-			byte[] buffer) throws IOException, MessageConvertException {
+	protected synchronized List<DataPacket> readPacketFromStream(
+			InputStream inputStream, byte[] buffer) throws IOException,
+			MessageConvertException {
 		int bytes; // bytes returned from read()
 		ArrayList<DataPacket> receivedPackets = new ArrayList<DataPacket>();
 		DataPacket dataPacket = null;
 
-		while (dataPacket == null) { // read at least one full packet
+		while (dataPacket == null && isAlive()) { // read at least one full
+													// packet
+			if (inputStream.available() <= 0) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+				}
+				continue;
+			}
 			bytes = inputStream.read(buffer);
 			Log.d(Helper.LOG_TAG,
 					"(Connection) received a stream chunk of size: " + bytes);
 			short totalSize;
 
-			int byteIndexInPacket = 0;
+			int byteIndexInPacket;
 			int byteIndexInBuffer = 0;
 			int missingBytes = 0;
 
 			if (lastPacketComplete) {
-				totalSize = (short) (DataPacket
-						.getDataSizeFromPacketByteArray(buffer,0) + DataPacket.HEADER_SIZE);
+				totalSize = getTotalPacketSize(buffer, 0, buffer.length);
 				byteIndexInPacket = 0;
 				lastPacketBytesRead = 0;
 				lastPacketComplete = false;
 			} else {
 				// Resuming packet receiption from earlier read()
 				byteIndexInPacket = lastPacketBytesRead;
-				totalSize = (short) (DataPacket
-						.getDataSizeFromPacketByteArray(lastReceivedPacket,0) + DataPacket.HEADER_SIZE);
+				totalSize = getTotalPacketSize(lastReceivedPacket, 0,
+						byteIndexInPacket + 1);
+			}
+			
+			if (totalSize == -1) {
+				// last time, we haven't received the DataSize field.
+				// read up to the dataSize field:
+				for (; byteIndexInBuffer < bytes
+				&& byteIndexInPacket <= DataPacket.INDEX_dataSize_END; 
+				byteIndexInBuffer++, byteIndexInPacket++) {
+					lastReceivedPacket[byteIndexInPacket] = buffer[byteIndexInBuffer];
+				}
+				lastPacketBytesRead = byteIndexInPacket;
+				totalSize = getTotalPacketSize(lastReceivedPacket, 0, byteIndexInPacket +1);
+				if (totalSize == -1) {
+//						throw new MessageConvertException(
+//						"(AConnection) After two read() calls i still don't know the dataSize of this Packet!");
+					continue;
+				}
 			}
 
 			missingBytes = totalSize - lastPacketBytesRead;
-			byteIndexInBuffer = 0;
-			while (byteIndexInBuffer < bytes - 1) { 
-				// continue as long as we're not finished interpreting the whole buffer
+			while (byteIndexInBuffer < bytes) {
+				// continue as long as we're not finished interpreting the whole
+				// buffer
 
 				// read one Packet, or, the most of the Packet we can get:
-				for (; byteIndexInBuffer < missingBytes
+				int toRead = missingBytes + byteIndexInBuffer;
+				for (; byteIndexInBuffer < toRead
 						&& byteIndexInBuffer < bytes; byteIndexInBuffer++, byteIndexInPacket++) {
 					lastReceivedPacket[byteIndexInPacket] = buffer[byteIndexInBuffer];
 				}
 				lastPacketBytesRead = byteIndexInPacket;
 
-				if (lastPacketBytesRead >= totalSize && totalSize != 0) {
+				if (lastPacketBytesRead >= totalSize) {
 					// read one packet successfully
 					dataPacket = new DataPacket(lastReceivedPacket);
 					Log.d(Helper.LOG_TAG,
-							"(Connection) received a DataPacket of Size: " + totalSize);
+							"(Connection) received a DataPacket of Size: "
+									+ totalSize);
 					receivedPackets.add(dataPacket);
 					if (bytes > missingBytes) {
 						// received more than one packet.
-						// the while-loop will continue to read the input buffer and
+						// the while-loop will continue to read the input buffer
+						// and
 						// build more packets
 						byteIndexInPacket = 0;
 						// next packet starts at byteIndexInBuffer
-						// TODO: this will fail if the first 58 bytes of the next packet are not transmitted yet!!
-						totalSize = DataPacket.getDataSizeFromPacketByteArray(buffer,byteIndexInBuffer);
-						// add the current buffer index to missing size
-						missingBytes = totalSize + byteIndexInBuffer;
-						lastPacketBytesRead = 0;
-						lastPacketComplete = false;
+						// TODO: this will fail if the first 58 bytes of the
+						// next packet are not transmitted yet!!
+						totalSize = getTotalPacketSize(buffer,
+								byteIndexInBuffer, buffer.length);
+						if (totalSize == -1) {
+							// just make the loop read the beginning of the
+							// packet into cache.
+							totalSize = Short.MAX_VALUE;
+							missingBytes = bytes;
+							lastPacketBytesRead = 0;
+							lastPacketComplete = false;
+						} else if (totalSize == 0) {
+							// PROBLEM
+							throw new MessageConvertException(
+									"(AConnection) Received a packet that claims a size of zero bytes.");
+						} else {
+							missingBytes = totalSize;
+							lastPacketBytesRead = 0;
+							lastPacketComplete = false;
+						}
 					} else {
 						lastPacketComplete = true;
 					}
@@ -272,6 +320,33 @@ public abstract class AConnection implements IConnection {
 			}
 		}
 		return receivedPackets;
+	}
+
+	/**
+	 * Reads the dataSize of the packet stored in rawPacketData and calculates
+	 * the total size of the DataPacket.
+	 * 
+	 * @param rawPacketData
+	 *            Array containing the Packet
+	 * @param offset
+	 *            Offset on which position in the rawPacketData Array the Packet
+	 *            begins.
+	 * @param bufferLength
+	 *            Indicates up to which length the buffer is filled with valid
+	 *            Data. (ignores everything beyond that length)
+	 * @return totalSize of Packet, including header, or -1 if size could not be
+	 *         read.
+	 */
+	private short getTotalPacketSize(byte[] rawPacketData, int offset,
+			int bufferLength) {
+		short totalSize;
+		if (offset + DataPacket.INDEX_dataSize_END < bufferLength) {
+			totalSize = (short) (DataPacket.getDataSizeFromPacketByteArray(
+					rawPacketData, offset) + DataPacket.HEADER_SIZE);
+		} else {
+			totalSize = -1;
+		}
+		return totalSize;
 	}
 
 	/*

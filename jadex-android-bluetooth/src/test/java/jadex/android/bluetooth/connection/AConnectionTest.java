@@ -5,8 +5,13 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import javassist.bytecode.ByteArray;
 
 import jadex.android.bluetooth.CustomTestRunner;
 import jadex.android.bluetooth.connection.AConnection.ConnectedThread;
@@ -45,6 +50,7 @@ public class AConnectionTest {
 			}
 		};
 		thread = conn.new ConnectedThread(socket);
+		conn.setConnectionAlive(true);
 	}
 
 	@Test
@@ -56,7 +62,7 @@ public class AConnectionTest {
 		DataPacket read = conn.readPacketFromStream(inputStream, buffer).get(0);
 		assertEquals(packet, read);
 	}
-	
+
 	@Test
 	public void testBigPacket() throws MessageConvertException, IOException {
 		byte[] buffer = new byte[DataPacket.PACKET_SIZE / 2];
@@ -66,31 +72,73 @@ public class AConnectionTest {
 		DataPacket read = conn.readPacketFromStream(inputStream, buffer).get(0);
 		assertEquals(packet, read);
 	}
-	
+
 	@Test
 	public void testMultiPacket() throws MessageConvertException, IOException {
 		byte[] buffer = new byte[DataPacket.PACKET_SIZE / 2];
 		DataPacket packet1 = getMessage(DataPacket.DATA_MAX_SIZE / 3);
 		DataPacket packet2 = getMessage(DataPacket.DATA_MAX_SIZE / 4);
+
+		writeReadAndCompare(buffer, packet1, packet2);
+	}
+
+	@Test
+	public void testMultiPacket2() throws MessageConvertException, IOException {
+		byte[] buffer = new byte[DataPacket.PACKET_SIZE / 2];
+		DataPacket packet1 = getMessage(110 - DataPacket.HEADER_SIZE);
+		DataPacket packet2 = getMessage(60 - DataPacket.HEADER_SIZE);
 		
+		writeReadAndCompare(buffer, packet1, packet2);
+	}
+
+	@Test
+	public void testMultiPacket3() throws MessageConvertException, IOException {
+		byte[] buffer = new byte[1024];
+		DataPacket packet1 = getMessage(1023 - DataPacket.HEADER_SIZE);
+		DataPacket packet2 = getMessage(80);
+
+		writeReadAndCompare(buffer, packet1, packet2);
+	}
+
+
+	@Test
+	public void testMultiPacket4() throws MessageConvertException, IOException {
+		byte[] buffer = new byte[10];
+		DataPacket packet1 = getMessage(1023 - DataPacket.HEADER_SIZE);
+		DataPacket packet2 = getMessage(80);
+		
+		writeReadAndCompare(buffer, packet1, packet2);
+	}
+	
+	private void writeReadAndCompare(byte[] buffer, DataPacket packet1,
+			DataPacket packet2) throws MessageConvertException, IOException {
 		final byte[] message1 = packet1.asByteArray();
 		final byte[] message2 = packet2.asByteArray();
 		
-		byte[] together = new byte[message1.length+message2.length];
+		byte[] together = new byte[message1.length + message2.length];
 		
 		for (int i = 0; i < message1.length; i++) {
 			together[i] = message1[i];
 		}
 		for (int i = message1.length; i < together.length; i++) {
-			together[i] = message2[i-message1.length];
+			together[i] = message2[i - message1.length];
 		}
 		
+		List<DataPacket> allPackets = new ArrayList<DataPacket>();
+		List<DataPacket> read = new ArrayList<DataPacket>();
 		InputStream inputStream = new EmulatedInputStream(together);
-		DataPacket read = conn.readPacketFromStream(inputStream, buffer).get(0);
-		assertEquals(packet1, read);
 		
-		read = conn.readPacketFromStream(inputStream, buffer).get(0);
-		assertEquals(packet2, read);
+		while (allPackets.size() != 2) {
+			read = conn.readPacketFromStream(inputStream, buffer);
+			allPackets.addAll(read);
+		}
+		
+		assertEquals(packet1, allPackets.get(0));
+		assertTrue(Arrays.equals(message1, allPackets.get(0).asByteArray()));
+		
+		assertEquals(packet2, allPackets.get(1));
+		assertTrue(Arrays.equals(message2, allPackets.get(1).asByteArray()));
+		
 	}
 
 	private DataPacket getMessage(int datasize) throws MessageConvertException {
@@ -100,8 +148,7 @@ public class AConnectionTest {
 
 		StringBuilder testString = new StringBuilder();
 
-		while (testString.length() < datasize
-				- testStringPart.length()) {
+		while (testString.length() < datasize - testStringPart.length()) {
 			testString.append(testStringPart);
 		}
 		BluetoothMessage btmsg = new BluetoothMessage(dev, testString
@@ -267,6 +314,11 @@ public class AConnectionTest {
 				return source[bytesRead];
 			} else
 				return -1;
+		}
+
+		@Override
+		public int available() throws IOException {
+			return source.length - (bytesRead == -1 ? 0 : bytesRead);
 		}
 	}
 

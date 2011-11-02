@@ -400,8 +400,8 @@ public class BTP2PConnector implements IBluetoothStateListener {
 				Log.d(Helper.LOG_TAG, "Connection lost: "
 						+ connection.getRemoteDevice().getName());
 				getConnections().remove(connection.getRemoteDevice().getAddress());
-				packetRouter.removeConnectedDevice(connection.getRemoteDevice()
-						.getAddress());
+//				packetRouter.removeConnectedDevice(connection.getRemoteDevice()
+//						.getAddress());
 				connection.removeConnectionListener(this);
 				connection = null;
 			}
@@ -647,11 +647,11 @@ public class BTP2PConnector implements IBluetoothStateListener {
 	}
 
 	public IBluetoothDevice[] getKnownDevices() {
-		Set<String> reachableDeviceAddresses = packetRouter.getReachableDeviceAddresses();
-		reachableDeviceAddresses.addAll(packetRouter.getConnectedDeviceAddresses());
-		IBluetoothDevice[] arr = new IBluetoothDevice[reachableDeviceAddresses.size()];
-		Iterator<String> it = reachableDeviceAddresses.iterator();
-		for (int i=0; i < reachableDeviceAddresses.size(); i++) {
+		HashSet<String> hashSet = new HashSet<String>(packetRouter.getReachableDeviceAddresses());
+		hashSet.addAll(packetRouter.getConnectedDeviceAddresses());
+		IBluetoothDevice[] arr = new IBluetoothDevice[hashSet.size()];
+		Iterator<String> it = hashSet.iterator();
+		for (int i=0; i < hashSet.size(); i++) {
 			arr[i] = Helper.getBluetoothDeviceFactory().createBluetoothDevice(it.next());
 		}
 		return arr;

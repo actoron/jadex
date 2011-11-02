@@ -40,7 +40,7 @@ public class ClientConnection extends AConnection {
 
 		@Override
 		public void run() {
-			Log.d(Helper.LOG_TAG, "Connection to " + remoteDevice.getAddress()
+			Log.e(Helper.LOG_TAG, "Connection to " + remoteDevice.getAddress()
 					+ " timed out after " + (System.currentTimeMillis() - lastPingReceivedTime) + "ms");
 			close();
 		}

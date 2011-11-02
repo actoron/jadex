@@ -66,6 +66,9 @@ public class BTTransportTest extends TestCase {
 		
 		ArrayList<IComponentIdentifier> receivers = new ArrayList<IComponentIdentifier>();
 		
+		receivers.add(new ComponentIdentifier("component1", new String[]{"bt-mtp://QWER:QWERASDFRT:WERT"}));
+		receivers.add(new ComponentIdentifier("component2", new String[]{"bt-mtp://wasd:QWERASDFRT:WERT"}));
+		
 		message = new MessageEnvelope(map, receivers, SFipa.FIPA_MESSAGE_TYPE.getName());
 		
 		btTransport.codecfac = new CodecFactory();
@@ -132,8 +135,11 @@ public class BTTransportTest extends TestCase {
 		}
 		
 		message.setMessage(msg);
+		byte[] xmlencoded = btTransport.encodeMessage(message, new byte[]{JadexXMLCodec.CODEC_ID});
 		
-		byte[] encoded = btTransport.encodeMessage(message, new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID});
+		String xmlstring = new String(xmlencoded);
+		
+		byte[] encoded = btTransport.encodeMessage(message, null);
 		MessageEnvelope message2 = btTransport.decodeMessage(encoded);
 		
 		String typeName = message2.getTypeName();
