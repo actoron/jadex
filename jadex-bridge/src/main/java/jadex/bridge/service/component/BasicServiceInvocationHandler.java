@@ -365,7 +365,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			}
 			else
 			{
-				throw new RuntimeException("Raw services must implement IInternalService (e.g. by extending BasicService).");
+				throw new RuntimeException("Raw services must implement IInternalService (e.g. by extending BasicService): " + service.getClass().getCanonicalName());
 			}
 		}
 		return ret;
