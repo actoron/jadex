@@ -146,7 +146,8 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		 */
 		private void informWPProduced(final IInternalAccess ia, final Task task) {
 			if (managerService == null) {
-				getRequiredService("managerService").addResultListener(new DefaultResultListener<IManagerService>() {
+				IFuture<IManagerService> future = getRequiredService("managerService");
+				future.addResultListener(new DefaultResultListener<IManagerService>() {
 
 					public void resultAvailable(IManagerService service) {
 						managerService = service;
@@ -335,7 +336,8 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 		}
 
 		if (managerService == null) {
-			getRequiredService("managerService").addResultListener(new DefaultResultListener<IManagerService>() {
+			IFuture<IManagerService> future = getRequiredService("managerService");
+			future.addResultListener(new DefaultResultListener<IManagerService>() {
 
 				@Override
 				public void resultAvailable(IManagerService result) {
