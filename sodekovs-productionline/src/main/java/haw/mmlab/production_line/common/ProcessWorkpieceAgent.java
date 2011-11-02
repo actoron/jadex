@@ -421,7 +421,8 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 	public void handleConsoleMsg(final ConsoleMessage msg, final Logger logger) {
 		logger.info(msg.getOutMsg());
 
-		this.getRequiredService("managerService").addResultListener(new DefaultResultListener<IManagerService>() {
+		IFuture<IManagerService> future = this.getRequiredService("managerService");
+		future.addResultListener(new DefaultResultListener<IManagerService>() {
 
 			public void resultAvailable(IManagerService service) {
 				service.handleConsoleMsg(msg);

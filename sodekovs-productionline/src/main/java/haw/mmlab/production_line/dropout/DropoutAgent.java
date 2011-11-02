@@ -135,7 +135,8 @@ public class DropoutAgent extends MicroAgent {
 		}
 
 		private void getReceiverAndExecute(final AgentQuery query, final Action action) {
-			getRequiredServices("processWorkpieceServices").addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
+			IFuture<Collection<IProcessWorkpieceService>> future = getRequiredServices("processWorkpieceServices");
+			future.addResultListener(new DefaultResultListener<Collection<IProcessWorkpieceService>>() {
 
 				@Override
 				public void resultAvailable(Collection<IProcessWorkpieceService> services) {

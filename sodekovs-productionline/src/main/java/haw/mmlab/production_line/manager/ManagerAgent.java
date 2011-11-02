@@ -209,7 +209,8 @@ public class ManagerAgent extends MicroAgent {
 	 * Starts all the participating agents.
 	 */
 	private void startAgents() {
-		this.getRequiredService("cmsservice").addResultListener(new DefaultResultListener<IComponentManagementService>() {
+		IFuture<IComponentManagementService> future = this.getRequiredService("cmsservice");
+		future.addResultListener(new DefaultResultListener<IComponentManagementService>() {
 
 			public void resultAvailable(IComponentManagementService cms) {
 				IExternalAccess parent = ManagerAgent.this.getParent();
@@ -359,7 +360,8 @@ public class ManagerAgent extends MicroAgent {
 	 * Kills all the started agents.
 	 */
 	private void killAgents() {
-		this.getRequiredService("cmsservice").addResultListener(new DefaultResultListener<IComponentManagementService>() {
+		IFuture<IComponentManagementService> future = this.getRequiredService("cmsservice");
+		future.addResultListener(new DefaultResultListener<IComponentManagementService>() {
 
 			public void resultAvailable(IComponentManagementService cms) {
 				getLogger().info("Manager agent is killing agents...");
@@ -437,7 +439,8 @@ public class ManagerAgent extends MicroAgent {
 	 * Starts the Dropout Agent
 	 */
 	public void startDropout() {
-		this.getRequiredService("cmsservice").addResultListener(new DefaultResultListener<IComponentManagementService>() {
+		IFuture<IComponentManagementService> future = this.getRequiredService("cmsservice");
+		future.addResultListener(new DefaultResultListener<IComponentManagementService>() {
 
 			public void resultAvailable(IComponentManagementService cms) {
 				// start the dropout agent

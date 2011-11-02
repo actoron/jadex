@@ -65,7 +65,8 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 
 		this.databaseLogger = new DatabaseLogger();
 
-		getRequiredService("managerService").addResultListener(new DefaultResultListener<IManagerService>() {
+		IFuture<IManagerService> future = this.getRequiredService("managerService");
+		future.addResultListener(new DefaultResultListener<IManagerService>() {
 
 			@Override
 			public void resultAvailable(IManagerService result) {
