@@ -83,6 +83,8 @@
 		
 		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
 		<argument name="awareness" class="boolean">true</argument>
+		<!-- Start the awareness agent discovery mechanisms. -->
+		<argument name="awamechanisms" class="String[]">new String[]{"Broadcast", "Multicast"}</argument>
 		<!-- Start the JCC agent to open the platform GUI? -->
 		<argument name="gui" class="boolean">true</argument>
 		<!-- The file name(s) of extension component(s) to load (separated by comma). -->
@@ -128,7 +130,6 @@
 		<componenttype filename="jadex/gpmn/KernelGPMN.component.xml" name="kernel_gpmn"/>
 		<componenttype filename="jadex/component/KernelMulti.component.xml" name="kernel_multi"/>
 		<componenttype filename="jadex/base/service/remote/RemoteServiceManagementAgent.class" name="rms"/>
-		<!-- <componenttype filename="jadex/base/service/awareness/AwarenessAgent.class" name="awa"/> -->
 		<componenttype filename="jadex/base/service/awareness/management/AwarenessManagementAgent.class" name="awa"/>
 
 		<!-- <componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/> -->
@@ -247,6 +248,7 @@
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
+						<argument name="mechanisms">$args.awamechanisms</argument>
 						<argument name="includes">$args.awaincludes</argument>
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
@@ -270,6 +272,7 @@
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
+						<argument name="mechanisms">$args.awamechanisms</argument>
 						<argument name="includes">$args.awaincludes</argument>
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
@@ -304,6 +307,7 @@
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
+						<argument name="mechanisms">$args.awamechanisms</argument>
 						<argument name="includes">$args.awaincludes</argument>
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
@@ -333,6 +337,7 @@
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
+						<argument name="mechanisms">$args.awamechanisms</argument>
 						<argument name="includes">$args.awaincludes</argument>
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>

@@ -5,6 +5,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.awareness.IManagementService;
@@ -13,8 +14,10 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Property;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -58,6 +61,7 @@ import java.util.TimerTask;
 {
 //	@Argument(name="address", clazz=String.class, defaultvalue="\"224.0.0.0\"", description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
 //	@Argument(name="port", clazz=int.class, defaultvalue="55667", description="The port used for finding other agents."),
+	@Argument(name="mechanisms", clazz=String[].class, defaultvalue="new String[]{\"Broadcast\"}", description="The discovery mechanisms."),
 	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
 	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
 	@Argument(name="autocreate", clazz=boolean.class, defaultvalue="true", description="Set if new proxies should be automatically created when discovering new components."),
@@ -77,7 +81,7 @@ import java.util.TimerTask;
 	@Configuration(name="Frequent updates (10s)", arguments=@NameValue(name="delay", value="10000"), 
 		components=
 		{
-			@Component(type="Broadcast")
+//			@Component(type="Broadcast")
 //			@Component(name="multicast", type="Multicast")
 //			@Component(name="scanner", type="Scanner")
 //			@Component(name="registry", type="Registry")
@@ -85,7 +89,7 @@ import java.util.TimerTask;
 	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000"),
 		components=
 		{
-			@Component(type="Broadcast")
+//			@Component(type="Broadcast")
 //			@Component(name="multicast", type="Multicast")
 //			@Component(name="scanner", type="Scanner")
 //			@Component(name="registry", type="Registry")
@@ -93,7 +97,7 @@ import java.util.TimerTask;
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"),
 		components=
 		{
-			@Component(type="Broadcast")
+//			@Component(type="Broadcast")
 //			@Component(name="multicast", type="Multicast")
 //			@Component(name="scanner", type="Scanner")
 //			@Component(name="registry", type="Registry")
@@ -147,26 +151,49 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	/**
 	 *  Called once after agent creation.
 	 */
-	public IFuture	agentCreated()
+	public IFuture<Void>	agentCreated()
 	{
 		initArguments();
 		
 		this.discovered = new LinkedHashMap();
 		
-		final Future	ret	= new Future();
-		getServiceContainer().getRequiredService("settings").addResultListener(createResultListener(new IResultListener()
+		final Future<Void>	ret	= new Future<Void>();
+		
+		final String[] mechas = (String[])getArgument("mechanisms");
+		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, 
+			RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				ISettingsService	settings	= (ISettingsService)result;
-				settings.registerPropertiesProvider(getAgentName(), AwarenessManagementAgent.this)
-					.addResultListener(new DelegationResultListener(ret));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				// No settings service: ignore.
-				ret.setResult(null);
+				CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(mechas.length, 
+					false, createResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						getServiceContainer().getRequiredService("settings").addResultListener(
+							createResultListener(new IResultListener()
+						{
+							public void resultAvailable(Object result)
+							{
+								ISettingsService	settings	= (ISettingsService)result;
+								
+								settings.registerPropertiesProvider(getAgentName(), AwarenessManagementAgent.this)
+									.addResultListener(new DelegationResultListener(ret));
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								// No settings service: ignore.
+								ret.setResult(null);
+							}
+						}));
+					}
+				}));
+				CreationInfo info = new CreationInfo(getComponentIdentifier());
+				for(int i=0; i<mechas.length; i++)
+				{
+					cms.createComponent(null, mechas[i], info, null).addResultListener(lis);
+				}
 			}
 		}));
 		
