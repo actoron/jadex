@@ -8,6 +8,7 @@ import java.util.Map;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.kernelbase.CacheableKernelModel;
 
@@ -62,21 +63,21 @@ public class MicroModel extends CacheableKernelModel
 	 *  @param name The name.
 	 *  @param field The field. 
 	 */
-	public void addArgumentInjection(String name, Field field)
+	public void addArgumentInjection(String name, Field field, String convert)
 	{
 		if(argumentinjections==null)
 			argumentinjections = new MultiCollection();
-		argumentinjections.put(name, field);
+		argumentinjections.put(name, new Tuple2<Field, String>(field, convert!=null && convert.length()==0? null: convert));
 	}
 	
 	/**
 	 *  Get the argument injection fields.
 	 *  @return The fields.
 	 */
-	public Field[] getArgumentInjections(String name)
+	public Tuple2<Field, String>[] getArgumentInjections(String name)
 	{
 		Collection col = argumentinjections==null? null: (Collection)argumentinjections.get(name);
-		return col==null? new Field[0]: (Field[])col.toArray(new Field[col.size()]);
+		return col==null? new Tuple2[0]: (Tuple2<Field, String>[])col.toArray(new Tuple2[col.size()]);
 	}
 	
 	/**

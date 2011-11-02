@@ -24,6 +24,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
 import jadex.kernelbase.InterpreterFetcher;
@@ -158,9 +159,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/**
 	 *  Inject the arguments to the annotated fields.
 	 */
-	protected IFuture injectArguments(final Object agent, final MicroModel model)
+	protected IFuture<Void> injectArguments(final Object agent, final MicroModel model)
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 
 		String[] names = model.getArgumentInjectionNames();
 		if(names.length>0)
@@ -168,16 +169,24 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			for(int i=0; i<names.length; i++)
 			{
 				Object val = getArguments().get(names[i]);
-				final Field[] fields = model.getArgumentInjections(names[i]);
+				final Tuple2<Field, String>[] infos = model.getArgumentInjections(names[i]);
 				
 				try
 				{
-					for(int j=0; j<fields.length; j++)
+					for(int j=0; j<infos.length; j++)
 					{
-						if(val!=null || !SReflect.isBasicType(fields[j].getType()))
+						Field field = infos[j].getFirstEntity();
+						String convert = infos[j].getSecondEntity();
+						if(val!=null || !SReflect.isBasicType(field.getType()))
 						{
-							fields[j].setAccessible(true);
-							fields[j].set(agent, val);
+							if(convert!=null)
+							{
+								SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
+								fetcher.setValue("$value", val);
+								val = SJavaParser.evaluateExpression(convert, fetcher);
+							}
+							field.setAccessible(true);
+							field.set(agent, val);
 						}
 					}
 				}
@@ -198,9 +207,9 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	/**
 	 *  Inject the services to the annotated fields.
 	 */
-	protected IFuture injectServices(final Object agent, final MicroModel model)
+	protected IFuture<Void> injectServices(final Object agent, final MicroModel model)
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 
 		String[] sernames = model.getServiceInjectionNames();
 		

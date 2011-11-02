@@ -1,7 +1,7 @@
 package jadex.base.service.awareness.gui;
 
+import jadex.base.gui.ExceptionSwingDelegationResultListener;
 import jadex.base.gui.SwingDefaultResultListener;
-import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.jtable.ComponentIdentifierRenderer;
 import jadex.base.gui.plugin.IControlCenter;
@@ -11,8 +11,15 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.EditableList;
@@ -31,7 +38,11 @@ import java.awt.event.ActionListener;
 import java.net.InetAddress;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
@@ -119,6 +130,10 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		
 	/** The cancel button. */
 	protected JButton	bucancel;
+	
+	/** The discovery mechanisms. */
+	protected JCheckBox[] cbmechanisms;
+
 		
 	//-------- methods --------
 	
@@ -128,7 +143,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param component The component.
 	 */
-	public IFuture<Void> init(final IControlCenter jcc, IExternalAccess component)
+	public IFuture<Void> init(final IControlCenter jcc, final IExternalAccess component)
 	{
 		this.jcc = jcc;
 		this.component = component;
@@ -285,6 +300,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				updateDiscoveryInfos(jtdis);
+				updateDiscoveryMechanisms();
 			}
 		});
 		
@@ -298,6 +314,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				updateDiscoveryInfos(jtdis);
+				updateDiscoveryMechanisms();
 			}
 		});
 		
@@ -394,9 +411,86 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		pbobuts.add(bucreate);
 		pbobuts.add(budelete);
 		
-		timer.start();
 		
+		SubcomponentTypeInfo[] dis = component.getModel().getSubcomponentTypes();
+		cbmechanisms = new JCheckBox[dis.length];
+		for(int i=0; i<dis.length; i++)
+		{
+			cbmechanisms[i] = new JCheckBox(dis[i].getName());
+			final JCheckBox cb = cbmechanisms[i];
+			final String localtype = dis[i].getName();
+			cbmechanisms[i].addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					final boolean on = cb.isSelected();
+					component.scheduleStep(new IComponentStep<Void>()
+					{
+						@XMLClassname("deoractivateDiscoveryMechanism")
+						public IFuture<Void> execute(final IInternalAccess ia)
+						{
+							ia.getChildren().addResultListener(ia.createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
+							{
+								public void resultAvailable(Collection<IExternalAccess> subs) 
+								{
+									IComponentIdentifier found = null;
+									for(Iterator<IExternalAccess> it=subs.iterator(); it.hasNext();)
+									{
+										IExternalAccess exta = it.next();
+										if(localtype.equals(exta.getLocalType()))
+										{
+											found = exta.getComponentIdentifier();
+											break;
+										}
+									}
+									
+									if(on)
+									{
+										if(found==null)
+										{
+											SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+												.addResultListener(ia.createResultListener(new DefaultResultListener<IComponentManagementService>()
+											{
+												public void resultAvailable(IComponentManagementService cms) 
+												{
+													CreationInfo info = new CreationInfo(ia.getComponentIdentifier());
+													cms.createComponent(null, localtype, info, null);
+												};
+											}));
+										}
+									}
+									else
+									{
+										if(found!=null)
+										{
+											final IComponentIdentifier cid = found;
+											SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+												.addResultListener(ia.createResultListener(new DefaultResultListener<IComponentManagementService>()
+											{
+												public void resultAvailable(IComponentManagementService cms) 
+												{
+													cms.destroyComponent(cid);
+												};
+											}));
+										}
+									}
+								};
+							}));
+							return null;
+						}
+					});
+				}
+			});
+		}
 		
+		final JPanel pdismechs = new JPanel(new GridBagLayout());
+		pdismechs.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Discovery Mechanisms "));
+		for(int i=0; i<cbmechanisms.length; i++)
+		{
+			pdismechs.add(cbmechanisms[i], new GridBagConstraints(i, 0, 1, 1, i==cbmechanisms.length-1? 1: 0, 0, GridBagConstraints.WEST, 
+				GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
+		}
+				
 		GridBagConstraints	gbc	= new GridBagConstraints();
 		gbc.fill	= GridBagConstraints.BOTH;
 		
@@ -420,10 +514,13 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		gbc.weightx	= 0;
 		panel.add(pdissettings, gbc);
 		gbc.gridx	= GridBagConstraints.RELATIVE;
-		
+				
 		gbc.gridy++;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
 		panel.add(pbuts, gbc);
+		
+		gbc.gridy++;
+		panel.add(pdismechs, gbc);
 		
 		gbc.gridy++;
 		gbc.weighty	= 1;
@@ -444,6 +541,11 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		gbc.weightx	= 1;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
 		panel.add(pbobuts, gbc);
+				
+		
+		updateDiscoveryMechanisms();
+		
+		timer.start();
 		
 		return refreshSettings();
 	}
@@ -506,7 +608,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	 */
 	protected IFuture<Void>	refreshSettings()
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		component.scheduleStep(new IComponentStep<AwarenessSettings>()
 		{
 			@XMLClassname("refreshSettings")
@@ -525,7 +627,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				ret.excludes	= agent.getExcludes();
 				return new Future<AwarenessSettings>(ret);
 			}
-		}).addResultListener(new SwingDelegationResultListener<AwarenessSettings>(ret)
+		}).addResultListener(new ExceptionSwingDelegationResultListener<AwarenessSettings, Void>(ret)
 		{
 			public void customResultAvailable(AwarenessSettings result)
 			{
@@ -569,6 +671,54 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				dtm.fireTableDataChanged();
 				if(sel!=-1 && sel<ds.length)
 					((DefaultListSelectionModel)jtdis.getSelectionModel()).setSelectionInterval(sel, sel);
+			}
+			
+			public void customExceptionOccurred(Exception exception)
+			{
+				sprefresh.setValue(new Integer(0));
+			}
+		});
+	}
+	
+	/**
+	 *  Update the discovery mechanisms.
+	 */
+	protected void updateDiscoveryMechanisms()
+	{
+		component.scheduleStep(new IComponentStep<Set<String>>()
+		{
+			@XMLClassname("getDiscoveryMechanisms")
+			public IFuture<Set<String>> execute(IInternalAccess ia)
+			{
+				final Future<Set<String>> ret = new Future<Set<String>>();
+				
+				ia.getChildren().addResultListener(ia.createResultListener(
+					new ExceptionDelegationResultListener<Collection<IExternalAccess>, Set<String>>(ret)
+				{
+					public void customResultAvailable(Collection<IExternalAccess> result)
+					{
+						Set<String> res = new HashSet<String>();
+						int i=0;
+						for(Iterator<IExternalAccess> it=result.iterator(); it.hasNext(); i++)
+						{
+							IExternalAccess child = it.next();
+							res.add(child.getLocalType());
+						}
+						ret.setResult(res);
+					}
+				}));
+				
+				return ret;
+			}
+		}).addResultListener(new SwingDefaultResultListener<Set<String>>()
+		{
+			public void customResultAvailable(Set<String> localtypes)
+			{
+				for(int i=0; i<cbmechanisms.length; i++)
+				{
+//					System.out.println("test: "+cbmechanisms[i].getText());
+					cbmechanisms[i].setSelected(localtypes.contains(cbmechanisms[i].getText()));
+				}
 			}
 			
 			public void customExceptionOccurred(Exception exception)

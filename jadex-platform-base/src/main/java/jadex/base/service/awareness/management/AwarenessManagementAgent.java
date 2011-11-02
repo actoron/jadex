@@ -67,36 +67,36 @@ import java.util.TimerTask;
 	@Argument(name="excludes", clazz=String.class, defaultvalue="\"\"", description="A list of platforms/IPs/hostnames to exclude (comma separated). Matches start of platform/IP/hostname.")
 })
 @ComponentTypes({
-	@ComponentType(name="broadcastdis", filename="jadex/base/service/awareness/discovery/ipbroadcast/BroadcastDiscoveryAgent.class"),
-	@ComponentType(name="multicastdis", filename="jadex/base/service/awareness/discovery/ipmulticast/MulticastDiscoveryAgent.class"),
-	@ComponentType(name="scannerdis", filename="jadex/base/service/awareness/discovery/ipscanner/ScannerDiscoveryAgent.class"),
-	@ComponentType(name="registrydis", filename="jadex/base/service/awareness/discovery/registry/RegistryDiscoveryAgent.class")
+	@ComponentType(name="Broadcast", filename="jadex/base/service/awareness/discovery/ipbroadcast/BroadcastDiscoveryAgent.class"),
+	@ComponentType(name="Multicast", filename="jadex/base/service/awareness/discovery/ipmulticast/MulticastDiscoveryAgent.class"),
+	@ComponentType(name="Scanner", filename="jadex/base/service/awareness/discovery/ipscanner/ScannerDiscoveryAgent.class"),
+	@ComponentType(name="Registry", filename="jadex/base/service/awareness/discovery/registry/RegistryDiscoveryAgent.class")
 })
 @Configurations(
 {
 	@Configuration(name="Frequent updates (10s)", arguments=@NameValue(name="delay", value="10000"), 
 		components=
 		{
-			@Component(name="broadcastdis", type="broadcastdis")
-//			@Component(name="multicastdis", type="multicastdis")
-//			@Component(name="scannerdis", type="scannerdis")
-//			@Component(name="registrydis", type="registrydis")
+			@Component(type="Broadcast")
+//			@Component(name="multicast", type="Multicast")
+//			@Component(name="scanner", type="Scanner")
+//			@Component(name="registry", type="Registry")
 		}),
 	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000"),
 		components=
 		{
-			@Component(name="broadcastdis", type="broadcastdis")
-//			@Component(name="multicastdis", type="multicastdis")
-//			@Component(name="scannerdis", type="scannerdis")
-//			@Component(name="registrydis", type="registrydis")
+			@Component(type="Broadcast")
+//			@Component(name="multicast", type="Multicast")
+//			@Component(name="scanner", type="Scanner")
+//			@Component(name="registry", type="Registry")
 		}),
 	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"),
 		components=
 		{
-			@Component(name="broadcastdis", type="broadcastdis")
-//			@Component(name="multicastdis", type="multicastdis")
-//			@Component(name="scannerdis", type="scannerdis")
-//			@Component(name="registrydis", type="registrydis")
+			@Component(type="Broadcast")
+//			@Component(name="multicast", type="Multicast")
+//			@Component(name="scanner", type="Scanner")
+//			@Component(name="registry", type="Registry")
 		})
 })
 @Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.base.service.awareness.gui.AwarenessAgentPanel\""))

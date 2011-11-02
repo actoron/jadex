@@ -567,7 +567,7 @@ public class MicroClassReader
 				{
 					AgentArgument arg = (AgentArgument)fields[i].getAnnotation(AgentArgument.class);
 					String name = arg.value().length()>0? arg.value(): fields[i].getName();
-					micromodel.addArgumentInjection(name, fields[i]);
+					micromodel.addArgumentInjection(name, fields[i], arg.convert());
 				}
 				else if(fields[i].isAnnotationPresent(AgentService.class))
 				{

@@ -7,6 +7,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -39,7 +40,7 @@ public interface IInternalAccess
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture getChildren();
+	public IFuture<Collection<IExternalAccess>> getChildren();
 	
 	/**
 	 *  Get the id of the component.
