@@ -305,6 +305,7 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 				}
 			} else {
 				databaseLogger.storeRoleChangeDistance(request);
+				managerService.informReconfSuccess();
 			}
 		}
 		// received its own help request

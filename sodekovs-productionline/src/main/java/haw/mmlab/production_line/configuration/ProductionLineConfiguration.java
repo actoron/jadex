@@ -112,4 +112,17 @@ public class ProductionLineConfiguration {
 	public void setReconfTime(int reconfTime) {
 		this.reconfTime = reconfTime;
 	}
+
+	public boolean simulateWithoutWorkpieces() {
+		boolean withoutWP = true;
+
+		for (Task task : tasks) {
+			if (task.getMaxWorkpieceCount() > 0) {
+				withoutWP = false;
+				break;
+			}
+		}
+
+		return withoutWP;
+	}
 }

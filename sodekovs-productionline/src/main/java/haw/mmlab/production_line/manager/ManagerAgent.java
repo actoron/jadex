@@ -262,6 +262,10 @@ public class ManagerAgent extends MicroAgent {
 						startedAgents.add(identifier);
 					}
 				});
+
+				if (plc.simulateWithoutWorkpieces()) {
+					startDropout();
+				}
 			}
 		});
 	}
@@ -290,7 +294,7 @@ public class ManagerAgent extends MicroAgent {
 	 * Finishes the current run and starts the next runs if specified.
 	 */
 	@SuppressWarnings({ "rawtypes" })
-	private void finishRun() {
+	public void finishRun() {
 		System.out.println("finishRun in Manager called.");
 
 		if (!finished) {

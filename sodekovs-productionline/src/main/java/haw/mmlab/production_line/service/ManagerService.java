@@ -64,4 +64,11 @@ public class ManagerService implements IManagerService {
 
 		return IFuture.DONE;
 	}
+
+	@Override
+	public IFuture<Void> informReconfSuccess() {
+		agent.finishRun();
+		
+		return IFuture.DONE;
+	}
 }

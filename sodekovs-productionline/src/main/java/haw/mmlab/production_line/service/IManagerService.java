@@ -46,4 +46,9 @@ public interface IManagerService {
 	 * Inform the manager that the reconfiguration failed.
 	 */
 	public IFuture<Void> informReconfError();
+	
+	/**
+	 * Inform the manager that the reconfiguration was successful.
+	 */
+	public IFuture<Void> informReconfSuccess();
 }

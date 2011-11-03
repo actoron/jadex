@@ -14,7 +14,6 @@ import jadex.micro.annotation.Description;
  * 
  * @author thomas
  */
-@SuppressWarnings("unchecked")
 @Description("This is the almighty timelord agent!")
 @Arguments({ @Argument(clazz = Integer.class, name = "interval") })
 public class TimelordAgent extends MicroAgent {

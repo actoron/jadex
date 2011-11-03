@@ -32,7 +32,6 @@ import javax.xml.bind.JAXBException;
  * 
  * @author thomas
  */
-@SuppressWarnings("unchecked")
 @Description("The dropout agent.")
 @Arguments(@Argument(clazz = String.class, name = "configuration_model"))
 @RequiredServices({ @RequiredService(name = "processWorkpieceServices", type = IProcessWorkpieceService.class, multiple = true, binding = @Binding(scope = RequiredServiceInfo.SCOPE_GLOBAL)) })

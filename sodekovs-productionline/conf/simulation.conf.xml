@@ -86,6 +86,9 @@
 	<!-- Default: false -->
 	<repeat_caps>false</repeat_caps>
 	
+	<!-- Specifies whether workpieces should be simulated or not. -->
+	<simulate_workpieces>false</simulate_workpieces>
+	
 	<!-- Specifies the amount of different capabilities in each robot. -->
 	<!-- For each robot a random value between min and max is used. -->
 	<!-- min must be greater or equals than 1 and max must be greater or equals than min -->

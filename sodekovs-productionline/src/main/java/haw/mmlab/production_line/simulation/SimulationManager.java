@@ -34,7 +34,7 @@ public class SimulationManager {
 
 	private static final int NUMBER_OF_ROBOTS = 10;
 
-	private static final int NUMBER_OF_WORKPIECES = 300;
+	private static final int NUMBER_OF_WORKPIECES = 0;
 
 	private static final int TIMELORD_INTERVAL = 0;
 
