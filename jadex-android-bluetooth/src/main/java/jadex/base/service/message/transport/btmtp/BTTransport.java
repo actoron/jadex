@@ -114,25 +114,9 @@ public class BTTransport implements ITransport {
 
 	public IBTP2PMessageCallback msgCallback = new IBTP2PMessageCallback.Stub() {
 
-		@SuppressWarnings({ "rawtypes", "unchecked" })
 		@Override
 		public void messageReceived(final byte[] data) throws RemoteException {
-			final Future fut = new Future();
-			SServiceProvider.getService(container, IThreadPoolService.class,
-					RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
-					new DelegationResultListener(fut) {
-						public void customResultAvailable(Object result) {
-							fut.setResult(null);
-							final IThreadPoolService tp = (IThreadPoolService) result;
-							tp.execute(new Runnable() {
-								public void run() {
-									BTTransport.this
-											.deliverMessage(BTTransport.this
-													.decodeMessage(data));
-								}
-							});
-						}
-					});
+			receiveMessage(data);
 		}
 	};
 
@@ -224,11 +208,11 @@ public class BTTransport implements ITransport {
 	 *            The message to send. (todo: On which thread this should be
 	 *            done?)
 	 */
-	public IFuture sendMessage(Map msg, String type,
+	public IFuture<Void> sendMessage(Map msg, String type,
 			IComponentIdentifier[] receivers, byte[] codecids) {
 
 		// Fetch all addresses
-		Set addresses = new LinkedHashSet();
+		Set<String> addresses = new LinkedHashSet<String>();
 		for (int i = 0; i < receivers.length; i++) {
 			String[] raddrs = receivers[i].getAddresses();
 			for (int j = 0; j < raddrs.length; j++) {
@@ -238,7 +222,7 @@ public class BTTransport implements ITransport {
 
 		// Iterate over all different addresses and try to send
 		// to missing and appropriate receivers
-		String[] addrs = (String[]) addresses.toArray(new String[addresses
+		String[] addrs = addresses.toArray(new String[addresses
 				.size()]);
 
 		boolean delivered = false;
@@ -256,9 +240,27 @@ public class BTTransport implements ITransport {
 			}
 		}
 
-		return delivered ? IFuture.DONE : new Future(new RuntimeException(
+		return delivered ? IFuture.DONE : new Future<Void>(new RuntimeException(
 		"Could not deliver message"));
-
+	}
+	
+	protected void receiveMessage(final byte[] data) {
+		final Future<IThreadPoolService> fut = new Future<IThreadPoolService>();
+		SServiceProvider.getService(container, IThreadPoolService.class,
+				RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+				new DelegationResultListener<IThreadPoolService>(fut) {
+					public void customResultAvailable(IThreadPoolService result) {
+						fut.setResult(null);
+						final IThreadPoolService tp = result;
+						tp.execute(new Runnable() {
+							public void run() {
+								BTTransport.this
+										.deliverMessage(BTTransport.this
+												.decodeMessage(data));
+							}
+						});
+					}
+				});
 	}
 
 	protected byte[] encodeMessage(MessageEnvelope msg, byte[] codecids) {

@@ -111,9 +111,10 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 			@Override
 			public synchronized void messageReceived(BluetoothMessage msg) {
 				try {
-					if (msg.getType() == DataPacket.TYPE_AWARENESS_INFO) {
+					if (msg.getType() == DataPacket.TYPE_AWARENESS_INFO
+							&& awarenessCallback != null) {
 						awarenessCallback.awarenessInfoReceived(msg.getData());
-					} else {
+					} else if (msgCallback != null){
 //						showToast(msg.getDataAsString());
 						msgCallback.messageReceived(msg.getData());
 					}

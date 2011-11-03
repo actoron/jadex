@@ -1,6 +1,12 @@
 package jadex.base.service.message.transport.btmtp;
 
 import jadex.android.bluetooth.CustomTestRunner;
+import jadex.android.bluetooth.TestConstants;
+import jadex.android.bluetooth.device.IBluetoothDevice;
+import jadex.android.bluetooth.message.BluetoothMessage;
+import jadex.android.bluetooth.service.IBTP2PAwarenessInfoCallback;
+import jadex.android.bluetooth.service.IBTP2PMessageCallback;
+import jadex.android.bluetooth.service.IConnectionServiceConnection;
 import jadex.base.fipa.SFipa;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
@@ -33,10 +39,12 @@ import jadex.xml.bean.JavaWriter;
 import jadex.xml.writer.WriteContext;
 import jadex.xml.writer.Writer;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,12 +56,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import android.os.RemoteException;
+
 @RunWith(CustomTestRunner.class)
 public class BTTransportTest extends TestCase {
 
 	private BTTransport btTransport;
 	private MessageEnvelope message;
 	private Writer writer;
+	private ComponentIdentifier sender;
 
 
 	@Before
@@ -64,10 +75,12 @@ public class BTTransportTest extends TestCase {
 		map.put("key1", "val1");
 		map.put("key2", "val2");
 		
+		sender = new ComponentIdentifier("senderComponent", new String[]{"bt-mtp://" + TestConstants.adapterAddress2});
+		
 		ArrayList<IComponentIdentifier> receivers = new ArrayList<IComponentIdentifier>();
 		
-		receivers.add(new ComponentIdentifier("component1", new String[]{"bt-mtp://QWER:QWERASDFRT:WERT"}));
-		receivers.add(new ComponentIdentifier("component2", new String[]{"bt-mtp://wasd:QWERASDFRT:WERT"}));
+		receivers.add(new ComponentIdentifier("component1", new String[]{"bt-mtp://" + TestConstants.sampleAddress}));
+		receivers.add(new ComponentIdentifier("component2", new String[]{"bt-mtp://" + TestConstants.defaultAdapterAddress}));
 		
 		message = new MessageEnvelope(map, receivers, SFipa.FIPA_MESSAGE_TYPE.getName());
 		
@@ -122,22 +135,24 @@ public class BTTransportTest extends TestCase {
 				RequiredServiceInfo.SCOPE_GLOBAL);
 		BasicResultSelector rs = new BasicResultSelector();
 		
-		
 		RemoteSearchCommand rsc = new RemoteSearchCommand("rms@anywhere", sm, vd, rs, "1");
 		
 		String cont = Writer.objectToXML(writer, rsc, getClass().getClassLoader(), new ComponentIdentifier("testcomponent"));
 		
-		HashMap<String, String> msg = new HashMap<String,String>();
+		HashMap<String, Object> msg = new HashMap<String,Object>();
 		msg.put(SFipa.CONTENT, cont);
 		
 		for (int i=0; i < 10; i++) {
 			msg.put(""+i, cont);
 		}
 		
+		msg.put(SFipa.SENDER, sender);
+		msg.put(SFipa.RECEIVERS, message.getReceivers());
+		
 		message.setMessage(msg);
 		byte[] xmlencoded = btTransport.encodeMessage(message, new byte[]{JadexXMLCodec.CODEC_ID});
 		
-		String xmlstring = new String(xmlencoded);
+		System.out.println(new String(xmlencoded));
 		
 		byte[] encoded = btTransport.encodeMessage(message, null);
 		MessageEnvelope message2 = btTransport.decodeMessage(encoded);
@@ -156,7 +171,107 @@ public class BTTransportTest extends TestCase {
 		assertTrue(Arrays.equals(message.getReceivers(), message2.getReceivers()));
 	}
 	
+	@Test
+	public void testSendMessage() {
+		ISearchManager sm = SServiceProvider.getSearchManager(false,
+				RequiredServiceInfo.SCOPE_GLOBAL);
+		IVisitDecider vd = SServiceProvider.getVisitDecider(false,
+				RequiredServiceInfo.SCOPE_GLOBAL);
+		BasicResultSelector rs = new BasicResultSelector();
+		
+		RemoteSearchCommand rsc = new RemoteSearchCommand("rms@anywhere", sm, vd, rs, "1");
+		
+		String cont = Writer.objectToXML(writer, rsc, getClass().getClassLoader(), new ComponentIdentifier("testcomponent"));
+		
+		HashMap<String, Object> msg = new HashMap<String,Object>();
+		msg.put(SFipa.SENDER, sender);
+		msg.put(SFipa.CONTENT, cont);
+		msg.put(SFipa.RECEIVERS, message.getReceivers());
+		
+		ArrayList<BluetoothMessage> receivedMsgs = new ArrayList<BluetoothMessage>();
+		
+		btTransport.binder = createDummyBinder(receivedMsgs);
+		btTransport.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE.getName(), message.getReceivers(), new byte[]{JadexXMLCodec.CODEC_ID});
+		
+		
+		assertFalse(receivedMsgs.isEmpty());
+		BluetoothMessage recMsg = receivedMsgs.get(0);
+		byte[] rawEncoded = recMsg.getData();
+
+		System.out.println(new String(rawEncoded));
+		
+		MessageEnvelope decodeMessage = btTransport.decodeMessage(rawEncoded);
+		
+		IComponentIdentifier[] receivers = decodeMessage.getReceivers();
+		assertTrue(Arrays.equals(message.getReceivers(), receivers));
+		
+		Map recMap = decodeMessage.getMessage();
+		
+		assertEquals(msg, recMap);
+	}
 	
+	
+	private IConnectionServiceConnection createDummyBinder(final List<BluetoothMessage> receivedMsgsList) {
+		return new IConnectionServiceConnection.Stub() {
+			
+			@Override
+			public void stopBTServer() throws RemoteException {
+			}
+			@Override
+			public void stopAutoConnect() throws RemoteException {
+			}
+			@Override
+			public void startBTServer() throws RemoteException {
+			}
+			@Override
+			public void startAutoConnect() throws RemoteException {
+			}
+			@Override
+			public void sendMessage(BluetoothMessage msg) throws RemoteException {
+				receivedMsgsList.add(msg);
+			}
+			@Override
+			public void scanEnvironment() throws RemoteException {
+			}
+			@Override
+			public void registerMessageCallback(IBTP2PMessageCallback callback)
+					throws RemoteException {
+			}
+			@Override
+			public void registerAwarenessInfoCallback(
+					IBTP2PAwarenessInfoCallback callback) throws RemoteException {
+			}
+			@Override
+			public IBluetoothDevice[] getUnbondedDevicesInRange()
+					throws RemoteException {
+				return null;
+			}
+			@Override
+			public IBluetoothDevice[] getReachableDevices() throws RemoteException {
+				return null;
+			}
+			@Override
+			public IBluetoothDevice[] getConnectedDevices() throws RemoteException {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			@Override
+			public IBluetoothDevice[] getBondedDevicesInRange() throws RemoteException {
+				return null;
+			}
+			@Override
+			public String getBTAddress() throws RemoteException {
+				return null;
+			}
+			@Override
+			public void disconnectDevice(IBluetoothDevice dev) throws RemoteException {
+			}
+			@Override
+			public void connectToDevice(IBluetoothDevice dev) throws RemoteException {
+			}
+		};
+	}
+
 	private IServiceProvider createServiceProvider() {
 		return new IServiceProvider() {
 			
