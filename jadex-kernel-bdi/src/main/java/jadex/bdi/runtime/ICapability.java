@@ -19,9 +19,17 @@ public interface ICapability	extends IElement
 {
 	/**
 	 *  Get the scope.
+	 *  Method with IExternalAccess return value included
+	 *  for compatibility with IInternalAccess. 
 	 *  @return The scope.
 	 */
-	public IBDIExternalAccess getExternalAccess();
+	public IExternalAccess getExternalAccess();
+
+	/**
+	 *  Get the scope.
+	 *  @return The scope.
+	 */
+	public IBDIExternalAccess getBDIExternalAccess();
 
 	/**
 	 *  Get the parent (if any).

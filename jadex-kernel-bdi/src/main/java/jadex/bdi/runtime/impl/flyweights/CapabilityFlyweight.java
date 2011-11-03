@@ -73,7 +73,16 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Get the scope.
 	 *  @return The scope.
 	 */
-	public IBDIExternalAccess getExternalAccess()
+	public IExternalAccess getExternalAccess()
+	{
+		return getBDIExternalAccess();
+	}
+		
+	/**
+	 *  Get the scope.
+	 *  @return The scope.
+	 */
+	public IBDIExternalAccess getBDIExternalAccess()
 	{
 		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
