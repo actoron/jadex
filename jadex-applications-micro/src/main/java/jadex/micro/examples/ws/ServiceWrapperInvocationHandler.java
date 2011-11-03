@@ -31,8 +31,8 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service.Mode;
 import javax.xml.ws.soap.SOAPBinding;
 
-import net.webservicex.StockQuote;
-import net.webservicex.StockQuoteSoap;
+//import net.webservicex.StockQuote;
+//import net.webservicex.StockQuoteSoap;
 
 /**
  * 
