@@ -294,7 +294,7 @@ public class ManagerAgent extends MicroAgent {
 	 * Finishes the current run and starts the next runs if specified.
 	 */
 	@SuppressWarnings({ "rawtypes" })
-	public void finishRun() {
+	private void finishRun() {
 		System.out.println("finishRun in Manager called.");
 
 		if (!finished) {
@@ -461,5 +461,11 @@ public class ManagerAgent extends MicroAgent {
 				});
 			}
 		});
+	}
+
+	public void informReconfSuccess() {
+		if (plc.simulateWithoutWorkpieces()) {
+			this.finishRun();
+		}
 	}
 }
