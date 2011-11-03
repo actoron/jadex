@@ -433,12 +433,12 @@ public class Writer
 		{
 			if(!prefix.equals(writer.getPrefix(uri)))
 			{
-				writer.writeStartElement(tag.getPrefix(), tag.getLocalPart(), tag.getNamespaceURI());
+				writer.writeStartElement(tag.getPrefix(), tag.getLocalPart(), uri);
 				writer.writeNamespace(tag.getPrefix(), tag.getNamespaceURI());
 			}
 			else
 			{
-				writer.writeStartElement(tag.getPrefix(), tag.getLocalPart(), tag.getNamespaceURI());
+				writer.writeStartElement(tag.getPrefix(), tag.getLocalPart(), uri);
 			}
 		}
 		else

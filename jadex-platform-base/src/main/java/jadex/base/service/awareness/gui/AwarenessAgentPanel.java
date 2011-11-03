@@ -698,10 +698,10 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					public void customResultAvailable(Collection<IExternalAccess> result)
 					{
 						Set<String> res = new HashSet<String>();
-						int i=0;
-						for(Iterator<IExternalAccess> it=result.iterator(); it.hasNext(); i++)
+						for(Iterator<IExternalAccess> it=result.iterator(); it.hasNext();)
 						{
 							IExternalAccess child = it.next();
+//							System.out.println("child: "+child.getLocalType()+" "+child.getComponentIdentifier());
 							res.add(child.getLocalType());
 						}
 						ret.setResult(res);
@@ -716,7 +716,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			{
 				for(int i=0; i<cbmechanisms.length; i++)
 				{
-//					System.out.println("test: "+cbmechanisms[i].getText());
+//					System.out.println("test: "+cbmechanisms[i].getText()+" "+localtypes);
 					cbmechanisms[i].setSelected(localtypes.contains(cbmechanisms[i].getText()));
 				}
 			}

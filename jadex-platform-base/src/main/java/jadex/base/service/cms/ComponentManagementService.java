@@ -298,7 +298,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			final Future<IComponentIdentifier> inited = new Future<IComponentIdentifier>();
 			final Future<Void> resfut = new Future<Void>();
 			
-			final CreationInfo cinfo = info!=null? info: new CreationInfo();	// Dummy default info, if null.
+			final CreationInfo cinfo = new CreationInfo(info);	// Dummy default info, if null. Must be cloned as localtype is set on info later.
 			
 			if(cinfo.getParent()!=null && isRemoteComponent(cinfo.getParent()))
 			{

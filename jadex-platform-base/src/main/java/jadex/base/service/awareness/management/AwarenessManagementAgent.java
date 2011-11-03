@@ -192,9 +192,11 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 						}));
 					}
 				}));
+				
 				CreationInfo info = new CreationInfo(getComponentIdentifier());
 				for(int i=0; i<mechas.length; i++)
 				{
+//					System.out.println("mecha: "+mechas[i]);
 					cms.createComponent(null, mechas[i], info, null).addResultListener(lis);
 				}
 			}

@@ -61,6 +61,25 @@ public class CreationInfo
 	{
 		// Bean constructor.
 	}
+	
+	/**
+	 *  Create a new creation info. 
+	 */
+	public CreationInfo(CreationInfo info)
+	{
+		if(info!=null)
+		{
+			this.config	= info.getConfiguration();
+			this.args	= info.getArguments();
+			this.parent	= info.getParent();
+			this.suspend	= info.getSuspend(); 
+			this.master = info.getMaster();
+			this.daemon = info.getDaemon();
+			this.autoshutdown = info.getAutoShutdown();
+			this.imports	= info.getImports();
+			this.bindings = info.getRequiredServiceBindings();
+		}
+	}
 
 	/**
 	 *  Create a new creation info.
