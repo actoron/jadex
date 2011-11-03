@@ -17,6 +17,7 @@ import jadex.android.bluetooth.message.MessageProtos;
 import jadex.android.bluetooth.message.MessageProtos.RoutingInformation;
 import jadex.android.bluetooth.routing.FloodingPacketRouter;
 import jadex.android.bluetooth.routing.IPacketRouter;
+import jadex.android.bluetooth.routing.dsdv.DsdvRouter;
 import jadex.android.bluetooth.service.Future;
 import jadex.android.bluetooth.service.IFuture;
 import jadex.android.bluetooth.service.IResultListener;
@@ -116,7 +117,8 @@ public class BTP2PConnector implements IBluetoothStateListener {
 			}
 		});
 
-		packetRouter = new FloodingPacketRouter(ownAdress);
+//		packetRouter = new FloodingPacketRouter(ownAdress);
+		packetRouter = new DsdvRouter(ownAdress);
 		packetRouter.setPacketSender(connections);
 		packetRouter
 				.addReachableDevicesChangeListener(new IPacketRouter.ReachableDevicesChangeListener() {
@@ -276,11 +278,11 @@ public class BTP2PConnector implements IBluetoothStateListener {
 //		}
 		
 		if (packet.getData() == null) {
-			Log.e(Helper.LOG_TAG, "received packet with data=null, type was: " + DataPacket.TYPE_DESCRIPTIONS[packet.Type]);
+			Log.e(Helper.LOG_TAG, "received packet with data=null, type was: " + packet.getTypeDescription());
 		}
 
-		BluetoothMessage bluetoothMessage = new BluetoothMessage(packet.Src,
-				packet.getData(), packet.Type);
+		BluetoothMessage bluetoothMessage = new BluetoothMessage(packet.getSource(),
+				packet.getData(), packet.getType());
 		List<MessageListener> list = listeners.get(bluetoothMessage
 				.getRemoteAdress());
 		if (list != null) {
@@ -311,25 +313,25 @@ public class BTP2PConnector implements IBluetoothStateListener {
 				return;
 			}
 
-			if (ownAdress.equals(pkt.Dest)) {
+			if (ownAdress.equals(pkt.getDestination())) {
 				// handle messages directed to us
-				if (!(pkt.Type == DataPacket.TYPE_PING || pkt.Type == DataPacket.TYPE_PONG)
+				if (!(pkt.getType() == DataPacket.TYPE_PING || pkt.getType() == DataPacket.TYPE_PONG)
 						|| PING_DEBUG) {
 //					String string = "[Received] " + pkt.toString();
 //					Log.d(Helper.LOG_TAG, string);
 				}
-				IConnection connection = getConnections().get(pkt.Src);
+				IConnection connection = getConnections().get(pkt.getSource());
 				if (connection == null) {
 					connection = incomingConnection;
 				}
 				if (connection != null) {
-					if (pkt.Type == DataPacket.TYPE_PING) {
+					if (pkt.getType() == DataPacket.TYPE_PING) {
 						/**
 						 * handle PING
 						 */
-						pkt.Dest = pkt.Src;
-						pkt.Type = DataPacket.TYPE_PONG;
-						pkt.Src = ownAdress;
+						pkt.setDestination(pkt.getSource());
+						pkt.setType(DataPacket.TYPE_PONG);
+						pkt.setSource(ownAdress);
 						pkt.newPaketID();
 						try {
 							connection.write(pkt);
@@ -337,7 +339,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-					} else if (pkt.Type == DataPacket.TYPE_PONG) {
+					} else if (pkt.getType() == DataPacket.TYPE_PONG) {
 						/**
 						 * handle PONG
 						 */
@@ -345,12 +347,12 @@ public class BTP2PConnector implements IBluetoothStateListener {
 								+ pkt.getSourceDevice());
 						getBondedDevicesInRange().add(pkt.getSourceDevice());
 						notifyKnownDevicesChanged();
-					} else if (pkt.Type == DataPacket.TYPE_CONNECT_SYN) {
+					} else if (pkt.getType() == DataPacket.TYPE_CONNECT_SYN) {
 						/**
 						 * handle SYN
 						 */
 						// proximityDevicesChanged();
-						Log.d(Helper.LOG_TAG, "SYN received from: " + pkt.Src);
+						Log.d(Helper.LOG_TAG, "SYN received from: " + pkt.getSource());
 						DataPacket ack;
 						try {
 							ack = new DataPacket(pkt.getSourceDevice(),
@@ -359,12 +361,12 @@ public class BTP2PConnector implements IBluetoothStateListener {
 						} catch (MessageConvertException e) {
 							e.logThisException();
 						}
-					} else if (pkt.Type == DataPacket.TYPE_CONNECT_ACK) {
+					} else if (pkt.getType() == DataPacket.TYPE_CONNECT_ACK) {
 						/**
 						 * handle ACK
 						 */
-						Log.d(Helper.LOG_TAG, "ACK received from: " + pkt.Src);
-					} else if (pkt.Type == DataPacket.TYPE_ROUTING_INFORMATION) {
+						Log.d(Helper.LOG_TAG, "ACK received from: " + pkt.getSource());
+					} else if (pkt.getType() == DataPacket.TYPE_ROUTING_INFORMATION) {
 						/**
 						 * handle ROUTING INFORMATION
 						 */
@@ -378,13 +380,13 @@ public class BTP2PConnector implements IBluetoothStateListener {
 					}
 				}
 
-				if (pkt.Type == DataPacket.TYPE_DATA ||
-						pkt.Type == DataPacket.TYPE_AWARENESS_INFO) {
+				if (pkt.getType() == DataPacket.TYPE_DATA ||
+						pkt.getType() == DataPacket.TYPE_AWARENESS_INFO) {
 					handleDataPacketReceived(pkt);
 				}
 				notifyKnownDevicesChanged();
 
-			} else if (pkt.Type == DataPacket.TYPE_BROADCAST) {
+			} else if (pkt.getType() == DataPacket.TYPE_BROADCAST) {
 				handleDataPacketReceived(pkt);
 				packetRouter.routePacket(pkt, fromDevice.getAddress());
 			} else {

@@ -39,14 +39,15 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
-public class ConnectionService extends Service implements IBluetoothStateInformer {
+public class ConnectionService extends Service implements
+		IBluetoothStateInformer {
 
 	public static final int SHOW_TOAST = 0;
 
 	private IBluetoothAdapter btAdapter;
 
 	private IBTP2PMessageCallback msgCallback;
-	
+
 	private IBTP2PAwarenessInfoCallback awarenessCallback;
 
 	public static Context CONTEXT = null;
@@ -76,7 +77,8 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 		super.onCreate();
 
 		CONTEXT = this;
-		btAdapter = Helper.getBluetoothAdapterFactory().getDefaultBluetoothAdapter();
+		btAdapter = Helper.getBluetoothAdapterFactory()
+				.getDefaultBluetoothAdapter();
 		if (btAdapter == null) {
 			showToast("No BT Adapter found! This will cause exceptions.");
 		}
@@ -97,12 +99,12 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 					@Override
 					public void connectionAdded(String address,
 							IConnection connection) {
-//						knownDevicesChanged();
+						// knownDevicesChanged();
 					}
 
 					@Override
 					public void connectionRemoved(String address) {
-//						knownDevicesChanged();
+						// knownDevicesChanged();
 					}
 				});
 
@@ -114,8 +116,8 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 					if (msg.getType() == DataPacket.TYPE_AWARENESS_INFO
 							&& awarenessCallback != null) {
 						awarenessCallback.awarenessInfoReceived(msg.getData());
-					} else if (msgCallback != null){
-//						showToast(msg.getDataAsString());
+					} else if (msgCallback != null) {
+						// showToast(msg.getDataAsString());
 						msgCallback.messageReceived(msg.getData());
 					}
 				} catch (RemoteException e) {
@@ -170,10 +172,14 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 	@Override
 	public void onDestroy() {
 		btp2pConnector.shutdown();
-		if (this.receiverRegistered) {
-			this.unregisterReceiver(bcReceiver);
-		} else {
-			Log.e(Helper.LOG_TAG, "(ConnectionService) Didn't unregister BroadcastIntentReceiver: was not registered"); 
+		synchronized (this) {
+			if (this.receiverRegistered) {
+				this.unregisterReceiver(bcReceiver);
+				receiverRegistered = false;
+			} else {
+				Log.e(Helper.LOG_TAG,
+						"(ConnectionService) Didn't unregister BroadcastIntentReceiver: was not registered");
+			}
 		}
 		super.onDestroy();
 	}
@@ -195,11 +201,11 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 		}
 
 		@Override
-		public void registerAwarenessInfoCallback(IBTP2PAwarenessInfoCallback callback)
-				throws RemoteException {
+		public void registerAwarenessInfoCallback(
+				IBTP2PAwarenessInfoCallback callback) throws RemoteException {
 			ConnectionService.this.awarenessCallback = callback;
 		}
-		
+
 		@Override
 		public void registerMessageCallback(IBTP2PMessageCallback callback)
 				throws RemoteException {
@@ -209,17 +215,17 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 		@Override
 		public IBluetoothDevice[] getUnbondedDevicesInRange()
 				throws RemoteException {
-			return btp2pConnector.getUnbondedDevicesInRange()
-					.toArray(new IBluetoothDevice[btp2pConnector.getUnbondedDevicesInRange()
-							.size()]);
+			return btp2pConnector.getUnbondedDevicesInRange().toArray(
+					new IBluetoothDevice[btp2pConnector
+							.getUnbondedDevicesInRange().size()]);
 		}
 
 		@Override
 		public IBluetoothDevice[] getBondedDevicesInRange()
 				throws RemoteException {
-			return btp2pConnector.getBondedDevicesInRange()
-					.toArray(new IBluetoothDevice[btp2pConnector.getBondedDevicesInRange()
-							.size()]);
+			return btp2pConnector.getBondedDevicesInRange().toArray(
+					new IBluetoothDevice[btp2pConnector
+							.getBondedDevicesInRange().size()]);
 		}
 
 		@Override
@@ -246,8 +252,8 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 		public IBluetoothDevice[] getConnectedDevices() throws RemoteException {
 			ArrayList<IBluetoothDevice> result = new ArrayList<IBluetoothDevice>();
 
-			Set<Entry<String, IConnection>> entrySet = btp2pConnector.getConnections()
-					.entrySet();
+			Set<Entry<String, IConnection>> entrySet = btp2pConnector
+					.getConnections().entrySet();
 			Iterator<Entry<String, IConnection>> it = entrySet.iterator();
 			int i = 0;
 			while (it.hasNext()) {
@@ -263,14 +269,16 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 
 		@Override
 		public IBluetoothDevice[] getReachableDevices() throws RemoteException {
-//			Set<String> reachableDevices = btp2pConnector.getReachableDevices();
-//			ArrayList<IBluetoothDevice> result = new ArrayList<IBluetoothDevice>(
-//					reachableDevices.size());
-//
-//			for (String string : reachableDevices) {
-//				result.add(Helper.getBluetoothDeviceFactory().createBluetoothDevice(string));
-//			}
-//			return result.toArray(new IBluetoothDevice[result.size()]);
+			// Set<String> reachableDevices =
+			// btp2pConnector.getReachableDevices();
+			// ArrayList<IBluetoothDevice> result = new
+			// ArrayList<IBluetoothDevice>(
+			// reachableDevices.size());
+			//
+			// for (String string : reachableDevices) {
+			// result.add(Helper.getBluetoothDeviceFactory().createBluetoothDevice(string));
+			// }
+			// return result.toArray(new IBluetoothDevice[result.size()]);
 			return btp2pConnector.getKnownDevices();
 		}
 
@@ -296,16 +304,18 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
 			if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
-				notifyBluetoothStateChanged(BluetoothState.discovery_started, null);
+				notifyBluetoothStateChanged(BluetoothState.discovery_started,
+						null);
 			} else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED
 					.equals(action)) {
-				notifyBluetoothStateChanged(BluetoothState.discovery_finished, null);
+				notifyBluetoothStateChanged(BluetoothState.discovery_finished,
+						null);
 			} else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 				// found new devices
 				BluetoothDevice device = intent
 						.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 				notifyBluetoothDeviceFound(new AndroidBluetoothDeviceWrapper(
-								device));
+						device));
 			} else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(action)) {
 				BluetoothDevice device = intent
 						.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -319,7 +329,8 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 						.convertFromAndroidBondState(bondState);
 				BluetoothBondState oldState = AndroidBluetoothDeviceWrapper
 						.convertFromAndroidBondState(prevBondState);
-				notifyBluetoothDeviceBondStateChanged(new AndroidBluetoothDeviceWrapper(device), newState,
+				notifyBluetoothDeviceBondStateChanged(
+						new AndroidBluetoothDeviceWrapper(device), newState,
 						oldState);
 			} else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
 				int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
@@ -335,18 +346,18 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 			}
 		}
 	};
-	
+
 	public void addBluetoothStateListener(IBluetoothStateListener l) {
 		stateListeners.add(l);
 	}
-	
+
 	public boolean removeBluetoothStateListener(IBluetoothStateListener l) {
 		return stateListeners.remove(l);
 	}
 
 	protected void notifyBluetoothDeviceBondStateChanged(
-			AndroidBluetoothDeviceWrapper device,
-			BluetoothBondState newState, BluetoothBondState oldState) {
+			AndroidBluetoothDeviceWrapper device, BluetoothBondState newState,
+			BluetoothBondState oldState) {
 		for (IBluetoothStateListener l : stateListeners) {
 			l.bluetoothDeviceBondStateChanged(device, newState, oldState);
 		}
@@ -356,7 +367,7 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 			AndroidBluetoothDeviceWrapper device) {
 		for (IBluetoothStateListener l : stateListeners) {
 			l.bluetoothDeviceFound(device);
-		}		
+		}
 	}
 
 	protected void notifyBluetoothStateChanged(BluetoothState newState,
@@ -369,12 +380,13 @@ public class ConnectionService extends Service implements IBluetoothStateInforme
 	protected void knownDevicesChanged() {
 		if (awarenessCallback != null) {
 			try {
-//				msgCallback.deviceListChanged();
-				awarenessCallback.knownDevicesChanged(btp2pConnector.getKnownDevices());
+				// msgCallback.deviceListChanged();
+				awarenessCallback.knownDevicesChanged(btp2pConnector
+						.getKnownDevices());
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 }

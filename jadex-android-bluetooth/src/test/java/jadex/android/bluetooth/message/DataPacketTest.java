@@ -93,7 +93,7 @@ public class DataPacketTest {
 		DataPacket dataPacket2 = null;
 
 		for (int i = 0; i < REPEAT_TIMES; i++) {
-			dataPacket.Src = TestConstants.sampleAddress;
+			dataPacket.setSource(TestConstants.sampleAddress);
 			byte[] byteArr = dataPacket.asByteArray();
 			dataPacket2 = new DataPacket(byteArr);
 		}
@@ -136,14 +136,14 @@ public class DataPacketTest {
 		assertEquals(maxDataString, packet.getDataAsString());
 
 		// modify data:
-		packet.Dest = null;
+		packet.setDestination(null);
 		try {
 			packet.asByteArray();
 			fail("Should have thrown an Exception");
 		} catch (MessageConvertException e) {
 		}
 
-		packet.Dest = "ABC";
+		packet.setDestination("ABC");
 		try {
 			asByteArray = packet.asByteArray();
 			packet = new DataPacket(asByteArray);

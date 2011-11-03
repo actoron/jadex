@@ -386,11 +386,11 @@ public class DsdvRouter implements IPacketRouter {
 	public IFuture routePacket(DataPacket packet, String fromDevice) {
 		// TODO: do some queueing here
 		IFuture result = new Future();
-		RoutingTableEntryWrapper routingEntry = routeTable.getRoutingEntry(packet.Dest);
+		RoutingTableEntryWrapper routingEntry = routeTable.getRoutingEntry(packet.getDestination());
 		
 		if (routingEntry != null && routingEntry.isValid()) {
 			String nextHop = routingEntry.getNextHop();
-			packet.HopCount++;
+			packet.incHopCount();
 			try {
 				sender.sendMessageToConnectedDevice(packet, nextHop);
 				Log.d(TAG, "Message routed to " + nextHop);
@@ -400,6 +400,9 @@ public class DsdvRouter implements IPacketRouter {
 				e.printStackTrace();
 				result.setException(e);
 			}
+		} else {
+			Log.e(TAG, "Could not send Message to: " + packet.getDestination() + ", no route found");
+			result.setException(new MessageNotSendException("Could not send Message to: " + packet.getDestination() + ", no route found"));
 		}
 		return result;
 	}

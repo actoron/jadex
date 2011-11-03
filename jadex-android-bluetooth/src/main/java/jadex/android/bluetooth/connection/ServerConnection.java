@@ -44,7 +44,7 @@ public class ServerConnection extends AConnection {
 							@Override
 							public void messageReceived(DataPacket pkt,
 									IBluetoothDevice fromDevice, IConnection incomingConnection) {
-								if (pkt.Type == DataPacket.TYPE_PONG) {
+								if (pkt.getType() == DataPacket.TYPE_PONG) {
 									lastPongReceived = true;
 								}
 							}

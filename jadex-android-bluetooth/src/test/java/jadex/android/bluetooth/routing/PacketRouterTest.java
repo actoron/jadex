@@ -38,11 +38,11 @@ import com.xtremelabs.robolectric.RobolectricTestRunner;
 @RunWith(CustomTestRunner.class)
 public abstract class PacketRouterTest {
 
-	private static final String ownAddress = "OwnBluetoothAddress";
-	private static final String ownAddress2 = "OwnBluetoothAddress2";
-	protected static final String device1 = "device1Address";
-	protected static final String device2 = "device2Address";
-	protected static final String device3 = "device3Address";
+	private static final String ownAddress = TestConstants.defaultAdapterAddress;
+	private static final String ownAddress2 = TestConstants.defaultAdapterAddress2;
+	protected static final String device1 = TestConstants.adapterAddress1;
+	protected static final String device2 = TestConstants.adapterAddress2;
+	protected static final String device3 = TestConstants.adapterAddress3;
 
 	protected IPacketRouter packetRouter1;
 
@@ -208,7 +208,7 @@ public abstract class PacketRouterTest {
 	public void testSendMessageToConnectedDevice() throws MessageConvertException {
 		DataPacket dataPacket = new DataPacket(device2, "data1".getBytes(),
 				DataPacket.TYPE_DATA);
-		dataPacket.Src = packetRouter1.getOwnAddress();
+		dataPacket.setSource(packetRouter1.getOwnAddress());
 		packetRouter1.addConnectedDevice(device2);
 		packetRouter1.routePacket(dataPacket, packetRouter1.getOwnAddress());
 		assertEquals(dataPacket, getSentPackages(ownAddress, device2).peek());
@@ -273,7 +273,7 @@ public abstract class PacketRouterTest {
 		// which is not directly connected.
 		DataPacket dataPacket = new DataPacket(device1,
 				"testData 1234".getBytes(), DataPacket.TYPE_DATA);
-		dataPacket.Src = TestConstants.sampleAddress;
+		dataPacket.setSource(TestConstants.sampleAddress);
 
 		packetRouter1.routePacket(dataPacket, packetRouter1.getOwnAddress());
 
@@ -281,8 +281,8 @@ public abstract class PacketRouterTest {
 				packetRouter2.getOwnAddress()).peek();
 		// packet should have been sent by router 1
 		assertEquals("testData 1234", dataPacket2.getDataAsString());
-		assertEquals(TestConstants.sampleAddress, dataPacket2.Src);
-		assertEquals(device1, dataPacket2.Dest);
+		assertEquals(TestConstants.sampleAddress, dataPacket2.getSource());
+		assertEquals(device1, dataPacket2.getDestination());
 
 		// now route the package to target by router2:
 		packetRouter2.routePacket(dataPacket2, ownAddress);
@@ -290,8 +290,8 @@ public abstract class PacketRouterTest {
 		// dataPacket2 = sentMessages2.get(device1);
 		dataPacket2 = sentPackages.peek();
 		assertEquals("testData 1234", dataPacket2.getDataAsString());
-		assertEquals(TestConstants.sampleAddress, dataPacket2.Src);
-		assertEquals(device1, dataPacket2.Dest);
+		assertEquals(TestConstants.sampleAddress, dataPacket2.getSource());
+		assertEquals(device1, dataPacket2.getDestination());
 	}
 
 	@Test
@@ -306,7 +306,7 @@ public abstract class PacketRouterTest {
 					String address) {
 				if ((packetRouter2 != null)
 						&& (address.equals(packetRouter2.getOwnAddress()))
-						&& (packet.Type == DataPacket.TYPE_ROUTING_INFORMATION)) {
+						&& (packet.getType() == DataPacket.TYPE_ROUTING_INFORMATION)) {
 					try {
 						RoutingInformation ri = MessageProtos.RoutingInformation
 								.parseFrom(packet.getData());
@@ -318,7 +318,7 @@ public abstract class PacketRouterTest {
 					} catch (InvalidProtocolBufferException e) {
 						throw new RuntimeException();
 					}
-				} else if (packet.Type == DataPacket.TYPE_DATA) {
+				} else if (packet.getType() == DataPacket.TYPE_DATA) {
 					putSentPacket(packetRouter1.getOwnAddress(), address,
 							packet);
 					// sentMessages2.put(address, packet);

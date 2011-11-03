@@ -63,7 +63,7 @@ public class ClientConnection extends AConnection {
 		// We need to overwrite this method. If we add ourselves as just another
 		// listener only, we get called after writing the response - which could
 		// take forever on dead connections.
-		if (dataPacket.Type == DataPacket.TYPE_PING && timer != null) {
+		if (dataPacket.getType() == DataPacket.TYPE_PING && timer != null) {
 			lastPingReceivedTime = System.currentTimeMillis();
 			timer.reset(false);
 		}

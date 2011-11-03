@@ -1,5 +1,6 @@
 package de.unihamburg.vsis.jadexAndroid_test;
 
+import jadex.base.service.awareness.management.AwarenessManagementAgent;
 import jadex.base.service.awareness.management.DiscoveryInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
@@ -31,6 +32,7 @@ import android.os.Message;
 		// description="The ip multicast address used for finding other agents (range 224.0.0.0-239.255.255.255)."),
 		// @Argument(name="port", clazz=int.class, defaultvalue="55667",
 		// description="The port used for finding other agents."),
+		@Argument(name="mechanisms", clazz=String[].class, defaultvalue="new String[]{\"Bluetooth\"}", description="The discovery mechanisms."),
 		@Argument(name = "delay", clazz = long.class, defaultvalue = "10000", description = "The delay between sending awareness infos (in milliseconds)."),
 		@Argument(name = "fast", clazz = boolean.class, defaultvalue = "true", description = "Flag for enabling fast startup awareness (pingpong send behavior)."),
 		@Argument(name = "autocreate", clazz = boolean.class, defaultvalue = "true", description = "Set if new proxies should be automatically created when discovering new components."),
@@ -39,24 +41,24 @@ import android.os.Message;
 		@Argument(name = "includes", clazz = String.class, defaultvalue = "\"\"", description = "A list of platforms/IPs/hostnames to include (comma separated). Matches start of platform/IP/hostname."),
 		@Argument(name = "excludes", clazz = String.class, defaultvalue = "\"\"", description = "A list of platforms/IPs/hostnames to exclude (comma separated). Matches start of platform/IP/hostname.") })
 @ComponentTypes({
-//		@ComponentType(name = "broadcastdis", filename = "jadex/base/service/awareness/discovery/ipbroadcast/BroadcastDiscoveryAgent.class"),
-//		@ComponentType(name = "multicastdis", filename = "jadex/base/service/awareness/discovery/ipmulticast/MulticastDiscoveryAgent.class"),
-//		@ComponentType(name = "scannerdis", filename = "jadex/base/service/awareness/discovery/ipscanner/ScannerDiscoveryAgent.class"),
-//		@ComponentType(name = "registrydis", filename = "jadex/base/service/awareness/discovery/registry/RegistryDiscoveryAgent.class"),
-		@ComponentType(name = "bluetoothdis", filename = "jadex.base.service.awareness.discovery.bluetoothp2p/BluetoothP2PDiscoveryAgent.class") 
+		@ComponentType(name="Broadcast", filename="jadex/base/service/awareness/discovery/ipbroadcast/BroadcastDiscoveryAgent.class"),
+		@ComponentType(name="Multicast", filename="jadex/base/service/awareness/discovery/ipmulticast/MulticastDiscoveryAgent.class"),
+		@ComponentType(name="Scanner", filename="jadex/base/service/awareness/discovery/ipscanner/ScannerDiscoveryAgent.class"),
+		@ComponentType(name="Registry", filename="jadex/base/service/awareness/discovery/registry/RegistryDiscoveryAgent.class"),
+		@ComponentType(name="Bluetooth", filename = "jadex/base/service/awareness/discovery/bluetoothp2p/BluetoothP2PDiscoveryAgent.class") 
 		})
 @Configurations({
-		@Configuration(name = "Frequent updates (10s)", arguments = @NameValue(name = "delay", value = "10000"), components = { @Component(name = "bluetoothdis", type = "bluetoothdis")
+		@Configuration(name = "Frequent updates (10s)", arguments = @NameValue(name = "delay", value = "10000"), components = { @Component(name = "Bluetooth", type = "Bluetooth")
 		// @Component(name="multicastdis", type="multicastdis")
 		// @Component(name="scannerdis", type="scannerdis")
 		// @Component(name="registrydis", type="registrydis")
 		}),
-		@Configuration(name = "Medium updates (20s)", arguments = @NameValue(name = "delay", value = "20000"), components = { @Component(name = "bluetoothdis", type = "bluetoothdis")
+		@Configuration(name = "Medium updates (20s)", arguments = @NameValue(name = "delay", value = "20000"), components = { @Component(name = "Bluetooth", type = "Bluetooth")
 		// @Component(name="multicastdis", type="multicastdis")
 		// @Component(name="scannerdis", type="scannerdis")
 		// @Component(name="registrydis", type="registrydis")
 		}),
-		@Configuration(name = "Seldom updates (60s)", arguments = @NameValue(name = "delay", value = "60000"), components = { @Component(name = "bluetoothdis", type = "bluetoothdis")
+		@Configuration(name = "Seldom updates (60s)", arguments = @NameValue(name = "delay", value = "60000"), components = { @Component(name = "Bluetooth", type = "Bluetooth")
 		// @Component(name="multicastdis", type="multicastdis")
 		// @Component(name="scannerdis", type="scannerdis")
 		// @Component(name="registrydis", type="registrydis")
@@ -65,7 +67,7 @@ import android.os.Message;
 @ProvidedServices(@ProvidedService(type = IManagementService.class, implementation = @Implementation(expression = "$component")))
 @Service(IManagementService.class)
 public class AwarenessNotifierAgent extends
-		jadex.base.service.awareness.management.AwarenessManagementAgent {
+		AwarenessManagementAgent {
 
 	@Override
 	public IFuture agentCreated() {

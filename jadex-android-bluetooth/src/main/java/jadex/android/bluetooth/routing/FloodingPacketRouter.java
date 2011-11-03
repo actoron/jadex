@@ -55,13 +55,13 @@ public class FloodingPacketRouter implements IPacketRouter {
 	@Override
 	public IFuture routePacket(DataPacket pkt, String fromDevice) {
 		Future future = new Future();
-		if (pkt.HopCount < BTP2PConnector.MAXHOPS) {
-			pkt.HopCount++;
-			if (connectedDevices.contains(pkt.Dest)) {
+		if (pkt.getHopCount() < BTP2PConnector.MAXHOPS) {
+			pkt.incHopCount();
+			if (connectedDevices.contains(pkt.getDestination())) {
 				// we have a direct connection to destination
 
 				try {
-					sender.sendMessageToConnectedDevice(pkt, pkt.Dest);
+					sender.sendMessageToConnectedDevice(pkt, pkt.getDestination());
 				} catch (MessageNotSendException e) {
 					e.printStackTrace();
 				}
@@ -156,10 +156,9 @@ public class FloodingPacketRouter implements IPacketRouter {
 
 		DataPacket pkt;
 		try {
-			pkt = new DataPacket("", ri.toByteArray(),
-					DataPacket.TYPE_ROUTING_INFORMATION);
 			for (String address : connectedDevices) {
-				pkt.Dest = address;
+				pkt = new DataPacket(address, ri.toByteArray(),
+						DataPacket.TYPE_ROUTING_INFORMATION);
 				try {
 					sender.sendMessageToConnectedDevice(pkt, address);
 				} catch (MessageNotSendException e) {

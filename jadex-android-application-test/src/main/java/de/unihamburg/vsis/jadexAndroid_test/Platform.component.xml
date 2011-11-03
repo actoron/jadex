@@ -88,6 +88,8 @@
 		
 		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
 		<argument name="awareness" class="boolean">true</argument>
+		<!-- Start the awareness agent discovery mechanisms. -->
+		<argument name="awamechanisms" class="String[]">new String[]{"Bluetooth"}</argument>
 		<!-- Start the JCC agent to open the platform GUI? -->
 		<argument name="gui" class="boolean">false</argument>
 		<!-- Save platform settings on shutdown? -->
@@ -239,6 +241,7 @@
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
+						<argument name="mechanisms">$args.awamechanisms</argument>
 						<argument name="includes">$args.awaincludes</argument>
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
@@ -255,8 +258,9 @@
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
 				<component name="rms" type="rms" daemon="true"/>
-				<component name="awa" type="btawa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
+				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
+						<argument name="mechanisms">$args.awamechanisms</argument>
 						<argument name="includes">$args.awaincludes</argument>
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
