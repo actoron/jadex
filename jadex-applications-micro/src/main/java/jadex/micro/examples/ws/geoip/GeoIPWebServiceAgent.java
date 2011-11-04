@@ -1,9 +1,6 @@
 package jadex.micro.examples.ws.geoip;
 
-import java.net.InetAddress;
-
 import jadex.base.service.ws.WebServiceAgent;
-import jadex.bridge.service.IService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
@@ -13,6 +10,8 @@ import jadex.micro.annotation.Imports;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.examples.ws.geoip.gen.GeoIP;
+
+import java.net.InetAddress;
 
 /**
  *  Agent that wraps a normal web service as Jadex service.
@@ -25,11 +24,15 @@ import jadex.micro.examples.ws.geoip.gen.GeoIP;
 	expression="$pojoagent.createServiceImplementation(IGeoIPService.class, new WebServiceMappingInfo(GeoIPService.class, \"getGeoIPServiceSoap\"))")))
 public class GeoIPWebServiceAgent extends WebServiceAgent
 {
+	//-------- attributes --------
+	
 	@Agent
 	protected MicroAgent agent;
 	
+	//-------- emthods --------
+
 	/**
-	 * 
+	 *  The agent body.
 	 */
 	@AgentBody
 	public void executeBody()
