@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class SimulationManager {
 
-	private static final int NUMBER_OF_RUNS_PER_CONFIG = 10;
+	private static final int NUMBER_OF_RUNS_PER_CONFIG = 1;
 
 	private static final int NUMBER_OF_TASKS = 10;
 

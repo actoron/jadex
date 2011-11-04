@@ -17,6 +17,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
@@ -293,7 +294,7 @@ public class ManagerAgent extends MicroAgent {
 	/**
 	 * Finishes the current run and starts the next runs if specified.
 	 */
-	@SuppressWarnings({ "rawtypes" })
+	@SuppressWarnings({})
 	private void finishRun() {
 		System.out.println("finishRun in Manager called.");
 
@@ -346,14 +347,20 @@ public class ManagerAgent extends MicroAgent {
 				System.out.println("Manager is killing the platform.");
 				// kill the platform
 				IExternalAccess application = getParent();
-				application.scheduleImmediate(new IComponentStep() {
+				IFuture<IExternalAccess> future = application.scheduleStep(new IComponentStep<IExternalAccess>() {
 
 					@Override
-					public IFuture execute(IInternalAccess ia) {
+					public IFuture<IExternalAccess> execute(IInternalAccess ia) {
 						IExternalAccess platform = ia.getParent();
-						platform.killComponent();
+						Future<IExternalAccess> ret = new Future<IExternalAccess>(platform);
+						return ret;
+					}
+				});
+				future.addResultListener(new DefaultResultListener<IExternalAccess>() {
 
-						return IFuture.DONE;
+					@Override
+					public void resultAvailable(IExternalAccess result) {
+						result.killComponent();
 					}
 				});
 			}
