@@ -1,7 +1,6 @@
 package jadex.base.service.library;
 
 import jadex.bridge.IResourceIdentifier;
-import jadex.commons.SUtil;
 
 import java.io.IOException;
 import java.net.URL;
@@ -37,7 +36,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 	 */
 	public DelegationURLClassLoader(IResourceIdentifier rid, ClassLoader basecl, DelegationURLClassLoader[] delegates)
 	{
-		super(rid!=null && rid.getLocalIdentifier()!=null? new URL[]{rid.getLocalIdentifier().getSecondEntity()}: new URL[0], basecl);
+		super(rid!=null && rid.getLocalIdentifier()!=null? new URL[]{rid.getLocalIdentifier().getUrl()}: new URL[0], basecl);
 		this.rid = rid;
 		this.delegates = delegates;
 //		System.out.println("d1 : "+url+" "+SUtil.arrayToString(delegates));

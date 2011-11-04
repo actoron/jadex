@@ -1,8 +1,5 @@
 package jadex.bridge;
 
-import jadex.commons.Tuple2;
-
-import java.net.URL;
 
 /**
  *  Interface for resource identification.
@@ -17,7 +14,7 @@ public interface IResourceIdentifier
 	 *  component identifier and the URL of the resource. 
 	 *  @return The local identifier. 
 	 */
-	public Tuple2<IComponentIdentifier, URL> getLocalIdentifier();
+	public ILocalResourceIdentifier getLocalIdentifier();
 	
 	/**
 	 *  Get the global identifier.

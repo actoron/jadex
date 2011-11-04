@@ -2,13 +2,10 @@ package jadex.bridge;
 
 import jadex.bridge.service.annotation.Reference;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
-
-import java.net.URL;
 
 /**
- *  Maven-based implementation for resource identification.
- *  Contains a local identifier and a global identifier
+ *  Default implementation for resource identification.
+ *  Contains only a local identifier and a global identifier
  *  that can be used to find the resource.
  */
 @Reference(local=true, remote=false)
@@ -17,7 +14,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 	//-------- attributes --------
 	
 	/** The local identifier. */
-	protected Tuple2<IComponentIdentifier, URL> lid;
+	protected ILocalResourceIdentifier	lid;
 	
 	/** The global identifier. */
 	protected String gid;
@@ -37,7 +34,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 	 *  @param lid The local identifier.
 	 *  @param gid The global idenfifier.
 	 */
-	public ResourceIdentifier(Tuple2<IComponentIdentifier, URL> lid, String gid)
+	public ResourceIdentifier(ILocalResourceIdentifier lid, String gid)
 	{
 		this.lid = lid;
 		this.gid = gid;
@@ -51,7 +48,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 	 *  component identifier and the URL of the resource. 
 	 *  @return The local identifier. 
 	 */
-	public Tuple2<IComponentIdentifier, URL> getLocalIdentifier()
+	public ILocalResourceIdentifier getLocalIdentifier()
 	{
 		return lid;
 	}
@@ -69,7 +66,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 	 *  Set the local identifier.
 	 *  @param lid The lid to set.
 	 */
-	public void setLocalIdentifier(Tuple2<IComponentIdentifier, URL> lid)
+	public void setLocalIdentifier(ILocalResourceIdentifier lid)
 	{
 		this.lid = lid;
 	}
@@ -118,6 +115,6 @@ public class ResourceIdentifier implements IResourceIdentifier
 	 */
 	public String	toString()
 	{
-		return "ResourceIdentifier("+gid+", "+(lid!=null?lid.getSecondEntity()+" @"+lid.getFirstEntity(): "")+")";
+		return "ResourceIdentifier("+gid+", "+(lid!=null?lid.toString(): "")+")";
 	}
 }

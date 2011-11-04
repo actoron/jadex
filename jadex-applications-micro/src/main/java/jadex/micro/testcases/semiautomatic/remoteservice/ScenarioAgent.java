@@ -32,7 +32,7 @@ public class ScenarioAgent extends MicroAgent
 						String[] libpaths = new String[libs.size()];
 						for(int i=0; i<libpaths.length; i++)
 						{
-							libpaths[i] = libs.get(i).getLocalIdentifier().getSecondEntity().toString();
+							libpaths[i] = libs.get(i).getLocalIdentifier().getUrl().toString();
 						}
 //						String[] libpaths = (String[])((List)result).toArray(new String[0]);
 						StartScenario.startScenario(libpaths).addResultListener(

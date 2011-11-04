@@ -2,13 +2,14 @@ package jadex.base.service.library;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.library.IDependencyService;
-import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -83,7 +84,7 @@ public class BasicDependencyService implements IDependencyService
 	public IFuture<IResourceIdentifier> getResourceIdentifier(URL url)
 	{
 		// Does not use global identifiers.
-		Tuple2<IComponentIdentifier, URL> lid = new Tuple2<IComponentIdentifier, URL>(cid, url);
+		ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
 		String gid	= null;
 		ResourceIdentifier rid = new ResourceIdentifier(lid, gid);
 		return new Future<IResourceIdentifier>(rid);

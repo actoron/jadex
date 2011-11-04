@@ -2,13 +2,14 @@ package jadex.base.service.dependency.maven;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.ILocalResourceIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.library.IDependencyService;
-import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -242,7 +243,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	public IFuture<IResourceIdentifier> getResourceIdentifier(URL url)
 	{
 		// todo: get stored rid for url?!
-		Tuple2<IComponentIdentifier, URL> lid = new Tuple2<IComponentIdentifier, URL>(cid, url);
+		ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
 		String gid	= null;
 		ModelSource	pom	= findModelSource(url);
 		if(pom!=null)
@@ -265,9 +266,9 @@ public class MavenDependencyResolverService	implements IDependencyService
 	protected void	loadDependencies(IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> rids) throws Exception
 	{
 		// Resolve from local URL.
-		if(!rids.containsKey(rid) && rid.getLocalIdentifier()!=null && cid.equals(rid.getLocalIdentifier().getFirstEntity()))
+		if(!rids.containsKey(rid) && rid.getLocalIdentifier()!=null && cid.equals(rid.getLocalIdentifier().getComponentIdentifier()))
 		{
-			ModelSource	pom	= findModelSource(rid.getLocalIdentifier().getSecondEntity());
+			ModelSource	pom	= findModelSource(rid.getLocalIdentifier().getUrl());
 			
 			if(pom!=null)
 			{
@@ -283,7 +284,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 						ArtifactRequest	ar	= new ArtifactRequest(SMaven.convertDependency(deps.get(i)), repositories, null);
 						ArtifactResult res = system.resolveArtifact(session, ar);
 						Artifact	art	= res.getArtifact();
-						ResourceIdentifier	deprid	= new ResourceIdentifier(new Tuple2<IComponentIdentifier, URL>(cid, getUrl(art.getFile())),
+						ResourceIdentifier	deprid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(art.getFile())),
 							getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion()));
 						deprids.add(deprid);
 						loadDependencies(deprid, rids);
@@ -330,7 +331,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 		DependencyRequest	request	= new DependencyRequest(crequest, null);
 		DependencyResult result = system.resolveDependencies(session, request);
 		File	file	= result.getRoot().getDependency().getArtifact().getFile();
-		rid	= new ResourceIdentifier(new Tuple2<IComponentIdentifier, URL>(cid, getUrl(file)), rid.getGlobalIdentifier());
+		rid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(file)), rid.getGlobalIdentifier());
 		processAetherDependencies(rid, rids, result.getRoot());
 		return rid;
 	}
@@ -349,7 +350,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 		{
 			DependencyNode	depnode	= children.get(i);
 			Artifact	art	= depnode.getDependency().getArtifact();
-			ResourceIdentifier	deprid	= new ResourceIdentifier(new Tuple2<IComponentIdentifier, URL>(cid, getUrl(art.getFile())),
+			ResourceIdentifier	deprid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(art.getFile())),
 				getCoordinates(art.getGroupId(), art.getArtifactId(), art.getVersion()));
 			processAetherDependencies(deprid, rids, depnode);
 			deps.add(deprid);

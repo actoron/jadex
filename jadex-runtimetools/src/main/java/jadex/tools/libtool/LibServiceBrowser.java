@@ -138,7 +138,6 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 						{
 							URL url = files[i].toURI().toURL();
 							libservice.addURL(url);
-							classpaths.addEntry(url.toString());
 						}
 						catch(MalformedURLException ex)
 						{

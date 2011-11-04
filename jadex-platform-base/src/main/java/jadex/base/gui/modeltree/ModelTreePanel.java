@@ -138,7 +138,7 @@ public class ModelTreePanel extends FileTreePanel
 						{
 							public void run()
 							{
-								URL url = rid.getLocalIdentifier().getSecondEntity();
+								URL url = rid.getLocalIdentifier().getUrl();
 								try
 								{
 									// Comparison of file/urls is hard.

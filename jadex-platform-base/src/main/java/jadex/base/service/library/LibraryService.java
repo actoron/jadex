@@ -149,7 +149,8 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		{
 			public void customResultAvailable(DelegationURLClassLoader result)
 			{
-
+				addManaged(rid);
+				
 				// Do not notify listeners with lock held!
 				
 				ILibraryServiceListener[] lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
@@ -426,7 +427,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				final List<URL> res = new ArrayList<URL>();
 				for(int i=0; i<result.size(); i++)
 				{
-					res.add(result.get(i).getLocalIdentifier().getSecondEntity());
+					res.add(result.get(i).getLocalIdentifier().getUrl());
 				}
 				getNonManagedURLs().addResultListener(new DelegationResultListener<List<URL>>(ret)
 				{

@@ -109,9 +109,18 @@ public class StarterPluginPanel extends JPanel
 			!SUtil.equals(jcc.getPlatformAccess().getComponentIdentifier().getPlatformName(), 
 			jcc.getJCCAccess().getComponentIdentifier().getPlatformName()))
 		{
+			protected void addNode(ITreeNode node)
+			{
+				super.addNode(node);
+				
+				pushPlatformProperties();	// ignore errors.
+			};
+			
 			public void removeTopLevelNode(ITreeNode node)
 			{
 				super.removeTopLevelNode(node);
+				
+				pushPlatformProperties();	// ignore errors.
 				
 				if(node instanceof IFileNode && spanel!=null && spanel.lastfile!=null)
 				{
