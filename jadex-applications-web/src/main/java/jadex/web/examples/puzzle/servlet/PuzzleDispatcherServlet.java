@@ -3,6 +3,7 @@ package jadex.web.examples.puzzle.servlet;
 import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.web.examples.puzzle.Board;
 import jadex.web.examples.puzzle.HighscoreEntry;
@@ -186,6 +187,10 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			{
 				request.setAttribute("error", "Sorry, your highscore entry was just replaced.");
 			}
+			
+			// Save platform settings in case of server crash
+			ISettingsService	settings	= SServiceProvider.getService(platform.getServiceProvider(), ISettingsService.class).get(sus, timeout);
+			settings.saveProperties().get(sus, timeout);
 			
 			view	= "/WEB-INF/jsp/puzzle/highscore.jsp";
 			SortedSet<HighscoreEntry>	entries	= puzzle.getHighscore(board.getSize()).get(sus, timeout);
