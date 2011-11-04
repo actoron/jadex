@@ -4,8 +4,8 @@
 
 		<table cellpadding="0" cellspacing="0" align="center">
 <%
-		//Object	hint	= request.getAttribute("hint");
-		//Position hint_pos = hint instanceof Position? (Position)hint: null;
+		Object	hint	= request.getAttribute("hint");
+		Position hint_pos = hint instanceof Position? (Position)hint: null;
 
 			List<Move> moves = board.getPossibleMoves();
 			HashSet<Position> posmoves = new HashSet<Position>();
@@ -50,12 +50,11 @@
 					Piece	piece	= board.getPiece(pos);
 					if(piece!=null)
 					{
-						//if(pos.equals(hint_pos))
-						//{
-						//	pic	= piece.isWhite() ? "white_piece_hint.png" : "red_piece_hint.png";
-						//}
-						//else
-						if(posmoves.contains(pos))
+						if(pos.equals(hint_pos))
+						{
+							pic	= piece.isWhite() ? "white_piece_hint.png" : "red_piece_hint.png";
+						}
+						else if(posmoves.contains(pos))
 						{
 							pic	= piece.isWhite() ? "white_piece_glow.png" : "red_piece_glow.png";
 						}

@@ -2,7 +2,7 @@
 <jsp:useBean class="jadex.web.examples.puzzle.Board" id="board" scope="session"/>
 
 <%
-	int	hint_count	= 0;//((Integer)request.getAttribute("hint_count")).intValue();
+	Object	hint_count	= request.getSession().getAttribute("hint_count");
 	Object	hint	= request.getAttribute("hint");
 	Object	error	= request.getAttribute("error");
 	Object	is_highscore	= request.getAttribute("is_highscore");

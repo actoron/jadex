@@ -50,7 +50,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			"-extensions", "null",
 			"-component", "jadex/web/examples/puzzle/agent/Sokrates.agent.xml"
 		};
-		int	timeout	= 300000;
+		int	timeout	= 30000;
 		ThreadSuspendable	sus	= new ThreadSuspendable();
 		platform	= Starter.createPlatform(args).get(sus, timeout);
 		puzzle	= SServiceProvider.getService(platform.getServiceProvider(), IPuzzleService.class).get(sus, timeout);
@@ -61,7 +61,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 	 */
 	public void destroy()
 	{
-		int	timeout	= 300000;
+		int	timeout	= 30000;
 		ThreadSuspendable	sus	= new ThreadSuspendable();
 		platform.killComponent().get(sus, timeout);
 	}
@@ -79,6 +79,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 		{
 			board	= new Board();
 			session.setAttribute("board", board);
+			session.setAttribute("hint_count", new Integer(0));
 		}
 		String	view	= "/WEB-INF/jsp/puzzle/index.jsp"; 
 		if("/gamerules".equals(request.getPathInfo()))
@@ -88,7 +89,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 		else if("/highscore".equals(request.getPathInfo()))
 		{
 			view	= "/WEB-INF/jsp/puzzle/highscore.jsp";
-			int	timeout	= 300000;
+			int	timeout	= 30000;
 			ThreadSuspendable	sus	= new ThreadSuspendable();
 			SortedSet<HighscoreEntry>	entries	= puzzle.getHighscore(board.getSize()).get(sus, timeout);
 			request.setAttribute("highscore", entries.toArray(new HighscoreEntry[entries.size()]));
@@ -108,6 +109,7 @@ public class PuzzleDispatcherServlet extends HttpServlet
 		{
 			board	= new Board();
 			session.setAttribute("board", board);
+			session.setAttribute("hint_count", new Integer(0));
 		}
 		String	view	= "/WEB-INF/jsp/puzzle/index.jsp"; 
 		if("/move".equals(request.getPathInfo()))
@@ -124,6 +126,19 @@ public class PuzzleDispatcherServlet extends HttpServlet
 				}
 			}
 			board.move(move);
+			
+			if(board.isSolution())
+			{
+				int	timeout	= 30000;
+				ThreadSuspendable	sus	= new ThreadSuspendable();
+				SortedSet<HighscoreEntry>	entries	= puzzle.getHighscore(board.getSize()).get(sus, timeout);
+				int	hint_count	= ((Integer)session.getAttribute("hint_count")).intValue();
+				HighscoreEntry	entry	= new HighscoreEntry("dummy", board.getSize(), hint_count);
+				if(entries.isEmpty() ||	entry.compareTo(entries.last())<0)
+				{
+					request.setAttribute("is_highscore", Boolean.TRUE);
+				}
+			}
 		}
 		else if("/takeback".equals(request.getPathInfo()))
 		{
@@ -134,12 +149,47 @@ public class PuzzleDispatcherServlet extends HttpServlet
 			int	size	= Integer.parseInt(request.getParameter("boardsize"));
 			board	= new Board(size);
 			session.setAttribute("board", board);
+			session.setAttribute("hint_count", new Integer(0));
 		}
 		else if("/hint".equals(request.getPathInfo()))
 		{
+			Object hint;
 			int	timeout	= Integer.parseInt(request.getParameter("timeout"))*1000;
+			int	hint_count	= ((Integer)session.getAttribute("hint_count")).intValue();
+			session.setAttribute("timeout", request.getParameter("timeout"));
+			session.setAttribute("hint_count", new Integer(hint_count+1));
 			ThreadSuspendable	sus	= new ThreadSuspendable();
-			puzzle.hint(board, timeout).get(sus, timeout+500);
+			try
+			{
+				Move	move	= puzzle.hint(board, timeout).get(sus, timeout+500);
+				hint	= move.getStart();
+			}
+			catch(Exception e)
+			{
+				hint	= "Sorry, no solution found.";
+			}
+			request.setAttribute("hint", hint);
+		}
+		else if("/addhighscore".equals(request.getPathInfo()))
+		{
+			int	hint_count	= ((Integer)session.getAttribute("hint_count")).intValue();
+			String	player	= request.getParameter("player");
+			session.setAttribute("player", player);
+			HighscoreEntry	entry	= new HighscoreEntry(player, board.getSize(), hint_count);
+			int	timeout	= 30000;
+			ThreadSuspendable	sus	= new ThreadSuspendable();
+			try
+			{
+				puzzle.addHighscore(entry).get(sus, timeout);
+			}
+			catch(Exception e)
+			{
+				request.setAttribute("error", "Sorry, your highscore entry was just replaced.");
+			}
+			
+			view	= "/WEB-INF/jsp/puzzle/highscore.jsp";
+			SortedSet<HighscoreEntry>	entries	= puzzle.getHighscore(board.getSize()).get(sus, timeout);
+			request.setAttribute("highscore", entries.toArray(new HighscoreEntry[entries.size()]));
 		}
 		RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);
 		rd.forward(request, response);

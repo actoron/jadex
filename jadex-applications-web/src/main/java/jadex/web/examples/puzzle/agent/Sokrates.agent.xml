@@ -28,16 +28,9 @@
 		<belief name="ml" class="String" exported="true">
 			<fact>"same_long"</fact>
 		</belief>
-		<!-- 
-		<belief name="clock" class="IClockService">
-			<fact class="IFuture">
-				SServiceProvider.getService($scope.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			</fact>
-		</belief>
 		<belief name="time" class="long" updaterate="1000">
-			<fact>$beliefbase.clock.getTime()</fact>
+			<fact>$scope.getTime()</fact>
 		</belief>
-		 -->
 	</beliefs>
 
 	<goals>
@@ -45,10 +38,10 @@
 		<achievegoal name="makemove" recalculate="false">
 			<parameter name="board" class="Board"/>
 			<parameter name="deadline" class="long"/>
-			<!-- <dropcondition>
-				$goal.deadline>$beliefbase.time
-			</dropcondition> -->
-			<targetcondition language="jcl">
+			<dropcondition>
+				$beliefbase.time > $goal.deadline &amp;&amp; $goal.deadline > 0
+			</dropcondition>
+			<targetcondition>
 				$goal.board.isSolution()
 			</targetcondition>
  		</achievegoal>
@@ -68,6 +61,9 @@
 		<plan name="move_plan">
 			<parameter name="board" class="Board">
 				<goalmapping ref="makemove.board"/>
+			</parameter>
+			<parameter name="deadline" class="long">
+				<goalmapping ref="makemove.deadline"/>
 			</parameter>
 			<parameter name="move" class="Move">
 				<bindingoptions>$goal.board.getPossibleMoves()</bindingoptions>
@@ -97,9 +93,6 @@
 		<providedservice class="IPuzzleService">
 			<implementation class="PuzzleService"/>
 		</providedservice>
-		<requiredservice name="clock" class="IClockService">
-			<binding scope="platform"/>
-		</requiredservice>
 	</services>
 	
 	<properties>

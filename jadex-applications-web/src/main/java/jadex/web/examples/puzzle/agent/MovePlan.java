@@ -19,6 +19,9 @@ public class MovePlan extends Plan
 	/** The board. */
 	protected Board board;
 
+	/** The deadline. */
+	protected long deadline;
+
 	//-------- constrcutors --------
 
 	/**
@@ -28,6 +31,7 @@ public class MovePlan extends Plan
 	{
 		this.move = (Move)getParameter("move").getValue();
 		this.board = (Board)getParameter("board").getValue();
+		this.deadline = ((Long)getParameter("deadline").getValue()).longValue();
 	}
 
 	//-------- methods --------
@@ -40,13 +44,13 @@ public class MovePlan extends Plan
 		// Make the move.
 		board.move(move);
 		
-		IGoal	goal	= (IGoal)getReason();
-		System.out.println("deadline: "+(((Long)goal.getParameter("deadline").getValue()).longValue() - getScope().getTime()));
+//		System.out.println("Move: "+(deadline-System.currentTimeMillis()));
 		
 		// Plan will be aborted when board is solution,
 		// otherwise continue with next move
 		IGoal mm = createGoal("makemove");
 		mm.getParameter("board").setValue(board);
+		mm.getParameter("deadline").setValue(deadline);	// Hack!!! Deadline of top goal should suffice.
 		dispatchSubgoalAndWait(mm);
 	}
 

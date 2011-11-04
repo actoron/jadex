@@ -4,6 +4,7 @@
 
 <%
 	HighscoreEntry[] highscore = (HighscoreEntry[])request.getAttribute("highscore");
+	Object	error = request.getAttribute("error");
 	SimpleDateFormat df = new SimpleDateFormat("yyyy/MM/dd");
 %>
 
@@ -27,6 +28,8 @@
 %>
 	</table>
 	<br><br>
+	
+	<%= error!=null ? error: "" %> 
 
 	<form action="highscore" method="post">
 		<input type="submit" name="dummy" value="Show highscore"/> Size:<select name="boardsize">
