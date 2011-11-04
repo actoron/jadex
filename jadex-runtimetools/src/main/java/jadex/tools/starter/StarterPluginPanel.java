@@ -113,14 +113,14 @@ public class StarterPluginPanel extends JPanel
 			{
 				super.addNode(node);
 				
-				pushPlatformProperties();	// ignore errors.
+//				pushPlatformProperties();	// ignore errors.
 			};
 			
 			public void removeTopLevelNode(ITreeNode node)
 			{
 				super.removeTopLevelNode(node);
 				
-				pushPlatformProperties();	// ignore errors.
+//				pushPlatformProperties();	// ignore errors.
 				
 				if(node instanceof IFileNode && spanel!=null && spanel.lastfile!=null)
 				{
