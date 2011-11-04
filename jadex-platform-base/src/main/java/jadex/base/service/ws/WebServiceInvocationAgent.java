@@ -1,4 +1,4 @@
-package jadex.micro.examples.ws;
+package jadex.base.service.ws;
 
 import jadex.micro.annotation.Agent;
 
@@ -9,6 +9,6 @@ import jadex.micro.annotation.Agent;
  *  call a new invocation agent is used.
  */
 @Agent
-public class InvocationAgent
+public class WebServiceInvocationAgent
 {
 }

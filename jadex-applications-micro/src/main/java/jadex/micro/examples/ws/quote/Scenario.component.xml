@@ -6,15 +6,15 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
-	name="Scenario" package="jadex.micro.examples.ws">
+	name="Scenario" package="jadex.micro.examples.ws.quote">
 	
 	<imports>
 		<import>jadex.bridge.service*</import>
 	</imports>
 	
 	<componenttypes>
-		<componenttype name="User" filename="jadex/micro/examples/ws/UserAgent.class"/>
-		<componenttype name="WebService" filename="jadex/micro/examples/ws/WebServiceAgent.class"/>
+		<componenttype name="User" filename="jadex/micro/examples/ws/quote/UserAgent.class"/>
+		<componenttype name="WebService" filename="jadex/micro/examples/ws/quote/QuoteWebServiceAgent.class"/>
 	</componenttypes>
 	
 	<configurations>

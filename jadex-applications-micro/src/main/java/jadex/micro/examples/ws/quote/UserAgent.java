@@ -1,10 +1,9 @@
-package jadex.micro.examples.ws;
+package jadex.micro.examples.ws.quote;
 
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -16,7 +15,9 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -54,14 +55,17 @@ public class UserAgent
 	{
 		JFrame f = new JFrame();
 		f.setLayout(new BorderLayout());
-		JPanel p = new JPanel(new FlowLayout());
+		JPanel p = new JPanel(new GridBagLayout());
 		tfsymbol = new JTextField(10);
 		tfsymbol.setText("Google");
 		JButton b = new JButton("get");
 		tfresult = new JTextField(10);
-		p.add(tfsymbol);
-		p.add(b);
-		p.add(tfresult);
+		p.add(tfsymbol, new GridBagConstraints(0, 0, 1, 1, 1, 0, GridBagConstraints.WEST, 
+			GridBagConstraints.HORIZONTAL, new Insets(0,0,0,0), 0, 0));
+		p.add(b, new GridBagConstraints(1, 0, 1, 1, 0, 0, GridBagConstraints.WEST, 
+			GridBagConstraints.NONE, new Insets(0,0,0,0), 0, 0));
+		p.add(tfresult, new GridBagConstraints(0, 1, 2, 1, 0, 0, GridBagConstraints.WEST, 
+			GridBagConstraints.HORIZONTAL, new Insets(0,0,0,0), 0, 0));
 		f.add(p, BorderLayout.CENTER);
 		f.pack();
 		f.setLocation(SGUI.calculateMiddlePosition(f));

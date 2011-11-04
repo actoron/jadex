@@ -1,4 +1,4 @@
-package jadex.micro.examples.ws;
+package jadex.micro.examples.ws.quote;
 
 import jadex.commons.future.IFuture;
 
