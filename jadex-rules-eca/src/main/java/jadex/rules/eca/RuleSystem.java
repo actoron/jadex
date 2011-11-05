@@ -224,4 +224,15 @@ public class RuleSystem
 		}
 	}
 	
+	/**
+	 * 
+	 */
+	public void processAllEvents()
+	{
+		while(events.size()>0)
+		{
+			processEvent();
+		}
+	}
+	
 }
