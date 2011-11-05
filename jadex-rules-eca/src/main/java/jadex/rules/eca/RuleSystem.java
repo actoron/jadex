@@ -1,15 +1,19 @@
 package jadex.rules.eca;
 
-import jadex.commons.ICommand;
 import jadex.commons.IResultCommand;
+import jadex.commons.SReflect;
 import jadex.rules.eca.annotations.Action;
 import jadex.rules.eca.annotations.Condition;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -23,19 +27,22 @@ import org.springframework.aop.framework.ProxyFactory;
  */
 public class RuleSystem
 {
+	/** The argument types for property change listener adding/removal (cached for speed). */
+	protected static Class[]	PCL	= new Class[]{PropertyChangeListener.class};
+	
 	//-------- attributes --------
 	
-//	/** The conditions by event type. */
-//	protected Map<String, ICommand> conditions;
-//	
-//	/** The actions by event type. */
-//	protected Map<String, ICommand> actions;
-
 	/** The event list. */
 	protected List<IEvent> events;
 	
 	/** The rulebase. */
 	protected IRulebase rulebase;
+	
+	/** The rules generated for an object. */
+	protected Map<Object, IRule[]> rules;
+
+	/** The Java beans property change listeners. */
+	protected Map<Object, PropertyChangeListener> pcls;
 	
 	//-------- constructors --------
 	
@@ -46,6 +53,7 @@ public class RuleSystem
 	{
 		this.events = new ArrayList<IEvent>();
 		this.rulebase = new Rulebase();
+		this.rules = new IdentityHashMap<Object, IRule[]>(); // objects may change
 	}
 
 	//-------- methods --------
@@ -54,16 +62,18 @@ public class RuleSystem
 	 *  Monitor an object to the rule engine.
 	 *  - Extracts conditions
 	 *  - Extracts actions
+	 *  - Creates rules from condition/action pairs 
+	 *      and adds them to the rulebase.
 	 *  - Subscribes for events
 	 */
-	public Object monitorObject(final Object object)
+	public Object observeObject(final Object object)
 	{
 		Class clazz = object.getClass();
-
-		final Map eventcreators = new HashMap();
+		
+		addPropertyChangeListener(object);
+		
+		final Map<Method, IResultCommand> eventcreators = new HashMap<Method, IResultCommand>();
 		final Map<String, Rule> rules = new HashMap<String, Rule>();
-//		final Map conditionevaluators = new HashMap();
-//		final Map actions = new HashMap();
 		
 		while(!clazz.equals(Object.class))
 		{
@@ -106,7 +116,7 @@ public class RuleSystem
 						rules.put(name, rule);
 					}
 					
-					// find event type
+					// Find event types
 					Annotation[][] paramannos = m.getParameterAnnotations();
 					List<String> events = new ArrayList<String>();
 					for(int j=0; j<paramannos.length; j++)
@@ -180,7 +190,13 @@ public class RuleSystem
 		
 		for(Iterator<Rule> it=rules.values().iterator(); it.hasNext(); )
 		{
-			rulebase.addRule(it.next());
+			Rule rule = it.next();
+			if(rule.getAction()==null || rule.getCondition()==null 
+				|| rule.getEvents()==null || rule.getEvents().size()==0)
+			{
+				throw new RuntimeException("Rule is incomplete: "+rule.getName());
+			}
+			rulebase.addRule(rule);
 		}
 		
 		ProxyFactory pf = new ProxyFactory(object);
@@ -193,7 +209,7 @@ public class RuleSystem
 				if(creator!=null)
 				{
 					Event event = (Event)creator.execute(null);
-					events.add(event);
+					addEvent(event);
 //					System.out.println("created event: "+event);
 				}
 				return ret;
@@ -201,11 +217,102 @@ public class RuleSystem
 		});
 		
 		Object proxy = pf.getProxy();
+
+		this.rules.put(proxy, rules.values().toArray(new IRule[rules.size()]));
+
 		return proxy;
 	}
 
 	/**
-	 * 
+	 *  Unobserve an object.
+	 */
+	public void unobserveObject(final Object object)
+	{
+		removePropertyChangeListener(object);
+		IRule[] rls = rules.remove(object);
+		for(int i=0; i<rls.length; i++)
+		{
+			rulebase.removeRule(rls[i]);
+		}
+	}
+	
+	/**  
+	 *  Add a property change listener.
+	 */
+	protected void	addPropertyChangeListener(Object object)
+	{
+		if(object!=null)
+		{
+			// Invoke addPropertyChangeListener on value
+			try
+			{
+				if(pcls==null)
+					pcls = new IdentityHashMap<Object, PropertyChangeListener>(); // values may change, therefore identity hash map
+				PropertyChangeListener pcl = (PropertyChangeListener)pcls.get(object);
+				
+				if(pcl==null)
+				{
+					pcl = new PropertyChangeListener()
+					{
+						public void propertyChange(PropertyChangeEvent evt)
+						{
+							// todo: problems:
+							// - may be called on wrong thread (-> synchronizator)
+							// - how to create correct event with type and value
+							
+							Event event = new Event(evt.getPropertyName(), evt.getNewValue());
+							addEvent(event);
+						}
+					};
+				}
+				
+				// Do not use Class.getMethod (slow).
+				Method	meth = SReflect.getMethod(object.getClass(), "addPropertyChangeListener", PCL);
+				if(meth!=null)
+					meth.invoke(object, new Object[]{pcl});				
+	
+				pcls.put(object, pcl);
+			}
+			catch(IllegalAccessException e){e.printStackTrace();}
+			catch(InvocationTargetException e){e.printStackTrace();}
+		}
+	}
+	
+	/**
+	 *  Deregister a value for observation.
+	 *  if its a bean then remove the property listener.
+	 */
+	protected void	removePropertyChangeListener(Object object)
+	{
+		if(object!=null)
+		{
+//			System.out.println("deregister ("+cnt[0]+"): "+value);
+			// Stop listening for bean events.
+			if(pcls!=null)
+			{
+				PropertyChangeListener pcl = (PropertyChangeListener)pcls.remove(object);
+				if(pcl!=null)
+				{
+					try
+					{
+//						System.out.println(getTypeModel().getName()+": Deregister: "+value+", "+type);						
+						// Do not use Class.getMethod (slow).
+						Method	meth = SReflect.getMethod(object.getClass(), "removePropertyChangeListener", PCL);
+						if(meth!=null)
+							meth.invoke(object, new Object[]{pcl});
+					}
+					catch(IllegalAccessException e){e.printStackTrace();}
+					catch(InvocationTargetException e){e.printStackTrace();}
+				}
+			}
+		}
+	}
+	
+	/**
+	 *  Process the next event by
+	 *  - finding rules that are sensible to the event type
+	 *  - evaluate the conditions of these conditions
+	 *  - fire actions of triggered rules.
 	 */
 	public void processEvent()
 	{
@@ -225,7 +332,7 @@ public class RuleSystem
 	}
 	
 	/**
-	 * 
+	 *  Process events until the event queue is empty.
 	 */
 	public void processAllEvents()
 	{
@@ -233,6 +340,14 @@ public class RuleSystem
 		{
 			processEvent();
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void addEvent(IEvent event)
+	{
+		events.add(event);
 	}
 	
 }

@@ -44,7 +44,7 @@ public class CleanerAgentConditions
 	{
 		RuleSystem rs = new RuleSystem();
 		CleanerAgentConditions cac = new CleanerAgentConditions();
-		cac = (CleanerAgentConditions)rs.monitorObject(cac);
+		cac = (CleanerAgentConditions)rs.observeObject(cac);
 		
 		for(int i=0; i<100; i++)
 		{
@@ -52,6 +52,8 @@ public class CleanerAgentConditions
 			System.out.println("Current charge state: "+cac.getChargeState());
 			rs.processAllEvents();
 		}
+		
+		rs.unobserveObject(cac);
 	}
 	
 //	@MaintainGoal

@@ -44,6 +44,10 @@ public class Rulebase implements IRulebase
 				String event = events.get(i);
 				List<IRule> rs = rules.get(event);
 				rs.remove(rule);
+				if(rs.size()==0)
+				{
+					rules.remove(event);
+				}
 			}
 		}
 	}

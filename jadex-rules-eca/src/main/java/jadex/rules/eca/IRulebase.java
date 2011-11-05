@@ -1,7 +1,6 @@
 package jadex.rules.eca;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 
