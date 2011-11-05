@@ -50,6 +50,7 @@ public class CleanerAgentConditions
 		{
 			cac.decreaseChargeState();
 			System.out.println("Current charge state: "+cac.getChargeState());
+			rs.processEvent();
 		}
 	}
 	

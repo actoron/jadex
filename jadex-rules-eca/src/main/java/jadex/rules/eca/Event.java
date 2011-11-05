@@ -3,7 +3,7 @@ package jadex.rules.eca;
 /**
  * 
  */
-public class Event
+public class Event implements IEvent
 {
 	/** The event type. */
 	protected String type;

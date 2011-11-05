@@ -8,7 +8,10 @@ import jadex.rules.eca.annotations.Condition;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -22,18 +25,17 @@ public class RuleSystem
 {
 	//-------- attributes --------
 	
-	/** The state. */
-//	protected Object state;
-	
-	/** The rule base containing all the rules. */
-//	protected IRulebase rulebase;
-	
-	/** The conditions by event type. */
-	protected Map<String, ICommand> conditions;
-	
-	/** The actions by event type. */
-	protected Map<String, ICommand> actions;
+//	/** The conditions by event type. */
+//	protected Map<String, ICommand> conditions;
+//	
+//	/** The actions by event type. */
+//	protected Map<String, ICommand> actions;
 
+	/** The event list. */
+	protected List<IEvent> events;
+	
+	/** The rulebase. */
+	protected IRulebase rulebase;
 	
 	//-------- constructors --------
 	
@@ -42,8 +44,8 @@ public class RuleSystem
 	 */
 	public RuleSystem()
 	{
-		this.conditions = new HashMap<String, ICommand>();
-		this.actions = new HashMap<String, ICommand>();
+		this.events = new ArrayList<IEvent>();
+		this.rulebase = new Rulebase();
 	}
 
 	//-------- methods --------
@@ -59,6 +61,7 @@ public class RuleSystem
 		Class clazz = object.getClass();
 
 		final Map eventcreators = new HashMap();
+		final Map<String, Rule> rules = new HashMap<String, Rule>();
 //		final Map conditionevaluators = new HashMap();
 //		final Map actions = new HashMap();
 		
@@ -95,10 +98,17 @@ public class RuleSystem
 					Condition cond = methods[i].getAnnotation(Condition.class);
 					final String name = cond.value();
 					final Method m = methods[i];
+
+					Rule rule = rules.get(name);
+					if(rule==null)
+					{
+						rule = new Rule(name);
+						rules.put(name, rule);
+					}
 					
 					// find event type
 					Annotation[][] paramannos = m.getParameterAnnotations();
-					String type = null;
+					List<String> events = new ArrayList<String>();
 					for(int j=0; j<paramannos.length; j++)
 					{
 						Annotation[] annos = paramannos[j];
@@ -106,53 +116,51 @@ public class RuleSystem
 						{
 							if(annos[k] instanceof jadex.rules.eca.annotations.Event)
 							{
-								type = ((jadex.rules.eca.annotations.Event)annos[k]).value();
+								String type = ((jadex.rules.eca.annotations.Event)annos[k]).value();
+								events.add(type);
 							}
 						}
 					}
-					if(type==null)
+					if(events.size()==0)
 						throw new RuntimeException("Event type not found: "+methods[i]);
 					
-					ICommand com = new ICommand()
+					rule.setEvents(events);
+					
+					rule.setCondition(new ICondition()
 					{
-						public void execute(Object event)
+						public boolean evaluate(IEvent event)
 						{
+							boolean ret = false;
 							try
 							{
 								m.setAccessible(true);
 								Object result = m.invoke(object, ((Event)event).getContent());
-								if(result instanceof Boolean && ((Boolean)result).booleanValue())
-								{
-									// fire action
-									ICommand action = (ICommand)actions.get(name);
-									if(action!=null)
-									{
-										// todo: args
-										action.execute(null); 
-									}
-									else
-									{
-										System.out.println("No action found: "+name);
-									}
-								}
+								ret = ((Boolean)result).booleanValue();
 							}
 							catch(Exception e)
 							{
 								throw new RuntimeException(e);
 							}
+							return ret;
 						}
-					};
-//					conditionevaluators.put(name, com);
-					conditions.put(type, com);
+					});
 				}
 				else if(methods[i].isAnnotationPresent(Action.class))
 				{
 					Action cond = methods[i].getAnnotation(Action.class);
 					final String name = cond.value();
 					final Method m = methods[i];
-					ICommand com = new ICommand()
+					
+					Rule rule = rules.get(name);
+					if(rule==null)
 					{
-						public void execute(Object args)
+						rule = new Rule(name);
+						rules.put(name, rule);
+					}
+					
+					rule.setAction(new IAction()
+					{
+						public void execute(IEvent event)
 						{
 							try
 							{
@@ -164,11 +172,15 @@ public class RuleSystem
 								throw new RuntimeException(e);
 							}
 						}
-					};
-					actions.put(name, com);
+					});
 				}
 			}
 			clazz = clazz.getSuperclass();
+		}
+		
+		for(Iterator<Rule> it=rules.values().iterator(); it.hasNext(); )
+		{
+			rulebase.addRule(it.next());
 		}
 		
 		ProxyFactory pf = new ProxyFactory(object);
@@ -181,9 +193,7 @@ public class RuleSystem
 				if(creator!=null)
 				{
 					Event event = (Event)creator.execute(null);
-					ICommand com = (ICommand)conditions.get(event.getType());
-					if(com!=null)
-						com.execute(event);
+					events.add(event);
 //					System.out.println("created event: "+event);
 				}
 				return ret;
@@ -193,23 +203,25 @@ public class RuleSystem
 		Object proxy = pf.getProxy();
 		return proxy;
 	}
-	
-//	/**
-//	 *  Get the memory.
-//	 *  @return The memory.
-//	 */
-//	public Object getState()
-//	{
-//		return state;
-//	}
-//
-//	/**
-//	 *  Get the rulebase.
-//	 *  @return The rulebase.
-//	 */
-//	public IRulebase getRulebase()
-//	{
-//		return rulebase;
-//	}
 
+	/**
+	 * 
+	 */
+	public void processEvent()
+	{
+		if(events.size()>0)
+		{
+			IEvent event = events.remove(0);
+			List<IRule> rules = rulebase.getRules(event.getType());
+			for(int i=0; i<rules.size(); i++)
+			{
+				IRule rule = rules.get(i);
+				if(rule.getCondition().evaluate(event))
+				{
+					rule.getAction().execute(event);
+				}
+			}
+		}
+	}
+	
 }
