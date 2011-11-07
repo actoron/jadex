@@ -2,7 +2,7 @@
 <dropout_conf>
 	<!-- rate: this config is repeated every x seconds  -->
 	<!-- count: this config is repeated x times; set to 0 for infinite loop  -->
-	<configuration rate="0" count="1">
+	<configuration rate="20" count="1">
 		<query>
 			<category>ROBOT</category>
 			<random>1</random>

@@ -112,7 +112,7 @@ public class DotWriter {
 	 *            the name of the file (for both .dot and .png extension)
 	 */
 	public void generatePNG(String fileName) {
-		String command = "C:/Program Files (x86)/Graphviz 2.28/bin/dot.exe -Tpng " + fileName + ".dot -o " + fileName + ".png";
+		String command = "C:/development/Graphviz2.26.3/bin/dot.exe -Tpng " + fileName + ".dot -o " + fileName + ".png";
 
 		try {
 			Runtime.getRuntime().exec(command);

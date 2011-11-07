@@ -17,7 +17,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
@@ -45,7 +44,6 @@ import java.util.logging.Level;
  * 
  * @author thomas
  */
-@SuppressWarnings("unchecked")
 @Description("The Manager Agent who manages the whole application.")
 @ProvidedServices(@ProvidedService(type = IManagerService.class, implementation = @Implementation(ManagerService.class)))
 @RequiredServices({ @RequiredService(name = "cmsservice", type = IComponentManagementService.class, binding = @Binding(scope = RequiredServiceInfo.SCOPE_PLATFORM)) })
@@ -172,7 +170,11 @@ public class ManagerAgent extends MicroAgent {
 	@Override
 	public IFuture<Void> agentKilled() {
 		closeWriters();
-		getParent().killComponent();
+
+		System.out.println("Manager is killing the application.");
+		// kill the application
+		IExternalAccess application = getParent();
+		application.killComponent();
 
 		return IFuture.DONE;
 	}
@@ -344,25 +346,23 @@ public class ManagerAgent extends MicroAgent {
 				// }
 				// });
 			} else {
-				System.out.println("Manager is killing the platform.");
-				// kill the platform
-				IExternalAccess application = getParent();
-				IFuture<IExternalAccess> future = application.scheduleStep(new IComponentStep<IExternalAccess>() {
-
-					@Override
-					public IFuture<IExternalAccess> execute(IInternalAccess ia) {
-						IExternalAccess platform = ia.getParent();
-						Future<IExternalAccess> ret = new Future<IExternalAccess>(platform);
-						return ret;
-					}
-				});
-				future.addResultListener(new DefaultResultListener<IExternalAccess>() {
-
-					@Override
-					public void resultAvailable(IExternalAccess result) {
-						result.killComponent();
-					}
-				});
+				this.killAgent();
+				// IFuture<IExternalAccess> future = application.scheduleStep(new IComponentStep<IExternalAccess>() {
+				//
+				// @Override
+				// public IFuture<IExternalAccess> execute(IInternalAccess ia) {
+				// IExternalAccess platform = ia.getParent();
+				// Future<IExternalAccess> ret = new Future<IExternalAccess>(platform);
+				// return ret;
+				// }
+				// });
+				// future.addResultListener(new DefaultResultListener<IExternalAccess>() {
+				//
+				// @Override
+				// public void resultAvailable(IExternalAccess result) {
+				// result.killComponent();
+				// }
+				// });
 			}
 		}
 	}
