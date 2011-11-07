@@ -184,7 +184,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<Void> removeResourceIdentifier(final IResourceIdentifier rid)
 	{
-		System.out.println("remove "+rid);
+//		System.out.println("remove "+rid);
 		
 		final Future<Void> ret = new Future<Void>();
 		
@@ -235,7 +235,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<Void> removeResourceIdentifierCompletely(final IResourceIdentifier rid)
 	{
-		System.out.println("remove "+rid);
+//		System.out.println("remove "+rid);
 		
 		final Future<Void> ret = new Future<Void>();
 		

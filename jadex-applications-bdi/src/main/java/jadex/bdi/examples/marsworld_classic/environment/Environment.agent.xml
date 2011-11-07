@@ -12,7 +12,8 @@
 	<imports>
 		<import>jadex.bdi.examples.marsworld_classic.*</import>
 		<import>jadex.bridge.*</import>
-		<import>jadex.bridge.service.clock.IClockService</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
+		<import>jadex.bridge.service.search.*</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
 	</imports>

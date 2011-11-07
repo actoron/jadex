@@ -18,6 +18,8 @@
 		<import>jadex.bdi.examples.marsworld_classic.movement.*</import>
 		<import>jadex.base.fipa.*</import>
 		<import>jadex.commons.*</import>
+		<import>jadex.bridge.service.types.df.*</import>
+		<import>jadex.bridge.service.search.*</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
 	</imports>

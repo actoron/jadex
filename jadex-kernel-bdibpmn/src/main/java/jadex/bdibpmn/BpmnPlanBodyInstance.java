@@ -57,6 +57,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
@@ -1528,5 +1529,13 @@ public class BpmnPlanBodyInstance extends BpmnInterpreter
 	{
 		ElementFlyweight.removeEventListener(listener, interpreter.getAgent(), false, getState(), interpreter.getAgent());
 		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Service container is set from the outside.
+	 */
+	public IServiceContainer createServiceContainer()
+	{
+		return null;
 	}
 }

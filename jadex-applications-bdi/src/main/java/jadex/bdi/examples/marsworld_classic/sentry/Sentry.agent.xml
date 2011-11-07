@@ -22,6 +22,8 @@
 		<import>jadex.commons.*</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
+		<import>jadex.bridge.service.types.df.*</import>
+		<import>jadex.bridge.service.search.*</import>
 	</imports>
 
 	<capabilities>

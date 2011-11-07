@@ -16,6 +16,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
@@ -154,7 +155,8 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					@XMLClassname("dealertf")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						ia.getServiceContainer().getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+						ia.getServiceContainer().getRequiredService("cms")
+							.addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -489,6 +491,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			@XMLClassname("startDealer")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				final Future<Void>	ret	= new Future<Void>();
 				final IBDIInternalAccess bia = (IBDIInternalAccess)ia;
 				final IGoal start = bia.getGoalbase().createGoal("cms_create_component");
 				start.getParameter("type").setValue("jadex/bdi/examples/blackjack/dealer/Dealer.agent.xml");
@@ -498,10 +501,18 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				{
 					public void goalFinished(AgentEvent ae)
 					{
-						IComponentIdentifier dealer = (IComponentIdentifier)start.getParameter("componentidentifier").getValue();
-						bia.getLogger().info("local DealerAgent started: "+dealer);
-						//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
-						bia.getBeliefbase().getBelief("localDealerAID").setFact(dealer);
+						if(start.isSucceeded())
+						{
+							IComponentIdentifier dealer = (IComponentIdentifier)start.getParameter("componentidentifier").getValue();
+							bia.getLogger().info("local DealerAgent started: "+dealer);
+							//access.getBeliefbase().getBelief("localDealerAID").setFact(start.getResult());
+							bia.getBeliefbase().getBelief("localDealerAID").setFact(dealer);
+							ret.setResult(null);
+						}
+						else
+						{
+							ret.setException(start.getException()!=null ? start.getException() : new RuntimeException("Dealer not created"));
+						}
 					}
 					
 					public void goalAdded(AgentEvent ae)
@@ -509,7 +520,13 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 					}
 				});
 				bia.getGoalbase().dispatchTopLevelGoal(start);
-				return IFuture.DONE;
+				return ret;
+			}
+		}).addResultListener(new SwingDefaultResultListener<Void>()	// Add listener for automatic error dialog.
+		{
+			public void customResultAvailable(Void result)
+			{
+				// dealer successfully created.
 			}
 		});
 		

@@ -17,12 +17,12 @@
 		<import>jadex.extension.envsupport.environment.space2d.*</import>
 		<import>jadex.extension.envsupport.environment.*</import>
 		<import>jadex.extension.envsupport.math.*</import>
-		<import>jadex.bridge.serviceclock.IClockService</import>
 		<import>jadex.extension.envsupport.dataview.*</import>
 		<import>jadex.extension.envsupport.observer.perspective.*</import>
 		<import>jadex.bdi.planlib.*</import>
 		<import>jadex.bdi.examples.cleanerworld.cleaner.*</import>
-		<import>jadex.bridge.service.clock.IClockService</import>
+		<import>jadex.bridge.service.types.clock.IClockService</import>
+		<import>jadex.bridge.service.search.*</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
 	</imports>
