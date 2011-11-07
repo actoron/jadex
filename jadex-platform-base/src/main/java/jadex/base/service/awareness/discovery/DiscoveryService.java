@@ -16,9 +16,6 @@ public class DiscoveryService	implements IDiscoveryService
 	@ServiceComponent
 	protected IInternalAccess agent;
 	
-	/** The send handler. */
-	protected SendHandler sender;
-	
 	/**
 	 *  Set the delay.
 	 *  @param delay The delay to set.
@@ -31,7 +28,7 @@ public class DiscoveryService	implements IDiscoveryService
 		if(getDiscoveryAgent().getDelay()!=delay)
 		{
 			getDiscoveryAgent().setDelay(delay);
-			sender.startSendBehavior();
+			getDiscoveryAgent().getSender().startSendBehavior();
 		}
 	}
 	
