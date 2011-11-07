@@ -10,6 +10,7 @@ import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.awareness.IManagementService;
 import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
@@ -26,7 +27,6 @@ import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
@@ -135,7 +135,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	protected boolean autodelete;
 
 	/** The discovered components. */
-	protected Map discovered;
+	protected Map<IComponentIdentifier, DiscoveryInfo> discovered;
 	
 	/** The timer. */
 	protected Timer	timer;
@@ -158,7 +158,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	{
 		initArguments();
 		
-		this.discovered = new LinkedHashMap();
+		this.discovered = new LinkedHashMap<IComponentIdentifier, DiscoveryInfo>();
 		
 		final Future<Void>	ret	= new Future<Void>();
 		
@@ -236,8 +236,6 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	public void executeBody()
 	{
 		root = getComponentIdentifier().getRoot();
-		discovered.put(root, new DiscoveryInfo(root, null, getClockTime(), delay, false));
-		
 		startRemoveBehaviour();
 	}
 	
@@ -332,7 +330,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		{
 			if(dif!=null && dif.getProxy()!=null)
 			{
-				deleteProxy(dif);
+				deleteProxy(dif.getProxy());
 			}
 		}
 		
@@ -554,7 +552,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 					{
 						DiscoveryInfo dif = (DiscoveryInfo)todel.get(i);
 						// Ignore deletion failures
-						deleteProxy(dif);
+						deleteProxy(dif.getProxy());
 					}
 				}
 				
@@ -569,16 +567,17 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 */
 	public void checkProxy(final DiscoveryInfo dif)
 	{
-		getServiceContainer().getRequiredService("cms").addResultListener(createResultListener(new IResultListener()
+		getServiceContainer().getRequiredService("cms").addResultListener(new IResultListener<Object>()
 		{
 			public void resultAvailable(Object result)
 			{
 				if(dif.getProxy()!=null)
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
-					cms.getComponentDescription(dif.getProxy()).addResultListener(new IResultListener()
+					cms.getComponentDescription(dif.getProxy())
+						.addResultListener(new IResultListener<IComponentDescription>()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(IComponentDescription result)
 						{
 						}
 						
@@ -593,7 +592,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			{
 				getLogger().warning("Could not get cms: "+exception);
 			}
-		}));
+		});
 	}
 	
 	/**
@@ -658,31 +657,28 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	/**
 	 *  Delete a proxy.
 	 */
-	public IFuture<Void> deleteProxy(final DiscoveryInfo dif)
+	public IFuture<Void> deleteProxy(final IComponentIdentifier cid)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		getServiceContainer().getRequiredService("cms").addResultListener(createResultListener(new DelegationResultListener(ret)
+		IFuture<IComponentManagementService>	cmsfut	= getServiceContainer().getRequiredService("cms");
+		cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				
-				IComponentIdentifier cid = dif.getProxy();
-				if(cid!=null)
+//				System.out.println("awareness destroy: "+cid);
+				cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
 				{
-//					System.out.println("awareness destroy: "+cid);
-					cms.destroyComponent(cid).addResultListener(createResultListener(new DelegationResultListener(ret)
+					public void customResultAvailable(Map<String, Object> result)
 					{
-						public void customResultAvailable(Object result)
-						{
+						DiscoveryInfo	dif	= discovered.get(cid);
+						if(dif!=null)
 							dif.setProxy(null);
-							ret.setResult(null);
-						}
-					}));
-				}
+						ret.setResult(null);
+					}
+				});
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -690,7 +686,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	/**
 	 *  Test if a platform is included and/or not excluded.
 	 */
-	protected synchronized boolean	isIncluded(IComponentIdentifier cid, String[] includes, String[] excludes)
+	public static boolean	isIncluded(IComponentIdentifier cid, String[] includes, String[] excludes)
 	{
 		boolean	included	= includes.length==0;
 		String[]	cidnames	= null;
@@ -723,7 +719,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	/**
 	 *  Extract names for matching to includes/excludes list.
 	 */
-	protected String[]	extractNames(IComponentIdentifier cid)
+	protected static String[]	extractNames(IComponentIdentifier cid)
 	{
 		List	ret	= new ArrayList();
 		ret.add(cid.getName());

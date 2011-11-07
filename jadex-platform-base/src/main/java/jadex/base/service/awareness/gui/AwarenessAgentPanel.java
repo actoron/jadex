@@ -28,13 +28,15 @@ import jadex.xml.annotation.XMLClassname;
 import jadex.xml.annotation.XMLIncludeFields;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.InetAddress;
 import java.sql.Date;
 import java.util.ArrayList;
@@ -44,6 +46,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -51,9 +55,12 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.Timer;
@@ -97,7 +104,10 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 //
 //	/** The port text field. */
 //	protected JTextField	tfport;
-
+	
+	/** The discovery info table. */
+	protected JTable	jtdis; 
+	
 	/** The delay spinner. */
 	protected JSpinner	spdelay;
 
@@ -124,12 +134,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	
 	/** The apply button. */
 	protected JButton	buapply;
-		
-	/** The refresh button. */
-	protected JButton	burefresh;
-		
-	/** The cancel button. */
-	protected JButton	bucancel;
 	
 	/** The discovery mechanisms. */
 	protected JCheckBox[] cbmechanisms;
@@ -160,7 +164,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 //		tfport.setPreferredSize(tfport.getPreferredSize());
 //		tfport.setMinimumSize(tfport.getPreferredSize());
 //		tfport.setHorizontalAlignment(JTextField.RIGHT);
-		SpinnerNumberModel spmdelay = new SpinnerNumberModel(0, 0, 100000, 1);
+		SpinnerNumberModel spmdelay = new SpinnerNumberModel(0, 0, 100, 1);
+		spmdelay.setMaximum(null); // unbounded
 		spdelay = new JSpinner(spmdelay);
 		cbfast = new JCheckBox();
 		
@@ -181,23 +186,20 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			public void stateChanged(ChangeEvent e)
 			{
 				buapply.setEnabled(true);
-				bucancel.setEnabled(true);
 			}
 		});
 		ActionListener	al	= new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				buapply.setEnabled(true);
-				bucancel.setEnabled(true);
+				applySettings();
 			}
 		};
 		TableModelListener	tml	= new TableModelListener()
 		{
 			public void tableChanged(TableModelEvent e)
 			{
-				buapply.setEnabled(true);
-				bucancel.setEnabled(true);
+				applySettings();
 			}
 		};
 		cbfast.addActionListener(al);
@@ -206,6 +208,20 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		includes.getModel().addTableModelListener(tml);
 		excludes.getModel().addTableModelListener(tml);
 		
+		buapply = new JButton("Apply");
+		buapply.setMargin(new Insets(0, 0, 0, 0));
+		buapply.setToolTipText("Apply setting changes to component.");
+		buapply.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent ae)
+			{
+				applySettings();
+			}
+		});
+		buapply.setEnabled(false);
+		Dimension	dim	= new Dimension(buapply.getMinimumSize().width, spdelay.getPreferredSize().height);
+		buapply.setMinimumSize(dim);
+		buapply.setPreferredSize(dim);
 		final JPanel pdissettings = new JPanel(new GridBagLayout());
 		pdissettings.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Discovery Settings "));
 		int y=0;
@@ -218,15 +234,17 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 //			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		y++;
 		pdissettings.add(new JLabel("Info send delay (0=off) [s]", JLabel.LEFT), 
-				new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
-				GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
-		pdissettings.add(spdelay, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+			new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
+		pdissettings.add(spdelay, new GridBagConstraints(1, y, 1, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
+		pdissettings.add(buapply, new GridBagConstraints(2, y, GridBagConstraints.REMAINDER, 1, 0, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		y++;
 		pdissettings.add(new JLabel("Fast startup awareness", JLabel.LEFT), 
 				new GridBagConstraints(0, y, 1, 1, 0, 0, GridBagConstraints.NORTHWEST, 
 				GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 1));
-		pdissettings.add(cbfast, new GridBagConstraints(1, y, 2, 1, 1, 0, GridBagConstraints.NORTHWEST, 
+		pdissettings.add(cbfast, new GridBagConstraints(1, y, GridBagConstraints.REMAINDER, 1, 1, 0, GridBagConstraints.NORTHWEST, 
 			GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		y++;
 		
@@ -246,54 +264,90 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			GridBagConstraints.NONE, new Insets(1,1,1,1), 0, 0));
 		y++;
 		
-		buapply = new JButton("Apply");
-		buapply.setToolTipText("Apply setting changes to component.");
-		buapply.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent ae)
-			{
-				applySettings();
-			}
-		});
-		bucancel = new JButton("Cancel");
-		bucancel.setToolTipText("Cancel changes and reset to previous values.");
-		bucancel.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				// Apply previous settings.
-				updateSettings(settings);
-			}
-		});
-		burefresh = new JButton("Refresh");
-		burefresh.setToolTipText("Refresh settings from underlying component.");
-		burefresh.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				refreshSettings();
-			}
-		});
-
-		buapply.setPreferredSize(burefresh.getPreferredSize());
-		buapply.setMinimumSize(burefresh.getMinimumSize());
-		bucancel.setPreferredSize(burefresh.getPreferredSize());
-		bucancel.setMinimumSize(burefresh.getMinimumSize());
-		JPanel pbuts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		pbuts.add(burefresh);
-		pbuts.add(buapply);
-		pbuts.add(bucancel);
-		
 		JPanel pdisinfos = new JPanel(new BorderLayout());
 		pdisinfos.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Discovery Infos "));
 		final DiscoveryTableModel dismodel = new DiscoveryTableModel();
-		final JTable jtdis = new JTable(dismodel);
+		jtdis = new JTable(dismodel);
 		jtdis.setPreferredScrollableViewportSize(new Dimension(600, 120));
 		jtdis.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		pdisinfos.add(BorderLayout.CENTER, new JScrollPane(jtdis));
 		jtdis.setDefaultRenderer(Date.class, new DateTimeRenderer());
 		jtdis.setDefaultRenderer(IComponentIdentifier.class, new ComponentIdentifierRenderer());
 		updateDiscoveryInfos(jtdis);
+		jtdis.addMouseListener(new MouseAdapter()
+		{
+			public void mousePressed(MouseEvent e)
+			{
+				popup(e);
+			}
+			public void mouseReleased(MouseEvent e)
+			{
+				popup(e);
+			}
+			protected void	popup(MouseEvent e)
+			{
+				if(e.isPopupTrigger())
+				{
+					int	row	= jtdis.rowAtPoint(e.getPoint());
+					if(row!=-1)
+					{
+						DiscoveryInfo	info	= dismodel.getList().get(row);
+						String	name	= info.getComponentIdentifier().getPlatformName();
+						String	template	= null; 
+						if(name.length()>4 && name.charAt(name.length()-4)=='_')
+							template	= name.substring(0, name.length()-4);
+						
+						JPopupMenu	menu	= new JPopupMenu("Adjust includes/excludes");
+						
+						String[]	entries	= includes.getEntries();
+						boolean	found	= false;
+						boolean	foundt	= false;
+						for(int i=0; i<entries.length; i++)
+						{
+							if(name.startsWith(entries[i]))
+							{
+								menu.add(new AddRemoveAction(false, true, entries[i]));
+							}
+							found	= found || entries[i].equals(name);
+							foundt	= foundt || (template!=null && entries[i].equals(template));
+						}
+						if(!found)
+						{
+							menu.add(new AddRemoveAction(true, true, name));	
+						}
+						if(template!=null && !foundt)
+						{
+							menu.add(new AddRemoveAction(true, true, template));							
+						}
+
+						menu.addSeparator();
+						
+						entries	= excludes.getEntries();
+						found	= false;
+						foundt	= false;
+						for(int i=0; i<entries.length; i++)
+						{
+							if(name.startsWith(entries[i]))
+							{
+								menu.add(new AddRemoveAction(false, false, entries[i]));
+							}
+							found	= found || entries[i].equals(name);
+							foundt	= foundt || (template!=null && entries[i].equals(template));
+						}
+						if(!found)
+						{
+							menu.add(new AddRemoveAction(true, false, name));	
+						}
+						if(template!=null && !foundt)
+						{
+							menu.add(new AddRemoveAction(true, false, template));							
+						}
+						
+						menu.show(jtdis, e.getX(), e.getY());
+					}
+				}
+			}
+		});
 		
 		timer = new Timer(timerdelay, new ActionListener()
 		{
@@ -304,113 +358,26 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			}
 		});
 		
-		SpinnerNumberModel spmrefresh = new SpinnerNumberModel(5, 0, 100000, 1);
+		SpinnerNumberModel spmrefresh = new SpinnerNumberModel(5, 0, 100, 1);
+		spmrefresh.setMaximum(null);	// unbounded.
 		sprefresh = new JSpinner(spmrefresh);
 		
-		JButton burefreshdis = new JButton("Refresh");
-		burefreshdis.setToolTipText("Refresh discovery infos.");
-		burefreshdis.addActionListener(new ActionListener()
+		JButton burefresh = new JButton("Refresh");
+		burefresh.setToolTipText("Refresh settings and discovery infos.");
+		burefresh.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				refreshSettings();
 				updateDiscoveryInfos(jtdis);
 				updateDiscoveryMechanisms();
 			}
 		});
 		
-		JButton bucreate = new JButton("Create");
-		bucreate.setToolTipText("Create a proxy for the selected component.");
-		bucreate.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				int sel = jtdis.getSelectedRow();
-				if(sel==-1)
-				{
-					jcc.displayError("Creation Error", "No discovered component selected.", null);
-				}
-				else
-				{
-					// todo: hack, could be wrong due to sorting (visual!=data order)
-					DiscoveryInfo dif = (DiscoveryInfo)dismodel.getList().get(sel);
-					if(dif.getProxy()!=null)
-					{
-						jcc.displayError("Creation Error", "Component already has proxy.", null);
-					}
-					else
-					{
-						final IComponentIdentifier	cid	= dif.getComponentIdentifier();
-						AwarenessAgentPanel.this.component.scheduleStep(new IComponentStep<IComponentIdentifier>()
-						{
-							@XMLClassname("createProxy")
-							public IFuture<IComponentIdentifier> execute(IInternalAccess ia)
-							{
-								AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
-								return agent.createProxy(cid);
-							}
-						}).addResultListener(new SwingDefaultResultListener<IComponentIdentifier>(panel)
-						{
-							public void customResultAvailable(IComponentIdentifier result)
-							{
-								updateDiscoveryInfos(jtdis);
-							}
-						});
-					}
-				}
-			}
-		});
-		
-		JButton budelete = new JButton("Delete");
-		budelete.setToolTipText("Delete proxy for the selected component.");
-		budelete.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				int sel = jtdis.getSelectedRow();
-				if(sel==-1)
-				{
-					jcc.displayError("Deletion Error", "No discovered component selected.", null);
-				}
-				else
-				{
-					// todo: hack, could be wrong due to sorting (visual!=data order)
-					final DiscoveryInfo dif = (DiscoveryInfo)dismodel.getList().get(sel);
-					if(dif.getProxy()==null)
-					{
-						jcc.displayError("Deletion Error", "Component has no proxy.", null);
-					}
-					else
-					{
-						AwarenessAgentPanel.this.component.scheduleStep(new IComponentStep<Void>()
-						{
-							@XMLClassname("deleteProxy")
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
-								return agent.deleteProxy(dif);
-							}
-						}).addResultListener(new SwingDefaultResultListener(panel)
-						{
-							public void customResultAvailable(Object result)
-							{
-								updateDiscoveryInfos(jtdis);
-							}
-						});
-					}
-				}
-			}
-		});
-				
-		bucreate.setPreferredSize(burefreshdis.getPreferredSize());
-		bucreate.setMinimumSize(burefreshdis.getPreferredSize());
-		budelete.setPreferredSize(burefreshdis.getPreferredSize());
-		budelete.setMinimumSize(burefreshdis.getMinimumSize());
-		
-		JPanel pbobuts = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		pbobuts.add(burefreshdis);
-		pbobuts.add(bucreate);
-		pbobuts.add(budelete);
-		
+		JPanel	prefresh	= new JPanel();
+		prefresh.add(sprefresh);
+		prefresh.add(new JLabel("Gui refresh delay (0=off) [s]", JLabel.LEFT));
+		prefresh.add(burefresh);
 		
 		SubcomponentTypeInfo[] dis = component.getModel().getSubcomponentTypes();
 		cbmechanisms = new JCheckBox[dis.length];
@@ -490,7 +457,9 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			pdismechs.add(cbmechanisms[i], new GridBagConstraints(i, 0, 1, 1, i==cbmechanisms.length-1? 1: 0, 0, GridBagConstraints.WEST, 
 				GridBagConstraints.HORIZONTAL, new Insets(1,1,1,1), 0, 0));
 		}
-				
+		
+		
+		// Layout of main panel starts here
 		GridBagConstraints	gbc	= new GridBagConstraints();
 		gbc.fill	= GridBagConstraints.BOTH;
 		
@@ -514,11 +483,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		gbc.weightx	= 0;
 		panel.add(pdissettings, gbc);
 		gbc.gridx	= GridBagConstraints.RELATIVE;
-				
-		gbc.gridy++;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
-		panel.add(pbuts, gbc);
-		
+				
 		gbc.gridy++;
 		panel.add(pdismechs, gbc);
 		
@@ -530,17 +496,10 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		gbc.weightx	= 0;
 		gbc.weighty	= 0;
 		gbc.gridx	= GridBagConstraints.RELATIVE;
-		gbc.gridwidth	= 1;
 		gbc.fill	= GridBagConstraints.NONE;
-		gbc.insets	= new Insets(0, 6, 0, 0);
-		panel.add(new JLabel("Gui refresh delay (0=off) [s]", JLabel.LEFT), gbc);
-		gbc.insets	= new Insets(0, 0, 0, 0);
-		panel.add(sprefresh, gbc);
-		gbc.fill	= GridBagConstraints.BOTH;
-
-		gbc.weightx	= 1;
+		gbc.anchor	= GridBagConstraints.EAST;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
-		panel.add(pbobuts, gbc);
+		panel.add(prefresh, gbc);
 				
 		
 		updateDiscoveryMechanisms();
@@ -657,7 +616,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			{
 				int sel = jtdis.getSelectedRow();
 				DiscoveryTableModel dtm = (DiscoveryTableModel)jtdis.getModel();
-				List disinfos = dtm.getList();
+				List<DiscoveryInfo> disinfos = dtm.getList();
 				disinfos.clear();
 				for(int i = 0; i < ds.length; i++)
 				{
@@ -766,7 +725,6 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				public void customResultAvailable(Void result)
 				{
 					buapply.setEnabled(false);
-					bucancel.setEnabled(false);
 				}
 			});
 		}
@@ -807,10 +765,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		cbautocreate.setSelected(settings.autocreate);
 		cbautodelete.setSelected(settings.autodelete);
 		includes.setEntries(settings.includes);
-		excludes.setEntries(settings.excludes);
-		
-		buapply.setEnabled(false);
-		bucancel.setEnabled(false);
+		excludes.setEntries(settings.excludes);		
 	}
 
 	/**
@@ -843,112 +798,280 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		/** The excludes list. */
 		public String[]	excludes;
 	}
+	
+	/**
+	 *  Action to add or remote an entry to/from the includes/excludes list.
+	 */
+	public class AddRemoveAction	extends AbstractAction
+	{
+		//-------- attributes --------
+		
+		/** Add  (true) or remove (false). */
+		protected boolean	add;
+		
+		/** Add/remove to/from includes (true) or excludes (false). */
+		protected boolean	includes;
+		
+		/** The entry. */
+		protected String entry;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a new add or remove action.
+		 */
+		public AddRemoveAction(boolean add, boolean includes, String entry)
+		{
+			super(add ? "Add '"+entry+"' to "+(includes?"includes":"excludes")
+				: "Remove '"+entry+"' from "+(includes?"includes":"excludes"));
+			this.add	= add;
+			this.includes	= includes;
+			this.entry	= entry;
+		}
+		
+		//-------- Action interface --------
+		
+		/**
+		 *  Perform the action.
+		 */
+		public void actionPerformed(ActionEvent e)
+		{
+			if(includes && add)
+			{
+				AwarenessAgentPanel.this.includes.addEntry(entry);
+			}
+			else if(includes && !add)
+			{
+				AwarenessAgentPanel.this.includes.removeEntry(entry);
+			}
+			else if(!includes && add)
+			{
+				AwarenessAgentPanel.this.excludes.addEntry(entry);
+			}
+			else if(!includes && !add)
+			{
+				AwarenessAgentPanel.this.excludes.removeEntry(entry);
+			}
+			
+			applySettings();
+		}
+	}
+
+	class DiscoveryTableModel extends AbstractTableModel
+	{
+		protected List<DiscoveryInfo> list;
+		
+		public DiscoveryTableModel()
+		{
+			this(new ArrayList<DiscoveryInfo>());
+		}
+		
+		public DiscoveryTableModel(List<DiscoveryInfo> list)
+		{
+			this.list = list;
+		}
+		
+		public List<DiscoveryInfo> getList()
+		{
+			return list;
+		}
+
+		public int getRowCount()
+		{
+			return list.size();
+		}
+
+		public int getColumnCount()
+		{
+			return 5;
+		}
+
+		public String getColumnName(int column)
+		{
+			switch(column)
+			{
+				case 0:
+					return "Component Identifier";
+				case 1:
+					return "Delay";
+				case 2:
+					return "Time of Last Info";
+				case 3:
+					return "Has a Proxy";
+				case 4:
+					return "Remote Excluded";
+				default:
+					return "";
+			}
+		}
+
+		public boolean isCellEditable(int row, int column)
+		{
+			return column==3;	// only proxy is editable
+		}
+
+		public Object getValueAt(int row, int column)
+		{
+			Object value = null;
+			DiscoveryInfo dif = (DiscoveryInfo)list.get(row);
+			if(column == 0)
+			{
+				value = dif.getComponentIdentifier();
+			}
+			else if(column == 1)
+			{
+				value = new Long(dif.getDelay());
+			}
+			else if(column == 2)
+			{
+				value = new Date(dif.getTime());
+			}
+			else if(column == 3)
+			{
+				value = dif.getProxy()!=null ? Boolean.TRUE : Boolean.FALSE;
+			}
+			else if(column == 4)
+			{
+				value = dif.isRemoteExcluded() ? Boolean.TRUE : Boolean.FALSE;
+			}
+			return value;
+		}
+		
+		public void setValueAt(Object val, int row, int column)
+		{
+			DiscoveryInfo dif = (DiscoveryInfo)list.get(row);
+			final boolean	create	= ((Boolean)val).booleanValue();
+			final IComponentIdentifier	cid	= dif.getComponentIdentifier();
+			final IComponentIdentifier	proxy	= dif.getProxy();
+			if(create && proxy==null || !create && proxy!=null)
+			{
+				// Ask user if platform should be added to excludes list.
+				boolean	proceed	= true;
+				if(!create && AwarenessManagementAgent.isIncluded(cid,
+					AwarenessAgentPanel.this.includes.getEntries(),
+					AwarenessAgentPanel.this.excludes.getEntries()))
+				{
+					String	name	= cid.getPlatformName();
+					String	template	= null; 
+					if(name.length()>4 && name.charAt(name.length()-4)=='_')
+						template	= name.substring(0, name.length()-4);
+					
+					
+					JPanel	pmsg	= new JPanel(new GridBagLayout());
+					GridBagConstraints	gbc	= new GridBagConstraints();
+					gbc.gridy	= 0;
+					gbc.anchor	= GridBagConstraints.WEST;
+					
+					JTextArea	msg	= new JTextArea("Add entry to the excludes list?");
+					msg.setEditable(false);  
+					msg.setCursor(null);  
+					msg.setOpaque(false);
+					
+					pmsg.add(msg, gbc);
+					gbc.gridy++;
+					gbc.insets	= new Insets(1,10,1,1);
+					
+					JRadioButton	rbname	= new JRadioButton(name);
+					JRadioButton	rbtmp	= new JRadioButton(template);
+					ButtonGroup	bg	= new ButtonGroup();
+					bg.add(rbname);
+					bg.add(rbtmp);
+					rbtmp.setSelected(true);
+					
+					if(template==null)
+					{
+						pmsg.add(new JLabel(name), gbc);
+					}
+					else
+					{
+						pmsg.add(rbname, gbc);
+						gbc.gridy++;
+						pmsg.add(rbtmp, gbc);
+					}
+					
+					int	res	= JOptionPane.showConfirmDialog(AwarenessAgentPanel.this.panel, pmsg, "Delete Proxy", JOptionPane.YES_NO_CANCEL_OPTION);
+					if(res==JOptionPane.CANCEL_OPTION)
+					{
+						proceed	= false;
+					}
+					else if(res==JOptionPane.YES_OPTION)
+					{
+						String	entry	= template!=null && rbtmp.isSelected() ? template : name;
+						excludes.addEntry(entry);
+						applySettings();
+					}
+				}
+				
+				if(proceed)
+				{
+					AwarenessAgentPanel.this.panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+					AwarenessAgentPanel.this.component.scheduleStep(new IComponentStep<Void>()
+					{
+						@XMLClassname("createDeleteProxy")
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
+							IFuture<Void>	ret;
+							if(create)
+							{
+								final Future<Void>	fut	= new Future<Void>();
+								ret	= fut;
+								agent.createProxy(cid).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(fut)
+								{
+									public void customResultAvailable(IComponentIdentifier result)
+									{
+										fut.setResult(null);
+									}
+								});
+							}
+							else
+							{
+								ret	= agent.deleteProxy(proxy);
+							}
+							return ret;
+						}
+					}).addResultListener(new SwingDefaultResultListener<Void>(panel)
+					{
+						public void customResultAvailable(Void result)
+						{
+							AwarenessAgentPanel.this.panel.setCursor(Cursor.getDefaultCursor());
+							updateDiscoveryInfos(jtdis);
+						}
+						public void customExceptionOccurred(Exception exception)
+						{
+							AwarenessAgentPanel.this.panel.setCursor(Cursor.getDefaultCursor());
+							super.customExceptionOccurred(exception);
+						}
+					});
+				}
+			}
+			
+		}
+		
+		public Class<?> getColumnClass(int column)
+		{
+			Class<?> ret = Object.class;
+			if(column == 0)
+			{
+				ret = IComponentIdentifier.class;
+			}
+			else if(column == 1)
+			{
+				ret = Long.class;
+			}
+			else if(column == 2)
+			{
+				ret = Date.class;
+			}
+			else if(column == 3)
+			{
+				ret = Boolean.class;
+			}
+			else if(column == 4)
+			{
+				ret = Boolean.class;
+			}
+			return ret;
+		}	
+	};
 }
-
-class DiscoveryTableModel extends AbstractTableModel
-{
-	protected List list;
-	
-	public DiscoveryTableModel()
-	{
-		this(new ArrayList());
-	}
-	
-	public DiscoveryTableModel(List list)
-	{
-		this.list = list;
-	}
-	
-	public List getList()
-	{
-		return list;
-	}
-
-	public int getRowCount()
-	{
-		return list.size();
-	}
-
-	public int getColumnCount()
-	{
-		return 5;
-	}
-
-	public String getColumnName(int column)
-	{
-		switch(column)
-		{
-			case 0:
-				return "Component Identifier";
-			case 1:
-				return "Delay";
-			case 2:
-				return "Time of Last Info";
-			case 3:
-				return "Has a Proxy";
-			case 4:
-				return "Remote Excluded";
-			default:
-				return "";
-		}
-	}
-
-	public boolean isCellEditable(int row, int column)
-	{
-		return false;
-	}
-
-	public Object getValueAt(int row, int column)
-	{
-		Object value = null;
-		DiscoveryInfo dif = (DiscoveryInfo)list.get(row);
-		if(column == 0)
-		{
-			value = dif.getComponentIdentifier();
-		}
-		else if(column == 1)
-		{
-			value = new Long(dif.getDelay());
-		}
-		else if(column == 2)
-		{
-			value = new Date(dif.getTime());
-		}
-		else if(column == 3)
-		{
-			value = dif.getProxy()!=null ? Boolean.TRUE : Boolean.FALSE;
-		}
-		else if(column == 4)
-		{
-			value = dif.isRemoteExcluded() ? Boolean.TRUE : Boolean.FALSE;
-		}
-		return value;
-	}
-	
-	public Class getColumnClass(int column)
-	{
-		Class ret = Object.class;
-		if(column == 0)
-		{
-			ret = IComponentIdentifier.class;
-		}
-		else if(column == 1)
-		{
-			ret = Long.class;
-		}
-		else if(column == 2)
-		{
-			ret = Date.class;
-		}
-		else if(column == 3)
-		{
-			ret = Boolean.class;
-		}
-		else if(column == 4)
-		{
-			ret = Boolean.class;
-		}
-		return ret;
-	}
-};
-
