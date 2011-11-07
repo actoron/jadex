@@ -2,6 +2,7 @@ package jadex.tools.testcenter;
 
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
+import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.modeltree.AddPathAction;
@@ -213,6 +214,20 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 			.equals(getJCC().getPlatformAccess().getComponentIdentifier().getPlatformName()));
 //		mpanel.setPopupBuilder(new PopupBuilder(new Object[]{mpanel.ADD_PATH, mpanel.REMOVE_PATH, mpanel.REFRESH,
 //			ADD_TESTCASE, ADD_TESTCASES, REMOVE_TESTCASE, REMOVE_TESTCASES}));
+
+		// Update properties on node change to have consistent state (model vs. library) for remote JCCs.
+		mpanel.getModel().addNodeListener(new INodeListener()
+		{
+			public void nodeRemoved(ITreeNode node)
+			{
+				pushPlatformSettings();
+			}
+			
+			public void nodeAdded(ITreeNode node)
+			{
+				pushPlatformSettings();
+			}
+		});
 
 //		mpanel.addTreeSelectionListener(new TreeSelectionListener()
 //		{
