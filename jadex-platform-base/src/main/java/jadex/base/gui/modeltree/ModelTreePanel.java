@@ -244,9 +244,10 @@ public class ModelTreePanel extends FileTreePanel
 			{
 				public void customResultAvailable(IResourceIdentifier rid) 
 				{
-					ModelTreePanel.super.addNode(node);
 					// Todo: remove entries on remove.
 					rootentries.put(url, rid);
+					
+					ModelTreePanel.super.addNode(node);
 				}
 				public void customExceptionOccurred(final Exception exception)
 				{

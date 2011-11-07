@@ -96,6 +96,22 @@ public class ModelFileFilter implements IRemoteFilter
 	}
 	
 	/**
+	 *  Get the resource identifiers for the root path entries.
+	 */
+	public Map<URL, IResourceIdentifier>	getResourceIdentifiers()
+	{
+		return rids;
+	}
+	
+	/**
+	 *  Set the resource identifiers for the root path entries.
+	 */
+	public void	setResourceIdentifiers(Map<URL, IResourceIdentifier> rids)
+	{
+		this.rids	= rids;
+	}
+	
+	/**
 	 *  Get the external access.
 	 *  @return The external access.
 	 */
@@ -145,7 +161,7 @@ public class ModelFileFilter implements IRemoteFilter
 				if(rid==null)
 				{
 					// Shouldn't happen!?
-//					System.out.println("no rid fur url: "+furl+", "+rids);
+					System.out.println("no rid fur url: "+furl+", "+rids);
 				}
 				
 				SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)
