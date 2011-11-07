@@ -249,7 +249,7 @@ public class UserInteractionTask implements ITask
 		{
 			public void run()
 			{
-				dialog.setVisible(false);
+				dialog.dispose();
 				ret.setResult(null);
 			}
 		});

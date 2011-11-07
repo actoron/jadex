@@ -1572,7 +1572,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	                    	}
 	            			else
 	            			{
-	            				component.getLogger().warning("Jar not found: "+urlfile);
+	            				component.getLogger().warning("Jar not found: "+file+", "+path);
 	            			}
 	               		}
 	                }
