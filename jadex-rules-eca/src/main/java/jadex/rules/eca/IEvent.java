@@ -1,7 +1,7 @@
 package jadex.rules.eca;
 
 /**
- * 
+ *  Interface for an event.
  */
 public interface IEvent
 {

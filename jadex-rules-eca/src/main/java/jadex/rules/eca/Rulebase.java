@@ -5,13 +5,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *  Rulebase implementation.
+ */
 public class Rulebase implements IRulebase
 {
+	//-------- attributes --------
+	
 	/** The rules. */
 	protected Map<String, List<IRule>>rules;
 
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Add a new rule.
+	 *  @param rule The rule.
 	 */
 	public void addRule(IRule rule)
 	{
@@ -32,7 +40,8 @@ public class Rulebase implements IRulebase
 	}
 	
 	/**
-	 * 
+	 *  Remove a rule.
+	 *  @param rule The rule.
 	 */
 	public void removeRule(IRule rule)
 	{
@@ -53,7 +62,9 @@ public class Rulebase implements IRulebase
 	}
 	
 	/**
-	 * 
+	 *  Get all rules that are relevant for an event type.
+	 *  @param event The event type.
+	 *  @return The rules.
 	 */
 	public List<IRule> getRules(String event)
 	{

@@ -3,10 +3,17 @@ package jadex.rules.eca;
 import java.util.List;
 
 /**
- * 
+ *  Implementation of a rule.
+ *  Has a 
+ *  - name
+ *  - event types it reacts to
+ *  - condition, lhs of the rule
+ *  - action, rhs of the rule
  */
 public class Rule implements IRule
 {
+	//-------- attributes --------
+	
 	/** The rule name. */
 	protected String name;
 	
@@ -18,6 +25,8 @@ public class Rule implements IRule
 	
 	/** The action. */
 	protected IAction action;
+
+	//-------- constructors --------
 
 	/**
 	 * 
@@ -45,6 +54,8 @@ public class Rule implements IRule
 		this.action = action;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the rule name.
 	 *  @return The rule name.
@@ -91,7 +102,8 @@ public class Rule implements IRule
 	}
 	
 	/**
-	 * 
+	 *  Set the event types.
+	 *  @param events The event types.
 	 */
 	public void setEvents(List<String> events)
 	{
@@ -99,7 +111,8 @@ public class Rule implements IRule
 	}
 	
 	/**
-	 * 
+	 *  Get the event types.
+	 *  @retur The event types.
 	 */
 	public List<String> getEvents()
 	{

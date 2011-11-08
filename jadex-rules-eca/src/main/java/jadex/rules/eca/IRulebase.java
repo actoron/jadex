@@ -3,22 +3,27 @@ package jadex.rules.eca;
 import java.util.List;
 
 /**
- * 
+ *  Interface for the rulebase that contains all
+ *  the rules of the system.
  */
 public interface IRulebase
 {
 	/**
-	 * 
+	 *  Add a new rule.
+	 *  @param rule The rule.
 	 */
 	public void addRule(IRule rule);
 	
 	/**
-	 * 
+	 *  Remove a rule.
+	 *  @param rule The rule.
 	 */
 	public void removeRule(IRule rule);
 	
 	/**
-	 * 
+	 *  Get all rules that are relevant for an event type.
+	 *  @param event The event type.
+	 *  @return The rules.
 	 */
 	public List<IRule> getRules(String event);
 }

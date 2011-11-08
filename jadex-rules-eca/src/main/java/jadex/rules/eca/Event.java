@@ -1,16 +1,20 @@
 package jadex.rules.eca;
 
 /**
- * 
+ *  Representation of an event.
  */
 public class Event implements IEvent
 {
+	//-------- attributes --------
+	
 	/** The event type. */
 	protected String type;
 	
 	/** The event content. */
 	protected Object content;
 	
+	//-------- constructors --------
+
 	/**
 	 *  Create a new event.
 	 */
@@ -19,6 +23,8 @@ public class Event implements IEvent
 		this.type = type;
 		this.content = content;
 	}
+	
+	//-------- methods --------
 
 	/**
 	 *  Get the type.

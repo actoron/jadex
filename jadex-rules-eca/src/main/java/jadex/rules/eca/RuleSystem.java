@@ -23,7 +23,8 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ProxyFactory;
 
 /**
- * 
+ *  The rule system is the main entry point. It contains the rulebase
+ *  with all rules and knows about the observed objects.
  */
 public class RuleSystem
 {
