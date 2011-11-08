@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+DTD for RELAX Namespace (Ver 1.0)
+$Id$
+-->
+<!--
+Typical invocation
+
+<!DOCTYPE module SYSTEM 
+ PUBLIC "-//RELAX//Module RELAX Namespace 1.0//JA"
+ SYSTEM "http://www.xml.gr.jp/relax/namespace1/relaxNamespace.dtd" [
+-->
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--         Parameter entities for qualified names        -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+<!ENTITY % nsPrefix "">
+<!ENTITY % grammar "%nsPrefix;grammar">
+<!ENTITY % namespace "%nsPrefix;namespace">
+<!ENTITY % includeNamespace "%nsPrefix;include">
+<!ENTITY % topLevel "%nsPrefix;topLevel">
+
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--         Parameter entities for customization          -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+<!ENTITY % namespaceContent "EMPTY">
+<!ENTITY % topLevelContent "EMPTY">
+
+<!ENTITY % annotationInGrammar "">
+<!ENTITY % includeContent "EMPTY">
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--         The overall structure of RELAX grammars       -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+
+<!ELEMENT %grammar;
+        (%annotationInGrammar; 
+         (%namespace; | %includeNamespace;)*,
+         (%topLevel;, (%namespace; | %includeNamespace;)*)? )>
+
+<!ATTLIST %grammar;
+        relaxNamespaceVersion CDATA  #REQUIRED
+        grammarVersion    CDATA      #IMPLIED
+        xmlns             CDATA      #FIXED "http://www.xml.gr.jp/xmlns/relaxNamespace"
+>
+
+<!ELEMENT %namespace;        %namespaceContent;>
+<!ATTLIST %namespace;
+        name              CDATA      #REQUIRED
+        moduleLocation    CDATA      #IMPLIED
+        language          CDATA      #IMPLIED
+        validation        (false)    #IMPLIED
+>
+
+<!ELEMENT %includeNamespace; %includeContent;>
+<!ATTLIST %includeNamespace; grammarLocation CDATA #REQUIRED>
+
+<!ELEMENT %topLevel; %topLevelContent;>

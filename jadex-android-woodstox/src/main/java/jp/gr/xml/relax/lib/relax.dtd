@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+DTD for the combination of RELAX Core  (Ver 1.0)+ RELAX Namesapce (Ver 1.0)
+$Id$
+-->
+
+<!ENTITY % corePrefix "rc:">
+<!ENTITY % nsPrefix "">
+<!ENTITY % namespaceContent  "(%corePrefix;module)">
+<!ENTITY % topLevelContent   "(%corePrefix;ref |  %corePrefix;hedgeRef)">
+
+<!ENTITY % relaxCore SYSTEM "relaxCore.dtd">
+%relaxCore;
+
+<!ENTITY % relaxNamespace SYSTEM "relaxNamespace.dtd">
+%relaxNamespace;
+
+<!ATTLIST %grammar;
+             xmlns:rc  CDATA #FIXED "http://www.xml.gr.jp/xmlns/relaxCore"
+>

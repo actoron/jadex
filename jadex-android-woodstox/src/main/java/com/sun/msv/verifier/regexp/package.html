@@ -1,0 +1,36 @@
+<HTML>
+<BODY>
+<P>VGM implementation by using regular expression derivation algorithm.</P>
+<P>This implementation bridges a gap between 
+neutral&nbsp;grammar model (com.sun.msv.grammar) and Verifier grammar 
+model (com.sun.msv.verifier). </P>
+<H2>Performance Analysis</H2>
+<P> This bridge is tuned for client-side use, where MSV is repeatedly 
+invoked from command line. Particularly,</P>
+<OL>
+  <LI>
+  <DIV>No preprocessing&nbsp;of grammar is necessary. Abstract grammar model can 
+  be directly used. This results in faster schema loading, at the expense of 
+  slower validation.</DIV>
+  <LI>
+  <DIV>Extensive error recovery and detailed error diagnosis is 
+  provided.</DIV></LI></OL>
+<P>Also, this bridge covers full expressiveness of RELAX and 
+TREX. </P>
+<H2>Algorithm </H2>
+<P>Those who are interested in the algorithm of this package 
+may want to see the following resources. </P>
+<DL>
+  <DT><a href="ftp://iecc.com/pub/file/regex.tar.gz">regexp.tar.gz</a></DT>
+  <DD>regular expression matching algorithm by Mark Hopkins.</DD>
+  
+  <DT><a href="http://www.flightlab.com/~joe/sgml/validate.html">
+	How to validate XML</a></DT>
+  <DD>A brief introduction of the above algorithm by Joe English</DD>
+  
+  <DT><a href="http://www.thaiopensource.com/trex/">TREX implementation</a></DT>
+  <DD>This implementation by James Clark employs the algorithm of Mark Hopkins.</DD>
+  
+</DL>
+</BODY>
+</HTML>

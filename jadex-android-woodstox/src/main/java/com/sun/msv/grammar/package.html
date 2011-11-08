@@ -1,0 +1,27 @@
+<HTML><BODY>
+<P>   abstract grammar model(AGM): common part. </P>
+<H2>ID/IDREF support</H2>
+<P>Support for 'ID' and 'IDREF' types are implemented in 
+this package, due to the restriction of the implementation.</P>
+<P>The implementation in this package works as follows:</P>
+<UL>
+  <LI>
+  <DIV>When verify method of IDType is called, it only checks the conformance as 
+  a NMTOKEN and uniqueness, then stores it as ID.</DIV>
+  <LI>
+  <DIV>When verify method of IDREFType is called, it only checks the conformance 
+  as a NMTOKEN and stores it as IDREF.</DIV>
+  <LI>
+  <DIV>When the entire document is parsed, ID list and IDREF list are 
+  cross-checked. IDREF without the corresponding ID is detected in this 
+  stage.</DIV></LI></UL>
+<P>This implementation implies very severe limitations. For example, consider the following TREX pattern.</P><PRE>&lt;element name="foo"&gt;<BR>  &lt;choice&gt;<BR>    &lt;attribute name="bar" type="ID" /&gt;<BR>    &lt;attribute name="bar" type="string" /&gt;<BR>  &lt;/choice&gt;<BR>  &lt;element name="child"&gt;<BR>    &lt;attribute name="id" type="ID" /&gt;<BR>  &lt;/element&gt;<BR>&lt;/element&gt;</PRE>
+<P>And the following XML fragment.</P><PRE>&lt;foo bar="xyz"&gt; &lt;child id="xyz" /&gt; &lt;/foo&gt;</PRE>
+<P>This implementation cannot validate the above fragment, because "xyz" is 
+registered as an ID when "bar" attribute is tested against "ID" type. IDREF type 
+also has similar problems.</P>
+<P>Note that RELAX prohibits these "abuse" of ID/IDREF in the way that this 
+implementation works.</P>
+       
+
+</BODY></HTML>

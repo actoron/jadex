@@ -1,0 +1,28 @@
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" Content="Microsoft Visual Studio 6.0">
+<TITLE></TITLE>
+</HEAD>
+<BODY>
+
+<P>Contains abstract model for grammar-based schema and 
+concrete verifier implementation for the abstract schema.</P>
+<P>The model of the schema consists of two interfaces:</P>
+<OL>
+  <LI>
+  <DIV> DocumentDeclaration, which corresponds to constraints over XML 
+  documents</DIV>
+  <LI>
+  <DIV>ElementDeclaration, which corresponds to&nbsp;constraints over an XML 
+  element</DIV>
+  <LI>
+  <DIV>Acceptor, which verifies XML content against the content 
+model</DIV></LI></OL>
+<P>Note that these definitions capture schema from 
+verifier's point of view. 
+検証に対して中立なスキーマのオブジェクトモデルと、検証のアルゴリズムに特化したアダプタとは別に用意するのが望ましい。These definitions are for the latter, not for the 
+former.</P>
+<P>&nbsp;</P>
+
+</BODY>
+</HTML>

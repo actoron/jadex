@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+DTD for RELAX Core (Ver 1.0)
+$Id$
+-->
+<!--
+Typical invocation
+
+<!DOCTYPE module SYSTEM 
+ PUBLIC "-//RELAX//Module RELAX Core 1.0//JA"
+ SYSTEM "http://www.xml.gr.jp/relax/core1/relaxCore.dtd" [
+-->
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--         Parameter entities for qualified names        -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+<!ENTITY % corePrefix "">
+<!ENTITY % interface "%corePrefix;interface">
+<!ENTITY % export "%corePrefix;export">
+<!ENTITY % hedgeExport "%corePrefix;hedgeExport">
+<!ENTITY % div "%corePrefix;div">
+<!ENTITY % tag "%corePrefix;tag">
+<!ENTITY % elementRule "%corePrefix;elementRule">
+<!ENTITY % module "%corePrefix;module">
+<!ENTITY % include "%corePrefix;include">
+<!ENTITY % attPool "%corePrefix;attPool">
+<!ENTITY % hedgeRule "%corePrefix;hedgeRule">
+<!ENTITY % ref "%corePrefix;ref">
+<!ENTITY % hedgeRef "%corePrefix;hedgeRef">
+<!ENTITY % choice "%corePrefix;choice">
+<!ENTITY % sequence "%corePrefix;sequence">
+<!ENTITY % element "%corePrefix;element">
+<!ENTITY % none "%corePrefix;none">
+<!ENTITY % empty "%corePrefix;empty">
+<!ENTITY % anyOtherElement "%corePrefix;anyOtherElement">
+<!ENTITY % anyOtherAttribute "%corePrefix;anyOtherAttribute">
+<!ENTITY % mixed "%corePrefix;mixed">
+<!ENTITY % attribute "%corePrefix;attribute">
+<!ENTITY % annotationCore "%corePrefix;annotation">
+<!ENTITY % annotationCoreContent "ANY">
+
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--            References to datatypes.mod                -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+<!ENTITY % datatype-definitions SYSTEM "datatypes.mod">
+%datatype-definitions;
+
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--                     annotation                        -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+<!ELEMENT %annotationCore; %annotationCoreContent;>
+
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--         The overall structure of RELAX modules.       -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+<!ELEMENT %interface; ((%annotationCore;)?, (%export; | %hedgeExport; | %div;)*)>
+
+<!ENTITY % clause "(%tag;|%attPool;)">
+
+<!ENTITY % rule "(%elementRule;|%hedgeRule;)">
+
+<!ELEMENT %module; ((%annotationCore;)?, (%interface;)?, 
+                       (%clause; | %rule; | %div; | %include; )*)>
+
+<!ATTLIST %module;
+                 moduleVersion    CDATA      #IMPLIED
+                 relaxCoreVersion CDATA      #REQUIRED
+                 targetNamespace  CDATA      #IMPLIED
+                 xmlns            CDATA      #FIXED "http://www.xml.gr.jp/xmlns/relaxCore"
+>
+        
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--                          div                          -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+<!ELEMENT %div; ((%annotationCore;)?,
+               (%div;)*,
+               (((%rule; |%clause; | %simpleType; | %include; ),
+                 (%rule; |%clause; | %simpleType; | %include; | %div;)*)
+                |
+                ((%export; | %hedgeExport;), (%export; | %hedgeExport; | %div;)*))?)>
+
+<!-- 
+
+(%rule; |%clause; | %simpleType; | %include; | %div;)* is used when a div
+appears in a module body, while (%export; | %hedgeExport; | %div;)* is used
+when it appears in an interface element.
+
+ -->
+
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--                       Interface                       -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+<!ELEMENT %export; ((%annotationCore;)?)>
+<!ATTLIST %export; label NMTOKEN #REQUIRED>
+
+<!ELEMENT %hedgeExport; ((%annotationCore;)?)>
+<!ATTLIST %hedgeExport; label NMTOKEN #REQUIRED>
+
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--                       Include                         -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+<!ELEMENT %include; ((%annotationCore;)?)>
+<!ATTLIST %include; moduleLocation CDATA #REQUIRED>
+
+
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--                    Hedge Models                       -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+<!-- The parameter entity "particle" is used to describe element hedge
+models.  It is also used as subordinates of <sequence>, <choice>,
+and <mixed>. -->
+
+<!ENTITY % particle "(%ref; | %hedgeRef; | %choice; | %sequence; | %element; 
+			  | %none; | %empty; | %anyOtherElement; )">
+
+<!ENTITY % hedgeModel 
+	"(%particle;  | %mixed;)">
+
+<!-- The parameter entity "repeatable" is used to specify the "occurs"
+ attribute, which is shared by several elements.  Permissible values
+ are either "?", "+", or "*".  -->
+
+<!ENTITY % repeatable '
+                 occurs       CDATA      #IMPLIED
+'>
+
+
+<!ELEMENT %hedgeRef; EMPTY >
+<!ATTLIST %hedgeRef; 
+                 label      NMTOKEN      #REQUIRED
+                 namespace  CDATA        #IMPLIED
+                 %repeatable;
+>
+
+<!ELEMENT %ref; EMPTY >
+<!ATTLIST %ref; 
+                 label      NMTOKEN      #IMPLIED
+                 role       NMTOKEN      #IMPLIED
+                 namespace  CDATA        #IMPLIED
+                 %repeatable;
+>
+
+<!ELEMENT %empty; EMPTY >
+
+<!ELEMENT %choice; (%particle;)* >
+<!ATTLIST %choice;
+                 %repeatable;
+>
+
+<!ELEMENT %sequence; (%particle;)* >
+<!ATTLIST %sequence;
+                 %repeatable;
+>
+
+<!ELEMENT %none; EMPTY>
+
+<!ELEMENT %mixed; (%particle;) >
+
+<!ELEMENT %element; ((%annotationCore;)?, (%facet;)*)>
+<!ATTLIST %element; 
+                 name     NMTOKEN #REQUIRED
+                 type     NMTOKEN #REQUIRED
+                 %repeatable;
+>
+
+
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--                       Rules                           -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+<!ELEMENT %elementRule; ((%annotationCore;)?, (%tag;)?,
+                        ((%hedgeModel;) | (%facet;)*))>
+
+<!ATTLIST %elementRule; 
+		role        NMTOKEN #IMPLIED
+		label       NMTOKEN #IMPLIED
+                type        NMTOKEN #IMPLIED
+>
+
+<!ELEMENT %hedgeRule;  ((%annotationCore;)?, %particle;) >
+<!ATTLIST %hedgeRule;
+                label       NMTOKEN #REQUIRED
+>
+
+
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--                        Clauses                        -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+<!ENTITY % clauseBody "((%annotationCore;)?, 
+                        (%ref; | %attribute;)*,
+                        (%anyOtherAttribute;, (%ref; | %attribute;)*)?)">
+
+<!ELEMENT %tag;  (%clauseBody;)>
+<!ATTLIST %tag;
+                 role     NMTOKEN      #IMPLIED
+                 name     NMTOKEN      #IMPLIED
+>
+
+<!ELEMENT %attPool; (%clauseBody;)>
+<!ATTLIST %attPool;
+                 role  NMTOKEN      #REQUIRED
+>
+
+<!ELEMENT %attribute; ((%annotationCore;)?, (%facet;)*) >
+<!ATTLIST %attribute;
+                 name      NMTOKEN      #REQUIRED
+                 required   (true)      #IMPLIED
+                 type      NMTOKEN      #IMPLIED
+>
+
+<!--*******************************************************-->
+<!--                                                       -->  
+<!--                     Wild Cards                        -->
+<!--                                                       -->  
+<!--*******************************************************-->
+
+<!ELEMENT %anyOtherElement; EMPTY>
+<!ATTLIST %anyOtherElement; 
+                 includedNamespace      CDATA     #IMPLIED
+                 excludedNamespace      CDATA     #IMPLIED
+                 %repeatable;
+>
+
+<!ELEMENT %anyOtherAttribute; EMPTY>
+<!ATTLIST %anyOtherAttribute;
+                 includedNamespace      CDATA     #IMPLIED
+                 excludedNamespace      CDATA     #IMPLIED
+>

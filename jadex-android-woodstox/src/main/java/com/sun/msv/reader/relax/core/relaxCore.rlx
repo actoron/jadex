@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+Module for RELAX Core (Ver 1.0)
+$Id$
+
+-->
+<module 
+  moduleVersion="1.0"
+  relaxCoreVersion="1.0"
+  targetNamespace="http://www.xml.gr.jp/xmlns/relaxCore"
+  xmlns="http://www.xml.gr.jp/xmlns/relaxCore">
+
+  <interface>
+    <export label="module"/>
+  </interface>
+
+
+  <div>
+
+    <annotation>
+      <documentation>The overall structure of RELAX modules</documentation>
+    </annotation>
+
+	<elementRule role="module">
+		<sequence>
+			<ref label="annotation" occurs="?"/>
+			<ref label="interface" occurs="?"/>
+			<choice occurs="*">
+				<hedgeRef label="clause"/>  <!-- forward references are fine -->
+				<hedgeRef label="rule"/>    <!-- forward references are fine -->
+				<ref label="divInModule"/>
+				<ref label="include"/>
+			</choice>
+		</sequence>
+	</elementRule>
+	
+	
+	<tag name="module">
+		<attribute name="moduleVersion" type="string"/>
+		<attribute name="relaxCoreVersion" type="string" required="true">
+			<enumeration value="1.0"/>
+		</attribute>
+		<attribute name="targetNamespace" type="uriReference"/>
+	</tag>
+	
+	<elementRule role="interface">
+		<sequence>
+			<ref label="annotation" occurs="?"/>
+			<choice occurs="*">
+				<ref label="export"/>
+				<ref label="divInInterface"/>
+			</choice>
+		</sequence>
+	</elementRule>
+
+    <tag name="interface"/>
+
+    <hedgeRule label="clause">
+      <choice>
+	<ref label="tag"/>
+	<ref label="attPool"/>
+      </choice>
+    </hedgeRule>
+	
+    <hedgeRule label="rule">
+      <choice>
+	<ref label="elementRule"/>
+	<ref label="hedgeRule"/>
+      </choice>
+    </hedgeRule>
+   
+    
+		<elementRule label="divInModule">
+			<annotation>
+				<documentation>div elements in modules</documentation>
+			</annotation>
+			
+			<tag name="div"/>
+			
+			<sequence>
+				<ref label="annotation" occurs="?"/>
+				<choice occurs="*">
+					<hedgeRef label="rule"/>
+					<hedgeRef label="clause"/>
+					<ref label="divInModule"/>
+					<ref label="include"/>
+				</choice>
+			</sequence>
+		</elementRule>
+	</div>
+	
+	<div>
+		<annotation>
+			<documentation>Interface</documentation>
+		</annotation>
+		
+		<elementRule role="export">
+			<ref label="annotation" occurs="?"/>
+		</elementRule>
+		
+		<tag name="export">
+			<attribute name="label" required="true" type="NCName"/>
+		</tag>
+		
+		<elementRule label="divInInterface">
+			<annotation>
+				<documentation>div elements in interfaces</documentation>
+			</annotation>
+			
+			<tag name="div"/>
+			
+			<sequence>
+				<ref label="annotation" occurs="?"/>
+				<choice occurs="*">
+					<ref label="export"/>
+					<ref label="divInInterface"/>
+				</choice>
+			</sequence>
+		</elementRule>
+	</div>
+  
+  <div>
+    <annotation>
+      <documentation>Include</documentation>
+    </annotation>
+
+    <elementRule role="include">
+      <ref label="annotation" occurs="?"/>
+    </elementRule>
+    
+    <tag name="include">
+      <attribute name="moduleLocation" type="uriReference" required="true"/>
+    </tag>
+  </div>
+  
+  <div>
+    <annotation>
+      <documentation>Hedge Models</documentation>
+    </annotation>
+
+    <hedgeRule label="particle">
+      <annotation>
+	<documentation>This is used to describe element hedge models.
+	It is also used as subordinates of sequence,
+	choice, and mixed.
+	</documentation>
+      </annotation>
+      <choice>
+	<ref label="refWithLabel"/>
+	<ref label="hedgeRef"/>
+	<ref label="choice"/>
+	<ref label="sequence"/>
+	<ref label="element"/>
+	<ref label="none"/>
+	<ref label="empty"/>
+      </choice>
+    </hedgeRule>
+    
+    <hedgeRule label="hedgeModel">
+      <choice>
+	<hedgeRef label="particle"/>
+	<ref label="mixed"/>
+      </choice>
+    </hedgeRule>
+    
+    <attPool role="repeatable">
+      <annotation>
+	<documentation>This is used to specify the "occurs" attribute,
+	which is shared by several elements.</documentation>
+      </annotation>
+      <attribute name="occurs" type="string">
+	<enumeration value="?"/>
+	<enumeration value="*"/>
+	<enumeration value="+"/>
+      </attribute>
+    </attPool>
+    
+    <elementRule role="hedgeRef" type="emptyString"/>
+    
+    <tag name="hedgeRef">
+      <ref role="repeatable"/>
+      <attribute name="label" required="true" type="NCName"/>
+    </tag>
+    
+    <elementRule label="refWithLabel" type="emptyString">
+      <annotation>
+	<documentation>ref elements with the label attribute</documentation>
+      </annotation>
+      <tag name="ref">
+	<ref role="repeatable"/>
+	<attribute name="label" required="true" type="NCName"/>
+	<attribute name="role" type="none"/>
+      </tag>
+    </elementRule>
+    
+    <elementRule role="empty" type="emptyString"/>
+
+    <tag name="empty"/>
+    
+    <elementRule role="choice">
+      <hedgeRef label="particle" occurs="*"/>
+    </elementRule>
+    
+    <tag name="choice">
+      <ref role="repeatable"/>
+    </tag>
+    
+    <elementRule role="sequence">
+      <hedgeRef label="particle" occurs="*"/>
+    </elementRule>
+    
+    <tag name="sequence">
+      <ref role="repeatable"/>
+    </tag>
+    
+    <elementRule role="none" type="emptyString"/>
+
+    <tag name="none"/>
+    
+    <elementRule role="mixed">
+      <hedgeRef label="particle"/>
+    </elementRule>
+
+    <tag name="mixed"/>
+  
+    <elementRule label="element">
+      <annotation>
+	<documentation>with the type attribute</documentation>
+      </annotation>
+      <tag name="element">
+	<ref role="repeatable"/>
+	<attribute name="name" required="true" type="NCName"/>
+	<attribute name="type" required="true" type="NCName"/>
+      </tag>
+      <sequence>
+	<ref label="annotation" occurs="?"/>
+	<hedgeRef label="facet"  occurs="*"/>
+      </sequence>
+    </elementRule>
+  </div>
+  
+  <div>
+    
+    <annotation>
+      <documentation>Rules</documentation>
+    </annotation>
+    
+    <elementRule label="elementRule">
+      <annotation>
+	<documentation>without an embedded tag element</documentation>
+	<documentation>with the type attribute</documentation>
+      </annotation>
+      <tag name="elementRule">
+	<attribute name="role" required="true" type="NCName"/>
+	<attribute name="label" type="NCName"/>
+	<attribute name="type" type="NCName" required="true"/>
+      </tag>
+      <sequence>
+        <ref label="annotation" occurs="?"/>
+        <hedgeRef label="facet" occurs="*"/>
+      </sequence>
+    </elementRule>
+    
+    <elementRule label="elementRule">
+      <annotation>
+	<documentation>with an embedded tag element</documentation>
+	<documentation>with the type attribute</documentation>
+      </annotation>
+      <tag name="elementRule">
+	<attribute name="role" type="none"/>
+	<attribute name="label" required="true" type="NCName"/>
+	<attribute name="type" type="NCName" required="true"/>
+      </tag>
+      <sequence>
+	<ref label="annotation" occurs="?"/>
+	<ref label="tagInRule"/>
+	<hedgeRef label="facet" occurs="*"/>
+      </sequence>
+    </elementRule>
+    
+    <elementRule label="elementRule">
+      <annotation>
+	<documentation>without an embedded tag element</documentation>
+	<documentation>with a hedge model</documentation>
+      </annotation>
+      <tag name="elementRule">
+	<attribute name="role" required="true" type="NCName"/>
+	<attribute name="label" type="NCName"/>
+	<attribute name="type" type="none"/>
+      </tag>
+      <sequence>
+	<ref label="annotation" occurs="?"/>
+	<hedgeRef label="hedgeModel"/>
+      </sequence>
+    </elementRule>
+    
+    <elementRule label="elementRule">
+      <annotation>
+	<documentation>with an embedded tag element</documentation>
+	<documentation>with a hedge model</documentation>
+      </annotation>
+      <tag name="elementRule">
+	<attribute name="role" type="none"/>
+	<attribute name="label" required="true" type="NCName"/>
+	<attribute name="type" type="none"/>
+      </tag>
+      <sequence>
+	<ref label="annotation" occurs="?"/>
+	<ref label="tagInRule"/>
+	<hedgeRef label="hedgeModel"/>
+      </sequence>
+    </elementRule>
+    
+    <elementRule role="hedgeRule">
+      <sequence>
+	<ref label="annotation" occurs="?"/>
+	<hedgeRef label="hedgeModel"/>
+      </sequence>
+    </elementRule>
+    
+    <tag name="hedgeRule">
+      <attribute name="label" required="true" type="NCName"/>
+    </tag>
+    
+  </div>
+  
+  <div>
+    
+    <annotation>
+      <documentation>Clauses</documentation>
+    </annotation>
+    
+    <hedgeRule label="clauseBody">
+      <sequence>
+	<ref label="annotation" occurs="?"/>
+	<ref label="refWithRole" occurs="*"/>
+	<ref label="attribute" occurs="*"/>
+      </sequence>
+    </hedgeRule>
+    
+    <elementRule role="tag">
+      <hedgeRef label="clauseBody"/>
+    </elementRule>
+    
+    <tag name="tag">
+      <attribute name="role" type="NCName"/>
+      <attribute name="name" required="true" type="NCName"/>
+    </tag>
+    
+    <elementRule label="tagInRule">
+      <annotation>
+	<documentation>tag elements embedded in	elementRules</documentation>
+      </annotation>
+      <tag name="tag">
+	<attribute name="role" type="none"/>
+	<attribute name="name" type="NCName"/>
+      </tag>
+      <hedgeRef label="clauseBody"/>
+    </elementRule>
+    
+    <elementRule role="attPool">
+      <hedgeRef label="clauseBody"/>
+    </elementRule>
+    
+    <tag name="attPool">
+      <attribute name="role" required="true" type="NCName"/>
+    </tag>
+    
+    <elementRule label="refWithRole" type="emptyString">
+      <annotation>
+	<documentation>ref elements with the role attribute</documentation>
+      </annotation>
+      <tag name="ref">
+	<attribute name="role" required="true" type="NCName"/>
+	<attribute name="label" type="none"/>
+      </tag>
+    </elementRule>
+    
+    <elementRule role="attribute">
+      <sequence>
+	<ref label="annotation" occurs="?"/>
+	<hedgeRef label="facet" occurs="*"/>
+      </sequence>
+    </elementRule>
+    
+    <tag name="attribute">
+      <attribute name="name" required="true" type="NMTOKEN">
+	<annotation>
+	  <documentation>Since RELAX Core is concerned with a single
+	  namespace, NCName might be more appropriate.  However,
+	  xml:space and xml:lang are so common that RELAX Core should
+	  allow them.
+	  </documentation>
+	</annotation>
+      </attribute>
+      <attribute name="type" type="NCName"/>
+      <attribute name="required" type="NMTOKEN">
+	<enumeration value="true"/>
+      </attribute>
+    </tag>
+    
+  </div>
+
+
+
+<!-- datatypes -->
+  <hedgeRule label="minBound">
+    <choice>
+      <ref label="minInclusive"/>
+      <ref label="minExclusive"/>
+    </choice>
+  </hedgeRule>
+
+  <hedgeRule label="maxBound">
+    <choice>
+      <ref label="maxInclusive"/>
+      <ref label="maxExclusive"/>
+    </choice>
+  </hedgeRule>
+
+  <hedgeRule label="bounds">
+    <choice>
+      <hedgeRef label="minBound"/>
+      <hedgeRef label="maxBound"/>
+    </choice>
+  </hedgeRule>
+
+  <hedgeRule label="numeric">
+    <choice>
+      <ref label="precision"/>
+      <ref label="scale"/>
+    </choice>
+  </hedgeRule>
+
+  <hedgeRule label="ordered">
+    <choice>
+      <hedgeRef label="bounds"/>
+      <hedgeRef label="numeric"/>
+    </choice>
+  </hedgeRule>
+
+  <hedgeRule label="unordered">
+    <choice>
+      <ref label="pattern"/>
+      <ref label="enumeration"/>
+      <ref label="length"/>
+      <ref label="maxLength"/>
+      <ref label="minLength"/>
+      <ref label="encoding"/>
+      <ref label="period"/>
+      <ref label="duration"/>
+    </choice>
+  </hedgeRule>
+
+  <hedgeRule label="facet">
+    <choice>
+      <hedgeRef label="ordered"/>
+      <hedgeRef label="unordered"/>
+    </choice>
+  </hedgeRule>
+
+  <hedgeRule label="facetModel">
+    <ref label="annotation" occurs="?"/>
+  </hedgeRule>
+
+  <attPool role="facetAttrs">
+    <attribute name="value" required="true"/>
+  </attPool>
+
+<!-- 
+RELAX Core published as JIS TR in 2000/5 does not have user-defined 
+types.  But this may change in the future.  Comments?
+
+  <elementRule role="simpleType">
+    <sequence>
+      <ref label="annotation" occurs="?"/>
+      <hedgeRef label="facet" occurs="*"/>
+    </sequence>
+  </elementRule>
+
+  <tag name="simpleType">
+    <attribute name="name" type="NMTOKEN"/>
+    <attribute name="base" required="true" type="string"/>
+  </tag>
+-->
+
+  <elementRule role="maxExclusive">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="maxExclusive">
+    <ref role="facetAttrs"/>
+  </tag>
+
+  <elementRule role="minExclusive">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="minExclusive">
+    <ref role="facetAttrs"/>
+  </tag>
+
+  <elementRule role="maxInclusive">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="maxInclusive">
+    <ref role="facetAttrs"/>
+  </tag>
+
+  <elementRule role="minInclusive">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="minInclusive">
+    <ref role="facetAttrs"/>
+  </tag>
+
+  <elementRule role="precision">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="precision">
+    <attribute name="value" required="true" type="positiveInteger"/>
+  </tag>
+
+  <elementRule role="scale">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="scale">
+    <attribute name="value" required="true" type="nonNegativeInteger"/>
+  </tag>
+
+  <elementRule role="length">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="length">
+    <attribute name="value" required="true" type="nonNegativeInteger"/>
+  </tag>
+
+  <elementRule role="minLength">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="minLength">
+    <attribute name="value" required="true" type="nonNegativeInteger"/>
+  </tag>
+
+  <elementRule role="maxLength">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="maxLength">
+    <attribute name="value" required="true" type="nonNegativeInteger"/>
+  </tag>
+
+  <elementRule role="enumeration">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="enumeration">
+    <ref role="facetAttrs"/>
+  </tag>
+
+  <elementRule role="pattern">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="pattern">
+    <ref role="facetAttrs"/>
+  </tag>
+
+  <elementRule role="encoding">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="encoding">
+    <attribute name="value" required="true" type="NMTOKEN">
+      <enumeration value="hex">
+	<annotation>
+	  <documentation>each (8-bit) byte is encoded as a sequence
+              of 2 hexidecimal digits</documentation>
+	</annotation>
+      </enumeration>
+      <enumeration value="base64">
+	<annotation>
+	  <documentation>value is encoded in Base64 as defined in the MIME RFC</documentation>
+	</annotation>
+      </enumeration>
+    </attribute>
+  </tag>
+
+  <elementRule role="period">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="period">
+    <attribute name="value" required="true" type="timeDuration"/>
+  </tag>
+
+  <elementRule role="duration">
+    <hedgeRef label="facetModel"/>
+  </elementRule>
+
+  <tag name="duration">
+    <ref role="facetAttrs"/>
+  </tag>
+
+  <elementRule role="annotation">
+    <choice occurs="*">
+      <ref label="appinfo"/>
+      <ref label="documentation"/>
+    </choice>
+  </elementRule>
+
+  <tag name="annotation"/>
+
+  <elementRule role="appinfo">
+    <mixed><empty/></mixed>
+  </elementRule>
+
+  <tag name="appinfo">
+    <attribute name="source" type="string"/>
+  </tag>
+
+  <elementRule role="documentation">
+    <mixed><empty/></mixed>
+  </elementRule>
+
+  <tag name="documentation">
+    <attribute name="source" type="string"/>
+    <attribute name="xml:lang" type="string"/>
+  </tag>
+
+</module>
+

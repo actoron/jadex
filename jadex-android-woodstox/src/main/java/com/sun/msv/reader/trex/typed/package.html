@@ -1,0 +1,12 @@
+<HTML><BODY>
+<P>    reads TREX grammar with "label 
+annotation".</P>
+<P>"label annotation" is a proprietary extension to TREX by MSV.</P>
+<H1>How it works</H1>
+<P>With this extension, &lt;element&gt; pattern in TREX pattern can have "label" 
+attribute in http://www.sun.com/xml/msv/trex-type 
+namespace.</P><PRE>&lt;grammar xmlns:ext="http://www.sun.com/xml/msv/trex-type"&gt;<BR>  &lt;start&gt;<BR>    &lt;element name="root" ext:label="root"&gt;<BR>      &lt;choice&gt;<BR>        &lt;element name="child1"&gt;&lt;empty /&gt;&lt;/element&gt;<BR>        &lt;element name="child2" ext:label="foo"&gt;&lt;empty /&gt;&lt;/element&gt;<BR>      &lt;/choice&gt;<BR>    &lt;/element&gt;<BR>  &lt;/start&gt;<BR>&lt;/grammar&gt;</PRE>
+<P>Once&nbsp;label is specified to &lt;element&gt; pattern,&nbsp;application can 
+call Verifier.getCurrentElementType method to obtain a&nbsp;reference 
+to&nbsp;TypedElementPattern object, which has label field.</P><PRE>void startElement( ... ) {<BR>  Object o = verifier.getCurrentElementType();<BR>  if(!( o instanceof TypedElementPattern ))<BR>    ... // the current element does not have 'label' attribute.<BR>  else {<BR>    String labelOfTheCurrentElement = ((TypedElementPattern)o).label;<BR>    ... // do whatever useful<BR>  }<BR>}</PRE>
+</BODY></HTML>

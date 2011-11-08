@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="shift_jis"?>
+<!--
+Grammar for the combination of RELAX Core  (Ver 1.0)+ RELAX Namesapce (Ver 1.0)
+$Id: relax.rxg,v 1.1 2001/08/02 18:29:49 kkawa Exp $
+-->
+
+<!DOCTYPE grammar SYSTEM "relax.dtd">
+<grammar
+   xmlns="http://www.xml.gr.jp/xmlns/relaxNamespace"
+   xmlns:rc="http://www.xml.gr.jp/xmlns/relaxCore"
+   relaxNamespaceVersion="1.0">
+
+  <topLevel>
+    <rc:ref label="grammar" namespace="http://www.xml.gr.jp/xmlns/relaxNamespace"/>
+  </topLevel>
+
+  <namespace name="http://www.xml.gr.jp/xmlns/relaxCore">
+    <rc:module
+	relaxCoreVersion="1.0">
+      <rc:include moduleLocation="relaxCore.rxm"/>
+
+<!--
+      <rc:hedgeRule label="...">
+        ....
+      </rc:hedgeRule>
+-->
+
+    </rc:module>
+  </namespace>
+
+<!--
+The above module element can be replaced with the following.
+
+  <namespace
+      name="http://www.xml.gr.jp/xmlns/relaxCore" 
+      moduleLocation=""relaxCore.rxm"
+      language="http://www.xml.gr.jp/xmlns/relaxCore"/>
+-->
+
+  <namespace 
+      name="http://www.xml.gr.jp/xmlns/relaxNamespace">
+    <rc:module
+	relaxCoreVersion="1.0">
+
+      <rc:include moduleLocation="relaxNamespace.rxm"/>
+
+<!--
+      <rc:hedgeRule label="...">
+        ....
+      </rc:hedgeRule>
+-->
+
+      <rc:hedgeRule label="namespaceContentWithoutLocation">
+        <rc:ref label="module"
+           namespace="http://www.xml.gr.jp/xmlns/relaxCore"/>
+      </rc:hedgeRule>
+
+      <rc:hedgeRule label="topLevelContent">
+        <rc:choice>
+          <rc:ref  label="refWithLabel"
+                namespace="http://www.xml.gr.jp/xmlns/relaxCore"/>
+          <rc:ref  label="hedgeRef"
+                namespace="http://www.xml.gr.jp/xmlns/relaxCore"/>
+        </rc:choice>
+      </rc:hedgeRule>
+    </rc:module>
+  </namespace>
+
+</grammar>

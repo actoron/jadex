@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<!--
+Module for RELAX Namespace (Ver 1.0)
+$Id: relaxNamespace.rxm,v 1.1 2001/08/02 18:29:49 kkawa Exp $
+-->
+<!DOCTYPE module
+       PUBLIC "-//RELAX//RELAX Core Version 1.0//JA"
+       "relaxCore.dtd"
+>
+
+<module 
+  moduleVersion="1.0"
+  relaxCoreVersion="1.0"
+  targetNamespace="http://www.xml.gr.jp/xmlns/relaxNamespace"
+  xmlns="http://www.xml.gr.jp/xmlns/relaxCore">
+
+  <interface>
+    <export label="grammar"/>
+  </interface>
+
+  <hedgeRule label="annotationInGrammar">
+    <empty/>
+  </hedgeRule>
+
+  <elementRule role="grammar">
+    <sequence>
+      <hedgeRef label="annotationInGrammar"/>
+      <choice occurs="*">
+        <ref label="namespace"/>
+        <ref label="include"/>
+      </choice>
+      <ref label="topLevel" occurs="?"/>
+        <choice occurs="*">
+          <ref label="namespace"/>
+          <ref label="include"/>
+        </choice>
+      </sequence>
+    </elementRule>
+    
+    <tag name="grammar">
+      <attribute name="relaxNamespaceVersion" type="string" required="true">
+        <enumeration value="1.0"/>
+      </attribute>
+      <attribute name="grammarVersion" type="string"/>
+    </tag>
+    
+    <hedgeRule label="namespaceContentWithLocation">
+      <empty/>
+    </hedgeRule>
+
+    <elementRule role="namespaceWithLocation" label="namespace">
+      <hedgeRef label="namespaceContentWithLocation"/>
+    </elementRule>
+
+    <tag name="namespace" role="namespaceWithLocation">
+      <attribute name="name" required="true" type="uriReference"/>
+      <attribute name="language" type="uriReference"/>
+      <attribute name="moduleLocation" required="true" type="uriReference"/>
+      <attribute name="validation">
+        <enumeration value="false"/>
+      </attribute>
+    </tag>
+
+    <hedgeRule label="namespaceContentWithoutLocation">
+      <none/>
+    </hedgeRule>
+
+    <elementRule role="namespaceWithoutLocation" label="namespace">
+      <hedgeRef label="namespaceContentWithoutLocation"/>
+    </elementRule>
+
+    <tag name="namespace" role="namespaceWithoutLocation">
+      <attribute name="name" required="true" type="uriReference"/>
+      <attribute name="language" type="none"/>
+      <attribute name="moduleLocation" type="none"/>
+      <attribute name="validation">
+        <enumeration value="false"/>
+      </attribute>
+    </tag>
+
+    <hedgeRule label="includeContent">
+      <empty/>
+    </hedgeRule>
+
+    <elementRule role="include">
+      <hedgeRef label="includeContent"/>
+    </elementRule>
+    
+    <tag name="include">
+      <attribute name="grammarLocation" type="uriReference" required="true"/>
+    </tag>
+
+    <hedgeRule label="topLevelContent">
+      <none/>
+    </hedgeRule>
+
+    <elementRule role="topLevel">
+      <hedgeRef label="topLevelContent"/>
+    </elementRule>
+    
+    <tag name="topLevel"/>
+
+</module>
+
