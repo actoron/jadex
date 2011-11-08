@@ -38,7 +38,10 @@ public class DsdvPacketRouterTest extends PacketRouterTest {
 	
 	@Override
 	protected IPacketRouter getPacketRouter(String ownAddress) {
-		return new DsdvRouter(ownAddress);
+		DsdvRouter dsdvRouter = new DsdvRouter();
+		dsdvRouter.setOwnAddress(ownAddress);
+		dsdvRouter.start();
+		return dsdvRouter;
 	}
 
 	@Override

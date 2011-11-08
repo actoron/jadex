@@ -49,7 +49,6 @@ public class ChatActivity extends BaseActivity {
 
 		arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
 		
-		
 		chatListView.setStackFromBottom(true);
 		chatListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 		chatListView.setDividerHeight(0);		
@@ -79,12 +78,9 @@ public class ChatActivity extends BaseActivity {
 											e.printStackTrace();
 										}
 									}
-
 									Log.i(Helper.LOG_TAG, "Chatservice set!");
-
 									setUiListeners();
 								}
-
 							});
 		}
 	};
@@ -140,7 +136,7 @@ public class ChatActivity extends BaseActivity {
 			if (v == sendButton) {
 				String text = editText.getText().toString();
 				if (text != null && text != "") {
-					tell("myName", text);
+					tell(chatAgent.getComponentIdentifier().getName(), text);
 				}
 				editText.setText("");
 			}

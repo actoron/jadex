@@ -29,6 +29,8 @@ public interface IPacketRouter {
 	String getOwnAddress();
 	
 	void setOwnAddress(String address);
+	
+	void start();
 
 	/**
 	 * 

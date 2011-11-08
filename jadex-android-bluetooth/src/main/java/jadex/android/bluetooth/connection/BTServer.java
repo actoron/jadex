@@ -163,7 +163,6 @@ public class BTServer {
 						Log.d(Helper.LOG_TAG, "Incoming Connection accepted.");
 						ServerConnection connection = new ServerConnection(adapter, socket);
 						connectedThreads.add(connection);
-						estListener.connectionEstablished(connection);
 						connection.addConnectionListener(new IConnectionListener() {
 							
 							@Override
@@ -183,6 +182,7 @@ public class BTServer {
 							}
 						});
 						connection.connect();
+						estListener.connectionEstablished(connection);
 					}
 					
 					try {

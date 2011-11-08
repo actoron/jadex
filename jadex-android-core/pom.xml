@@ -21,7 +21,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-stax</artifactId>
+			<artifactId>jadex-android-woodstox</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

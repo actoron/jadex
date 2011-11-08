@@ -118,7 +118,11 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		});
 
 //		packetRouter = new FloodingPacketRouter(ownAdress);
-		packetRouter = new DsdvRouter(ownAdress);
+		packetRouter = new FloodingPacketRouter();
+		if (ownAdress != null) {
+			packetRouter.setOwnAddress(ownAdress);
+			packetRouter.start();
+		}
 		packetRouter.setPacketSender(connections);
 		packetRouter
 				.addReachableDevicesChangeListener(new IPacketRouter.ReachableDevicesChangeListener() {
@@ -574,6 +578,8 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		switch (newState) {
 		case on:
 			ownAdress = btAdapter.getAddress();
+			packetRouter.setOwnAddress(ownAdress);
+			packetRouter.start();
 			break;
 		case discovery_started:
 			Log.d(Helper.LOG_TAG, "Discovery started");

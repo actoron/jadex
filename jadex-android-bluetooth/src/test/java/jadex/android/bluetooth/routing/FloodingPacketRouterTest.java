@@ -14,7 +14,10 @@ public class FloodingPacketRouterTest extends PacketRouterTest {
 
 	@Override
 	protected IPacketRouter getPacketRouter(String ownAddress) {
-		return new FloodingPacketRouter(ownAddress);
+		FloodingPacketRouter floodingPacketRouter = new FloodingPacketRouter();
+		floodingPacketRouter.setOwnAddress(ownAddress);
+		floodingPacketRouter.start();
+		return floodingPacketRouter;
 	}
 
 	@Override

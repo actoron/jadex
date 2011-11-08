@@ -52,15 +52,17 @@ public class DsdvRouter implements IPacketRouter {
 
 	/**
 	 * Class constructor
-	 * 
-	 * @param appMsgListener
-	 *            handles messages
-	 * @param bednetService
-	 *            used to read of the status of the initialization
 	 */
-	public DsdvRouter(String ownAddress) {
+	public DsdvRouter() {
 		// create & initialize the route manager
-		setOwnAddress(ownAddress);
+		
+	}
+	
+	/**
+	 * starts the Router.
+	 * Needs ownAddress set before starting.
+	 */
+	public void start() {
 		initRoutingTable();
 		broadcaster = new BroadcastMinder(this, routeTable);
 		periodicBroadcaster = new PeriodicBroadcastMinder(this, routeTable);

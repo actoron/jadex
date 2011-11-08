@@ -34,7 +34,7 @@ public final class R {
         public static final int logexitButton=0x7f05000a;
         public static final int main_exitButton=0x7f050011;
         public static final int main_startPlatformButton=0x7f050010;
-        public static final int relLayout=0x7f050005;
+        public static final int scrollView=0x7f050005;
     }
     public static final class layout {
         public static final int agent_activity=0x7f030000;

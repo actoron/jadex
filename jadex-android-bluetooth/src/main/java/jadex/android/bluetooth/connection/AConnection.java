@@ -226,8 +226,8 @@ public abstract class AConnection implements IConnection {
 				continue;
 			}
 			bytes = inputStream.read(buffer);
-			Log.d(Helper.LOG_TAG,
-					"(Connection) received a stream chunk of size: " + bytes);
+//			Log.d(Helper.LOG_TAG,
+//					"(Connection) received a stream chunk of size: " + bytes);
 			short totalSize;
 
 			int byteIndexInPacket;
@@ -279,9 +279,9 @@ public abstract class AConnection implements IConnection {
 				if (lastPacketBytesRead >= totalSize) {
 					// read one packet successfully
 					dataPacket = new DataPacket(lastReceivedPacket);
-					Log.d(Helper.LOG_TAG,
-							"(Connection) received a DataPacket of Size: "
-									+ totalSize);
+//					Log.d(Helper.LOG_TAG,
+//							"(Connection) received a DataPacket of Size: "
+//									+ totalSize);
 					receivedPackets.add(dataPacket);
 					if (bytes > missingBytes) {
 						// received more than one packet.

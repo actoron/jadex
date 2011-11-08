@@ -31,8 +31,7 @@ public class FloodingPacketRouter implements IPacketRouter {
 	private String ownAddress;
 	private Set<ReachableDevicesChangeListener> listeners;
 
-	public FloodingPacketRouter(String ownAddress) {
-		this.ownAddress = ownAddress;
+	public FloodingPacketRouter() {
 		connectedDevices = new HashSet<String>();
 		reachableDevices = new HashSet<String>();
 		listeners = new HashSet<IPacketRouter.ReachableDevicesChangeListener>();
@@ -214,6 +213,10 @@ public class FloodingPacketRouter implements IPacketRouter {
 	@Override
 	public void setOwnAddress(String address) {
 		ownAddress = address;
+	}
+
+	@Override
+	public void start() {
 	}
 
 }
