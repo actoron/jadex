@@ -1,6 +1,7 @@
 package jadex.base.gui.modeltree;
 
 import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.asynctree.AsyncTreeCellRenderer;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.DefaultNodeFactory;
 import jadex.base.gui.filetree.DefaultNodeHandler;
@@ -27,6 +28,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PopupBuilder;
+import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
 import java.net.URL;
@@ -37,13 +39,23 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
 
 /**
  *  Tree for component models.
  */
 public class ModelTreePanel extends FileTreePanel
 {
+	//-------- constants --------
+
+	/** The image icons. */
+	protected static final UIDefaults icons = new UIDefaults(new Object[]
+	{
+		"gid", SGUI.makeIcon(ModelTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png")
+	});
+	
 	protected static int LISTENER_COUNTER = 0;
 	
 	//-------- attributes --------
@@ -104,9 +116,44 @@ public class ModelTreePanel extends FileTreePanel
 			actions.get(AddRemotePathAction.getName()), mic}));
 		setMenuItemConstructor(mic);
 		setIconCache(ic);
-		DefaultNodeHandler dnh = new DefaultNodeHandler(getTree());
+		DefaultNodeHandler dnh = new DefaultNodeHandler(getTree())
+		{
+			public Icon getOverlay(ITreeNode node)
+			{
+				Icon	overlay	= null;
+				if(getModel().getRoot().equals(node.getParent()) && node instanceof IFileNode)
+				{
+					URL	url	= SUtil.toURL(((IFileNode)node).getFilePath());
+					IResourceIdentifier	rid	= rootentries.get(url);
+					if(rid!=null && rid.getGlobalIdentifier()!=null)
+					{
+						overlay	= ModelTreePanel.this.icons.getIcon("gid");
+					}
+				}
+				return overlay;
+			}
+		};
 		dnh.addAction(new RemovePathAction(this), null);
 		addNodeHandler(dnh);
+		
+		tree.setCellRenderer(new AsyncTreeCellRenderer()
+		{
+			protected String getLabel(ITreeNode node)
+			{
+				String	ret	= null;
+				if(getModel().getRoot().equals(node.getParent()) && node instanceof IFileNode)
+				{
+					URL	url	= SUtil.toURL(((IFileNode)node).getFilePath());
+					IResourceIdentifier	rid	= rootentries.get(url);
+					ret	= rid!=null && rid.getGlobalIdentifier()!=null
+						? rid.getGlobalIdentifier().toString() : null;
+					if(ret!=null && ret.indexOf(':')!=-1)
+						ret	= ret.substring(ret.indexOf(':')+1);
+				}
+				
+				return ret!=null ? ret : node.toString();
+			}
+		});
 		
 		final String lid = exta.getServiceProvider().getId().toString() + localexta.getServiceProvider().getId().toString() + "_" + LISTENER_COUNTER++;
 		SServiceProvider.getService(exta.getServiceProvider(), IMultiKernelNotifierService.class, RequiredServiceInfo.SCOPE_PLATFORM)

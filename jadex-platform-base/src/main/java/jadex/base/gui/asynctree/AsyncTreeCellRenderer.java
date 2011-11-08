@@ -89,7 +89,7 @@ public class AsyncTreeCellRenderer extends DefaultTreeCellRenderer
 		}
 		
 		JComponent comp = (JComponent)super.getTreeCellRendererComponent(tree,
-			value, selected, expanded, leaf, row, hasFocus);
+			getLabel(node), selected, expanded, leaf, row, hasFocus);
 
 		return comp;
 	}
@@ -106,5 +106,14 @@ public class AsyncTreeCellRenderer extends DefaultTreeCellRenderer
 			g.fillRect(0, 0, getWidth(), getHeight());
 		}
 		super.paint(g);
+	}
+	
+	/**
+	 *  Get the label for a node.
+	 *  May be overridden by sub classes.
+	 */
+	protected String	getLabel(ITreeNode node)
+	{
+		return node.toString();
 	}
 }
