@@ -136,8 +136,7 @@ public class RemoteReferenceModule
 	 *  Get a remote reference for a component for transport. 
 	 *  (Called during marshalling from writer).
 	 */
-	public ProxyReference getProxyReference(Object target, Class[] remoteinterfaces, 
-		IComponentIdentifier tmpholder, final ClassLoader cl)
+	public ProxyReference getProxyReference(Object target, IComponentIdentifier tmpholder, final ClassLoader cl)
 	{
 		checkThread();
 		
@@ -159,6 +158,11 @@ public class RemoteReferenceModule
 		// via synchronized block and rechecking if proxy was already created.
 		// -> not necessary due to only single threaded access via agent thread
 		
+		Class[] remoteinterfaces = marshalservice.getRemoteInterfaces(target);
+		
+		if(remoteinterfaces.length==0)
+			throw new RuntimeException("Proxyable object has no remote interfaces: "+target);
+
 		Object tcid = target instanceof IExternalAccess? (Object)((IExternalAccess)target).getModel().getFullName(): target.getClass();
 		ProxyInfo pi = (ProxyInfo)proxyinfos.get(tcid);
 		if(pi==null)

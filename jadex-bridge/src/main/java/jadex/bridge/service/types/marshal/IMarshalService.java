@@ -29,13 +29,19 @@ public interface IMarshalService
 	 *  Register a class with reference values for local and remote.
 	 */
 	@Excluded
-	public void setReferenceProperties(Class clazz, boolean localref, boolean remoteref);
+	public void setReferenceProperties(Class<?> clazz, boolean localref, boolean remoteref);
 	
 	/**
 	 *  Test if an object is a remote object.
 	 */
 	@Excluded
 	public boolean isRemoteObject(Object object);
+	
+	/**
+	 *  Get the proxy interfaces (empty list if none).
+	 */
+	@Excluded
+	public Class<?>[] getRemoteInterfaces(Object object);
 	
 	//-------- local clone processors --------
 	

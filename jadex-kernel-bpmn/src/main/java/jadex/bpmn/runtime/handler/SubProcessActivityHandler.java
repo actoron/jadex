@@ -11,7 +11,6 @@ import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IValueFetcher;
@@ -151,8 +150,8 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 
 			thread.setWaiting(true);
 			
-			IFuture<IComponentManagementService> cmsfut	= SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-			cmsfut.addResultListener(instance.createResultListener(new DefaultResultListener<IComponentManagementService>()
+			instance.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new DefaultResultListener<IComponentManagementService>()
 			{
 				public void resultAvailable(IComponentManagementService cms)
 				{
@@ -163,7 +162,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 					
 					IFuture<IComponentIdentifier> ret = cms.createComponent(null, file,
 						new CreationInfo(null, args, parent, false, instance.getModelElement().getModelInfo().getAllImports()), 
-						new IRemoteResultListener<Map<String, Object>>()
+						new IResultListener<Map<String, Object>>()
 					{
 						public void resultAvailable(final Map<String, Object> results)
 						{
@@ -249,7 +248,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 					
 					ret.addResultListener(lis);
 				}
-			}));
+			});
 		}
 		
 		// Empty subprocess.

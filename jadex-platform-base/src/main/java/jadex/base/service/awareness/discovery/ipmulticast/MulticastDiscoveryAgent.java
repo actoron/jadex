@@ -176,7 +176,7 @@ public class MulticastDiscoveryAgent extends DiscoveryAgent
 				catch(Exception e)
 				{
 					socket	= null;
-					getMicroAgent().getLogger().warning("Awareness error when joining mutlicast group: "+e);
+					getMicroAgent().getLogger().warning("Awareness error when joining multicast group: "+e);
 					throw new RuntimeException(e);
 				}
 			}

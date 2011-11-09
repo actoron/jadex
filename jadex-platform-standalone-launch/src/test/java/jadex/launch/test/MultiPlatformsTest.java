@@ -40,13 +40,13 @@ public class MultiPlatformsTest extends TestCase
 			platforms[i]	= futures.get(i).get(sus, timeout);
 		}
 		
-//		try
-//		{
-//			Thread.sleep(3000000);
-//		}
-//		catch(InterruptedException e)
-//		{
-//		}
+		try
+		{
+			Thread.sleep(3000000);
+		}
+		catch(InterruptedException e)
+		{
+		}
 		
 		for(int i=0; i<number; i++)
 		{

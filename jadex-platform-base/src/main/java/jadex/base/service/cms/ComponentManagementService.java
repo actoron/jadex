@@ -301,25 +301,13 @@ public abstract class ComponentManagementService extends BasicService implements
 			final CreationInfo cinfo = new CreationInfo(info);	// Dummy default info, if null. Must be cloned as localtype is set on info later.
 			
 			if(cinfo.getParent()!=null && isRemoteComponent(cinfo.getParent()))
-			{
-				final IResultListener<Map<String, Object>>	rkilllis;
-				if(killlistener!=null && !marshalservice.isRemoteReference(killlistener))//(killlistener instanceof IRemotable))
-				{
-					Future<Map<String, Object>>	kill	= new Future<Map<String, Object>>();
-					rkilllis	= new RemoteDelegationResultListener<Map<String, Object>>(kill);
-					kill.addResultListener(killlistener);
-				}
-				else
-				{
-					rkilllis	= killlistener;
-				}
-				
+			{				
 				getRemoteCMS(cinfo.getParent()).addResultListener(
 					new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(inited)
 				{
 					public void customResultAvailable(IComponentManagementService rcms)
 					{
-						rcms.createComponent(name, modelname, cinfo, rkilllis).addResultListener(new DelegationResultListener<IComponentIdentifier>(inited));
+						rcms.createComponent(name, modelname, cinfo, killlistener).addResultListener(new DelegationResultListener<IComponentIdentifier>(inited));
 					}
 				});
 			}

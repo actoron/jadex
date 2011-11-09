@@ -4,6 +4,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
@@ -15,6 +16,8 @@ import jadex.commons.IChangeListener;
 import jadex.commons.ICloneProcessor;
 import jadex.commons.IRemotable;
 import jadex.commons.IRemoteChangeListener;
+import jadex.commons.SReflect;
+import jadex.commons.collection.LRU;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -36,6 +39,35 @@ import java.util.Map;
  */
 public class MarshalService extends BasicService implements IMarshalService
 {
+	//-------- constants --------
+	
+	/** The predefined reference settings (clazz->boolean (is reference)). */
+	public static final Map<Class<?>, boolean[]> REFERENCES;
+	
+	static
+	{
+		Map<Class<?>, boolean[]>	refs	= new HashMap<Class<?>, boolean[]>();
+		boolean[] tt = new boolean[]{true, true};
+		refs.put(IRemotable.class, tt);
+		refs.put(IResultListener.class, tt);
+		refs.put(IIntermediateResultListener.class, tt);
+		refs.put(IFuture.class, tt);
+		refs.put(IIntermediateFuture.class, tt);
+		refs.put(IChangeListener.class, tt);
+		refs.put(IRemoteChangeListener.class, tt);
+		
+		boolean[] tf = new boolean[]{true, false};
+		refs.put(URL.class, tf);
+		refs.put(InetAddress.class, tf);
+		refs.put(Inet4Address.class, tf);
+		refs.put(Inet6Address.class, tf);
+		refs.put(IComponentIdentifier.class, tf);
+		refs.put(ComponentIdentifier.class, tf);
+		
+		REFERENCES = Collections.unmodifiableMap(refs);
+		
+	}
+	
 	//-------- attributes --------
 	
 	/** The component. */
@@ -45,7 +77,7 @@ public class MarshalService extends BasicService implements IMarshalService
 	protected List<ICloneProcessor> processors;
 	
 	/** The reference class cache (clazz->boolean (is reference)). */
-	protected Map<Class, boolean[]> references;
+	protected Map<Class<?>, boolean[]> references;
 	
 	//-------- constructors --------
 	
@@ -67,27 +99,9 @@ public class MarshalService extends BasicService implements IMarshalService
 	@ServiceStart
 	public IFuture<Void>	startService()
 	{
-//		references = Collections.synchronizedMap(new LRU(500));
-		references = Collections.synchronizedMap(new HashMap());
+		references = Collections.synchronizedMap(new LRU<Class<?>, boolean[]>(500));
 		processors = Collections.synchronizedList(new ArrayList<ICloneProcessor>());
-		
-		boolean[] tt = new boolean[]{true, true};
-		references.put(IRemotable.class, tt);
-		references.put(IResultListener.class, tt);
-		references.put(IIntermediateResultListener.class, tt);
-		references.put(IFuture.class, tt);
-		references.put(IIntermediateFuture.class, tt);
-		references.put(IChangeListener.class, tt);
-		references.put(IRemoteChangeListener.class, tt);
-		
-		boolean[] tf = new boolean[]{true, false};
-		references.put(URL.class, tf);
-		references.put(InetAddress.class, tf);
-		references.put(Inet4Address.class, tf);
-		references.put(Inet6Address.class, tf);
-		references.put(IComponentIdentifier.class, tf);
-		references.put(ComponentIdentifier.class, tf);
-		
+				
 		// Problem: if micro agent implements a service it cannot
 		// be determined if the service or the agent should be transferred.
 		// Per default a service is assumed.
@@ -280,22 +294,33 @@ public class MarshalService extends BasicService implements IMarshalService
 				}
 				else
 				{
-					Reference ref = (Reference)clazz.getAnnotation(Reference.class);
-					if(ref!=null)
+					isref = (boolean[])REFERENCES.get(clazz);
+					if(isref!=null)
 					{
-						localret = ref.local();
-						remoteret = ref.remote();
+						localret = isref[0];
+						remoteret = isref[1];
 						break;
 					}
 					else
 					{
-						Class superclazz = clazz.getSuperclass();
-						if(superclazz!=null && !superclazz.equals(Object.class))
-							todo.add(superclazz);
-						Class[] interfaces = clazz.getInterfaces();
-						for(int i=0; i<interfaces.length; i++)
+						remoteret	= remoteret || SReflect.isSupertype(IRemotable.class, clazz);
+						Reference ref = (Reference)clazz.getAnnotation(Reference.class);
+						if(ref!=null)
 						{
-							todo.add(interfaces[i]);
+							localret = ref.local();
+							remoteret = remoteret || ref.remote();
+							break;
+						}
+						else
+						{
+							Class superclazz = clazz.getSuperclass();
+							if(superclazz!=null && !superclazz.equals(Object.class))
+								todo.add(superclazz);
+							Class[] interfaces = clazz.getInterfaces();
+							for(int i=0; i<interfaces.length; i++)
+							{
+								todo.add(interfaces[i]);
+							}
 						}
 					}
 				}
@@ -317,5 +342,57 @@ public class MarshalService extends BasicService implements IMarshalService
 //			System.out.println("wrong reference semantics");
 		
 		return ret;
+	}
+
+	
+	/**
+	 *  Get the proxy interfaces (empty list if none).
+	 */
+	public Class<?>[] getRemoteInterfaces(Object object)
+	{
+		List ret = new ArrayList();
+		
+		if(object!=null)
+		{
+			List todo = new ArrayList();
+			todo.add(object.getClass());
+			
+			while(todo.size()>0)
+			{
+				Class clazz = (Class)todo.remove(0);
+				if(clazz.isInterface())
+				{
+					boolean isref = SReflect.isSupertype(IRemotable.class, clazz)
+						|| REFERENCES.containsKey(clazz) && REFERENCES.get(clazz)[1];
+					if(!isref)
+					{
+						Reference ref = (Reference)clazz.getAnnotation(Reference.class);
+						isref = ref!=null && ref.remote();
+					}
+					if(isref)
+					{
+						if(!ret.contains(clazz))
+							ret.add(clazz);
+					}
+				}
+				Class superclazz = clazz.getSuperclass();
+				if(superclazz!=null && !superclazz.equals(Object.class))
+					todo.add(superclazz);
+				Class[] interfaces = clazz.getInterfaces();
+				for(int i=0; i<interfaces.length; i++)
+				{
+					todo.add(interfaces[i]);
+				}
+			}
+			
+			if(object instanceof IService)
+			{
+				Class serviceinterface = ((IService)object).getServiceIdentifier().getServiceType();
+				if(!ret.contains(serviceinterface))
+					ret.add(serviceinterface);
+			}
+		}
+		
+		return (Class[])ret.toArray(new Class[ret.size()]);
 	}
 }

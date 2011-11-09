@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  *  A least recently used map.
  */
-public class LRU extends LinkedHashMap
+public class LRU<K, V> extends LinkedHashMap<K, V>
 {
 	// note for mobile version: change LinkedHashMap to HashMap
 	
@@ -73,7 +73,7 @@ public class LRU extends LinkedHashMap
 	 *  @param eldest The eldest entry.
 	 *  @return True if need to be removed.
 	 */
-	public boolean removeEldestEntry(Map.Entry eldest)
+	public boolean removeEldestEntry(Map.Entry<K, V> eldest)
 	{
 //		if(size() > max)
 //			System.out.println("removing: "+eldest);
