@@ -71,7 +71,7 @@ public class RuleSystem
 	{
 		Class clazz = object.getClass();
 		
-		addPropertyChangeListener(object);
+//		addPropertyChangeListener(object);
 		
 		final Map<Method, IResultCommand> eventcreators = new HashMap<Method, IResultCommand>();
 		final Map<String, Rule> rules = new HashMap<String, Rule>();
@@ -229,7 +229,7 @@ public class RuleSystem
 	 */
 	public void unobserveObject(final Object object)
 	{
-		removePropertyChangeListener(object);
+//		removePropertyChangeListener(object);
 		IRule[] rls = rules.remove(object);
 		for(int i=0; i<rls.length; i++)
 		{

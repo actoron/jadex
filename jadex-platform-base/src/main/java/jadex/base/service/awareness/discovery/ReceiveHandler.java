@@ -68,16 +68,18 @@ public abstract class ReceiveHandler
 					{						
 						try
 						{
-							// Init receive socket
-							try
-							{
-								agent.initNetworkRessource();
-								ret.setResultIfUndone(null);
-							}
-							catch(Exception e)
-							{
-								ret.setExceptionIfUndone(e);
-							}
+							ret.setResult(null);
+							
+//							// Init receive socket
+//							try
+//							{
+//								agent.initNetworkRessource();
+//								ret.setResultIfUndone(null);
+//							}
+//							catch(Exception e)
+//							{
+//								ret.setExceptionIfUndone(e);
+//							}
 						
 							while(!agent.isKilled())
 							{
@@ -117,11 +119,12 @@ public abstract class ReceiveHandler
 									// In this case stop calling receive for some time.
 									if(e instanceof ConnectionException)
 									{
-										Thread.sleep(20000);
+										// todo: make customizable
+										Thread.sleep(60000);
 									}
 									
 	//								getLogger().warning("Receiving awareness info error: "+e);
-									ret.setExceptionIfUndone(e);
+//									ret.setExceptionIfUndone(e);
 								}
 							}
 						}

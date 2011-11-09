@@ -3,6 +3,7 @@ package jadex.base.service.awareness.discovery.ipmulticast;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 
 /**
@@ -42,7 +43,7 @@ public class MulticastReceiveHandler extends ReceiveHandler
 			System.arraycopy(buffer, 0, data, 0, pack.getLength());
 			ret = new Object[]{pack.getAddress(), new Integer(pack.getPort()), data};
 		}
-		catch(Exception e)
+		catch(IOException e)
 		{
 //			getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
 		}

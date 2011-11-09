@@ -45,7 +45,7 @@ public class CleanerAgentConditions
 		RuleSystem rs = new RuleSystem();
 		CleanerAgentConditions cac = new CleanerAgentConditions();
 		cac = (CleanerAgentConditions)rs.observeObject(cac);
-		
+				
 		for(int i=0; i<100; i++)
 		{
 			cac.decreaseChargeState();
