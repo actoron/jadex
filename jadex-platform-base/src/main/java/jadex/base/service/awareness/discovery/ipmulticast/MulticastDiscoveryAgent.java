@@ -1,5 +1,6 @@
 package jadex.base.service.awareness.discovery.ipmulticast;
 
+import jadex.base.service.awareness.discovery.ConnectionException;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.DiscoveryService;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
@@ -175,9 +176,10 @@ public class MulticastDiscoveryAgent extends DiscoveryAgent
 				}
 				catch(Exception e)
 				{
+//					e.printStackTrace();
 					socket	= null;
 					getMicroAgent().getLogger().warning("Awareness error when joining multicast group: "+e);
-					throw new RuntimeException(e);
+					throw new ConnectionException(e);
 				}
 			}
 		}

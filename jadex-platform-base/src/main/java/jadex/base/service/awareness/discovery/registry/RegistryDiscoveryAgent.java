@@ -1,5 +1,6 @@
 package jadex.base.service.awareness.discovery.registry;
 
+import jadex.base.service.awareness.discovery.ConnectionException;
 import jadex.base.service.awareness.discovery.DiscoveryService;
 import jadex.base.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
@@ -274,6 +275,7 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 					catch(Exception e)
 					{
 						getMicroAgent().getLogger().warning("Socket creation error: "+e);
+						throw new ConnectionException(e);
 //						e.printStackTrace();
 					}
 				}
@@ -281,7 +283,7 @@ public class RegistryDiscoveryAgent extends MasterSlaveDiscoveryAgent
 		}
 		else if(socket==null)
 		{
-			throw new RuntimeException("No creation of socket in killed state.");
+			throw new ConnectionException("No creation of socket in killed state.");
 		}
 		
 		return socket;

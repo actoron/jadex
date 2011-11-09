@@ -1,17 +1,11 @@
 package jadex.base.service.awareness.discovery.ipbroadcast;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-
+import jadex.base.service.awareness.discovery.ConnectionException;
 import jadex.base.service.awareness.discovery.DiscoveryService;
 import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
-import jadex.base.service.awareness.discovery.ipmulticast.MulticastReceiveHandler;
-import jadex.base.service.awareness.discovery.ipmulticast.MulticastSendHandler;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
@@ -31,6 +25,9 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
+
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 /**
  *  Agent that sends multicasts to locate other Jadex awareness agents.
@@ -200,7 +197,8 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 					catch(Exception e2)
 					{
 //						e2.printStackTrace();
-						throw new RuntimeException(e2);
+						getMicroAgent().getLogger().warning("Awareness error when creating broadcase socket: "+e);
+						throw new ConnectionException(e2);
 					}
 				}
 			}

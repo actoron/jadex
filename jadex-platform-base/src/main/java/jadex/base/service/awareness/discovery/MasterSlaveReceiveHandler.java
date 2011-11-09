@@ -7,7 +7,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
 /**
- * 
+ *  Master slave receiving handler.
  */
 public abstract class MasterSlaveReceiveHandler extends ReceiveHandler
 {

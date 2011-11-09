@@ -1,6 +1,5 @@
 package jadex.base.service.awareness.discovery;
 
-import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -13,11 +12,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.net.InetAddress;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 
 /**
- * 
+ *  Abstract receive handler base class.
  */
 public abstract class ReceiveHandler
 {
@@ -115,6 +112,14 @@ public abstract class ReceiveHandler
 								{
 									// Can happen if is slave and master goes down.
 									// In that case it tries to find new master.
+									
+									// Can also happen when getSocket() does not work
+									// In this case stop calling receive for some time.
+									if(e instanceof ConnectionException)
+									{
+										Thread.sleep(20000);
+									}
+									
 	//								getLogger().warning("Receiving awareness info error: "+e);
 									ret.setExceptionIfUndone(e);
 								}

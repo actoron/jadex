@@ -1,5 +1,6 @@
 package jadex.base.service.awareness.discovery.ipscanner;
 
+import jadex.base.service.awareness.discovery.ConnectionException;
 import jadex.base.service.awareness.discovery.DiscoveryService;
 import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.MasterSlaveDiscoveryAgent;
@@ -235,7 +236,7 @@ public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
 					{
 //						e2.printStackTrace();
 						getMicroAgent().getLogger().warning("Channel problem: "+e2);
-						throw new RuntimeException(e2);
+						throw new ConnectionException(e2);
 					}
 				}
 			}
