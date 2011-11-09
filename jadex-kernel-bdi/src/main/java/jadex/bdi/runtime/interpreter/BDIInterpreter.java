@@ -37,6 +37,7 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.IValueFetcher;
+import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
@@ -957,6 +958,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		Boolean	useparent	= null;
 		Level	addconsole	= null;
 		String	logfile	= null;
+		Object	handlers = null;
 		
 		for(int i=-1; i<path.size(); i++)
 		{
@@ -974,13 +976,18 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 			}
 			if(addconsole==null)
 			{
-				Object prop = AgentRules.getPropertyValue(state, rcapa, "addConsoleHandler");
+				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.addConsoleHandler");
 				addconsole	= prop!=null ? (Level)prop : null;
 			}
 			if(logfile==null)
 			{
 				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.file");
 				logfile	= prop!=null ? (String)prop : null;
+			}
+			if(logfile==null)
+			{
+				Object prop = AgentRules.getPropertyValue(state, rcapa, "logging.handlers");
+				handlers	= prop!=null ? prop : null;
 			}
 		}
 		
@@ -1025,6 +1032,33 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		    	System.err.println("I/O Error attempting to create logfile: "
 		    		+ logfile + "\n" + e.getMessage());
 		    }
+		}
+		
+		if(handlers!=null)
+		{
+			if(handlers instanceof Handler)
+			{
+				logger.addHandler((Handler)handlers);
+			}
+			else if(SReflect.isIterable(handlers))
+			{
+				for(Iterator it=SReflect.getIterator(handlers); it.hasNext(); )
+				{
+					Object obj = it.next();
+					if(obj instanceof Handler)
+					{
+						logger.addHandler((Handler)obj);
+					}
+					else
+					{
+						logger.warning("Property is not a logging handler: "+obj);
+					}
+				}
+			}
+			else
+			{
+				logger.warning("Property 'logging.handlers' must be Handler or list of handlers: "+handlers);
+			}
 		}
 	}
 	

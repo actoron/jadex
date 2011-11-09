@@ -4,8 +4,11 @@ import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.extension.envsupport.evaluation.ITableDataConsumer;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -100,6 +103,7 @@ public class RoundBasedExecutor extends SimplePropertyObject implements ISpaceEx
 				{
 					space.getComponentActionList().setOrdering(comp);
 				}
+				
 				if(MODE_LASTACTION.equals(getProperty(PROPERTY_MODE)))
 				{
 					space.getComponentActionList().setScheduleCommand(new ICommand()

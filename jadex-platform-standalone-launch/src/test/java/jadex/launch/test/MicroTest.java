@@ -1,6 +1,9 @@
 package jadex.launch.test;
 
+import jadex.base.Starter;
 import jadex.base.test.ComponentTestSuite;
+import jadex.bridge.IExternalAccess;
+import jadex.commons.future.ThreadSuspendable;
 
 import java.io.File;
 
@@ -30,4 +33,5 @@ public class MicroTest	extends ComponentTestSuite
 	{
 		return new MicroTest();
 	}
+	
 }

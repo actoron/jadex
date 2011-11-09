@@ -799,36 +799,54 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				final Object value = props.get(name);
 				if(value instanceof UnparsedExpression)
 				{
-					final UnparsedExpression unexp = (UnparsedExpression)value;
-					final Object val = SJavaParser.evaluateExpression(unexp.getValue(), model.getAllImports(), getFetcher(), getClassLoader());
-					Class clazz = unexp.getClazz(getClassLoader(), model.getAllImports());
-					if(SReflect.isSupertype(IFuture.class, clazz!=null? clazz: val.getClass()))
+					try
 					{
-//						System.out.println("Future property: "+unexp.getName()+", "+val);
-						if(val instanceof IFuture)
+						final UnparsedExpression unexp = (UnparsedExpression)value;
+						Class clazz = unexp.getClazz(getClassLoader(), model.getAllImports());
+						Object tmp;
+						if(unexp.getValue()==null || unexp.getValue().length()==0 && clazz!=null)
 						{
-							// Use second future to start component only when value has already been set.
-							final Future retu = new Future();
-							((IFuture)val).addResultListener(createResultListener(new DefaultResultListener()
-							{
-								public void resultAvailable(Object result)
-								{
-//									System.out.println("Setting future property: "+unexp.getName()+" "+result);
-									addProperty(unexp.getName(), result);
-									retu.setResult(result);
-								}
-							}));
-							futures.add(retu);
+							tmp = clazz.newInstance();
 						}
-						else if(val!=null)
+						else
 						{
-							throw new RuntimeException("Future property must be instance of jadex.commons.IFuture: "+name+", "+unexp.getValue());
+							tmp = SJavaParser.evaluateExpression(unexp.getValue(), model.getAllImports(), getFetcher(), getClassLoader());
+						}
+					
+						final Object val = tmp;
+						if(SReflect.isSupertype(IFuture.class, clazz!=null? clazz: val.getClass()))
+						{
+	//						System.out.println("Future property: "+unexp.getName()+", "+val);
+							if(val instanceof IFuture)
+							{
+								// Use second future to start component only when value has already been set.
+								final Future retu = new Future();
+								((IFuture)val).addResultListener(createResultListener(new DefaultResultListener()
+								{
+									public void resultAvailable(Object result)
+									{
+	//									System.out.println("Setting future property: "+unexp.getName()+" "+result);
+										addProperty(unexp.getName(), result);
+										retu.setResult(result);
+									}
+								}));
+								futures.add(retu);
+							}
+							else if(val!=null)
+							{
+								futures.add(new Future(new RuntimeException("Future property must be instance of jadex.commons.IFuture: "+name+", "+unexp.getValue())));
+//								throw new RuntimeException("Future property must be instance of jadex.commons.IFuture: "+name+", "+unexp.getValue());
+							}
+						}
+						else
+						{
+							// Todo: handle specific properties (logging etc.)
+							addProperty(name, val);
 						}
 					}
-					else
+					catch(Exception e)
 					{
-						// Todo: handle specific properties (logging etc.)
-						addProperty(name, val);
+						futures.add(new Future(e));
 					}
 				}
 			}

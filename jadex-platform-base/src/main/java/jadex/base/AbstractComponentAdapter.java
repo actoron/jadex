@@ -17,6 +17,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.ICommand;
+import jadex.commons.SReflect;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -278,7 +280,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			
 		// add a ConsoleHandler to the logger to print out
         // logs to the console. Set Level to given property value
-		prop = component.getProperty("addConsoleHandler");
+		prop = component.getProperty("logging.addConsoleHandler");
 		if(prop!=null)
 		{
             ConsoleHandler console = new ConsoleHandler();
@@ -309,6 +311,35 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		    	System.err.println("I/O Error attempting to create logfile: "
 		    		+ logfile + "\n" + e.getMessage());
 		    }
+		}
+		
+		// Add further custom log handlers.
+		prop = component.getProperty("logging.handlers");
+		if(prop!=null)
+		{
+			if(prop instanceof Handler)
+			{
+				logger.addHandler((Handler)prop);
+			}
+			else if(SReflect.isIterable(prop))
+			{
+				for(Iterator it=SReflect.getIterator(prop); it.hasNext(); )
+				{
+					Object obj = it.next();
+					if(obj instanceof Handler)
+					{
+						logger.addHandler((Handler)obj);
+					}
+					else
+					{
+						logger.warning("Property is not a logging handler: "+obj);
+					}
+				}
+			}
+			else
+			{
+				logger.warning("Property 'logging.handlers' must be Handler or list of handlers: "+prop);
+			}
 		}
 	}
 	

@@ -445,6 +445,13 @@ public class Starter
 		return configname;
 	}
 
+	/**
+	 *  Loop for starting components.
+	 *  @param i Number to start.
+	 *  @param components The list of components.
+	 *  @param instance The instance.
+	 *  @return True, when done.
+	 */
 	protected static IFuture<Void> startComponents(final int i, final List<String> components, final IComponentInstance instance)
 	{
 		final Future<Void>	ret	= new Future<Void>();
@@ -498,5 +505,7 @@ public class Starter
 		
 		return ret;
 	}
+	
+	
 }
 
