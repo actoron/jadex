@@ -173,6 +173,7 @@ public class DefaultStepHandler implements IStepHandler
 		}
 		else if(next==null)
 		{
+			thread.setActivity(null);
 			thread.getThreadContext().removeThread(thread);
 		} 
 		else

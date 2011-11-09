@@ -1423,7 +1423,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	public IComponentChangeEvent createThreadEvent(String type, ProcessThread thread)
 	{
 		return new ComponentChangeEvent(type, TYPE_THREAD, thread.getClass().getName(), 
-			thread.getId(), getComponentIdentifier(), getCreationTime(), createProcessThreadInfo(thread));
+			thread.getId(), getComponentIdentifier(), getCreationTime(),
+			IComponentChangeEvent.EVENT_TYPE_DISPOSAL.equals(type) ? null : createProcessThreadInfo(thread));
 	}
 	
 	/**
