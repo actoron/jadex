@@ -85,7 +85,7 @@
 		<argument name="awareness" class="boolean">true</argument>
 		<!-- Start the awareness agent discovery mechanisms. -->
 		<!-- <argument name="awamechanisms" class="String[]">new String[]{"Broadcast"}</argument>-->
-		<argument name="awamechanisms" class="String[]">new String[]{"Multicast"}</argument>
+		<argument name="awamechanisms" class="String[]">new String[]{"Broadcast", "Multicast"}</argument>
 		<!-- Start the JCC agent to open the platform GUI? -->
 		<argument name="gui" class="boolean">true</argument>
 		<!-- The file name(s) of extension component(s) to load (separated by comma). -->
