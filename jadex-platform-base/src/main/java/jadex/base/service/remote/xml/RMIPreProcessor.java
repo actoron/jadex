@@ -47,7 +47,7 @@ public class RMIPreProcessor implements IPreProcessor
 		Class[] remoteinterfaces = getRemoteInterfaces(object);
 		
 		if(remoteinterfaces.length==0)
-			throw new RuntimeException("Proxyable object has no remote references: "+object);
+			throw new RuntimeException("Proxyable object has no remote interfaces: "+object);
 
 		object = rrm.getProxyReference(object, remoteinterfaces, 
 			(IComponentIdentifier)context.getUserContext(), context.getClassLoader());

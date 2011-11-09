@@ -370,7 +370,7 @@ public class MActivity extends MAssociationTarget
 	 *  Get the event handlers.
 	 *  @return The event handlers.
 	 */
-	public List getEventHandlers()
+	public List<MActivity> getEventHandlers()
 	{
 		return eventhandlers;
 	}

@@ -57,7 +57,7 @@ public class ModelInfo extends Startable implements IModelInfo
 //	protected ClassLoader classloader;
 	
 	/** The required services. */
-	protected Map<String, RequiredServiceInfo> requiredservices;
+	protected Map<String, RequiredServiceInfo<?>> requiredservices;
 	
 	/** The provided services. */
 	protected List<ProvidedServiceInfo> providedservices;
@@ -89,7 +89,7 @@ public class ModelInfo extends Startable implements IModelInfo
 		String description, IErrorReport report,
 		IArgument[] arguments, IArgument[] results, boolean startable,
 		String filename, Map<String, Object> properties, ClassLoader classloader, 
-		RequiredServiceInfo[] requiredservices, ProvidedServiceInfo[] providedservices, 
+		RequiredServiceInfo<?>[] requiredservices, ProvidedServiceInfo[] providedservices, 
 		ConfigurationInfo[] configurations, SubcomponentTypeInfo[] subcomponents, String[] imports,
 		IResourceIdentifier rid)
 	{
@@ -554,7 +554,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  Get the required services.
 	 *  @return The required services.
 	 */
-	public RequiredServiceInfo[] getRequiredServices()
+	public RequiredServiceInfo<?>[] getRequiredServices()
 	{
 		return requiredservices==null? new RequiredServiceInfo[0]: 
 			requiredservices.values().toArray(new RequiredServiceInfo[requiredservices.size()]);
@@ -573,11 +573,11 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  Set the required services.
 	 *  @param required services The required services to set.
 	 */
-	public void setRequiredServices(RequiredServiceInfo[] requiredservices)
+	public void setRequiredServices(RequiredServiceInfo<?>[] requiredservices)
 	{
 		if(requiredservices!=null && requiredservices.length>0)
 		{
-			this.requiredservices = new HashMap<String, RequiredServiceInfo>();
+			this.requiredservices = new HashMap<String, RequiredServiceInfo<?>>();
 			for(int i=0; i<requiredservices.length; i++)
 			{
 				this.requiredservices.put(requiredservices[i].getName(), requiredservices[i]);
@@ -589,7 +589,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  Get the required service.
 	 *  @return The required service.
 	 */
-	public RequiredServiceInfo getRequiredService(String name)
+	public RequiredServiceInfo<?> getRequiredService(String name)
 	{
 		return requiredservices!=null? requiredservices.get(name): null;
 	}
@@ -598,10 +598,10 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  Add a required service.
 	 *  @param requiredservice The required service.
 	 */
-	public void addRequiredService(RequiredServiceInfo requiredservice)
+	public void addRequiredService(RequiredServiceInfo<?> requiredservice)
 	{
 		if(requiredservices==null)
-			requiredservices = new HashMap<String, RequiredServiceInfo>();
+			requiredservices = new HashMap<String, RequiredServiceInfo<?>>();
 		requiredservices.put(requiredservice.getName(), requiredservice);
 	}
 

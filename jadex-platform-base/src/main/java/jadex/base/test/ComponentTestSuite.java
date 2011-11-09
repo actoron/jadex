@@ -52,7 +52,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes, long timeout) throws Exception
 	{
-		this(new String[]{"-platformname", "testcases", "-configname", "allkernels", "-simulation", "true", "-niotransport", "false",
+		this(new String[]{"-platformname", "testcases", "-configname", "allkernels", "-simulation", "true", //"-niotransport", "false", (required for remote subprocess bpmn)
 			"-gui", "false", "-awareness", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"},
 			path, root, excludes, timeout);
 	}

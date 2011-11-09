@@ -812,7 +812,7 @@ public class SReflect
 	 *  @throws IllegalArgumentException when argument is not
 	 * 		one of (Iterator, Enumeration, Collection, Map, Array).
 	 */
-	public static Iterator	getIterator(Object collection)
+	public static Iterator<Object>	getIterator(Object collection)
 	{
 		if(collection==null)
 		{

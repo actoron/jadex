@@ -854,19 +854,19 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Start activities are those without incoming edges. 
 	 *  @return A non-empty List of start activities or null, if none.
 	 */
-	public static List	getStartActivities(List activities)
+	public static List<MActivity>	getStartActivities(List<MActivity> activities)
 	{
-		List	ret	= null;
+		List<MActivity>	ret	= null;
 		if (activities != null)
 		{
-			for(Iterator it=activities.iterator(); it.hasNext(); )
+			for(Iterator<MActivity> it=activities.iterator(); it.hasNext(); )
 			{
-				MActivity	activity	= (MActivity) it.next();
+				MActivity	activity	= it.next();
 				if(activity.getIncomingSequenceEdges()==null || activity.getIncomingSequenceEdges().isEmpty())
 				{
 					if(ret==null)
 					{
-						ret	= new ArrayList();
+						ret	= new ArrayList<MActivity>();
 					}
 					ret.add(activity);
 				}

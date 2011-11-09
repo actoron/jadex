@@ -41,9 +41,8 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 //		System.out.println(instance.getComponentIdentifier().getLocalName()+": sub "+activity);
 
 		MSubProcess	proc	= (MSubProcess) activity;
-		List start = proc.getStartActivities();
+		List<MActivity> start = proc.getStartActivities();
 		final String	file	= (String)thread.getPropertyValue("file");
-		
 	
 		// Internal subprocess.
 		// Todo: cancel timer on normal/exception exit
@@ -57,7 +56,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			if(MSubProcess.SUBPROCESSTYPE_PARALLEL.equals(proc.getSubprocessType()))
 			{
 				// Todo: use subcontext?
-				Iterator	it	= SReflect.getIterator(thread.getPropertyValue("items"));
+				Iterator<Object>	it	= SReflect.getIterator(thread.getPropertyValue("items"));
 				// If empty parallel activity (i.e. no items at all) continue process.
 				if(!it.hasNext())
 				{
@@ -106,10 +105,10 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			{
 				// todo: support more than one timer?
 				MActivity	timer	= null;
-				List handlers = activity.getEventHandlers();
+				List<MActivity> handlers = activity.getEventHandlers();
 				for(int i=0; timer==null && handlers!=null && i<handlers.size(); i++)
 				{
-					MActivity	handler	= (MActivity)handlers.get(i);
+					MActivity	handler	= handlers.get(i);
 					if(handler.getActivityType().equals("EventIntermediateTimer"))
 					{
 						timer	= handler;
@@ -136,14 +135,14 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		else if((start==null || start.isEmpty()) && file!=null)
 		{
 			// Extract arguments from in/inout parameters.
-			final Map	args	= new HashMap();
-			List params	= activity.getParameters(new String[]{MParameter.DIRECTION_IN, MParameter.DIRECTION_INOUT});
+			final Map<String, Object>	args	= new HashMap<String, Object>();
+			List<MParameter> params	= activity.getParameters(new String[]{MParameter.DIRECTION_IN, MParameter.DIRECTION_INOUT});
 			if(params!=null && !params.isEmpty())
 			{
 //				args	= new HashMap();
 				for(int i=0; i<params.size(); i++)
 				{
-					MParameter	param	= (MParameter)params.get(i);
+					MParameter	param	= params.get(i);
 					args.put(param.getName(), thread.getParameterValue(param.getName()));
 				}
 			}
@@ -157,9 +156,14 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			{
 				public void resultAvailable(IComponentManagementService cms)
 				{
+					// Todo: If remote remember subprocess and kill on cancel.
+					IComponentIdentifier	parent	= thread.hasPropertyValue("parent")
+						? (IComponentIdentifier)thread.getPropertyValue("parent")
+						: instance.getComponentIdentifier();
+					
 					IFuture<IComponentIdentifier> ret = cms.createComponent(null, file,
-						new CreationInfo(null, args, instance.getComponentIdentifier(), false, instance.getModelElement().getModelInfo().getAllImports()), 
-						new IResultListener<Map<String, Object>>()
+						new CreationInfo(null, args, parent, false, instance.getModelElement().getModelInfo().getAllImports()), 
+						new IRemoteResultListener<Map<String, Object>>()
 					{
 						public void resultAvailable(final Map<String, Object> results)
 						{
