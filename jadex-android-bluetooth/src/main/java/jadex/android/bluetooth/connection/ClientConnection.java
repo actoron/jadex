@@ -53,9 +53,9 @@ public class ClientConnection extends AConnection {
 	public void manageConnectedSocket(IBluetoothSocket mmSocket) {
 		connectedThread = new ConnectedThread(mmSocket);
 		connectedThread.start();
-		timer = new ResettableTimer(
-				Executors.newSingleThreadScheduledExecutor(),
-				CONNECTION_TIMEOUT * 2, TimeUnit.MILLISECONDS, receivePingTask);
+//		timer = new ResettableTimer(
+//				Executors.newSingleThreadScheduledExecutor(),
+//				CONNECTION_TIMEOUT * 2, TimeUnit.MILLISECONDS, receivePingTask);
 	}
 
 	@Override

@@ -24,8 +24,8 @@ public class ServerConnection extends AConnection {
 	public void connect() {
 		connectedThread = new ConnectedThread(socket);
 		connectedThread.start();
-		timer = new Timer();
-		timer.scheduleAtFixedRate(pingTask, 1000, CONNECTION_TIMEOUT);
+//		timer = new Timer();
+//		timer.scheduleAtFixedRate(pingTask, 1000, CONNECTION_TIMEOUT);
 	}
 
 	private TimerTask pingTask = new TimerTask() {

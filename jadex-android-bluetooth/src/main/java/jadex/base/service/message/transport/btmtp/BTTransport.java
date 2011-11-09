@@ -1,5 +1,6 @@
 package jadex.base.service.message.transport.btmtp;
 
+import jadex.android.bluetooth.AndroidContextChangeListener;
 import jadex.android.bluetooth.JadexBluetoothActivity;
 import jadex.android.bluetooth.exceptions.ActivityIsNotJadexBluetoothActivityException;
 import jadex.android.bluetooth.message.BluetoothMessage;
@@ -65,7 +66,7 @@ import android.util.Log;
  * For the receiving side a separate listener thread is necessary as it must be
  * continuously listened for incoming transmission requests.
  */
-public class BTTransport implements ITransport {
+public class BTTransport implements ITransport, AndroidContextChangeListener {
 	// -------- constants --------
 
 	/** The schema name. */
@@ -124,6 +125,10 @@ public class BTTransport implements ITransport {
 
 	protected ClassLoader classLoader;
 
+	private Context context;
+
+	private boolean started;
+
 	// -------- constructors --------
 
 	/**
@@ -150,16 +155,17 @@ public class BTTransport implements ITransport {
 		this.logger = Logger.getLogger("BTTransport" + this);
 		this.container = container;
 		this.async = async;
+		JadexBluetoothActivity.addContextChangeListener(this);
 	}
 
 	/**
 	 * Start the transport.
 	 */
 	public IFuture<?> start() {
+		started = true;
 		final Future<?> ret = new Future();
 		try {
-			Context context = JadexBluetoothActivity.application_context;
-			if (context != null) {
+			if (context != null && binder == null) {
 				Intent intent = new Intent(context, ConnectionService.class);
 				Log.d(Helper.LOG_TAG, "(BTTransport) Trying to bind BT Service...");
 				sc = new BTServiceConnection(ret);
@@ -182,7 +188,7 @@ public class BTTransport implements ITransport {
 	 * Perform cleanup operations (if any).
 	 */
 	public IFuture shutdown() {
-		Context context = JadexBluetoothActivity.application_context;
+		started = false;
 		if (binder != null && context != null) {
 			try {
 				Log.d(Helper.LOG_TAG, "(BTTransport) Stopping autoconnect...");
@@ -197,6 +203,24 @@ public class BTTransport implements ITransport {
 			}
 		}
 		return new Future(null);
+	}
+	
+	@Override
+	public void onContextCreate(Context ctx) {
+		context = ctx;
+		if (started) {
+			Intent intent = new Intent(context, ConnectionService.class);
+			Log.d(Helper.LOG_TAG, "(BTTransport) Trying to bind BT Service...");
+			context.bindService(intent, sc, Activity.BIND_AUTO_CREATE);
+		}
+	}
+	
+	@Override
+	public void onContextDestroy(Context ctx) {
+		if (started && context == ctx && binder != null) {
+			context.unbindService(sc);
+			context = null;
+		}
 	}
 
 	// -------- methods --------

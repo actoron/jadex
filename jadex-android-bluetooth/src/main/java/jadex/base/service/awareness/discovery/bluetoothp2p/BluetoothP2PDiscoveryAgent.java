@@ -1,5 +1,6 @@
 package jadex.base.service.awareness.discovery.bluetoothp2p;
 
+import jadex.android.bluetooth.AndroidContextChangeListener;
 import jadex.android.bluetooth.JadexBluetoothActivity;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.message.BluetoothMessage;
@@ -62,16 +63,18 @@ import android.util.Log;
 	@RequiredService(name="threadpool", type=IThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="management", type=IManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
-public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
+public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent implements AndroidContextChangeListener
 {
 
 	private Intent intent;
 	private IConnectionServiceConnection binder;
 	protected IBluetoothDevice[] _knownDevices;
+	private Context context;
 	
 	public BluetoothP2PDiscoveryAgent() {
 		intent = new Intent();
 		_knownDevices = new IBluetoothDevice[0];
+		JadexBluetoothActivity.addContextChangeListener(this);
 		//intent.setClassName("jadex.android.bluetooth.service", "jadex.android.bluetooth.service.ConnectionService");
 	}
 
@@ -88,19 +91,35 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
 	}
 
 	@Override
+	public void onContextCreate(Context ctx) {
+		context = ctx;
+		if (isStarted()) {
+			intent = new Intent(context, ConnectionService.class);
+			Log.d(Helper.LOG_TAG, "(BTP2PDiscovery) Trying to bind BT Service...");
+			context.bindService(intent, sc, Activity.BIND_AUTO_CREATE);
+		}
+	}
+	
+	@Override
+	public void onContextDestroy(Context ctx) {
+		if (isStarted() && context == ctx && binder != null) {
+			context.unbindService(sc);
+			context = null;
+		}
+	}
+	
+	@Override
 	protected void initNetworkRessource() {
-		Context context = JadexBluetoothActivity.application_context;
-		if (context != null) {
+		if (context != null && binder == null) {
 			//context.startService(intent);
 			intent = new Intent(context, ConnectionService.class);
-			Log.d(Helper.LOG_TAG, "Trying to bind BT Service...");
+			Log.d(Helper.LOG_TAG, "(BTP2PDiscovery) Trying to bind BT Service...");
 			context.bindService(intent, sc, Activity.BIND_AUTO_CREATE);
 		}
 	}
 
 	@Override
 	protected void terminateNetworkRessource() {
-		Context context = JadexBluetoothActivity.application_context;
 		if (binder != null && context != null) {
 			try {
 				Log.d(Helper.LOG_TAG, "Stopping autoconnect...");
@@ -141,7 +160,7 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent
 		@Override
 		public void onServiceConnected(ComponentName arg0, IBinder arg1) {
 			binder = IConnectionServiceConnection.Stub.asInterface(arg1);
-			Log.d(Helper.LOG_TAG, "Service bound! starting autoconnect...");
+			Log.d(Helper.LOG_TAG, "(BTP2PDiscovery) Service bound! starting autoconnect...");
 			try {
 				
 				binder.registerAwarenessInfoCallback(awarenessCallback);

@@ -1,7 +1,6 @@
 package de.unihamburg.vsis.jadexAndroid_test;
 
 import jadex.base.service.awareness.management.AwarenessManagementAgent;
-import jadex.base.service.awareness.management.DiscoveryInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.awareness.IManagementService;
@@ -103,20 +102,20 @@ public class AwarenessNotifierAgent extends
 	}
 
 	@Override
-	public IFuture<Void> deleteProxy(DiscoveryInfo dif) {
+	public IFuture<Void> deleteProxy(IComponentIdentifier id) {
 		if (AwarenessActivity.handler != null) {
 			Bundle data = new Bundle();
 			data.putString("text",
-					dif.cid.getName() + " auf " + dif.cid.getPlatformName()
+					id.getName() + " auf " + id.getPlatformName()
 							+ " nicht mehr da");
 			data.putSerializable("identifier", new RemoteComponentIdentifier(
-					dif.cid));
+					id));
 			data.putString("method", "remove");
 			Message message = AwarenessActivity.handler.obtainMessage();
 			message.setData(data);
 			message.sendToTarget();
 		}
-		return super.deleteProxy(dif);
+		return super.deleteProxy(id);
 	}
 
 }

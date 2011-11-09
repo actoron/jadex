@@ -1,5 +1,6 @@
 package de.unihamburg.vsis.jadexAndroid_test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -16,9 +17,11 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.rules.rulesystem.rules.Operator.InstanceOf;
 import jadex.xml.annotation.XMLClassname;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;

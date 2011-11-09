@@ -32,6 +32,7 @@ import de.unihamburg.vsis.jadexAndroid_test.R;
 import de.unihamburg.vsis.jadexAndroid_test.Startup;
 
 public class ChatActivity extends BaseActivity {
+	private static final String KEY_TEXTINPUT = "KEY_TEXTINPUT";
 	private ListView chatListView;
 	private Button sendButton;
 	private EditText editText;
@@ -49,14 +50,65 @@ public class ChatActivity extends BaseActivity {
 
 		arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
 		
+		String[] chatList = getRetainConfigObject().chatList;
+		if (chatList != null) {
+			for (int i = 0; i < chatList.length; i++) {
+				arrayAdapter.add(chatList[i]);
+			}
+		}
+		
 		chatListView.setStackFromBottom(true);
 		chatListView.setTranscriptMode(ListView.TRANSCRIPT_MODE_NORMAL);
 		chatListView.setDividerHeight(0);		
 		chatListView.setAdapter(arrayAdapter);
 		
-		IFuture<IExternalAccess> future = Startup
-				.startBluetoothPlatform("Platform-" + createRandomPlattformID());
-		future.addResultListener(platformResultListener);
+		extAcc = getRetainConfigObject().extAcc;
+		
+		if (extAcc == null) {
+			IFuture<IExternalAccess> future = Startup
+					.startBluetoothPlatform("Platform-" + createRandomPlattformID());
+			future.addResultListener(platformResultListener);
+		}
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (isFinishing() && extAcc != null) {
+			extAcc.killComponent();
+		}
+	}
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		editText.setText(savedInstanceState.getString(KEY_TEXTINPUT));
+		if (chatAgent != null) {
+			setUiListeners();
+		}
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putString(KEY_TEXTINPUT, editText.getText().toString());
+	}
+	
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+		retainNonConfigurationInstance o = new retainNonConfigurationInstance();
+		o.extAcc = extAcc;
+		o.chatList = new String[arrayAdapter.getCount()];
+		for (int i = 0; i < arrayAdapter.getCount(); i++) {
+			o.chatList[i] = arrayAdapter.getItem(i);
+		}
+		
+		return o;
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
 	}
 
 	private IResultListener<IExternalAccess> platformResultListener = new DefaultResultListener<IExternalAccess>() {
@@ -197,4 +249,20 @@ public class ChatActivity extends BaseActivity {
 			}
 		});
 	}
+	
+	
+	private retainNonConfigurationInstance getRetainConfigObject() {
+		Object object = getLastNonConfigurationInstance();
+		if (object != null && object instanceof retainNonConfigurationInstance) {
+			return (retainNonConfigurationInstance) object;
+		} else {
+			return new retainNonConfigurationInstance();
+		}
+	}
+	
+	private static class retainNonConfigurationInstance {
+		public IExternalAccess extAcc;
+		public String[] chatList;
+	}
+	
 }
