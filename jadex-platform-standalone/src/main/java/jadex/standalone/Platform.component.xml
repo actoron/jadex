@@ -61,6 +61,7 @@
 		<import>jadex.base.service.message.transport.localmtp.*</import>
 		<import>jadex.base.service.message.transport.tcpmtp.*</import>
 		<import>jadex.base.service.message.transport.niotcpmtp.*</import>
+		<import>jadex.base.service.message.transport.httprelaymtp.*</import>
 		<import>jadex.base.service.message.transport.codecs.*</import>
 	</imports>
 	
@@ -187,8 +188,9 @@
 				{
 					//new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, java.util.logging.Logger.getLogger("test"))
 					new LocalTransport($component.getServiceProvider()),
-					$args.niotransport? new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())
-					: new TCPTransport($component.getServiceProvider(), $args.tcpport)
+					//$args.niotransport? new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())
+					//: new TCPTransport($component.getServiceProvider(), $args.tcpport)
+					new HttpRelayTransport($component, SRelay.DEFAULT_ADDRESS)
 				},
 				new MessageType[]
 				{

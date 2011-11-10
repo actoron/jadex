@@ -10,29 +10,24 @@ import java.util.Map;
  */
 public interface ITransport
 {
-	//-------- constants --------
-		
-	/** The receiving port (if any). */
-	public final static String PORT = "port";
-	
 	//-------- methods --------
 	
 	/**
 	 *  Start the transport.
 	 */
-	public IFuture start();
+	public IFuture<Void> start();
 
 	/**
 	 *  Perform cleanup operations (if any).
 	 */
-	public IFuture shutdown();
+	public IFuture<Void> shutdown();
 	
 	/**
 	 *  Send a message to receivers on the same platform.
 	 *  @param message The message to send.
 	 *  @return A future indicating if sending was successful.
 	 */
-	public IFuture	sendMessage(Map message, String msgtype, IComponentIdentifier[] receivers, byte[] codecids);
+	public IFuture<Void>	sendMessage(Map<String, Object> message, String msgtype, IComponentIdentifier[] receivers, byte[] codecids);
 	
 	/**
 	 *  Returns the prefix of this transport

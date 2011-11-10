@@ -3,20 +3,20 @@ package jadex.commons.collection;
 /**
  *  A queue that blocks until an element is available.
  */
-public interface IBlockingQueue
+public interface IBlockingQueue<T>
 {
 	/**
 	 *  Enqueue an element.
 	 *  @param element The element.
 	 */
-	public void enqueue(Object element)	throws ClosedException;
+	public void enqueue(T element)	throws ClosedException;
 
 	/**
 	 *  Dequeue an element.
 	 *  @return The element. When queue is empty
 	 *  the methods blocks until an element is added.
 	 */
-	public Object dequeue()	throws ClosedException;
+	public T dequeue()	throws ClosedException;
 
 	/**
 	 *  Dequeue an element.
@@ -24,7 +24,7 @@ public interface IBlockingQueue
 	 *  @return The element. When queue is empty
 	 *  the methods blocks until an element is added or the timeout occurs.
 	 */
-	public Object dequeue(long timeout)	throws ClosedException, TimeoutException;
+	public T dequeue(long timeout)	throws ClosedException, TimeoutException;
 
 	/**
 	 *  Open/close the queue.

@@ -834,7 +834,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @return The codec factory.
 	 */
 	@Excluded
-	public Object getCodecFactory()
+	public Object	getCodecFactory()
 	{
 		return codecfactory;
 	}

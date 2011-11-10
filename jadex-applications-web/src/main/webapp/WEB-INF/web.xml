@@ -10,19 +10,27 @@
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
   <servlet>
-  	<servlet-name>HelloDispatcher</servlet-name>
-  	<servlet-class>jadex.web.examples.helloworld.JadexDispatcherServlet</servlet-class>
+    <servlet-name>HelloDispatcher</servlet-name>
+    <servlet-class>jadex.web.examples.helloworld.JadexDispatcherServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-  	<servlet-name>HelloDispatcher</servlet-name>
-  	<url-pattern>/hello/*</url-pattern>
+    <servlet-name>HelloDispatcher</servlet-name>
+    <url-pattern>/hello/*</url-pattern>
   </servlet-mapping>
   <servlet>
-  	<servlet-name>PuzzleDispatcher</servlet-name>
-  	<servlet-class>jadex.web.examples.puzzle.servlet.PuzzleDispatcherServlet</servlet-class>
+    <servlet-name>PuzzleDispatcher</servlet-name>
+    <servlet-class>jadex.web.examples.puzzle.servlet.PuzzleDispatcherServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-  	<servlet-name>PuzzleDispatcher</servlet-name>
-  	<url-pattern>/puzzle/*</url-pattern>
+    <servlet-name>PuzzleDispatcher</servlet-name>
+    <url-pattern>/puzzle/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>RelayServlet</servlet-name>
+    <servlet-class>jadex.web.examples.relay.RelayServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RelayServlet</servlet-name>
+    <url-pattern>/relay/*</url-pattern>
   </servlet-mapping>
 </web-app>

@@ -5,7 +5,7 @@ package jadex.commons.collection;
  *  Blocking queue implemented as array.
  *  The array is expanded automatically when the queue grows.
  */
-public class ArrayBlockingQueue	implements IBlockingQueue
+public class ArrayBlockingQueue<T>	implements IBlockingQueue<T>
 {
 	//-------- attributes --------
 	
@@ -90,7 +90,7 @@ public class ArrayBlockingQueue	implements IBlockingQueue
 	 *  @return The element. When queue is empty
 	 *  the methods blocks until an element is added or the timeout occurs.
 	 */
-    public Object dequeue(long timeout) throws ClosedException, TimeoutException
+    public T dequeue(long timeout) throws ClosedException, TimeoutException
     {
 		if(closed)
 			throw new IBlockingQueue.ClosedException("Queue closed.");
@@ -130,7 +130,7 @@ public class ArrayBlockingQueue	implements IBlockingQueue
             elements[start]	= null;	// Allow object to be garbage collected.
             start	= (start+1)%elements.length;
             size--;
-            return ret;
+            return (T)ret;
         }
     }
     
@@ -138,7 +138,7 @@ public class ArrayBlockingQueue	implements IBlockingQueue
      *  Remove an object from the queue
      *  (blocks until an element is available).
      */
-    public Object dequeue()
+    public T dequeue()
     {
     	return dequeue(-1);
     }
