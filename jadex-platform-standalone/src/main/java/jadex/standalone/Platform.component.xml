@@ -188,9 +188,10 @@
 				{
 					//new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, java.util.logging.Logger.getLogger("test"))
 					new LocalTransport($component.getServiceProvider()),
-					//$args.niotransport? new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())
-					//: new TCPTransport($component.getServiceProvider(), $args.tcpport),
+					$args.niotransport? new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())
+					: new TCPTransport($component.getServiceProvider(), $args.tcpport),
 					new HttpRelayTransport($component, SRelay.DEFAULT_ADDRESS)
+					//new HttpRelayTransport($component, "http://localhost:8080/jadex-applications-web/relay/")
 				},
 				new MessageType[]
 				{
