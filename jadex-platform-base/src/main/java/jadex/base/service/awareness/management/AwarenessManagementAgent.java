@@ -727,11 +727,25 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		for(int i=0; i<addrs.length; i++)
 		{
 			int	prot	= addrs[i].indexOf("://");
-			int	port	= addrs[i].indexOf(':', prot+3);
-			if(prot!=-1 && port!=-1)
+			if(prot!=-1)
 			{
-//				ret.add(addrs[i].substring(prot+3, port));
-				ret.add(addrs[i].substring(0, port));
+				int	port	= addrs[i].indexOf(':', prot+3);
+				if(port!=-1)
+				{
+					ret.add(addrs[i].substring(0, port));
+				}
+				else
+				{
+					int	slash	= addrs[i].indexOf('/', prot+3);
+					if(slash!=-1)
+					{
+						ret.add(addrs[i].substring(0, slash));
+					}
+					else
+					{
+						System.out.println("Warning: Unknown address scheme "+addrs[i]);
+					}
+				}
 			}
 			else
 			{
