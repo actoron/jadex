@@ -203,12 +203,14 @@ public class ConnectionService extends Service implements
 		@Override
 		public void registerAwarenessInfoCallback(
 				IBTP2PAwarenessInfoCallback callback) throws RemoteException {
+			// TODO: allow multiple awareness callbacks
 			ConnectionService.this.awarenessCallback = callback;
 		}
 
 		@Override
 		public void registerMessageCallback(IBTP2PMessageCallback callback)
 				throws RemoteException {
+			// TODO: allow multiple message callbacks
 			ConnectionService.this.msgCallback = callback;
 		}
 

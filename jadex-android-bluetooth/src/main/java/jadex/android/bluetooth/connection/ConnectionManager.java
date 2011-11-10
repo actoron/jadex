@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public class ConnectionManager extends HashMap<String, IConnection> implements
 		IPacketSender {
@@ -33,18 +34,22 @@ public class ConnectionManager extends HashMap<String, IConnection> implements
 
 	@Override
 	public IConnection put(String address, IConnection value) {
-		IConnection put = super.put(address, value);
-		notifyConnectionAdded(address, value);
-		return put;
+		synchronized (this) {
+			IConnection put = super.put(address, value);
+			notifyConnectionAdded(address, value);
+			return put;
+		}
 	}
 
 	@Override
 	public IConnection remove(Object key) {
-		IConnection remove = super.remove(key);
-		if (remove != null) {
-			notifyConnectionRemoved(key.toString());
+		synchronized (this) {
+			IConnection remove = super.remove(key);
+			if (remove != null) {
+				notifyConnectionRemoved(key.toString());
+			}
+			return remove;
 		}
-		return remove;
 	}
 
 	public boolean containsKey(String deviceID) {
@@ -79,15 +84,17 @@ public class ConnectionManager extends HashMap<String, IConnection> implements
 			// send message to inform others of shutdown
 		}
 		clear();
+		String[] keys = keySet().toArray(new String[keySet().size()]);
+		for (String address : keys) {
 		for (ConnectionsListener l : listeners) {
-			for (String address : this.keySet()) {
 				l.connectionRemoved(address);
 			}
 		}
 	}
 
 	@Override
-	public void sendMessageToConnectedDevice(DataPacket packet, String address) throws MessageNotSendException {
+	public void sendMessageToConnectedDevice(DataPacket packet, String address)
+			throws MessageNotSendException {
 		IConnection con = get(address);
 		if (con != null && con.isAlive()) {
 			try {

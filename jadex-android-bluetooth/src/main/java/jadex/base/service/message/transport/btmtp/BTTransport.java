@@ -35,6 +35,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -240,7 +241,10 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 		for (int i = 0; i < receivers.length; i++) {
 			String[] raddrs = receivers[i].getAddresses();
 			for (int j = 0; j < raddrs.length; j++) {
-				addresses.add(raddrs[j]);
+				String parseAddress = parseAddress(raddrs[j]);
+				if (parseAddress != null) {
+					addresses.add(parseAddress);
+				}
 			}
 		}
 
@@ -413,6 +417,37 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 						ret.setResult(null);
 					}
 				});
+		return ret;
+	}
+	
+	/**
+	 *  Get the address of this transport.
+	 *  @param hostname The hostname.
+	 *  @param port The port.
+	 *  @return <scheme>:<hostname>:<port>
+	 */
+	protected String getAddress(String hostname, int port)
+	{
+		return getServiceSchema()+hostname+":"+port;
+	}
+	
+	/**
+	 *  Parse an address.
+	 *  @param address The address string.
+	 *  @return The parsed address.
+	 */
+	protected static String parseAddress(String address)
+	{
+		String ret = null;
+		
+		if(address.startsWith(SCHEMA))
+		{		
+				int schemalen = SCHEMA.length();
+				if (address.length() == schemalen + 17) {
+					ret = address;
+				}
+		}
+		
 		return ret;
 	}
 

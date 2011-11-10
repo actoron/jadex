@@ -337,8 +337,12 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	public IFuture<Icon> getComponentTypeIcon(String type)
 	{
 		return new Future<Icon>(type.equals(FILETYPE_APPLICATION)? icons.getIcon("application"): null);
+	}	
+	/* $else $
+	public IFuture<Void> getComponentTypeIcon(String type) {
+		return new Future(null);
 	}
-	/* $endif $ */
+	$endif $ */
 
 	/**
 	 *  Get the component type of a model.

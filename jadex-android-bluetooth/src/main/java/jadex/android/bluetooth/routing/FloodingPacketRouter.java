@@ -61,24 +61,27 @@ public class FloodingPacketRouter implements IPacketRouter {
 
 				try {
 					sender.sendMessageToConnectedDevice(pkt, pkt.getDestination());
+					future.setResult(BluetoothMessage.MESSAGE_SENT);
 				} catch (MessageNotSendException e) {
 					e.printStackTrace();
 				}
-			} else {
+			} else if (reachableDevices.contains(pkt.getDestination())){
 				// broadcast to everyone except fromDevice
 				for (String address : connectedDevices) {
 					if (!address.equals(fromDevice)) {
 						try {
 							sender.sendMessageToConnectedDevice(pkt, address);
+							future.setResult(BluetoothMessage.MESSAGE_SENT);
 						} catch (MessageNotSendException e) {
 							e.printStackTrace();
 						}
 					}
 				}
-				future.setResult(BluetoothMessage.MESSAGE_SENT);
+			} else {
+				future.setException(new MessageNotSendException("Destination not reachable"));
 			}
 		} else {
-			// maxhops reached.
+			future.setException(new MessageNotSendException("MaxHops reached"));
 		}
 		return future;
 	}

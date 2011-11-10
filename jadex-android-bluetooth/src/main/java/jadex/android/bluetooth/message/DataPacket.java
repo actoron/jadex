@@ -160,6 +160,9 @@ public class DataPacket {
 	}
 
 	private void checkAddresses() throws MessageConvertException {
+		if (_src == null || _dest == null) {
+			throw new MessageConvertException("Src and Dest must be non-null!");
+		}
 		if (_src.length() != 17) {
 			if (_src.matches("bt-mtp://.*")) {
 				_src = _src.substring(9);

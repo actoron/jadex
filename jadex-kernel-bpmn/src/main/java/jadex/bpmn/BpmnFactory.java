@@ -247,7 +247,11 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	{
 		return new Future<Icon>(type.equals(FILETYPE_BPMNPROCESS)? icons.getIcon("bpmn_process") : null);
 	}
-	/* $endif $ */
+	/* $else $
+	public IFuture<Void> getComponentTypeIcon(String type) {
+		return new Future(null);
+	}
+	$endif $ */
 
 	/**
 	 *  Get the component type of a model.

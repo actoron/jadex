@@ -293,7 +293,11 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		return new Future<Icon>(type.equals(FILETYPE_MICROAGENT) ? icons.getIcon("micro_agent") : null);
 	}
-	/* $endif $ */
+	/* $else $
+	public IFuture<Void> getComponentTypeIcon(String type) {
+		return new Future(null);
+	}
+	$endif $ */
 
 	/**
 	 *  Get the component type of a model.

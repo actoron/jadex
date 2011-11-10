@@ -343,7 +343,11 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	{
 		return new Future<Icon>(type.equals(FILETYPE_COMPONENT)? icons.getIcon("component"): null);
 	}
-	/* $endif $ */
+	/* $else $
+	public IFuture<Void> getComponentTypeIcon(String type) {
+		return new Future(null);
+	}
+	$endif $ */
 
 	/**
 	 *  Get the component type of a model.

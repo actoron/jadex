@@ -400,7 +400,11 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 		return new Future<Icon>(type.equals(FILETYPE_BDIAGENT) ? icons.getIcon("bdi_agent")
 			: type.equals(FILETYPE_BDICAPABILITY) ? icons.getIcon("bdi_capability") : null);
 	}
-	/* $endif $ */
+	/* $else $
+	public IFuture<Void> getComponentTypeIcon(String type) {
+		return new Future(null);
+	}
+	$endif $ */
 
 	/**
 	 *  Get the component type of a model.

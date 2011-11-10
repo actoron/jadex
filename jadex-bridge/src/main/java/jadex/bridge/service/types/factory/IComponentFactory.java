@@ -36,7 +36,9 @@ public interface IComponentFactory
 	 */
 	/* $if !android $ */
 	public IFuture<Icon> getComponentTypeIcon(String type);
-	/* $endif $ */
+	/* $else $
+	public IFuture<Void> getComponentTypeIcon(String type);
+	$endif $ */
 
 	//-------- cached --------
 	

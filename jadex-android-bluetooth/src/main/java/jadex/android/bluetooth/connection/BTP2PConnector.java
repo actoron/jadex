@@ -117,8 +117,8 @@ public class BTP2PConnector implements IBluetoothStateListener {
 			}
 		});
 
-//		packetRouter = new FloodingPacketRouter(ownAdress);
-		packetRouter = new FloodingPacketRouter();
+//		packetRouter = new FloodingPacketRouter();
+		packetRouter = new DsdvRouter();
 		if (ownAdress != null) {
 			packetRouter.setOwnAddress(ownAdress);
 			packetRouter.start();
@@ -184,7 +184,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 					DataPacket.TYPE_CONNECT_SYN);
 			return sendInitialMessage(dataPacket);
 		} catch (MessageConvertException e) {
-			//e.logThisException();
+			e.logThisException();
 			Future ret = new Future();
 			ret.setException(e);
 			return ret;
