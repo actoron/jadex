@@ -46,6 +46,11 @@ public class DuplicateResultException	extends RuntimeException
 		this.future	= future;
 		this.first	= first;
 		this.second	= second;
+		printStackTrace();
+		if(first instanceof Exception)
+			((Exception)first).printStackTrace();
+		if(second instanceof Exception)
+			((Exception)second).printStackTrace();
 	}
 	
 	//-------- methods --------
