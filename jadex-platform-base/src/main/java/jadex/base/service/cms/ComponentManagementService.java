@@ -2638,13 +2638,13 @@ public abstract class ComponentManagementService extends BasicService implements
 //		this.listeners	= null;	// required for final cleanup command
 //		this.killresultlisteners	= null;	// required for final cleanup command
 //		this.root	= null;	// required for final cleanup command
+//		this.initinfos	= null;	// required for final cleanup command
 		
 		this.childcounts	= null;
 		this.componentfactory	= null;
 		this.exeservice	= null;
 		this.exta	= null;
 		this.factories	= null;
-		this.initinfos	= null;
 		this.localtypes	= null;
 		this.marshalservice	= null;
 		this.msgservice	= null;
