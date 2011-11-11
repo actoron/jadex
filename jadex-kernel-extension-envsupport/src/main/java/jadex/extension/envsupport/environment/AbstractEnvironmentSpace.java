@@ -634,23 +634,30 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 			
 			// Create the environment executor.
 			Map mse = (Map)MEnvSpaceType.getProperty(mspacetype.getProperties(), "spaceexecutor");
-			IParsedExpression exp = (IParsedExpression)MEnvSpaceType.getProperty(mse, "expression");
-			ISpaceExecutor exe = null;
-			if(exp!=null)
+			if(mse!=null)
 			{
-				exe = (ISpaceExecutor)exp.getValue(fetcher);	// Executor starts itself
+				IParsedExpression exp = (IParsedExpression)MEnvSpaceType.getProperty(mse, "expression");
+				ISpaceExecutor exe = null;
+				if(exp!=null)
+				{
+					exe = (ISpaceExecutor)exp.getValue(fetcher);	// Executor starts itself
+				}
+				else
+				{
+					exe = (ISpaceExecutor)((Class)MEnvSpaceType.getProperty(mse, "clazz")).newInstance();
+					List props = (List)mse.get("properties");
+					MEnvSpaceType.setProperties(exe, props, fetcher);
+				}
+				if(exe!=null)
+					exe.start();
 			}
-			else
-			{
-				exe = (ISpaceExecutor)((Class)MEnvSpaceType.getProperty(mse, "clazz")).newInstance();
-				List props = (List)mse.get("properties");
-				MEnvSpaceType.setProperties(exe, props, fetcher);
-			}
-			if(exe!=null)
-				exe.start();	
 		}
 		catch(Exception e)
 		{
+			for(int i=0; observercenters!=null && i<observercenters.size(); i++)
+			{
+				((ObserverCenter)observercenters.get(i)).dispose();
+			}
 			throw new RuntimeException(e);
 		}
 	}
@@ -2720,8 +2727,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	}
 	
 	/**
-	 *  Initialize the extension.
-	 *  Called once, when the extension is terminate.
+	 *  Terminate the extension.
+	 *  Called once, when the extension is terminated.
 	 */
 	public IFuture terminate()
 	{

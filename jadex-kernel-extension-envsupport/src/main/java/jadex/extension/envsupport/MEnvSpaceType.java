@@ -1500,15 +1500,7 @@ public class MEnvSpaceType
 	 */
 	public static Object getProperty(Map map, String name)
 	{
-		try
-		{
-			Object tmp = map.get(name);
-			return (tmp instanceof List)? ((List)tmp).get(0): tmp; 
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+		Object tmp = map.get(name);
+		return (tmp instanceof List)? ((List)tmp).get(0): tmp; 
 	}
 }

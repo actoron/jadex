@@ -784,7 +784,8 @@ public class ObserverCenter
 			vptimer.stop();
 		if (plugintimer != null)
 			plugintimer.stop();
-		mainwindow.dispose();
+		if(mainwindow!=null)
+			mainwindow.dispose();
 	}
 	
 	/**
