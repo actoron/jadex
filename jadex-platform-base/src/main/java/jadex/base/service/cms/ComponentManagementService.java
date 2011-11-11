@@ -983,8 +983,6 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	protected boolean isRemoteComponent(IComponentIdentifier cid)
 	{
-		if(cid==null) System.err.println("cid is null");
-		if(root==null) System.err.println("root is null");
 		return !cid.getPlatformName().equals(root.getComponentIdentifier().getName());
 	}
 	
@@ -2639,6 +2637,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //		this.logger	= null;	// required for final cleanup command
 //		this.listeners	= null;	// required for final cleanup command
 //		this.killresultlisteners	= null;	// required for final cleanup command
+//		this.root	= null;	// required for final cleanup command
 		
 		this.childcounts	= null;
 		this.componentfactory	= null;
@@ -2649,7 +2648,6 @@ public abstract class ComponentManagementService extends BasicService implements
 		this.localtypes	= null;
 		this.marshalservice	= null;
 		this.msgservice	= null;
-		this.root	= null;
 		return super.shutdownService();
 
 		/*final Future ret = new Future();
