@@ -120,7 +120,7 @@ public class LoggerAgent extends MicroAgent
 	{
 		public void publish(LogRecord record)
 		{
-			System.out.println("Recieved log record: "+record);
+//			System.out.println("Received log record: "+record);
 		}
 		
 		public void close() throws SecurityException
