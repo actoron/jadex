@@ -983,6 +983,8 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	protected boolean isRemoteComponent(IComponentIdentifier cid)
 	{
+		if(cid==null) System.err.println("cid is null");
+		if(root==null) System.err.println("root is null");
 		return !cid.getPlatformName().equals(root.getComponentIdentifier().getName());
 	}
 	
