@@ -25,5 +25,5 @@ public interface IErrorReport extends Serializable
 	 *  (model -> report)
 	 *  @return The external documents.
 	 */
-	public Map getDocuments();
+	public Map<String, String> getDocuments();
 }

@@ -2631,6 +2631,23 @@ public abstract class ComponentManagementService extends BasicService implements
 	public IFuture<Void>	shutdownService()
 	{
 //		System.out.println(": "+this);
+//		this.adapters	= null;	// required for final cleanup command
+//		this.ccs	= null;	// required for final cleanup command
+//		this.cfs	= null;	// required for final cleanup command
+//		this.logger	= null;	// required for final cleanup command
+//		this.listeners	= null;	// required for final cleanup command
+//		this.killresultlisteners	= null;	// required for final cleanup command
+		
+		this.childcounts	= null;
+		this.componentfactory	= null;
+		this.exeservice	= null;
+		this.exta	= null;
+		this.factories	= null;
+		this.initinfos	= null;
+		this.localtypes	= null;
+		this.marshalservice	= null;
+		this.msgservice	= null;
+		this.root	= null;
 		return super.shutdownService();
 
 		/*final Future ret = new Future();

@@ -31,7 +31,7 @@ public class RemoteReferenceTest extends TestCase
 		
 		// Start platform1 with local service.
 		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases1",
-			"-niotransport", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false",
+			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false",
 			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(sus, timeout);
 		
 		// Find local service (as local provided service proxy).
@@ -40,7 +40,7 @@ public class RemoteReferenceTest extends TestCase
 		
 		// Start platform2 with (remote) search service.
 		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", "testcases2",
-			"-niotransport", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false",
+			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false",
 			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class"}).get(sus, timeout);
 		
 		// Connect platforms by creating proxy agents.

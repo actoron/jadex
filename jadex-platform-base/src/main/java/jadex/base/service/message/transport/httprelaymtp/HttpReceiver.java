@@ -29,14 +29,20 @@ public class HttpReceiver
 	
 	/** The receiver thread. */
 	protected Thread	thread;
+	IExternalAccess access;
+	CodecFactory codecfac;
+	String address;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create and start a new receiver.
 	 */
-	public HttpReceiver(final IExternalAccess access, final CodecFactory codecfac, final String address)
+	public HttpReceiver(IExternalAccess access_, CodecFactory codecfac_, String address_)
 	{
+		this.access	= access_;
+		this.codecfac	= codecfac_;
+		this.address	= address_;
 		thread	= new Thread(new Runnable()
 		{
 			public void run()
@@ -164,5 +170,9 @@ public class HttpReceiver
 	{
 		// Hack!!! using NIO, one could use thread.interrupt()
 		thread.stop();
+		access	= null;
+		codecfac	= null;
+		address	= null;
+		thread	= null;
 	}
 }

@@ -330,6 +330,26 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	}
 	
 	/**
+	 *  Shutdown the container.
+	 */
+	public IFuture<Void> shutdown()
+	{
+		Future<Void>	ret	= new Future<Void>();
+		super.shutdown().addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				adapter	= null;
+				cms	= null;
+				instance	= null;
+				marshal	= null;
+				super.customResultAvailable(result);
+			}
+		});
+		return ret;
+	}
+	
+	/**
 	 *  Get the string representation.
 	 *  @return The string representation.
 	 */

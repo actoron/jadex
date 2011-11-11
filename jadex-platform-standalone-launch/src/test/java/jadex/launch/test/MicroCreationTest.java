@@ -1,6 +1,7 @@
 package jadex.launch.test;
 
 import jadex.base.Starter;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -81,6 +82,15 @@ public class MicroCreationTest extends TestCase
 			{
 				System.out.println("Warning: could not save value: "+e);
 			}
+		}
+		
+		try
+		{
+			platform.killComponent().get(sus, timeout);
+		}
+		catch(ComponentTerminatedException e)
+		{
+			// Platform autoshutdown already finished.			
 		}
 	}
 }

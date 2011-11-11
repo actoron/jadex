@@ -67,7 +67,7 @@ public class SelectorThread implements Runnable
 	protected IServiceProvider	provider;
 	
 	/** The tasks enqueued from external threads. */
-	protected List	tasks;
+	protected List<Runnable>	tasks;
 
 	/** The pool of output connections (InetSocketAddress -> NIOTCPOutputConnection). */
 	protected Map	connections;
@@ -89,7 +89,7 @@ public class SelectorThread implements Runnable
 		this.libservice	= libservice;
 		this.logger	= logger;
 		this.provider	= provider;
-		this.tasks	= new ArrayList();
+		this.tasks	= new ArrayList<Runnable>();
 		this.connections	= new LinkedHashMap();
 		this.writetasks	= new LinkedHashMap();
 	}
@@ -109,7 +109,7 @@ public class SelectorThread implements Runnable
 				Runnable[]	atasks;
 				synchronized(tasks)
 				{
-					atasks	= tasks.isEmpty() ? null : (Runnable[])tasks.toArray(new Runnable[tasks.size()]);
+					atasks	= tasks.isEmpty() ? null : tasks.toArray(new Runnable[tasks.size()]);
 					tasks.clear();
 				}
 				for(int i=0; atasks!=null && i<atasks.length; i++)
@@ -122,10 +122,10 @@ public class SelectorThread implements Runnable
 				this.selector.select();
 
 				// Iterate over the set of keys for which events are available
-				Iterator selectedKeys = this.selector.selectedKeys().iterator();
+				Iterator<SelectionKey> selectedKeys = this.selector.selectedKeys().iterator();
 				while(selectedKeys.hasNext())
 				{
-					SelectionKey key = (SelectionKey)selectedKeys.next();
+					SelectionKey key = selectedKeys.next();
 					selectedKeys.remove();
 
 					if(key.isValid())
@@ -159,6 +159,15 @@ public class SelectorThread implements Runnable
 //				e.printStackTrace();
 			}
 		}
+		
+		for(Iterator it=connections.values().iterator(); it.hasNext(); )
+		{
+			Object	con	= it.next();
+			if(con instanceof NIOTCPOutputConnection)
+			{
+				((NIOTCPOutputConnection)con).getCleaner().remove();
+			}
+		}
 	}
 	
 	//-------- methods to be called from external --------
@@ -185,7 +194,7 @@ public class SelectorThread implements Runnable
 		final Future	ret	= new Future();
 		
 		NIOTCPOutputConnection	con	= null;
-		List	todo	= null;
+		List<Runnable>	todo	= null;
 		List	futures	= null;
 		synchronized(connections)
 		{
@@ -237,7 +246,7 @@ public class SelectorThread implements Runnable
 						};
 						if(todo==null)
 						{
-							todo	= new ArrayList();
+							todo	= new ArrayList<Runnable>();
 						}
 						todo.add(task);
 						if(futures==null)
@@ -540,6 +549,7 @@ public class SelectorThread implements Runnable
 		}
 		catch(Exception e)
 		{
+			con.getCleaner().remove();
 			synchronized(connections)
 			{
 				connections.put(con.getAddress(), new NIOTCPDeadConnection());
@@ -645,7 +655,9 @@ public class SelectorThread implements Runnable
 		public void remove()
 		{
 			if(timer!=null)
+			{
 				timer.stop();
+			}
 		}
 	}
 }

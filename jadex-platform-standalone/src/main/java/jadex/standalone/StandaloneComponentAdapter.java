@@ -11,6 +11,8 @@ import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.io.Serializable;
@@ -78,5 +80,19 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 			exeservice	= SServiceProvider.getService(getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		}
 		return exeservice;
+	}
+	
+	public IFuture<Void> killComponent()
+	{
+		Future<Void>	ret	= new Future<Void>();
+		super.killComponent().addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				exeservice	= null;
+				super.customResultAvailable(result);
+			}
+		});
+		return ret;
 	}
 }

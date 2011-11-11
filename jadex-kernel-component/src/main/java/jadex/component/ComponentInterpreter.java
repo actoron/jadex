@@ -37,7 +37,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	//-------- attributes --------
 	
 	/** The scheduled steps of the component. */
-	protected List steps;
+	protected List<Object[]> steps;
 	
 	/** Flag indicating an added step will be executed without the need for calling wakeup(). */
 	// Required for startup bug fix in scheduleStep (synchronization between main thread and executor).
@@ -46,6 +46,9 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	
 	/** The classloader (hack? should be in model). */
 	protected ClassLoader classloader;
+	
+	/** No more steps allowed. */
+	protected boolean	nosteps;
 	
 	//-------- constructors --------
 	
@@ -119,16 +122,16 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	 */
 	protected void addStep(Object[] step)
 	{
-//		if(nosteps)
-//		{
-//			((Future)step[1]).setException(new ComponentTerminatedException(getComponentAdapter().getComponentIdentifier()));
-//		}
-//		else
-//		{
+		if(nosteps)
+		{
+			((Future)step[1]).setException(new ComponentTerminatedException(getComponentAdapter().getComponentIdentifier()));
+		}
+		else
+		{
 			steps.add(step);
 //			notifyListeners(new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, TYPE_STEP, step[0].getClass().getName(), 
 //				step[0].toString(), microagent.getComponentIdentifier(), getStepDetails((IComponentStep)step[0])));
-//		}
+		}
 	}
 	
 //	/**
@@ -327,4 +330,19 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		return classloader;
 	}
 	
+	/**
+	 *  Overridden to abort remaining steps on cleanup.
+	 */
+	public IFuture<Void> terminateExtensions()
+	{
+		nosteps	= true;
+		ComponentTerminatedException ex = new ComponentTerminatedException(getComponentAdapter().getComponentIdentifier());
+		while(steps!=null && !steps.isEmpty())
+		{
+			Object[] step = (Object[])steps.remove(0);
+			Future<Void> future = (Future<Void>)step[1];
+			future.setException(ex);
+		}
+		return super.terminateExtensions();
+	}
 }

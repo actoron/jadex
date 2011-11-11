@@ -33,7 +33,6 @@ public class PlatformsTest extends TestCase
 	String[]	BASEARGS	= new String[]
     {
 		"-platformname", "testcases",
-		"-niotransport", "false",
 		"-gui", "false",
 		"-saveonexit", "false",
 		"-welcome", "false",

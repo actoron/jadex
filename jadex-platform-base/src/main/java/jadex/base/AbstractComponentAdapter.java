@@ -531,7 +531,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 *  which might perform arbitrary cleanup actions, goals, etc.
 	 *  @return A future top indicate, when cleanup of the component is finished.
 	 */
-	public IFuture killComponent()
+	public IFuture<Void> killComponent()
 	{
 		assert killfuture==null;
 		
@@ -562,7 +562,20 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 									{								
 										public void run()
 										{
-											shutdownContainer().addResultListener(new DelegationResultListener(killfuture));
+											shutdownContainer().addResultListener(new DelegationResultListener(killfuture)
+											{
+												public void customResultAvailable(Object result)
+												{
+													clock	= null;
+													cms	= null;
+//													component	= null;	// Required by getResults()
+													model	= null;
+//													desc	= null;	// Required by toString()
+													parent	= null;
+													
+													super.customResultAvailable(result);
+												}
+											});
 											
 //											System.out.println("Checking ext entries after cleanup: "+cid);
 											assert ext_entries==null || ext_entries.isEmpty() : "Ext entries after cleanup: "+desc.getName()+", "+ext_entries;
@@ -600,15 +613,15 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/**
 	 *  Called from killComponent.
 	 */
-	protected IFuture shutdownContainer()
+	protected IFuture<Void> shutdownContainer()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
-		getServiceContainer().shutdown().addResultListener(new IResultListener()
+		getServiceContainer().shutdown().addResultListener(new IResultListener<Void>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Void result)
 			{
-				ret.setResult(getComponentIdentifier());
+				ret.setResult(null);
 //				listener.resultAvailable(this, getComponentIdentifier());
 			}
 			

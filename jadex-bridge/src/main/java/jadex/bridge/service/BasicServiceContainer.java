@@ -300,6 +300,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			}
 			
 			// Shutdown services in reverse order as later services might depend on earlier ones.
+			// Todo: use removeService() to avoid duplicate code...
 			final IInternalService[]	service	= new IInternalService[1];	// one element array for final variable.
 			service[0]	= (IInternalService)allservices.remove(allservices.size()-1);
 			getLogger().info("Terminating service: "+service[0].getServiceIdentifier());
@@ -308,6 +309,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			{
 				public void customResultAvailable(Object result)
 				{
+					services.remove(service[0].getServiceIdentifier().getServiceType());
 					getLogger().info("Terminated service: "+service[0].getServiceIdentifier());
 //					System.out.println("shutdown end: "+result);
 					if(!allservices.isEmpty())
@@ -319,6 +321,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 					}
 					else
 					{
+						reqservicefetchers	= null;
+						requiredserviceinfos	= null;
 						super.customResultAvailable(result);
 					}
 				}

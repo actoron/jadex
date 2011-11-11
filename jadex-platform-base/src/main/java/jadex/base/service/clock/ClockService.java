@@ -295,26 +295,29 @@ public class ClockService extends BasicService implements IClockService, IProper
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public IFuture shutdownService()
+	public IFuture<Void> shutdownService()
 	{
 		clock.dispose();
-		final Future	ret	= new Future();
-		super.shutdownService().addResultListener(new DelegationResultListener(ret)
+		clock	= null;
+		listeners	= null;
+		threadpool	= null;
+		final Future<Void>	ret	= new Future<Void>();
+		super.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 				SServiceProvider.getService(provider, ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new IResultListener()
+					.addResultListener(new IResultListener<ISettingsService>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(ISettingsService settings)
 					{
-						ISettingsService	settings	= (ISettingsService)result;
 						settings.deregisterPropertiesProvider("clockservice")
-							.addResultListener(new DelegationResultListener(ret)
+							.addResultListener(new DelegationResultListener<Void>(ret)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(Void result)
 							{
-								super.customResultAvailable(getServiceIdentifier());
+								ClockService.this.provider	= null;
+								ret.setResult(null);
 							}
 						});
 					}
@@ -322,7 +325,8 @@ public class ClockService extends BasicService implements IClockService, IProper
 					public void exceptionOccurred(Exception exception)
 					{
 						// No settings service: ignore.
-						ret.setResult(getServiceIdentifier());
+						ClockService.this.provider	= null;
+						ret.setResult(null);
 					}
 				});
 			}

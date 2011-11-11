@@ -56,7 +56,7 @@ public class BrowserPane extends JTextPane
 //	protected List	history;
 
 	/** The external references. */
-	protected Map	externals;
+	protected Map<String, String>	externals;
 
 	/** Open links per click in external browser. */
 	protected boolean inbrowser;
@@ -169,7 +169,7 @@ public class BrowserPane extends JTextPane
 					//System.out.println("referencing: "+reference);
 					if(externals!=null && externals.containsKey(reference))
 					{
-						setText((String)externals.get(reference));
+						setText(externals.get(reference));
 					}
 					else
 					{
@@ -256,7 +256,7 @@ System.out.println("setDocument");
 	 *  Set the externals of this BrowserPane.
 	 *  @param externals The externals to set.
 	 */
-	public void setExternals(Map externals)
+	public void setExternals(Map<String, String> externals)
 	{
 		this.externals = externals;
 	}

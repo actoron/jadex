@@ -52,7 +52,8 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes, long timeout) throws Exception
 	{
-		this(new String[]{"-platformname", "testcases", "-configname", "allkernels", "-simulation", "true", //"-niotransport", "false", (required for remote subprocess bpmn)
+		this(new String[]{"-platformname", "testcases", "-configname", "allkernels", "-simulation", "true",
+//			"-logging_level", "java.util.logging.Level.INFO",
 			"-gui", "false", "-awareness", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"},
 			path, root, excludes, timeout);
 	}
@@ -102,7 +103,7 @@ public class ComponentTestSuite extends TestSuite
 		}
 		
 		// Scan for test cases.
-		List	todo	= new LinkedList();
+		List<File>	todo	= new LinkedList<File>();
 		todo.add(path);
 //		System.out.println("Path: "+path);
 		while(!todo.isEmpty())
@@ -167,7 +168,7 @@ public class ComponentTestSuite extends TestSuite
 									return getErrorText();
 								}
 								
-								public Map getDocuments()
+								public Map<String, String> getDocuments()
 								{
 									return null;
 								}
@@ -177,5 +178,7 @@ public class ComponentTestSuite extends TestSuite
 				}
 			}
 		}
+		// Hack!!! Isn't there some tearDown for the test suite?
+		addTest(new Cleanup(rootcomp));
 	}
 }
