@@ -30,7 +30,7 @@ public class Future<E> implements IFuture<E>
 	protected final String	CALLER_SUSPENDED	= "suspended";
 	
 	/** Debug flag. */
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 	
 	/** The empty future. */
 	public static final IFuture	EMPTY	= new Future(null);
