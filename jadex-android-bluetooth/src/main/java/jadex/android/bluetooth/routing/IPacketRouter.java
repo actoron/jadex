@@ -7,15 +7,16 @@ import jadex.android.bluetooth.service.IFuture;
 import java.util.Set;
 
 public interface IPacketRouter {
-	
-	interface ReachableDevicesChangeListener {
+
+	interface RoutingEntriesChangeListener {
+		void connectedDevicesChanged();
 		void reachableDevicesChanged();
 	}
-	
-	void addReachableDevicesChangeListener(ReachableDevicesChangeListener l);
-	
-	boolean removeReachableDevicesChangeListener(ReachableDevicesChangeListener l);
-	
+
+	void addRoutingEntriesChangedListener(RoutingEntriesChangeListener l);
+
+	boolean removeReachableDevicesChangeListener(RoutingEntriesChangeListener l);
+
 	void setPacketSender(IPacketSender sender);
 
 	IFuture routePacket(DataPacket packet, String fromDevice);
@@ -25,11 +26,11 @@ public interface IPacketRouter {
 	void removeConnectedDevice(String device);
 
 	void updateRoutingInformation(RoutingInformation ri);
-	
+
 	String getOwnAddress();
-	
+
 	void setOwnAddress(String address);
-	
+
 	void start();
 
 	/**
@@ -40,5 +41,10 @@ public interface IPacketRouter {
 
 	Set<String> getReachableDeviceAddresses();
 
+	/**
+	 * 
+	 * @return all entries in the routing table that are reachable via zero hops
+	 *         = directly connected
+	 */
 	Set<String> getConnectedDeviceAddresses();
 }

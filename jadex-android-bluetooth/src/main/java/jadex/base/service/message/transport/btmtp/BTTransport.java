@@ -162,9 +162,9 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	/**
 	 * Start the transport.
 	 */
-	public IFuture<?> start() {
+	public IFuture<Void> start() {
 		started = true;
-		final Future<?> ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		try {
 			if (context != null && binder == null) {
 				Intent intent = new Intent(context, ConnectionService.class);

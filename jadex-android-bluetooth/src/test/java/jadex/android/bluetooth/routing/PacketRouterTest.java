@@ -14,6 +14,7 @@ import jadex.android.bluetooth.message.MessageProtos.RoutingInformation;
 import jadex.android.bluetooth.message.MessageProtos.RoutingInformation.Builder;
 import jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry;
 import jadex.android.bluetooth.message.MessageProtos.RoutingType;
+import jadex.android.bluetooth.routing.IPacketRouter.RoutingEntriesChangeListener;
 import jadex.commons.collection.ArrayBlockingQueue;
 
 import java.util.ArrayList;
@@ -229,6 +230,55 @@ public abstract class PacketRouterTest {
 		DataPacket sentPacket = getSentPackages(packetRouter1.getOwnAddress(),
 				sampleReachableDevice).peek();
 		assertTrue(sentPacket.getDataAsString().equals("data1"));
+	}
+	
+	@Test
+	public void testDevicesChangedListeners() throws MessageConvertException {
+		RoutingInformation sampleRI = getSampleRoutingInformation();
+		List<String> deviceList = getDeviceList(sampleRI);
+		
+		String sampleReachableDevice = null;
+		
+		for (String string : deviceList) {
+			if (!TestConstants.sampleAddress.equals(string)) {
+				sampleReachableDevice = string;
+			}
+		}
+		
+		
+//		String sampleReachableDevice = getDeviceList(sampleRI).get(0);
+		DataPacket dataPacket = new DataPacket(sampleReachableDevice,
+				"data1".getBytes(), DataPacket.TYPE_DATA);
+		
+		
+		final Set<String>[] reachableDeviceAddresses = new Set[1];
+		final Set<String>[] connectedDeviceAddresses = new Set[1];
+		
+		packetRouter1.addRoutingEntriesChangedListener(new RoutingEntriesChangeListener() {
+
+			@Override
+			public void reachableDevicesChanged() {
+				reachableDeviceAddresses[0] = packetRouter1.getReachableDeviceAddresses();
+			}
+
+			@Override
+			public void connectedDevicesChanged() {
+				connectedDeviceAddresses[0] = packetRouter1.getConnectedDeviceAddresses();
+				
+			}
+		});
+		
+		packetRouter1.addConnectedDevice(TestConstants.sampleAddress);
+		assertNull(reachableDeviceAddresses[0]);
+		assertTrue(connectedDeviceAddresses[0].contains(TestConstants.sampleAddress));
+		
+//		packetRouter1.routePacket(dataPacket, packetRouter1.getOwnAddress());
+		packetRouter1.updateRoutingInformation(sampleRI);
+		assertTrue(reachableDeviceAddresses[0].size() > 0);
+		assertTrue(reachableDeviceAddresses[0].contains(sampleReachableDevice));
+//		packetRouter1.routePacket(dataPacket, packetRouter1.getOwnAddress());
+//		DataPacket sentPacket = getSentPackages(packetRouter1.getOwnAddress(),
+//				sampleReachableDevice).peek();
 	}
 
 	@Test

@@ -9,8 +9,10 @@ import jadex.android.bluetooth.message.MessageProtos.RoutingTable;
 import jadex.android.bluetooth.message.MessageProtos.RoutingTable.Builder;
 import jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry;
 import jadex.android.bluetooth.message.MessageProtos.RoutingType;
+import jadex.android.bluetooth.routing.AbstractPacketRouter;
 import jadex.android.bluetooth.routing.IPacketRouter;
 import jadex.android.bluetooth.routing.IPacketSender;
+import jadex.android.bluetooth.routing.IPacketRouter.RoutingEntriesChangeListener;
 import jadex.android.bluetooth.routing.dsdv.info.ConfigInfo;
 import jadex.android.bluetooth.routing.dsdv.info.CurrentInfo;
 import jadex.android.bluetooth.routing.dsdv.minders.BroadcastMinder;
@@ -22,10 +24,12 @@ import jadex.android.bluetooth.service.Future;
 import jadex.android.bluetooth.service.IFuture;
 import jadex.android.bluetooth.util.Helper;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import android.util.Log;
 
@@ -34,28 +38,26 @@ import android.util.Log;
  * 
  * @author Arnar http://code.google.com/p/beddernet/
  */
-public class DsdvRouter implements IPacketRouter {
+public class DsdvRouter extends AbstractPacketRouter implements IPacketRouter {
 
 	private static final RoutingType ROUTING_TYPE = RoutingType.DSDV;
 
 	private String TAG = Helper.LOG_TAG;
-	private String ownAddress;
 
 	private LocalRoutingTable routeTable;
 	private BroadcastMinder broadcaster;
 	private PeriodicBroadcastMinder periodicBroadcaster;
+	
 	/**
 	 * manages a route dampening time for new or deleted routes
 	 */
 	private RouteSender routeSender;
-	private IPacketSender sender;
 
 	/**
 	 * Class constructor
 	 */
 	public DsdvRouter() {
-		// create & initialize the route manager
-		
+		super();
 	}
 	
 	/**
@@ -128,7 +130,6 @@ public class DsdvRouter implements IPacketRouter {
 	private void broadcastRouteBroadcastPacket(
 			Vector<RoutingTableEntryWrapper> routes, boolean routeDown) {
 		Vector<String> neighbors = routeTable.getNeighborAddresses();
-
 		if (neighbors != null) {
 			for (int i = 0; i < neighbors.size(); i++) {
 				try {
@@ -148,7 +149,7 @@ public class DsdvRouter implements IPacketRouter {
 
 					DataPacket packet = new DataPacket(dest, riBuilder.build()
 							.toByteArray(), DataPacket.TYPE_ROUTING_INFORMATION);
-					sender.sendMessageToConnectedDevice(packet, dest);
+					sendMessageToConnectedDevice(packet, dest);
 				} catch (Exception exception) {
 					Log.e(TAG, "Error in BroadcastRouteBroadcastPacket",
 							exception);
@@ -210,6 +211,8 @@ public class DsdvRouter implements IPacketRouter {
 		RoutingTable routingTable = rInfo.getRoutingTable();
 		List<RoutingTableEntry> routes = routingTable.getEntryList();
 		// log.out("Processing down message :"+rBroad.routes.size());
+		boolean changedReachable = false;
+		boolean changedConnected= false;
 		for (int i = 0; i < routes.size(); i++) {
 			RoutingTableEntryWrapper rte = new RoutingTableEntryWrapper(
 					routes.get(i));
@@ -222,7 +225,18 @@ public class DsdvRouter implements IPacketRouter {
 			if (existing != null && existing.getSeqNum() < rte.getSeqNum()
 					&& rInfo.getFromAddress().equals(existing.getNextHop())) {
 				routeTable.addRoutingEntry(rte);
+				if (rte.getNumHops() < 2){
+					changedConnected = true;
+				} else {
+					changedReachable = true;
+				}
 			}
+		}
+		if (changedReachable) {
+			notifyReachableDevicesChanged();
+		}
+		if (changedConnected) {
+			notifyConnectedDevicesChanged();
 		}
 	}
 
@@ -239,6 +253,8 @@ public class DsdvRouter implements IPacketRouter {
 	public void processDSDVMsgBroadcast(RoutingInformation rBroad) {
 		try {
 			boolean reBroadcast = false;
+			boolean changedConnected = false;
+			boolean changedReachable = false;
 			List<RoutingTableEntry> routes = rBroad.getRoutingTable()
 					.getEntryList();
 			// System.out.println("Processing broadcast. :"+rBroad.routes.size());
@@ -263,6 +279,11 @@ public class DsdvRouter implements IPacketRouter {
 					// routeSender.reset();
 					rte.setRouteChanged(true); // mark as sent now
 					routeTable.addRoutingEntry(rte);
+					if (rte.getNumHops() < 2){
+						changedConnected = true;
+					} else {
+						changedReachable = true;
+					}
 					reBroadcast = true;
 				} else // compare the existing route with the new one
 				{
@@ -279,6 +300,11 @@ public class DsdvRouter implements IPacketRouter {
 						rte.setNumHops(0);
 						rte.setRouteChanged(true);
 						routeTable.addRoutingEntry(rte);
+						if (rte.getNumHops() < 2){
+							changedConnected = true;
+						} else {
+							changedReachable = true;
+						}
 						reBroadcast = true;
 					} else if (existing.getSeqNum() < rte.getSeqNum()) {
 						// System.out.println("Got from " +
@@ -298,6 +324,11 @@ public class DsdvRouter implements IPacketRouter {
 							// " with sewnum "+rte.getSeqNum()+" route is odd num");
 							rte.setRouteChanged(true);
 							routeTable.addRoutingEntry(rte);
+							if (rte.getNumHops() < 2){
+								changedConnected = true;
+							} else {
+								changedReachable = true;
+							}
 							reBroadcast = true;
 
 						} else if (rte.getSeqNum() % 2 == 0) {
@@ -307,6 +338,11 @@ public class DsdvRouter implements IPacketRouter {
 							// " with sewnum "+rte.getSeqNum()+" route is even num");
 							// routeSender.reset();
 							routeTable.addRoutingEntry(rte);
+							if (rte.getNumHops() < 2){
+								changedConnected = true;
+							} else {
+								changedReachable = true;
+							}
 							// reBroadcast = true;
 						} else {
 							// System.out.println("Doing nada !! ");
@@ -319,6 +355,11 @@ public class DsdvRouter implements IPacketRouter {
 						// " with sewnum "+rte.getSeqNum()+" same seq lower hop");
 						rte.setRouteChanged(true);
 						routeTable.addRoutingEntry(rte);
+						if (rte.getNumHops() < 2){
+							changedConnected = true;
+						} else {
+							changedReachable = true;
+						}
 					} else {
 						// System.out.println("Do nothing with Route");
 					}
@@ -331,12 +372,17 @@ public class DsdvRouter implements IPacketRouter {
 				routeSender = new RouteSender(this, routeTable);
 				routeSender.start();
 			}
+			if (changedConnected) {
+				notifyConnectedDevicesChanged();
+			}
+			if (changedReachable) {
+				notifyReachableDevicesChanged();
+			}
 
 		} catch (Exception exception) {
 			System.out.println("Exception in process : "
 					+ exception.getMessage());
 		}
-
 	}
 
 	/**
@@ -394,7 +440,7 @@ public class DsdvRouter implements IPacketRouter {
 			String nextHop = routingEntry.getNextHop();
 			packet.incHopCount();
 			try {
-				sender.sendMessageToConnectedDevice(packet, nextHop);
+				sendMessageToConnectedDevice(packet, nextHop);
 				Log.d(TAG, "Message routed to " + nextHop);
 				result.setResult(BluetoothMessage.MESSAGE_SENT);
 			} catch (MessageNotSendException e) {
@@ -407,25 +453,6 @@ public class DsdvRouter implements IPacketRouter {
 			result.setException(new MessageNotSendException("Could not send Message to: " + packet.getDestination() + ", no route found"));
 		}
 		return result;
-	}
-
-	@Override
-	public void addReachableDevicesChangeListener(
-			ReachableDevicesChangeListener l) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean removeReachableDevicesChangeListener(
-			ReachableDevicesChangeListener l) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void setPacketSender(IPacketSender sender) {
-		this.sender = sender;
 	}
 
 	@Override
@@ -474,7 +501,7 @@ public class DsdvRouter implements IPacketRouter {
 			}
 		}
 	}
-
+	
 	@Override
 	public Set<String> getReachableDeviceAddresses() {
 		HashSet<String> result = new HashSet<String>();
@@ -493,7 +520,7 @@ public class DsdvRouter implements IPacketRouter {
 		}
 		return result;
 	}
-
+	
 	@Override
 	public Set<String> getConnectedDeviceAddresses() {
 		HashSet<String> result = new HashSet<String>();
@@ -502,16 +529,6 @@ public class DsdvRouter implements IPacketRouter {
 		return result;
 	}
 
-	@Override
-	public void setOwnAddress(String ownAddress) {
-		this.ownAddress = ownAddress;
-	}
-
-	@Override
-	public String getOwnAddress() {
-		return ownAddress;
-	}
-	
 	@Override
 	public String toString() {
 		return printRouteTable();

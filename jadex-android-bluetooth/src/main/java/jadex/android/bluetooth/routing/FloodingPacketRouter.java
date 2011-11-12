@@ -21,25 +21,19 @@ import java.util.Set;
 
 import android.util.Log;
 
-public class FloodingPacketRouter implements IPacketRouter {
+public class FloodingPacketRouter extends AbstractPacketRouter implements IPacketRouter {
 
 	private static final RoutingType ROUTING_TYPE = RoutingType.Flooding;
 	private Set<String> connectedDevices;
-	private IPacketSender sender;
 
 	private Set<String> reachableDevices;
-	private String ownAddress;
-	private Set<ReachableDevicesChangeListener> listeners;
+	
 
 	public FloodingPacketRouter() {
+		super();
 		connectedDevices = new HashSet<String>();
 		reachableDevices = new HashSet<String>();
-		listeners = new HashSet<IPacketRouter.ReachableDevicesChangeListener>();
-	}
-
-	@Override
-	public void setPacketSender(IPacketSender sender) {
-		this.sender = sender;
+		
 	}
 
 	/**
@@ -60,7 +54,7 @@ public class FloodingPacketRouter implements IPacketRouter {
 				// we have a direct connection to destination
 
 				try {
-					sender.sendMessageToConnectedDevice(pkt, pkt.getDestination());
+					sendMessageToConnectedDevice(pkt, pkt.getDestination());
 					future.setResult(BluetoothMessage.MESSAGE_SENT);
 				} catch (MessageNotSendException e) {
 					e.printStackTrace();
@@ -70,7 +64,7 @@ public class FloodingPacketRouter implements IPacketRouter {
 				for (String address : connectedDevices) {
 					if (!address.equals(fromDevice)) {
 						try {
-							sender.sendMessageToConnectedDevice(pkt, address);
+							sendMessageToConnectedDevice(pkt, address);
 							future.setResult(BluetoothMessage.MESSAGE_SENT);
 						} catch (MessageNotSendException e) {
 							e.printStackTrace();
@@ -110,7 +104,7 @@ public class FloodingPacketRouter implements IPacketRouter {
 			}
 		}
 		if (changed) {
-			// proximityDevicesChanged();
+			notifyReachableDevicesChanged();
 			broadcastRoutingInformation(createRoutingInformation());
 		}
 	}
@@ -150,19 +144,18 @@ public class FloodingPacketRouter implements IPacketRouter {
 	@Override
 	public void addConnectedDevice(String device) {
 		connectedDevices.add(device);
+		notifyConnectedDevicesChanged();
 		broadcastRoutingInformation(createRoutingInformation());
 	}
 
 	private void broadcastRoutingInformation(RoutingInformation ri) {
-		notifyListeners();
-
 		DataPacket pkt;
 		try {
 			for (String address : connectedDevices) {
 				pkt = new DataPacket(address, ri.toByteArray(),
 						DataPacket.TYPE_ROUTING_INFORMATION);
 				try {
-					sender.sendMessageToConnectedDevice(pkt, address);
+					sendMessageToConnectedDevice(pkt, address);
 				} catch (MessageNotSendException e) {
 					e.printStackTrace();
 				}
@@ -188,34 +181,6 @@ public class FloodingPacketRouter implements IPacketRouter {
 	@Override
 	public Set<String> getConnectedDeviceAddresses() {
 		return connectedDevices;
-	}
-
-	@Override
-	public void addReachableDevicesChangeListener(
-			ReachableDevicesChangeListener l) {
-		listeners.add(l);
-	}
-
-	@Override
-	public boolean removeReachableDevicesChangeListener(
-			ReachableDevicesChangeListener l) {
-		return listeners.remove(l);
-	}
-
-	private void notifyListeners() {
-		for (ReachableDevicesChangeListener l : listeners) {
-			l.reachableDevicesChanged();
-		}
-	}
-
-	@Override
-	public String getOwnAddress() {
-		return ownAddress;
-	}
-
-	@Override
-	public void setOwnAddress(String address) {
-		ownAddress = address;
 	}
 
 	@Override

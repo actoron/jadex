@@ -101,6 +101,14 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent implements Androi
 	}
 	
 	@Override
+	public void setStarted(boolean started) {
+		super.setStarted(started);
+		if (context != null) {
+			onContextCreate(context);
+		}
+	}
+	
+	@Override
 	public void onContextDestroy(Context ctx) {
 		if (isStarted() && context == ctx && binder != null) {
 			context.unbindService(sc);
@@ -162,7 +170,6 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent implements Androi
 			binder = IConnectionServiceConnection.Stub.asInterface(arg1);
 			Log.d(Helper.LOG_TAG, "(BTP2PDiscovery) Service bound! starting autoconnect...");
 			try {
-				
 				binder.registerAwarenessInfoCallback(awarenessCallback);
 				binder.startAutoConnect();
 			} catch (RemoteException e) {
