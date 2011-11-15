@@ -25,12 +25,4 @@
     <servlet-name>PuzzleDispatcher</servlet-name>
     <url-pattern>/puzzle/*</url-pattern>
   </servlet-mapping>
-  <servlet>
-    <servlet-name>RelayServlet</servlet-name>
-    <servlet-class>jadex.web.examples.relay.RelayServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>RelayServlet</servlet-name>
-    <url-pattern>/relay/*</url-pattern>
-  </servlet-mapping>
 </web-app>
