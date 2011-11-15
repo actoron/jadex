@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-android-example-project-maven</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.3</version>
 	<packaging>apk</packaging>
 	<name>jadex-android-example-project-maven</name>
 
@@ -12,9 +12,9 @@
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-core</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
+			<version>0.0.3</version>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>

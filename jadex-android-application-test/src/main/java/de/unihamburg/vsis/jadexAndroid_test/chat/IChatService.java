@@ -25,4 +25,6 @@ public interface IChatService
 	 */
 	public void removeChangeListener(IRemoteChangeListener listener);
 	
+	public String getIdentification();
+	
 }

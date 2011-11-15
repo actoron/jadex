@@ -22,7 +22,7 @@ import jadex.micro.annotation.RequiredServices;
 	@RequiredService(name="mychatservice", type=IChatService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_LOCAL))
 })
-@GuiClass(ChatActivity.class)
+@GuiClass(MeasureActivity.class)
 public class ChatAgent extends MicroAgent
 {
 }

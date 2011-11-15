@@ -25,6 +25,8 @@ public class ChatService implements IChatService
 	
 	/** The listeners. */
 	protected List listeners;
+
+	private String identification;
 	
 	/** The chat gui. */
 	
@@ -37,7 +39,8 @@ public class ChatService implements IChatService
 	public void start()
 	{
 		this.listeners = new ArrayList();
-		ChatActivity.chatAgent = this.agent.getExternalAccess();
+		this.identification = agent.getComponentIdentifier().getName();
+		MeasureActivity.chatAgent = this.agent.getExternalAccess();
 	}
 	
 	/**
@@ -81,6 +84,11 @@ public class ChatService implements IChatService
 	public void removeChangeListener(IRemoteChangeListener listener)
 	{
 		listeners.remove(listener);
+	}
+	
+	@Override
+	public String getIdentification() {
+		return identification;
 	}
 	
 	/**

@@ -1,6 +1,6 @@
 package de.unihamburg.vsis.jadexAndroid_test;
 
-import de.unihamburg.vsis.jadexAndroid_test.chat.ChatActivity;
+import de.unihamburg.vsis.jadexAndroid_test.chat.MeasureActivity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -45,7 +45,7 @@ public class MainMenu extends Activity implements OnClickListener {
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
 		configurations = new ConfigurationItem[] {
-				new ConfigurationItem("Chat Example", "chat"),
+				new ConfigurationItem("Performance Measurements", "performance"),
 				new ConfigurationItem("Micro Agent Creation Test",
 				"jadex/micro/benchmarks/AgentCreationAgent.class"),
 				new ConfigurationItem("BPMN Creation Test",
@@ -78,8 +78,8 @@ public class MainMenu extends Activity implements OnClickListener {
 				else if (conf.get_configFile().equals("awareness")) {
 					Intent i = new Intent(this, AwarenessActivity.class);
 					MainMenu.this.startActivity(i);
-				} else if (conf.get_configFile().equals("chat")) {
-					Intent i = new Intent(this, ChatActivity.class);
+				} else if (conf.get_configFile().equals("performance")) {
+					Intent i = new Intent(this, MeasureActivity.class);
 					MainMenu.this.startActivity(i);
 				}
 				else {

@@ -7,5 +7,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/jadex-android-core-0.0.3.jar"/>
 	<classpathentry kind="output" path="target/android-classes"/>
 </classpath>

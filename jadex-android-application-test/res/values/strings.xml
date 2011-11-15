@@ -14,6 +14,6 @@
 
 	<string name="agent_activity:launchAgent">launch Agent</string>
 
-
-	<string name="chat_activity:sendButtonLabel">send</string>
+	<string name="measure_activity:refreshButtonLabel">refresh</string>
+	<string name="measure_activity:sendButtonLabel">send</string>
 </resources>

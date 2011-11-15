@@ -58,9 +58,11 @@ public class DataPacket {
 
 	private byte[] _data;
 
-	// this is copied from BTClick. Setting higher values should work just fine.
-//	public static final int PACKET_SIZE = 1008;
-	public static final short PACKET_SIZE = 2048;
+	/**
+	 * Max packet size in bytes.
+	 */
+	public static final short PACKET_SIZE = 20000;
+//	public static final short PACKET_SIZE = 2048;
 	public static final short HEADER_SIZE = 1 + 17 + 17 + 1 + 21 + 2 + 1;
 	public static final short DATA_MAX_SIZE = PACKET_SIZE - HEADER_SIZE;
 
