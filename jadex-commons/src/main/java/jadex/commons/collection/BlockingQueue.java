@@ -2,6 +2,7 @@ package jadex.commons.collection;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -115,9 +116,11 @@ public class BlockingQueue implements IBlockingQueue
 	/**
 	 *  Open/close the queue.
 	 *  @param closed The closed state.
+	 *  @return The remaining elements after the queue has been closed.
 	 */
-	public void setClosed(boolean closed)
+	public List	setClosed(boolean closed)
 	{
+		List	ret;
 		if(!this.closed)
 		{
 			synchronized(monitor)
@@ -125,7 +128,13 @@ public class BlockingQueue implements IBlockingQueue
 				this.closed = closed;
 				monitor.notifyAll();
 			}
+			ret	= this.elems;
 		}
+		else
+		{
+			ret	= Collections.emptyList();
+		}
+		return ret;
 	}
 
 	/**

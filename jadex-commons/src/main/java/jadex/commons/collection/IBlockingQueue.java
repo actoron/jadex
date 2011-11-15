@@ -1,5 +1,7 @@
 package jadex.commons.collection;
 
+import java.util.List;
+
 /**
  *  A queue that blocks until an element is available.
  */
@@ -29,9 +31,10 @@ public interface IBlockingQueue<T>
 	/**
 	 *  Open/close the queue.
 	 *  @param closed The closed state.
+	 *  @return The remaining elements after the queue has been closed.
 	 */
-	public void setClosed(boolean closed);
-
+	public List<T>	setClosed(boolean closed);
+	
 	/**
 	 *  Get the size.
 	 *  @return The size.

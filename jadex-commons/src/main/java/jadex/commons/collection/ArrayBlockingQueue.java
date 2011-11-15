@@ -1,5 +1,9 @@
 package jadex.commons.collection;
 
+import java.util.Arrays;
+import java.util.List;
+
+
 
 /**
  *  Blocking queue implemented as array.
@@ -144,18 +148,38 @@ public class ArrayBlockingQueue<T>	implements IBlockingQueue<T>
     }
 
 	/**
-	 *  Close the queue.
+	 *  Open/close the queue.
 	 *  @param closed The closed state.
+	 *  @return The remaining elements after the queue has been closed.
 	 */
-	public void setClosed(boolean closed)
+	public List<T>	setClosed(boolean closed)
 	{
-		if(!this.closed)
+		Object[]	ret;
+		if(!this.closed && closed)
 		{
 			synchronized(monitor)
 			{
 				this.closed = closed;
 				monitor.notifyAll();
 			}
+			
+			
+			ret	= new Object[size];
+			if(start<end)
+        	{
+        		System.arraycopy(elements, start, ret, 0, size);
+        	}
+        	else if(start>end)
+        	{
+        		System.arraycopy(elements, start, ret, 0, elements.length-start);
+        		System.arraycopy(elements, 0, ret, elements.length-start, end);
+        	}
+
 		}
+		else
+		{
+			ret	= new Object[0];
+		}
+		return (List<T>)Arrays.asList(ret);
 	}
 }

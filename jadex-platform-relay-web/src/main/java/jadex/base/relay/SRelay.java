@@ -1,4 +1,4 @@
-package jadex.base.service.message.transport.httprelaymtp;
+package jadex.base.relay;
 
 import jadex.commons.SUtil;
 import jadex.xml.bean.JavaReader;

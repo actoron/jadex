@@ -191,7 +191,7 @@
 					$args.niotransport? new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())
 					: new TCPTransport($component.getServiceProvider(), $args.tcpport),
 					new HttpRelayTransport($component, SRelay.DEFAULT_ADDRESS)
-					//new HttpRelayTransport($component, "http://localhost:8080/jadex-applications-web/relay/")
+					//new HttpRelayTransport($component, "http://localhost:8080/jadex-platform-relay-web/")
 				},
 				new MessageType[]
 				{
