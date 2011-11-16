@@ -13,12 +13,12 @@ import java.lang.annotation.Target;
 public @interface Publish
 {
 	/**
-	 *  The publishing url.
+	 *  The publishing id, e.g. url or name.
 	 */
-	public String url();
+	public String publishid();
 	
 	/**
-	 *  The web service interface.
+	 *  The publishing type, e.g. web service.
 	 */
-	public Class type();
+	public String type();
 }

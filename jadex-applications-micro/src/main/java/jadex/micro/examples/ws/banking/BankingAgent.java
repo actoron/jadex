@@ -1,5 +1,6 @@
 package jadex.micro.examples.ws.banking;
 
+import jadex.bridge.service.types.publish.IPublishService;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentCreated;
@@ -17,7 +18,7 @@ import javax.xml.ws.Endpoint;
 @Agent
 @Imports({"jadex.base.service.ws.*", "jadex.micro.examples.ws.offerquote.gen.*"})
 @ProvidedServices(@ProvidedService(type=IBankingService.class, implementation=@Implementation(BankingService.class),
-	publish=@Publish(url="http://localhost:8080/quote", type=IWSBankingService.class)))
+	publish=@Publish(type=IPublishService.PUBLISH_WS, publishid="http://localhost:8080/quote")))
 public class BankingAgent
 {
 //	@Agent

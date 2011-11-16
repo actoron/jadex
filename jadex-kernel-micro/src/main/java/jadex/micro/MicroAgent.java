@@ -609,7 +609,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IFuture<Void>	addService(String name, Class<?> type, Object service, String proxytype)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IInternalService> fut = interpreter.addService(name, type, proxytype, null, service);
+		IFuture<IInternalService> fut = interpreter.addService(name, type, proxytype, null, service, null);
 		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
 		{
 			public void customResultAvailable(IInternalService result)
@@ -630,7 +630,7 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	public IFuture<Void>	addService(String name, Class<?> type, Object service)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IInternalService> fut = interpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service);
+		IFuture<IInternalService> fut = interpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service, null);
 		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
 		{
 			public void customResultAvailable(IInternalService result)

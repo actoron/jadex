@@ -1,5 +1,7 @@
 package jadex.micro.annotation;
 
+import jadex.bridge.service.types.publish.IPublishService;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -30,5 +32,5 @@ public @interface ProvidedService
 	/**
 	 *  Publish details.
 	 */
-	public Publish publish() default @Publish(url="", type=Object.class);
+	public Publish publish() default @Publish(publishid="", type=IPublishService.PUBLISH_WS);
 }

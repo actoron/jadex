@@ -11,6 +11,7 @@ import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectStringConverter;
+import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 /* $if !android $ */
 import javax.xml.namespace.QName;
@@ -217,6 +219,22 @@ public class JavaWriter extends Writer
 				null
 			));
 			typeinfos.add(ti_level);
+			
+			// java.logging.LogRecord
+			TypeInfo ti_record = new TypeInfo(null, new ObjectInfo(LogRecord.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("level", null), new AttributeConverter(null, new IObjectStringConverter()
+				{
+					public String convertObject(Object val, IContext context)
+					{
+						return ((Level)val).getName();
+					}
+				})),
+				new AttributeInfo(new AccessInfo("level", null))},
+				null
+			));
+			typeinfos.add(ti_record);
+			
 			
 			// java.net.InetAddress
 			// The following hack ensures that all subclasses of InetAdress will be stored using the same tag
@@ -574,9 +592,9 @@ public class JavaWriter extends Writer
 			{
 				public String convertObject(Object val, IContext context)
 				{
-					byte[] bytes = (byte[])val;
+					byte[] bytes = Base64.encode((byte[])val);
+//					byte[] bytes = (byte[])val;
 					return new String(bytes);
-					
 				}
 			};
 			TypeInfo ti_bytearray = new TypeInfo(null, new ObjectInfo(byte[].class),

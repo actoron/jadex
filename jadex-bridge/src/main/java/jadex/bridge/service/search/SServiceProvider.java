@@ -244,7 +244,7 @@ public class SServiceProvider
 	
 	/**
 	 *  Get one service with id.
-	 *  @param type The class.
+	 *  @param clazz The class.
 	 *  @return The corresponding service.
 	 */
 	public static <T> IFuture<T> getService(IServiceProvider provider, final IServiceIdentifier sid)
@@ -278,7 +278,7 @@ public class SServiceProvider
 	
 	/**
 	 *  Get one service of a type.
-	 *  @param type The class.
+	 *  @param clazz The class.
 	 *  @return The corresponding service.
 	 */
 	public static <T> IFuture<T> getService(IServiceProvider provider, final IResultSelector selector)

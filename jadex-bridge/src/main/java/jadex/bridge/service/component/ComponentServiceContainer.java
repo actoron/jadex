@@ -7,13 +7,17 @@ import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.marshal.IMarshalService;
+import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -26,7 +30,10 @@ import jadex.commons.future.IntermediateFuture;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.logging.Logger;
+
+import javax.management.ServiceNotFoundException;
 
 /**
  *  Service container for active components.
@@ -37,9 +44,6 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	
 	/** The component adapter. */
 	protected IComponentAdapter adapter;
-	
-//	/** The external access. */
-//	protected IComponentInstance instance;
 	
 	/** The internal access. */
 	protected IInternalAccess instance;
@@ -346,6 +350,100 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				super.customResultAvailable(result);
 			}
 		});
+		return ret;
+	}
+	
+	/**
+	 *  Called after a service has been started.
+	 */
+	public IFuture<Void> serviceStarted(final IInternalService service)
+	{
+		final Future<Void> ret = new Future<Void>();
+		ProvidedServiceInfo info = getProvidedServiceInfo(service.getServiceIdentifier());
+		final PublishInfo pi = info==null? null: info.getPublish();
+		if(pi!=null)
+		{
+			getPublishService(instance, pi.getType(), (Iterator<IPublishService>)null)
+				.addResultListener(instance.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
+			{
+				public void customResultAvailable(IPublishService ps)
+				{
+					ps.publishService(instance.getClassLoader(), service, pi.getPublishId())
+						.addResultListener(instance.createResultListener(new DelegationResultListener<Void>(ret)));
+				}
+			}));
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Called after a service has been shutdowned.
+	 */
+	public IFuture<Void> serviceShutdowned(IInternalService service)
+	{
+		final Future<Void> ret = new Future<Void>();
+		final IServiceIdentifier sid = service.getServiceIdentifier();
+		getPublishService(instance, type, null).addResultListener(instance.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
+		{
+			public void customResultAvailable(IPublishService ps)
+			{
+				ps.unpublishService(sid).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		}));
+		return ret;
+	}
+	
+	/**
+	 *  Get the publish service for a publish type (e.g. web service).
+	 *  @param type The type.
+	 *  @param services The iterator of publish services (can be null).
+	 *  @return The publish service.
+	 */
+	public static IFuture<IPublishService> getPublishService(final IInternalAccess instance, final String type, final Iterator<IPublishService> services)
+	{
+		final Future<IPublishService> ret = new Future<IPublishService>();
+		
+		if(services==null)
+		{
+			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(instance.getServiceContainer(), IPublishService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			fut.addResultListener(instance.createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
+			{
+				public void customResultAvailable(Collection<IPublishService> result)
+				{
+					getPublishService(instance, type, result.iterator()).addResultListener(new DelegationResultListener<IPublishService>(ret));
+				}
+			}));
+		}
+		else
+		{
+			if(services.hasNext())
+			{
+				final IPublishService ps = (IPublishService)services.next();
+				ps.isSupported(type).addResultListener(instance.createResultListener(new ExceptionDelegationResultListener<Boolean, IPublishService>(ret)
+				{
+					public void customResultAvailable(Boolean supported)
+					{
+						if(supported.booleanValue())
+						{
+							ret.setResult(ps);
+						}
+						else
+						{
+							getPublishService(instance, type, services).addResultListener(new DelegationResultListener<IPublishService>(ret));
+						}
+					}
+				}));
+			}
+			else
+			{
+				ret.setException(new ServiceNotFoundException("IPublishService"));
+			}
+		}
+		
 		return ret;
 	}
 	

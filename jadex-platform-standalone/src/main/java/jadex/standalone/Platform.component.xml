@@ -40,6 +40,7 @@
 		<import>jadex.bridge.service.types.settings.*</import>
 		<import>jadex.bridge.service.types.simulation.*</import>
 		<import>jadex.bridge.service.types.threadpool.*</import>
+		<import>jadex.bridge.service.types.publish.*</import>
 		<import>jadex.bridge.service.types.security.*</import>
 		
 		<import>jadex.base.service.awareness.*</import>
@@ -56,6 +57,7 @@
 		<import>jadex.base.service.settings.*</import>
 		<import>jadex.base.service.simulation.*</import>
 		<import>jadex.base.service.threadpool.*</import>
+		<import>jadex.base.service.publish.*</import>
 		<import>jadex.base.service.dependency.maven.*</import>
 		<import>jadex.base.service.security.*</import>
 		
@@ -223,12 +225,14 @@
 				new DeploymentService($component.getServiceProvider())
 			</implementation>		
 		</providedservice>
+		<providedservice class="IPublishService">
+			<implementation class="DefaultWebServicePublishService"/>
+		</providedservice>
 		<!-- 
 		<providedservice class="ISecurityService">
 			<implementation class="SecurityService"/>
 		</providedservice>
 		 -->
-		
 		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true">
 			<binding scope="platform"/>
 		</requiredservice>

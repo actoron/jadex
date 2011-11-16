@@ -1385,7 +1385,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 //			System.out.println("Found mapping: "+methods);
 			// Todo: interceptors
 			ret	= addService(info.getName(), info.getType(model, getClassLoader()), info.getImplementation().getProxytype(), null,
-				Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getType(model, getClassLoader())}, new ProcessServiceInvocationHandler(this, methods)));
+				Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getType(model, getClassLoader())}, new ProcessServiceInvocationHandler(this, methods)), null);
 		}
 		
 		// External service implementation

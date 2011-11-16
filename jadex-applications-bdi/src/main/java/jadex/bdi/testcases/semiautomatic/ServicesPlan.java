@@ -16,7 +16,7 @@ public class ServicesPlan extends Plan
 	public void body()
 	{
 		IServiceContainer container = (IServiceContainer)getServiceContainer();
-		container.addService(new PrintHelloService(container));
+		container.addService(new PrintHelloService(container), null);
 		
 		IPrintHelloService service = (IPrintHelloService)SServiceProvider.getService(container, 
 			IPrintHelloService.class, RequiredServiceInfo.SCOPE_LOCAL).get(this);

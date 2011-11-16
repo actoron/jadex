@@ -7,6 +7,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.search.IResultSelector;
@@ -68,9 +69,9 @@ public class ServiceContainerProxy implements IServiceContainer
 	 *  The service is started, if the container is already running.
 	 *  @param service The service.
 	 */
-	public IFuture	addService(IInternalService service)
+	public IFuture	addService(IInternalService service, ProvidedServiceInfo info)
 	{
-		return interpreter.getServiceContainer().addService(service);
+		return interpreter.getServiceContainer().addService(service, info);
 	}
 	
 	/**

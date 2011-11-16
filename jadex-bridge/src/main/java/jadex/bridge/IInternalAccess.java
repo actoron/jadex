@@ -93,25 +93,25 @@ public interface IInternalAccess
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
-	public IFuture addComponentListener(IComponentListener listener);
+	public IFuture<Void> addComponentListener(IComponentListener listener);
 	
 	/**
 	 *  Remove a component listener.
 	 *  @param listener The listener.
 	 */
-	public IFuture removeComponentListener(IComponentListener listener);
+	public IFuture<Void> removeComponentListener(IComponentListener listener);
 		
 	/**
 	 *  Get the arguments.
 	 *  @return The arguments.
 	 */
-	public Map getArguments();
+	public Map<String, Object> getArguments();
 	
 	/**
 	 *  Get the component results.
 	 *  @return The results.
 	 */
-	public Map getResults();
+	public Map<String, Object> getResults();
 	
 	/**
 	 *  Set a result value.

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 import junit.framework.TestCase;
 
@@ -101,6 +102,7 @@ public class Test extends TestCase
 				t.testInnerClass();
 				t.testURL();
 				t.testLoggingLevel();
+				t.testLogRecord();
 				t.testInetAddress();
 				t.testBeanWithPublicFields();
 				t.testBeanWithIncludedFields();
@@ -742,6 +744,22 @@ public class Test extends TestCase
 		Level level = Level.SEVERE;
 		
 		doWriteAndRead(level);
+	}
+	
+	/**
+	 *  Test if java.util.logging.LogRecord transfer works.
+	 */
+	public void testLogRecord() throws Exception
+	{
+		LogRecord lr = new LogRecord(Level.WARNING, "test message");
+		
+		doWriteAndRead(lr, new Comparator<LogRecord>()
+		{
+			public int compare(LogRecord o1, LogRecord o2)
+			{
+				return o1.getMessage().equals(o2.getMessage()) && o1.getLevel().equals(o2.getLevel())? 0: 1;
+			}
+		});
 	}
 	
 	/**

@@ -352,7 +352,7 @@ public class MicroClassReader
 					}
 					ProvidedServiceImplementation impl = createImplementation(im);
 					Publish p = vals[i].publish();
-					PublishInfo pi = p.url().length()==0? null: new PublishInfo(p.url(), p.type());
+					PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.type());
 					ProvidedServiceInfo psis = new ProvidedServiceInfo(vals[i].name().length()>0? 
 						vals[i].name(): null, vals[i].type(), impl, pi);
 				
@@ -500,7 +500,7 @@ public class MicroClassReader
 							ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
 								im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 							Publish p = provs[j].publish();
-							PublishInfo pi = p.url().length()==0? null: new PublishInfo(p.url(), p.type());
+							PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.type());
 							psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, pi);
 							configinfo.setProvidedServices(psis);
 						}

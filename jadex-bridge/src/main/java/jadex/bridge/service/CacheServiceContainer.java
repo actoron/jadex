@@ -337,9 +337,9 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  @param name The name.
 	 *  @param service The service.
 	 */
-	public IFuture addService(IInternalService service)
+	public IFuture addService(IInternalService service, ProvidedServiceInfo info)
 	{
-		return container.addService(service);
+		return container.addService(service, info);
 	}
 
 	/**

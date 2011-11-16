@@ -122,9 +122,9 @@ class ComponentAdapter implements IComponentAdapter
 	{
 		container = new ComponentServiceContainer(this, "platform", true, null);
 		ThreadPoolService tps = new ThreadPoolService(ThreadPoolFactory.createThreadPool(), container);
-		container.addService(tps);
+		container.addService(tps, null);
 		ClockService clock = new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "system"), container);
-		container.addService(clock);
+		container.addService(clock, null);
 		
 		exe = new Executor(tps);
 		exe.setExecutable(new IExecutable()

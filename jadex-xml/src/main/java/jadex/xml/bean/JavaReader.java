@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 /* $if !android $ */
 import javax.imageio.ImageIO;
@@ -391,6 +392,24 @@ public class JavaReader
 			));
 			typeinfos.add(ti_level);
 			
+			TypeInfo ti_record = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util.logging", "LogRecord")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						String name = (String)rawattributes.get("level");
+						String msg = (String)rawattributes.get("message");
+						Level level = Level.parse(name);
+						LogRecord ret = new LogRecord(level, msg);
+						return ret;
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("level", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("message", null, AccessInfo.IGNORE_READWRITE))}
+			));
+			typeinfos.add(ti_record);
+			
 			// java.net.InetAddress
 			TypeInfo ti_inetaddr = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.net", "InetAddress")}),
 				new ObjectInfo(new IBeanObjectCreator()
@@ -651,7 +670,7 @@ public class JavaReader
 			{
 				public Object convertString(String val, IContext context)
 				{
-					return val.getBytes();
+					return Base64.decode(val.getBytes());
 				}
 			};
 			TypeInfo ti_bytearray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO, "byte__1")}), null,

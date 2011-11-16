@@ -40,6 +40,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/** The map of platform services. */
 	protected Map services;
 	
+	/** The map of provided service infos. (sid -> provided service info) */
+	protected Map<IServiceIdentifier, ProvidedServiceInfo> serviceinfos;
+	
 	/** The container name. */
 	protected Object id;
 	
@@ -60,7 +63,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	
 	/**
 	 *  Get all services of a type.
-	 *  @param type The class.
+	 *  @param clazz The class.
 	 *  @return The corresponding services.
 	 */
 	public IIntermediateFuture<IService>	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
@@ -73,18 +76,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @return The parent container.
 	 */
 	public abstract IFuture<IServiceProvider>	getParent();
-//	{
-//		return new Future(null);
-//	}
 	
 	/**
 	 *  Get the children container.
 	 *  @return The children container.
 	 */
 	public abstract IFuture<Collection<IServiceProvider>>	getChildren();
-//	{
-//		return new Future(null);
-//	}
 	
 	/**
 	 *  Get the globally unique id of the provider.
@@ -111,7 +108,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param id The name.
 	 *  @param service The service.
 	 */
-	public IFuture<Void>	addService(IInternalService service)
+	public IFuture<Void>	addService(final IInternalService service, ProvidedServiceInfo info)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -125,12 +122,21 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 				if(services==null)
 					services = Collections.synchronizedMap(new LinkedHashMap());
 				services.put(service.getServiceIdentifier().getServiceType(), tmp);
+				if(serviceinfos==null)
+					serviceinfos = Collections.synchronizedMap(new HashMap());
+				serviceinfos.put(service.getServiceIdentifier(), info);
 			}
 			tmp.add(service);
 			
 			if(started)
 			{
-				service.startService().addResultListener(new DelegationResultListener(ret));
+				service.startService().addResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						serviceStarted(service);
+					}
+				});
 			}
 			else
 			{
@@ -148,7 +154,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public IFuture<Void> removeService(IServiceIdentifier sid)
 	{
-		Future<Void> ret = new Future<Void>();
+		final Future<Void> ret = new Future<Void>();
 		
 		if(sid==null)
 		{
@@ -166,14 +172,20 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			{
 				for(Iterator it=tmp.iterator(); it.hasNext() && service==null; )
 				{
-					IInternalService tst = (IInternalService)it.next();
+					final IInternalService tst = (IInternalService)it.next();
 					if(tst.getServiceIdentifier().equals(sid))
 					{
 						service = tst;
 						tmp.remove(service);
 						if(started)
 						{
-							service.shutdownService().addResultListener(new DelegationResultListener(ret));
+							service.shutdownService().addResultListener(new DelegationResultListener(ret)
+							{
+								public void customResultAvailable(Object result)
+								{
+									serviceShutdowned(tst).addResultListener(new DelegationResultListener<Void>(ret));
+								}
+							});
 						}
 						else
 						{
@@ -216,26 +228,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 				allservices.addAll((Collection)it.next());
 			}
 			initServices(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
-			
-//			final CounterResultListener	crl	= new CounterResultListener(allservices.size(), new DelegationResultListener(ret));
-//			for(Iterator it=allservices.iterator(); it.hasNext(); )
-//			{
-//				final IInternalService	is	= (IInternalService)it.next();
-//				getLogger().info("Starting service: "+is.getServiceIdentifier());
-//				is.startService().addResultListener(new IResultListener<Void>()
-//				{
-//					public void resultAvailable(Void result)
-//					{
-//						getLogger().info("Started service: "+is.getServiceIdentifier());
-//						crl.resultAvailable(result);
-//					}
-//					
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						crl.exceptionOccurred(exception);
-//					}
-//				});
-//			}
 		}
 		else
 		{
@@ -260,7 +252,13 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 				public void resultAvailable(Void result)
 				{
 					getLogger().info("Started service: "+is.getServiceIdentifier());
-					initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
+					serviceStarted(is).addResultListener(new DelegationResultListener<Void>(ret)
+					{
+						public void customResultAvailable(Void result)
+						{
+							initServices(services).addResultListener(new DelegationResultListener<Void>(ret));
+						}
+					});
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -301,32 +299,43 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			
 			// Shutdown services in reverse order as later services might depend on earlier ones.
 			// Todo: use removeService() to avoid duplicate code...
-			final IInternalService[]	service	= new IInternalService[1];	// one element array for final variable.
-			service[0]	= (IInternalService)allservices.remove(allservices.size()-1);
-			getLogger().info("Terminating service: "+service[0].getServiceIdentifier());
-//			System.out.println("shutdown start: "+service.getServiceIdentifier());
-			service[0].shutdownService().addResultListener(new DelegationResultListener(ret)
+			
+			doShutdown(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Void result)
 				{
-					services.remove(service[0].getServiceIdentifier().getServiceType());
-					getLogger().info("Terminated service: "+service[0].getServiceIdentifier());
-//					System.out.println("shutdown end: "+result);
-					if(!allservices.isEmpty())
-					{
-						service[0] = (IInternalService)allservices.remove(allservices.size()-1);
-						getLogger().info("Terminating service: "+service[0].getServiceIdentifier());
-//						System.out.println("shutdown start: "+service.getServiceIdentifier());
-						service[0].shutdownService().addResultListener(this);
-					}
-					else
-					{
-						reqservicefetchers	= null;
-						requiredserviceinfos	= null;
-						super.customResultAvailable(result);
-					}
+					reqservicefetchers	= null;
+					requiredserviceinfos	= null;
+					ret.setResult(null);
 				}
 			});
+			
+//			final IInternalService[]	service	= new IInternalService[1];	// one element array for final variable.
+//			service[0]	= (IInternalService)allservices.remove(allservices.size()-1);
+//			getLogger().info("Terminating service: "+service[0].getServiceIdentifier());
+////			System.out.println("shutdown start: "+service.getServiceIdentifier());
+//			service[0].shutdownService().addResultListener(new DelegationResultListener(ret)
+//			{
+//				public void customResultAvailable(Object result)
+//				{
+//					services.remove(service[0].getServiceIdentifier().getServiceType());
+//					getLogger().info("Terminated service: "+service[0].getServiceIdentifier());
+////					System.out.println("shutdown end: "+result);
+//					if(!allservices.isEmpty())
+//					{
+//						service[0] = (IInternalService)allservices.remove(allservices.size()-1);
+//						getLogger().info("Terminating service: "+service[0].getServiceIdentifier());
+////						System.out.println("shutdown start: "+service.getServiceIdentifier());
+//						service[0].shutdownService().addResultListener(this);
+//					}
+//					else
+//					{
+//						reqservicefetchers	= null;
+//						requiredserviceinfos	= null;
+//						super.customResultAvailable(result);
+//					}
+//				}
+//			});
 		}
 		else
 		{
@@ -334,6 +343,59 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Do shutdown the services.
+	 */
+	protected IFuture<Void> doShutdown(final Iterator<IInternalService> services)
+	{
+		final Future<Void> ret = new Future<Void>();
+		if(services.hasNext())
+		{
+			final IInternalService ser = services.next();
+			final IServiceIdentifier sid = ser.getServiceIdentifier();
+			getLogger().info("Terminating service: "+sid);
+			removeService(sid).addResultListener(new DelegationResultListener<Void>(ret)
+			{
+				public void customResultAvailable(Void result)
+				{
+					getLogger().info("Terminated service: "+sid);
+					doShutdown(services).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Called after a service has been started.
+	 */
+	public IFuture<Void> serviceStarted(IInternalService service)
+	{
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Called after a service has been shutdowned.
+	 */
+	public IFuture<Void> serviceShutdowned(IInternalService service)
+	{
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Get the provided service info for a service.
+	 *  @param sid The service identifier.
+	 *  @return The provided service info.
+	 */
+	protected ProvidedServiceInfo getProvidedServiceInfo(IServiceIdentifier sid)
+	{
+		return serviceinfos.get(sid);
 	}
 	
 	//-------- provided and required service management --------

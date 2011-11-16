@@ -3,14 +3,21 @@ package jadex.bridge.service;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.SReflect;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+
+import javax.management.ServiceNotFoundException;
 
 /**
  *  Basic service provide a simple default isValid() implementation
@@ -18,6 +25,7 @@ import java.util.Map;
  */
 public class BasicService implements IInternalService
 {	
+	
 	//-------- attributes --------
 
 	/** The id counter. */
@@ -35,52 +43,21 @@ public class BasicService implements IInternalService
 	/** The service properties. */
 	protected Map properties;
 	
+	/** The publish info. */
+	protected PublishInfo publishinfo;
+	
 	
 	/** The provider id. */
 	protected Object providerid;
 	
 	/** The type. */
 	protected Class type;
-//	
-//	/** The name. */
-//	protected String name;
-//	
-//	/** The type. */
-//	protected Class type;
-//	
-//	/** The implementation class. */
-//	protected Class implclazz;
 	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new service.
-	 * /
-	public BasicService()
-	{
-		this(null);
-	}*/
-	
-	/**
-	 *  Create a new service.
-	 * /
-	public BasicService(IServiceIdentifier sid)
-	{
-		this.sid = sid;
-	}*/
-	
-//	/**
-//	 *  Create a new service.
-//	 */
-//	public BasicService(Object providerid, Class type, Map properties)
-//	{
-//		this(providerid, type, null, properties);
-//	}
-	
-	/**
-	 *  Create a new service.
 	 */
-//	public BasicService(Object providerid, Class type, Class implclazz, Map properties)
 	public BasicService(Object providerid, Class type, Map properties)
 	{
 //		if(!SReflect.isSupertype(type, getClass()))
@@ -170,6 +147,24 @@ public class BasicService implements IInternalService
 	public void setPropertyMap(Map properties)
 	{
 		this.properties = properties;
+	}
+	
+	/**
+	 *  Get the publish info.
+	 *  @return The publish info.
+	 */
+	public PublishInfo getPublishInfo()
+	{
+		return publishinfo;
+	}
+	
+	/**
+	 *  Set the publishinfo.
+	 *  @param publishinfo The publishinfo to set.
+	 */
+	public void setPublishInfo(PublishInfo publishinfo)
+	{
+		this.publishinfo = publishinfo;
 	}
 
 	/**

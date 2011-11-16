@@ -55,6 +55,7 @@ public class MarshalService extends BasicService implements IMarshalService
 		refs.put(IIntermediateFuture.class, tt);
 		refs.put(IChangeListener.class, tt);
 		refs.put(IRemoteChangeListener.class, tt);
+		refs.put(ClassLoader.class, tt);
 		
 		boolean[] tf = new boolean[]{true, false};
 		refs.put(URL.class, tf);

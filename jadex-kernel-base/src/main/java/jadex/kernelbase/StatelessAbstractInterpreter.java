@@ -27,6 +27,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -37,6 +38,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.future.CollectionResultListener;
@@ -51,7 +53,6 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,9 +65,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
-import javax.xml.ws.Endpoint;
+import javax.management.ServiceNotFoundException;
 
 /**
  *  Base class for all kinds of interpreters.
@@ -1043,14 +1042,15 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param service The service.
 	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public IFuture<IInternalService> addService(String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, Object service)
+	public IFuture<IInternalService> addService(String name, Class type, String proxytype, 
+		IServiceInvocationInterceptor[] ics, Object service, ProvidedServiceInfo info)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		final Future<IInternalService> ret = new Future<IInternalService>();
 		
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
 			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy());
-		getServiceContainer().addService(proxy).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
+		getServiceContainer().addService(proxy, info).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
@@ -1082,7 +1082,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					rsi.getName(), rsi.getType(model, getClassLoader()), BasicServiceInvocationHandler.class);
 				final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
 					getExternalAccess(), getComponentAdapter(), sid, rsi, impl.getBinding(), isCopy(), getClassLoader());
-				getServiceContainer().addService(service).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
+				getServiceContainer().addService(service, info).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 			}
 			else
 			{
@@ -1130,17 +1130,28 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					}
 					
 					final Class type = info.getType(model, getClassLoader());
-					addService(info.getName(), type, info.getImplementation().getProxytype(), ics, ser)
+					addService(info.getName(), type, info.getImplementation().getProxytype(), ics, ser, info)
 						.addResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
 					{
-						public void customResultAvailable(IInternalService service)
+						public void customResultAvailable(final IInternalService service)
 						{
-							if(info.getPublish()!=null)
+							final PublishInfo pi = info.getPublish();
+							if(pi!=null)
 							{
-								Object pr = Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getPublish().getType()}, new WebServiceWrapperInvocationHandler2(service));
-								Endpoint endpoint = Endpoint.publish(info.getPublish().getUrl(), pr);
+								getPublishService(pi.getType(), (Iterator<IPublishService>)null)
+									.addResultListener(createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
+								{
+									public void customResultAvailable(IPublishService ps)
+									{
+										ps.publishService(getClassLoader(), service, pi.getPublishId())
+											.addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
+									}
+								}));
 							}
-							ret.setResult(null);
+							else
+							{
+								ret.setResult(null);
+							}
 						}
 					});
 				}
@@ -1150,6 +1161,56 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		{
 //			e.printStackTrace();
 			ret.setException(e);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the publish service for a publish type (e.g. web service).
+	 *  @param type The type.
+	 *  @param services The iterator of publish services (can be null).
+	 *  @return The publish service.
+	 */
+	protected IFuture<IPublishService> getPublishService(final String type, final Iterator<IPublishService> services)
+	{
+		final Future<IPublishService> ret = new Future<IPublishService>();
+		
+		if(services==null)
+		{
+			IFuture<Collection<IPublishService>> fut = SServiceProvider.getServices(getServiceProvider(), IPublishService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<Collection<IPublishService>, IPublishService>(ret)
+			{
+				public void customResultAvailable(Collection<IPublishService> result)
+				{
+					getPublishService(type, result.iterator()).addResultListener(new DelegationResultListener<IPublishService>(ret));
+				}
+			}));
+		}
+		else
+		{
+			if(services.hasNext())
+			{
+				final IPublishService ps = (IPublishService)services.next();
+				ps.isSupported(type).addResultListener(createResultListener(new ExceptionDelegationResultListener<Boolean, IPublishService>(ret)
+				{
+					public void customResultAvailable(Boolean supported)
+					{
+						if(supported.booleanValue())
+						{
+							ret.setResult(ps);
+						}
+						else
+						{
+							getPublishService(type, services).addResultListener(new DelegationResultListener<IPublishService>(ret));
+						}
+					}
+				}));
+			}
+			else
+			{
+				ret.setException(new ServiceNotFoundException("IPublishService"));
+			}
 		}
 		
 		return ret;

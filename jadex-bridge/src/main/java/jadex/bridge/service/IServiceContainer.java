@@ -33,14 +33,14 @@ public interface IServiceContainer extends IServiceProvider
 	// todo: remove, only call from platform
 	public IFuture<Void> shutdown();
 	
-	
 	/**
 	 *  Add a service to the container.
 	 *  The service is started, if the container is already running.
 	 *  @param service The service.
+	 *  @param info The provided service info.
 	 *  @return A future that is done when the service has completed starting.  
 	 */
-	public IFuture<Void>	addService(IInternalService service);
+	public IFuture<Void>	addService(IInternalService service, ProvidedServiceInfo info);
 
 	/**
 	 *  Removes a service from the container (shutdowns also the service if the container is running).

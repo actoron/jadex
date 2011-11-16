@@ -5,11 +5,11 @@ package jadex.bridge.service;
  */
 public class PublishInfo
 {
-	/** The url. */
-	protected String url;
+	/** The publish id. */
+	protected String pid;
 	
-	/** The interface to publish. */
-	protected Class type;
+	/** The publish type. */
+	protected String type;
 
 	/**
 	 *  Create a new publish info.
@@ -19,39 +19,39 @@ public class PublishInfo
 	}
 
 	/**
-	 * 
-	 *  @param url The url.
+	 *  Create a new publish info.
+	 *  @param pid The publish id, e.g. url.
 	 *  @param type The type.
 	 */
-	public PublishInfo(String url, Class type)
+	public PublishInfo(String pid, String type)
 	{
-		this.url = url;
+		this.pid = pid;
 		this.type = type;
 	}
 
 	/**
-	 *  Get the url.
-	 *  @return The url.
+	 *  Get the publishid.
+	 *  @return the publishid.
 	 */
-	public String getUrl()
+	public String getPublishId()
 	{
-		return url;
+		return pid;
 	}
 
 	/**
-	 *  Set the url.
-	 *  @param url The url to set.
+	 *  Set the publishid.
+	 *  @param publishid The publishid to set.
 	 */
-	public void setUrl(String url)
+	public void setPublishId(String pid)
 	{
-		this.url = url;
+		this.pid = pid;
 	}
 
 	/**
 	 *  Get the type.
-	 *  @return The type.
+	 *  @return the type.
 	 */
-	public Class getType()
+	public String getType()
 	{
 		return type;
 	}
@@ -60,7 +60,7 @@ public class PublishInfo
 	 *  Set the type.
 	 *  @param type The type to set.
 	 */
-	public void setType(Class type)
+	public void setType(String type)
 	{
 		this.type = type;
 	}
