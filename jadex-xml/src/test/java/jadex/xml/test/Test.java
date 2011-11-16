@@ -89,6 +89,7 @@ public class Test extends TestCase
 				t.testMultiArray();
 				t.testMultiArray2();
 				t.testMultiArrayAttribute();
+				t.testByteArrayAttribute();
 				t.testVectorModel();
 				t.testClass();
 				t.testDate();
@@ -588,6 +589,22 @@ public class Test extends TestCase
 		ad.setData(new int[]{1,2,3});
 		
 		doWriteAndRead(ad);
+	}
+	
+	/**
+	 *  Test if multi array attribute transfer works.
+	 */
+	public void testByteArrayAttribute() throws Exception
+	{
+		byte[]	data	= new byte[256];
+		for(int b=0; b<256; b++)
+		{
+			data[b]	= (byte)b;
+		}
+		ByteArrayHolder	bah	= new ByteArrayHolder();
+		bah.setData(data);
+		
+		doWriteAndRead(bah);
 	}
 	
 	/**
