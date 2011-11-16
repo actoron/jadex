@@ -3,7 +3,6 @@ package jadex.base.service.remote;
 import jadex.base.fipa.SFipa;
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.base.service.remote.commands.RemoteGetExternalAccessCommand;
-import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.base.service.remote.commands.RemoteSearchCommand;
 import jadex.base.service.remote.xml.RMIPostProcessor;
 import jadex.base.service.remote.xml.RMIPreProcessor;
@@ -30,6 +29,7 @@ import jadex.commons.IRemotable;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -58,17 +58,10 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/* $if !android $ */
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
-/* $else $
-import javaxx.xml.namespace.QName;
-import javaxx.xml.stream.Location;
-import javaxx.xml.stream.XMLReporter;
-import javaxx.xml.stream.XMLStreamException;
-$endif $ */
 
 /**
  *  The remote service management service is responsible for 
@@ -350,6 +343,19 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		return ret;
 	}
+	
+	/**
+	 *  Get the local password.
+	 *  @return 
+	 */
+	// Save to be allowed remotely, as it can only be called, when password is already known.
+	// Putting method in service allows passwords to be administered using remote JCCs.
+	public IFuture<String>	getLocalPassword()
+	{
+		return new Future<String>("dummy");
+//		return new Future<String>((String)null);
+	}
+
 
 	/**
 	 *  Get the component.
@@ -447,169 +453,191 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public void sendMessage(final IComponentIdentifier receiver, final Object content,
 		final String callid, final long to, final Future future)
 	{
+//		System.out.println("RMS sending: "+content);
+		
 		component.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("sendMessage")
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
+				Future<Void>	pre	= new Future<Void>(); 
 				if(content instanceof AbstractRemoteCommand)
 				{
-					((AbstractRemoteCommand)content).preprocessCommand(rrm, receiver);
+					((AbstractRemoteCommand)content).preprocessCommand(ia, rrm, receiver)
+						.addResultListener(new DelegationResultListener<Void>(pre));
+				}
+				else
+				{
+					pre.setResult(null);
 				}
 				
-				final long timeout = to<=0? DEFAULT_TIMEOUT: to;
-				
-				putWaitingCall(callid, future);
-//				System.out.println("Waitingcalls: "+waitingcalls.size());
-				
-				final Map msg = new HashMap();
-				msg.put(SFipa.SENDER, component.getComponentIdentifier());
-				msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
-				msg.put(SFipa.CONVERSATION_ID, callid);
-//				msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
-				
-				SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new IResultListener()
+				pre.addResultListener(new DefaultResultListener<Void>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Void v)
 					{
-						final ILibraryService ls = (ILibraryService)result;
+						final long timeout = to<=0? DEFAULT_TIMEOUT: to;
 						
-						SServiceProvider.getService(component.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						putWaitingCall(callid, future);
+//						System.out.println("Waitingcalls: "+waitingcalls.size());
+						
+						final Map msg = new HashMap();
+						msg.put(SFipa.SENDER, component.getComponentIdentifier());
+						msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
+						msg.put(SFipa.CONVERSATION_ID, callid);
+		//				msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
+						
+						SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(ia.createResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
-								final IMessageService ms = (IMessageService)result;
+								final ILibraryService ls = (ILibraryService)result;
 								
-								ls.getClassLoader(component.getModel().getResourceIdentifier()).addResultListener(new IResultListener()
+								SServiceProvider.getService(component.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(ia.createResultListener(new IResultListener()
 								{
 									public void resultAvailable(Object result)
 									{
-										ClassLoader cl = (ClassLoader)result;
+										final IMessageService ms = (IMessageService)result;
 										
-										// todo: use rid of sender?! (not important as writer does not use classloader, only nuggets)
-//										ClassLoader cl = ls.getClassLoader(component.getModel().getResourceIdentifier());
-										
-										// Hack!!! Manual encoding for using custom class loader at receiver side.
-//										msg.put(SFipa.CONTENT, JavaWriter.objectToXML(content, ls.getClassLoader()));
-										
-//										System.out.println("sent: "+callid);
-//										System.out.println("RMS sending to: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
-										
-										
-										String cont = Writer.objectToXML(getWriter(), content, cl, receiver);
-										msg.put(SFipa.CONTENT, cont);
-										
-//										if(cont.indexOf("getServices")!=-1)
-//										{
-//											interestingcalls.put(callid, cont);
-//										}
-										
-										ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), component.getModel().getResourceIdentifier(), null)
-											.addResultListener(ia.createResultListener(new IResultListener()
+										ls.getClassLoader(component.getModel().getResourceIdentifier()).addResultListener(new IResultListener()
 										{
 											public void resultAvailable(Object result)
 											{
-												// ok message could be sent.
-												timer.schedule(new TimerTask()
-												{
-													public void run()
-													{
-														ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-														{
-															public IFuture<Void> execute(IInternalAccess ia)
-															{
-																if(!future.isDone())
-																{
-																	removeWaitingCall(callid);
-																	future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid)
-																	{
-																		public void printStackTrace()
-																		{
-																			Thread.dumpStack();
-																			super.printStackTrace();
-																		}
-																	}
-																	);
-																}
-																return IFuture.DONE;
-															}
-														});
-//														System.out.println("timeout triggered: "+msg);
-													}
-												}, timeout);
+												ClassLoader cl = (ClassLoader)result;
 												
-
-												future.addResultListener(ia.createResultListener(new IResultListener()
+												// todo: use rid of sender?! (not important as writer does not use classloader, only nuggets)
+		//										ClassLoader cl = ls.getClassLoader(component.getModel().getResourceIdentifier());
+												
+												// Hack!!! Manual encoding for using custom class loader at receiver side.
+		//										msg.put(SFipa.CONTENT, JavaWriter.objectToXML(content, ls.getClassLoader()));
+												
+//												System.out.println("RMS sending to: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
+//												try
+//												{
+													String cont = Writer.objectToXML(getWriter(), content, cl, receiver);
+													msg.put(SFipa.CONTENT, cont);
+//												}
+//												catch(RuntimeException e)
+//												{
+//													e.printStackTrace();
+//													throw e;
+//												}
+												
+//												System.out.println("RMS sending to2: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
+		//										if(cont.indexOf("getServices")!=-1)
+		//										{
+		//											interestingcalls.put(callid, cont);
+		//										}
+												
+												ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), component.getModel().getResourceIdentifier(), null)
+													.addResultListener(ia.createResultListener(new IResultListener()
 												{
 													public void resultAvailable(Object result)
 													{
-														removeWaitingCall(callid);
-//														System.out.println("Waitingcalls: "+waitingcalls.size());
-//														System.out.println("Cancel timeout (res): "+callid+" "+future);
-//														errors.put(callid, new Object[]{"Cancel timeout (res)", result});
+//														System.out.println("sent: "+callid);
+														// ok message could be sent.
+														timer.schedule(new TimerTask()
+														{
+															public void run()
+															{
+																ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+																{
+																	public IFuture<Void> execute(IInternalAccess ia)
+																	{
+																		if(!future.isDone())
+																		{
+																			removeWaitingCall(callid);
+																			future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid)
+																			{
+																				public void printStackTrace()
+																				{
+																					Thread.dumpStack();
+																					super.printStackTrace();
+																				}
+																			}
+																			);
+																		}
+																		return IFuture.DONE;
+																	}
+																});
+		//														System.out.println("timeout triggered: "+msg);
+															}
+														}, timeout);
+														
+		
+														future.addResultListener(ia.createResultListener(new IResultListener()
+														{
+															public void resultAvailable(Object result)
+															{
+																removeWaitingCall(callid);
+		//														System.out.println("Waitingcalls: "+waitingcalls.size());
+		//														System.out.println("Cancel timeout (res): "+callid+" "+future);
+		//														errors.put(callid, new Object[]{"Cancel timeout (res)", result});
+															}
+																			
+															public void exceptionOccurred(Exception exception)
+															{
+		//														exception.printStackTrace();
+																removeWaitingCall(callid);
+		//														System.out.println("Waitingcalls: "+waitingcalls.size());
+		//														System.out.println("Cancel timeout (ex): "+callid+" "+future);
+		//														errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
+		//														ia.getLogger().warning("Remote request failed: "+content);
+																ia.getLogger().info("Remote exception occurred: "+exception.toString());
+															}
+														}));
 													}
-																	
+													
 													public void exceptionOccurred(Exception exception)
 													{
-//														exception.printStackTrace();
+//														System.out.println("not sent: "+callid);
+														// message could not be sent -> fail immediately.
+		//												System.out.println("Callee could not be reached: "+exception);
+		//												errors.put(callid, new Object[]{"Callee could not be reached", exception});
+														future.setException(exception);
 														removeWaitingCall(callid);
-//														System.out.println("Waitingcalls: "+waitingcalls.size());
-//														System.out.println("Cancel timeout (ex): "+callid+" "+future);
-//														errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
-//														ia.getLogger().warning("Remote request failed: "+content);
-														ia.getLogger().info("Remote exception occurred: "+exception.toString());
+		//												waitingcalls.remove(callid);
+		//												System.out.println("Waitingcalls: "+waitingcalls.size());
 													}
 												}));
 											}
-											
 											public void exceptionOccurred(Exception exception)
 											{
-												// message could not be sent -> fail immediately.
-//												System.out.println("Callee could not be reached: "+exception);
-//												errors.put(callid, new Object[]{"Callee could not be reached", exception});
-												future.setException(exception);
+		//										System.out.println("Classlooder not found: "+exception);
+		//										errors.put(callid, new Object[]{"No msg service", exception});
 												removeWaitingCall(callid);
-//												waitingcalls.remove(callid);
-//												System.out.println("Waitingcalls: "+waitingcalls.size());
+		//										waitingcalls.remove(callid);
+		//										System.out.println("Waitingcalls: "+waitingcalls.size());
+												future.setException(exception);
 											}
-										}));
+										});
 									}
+									
 									public void exceptionOccurred(Exception exception)
 									{
-//										System.out.println("Classlooder not found: "+exception);
-//										errors.put(callid, new Object[]{"No msg service", exception});
+		//								System.out.println("Message service not found: "+exception);
+		//								errors.put(callid, new Object[]{"No msg service", exception});
 										removeWaitingCall(callid);
-//										waitingcalls.remove(callid);
-//										System.out.println("Waitingcalls: "+waitingcalls.size());
+		//								waitingcalls.remove(callid);
+		//								System.out.println("Waitingcalls: "+waitingcalls.size());
 										future.setException(exception);
 									}
-								});
+								}));
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
-//								System.out.println("Message service not found: "+exception);
-//								errors.put(callid, new Object[]{"No msg service", exception});
+		//						System.out.println("Library service not found: "+exception);
+		//						errors.put(callid, new Object[]{"No lib service", exception});
 								removeWaitingCall(callid);
-//								waitingcalls.remove(callid);
-//								System.out.println("Waitingcalls: "+waitingcalls.size());
+		//						waitingcalls.remove(callid);
+		//						System.out.println("Waitingcalls: "+waitingcalls.size());
 								future.setException(exception);
 							}
 						}));
 					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-//						System.out.println("Library service not found: "+exception);
-//						errors.put(callid, new Object[]{"No lib service", exception});
-						removeWaitingCall(callid);
-//						waitingcalls.remove(callid);
-//						System.out.println("Waitingcalls: "+waitingcalls.size());
-						future.setException(exception);
-					}
-				}));
+				});
 				
 				return IFuture.DONE;
 			}

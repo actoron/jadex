@@ -7,8 +7,10 @@ import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.marshal.IMarshalService;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -76,23 +78,33 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	/**
 	 *  Preprocess command and replace if they are remote references.
 	 */
-	public void preprocessCommand(RemoteReferenceModule rrm, IComponentIdentifier target)
+	public IFuture<Void>	preprocessCommand(IInternalAccess component, final RemoteReferenceModule rrm, final IComponentIdentifier target)
 	{
-		if(parametertypes.length>0)
+		Future<Void>	ret	= new Future<Void>();
+		super.preprocessCommand(component, rrm, target)
+			.addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			RMIPreProcessor preproc = new RMIPreProcessor(rrm);
-			boolean[] refs = SServiceProvider.getRemoteReferenceInfo(method, false);
-			WriteContext context = new WriteContext(null, target, null, null);
-			for(int i=0; i<parametertypes.length; i++)
+			public void customResultAvailable(Void result)
 			{
-				if(refs[i] || rrm.getMarshalService().isRemoteReference(parametervalues[i]))
+				if(parametertypes.length>0)
 				{
-//					System.out.println("found ref: "+parametervalues[i]);
-					parametervalues[i] = preproc.preProcess(context, parametervalues[i]);
+					RMIPreProcessor preproc = new RMIPreProcessor(rrm);
+					boolean[] refs = SServiceProvider.getRemoteReferenceInfo(method, false);
+					WriteContext context = new WriteContext(null, target, null, null);
+					for(int i=0; i<parametertypes.length; i++)
+					{
+						if(refs[i] || rrm.getMarshalService().isRemoteReference(parametervalues[i]))
+						{
+//							System.out.println("found ref: "+parametervalues[i]);
+							parametervalues[i] = preproc.preProcess(context, parametervalues[i]);
+						}
+					}
+					returnisref = SServiceProvider.isReturnValueRemoteReference(method, false);
 				}
+				super.customResultAvailable(result);
 			}
-			returnisref = SServiceProvider.isReturnValueRemoteReference(method, false);
-		}
+		});
+		return ret;
 	}
 	
 	/**

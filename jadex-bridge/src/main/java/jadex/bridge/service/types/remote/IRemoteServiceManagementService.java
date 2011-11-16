@@ -2,6 +2,7 @@ package jadex.bridge.service.types.remote;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.Uncached;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
@@ -61,5 +62,4 @@ public interface IRemoteServiceManagementService extends IService
 	 *  @return External access of remote component. 
 	 */
 	public IFuture getExternalAccessProxy(IComponentIdentifier cid);
-	
 }

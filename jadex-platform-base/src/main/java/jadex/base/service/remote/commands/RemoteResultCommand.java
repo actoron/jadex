@@ -1,13 +1,12 @@
 package jadex.base.service.remote.commands;
 
 import jadex.base.service.remote.ExceptionInfo;
-import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.marshal.IMarshalService;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.IMicroExternalAccess;
@@ -69,19 +68,30 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	//-------- methods --------
 	
 	/**
-	 *  Preprocess command and replace  if they are remote references.
+	 *  Preprocess command and replace if they are remote references.
 	 */
-	public void preprocessCommand(RemoteReferenceModule rrm, IComponentIdentifier target)
+	public IFuture<Void>	preprocessCommand(IInternalAccess component, final RemoteReferenceModule rrm, final IComponentIdentifier target)
 	{
-		if(result!=null)
-		{
-			if(isref || rrm.getMarshalService().isRemoteReference(result))
-			{
-				RMIPreProcessor preproc = new RMIPreProcessor(rrm);
-				WriteContext context = new WriteContext(null, target, null, null);
-				result = preproc.preProcess(context, result);
-			}
-		}
+		final Future<Void>	ret	= new Future<Void>();
+		// Do not preprocess result commands in security service, as results are allowed by default.
+//		super.preprocessCommand(component, rrm, target)
+//			.addResultListener(new DelegationResultListener<Void>(ret)
+//		{
+//			public void customResultAvailable(Void v)
+//			{
+				if(result!=null)
+				{
+					if(isref || rrm.getMarshalService().isRemoteReference(result))
+					{
+						RMIPreProcessor preproc = new RMIPreProcessor(rrm);
+						WriteContext context = new WriteContext(null, target, null, null);
+						result = preproc.preProcess(context, result);
+					}
+				}
+				ret.setResult(null);
+//			}
+//		});
+		return ret;
 	}
 	
 	/**

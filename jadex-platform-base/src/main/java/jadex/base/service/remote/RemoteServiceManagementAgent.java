@@ -8,14 +8,18 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
+import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.xml.reader.Reader;
@@ -88,7 +92,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 *  Called just before the agent is removed from the platform.
 	 *  @return The result of the component.
 	 */
-	public IFuture	agentKilled()
+	public IFuture<Void>	agentKilled()
 	{
 		// Send notifications to other processes that remote references are not needed any longer.
 		return rms.getRemoteReferenceModule().shutdown();
@@ -99,27 +103,25 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 *  @param msg The message.
 	 *  @param mt The message type.
 	 */
-	public void messageArrived(final Map msg, final MessageType mt)
+	public void messageArrived(final Map<String, Object> msg, final MessageType mt)
 	{
+//		System.out.println("RMS received message: "+msg);
+		
 		if(SFipa.MESSAGE_TYPE_NAME_FIPA.equals(mt.getName()))
 		{
-			SServiceProvider.getService(getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(createResultListener(new DefaultResultListener()
+			getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new DefaultResultListener<ILibraryService>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(final ILibraryService ls)
 				{
 					// Hack!!! Manual decoding for using custom class loader.
-					final ILibraryService ls = (ILibraryService)result;
-					
 					// todo: use classloader of receiver
 					// currently just uses the 'global' platform classloader 
 //					ClassLoader cl = ls.getClassLoader(null);//rms.getComponent().getModel().getResourceIdentifier());
-					ls.getClassLoader(null).addResultListener(new DefaultResultListener()
+					ls.getClassLoader(null).addResultListener(new DefaultResultListener<ClassLoader>()
 					{
-						public void resultAvailable(Object result) 
+						public void resultAvailable(final ClassLoader cl) 
 						{
-							final ClassLoader cl = (ClassLoader)result;
-					
 							Object content = msg.get(SFipa.CONTENT);
 							final String callid = (String)msg.get(SFipa.CONVERSATION_ID);
 							
@@ -129,7 +131,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 		//						System.out.println("store command: "+callid+" "+getComponentIdentifier());
 		
 		//					// For debugging.
-							final String orig = (String)content;
+//							final String orig = (String)content;
 		
 							if(content instanceof String)
 							{
@@ -138,7 +140,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								// Should be ignored or be a warning.
 								try
 								{	
-									List	errors	= new ArrayList();
+									List<Object>	errors	= new ArrayList<Object>();
 		//								String contentcopy = (String)content;	// for debugging
 									
 									content = Reader.objectFromXML(rms.getReader(), (String)content, cl, errors);
@@ -179,44 +181,106 @@ public class RemoteServiceManagementAgent extends MicroAgent
 		//						if(content instanceof RemoteResultCommand && ((RemoteResultCommand)content).getMethodName()!=null && ((RemoteResultCommand)content).getMethodName().indexOf("store")!=-1)
 		//							System.out.println("result of command1: "+com+" "+result);
 								
-		//						System.out.println("received: "+rms.getServiceIdentifier()+" "+content);
+//								System.out.println("received: "+rms.getServiceIdentifier()+" "+content);
 								
-								com.execute((IMicroExternalAccess)getExternalAccess(), rms).addResultListener(createResultListener(new DefaultResultListener()
+								// Validate command.
+								final Future<Void>	valid	= new Future<Void>();
+								if(com instanceof RemoteResultCommand)
 								{
-									public void resultAvailable(Object result)
+									// Results are allowed to simplify one-way authentication.
+									valid.setResult(null);
+								}
+								else
+								{
+									getServiceContainer().searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+										.addResultListener(new IResultListener<ISecurityService>()
 									{
-		//								if(((String)orig).indexOf("store")!=-1)
-		//									System.out.println("result of command2: "+com+" "+result);
+										public void resultAvailable(ISecurityService sec)
+										{
+											sec.validateRequest(com).addResultListener(new DelegationResultListener<Void>(valid));
+										}
+										public void exceptionOccurred(Exception e)
+										{
+											if(e instanceof ServiceNotFoundException)
+											{
+												// Valid by default, if no security service installed.
+												valid.setResult(null);
+											}
+											else
+											{
+												valid.setException(e);
+											}
+										}
+									});
+								}
+								
+								// Execute command and fetch reply
+								final Future<IRemoteCommand>	reply	= new Future<IRemoteCommand>();
+								valid.addResultListener(new IResultListener<Void>()
+								{
+									public void resultAvailable(Void result)
+									{
+//										System.out.println("Command valid: "+com);
+										com.execute((IMicroExternalAccess)getExternalAccess(), rms)
+											.addResultListener(createResultListener(new DelegationResultListener<IRemoteCommand>(reply)));
+									}
+									
+									public void exceptionOccurred(Exception exception)
+									{
+										getLogger().info("RMS rejected unauthorized command: "+com);
+										reply.setResult(new RemoteResultCommand(null, exception, callid, false));
+									}
+								});
+								
+								reply.addResultListener(new DefaultResultListener<IRemoteCommand>()
+								{
+									public void resultAvailable(final IRemoteCommand result)
+									{
+//										if(((String)orig).indexOf("store")!=-1)
+//											System.out.println("result of command: "+com+" "+result);
 										if(result!=null)
 										{
-											final Object repcontent = result;
-											if(repcontent instanceof AbstractRemoteCommand)
-												((AbstractRemoteCommand)repcontent).preprocessCommand(rms.getRemoteReferenceModule(), (IComponentIdentifier)msg.get(SFipa.SENDER));
-											
-											createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener()
+											Future<Void>	pre	= new Future<Void>(); 
+											if(result instanceof AbstractRemoteCommand)
 											{
-												public void resultAvailable(Object result)
+												((AbstractRemoteCommand)result).preprocessCommand(RemoteServiceManagementAgent.this,
+													rms.getRemoteReferenceModule(), (IComponentIdentifier)msg.get(SFipa.SENDER))
+													.addResultListener(new DelegationResultListener<Void>(pre));
+											}
+											else
+											{
+												pre.setResult(null);
+											}
+											
+											pre.addResultListener(new DefaultResultListener<Void>()
+											{
+												public void resultAvailable(Void v)
 												{
-													Map reply = (Map)result;
-		//											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
-													
-//													ClassLoader cl = ls.getClassLoader(null);//rms.getComponent().getModel().getResourceIdentifier());
-													String content = Writer.objectToXML(rms.getWriter(), repcontent, cl, msg.get(SFipa.SENDER));
-													reply.put(SFipa.CONTENT, content);
-		//											System.out.println("content: "+content);
-													
-		//											System.out.println("reply: "+callid);
-													sendMessage(reply, mt);
-												}
-												public void exceptionOccurred(Exception exception)
-												{
-													// Terminated, when rms killed in mean time
-													if(!(exception instanceof ComponentTerminatedException))
+													createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener<Map<String, Object>>()
 													{
-														super.exceptionOccurred(exception);
-													}
+														public void resultAvailable(Map<String, Object> reply)
+														{
+				//											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
+															
+//															ClassLoader cl = ls.getClassLoader(null);//rms.getComponent().getModel().getResourceIdentifier());
+															String content = Writer.objectToXML(rms.getWriter(), result, cl, msg.get(SFipa.SENDER));
+															reply.put(SFipa.CONTENT, content);
+				//											System.out.println("content: "+content);
+															
+//															System.out.println("reply: "+callid);
+															sendMessage(reply, mt);
+														}
+														public void exceptionOccurred(Exception exception)
+														{
+															// Terminated, when rms killed in mean time
+															if(!(exception instanceof ComponentTerminatedException))
+															{
+																super.exceptionOccurred(exception);
+															}
+														}
+													}));
 												}
-											}));
+											});
 										}
 									}
 									public void exceptionOccurred(Exception exception)
@@ -227,7 +291,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 											super.exceptionOccurred(exception);
 										}
 									}
-								}));
+								});
 							}
 							else if(content!=null)
 							{
@@ -236,7 +300,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						}
 					});
 				}
-			}));
+			});
 		}
 	}
 }

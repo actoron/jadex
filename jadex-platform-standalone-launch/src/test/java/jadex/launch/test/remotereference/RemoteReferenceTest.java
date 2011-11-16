@@ -26,7 +26,7 @@ public class RemoteReferenceTest extends TestCase
 {
 	public void	testRemoteReference()
 	{
-		long timeout	= 1000000;
+		long timeout	= 10000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		
 		// Start platform1 with local service.

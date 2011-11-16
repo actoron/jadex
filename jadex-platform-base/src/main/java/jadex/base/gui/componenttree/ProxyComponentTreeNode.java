@@ -4,6 +4,7 @@ import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.service.remote.ProxyAgent;
+import jadex.base.service.remote.RemoteException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -11,6 +12,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -33,13 +35,23 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 {
 	//-------- constants --------
 	
+	/** The unconnected state. */
+	public static final String	STATE_UNCONNECTED	= "proxy_noconnection";
+	
+	/** The unconnected state. */
+	public static final String	STATE_CONNECTED	= "proxy_connection";
+	
+	/** The locked state. */
+	public static final String	STATE_LOCKED	= "proxy_locked";
+	
 	/**
 	 * The image icons.
 	 */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"overlay_proxy_noconnection", SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/base/gui/images/overlay_proxy_noconnection.png"),
-		"overlay_proxy_connection", SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/base/gui/images/overlay_proxy_connection.png"),
+		STATE_LOCKED, SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/base/gui/images/overlay_proxy_locked.png"),
+		STATE_UNCONNECTED, SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/base/gui/images/overlay_proxy_noconnection.png"),
+		STATE_CONNECTED, SGUI.makeIcon(ProxyComponentTreeNode.class, "/jadex/base/gui/images/overlay_proxy_connection.png")
 	});
 	
 	//-------- attribute --------
@@ -48,8 +60,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	protected IComponentIdentifier cid;
 	
 	/** The connection state. */
-	protected boolean connected;
-//	
+	protected String	state;
 	
 	//-------- constructors --------
 	
@@ -60,26 +71,27 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		IComponentManagementService cms, ComponentIconCache iconcache)
 	{
 		super(parent, model, tree, desc, cms, iconcache);
-		this.connected = false;
+		this.state = STATE_UNCONNECTED;
 		
 		// Add CMS listener for remote proxy node.
-		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener()
+		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener<IComponentIdentifier>()
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentIdentifier result)
 			{
 				if(result!=null)
 				{
-					addCMSListener((IComponentIdentifier)result);
+					addCMSListener(result);
 				}
 				else
 				{
-					connected	= false;
+					state	= STATE_UNCONNECTED;
 					getModel().fireNodeChanged(ProxyComponentTreeNode.this);					
 				}
 			}
 			public void customExceptionOccurred(Exception exception)
 			{
-				connected	= false;
+				state	= exception instanceof RemoteException && SecurityException.class.equals(((RemoteException)exception).getType())
+					? STATE_LOCKED : STATE_UNCONNECTED;
 				getModel().fireNodeChanged(ProxyComponentTreeNode.this);
 			}
 		});
@@ -105,8 +117,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		Icon base = super.getIcon();
 		if(base!=null)
 		{
-			ret = new CombiIcon(new Icon[]{base, connected? 
-				icons.getIcon("overlay_proxy_connection"): icons.getIcon("overlay_proxy_noconnection")});
+			ret = new CombiIcon(new Icon[]{base, icons.getIcon(state)});
 		}
 		return ret;
 	}
@@ -119,38 +130,45 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	protected void	searchChildren()
 	{
 		// Get remote component identifier before calling searchChildren
-		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener()
+		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener<IComponentIdentifier>()
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentIdentifier result)
 			{
 				if(result!=null)
 				{
-					searchChildren(cms, getComponentIdentifier())
-						.addResultListener(new IResultListener()
+					searchChildren(cms, result).addResultListener(new IResultListener<List<ITreeNode>>()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(List<ITreeNode> result)
 						{
-							connected = true;			
-							setChildren((List)result);
+							state	= STATE_CONNECTED;
+							setChildren(result);
 						}
 						public void exceptionOccurred(Exception exception)
 						{
-							connected = false;			
-							setChildren(Collections.EMPTY_LIST);
+							state	= exception instanceof RemoteException && SecurityException.class.equals(((RemoteException)exception).getType())
+								? STATE_LOCKED : STATE_UNCONNECTED;
+							List<ITreeNode> list	= Collections.emptyList();
+							setChildren(list);
+							getModel().fireNodeChanged(ProxyComponentTreeNode.this);					
 						}
 					});
 				}
 				else
 				{
-					connected = false;
-					setChildren(Collections.EMPTY_LIST);					
+					state	= STATE_UNCONNECTED;
+					List<ITreeNode> list	= Collections.emptyList();
+					setChildren(list);
+					getModel().fireNodeChanged(ProxyComponentTreeNode.this);					
 				}
 			}
 			
 			public void customExceptionOccurred(Exception exception)
 			{
-				connected = false;
-				setChildren(Collections.EMPTY_LIST);
+				state	= exception instanceof RemoteException && SecurityException.class.equals(((RemoteException)exception).getType())
+					? STATE_LOCKED : STATE_UNCONNECTED;
+				List<ITreeNode> list	= Collections.emptyList();
+				setChildren(list);
+				getModel().fireNodeChanged(ProxyComponentTreeNode.this);					
 //				exception.printStackTrace();
 			}
 		});				
@@ -168,17 +186,16 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 *  Get the remote component identifier.
 	 *  @return The remote identifier.
 	 */
-	public IFuture getRemoteComponentIdentifier()
+	public IFuture<IComponentIdentifier> getRemoteComponentIdentifier()
 	{
-		final Future ret = new Future();
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
 		if(cid==null)
 		{
-			cms.getExternalAccess(desc.getName()).addResultListener(new IResultListener()
+			cms.getExternalAccess(desc.getName()).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IComponentIdentifier>(ret)
 			{
-				public void resultAvailable(Object result)
+				public void customResultAvailable(final IExternalAccess exta)
 				{
-					final IExternalAccess exta = (IExternalAccess)result;
 					exta.scheduleStep(new IComponentStep<IComponentIdentifier>()
 					{
 						@XMLClassname("rem")
@@ -187,19 +204,14 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 							ProxyAgent pa = (ProxyAgent)ia;
 							return new Future<IComponentIdentifier>(pa.getRemotePlatformIdentifier());
 						}
-					}).addResultListener(new DelegationResultListener(ret)
+					}).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(IComponentIdentifier result)
 						{
-							cid = (IComponentIdentifier)result;
+							cid = result;
 							super.customResultAvailable(result);
 						}
 					});
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setException(exception);
 				}
 			});
 		}
@@ -217,6 +229,6 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 */
 	public boolean isConnected()
 	{
-		return connected;
+		return STATE_CONNECTED.equals(state);
 	}
 }

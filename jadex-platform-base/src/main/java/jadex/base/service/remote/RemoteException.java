@@ -2,27 +2,35 @@ package jadex.base.service.remote;
 
 
 /**
- *  Exception that denotes 
+ *  Exception that wraps a remote exception. 
  */
 public class RemoteException extends RuntimeException
 {
 	//-------- attributes --------
 	
 	/** The remote exception type. */
-	protected Class	type;
+	protected Class<?>	type;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new exception info.
 	 */
-	public RemoteException(Class type, String message)
+	public RemoteException(Class<?> type, String message)
 	{
 		super(message);
 		this.type	= type;
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Get the type.
+	 */
+	public Class<?>	getType()
+	{
+		return type;
+	}
 	
 	/**
 	 *  A string representation.

@@ -65,6 +65,7 @@ public class SettingsService extends BasicService implements ISettingsService
 			prefix	= access.getComponentIdentifier().getPlatformName();
 			
 			// Strip auto-generated platform suffix (hack???).
+			// cf. Starter and SecurityService
 			if(prefix.indexOf('_')!=-1)
 			{
 				prefix	= prefix.substring(0, prefix.lastIndexOf('_'));

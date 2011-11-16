@@ -1765,6 +1765,47 @@ public class SUtil
 
 		return buffer;
 	}
+	
+	/**
+	 *  Convert bytes to an integer.
+	 */
+	public static int bytesToLong(byte[] buffer)
+	{
+		if(buffer.length != 8)
+		{
+			throw new IllegalArgumentException("buffer length must be 8 bytes!");
+		}
+
+		int value = (0xFF & buffer[0]) << 56;
+		value |= (0xFF & buffer[1]) << 48;
+		value |= (0xFF & buffer[1]) << 40;
+		value |= (0xFF & buffer[1]) << 32;
+		value |= (0xFF & buffer[1]) << 24;
+		value |= (0xFF & buffer[1]) << 16;
+		value |= (0xFF & buffer[2]) << 8;
+		value |= (0xFF & buffer[3]);
+
+		return value;
+	}
+
+	/**
+	 *  Convert an integer to bytes.
+	 */
+	public static byte[] longToBytes(long val)
+	{
+		byte[] buffer = new byte[8];
+
+		buffer[0] = (byte)(val >>> 56);
+		buffer[0] = (byte)(val >>> 48);
+		buffer[0] = (byte)(val >>> 40);
+		buffer[0] = (byte)(val >>> 32);
+		buffer[0] = (byte)(val >>> 24);
+		buffer[1] = (byte)(val >>> 16);
+		buffer[2] = (byte)(val >>> 8);
+		buffer[3] = (byte)val;
+
+		return buffer;
+	}
 
 	/**
 	 *  Convert an URL to a local file name.

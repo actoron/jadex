@@ -168,6 +168,8 @@ public class MessageService extends BasicService implements IMessageService
 	public IFuture<Void> sendMessage(final Map msg, final MessageType type, 
 		final IComponentIdentifier sender, final IResourceIdentifier rid, final byte[] codecids)
 	{
+//		System.out.println("msgservice sendMessage()");
+		
 		final Future<Void> ret = new Future<Void>();
 		
 		libservice.getClassLoader(rid)
@@ -212,6 +214,7 @@ public class MessageService extends BasicService implements IMessageService
 							public void customResultAvailable(Object result)
 							{
 								IExternalAccess exta = (IExternalAccess)result;
+//								System.out.println("msgservice calling doSendMessage()");
 								doSendMessage(msg, type, exta, cl, ret, codecids);
 							}
 						});
@@ -339,6 +342,7 @@ public class MessageService extends BasicService implements IMessageService
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm)
 				.toArray(new IComponentIdentifier[0]);
 			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, getTransports(), codecids, tm);
+//			System.out.println("msgservice adding send task");
 			task.getSendManager().addMessage(task).addResultListener(crl);
 		}
 		

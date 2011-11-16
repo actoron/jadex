@@ -1,5 +1,6 @@
 package jadex.base.service.remote;
 
+import jadex.bridge.service.types.security.IAuthorizable;
 import jadex.commons.future.IFuture;
 import jadex.micro.IMicroExternalAccess;
 
@@ -8,7 +9,7 @@ import jadex.micro.IMicroExternalAccess;
  *  Remote command interface for commands that the 
  *  remote service management can execute.
  */
-public interface IRemoteCommand
+public interface IRemoteCommand	extends IAuthorizable
 {
 	/**
 	 *  Execute the command.
