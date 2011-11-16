@@ -11,7 +11,6 @@ import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectStringConverter;
-import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
@@ -340,6 +339,21 @@ public class JavaWriter extends Writer
 				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
 			typeinfos.add(ti_character);
 			
+			// java.lang.enum
+			IObjectStringConverter enumconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					Enum en = (Enum)val;
+					String clazz = SReflect.getClassName(val.getClass());
+					String name = en.name();
+					return clazz+"="+name;
+				}
+			};
+			TypeInfo ti_enum = new TypeInfo(new XMLInfo(new QName("typeinfo:java.lang", "Enum")), new ObjectInfo(Enum.class), new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS), new AttributeConverter(null, enumconv))}));
+			typeinfos.add(ti_enum);
+			
 			// Shortcut notations for simple array types
 			
 			// boolean/Boolean Array
@@ -655,6 +669,9 @@ public class JavaWriter extends Writer
 				new MappingInfo(null, null,
 				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, characterconv))));
 			typeinfos.add(ti_characterarray);
+			
+			
+			
 		}
 		catch(Exception e)
 		{

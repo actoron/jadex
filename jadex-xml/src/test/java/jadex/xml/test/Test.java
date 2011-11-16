@@ -60,6 +60,7 @@ public class Test extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
+				t.testEnum();
 				t.testByte();
 				t.testDouble();
 //				t.testBigData();
@@ -176,6 +177,15 @@ public class Test extends TestCase
 		}
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);
+	}
+	
+	/**
+	 * 
+	 */
+	public void testEnum() throws Exception
+	{
+//		System.out.println("test enum: "+(TestEnum.A instanceof Enum));
+		doWriteAndRead(TestEnum.A);
 	}
 	
 	/**

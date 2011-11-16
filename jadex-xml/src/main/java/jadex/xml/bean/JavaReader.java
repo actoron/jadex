@@ -8,6 +8,7 @@ import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectObjectConverter;
+import jadex.xml.IObjectStringConverter;
 import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
@@ -393,6 +394,7 @@ public class JavaReader
 			));
 			typeinfos.add(ti_level);
 			
+			// java.logging.LogRecord
 			TypeInfo ti_record = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util.logging", "LogRecord")}),
 				new ObjectInfo(new IBeanObjectCreator()
 				{
@@ -459,6 +461,23 @@ public class JavaReader
 				}
 			));
 			typeinfos.add(ti_image);
+			
+			TypeInfo ti_enum = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Enum")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						String tmp = (String)rawattributes.get("content");
+						int idx = tmp.indexOf("=");
+						String classname = tmp.substring(0, idx);
+						String name = tmp.substring(idx+1);
+						Class clazz = SReflect.findClass(classname, null, context.getClassLoader());
+						return Enum.valueOf(clazz, name);
+					}
+				}),
+				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
+			));
+			typeinfos.add(ti_enum);
 			
 			// Shortcut notations for simple array types
 			
