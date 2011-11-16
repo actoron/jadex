@@ -324,8 +324,15 @@ public class JavaWriter extends Writer
 			typeinfos.add(ti_short);
 			
 			// java.lang.Byte
+			IObjectStringConverter byteconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					return new String(Base64.encode(new byte[]{((Byte)val).byteValue()}));
+				}
+			};
 			TypeInfo ti_byte = new TypeInfo(null, new ObjectInfo(Byte.class), new MappingInfo(null, new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS))}));
+				new AttributeInfo(new AccessInfo("content", AccessInfo.THIS), new AttributeConverter(null, byteconv))}));
 			typeinfos.add(ti_byte);
 			
 			// java.lang.Character
@@ -588,7 +595,7 @@ public class JavaWriter extends Writer
 			typeinfos.add(ti_bshortarray);
 			
 			// byte/Byte Array
-			IObjectStringConverter byteconv = new IObjectStringConverter()
+			IObjectStringConverter bytesconv = new IObjectStringConverter()
 			{
 				public String convertObject(Object val, IContext context)
 				{
@@ -599,7 +606,7 @@ public class JavaWriter extends Writer
 			};
 			TypeInfo ti_bytearray = new TypeInfo(null, new ObjectInfo(byte[].class),
 				new MappingInfo(null, null,
-				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, byteconv))));
+				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, bytesconv))));
 			typeinfos.add(ti_bytearray);
 			
 			IObjectStringConverter bbyteconv = new IObjectStringConverter()

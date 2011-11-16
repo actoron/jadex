@@ -337,7 +337,8 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						return new Byte((String)rawattributes.get("content"));
+						byte[] bytes = Base64.decode(((String)rawattributes.get("content")).getBytes());
+						return new Byte(bytes[0]);
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("content", null, AccessInfo.IGNORE_READWRITE))}
