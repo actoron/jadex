@@ -10,6 +10,7 @@ import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.GuiClass;
@@ -36,6 +37,7 @@ import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Properties;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.Publish;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -349,7 +351,10 @@ public class MicroClassReader
 						}
 					}
 					ProvidedServiceImplementation impl = createImplementation(im);
-					ProvidedServiceInfo psis = new ProvidedServiceInfo(vals[i].name().length()>0? vals[i].name(): null, vals[i].type(), impl);
+					Publish p = vals[i].publish();
+					PublishInfo pi = p.url().length()==0? null: new PublishInfo(p.url(), p.type());
+					ProvidedServiceInfo psis = new ProvidedServiceInfo(vals[i].name().length()>0? 
+						vals[i].name(): null, vals[i].type(), impl, pi);
 				
 					if(vals[i].name().length()==0 || !psers.containsKey(vals[i].name()))
 					{
@@ -494,7 +499,9 @@ public class MicroClassReader
 							RequiredServiceBinding bind = createBinding(im.binding());
 							ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
 								im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
-							psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl);
+							Publish p = provs[j].publish();
+							PublishInfo pi = p.url().length()==0? null: new PublishInfo(p.url(), p.type());
+							psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, pi);
 							configinfo.setProvidedServices(psis);
 						}
 						

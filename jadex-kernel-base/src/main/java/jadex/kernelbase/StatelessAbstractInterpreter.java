@@ -51,6 +51,7 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,6 +63,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import javax.jws.WebMethod;
+import javax.jws.WebService;
+import javax.xml.ws.Endpoint;
 
 /**
  *  Base class for all kinds of interpreters.
@@ -123,7 +128,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  terminated (i.e. no invokerLater can be used).
 	 *  @return The results map (name -> value). 
 	 */
-	public abstract Map getResults();
+	public abstract Map<String, Object> getResults();
 
 	/**
 	 *  Can be called on the component thread only.
@@ -148,7 +153,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Can be called concurrently (also during executeAction()).
 	 *  @param listener	When cleanup of the component is finished, the listener must be notified.
 	 */
-	public IFuture cleanupComponent()
+	public IFuture<Void> cleanupComponent()
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
@@ -180,7 +185,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The newly created component.
 	 */
-	public IFuture	componentCreated(final IComponentDescription desc, final IModelInfo model)
+	public IFuture<Void>	componentCreated(final IComponentDescription desc, final IModelInfo model)
 	{
 		// cannot use scheduleStep as it is not available in init phase of component.
 //		return scheduleStep(new IComponentStep()
@@ -202,7 +207,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().
 	 *  @param comp	The destroyed component.
 	 */
-	public IFuture	componentDestroyed(final IComponentDescription desc)
+	public IFuture<Void>	componentDestroyed(final IComponentDescription desc)
 	{
 //		System.out.println("dest: "+desc.getName());
 		return scheduleStep(new IComponentStep<Void>()
@@ -266,9 +271,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Start the end steps of the component.
 	 *  Called as part of cleanup behavior.
 	 */
-	public IFuture	startEndSteps()
+	public IFuture<Void>	startEndSteps()
 	{
-		Future	ret	= new Future();
+		Future<Void>	ret	= new Future<Void>();
 		ConfigurationInfo	ci	= getConfiguration()!=null
 			? getModel().getConfiguration(getConfiguration())
 			: getModel().getConfigurations().length>0 ? getModel().getConfigurations()[0] : null;
@@ -434,17 +439,17 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Get the component listeners.
 	 *  @return The component listeners.
 	 */
-	public abstract Collection getInternalComponentListeners();
+	public abstract Collection<IComponentListener> getInternalComponentListeners();
 
 	/**
 	 *  Add component listener.
 	 */
-	public abstract IFuture addComponentListener(IComponentListener listener);
+	public abstract IFuture<Void> addComponentListener(IComponentListener listener);
 
 	/**
 	 *  Remove component listener.
 	 */
-	public abstract IFuture removeComponentListener(IComponentListener listener);
+	public abstract IFuture<Void> removeComponentListener(IComponentListener listener);
 	
 	/**
 	 *  Add a property value.
@@ -457,13 +462,13 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Get the properties.
 	 *  @return The properties.
 	 */
-	public abstract Map getProperties();
+	public abstract Map<String, Object> getProperties();
 	
 	/**
 	 *  Get the arguments.
 	 *  @return The arguments.
 	 */
-	public abstract Map getArguments();
+	public abstract Map<String, Object> getArguments();
 	
 	/**
 	 *  Flag for parameter copy.
@@ -640,7 +645,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				{
 					Object key = cs[i].getName()!=null? cs[i].getName(): cs[i].getType(model, getClassLoader());
 					ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(key);
-					ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType(model, getClassLoader()), new ProvidedServiceImplementation(cs[i].getImplementation()));
+					ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType(model, getClassLoader()), 
+						new ProvidedServiceImplementation(cs[i].getImplementation()), psi.getPublish());
 					sermap.put(key, newpsi);
 				}
 			}
@@ -704,45 +710,44 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	protected IFuture<Void>	initProvidedServices(final int i, final ProvidedServiceInfo[] services, final IModelInfo model)
 	{
-		final IFuture	ret;
+		final IFuture<Void>	ret;
 		
 		if(i<services.length)
 		{
-			ret	= new Future();
-			IFuture	fut;
-			ProvidedServiceImplementation impl = services[i].getImplementation(); 
-			
-			// Virtual service (e.g. promoted)
-			if(impl!=null && impl.getBinding()!=null)
-			{
-				RequiredServiceInfo info = new RequiredServiceInfo(BasicService.generateServiceName(services[i].getType(model, getClassLoader()))+":virtual", services[i].getType(model, getClassLoader()));
-				IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
-					info.getName(), info.getType(model, getClassLoader()), BasicServiceInvocationHandler.class);
-				IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(getExternalAccess(), getComponentAdapter(), 
-					sid, info, impl.getBinding(), isCopy(), getClassLoader());
-				fut	= getServiceContainer().addService(service);
-				
-			}
+			ret	= new Future<Void>();
+			IFuture<Void>	fut;
+
+//			ProvidedServiceImplementation impl = services[i].getImplementation(); 
+//			// Virtual service (e.g. promoted)
+//			if(impl!=null && impl.getBinding()!=null)
+//			{
+//				RequiredServiceInfo info = new RequiredServiceInfo(BasicService.generateServiceName(services[i].getType(model, getClassLoader()))+":virtual", services[i].getType(model, getClassLoader()));
+//				IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
+//					info.getName(), info.getType(model, getClassLoader()), BasicServiceInvocationHandler.class);
+//				IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(getExternalAccess(), getComponentAdapter(), 
+//					sid, info, impl.getBinding(), isCopy(), getClassLoader());
+//				fut	= getServiceContainer().addService(service);
+//			}
 			
 			// Directly provided service.
-			else
-			{
+//			else
+//			{
 				try
 				{
 					fut	= initService(services[i], model);
 				}
 				catch(Exception e)
 				{
-					fut	= new Future(e);
+					fut	= new Future<Void>(e);
 				}
-			}
+//			}
 			
-			fut.addResultListener(createResultListener(new DelegationResultListener((Future)ret)
+			fut.addResultListener(createResultListener(new DelegationResultListener<Void>((Future<Void>)ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Void result)
 				{
 					initProvidedServices(i+1, services, model)
-						.addResultListener(createResultListener(new DelegationResultListener((Future)ret)));
+						.addResultListener(createResultListener(new DelegationResultListener<Void>((Future<Void>)ret)));
 				}
 			}));
 		}
@@ -1038,76 +1043,113 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  @param service The service.
 	 *  @param proxytype	The proxy type (@see{BasicServiceInvocationHandler}).
 	 */
-	public IFuture<Void>	addService(String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, Object service)
+	public IFuture<IInternalService> addService(String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, Object service)
 	{
 		assert !getComponentAdapter().isExternalThread();
+		final Future<IInternalService> ret = new Future<IInternalService>();
 		
-		IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
+		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
 			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy());
-		return getServiceContainer().addService(proxy);
+		getServiceContainer().addService(proxy).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				ret.setResult(proxy);
+			}
+		});
+		return ret;
 	}
 	
 	/**
 	 *  Add a service to the component. 
 	 *  @param info The provided service info.
 	 */
-	protected IFuture	initService(ProvidedServiceInfo info, IModelInfo model)
+	protected IFuture<Void>	initService(final ProvidedServiceInfo info, IModelInfo model)
 	{
-		IFuture	ret	= null;
+		final Future<Void> ret = new Future<Void>();
 		assert !getComponentAdapter().isExternalThread();
 		
 		try
 		{
-			ProvidedServiceImplementation	impl	= info.getImplementation();
-			Object	ser	= null;
-			if(impl!=null && impl.getExpression()!=null)
-			{
-				// todo: other Class imports, how can be found out?
-				try
-				{
-					ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), getClassLoader());
-				}
-				catch(RuntimeException e)
-				{
-					throw new RuntimeException("Service creation error: "+info, e);
-				}
-//				System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
-			}
-			else if(impl!=null && impl.getImplementation(model, getClassLoader())!=null)
-			{
-				ser = impl.getImplementation(model, getClassLoader()).newInstance();
-			}
+			final ProvidedServiceImplementation	impl	= info.getImplementation();
 			
-			if(ser==null)
+			// Virtual service (e.g. promoted)
+			if(impl!=null && impl.getBinding()!=null)
 			{
-				ret = new Future(new RuntimeException("Service creation error: "+info));
+				RequiredServiceInfo rsi = new RequiredServiceInfo(BasicService.generateServiceName(info.getType(model, 
+					getClassLoader()))+":virtual", info.getType(model, getClassLoader()));
+				IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
+					rsi.getName(), rsi.getType(model, getClassLoader()), BasicServiceInvocationHandler.class);
+				final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
+					getExternalAccess(), getComponentAdapter(), sid, rsi, impl.getBinding(), isCopy(), getClassLoader());
+				getServiceContainer().addService(service).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 			}
 			else
 			{
-				UnparsedExpression[] ins = info.getImplementation().getInterceptors();
-				IServiceInvocationInterceptor[] ics = null;
-				if(ins!=null)
+				Object	ser	= null;
+				if(impl!=null && impl.getExpression()!=null)
 				{
-					ics = new IServiceInvocationInterceptor[ins.length];
-					for(int i=0; i<ins.length; i++)
+					// todo: other Class imports, how can be found out?
+					try
 					{
-						if(ins[i].getValue()!=null && ins[i].getValue().length()>0)
+						ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), getClassLoader());
+					}
+					catch(RuntimeException e)
+					{
+						throw new RuntimeException("Service creation error: "+info, e);
+					}
+	//				System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
+				}
+				else if(impl!=null && impl.getImplementation(model, getClassLoader())!=null)
+				{
+					ser = impl.getImplementation(model, getClassLoader()).newInstance();
+				}
+				
+				if(ser==null)
+				{
+					ret.setException(new RuntimeException("Service creation error: "+info));
+				}
+				else
+				{
+					UnparsedExpression[] ins = info.getImplementation().getInterceptors();
+					IServiceInvocationInterceptor[] ics = null;
+					if(ins!=null)
+					{
+						ics = new IServiceInvocationInterceptor[ins.length];
+						for(int i=0; i<ins.length; i++)
 						{
-							ics[i] = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(ins[i].getValue(), model.getAllImports(), getFetcher(), getClassLoader());
-						}
-						else
-						{
-							ics[i] = (IServiceInvocationInterceptor)ins[i].getClazz(getClassLoader(), model.getAllImports()).newInstance();
+							if(ins[i].getValue()!=null && ins[i].getValue().length()>0)
+							{
+								ics[i] = (IServiceInvocationInterceptor)SJavaParser.evaluateExpression(ins[i].getValue(), model.getAllImports(), getFetcher(), getClassLoader());
+							}
+							else
+							{
+								ics[i] = (IServiceInvocationInterceptor)ins[i].getClazz(getClassLoader(), model.getAllImports()).newInstance();
+							}
 						}
 					}
+					
+					final Class type = info.getType(model, getClassLoader());
+					addService(info.getName(), type, info.getImplementation().getProxytype(), ics, ser)
+						.addResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
+					{
+						public void customResultAvailable(IInternalService service)
+						{
+							if(info.getPublish()!=null)
+							{
+								Object pr = Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getPublish().getType()}, new WebServiceWrapperInvocationHandler2(service));
+								Endpoint endpoint = Endpoint.publish(info.getPublish().getUrl(), pr);
+							}
+							ret.setResult(null);
+						}
+					});
 				}
-				ret	= addService(info.getName(), info.getType(model, getClassLoader()), info.getImplementation().getProxytype(), ics, ser);
 			}
 		}
 		catch(Exception e)
 		{
 //			e.printStackTrace();
-			ret	= new Future(e);
+			ret.setException(e);
 		}
 		
 		return ret;

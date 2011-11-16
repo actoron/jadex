@@ -345,7 +345,8 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 								{
 									IService	service	= it.next();
 									// todo: implementation?
-									pis[i]	= new ProvidedServiceInfo(service.getServiceIdentifier().getServiceName(), service.getServiceIdentifier().getServiceType(), null);
+									pis[i]	= new ProvidedServiceInfo(service.getServiceIdentifier().getServiceName(), 
+										service.getServiceIdentifier().getServiceType(), null, null);
 								}
 								
 								ret.setResult(new Object[]{pis, ris});

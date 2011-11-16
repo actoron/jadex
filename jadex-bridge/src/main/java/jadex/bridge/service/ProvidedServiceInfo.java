@@ -22,6 +22,9 @@ public class ProvidedServiceInfo
 	
 	/** The service implementation. */
 	protected ProvidedServiceImplementation implementation;
+	
+	/** Publish information. */
+	protected PublishInfo publish;
 		
 	//-------- constructors --------
 	
@@ -36,10 +39,11 @@ public class ProvidedServiceInfo
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation)
+	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation, PublishInfo publish)
 	{
 		this.name = name;
 		this.implementation = implementation;
+		this.publish = publish;
 		setType(type);
 	}
 	
@@ -136,6 +140,24 @@ public class ProvidedServiceInfo
 		this.implementation = implementation;
 	}
 	
+	/**
+	 *  Get the publish.
+	 *  @return The publish.
+	 */
+	public PublishInfo getPublish()
+	{
+		return publish;
+	}
+
+	/**
+	 *  Set the publish.
+	 *  @param publish The publish to set.
+	 */
+	public void setPublish(PublishInfo publish)
+	{
+		this.publish = publish;
+	}
+
 	/**
 	 *  Get the string representation.
 	 */

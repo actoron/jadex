@@ -405,7 +405,7 @@ public class DaemonAgent extends MicroAgent
 			new IArgument[]{}//new Argument("infos", "Initial information records.", "InformationEntry[]")}
 			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.tools.daemon.DaemonViewerPanel"}),
 			new RequiredServiceInfo[]{new RequiredServiceInfo("libservice", ILibraryService.class)}
-			, new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, IDaemonService.class, null)});
+			, new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, IDaemonService.class, null, null)});
 	}
 
 }

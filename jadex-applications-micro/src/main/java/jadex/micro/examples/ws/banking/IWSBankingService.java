@@ -1,5 +1,7 @@
 package jadex.micro.examples.ws.banking;
 
+import javax.jws.WebService;
+
 
 
 /**

@@ -6,6 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
@@ -607,7 +608,16 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IFuture<Void>	addService(String name, Class<?> type, Object service, String proxytype)
 	{
-		return interpreter.addService(name, type, proxytype, null, service);
+		final Future<Void> ret = new Future<Void>();
+		IFuture<IInternalService> fut = interpreter.addService(name, type, proxytype, null, service);
+		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
+		{
+			public void customResultAvailable(IInternalService result)
+			{
+				ret.setResult(null);
+			}
+		}));
+		return ret;
 	}
 	
 	/**
@@ -619,7 +629,16 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 	 */
 	public IFuture<Void>	addService(String name, Class<?> type, Object service)
 	{
-		return interpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service);
+		final Future<Void> ret = new Future<Void>();
+		IFuture<IInternalService> fut = interpreter.addService(name, type, BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, service);
+		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
+		{
+			public void customResultAvailable(IInternalService result)
+			{
+				ret.setResult(null);
+			}
+		}));
+		return ret;
 	}
 
 	/**

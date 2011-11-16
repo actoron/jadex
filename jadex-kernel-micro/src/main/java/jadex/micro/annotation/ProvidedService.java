@@ -26,4 +26,9 @@ public @interface ProvidedService
 	 *  The service implementation.
 	 */
 	public Implementation implementation();
+	
+	/**
+	 *  Publish details.
+	 */
+	public Publish publish() default @Publish(url="", type=Object.class);
 }
