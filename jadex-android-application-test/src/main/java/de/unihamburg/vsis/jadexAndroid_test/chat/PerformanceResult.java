@@ -86,6 +86,18 @@ public class PerformanceResult {
 				return sum;
 			}
 		}
+		
+		public int getVarianz() {
+			int erg = 0;
+			
+			int u = getAverageDelay();
+			
+			for (Integer wert : delays) {
+				erg *= Math.pow(wert -u, 2);
+			}
+			
+			return erg / (delays.size() -1);
+		}
 	}
 
 	public boolean isComplete() {
@@ -121,6 +133,8 @@ public class PerformanceResult {
 			s.append(ping.maxDelay);
 			s.append(" average: ");
 			s.append(ping.getAverageDelay());
+			s.append(" varianz: ");
+			s.append(ping.getVarianz());
 			s.append("\n");
 		}
 		
