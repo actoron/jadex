@@ -99,8 +99,9 @@ public class DeltaTimeExecutor4Simulation extends SimplePropertyObject implement
 		allObservedEventsMap = new ConcurrentHashMap<Long, ArrayList<ObservedEvent>>();
 		final AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) getProperty("space");
 		final boolean tick = getProperty("tick") != null && ((Boolean) getProperty("tick")).booleanValue();
-		this.container = space.getExternalAccess().getServiceProvider();
-
+		container = space.getExternalAccess().getServiceProvider();
+		
+//		clock = (IClockService) SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IClockService.class).get(new ThreadSuspendable());		
 		SServiceProvider.getService(container, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener() {
 			public void resultAvailable(Object result) {
 				final IClockService clockservice = (IClockService) result;

@@ -35,7 +35,9 @@
 		<import>jadex.bridge.service.types.clock.IClockService</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
-		<import>jadex.simulation.environment.*</import>		
+		<import>jadex.simulation.environment.*</import>
+		<import>jadex.bridge.service.search.*</import>
+		<import>java.util.HashMap</import>				
 	</imports>
 
 	<arguments>
@@ -69,17 +71,17 @@
 					<env:property name="state">"unknown"</env:property>
 				</env:objecttype>
 				<env:objecttype name="sentry">
-					<env:property name="vision">0.1</env:property>
+					<env:property name="vision">0.07</env:property>
 					<env:property name="speed">0.05</env:property>
 					<env:property name="position" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="producer">
-					<env:property name="vision">0.05</env:property>
+					<env:property name="vision">0.07</env:property>
 					<env:property name="speed">0.1</env:property>
 					<env:property name="position" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
 				</env:objecttype>
 				<env:objecttype name="carry">
-					<env:property name="vision">0.05</env:property>
+					<env:property name="vision">0.07</env:property>
 					<env:property name="speed">0.15</env:property>
 					<env:property name="ore">0</env:property>
 					<env:property name="capacity">20</env:property>
@@ -103,6 +105,11 @@
 				<!-- TMP_HACK: Needed in order to able to find the IComponentIdentifier 
 					for this agent from the space. Used within the DeltaTimeExecutor4Simulation. -->
 				<env:objecttype name="clientSimulator" />
+				
+				<!-- Trace object -->
+				<env:objecttype name="trace">					
+					<env:property name="position" dynamic="true">$space.getRandomPosition(Vector2Int.ZERO)</env:property>
+				</env:objecttype>
 
 			</env:objecttypes>
 
@@ -162,6 +169,7 @@
 					<!-- Homebase -->
 					<env:drawable objecttype="homebase" width="0.14"
 						height="0.12">
+						<env:property name="visitedPos" dynamic="true">new HashMap()</env:property>
 						<env:property name="oresize" dynamic="true">new	Vector2Double(Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0))</env:property>
 						<env:property name="oreposition" dynamic="true">new	Vector2Double(0,0.3-Math.sqrt(((Number)$object.getProperty("ore")).intValue()/200.0)/2)</env:property>
 						<env:rectangle layer="1" width="1" height="1"
@@ -208,6 +216,14 @@
 						</env:texturedrectangle>
 					</env:drawable>
 
+					<!-- Trace -->					
+					<env:drawable objecttype="trace" width="0.1"
+						height="0.1">
+						<env:property name="size" dynamic="true">new Vector2Double(0.1,0.1)</env:property>
+						<env:texturedrectangle layer="1" size="size"
+							imagepath="jadex/simulation/examples/marsworld/images/ore.png"/>
+					</env:drawable>
+					
 					<env:prelayers>
 						<env:tiledlayer width="0.6" height="0.6"
 							imagepath="jadex/simulation/examples/marsworld/images/mars.png" />
@@ -412,6 +428,219 @@
 				<component type="Carry" number="$args.NumberOfCarries" />			
 			</components>
 		</configuration>
+
+
+	<configuration name="TestIWSOSKleineKarte">
+			<extensions>
+				<agr:agrspace name="myagrspace" type="marsagrspace">
+					<agr:group name="mymarsteam" type="marsteam">
+						<agr:position role="sentry" componenttype="Sentry" />
+						<agr:position role="producer" componenttype="Producer" />
+						<agr:position role="carrier" componenttype="Carry" />
+					</agr:group>
+				</agr:agrspace>
+
+				<!-- <env:envspace name="my2dspace" type="2dspace"> -->
+				<env:envspace name="my2dspace" type="2dspace" width="1"
+					height="1">
+					<env:objects>
+						<env:object type="homebase">
+							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>
+							<env:property name="space">$space</env:property>
+							<env:property name="missiontime">7000000 +$properties.clock.getTime()</env:property>
+							<env:property name="visitedPos" dynamic="true">new HashMap()</env:property>
+						</env:object>				
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.1, 0.2)</env:property>
+							<env:property name="ore">20</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.05, 0.7)</env:property>
+							<env:property name="ore">0</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.5, 0.6)</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.8, 0.1)</env:property>
+							<env:property name="ore">0</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.7, 0.4)</env:property>
+							<env:property name="ore">10</env:property>
+							<!-- <env:property name="ore">$args.al</env:property> -->
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
+							<env:property name="ore">25</env:property>
+						</env:object>						
+
+						<!-- TMP-HACK! -->
+						<env:object type="experimentID">
+							<env:property name="experimentID">$args.Experiment_id</env:property>
+						</env:object>
+
+					</env:objects>
+				
+					<env:observers>
+						<env:observer name="MarsWorld" dataview="view_all"
+							perspective="icons">
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+			<components>
+				<component type="Sentry" number="$args.NumberOfSentries" />
+				<component type="Producer" number="$args.NumberOfProducers" />
+				<component type="Carry" number="$args.NumberOfCarries" />			
+			</components>
+		</configuration>
+		
+		<configuration name="TestIWSOSGrosseKarte">
+			<extensions>
+				<agr:agrspace name="myagrspace" type="marsagrspace">
+					<agr:group name="mymarsteam" type="marsteam">
+						<agr:position role="sentry" componenttype="Sentry" />
+						<agr:position role="producer" componenttype="Producer" />
+						<agr:position role="carrier" componenttype="Carry" />
+					</agr:group>
+				</agr:agrspace>
+
+				<!-- <env:envspace name="my2dspace" type="2dspace"> -->
+				<env:envspace name="my2dspace" type="2dspace" width="2"
+					height="2">
+					<env:objects>
+						<env:object type="homebase">
+							<env:property name="position">new Vector2Double(1.0, 1.0)</env:property>
+							<env:property name="space">$space</env:property>
+							<env:property name="missiontime">7000000 +$properties.clock.getTime()</env:property>
+							<env:property name="visitedPos" dynamic="true">new HashMap()</env:property>
+						</env:object>										
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.9, 0.9)</env:property>
+							<env:property name="ore">10</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(1.8, 1.7)</env:property>
+							<env:property name="ore">20</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.1, 1.9)</env:property>
+							<env:property name="ore">15</env:property>
+						</env:object>					
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.8, 0.1)</env:property>
+							<env:property name="ore">10</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.2, 1.4)</env:property>
+							<env:property name="ore">10</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(1.2, 1.5)</env:property>
+							<env:property name="ore">25</env:property>
+						</env:object>
+
+						<!-- TMP-HACK! -->
+						<env:object type="experimentID">
+							<env:property name="experimentID">$args.Experiment_id</env:property>
+						</env:object>
+
+					</env:objects>
+				
+					<env:observers>
+						<env:observer name="MarsWorld" dataview="view_all"
+							perspective="icons">
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+			<components>
+				<component type="Sentry" number="$args.NumberOfSentries" />
+				<component type="Producer" number="$args.NumberOfProducers" />
+				<component type="Carry" number="$args.NumberOfCarries" />			
+			</components>
+		</configuration>
+		
+		<configuration name="TestIWSOSSehrGrosseKarte">
+			<extensions>
+				<agr:agrspace name="myagrspace" type="marsagrspace">
+					<agr:group name="mymarsteam" type="marsteam">
+						<agr:position role="sentry" componenttype="Sentry" />
+						<agr:position role="producer" componenttype="Producer" />
+						<agr:position role="carrier" componenttype="Carry" />
+					</agr:group>
+				</agr:agrspace>
+
+				<!-- <env:envspace name="my2dspace" type="2dspace"> -->
+				<env:envspace name="my2dspace" type="2dspace" width="3"
+					height="3">
+					<env:objects>
+						<env:object type="homebase">
+							<env:property name="position">new Vector2Double(1.5, 1.5)</env:property>
+							<env:property name="space">$space</env:property>
+							<env:property name="missiontime">7000000 +$properties.clock.getTime()</env:property>
+							<env:property name="visitedPos" dynamic="true">new HashMap()</env:property>
+						</env:object>										
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.9, 0.9)</env:property>
+							<env:property name="ore">10</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(2.1, 0.7)</env:property>
+							<env:property name="ore">20</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.1, 1.9)</env:property>
+							<env:property name="ore">15</env:property>
+						</env:object>					
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.8, 0.1)</env:property>
+							<env:property name="ore">10</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(0.2, 1.4)</env:property>
+							<env:property name="ore">10</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(1.2, 1.5)</env:property>
+							<env:property name="ore">25</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(2.2, 2.2)</env:property>
+							<env:property name="ore">10</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(2.8, 2.9)</env:property>
+							<env:property name="ore">10</env:property>
+						</env:object>
+						<env:object type="target">
+							<env:property name="position">new Vector2Double(1.2, 2.6)</env:property>
+							<env:property name="ore">10</env:property>
+						</env:object>
+
+						<!-- TMP-HACK! -->
+						<env:object type="experimentID">
+							<env:property name="experimentID">$args.Experiment_id</env:property>
+						</env:object>
+
+					</env:objects>
+				
+					<env:observers>
+						<env:observer name="MarsWorld" dataview="view_all"
+							perspective="icons">
+						</env:observer>
+					</env:observers>
+				</env:envspace>
+			</extensions>
+			<components>
+				<component type="Sentry" number="$args.NumberOfSentries" />
+				<component type="Producer" number="$args.NumberOfProducers" />
+				<component type="Carry" number="$args.NumberOfCarries" />			
+			</components>
+		</configuration>
+		
+
 
 		<configuration name="Multi">
 			<extensions>

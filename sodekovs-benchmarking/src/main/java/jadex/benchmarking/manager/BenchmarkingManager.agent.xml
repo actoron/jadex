@@ -21,6 +21,7 @@
 		<import>jadex.benchmarking.model.*</import>
 		<import>jadex.benchmarking.manager.*</import>
 		<import>jadex.benchmarking.services.*</import>
+		<import>jadex.bridge.service.types.clock.*</import>
 	</imports>
 
 
@@ -152,6 +153,9 @@
 			<implementation>new BenchmarkingExecutionService($scope)
 			</implementation>
 		</providedservice>
+		<requiredservice name="clockservice" class="IClockService">
+			<binding scope="platform" />
+		</requiredservice>
 	</services>
 
 

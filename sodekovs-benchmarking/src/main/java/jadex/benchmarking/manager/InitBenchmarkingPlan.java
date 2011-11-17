@@ -106,7 +106,8 @@ public class InitBenchmarkingPlan extends Plan {
 		// NEW ********************************************
 
 		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
-		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+//		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+		clockservice = (IClockService) getScope().getServiceContainer().getRequiredService("clockservice").get(this);
 
 		String benchmarkDescription = (String) getBeliefbase().getBelief("scheduleDescriptionFile").getFact();
 		System.out.println("#InitBench# Init Benchmark Agent with configuration file: " + benchmarkDescription);

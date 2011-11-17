@@ -19,6 +19,7 @@
 		<import>jadex.benchmarking.model.*</import>
 		<import>jadex.benchmarking.scheduler.*</import>
 		<import>jadex.benchmarking.logger.*</import>
+		<import>jadex.bridge.service.types.clock.*</import>
 	</imports>
 
 
@@ -120,5 +121,11 @@
 			</goals>
 		</configuration>
 	</configurations>
+	
+	<services>		
+		<requiredservice name="clockservice" class="IClockService">
+			<binding scope="platform" />
+		</requiredservice>
+	</services>
 
 </agent>

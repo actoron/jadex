@@ -25,6 +25,7 @@ public class ProduceOrePlan extends Plan
 		ISpaceObject target = (ISpaceObject)getParameter("target").getValue();
 
 		// Move to the target.
+//		System.out.println("Provider moving to target!");
 		IGoal go_target = createGoal("move.move_dest");
 		go_target.getParameter("destination").setValue(target.getProperty(Space2D.PROPERTY_POSITION));
 		dispatchSubgoalAndWait(go_target);

@@ -172,7 +172,8 @@ public abstract class AbstractSchedulerPlan extends Plan {
 	 */
 	protected void init(SuTinfo sut) {
 		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
-		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+//		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+		clockservice = (IClockService) getScope().getServiceContainer().getRequiredService("clockservice").get(this);
 		sortedSequenceList = sut.getSortedSequenceList();
 		sutCID = sut.getSutCID();
 		sutExta = sut.getSutExta();

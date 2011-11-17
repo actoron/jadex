@@ -14,7 +14,10 @@ import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
 
+import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -48,7 +51,7 @@ public class MoveTask extends AbstractTask
 	 *  @param obj	The object that is executing the task.
 	 *  @param progress	The time that has passed according to the environment executor.
 	 */
-	public void execute(IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
+	public void execute(final IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock)
 	{
 		IVector2 destination = (IVector2)getProperty(PROPERTY_DESTINATION);
 		final IBDIExternalAccess agent = (IBDIExternalAccess)getProperty(PROPERTY_SCOPE);
@@ -61,7 +64,37 @@ public class MoveTask extends AbstractTask
 			? destination : destination.copy().subtract(loc).normalize().multiply(maxdist).add(loc);
 
 		((Space2D)space).setPosition(obj.getId(), newloc);
-
+		
+		
+		//************************Hack for Agents: *******************************
+		final IVector2 newLocation  = newloc.copy();
+		final DecimalFormat decimalFormat = new DecimalFormat("#0.0000");		
+		agent.scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+							ISpaceObject[] homebases = ((ISpaceObject[])((Space2D)space).getSpaceObjectsByType("homebase"));							
+							HashMap map =  (HashMap) homebases[0].getProperty("visitedPos");
+							synchronized (map) {
+								map.put(decimalFormat.format(newLocation.getXAsDouble()), decimalFormat.format(newLocation.getYAsDouble())) ;
+								homebases[0].setProperty("visitedPos", map);	
+							}
+							
+							//Hack: Create trace
+							Map props = new HashMap();
+							props.put(Space2D.PROPERTY_POSITION, newLocation);
+							space.createSpaceObject("trace", props, null);
+							
+//							System.out.println("#Sentry# MoveTask: " + map.size());
+//							((Space2D)space).get							
+//						}							
+						return IFuture.DONE;
+					}
+				});		
+		//*******************************
+		
+	
 		// Process vision at new location.
 		double	vision	= ((Number)obj.getProperty(PROPERTY_VISION)).doubleValue();
 		final Set objects	= ((Space2D)space).getNearObjects((IVector2)obj.getProperty(Space2D.PROPERTY_POSITION), new Vector1Double(vision));

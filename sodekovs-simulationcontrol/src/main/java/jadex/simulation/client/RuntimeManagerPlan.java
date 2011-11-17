@@ -5,14 +5,10 @@ import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.OAVBDIFetcher;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.component.ComponentFactorySelector;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.factory.IComponentFactory;
-import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.MEnvSpaceType;
@@ -26,7 +22,6 @@ import jadex.extension.envsupport.evaluation.SpaceObjectSource;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.micro.MicroAgentFactory;
 import jadex.rules.state.IOAVState;
 import jadex.simulation.controlcenter.OnlineVisualisation;
 import jadex.simulation.evaluation.SimulationDataConsumer;
@@ -68,7 +63,8 @@ public class RuntimeManagerPlan extends Plan {
 	 * External access of the application that is executed and observed by this agent
 	 */
 	private IExternalAccess exta = null;
-	private IClockService clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+//	private IClockService clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);										
+	private IClockService clockservice = null;//(IClockService) getScope().getServiceContainer().getRequiredService("clockservice").get(this);
 	private IComponentManagementService cms = null;
 	private OnlineVisualisation vis = null;
 	private int localExperimentCounter = -1;	
@@ -97,7 +93,8 @@ public class RuntimeManagerPlan extends Plan {
 
 		// SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler
 		// .parseXMLFromString((String) clientConfMap.get(Constants.CONFIGURATION_FILE_AS_XML_STRING), SimulationConfiguration.class);
-		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+//		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class,RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+		cms = (IComponentManagementService) getScope().getServiceContainer().getRequiredService("cms").get(this);
 				
 		startApplication((Map) getParameter("applicationConf").getValue(), clientConfMap, simConf);
 		System.out.println("#RumtimeManagerPlan# Startet Simulation Experiment Nr.:" + clientConfMap.get(GlobalConstants.EXPERIMENT_ID) + ") with Optimization Values: "
@@ -132,11 +129,10 @@ public class RuntimeManagerPlan extends Plan {
 
 			TargetFunction targetFunct = simConf.getRunConfiguration().getRows().getTerminateCondition().getTargetFunction();
 
-			// HACK: Need a observer / listener instead evaluating expression
-			// every 1000ms
+			// HACK: Need a observer / listener instead evaluating expression every 1000ms
 			while (true) {
 				waitFor(1000);
-
+								
 				// Hack: Works right now only for single objects but not for all
 				// of that type...
 				// Additionally: only one part of the equation can be an
@@ -488,6 +484,7 @@ public class RuntimeManagerPlan extends Plan {
 
 	private void init() {
 		callerID = (Long) getParameter("callerID").getValue();
+		clockservice = (IClockService) getScope().getServiceContainer().getRequiredService("clockservice").get(this);
 		File file = new File("..");
 		try {
 			// System.out.println("-->" + file.getCanonicalPath().toString());

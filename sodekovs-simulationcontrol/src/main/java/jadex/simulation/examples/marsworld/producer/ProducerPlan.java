@@ -10,6 +10,8 @@ import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
+import jadex.extension.envsupport.math.IVector2;
 import jadex.simulation.examples.marsworld.RequestCarry;
 import jadex.simulation.examples.marsworld.RequestProduction;
 
@@ -48,6 +50,9 @@ public class ProducerPlan extends Plan
 			IEnvironmentSpace env = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
 			ISpaceObject target = env.getSpaceObject(ot.getId());
 
+			//Call Carry agent before. Does it save time?
+//			callCarryAgent(target);
+			
 			// Producing ore here.
 			IGoal produce_ore = createGoal("produce_ore");
 			produce_ore.getParameter("target").setValue(target);
@@ -71,18 +76,25 @@ public class ProducerPlan extends Plan
 		
 		if(carriers!=null && carriers.length>0)
 		{
-			//System.out.println("Carry Agent: Found Carry Agents: "+carriers.length);
+//			System.out.println("Carry Agent: Found Carry Agents: "+carriers.length);
 
 			RequestCarry rc = new RequestCarry();
 			rc.setTarget(target);
-			//Action action = new Action();
-			//action.setAction(rc);
-			//action.setActor(new AID("dummy", true)); // Hack!! What to do with more than one receiver?
 			IMessageEvent mevent = createMessageEvent("request_carries");
+			//Get closest carrier agent
 			mevent.getParameterSet(SFipa.RECEIVERS).addValues(carriers);
+//			mevent.getParameterSet(SFipa.RECEIVERS).addValues(getClosestCarrierAgent());
 			mevent.getParameter(SFipa.CONTENT).setValue(rc);
 			sendMessage(mevent);
-			//System.out.println("Production Agent sent target to: "+carriers.length);
 		}
+	}
+	
+	private IComponentIdentifier[] getClosestCarrierAgent() {
+		ContinuousSpace2D space = (ContinuousSpace2D) ((IExternalAccess) getScope().getParent()).getExtension("my2dspace").get(this);
+		IVector2 myPos = (IVector2) getBeliefbase().getBelief("myPos").getFact();
+		ISpaceObject nearestCarrier = space.getNearestObject(myPos, null, "carry");
+		IComponentIdentifier[] ret =  new IComponentIdentifier[1];
+		ret[0] = space.getOwner(nearestCarrier.getId()).getName();		
+		return ret;
 	}
 }

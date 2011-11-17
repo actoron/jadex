@@ -10,6 +10,8 @@
 		<import>java.util.*</import>
 		<import>java.lang.*</import>
 		<import>jadex.simulation.client.*</import>
+		<import>jadex.bridge.service.types.clock.*</import>
+		<import>jadex.bridge.service.types.cms.*</import>
 	</imports>
 
 
@@ -20,40 +22,44 @@
 	</capabilities>
 
 	<beliefs>
-	<!-- Used to manage reference the between calling service and finished experiment: Which service call corresponds to which experiment? Caller ID is the time when the experiment was init. (long); The value (int) is the local experiment counter. -->
+		<!-- Used to manage reference the between calling service and finished 
+			experiment: Which service call corresponds to which experiment? Caller ID 
+			is the time when the experiment was init. (long); The value (int) is the 
+			local experiment counter. -->
 		<belief name="callerExperimentReference" class="Map">
 			<!-- HashMap used as: new HashMap<Long,Integer> -->
-			 <fact>new HashMap()</fact>
-		</belief>
-	
-	<!-- Contains two information for each conducted experiment: simulationFacts and  observedEventsMap. Key is the experimentCounter, which is incremented automatically.-->
-		<belief name="factsAboutAllExperiments" class="Map">
-		<!-- HashMap used as: new HashMap<Integer,HashMap> -->
 			<fact>new HashMap()</fact>
 		</belief>
-		
-		
-		<!-- Counts the number of experiments that have been executed. Is also used as ID for the experiments to enable parallel execution. -->
+
+		<!-- Contains two information for each conducted experiment: simulationFacts 
+			and observedEventsMap. Key is the experimentCounter, which is incremented 
+			automatically. -->
+		<belief name="factsAboutAllExperiments" class="Map">
+			<!-- HashMap used as: new HashMap<Integer,HashMap> -->
+			<fact>new HashMap()</fact>
+		</belief>
+
+
+		<!-- Counts the number of experiments that have been executed. Is also 
+			used as ID for the experiments to enable parallel execution. -->
 		<belief name="experimentCounter" class="int">
 			<fact>0</fact>
 		</belief>
-		
+
 		<!-- Returns the number of currently running experiments on this agent. -->
 		<belief name="numberOfRunningExperiments" class="int">
 			<fact>0</fact>
 		</belief>
-		
+
 		<!-- Map contains all facts related to this simulation run. -->
-		<!--<belief name="simulationFacts" class="Map">
-			<fact>new HashMap()</fact>
-		</belief> -->
+		<!--<belief name="simulationFacts" class="Map"> <fact>new HashMap()</fact> 
+			</belief> -->
 	</beliefs>
 
 	<goals>
 		<!-- Used to search for the masters simulation agent. -->
-		<!-- <achievegoalref name="df_search">
-			<concrete ref="dfcap.df_search" />
-		</achievegoalref>-->
+		<!-- <achievegoalref name="df_search"> <concrete ref="dfcap.df_search" 
+			/> </achievegoalref> -->
 		<performgoal name="startExecution" retry="false" exclude="never">
 			<!-- Args required to start application -->
 			<parameter name="applicationConf" class="Map" />
@@ -65,18 +71,18 @@
 	</goals>
 
 	<plans>
-		<!-- Responsible for all aspects related to the run of the simulation, especially 
-			to monitor the terminate condition. -->
+		<!-- Responsible for all aspects related to the run of the simulation, 
+			especially to monitor the terminate condition. -->
 		<plan name="runtime_manager">
 			<body class="RuntimeManagerPlan" />
 			<parameter name="applicationConf" class="Map">
-				<goalmapping ref="startExecution.applicationConf"/>
+				<goalmapping ref="startExecution.applicationConf" />
 			</parameter>
 			<parameter name="clientConf" class="HashMap">
-				<goalmapping ref="startExecution.clientConf"/>
+				<goalmapping ref="startExecution.clientConf" />
 			</parameter>
 			<parameter name="callerID" class="Long">
-				<goalmapping ref="startExecution.callerID"/>
+				<goalmapping ref="startExecution.callerID" />
 			</parameter>
 			<trigger>
 				<goal ref="startExecution" />
@@ -92,10 +98,17 @@
 		<property name="debugging">false</property>
 	</properties>
 
-	<services>		
+	<services>
 		<providedservice class="IRemoteSimulationExecutionService">
-			<implementation>new RemoteSimulationExecutionService($scope)</implementation>
+			<implementation>new RemoteSimulationExecutionService($scope)
+			</implementation>
 		</providedservice>
-	</services>	
+		<requiredservice name="clockservice" class="IClockService">
+			<binding scope="platform" />
+		</requiredservice>
+		<requiredservice name="cms" class="IComponentManagementService">
+			<binding scope="platform"/>
+		</requiredservice>
+	</services>
 
 </agent>

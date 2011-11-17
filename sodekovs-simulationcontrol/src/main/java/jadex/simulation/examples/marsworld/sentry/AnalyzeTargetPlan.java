@@ -12,24 +12,23 @@ import jadex.extension.agr.Group;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.math.IVector2;
 import jadex.simulation.examples.marsworld.RequestProduction;
 
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
- *  Inform the sentry agent about a new target.
+ * Inform the sentry agent about a new target.
  */
-public class AnalyzeTargetPlan extends Plan
-{
+public class AnalyzeTargetPlan extends Plan {
 	/**
-	 *  The plan body.
+	 * The plan body.
 	 */
-	public void body()
-	{
-		ISpaceObject target = (ISpaceObject)getParameter("target").getValue();
+	public void body() {
+		ISpaceObject target = (ISpaceObject) getParameter("target").getValue();
 
 		// Move to the target.
 		IGoal go_target = createGoal("move.move_dest");
@@ -37,55 +36,58 @@ public class AnalyzeTargetPlan extends Plan
 		dispatchSubgoalAndWait(go_target);
 
 		// Analyse the target.
-		try
-		{
-			ISpaceObject	myself	= (ISpaceObject)getBeliefbase().getBelief("myself").getFact();
-			SyncResultListener	res	= new SyncResultListener();
+		try {
+			ISpaceObject myself = (ISpaceObject) getBeliefbase().getBelief("myself").getFact();
+			SyncResultListener res = new SyncResultListener();
 			Map props = new HashMap();
 			props.put(AnalyzeTargetTask.PROPERTY_TARGET, target);
 			props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
-			IEnvironmentSpace space = (IEnvironmentSpace)getBeliefbase().getBelief("move.environment").getFact();
-			Object	taskid	= space.createObjectTask(AnalyzeTargetTask.PROPERTY_TYPENAME, props, myself.getId());
+			IEnvironmentSpace space = (IEnvironmentSpace) getBeliefbase().getBelief("move.environment").getFact();
+			Object taskid = space.createObjectTask(AnalyzeTargetTask.PROPERTY_TYPENAME, props, myself.getId());
 			space.addTaskListener(taskid, myself.getId(), res);
 
 			res.waitForResult();
-//			System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");
-			if(((Number)target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue()>0)
+			// System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");
+			if (((Number) target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue() > 0)
 				callProducerAgent(target);
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 			// Fails for one agent, when two agents try to analyze the same target at once.
 		}
 	}
 
 	/**
-	 *  Sending a location to the Producer Agent.
-	 *  Therefore it has first to be looked up in the DF.
-	 *  @param target
+	 * Sending a location to the Producer Agent. Therefore it has first to be looked up in the DF.
+	 * 
+	 * @param target
 	 */
-	private void callProducerAgent(ISpaceObject target)
-	{
-//		System.out.println("Calling some Production Agent...");
-		AGRSpace agrs = (AGRSpace)((IExternalAccess)getScope().getParent()).getExtension("myagrspace").get(this);		
+	private void callProducerAgent(ISpaceObject target) {
+		// System.out.println("Calling some Production Agent...");
+		AGRSpace agrs = (AGRSpace) ((IExternalAccess) getScope().getParent()).getExtension("myagrspace").get(this);
 		Group group = agrs.getGroup("mymarsteam");
-		IComponentIdentifier[]	producers	= group.getAgentsForRole("producer");
+		IComponentIdentifier[] producers = group.getAgentsForRole("producer");
 
-		if(producers!=null && producers.length>0)
-		{
-			int sel = (int)(Math.random()*producers.length); // todo: Select not randomly
-//			System.out.println("Found agents: "+producers.length+" selected: "+sel);
+		if (producers != null && producers.length > 0) {
+			int sel = (int) (Math.random() * producers.length); // todo: Select not randomly
+			// System.out.println("Found agents: "+producers.length+" selected: "+sel);
 
 			RequestProduction rp = new RequestProduction(target);
-			//Action action = new Action();
-			//action.setAction(rp);
-			//action.setActor(SJade.convertAIDtoJade(producers[sel].getName()));
 			IMessageEvent mevent = createMessageEvent("request_producer");
+			//send to closest producer
 			mevent.getParameterSet(SFipa.RECEIVERS).addValue(producers[sel]);
+//			mevent.getParameterSet(SFipa.RECEIVERS).addValue(getClosestProducerAgent());
 			mevent.getParameter(SFipa.CONTENT).setValue(rp);
 			sendMessage(mevent);
-//			System.out.println("Sentry Agent: sent location to: "+producers[sel].getName());
+			// System.out.println("Sentry Agent: sent location to: "+producers[sel].getName());
 		}
+	}
+
+	private IComponentIdentifier getClosestProducerAgent() {
+		ContinuousSpace2D space = (ContinuousSpace2D) ((IExternalAccess) getScope().getParent()).getExtension("my2dspace").get(this);
+		IVector2 myPos = (IVector2) getBeliefbase().getBelief("myPos").getFact();
+		ISpaceObject nearestProducer = space.getNearestObject(myPos, null, "producer");
+
+		return space.getOwner(nearestProducer.getId()).getName();
+
 	}
 }

@@ -28,6 +28,16 @@
 			<component type="RemoteSimulationClient" master="false"/>
 			</components>
 		</configuration>
+		<configuration name="Simulate IWSOS MarsWorld with included Remote Client">
+			<components>
+				<component type="SimulationManager" master="true">
+					<arguments>
+						<argument name="simulationDescriptionFile">"../sodekovs-simulationcontrol/src/main/java/jadex/simulation/IWSOSConfiguration.xml"</argument>			
+					</arguments>
+				</component>
+			<component type="RemoteSimulationClient" master="false"/>
+			</components>
+		</configuration>
 		<configuration name="Simulate MarsWorld">
 			<components>
 				<component type="SimulationManager" master="true">
