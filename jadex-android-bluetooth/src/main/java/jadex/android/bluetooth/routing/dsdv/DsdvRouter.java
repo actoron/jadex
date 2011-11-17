@@ -115,7 +115,7 @@ public class DsdvRouter extends AbstractPacketRouter implements IPacketRouter {
 	 */
 	public void BroadcastRouteDown(String[] toNetworkAddresses) {
 		for (String l : toNetworkAddresses) {
-			BroadcastRouteDown(l);
+			broadcastRouteDown(l);
 		}
 	}
 
@@ -132,8 +132,8 @@ public class DsdvRouter extends AbstractPacketRouter implements IPacketRouter {
 		Vector<String> neighbors = routeTable.getNeighborAddresses();
 		if (neighbors != null) {
 			for (int i = 0; i < neighbors.size(); i++) {
+				String dest = neighbors.get(i);
 				try {
-					String dest = neighbors.get(i);
 					Builder rtBuilder = jadex.android.bluetooth.message.MessageProtos.RoutingTable
 							.newBuilder();
 					for (RoutingTableEntryWrapper rtew : routes) {
@@ -153,6 +153,7 @@ public class DsdvRouter extends AbstractPacketRouter implements IPacketRouter {
 				} catch (Exception exception) {
 					Log.e(TAG, "Error in BroadcastRouteBroadcastPacket",
 							exception);
+					broadcastRouteDown(dest);
 				}
 			}
 		}
@@ -169,7 +170,7 @@ public class DsdvRouter extends AbstractPacketRouter implements IPacketRouter {
 	 *            the destination that is down
 	 */
 
-	public void BroadcastRouteDown(String dest) {
+	public void broadcastRouteDown(String dest) {
 		RoutingTableEntryWrapper rte = routeTable.getRoutingEntry(dest);
 		if (rte != null) {
 			// get all routes concerning dest, set as invalid
@@ -488,7 +489,7 @@ public class DsdvRouter extends AbstractPacketRouter implements IPacketRouter {
 
 	@Override
 	public void removeConnectedDevice(String device) {
-		BroadcastRouteDown(device);
+		broadcastRouteDown(device);
 	}
 
 	@Override

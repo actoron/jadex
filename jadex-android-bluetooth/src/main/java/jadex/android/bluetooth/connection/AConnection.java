@@ -10,7 +10,6 @@ import jadex.android.bluetooth.util.Helper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -21,20 +20,58 @@ import android.util.Log;
 
 public abstract class AConnection implements IConnection {
 
+	/**
+	 * Timeout, after which a Connection can be considered dead.
+	 */
 	protected static final int CONNECTION_TIMEOUT = 2000;
 
-	public static final int MESSAGE_READ = 0;
+	/**
+	 * The local {@link IBluetoothAdapter} this connection uses.
+	 */
 	protected IBluetoothAdapter adapter;
+
+	/**
+	 * The remote {@link IBluetoothDevice} this Connection is connected with.
+	 */
 	protected IBluetoothDevice remoteDevice;
 
+	/**
+	 * The Thread which is used to manage the connection.
+	 */
 	protected ConnectedThread connectedThread;
+	
+	/**
+	 * Indicates wether this connection is alive or closed.
+	 */
+	private boolean connectionAlive;
 
+	/**
+	 * The {@link IConnectionListener}s, which are informed about Connection
+	 * changes.
+	 */
 	protected List<IConnectionListener> listeners;
 
+	/**
+	 * Indicates how much bytes where read during the last {@link InputStream}
+	 * .read() operation.
+	 */
 	private int lastPacketBytesRead;
+
+	/**
+	 * Contains the last Packet that was received (may be incomplete).
+	 */
 	private byte[] lastReceivedPacket;
+	/**
+	 * Indicates wether the last {@link InputStream}.read() operation resulted
+	 * in a complete packet.
+	 */
 	private boolean lastPacketComplete;
 
+	/**
+	 * Creates a new Connection.
+	 * @param adapter local {@link IBluetoothAdapter}
+	 * @param remoteDevice remote {@link IBluetoothDevice}
+	 */
 	public AConnection(IBluetoothAdapter adapter, IBluetoothDevice remoteDevice) {
 		this.adapter = adapter;
 		this.remoteDevice = remoteDevice;
@@ -44,6 +81,9 @@ public abstract class AConnection implements IConnection {
 		lastPacketComplete = true;
 	}
 
+	/**
+	 * Manages the Connection.
+	 */
 	protected class ConnectedThread extends Thread {
 		private final IBluetoothSocket mmSocket;
 		private InputStream mmInStream;
@@ -97,7 +137,6 @@ public abstract class AConnection implements IConnection {
 			}
 		}
 
-		/* Call this from the main Activity to send data to the remote device */
 		public void write(byte[] bytes) {
 			if (running) {
 				packetQueue.add(bytes);
@@ -226,8 +265,8 @@ public abstract class AConnection implements IConnection {
 				continue;
 			}
 			bytes = inputStream.read(buffer);
-//			Log.d(Helper.LOG_TAG,
-//					"(Connection) received a stream chunk of size: " + bytes);
+			// Log.d(Helper.LOG_TAG,
+			// "(Connection) received a stream chunk of size: " + bytes);
 			short totalSize;
 
 			int byteIndexInPacket;
@@ -245,20 +284,20 @@ public abstract class AConnection implements IConnection {
 				totalSize = getTotalPacketSize(lastReceivedPacket, 0,
 						byteIndexInPacket + 1);
 			}
-			
+
 			if (totalSize == -1) {
 				// last time, we haven't received the DataSize field.
 				// read up to the dataSize field:
 				for (; byteIndexInBuffer < bytes
-				&& byteIndexInPacket <= DataPacket.INDEX_dataSize_END; 
-				byteIndexInBuffer++, byteIndexInPacket++) {
+						&& byteIndexInPacket <= DataPacket.INDEX_dataSize_END; byteIndexInBuffer++, byteIndexInPacket++) {
 					lastReceivedPacket[byteIndexInPacket] = buffer[byteIndexInBuffer];
 				}
 				lastPacketBytesRead = byteIndexInPacket;
-				totalSize = getTotalPacketSize(lastReceivedPacket, 0, byteIndexInPacket +1);
+				totalSize = getTotalPacketSize(lastReceivedPacket, 0,
+						byteIndexInPacket + 1);
 				if (totalSize == -1) {
-//						throw new MessageConvertException(
-//						"(AConnection) After two read() calls i still don't know the dataSize of this Packet!");
+					// throw new MessageConvertException(
+					// "(AConnection) After two read() calls i still don't know the dataSize of this Packet!");
 					continue;
 				}
 			}
@@ -270,8 +309,7 @@ public abstract class AConnection implements IConnection {
 
 				// read one Packet, or, the most of the Packet we can get:
 				int toRead = missingBytes + byteIndexInBuffer;
-				for (; byteIndexInBuffer < toRead
-						&& byteIndexInBuffer < bytes; byteIndexInBuffer++, byteIndexInPacket++) {
+				for (; byteIndexInBuffer < toRead && byteIndexInBuffer < bytes; byteIndexInBuffer++, byteIndexInPacket++) {
 					lastReceivedPacket[byteIndexInPacket] = buffer[byteIndexInBuffer];
 				}
 				lastPacketBytesRead = byteIndexInPacket;
@@ -279,9 +317,9 @@ public abstract class AConnection implements IConnection {
 				if (lastPacketBytesRead >= totalSize) {
 					// read one packet successfully
 					dataPacket = new DataPacket(lastReceivedPacket);
-//					Log.d(Helper.LOG_TAG,
-//							"(Connection) received a DataPacket of Size: "
-//									+ totalSize);
+					// Log.d(Helper.LOG_TAG,
+					// "(Connection) received a DataPacket of Size: "
+					// + totalSize);
 					receivedPackets.add(dataPacket);
 					if (bytes > missingBytes) {
 						// received more than one packet.
@@ -349,11 +387,6 @@ public abstract class AConnection implements IConnection {
 		return totalSize;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jadex.android.bluetooth.IConnection#write(byte[])
-	 */
 	@Override
 	public void write(DataPacket pkt) throws IOException {
 		if (isAlive()) {
@@ -367,8 +400,10 @@ public abstract class AConnection implements IConnection {
 		}
 	}
 
-	private boolean connectionAlive;
-
+	/**
+	 * Sets the status of this connection and informs listeners if the status has changed
+	 * @param alive new status of this connection
+	 */
 	protected void setConnectionAlive(boolean alive) {
 		if (connectionAlive != alive) {
 			connectionAlive = alive;
@@ -376,22 +411,11 @@ public abstract class AConnection implements IConnection {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jadex.android.bluetooth.IConnection#isAlive()
-	 */
 	@Override
 	public boolean isAlive() {
 		return connectionAlive;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jadex.android.bluetooth.IConnection#setConnectionListener(de
-	 * .unihamburg.vsis.test.bluetooth.BTConnectionListener)
-	 */
 	@Override
 	public void addConnectionListener(final IConnectionListener l) {
 		new Thread(new Runnable() {
@@ -404,12 +428,6 @@ public abstract class AConnection implements IConnection {
 		}).start();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jadex.android.bluetooth.IConnection#setConnectionListener(de
-	 * .unihamburg.vsis.test.bluetooth.BTConnectionListener)
-	 */
 	@Override
 	public void removeConnectionListener(final IConnectionListener l) {
 		new Thread(new Runnable() {
@@ -422,6 +440,10 @@ public abstract class AConnection implements IConnection {
 		}).start();
 	}
 
+	/**
+	 * Notifies Listeners that a {@link DataPacket} has been received
+	 * @param dataPacket that was received
+	 */
 	protected void notifyMessageReceived(DataPacket dataPacket) {
 		synchronized (listeners) {
 			for (IConnectionListener l : listeners) {
@@ -430,6 +452,9 @@ public abstract class AConnection implements IConnection {
 		}
 	}
 
+	/**
+	 * Notifies Listeners that the status of this connection has changed.
+	 */
 	protected void notifyConnectionStateChanged() {
 		synchronized (listeners) {
 			for (IConnectionListener l : listeners) {
@@ -438,12 +463,6 @@ public abstract class AConnection implements IConnection {
 		}
 	}
 
-	/* Call this from the main Activity to shutdown the connection */
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see jadex.android.bluetooth.IConnection#close()
-	 */
 	@Override
 	public void close() {
 		if (connectedThread != null) {

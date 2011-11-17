@@ -10,6 +10,7 @@
 		<groupId>net.sourceforge.jadex</groupId>
 		<artifactId>jadex-android-parent</artifactId>
 		<version>0.0.4-SNAPSHOT</version>
+		<relativePath>../jadex-android-parent/pom.xml</relativePath>
 	</parent>
 
 	<dependencies>

@@ -51,7 +51,7 @@ public class MeasureActivity extends BaseActivity {
 	private Button refreshButton;
 	private HashMap<String, IChatService> receiverMap;
 
-	private LinkedList<Integer> times;
+	private PerformanceResult perfRes;
 
 	public static IExternalAccess chatAgent;
 
@@ -68,7 +68,7 @@ public class MeasureActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.measure_activity);
 		receiverMap = new HashMap<String, IChatService>();
-		times = new LinkedList<Integer>();
+		//perfRes = new PerformanceResult();
 
 		ownNameTextView = findTextViewById(R.id.measure_activity_ownName);
 
@@ -110,9 +110,22 @@ public class MeasureActivity extends BaseActivity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				if (measureComplete) {
+					perfRes = new PerformanceResult(PerformanceResult.byteLengths);
+					int byteLen = perfRes.getNextByteLength();
+					perfRes.newPingRun(byteLen);
+					
+					StringBuilder sb = new StringBuilder();
+					Random random = new Random();
+					for (int i = 0; i < byteLen; i++) {
+						sb.append((char) (random.nextInt(78) + '0'));
+					}
+					
+					measureString = sb.toString();
 					measureComplete = false;
 					IChatService item = (IChatService) agentsListView
 							.getItemAtPosition(position);
+					perfRes.fromDevice = chatAgent.getComponentIdentifier().getName();
+					perfRes.toDevice = item.getIdentification();
 					measureTarget = item;
 					pingSentTime = System.nanoTime();
 					item.hear(chatAgent.getComponentIdentifier().getName(),
@@ -123,6 +136,8 @@ public class MeasureActivity extends BaseActivity {
 		});
 
 		registerForContextMenu(agentsListView);
+		
+		statusTextView.setOnClickListener(sendClickListener);
 	}
 
 	@Override
@@ -199,9 +214,6 @@ public class MeasureActivity extends BaseActivity {
 			break;
 		}
 
-//		bytelen = bytelen / 8;
-//		bytelen = bytelen / 4;
-		
 		StringBuilder sb = new StringBuilder();
 		Random random = new Random();
 		for (int i = 0; i < bytelen; i++) {
@@ -312,6 +324,16 @@ public class MeasureActivity extends BaseActivity {
 			} else if (v == refreshButton) {
 				measureComplete = true;
 				refreshAvailableChatServices();
+			} else if (v == statusTextView) {
+				if (perfRes != null) {
+					final String result = perfRes.toString();
+					Log.i(Helper.LOG_TAG, result);
+					runOnUiThread(new Runnable() {
+						public void run() {
+							statusTextView.setText(result);
+						}
+					});
+				}
 			}
 		}
 	};
@@ -387,17 +409,11 @@ public class MeasureActivity extends BaseActivity {
 			if (!measureComplete) {
 				long arrivalTime = System.nanoTime();
 				final int roundTripTime = (int) ((arrivalTime - pingSentTime) / 1000000);
-				times.add(roundTripTime);
+				
+				perfRes.addDelay(roundTripTime);
 
-				int average = 0;
-
-				for (long time : times) {
-					average += time;
-				}
-				final int count = times.size();
-				average = average / count;
-
-				final int av = average;
+				final int av = perfRes.getCurrentPingRunAverage();
+				final int count = perfRes.getCurrentPingRunCount();
 
 				runOnUiThread(new Runnable() {
 					@Override
@@ -415,10 +431,32 @@ public class MeasureActivity extends BaseActivity {
 					measureTarget.hear(chatAgent.getComponentIdentifier()
 							.getName(), measureString);
 				} else {
-					measureTarget = null;
-					measureComplete = true;
-					times.clear();
+					if (!perfRes.isComplete()) {
+						int nextByteLength = perfRes.getNextByteLength();
+						perfRes.newPingRun(nextByteLength);
+						StringBuilder sb = new StringBuilder();
+						Random random = new Random();
+						for (int i = 0; i < nextByteLength; i++) {
+							sb.append((char) (random.nextInt(78) + '0'));
+						}
+						measureString = sb.toString();
+						
+						pingSentTime = System.nanoTime();
+						measureTarget.hear(chatAgent.getComponentIdentifier()
+								.getName(), measureString);
+					} else {
+						measureTarget = null;
+						measureComplete = true;
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								statusTextView.setText(perfRes.toString());
+							}
+						});
+					}
 				}
+				
+				
 			}
 		}
 	}
