@@ -364,14 +364,14 @@ public class BTP2PConnector implements IBluetoothStateListener {
 							if (!future.resultAvailable) {
 								future.setResult(BluetoothMessage.MESSAGE_SENT);
 							}
-							connection.removeConnectionListener(this);
 						} catch (IOException e) {
 							// try again?
 							connection.close();
-							connection.removeConnectionListener(this);
 							if (!future.resultAvailable) {
 								future.setResult(BluetoothMessage.NOT_CONNECTABLE);
 							}
+						} finally {
+							connection.removeConnectionListener(this);
 						}
 					} else {
 						connection.removeConnectionListener(this);
@@ -821,6 +821,9 @@ public class BTP2PConnector implements IBluetoothStateListener {
 
 					@Override
 					public void run() {
+						if (connections.size() >= 1) {
+							return;
+						}
 						Log.i(Helper.LOG_TAG,
 								"Autoconnect Task Active... currently connected to "
 										+ connections.size() + " devices.");

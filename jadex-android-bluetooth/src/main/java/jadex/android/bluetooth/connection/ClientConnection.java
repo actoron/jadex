@@ -117,6 +117,10 @@ public class ClientConnection extends AConnection {
 					break;
 				} catch (IOException e) {
 					uuidNum++;
+					while (BTServer.usedUUIDnums.contains(uuidNum)) {
+						uuidNum++;
+					}
+					
 					// cancel connection if tried UUID was the first
 					// (because then no server is running on remote device)
 					if (uuidNum != 1 && (uuidNum < BTServer.UUIDS.length)) {

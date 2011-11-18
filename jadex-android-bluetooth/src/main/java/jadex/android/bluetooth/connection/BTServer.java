@@ -11,7 +11,9 @@ import jadex.android.bluetooth.util.Helper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import android.os.Handler;
@@ -33,6 +35,8 @@ public class BTServer {
 	private IBluetoothStateInformer stateInformer;
 
 	public static final String SERVICE_NAME = "";
+	
+	public static Set<Integer> usedUUIDnums;
 
 	public static final UUID[] UUIDS = new UUID[] { UUID.fromString("8050a070-bcf2-11e0-962b-0800200c9a66"),
 			UUID.fromString("8050a071-bcf2-11e0-962b-0800200c9a66"),
@@ -58,6 +62,7 @@ public class BTServer {
 		this.stateInformer = stateInformer;
 		listenThreads = new ArrayList<AcceptThread>();
 		connectedThreads = new ArrayList<ServerConnection>();
+		usedUUIDnums = new HashSet<Integer>();
 	}
 	
 	public void listen() {
@@ -100,7 +105,7 @@ public class BTServer {
 	private void _listen() {
 		if (!listening) {
 			for (int i = 0; i < UUIDS.length; i++) {
-				AcceptThread acceptThread = new AcceptThread(UUIDS[i]);
+				AcceptThread acceptThread = new AcceptThread(UUIDS[i], i);
 				listenThreads.add(acceptThread);
 				acceptThread.start();
 				Log.d(Helper.LOG_TAG, "AcceptThread #" + i + " started");
@@ -119,11 +124,13 @@ public class BTServer {
 	class AcceptThread extends Thread {
 		private IBluetoothServerSocket mmServerSocket;
 		private UUID uuid;
+		private int uuidNum;
 
-		public AcceptThread(UUID uuid) {
+		public AcceptThread(UUID uuid, int num) {
 			// Use a temporary object that is later assigned to mmServerSocket,
 			// because mmServerSocket is final
 			this.uuid = uuid;
+			this.uuidNum = num;
 		}
 
 		public void run() {
@@ -134,7 +141,7 @@ public class BTServer {
 					IBluetoothServerSocket tmp = null;
 					tmp = adapter.listenUsingRfcommWithServiceRecord(SERVICE_NAME, uuid);
 					mmServerSocket = tmp;
-					Log.d(Helper.LOG_TAG, "Socket listening with uuid: " + uuid.toString());
+					Log.d(Helper.LOG_TAG, "Socket listening with uuid: " + uuidNum);
 					socket = mmServerSocket.accept();
 				} catch (IOException e) {
 					//e.printStackTrace();
@@ -145,7 +152,7 @@ public class BTServer {
 				// If a connection was accepted
 				if (socket != null) {
 					// Do work to manage the connection (in a separate thread)
-					if (uuid.equals(UUIDS[0])) {
+					if (uuidNum == 0) {
 						try {
 							Log.d(Helper.LOG_TAG, "Incoming Connection on first UUID. Dropping...");
 							Thread.sleep(500);
@@ -160,7 +167,8 @@ public class BTServer {
 							run();
 						}
 					} else {
-						Log.d(Helper.LOG_TAG, "Incoming Connection accepted.");
+						Log.d(Helper.LOG_TAG, "Incoming Connection accepted on UUID " + uuidNum);
+						usedUUIDnums.add(uuidNum);
 						ServerConnection connection = new ServerConnection(adapter, socket);
 						connectedThreads.add(connection);
 						connection.addConnectionListener(new IConnectionListener() {
@@ -173,6 +181,8 @@ public class BTServer {
 							@Override
 							public void connectionStateChanged(IConnection connection) {
 								if (!connection.isAlive()) {
+									connection.removeConnectionListener(this);
+									usedUUIDnums.remove(uuidNum);
 									run();
 								}
 							}

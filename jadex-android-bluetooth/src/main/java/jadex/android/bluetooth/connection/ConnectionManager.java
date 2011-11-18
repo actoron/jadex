@@ -103,6 +103,7 @@ public class ConnectionManager extends HashMap<String, IConnection> implements
 				throw new MessageNotSendException(e.getMessage());
 			}
 		} else {
+			remove(con);
 			throw new MessageNotSendException("connection was not alive");
 		}
 	}
