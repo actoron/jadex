@@ -1,7 +1,8 @@
 #!/bin/bash
 ##########################################
 # Android Deployment Script              #
-# v4                                     #
+# v5                                     #
+# Julian Kalinowski			 #
 # 8kalinow@informatik.uni-hamburg.de     #
 ##########################################
 ADB_PATH=$ANDROID_HOME/tools/adb
@@ -238,18 +239,22 @@ fi
 
 	
 e $(echo_bold "Deploying...")
-e "Deploying to $(echo_bold $(echo $DEVICES | awk '{print NF;}')) devices"
+e "Deploying to $(echo_bold $(echo $DEVICES | awk '{print NF;}')) devices (parallel deploy)"
 for d in $DEVICES; do
 	if [ $clearlog == true ]; then
 		e "Clearing logcat of device $(echo_bold $d)"
 		$ADB_PATH -s $d logcat -c
 	fi
 
-	e "Transferring file to device: $(echo_bold $d)"
-	$ADB_PATH -s $d install -r $APKFILE
-	if [ ! "$?" -eq "0" ]; then
-		f "Transfer to device $d failed."
-	else 
+	#e "Transferring file to device: $(echo_bold $d)"
+	$ADB_PATH -s $d install -r $APKFILE &
+done
+wait
+
+for d in $DEVICES; do
+	#if [ ! "$?" -eq "0" ]; then
+	#	f "Transfer to device $d failed."
+	#else 
 		e "Starting Application on device $d"
 		$ADB_PATH -s $d shell am start -n $APPLICATION_PACKAGE/$APPLICATION_PACKAGE.$MAIN_ACTIVITY
         if [ ! "$?" -eq "0" ]; then
@@ -257,6 +262,6 @@ for d in $DEVICES; do
         else
             e "Application started on device $d."
         fi
-	fi
+	#fi
 done
 

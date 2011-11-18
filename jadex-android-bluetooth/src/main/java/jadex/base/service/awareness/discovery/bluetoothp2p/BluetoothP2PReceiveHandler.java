@@ -47,7 +47,7 @@ public class BluetoothP2PReceiveHandler extends ReceiveHandler {
 
 			return ret;
 		} catch (InterruptedException e) {
-			return receive();
+			return null;
 		}
 
 		// try

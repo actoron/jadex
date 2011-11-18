@@ -8,10 +8,12 @@ public class PerformanceResult {
 	public String fromDevice;
 	public String toDevice;
 
-//	public static int[] byteLengths = { 32, 512, 1024, 2048, 10 * 1024,
-//			20 * 1024 };
+	public static int[] byteLengths = { 32, 512, 1024, 2048, 10 * 1024,
+			20 * 1024 };
 	
-	public static int[] byteLengths = { 32, 512, 1024, 2048};
+//	public static int[] byteLengths = { 32, 512, 1024, 2048};
+	
+//	public static int[] byteLengths = { 32};
 	
 	private int[] byteLengthToTry = {32};
 
@@ -89,11 +91,10 @@ public class PerformanceResult {
 		
 		public int getVarianz() {
 			int erg = 0;
-			
 			int u = getAverageDelay();
 			
 			for (Integer wert : delays) {
-				erg *= Math.pow(wert -u, 2);
+				erg += Math.pow(wert -u, 2);
 			}
 			
 			return erg / (delays.size() -1);

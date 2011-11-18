@@ -442,7 +442,9 @@ public class DsdvRouter extends AbstractPacketRouter implements IPacketRouter {
 			packet.incHopCount();
 			try {
 				sendMessageToConnectedDevice(packet, nextHop);
-				Log.d(TAG, "Message routed to " + nextHop);
+				if (!nextHop.equals(packet.getDestination())) {
+					Log.d(TAG, "Message sent to intermediate device: " + nextHop);
+				}
 				result.setResult(BluetoothMessage.MESSAGE_SENT);
 			} catch (MessageNotSendException e) {
 				Log.e(TAG, "Could not send Message to: " + nextHop + ", see Stacktrace");

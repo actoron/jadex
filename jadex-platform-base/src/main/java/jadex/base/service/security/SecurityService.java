@@ -334,7 +334,7 @@ public class SecurityService implements ISecurityService
 		};
 		
 		String	pw	= "platformpass";
-		IComponentIdentifier	cid	= new ComponentIdentifier("platform_xyz", new String[]{"hasfgjdlah", "t4qohnc37rtcb0q479tfb", "3t7qh90c3tq0dch9347qgbﬂ0234", "w34q256vﬂ348956qfhﬂ03489fh6c"});
+		IComponentIdentifier	cid	= new ComponentIdentifier("platform_xyz", new String[]{"hasfgjdlah", "t4qohnc37rtcb0q479tfb", "3t7qh90c3tq0dch9347qgbz0234", "w34q256vz348956qfhz03489fh6c"});
 		byte[]	cidbytes	= JavaWriter.objectToByteArray(cid, AbstractRemoteCommand.class.getClassLoader());
 		for(int runs=0; runs<3; runs++)
 		{
