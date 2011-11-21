@@ -11,15 +11,15 @@ import java.math.BigInteger;
  */
 public class MathmaticModel {
 
-	private static final long R = 100;
+	private static final long R = 50;
 
-	private static final long C = 100;
+	private static final long C = 50;
 
-	private static final long N = 300;
+	private static final long N = 150;
 
-	private static final double RHO = 0.055;
+	// private static final double DELTA = 0.35;
 
-	private static final double KAPPA = 5.5;
+	// private static final double KAPPA = 2.2;
 
 	/**
 	 * @param args
@@ -37,17 +37,25 @@ public class MathmaticModel {
 		for (int r = 1; r <= 10; r++) {
 			double redRate = r / 10.0;
 			long k = Math.round((redRate * C) - 1);
-			long t = Math.round(RHO * ((redRate * C) - 1));
+			long t = Math.round(delta(redRate) * ((redRate * C) - 1));
 
 			for (int w = 1; w <= 10; w++) {
 				double workload = w / 10.0;
-				double expValue = expectationValue(N, redRate, workload, KAPPA, C, k, t);
-				double df = distributionFunction(N, redRate, workload, KAPPA, C, k, t);
+				double expValue = expectationValue(N, redRate, workload, kappa(workload), C, k, t);
+				double df = distributionFunction(N, redRate, workload, kappa(workload), C, k, t);
 
 				System.out.println(redRate + "\t" + workload + "\t" + expValue + "\t" + df);
 			}
 		}
 
+	}
+
+	private static double delta(double redRate) {
+		return 1 / (redRate * C);
+	}
+
+	private static double kappa(double workload) {
+		return workload * 10;
 	}
 
 	private static double expectationValue(long n, double redRate, double workload, double kappa, long c, long k, long t) {
@@ -98,7 +106,7 @@ public class MathmaticModel {
 		BigInteger fractionDown = binomialCoefficient(BigInteger.valueOf(c), BigInteger.valueOf(t));
 		double fraction = fractionTop.doubleValue() / fractionDown.doubleValue();
 
-		return (redRate / kappa) * fraction;
+		return (redRate) * fraction;
 	}
 
 	private static BigInteger binomialCoefficient(BigInteger n, BigInteger k) {
