@@ -144,10 +144,17 @@ public abstract class AConnection implements IConnection {
 		}
 
 		public synchronized void cancel() {
+			if (writer != null) {
+				writer.running = false;
+				writer = null;
+			}
+			if (reader != null) {
+				reader.running = false;
+				reader = null;
+			}
 			if (running) {
 				running = false;
-				writer.running = false;
-				reader.running = false;
+			
 				try {
 					// this wakes up the writer thread
 					// which will then terminate
@@ -156,7 +163,7 @@ public abstract class AConnection implements IConnection {
 					mmInStream.close();
 					mmSocket.close();
 				} catch (IOException e) {
-
+					e.printStackTrace();
 				} finally {
 					mmOutStream = null;
 					mmInStream = null;

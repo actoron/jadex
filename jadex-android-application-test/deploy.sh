@@ -161,7 +161,7 @@ fi
 # get package and main activity name from Manifest:
 
 e $(echo_bold "Parsing $MANIFEST...")
-APPLICATION_PACKAGE=$(grep -Eo package="\S*" $MANIFEST | sed -rn 's/package="(\S*)"/\1/p')
+APPLICATION_PACKAGE=$(grep -Eo package="\S*" $MANIFEST | sed -rn 's/package="(\S*)"(>|)/\1/p')
 while read line; 
 do
 	temp=$(echo "$line" | sed -rn 's/<activity.*name.*"(\S*).*">.*/\1/p')
