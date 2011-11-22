@@ -387,11 +387,18 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	{
 		final Future<Void> ret = new Future<Void>();
 		final IServiceIdentifier sid = service.getServiceIdentifier();
-		getPublishService(instance, type, null).addResultListener(instance.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
+		getPublishService(instance, type, null).addResultListener(instance.createResultListener(new IResultListener<IPublishService>()
 		{
-			public void customResultAvailable(IPublishService ps)
+			public void resultAvailable(IPublishService ps)
 			{
 				ps.unpublishService(sid).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// ignore, if no publish info
+				ret.setResult(null);
+				// todo: what if publish info but no publish service?
 			}
 		}));
 		return ret;

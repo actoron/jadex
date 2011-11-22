@@ -152,7 +152,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param id The name.
 	 *  @param service The service.
 	 */
-	public IFuture<Void> removeService(IServiceIdentifier sid)
+	public IFuture<Void> removeService(final IServiceIdentifier sid)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -177,20 +177,23 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 					{
 						service = tst;
 						tmp.remove(service);
-						if(started)
-						{
+						// Todo: fix started/terminated!? (i.e. addService() is ignored, when not started!?)
+//						if(!terminated)
+//						{
+							getLogger().info("Terminating service: "+sid);
 							service.shutdownService().addResultListener(new DelegationResultListener(ret)
 							{
 								public void customResultAvailable(Object result)
 								{
+									getLogger().info("Terminated service: "+sid);
 									serviceShutdowned(tst).addResultListener(new DelegationResultListener<Void>(ret));
 								}
 							});
-						}
-						else
-						{
-							ret.setResult(null);
-						}
+//						}
+//						else
+//						{
+//							ret.setResult(null);
+//						}
 					}
 				}
 			}
@@ -297,9 +300,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 				allservices.addAll((Collection)it.next());
 			}
 			
-			// Shutdown services in reverse order as later services might depend on earlier ones.
-			// Todo: use removeService() to avoid duplicate code...
-			
 			doShutdown(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
@@ -355,13 +355,13 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		{
 			final IInternalService ser = services.next();
 			final IServiceIdentifier sid = ser.getServiceIdentifier();
-			getLogger().info("Terminating service: "+sid);
-			removeService(sid).addResultListener(new DelegationResultListener<Void>(ret)
+
+			// Shutdown services in reverse order as later services might depend on earlier ones.
+			doShutdown(services).addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)
 				{
-					getLogger().info("Terminated service: "+sid);
-					doShutdown(services).addResultListener(new DelegationResultListener<Void>(ret));
+					removeService(sid).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
