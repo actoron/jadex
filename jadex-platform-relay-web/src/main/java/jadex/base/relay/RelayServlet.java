@@ -33,6 +33,9 @@ public class RelayServlet extends HttpServlet
 	/** The relay map (id -> queue for pending requests). */
 	protected Map<Object, IBlockingQueue<Tuple2<InputStream, Future<Void>>>>	map;
 	
+	/** Counter for open connections (for testing). */
+	protected int	opencnt	= 0;
+	
 	//-------- constructors --------
 
 	/**
@@ -70,9 +73,27 @@ public class RelayServlet extends HttpServlet
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		System.out.println("Entering GET request. opencnt="+(++opencnt)+", mapsize="+map.size());
+		
 		String	idstring	= request.getParameter("id");
 		Object	id	= JavaReader.objectFromXML(idstring, getClass().getClassLoader());
-		IBlockingQueue<Tuple2<InputStream, Future<Void>>>	queue	= new ArrayBlockingQueue<Tuple2<InputStream, Future<Void>>>();
+		IBlockingQueue<Tuple2<InputStream, Future<Void>>>	queue	= map.get(id);
+		List<Tuple2<InputStream, Future<Void>>>	items	= null;
+		if(queue!=null)
+		{
+			// Close old queue to free old servlet request
+			items	= queue.setClosed(true);
+			queue	= 	new ArrayBlockingQueue<Tuple2<InputStream, Future<Void>>>();
+			// Add outstanding requests to new queue.
+			for(int i=0; i<items.size(); i++)
+			{
+				queue.enqueue(items.get(i));
+			}
+		}
+		else
+		{
+			queue	= 	new ArrayBlockingQueue<Tuple2<InputStream, Future<Void>>>();
+		}
 		map.put(id, queue);
 //		System.out.println("Added to map. New size: "+map.size());
 		try
@@ -114,16 +135,21 @@ public class RelayServlet extends HttpServlet
 		}
 		catch(Exception e)
 		{
-			// exception on queue, when servlet is destroyed
+			// exception on queue, when same platform reconnects or servlet is destroyed
 			// exception on output stream, when client disconnects
 		}
-		List<Tuple2<InputStream, Future<Void>>>	items	= queue.setClosed(true);
-		map.remove(id);
-//		System.out.println("Removed from map ("+items.size()+" remaining items). New size: "+map.size());
-		for(int i=0; i<items.size(); i++)
+		
+		if(!queue.isClosed())
 		{
-			items.get(i).getSecondEntity().setException(new RuntimeException("Target disconnected."));
+			items	= queue.setClosed(true);
+			map.remove(id);
+	//		System.out.println("Removed from map ("+items.size()+" remaining items). New size: "+map.size());
+			for(int i=0; i<items.size(); i++)
+			{
+				items.get(i).getSecondEntity().setException(new RuntimeException("Target disconnected."));
+			}
 		}
+		System.out.println("Leaving GET request. opencnt="+(--opencnt)+", mapsize="+map.size());
 	}
 
 	/**
@@ -131,6 +157,7 @@ public class RelayServlet extends HttpServlet
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
+		System.out.println("Entering POST request. opencnt="+(++opencnt)+", mapsize="+map.size());
 		ServletInputStream	in	= request.getInputStream();
 		Object	targetid	= SRelay.readObject(in);
 		IBlockingQueue<Tuple2<InputStream, Future<Void>>>	queue	= map.get(targetid);
@@ -153,5 +180,6 @@ public class RelayServlet extends HttpServlet
 		{
 			response.sendError(404);
 		}
+		System.out.println("Leaving POST request. opencnt="+(--opencnt)+", mapsize="+map.size());
 	}
 }

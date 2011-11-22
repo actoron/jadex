@@ -182,4 +182,12 @@ public class ArrayBlockingQueue<T>	implements IBlockingQueue<T>
 		}
 		return (List<T>)Arrays.asList(ret);
 	}
+	
+	/**
+	 *  Check if the queue is closed.
+	 */
+	public boolean	isClosed()
+	{
+		return closed;
+	}
 }

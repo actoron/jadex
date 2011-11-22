@@ -112,6 +112,14 @@ public class BlockingQueue implements IBlockingQueue
 	{
 		return dequeue(-1);
 	}
+	
+	/**
+	 *  Check if the queue is closed.
+	 */
+	public boolean	isClosed()
+	{
+		return closed;
+	}
 
 	/**
 	 *  Open/close the queue.

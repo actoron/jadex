@@ -36,6 +36,11 @@ public interface IBlockingQueue<T>
 	public List<T>	setClosed(boolean closed);
 	
 	/**
+	 *  Check if the queue is closed.
+	 */
+	public boolean	isClosed();
+	
+	/**
 	 *  Get the size.
 	 *  @return The size.
 	 */
