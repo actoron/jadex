@@ -33,7 +33,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+/* $if !android $ */
 import javax.management.ServiceNotFoundException;
+/* $else $
+import javaxx.management.ServiceNotFoundException;
+$endif $ */
 
 /**
  *  Service container for active components.

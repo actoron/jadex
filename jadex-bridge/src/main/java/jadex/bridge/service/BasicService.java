@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.management.ServiceNotFoundException;
-
 /**
  *  Basic service provide a simple default isValid() implementation
  *  that returns true after start service and false afterwards.

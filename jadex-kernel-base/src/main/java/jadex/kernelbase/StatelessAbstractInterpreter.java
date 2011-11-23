@@ -65,7 +65,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+/* $if !android $ */
 import javax.management.ServiceNotFoundException;
+/* $else $
+import javaxx.management.ServiceNotFoundException;
+$endif $ */
 
 /**
  *  Base class for all kinds of interpreters.

@@ -117,7 +117,8 @@
 		ExceptionSwingDelegationResultListener.java,
 		ProvidedServiceInfoNode.java,
 		ProvidedServiceInfoProperties.java,
-		ProvidedServiceData.java
+		ProvidedServiceData.java,
+		publish
 		" />
 
 	<property name="exclude-jadex-xml" value="
