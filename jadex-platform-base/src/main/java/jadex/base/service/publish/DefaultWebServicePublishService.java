@@ -58,36 +58,36 @@ public class DefaultWebServicePublishService implements IPublishService
 		return IFuture.DONE;
 	}
 	
-	public static void main(String[] args)
-	{
-		try
-		{
-			Class type = ITestService.class;
-			ClassPool pool = ClassPool.getDefault();
-			CtClass ctclazz = pool.makeClass("Proxy");
-			ClassPath cp = new ClassClassPath(type);
-	        pool.insertClassPath(cp);
-			ctclazz.addInterface(pool.get(type.getName()));
-			Method[] ms = type.getMethods();
-			for(int i=0; i<ms.length; i++)
-			{
-//				CtNewMethod.wrapped(ms[i].getReturnType(), ms[i].getName(), 
-//					ms[i].getParameterTypes(), ms[i].getExceptionTypes(), body, constParam, declaring);
-			}
-	//		clazz.addMethod(CtNewMethod.make("public double eval (double x) { return (" + args[0] + ") ; }", clazz));
-			Class cl = ctclazz.toClass();
-			Object obj = cl.newInstance();
-	//		Class[] formalParams = new Class[] { double.class };
-	//		Method meth = clazz.getDeclaredMethod("eval", formalParams);
-	//		Object[] actualParams = new Object[] { new Double(17) };
-	//		double result = ((Double) meth.invoke(obj, actualParams)).doubleValue();
-	//		System.out.println(result);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+//	public static void main(String[] args)
+//	{
+//		try
+//		{
+//			Class type = ITestService.class;
+//			ClassPool pool = ClassPool.getDefault();
+//			CtClass ctclazz = pool.makeClass("Proxy");
+//			ClassPath cp = new ClassClassPath(type);
+//	        pool.insertClassPath(cp);
+//			ctclazz.addInterface(pool.get(type.getName()));
+//			Method[] ms = type.getMethods();
+//			for(int i=0; i<ms.length; i++)
+//			{
+////				CtNewMethod.wrapped(ms[i].getReturnType(), ms[i].getName(), 
+////					ms[i].getParameterTypes(), ms[i].getExceptionTypes(), body, constParam, declaring);
+//			}
+//	//		clazz.addMethod(CtNewMethod.make("public double eval (double x) { return (" + args[0] + ") ; }", clazz));
+//			Class cl = ctclazz.toClass();
+//			Object obj = cl.newInstance();
+//	//		Class[] formalParams = new Class[] { double.class };
+//	//		Method meth = clazz.getDeclaredMethod("eval", formalParams);
+//	//		Object[] actualParams = new Object[] { new Double(17) };
+//	//		double result = ((Double) meth.invoke(obj, actualParams)).doubleValue();
+//	//		System.out.println(result);
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+//	}
 	
 	protected Object createProxy(Class type)
 	{
