@@ -16,6 +16,7 @@ import javassist.ClassClassPath;
 import javassist.ClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtMethod;
 import javassist.CtNewMethod;
 
 import javax.xml.ws.Endpoint;
@@ -58,36 +59,73 @@ public class DefaultWebServicePublishService implements IPublishService
 		return IFuture.DONE;
 	}
 	
-//	public static void main(String[] args)
-//	{
-//		try
-//		{
-//			Class type = ITestService.class;
-//			ClassPool pool = ClassPool.getDefault();
-//			CtClass ctclazz = pool.makeClass("Proxy");
-//			ClassPath cp = new ClassClassPath(type);
-//	        pool.insertClassPath(cp);
-//			ctclazz.addInterface(pool.get(type.getName()));
-//			Method[] ms = type.getMethods();
-//			for(int i=0; i<ms.length; i++)
-//			{
-////				CtNewMethod.wrapped(ms[i].getReturnType(), ms[i].getName(), 
-////					ms[i].getParameterTypes(), ms[i].getExceptionTypes(), body, constParam, declaring);
-//			}
-//	//		clazz.addMethod(CtNewMethod.make("public double eval (double x) { return (" + args[0] + ") ; }", clazz));
-//			Class cl = ctclazz.toClass();
-//			Object obj = cl.newInstance();
-//	//		Class[] formalParams = new Class[] { double.class };
-//	//		Method meth = clazz.getDeclaredMethod("eval", formalParams);
-//	//		Object[] actualParams = new Object[] { new Double(17) };
-//	//		double result = ((Double) meth.invoke(obj, actualParams)).doubleValue();
-//	//		System.out.println(result);
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace();
-//		}
-//	}
+	public static void main(String[] args)
+	{
+		try
+		{
+			Class type = ITestService.class;
+			ClassPool pool = ClassPool.getDefault();
+			CtClass proxyclazz = pool.makeClass("Proxy");
+			ClassPath cp = new ClassClassPath(type);
+	        pool.insertClassPath(cp);
+			cp = new ClassClassPath(WebServiceToJadexWrapperInvocationHandler.class);
+			pool.insertClassPath(cp);
+			proxyclazz.addInterface(pool.get(type.getName()));
+			Method[] ms = type.getMethods();
+			CtClass handlerclazz =  getCtClass(WebServiceToJadexWrapperInvocationHandler.class, pool);
+			CtMethod del = handlerclazz.getDeclaredMethod("invoke");
+			for(int i=0; i<ms.length; i++)
+			{
+//				CtMethod method = proxyclazz.getDeclaredMethod(ms[i].getName(), getCtClasses(ms[i].getParameterTypes(), pool));
+				CtMethod m = CtNewMethod.wrapped(getCtClass(ms[i].getReturnType(), pool), ms[i].getName(), 
+					getCtClasses(ms[i].getParameterTypes(), pool), getCtClasses(ms[i].getExceptionTypes(), pool),
+					del, null, handlerclazz);
+				
+			}
+	//		clazz.addMethod(CtNewMethod.make("public double eval (double x) { return (" + args[0] + ") ; }", clazz));
+			Class cl = proxyclazz.toClass();
+			Object obj = cl.newInstance();
+	//		Class[] formalParams = new Class[] { double.class };
+	//		Method meth = clazz.getDeclaredMethod("eval", formalParams);
+	//		Object[] actualParams = new Object[] { new Double(17) };
+	//		double result = ((Double) meth.invoke(obj, actualParams)).doubleValue();
+	//		System.out.println(result);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected static CtClass getCtClass(Class clazz, ClassPool pool)
+	{
+		try
+		{
+			ClassPath cp = new ClassClassPath(clazz);
+			pool.insertClassPath(cp);
+			return pool.get(clazz.getName());
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected static CtClass[] getCtClasses(Class[] clazzes, ClassPool pool)
+	{
+		CtClass[] ret = new CtClass[clazzes.length];
+		for(int i=0; i<clazzes.length; i++)
+		{
+			ret[i] = getCtClass(clazzes[i], pool);
+		}
+		return ret;	
+	}
 	
 	protected Object createProxy(Class type)
 	{
