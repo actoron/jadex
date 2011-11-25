@@ -60,16 +60,5 @@ class WebServiceToJadexWrapperInvocationHandler implements InvocationHandler
 		
 		return ret;
 	}
-	
-	public Object method(Object[] params)
-	{
-		try
-		{
-			return invoke(params[0], (Method)params[1], (Object[])params[2]);
-		}
-		catch(Throwable t)
-		{
-			throw new RuntimeException(t);
-		}
-	}
+
 }
