@@ -996,6 +996,20 @@ public class SReflect
 		
 		return ret;
 	}
+	
+	/**
+	 *  Get the current method name from the caller.
+	 *  @return The method name. 
+	 */
+	public static String getMethodName() 
+	{
+		return Thread.currentThread().getStackTrace()[2].getMethodName();
+	}
+	
+//	public static void main(String[] args)
+//	{
+//		System.out.println(getMethodName());
+//	}
 }
 
 

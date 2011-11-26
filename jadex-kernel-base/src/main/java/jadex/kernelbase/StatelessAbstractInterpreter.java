@@ -1139,23 +1139,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					{
 						public void customResultAvailable(final IInternalService service)
 						{
-							final PublishInfo pi = info.getPublish();
-							if(pi!=null)
-							{
-								getPublishService(pi.getType(), (Iterator<IPublishService>)null)
-									.addResultListener(createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
-								{
-									public void customResultAvailable(IPublishService ps)
-									{
-										ps.publishService(getClassLoader(), service, pi.getPublishId())
-											.addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
-									}
-								}));
-							}
-							else
-							{
-								ret.setResult(null);
-							}
+							ret.setResult(null);
 						}
 					});
 				}

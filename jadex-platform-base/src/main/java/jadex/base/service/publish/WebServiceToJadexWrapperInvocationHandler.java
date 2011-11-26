@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
  *  a Jadex service and waits for the result, which is returned
  *  to the web service caller.
  */
-class WebServiceToJadexWrapperInvocationHandler implements InvocationHandler
+public class WebServiceToJadexWrapperInvocationHandler implements InvocationHandler
 {
 	//-------- attributes --------
 	

@@ -18,7 +18,7 @@ import javax.xml.ws.Endpoint;
 @Agent
 @Imports({"jadex.base.service.ws.*", "jadex.micro.examples.ws.offerquote.gen.*"})
 @ProvidedServices(@ProvidedService(type=IBankingService.class, implementation=@Implementation(BankingService.class),
-	publish=@Publish(type=IPublishService.PUBLISH_WS, publishid="http://localhost:8080/quote")))
+	publish=@Publish(type=IPublishService.PUBLISH_WS, publishid="http://localhost:8080/quote", servicetype=IWSBankingService.class)))
 public class BankingAgent
 {
 //	@Agent

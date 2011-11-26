@@ -53,6 +53,7 @@ public class Cloner
 		immutabletypes.add(Character.class);
 		immutabletypes.add(char.class);
 		immutabletypes.add(String.class);
+		immutabletypes.add(Class.class);
 	}
 	
 	//-------- attributes --------

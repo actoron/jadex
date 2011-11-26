@@ -372,7 +372,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			{
 				public void customResultAvailable(IPublishService ps)
 				{
-					ps.publishService(instance.getClassLoader(), service, pi.getPublishId())
+					ps.publishService(instance.getClassLoader(), service, pi)
 						.addResultListener(instance.createResultListener(new DelegationResultListener<Void>(ret)));
 				}
 			}));

@@ -2,6 +2,7 @@ package jadex.bridge.service.types.publish;
 
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.PublishInfo;
 import jadex.commons.future.IFuture;
 
 /**
@@ -25,7 +26,7 @@ public interface IPublishService
 	 *  @param service The original service.
 	 *  @param pid The publish id (e.g. url or name).
 	 */
-	public IFuture<Void> publishService(ClassLoader cl, IService service, String pid);
+	public IFuture<Void> publishService(ClassLoader cl, IService service, PublishInfo pi);
 	
 	/**
 	 *  Unpublish a service.

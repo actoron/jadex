@@ -2,8 +2,10 @@ package jadex.base.service.publish;
 
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.publish.IPublishService;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -54,20 +56,21 @@ public class DefaultWebServicePublishService implements IPublishService
 	 *  @param service The original service.
 	 *  @param pid The publish id (e.g. url or name).
 	 */
-	public IFuture<Void> publishService(ClassLoader cl, IService service, String pid)
+	public IFuture<Void> publishService(ClassLoader cl, IService service, PublishInfo pi)
 	{
 //		Object pr = Proxy.newProxyInstance(cl, new Class[]{service.getServiceIdentifier().getServiceType()}, 
 //			new WebServiceToJadexWrapperInvocationHandler(service));
 		try
 		{
-			Object pr = createProxy(service, cl);
-			Endpoint endpoint = Endpoint.publish(pid, pr);
+			Object pr = createProxy(service, cl, pi.getServiceType());
+			Thread.currentThread().setContextClassLoader(cl);
+			Endpoint endpoint = Endpoint.publish(pi.getPublishId(), pr);
 			if(endpoints==null)
 				endpoints = new HashMap<IServiceIdentifier, Endpoint>();
 			endpoints.put(service.getServiceIdentifier(), endpoint);
 			return IFuture.DONE;
 		}
-		catch(Exception e)
+		catch(Throwable e)
 		{
 			e.printStackTrace();
 			throw new RuntimeException(e);
@@ -119,14 +122,14 @@ public class DefaultWebServicePublishService implements IPublishService
 	 * @param service
 	 * @return
 	 */
-	protected Object createProxy(IService service, ClassLoader classloader)
+	protected Object createProxy(IService service, ClassLoader classloader, Class type)
 	{
+		System.out.println("createProxy: "+service.getServiceIdentifier());
 		Object ret = null;
-		Class type = service.getServiceIdentifier().getServiceType();
 		try
 		{
 			ClassPool pool = ClassPool.getDefault();
-			String pck = service.getServiceIdentifier().getServiceType().getPackage().getName();
+			String pck = type.getPackage().getName();
 			CtClass proxyclazz = pool.makeClass("ExtendedProxy", getCtClass(jadex.base.service.publish.Proxy.class, pool));
 			proxyclazz.addInterface(getCtClass(type, pool));
 			Method[] ms = type.getMethods();
@@ -137,21 +140,28 @@ public class DefaultWebServicePublishService implements IPublishService
 				CtMethod m = CtNewMethod.wrapped(getCtClass(ms[i].getReturnType(), pool), ms[i].getName(), 
 					getCtClasses(ms[i].getParameterTypes(), pool), getCtClasses(ms[i].getExceptionTypes(), pool),
 					invoke, null, proxyclazz);
+				System.out.println("m: "+m.getName()+" "+getCtClasses(ms[i].getParameterTypes(), pool).length);
 				proxyclazz.addMethod(m);
 			}
 	//		clazz.addMethod(CtNewMethod.make("public double eval (double x) { return (" + args[0] + ") ; }", clazz));
+			
+//			Class c = classloader.loadClass("jadex.micro.examples.ws.banking.Request");
 			
 			ClassFile cf = proxyclazz.getClassFile();
 			ConstPool constpool = cf.getConstPool();
 			AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
 			Annotation annot = new Annotation(constpool, getCtClass(WebService.class, pool));
-			annot.addMemberValue("targetNamespace", new StringMemberValue(pck, constpool));
+			annot.addMemberValue("targetNamespace", new StringMemberValue("http://banking.ws.examples.micro.jadex/", constpool));
+			annot.addMemberValue("serviceName", new StringMemberValue("WSBankingServiceService", constpool));
+			annot.addMemberValue("portName", new StringMemberValue("WSBankingServicePort", constpool));
+//			annot.addMemberValue("name", new StringMemberValue("WSBankingService", constpool));
 //			annot.addMemberValue("value", new IntegerMemberValue(ccFile.getConstPool(), 0));
 			attr.addAnnotation(annot);
 			cf.addAttribute(attr);
 			proxyclazz.getClassFile().addAttribute(attr);
 			
 			Class cl = proxyclazz.toClass(classloader, service.getClass().getProtectionDomain());
+			System.out.println("cl: "+cl.getPackage()+" "+cl.getClassLoader()+" "+classloader);
 			ret = cl.newInstance();
 			Method shm = cl.getMethod("setHandler", new Class[]{InvocationHandler.class});
 			shm.invoke(ret, new Object[]{new WebServiceToJadexWrapperInvocationHandler(service)});

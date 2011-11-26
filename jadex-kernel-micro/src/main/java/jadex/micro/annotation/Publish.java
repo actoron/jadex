@@ -21,4 +21,9 @@ public @interface Publish
 	 *  The publishing type, e.g. web service.
 	 */
 	public String type();
+	
+	/**
+	 * The service type. 
+	 */
+	public Class servicetype();
 }

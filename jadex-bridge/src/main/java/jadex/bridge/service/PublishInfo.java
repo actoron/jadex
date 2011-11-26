@@ -10,6 +10,9 @@ public class PublishInfo
 	
 	/** The publish type. */
 	protected String type;
+	
+	/** The service type. */
+	protected Class servicetype;
 
 	/**
 	 *  Create a new publish info.
@@ -23,10 +26,11 @@ public class PublishInfo
 	 *  @param pid The publish id, e.g. url.
 	 *  @param type The type.
 	 */
-	public PublishInfo(String pid, String type)
+	public PublishInfo(String pid, String type, Class servicetype)
 	{
 		this.pid = pid;
 		this.type = type;
+		this.servicetype = servicetype;
 	}
 
 	/**
@@ -64,4 +68,24 @@ public class PublishInfo
 	{
 		this.type = type;
 	}
+
+	/**
+	 *  Get the servicetype.
+	 *  @return The servicetype.
+	 */
+	public Class getServiceType()
+	{
+		return servicetype;
+	}
+
+	/**
+	 *  Set the servicetype.
+	 *  @param servicetype The servicetype to set.
+	 */
+	public void setServiceType(Class servicetype)
+	{
+		this.servicetype = servicetype;
+	}
+	
+	
 }
