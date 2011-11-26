@@ -822,6 +822,9 @@ public class BTP2PConnector implements IBluetoothStateListener {
 					@Override
 					public void run() {
 						if (connections.size() >= 1) {
+							Log.i(Helper.LOG_TAG,
+									"Not activating Autoconnect. Already Connected to "
+											+ connections.size() + " devices.");
 							return;
 						}
 						Log.i(Helper.LOG_TAG,

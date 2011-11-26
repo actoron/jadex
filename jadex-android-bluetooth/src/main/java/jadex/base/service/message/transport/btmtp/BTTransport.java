@@ -406,7 +406,6 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	 *            The connection.
 	 */
 	protected IFuture deliverMessage(final MessageEnvelope msg) {
-		Log.i(Helper.LOG_TAG, "(BTTransport) deliverMessage called");
 		final Future ret = new Future();
 		SServiceProvider.getService(container, IMessageService.class,
 				RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
