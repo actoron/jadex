@@ -16,11 +16,11 @@ import javax.xml.ws.ResponseWrapper;
  * Generated source version: 2.1
  * 
  */
-@WebService(name = "WSBankingService", targetNamespace = "http://banking.ws.examples.micro.jadex/")
+@WebService(name = "ProxyIWSBankingService", targetNamespace = "http://jadex.micro.examples.ws.banking/")
 @XmlSeeAlso({
     ObjectFactory.class
 })
-public interface WSBankingService {
+public interface ProxyIWSBankingService {
 
 
     /**
@@ -31,8 +31,8 @@ public interface WSBankingService {
      */
     @WebMethod
     @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "getAccountStatement", targetNamespace = "http://banking.ws.examples.micro.jadex/", className = "jadex.micro.examples.ws.banking.client.gen.GetAccountStatement")
-    @ResponseWrapper(localName = "getAccountStatementResponse", targetNamespace = "http://banking.ws.examples.micro.jadex/", className = "jadex.micro.examples.ws.banking.client.gen.GetAccountStatementResponse")
+    @RequestWrapper(localName = "getAccountStatement", targetNamespace = "http://jadex.micro.examples.ws.banking/", className = "jadex.micro.examples.ws.banking.client.gen.GetAccountStatement")
+    @ResponseWrapper(localName = "getAccountStatementResponse", targetNamespace = "http://jadex.micro.examples.ws.banking/", className = "jadex.micro.examples.ws.banking.client.gen.GetAccountStatementResponse")
     public AccountStatement getAccountStatement(
         @WebParam(name = "arg0", targetNamespace = "")
         Request arg0);

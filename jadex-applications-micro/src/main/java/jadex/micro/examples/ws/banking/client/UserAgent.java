@@ -10,9 +10,9 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.examples.ws.banking.IBankingService;
 import jadex.micro.examples.ws.banking.client.gen.AccountStatement;
+import jadex.micro.examples.ws.banking.client.gen.ProxyIWSBankingService;
+import jadex.micro.examples.ws.banking.client.gen.ProxyIWSBankingServiceService;
 import jadex.micro.examples.ws.banking.client.gen.Request;
-import jadex.micro.examples.ws.banking.client.gen.WSBankingService;
-import jadex.micro.examples.ws.banking.client.gen.WSBankingServiceService;
 
 import java.util.GregorianCalendar;
 
@@ -39,8 +39,8 @@ public class UserAgent
 	{
 		try
 		{
-			WSBankingServiceService bss = new WSBankingServiceService();
-			WSBankingService bs = bss.getWSBankingServicePort();
+			ProxyIWSBankingServiceService bss = new ProxyIWSBankingServiceService();
+			ProxyIWSBankingService bs = bss.getProxyIWSBankingServicePort();
 	
 			Request rq = new Request();
 			GregorianCalendar calbegin = (GregorianCalendar)GregorianCalendar.getInstance();

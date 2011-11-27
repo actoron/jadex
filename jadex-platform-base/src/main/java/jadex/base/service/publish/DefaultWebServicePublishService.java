@@ -5,13 +5,11 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.publish.IPublishService;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,13 +56,20 @@ public class DefaultWebServicePublishService implements IPublishService
 	 */
 	public IFuture<Void> publishService(ClassLoader cl, IService service, PublishInfo pi)
 	{
+		// Java dynamic proxy cannot be used as @WebService annotation cannot be added.
 //		Object pr = Proxy.newProxyInstance(cl, new Class[]{service.getServiceIdentifier().getServiceType()}, 
 //			new WebServiceToJadexWrapperInvocationHandler(service));
+		
 		try
 		{
 			Object pr = createProxy(service, cl, pi.getServiceType());
+			
+			// Jaxb seems to use the context classloader :-(
+			ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 			Thread.currentThread().setContextClassLoader(cl);
 			Endpoint endpoint = Endpoint.publish(pi.getPublishId(), pr);
+			Thread.currentThread().setContextClassLoader(ccl);
+			
 			if(endpoints==null)
 				endpoints = new HashMap<IServiceIdentifier, Endpoint>();
 			endpoints.put(service.getServiceIdentifier(), endpoint);
@@ -119,51 +124,17 @@ public class DefaultWebServicePublishService implements IPublishService
 	
 	/**
 	 * 
-	 * @param service
-	 * @return
 	 */
 	protected Object createProxy(IService service, ClassLoader classloader, Class type)
 	{
-		System.out.println("createProxy: "+service.getServiceIdentifier());
+//		System.out.println("createProxy: "+service.getServiceIdentifier());
 		Object ret = null;
 		try
 		{
-			ClassPool pool = ClassPool.getDefault();
-			String pck = type.getPackage().getName();
-			CtClass proxyclazz = pool.makeClass("ExtendedProxy", getCtClass(jadex.base.service.publish.Proxy.class, pool));
-			proxyclazz.addInterface(getCtClass(type, pool));
-			Method[] ms = type.getMethods();
-			CtMethod invoke = getCtClass(jadex.base.service.publish.Proxy.class, pool).getDeclaredMethod("invoke");
-			for(int i=0; i<ms.length; i++)
-			{
-	//			CtMethod method = proxyclazz.getDeclaredMethod(ms[i].getName(), getCtClasses(ms[i].getParameterTypes(), pool));
-				CtMethod m = CtNewMethod.wrapped(getCtClass(ms[i].getReturnType(), pool), ms[i].getName(), 
-					getCtClasses(ms[i].getParameterTypes(), pool), getCtClasses(ms[i].getExceptionTypes(), pool),
-					invoke, null, proxyclazz);
-				System.out.println("m: "+m.getName()+" "+getCtClasses(ms[i].getParameterTypes(), pool).length);
-				proxyclazz.addMethod(m);
-			}
-	//		clazz.addMethod(CtNewMethod.make("public double eval (double x) { return (" + args[0] + ") ; }", clazz));
-			
-//			Class c = classloader.loadClass("jadex.micro.examples.ws.banking.Request");
-			
-			ClassFile cf = proxyclazz.getClassFile();
-			ConstPool constpool = cf.getConstPool();
-			AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-			Annotation annot = new Annotation(constpool, getCtClass(WebService.class, pool));
-			annot.addMemberValue("targetNamespace", new StringMemberValue("http://banking.ws.examples.micro.jadex/", constpool));
-			annot.addMemberValue("serviceName", new StringMemberValue("WSBankingServiceService", constpool));
-			annot.addMemberValue("portName", new StringMemberValue("WSBankingServicePort", constpool));
-//			annot.addMemberValue("name", new StringMemberValue("WSBankingService", constpool));
-//			annot.addMemberValue("value", new IntegerMemberValue(ccFile.getConstPool(), 0));
-			attr.addAnnotation(annot);
-			cf.addAttribute(attr);
-			proxyclazz.getClassFile().addAttribute(attr);
-			
-			Class cl = proxyclazz.toClass(classloader, service.getClass().getProtectionDomain());
-			System.out.println("cl: "+cl.getPackage()+" "+cl.getClassLoader()+" "+classloader);
-			ret = cl.newInstance();
-			Method shm = cl.getMethod("setHandler", new Class[]{InvocationHandler.class});
+			Class clazz = getProxyClass(type, classloader);
+//			System.out.println("proxy class: "+clazz.getPackage()+" "+clazz.getClassLoader()+" "+classloader);
+			ret = clazz.newInstance();
+			Method shm = clazz.getMethod("setHandler", new Class[]{InvocationHandler.class});
 			shm.invoke(ret, new Object[]{new WebServiceToJadexWrapperInvocationHandler(service)});
 		}
 		catch(Exception e)
@@ -173,7 +144,67 @@ public class DefaultWebServicePublishService implements IPublishService
 		}
 		return ret;
 	}
-	
+
+	/**
+	 * 
+	 */
+	protected Class getProxyClass(Class type, ClassLoader classloader)
+	{
+		Class ret = null;
+
+		ClassPool pool = ClassPool.getDefault();
+//		String pck = type.getPackage().getName();
+//		pool.importPackage(pck);
+		String name = type.getPackage().getName()+".Proxy"+type.getSimpleName();
+		
+		try
+		{
+			ret = classloader.loadClass(name);
+//			ret = SReflect.classForName0(name, classloader); // does not work because SReflect cache saves that not found!
+		}
+		catch(Exception e)
+		{
+			try
+			{
+				CtClass proxyclazz = pool.makeClass(name, getCtClass(jadex.base.service.publish.Proxy.class, pool));
+				proxyclazz.addInterface(getCtClass(type, pool));
+				Method[] ms = type.getMethods();
+				CtMethod invoke = getCtClass(jadex.base.service.publish.Proxy.class, pool).getDeclaredMethod("invoke");
+				for(int i=0; i<ms.length; i++)
+				{
+					CtMethod m = CtNewMethod.wrapped(getCtClass(ms[i].getReturnType(), pool), ms[i].getName(), 
+						getCtClasses(ms[i].getParameterTypes(), pool), getCtClasses(ms[i].getExceptionTypes(), pool),
+						invoke, null, proxyclazz);
+//					System.out.println("m: "+m.getName()+" "+getCtClasses(ms[i].getParameterTypes(), pool).length);
+					proxyclazz.addMethod(m);
+				}
+				
+				ClassFile cf = proxyclazz.getClassFile();
+				
+				ConstPool constpool = cf.getConstPool();
+				AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+				Annotation annot = new Annotation(constpool, getCtClass(WebService.class, pool));
+				// Must be set due to bug in javassit, package nulls. package is used for namespace.
+				String ns = "http://"+type.getPackage().getName()+"/";
+				annot.addMemberValue("targetNamespace", new StringMemberValue(ns, constpool));
+//				annot.addMemberValue("serviceName", new StringMemberValue("WSBankingServiceService", constpool));
+//				annot.addMemberValue("portName", new StringMemberValue("WSBankingServicePort", constpool));
+				attr.addAnnotation(annot);
+				cf.addAttribute(attr);
+				proxyclazz.getClassFile().addAttribute(attr);
+				ret = proxyclazz.toClass(classloader, type.getProtectionDomain());
+				proxyclazz.freeze();
+//				System.out.println("name: "+ret.getName()+" "+ret.getPackage()+" "+proxyclazz.getPackageName());
+			}
+			catch(Exception e2)
+			{
+				e2.printStackTrace();
+				throw new RuntimeException(e2);
+			}
+		}
+		
+		return ret;
+	}
 	
 	/**
 	 *  Unpublish a service.
@@ -198,41 +229,21 @@ public class DefaultWebServicePublishService implements IPublishService
 		return ret;
 	}
 	
-//	public static void main(String[] args)
-//	{
-//		try
-//		{
-//			Class type = ITestService.class;
-//			ClassPool pool = ClassPool.getDefault();
-//			CtClass proxyclazz = pool.makeClass("ExtendedProxy");
-//			proxyclazz.setSuperclass(getCtClass(jadex.base.service.publish.Proxy.class, pool));
-//			proxyclazz.addInterface(getCtClass(type, pool));
-//			Method[] ms = type.getMethods();
-//			CtMethod invoke = getCtClass(jadex.base.service.publish.Proxy.class, pool).getDeclaredMethod("invoke");
-//			for(int i=0; i<ms.length; i++)
-//			{
-////				CtMethod method = proxyclazz.getDeclaredMethod(ms[i].getName(), getCtClasses(ms[i].getParameterTypes(), pool));
-//				CtMethod m = CtNewMethod.wrapped(getCtClass(ms[i].getReturnType(), pool), ms[i].getName(), 
-//					getCtClasses(ms[i].getParameterTypes(), pool), getCtClasses(ms[i].getExceptionTypes(), pool),
-//					invoke, null, proxyclazz);
-//				proxyclazz.addMethod(m);
-//			}
-//	//		clazz.addMethod(CtNewMethod.make("public double eval (double x) { return (" + args[0] + ") ; }", clazz));
-//			Class cl = proxyclazz.toClass();
-//			Object obj = cl.newInstance();
-//			Method shm = cl.getMethod("setHandler", new Class[]{InvocationHandler.class});
-//			shm.invoke(obj, new Object[]{new WebServiceToJadexWrapperInvocationHandler(null)});
-//			
-//	//		Class[] formalParams = new Class[] { double.class };
-//	//		Method meth = clazz.getDeclaredMethod("eval", formalParams);
-//	//		Object[] actualParams = new Object[] { new Double(17) };
-//	//		double result = ((Double) meth.invoke(obj, actualParams)).doubleValue();
-//	//		System.out.println(result);
-//		}
-//		catch(Exception e)
-//		{
-//			e.printStackTrace();
-//		}
-//	}
+	public static void main(String[] args)
+	{
+		// Bug in javassist: created package is null.
+		try
+		{
+			ClassPool pool = ClassPool.getDefault();
+			CtClass ctcl = pool.makeClass("a.b.C");
+			Class cl = ctcl.toClass();
+			System.out.println("pck: "+ctcl.getPackageName()+" "+cl.getPackage());
+			Object obj = cl.newInstance();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 	
 }
