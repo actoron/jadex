@@ -32,5 +32,5 @@ public @interface ProvidedService
 	/**
 	 *  Publish details.
 	 */
-	public Publish publish() default @Publish(publishid="", type=IPublishService.PUBLISH_WS, servicetype=Object.class);
+	public Publish publish() default @Publish(publishid="", publishtype=IPublishService.PUBLISH_WS, servicetype=Object.class);
 }

@@ -20,7 +20,7 @@ public @interface Publish
 	/**
 	 *  The publishing type, e.g. web service.
 	 */
-	public String type();
+	public String publishtype();
 	
 	/**
 	 * The service type. 

@@ -35,8 +35,12 @@ import javax.xml.ws.Endpoint;
 @Service
 public class DefaultWebServicePublishService implements IPublishService
 {
+	//-------- attributes --------
+	
 	/** The published endpoints. */
 	protected Map<IServiceIdentifier, Endpoint> endpoints;
+	
+	//-------- methods --------
 	
 	/**
 	 *  Test if publishing a specific type is supported (e.g. web service).
@@ -57,73 +61,62 @@ public class DefaultWebServicePublishService implements IPublishService
 	public IFuture<Void> publishService(ClassLoader cl, IService service, PublishInfo pi)
 	{
 		// Java dynamic proxy cannot be used as @WebService annotation cannot be added.
+		
 //		Object pr = Proxy.newProxyInstance(cl, new Class[]{service.getServiceIdentifier().getServiceType()}, 
 //			new WebServiceToJadexWrapperInvocationHandler(service));
 		
-		try
-		{
-			Object pr = createProxy(service, cl, pi.getServiceType());
-			
-			// Jaxb seems to use the context classloader :-(
-			ClassLoader ccl = Thread.currentThread().getContextClassLoader();
-			Thread.currentThread().setContextClassLoader(cl);
-			Endpoint endpoint = Endpoint.publish(pi.getPublishId(), pr);
-			Thread.currentThread().setContextClassLoader(ccl);
-			
-			if(endpoints==null)
-				endpoints = new HashMap<IServiceIdentifier, Endpoint>();
-			endpoints.put(service.getServiceIdentifier(), endpoint);
-			return IFuture.DONE;
-		}
-		catch(Throwable e)
-		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
+		Object pr = createProxy(service, cl, pi.getServiceType());
+		
+		// Jaxb seems to use the context classloader so it needs to be set :-(
+		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(cl);
+		Endpoint endpoint = Endpoint.publish(pi.getPublishId(), pr);
+		Thread.currentThread().setContextClassLoader(ccl);
+		
+		if(endpoints==null)
+			endpoints = new HashMap<IServiceIdentifier, Endpoint>();
+		endpoints.put(service.getServiceIdentifier(), endpoint);
+		return IFuture.DONE;
+		
+//		try
+//		{
+//		}
+//		catch(Throwable e)
+//		{
+//			e.printStackTrace();
+//			throw new RuntimeException(e);
+//		}
 	}
 	
 	/**
-	 * 
+	 *  Unpublish a service.
+	 *  @param sid The service identifier.
 	 */
-	protected static CtClass getCtClass(Class clazz, ClassPool pool)
+	public IFuture<Void> unpublishService(IServiceIdentifier sid)
 	{
-		CtClass ret = null;
-		try
+		Future<Void> ret = new Future<Void>();
+		boolean stopped = false;
+		if(endpoints!=null)
 		{
-			ret = pool.get(clazz.getName());
-		}
-		catch(Exception e)
-		{
-			try
+			Endpoint ep = endpoints.remove(sid);
+			if(ep!=null)
 			{
-				
-				ClassPath cp = new ClassClassPath(clazz);
-				pool.insertClassPath(cp);
-				ret = pool.get(clazz.getName());
-			}
-			catch(Exception e2)
-			{
-				throw new RuntimeException(e2);
+				ep.stop();
+				stopped = true;
+				ret.setResult(null);
 			}
 		}
+		if(!stopped)
+			ret.setException(new RuntimeException("Published service could not be stopped: "+sid));
 		return ret;
 	}
 	
 	/**
-	 * 
-	 */
-	protected static CtClass[] getCtClasses(Class[] clazzes, ClassPool pool)
-	{
-		CtClass[] ret = new CtClass[clazzes.length];
-		for(int i=0; i<clazzes.length; i++)
-		{
-			ret[i] = getCtClass(clazzes[i], pool);
-		}
-		return ret;	
-	}
-	
-	/**
-	 * 
+	 *  Create a service proxy.
+	 *  @param service The Jadex service.
+	 *  @param classloader The classloader.
+	 *  @param type The web service interface type.
+	 *  @return The proxy object.
 	 */
 	protected Object createProxy(IService service, ClassLoader classloader, Class type)
 	{
@@ -139,14 +132,19 @@ public class DefaultWebServicePublishService implements IPublishService
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 		return ret;
 	}
-
+	
 	/**
-	 * 
+	 *  Get the proxy class for a web service interface type.
+	 *  The method generates a new proxy class if called the 
+	 *  first time for a specific service interface.
+	 *  @param type The interface service type.
+	 *  @param classloader The class loader.
+	 *  @return The (possibly newly generated) proxy class.
 	 */
 	protected Class getProxyClass(Class type, ClassLoader classloader)
 	{
@@ -207,43 +205,69 @@ public class DefaultWebServicePublishService implements IPublishService
 	}
 	
 	/**
-	 *  Unpublish a service.
-	 *  @param sid The service identifier.
+	 *  Get a ctclass for a Java class from the pool.
+	 *  @param clazz The Java class.
+	 *  @param pool The class pool.
+	 *  @return The ctclass.
 	 */
-	public IFuture<Void> unpublishService(IServiceIdentifier sid)
+	protected static CtClass getCtClass(Class clazz, ClassPool pool)
 	{
-		Future<Void> ret = new Future<Void>();
-		boolean stopped = false;
-		if(endpoints!=null)
-		{
-			Endpoint ep = endpoints.remove(sid);
-			if(ep!=null)
-			{
-				ep.stop();
-				stopped = true;
-				ret.setResult(null);
-			}
-		}
-		if(!stopped)
-			ret.setException(new RuntimeException("Published service could not be stopped: "+sid));
-		return ret;
-	}
-	
-	public static void main(String[] args)
-	{
-		// Bug in javassist: created package is null.
+		CtClass ret = null;
 		try
 		{
-			ClassPool pool = ClassPool.getDefault();
-			CtClass ctcl = pool.makeClass("a.b.C");
-			Class cl = ctcl.toClass();
-			System.out.println("pck: "+ctcl.getPackageName()+" "+cl.getPackage());
-			Object obj = cl.newInstance();
+			ret = pool.get(clazz.getName());
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+			try
+			{
+				
+				ClassPath cp = new ClassClassPath(clazz);
+				pool.insertClassPath(cp);
+				ret = pool.get(clazz.getName());
+			}
+			catch(Exception e2)
+			{
+				throw new RuntimeException(e2);
+			}
 		}
+		return ret;
 	}
+	
+	/**
+	 *  Get a ctclass array for a class array.
+	 *  @param classes The classes.
+	 *  @param pool The pool.
+	 *  @return The ctclass array.
+	 */
+	protected static CtClass[] getCtClasses(Class[] classes, ClassPool pool)
+	{
+		CtClass[] ret = new CtClass[classes.length];
+		for(int i=0; i<classes.length; i++)
+		{
+			ret[i] = getCtClass(classes[i], pool);
+		}
+		return ret;	
+	}
+	
+//	/**
+//	 *  Main for testing-
+//	 */
+//	public static void main(String[] args)
+//	{
+//		// Bug in javassist: created package is null.
+//		try
+//		{
+//			ClassPool pool = ClassPool.getDefault();
+//			CtClass ctcl = pool.makeClass("a.b.C");
+//			Class cl = ctcl.toClass();
+//			System.out.println("pck: "+ctcl.getPackageName()+" "+cl.getPackage());
+//			Object obj = cl.newInstance();
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+//	}
 	
 }
