@@ -14,7 +14,9 @@ import jadex.micro.annotation.Publish;
  *  This example shows how a Jadex service can be automatically published
  *  as web service with a synchronous interfaces.
  *  
- *  The @Publish annotation requires the 
+ *  The @Publish annotation requires the publishing type (e.g. web service),
+ *  the id (e.g. a web service url) and the service type, i.e. interface to
+ *  be specified.
  */
 @Agent
 @Imports({"jadex.base.service.ws.*", "jadex.micro.examples.ws.offerquote.gen.*"})
