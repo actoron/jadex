@@ -2,6 +2,8 @@ package jadex.android.bluetooth.device.factory;
 
 import jadex.android.bluetooth.device.AndroidBluetoothAdapterWrapper;
 import jadex.android.bluetooth.device.IBluetoothAdapter;
+import jadex.android.bluetooth.exceptions.JadexBluetoothException;
+import jadex.android.bluetooth.exceptions.JadexBluetoothRuntimeError;
 import android.bluetooth.BluetoothAdapter;
 
 /**
@@ -30,8 +32,12 @@ public class AndroidBluetoothAdapterFactory implements IBluetoothAdapterFactory 
 	@Override
 	public IBluetoothAdapter getDefaultBluetoothAdapter() {
 		if (androidBluetoothAdapterWrapper == null) {
+			BluetoothAdapter defaultAdapter = BluetoothAdapter.getDefaultAdapter();
+			if (defaultAdapter == null) {
+				throw new JadexBluetoothRuntimeError("No default bluetooth Device found! (Running in an Emulator?)");
+			}
 			androidBluetoothAdapterWrapper = new AndroidBluetoothAdapterWrapper(
-					BluetoothAdapter.getDefaultAdapter());
+					defaultAdapter);
 		}
 		return androidBluetoothAdapterWrapper;
 	}
