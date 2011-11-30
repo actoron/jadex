@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.security;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.annotation.GuiClassName;
 import jadex.commons.future.IFuture;
 
 import java.util.Map;
@@ -15,21 +16,35 @@ import java.util.Map;
  */
 // Safe to be allowed remotely, as it can only be called, when platform access is granted.
 // Putting method in service allows security settings to be administered using remote JCCs.
+@GuiClassName("jadex.tools.security.SecuritySettings")
 public interface ISecurityService
 {
 	//-------- password management --------
 	
 	/**
+	 *  Check if password protection is enabled.
+	 *  @return	True, if password protection is enabled.
+	 */
+	public IFuture<Boolean>	isUsePassword();
+
+	/**
+	 *  Enable / disable password protection.
+	 *  @param enable	If true, password protection is enabled, otherwise disabled.
+	 *  @throws Exception, when enable is true and no password is set.
+	 */
+	public IFuture<Void>	setUsePassword(boolean enable);
+
+	/**
 	 *  Get the local password.
-	 *  @return	The password of the local platform (if any).
+	 *  @return	The password of the local platform (if set).
 	 */
 	// Todo: password is transferred in plain text unless transport uses encryption.
 	public IFuture<String>	getLocalPassword();
 
 	/**
 	 *  Set the local password.
-	 *  If the password is set to null, acces is granted to all requests.
-	 *  @param password	The password of the local platform (if any). 
+	 *  @param password	The password of the local platform.
+	 *  @throws  Exception, when a null password is provided and use password is true.
 	 */
 	// Todo: password is transferred in plain text unless transport uses encryption.
 	public IFuture<Void>	setLocalPassword(String password);
@@ -59,6 +74,7 @@ public interface ISecurityService
 	 *  Get all stored passwords.
 	 *  @return A map containing the stored passwords as pairs (platform name -> password).
 	 */
+	// Todo: passwords are transferred in plain text unless transport uses encryption.
 	public IFuture<Map<String, String>>	getStoredPasswords();
 	
 	//-------- request validation --------

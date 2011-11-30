@@ -3,7 +3,7 @@ package jadex.commons;
 /**
  *  The basic change event.
  */
-public class ChangeEvent //extends EventObject
+public class ChangeEvent <T> //extends EventObject
 {
 	//-------- attributes --------
 	
@@ -14,7 +14,7 @@ public class ChangeEvent //extends EventObject
 	protected String type;
 	
 	/** The value. */
-	protected Object value;
+	protected T value;
 	
 	//-------- constructors --------
 	
@@ -44,7 +44,7 @@ public class ChangeEvent //extends EventObject
 	/**
 	 *  Create a new event.
 	 */
-	public ChangeEvent(Object source, String type, Object value)
+	public ChangeEvent(Object source, String type, T value)
 	{
 		this.source = source;
 		this.type = type;
@@ -93,7 +93,7 @@ public class ChangeEvent //extends EventObject
 	 *  Get the value.
 	 *  @return The value.
 	 */
-	public Object getValue()
+	public T getValue()
 	{
 		return this.value;
 	}
@@ -102,7 +102,7 @@ public class ChangeEvent //extends EventObject
 	 *  Set the value.
 	 *  @param value The value to set.
 	 */
-	public void setValue(Object value)
+	public void setValue(T value)
 	{
 		this.value = value;
 	}

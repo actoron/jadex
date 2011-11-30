@@ -452,7 +452,7 @@ public class SelectorThread implements Runnable
 		}
 		catch(Exception e)
 		{ 
-			logger.info("NIOTCP receiving error while reading data: "+con+", "+e);
+			logger.warning("NIOTCP receiving error while reading data: "+con+", "+e);
 //			e.printStackTrace();
 			con.close();
 			key.cancel();

@@ -1691,7 +1691,8 @@ public abstract class ComponentManagementService extends BasicService implements
 
 			notifyListenersRemoved(cid, desc, results);
 			
-			Exception	ex	= adapter.getException();
+			// Use adapter exception before cleanup exception as it probably happened first.
+			Exception	ex	= adapter.getException()!=null ? adapter.getException() : exception;
 //			if(exceptions!=null && exceptions.containsKey(cid))
 //			{
 //				ex	= (Exception)exceptions.get(cid);

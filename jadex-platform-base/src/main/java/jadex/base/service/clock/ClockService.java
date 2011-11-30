@@ -298,7 +298,6 @@ public class ClockService extends BasicService implements IClockService, IProper
 	public IFuture<Void> shutdownService()
 	{
 		clock.dispose();
-		clock	= null;
 		listeners	= null;
 		threadpool	= null;
 		final Future<Void>	ret	= new Future<Void>();
@@ -317,6 +316,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 							public void customResultAvailable(Void result)
 							{
 								ClockService.this.provider	= null;
+								ClockService.this.clock	= null;
 								ret.setResult(null);
 							}
 						});
@@ -326,6 +326,7 @@ public class ClockService extends BasicService implements IClockService, IProper
 					{
 						// No settings service: ignore.
 						ClockService.this.provider	= null;
+						ClockService.this.clock	= null;
 						ret.setResult(null);
 					}
 				});

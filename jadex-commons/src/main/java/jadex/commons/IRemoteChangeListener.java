@@ -7,7 +7,7 @@ import jadex.commons.future.IFuture;
  *  Remote version of the change listener.
  */
 // @Reference
-public interface IRemoteChangeListener extends IRemotable
+public interface IRemoteChangeListener<T> extends IRemotable
 {
 	/**
 	 *  Called when a change occurs.
@@ -15,5 +15,5 @@ public interface IRemoteChangeListener extends IRemotable
 	 *  occurs so that there is a chance to remove the listener:
 	 *  @param event The event.
 	 */
-	public IFuture changeOccurred(ChangeEvent event);
+	public IFuture<Void> changeOccurred(ChangeEvent<T> event);
 }

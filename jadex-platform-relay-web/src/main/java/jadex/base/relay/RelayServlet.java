@@ -34,7 +34,9 @@ public class RelayServlet extends HttpServlet
 	protected Map<Object, IBlockingQueue<Tuple2<InputStream, Future<Void>>>>	map;
 	
 	/** Counter for open connections (for testing). */
-	protected int	opencnt	= 0;
+	protected int	opencnt1	= 0;
+	/** Counter for open connections (for testing). */
+	protected int	opencnt2	= 0;
 	
 	//-------- constructors --------
 
@@ -73,7 +75,7 @@ public class RelayServlet extends HttpServlet
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		System.out.println("Entering GET request. opencnt="+(++opencnt)+", mapsize="+map.size());
+		System.out.println("Entering GET request. opencnt="+(++opencnt1)+", mapsize="+map.size());
 		
 		String	idstring	= request.getParameter("id");
 		Object	id	= JavaReader.objectFromXML(idstring, getClass().getClassLoader());
@@ -149,7 +151,7 @@ public class RelayServlet extends HttpServlet
 				items.get(i).getSecondEntity().setException(new RuntimeException("Target disconnected."));
 			}
 		}
-		System.out.println("Leaving GET request. opencnt="+(--opencnt)+", mapsize="+map.size());
+		System.out.println("Leaving GET request. opencnt="+(--opencnt1)+", mapsize="+map.size());
 	}
 
 	/**
@@ -157,7 +159,7 @@ public class RelayServlet extends HttpServlet
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		System.out.println("Entering POST request. opencnt="+(++opencnt)+", mapsize="+map.size());
+		System.out.println("Entering POST request. opencnt="+(++opencnt2)+", mapsize="+map.size());
 		ServletInputStream	in	= request.getInputStream();
 		Object	targetid	= SRelay.readObject(in);
 		IBlockingQueue<Tuple2<InputStream, Future<Void>>>	queue	= map.get(targetid);
@@ -180,6 +182,6 @@ public class RelayServlet extends HttpServlet
 		{
 			response.sendError(404);
 		}
-		System.out.println("Leaving POST request. opencnt="+(--opencnt)+", mapsize="+map.size());
+		System.out.println("Leaving POST request. opencnt="+(--opencnt2)+", mapsize="+map.size());
 	}
 }

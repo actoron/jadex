@@ -29,8 +29,8 @@ public class RemoteReferenceTest extends TestCase
 		long timeout	= 10000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		
-		// Start platform1 with local service.
-		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases1",
+		// Start platform1 with local service. (underscore in name assures both platforms use same password)
+		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases_1",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false",
 			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(sus, timeout);
 		
@@ -38,8 +38,8 @@ public class RemoteReferenceTest extends TestCase
 		ILocalService	service1	= SServiceProvider
 			.getService(platform1.getServiceProvider(), ILocalService.class).get(sus, timeout);
 		
-		// Start platform2 with (remote) search service.
-		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", "testcases2",
+		// Start platform2 with (remote) search service. (underscore in name assures both platforms use same password)
+		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", "testcases_2",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false",
 			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class"}).get(sus, timeout);
 		

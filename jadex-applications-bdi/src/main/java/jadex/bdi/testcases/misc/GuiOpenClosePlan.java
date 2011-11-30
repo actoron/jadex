@@ -48,6 +48,7 @@ public class GuiOpenClosePlan extends Plan
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				button.removeActionListener(this);	// To improve garbage collection
 				try
 				{
 					getExternalAccess().scheduleStep(new IComponentStep<Void>()

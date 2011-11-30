@@ -63,13 +63,13 @@ public class SettingsService extends BasicService implements ISettingsService
 		if(prefix==null)
 		{
 			prefix	= access.getComponentIdentifier().getPlatformName();
+		}
 			
-			// Strip auto-generated platform suffix (hack???).
-			// cf. Starter and SecurityService
-			if(prefix.indexOf('_')!=-1)
-			{
-				prefix	= prefix.substring(0, prefix.lastIndexOf('_'));
-			}
+		// Strip auto-generated platform suffix (hack???).
+		// cf. Starter and SecurityService
+		if(prefix.indexOf('_')!=-1)
+		{
+			prefix	= prefix.substring(0, prefix.lastIndexOf('_'));
 		}
 		
 		file	= new File(prefix + SETTINGS_EXTENSION);

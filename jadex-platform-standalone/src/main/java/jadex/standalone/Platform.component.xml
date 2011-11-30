@@ -233,6 +233,7 @@
 			<implementation class="SecurityService"/>
 		</providedservice>
 		 -->
+		
 		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true">
 			<binding scope="platform"/>
 		</requiredservice>

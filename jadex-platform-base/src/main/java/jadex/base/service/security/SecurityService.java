@@ -9,6 +9,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.security.IAuthorizable;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -22,6 +23,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -45,6 +47,9 @@ public class SecurityService implements ISecurityService
 	/** The component. */
 	@ServiceComponent
 	protected IInternalAccess	component;
+	
+	/** Flag to enable / disable password protection. */
+	protected boolean	usepass;
 	
 	/** The local password (if any). */
 	protected String	password;
@@ -73,9 +78,10 @@ public class SecurityService implements ISecurityService
 				{
 					public void customResultAvailable(final Properties props)
 					{
-						if(props==null)
+						// generate new password, if no security settings exist, yet.
+						final boolean	genpass	= props==null || props.getProperty("password")==null; 
+						if(genpass)
 						{
-							// generate new password, if no security settings exist, yet.
 							password	= UUID.randomUUID().toString().substring(0, 8);
 						}
 						
@@ -89,8 +95,9 @@ public class SecurityService implements ISecurityService
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
+										usepass	= props.getProperty("usepass")==null || props.getBooleanProperty("usepass");
 										password	= props.getStringProperty("password");
-										if(props.getStringProperty("passwords")!=null)
+										if(props.getProperty("passwords")!=null)
 										{
 											passwords	= JavaReader.objectFromXML(props.getStringProperty("passwords"), ia.getClassLoader());
 										}
@@ -110,6 +117,7 @@ public class SecurityService implements ISecurityService
 									public IFuture<Properties> execute(IInternalAccess ia)
 									{
 										Properties	ret	= new Properties();
+										ret.addProperty(new Property("usepass", Boolean.toString(usepass)));
 										ret.addProperty(new Property("password", password));
 										ret.addProperty(new Property("passwords", JavaWriter.objectToXML(passwords, ia.getClassLoader())));
 										return new Future<Properties>(ret);
@@ -121,7 +129,7 @@ public class SecurityService implements ISecurityService
 							public void customResultAvailable(Void result)
 							{
 								// If new password was generated, save settings such that new platform instances use it.
-								if(props==null)
+								if(genpass)
 								{
 									settings.saveProperties().addResultListener(new DelegationResultListener<Void>(ret));
 								}
@@ -139,8 +147,71 @@ public class SecurityService implements ISecurityService
 		return ret;
 	}
 	
+	/**
+	 *  Shutdown the service.
+	 */
+	@ServiceShutdown
+	public IFuture<Void> shutdown()
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<ISettingsService>()
+		{
+			public void resultAvailable(ISettingsService settings)
+			{
+				settings.deregisterPropertiesProvider(PROEPRTIES_ID)
+					.addResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						SecurityService.this.passwords	= null;
+						ret.setResult(null);
+					}
+				});
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// No settings service: ignore.
+				SecurityService.this.passwords	= null;
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
+	}
+	
 	//-------- password management --------
 	
+	/**
+	 *  Check if password protection is enabled.
+	 *  @return	True, if password protection is enabled.
+	 */
+	public IFuture<Boolean>	isUsePassword()
+	{
+		return new Future<Boolean>(Boolean.valueOf(usepass));
+	}
+
+	/**
+	 *  Enable / disable password protection.
+	 *  @param enable	If true, password protection is enabled, otherwise disabled.
+	 *  @throws Exception, when enable is true and no password is set.
+	 */
+	public IFuture<Void>	setUsePassword(boolean enable)
+	{
+		IFuture<Void>	ret;
+		if(enable && password==null)
+		{
+			ret	= new Future<Void>(new IllegalStateException("Cannot enable password protection, no password set."));
+		}
+		else
+		{
+			this.usepass	= enable;
+			ret	= IFuture.DONE;
+		}
+		return ret;
+	}
+
 	/**
 	 *  Get the local password.
 	 *  @return	The password of the local platform (if any).
@@ -153,14 +224,23 @@ public class SecurityService implements ISecurityService
 
 	/**
 	 *  Set the local password.
-	 *  If the password is set to null, acces is granted to all requests.
-	 *  @param password	The password of the local platform (if any). 
+	 *  @param password	The password of the local platform. 
+	 *  @throws  Exception, when a null password is provided and use password is true.
 	 */
 	// Todo: password is transferred in plain text unless transport uses encryption.
 	public IFuture<Void>	setLocalPassword(String password)
 	{
-		this.password	= password;
-		return IFuture.DONE;
+		IFuture<Void>	ret;
+		if(password==null && usepass)
+		{
+			ret	= new Future<Void>(new IllegalStateException("Cannot set password to null, when password protection is enabled."));
+		}
+		else
+		{
+			this.password	= password;
+			ret	= IFuture.DONE;
+		}
+		return ret;
 	}
 
 	/**
@@ -198,16 +278,17 @@ public class SecurityService implements ISecurityService
 		}
 		return IFuture.DONE;		
 	}
-	
+
 	/**
 	 *  Get all stored passwords.
 	 *  @return A map containing the stored passwords as pairs (platform name -> password).
 	 */
+	// Todo: passwords are transferred in plain text unless transport uses encryption.
 	public IFuture<Map<String, String>>	getStoredPasswords()
 	{
 		return new Future<Map<String, String>>(passwords);
-	}
-	
+	}	
+
 	//-------- request validation --------
 	
 	/**
@@ -218,7 +299,7 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void>	validateRequest(IAuthorizable request)
 	{
 		String	error	= null;
-		if(password!=null)
+		if(usepass && password!=null)
 		{
 			if(request.getAuthenticationData()!=null)
 			{
@@ -226,6 +307,8 @@ public class SecurityService implements ISecurityService
 				{
 					if(!Arrays.equals(request.getAuthenticationData(), buildDigest(request.getTimestamp(), password)))
 					{
+//						System.out.println("received auth data: "+new String(Base64.encode(request.getAuthenticationData()))+", "+request.getTimestamp());
+//						System.out.println("expected auth data: "+new String(Base64.encode(buildDigest(request.getTimestamp(), password)))+", "+password);
 						error	= "Password incorrect.";
 					}
 				}
@@ -240,17 +323,7 @@ public class SecurityService implements ISecurityService
 			}
 		}
 		
-		IFuture<Void>	ret	= error==null ? new Future<Void>((Void)null) : new Future<Void>(new SecurityException(error));
-		try
-		{
-			ret.get(null);
-			System.out.println("Request valid: "+request);
-		}
-		catch(Exception e)
-		{
-			System.out.println("Request invalid: "+request+", "+e);			
-		}
-		return ret;
+		return error==null ? new Future<Void>((Void)null) : new Future<Void>(new SecurityException(error));
 	}
 	
 	
@@ -273,6 +346,7 @@ public class SecurityService implements ISecurityService
 			byte[]	authdata	= buildDigest(timestamp, pw);
 			request.setTimestamp(timestamp);
 			request.setAuthenticationData(authdata);
+//			System.out.println("sending auth data: "+new String(Base64.encode(request.getAuthenticationData()))+", "+pw+", "+timestamp);
 		}
 		
 		return IFuture.DONE;
