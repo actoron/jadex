@@ -33,9 +33,9 @@ public class RelayServlet extends HttpServlet
 	/** The relay map (id -> queue for pending requests). */
 	protected Map<Object, IBlockingQueue<Tuple2<InputStream, Future<Void>>>>	map;
 	
-	/** Counter for open connections (for testing). */
+	/** Counter for open GET connections (for testing). */
 	protected int	opencnt1	= 0;
-	/** Counter for open connections (for testing). */
+	/** Counter for open POST connections (for testing). */
 	protected int	opencnt2	= 0;
 	
 	//-------- constructors --------
@@ -180,6 +180,7 @@ public class RelayServlet extends HttpServlet
 		
 		if(!sent)
 		{
+			// Todo: other error msg?
 			response.sendError(404);
 		}
 		System.out.println("Leaving POST request. opencnt="+(--opencnt2)+", mapsize="+map.size());
