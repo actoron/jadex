@@ -333,7 +333,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 					public IFuture<Object[]> execute(IInternalAccess ia)
 					{
 						final Future<Object[]>	ret	= new Future<Object[]>();
-						final RequiredServiceInfo[]	ris	= ia.getServiceContainer().getRequiredServiceInfos();
+						final RequiredServiceInfo<?>[]	ris	= ia.getServiceContainer().getRequiredServiceInfos();
 						IIntermediateFuture<IService>	ds	= SServiceProvider.getDeclaredServices(ia.getServiceContainer());
 						ds.addResultListener(new ExceptionDelegationResultListener<Collection<IService>, Object[]>(ret)
 						{
@@ -359,7 +359,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 					public void customResultAvailable(final Object[] res)
 					{
 						final ProvidedServiceInfo[] pros = (ProvidedServiceInfo[])res[0];
-						final RequiredServiceInfo[] reqs = (RequiredServiceInfo[])res[1];
+						final RequiredServiceInfo<?>[] reqs = (RequiredServiceInfo[])res[1];
 						if((pros!=null && pros.length>0 || (reqs!=null && reqs.length>0)))
 						{
 							ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+ServiceContainerNode.NAME);
@@ -368,7 +368,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 //							System.err.println(getModel().hashCode()+", "+ready.hashCode()+" searchChildren.add "+scn);
 							children.add(0, scn);
 									
-							final List	subchildren	= new ArrayList();
+							final List<ITreeNode>	subchildren	= new ArrayList<ITreeNode>();
 							if(pros!=null)
 							{
 								for(int i=0; i<pros.length; i++)
@@ -401,9 +401,9 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 							}
 							
 							final ServiceContainerNode	node	= scn;
-							ret.addResultListener(new SwingDefaultResultListener()
+							ret.addResultListener(new SwingDefaultResultListener<List<ITreeNode>>()
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(List<ITreeNode> result)
 								{
 									node.setChildren(subchildren);
 								}

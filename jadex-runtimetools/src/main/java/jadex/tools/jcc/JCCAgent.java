@@ -4,7 +4,6 @@ import jadex.base.gui.componentviewer.ComponentViewerPlugin;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
