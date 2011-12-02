@@ -83,6 +83,7 @@ public class SecurityService implements ISecurityService
 						if(genpass)
 						{
 							password	= UUID.randomUUID().toString().substring(0, 8);
+							usepass	= true;
 						}
 						
 						final IExternalAccess	access	= component.getExternalAccess();

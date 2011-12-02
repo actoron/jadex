@@ -228,11 +228,9 @@
 		<providedservice class="IPublishService">
 			<implementation class="DefaultWebServicePublishService"/>
 		</providedservice>
-		<!-- 
 		<providedservice class="ISecurityService">
 			<implementation class="SecurityService"/>
 		</providedservice>
-		 -->
 		
 		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true">
 			<binding scope="platform"/>
