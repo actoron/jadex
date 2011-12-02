@@ -31,6 +31,8 @@ import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -44,7 +46,9 @@ import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -53,6 +57,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.UIDefaults;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
@@ -90,7 +96,8 @@ public class ComponentTreePanel extends JSplitPane
 		"overlay_refresh", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png"),
 		"overlay_refreshtree", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_refresh.png"),
 		"overlay_showprops", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_doc.png"),
-		"overlay_showobject", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_bean.png")
+		"overlay_showobject", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_bean.png"),
+		"overlay_lock", SGUI.makeIcon(ComponentTreePanel.class, "/jadex/base/gui/images/overlay_proxy_locked.png")
 	});
 	
 	/** The kill action constant. */
@@ -480,20 +487,66 @@ public class ComponentTreePanel extends JSplitPane
 						SServiceProvider.getService(access.getServiceProvider(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new SwingDefaultResultListener<ISecurityService>(ComponentTreePanel.this)
 						{
-							public void customResultAvailable(ISecurityService sec)
+							public void customResultAvailable(final ISecurityService sec)
 							{
 								sec.getTargetPassword(cid)
 									.addResultListener(new SwingDefaultResultListener<String>(ComponentTreePanel.this)
 								{
 									public void customResultAvailable(String pass)
 									{
-										JOptionPane.showInputDialog(ComponentTreePanel.this, new JPasswordField(pass), "Please enter password.");
+										JLabel	lbpass	= new JLabel("Password");
+										final JPasswordField	tfpass	= new JPasswordField(10);
+										tfpass.setText(pass);
+										final char	echo	= tfpass.getEchoChar();
+										final JCheckBox cbshowchars	= new JCheckBox("Show characters");
+										cbshowchars.addChangeListener(new ChangeListener()
+										{
+											public void stateChanged(ChangeEvent e)
+											{
+												tfpass.setEchoChar(cbshowchars.isSelected() ? 0 : echo);
+											}
+										});
+										
+										lbpass.setToolTipText("The platform password");
+										tfpass.setToolTipText("The platform password");
+										cbshowchars.setToolTipText("Show / hide password characters in gui");
+										
+										// The local password settings.
+										JPanel	ppass	= new JPanel(new GridBagLayout());
+										GridBagConstraints	gbc	= new GridBagConstraints();
+										gbc.insets	= new Insets(0, 3, 0, 3);
+										gbc.weightx	= 0;
+										gbc.weighty	= 0;
+										gbc.anchor	= GridBagConstraints.WEST;
+										gbc.fill	= GridBagConstraints.NONE;
+										gbc.gridy	= 0;
+										gbc.gridwidth	= 1;
+										ppass.add(lbpass, gbc);
+										gbc.weightx	= 1;
+										ppass.add(tfpass, gbc);
+										gbc.gridy++;
+										gbc.gridwidth	= GridBagConstraints.REMAINDER;
+										ppass.add(cbshowchars, gbc);
+										int	ok	= JOptionPane.showConfirmDialog(SGUI.getWindowParent(ComponentTreePanel.this),
+											ppass, "Please enter password.", JOptionPane.OK_CANCEL_OPTION,
+											JOptionPane.PLAIN_MESSAGE, icons.getIcon("overlay_lock"));
+										if(ok==JOptionPane.OK_OPTION)
+										{
+											sec.setTargetPassword(cid, new String(tfpass.getPassword()))
+												.addResultListener(new SwingDefaultResultListener<Void>()
+											{
+												public void	customResultAvailable(Void result)
+												{
+													pctn.refresh(false);
+												}
+											});
+										}
 									}
 								});
 							}
 							public void customExceptionOccurred(Exception e)
 							{
-								JOptionPane.showMessageDialog(ComponentTreePanel.this, "No security service installed.");
+								JOptionPane.showMessageDialog(SGUI.getWindowParent(ComponentTreePanel.this), "No security service installed.");
 							}
 						});
 					}

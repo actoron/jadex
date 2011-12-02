@@ -253,7 +253,13 @@ public class SecurityService implements ISecurityService
 	// Todo: password is transferred in plain text unless transport uses encryption.
 	public IFuture<String>	getTargetPassword(IComponentIdentifier target)
 	{
-		return new Future<String>(passwords.get(getStrippedPlatformName(target)));
+		String	starget	= getStrippedPlatformName(target);
+		String	ret	= passwords.get(starget);
+		if(ret==null && starget.equals(getStrippedPlatformName(component.getComponentIdentifier())))
+		{
+			ret	= this.password;
+		}
+		return new Future<String>(ret);
 	}
 
 	/**
