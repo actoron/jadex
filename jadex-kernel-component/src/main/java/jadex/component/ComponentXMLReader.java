@@ -12,6 +12,7 @@ import jadex.bridge.modelinfo.SubcomponentTypeInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.ResourceInfo;
@@ -373,6 +374,12 @@ public class ComponentXMLReader
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "implementation")), new ObjectInfo(ProvidedServiceImplementation.class),
 			new MappingInfo(null, null, "expression", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "implementation"), new AttributeConverter(classconv, reclassconv)),
+			}, null)));
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "publish")), new ObjectInfo(PublishInfo.class),
+			new MappingInfo(null, null, null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("publishid", "publishId")),
+				new AttributeInfo(new AccessInfo("publishtype", "publishType")),
+				new AttributeInfo(new AccessInfo("servicetype", "serviceType"), new AttributeConverter(classconv, reclassconv)),
 			}, null)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "interceptor")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{

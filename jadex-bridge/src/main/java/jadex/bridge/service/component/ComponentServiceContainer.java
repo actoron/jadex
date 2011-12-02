@@ -367,7 +367,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		final PublishInfo pi = info==null? null: info.getPublish();
 		if(pi!=null)
 		{
-			getPublishService(instance, pi.getType(), (Iterator<IPublishService>)null)
+			getPublishService(instance, pi.getPublishType(), (Iterator<IPublishService>)null)
 				.addResultListener(instance.createResultListener(new ExceptionDelegationResultListener<IPublishService, Void>(ret)
 			{
 				public void customResultAvailable(IPublishService ps)

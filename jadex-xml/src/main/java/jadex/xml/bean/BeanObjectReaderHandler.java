@@ -1025,11 +1025,6 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		{
 			AccessInfo ai = (AccessInfo)accessinfo;
 			
-			if(!(ai.getObjectIdentifier() instanceof String))
-			{
-				System.out.println("sdl");
-			}
-			
 			String fieldname = ai.getObjectIdentifier()!=null? ((String)ai.getObjectIdentifier()): xmlname.getLocalPart();
 			set = setField(fieldname, object, val, converter, context, id);
 

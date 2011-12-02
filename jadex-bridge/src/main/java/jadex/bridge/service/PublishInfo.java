@@ -1,18 +1,22 @@
 package jadex.bridge.service;
 
 /**
- * 
+ *  Info struct for service publishing details.
  */
 public class PublishInfo
 {
+	//-------- attributes --------
+	
 	/** The publish id. */
 	protected String pid;
 	
 	/** The publish type. */
-	protected String type;
+	protected String publishtype;
 	
 	/** The service type. */
 	protected Class servicetype;
+
+	//-------- constructors --------
 
 	/**
 	 *  Create a new publish info.
@@ -24,14 +28,16 @@ public class PublishInfo
 	/**
 	 *  Create a new publish info.
 	 *  @param pid The publish id, e.g. url.
-	 *  @param type The type.
+	 *  @param publishtype The publish type.
 	 */
-	public PublishInfo(String pid, String type, Class servicetype)
+	public PublishInfo(String pid, String publishtype, Class servicetype)
 	{
 		this.pid = pid;
-		this.type = type;
+		this.publishtype = publishtype;
 		this.servicetype = servicetype;
 	}
+
+	//-------- methods --------
 
 	/**
 	 *  Get the publishid.
@@ -55,18 +61,18 @@ public class PublishInfo
 	 *  Get the type.
 	 *  @return the type.
 	 */
-	public String getType()
+	public String getPublishType()
 	{
-		return type;
+		return publishtype;
 	}
 
 	/**
 	 *  Set the type.
 	 *  @param type The type to set.
 	 */
-	public void setType(String type)
+	public void setPublishType(String type)
 	{
-		this.type = type;
+		this.publishtype = type;
 	}
 
 	/**
@@ -86,6 +92,4 @@ public class PublishInfo
 	{
 		this.servicetype = servicetype;
 	}
-	
-	
 }
