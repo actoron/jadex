@@ -18,6 +18,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
+import jadex.bridge.service.types.security.ISecurityService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -44,7 +45,9 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
@@ -119,6 +122,9 @@ public class ComponentTreePanel extends JSplitPane
 
 	/** The remove service action constant. */
 	public static final String SHOWDETAILS_ACTION = "Show object details";
+
+	/** The set password action constant. */
+	public static final String SET_PASSWD_ACTION = "Set/change remote platform password";
 
 	
 	//-------- attributes --------
@@ -460,6 +466,42 @@ public class ComponentTreePanel extends JSplitPane
 		};
 		actions.put(showobject.getValue(Action.NAME), showobject);
 
+		final Action setpasswd = new AbstractAction(SET_PASSWD_ACTION)
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				TreePath path = tree.getSelectionPath();
+				if(path!=null)
+				{
+					final ProxyComponentTreeNode  pctn = (ProxyComponentTreeNode)path.getLastPathComponent();
+					final IComponentIdentifier	cid	= pctn.getComponentIdentifier();
+					if(cid!=null)
+					{
+						SServiceProvider.getService(access.getServiceProvider(), ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new SwingDefaultResultListener<ISecurityService>(ComponentTreePanel.this)
+						{
+							public void customResultAvailable(ISecurityService sec)
+							{
+								sec.getTargetPassword(cid)
+									.addResultListener(new SwingDefaultResultListener<String>(ComponentTreePanel.this)
+								{
+									public void customResultAvailable(String pass)
+									{
+										JOptionPane.showInputDialog(ComponentTreePanel.this, new JPasswordField(pass), "Please enter password.");
+									}
+								});
+							}
+							public void customExceptionOccurred(Exception e)
+							{
+								JOptionPane.showMessageDialog(ComponentTreePanel.this, "No security service installed.");
+							}
+						});
+					}
+				}
+			}
+		};
+		actions.put(setpasswd.getValue(Action.NAME), setpasswd);
+		
 		// Default overlays and popups.
 		model.addNodeHandler(new INodeHandler()
 		{
@@ -512,6 +554,18 @@ public class ComponentTreePanel extends JSplitPane
 							}
 						};
 						ret.add(premoveservice);
+					}
+					
+					if(nodes[0] instanceof ProxyComponentTreeNode)
+					{
+						Action psetpasswd = new AbstractAction((String)setpasswd.getValue(Action.NAME), base)
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								setpasswd.actionPerformed(e);
+							}
+						};
+						ret.add(psetpasswd);
 					}
 				}
 				
