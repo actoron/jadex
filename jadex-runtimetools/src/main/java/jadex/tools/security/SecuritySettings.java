@@ -1,6 +1,7 @@
 package jadex.tools.security;
 
 import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.service.IService;
@@ -9,6 +10,7 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.tools.generic.AutoRefreshPanel;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -35,15 +37,24 @@ import javax.swing.table.DefaultTableModel;
 /**
  *  The library plugin.
  */
-public class SecuritySettings	extends	JPanel	implements IServiceViewerPanel
+public class SecuritySettings	implements IServiceViewerPanel
 {
 	//-------- attributes --------
 	
 	/** The security service. */
 	protected ISecurityService secservice;
 	
+	/** Enable password protected for local platform. */
+	protected JCheckBox	cbusepass;
+	
+	/** The local platform password. */
+	protected JPasswordField	tfpass;
+	
 	/** Show / hide password characters in gui. */
 	protected JCheckBox	cbshowchars;
+	
+	/** The inner panel. */
+	protected JComponent	inner;
 	
 	//-------- methods --------
 	
@@ -57,9 +68,9 @@ public class SecuritySettings	extends	JPanel	implements IServiceViewerPanel
 		
 		this.secservice	= (ISecurityService)service;
 		
-		final JCheckBox	cbusepass	= new JCheckBox("Use password");
+		cbusepass	= new JCheckBox("Use password");
 		final JLabel	lbpass	= new JLabel("Password");
-		final JPasswordField	tfpass	= new JPasswordField(10);
+		tfpass	= new JPasswordField(10);
 		final char	echo	= tfpass.getEchoChar();
 		final JButton	buapply	= new JButton("Apply");
 		cbshowchars	= new JCheckBox("Show characters");
@@ -97,9 +108,78 @@ public class SecuritySettings	extends	JPanel	implements IServiceViewerPanel
 		premote.add(new JScrollPane(new JTable(new DefaultTableModel(new String[]{"Platform Name", "Password"}, 0))), BorderLayout.CENTER);
 		
 		// Overall layout.
-		this.setLayout(new BorderLayout());
-		this.add(plocal, BorderLayout.NORTH);
-		this.add(premote, BorderLayout.CENTER);
+		this.inner	= new JPanel(new BorderLayout());
+		inner.add(plocal, BorderLayout.NORTH);
+		inner.add(premote, BorderLayout.CENTER);
+		
+		// Gui listeners.
+		buapply.setEnabled(false);
+		cbusepass.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				final boolean	usepass	= cbusepass.isSelected();
+				secservice.setUsePassword(usepass).addResultListener(new SwingDefaultResultListener<Void>(inner)
+				{
+					public void customResultAvailable(Void result)
+					{
+						lbpass.setEnabled(usepass);
+						tfpass.setEnabled(usepass);
+						cbshowchars.setEnabled(usepass);
+					}
+				});
+			}
+		});
+		ActionListener	al	= new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String	newpass	= new String(tfpass.getPassword());
+				secservice.setLocalPassword(newpass).addResultListener(new SwingDefaultResultListener<Void>(inner)
+				{
+					public void customResultAvailable(Void result)
+					{
+						buapply.setEnabled(false);
+					}
+				});
+			}
+		};
+		buapply.addActionListener(al);
+		tfpass.addActionListener(al);
+		tfpass.addKeyListener(new KeyAdapter()
+		{
+			public void keyTyped(KeyEvent e)
+			{
+				buapply.setEnabled(true);
+			}
+		});
+		cbshowchars.addChangeListener(new ChangeListener()
+		{
+			public void stateChanged(ChangeEvent e)
+			{
+				tfpass.setEchoChar(cbshowchars.isSelected() ? 0 : echo);
+			}
+		});
+		
+		doRefresh().addResultListener(new SwingDelegationResultListener<Void>(ret));
+		
+		return ret;
+	}
+
+	/**
+	 *  Informs the plugin that it should stop all its computation
+	 */
+	public IFuture<Void> shutdown()
+	{
+		return IFuture.DONE;
+	}
+
+	/**
+	 *  Refresh the panel.
+	 */
+	protected IFuture<Void> doRefresh()
+	{
+		final Future<Void>	ret	= new Future<Void>();
 		
 		// Initialize values from security service.
 		secservice.isUsePassword().addResultListener(new SwingDefaultResultListener<Boolean>()
@@ -134,73 +214,26 @@ public class SecuritySettings	extends	JPanel	implements IServiceViewerPanel
 			}
 		});
 		
-		// Gui listeners.
-		buapply.setEnabled(false);
-		cbusepass.addChangeListener(new ChangeListener()
-		{
-			public void stateChanged(ChangeEvent e)
-			{
-				final boolean	usepass	= cbusepass.isSelected();
-				secservice.setUsePassword(usepass).addResultListener(new SwingDefaultResultListener<Void>(SecuritySettings.this)
-				{
-					public void customResultAvailable(Void result)
-					{
-						lbpass.setEnabled(usepass);
-						tfpass.setEnabled(usepass);
-						cbshowchars.setEnabled(usepass);
-					}
-				});
-			}
-		});
-		ActionListener	al	= new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				String	newpass	= new String(tfpass.getPassword());
-				secservice.setLocalPassword(newpass).addResultListener(new SwingDefaultResultListener<Void>(SecuritySettings.this)
-				{
-					public void customResultAvailable(Void result)
-					{
-						buapply.setEnabled(false);
-					}
-				});
-			}
-		};
-		buapply.addActionListener(al);
-		tfpass.addActionListener(al);
-		tfpass.addKeyListener(new KeyAdapter()
-		{
-			public void keyTyped(KeyEvent e)
-			{
-				buapply.setEnabled(true);
-			}
-		});
-		cbshowchars.addChangeListener(new ChangeListener()
-		{
-			public void stateChanged(ChangeEvent e)
-			{
-				tfpass.setEchoChar(cbshowchars.isSelected() ? 0 : echo);
-			}
-		});
-		
 		return ret;
 	}
-	
-	/**
-	 *  Informs the plugin that it should stop all its computation
-	 */
-	public IFuture<Void> shutdown()
-	{
-		return IFuture.DONE;
-	}
 
-	
 	/**
 	 *  Get the component.
 	 */
 	public JComponent getComponent()
 	{
-		return this;
+		return new AutoRefreshPanel()
+		{
+			public IFuture<Void> refresh()
+			{
+				return SecuritySettings.this.doRefresh();
+			}
+			
+			public IFuture<JComponent> createInnerPanel()
+			{
+				return new Future<JComponent>(inner);
+			}
+		};
 	}
 		
 	/**
