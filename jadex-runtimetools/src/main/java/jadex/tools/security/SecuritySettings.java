@@ -20,6 +20,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -52,6 +54,9 @@ public class SecuritySettings	implements IServiceViewerPanel
 	
 	/** Show / hide password characters in gui. */
 	protected JCheckBox	cbshowchars;
+	
+	/** The remote passwords. */
+	protected DefaultTableModel	tmremote;
 	
 	/** The inner panel. */
 	protected JComponent	inner;
@@ -105,7 +110,8 @@ public class SecuritySettings	implements IServiceViewerPanel
 		// The remote password settings.
 		JPanel	premote	= new JPanel(new BorderLayout());
 		premote.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Remote Password Settings"));
-		premote.add(new JScrollPane(new JTable(new DefaultTableModel(new String[]{"Platform Name", "Password"}, 0))), BorderLayout.CENTER);
+		tmremote	= new DefaultTableModel(new String[]{"Platform Name", "Password"}, 0);
+		premote.add(new JScrollPane(new JTable(tmremote)), BorderLayout.CENTER);
 		
 		// Overall layout.
 		this.inner	= new JPanel(new BorderLayout());
@@ -196,7 +202,36 @@ public class SecuritySettings	implements IServiceViewerPanel
 							tfpass.setText(password);
 						}
 						
-						ret.setResult(null);
+						secservice.getStoredPasswords().addResultListener(new SwingDefaultResultListener<Map<String, String>>()
+						{
+							public void customResultAvailable(Map<String, String> passwords)
+							{
+								// Update table in place to avoid GUI flickering.
+								for(int i=tmremote.getRowCount(); i>=0; i--)
+								{
+									// Update existing value.
+									if(passwords.containsKey(tmremote.getValueAt(i, 0)))
+									{
+										String	newval	= passwords.remove(tmremote.getValueAt(i, 0));
+										tmremote.setValueAt(newval, i, 1);
+									}
+									
+									// Remove non-existing values.
+									else
+									{
+										tmremote.removeRow(i);
+									}
+								}
+								// Add new values.
+								for(Iterator<String> it=passwords.keySet().iterator(); it.hasNext(); )
+								{
+									String	key	= it.next();
+									tmremote.addRow(new Object[]{key, passwords.get(key)});
+								}
+								
+								ret.setResult(null);								
+							}
+						});
 					}
 					
 					// Todo: SwingExceptionDelegationResultListener
