@@ -155,11 +155,11 @@
 						<dex>
 							<jvmArguments>
 								<jvmArgument>-Xms256m</jvmArgument>
-								<jvmArgument>-Xmx512m</jvmArgument>
+								<jvmArgument>-Xmx1024m</jvmArgument>
 							</jvmArguments>
-							<coreLibrary>true|false</coreLibrary>
+							<coreLibrary>false</coreLibrary>
 							<noLocals>false</noLocals>
-							<optimize>true</optimize>
+							<optimize>false</optimize>
 						</dex>
 
 						<!-- <test> -->
