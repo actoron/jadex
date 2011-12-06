@@ -931,7 +931,7 @@ public class DisplayPanel extends JComponent
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.getServiceContainer().getRequiredService("generateservice")
-					.addResultListener(new SwingDefaultResultListener()
+					.addResultListener(new SwingDefaultResultListener(DisplayPanel.this)
 				{
 					public void customResultAvailable(Object result)
 					{

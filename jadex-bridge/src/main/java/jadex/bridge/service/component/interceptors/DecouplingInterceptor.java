@@ -1,12 +1,12 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.component.ComponentIntermediateFuture;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
@@ -47,16 +47,19 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	//-------- constants --------
 	
 	/** The static map of subinterceptors (method -> interceptor). */
-	protected static Map<Method, IServiceInvocationInterceptor> SUBINTERCEPTORS = getInterceptors();
+	protected static final Map<Method, IServiceInvocationInterceptor> SUBINTERCEPTORS = getInterceptors();
 
 	/** The static set of no decoupling methods. */
-	protected static Set<Method> NO_DECOUPLING;
+	protected static final Set<Method> NO_DECOUPLING;
+	
+	/** The call stack. */
+	protected static final ThreadLocal<List<IComponentIdentifier>>	CALLSTACK	= new ThreadLocal<List<IComponentIdentifier>>();
 	
 	static
 	{
+		NO_DECOUPLING = new HashSet<Method>();
 		try
 		{
-			NO_DECOUPLING = new HashSet<Method>();
 			NO_DECOUPLING.add(IInternalService.class.getMethod("shutdownService", new Class[0]));
 		}
 		catch(Exception e)
@@ -218,13 +221,16 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		{
 //			if(sic.getMethod().getName().equals("add"))
 //				System.out.println("direct: "+Thread.currentThread());
+			pushToCallStack(IComponentIdentifier.LOCAL.get());
 			sic.invoke().addResultListener(new CopyReturnValueResultListener(ret, sic));
+			popFromCallStack();
 		}
 		else
 		{
 //			if(sic.getMethod().getName().equals("add"))
 //				System.out.println("decouple: "+Thread.currentThread());
-			ea.scheduleStep(new InvokeMethodStep(sic)).addResultListener(new CopyReturnValueResultListener(ret, sic));
+			ea.scheduleStep(new InvokeMethodStep(sic, IComponentIdentifier.LOCAL.get()))
+				.addResultListener(new CopyReturnValueResultListener(ret, sic));
 		}
 		
 		return ret;
@@ -321,6 +327,41 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		return ret;
 	}
 	
+	/**
+	 *  Push a service call to the call stack.
+	 *  @param caller	The calling component. 
+	 */
+	protected static void	pushToCallStack(IComponentIdentifier caller)
+	{
+		IComponentIdentifier	previous	= IComponentIdentifier.CALLER.get();
+		if(previous!=null)
+		{
+			List<IComponentIdentifier>	stack	= CALLSTACK.get();
+			if(stack==null)
+			{
+				stack	= new ArrayList<IComponentIdentifier>();
+				CALLSTACK.set(stack);
+			}
+			stack.add(previous);
+		}
+		IComponentIdentifier.CALLER.set(caller);
+	}
+	
+	/**
+	 *  Pop a service call from the call stack.
+	 *  @param caller	The calling component. 
+	 */
+	protected static void	popFromCallStack()
+	{
+		IComponentIdentifier	caller	= null;
+		List<IComponentIdentifier>	stack	= CALLSTACK.get();
+		if(stack!=null && !stack.isEmpty())
+		{
+			caller	= stack.remove(stack.size()-1);
+		}
+		IComponentIdentifier.CALLER.set(caller);
+	}
+	
 	//-------- helper classes --------
 	
 	/**
@@ -404,15 +445,19 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	public static class InvokeMethodStep implements IComponentStep<Void>
 	{
 		protected ServiceInvocationContext sic;
+		protected IComponentIdentifier caller;
 
-		public InvokeMethodStep(ServiceInvocationContext sic)
+		public InvokeMethodStep(ServiceInvocationContext sic, IComponentIdentifier caller)
 		{
 			this.sic = sic;
+			this.caller = caller;
 		}
 
 		public IFuture<Void> execute(IInternalAccess ia)
 		{					
 			IFuture<Void> ret;
+			
+			pushToCallStack(caller);
 			
 			try
 			{
@@ -424,6 +469,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //				e.printStackTrace();
 				ret	= new Future<Void>(e);
 			}
+			
+			popFromCallStack();
 			
 			return ret;
 		}

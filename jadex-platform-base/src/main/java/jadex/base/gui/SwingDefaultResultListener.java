@@ -1,6 +1,7 @@
 package jadex.base.gui;
 
 import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
@@ -62,15 +63,19 @@ public abstract class SwingDefaultResultListener<E> extends DefaultResultListene
 		if(!SGUI.HAS_GUI || SwingUtilities.isEventDispatchThread() || Starter.isShutdown())
 //		if(SwingUtilities.isEventDispatchThread())
 		{
-			customResultAvailable(result);			
+			customResultAvailable(result);
 		}
 		else
 		{
+			// When called in component context, temporarily assign cid to swing thread.
+			final IComponentIdentifier	local	= IComponentIdentifier.LOCAL.get();
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
 				{
+					IComponentIdentifier.LOCAL.set(local);
 					customResultAvailable(result);
+					IComponentIdentifier.LOCAL.set(null);
 				}
 			});
 		}

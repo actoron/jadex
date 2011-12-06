@@ -14,6 +14,7 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.publish.IPublishService;
@@ -31,12 +32,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.logging.Logger;
-
-/* $if !android $ */
-import javax.management.ServiceNotFoundException;
-/* $else $
-import javaxx.management.ServiceNotFoundException;
-$endif $ */
 
 /**
  *  Service container for active components.

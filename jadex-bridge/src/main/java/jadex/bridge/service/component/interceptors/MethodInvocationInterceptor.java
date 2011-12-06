@@ -1,10 +1,13 @@
 package jadex.bridge.service.component.interceptors;
 
-import java.lang.reflect.InvocationTargetException;
-
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.ServiceInvocationContext;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
 
 /**
  *  Calls a methods on an object and returns the result.
@@ -19,6 +22,13 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 	{
 		try
 		{
+			if(!Proxy.isProxyClass(sic.getObject().getClass())
+				&& !SUtil.equals(IComponentIdentifier.CALLER.get(), IComponentIdentifier.LOCAL.get()))
+				// && sic.getMethod().getName().indexOf("Area")!=-1)
+			{
+				if(IComponentIdentifier.CALLER.get()==null)
+					System.out.println(IComponentIdentifier.CALLER.get()+" invoking "+sic.getMethod().getName()+" on "+IComponentIdentifier.LOCAL.get());
+			}			
 			Object res = sic.getMethod().invoke(sic.getObject(), sic.getArgumentArray());
 			sic.setResult(res);
 		}
