@@ -2,6 +2,7 @@ package jadex.base.gui;
 
 
 import jadex.base.Starter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.Future;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
@@ -55,10 +56,13 @@ public class SwingDelegationResultListener<E> implements IResultListener<E>
 		}
 		else
 		{
+			// When called in component context, temporarily assign cid to swing thread.
+			final IComponentIdentifier	local	= IComponentIdentifier.LOCAL.get();
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
 				{
+					IComponentIdentifier.LOCAL.set(local);
 					try
 					{
 						customResultAvailable(result);
@@ -69,6 +73,7 @@ public class SwingDelegationResultListener<E> implements IResultListener<E>
 						// first sets result and then throws exception (listener ex are catched).
 						future.setExceptionIfUndone(e);
 					}
+					IComponentIdentifier.LOCAL.set(null);
 				}
 			});
 		}
@@ -90,11 +95,15 @@ public class SwingDelegationResultListener<E> implements IResultListener<E>
 		}
 		else
 		{
+			// When called in component context, temporarily assign cid to swing thread.
+			final IComponentIdentifier	local	= IComponentIdentifier.LOCAL.get();
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
 				{
+					IComponentIdentifier.LOCAL.set(local);
 					customExceptionOccurred(exception);
+					IComponentIdentifier.LOCAL.set(null);
 				}
 			});
 		}

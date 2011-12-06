@@ -267,6 +267,8 @@ public class Starter
 					}
 					
 					final IComponentIdentifier cid = new ComponentIdentifier(platformname);
+					if(IComponentIdentifier.LOCAL.get()==null)
+						IComponentIdentifier.LOCAL.set(cid);
 					// Hack!!! Autoshutdown!?
 					
 					// todo: null as rid?
@@ -354,6 +356,9 @@ public class Starter
 							}
 						};
 					});
+
+					if(cid.equals(IComponentIdentifier.LOCAL.get()))
+						IComponentIdentifier.LOCAL.set(null);
 				}
 			});
 	//		System.out.println("Model: "+model);

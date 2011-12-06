@@ -2,7 +2,6 @@ package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -22,14 +21,18 @@ public class MethodInvocationInterceptor extends AbstractApplicableInterceptor
 	{
 		try
 		{
-			if(!Proxy.isProxyClass(sic.getObject().getClass())
-				&& !SUtil.equals(IComponentIdentifier.CALLER.get(), IComponentIdentifier.LOCAL.get()))
+			boolean	setcaller	= false;
+			if(!Proxy.isProxyClass(sic.getObject().getClass()) && IComponentIdentifier.CALLER.get()==null)
 				// && sic.getMethod().getName().indexOf("Area")!=-1)
 			{
-				if(IComponentIdentifier.CALLER.get()==null)
-					System.out.println(IComponentIdentifier.CALLER.get()+" invoking "+sic.getMethod().getName()+" on "+IComponentIdentifier.LOCAL.get());
+//				if(IComponentIdentifier.LOCAL.get()==null)
+//					System.out.println("No caller information: "+sic.getMethod());
+				IComponentIdentifier.CALLER.set(IComponentIdentifier.LOCAL.get());
+				setcaller	= true;
 			}			
 			Object res = sic.getMethod().invoke(sic.getObject(), sic.getArgumentArray());
+			if(setcaller)
+				IComponentIdentifier.CALLER.set(null);
 			sic.setResult(res);
 		}
 		catch(Exception e)

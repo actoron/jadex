@@ -97,11 +97,15 @@ public abstract class SwingDefaultResultListener<E> extends DefaultResultListene
 		}
 		else
 		{
+			// When called in component context, temporarily assign cid to swing thread.
+			final IComponentIdentifier	local	= IComponentIdentifier.LOCAL.get();
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()
 				{
+					IComponentIdentifier.LOCAL.set(local);
 					customExceptionOccurred(exception);
+					IComponentIdentifier.LOCAL.set(null);
 				}
 			});
 		}

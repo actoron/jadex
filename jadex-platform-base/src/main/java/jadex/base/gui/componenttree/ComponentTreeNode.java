@@ -282,7 +282,6 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		final Future<List<ITreeNode>>	ret	= new Future<List<ITreeNode>>();
 		final List<ITreeNode>	children	= new ArrayList<ITreeNode>();
 		final boolean	ready[]	= new boolean[2];	// 0: children, 1: services;
-		ready[1]	= true;
 
 //		if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //			System.err.println("searchChildren queued: "+this);
