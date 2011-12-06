@@ -60,6 +60,7 @@
 		<import>jadex.base.service.message.transport.*</import>
 		<import>jadex.base.service.message.transport.localmtp.*</import>
 		<import>jadex.base.service.message.transport.tcpmtp.*</import>
+		<import>jadex.base.service.message.transport.httprelaymtp.*</import>
 		<import>jadex.base.service.message.transport.niotcpmtp.*</import>
 		<import>jadex.base.service.message.transport.btmtp.*</import>
 		<import>jadex.base.service.message.transport.codecs.*</import>
@@ -85,7 +86,7 @@
 				<!-- ======== Arguments used by platform components. ======== -->
 		
 		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
-		<argument name="awareness" class="boolean">false</argument>
+		<argument name="awareness" class="boolean">true</argument>
 		<!-- Start the awareness agent discovery mechanisms. -->
 		<argument name="awamechanisms" class="String[]">new String[]{"Broadcast"}</argument>
 		<!-- Start the JCC agent to open the platform GUI? -->
@@ -178,9 +179,10 @@
 				new MessageService($component.getExternalAccess(), $component.getLogger(),
 				new ITransport[]
 				{
-					new LocalTransport($component.getServiceProvider())
-					//$args.niotransport? new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())
-					//: new TCPTransport($component.getServiceProvider(), $args.tcpport)
+					new LocalTransport($component.getServiceProvider()),
+					$args.niotransport? new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())
+					: new TCPTransport($component.getServiceProvider(), $args.tcpport),
+					new HttpRelayTransport($component, SRelay.DEFAULT_ADDRESS)
 				},
 				new MessageType[]
 				{
