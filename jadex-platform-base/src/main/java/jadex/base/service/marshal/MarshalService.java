@@ -17,6 +17,7 @@ import jadex.commons.ICloneProcessor;
 import jadex.commons.IRemotable;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;

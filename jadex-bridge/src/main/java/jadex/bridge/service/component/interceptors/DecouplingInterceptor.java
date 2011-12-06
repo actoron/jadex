@@ -5,6 +5,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.component.ComponentIntermediateFuture;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
@@ -16,6 +18,9 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -42,16 +47,16 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	//-------- constants --------
 	
 	/** The static map of subinterceptors (method -> interceptor). */
-	protected static Map SUBINTERCEPTORS = getInterceptors();
+	protected static Map<Method, IServiceInvocationInterceptor> SUBINTERCEPTORS = getInterceptors();
 
 	/** The static set of no decoupling methods. */
-	protected static Set NO_DECOUPLING;
+	protected static Set<Method> NO_DECOUPLING;
 	
 	static
 	{
 		try
 		{
-			NO_DECOUPLING = new HashSet();
+			NO_DECOUPLING = new HashSet<Method>();
 			NO_DECOUPLING.add(IInternalService.class.getMethod("shutdownService", new Class[0]));
 		}
 		catch(Exception e)
@@ -145,7 +150,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			boolean[] refs = SServiceProvider.getLocalReferenceInfo(method, !copy);
 			
 			Object[] args = sic.getArgumentArray();
-			List copyargs = new ArrayList(); 
+			List<Object> copyargs = new ArrayList<Object>(); 
 			if(args.length>0)
 			{
 				for(int i=0; i<args.length; i++)
@@ -213,13 +218,13 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		{
 //			if(sic.getMethod().getName().equals("add"))
 //				System.out.println("direct: "+Thread.currentThread());
-			sic.invoke().addResultListener(new DelegationResultListener(ret));
+			sic.invoke().addResultListener(new CopyReturnValueResultListener(ret, sic));
 		}
 		else
 		{
 //			if(sic.getMethod().getName().equals("add"))
 //				System.out.println("decouple: "+Thread.currentThread());
-			ea.scheduleStep(new InvokeMethodStep(sic)).addResultListener(new DelegationResultListener(ret));
+			ea.scheduleStep(new InvokeMethodStep(sic)).addResultListener(new CopyReturnValueResultListener(ret, sic));
 		}
 		
 		return ret;
@@ -236,16 +241,47 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	}
 	
 	/**
+	 *  Copy a value, if necessary.
+	 */
+	protected Object doCopy(final boolean copy, final IFilter deffilter, final Object value)
+	{
+		Object	res	= value;
+		if(value!=null)
+		{
+			// Hack!!! Should copy in any case to apply processors
+			// (e.g. for proxy replacement of service references).
+			// Does not work, yet as service object might have wrong interface
+			// (e.g. service interface instead of listener interface --> settings properties provider)
+			if(copy && !marshal.isLocalReference(value))
+			{
+//			System.out.println("copy result: "+result);
+				// Copy result if
+				// - copy flag is true (use custom filter)
+				// - and result is not a reference object (default filter)
+				IFilter	filter	= copy ? new IFilter()
+				{
+					public boolean filter(Object obj)
+					{
+						return obj==value ? false : deffilter.filter(obj);
+					}
+				} : deffilter;
+				res = Cloner.deepCloneObject(value, marshal.getCloneProcessors(), filter);
+			}
+		}
+		return res;
+	}
+
+	/**
 	 *  Get the sub interceptors for special cases.
 	 */
-	public static Map getInterceptors()
+	public static Map<Method, IServiceInvocationInterceptor> getInterceptors()
 	{
-		Map ret = new HashMap();
+		Map<Method, IServiceInvocationInterceptor> ret = new HashMap<Method, IServiceInvocationInterceptor>();
 		try
 		{
 			ret.put(Object.class.getMethod("toString", new Class[0]), new AbstractApplicableInterceptor()
 			{
-				public IFuture execute(ServiceInvocationContext context)
+				public IFuture<Void> execute(ServiceInvocationContext context)
 				{
 					Object proxy = context.getProxy();
 					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
@@ -255,7 +291,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			});
 			ret.put(Object.class.getMethod("equals", new Class[]{Object.class}), new AbstractApplicableInterceptor()
 			{
-				public IFuture execute(ServiceInvocationContext context)
+				public IFuture<Void> execute(ServiceInvocationContext context)
 				{
 					Object proxy = context.getProxy();
 					InvocationHandler handler = (InvocationHandler)Proxy.getInvocationHandler(proxy);
@@ -267,7 +303,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			});
 			ret.put(Object.class.getMethod("hashCode", new Class[0]), new AbstractApplicableInterceptor()
 			{
-				public IFuture execute(ServiceInvocationContext context)
+				public IFuture<Void> execute(ServiceInvocationContext context)
 				{
 					Object proxy = context.getProxy();
 					InvocationHandler handler = Proxy.getInvocationHandler(proxy);
@@ -287,6 +323,80 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 	
 	//-------- helper classes --------
 	
+	/**
+	 *  Copy return value, when service call is finished.
+	 */
+	protected class CopyReturnValueResultListener extends DelegationResultListener<Void>
+	{
+		//-------- attributes --------
+		
+		/** The service invocation context. */
+		protected ServiceInvocationContext	sic;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a result listener.
+		 */
+		protected CopyReturnValueResultListener(Future<Void> future, ServiceInvocationContext sic)
+		{
+			super(future);
+			this.sic = sic;
+		}
+		
+		//-------- IResultListener interface --------
+
+		/**
+		 *  Called when the service call is finished.
+		 */
+		public void customResultAvailable(Void result)
+		{
+			Object	res	= sic.getResult();
+			
+			if(res instanceof IFuture)
+			{
+				Method method = sic.getMethod();
+				Reference ref = method.getAnnotation(Reference.class);
+				final boolean copy = !marshal.isRemoteObject(sic.getObject()) && (ref!=null? !ref.local(): true);
+				final IFilter	deffilter = new IFilter()
+				{
+					public boolean filter(Object object)
+					{
+						return marshal.isLocalReference(object);
+					}
+				};
+				if(res instanceof IIntermediateFuture)
+				{
+					IntermediateFuture<Object>	fut	= new IntermediateFuture<Object>()
+					{
+						public void addIntermediateResult(Object result)
+						{
+					    	Object res = doCopy(copy, deffilter, result);
+							super.addIntermediateResult(res);
+						}
+					};
+					((IntermediateFuture<Object>)res).addResultListener(new IntermediateDelegationResultListener<Object>(fut));
+					res	= fut;
+				}
+				else
+				{
+					Future<Object>	fut	= new Future<Object>()
+					{
+					    public void	setResult(Object result)
+					    {
+					    	Object res = doCopy(copy, deffilter, result);
+							super.setResult(res);
+					    }							
+					};							
+					((Future<Object>)res).addResultListener(new DelegationResultListener<Object>(fut));
+					res	= fut;
+				}
+				sic.setResult(res);
+			}
+			super.customResultAvailable(null);
+		}
+	}
+
 	/**
 	 *  Service invocation step.
 	 */

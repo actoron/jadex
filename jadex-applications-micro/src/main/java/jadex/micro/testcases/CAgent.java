@@ -4,9 +4,13 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Implementation;
@@ -18,10 +22,13 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
- *  Simple test agent with one service.
+ *  Simple test agent with one service for testing parameter and result copying.
  */
 @ProvidedServices(@ProvidedService(type=ICService.class, implementation=@Implementation(expression="$component")))
 @RequiredServices(@RequiredService(name="cservice", type=ICService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_LOCAL)))
@@ -34,78 +41,33 @@ public class CAgent extends MicroAgent implements ICService
 	 */
 	public void executeBody()
 	{
-		final List testcases = new ArrayList();
+		final List<TestReport> testcases = new ArrayList<TestReport>();
 		
-		getRequiredService("cservice").addResultListener(new DefaultResultListener()
+		// Test with required service proxy.
+		IFuture<ICService>	fut	= getRequiredService("cservice");
+		fut.addResultListener(new DefaultResultListener<ICService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(ICService result)
 			{
-				final ICService cservice = (ICService)result;
-				final Object arg = new Object();
-				cservice.testArgumentReference(arg, arg.hashCode()).addResultListener(new DefaultResultListener()
+				testService(testcases, result)
+					.addResultListener(new DefaultResultListener<Void>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Void result)
 					{
-						TestReport tr = new TestReport("#1", "Test if argument is not copied.");
-						if(((Boolean)result).booleanValue())
+						// Test with provided service proxy.
+						SServiceProvider.getService(getServiceProvider(), ICService.class)
+							.addResultListener(new DefaultResultListener<ICService>()
 						{
-							tr.setSucceeded(true);
-						}
-						else
-						{
-							tr.setReason("Hashcode is not equal.");
-						}
-						testcases.add(tr);
-						
-						cservice.testArgumentCopy(arg, arg.hashCode()).addResultListener(new DefaultResultListener()
-						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(ICService result)
 							{
-								TestReport tr = new TestReport("#2", "Test if argument is copied.");
-								if(((Boolean)result).booleanValue())
+								testService(testcases, result)
+									.addResultListener(new DefaultResultListener<Void>()
 								{
-									tr.setSucceeded(true);
-								}
-								else
-								{
-									tr.setReason("Hashcode is equal.");
-								}
-								testcases.add(tr);
-						
-								cservice.testResultReference(arg).addResultListener(new DefaultResultListener()
-								{
-									public void resultAvailable(Object result)
-									{
-										TestReport tr = new TestReport("#3", "Test if result is not copied.");
-										if(arg.hashCode()==result.hashCode())
-										{
-											tr.setSucceeded(true);
-										}
-										else
-										{
-											tr.setReason("Hashcode is not equal.");
-										}
-										testcases.add(tr);
-										
-										cservice.testResultCopy(arg).addResultListener(new DefaultResultListener()
-										{
-											public void resultAvailable(Object result)
-											{
-												TestReport tr = new TestReport("#4", "Test if result is not copied.");
-												if(arg.hashCode()!=result.hashCode())
-												{
-													tr.setSucceeded(true);
-												}
-												else
-												{
-													tr.setReason("Hashcode is equal.");
-												}
-												testcases.add(tr);
-												
-												setResultValue("testresults", new Testcase(testcases.size(), (TestReport[])testcases.toArray(new TestReport[testcases.size()])));
-												killAgent();
-											}
-										});
+									public void resultAvailable(Void result)
+									{										
+										setResultValue("testresults", new Testcase(testcases.size(),
+											(TestReport[])testcases.toArray(new TestReport[testcases.size()])));
+										killAgent();
 									}
 								});
 							}
@@ -119,33 +81,196 @@ public class CAgent extends MicroAgent implements ICService
 	/**
 	 *  Test if no copy works.
 	 */
-	public IFuture testArgumentReference(Object arg, int hash)
+	public IFuture<Boolean> testArgumentReference(Object arg, int hash)
 	{
 //		System.out.println("called service");
-		return new Future(arg.hashCode()==hash? Boolean.TRUE: Boolean.FALSE);
+		return new Future<Boolean>(arg.hashCode()==hash? Boolean.TRUE: Boolean.FALSE);
 	}
 	
 	/**
 	 *  Test if no copy works.
 	 */
-	public IFuture testArgumentCopy(Object arg, int hash)
+	public IFuture<Boolean> testArgumentCopy(Object arg, int hash)
 	{
-		return new Future(arg.hashCode()!=hash? Boolean.TRUE: Boolean.FALSE);
+		return new Future<Boolean>(arg.hashCode()!=hash? Boolean.TRUE: Boolean.FALSE);
 	}
 	
 	/**
 	 *  Test if result value can be passed by reference.
 	 */
-	public IFuture testResultReference(Object arg)
+	public IFuture<Object> testResultReference(Object arg)
 	{
-		return new Future(arg);
+		return new Future<Object>(arg);
 	}
 	
 	/**
 	 *  Test if result value can be passed by copy.
 	 */
-	public IFuture testResultCopy(Object arg)
+	public IFuture<Object> testResultCopy(Object arg)
 	{
-		return new Future(arg);
+		return new Future<Object>(arg);
+	}
+	
+	/**
+	 *  Test if result value can be passed by reference.
+	 */
+	public IIntermediateFuture<Object> testResultReferences(Object[] args)
+	{
+		return new IntermediateFuture<Object>(Arrays.asList(args));
+	}
+	
+	/**
+	 *  Test if result value can be passed by copy.
+	 */
+	public IIntermediateFuture<Object> testResultCopies(Object[] args)
+	{
+		return new IntermediateFuture<Object>(Arrays.asList(args));		
+	}
+	
+	//-------- helper methods --------
+	/**
+	 *  Perform test with the service.
+	 */
+	protected IFuture<Void>	testService(final List<TestReport> testcases, final ICService cservice)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		
+		final Object arg = new Object();
+		cservice.testArgumentReference(arg, arg.hashCode()).addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
+		{
+			public void customResultAvailable(Boolean result)
+			{
+				TestReport tr = new TestReport("#1", "Test if argument is not copied.");
+				if(result.booleanValue())
+				{
+					tr.setSucceeded(true);
+				}
+				else
+				{
+					tr.setReason("Hashcode is not equal.");
+				}
+				testcases.add(tr);
+				
+				cservice.testArgumentCopy(arg, arg.hashCode()).addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
+				{
+					public void customResultAvailable(Boolean result)
+					{
+						TestReport tr = new TestReport("#2", "Test if argument is copied.");
+						if(result.booleanValue())
+						{
+							tr.setSucceeded(true);
+						}
+						else
+						{
+							tr.setReason("Hashcode is equal.");
+						}
+						testcases.add(tr);
+				
+						cservice.testResultReference(arg).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+						{
+							public void customResultAvailable(Object result)
+							{
+								TestReport tr = new TestReport("#3", "Test if result is not copied.");
+								if(arg.hashCode()==result.hashCode())
+								{
+									tr.setSucceeded(true);
+								}
+								else
+								{
+									tr.setReason("Hashcode is not equal.");
+								}
+								testcases.add(tr);
+								
+								cservice.testResultCopy(arg).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+								{
+									public void customResultAvailable(Object result)
+									{
+										TestReport tr = new TestReport("#4", "Test if result is copied.");
+										if(arg.hashCode()!=result.hashCode())
+										{
+											tr.setSucceeded(true);
+										}
+										else
+										{
+											tr.setReason("Hashcode is equal.");
+										}
+										testcases.add(tr);
+										
+										final Object[]	args	= new Object[]{arg, new Object()};
+										cservice.testResultReferences(args)
+											.addResultListener(new ExceptionDelegationResultListener<Collection<Object>, Void>(ret)
+										{
+											public void customResultAvailable(Collection<Object> result)
+											{
+												TestReport tr = new TestReport("#4", "Test if results are not copied.");
+												if(args.length!=result.size())
+												{
+													tr.setReason("Wrong number of results.");													
+												}
+												else
+												{
+													boolean	match	= true;
+													Iterator<Object>	it	= result.iterator();
+													for(int i=0; match && i<args.length; i++)
+													{
+														match	= args[i].hashCode()==it.next().hashCode();
+													}
+													
+													if(match)
+													{
+														tr.setSucceeded(true);
+													}
+													else
+													{
+														tr.setReason("Hashcode is not equal.");
+													}
+												}
+												testcases.add(tr);
+												
+												cservice.testResultCopies(args)
+													.addResultListener(new ExceptionDelegationResultListener<Collection<Object>, Void>(ret)
+												{
+													public void customResultAvailable(Collection<Object> result)
+													{
+														TestReport tr = new TestReport("#5", "Test if results are copied.");
+														if(args.length!=result.size())
+														{
+															tr.setReason("Wrong number of results.");													
+														}
+														else
+														{
+															boolean	match	= false;
+															Iterator<Object>	it	= result.iterator();
+															for(int i=0; !match && i<args.length; i++)
+															{
+																match	= args[i].hashCode()==it.next().hashCode();
+															}
+															
+															if(!match)
+															{
+																tr.setSucceeded(true);
+															}
+															else
+															{
+																tr.setReason("Hashcode is equal.");
+															}
+														}
+														testcases.add(tr);
+														
+														ret.setResult(null);
+													}
+												});
+											}
+										});
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		});
+		
+		return ret;
 	}
 }

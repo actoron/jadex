@@ -16,7 +16,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -55,14 +54,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/** The cms. */
 	protected IComponentManagementService cms;
 
-	/** The marshal service. */
-	protected IMarshalService marshal;
-	
 	/** The component type. */
 	protected String type;
-	
-	/** The parameter copy flag. */
-	protected boolean copy;
 	
 	//-------- constructors --------
 
@@ -70,12 +63,11 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  Create a new service container.
 	 */
 //	public ComponentServiceContainer(IExternalAccess ea, IComponentAdapter adapter, String type)
-	public ComponentServiceContainer(IComponentAdapter adapter, String type, boolean copy, IInternalAccess instance)//IComponentInstance instance)
+	public ComponentServiceContainer(IComponentAdapter adapter, String type,IInternalAccess instance)//IComponentInstance instance)
 	{
 		super(adapter.getComponentIdentifier());
 		this.adapter = adapter;
 		this.type	= type;
-		this.copy = copy;
 		this.instance = instance;
 	}
 	
@@ -88,7 +80,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	public IFuture<IService> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
 		return new ComponentFuture<IService>(instance.getExternalAccess(), adapter, 
-			super.getRequiredService(info, binding, rebind), false, marshal);
+			super.getRequiredService(info, binding, rebind));
 	}
 	
 	/**
@@ -98,7 +90,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	public IIntermediateFuture<IService> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
 		return new ComponentIntermediateFuture<IService>(instance.getExternalAccess(), adapter, 
-			super.getRequiredServices(info, binding, rebind), false, marshal);
+			super.getRequiredServices(info, binding, rebind));
 	}
 	
 	/**
@@ -114,10 +106,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			public void customResultAvailable(Object result)
 			{
 				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, 
-					instance.getExternalAccess(), adapter, (IService)result, null, null, null, copy));
+					instance.getExternalAccess(), adapter, (IService)result, null, null, null));
 			}
 		});
-		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut, false, marshal);
+		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut);
 	}
 	
 	/**
@@ -133,10 +125,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			public void customResultAvailable(Object result)
 			{
 				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, 
-					instance.getExternalAccess(), adapter, (IService)result, null, null, null, copy));
+					instance.getExternalAccess(), adapter, (IService)result, null, null, null));
 			}
 		});
-		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut, false, marshal);
+		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut);
 	}
 	
 	// todo: remove
@@ -153,10 +145,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			public void customResultAvailable(Object result)
 			{
 				fut.setResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, 
-					instance.getExternalAccess(), adapter, (IService)result, null, null, null, copy));
+					instance.getExternalAccess(), adapter, (IService)result, null, null, null));
 			}
 		});
-		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut, false, marshal);
+		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut);
 	}
 
 	/**
@@ -172,10 +164,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			public void customIntermediateResultAvailable(Object result)
 			{
 				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
-					adapter, (IService)result, null, null, null, copy));
+					adapter, (IService)result, null, null, null));
 			}
 		});
-		return new ComponentIntermediateFuture<T>(instance.getExternalAccess(), adapter, fut, false, marshal);
+		return new ComponentIntermediateFuture<T>(instance.getExternalAccess(), adapter, fut);
 	}
 	
 	/**
@@ -191,10 +183,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			public void customIntermediateResultAvailable(Object result)
 			{
 				fut.addIntermediateResult((T)BasicServiceInvocationHandler.createRequiredServiceProxy(instance, instance.getExternalAccess(), 
-					adapter, (IService)result, null, null, null, copy));
+					adapter, (IService)result, null, null, null));
 			}
 		});
-		return new ComponentIntermediateFuture<T>(instance.getExternalAccess(), adapter, fut, false, marshal);
+		return new ComponentIntermediateFuture<T>(instance.getExternalAccess(), adapter, fut);
 	}
 	
 	/**
@@ -291,7 +283,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IRequiredServiceFetcher createServiceFetcher(String name)
 	{
-		return new DefaultServiceFetcher(this, copy);
+		return new DefaultServiceFetcher(this);
 	}
 	
 	/**
@@ -320,17 +312,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				cms = result;
 //				System.out.println("Has cms: "+getId()+" "+cms);
 				
-				SServiceProvider.getServiceUpwards(ComponentServiceContainer.this, IMarshalService.class)
-					.addResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
-				{
-					public void customResultAvailable(IMarshalService result)
-					{
-						marshal = result;
-						// Services may need other services and thus need to be able to search
-						// the container.
-						ComponentServiceContainer.super.start().addResultListener(new DelegationResultListener<Void>(ret));
-					}
-				});
+				// Services may need other services and thus need to be able to search
+				// the container.
+				ComponentServiceContainer.super.start().addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
 		
@@ -350,7 +334,6 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 				adapter	= null;
 				cms	= null;
 				instance	= null;
-				marshal	= null;
 				super.customResultAvailable(result);
 			}
 		});

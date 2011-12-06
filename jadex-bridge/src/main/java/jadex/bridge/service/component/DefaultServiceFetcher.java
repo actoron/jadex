@@ -57,16 +57,14 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/** The result. */
 	protected Object result;
 	
-	/** The parameter copy flag. */
-	protected boolean copy;
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new required service fetcher.
 	 */
-	public DefaultServiceFetcher(IServiceProvider provider, boolean copy)
+	public DefaultServiceFetcher(IServiceProvider provider)
 	{
 		this.provider = provider;
-		this.copy = copy;
 	}
 	
 	//-------- methods --------
@@ -749,7 +747,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 							public IFuture<IService> execute(IInternalAccess ia)
 							{
 //								System.out.println("createProxy 3:"+service);
-								return new Future<IService>(BasicServiceInvocationHandler.createRequiredServiceProxy(ia, ea, adapter, service, DefaultServiceFetcher.this, info, binding, copy));
+								return new Future<IService>(BasicServiceInvocationHandler.createRequiredServiceProxy(ia, ea, adapter, service, DefaultServiceFetcher.this, info, binding));
 							}
 						});
 //						fut.addResultListener(new IResultListener()

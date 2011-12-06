@@ -35,7 +35,7 @@ public interface IComponentFactory
 	 *  Get a default icon for a component type.
 	 */
 	/* $if !android $ */
-	public IFuture<Icon> getComponentTypeIcon(String type);
+	public @Reference(remote=false) IFuture<Icon> getComponentTypeIcon(String type);
 	/* $else $
 	public IFuture<Void> getComponentTypeIcon(String type);
 	$endif $ */
@@ -100,7 +100,7 @@ public interface IComponentFactory
 	 * @return An instance of a component and the corresponding adapter.
 	 */
 	@Excluded
-	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference IComponentDescription desc, IComponentAdapterFactory factory, 
+	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference IComponentDescription desc, IComponentAdapterFactory factory, 
 		IModelInfo model, String config, Map<String, Object> arguments, IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, 
 		boolean copy, Future<Void> init);
 

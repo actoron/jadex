@@ -207,7 +207,7 @@ public class SecuritySettings	implements IServiceViewerPanel
 							public void customResultAvailable(Map<String, String> passwords)
 							{
 								// Update table in place to avoid GUI flickering.
-								for(int i=tmremote.getRowCount(); i>=0; i--)
+								for(int i=tmremote.getRowCount()-1; i>=0; i--)
 								{
 									// Update existing value.
 									if(passwords.containsKey(tmremote.getValueAt(i, 0)))

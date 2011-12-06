@@ -44,9 +44,14 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
      *  Get the intermediate results that are available.
      *  @return The current intermediate results (copy of the list).
      */
-	public synchronized Collection getIntermediateResults()
+	public synchronized Collection<E> getIntermediateResults()
 	{
-		return results!=null ? new ArrayList(results) : Collections.emptyList();
+		Collection<E>	ret;
+		if(results!=null)
+			ret	= new ArrayList<E>(results);
+		else
+			ret	= Collections.emptyList();
+		return ret;
 	}
 	
 	//-------- methods --------
@@ -74,7 +79,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
         	intermediate = true;
 		
 			if(results==null)
-				results	= new ArrayList();
+				results	= new ArrayList<E>();
 			
 			results.add(result);
 			

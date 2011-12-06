@@ -52,12 +52,12 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 	 *  Create a new invocation handler.
 	 */
 	public DelegationInterceptor(IExternalAccess ea, RequiredServiceInfo info, 
-		RequiredServiceBinding binding, IRequiredServiceFetcher fetcher, boolean copy)
+		RequiredServiceBinding binding, IRequiredServiceFetcher fetcher)
 	{
 		this.ea = ea;
 		this.info = info;
 		this.binding = binding;
-		this.fetcher = fetcher!=null? fetcher: new DefaultServiceFetcher(ea.getServiceProvider(), copy);
+		this.fetcher = fetcher!=null? fetcher: new DefaultServiceFetcher(ea.getServiceProvider());
 	}
 	
 	//-------- methods --------

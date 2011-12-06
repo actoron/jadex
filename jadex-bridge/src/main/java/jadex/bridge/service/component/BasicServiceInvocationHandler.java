@@ -522,11 +522,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  provided service that is not offered by the component itself.
 	 */
 	public static IInternalService createDelegationProvidedServiceProxy(IExternalAccess ea, IComponentAdapter adapter, IServiceIdentifier sid, 
-		RequiredServiceInfo info, RequiredServiceBinding binding, boolean copy, ClassLoader classloader)
+		RequiredServiceInfo info, RequiredServiceBinding binding, ClassLoader classloader)
 	{
 		BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(sid, adapter.getLogger());
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
-		handler.addFirstServiceInterceptor(new DelegationInterceptor(ea, info, binding, null, copy));
+		handler.addFirstServiceInterceptor(new DelegationInterceptor(ea, info, binding, null));
 //		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
 		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
 	}
@@ -535,7 +535,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Static method for creating a standard service proxy for a required service.
 	 */
 	public static IService createRequiredServiceProxy(IInternalAccess ia, IExternalAccess ea, IComponentAdapter adapter, IService service, 
-		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding, boolean copy)
+		IRequiredServiceFetcher fetcher, RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
 		IService ret = service;
 		
@@ -547,7 +547,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			if(binding!=null && binding.isRecover())
 				handler.addFirstServiceInterceptor(new RecoveryInterceptor(info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype()))
-				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ea, adapter, copy));
+				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ea, adapter));
 			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;
 			if(interceptors!=null && interceptors.length>0)
 			{

@@ -4,9 +4,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.bridge.service.types.marshal.IMarshalService;
-import jadex.commons.Cloner;
-import jadex.commons.IFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -26,34 +23,15 @@ public class ComponentFuture<E> extends Future<E>
 	/** The external acces. */
 	protected IExternalAccess	ea;
 	
-	/** The result copy flag. */
-	protected boolean copy;
-	
-	/** The marshal manager. */
-	protected IMarshalService marshal;
-	
-	/** The clone filter. */
-	protected IFilter filter;
-	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new future.
 	 */
-	public ComponentFuture(IExternalAccess ea, IComponentAdapter adapter, IFuture source, 
-		boolean copy, final IMarshalService marshal)
+	public ComponentFuture(IExternalAccess ea, IComponentAdapter adapter, IFuture<E> source)
 	{
 		this.ea	= ea;
 		this.adapter	= adapter;
-		this.copy = copy;
-		this.marshal = marshal;
-		this.filter = new IFilter()
-		{
-			public boolean filter(Object object)
-			{
-				return marshal.isLocalReference(object);
-			}
-		};
 		source.addResultListener(new DelegationResultListener<E>(this));
 	}
 	
@@ -79,46 +57,4 @@ public class ComponentFuture<E> extends Future<E>
 			super.notifyListener(listener);
 		}
 	}
-	
-	/**
-     *  Set the result. 
-     *  Listener notifications occur on calling thread of this method.
-     *  @param result The result.
-     */
-    public void	setResult(final E result)
-    {
-    	E	res	= result;
-    	if(result!=null)
-		{
-    		// Hack!!! Should copy in any case to apply processors
-    		// (e.g. for proxy replacement of service references).
-    		// Does not work, yet as service object might have wrong interface
-    		// (e.g. service interface instead of listener interface --> settings properties provider)
-    		if(copy && !marshal.isLocalReference(result))
-    		{
-	//			System.out.println("copy result: "+result);
-	    		// Copy result if
-	    		// - copy flag is true (use custom filter)
-	    		// - or result is not a reference object (default filter)
-	    		IFilter	filter	= copy ? new IFilter()
-				{
-					public boolean filter(Object obj)
-					{
-						return obj==result ? false : ComponentFuture.this.filter.filter(obj);
-					}
-				} : this.filter;
-				res = Cloner.deepCloneObject(result, marshal.getCloneProcessors(), filter);
-    		}
-		}
-		super.setResult(res);
-    }
- 
-//    /**
-//     *  Test if done, i.e. result is available.
-//     *  @return True, if done.
-//     */
-//    public synchronized boolean isDone()
-//    {
-//    	return source.isDone();
-//    }
 }
