@@ -118,7 +118,8 @@
 		ProvidedServiceInfoNode.java,
 		ProvidedServiceInfoProperties.java,
 		ProvidedServiceData.java,
-		publish
+		publish,
+		test
 		" />
 
 	<property name="exclude-jadex-xml" value="
