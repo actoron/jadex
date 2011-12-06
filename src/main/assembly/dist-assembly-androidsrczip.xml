@@ -60,8 +60,8 @@
 			<destName>pom.xml</destName>
 		</file>
 		<file>
-			<source>jadex-android-stax/pom.xml</source>
-			<outputDirectory>sources/jadex-android-stax/</outputDirectory>
+			<source>jadex-android-woodstox/pom.xml</source>
+			<outputDirectory>sources/jadex-android-woodstox/</outputDirectory>
 			<destName>pom.xml</destName>
 		</file>
 		<file>
