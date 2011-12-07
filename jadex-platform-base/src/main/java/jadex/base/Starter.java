@@ -480,7 +480,7 @@ public class Starter
 					int	i2	= comp.indexOf('(');
 					if(i2!=-1)
 					{
-						if(comp.endsWith("("))
+						if(comp.endsWith(")"))
 						{
 							config	= comp.substring(i2+1, comp.length()-1);
 							comp	= comp.substring(0, i2);
