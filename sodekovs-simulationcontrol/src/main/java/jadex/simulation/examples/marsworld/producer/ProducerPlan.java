@@ -11,6 +11,7 @@ import jadex.extension.agr.Group;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
+import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.simulation.examples.marsworld.RequestCarry;
 import jadex.simulation.examples.marsworld.RequestProduction;
@@ -51,7 +52,12 @@ public class ProducerPlan extends Plan
 			ISpaceObject target = env.getSpaceObject(ot.getId());
 
 			//Call Carry agent before. Does it save time?
-//			callCarryAgent(target);
+			//Confer WalkingStrategyEnum for Mapping of int values to semantics.
+//			int walkingStrategyProperty = (Integer) ((Space2D) getBeliefbase().getBelief("environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
+			int walkingStrategyProperty = (Integer) ((IEnvironmentSpace) getBeliefbase().getBelief("move.environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
+			if (walkingStrategyProperty == 2) {
+				callCarryAgent(target);
+			}
 			
 			// Producing ore here.
 			IGoal produce_ore = createGoal("produce_ore");
@@ -81,9 +87,15 @@ public class ProducerPlan extends Plan
 			RequestCarry rc = new RequestCarry();
 			rc.setTarget(target);
 			IMessageEvent mevent = createMessageEvent("request_carries");
-			//Get closest carrier agent
-			mevent.getParameterSet(SFipa.RECEIVERS).addValues(carriers);
-//			mevent.getParameterSet(SFipa.RECEIVERS).addValues(getClosestCarrierAgent());
+			//Get closest carrier agent ?
+			//Confer WalkingStrategyEnum for Mapping of int values to semantics.
+//			int walkingStrategyProperty = (Integer) ((Space2D) getBeliefbase().getBelief("environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
+			int walkingStrategyProperty = (Integer) ((IEnvironmentSpace) getBeliefbase().getBelief("move.environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
+			if (walkingStrategyProperty == 2) {
+				mevent.getParameterSet(SFipa.RECEIVERS).addValues(getClosestCarrierAgent());
+			}else{
+				mevent.getParameterSet(SFipa.RECEIVERS).addValues(carriers);	
+			}		
 			mevent.getParameter(SFipa.CONTENT).setValue(rc);
 			sendMessage(mevent);
 		}

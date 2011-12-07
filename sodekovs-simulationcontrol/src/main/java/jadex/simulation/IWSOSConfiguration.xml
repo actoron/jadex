@@ -114,12 +114,21 @@
 				class="Int" /><!-- Add type of element: String, double, int -->
 		</Data>
 		
+		<!-- Confer WalkingStrategyEnum for Mapping of int values to semantics. -->
+		<Data name="walkingStrategy"> <!-- Referenz to $args.value in application.xml -->
+			<ObjectSource type="ISpaceObject" name="walkingStrategy" />
+			<ElementSource type="AgentNumber" name="AgentNumber"
+				class="Int" /><!-- Add type of element: String, double, int -->
+		</Data>
+		
 		
 		<!-- Important: Number of sweeps has to be equal with number of rows!-->
 		<ParameterSweeping strategy="recursively"> <!-- space, list or algorithm (algorithm is not implemented yet!)-->
 			<Configuration type="space" name="NumberOfCarries" start="2" end="2" step="1" class="int" />
 			<Configuration type="list" name="NumberOfSentries" values="2;" class="int" />
 			<Configuration type="list" name="NumberOfProducers" values="2;" class="int" />
+			<!-- Confer WalkingStrategyEnum for Mapping of int values to semantics. -->
+			<Configuration type="list" name="walkingStrategy" values="2;" class="int" />
 			<!-- <Configuration type="list" name="NumberOfProducers" values="1;2;" class="int" />--><!-- Has to be comma separated list, with a comma as last character. -->			
 		</ParameterSweeping>
 		<Algorithm>

@@ -73,9 +73,16 @@ public class AnalyzeTargetPlan extends Plan {
 
 			RequestProduction rp = new RequestProduction(target);
 			IMessageEvent mevent = createMessageEvent("request_producer");
-			//send to closest producer
-			mevent.getParameterSet(SFipa.RECEIVERS).addValue(producers[sel]);
-//			mevent.getParameterSet(SFipa.RECEIVERS).addValue(getClosestProducerAgent());
+			//send to closest producer?
+			//Confer WalkingStrategyEnum for Mapping of int values to semantics.
+//			int walkingStrategyProperty = (Integer) ((Space2D) getBeliefbase().getBelief("environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
+			int walkingStrategyProperty = (Integer) ((IEnvironmentSpace) getBeliefbase().getBelief("move.environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
+			if (walkingStrategyProperty == 2) {
+				mevent.getParameterSet(SFipa.RECEIVERS).addValue(getClosestProducerAgent());				
+			}else{
+				mevent.getParameterSet(SFipa.RECEIVERS).addValue(producers[sel]);				
+			}
+
 			mevent.getParameter(SFipa.CONTENT).setValue(rp);
 			sendMessage(mevent);
 			// System.out.println("Sentry Agent: sent location to: "+producers[sel].getName());
@@ -83,7 +90,7 @@ public class AnalyzeTargetPlan extends Plan {
 	}
 
 	private IComponentIdentifier getClosestProducerAgent() {
-		ContinuousSpace2D space = (ContinuousSpace2D) ((IExternalAccess) getScope().getParent()).getExtension("my2dspace").get(this);
+		ContinuousSpace2D space = (ContinuousSpace2D) ((IExternalAccess) getScope().getParent()).getExtension("my2dspace").get(this);		
 		IVector2 myPos = (IVector2) getBeliefbase().getBelief("myPos").getFact();
 		ISpaceObject nearestProducer = space.getNearestObject(myPos, null, "producer");
 

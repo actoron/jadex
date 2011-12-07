@@ -2,11 +2,11 @@ package jadex.simulation.examples.marsworld.movement;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.Vector1Double;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
 
@@ -33,7 +33,12 @@ public class RandomWalkPlan extends Plan {
 	public void body() {
 		IVector2 dest = ((Space2D) getBeliefbase().getBelief("environment").getFact()).getRandomPosition(Vector2Int.ZERO);
 
-		dest = checkPosIfVisitedAlreay(dest);
+		//Check, whether agent should walk randomly with or without remembering already visited positions.
+		//Confer WalkingStrategyEnum for Mapping of int values to semantics.
+		int walkingStrategyProperty = (Integer) ((Space2D) getBeliefbase().getBelief("environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
+		if (walkingStrategyProperty> 0) {
+			dest = checkPosIfVisitedAlreay(dest);
+		}
 
 		IGoal moveto = createGoal("move_dest");
 		moveto.getParameter("destination").setValue(dest);
@@ -47,45 +52,40 @@ public class RandomWalkPlan extends Plan {
 	 * @param dest
 	 */
 	private IVector2 checkPosIfVisitedAlreay(IVector2 dest) {
-//		if (((ISpaceObject) getBeliefbase().getBelief("myself").getFact()).getType().toString().equalsIgnoreCase("sentry")) {
 
-			Space2D space = ((Space2D) getBeliefbase().getBelief("environment").getFact());
-			ISpaceObject[] homebases = (ISpaceObject[]) space.getSpaceObjectsByType("homebase");
-			HashMap positions = (HashMap) homebases[0].getProperty("visitedPos");
-			double vision = (Double) ((ISpaceObject) getBeliefbase().getBelief("myself").getFact()).getProperty("vision");
-			HashMap copyOfPositionsMap = null;
-			synchronized (positions) {
-				copyOfPositionsMap = (HashMap) positions.clone();
-//				System.out.println("Check clone HashMap " + copyOfPositionsMap.size() +" : " + positions.size());
-			}
-			 
+		Space2D space = ((Space2D) getBeliefbase().getBelief("environment").getFact());
+		ISpaceObject[] homebases = (ISpaceObject[]) space.getSpaceObjectsByType("homebase");
+		HashMap positions = (HashMap) homebases[0].getProperty("visitedPos");
+		double vision = (Double) ((ISpaceObject) getBeliefbase().getBelief("myself").getFact()).getProperty("vision");
+		HashMap copyOfPositionsMap = null;
+		synchronized (positions) {
+			copyOfPositionsMap = (HashMap) positions.clone();
+			// System.out.println("Check clone HashMap " + copyOfPositionsMap.size() +" : " + positions.size());
+		}
 
-			int loopCounter = 0;
-				if(copyOfPositionsMap.size() > 0){
-					Object[] positionsKeyArrayTMP = copyOfPositionsMap.keySet().toArray();
-					Object[] positionsKeyArray =copy(positionsKeyArrayTMP);
+		int loopCounter = 0;
+		if (copyOfPositionsMap.size() > 0) {
+			Object[] positionsKeyArrayTMP = copyOfPositionsMap.keySet().toArray();
+			Object[] positionsKeyArray = copy(positionsKeyArrayTMP);
 
-					for (int i = 0; i < positionsKeyArray.length; i++) {
+			for (int i = 0; i < positionsKeyArray.length; i++) {
 
-						String xPos = ((String) positionsKeyArray[i]).replaceFirst(",", ".");
-						String yPos = ((String) copyOfPositionsMap.get(positionsKeyArray[i])).replaceFirst(",", ".");
-						boolean visitedPos = checkIfVisited(Double.valueOf(xPos), Double.valueOf(yPos), vision, dest);
+				String xPos = ((String) positionsKeyArray[i]).replaceFirst(",", ".");
+				String yPos = ((String) copyOfPositionsMap.get(positionsKeyArray[i])).replaceFirst(",", ".");
+				boolean visitedPos = checkIfVisited(Double.valueOf(xPos), Double.valueOf(yPos), vision, dest);
 
-						if (visitedPos) {
-//							System.out.println("#RandomWalk#: Desired dest " + dest + " has been already visited " + xPos + "," + yPos);
-							dest = ((Space2D) getBeliefbase().getBelief("environment").getFact()).getRandomPosition(Vector2Int.ZERO);
-							i = 0;
-							loopCounter++;
-							// Hack to avoid "no movement", because no "free" destination can be found.
-							if(loopCounter > 20){
-								i = positionsKeyArray.length;
-							}
-						} 					
+				if (visitedPos) {
+					// System.out.println("#RandomWalk#: Desired dest " + dest + " has been already visited " + xPos + "," + yPos);
+					dest = ((Space2D) getBeliefbase().getBelief("environment").getFact()).getRandomPosition(Vector2Int.ZERO);
+					i = 0;
+					loopCounter++;
+					// Hack to avoid "no movement", because no "free" destination can be found.
+					if (loopCounter > 20) {
+						i = positionsKeyArray.length;
 					}
-				}	
-//			}
-			
-//		}
+				}
+			}
+		}
 		return dest;
 	}
 
@@ -108,29 +108,30 @@ public class RandomWalkPlan extends Plan {
 		IVector2 vec = new Vector2Double(xPos, yPos);
 		IVector1 one = space.getDistance(vec, destination);
 
-//		System.out.println("#checkIfVisited# Res: " + Math.sqrt(squareSum) + "<=" + vision + "; res by distance: " + one + ";--- vision: " + new Vector1Double(vision));
+		// System.out.println("#checkIfVisited# Res: " + Math.sqrt(squareSum) + "<=" + vision + "; res by distance: " + one + ";--- vision: " + new Vector1Double(vision));
 		return Math.sqrt(squareSum) <= vision;
 	}
-	
-	private Object[] copy(Object[] copy){
+
+	private Object[] copy(Object[] copy) {
 		Object[] ret = new Object[copy.length];
-		
-		for(int i=0; i<copy.length;i++){
+
+		for (int i = 0; i < copy.length; i++) {
 			ret[i] = copy[i];
 		}
 		return ret;
 	}
-	
+
 	/**
 	 * Copy a HashMap
+	 * 
 	 * @param org
 	 * @param positionsKeyArray
 	 * @return
 	 */
-	private HashMap copyHashMap(HashMap org, Object[] positionsKeyArray){
+	private HashMap copyHashMap(HashMap org, Object[] positionsKeyArray) {
 		HashMap ret = new HashMap();
-		
-		for(int i=0; i<positionsKeyArray.length;i++){
+
+		for (int i = 0; i < positionsKeyArray.length; i++) {
 			String s = (String) org.get(positionsKeyArray[i]);
 			ret.put(positionsKeyArray[i], s);
 		}

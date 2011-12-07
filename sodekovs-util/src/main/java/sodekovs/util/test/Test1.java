@@ -1,11 +1,9 @@
 package sodekovs.util.test;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.sql.Connection;
+
+import sodekovs.util.misc.WalkingStrategyEnum;
 
 public class Test1 {
 
@@ -13,6 +11,13 @@ public class Test1 {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
+//		for(int i : WalkingStrategyEnum.values()){
+//			
+//		}
+//		WalkingStrategyEnum p = WalkingStrategyEnum.randomly;
+		System.out.println(WalkingStrategyEnum.valueOf("randomly").ordinal());
+		
 		// TODO Auto-generated method stub
 		
 		Connection con = sodekovs.util.bike.persistence.ConnectionMgr.getConnection();

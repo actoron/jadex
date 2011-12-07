@@ -8,7 +8,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.MEnvSpaceType;
@@ -508,8 +507,8 @@ public class RuntimeManagerPlan extends Plan {
 
 		for (int i = 0; i < list.size(); i++) {
 			array[i] = list.get(i);
-		}
-
+		}	
+		
 		return array;
 	}
 }

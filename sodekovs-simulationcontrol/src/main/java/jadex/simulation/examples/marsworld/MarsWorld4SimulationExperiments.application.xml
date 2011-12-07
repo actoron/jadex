@@ -49,6 +49,7 @@
 		<!-- <argument name="nrr" typename="Int">new Integer(10)</argument> -->
 		<argument name="SentryNumber" class="Int">new Integer(10)</argument>
 		<argument name="Experiment_id" class="String">"not set"</argument>
+		<argument name="walkingStrategy" class="int">new Integer(0)</argument>
 	</arguments>
 	 
 	<extensiontypes>
@@ -106,9 +107,19 @@
 					for this agent from the space. Used within the DeltaTimeExecutor4Simulation. -->
 				<env:objecttype name="clientSimulator" />
 				
-				<!-- Trace object -->
+				<!-- Trace object. Depicts the way an agent has walked on. -->
 				<env:objecttype name="trace">					
 					<env:property name="position" dynamic="true">$space.getRandomPosition(Vector2Int.ZERO)</env:property>
+				</env:objecttype>
+				
+				<!-- WalkingStrategy: Are the agents walking:
+				a)"randomly", without remembering already visited positions. 
+				b)"randomlyWithMemory", randomly, with remembering already visited positions.
+				c)"randomlyWithMemoryWithGroup", randomly, with remembering already visited positions AND producer is calling carry as soon as he is informed AND Sentry is calling closest producer. 
+				DEFAULT: "randomly"
+				!!!!Confer WalkingStrategyEnum for Mapping of int values to semantics. -->
+				<env:objecttype name="walkingStrategy">					
+					<env:property name="strategy">$args.walkingStrategy</env:property>
 				</env:objecttype>
 
 			</env:objecttypes>
@@ -623,6 +634,11 @@
 						<env:object type="experimentID">
 							<env:property name="experimentID">$args.Experiment_id</env:property>
 						</env:object>
+						
+						<env:object type="walkingStrategy">					
+							<env:property name="strategy">$args.walkingStrategy</env:property>
+						</env:object>
+						
 
 					</env:objects>
 				
