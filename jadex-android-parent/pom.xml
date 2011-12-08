@@ -159,7 +159,7 @@
 							</jvmArguments>
 							<coreLibrary>false</coreLibrary>
 							<noLocals>false</noLocals>
-							<optimize>false</optimize>
+							<optimize>true</optimize>
 						</dex>
 
 						<!-- <test> -->

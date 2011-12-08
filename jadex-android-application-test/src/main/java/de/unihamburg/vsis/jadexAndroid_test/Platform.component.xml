@@ -62,6 +62,7 @@
 		<import>jadex.base.service.message.transport.*</import>
 		<import>jadex.base.service.message.transport.localmtp.*</import>
 		<import>jadex.base.service.message.transport.tcpmtp.*</import>
+		<import>jadex.base.service.message.transport.httprelaymtp.*</import>
 		<import>jadex.base.service.message.transport.niotcpmtp.*</import>
 		<import>jadex.base.service.message.transport.btmtp.*</import>
 		<import>jadex.base.service.message.transport.codecs.*</import>
@@ -184,11 +185,12 @@
 				new MessageService($component.getExternalAccess(), $component.getLogger(),
 				new ITransport[]
 				{
-					new BTTransport($component.getServiceProvider()),
-					//new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, java.util.logging.Logger.getLogger("test"))
 					new LocalTransport($component.getServiceProvider()),
+					new BTTransport($component.getServiceProvider()),
 					$args.niotransport? new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger())
-					: new TCPTransport($component.getServiceProvider(), $args.tcpport)
+					: new TCPTransport($component.getServiceProvider(), $args.tcpport),
+					new HttpRelayTransport($component, SRelay.DEFAULT_ADDRESS)
+					//new HttpRelayTransport($component, "http://localhost:8080/jadex-platform-relay-web/")
 				},
 				new MessageType[]
 				{

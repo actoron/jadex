@@ -63,11 +63,12 @@ public class JavaCCExpressionParser	implements IExpressionParser, Serializable
 		{
 //			e.printStackTrace();
 			String	msg	= e.getMessage();
-			int	index	= msg.indexOf("Was expecting one of");
-			if(index!=-1)
-			{
-				msg	= msg.substring(0, index);//+ "Maybe missing import?";
-				msg	= msg.replace("\n", " ");
+			if (msg != null) {
+				int index = msg.indexOf("Was expecting one of");
+				if (index != -1) {
+					msg = msg.substring(0, index);// + "Maybe missing import?";
+					msg = msg.replace("\n", " ");
+				}
 			}
 			else
 			{
