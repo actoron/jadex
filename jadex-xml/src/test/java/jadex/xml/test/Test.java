@@ -1,6 +1,8 @@
 package jadex.xml.test;
 
 import jadex.commons.SReflect;
+import jadex.commons.Tuple;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
@@ -110,6 +112,8 @@ public class Test extends TestCase
 				t.testAnonymousInnerClass();
 				t.testAnonymousInnerClassWithSimpleTypes();
 				t.testImage();
+				t.testTuple();
+				t.testTuple2();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -896,6 +900,28 @@ public class Test extends TestCase
 			}
 		};
 		
+		doWriteAndRead(obj);
+	}
+	
+	/**
+	 *  Test reading / writing tuple2.
+	 */
+	public void	testTuple() throws Exception
+	{
+		Tuple	obj	= new Tuple("hello", "world");
+		doWriteAndRead(obj);
+		
+		obj	= new Tuple(new String[]{"hello", "world", "!"});
+		doWriteAndRead(obj);
+
+	}
+	
+	/**
+	 *  Test reading / writing tuple2.
+	 */
+	public void	testTuple2() throws Exception
+	{
+		Tuple2<String, String>	obj	= new Tuple2<String, String>("hello", "world");
 		doWriteAndRead(obj);
 	}
 	

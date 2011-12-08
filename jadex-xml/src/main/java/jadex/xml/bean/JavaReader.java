@@ -2,6 +2,8 @@ package jadex.xml.bean;
 
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
@@ -65,9 +67,9 @@ public class JavaReader
 	 *  @param typeinfos The user specific type infos. 
 	 *  @return The joined type infos.
 	 */
-	public static Set joinTypeInfos(Set typeinfos)
+	public static Set<TypeInfo> joinTypeInfos(Set<TypeInfo> typeinfos)
 	{
-		Set ret = getTypeInfos();
+		Set<TypeInfo> ret = getTypeInfos();
 		if(typeinfos!=null)
 			ret.addAll(typeinfos);
 		return ret;
@@ -76,9 +78,9 @@ public class JavaReader
 	/**
 	 *  Get the type infos.
 	 */
-	public static Set getTypeInfos()
+	public static Set<TypeInfo> getTypeInfos()
 	{
-		Set typeinfos = new HashSet();
+		Set<TypeInfo> typeinfos = new HashSet<TypeInfo>();
 		try
 		{
 			// java.util.Map
@@ -738,6 +740,45 @@ public class JavaReader
 			TypeInfo ti_characterarray = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "Character__1")}), null,
 				new MappingInfo(null, null, new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(characterconv, null))));
 			typeinfos.add(ti_characterarray);
+			
+			TypeInfo ti_tuple	= new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.commons", "Tuple")}),
+				new ObjectInfo(HashMap.class, new IPostProcessor()
+			{
+				public Object postProcess(IContext context, Object object)
+				{
+					Map<String, Object>	map	= (Map<String, Object>) object;
+					return new Tuple((Object[])map.get("entities"));
+				}
+				
+				public int getPass()
+				{
+					return 0;
+				}
+			}), new MappingInfo(null, new SubobjectInfo[]
+			{
+				new SubobjectInfo(new AccessInfo("entities", "entities", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+			}));
+			typeinfos.add(ti_tuple);
+				
+			TypeInfo ti_tuple2	= new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.commons", "Tuple2")}),
+				new ObjectInfo(HashMap.class, new IPostProcessor()
+			{
+				public Object postProcess(IContext context, Object object)
+				{
+					Map<String, Object>	map	= (Map<String, Object>) object;
+					return new Tuple2<Object, Object>(map.get("firstEntity"), map.get("secondEntity"));
+				}
+				
+				public int getPass()
+				{
+					return 0;
+				}
+			}), new MappingInfo(null, new SubobjectInfo[]
+			{
+				new SubobjectInfo(new AccessInfo("firstEntity", "firstEntity", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo("secondEntity", "secondEntity", null, null, new BeanAccessInfo(AccessInfo.THIS)))
+			}));
+			typeinfos.add(ti_tuple2);
 		}
 		catch(NoSuchMethodException e)
 		{

@@ -193,9 +193,12 @@ public class HttpReceiver
 	 */
 	public void	stop()
 	{
-		// Hack!!! using NIO, one could use thread.interrupt()
+		// Hack!!! InputStream doesn't wake up. 
+		// using NIO, one could use thread.interrupt()
+		// See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4514257
 		thread.stop();
-//		finished	= true;
+		
+		finished	= true;
 //		thread.interrupt();
 //		if(con!=null)
 //		{

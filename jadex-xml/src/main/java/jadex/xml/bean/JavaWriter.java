@@ -1,7 +1,10 @@
 package jadex.xml.bean;
 
+
 import jadex.commons.Base64;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 /* $if !android $ */
 import jadex.commons.gui.SGUI;
@@ -670,8 +673,18 @@ public class JavaWriter extends Writer
 				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, characterconv))));
 			typeinfos.add(ti_characterarray);
 			
+			TypeInfo ti_tuple	= new TypeInfo(null, new ObjectInfo(Tuple.class), new MappingInfo(null, new SubobjectInfo[]
+			{
+				new SubobjectInfo(new AccessInfo("entities"))
+			}));
+			typeinfos.add(ti_tuple);
 			
-			
+			TypeInfo ti_tuple2	= new TypeInfo(null, new ObjectInfo(Tuple2.class), new MappingInfo(null, new SubobjectInfo[]
+			{
+				new SubobjectInfo(new AccessInfo("firstEntity")),
+				new SubobjectInfo(new AccessInfo("secondEntity"))
+			}));
+			typeinfos.add(ti_tuple2);			
 		}
 		catch(Exception e)
 		{

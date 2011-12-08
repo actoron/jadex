@@ -1,6 +1,7 @@
 package jadex.base.gui.componenttree;
 
 import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.gui.SRemoteGui;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
@@ -17,6 +18,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -327,39 +329,13 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 //					System.err.println("searchChildren queued4: "+ComponentTreeNode.this);
 //				final IExternalAccess	ea	= (IExternalAccess)result;
 				
-				ea.scheduleImmediate(new IComponentStep<Object[]>()
+				SRemoteGui.getServiceInfos(ea).addResultListener(
+					new SwingDefaultResultListener<Tuple2<ProvidedServiceInfo[], RequiredServiceInfo<?>[]>>()
 				{
-					@XMLClassname("getServiceInfos")
-					public IFuture<Object[]> execute(IInternalAccess ia)
+					public void customResultAvailable(final Tuple2<ProvidedServiceInfo[], RequiredServiceInfo<?>[]> res)
 					{
-						final Future<Object[]>	ret	= new Future<Object[]>();
-						final RequiredServiceInfo<?>[]	ris	= ia.getServiceContainer().getRequiredServiceInfos();
-						IIntermediateFuture<IService>	ds	= SServiceProvider.getDeclaredServices(ia.getServiceContainer());
-						ds.addResultListener(new ExceptionDelegationResultListener<Collection<IService>, Object[]>(ret)
-						{
-							public void customResultAvailable(Collection<IService> result)
-							{
-								ProvidedServiceInfo[]	pis	= new ProvidedServiceInfo[result.size()];
-								Iterator<IService>	it	= result.iterator();
-								for(int i=0; i<pis.length; i++)
-								{
-									IService	service	= it.next();
-									// todo: implementation?
-									pis[i]	= new ProvidedServiceInfo(service.getServiceIdentifier().getServiceName(), 
-										service.getServiceIdentifier().getServiceType(), null, null);
-								}
-								
-								ret.setResult(new Object[]{pis, ris});
-							}
-						});
-						return ret;
-					}
-				}).addResultListener(new SwingDefaultResultListener<Object[]>()
-				{
-					public void customResultAvailable(final Object[] res)
-					{
-						final ProvidedServiceInfo[] pros = (ProvidedServiceInfo[])res[0];
-						final RequiredServiceInfo<?>[] reqs = (RequiredServiceInfo[])res[1];
+						final ProvidedServiceInfo[] pros = res.getFirstEntity();
+						final RequiredServiceInfo<?>[] reqs = res.getSecondEntity();
 						if((pros!=null && pros.length>0 || (reqs!=null && reqs.length>0)))
 						{
 							ServiceContainerNode	scn	= (ServiceContainerNode)getModel().getNode(getId()+ServiceContainerNode.NAME);

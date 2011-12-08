@@ -82,7 +82,8 @@ public class SecurityService implements ISecurityService
 						final boolean	genpass	= props==null || props.getProperty("password")==null; 
 						if(genpass)
 						{
-							password	= UUID.randomUUID().toString().substring(0, 8);
+							password	= UUID.randomUUID().toString().substring(0, 12);
+							System.out.println("Generated platform password: "+password);
 							usepass	= true;
 						}
 						
