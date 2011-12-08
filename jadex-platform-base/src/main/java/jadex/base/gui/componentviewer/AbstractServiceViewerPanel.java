@@ -1,7 +1,5 @@
 package jadex.base.gui.componentviewer;
 
-import java.util.Collections;
-
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.service.IService;
 import jadex.commons.Properties;

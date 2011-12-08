@@ -1,6 +1,7 @@
 package jadex.component;
 
 import jadex.bridge.AbstractErrorReportBuilder;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.Argument;
@@ -133,6 +134,10 @@ public class ComponentXMLReader
 					MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
 					report.put(se, "Class not found: "+val);
 				}
+				else
+				{
+					ret = new ClassInfo((Class)ret);
+				}
 			}
 			return ret;
 		}
@@ -143,9 +148,10 @@ public class ComponentXMLReader
 		public String convertObject(Object val, IContext context)
 		{
 			String ret = null;
-			if(val instanceof Class)
+			if(val instanceof ClassInfo)
 			{
-				ret = SReflect.getClassName((Class)val);
+				ret = ((ClassInfo)val).getTypeName();
+//				ret = SReflect.getClassName((ClassInfo)val);
 				if(ret==null)
 				{
 					Object	se	= new Tuple(((ReadContext)context).getStack());
@@ -331,23 +337,23 @@ public class ComponentXMLReader
 			}), null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
-				new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
-				new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "classname"))}, null), null, new BeanObjectReaderHandler()));
-			
+			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
+			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))}, null), null, new BeanObjectReaderHandler()));
+		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "result")}), new ObjectInfo(Argument.class), 
-				new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
-				new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "classname"))}, null), null, new BeanObjectReaderHandler()));
+			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
+			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "classname"), new AttributeConverter(classconv, reclassconv))}, null), null, new BeanObjectReaderHandler()));
 			
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "import")), new ObjectInfo(String.class), null, null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
-				new MappingInfo(null, null, "value", new AttributeInfo[]{
-					new AttributeInfo(new AccessInfo("class", "className"))
-				}, null)));
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, null)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "arguments"), new QName(uri, "result")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
-				new MappingInfo(null, null, "value", new AttributeInfo[]{
-					new AttributeInfo(new AccessInfo("class", "className"))
-				}, null)));
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
+			}, null)));
 			
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttypes"), new QName(uri, "componenttype")}), new ObjectInfo(SubcomponentTypeInfo.class),
 			new MappingInfo(null, new AttributeInfo[]{
@@ -363,7 +369,7 @@ public class ComponentXMLReader
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "component"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "providedservice")}), 
@@ -383,7 +389,7 @@ public class ComponentXMLReader
 			}, null)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "interceptor")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "className"))
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(RequiredServiceInfo.class), // new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
@@ -404,17 +410,17 @@ public class ComponentXMLReader
 					
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "initialstep")), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
 				new MappingInfo(null, null, "value", new AttributeInfo[]{
-					new AttributeInfo(new AccessInfo("class", "className"))
+					new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 				}, null), null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "endstep")), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
 				new MappingInfo(null, null, "value", new AttributeInfo[]{
-					new AttributeInfo(new AccessInfo("class", "className"))
+					new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 				}, null), null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
 				new MappingInfo(null, null, "value", new AttributeInfo[]{
-					new AttributeInfo(new AccessInfo("class", "className"))
+					new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 				}, null), null, new BeanObjectReaderHandler()));
 		
 		for(int i=0; mappings!=null && i<mappings.length; i++)

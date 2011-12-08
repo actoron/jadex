@@ -65,7 +65,7 @@ public class DefaultWebServicePublishService implements IPublishService
 //		Object pr = Proxy.newProxyInstance(cl, new Class[]{service.getServiceIdentifier().getServiceType()}, 
 //			new WebServiceToJadexWrapperInvocationHandler(service));
 		
-		Object pr = createProxy(service, cl, pi.getServiceType());
+		Object pr = createProxy(service, cl, pi.getServiceType().getType(cl));
 		
 		// Jaxb seems to use the context classloader so it needs to be set :-(
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();

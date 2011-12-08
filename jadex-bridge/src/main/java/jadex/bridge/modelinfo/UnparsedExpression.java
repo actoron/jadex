@@ -1,5 +1,6 @@
 package jadex.bridge.modelinfo;
 
+import jadex.bridge.ClassInfo;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.javaparser.SJavaParser;
@@ -17,11 +18,14 @@ public class UnparsedExpression
 	/** The name. */
 	protected String name;
 
-	/** The class name. */
-	protected String classname;
+	/** The clazz info. */
+	protected ClassInfo clazz;
 	
-	/** The class. */
-	protected Class<?> clazz;
+//	/** The class name. */
+//	protected String classname;
+//	
+//	/** The class. */
+//	protected Class<?> clazz;
 	
 	/** The value. */
 	protected String value;
@@ -44,8 +48,7 @@ public class UnparsedExpression
 	public UnparsedExpression(String name, Class<?> clazz, String value, String language)
 	{
 		this.name = name;
-		this.clazz = clazz;
-		this.classname	= clazz!=null ? clazz.getName() : null;
+		this.clazz = clazz!=null? new ClassInfo(clazz): null; 
 		this.value = value;
 		this.language = language;
 	}
@@ -56,7 +59,7 @@ public class UnparsedExpression
 	public UnparsedExpression(String name, String classname, String value, String language)
 	{
 		this.name = name;
-		this.classname	= classname;
+		this.clazz = classname!=null? new ClassInfo(classname): null; 
 		this.value = value;
 		this.language = language;
 	}
@@ -81,23 +84,23 @@ public class UnparsedExpression
 		this.name = name;
 	}
 
-	/**
-	 *  Get the clazz name.
-	 *  @return The clazz name.
-	 */
-	public String getClassName()
-	{
-		return classname;
-	}
-
-	/**
-	 *  Set the clazz name.
-	 *  @param clazz The clazz name.
-	 */
-	public void setClassName(String classname)
-	{
-		this.classname = classname;
-	}
+//	/**
+//	 *  Get the clazz name.
+//	 *  @return The clazz name.
+//	 */
+//	public String getClassName()
+//	{
+//		return classname;
+//	}
+//
+//	/**
+//	 *  Set the clazz name.
+//	 *  @param clazz The clazz name.
+//	 */
+//	public void setClassName(String classname)
+//	{
+//		this.classname = classname;
+//	}
 
 //	/**
 //	 *  Get the clazz.
@@ -108,18 +111,18 @@ public class UnparsedExpression
 //		return clazz;
 //	}
 	
-	/**
-	 *  Get the clazz.
-	 *  @return The clazz.
-	 */
-	public Class<?> getClazz(ClassLoader classloader, String[] imports)
-	{
-		if(clazz==null && classname!=null)
-		{
-			clazz = SReflect.findClass0(classname, imports, classloader);
-		}
-		return clazz;
-	}
+//	/**
+//	 *  Get the clazz.
+//	 *  @return The clazz.
+//	 */
+//	public Class<?> getClazz(ClassLoader classloader, String[] imports)
+//	{
+//		if(clazz==null && classname!=null)
+//		{
+//			clazz = SReflect.findClass0(classname, imports, classloader);
+//		}
+//		return clazz;
+//	}
 
 	// Excluded to avoid sending per xml 
 //	/**
@@ -131,6 +134,24 @@ public class UnparsedExpression
 //		this.clazz = clazz;
 //	}
 
+	/**
+	 *  Get the clazz.
+	 *  @return the clazz.
+	 */
+	public ClassInfo getClazz()
+	{
+		return clazz;
+	}
+
+	/**
+	 *  Set the clazz.
+	 *  @param clazz The clazz to set.
+	 */
+	public void setClazz(ClassInfo clazz)
+	{
+		this.clazz = clazz;
+	}
+	
 	/**
 	 *  Get the value.
 	 *  @return The value.
@@ -213,9 +234,7 @@ public class UnparsedExpression
 	 */
 	public String toString()
 	{
-		return "UnparsedExpression(name=" + name + ", classname=" + classname
+		return "UnparsedExpression(name=" + name + ", classname=" + clazz
 				+ ", value=" + value + ")";
 	}
-	
-	
 }

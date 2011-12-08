@@ -1403,7 +1403,7 @@ public class StarterPanel extends JLayeredPane
 		//mvalt.setMinimumSize(new Dimension(mvalt.getPreferredSize().width/4, mvalt.getPreferredSize().height/4));
 		mvalt.setEditable(false);
 		
-		JLabel typel = new JLabel(arg.getClassname()!=null? arg.getClassname(): "undefined");
+		JLabel typel = new JLabel(arg.getClazz()!=null? arg.getClazz().getTypeName(): "undefined");
 		
 		String description = arg.getDescription();
 		if(description!=null)
@@ -1443,7 +1443,7 @@ public class StarterPanel extends JLayeredPane
 		//mvalt.setMinimumSize(new Dimension(mvalt.getPreferredSize().width/4, mvalt.getPreferredSize().height/4));
 		mvalt.setEditable(false);
 		
-		JLabel typel = new JLabel(arg.getClassname()!=null? arg.getClassname(): "undefined");
+		JLabel typel = new JLabel(arg.getClazz()!=null? arg.getClazz().getTypeName(): "undefined");
 		
 		String description = arg.getDescription();
 		if(description!=null)
@@ -1487,7 +1487,7 @@ public class StarterPanel extends JLayeredPane
 				for(int i=0; i<required.length; i++)
 				{
 					((DefaultTableModel)requiredt.getModel()).addRow(new Object[]{required[i].getName(), 
-						SReflect.getUnqualifiedTypeName(required[i].getTypeName()), required[i].isMultiple()});
+						SReflect.getUnqualifiedTypeName(required[i].getType().getTypeName()), required[i].isMultiple()});
 				}
 //				requiredt.getColumn("Interface").setCellRenderer(new ClassRenderer());
 
@@ -1522,7 +1522,7 @@ public class StarterPanel extends JLayeredPane
 				for(int i=0; i<provided.length; i++)
 				{
 					((DefaultTableModel)providedt.getModel()).addRow(new Object[]{
-						provided[i]!=null? SReflect.getUnqualifiedTypeName(provided[i].getTypeName()): "unknown service type (class definition missing)",
+						provided[i]!=null? SReflect.getUnqualifiedTypeName(provided[i].getType().getTypeName()): "unknown service type (class definition missing)",
 						provided[i]!=null? provided[i].getImplementation(): ""});
 				}
 //				providedt.getColumn("Interface").setCellRenderer(new ClassRenderer());

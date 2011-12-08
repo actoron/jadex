@@ -1,5 +1,6 @@
 package jadex.bridge.modelinfo;
 
+import jadex.bridge.ClassInfo;
 import jadex.commons.SReflect;
 
 
@@ -16,11 +17,14 @@ public class Argument implements IArgument
 	/** The description. */
 	protected String	description;
 	
-	/** The class name. */
-	protected String	classname;
+//	/** The class name. */
+//	protected String	classname;
+//	
+//	/** The class. */
+//	protected Class<?>	clazz;
 	
-	/** The class. */
-	protected Class<?>	clazz;
+	/** The class info. */
+	protected ClassInfo clazz;
 	
 	/** The default value. */
 	protected Object	defaultvalue;
@@ -39,9 +43,7 @@ public class Argument implements IArgument
 	 */
 	public Argument(String name, String description, String classname)
 	{
-		this.name = name;
-		this.description = description;
-		this.classname = classname;
+		this(name, description, classname, null);
 	}
 	
 	/**
@@ -51,7 +53,7 @@ public class Argument implements IArgument
 	{
 		this.name = name;
 		this.description = description;
-		this.classname = classname;
+		this.clazz = classname!=null? new ClassInfo(classname): null;
 		this.defaultvalue = defaultvalue;
 	}
 	
@@ -93,37 +95,55 @@ public class Argument implements IArgument
 		this.description = description;
 	}
 	
+//	/**
+//	 *  Get the typename.
+//	 *  @return The typename. 
+//	 */
+//	public String getClassname()
+//	{
+//		return classname;
+//	}
+//	
+//	/**
+//	 *  Set the class name.
+//	 *  @param classname The class name to set.
+//	 */
+//	public void setClassname(String classname)
+//	{
+//		this.classname = classname;
+//	}
+//	
+//	/**
+//	 *  Get the clazz.
+//	 *  @return The clazz.
+//	 */
+//	public Class<?> getClazz(ClassLoader classloader, String[] imports)
+//	{
+//		if(clazz==null && classname!=null)
+//		{
+//			clazz = SReflect.findClass0(classname, imports, classloader);
+//		}
+//		return clazz;
+//	}
+
 	/**
-	 *  Get the typename.
-	 *  @return The typename. 
+	 *  Get the class info
+	 *  @return the class info.
 	 */
-	public String getClassname()
+	public ClassInfo getClazz()
 	{
-		return classname;
-	}
-	
-	/**
-	 *  Set the class name.
-	 *  @param classname The class name to set.
-	 */
-	public void setClassname(String classname)
-	{
-		this.classname = classname;
-	}
-	
-	/**
-	 *  Get the clazz.
-	 *  @return The clazz.
-	 */
-	public Class<?> getClazz(ClassLoader classloader, String[] imports)
-	{
-		if(clazz==null && classname!=null)
-		{
-			clazz = SReflect.findClass0(classname, imports, classloader);
-		}
 		return clazz;
 	}
 
+	/**
+	 *  Set the class info.
+	 *  @param clazz The class info to set.
+	 */
+	public void setClazz(ClassInfo clazz)
+	{
+		this.clazz = clazz;
+	}
+	
 	/**
 	 *  Get the default value.
 	 *  @return The default value.
@@ -132,7 +152,7 @@ public class Argument implements IArgument
 	{
 		return defaultvalue;
 	}
-	
+
 	/**
 	 *  Set the defaultvalue.
 	 *  @param defaultvalue The defaultvalue to set.
@@ -161,6 +181,6 @@ public class Argument implements IArgument
 	{
 		return "Argument(defaultvalue=" + this.defaultvalue + ", description="
 			+ this.description + ", name=" + this.name + ", typename="
-			+ this.classname + ")";
+			+ this.clazz + ")";
 	}
 }

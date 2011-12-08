@@ -94,7 +94,7 @@ public class RequiredServiceNode extends AbstractTreeNode
 	 */
 	public String toString()
 	{
-		return SReflect.getUnqualifiedTypeName(info.getTypeName());
+		return SReflect.getUnqualifiedTypeName(info.getType().getTypeName());
 	}
 	
 	/**

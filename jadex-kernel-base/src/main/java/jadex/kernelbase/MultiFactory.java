@@ -1326,7 +1326,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	
 	public boolean equals(Object obj)
 	{
-		if (obj instanceof IService)
+		if(obj instanceof IService)
 			return sid.equals(((IService) obj).getServiceIdentifier());
 		return false;
 	}

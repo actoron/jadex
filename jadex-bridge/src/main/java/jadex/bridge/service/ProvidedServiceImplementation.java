@@ -3,9 +3,8 @@ package jadex.bridge.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.SReflect;
 
 /**
  *  Contains information for provided service implementation:
@@ -19,11 +18,8 @@ public class ProvidedServiceImplementation
 	
 	//-------- attributes --------
 	
-	/** The implementation class name. */
-	protected String	implname;
-
 	/** The implementation class. */
-	protected Class<?> implementation;
+	protected ClassInfo implementation;
 
 	/** The creation expression. */
 	protected String expression;
@@ -50,7 +46,16 @@ public class ProvidedServiceImplementation
 	/**
 	 *  Create a new service implementation.
 	 */
-	public ProvidedServiceImplementation(Class<?> implementation,
+	public ProvidedServiceImplementation(Class implementation,
+		String expression, String proxytype, RequiredServiceBinding binding, UnparsedExpression[] interceptors)
+	{
+		this(implementation!=null? new ClassInfo(implementation): null, expression, proxytype, binding, interceptors);
+	}
+		
+	/**
+	 *  Create a new service implementation.
+	 */
+	public ProvidedServiceImplementation(ClassInfo implementation,
 		String expression, String proxytype, RequiredServiceBinding binding, UnparsedExpression[] interceptors)
 	{
 		setImplementation(implementation);
@@ -73,39 +78,34 @@ public class ProvidedServiceImplementation
 	{
 		this(prov.implementation, prov.getExpression(), prov.getProxytype(), prov.getBinding()!=null? 
 			new RequiredServiceBinding(prov.getBinding()): null, prov.getInterceptors());
-		this.implname	= prov.implname;
 	}
 
 	//-------- methods --------
 	
-	/**
-	 *  Get the implementation name.
-	 *  @return the implementation name.
-	 */
-	public String getImplementationName()
-	{
-		return implname;
-	}
-
-	/**
-	 *  Set the implementation name.
-	 *  @param name The implementation name to set.
-	 */
-	public void setImplementationName(String implname)
-	{
-		this.implname = implname;
-	}
+//	/**
+//	 *  Get the implementation name.
+//	 *  @return the implementation name.
+//	 */
+//	public String getImplementationName()
+//	{
+//		return implname;
+//	}
+//
+//	/**
+//	 *  Set the implementation name.
+//	 *  @param name The implementation name to set.
+//	 */
+//	public void setImplementationName(String implname)
+//	{
+//		this.implname = implname;
+//	}
 
 	/**
 	 *  Get the implementation.
 	 *  @return The implementation.
 	 */
-	public Class<?> getImplementation(IModelInfo model, ClassLoader cl)
+	public ClassInfo getImplementation()
 	{
-		if(implementation==null && implname!=null)
-		{
-			this.implementation	= SReflect.findClass0(implname, model.getAllImports(), cl);
-		}
 		return implementation;
 	}
 
@@ -113,10 +113,8 @@ public class ProvidedServiceImplementation
 	 *  Set the implementation.
 	 *  @param implementation The implementation to set.
 	 */
-	public void setImplementation(Class<?> implementation)
+	public void setImplementation(ClassInfo implementation)
 	{
-		if(implementation!=null)
-			implname	= implementation.getName();
 		this.implementation = implementation;
 	}
 
@@ -209,7 +207,7 @@ public class ProvidedServiceImplementation
 	 */
 	public String toString()
 	{
-		return implementation!=null? SReflect.getInnerClassName(implementation): 
+		return implementation!=null? implementation.getTypeName(): 
 			expression!=null? expression: binding!=null? 
 			binding.getComponentName()!=null? binding.getComponentName(): 
 				binding.getComponentType(): "";

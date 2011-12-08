@@ -27,7 +27,6 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
-import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -242,7 +241,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				}
 				else
 				{
-					Class	clazz	= SReflect.findClass0(upes[i].getClassName(), getModel().getAllImports(), getClassLoader());
+					Class clazz = upes[i].getClazz().getType(getClassLoader(), getModel().getAllImports());
 					try
 					{
 						step	= clazz.newInstance();
@@ -259,7 +258,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				}
 				else
 				{
-					throw new RuntimeException("Unsupported initial component step, class="+upes[i].getClassName()+", value="+upes[i].getValue());
+					throw new RuntimeException("Unsupported initial component step, class="+upes[i].getClazz()+", value="+upes[i].getValue());
 				}
 			}
 		}
@@ -289,7 +288,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				}
 				else
 				{
-					Class	clazz	= SReflect.findClass0(upes[i].getClassName(), getModel().getAllImports(), getClassLoader());
+					Class clazz = upes[i].getClazz().getType(getClassLoader(), getModel().getAllImports());
 					try
 					{
 						step	= clazz.newInstance();
@@ -306,7 +305,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				}
 				else if(step!=null)
 				{
-					ret.setException(new RuntimeException("Unsupported component end step, class="+upes[i].getClassName()+", value="+upes[i].getValue()));
+					ret.setException(new RuntimeException("Unsupported component end step, class="+upes[i].getClazz()+", value="+upes[i].getValue()));
 				}
 			}
 			
@@ -632,7 +631,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			Map<Object, ProvidedServiceInfo> sermap = new LinkedHashMap<Object, ProvidedServiceInfo>();
 			for(int i=0; i<ps.length; i++)
 			{
-				Object key = ps[i].getName()!=null? ps[i].getName(): ps[i].getType(model, getClassLoader());
+				Object key = ps[i].getName()!=null? ps[i].getName(): ps[i].getType().getType(getClassLoader());
 				sermap.put(key, ps[i]);
 			}
 			if(config!=null)
@@ -641,9 +640,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				ProvidedServiceInfo[] cs = cinfo.getProvidedServices();
 				for(int i=0; i<cs.length; i++)
 				{
-					Object key = cs[i].getName()!=null? cs[i].getName(): cs[i].getType(model, getClassLoader());
+					Object key = cs[i].getName()!=null? cs[i].getName(): cs[i].getType().getType(getClassLoader());
 					ProvidedServiceInfo psi = (ProvidedServiceInfo)sermap.get(key);
-					ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType(model, getClassLoader()), 
+					ProvidedServiceInfo newpsi= new ProvidedServiceInfo(psi.getName(), psi.getType().getType(getClassLoader()), 
 						new ProvidedServiceImplementation(cs[i].getImplementation()), psi.getPublish());
 					sermap.put(key, newpsi);
 				}
@@ -654,12 +653,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				public void customResultAvailable(Void result)
 				{
 					// Required services.
-					RequiredServiceInfo<?>[] ms = model.getRequiredServices();
+					RequiredServiceInfo[] ms = model.getRequiredServices();
 					
-					Map<String, RequiredServiceInfo<?>>	sermap = new LinkedHashMap<String, RequiredServiceInfo<?>>();
+					Map<String, RequiredServiceInfo>	sermap = new LinkedHashMap<String, RequiredServiceInfo>();
 					for(int i=0; i<ms.length; i++)
 					{
-						ms[i]	= new RequiredServiceInfo(getServicePrefix()+ms[i].getName(), ms[i].getType(model, getClassLoader()), ms[i].isMultiple(), ms[i].getDefaultBinding());
+						ms[i]	= new RequiredServiceInfo(getServicePrefix()+ms[i].getName(), ms[i].getType().getType(getClassLoader()), ms[i].isMultiple(), ms[i].getDefaultBinding());
 						sermap.put(ms[i].getName(), ms[i]);
 					}
 
@@ -670,7 +669,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 						for(int i=0; i<cs.length; i++)
 						{
 							RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getServicePrefix()+cs[i].getName());
-							RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType(model, getClassLoader()), rsi.isMultiple(), 
+							RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
 								new RequiredServiceBinding(cs[i].getDefaultBinding()));
 							sermap.put(rsi.getName(), newrsi);
 						}
@@ -680,7 +679,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 						for(int i=0; i<getBindings().length; i++)
 						{
 							RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getBindings()[i].getName());
-							RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType(model, getClassLoader()), rsi.isMultiple(), 
+							RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
 								new RequiredServiceBinding(getBindings()[i]));
 							sermap.put(rsi.getName(), newrsi);
 						}
@@ -805,7 +804,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					try
 					{
 						final UnparsedExpression unexp = (UnparsedExpression)value;
-						Class clazz = unexp.getClazz(getClassLoader(), model.getAllImports());
+						Class clazz = unexp.getClazz()!=null? unexp.getClazz().getType(getClassLoader(), model.getAllImports()): null;
 						Object tmp;
 						if(unexp.getValue()==null || unexp.getValue().length()==0 && clazz!=null)
 						{
@@ -1048,7 +1047,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		final Future<IInternalService> ret = new Future<IInternalService>();
 		
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy());
+			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), getModel().getResourceIdentifier());
 		getServiceContainer().addService(proxy, info).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
 		{
 			public void customResultAvailable(Void result)
@@ -1075,10 +1074,10 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			// Virtual service (e.g. promoted)
 			if(impl!=null && impl.getBinding()!=null)
 			{
-				RequiredServiceInfo rsi = new RequiredServiceInfo(BasicService.generateServiceName(info.getType(model, 
-					getClassLoader()))+":virtual", info.getType(model, getClassLoader()));
+				RequiredServiceInfo rsi = new RequiredServiceInfo(BasicService.generateServiceName(info.getType().getType( 
+					getClassLoader()))+":virtual", info.getType().getType(getClassLoader()));
 				IServiceIdentifier sid = BasicService.createServiceIdentifier(getExternalAccess().getServiceProvider().getId(), 
-					rsi.getName(), rsi.getType(model, getClassLoader()), BasicServiceInvocationHandler.class);
+					rsi.getName(), rsi.getType().getType(getClassLoader()), BasicServiceInvocationHandler.class, getModel().getResourceIdentifier());
 				final IInternalService service = BasicServiceInvocationHandler.createDelegationProvidedServiceProxy(
 					getExternalAccess(), getComponentAdapter(), sid, rsi, impl.getBinding(), getClassLoader());
 				getServiceContainer().addService(service, info).addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
@@ -1092,16 +1091,16 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					try
 					{
 						ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), getClassLoader());
+//						System.out.println("added: "+ser+" "+model.getName());
 					}
 					catch(RuntimeException e)
 					{
 						throw new RuntimeException("Service creation error: "+info, e);
 					}
-	//				System.out.println("added: "+service+" "+getAgentAdapter().getComponentIdentifier());
 				}
-				else if(impl!=null && impl.getImplementation(model, getClassLoader())!=null)
+				else if(impl!=null && impl.getImplementation().getType(getClassLoader())!=null)
 				{
-					ser = impl.getImplementation(model, getClassLoader()).newInstance();
+					ser = impl.getImplementation().getType(getClassLoader()).newInstance();
 				}
 				
 				if(ser==null)
@@ -1123,12 +1122,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 							}
 							else
 							{
-								ics[i] = (IServiceInvocationInterceptor)ins[i].getClazz(getClassLoader(), model.getAllImports()).newInstance();
+								ics[i] = (IServiceInvocationInterceptor)ins[i].getClazz().getType(getClassLoader(), model.getAllImports()).newInstance();
 							}
 						}
 					}
 					
-					final Class type = info.getType(model, getClassLoader());
+					final Class type = info.getType().getType(getClassLoader());
 					addService(info.getName(), type, info.getImplementation().getProxytype(), ics, ser, info)
 						.addResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(ret)
 					{

@@ -2295,6 +2295,15 @@ public abstract class ComponentManagementService extends BasicService implements
 	}
 	
 	/**
+	 *  Get the root identifier (platform).
+	 *  @return The root identifier.
+	 */
+	public IFuture<IComponentIdentifier> getRootIdentifier()
+	{
+		return new Future<IComponentIdentifier>(root.getComponentIdentifier());
+	}
+	
+	/**
 	 *  Search for components matching the given description.
 	 *  @return An array of matching component descriptions.
 	 */

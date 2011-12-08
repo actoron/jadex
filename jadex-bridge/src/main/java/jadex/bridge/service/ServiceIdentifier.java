@@ -1,5 +1,9 @@
 package jadex.bridge.service;
 
+import jadex.bridge.ClassInfo;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
+
 
 /**
  *  Service identifier for uniquely identifying a service.
@@ -10,13 +14,16 @@ public class ServiceIdentifier implements IServiceIdentifier
 	//-------- attributes --------
 	
 	/** The provider identifier. */
-	protected Object providerid;
-	
-	/** The service type. */
-	protected Class type;
-	
+	protected IComponentIdentifier providerid;
+		
 	/** The service name. */
 	protected String servicename;
+	
+	/** The service type. */
+	protected ClassInfo type;
+
+	/** The resource identifier. */
+	protected IResourceIdentifier rid;
 	
 	//-------- constructors --------
 	
@@ -30,11 +37,12 @@ public class ServiceIdentifier implements IServiceIdentifier
 	/**
 	 *  Create a new service identifier.
 	 */
-	public ServiceIdentifier(Object providerid, Class type, String servicename)
+	public ServiceIdentifier(IComponentIdentifier providerid, Class type, String servicename, IResourceIdentifier rid)
 	{
 		this.providerid = providerid;
-		this.type	= type;
+		this.type	= new ClassInfo(type);
 		this.servicename = servicename;
+		this.rid = rid;
 	}
 	
 	//-------- methods --------
@@ -43,7 +51,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 *  Get the service provider identifier.
 	 *  @return The provider id.
 	 */
-	public Object getProviderId()
+	public IComponentIdentifier getProviderId()
 	{
 		return providerid;
 	}
@@ -52,7 +60,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 *  Set the providerid.
 	 *  @param providerid The providerid to set.
 	 */
-	public void setProviderId(Object providerid)
+	public void setProviderId(IComponentIdentifier providerid)
 	{
 		this.providerid = providerid;
 	}
@@ -61,17 +69,16 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 *  Get the service type.
 	 *  @return The service type.
 	 */
-	public Class getServiceType()
+	public ClassInfo getServiceType()
 	{
 		return type;
 	}
 
-	
 	/**
 	 *  Set the service type.
 	 *  @param type The service type.
 	 */
-	public void	setServiceType(Class type)
+	public void	setServiceTypeId(ClassInfo type)
 	{
 		this.type	= type;
 	}
@@ -94,6 +101,24 @@ public class ServiceIdentifier implements IServiceIdentifier
 		this.servicename = servicename;
 	}
 
+	/** 
+	 *  Get the resource identifier.
+	 *  @return The resource identifier.
+	 */
+	public IResourceIdentifier getResourceIdentifier()
+	{
+		return rid;
+	}
+
+	/**
+	 *  Set the resource identifier. 
+	 *  @param rid The resource identifier.
+	 */
+	public void setReourceIdentifier(IResourceIdentifier rid)
+	{
+		this.rid = rid;
+	}
+	
 	/**
 	 *  Get the hashcode.
 	 *  @return The hashcode.

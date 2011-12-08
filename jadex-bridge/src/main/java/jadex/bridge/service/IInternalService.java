@@ -1,5 +1,6 @@
 package jadex.bridge.service;
 
+import jadex.bridge.IResourceIdentifier;
 import jadex.commons.future.IFuture;
 
 /**
@@ -22,6 +23,6 @@ public interface IInternalService extends IService
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class implclazz);
+	public void createServiceIdentifier(String name, Class implclazz, IResourceIdentifier rid);
 	
 }

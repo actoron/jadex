@@ -1,6 +1,12 @@
 package jadex.base.gui.componenttree;
 
+import jadex.base.gui.SwingDefaultResultListener;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
@@ -49,17 +55,56 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 	/**
 	 *  Set the service.
 	 */
-	public void	setService(ProvidedServiceInfo service)
+	public void	setService(final ProvidedServiceInfo service, final IServiceIdentifier sid, IExternalAccess ea)
 	{
 		getTextField("Name").setText(service.getName());
-		getTextField("Type").setText(service.getTypeName());
+		getTextField("Type").setText(service.getType().getTypeName());
 //		getTextField("Implementation").setText();
-		
-		try
+
+		if(service.getType().getType()==null)
+		{
+			SServiceProvider.getService(ea.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new SwingDefaultResultListener<ILibraryService>()
+			{
+				public void customResultAvailable(ILibraryService ls)
+				{
+					ls.getClassLoader(sid.getResourceIdentifier())
+						.addResultListener(new SwingDefaultResultListener<ClassLoader>()
+					{
+						public void customResultAvailable(ClassLoader cl)
+						{
+							Class type = service.getType().getType(cl);
+//							System.out.println("Found: "+service.getType().getTypeName()+" "+cl+" "+type);
+							internalSetService(type);
+						}
+					});
+				}
+			});
+		}
+		else
+		{
+			internalSetService(service.getType().getType());
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void internalSetService(Class type)
+	{
+		if(type==null)
+		{
+			// Class not available
+			JTable	list	= (JTable)getComponent("Methods").getComponent(0);
+			DefaultTableModel	dtm	= new DefaultTableModel();
+			dtm.addColumn("Not Available", new String[]{"Class file for service type not available locally.", "Methods cannot be displayed."});
+			list.setModel(dtm);
+		}
+		else
 		{
 			JTable	list	= (JTable)getComponent("Methods").getComponent(0);
 			// remote case not supported yet
-			Method[] methods	= service.getType(null, null).getMethods();
+			Method[] methods	= type.getMethods();
 			String[] returntypes	= new String[methods.length]; 
 			String[] names	= new String[methods.length]; 
 			String[] parameters	= new String[methods.length];
@@ -90,14 +135,6 @@ public class ProvidedServiceInfoProperties	extends	PropertiesPanel
 			dtm.addColumn("Return Type", returntypes);
 			dtm.addColumn("Method Name", names);
 			dtm.addColumn("Parameters", parameters);
-			list.setModel(dtm);
-		}
-		catch(NullPointerException e)
-		{
-			// Class not available
-			JTable	list	= (JTable)getComponent("Methods").getComponent(0);
-			DefaultTableModel	dtm	= new DefaultTableModel();
-			dtm.addColumn("Not Available", new String[]{"Class file for service type not available locally.", "Methods cannot be displayed."});
 			list.setModel(dtm);
 		}
 	}

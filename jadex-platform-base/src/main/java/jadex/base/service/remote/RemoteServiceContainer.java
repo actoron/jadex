@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.IResultSelector;
@@ -312,5 +313,14 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	{
 		return adapter.getLogger();
 	}
+	
+	/**
+	 * 
+	 */
+	public IFuture<Class> getServiceType(final IServiceIdentifier sid)
+	{
+		return new Future(new UnsupportedOperationException());
+	}
+
 }
 

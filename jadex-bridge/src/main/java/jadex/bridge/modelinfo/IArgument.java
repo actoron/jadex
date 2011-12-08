@@ -1,5 +1,7 @@
 package jadex.bridge.modelinfo;
 
+import jadex.bridge.ClassInfo;
+
 
 /**
  *  Interface for start arguments.
@@ -18,17 +20,23 @@ public interface IArgument
 	 */
 	public String getDescription();
 	
-	/**
-	 *  Get the class name.
-	 *  @return The class name. 
-	 */
-	public String getClassname();
+//	/**
+//	 *  Get the class name.
+//	 *  @return The class name. 
+//	 */
+//	public String getClassname();
+	
+//	/**
+//	 *  Get the clazz.
+//	 *  @return The clazz.
+//	 */
+//	public Class<?> getClazz(ClassLoader classloader, String[] imports);
 	
 	/**
-	 *  Get the clazz.
-	 *  @return The clazz.
+	 *  Get the class info.
+	 *  @return The class info.
 	 */
-	public Class<?> getClazz(ClassLoader classloader, String[] imports);
+	public ClassInfo getClazz();
 	
 	/**
 	 *  Get the default value.

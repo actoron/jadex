@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -30,31 +31,35 @@ public class SRemoteGui
 	 *  @param ea	The component access.
 	 *  @return	The provided and required service infos.
 	 */
-	public static IFuture<Tuple2<ProvidedServiceInfo[], RequiredServiceInfo<?>[]>>	getServiceInfos(IExternalAccess ea)
+	public static IFuture<Object[]>	getServiceInfos(IExternalAccess ea)
 	{
-		return ea.scheduleImmediate(new IComponentStep<Tuple2<ProvidedServiceInfo[], RequiredServiceInfo<?>[]>>()
+		return ea.scheduleImmediate(new IComponentStep<Object[]>()
 		{
 			@XMLClassname("getServiceInfos")
-			public IFuture<Tuple2<ProvidedServiceInfo[], RequiredServiceInfo<?>[]>> execute(IInternalAccess ia)
+			public IFuture<Object[]> execute(IInternalAccess ia)
 			{
-				final Future<Tuple2<ProvidedServiceInfo[], RequiredServiceInfo<?>[]>>	ret	= new Future<Tuple2<ProvidedServiceInfo[], RequiredServiceInfo<?>[]>>();
-				final RequiredServiceInfo<?>[]	ris	= ia.getServiceContainer().getRequiredServiceInfos();
+				final Future<Object[]>	ret	= new Future<Object[]>();
+				final RequiredServiceInfo[]	ris	= ia.getServiceContainer().getRequiredServiceInfos();
+//				final IServiceIdentifier[] sid
 				IIntermediateFuture<IService>	ds	= SServiceProvider.getDeclaredServices(ia.getServiceContainer());
-				ds.addResultListener(new ExceptionDelegationResultListener<Collection<IService>, Tuple2<ProvidedServiceInfo[], RequiredServiceInfo<?>[]>>(ret)
+				ds.addResultListener(new ExceptionDelegationResultListener<Collection<IService>, Object[]>(ret)
 				{
 					public void customResultAvailable(Collection<IService> result)
 					{
 						ProvidedServiceInfo[]	pis	= new ProvidedServiceInfo[result.size()];
+						IServiceIdentifier[]	sis	= new IServiceIdentifier[result.size()];
 						Iterator<IService>	it	= result.iterator();
 						for(int i=0; i<pis.length; i++)
 						{
 							IService	service	= it.next();
 							// todo: implementation?
+							sis[i] = service.getServiceIdentifier();
 							pis[i]	= new ProvidedServiceInfo(service.getServiceIdentifier().getServiceName(), 
-								service.getServiceIdentifier().getServiceType(), null, null);
+//								service.getServiceIdentifier().getServiceType(), null, null);
+								sis[i].getServiceType().getType(), null, null);
 						}
 						
-						ret.setResult(new Tuple2<ProvidedServiceInfo[], RequiredServiceInfo<?>[]>(pis, ris));
+						ret.setResult(new Object[]{pis, ris, sis});
 					}
 				});
 				return ret;

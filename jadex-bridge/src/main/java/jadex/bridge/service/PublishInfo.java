@@ -1,5 +1,7 @@
 package jadex.bridge.service;
 
+import jadex.bridge.ClassInfo;
+
 /**
  *  Info struct for service publishing details.
  */
@@ -14,7 +16,7 @@ public class PublishInfo
 	protected String publishtype;
 	
 	/** The service type. */
-	protected Class servicetype;
+	protected ClassInfo servicetype;
 
 	//-------- constructors --------
 
@@ -34,7 +36,7 @@ public class PublishInfo
 	{
 		this.pid = pid;
 		this.publishtype = publishtype;
-		this.servicetype = servicetype;
+		this.servicetype = new ClassInfo(servicetype);
 	}
 
 	//-------- methods --------
@@ -79,7 +81,7 @@ public class PublishInfo
 	 *  Get the servicetype.
 	 *  @return The servicetype.
 	 */
-	public Class getServiceType()
+	public ClassInfo getServiceType()
 	{
 		return servicetype;
 	}
@@ -88,7 +90,7 @@ public class PublishInfo
 	 *  Set the servicetype.
 	 *  @param servicetype The servicetype to set.
 	 */
-	public void setServiceType(Class servicetype)
+	public void setServiceType(ClassInfo servicetype)
 	{
 		this.servicetype = servicetype;
 	}

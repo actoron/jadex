@@ -41,7 +41,7 @@ public interface IMarshalService
 	 *  Get the proxy interfaces (empty list if none).
 	 */
 	@Excluded
-	public Class<?>[] getRemoteInterfaces(Object object);
+	public Class<?>[] getRemoteInterfaces(Object object, ClassLoader cl);
 	
 	//-------- local clone processors --------
 	

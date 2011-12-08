@@ -139,7 +139,7 @@ public class ComponentTestSuite extends TestSuite
 								for(int i=0; !istest && i<results.length; i++)
 								{
 									if(results[i].getName().equals("testresults") && Testcase.class.equals(
-										results[i].getClazz(libsrv.getClassLoader(model.getResourceIdentifier()).get(ts), model.getAllImports())))
+										results[i].getClazz().getType(libsrv.getClassLoader(model.getResourceIdentifier()).get(ts), model.getAllImports())))
 									{
 										istest	= true;
 									}

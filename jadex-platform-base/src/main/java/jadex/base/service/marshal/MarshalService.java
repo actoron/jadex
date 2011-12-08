@@ -67,7 +67,6 @@ public class MarshalService extends BasicService implements IMarshalService
 		refs.put(ComponentIdentifier.class, tf);
 		
 		REFERENCES = Collections.unmodifiableMap(refs);
-		
 	}
 	
 	//-------- attributes --------
@@ -88,7 +87,7 @@ public class MarshalService extends BasicService implements IMarshalService
 	 */
 	public MarshalService(IExternalAccess access)
 	{
-		super(access, IMarshalService.class, null);
+		super(access.getComponentIdentifier(), IMarshalService.class, null);
 		this.access = access;
 	}
 	
@@ -350,7 +349,7 @@ public class MarshalService extends BasicService implements IMarshalService
 	/**
 	 *  Get the proxy interfaces (empty list if none).
 	 */
-	public Class<?>[] getRemoteInterfaces(Object object)
+	public Class<?>[] getRemoteInterfaces(Object object, ClassLoader cl)
 	{
 		List ret = new ArrayList();
 		
@@ -389,7 +388,7 @@ public class MarshalService extends BasicService implements IMarshalService
 			
 			if(object instanceof IService)
 			{
-				Class serviceinterface = ((IService)object).getServiceIdentifier().getServiceType();
+				Class serviceinterface = ((IService)object).getServiceIdentifier().getServiceType().getType(cl);
 				if(!ret.contains(serviceinterface))
 					ret.add(serviceinterface);
 			}

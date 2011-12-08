@@ -1,5 +1,7 @@
 package jadex.bridge.service;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -23,7 +25,6 @@ import java.util.Map;
  */
 public class BasicService implements IInternalService
 {	
-	
 	//-------- attributes --------
 
 	/** The id counter. */
@@ -42,11 +43,10 @@ public class BasicService implements IInternalService
 	protected Map properties;
 	
 	/** The publish info. */
-	protected PublishInfo publishinfo;
-	
+//	protected PublishInfo publishinfo;
 	
 	/** The provider id. */
-	protected Object providerid;
+	protected IComponentIdentifier providerid;
 	
 	/** The type. */
 	protected Class type;
@@ -56,7 +56,7 @@ public class BasicService implements IInternalService
 	/**
 	 *  Create a new service.
 	 */
-	public BasicService(Object providerid, Class type, Map properties)
+	public BasicService(IComponentIdentifier providerid, Class type, Map properties)
 	{
 //		if(!SReflect.isSupertype(type, getClass()))
 //			throw new RuntimeException("Service must implement provided interface: "+getClass().getName()+", "+type.getName());
@@ -76,6 +76,7 @@ public class BasicService implements IInternalService
 			if(this.properties==null)
 				this.properties = new HashMap();
 			this.properties.put("componentviewer.viewerclass", guiclazz);
+//			System.out.println("found: "+guiclazz);
 		}
 		else if(guiclazz==null && type.isAnnotationPresent(GuiClassName.class))
 		{
@@ -84,6 +85,7 @@ public class BasicService implements IInternalService
 			if(this.properties==null)
 				this.properties = new HashMap();
 			this.properties.put("componentviewer.viewerclass", guiclazz);
+//			System.out.println("found: "+guiclazz);
 		}
 	}
 	
@@ -103,9 +105,9 @@ public class BasicService implements IInternalService
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class implclazz)
+	public void createServiceIdentifier(String name, Class implclazz, IResourceIdentifier rid)
 	{
-		this.sid = createServiceIdentifier(providerid, name, type, implclazz);
+		this.sid = createServiceIdentifier(providerid, name, type, implclazz, rid);
 	}
 	
 	/**
@@ -147,23 +149,23 @@ public class BasicService implements IInternalService
 		this.properties = properties;
 	}
 	
-	/**
-	 *  Get the publish info.
-	 *  @return The publish info.
-	 */
-	public PublishInfo getPublishInfo()
-	{
-		return publishinfo;
-	}
-	
-	/**
-	 *  Set the publishinfo.
-	 *  @param publishinfo The publishinfo to set.
-	 */
-	public void setPublishInfo(PublishInfo publishinfo)
-	{
-		this.publishinfo = publishinfo;
-	}
+//	/**
+//	 *  Get the publish info.
+//	 *  @return The publish info.
+//	 */
+//	public PublishInfo getPublishInfo()
+//	{
+//		return publishinfo;
+//	}
+//	
+//	/**
+//	 *  Set the publishinfo.
+//	 *  @param publishinfo The publishinfo to set.
+//	 */
+//	public void setPublishInfo(PublishInfo publishinfo)
+//	{
+//		this.publishinfo = publishinfo;
+//	}
 
 	/**
 	 *  Start the service.
@@ -246,9 +248,10 @@ public class BasicService implements IInternalService
 	 *  @param servicename The service name.
 	 *  @return A service identifier.
 	 */
-	public static IServiceIdentifier createServiceIdentifier(Object providerid, String servicename, Class servicetype, Class serviceimpl)
+	public static IServiceIdentifier createServiceIdentifier(IComponentIdentifier providerid, String servicename, 
+		Class servicetype, Class serviceimpl, IResourceIdentifier rid)
 	{
-		return new ServiceIdentifier(providerid, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl));
+		return new ServiceIdentifier(providerid, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl), rid);
 	}
 	
 	/**

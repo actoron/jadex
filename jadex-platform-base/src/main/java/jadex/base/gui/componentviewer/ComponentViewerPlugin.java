@@ -7,11 +7,14 @@ import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
-import jadex.base.gui.componenttree.ProvidedServiceNode;
+import jadex.base.gui.componenttree.ProvidedServiceInfoNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.IServiceContainer;
+import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Properties;
@@ -321,50 +324,59 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				{
 					final Object tmp = paths[i].getLastPathComponent();
 					
-					if(tmp instanceof ProvidedServiceNode)
+					if(tmp instanceof ProvidedServiceInfoNode)
 					{
-						final ProvidedServiceNode node = (ProvidedServiceNode)tmp;
-						final IService service = node.getService();
-
-						AbstractJCCPlugin.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
+						final ProvidedServiceInfoNode node = (ProvidedServiceInfoNode)tmp;
+//						final IService service = node.getService();
+						
+						SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), node.getServiceIdentifier())
 							.addResultListener(new SwingDefaultResultListener(comptree)
 						{
 							public void customResultAvailable(Object result)
 							{
-								ClassLoader	cl	= (ClassLoader)result;
-								
-								final Object clid = service.getPropertyMap()!=null? service.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
-								final Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
-								
-								if(clid!=null)
+								final IService service = (IService)result;
+
+								AbstractJCCPlugin.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), getJCC())
+									.addResultListener(new SwingDefaultResultListener(comptree)
 								{
-									try
+									public void customResultAvailable(Object result)
 									{
-										storeCurrentPanelSettings();
-										final IServiceViewerPanel	panel = (IServiceViewerPanel)clazz.newInstance();
-										panel.init(getJCC(), service).addResultListener(new SwingDefaultResultListener(comptree)
+										ClassLoader	cl	= (ClassLoader)result;
+										
+										final Object clid = service.getPropertyMap()!=null? service.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
+										final Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
+										
+										if(clid!=null)
 										{
-											public void customResultAvailable(Object result)
+											try
 											{
-												Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
-												if(sub!=null)
-													panel.setProperties(sub);
-												JComponent comp = panel.getComponent();
-												
-												// todo: help 
-												//SHelp.setupHelp(comp, getHelpID());
-												panels.put(service.getServiceIdentifier(), panel);
-												detail.add(comp, service.getServiceIdentifier());
-												comptree.getModel().fireNodeChanged(node);
+												storeCurrentPanelSettings();
+												final IServiceViewerPanel	panel = (IServiceViewerPanel)clazz.newInstance();
+												panel.init(getJCC(), service).addResultListener(new SwingDefaultResultListener(comptree)
+												{
+													public void customResultAvailable(Object result)
+													{
+														Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+														if(sub!=null)
+															panel.setProperties(sub);
+														JComponent comp = panel.getComponent();
+														
+														// todo: help 
+														//SHelp.setupHelp(comp, getHelpID());
+														panels.put(node.getServiceIdentifier(), panel);
+														detail.add(comp, node.getServiceIdentifier());
+														comptree.getModel().fireNodeChanged(node);
+													}
+												});
 											}
-										});
+											catch(Exception e)
+											{
+												e.printStackTrace();
+												getJCC().displayError("Error initializing service viewer panel.", "Component viewer panel class: "+clid, e);
+											}
+										}
 									}
-									catch(Exception e)
-									{
-										e.printStackTrace();
-										getJCC().displayError("Error initializing service viewer panel.", "Component viewer panel class: "+clid, e);
-									}
-								}
+								});
 							}
 						});
 					}
@@ -478,11 +490,39 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 	 */
 	protected boolean isNodeViewable(final ITreeNode node)
 	{
+//		System.out.println("called isVis: "+node.getId());
 		boolean ret = false;
-		if(node instanceof ProvidedServiceNode)
+		if(node instanceof ProvidedServiceInfoNode)
 		{
-			Map	props	= ((ProvidedServiceNode)node).getService().getPropertyMap();
-			ret = props!=null && props.get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)!=null;
+			final IServiceIdentifier sid = ((ProvidedServiceInfoNode)node).getServiceIdentifier();
+			if(sid!=null)
+			{
+				Boolean viewable = (Boolean)viewables.get(sid);
+				if(viewable!=null)
+				{
+					ret = viewable.booleanValue();
+//					System.out.println("isVis result: "+node.getId()+" "+ret);
+				}
+				else
+				{
+					// Unknown -> start search to find out asynchronously
+					SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), sid)
+						.addResultListener(new SwingDefaultResultListener(comptree)
+					{
+						public void customResultAvailable(Object result)
+						{
+							IService service = (IService)result;
+							Map	props = service.getPropertyMap();
+							boolean vis = props!=null && props.get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)!=null;
+							viewables.put(sid, vis? Boolean.TRUE: Boolean.FALSE);
+//							System.out.println("isVis first res: "+viewables.get(sid));
+							node.refresh(false);
+						}
+					});
+				}
+			}
+//			Map	props	= ((ProvidedServiceInfoNode)node).getServiceIdentifier().get.getPropertyMap();
+//			ret = props!=null && props.get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)!=null;
 		}
 		else if(node instanceof IActiveComponentTreeNode)
 		{
@@ -498,6 +538,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				if(viewable!=null)
 				{
 					ret = viewable.booleanValue();
+//					System.out.println("isVis result: "+node.getId()+" "+ret);
 				}
 				else
 				{
@@ -521,7 +562,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 										{
 											final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
 											viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
-			//								System.out.println("node: "+viewables.get(cid));
+//											System.out.println("isVis first res: "+viewables.get(cid));
 											node.refresh(false);
 										}										
 									});

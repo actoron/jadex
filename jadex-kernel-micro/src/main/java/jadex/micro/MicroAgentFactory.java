@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
@@ -21,19 +22,15 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-/* $if !android $ */
 import jadex.commons.gui.SGUI;
-/* $endif $ */
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/* $if !android $ */
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
-/* $endif $ */
 
 /**
  *  Factory for creating micro agents.
@@ -106,7 +103,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	// This constructor is used by the Starter class and the ADFChecker plugin. 
 	public MicroAgentFactory(String providerid)
 	{
-		super(providerid, IComponentFactory.class, null);
+		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new MicroModelLoader();
 	}
 	

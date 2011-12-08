@@ -158,7 +158,7 @@ public class RemoteReferenceModule
 		// via synchronized block and rechecking if proxy was already created.
 		// -> not necessary due to only single threaded access via agent thread
 		
-		Class[] remoteinterfaces = marshalservice.getRemoteInterfaces(target);
+		Class[] remoteinterfaces = marshalservice.getRemoteInterfaces(target, cl);
 		
 		if(remoteinterfaces.length==0)
 			throw new RuntimeException("Proxyable object has no remote interfaces: "+target);

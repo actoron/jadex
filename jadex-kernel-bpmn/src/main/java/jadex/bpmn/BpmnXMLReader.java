@@ -15,6 +15,7 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.AbstractErrorReportBuilder;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.Argument;
@@ -1598,12 +1599,12 @@ public class BpmnXMLReader
 										if(binding!=null)
 										{
 											// todo: interceptors
-											psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding, null);
+											psim = new ProvidedServiceImplementation(new ClassInfo(impltype), null, proxytype, binding, null);
 										}
 										else
 										{
 											// todo: interceptors
-											psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
+											psim = new ProvidedServiceImplementation(new ClassInfo(impltype), impltype==null? implname: null, proxytype, null, null);
 										}
 										// todo: support publish
 										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim, null));

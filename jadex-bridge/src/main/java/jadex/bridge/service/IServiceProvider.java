@@ -2,6 +2,7 @@ package jadex.bridge.service;
 
 import java.util.Collection;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
@@ -37,7 +38,7 @@ public interface IServiceProvider extends IRemotable
 	 *  Get the globally unique id of the provider.
 	 *  @return The id of this provider.
 	 */
-	public Object	getId();
+	public IComponentIdentifier	getId();
 	
 	/**
 	 *  Get the type of the service provider (e.g. enclosing component type).

@@ -60,8 +60,8 @@ public class STestCenter
 														boolean	istest	= false;
 														for(int i=0; !istest && i<results.length; i++)
 														{
-															if(results[i].getName().equals("testresults") 
-																&& results[i].getClassname().equals("jadex.base.test.Testcase"))
+															if(results[i].getName().equals("testresults") && results[i].getClazz()!=null
+																&& "jadex.base.test.Testcase".equals(results[i].getClazz().getTypeName()))
 //																&& Testcase.class.equals(results[i].getClazz(ls.getClassLoader(model.getResourceIdentifier()), model.getAllImports())))
 															{	
 																istest	= true;

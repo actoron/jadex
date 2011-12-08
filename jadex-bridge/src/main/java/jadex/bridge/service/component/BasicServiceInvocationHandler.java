@@ -2,6 +2,7 @@ package jadex.bridge.service.component;
 
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IInternalService;
@@ -324,7 +325,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, 
-		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy)
+		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, IResourceIdentifier rid)
 	{
 		IInternalService	ret;
 		
@@ -335,7 +336,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		
 		if(service instanceof IInternalService)
 		{
-			((IInternalService)service).createServiceIdentifier(name, service.getClass());
+			((IInternalService)service).createServiceIdentifier(name, service.getClass(), rid);
 		}
 		
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
@@ -414,7 +415,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			}
 			
 			BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, null);
-			mgmntservice.createServiceIdentifier(name, service.getClass());
+			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier());
 						
 			boolean found = false;
 			Class serclass = service.getClass();
@@ -528,7 +529,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 		handler.addFirstServiceInterceptor(new DelegationInterceptor(ea, info, binding, null));
 //		return (IInternalService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
-		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, sid.getServiceType()}, handler); 
+		return (IInternalService)Proxy.newProxyInstance(classloader, new Class[]{IInternalService.class, info.getType().getType(classloader)}, handler); //sid.getServiceType()
 	}
 
 	/**
@@ -560,8 +561,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 				}
 			}
 //			ret = (IService)Proxy.newProxyInstance(ea.getModel().getClassLoader(), new Class[]{IService.class, 
-			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, 
-				service.getServiceIdentifier().getServiceType()}, handler); 
+			// service.getServiceIdentifier().getServiceType()
+			ret = (IService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IService.class, info.getType().getType(ia.getClassLoader())}, handler); 
 		}
 		
 		return ret;

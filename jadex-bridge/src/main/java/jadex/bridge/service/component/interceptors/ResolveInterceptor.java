@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -45,7 +46,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 			SERVICEMETHODS.add(IService.class.getMethod("getServiceIdentifier", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("getPropertyMap", new Class[0]));
 			SERVICEMETHODS.add(IInternalService.class.getMethod("isValid", new Class[0]));
-			SERVICEMETHODS.add(IInternalService.class.getMethod("createServiceIdentifier", new Class[]{String.class, Class.class}));
+			SERVICEMETHODS.add(IInternalService.class.getMethod("createServiceIdentifier", new Class[]{String.class, Class.class, IResourceIdentifier.class}));
 		}
 		catch(Exception e)
 		{

@@ -1,10 +1,15 @@
 package jadex.base.gui.componenttree;
 
+import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.AbstractTreeNode;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.gui.SGUI;
 
@@ -14,7 +19,7 @@ import javax.swing.JTree;
 import javax.swing.UIDefaults;
 
 /**
- *  Node object representing a service container.
+ *  Node object representing a service.
  */
 public class ProvidedServiceInfoNode	extends AbstractTreeNode
 {
@@ -30,20 +35,29 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode
 	
 	/** The service. */
 	private final ProvidedServiceInfo	service;
+	
+	/** The service id. */
+	protected IServiceIdentifier sid;
 
 	/** The properties component (if any). */
 	protected ProvidedServiceInfoProperties	propcomp;
+	
+	/** The external access. */
+	protected IExternalAccess ea;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new service container node.
 	 */
-	public ProvidedServiceInfoNode(ITreeNode parent, AsyncTreeModel model, JTree tree, ProvidedServiceInfo service)
+	public ProvidedServiceInfoNode(ITreeNode parent, AsyncTreeModel model, JTree tree, 
+		ProvidedServiceInfo service, IServiceIdentifier sid, IExternalAccess ea)
 	{
 		super(parent, model, tree);
 		this.service	= service;
-//		if(service==null || service.getServiceIdentifier()==null)
+		this.sid = sid;
+		this.ea = ea;
+//		if(service==null || service.getType().getTypeName()==null)
 //			System.out.println("service node: "+this);
 		model.registerNode(this);
 	}
@@ -57,12 +71,22 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode
 	{
 		return service;
 	}
+	
+	/**
+	 *  Get the sid.
+	 *  @return the sid.
+	 */
+	public IServiceIdentifier getServiceIdentifier()
+	{
+		return sid;
+	}
 
 	/**
 	 *  Get the id used for lookup.
 	 */
 	public Object	getId()
 	{
+//		return sid;
 		return getId(parent, service);
 	}
 
@@ -89,7 +113,7 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode
 	 */
 	public String toString()
 	{
-		return SReflect.getUnqualifiedTypeName(service.getTypeName());
+		return SReflect.getUnqualifiedTypeName(service.getType().getTypeName());
 	}
 	
 	/**
@@ -99,7 +123,7 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode
 	{
 		StringBuffer buf = new StringBuffer();
 		buf.append(service.getName());
-		buf.append(" :").append(service.getTypeName()); 
+		buf.append(" :").append(service.getType().getTypeName()); 
 		return buf.toString();
 	}
 
@@ -121,7 +145,8 @@ public class ProvidedServiceInfoNode	extends AbstractTreeNode
 		{
 			propcomp	= new ProvidedServiceInfoProperties();
 		}
-		propcomp.setService(service);
+		propcomp.setService(service, sid, ea);
+		
 		return propcomp;
 	}
 	

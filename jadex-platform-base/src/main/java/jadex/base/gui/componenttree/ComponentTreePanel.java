@@ -13,6 +13,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
@@ -37,7 +38,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -427,8 +427,8 @@ public class ComponentTreePanel extends JSplitPane
 				if(path!=null)
 				{
 					final ServiceContainerNode scn = (ServiceContainerNode)path.getPathComponent(path.getPathCount()-2);
-					final ProvidedServiceNode sn = (ProvidedServiceNode)path.getLastPathComponent();
-					scn.getContainer().removeService(sn.getService().getServiceIdentifier()).addResultListener(new SwingDefaultResultListener(proppanel)
+					final ProvidedServiceInfoNode sn = (ProvidedServiceInfoNode)path.getLastPathComponent();
+					scn.getContainer().removeService(sn.getServiceIdentifier()).addResultListener(new SwingDefaultResultListener(proppanel)
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -440,6 +440,8 @@ public class ComponentTreePanel extends JSplitPane
 		};
 		actions.put(removeservice.getValue(Action.NAME), removeservice);
 
+		
+		
 		final Action showobject = new AbstractAction(SHOWDETAILS_ACTION, icons.getIcon("show_details"))
 		{
 			public void actionPerformed(ActionEvent e)
@@ -448,11 +450,19 @@ public class ComponentTreePanel extends JSplitPane
 				if(path!=null)
 				{
 					final ITreeNode node = (ITreeNode)path.getLastPathComponent();
-					if(node instanceof ProvidedServiceNode)
+					if(node instanceof ProvidedServiceInfoNode)
 					{
-						Object obj = ((ProvidedServiceNode)node).getService();
-						JPanel panel = new ObjectInspectorPanel(obj);
-						showProperties(panel);
+//						Object obj = ((ProvidedServiceInfoNode)node).getService();
+						IServiceIdentifier sid = ((ProvidedServiceInfoNode)node).getServiceIdentifier();
+						IFuture<Object> fut = SServiceProvider.getService(access.getServiceProvider(), sid);
+						fut.addResultListener(new SwingDefaultResultListener<Object>()
+						{
+							public void customResultAvailable(Object obj)
+							{
+								JPanel panel = new ObjectInspectorPanel(obj);
+								showProperties(panel);
+							}
+						});
 					}
 					else if(node instanceof IActiveComponentTreeNode)
 					{
@@ -583,7 +593,7 @@ public class ComponentTreePanel extends JSplitPane
 						ret.add(pshowprops);
 					}
 					
-					if(nodes[0] instanceof ProvidedServiceNode || nodes[0] instanceof IActiveComponentTreeNode)
+					if(nodes[0] instanceof ProvidedServiceInfoNode || nodes[0] instanceof IActiveComponentTreeNode)
 					{
 						Action pshowobject = new AbstractAction((String)showobject.getValue(Action.NAME),
 							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_showobject")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
@@ -596,18 +606,18 @@ public class ComponentTreePanel extends JSplitPane
 						ret.add(pshowobject);
 					}
 					
-					if(nodes[0] instanceof ProvidedServiceNode && !Proxy.isProxyClass(((ProvidedServiceNode)nodes[0]).getService().getClass()))
-					{
-						Action premoveservice = new AbstractAction((String)removeservice.getValue(Action.NAME),
-							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
-						{
-							public void actionPerformed(ActionEvent e)
-							{
-								removeservice.actionPerformed(e);
-							}
-						};
-						ret.add(premoveservice);
-					}
+//					if(nodes[0] instanceof ProvidedServiceInfoNode && !Proxy.isProxyClass(((ProvidedServiceNode)nodes[0]).getService().getClass()))
+//					{
+//						Action premoveservice = new AbstractAction((String)removeservice.getValue(Action.NAME),
+//							base!=null ? new CombiIcon(new Icon[]{base, icons.getIcon("overlay_kill")}) : (Icon)showprops.getValue(Action.SMALL_ICON))
+//						{
+//							public void actionPerformed(ActionEvent e)
+//							{
+//								removeservice.actionPerformed(e);
+//							}
+//						};
+//						ret.add(premoveservice);
+//					}
 					
 					if(nodes[0] instanceof ProxyComponentTreeNode)
 					{

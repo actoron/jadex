@@ -911,6 +911,32 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 //		return libcl;
 //	}
 
+//	/**
+//	 *  Load a class given a class identifier.
+//	 *  @param clid The class identifier.
+//	 *  @return The class for the identifier.
+//	 */
+//	public IFuture<Class> loadClass(final IClassIdentifier clid)
+//	{
+//		final Future<Class> ret = new Future<Class>();
+//		IResourceIdentifier rid = clid.getResourceIdentifier();
+//		getClassLoader(rid).addResultListener(component.createResultListener(new ExceptionDelegationResultListener<ClassLoader, Class>(ret)
+//		{
+//			public void customResultAvailable(ClassLoader cl)
+//			{
+//				try
+//				{
+//					ret.setResult(cl.loadClass(clid.getClassname()));
+//				}
+//				catch(Exception e)
+//				{
+//					ret.setException(e);
+//				}
+//			}
+//		}));
+//		return ret;
+//	}
+	
 	/**
 	 *  Start the service.
 	 */

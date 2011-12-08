@@ -1323,7 +1323,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		ProvidedServiceImplementation	impl	= info.getImplementation();
 		
 		// Service implementation inside BPMN: find start events for service methods.
-		if(impl!=null && impl.getExpression()==null && impl.getImplementation(model, getClassLoader())==null && info.getName()!=null)
+		if(impl!=null && impl.getExpression()==null && impl.getImplementation().getType(getClassLoader())==null && info.getName()!=null)
 		{
 			// Build map of potentially matching events: method name -> {list of matching signal event activities}
 			MultiCollection	events	= new MultiCollection();
@@ -1354,7 +1354,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 			// Find matching events for each method.
 			Future	fut	= new Future();
 			ret	= fut;
-			Class	type	= info.getType(model, getClassLoader());
+			Class	type	= info.getType().getType(getClassLoader());
 			Method[]	meths	= type.getMethods();
 			Map	methods	= new HashMap(); // method -> event.
 			for(int i=0; !fut.isDone() && i<meths.length; i++)
@@ -1384,8 +1384,8 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 
 //			System.out.println("Found mapping: "+methods);
 			// Todo: interceptors
-			ret	= addService(info.getName(), info.getType(model, getClassLoader()), info.getImplementation().getProxytype(), null,
-				Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getType(model, getClassLoader())}, new ProcessServiceInvocationHandler(this, methods)), null);
+			ret	= addService(info.getName(), info.getType().getType(getClassLoader()), info.getImplementation().getProxytype(), null,
+				Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getType().getType(getClassLoader())}, new ProcessServiceInvocationHandler(this, methods)), null);
 		}
 		
 		// External service implementation

@@ -10,7 +10,9 @@ import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -44,7 +46,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	protected Map<IServiceIdentifier, ProvidedServiceInfo> serviceinfos;
 	
 	/** The container name. */
-	protected Object id;
+	protected IComponentIdentifier id;
 	
 	/** True, if the container is started. */
 	protected boolean started;
@@ -54,7 +56,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/**
 	 *  Create a new service container.
 	 */
-	public BasicServiceContainer(Object id)
+	public BasicServiceContainer(IComponentIdentifier id)
 	{
 		this.id = id;
 	}
@@ -87,7 +89,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get the globally unique id of the provider.
 	 *  @return The id of this provider.
 	 */
-	public Object	getId()
+	public IComponentIdentifier	getId()
 	{
 		return id;
 	}
@@ -108,41 +110,49 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param id The name.
 	 *  @param service The service.
 	 */
-	public IFuture<Void>	addService(final IInternalService service, ProvidedServiceInfo info)
+	public IFuture<Void>	addService(final IInternalService service, final ProvidedServiceInfo info)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		System.out.println("Adding service: " + name + " " + type + " " + service);
-		synchronized(this)
+		getServiceType(service.getServiceIdentifier()).addResultListener(new ExceptionDelegationResultListener<Class, Void>(ret)
 		{
-			Collection tmp = services!=null? (Collection)services.get(service.getServiceIdentifier().getServiceType()): null;
-			if(tmp == null)
+			public void customResultAvailable(Class servicetype)
 			{
-				tmp = Collections.synchronizedList(new ArrayList());
-				if(services==null)
-					services = Collections.synchronizedMap(new LinkedHashMap());
-				services.put(service.getServiceIdentifier().getServiceType(), tmp);
-				if(serviceinfos==null)
-					serviceinfos = Collections.synchronizedMap(new HashMap());
-				serviceinfos.put(service.getServiceIdentifier(), info);
-			}
-			tmp.add(service);
-			
-			if(started)
-			{
-				service.startService().addResultListener(new DelegationResultListener<Void>(ret)
+//				System.out.println("Adding service: " + name + " " + type + " " + service);
+				synchronized(this)
 				{
-					public void customResultAvailable(Void result)
+					Collection tmp = services!=null? (Collection)services.get(servicetype): null;
+					if(tmp == null)
 					{
-						serviceStarted(service);
+						tmp = Collections.synchronizedList(new ArrayList());
+						if(services==null)
+							services = Collections.synchronizedMap(new LinkedHashMap());
+						services.put(servicetype, tmp);
+						if(serviceinfos==null)
+							serviceinfos = Collections.synchronizedMap(new HashMap());
+						serviceinfos.put(service.getServiceIdentifier(), info);
 					}
-				});
+					tmp.add(service);
+					
+					if(started)
+					{
+						service.startService().addResultListener(new DelegationResultListener<Void>(ret)
+						{
+							public void customResultAvailable(Void result)
+							{
+								serviceStarted(service);
+							}
+						});
+					}
+					else
+					{
+						ret.setResult(null);
+					}
+				}
 			}
-			else
-			{
-				ret.setResult(null);
-			}
-		}
+		});
+		
+//		
 		
 		return ret;
 	}
@@ -162,50 +172,55 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			return ret;
 		}
 		
-		// System.out.println("Removing service: " + type + " " + service);
-		synchronized(this)
+		getServiceType(sid).addResultListener(new ExceptionDelegationResultListener<Class, Void>(ret)
 		{
-			Collection tmp = services!=null? (Collection)services.get(sid.getServiceType()): null;
-			
-			IInternalService service = null;
-			if(tmp!=null)
+			public void customResultAvailable(final Class servicetype)
 			{
-				for(Iterator it=tmp.iterator(); it.hasNext() && service==null; )
+				// System.out.println("Removing service: " + type + " " + service);
+				synchronized(this)
 				{
-					final IInternalService tst = (IInternalService)it.next();
-					if(tst.getServiceIdentifier().equals(sid))
+					Collection tmp = services!=null? (Collection)services.get(servicetype): null;
+					
+					IInternalService service = null;
+					if(tmp!=null)
 					{
-						service = tst;
-						tmp.remove(service);
-						// Todo: fix started/terminated!? (i.e. addService() is ignored, when not started!?)
-//						if(!terminated)
-//						{
-							getLogger().info("Terminating service: "+sid);
-							service.shutdownService().addResultListener(new DelegationResultListener(ret)
+						for(Iterator it=tmp.iterator(); it.hasNext() && service==null; )
+						{
+							final IInternalService tst = (IInternalService)it.next();
+							if(tst.getServiceIdentifier().equals(sid))
 							{
-								public void customResultAvailable(Object result)
-								{
-									getLogger().info("Terminated service: "+sid);
-									serviceShutdowned(tst).addResultListener(new DelegationResultListener<Void>(ret));
-								}
-							});
-//						}
-//						else
-//						{
-//							ret.setResult(null);
-//						}
+								service = tst;
+								tmp.remove(service);
+								// Todo: fix started/terminated!? (i.e. addService() is ignored, when not started!?)
+//								if(!terminated)
+//								{
+									getLogger().info("Terminating service: "+sid);
+									service.shutdownService().addResultListener(new DelegationResultListener(ret)
+									{
+										public void customResultAvailable(Object result)
+										{
+											getLogger().info("Terminated service: "+sid);
+											serviceShutdowned(tst).addResultListener(new DelegationResultListener<Void>(ret));
+										}
+									});
+//								}
+//								else
+//								{
+//									ret.setResult(null);
+//								}
+							}
+						}
 					}
+					if(service==null)
+					{
+						ret.setException(new IllegalArgumentException("Service not found: "+sid));
+					}
+			
+					if(tmp.isEmpty())
+						services.remove(servicetype);
 				}
 			}
-			if(service==null)
-			{
-				ret.setException(new IllegalArgumentException("Service not found: "+sid));
-				return ret;
-			}
-	
-			if(tmp.isEmpty())
-				services.remove(sid.getServiceType());
-		}
+		});
 		
 		return ret;
 	}
@@ -716,6 +731,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
 		return handler.getInterceptors();
 	}
+	
+	/**
+	 * 
+	 */
+	public abstract IFuture<Class> getServiceType(final IServiceIdentifier sid);
 	
 //	/**
 //	 *  Add a provided service interceptor (at first position in the chain).

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="componenttype" type="componenttype">
 		<xs:annotation>
 			<xs:documentation>A component type specifies the interface, the structure and content of a component.</xs:documentation>
@@ -385,7 +385,7 @@
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="implementation" type="implementation"/>
-			<xs:element name="publish" type="publish"/>
+			<xs:element name="publish" type="publish" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="optional"/>
 		<xs:attribute name="class" type="xs:string" use="required"/>

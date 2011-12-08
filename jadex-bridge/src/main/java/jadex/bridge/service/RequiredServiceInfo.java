@@ -1,8 +1,7 @@
 package jadex.bridge.service;
 
-import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.commons.SReflect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.List;
 /**
  *  Struct for information about a required service.
  */
-public class RequiredServiceInfo<T>
+public class RequiredServiceInfo
 {
 	//-------- constants --------
 	
@@ -42,12 +41,15 @@ public class RequiredServiceInfo<T>
 	/** The component internal service name. */
 	protected String name;
 	
-	/** The service interface type as string. */
-	protected String typename;
+//	/** The service interface type as string. */
+//	protected String typename;
 	
-	/** The service interface type. */
-	protected Class<T> type;
+//	/** The service interface type. */
+//	protected Class<T> type;
 
+	/** The type. */
+	protected ClassInfo type;
+	
 	/** Flag if multiple services should be returned. */
 	protected boolean multiple;
 
@@ -75,7 +77,7 @@ public class RequiredServiceInfo<T>
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class<T> type)
+	public RequiredServiceInfo(String name, Class type)
 	{
 		this(name, type, RequiredServiceInfo.SCOPE_APPLICATION);
 	}
@@ -83,7 +85,15 @@ public class RequiredServiceInfo<T>
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class<T> type, String scope)
+	public RequiredServiceInfo(Class type)
+	{
+		this(null, type, RequiredServiceInfo.SCOPE_APPLICATION);
+	}
+	
+	/**
+	 *  Create a new service info.
+	 */
+	public RequiredServiceInfo(String name, Class type, String scope)
 	{
 		this(name, type, false, new RequiredServiceBinding(name, scope));
 	}
@@ -91,10 +101,11 @@ public class RequiredServiceInfo<T>
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class<T> type, boolean multiple, RequiredServiceBinding binding)
+	public RequiredServiceInfo(String name, Class type, boolean multiple, RequiredServiceBinding binding)
 	{
 		this.name = name;
-		setType(type);
+		if(type!=null)
+			setType(new ClassInfo(type));
 		this.multiple = multiple;
 		this.binding = binding;
 	}
@@ -120,34 +131,11 @@ public class RequiredServiceInfo<T>
 	}
 
 	/**
-	 *  Get the type name.
-	 *  @return the type name.
-	 */
-	public String getTypeName()
-	{
-		return typename;
-	}
-
-	/**
-	 *  Set the name.
-	 *  @param name The name to set.
-	 */
-	public void setTypeName(String typename)
-	{
-		this.typename = typename;
-	}
-	
-	/**
 	 *  Get the type.
 	 *  @return The type.
 	 */
-	public Class<T> getType(IModelInfo info, ClassLoader cl)
+	public ClassInfo getType()
 	{
-		if(type==null && typename!=null)
-		{
-			type = SReflect.findClass0(typename, info.getAllImports(), cl);
-		}
-		
 		return type;
 	}
 
@@ -155,10 +143,8 @@ public class RequiredServiceInfo<T>
 	 *  Set the type.
 	 *  @param type The type to set.
 	 */
-	public void setType(Class<T> type)
+	public void setType(ClassInfo type)
 	{
-		if(type!=null)
-			this.typename	= type.getName();
 		this.type = type;
 	}
 

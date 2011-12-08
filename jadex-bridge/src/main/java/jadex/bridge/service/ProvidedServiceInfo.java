@@ -1,7 +1,6 @@
 package jadex.bridge.service;
 
-import jadex.bridge.modelinfo.IModelInfo;
-import jadex.commons.SReflect;
+import jadex.bridge.ClassInfo;
 
 
 /**
@@ -17,8 +16,8 @@ public class ProvidedServiceInfo
 	/** The service interface type as string. */
 	protected String typename;
 	
-	/** The service interface type. */
-	protected Class<?> type;
+	/** The type. */
+	protected ClassInfo type;
 	
 	/** The service implementation. */
 	protected ProvidedServiceImplementation implementation;
@@ -39,12 +38,12 @@ public class ProvidedServiceInfo
 	/**
 	 *  Create a new service info.
 	 */
-	public ProvidedServiceInfo(String name, Class<?> type, ProvidedServiceImplementation implementation, PublishInfo publish)
+	public ProvidedServiceInfo(String name, Class type, ProvidedServiceImplementation implementation, PublishInfo publish)
 	{
 		this.name = name;
 		this.implementation = implementation;
 		this.publish = publish;
-		setType(type);
+		setType(new ClassInfo(type));
 	}
 	
 //	/**
@@ -76,39 +75,11 @@ public class ProvidedServiceInfo
 	}
 	
 	/**
-	 *  Get the type name.
-	 *  @return the type name.
-	 */
-	public String getTypeName()
-	{
-		return typename;
-	}
-
-	/**
-	 *  Set the name.
-	 *  @param name The name to set.
-	 */
-	public void setTypeName(String typename)
-	{
-		this.typename = typename;
-	}
-	
-	/**
 	 *  Get the type.
 	 *  @return The type.
 	 */
-	public Class<?> getType(IModelInfo info, ClassLoader cl)
+	public ClassInfo getType()
 	{
-		if(type==null && typename!=null)
-		{
-			type = SReflect.findClass0(typename, info!=null? info.getAllImports(): null, cl);
-		}
-//		else if(type==null)
-//		{
-//			System.out.println("Type is null: "+this);
-//		}
-			
-		
 		return type;
 	}
 
@@ -116,10 +87,9 @@ public class ProvidedServiceInfo
 	 *  Set the type.
 	 *  @param type The type to set.
 	 */
-	public void setType(Class<?> type)
+	public void setType(ClassInfo type)
 	{
 		this.type = type;
-		this.typename	= type!=null? type.getName(): null;
 	}
 
 	/**

@@ -72,10 +72,10 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get a required service.
 	 */
-	public <T> IFuture<T> getService(final RequiredServiceInfo<T> info, RequiredServiceBinding bd, final boolean rebind)
+	public <T> IFuture<T> getService(final RequiredServiceInfo info, RequiredServiceBinding bd, final boolean rebind)
 	{
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
-		final Class<T>	type	= info.getType(null, null);
+		final Class	type	= info.getType().getType();
 		
 //		if(info.getType().toString().indexOf("IDis")!=-1)
 //			System.out.println("diss" );
@@ -164,7 +164,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		final RequiredServiceBinding bd, boolean rebind)
 	{
 		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
-		final Class	type	= info.getType(null, null);
+		final Class	type	= info.getType().getType();
 		
 		final IntermediateFuture ret = new IntermediateFuture();
 		final RequiredServiceBinding binding = bd!=null? bd: info.getDefaultBinding();
@@ -378,7 +378,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get the external access of a component by its name.
 	 */
-	protected IFuture<IExternalAccess> getExternalAccessByName(final IServiceProvider provider, final RequiredServiceInfo<?> info, 
+	protected IFuture<IExternalAccess> getExternalAccessByName(final IServiceProvider provider, final RequiredServiceInfo info, 
 		final RequiredServiceBinding binding)
 	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
@@ -405,7 +405,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Get the external access of a component by type.
 	 */
-	protected IFuture<Collection<IExternalAccess>> getExternalAccessesByType(final IServiceProvider provider, final RequiredServiceInfo<?> info, 
+	protected IFuture<Collection<IExternalAccess>> getExternalAccessesByType(final IServiceProvider provider, final RequiredServiceInfo info, 
 		final RequiredServiceBinding binding)
 	{
 		final Future<Collection<IExternalAccess>> ret = new Future<Collection<IExternalAccess>>();
@@ -650,7 +650,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		}
 		else
 		{
-			ret.setException(new ServiceNotFoundException("name="+info.getName()+", interface="+info.getTypeName()+", no component creation possible"));
+			ret.setException(new ServiceNotFoundException("name="+info.getName()+", interface="+info.getType().getTypeName()+", no component creation possible"));
 		}
 		
 		return ret;
@@ -715,6 +715,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	public IFuture createProxy(final IService service, final RequiredServiceInfo info, final RequiredServiceBinding binding)
 	{
 		final Future ret = new Future();
+//		final Class type = info.getType(info, cl)
 //		ret.addResultListener(new IResultListener()
 //		{
 //			public void exceptionOccurred(Exception exception)
@@ -780,7 +781,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		protected IServiceProvider provider;
 		
 		/** The required service info. */
-		protected RequiredServiceInfo<T> info;
+		protected RequiredServiceInfo info;
 		
 		/** The required service binding. */
 		protected RequiredServiceBinding binding;
@@ -790,7 +791,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		/**
 		 *  Create a new listener.
 		 */
-		public StoreDelegationResultListener(Future<T> ret, IServiceProvider provider, RequiredServiceInfo<T> info, RequiredServiceBinding binding)
+		public StoreDelegationResultListener(Future<T> ret, IServiceProvider provider, RequiredServiceInfo info, RequiredServiceBinding binding)
 		{
 			super(ret);
 			this.provider = provider;

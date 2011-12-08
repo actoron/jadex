@@ -244,6 +244,9 @@ public class SReflect
 	 */
 	public static String getUnqualifiedTypeName(String name)
 	{
+		if(name==null)
+			throw new IllegalArgumentException("Null not allowed.");
+		
 		int lpos = name.indexOf("<");
 		if(lpos>0)
 		{

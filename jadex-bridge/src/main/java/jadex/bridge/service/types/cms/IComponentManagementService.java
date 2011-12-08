@@ -74,6 +74,12 @@ public interface IComponentManagementService //extends IService
 	//-------- information methods --------
 	
 	/**
+	 *  Get the root identifier (platform).
+	 *  @return The root identifier.
+	 */
+	public IFuture<IComponentIdentifier> getRootIdentifier();
+	
+	/**
 	 *  Get the component identifiers.
 	 *  @return The component identifiers.
 	 *  This method should be used with caution when the agent population is large.

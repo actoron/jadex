@@ -82,8 +82,16 @@ public interface ILibraryService
 	 *  Returns the current ClassLoader.
 	 *  @return the current ClassLoader
 	 */
-	@Excluded()
+	@Excluded
 	public @Reference IFuture<ClassLoader> getClassLoader(IResourceIdentifier rid);
+	
+//	/**
+//	 *  Load a class given a class identifier.
+//	 *  @param clid The class identifier.
+//	 *  @return The class for the identifier.
+//	 */
+//	@Excluded
+//	public IFuture<Class> loadClass(final IClassIdentifier clid);
 	
 	/** 
 	 *  Returns the resource identifier.

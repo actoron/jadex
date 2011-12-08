@@ -53,7 +53,7 @@ public class RequiredServiceProperties	extends	PropertiesPanel
 //		IServiceIdentifier	sid	= service.getServiceIdentifier();
 		
 		getTextField("Name").setText(info.getName());
-		getTextField("Type").setText(info.getTypeName());
+		getTextField("Type").setText(info.getType().getTypeName());
 		getTextField("Multiple").setText(""+info.isMultiple());
 		RequiredServiceBinding bind = info.getDefaultBinding();
 		StringBuffer buf = new StringBuffer();
@@ -71,7 +71,7 @@ public class RequiredServiceProperties	extends	PropertiesPanel
 		{
 			// Todo: support methods also for remote components.
 			JTable	list	= (JTable)getComponent("Methods").getComponent(0);
-			Method[] methods	= info.getType(null, null).getMethods();	// NullPointerException for remote
+			Method[] methods	= info.getType().getType().getMethods();	// NullPointerException for remote
 			String[] returntypes	= new String[methods.length]; 
 			String[] names	= new String[methods.length]; 
 			String[] parameters	= new String[methods.length];

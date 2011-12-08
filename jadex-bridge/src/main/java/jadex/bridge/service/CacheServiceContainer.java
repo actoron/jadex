@@ -277,7 +277,7 @@ public class CacheServiceContainer	implements IServiceContainer
 	 *  Get the globally unique id of the provider.
 	 *  @return The id of this provider.
 	 */
-	public Object getId()
+	public IComponentIdentifier getId()
 	{
 		return container.getId();
 	}

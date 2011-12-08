@@ -313,7 +313,7 @@ public class MicroClassReader
 					if(rsers.containsKey(vals[i].name()))
 					{
 						RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(vals[i].name());
-						if(old.isMultiple()!=rsis.isMultiple() || !old.getType(modelinfo, classloader).equals(rsis.getType(modelinfo, classloader)))
+						if(old.isMultiple()!=rsis.isMultiple() || !old.getType().getType(classloader).equals(rsis.getType().getType(classloader)))
 							throw new RuntimeException("Extension hierarchy contains incompatible required service more than once: "+vals[i].name());
 					}
 					else
