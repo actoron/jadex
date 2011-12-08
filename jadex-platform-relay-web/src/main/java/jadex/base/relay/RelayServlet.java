@@ -13,9 +13,11 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
@@ -33,6 +35,9 @@ public class RelayServlet extends HttpServlet
 	/** The relay map (id -> queue for pending requests). */
 	protected Map<Object, IBlockingQueue<Tuple2<InputStream, Future<Void>>>>	map;
 	
+	/** Info about connected platforms.*/
+	protected Map<Object, PlatformInfo>	platforms;
+	
 	/** Counter for open GET connections (for testing). */
 	protected int	opencnt1	= 0;
 	/** Counter for open POST connections (for testing). */
@@ -46,6 +51,7 @@ public class RelayServlet extends HttpServlet
 	public void init() throws ServletException
 	{
 		map	= Collections.synchronizedMap(new HashMap<Object, IBlockingQueue<Tuple2<InputStream, Future<Void>>>>());
+		platforms	= Collections.synchronizedMap(new LinkedHashMap<Object, PlatformInfo>());
 	}
 	
 	/**
@@ -75,83 +81,113 @@ public class RelayServlet extends HttpServlet
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		System.out.println("Entering GET request. opencnt="+(++opencnt1)+", mapsize="+map.size());
-		
 		String	idstring	= request.getParameter("id");
-		Object	id	= JavaReader.objectFromXML(idstring, getClass().getClassLoader());
-		IBlockingQueue<Tuple2<InputStream, Future<Void>>>	queue	= map.get(id);
-		List<Tuple2<InputStream, Future<Void>>>	items	= null;
-		if(queue!=null)
+		
+		// Render status page.
+		if(idstring==null)
 		{
-			// Close old queue to free old servlet request
-			items	= queue.setClosed(true);
-			queue	= 	new ArrayBlockingQueue<Tuple2<InputStream, Future<Void>>>();
-			// Add outstanding requests to new queue.
-			for(int i=0; i<items.size(); i++)
-			{
-				queue.enqueue(items.get(i));
-			}
+			request.setAttribute("platforms", platforms);
+			String	view	= "/WEB-INF/jsp/status.jsp";
+			RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);
+			rd.forward(request, response);
 		}
+		
+		// Handle platform connection.
 		else
 		{
-			queue	= 	new ArrayBlockingQueue<Tuple2<InputStream, Future<Void>>>();
-		}
-		map.put(id, queue);
-//		System.out.println("Added to map. New size: "+map.size());
-		try
-		{
-			while(true)
+			System.out.println("Entering GET request. opencnt="+(++opencnt1)+", mapsize="+map.size()+", infosize="+platforms.size());
+			
+			Object	id	= JavaReader.objectFromXML(idstring, getClass().getClassLoader());
+			PlatformInfo	info	= platforms.get(id);
+			if(info==null)
 			{
-				try
+				info	= new PlatformInfo(id, request.getRemoteHost());
+				platforms.put(id, info);
+			}
+			else
+			{
+				info.reconnect(request.getRemoteHost());
+			}
+			
+			IBlockingQueue<Tuple2<InputStream, Future<Void>>>	queue	= map.get(id);
+			List<Tuple2<InputStream, Future<Void>>>	items	= null;
+			if(queue!=null)
+			{
+				// Close old queue to free old servlet request
+				items	= queue.setClosed(true);
+				queue	= 	new ArrayBlockingQueue<Tuple2<InputStream, Future<Void>>>();
+				// Add outstanding requests to new queue.
+				for(int i=0; i<items.size(); i++)
 				{
-					// Get next request from queue.
-					Tuple2<InputStream, Future<Void>>	msg	= queue.dequeue(30000);	// Todo: make ping delay configurable on per client basis
+					queue.enqueue(items.get(i));
+				}
+			}
+			else
+			{
+				queue	= 	new ArrayBlockingQueue<Tuple2<InputStream, Future<Void>>>();
+			}
+			map.put(id, queue);
+	//		System.out.println("Added to map. New size: "+map.size());
+			try
+			{
+				while(true)
+				{
 					try
 					{
-						// Send message header.
-						response.getOutputStream().write(SRelay.MSGTYPE_DEFAULT);
-						
-						// Copy message to output stream.
-						byte[]	buf	= new byte[8192];  
-						int	len;  
-						while((len=msg.getFirstEntity().read(buf)) != -1)
+						// Get next request from queue.
+						Tuple2<InputStream, Future<Void>>	msg	= queue.dequeue(30000);	// Todo: make ping delay configurable on per client basis
+						try
 						{
-							response.getOutputStream().write(buf, 0, len);  
+							// Send message header.
+							response.getOutputStream().write(SRelay.MSGTYPE_DEFAULT);
+							
+							// Copy message to output stream.
+							long	start	= System.nanoTime();
+							byte[]	buf	= new byte[8192];  
+							int	len;
+							int	cnt	= 0;
+							while((len=msg.getFirstEntity().read(buf)) != -1)
+							{
+								response.getOutputStream().write(buf, 0, len);
+								cnt	+= len;
+							}
+							response.getOutputStream().flush();
+							info.addMessage(cnt, System.nanoTime()-start);
+							msg.getSecondEntity().setResult(null);
 						}
-						response.getOutputStream().flush();
-						msg.getSecondEntity().setResult(null);
+						catch(Exception e)
+						{
+							msg.getSecondEntity().setException(e);
+							throw e;	// rethrow exception to end servlet execution for client.
+						}
 					}
-					catch(Exception e)
+					catch(TimeoutException te)
 					{
-						msg.getSecondEntity().setException(e);
-						throw e;	// rethrow exception to end servlet execution for client.
+						// Send ping and continue loop.
+						response.getOutputStream().write(SRelay.MSGTYPE_PING);  
+						response.getOutputStream().flush();
 					}
 				}
-				catch(TimeoutException te)
+			}
+			catch(Exception e)
+			{
+				// exception on queue, when same platform reconnects or servlet is destroyed
+				// exception on output stream, when client disconnects
+			}
+			
+			if(!queue.isClosed())
+			{
+				items	= queue.setClosed(true);
+				map.remove(id);
+		//		System.out.println("Removed from map ("+items.size()+" remaining items). New size: "+map.size());
+				for(int i=0; i<items.size(); i++)
 				{
-					// Send ping and continue loop.
-					response.getOutputStream().write(SRelay.MSGTYPE_PING);  
-					response.getOutputStream().flush();
+					items.get(i).getSecondEntity().setException(new RuntimeException("Target disconnected."));
 				}
 			}
+			
+			System.out.println("Leaving GET request. opencnt="+(--opencnt1)+", mapsize="+map.size()+", infosize="+platforms.size());
 		}
-		catch(Exception e)
-		{
-			// exception on queue, when same platform reconnects or servlet is destroyed
-			// exception on output stream, when client disconnects
-		}
-		
-		if(!queue.isClosed())
-		{
-			items	= queue.setClosed(true);
-			map.remove(id);
-	//		System.out.println("Removed from map ("+items.size()+" remaining items). New size: "+map.size());
-			for(int i=0; i<items.size(); i++)
-			{
-				items.get(i).getSecondEntity().setException(new RuntimeException("Target disconnected."));
-			}
-		}
-		System.out.println("Leaving GET request. opencnt="+(--opencnt1)+", mapsize="+map.size());
 	}
 
 	/**
@@ -175,6 +211,7 @@ public class RelayServlet extends HttpServlet
 			}
 			catch(Exception e)
 			{
+				// timeout
 			}
 		}
 		
