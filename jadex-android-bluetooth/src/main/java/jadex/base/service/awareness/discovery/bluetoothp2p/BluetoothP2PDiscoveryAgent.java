@@ -1,6 +1,6 @@
 package jadex.base.service.awareness.discovery.bluetoothp2p;
 
-import jadex.android.bluetooth.AndroidContextChangeListener;
+import jadex.android.AndroidContextChangeListener;
 import jadex.android.bluetooth.JadexBluetoothActivity;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.message.BluetoothMessage;

@@ -34,6 +34,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/* $if android $
+import android.util.Log;
+$endif $ */
+
 @Service
 public class SecurityService implements ISecurityService
 {
@@ -83,7 +87,9 @@ public class SecurityService implements ISecurityService
 						if(genpass)
 						{
 							password	= UUID.randomUUID().toString().substring(0, 12);
-							System.out.println("Generated platform password: "+password);
+							/* $if android $
+							Log.i("jadex-android", "Generated platform password: "+password);
+							$endif $ */
 							usepass	= true;
 						}
 						

@@ -654,6 +654,7 @@
 			<modules>
 				<module>jadex-android-parent</module>
 				<module>jadex-android-misc</module>
+				<module>jadex-android-antlr</module>
 				<module>jadex-android-woodstox</module>
 				<module>jadex-android-core</module>
 				<module>jadex-android-beans</module>
@@ -725,6 +726,7 @@
 			<modules>
 				<module>jadex-android-parent</module>
 				<module>jadex-android-misc</module>
+				<module>jadex-android-antlr</module>
 				<module>jadex-android-woodstox</module>
 				<module>jadex-android-core</module>
 				<module>jadex-android-beans</module>

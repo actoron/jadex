@@ -70,6 +70,11 @@
 			<destName>pom.xml</destName>
 		</file>
 		<file>
+			<source>jadex-android-antlr/pom.xml</source>
+			<outputDirectory>sources/jadex-android-antlr/</outputDirectory>
+			<destName>pom.xml</destName>
+		</file>
+		<file>
 			<source>jadex-android-bdi/pom.xml</source>
 			<outputDirectory>sources/jadex-android-bdi/</outputDirectory>
 			<destName>pom.xml</destName>

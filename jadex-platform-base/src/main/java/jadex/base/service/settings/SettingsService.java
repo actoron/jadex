@@ -72,7 +72,13 @@ public class SettingsService extends BasicService implements ISettingsService
 			prefix	= prefix.substring(0, prefix.lastIndexOf('_'));
 		}
 		
+		/* $if !android $ */
 		file	= new File(prefix + SETTINGS_EXTENSION);
+		/* $else $
+		// TODO: introduce jadex platform service that provides activity context access to use
+		// openFileOutput()
+		file = new File("/sdcard/" + prefix + SETTINGS_EXTENSION);
+		$endif $ */
 	}
 	
 	//-------- BasicService overridings --------

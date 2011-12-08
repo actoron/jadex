@@ -196,7 +196,18 @@ public class HttpReceiver
 		// Hack!!! InputStream doesn't wake up. 
 		// using NIO, one could use thread.interrupt()
 		// See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4514257
+		/* $if !android $ */
+		// deprecated method calls not allowed in Android
 		thread.stop();
+		/* $else $
+		thread.interrupt();
+		if(con!=null)
+		{
+			System.out.println("Closing connection.");
+			con.disconnect();
+			System.out.println("Closed connection.");
+		}
+		$endif $ */
 		
 		finished	= true;
 //		thread.interrupt();

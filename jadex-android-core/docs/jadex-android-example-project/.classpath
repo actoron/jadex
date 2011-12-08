@@ -11,5 +11,5 @@
 	<classpathentry kind="lib" path="lib/jadex-android-woodstox-0.0.4-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/jadex-android-misc-0.0.4-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/jadex-android-beans-0.0.4-SNAPSHOT.jar"/>
-	<classpathentry kind="output" path="target/android-classes"/>
+	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -17,6 +17,7 @@ import jadex.commons.future.IResultListener;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -88,7 +89,7 @@ public class JadexAndroidHelloWorldActivity extends Activity {
 										"-conf",
 										"jadex/android/application/demo/Platform.component.xml",
 										"-configname", "android_fixed",
-										"-platformname", "testcases",
+										"-platformname", "and-" + createRandomPlattformID(),
 										"-saveonexit", "false", "-gui", "false" });
 						future.addResultListener(platformResultListener);
 					}
@@ -158,4 +159,9 @@ public class JadexAndroidHelloWorldActivity extends Activity {
 			});
 		}
 	};
+	
+	protected String createRandomPlattformID() {
+		UUID randomUUID = UUID.randomUUID();
+		return randomUUID.toString().substring(0, 5);
+	}
 }

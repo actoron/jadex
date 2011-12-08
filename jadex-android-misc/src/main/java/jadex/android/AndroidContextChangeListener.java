@@ -1,4 +1,4 @@
-package jadex.android.bluetooth;
+package jadex.android;
 
 import android.content.Context;
 
