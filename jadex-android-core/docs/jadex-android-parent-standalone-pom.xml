@@ -12,19 +12,21 @@
 		<maven-compiler-plugin-version>2.3.2</maven-compiler-plugin-version>
 		<java-version>1.6</java-version>
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
+		<android-maven-plugin-version>3.0.0-alpha-14</android-maven-plugin-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<dependencies>
 		<!-- To get all android-related errors, uncomment the following dependency -->
 		<!-- and remove the JRE from eclipse build path. -->
-		<!-- <dependency> -->
-		<!-- <groupId>proprietary</groupId> -->
-		<!-- <artifactId>android</artifactId> -->
-		<!-- <version>2.2.1</version> -->
-		<!-- <scope>system</scope> -->
-		<!-- <systemPath>/home/julakali/android/sdk/platforms/android-8/android.jar</systemPath> -->
-		<!-- <systemPath>/scratch/8kalinow/android-sdk-linux_x86/platforms/android-8/android.jar</systemPath> -->
-		<!-- </dependency> -->
+<!-- 		<dependency> -->
+<!-- 		<groupId>proprietary</groupId> -->
+<!-- 		<artifactId>android</artifactId> -->
+<!-- 		<version>2.2.1</version> -->
+<!-- 		<scope>system</scope> -->
+<!-- 		<systemPath>/home/julakali/android/sdk/platforms/android-8/android.jar</systemPath> -->
+<!-- 		<systemPath>/scratch/8kalinow/android-sdk-linux_x86/platforms/android-8/android.jar</systemPath> -->
+<!-- 		</dependency> -->
 
 		<dependency>
 			<groupId>com.google.android</groupId>
@@ -34,10 +36,17 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.pivotallabs</groupId>
+			<artifactId>robolectric</artifactId>
+			<version>1.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.8.2</version>
-			<scope>provided</scope>
+			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
@@ -54,6 +63,28 @@
 					<configuration>
 						<lifecycleMappingMetadata>
 							<pluginExecutions>
+								<!-- <pluginExecution> -->
+								<!-- <pluginExecutionFilter> -->
+								<!-- <groupId> -->
+								<!-- com.jayway.maven.plugins.android.generation2 -->
+								<!-- </groupId> -->
+								<!-- <artifactId> -->
+								<!-- android-maven-plugin -->
+								<!-- </artifactId> -->
+								<!-- <versionRange> -->
+								<!-- [3.0.0-alpha-13,) -->
+								<!-- </versionRange> -->
+								<!-- <goals> -->
+								<!-- <goal>run</goal> -->
+								<!-- <goal>unpack</goal> -->
+								<!-- <goal>generate-sources</goal> -->
+								<!-- </goals> -->
+								<!-- </pluginExecutionFilter> -->
+								<!-- <action> -->
+								<!-- <execute /> -->
+								<!-- </action> -->
+								<!-- </pluginExecution> -->
+
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>
@@ -83,8 +114,6 @@
 					<version>${maven-antrun-plugin-version}</version>
 					<executions>
 						<execution>
-							<!-- This plugin has been deactivated for 
-							Distribution building -->
 							<phase>none</phase>
 						</execution>
 					</executions>
@@ -98,6 +127,72 @@
 						<target>${java-version}</target>
 					</configuration>
 				</plugin>
+
+				<plugin>
+					<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+					<artifactId>android-maven-plugin</artifactId>
+					<version>${android-maven-plugin-version}</version>
+					<configuration>
+						<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
+						<assetsDirectory>${project.basedir}/assets</assetsDirectory>
+						<resourceDirectory>${project.basedir}/res</resourceDirectory>
+						<nativeLibrariesDirectory>${project.basedir}/src/main/native</nativeLibrariesDirectory>
+						<sdk>
+							<path>${env.ANDROID_HOME}</path>
+							<platform>2.2</platform>
+						</sdk>
+						<undeployBeforeDeploy>true</undeployBeforeDeploy>
+						<generateApk>true</generateApk>
+						<dex>
+							<jvmArguments>
+								<jvmArgument>-Xms256m</jvmArgument>
+								<jvmArgument>-Xmx1024m</jvmArgument>
+							</jvmArguments>
+							<coreLibrary>false</coreLibrary>
+							<noLocals>false</noLocals>
+							<optimize>true</optimize>
+						</dex>
+
+						<!-- <test> -->
+						<!-- <skip>true|false|auto</skip> -->
+						<!-- <instrumentationPackage>packageName</instrumentationPackage> -->
+						<!-- <instrumentationRunner>className</instrumentationRunner> -->
+						<!-- <debug>true|false</debug> -->
+						<!-- <coverage>true|false</coverage> -->
+						<!-- <logonly>true|false</logonly> -->
+						<!-- avd -->
+						<!-- <testsize>small|medium|large</testsize> -->
+						<!-- <createreport>true|false</createreport> -->
+						<!-- <classes> -->
+						<!-- <class>your.package.name.YourTestClass</class> -->
+						<!-- </classes> -->
+						<!-- <packages> -->
+						<!-- <package>your.package.name</package> -->
+						<!-- </packages> -->
+						<!-- </test> -->
+
+						<!-- <manifest> -->
+						<!-- <versionName></versionName> -->
+						<!-- <versionCode>123</versionCode> -->
+						<!-- <versionCodeAutoIncrement>true|false</versionCodeAutoIncrement> -->
+						<!-- <versionCodeUpdateFromVersion>true|false</versionCodeUpdateFromVersion> -->
+						<!-- <sharedUserId>anId</sharedUserId> -->
+						<!-- <debuggable>true|false</debuggable> -->
+						<!-- </manifest> -->
+
+
+
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>2.2.1</version>
+					<configuration>
+					</configuration>
+				</plugin>
+
 			</plugins>
 		</pluginManagement>
 	</build>
