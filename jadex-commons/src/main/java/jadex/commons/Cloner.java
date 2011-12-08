@@ -10,6 +10,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -86,23 +88,23 @@ public class Cloner
 	 */
 	public static Object deepCloneObject(Object object)
 	{
-		return getInstance().deepClone(object, null, new HashMap(), null, null);
+		return getInstance().deepClone(object, null, new HashMap<Object, Object>(), null, null);
 	}
 	
 	/**
 	 *  Deep clone an object.
 	 */
-	public static Object deepCloneObject(Object object, List processors)
+	public static Object deepCloneObject(Object object, List<ICloneProcessor> processors)
 	{
-		return getInstance().deepClone(object, null, new HashMap(), processors, null);
+		return getInstance().deepClone(object, null, new HashMap<Object, Object>(), processors, null);
 	}
 	
 	/**
 	 *  Deep clone an object.
 	 */
-	public static <T> T deepCloneObject(T object, List processors, IFilter filter)
+	public static <T> T deepCloneObject(T object, List<ICloneProcessor> processors, IFilter filter)
 	{
-		return (T)getInstance().deepClone(object, null, new HashMap(), processors, filter);
+		return (T)getInstance().deepClone(object, null, new HashMap<Object, Object>(), processors, filter);
 	}
 	
 	/**
@@ -110,29 +112,29 @@ public class Cloner
 	 */
 	public Object deepClone(Object object)
 	{
-		return deepClone(object, null, new HashMap(), null, null);
+		return deepClone(object, null, new HashMap<Object, Object>(), null, null);
 	}
 	
 	/**
 	 *  Deep clone an object.
 	 */
-	public Object deepClone(Object object, List processors)
+	public Object deepClone(Object object, List<ICloneProcessor> processors)
 	{
-		return deepClone(object, null, new HashMap(), processors, null);
+		return deepClone(object, null, new HashMap<Object, Object>(), processors, null);
 	}
 	
 	/**
 	 *  Deep clone an object.
 	 */
-	public Object deepClone(Object object, List processors, IFilter filter)
+	public Object deepClone(Object object, List<ICloneProcessor> processors, IFilter filter)
 	{
-		return deepClone(object, null, new HashMap(), processors, filter);
+		return deepClone(object, null, new HashMap<Object, Object>(), processors, filter);
 	}
 
 	/**
 	 *  Deep clone an object.
 	 */
-	public Object deepClone(Object object, Class<?> clazz, Map cloned, List processors, IFilter filter)
+	public Object deepClone(Object object, Class<?> clazz, Map<Object, Object> cloned, List<ICloneProcessor> processors, IFilter filter)
 	{
 		Object ret = null;
 		
@@ -159,7 +161,7 @@ public class Cloner
 				Object	processed	= object;
 				for(int i=0; i<processors.size()/* && !fin*/; i++)
 				{
-					ICloneProcessor proc = (ICloneProcessor)processors.get(i);
+					ICloneProcessor proc = processors.get(i);
 					if(proc.isApplicable(processed))
 					{
 						processed = proc.process(processed, processors);
@@ -205,7 +207,8 @@ public class Cloner
 					}
 					catch(Exception e)
 					{
-						ret = new HashMap();
+						// Using linked hash map as default to avoid loosing order if has order.
+						ret = new LinkedHashMap();
 					}
 					cloned.put(object, ret);
 					((Map)ret).putAll((Map)object);
@@ -220,7 +223,8 @@ public class Cloner
 					{
 						if(SReflect.isSupertype(Set.class, clazz))
 						{
-							ret = new HashSet();
+							// Using linked hash set as default to avoid loosing order if has order.
+							ret = new LinkedHashSet();
 						}
 						else //if(isSupertype(List.class, clazz))
 						{
@@ -341,10 +345,12 @@ public class Cloner
 	 */
 	public static void main(String[] args) throws Exception
 	{
-		Set test = new TreeSet();
-		test.add(new Integer(2));
-		test.add(new Integer(1));
-		test.add(new Integer(3));
+//		Set test = new TreeSet();
+//		test.add(new Integer(2));
+//		test.add(new Integer(1));
+//		test.add(new Integer(3));
+		
+		Tuple2<String, String> test = new Tuple2<String, String>("a", "b");
 		
 		System.out.println("test deep cloning: "+test+" "+deepCloneObject(test));
 	}

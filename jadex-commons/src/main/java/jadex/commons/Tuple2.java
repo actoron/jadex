@@ -32,4 +32,15 @@ public class Tuple2<T, E> extends Tuple
 	{
 		return (E)getEntity(1);
 	}
+	
+	//-------- Cloneable interface --------
+
+	/**
+	 *  Clone this tuple.
+	 *  @return A shallow copy of this tuple.
+	 */
+	public Object	clone()
+	{
+		return new Tuple2<T, E>(getFirstEntity(), getSecondEntity());
+	}
 }
