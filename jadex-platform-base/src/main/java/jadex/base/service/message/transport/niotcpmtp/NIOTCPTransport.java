@@ -134,9 +134,14 @@ public class NIOTCPTransport implements ITransport
 			for(Enumeration nis = NetworkInterface.getNetworkInterfaces(); nis.hasMoreElements(); )
 			{
 				NetworkInterface ni = (NetworkInterface)nis.nextElement();
-				for(Enumeration iadrs = ni.getInetAddresses(); iadrs.hasMoreElements(); )
+				for(Enumeration<InetAddress> iadrs = ni.getInetAddresses(); iadrs.hasMoreElements(); )
 				{
-					addrs.add(getAddress(((InetAddress)iadrs.nextElement()).getHostAddress(), this.port));
+					InetAddress addr = iadrs.nextElement();
+//					System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress());
+					if(!addr.isAnyLocalAddress() && !addr.isLoopbackAddress() && !addr.isSiteLocalAddress()) // or only addr.isLoopbackAddress() ?
+					{
+						addrs.add(getAddress(addr.getHostAddress(), this.port));
+					}
 				}
 			}
 			

@@ -3,23 +3,38 @@ package jadex.bridge;
 import jadex.commons.SReflect;
 
 /**
- * 
+ *  The class info struct serves for saving class information.
+ *  A class info may hold a class itself or the class name for
+ *  resolving the class. This struct should be used at all places
+ *  where classes are meant to be send to remote nodes. In this
+ *  case the class info will only transfer the class name forcing
+ *  the receiver to lookup the class itself. The class loader
+ *  for resolving a class info can be found by using the corresponding
+ *  resource identifier (rid) of the component or service that uses
+ *  the class.
  */
 public class ClassInfo
 {
+	//-------- attributes --------
+	
 	/** The service interface type as string. */
 	protected String typename;
 	
 	/** The service interface type. */
 	protected Class<?> type;
 
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new class info.
 	 */
 	public ClassInfo()
 	{
+		// Bean constructor, do not delete.
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Create a new class info.
 	 *  @param type The class info.
