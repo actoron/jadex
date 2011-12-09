@@ -57,7 +57,6 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 */
 	public RemoteResultCommand(Object result, Exception exception, String callid, boolean isref, String methodname)
 	{
-//		System.out.println("result command: "+result+" "+callid);
 		this.result = result;
 		this.exceptioninfo = exception!=null? new ExceptionInfo(exception): null;
 		this.callid = callid;
@@ -102,6 +101,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 */
 	public IFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
+//		System.out.println("result command: "+result+" "+exceptioninfo+" "+callid);
 //		if(callid.equals(RemoteMethodInvocationHandler.debugcallid))
 //			System.out.println("debuggcallid");
 		
@@ -206,4 +206,11 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 		this.methodname = methodname;
 	}
 	
+	/**
+	 *  Get as string.
+	 */
+	public String toString()
+	{
+		return "RemoteResultCommand(result="+result+", exception="+exceptioninfo+", callid="+callid;
+	}
 }

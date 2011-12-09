@@ -44,7 +44,6 @@
 		ObjectInspectorPanel.java,
 		ObjectTreeModel.java,
 		ParserValidator.java,
-		RemoteCMSListener.java,
 		StatusBar.java,
 		SwingDelegationResultListener.java,
 		SwingDefaultResultListener.java,

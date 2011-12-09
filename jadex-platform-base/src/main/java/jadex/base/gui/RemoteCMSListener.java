@@ -23,6 +23,28 @@ import java.util.TimerTask;
  */
 public class RemoteCMSListener	implements ICMSComponentListener
 {
+	//-------- constants --------
+	
+	/** The event type for an added component (value is component description). */
+	protected static final String	EVENT_COMPONENT_ADDED	= "component-added";
+	
+	/** The event type for a changed component (value is component description). */
+	protected static final String	EVENT_COMPONENT_CHANGED	= "component-changed";
+	
+	/** The event type for a removed component (value is component description). */
+	protected static final String	EVENT_COMPONENT_REMOVED	= "component-removed";
+	
+	/** The event type for a removed component (value is collection of change events). */
+	protected static final String	EVENT_BULK	= "bulk-event";
+	
+	/** Update delay. */
+	// todo: make configurable.
+	protected static final long UPDATE_DELAY	= 500;	
+	
+	/** Maximum number of events per delay period. */
+	// todo: make configurable.
+	protected static final int MAX_EVENTS	= 20;	
+	
 	//-------- attributes --------
 	
 	/** The local platform cid used as event source. */
@@ -153,25 +175,25 @@ public class RemoteCMSListener	implements ICMSComponentListener
 						timer	= null;
 						if(removed!=null)
 						{
-							for(Iterator it=removed.values().iterator(); events.size()<CMSUpdateHandler.MAX_EVENTS && it.hasNext(); )
+							for(Iterator it=removed.values().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 							{
-								events.add(new ChangeEvent(cid, CMSUpdateHandler.EVENT_COMPONENT_REMOVED, it.next()));
+								events.add(new ChangeEvent(cid, EVENT_COMPONENT_REMOVED, it.next()));
 								it.remove();
 							}
 						}
 						if(added!=null)
 						{
-							for(Iterator it=added.values().iterator(); events.size()<CMSUpdateHandler.MAX_EVENTS && it.hasNext(); )
+							for(Iterator it=added.values().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 							{
-								events.add(new ChangeEvent(cid, CMSUpdateHandler.EVENT_COMPONENT_ADDED, it.next()));
+								events.add(new ChangeEvent(cid, EVENT_COMPONENT_ADDED, it.next()));
 								it.remove();
 							}
 						}
 						if(changed!=null)
 						{
-							for(Iterator it=changed.values().iterator(); events.size()<CMSUpdateHandler.MAX_EVENTS && it.hasNext(); )
+							for(Iterator it=changed.values().iterator(); events.size()<MAX_EVENTS && it.hasNext(); )
 							{
-								events.add(new ChangeEvent(cid, CMSUpdateHandler.EVENT_COMPONENT_CHANGED, it.next()));
+								events.add(new ChangeEvent(cid, EVENT_COMPONENT_CHANGED, it.next()));
 								it.remove();
 							}
 						}
@@ -192,7 +214,7 @@ public class RemoteCMSListener	implements ICMSComponentListener
 					if(!events.isEmpty())
 					{
 //						System.out.println("events: "+events.size());
-						rcl.changeOccurred(new ChangeEvent(cid, CMSUpdateHandler.EVENT_BULK, events)).addResultListener(new IResultListener()
+						rcl.changeOccurred(new ChangeEvent(cid, EVENT_BULK, events)).addResultListener(new IResultListener()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -218,7 +240,7 @@ public class RemoteCMSListener	implements ICMSComponentListener
 						});
 					}
 				}
-			}, CMSUpdateHandler.UPDATE_DELAY);
+			}, UPDATE_DELAY);
 		}
 	}
 	

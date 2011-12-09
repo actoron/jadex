@@ -30,29 +30,6 @@ import javax.swing.SwingUtilities;
  */
 public class CMSUpdateHandler
 {
-	//-------- constants --------
-	
-	/** The event type for an added component (value is component description). */
-	protected static final String	EVENT_COMPONENT_ADDED	= "component-added";
-	
-	/** The event type for a changed component (value is component description). */
-	protected static final String	EVENT_COMPONENT_CHANGED	= "component-changed";
-	
-	/** The event type for a removed component (value is component description). */
-	protected static final String	EVENT_COMPONENT_REMOVED	= "component-removed";
-	
-	/** The event type for a removed component (value is collection of change events). */
-	protected static final String	EVENT_BULK	= "bulk-event";
-	
-	/** Update delay. */
-	// todo: make configurable.
-	// Used in RemoteCMSListener
-	protected static final long UPDATE_DELAY	= 500;	
-	
-	/** Maximum number of events per delay period. */
-	// todo: make configurable.
-	protected static final int MAX_EVENTS	= 20;	
-	
 	//-------- attributes --------
 
 	/** The local external access. */
@@ -116,13 +93,13 @@ public class CMSUpdateHandler
 		if(listeners!=null)
 		{
 			Future<Void>	fut	= new Future<Void>();
-			CounterResultListener<Void>	crl	= new CounterResultListener<Void>(listeners.keySet().size(), true, new DelegationResultListener(fut));
+			CounterResultListener<Void>	crl	= new CounterResultListener<Void>(listeners.keySet().size(), true, new SwingDelegationResultListener<Void>(fut));
 			for(Iterator it=listeners.keySet().iterator(); it.hasNext(); )
 			{
 				IComponentIdentifier	cid	= (IComponentIdentifier)it.next();
 				// Deregister if not registration in progress.
 				if(futures==null || !futures.containsKey(cid))
-					deregisterRemoteCMSListener(cid).addResultListener(crl);
+					SRemoteGui.deregisterRemoteCMSListener(access, cid, buildId(cid)).addResultListener(crl);
 				else
 					crl.resultAvailable(null);
 			}
@@ -194,7 +171,7 @@ public class CMSUpdateHandler
 			futures.put(cid, ret);
 			listeners.put(cid, listener);
 
-			installRemoteCMSListener(cid).addResultListener(new SwingDefaultResultListener()
+			SRemoteGui.installRemoteCMSListener(access, cid, rcl, buildId(cid)).addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object result)
 				{
@@ -257,7 +234,10 @@ public class CMSUpdateHandler
 			listeners.remove(cid, listener);
 			if(!listeners.containsKey(cid))
 			{
-				ret	= deregisterRemoteCMSListener(cid);
+				Future	fut	= new Future();
+				ret	= fut;
+				SRemoteGui.deregisterRemoteCMSListener(access, cid, buildId(cid))
+					.addResultListener(new SwingDelegationResultListener<Void>(fut));
 				if(listeners.isEmpty())
 					listeners	= null;
 			}
@@ -286,7 +266,7 @@ public class CMSUpdateHandler
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
-		if(EVENT_COMPONENT_ADDED.equals(event.getType()))
+		if(RemoteCMSListener.EVENT_COMPONENT_ADDED.equals(event.getType()))
 		{
 			for(int i=0; i<cls.length; i++)
 			{
@@ -305,7 +285,7 @@ public class CMSUpdateHandler
 				});
 			}
 		}
-		else if(EVENT_COMPONENT_CHANGED.equals(event.getType()))
+		else if(RemoteCMSListener.EVENT_COMPONENT_CHANGED.equals(event.getType()))
 		{
 			for(int i=0; i<cls.length; i++)
 			{
@@ -324,7 +304,7 @@ public class CMSUpdateHandler
 				});
 			}
 		}
-		else if(EVENT_COMPONENT_REMOVED.equals(event.getType()))
+		else if(RemoteCMSListener.EVENT_COMPONENT_REMOVED.equals(event.getType()))
 		{
 			for(int i=0; i<cls.length; i++)
 			{
@@ -345,7 +325,7 @@ public class CMSUpdateHandler
 				});
 			}
 		}
-		else if(EVENT_BULK.equals(event.getType()))
+		else if(RemoteCMSListener.EVENT_BULK.equals(event.getType()))
 		{
 			Collection	events	= (Collection)event.getValue();
 			for(Iterator it=events.iterator(); it.hasNext(); )
@@ -395,106 +375,6 @@ public class CMSUpdateHandler
 		return ret;
 	}
 
-	/**
-	 *  Install the remote listener.
-	 *  @param cid	The remote component id.
-	 */
-	protected IFuture<Void>	installRemoteCMSListener(final IComponentIdentifier cid)
-	{
-		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionSwingDelegationResultListener<IComponentManagementService, Void>(ret)
-		{
-			public void customResultAvailable(IComponentManagementService	cms)
-			{
-//				IComponentManagementService	cms	= (IComponentManagementService)result;
-				cms.getExternalAccess(cid).addResultListener(new ExceptionSwingDelegationResultListener<IExternalAccess, Void>(ret)
-				{
-					public void customResultAvailable(IExternalAccess exta)
-					{
-//						IExternalAccess	exta	= (IExternalAccess)result;
-						final IComponentIdentifier	icid	= cid;	// internal reference to cid, because java compiler stores final references in outmost object (grrr.)
-						final String	id	= buildId(cid);
-						final IRemoteChangeListener	rcl	= CMSUpdateHandler.this.rcl;
-						exta.scheduleStep(new IComponentStep<Void>()
-						{
-							@XMLClassname("installListener")
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								final Future<Void>	ret	= new Future<Void>();
-								SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-								{
-									public void customResultAvailable(IComponentManagementService cms)
-									{
-//										IComponentManagementService	cms	= (IComponentManagementService)result;
-										RemoteCMSListener	rcmsl	= new RemoteCMSListener(icid, id, cms, rcl);
-										cms.addComponentListener(null, rcmsl);
-										ret.setResult(null);
-									}
-								}));
-								return ret;
-							}
-						}).addResultListener(new SwingDelegationResultListener<Void>(ret));
-					}
-				});
-			}
-		});
-		return ret;
-	}
-
-	/**
-	 *  Deregister the remote listener.
-	 */
-	protected IFuture<Void>	deregisterRemoteCMSListener(final IComponentIdentifier cid)
-	{
-		final Future<Void>	ret	= new Future<Void>();
-		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionSwingDelegationResultListener<IComponentManagementService, Void>(ret)
-		{
-			public void customResultAvailable(IComponentManagementService cms)
-			{
-//				IComponentManagementService	cms	= (IComponentManagementService)result;
-				cms.getExternalAccess(cid).addResultListener(new ExceptionSwingDelegationResultListener<IExternalAccess, Void>(ret)
-				{
-					public void customResultAvailable(IExternalAccess exta)
-					{
-//						IExternalAccess	exta	= (IExternalAccess)result;
-						final String	id	= buildId(cid);
-						exta.scheduleStep(new IComponentStep<Void>()
-						{
-							@XMLClassname("deregisterListener")
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								final Future<Void>	ret	= new Future<Void>();
-								SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-								{
-									public void customResultAvailable(IComponentManagementService cms)
-									{
-//										System.out.println("Removing listener: "+id);
-//										IComponentManagementService	cms	= (IComponentManagementService)result;
-										try
-										{
-											cms.removeComponentListener(null, new RemoteCMSListener(cid, id, cms, null));
-										}
-										catch(RuntimeException e)
-										{
-		//									System.out.println("Listener already removed: "+id);
-										}
-										ret.setResult(null);
-									}
-								}));
-								return ret;
-							}
-						}).addResultListener(new DelegationResultListener<Void>(ret));
-					}
-				});
-			}
-		});
-		return ret;
-	}
-	
 	/**
 	 *  Build an id to be used for remote listener (de-)registration.
 	 *  @param cid	The remote component id.

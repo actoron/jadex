@@ -89,6 +89,7 @@ public class JadexAndroidHelloWorldActivity extends Activity {
 										"-conf",
 										"jadex/android/application/demo/Platform.component.xml",
 										"-configname", "android_fixed",
+										"-logging_level", "java.util.logging.Level.INFO",
 										"-platformname", "and-" + createRandomPlattformID(),
 										"-saveonexit", "false", "-gui", "false" });
 						future.addResultListener(platformResultListener);

@@ -132,4 +132,12 @@ public class ExceptionInfo
 		}
 		return ret;
 	}
+	
+	/**
+	 *  Get as string.
+	 */
+	public String toString()
+	{
+		return recreateException().toString();
+	}
 }
