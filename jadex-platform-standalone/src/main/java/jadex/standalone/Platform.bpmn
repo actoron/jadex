@@ -8,7 +8,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_fTcOsKx7EeCZ3OinfyRPjQ" key="configuration" value="id:auto"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_TzGmgJv9EeCTM9TB44euIw" source="jadex_imports_table">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aVjhAAFBEeGeD-WYveO-ww" key="dimension" value="38:1"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aVjhAAFBEeGeD-WYveO-ww" key="dimension" value="39:1"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aVjhAQFBEeGeD-WYveO-ww" key="uniqueColumnIndex" value="0"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aVjhAgFBEeGeD-WYveO-ww" key="complexColumns" value="false"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aVjhAwFBEeGeD-WYveO-ww" key="0:0" value="jadex.commons.*"/>
@@ -49,6 +49,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aVjhJgFBEeGeD-WYveO-ww" key="35:0" value="jadex.base.service.extensions.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aVjhJwFBEeGeD-WYveO-ww" key="36:0" value="jadex.bridge.service.types.marshal.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aVjhKAFBEeGeD-WYveO-ww" key="37:0" value="jadex.base.service.marshal.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aVjhKAFBEeGeD-WYveO-ww" key="38:0" value="jadex.bridge.service.types.factory.*"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_1KV4AJv9EeCTM9TB44euIw" source="jadex_configurations_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_eIvWIKx7EeCZ3OinfyRPjQ" key="dimension" value="1:3"/>

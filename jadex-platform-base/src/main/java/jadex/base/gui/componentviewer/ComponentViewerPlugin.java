@@ -570,7 +570,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 								
 								public void customExceptionOccurred(Exception exception)
 								{
-									// Happens e.g. when remote classes not locally available.
+									// Happens e.g. when remote classes not locally available or platform is shutting down.
 //									exception.printStackTrace();
 								}
 							});

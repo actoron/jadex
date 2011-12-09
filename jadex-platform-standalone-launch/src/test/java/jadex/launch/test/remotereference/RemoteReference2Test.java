@@ -21,7 +21,7 @@ public class RemoteReference2Test extends TestCase
 {
 	public void	testRemoteReference()
 	{
-		long timeout	= 100000;
+		long timeout	= 30000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		
 		// Start platform1 used for remote access. (underscore in name assures both platforms use same password)

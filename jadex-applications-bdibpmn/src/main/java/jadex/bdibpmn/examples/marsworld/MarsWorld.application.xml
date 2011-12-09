@@ -38,8 +38,7 @@
 		<import>jadex.bdi.examples.marsworld.producer.*</import>
 		<import>jadex.bdi.examples.marsworld.sentry.*</import>
 		<import>jadex.bdi.examples.marsworld.movement.*</import>
-		<import>jjadex.bridge.serviceServiceProvider</import>
-		<import>jadex.commons.IFuture</import>
+		<import>jadex.commons.future.IFuture</import>
 		<import>jadex.bridge.service.search.*</import>
 		<import>jadex.bridge.service.*</import>
 	</imports>

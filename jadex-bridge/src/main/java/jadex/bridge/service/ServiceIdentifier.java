@@ -78,7 +78,7 @@ public class ServiceIdentifier implements IServiceIdentifier
 	 *  Set the service type.
 	 *  @param type The service type.
 	 */
-	public void	setServiceTypeId(ClassInfo type)
+	public void	setServiceType(ClassInfo type)
 	{
 		this.type	= type;
 	}

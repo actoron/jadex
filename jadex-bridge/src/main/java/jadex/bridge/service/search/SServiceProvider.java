@@ -5,29 +5,19 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.commons.IChangeListener;
-import jadex.commons.IRemotable;
-import jadex.commons.IRemoteChangeListener;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -211,33 +201,40 @@ public class SServiceProvider
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 //		IVisitDecider rabortdecider = new DefaultVisitDecider(true, false);
 		
-		provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
-			new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
-				.addResultListener(new DelegationResultListener(ret)
+		try
 		{
-			public void customResultAvailable(Object result)
+			provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
+				new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
+					.addResultListener(new DelegationResultListener(ret)
 			{
-//				System.out.println("Search result: "+result);
-				Collection res = (Collection)result;
-				if(res==null || res.size()==0)
+				public void customResultAvailable(Object result)
 				{
-//					provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
-//						new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
-//						.addResultListener(new DefaultResultListener()
-//					{
-//						public void resultAvailable(Object result)
-//						{
-//							System.out.println("rrr: "+result);
-//						}
-//					});
-					exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()+" scope: "+scope));
+	//				System.out.println("Search result: "+result);
+					Collection res = (Collection)result;
+					if(res==null || res.size()==0)
+					{
+	//					provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
+	//						new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
+	//						.addResultListener(new DefaultResultListener()
+	//					{
+	//						public void resultAvailable(Object result)
+	//						{
+	//							System.out.println("rrr: "+result);
+	//						}
+	//					});
+						exceptionOccurred(new ServiceNotFoundException("No matching service found for type: "+type.getName()+" scope: "+scope));
+					}
+					else
+					{
+						super.customResultAvailable(res.iterator().next());
+					}
 				}
-				else
-				{
-					super.customResultAvailable(res.iterator().next());
-				}
-			}
-		});
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		
 		return ret;
 	}
@@ -259,19 +256,26 @@ public class SServiceProvider
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
 		
-		provider.getServices(getSearchManager(false, RequiredServiceInfo.SCOPE_PLATFORM),
-			getVisitDecider(true, RequiredServiceInfo.SCOPE_PLATFORM), new IdResultSelector(sid))
-			.addResultListener(new DelegationResultListener(ret)
+		try
 		{
-			public void customResultAvailable(Object result)
+			provider.getServices(getSearchManager(false, RequiredServiceInfo.SCOPE_PLATFORM),
+				getVisitDecider(true, RequiredServiceInfo.SCOPE_PLATFORM), new IdResultSelector(sid))
+				.addResultListener(new DelegationResultListener(ret)
 			{
-				Collection res = (Collection)result;
-				if(res==null || res.size()==0)
-					exceptionOccurred(new ServiceNotFoundException("No service found for id: "+sid));
-				else
-					super.customResultAvailable(res.iterator().next());
-			}
-		});
+				public void customResultAvailable(Object result)
+				{
+					Collection res = (Collection)result;
+					if(res==null || res.size()==0)
+						exceptionOccurred(new ServiceNotFoundException("No service found for id: "+sid));
+					else
+						super.customResultAvailable(res.iterator().next());
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		
 		return ret;
 	}
@@ -292,20 +296,28 @@ public class SServiceProvider
 		
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
-		
-		provider.getServices(getSearchManager(false, RequiredServiceInfo.SCOPE_PLATFORM),
-			getVisitDecider(true, RequiredServiceInfo.SCOPE_PLATFORM), selector)
-			.addResultListener(new DelegationResultListener(ret)
+
+		try
 		{
-			public void customResultAvailable(Object result)
+			provider.getServices(getSearchManager(false, RequiredServiceInfo.SCOPE_PLATFORM),
+				getVisitDecider(true, RequiredServiceInfo.SCOPE_PLATFORM), selector)
+				.addResultListener(new DelegationResultListener(ret)
 			{
-				Collection res = (Collection)result;
-				if(res==null || res.size()==0)
-					exceptionOccurred(new ServiceNotFoundException("No matching service found for: "+selector));
-				else
-					super.customResultAvailable(res.iterator().next());
-			}
-		});
+				public void customResultAvailable(Object result)
+				{
+					Collection res = (Collection)result;
+					if(res==null || res.size()==0)
+						exceptionOccurred(new ServiceNotFoundException("No matching service found for: "+selector));
+					else
+						super.customResultAvailable(res.iterator().next());
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
+
 		
 		return ret;
 	}
@@ -348,17 +360,24 @@ public class SServiceProvider
 //		IVisitDecider contdecider = new DefaultVisitDecider(false);
 //		IVisitDecider rcontdecider = new DefaultVisitDecider(false, false);
 		
-		provider.getServices(getSearchManager(true, scope), 
-			getVisitDecider(false, scope),
-			new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
-				.addResultListener(new IntermediateDelegationResultListener(ret));
-//				{
-//					public void customResultAvailable(Object source, Object result)
-//					{
-//						System.out.println(6);
-//						super.customResultAvailable(source, result);
-//					}
-//				});
+		try
+		{
+			provider.getServices(getSearchManager(true, scope), 
+				getVisitDecider(false, scope),
+				new TypeResultSelector(type, false, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
+					.addResultListener(new IntermediateDelegationResultListener(ret));
+	//				{
+	//					public void customResultAvailable(Object source, Object result)
+	//					{
+	//						System.out.println(6);
+	//						super.customResultAvailable(source, result);
+	//					}
+	//				});
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		
 		return ret;
 	}

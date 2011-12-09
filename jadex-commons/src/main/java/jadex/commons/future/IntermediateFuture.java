@@ -38,6 +38,15 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 		super(results);
 	}
 	
+	/**
+	 *  Create a future that is already done (failed).
+	 *  @param exception	The exception.
+	 */
+	public IntermediateFuture(Exception exception)
+	{
+		super(exception);
+	}
+	
 	//-------- IIntermediateFuture interface --------
 		
     /**
