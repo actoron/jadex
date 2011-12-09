@@ -179,6 +179,7 @@ public class RelayServlet extends HttpServlet
 			{
 				items	= queue.setClosed(true);
 				map.remove(id);
+				platforms.remove(id);
 		//		System.out.println("Removed from map ("+items.size()+" remaining items). New size: "+map.size());
 				for(int i=0; i<items.size(); i++)
 				{
