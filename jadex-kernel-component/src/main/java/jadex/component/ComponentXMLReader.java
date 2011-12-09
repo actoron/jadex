@@ -342,7 +342,7 @@ public class ComponentXMLReader
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "result")}), new ObjectInfo(Argument.class), 
 			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
-			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "classname"), new AttributeConverter(classconv, reclassconv))}, null), null, new BeanObjectReaderHandler()));
+			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))}, null), null, new BeanObjectReaderHandler()));
 			
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "import")), new ObjectInfo(String.class), null, null, new BeanObjectReaderHandler()));
 		
