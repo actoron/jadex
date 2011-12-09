@@ -24,7 +24,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.gui.SGUI;
 import jadex.component.ComponentInterpreter;
 import jadex.kernelbase.CacheableKernelModel;
 
@@ -34,8 +33,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+/* $if !android $ */
+import jadex.commons.gui.SGUI;
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
+/* $endif $ */
 
 /**
  *  Factory for default contexts.

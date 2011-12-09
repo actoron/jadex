@@ -22,15 +22,17 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.gui.SGUI;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/* $if !android $ */
+import jadex.commons.gui.SGUI;
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
+/* $endif $ */
 
 /**
  *  Factory for creating micro agents.
