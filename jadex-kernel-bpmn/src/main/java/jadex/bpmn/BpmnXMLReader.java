@@ -1599,12 +1599,12 @@ public class BpmnXMLReader
 										if(binding!=null)
 										{
 											// todo: interceptors
-											psim = new ProvidedServiceImplementation(new ClassInfo(impltype), null, proxytype, binding, null);
+											psim = new ProvidedServiceImplementation(impltype, null, proxytype, binding, null);
 										}
 										else
 										{
 											// todo: interceptors
-											psim = new ProvidedServiceImplementation(new ClassInfo(impltype), impltype==null? implname: null, proxytype, null, null);
+											psim = new ProvidedServiceImplementation(impltype, impltype==null? implname: null, proxytype, null, null);
 										}
 										// todo: support publish
 										ci.addProvidedService(new ProvidedServiceInfo(name, type, psim, null));
