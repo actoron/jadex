@@ -420,6 +420,7 @@
 				<module>jadex-javaparser</module>
 				<module>jadex-bridge</module>
 				<module>jadex-platform-base</module>
+				<module>jadex-platform-standalone</module>
 				<module>jadex-nuggets</module>
 
 				<module>jadex-kernel-base</module>
@@ -449,7 +450,6 @@
 				<module>jadex-tools-bdi</module>
 				<module>jadex-tools-bpmn</module>
 				<module>jadex-tools-comanalyzer</module>
-				<module>jadex-platform-standalone</module>
 
 			</modules>
 		</profile>
