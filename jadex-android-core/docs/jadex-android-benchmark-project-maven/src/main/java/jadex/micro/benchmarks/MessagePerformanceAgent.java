@@ -46,7 +46,8 @@ public class MessagePerformanceAgent extends MicroAgent
 				starttime = result.longValue();
 				
 				final int msgcnt = ((Integer)getArgument("max")).intValue();
-				final IComponentIdentifier receiver = getComponentIdentifier();
+				final IComponentIdentifier receiver = getArgument("echo")!=null
+					? (IComponentIdentifier)getArgument("echo") : getComponentIdentifier();
 				final boolean usecodec = ((Boolean)getArgument("codec")).booleanValue();
 				
 				IComponentStep<Void> send = new IComponentStep<Void>()
@@ -110,6 +111,10 @@ public class MessagePerformanceAgent extends MicroAgent
 	 */
 	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
+//		if(received%10 == 0)
+//		{
+//			System.out.println("received: "+received);
+//		}
 		received++;
 		final int msgcnt = ((Integer)getArgument("max")).intValue();
 		if(received==msgcnt)
@@ -167,7 +172,8 @@ public class MessagePerformanceAgent extends MicroAgent
 						}
 						return ret;
 					}
-				}
+				},
+				new Argument("echo", "Address of an echo agent.", "jadex.bridge.IComponentIdentifier", null)
 			}, new IArgument[]
 			{
 				new Argument("result", "The benchmark results as text.", "String")

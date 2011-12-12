@@ -1240,7 +1240,16 @@ public class MessageService extends BasicService implements IMessageService
 			}
 			
 			if(tmp!=null)
-				internalDeliverMessage((Map)tmp[0], (String)tmp[1], (IComponentIdentifier[])tmp[2]);
+			{
+				try
+				{
+					internalDeliverMessage((Map)tmp[0], (String)tmp[1], (IComponentIdentifier[])tmp[2]);
+				}
+				catch(Exception e)
+				{
+					logger.warning("Message could not be delivered to receiver: "+tmp[2]+", "+e);
+				}
+			}
 			
 			return !isempty;
 		}

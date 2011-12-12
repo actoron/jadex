@@ -3,7 +3,7 @@ package jadex.micro.benchmarks;
 /**
  * 
  */
-public class Message
+public class BenchmarkMessage
 {
 	//-------- attributes --------
 	
@@ -18,14 +18,14 @@ public class Message
 	/**
 	 *  Create a new message.
 	 */
-	public Message()
+	public BenchmarkMessage()
 	{
 	}
 	
 	/**
 	 *  Create a new message.
 	 */
-	public Message(String text, boolean confidential)
+	public BenchmarkMessage(String text, boolean confidential)
 	{
 		this.text = text;
 		this.confidential = confidential;
