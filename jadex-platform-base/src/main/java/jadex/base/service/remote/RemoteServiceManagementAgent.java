@@ -25,8 +25,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
-import jadex.micro.annotation.NameValue;
-import jadex.micro.annotation.Properties;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
@@ -39,7 +37,7 @@ import java.util.Map;
  *  service. It basically has the task to forward messages from
  *  remote service management components on other platforms to its service.
  */
-@Properties(@NameValue(name="logging.level", value="java.util.logging.Level.INFO"))
+//@Properties(@NameValue(name="logging.level", value="java.util.logging.Level.INFO"))
 public class RemoteServiceManagementAgent extends MicroAgent
 {
 	//-------- attributes --------
