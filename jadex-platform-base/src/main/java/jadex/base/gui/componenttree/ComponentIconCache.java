@@ -139,6 +139,7 @@ public class ComponentIconCache
 				{
 					public void customResultAvailable(IExternalAccess exta)
 					{
+//						System.out.println("Searching for icon: "+type+" at "+exta);
 						SComponentFactory.getFileTypeIcon(exta, type)
 							.addResultListener(new SwingDelegationResultListener<Icon>(ret)
 						{

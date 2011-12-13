@@ -485,7 +485,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 									FileData[]	ret	= new FileData[entries.length];
 									for(int i=0; i<entries.length; i++)
 									{
-										ret[i]	= new FileData(new File(entries[i]));
+										ret[i]	= new FileData(new File(entries[i]).getAbsoluteFile());
 									}
 									return new Future<FileData[]>(ret);
 								}
