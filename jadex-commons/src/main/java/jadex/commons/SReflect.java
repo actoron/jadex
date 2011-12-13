@@ -173,7 +173,7 @@ public class SReflect
 					// Also handled by dynamic url class loader, but not in applets/webstart.
 					catch(LinkageError e)
 					{
-						e.printStackTrace();
+//						e.printStackTrace();
 					}
 				}
 				
