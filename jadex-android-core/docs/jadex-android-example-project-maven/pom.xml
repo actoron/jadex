@@ -66,7 +66,7 @@
 						<path>${env.ANDROID_HOME}</path>
 						<platform>2.2</platform>
 					</sdk>
-					<undeployBeforeDeploy>true</undeployBeforeDeploy>
+					<undeployBeforeDeploy>false</undeployBeforeDeploy>
 					<generateApk>true</generateApk>
 					<dex>
 						<jvmArguments>

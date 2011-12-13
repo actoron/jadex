@@ -9,6 +9,7 @@ import jadex.android.bluetooth.service.ConnectionService;
 import jadex.android.bluetooth.service.IBTP2PMessageCallback;
 import jadex.android.bluetooth.service.IConnectionServiceConnection;
 import jadex.android.bluetooth.util.Helper;
+import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
@@ -19,6 +20,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
@@ -217,8 +219,10 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	 *            The message to send. (todo: On which thread this should be
 	 *            done?)
 	 */
-	public IFuture<Void> sendMessage(Map msg, String type,
-			IComponentIdentifier[] receivers, byte[] codecids) {
+//	public IFuture<Void> sendMessage(Map msg, String type,
+//			IComponentIdentifier[] receivers, byte[] codecids) {
+	public IFuture<Void> sendMessage(ManagerSendTask task) {
+		IComponentIdentifier[] receivers = task.getReceivers();
 
 		// Fetch all addresses
 		Set<String> addresses = new LinkedHashSet<String>();
@@ -239,10 +243,23 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 
 		boolean delivered = false;
 		BluetoothMessage bluetoothMessage;
+		ByteArrayOutputStream stream = new ByteArrayOutputStream(task.getProlog().length + task.getData().length);
+		
+		try {
+			stream.write(task.getProlog());
+			stream.write(task.getData());
+		} catch (IOException e1) {
+			Log.e(Helper.LOG_TAG, "Could not encode Message: " + e1.toString());
+		}
+		byte[] msgData = stream.toByteArray();
+		
 		for (int i = 0; !delivered && i < addrs.length; i++) {
-			bluetoothMessage = new BluetoothMessage(addrs[i], BTTransport.this.encodeMessage(
-					new MessageEnvelope(msg, Arrays.asList(receivers), type),
-					codecids), DataPacket.TYPE_DATA);
+//			bluetoothMessage = new BluetoothMessage(addrs[i], BTTransport.this.encodeMessage(
+//					new MessageEnvelope(msg, Arrays.asList(receivers), type.getName()),
+//					codecids), DataPacket.TYPE_DATA);
+			
+			bluetoothMessage = new BluetoothMessage(addrs[i], msgData, DataPacket.TYPE_DATA);
+			
 			try {
 				binder.sendMessage(bluetoothMessage);
 				delivered = true;
@@ -275,34 +292,34 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 				});
 	}
 
-	protected byte[] encodeMessage(MessageEnvelope msg, byte[] codecids) {
-
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		if (codecids == null || codecids.length == 0)
-			codecids = codecfac.getDefaultCodecIds();
-
-		Object enc_msg = msg;
-		for (int i = 0; i < codecids.length; i++) {
-			ICodec codec = codecfac.getCodec(codecids[i]);
-			enc_msg = codec.encode(enc_msg, classLoader);
-		}
-		byte[] res = (byte[]) enc_msg;
-
-		int dynlen = BTTransport.PROLOG_SIZE + 1 + codecids.length;
-		int size = res.length + dynlen;
-		try {
-			os.write((byte) codecids.length);
-				os.write(codecids);
-			os.write(SUtil.intToBytes(size));
-			os.write(res);
-			os.flush();
-		} catch (IOException e) {
-			Log.e(Helper.LOG_TAG, "Could not encode Message: " + e.toString());
-		}
-
-		Log.i(Helper.LOG_TAG, "Encoded message byte array is: " + os.size());
-		return os.toByteArray();
-	}
+//	protected byte[] encodeMessage(MessageEnvelope msg, byte[] codecids) {
+//
+//		ByteArrayOutputStream os = new ByteArrayOutputStream();
+//		if (codecids == null || codecids.length == 0)
+//			codecids = codecfac.getDefaultCodecIds();
+//
+//		Object enc_msg = msg;
+//		for (int i = 0; i < codecids.length; i++) {
+//			ICodec codec = codecfac.getCodec(codecids[i]);
+//			enc_msg = codec.encode(enc_msg, classLoader);
+//		}
+//		byte[] res = (byte[]) enc_msg;
+//
+//		int dynlen = BTTransport.PROLOG_SIZE + 1 + codecids.length;
+//		int size = res.length + dynlen;
+//		try {
+//			os.write((byte) codecids.length);
+//				os.write(codecids);
+//			os.write(SUtil.intToBytes(size));
+//			os.write(res);
+//			os.flush();
+//		} catch (IOException e) {
+//			Log.e(Helper.LOG_TAG, "Could not encode Message: " + e.toString());
+//		}
+//
+//		Log.i(Helper.LOG_TAG, "Encoded message byte array is: " + os.size());
+//		return os.toByteArray();
+//	}
 
 	/**
 	 * Returns the prefix of this transport

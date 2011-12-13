@@ -18,6 +18,11 @@ public class JadexAndroidActivity extends Activity {
 			l.onContextCreate(lastContext);
 		}
 	}
+	
+	public static void removeContextChangeListener(AndroidContextChangeListener l) {
+		listeners.remove(l);
+		l.onContextDestroy(lastContext);
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

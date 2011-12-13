@@ -9,7 +9,7 @@
 	name="Platform" package="jadex.android.application.demo">
 	
 	<imports>
-				<import>jadex.commons.*</import>
+		<import>jadex.commons.*</import>
 		<import>jadex.commons.future.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.bridge.service.*</import>
@@ -67,7 +67,10 @@
 		<import>jadex.base.service.message.transport.btmtp.*</import>
 		<import>jadex.base.service.message.transport.codecs.*</import>
 		
+		<import>jadex.android.service.*</import>
+		
 		<import>jadex.standalone.*</import>
+		
 	</imports>
 	
 	<arguments>
@@ -142,7 +145,7 @@
 		</providedservice>
 		<providedservice class="ISettingsService">
 			<implementation>
-				new SettingsService($args.platformname, $component, $args.saveonexit)
+				new AndroidSettingsService($args.platformname, $component, $args.saveonexit)
 			</implementation>
 		</providedservice>
 		<providedservice class="IThreadPool">
@@ -216,6 +219,11 @@
 		</providedservice>
 		<providedservice class="ISecurityService">
 			<implementation class="SecurityService"/>
+		</providedservice>
+		<providedservice class="IAndroidContextService">
+			<implementation>
+				new AndroidContextService($component.getServiceProvider())
+			</implementation>
 		</providedservice>
 		
 		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true"/>

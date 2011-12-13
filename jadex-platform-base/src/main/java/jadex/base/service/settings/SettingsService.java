@@ -34,8 +34,8 @@ public class SettingsService extends BasicService implements ISettingsService
 	/** The service provider. */
 	protected IInternalAccess	access;
 	
-	/** The properties file. */
-	protected File	file;
+	/** The properties filename. */
+	protected String filename;
 	
 	/** The current properties. */
 	protected Properties	props;
@@ -72,13 +72,7 @@ public class SettingsService extends BasicService implements ISettingsService
 			prefix	= prefix.substring(0, prefix.lastIndexOf('_'));
 		}
 		
-		/* $if !android $ */
-		file	= new File(prefix + SETTINGS_EXTENSION);
-		/* $else $
-		// TODO: introduce jadex platform service that provides activity context access to use
-		// openFileOutput()
-		file = new File("/sdcard/" + prefix + SETTINGS_EXTENSION);
-		$endif $ */
+		filename	= prefix + SETTINGS_EXTENSION;
 	}
 	
 	//-------- BasicService overridings --------
@@ -247,7 +241,8 @@ public class SettingsService extends BasicService implements ISettingsService
 		try
 		{
 			// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
-			FileInputStream fis = new FileInputStream(file.exists() ? file : new File("default"+SETTINGS_EXTENSION));
+			File file = getFile(filename);
+			FileInputStream fis = new FileInputStream(file.exists() ? file : getFile("default"+SETTINGS_EXTENSION));
 			props	= (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, getClass().getClassLoader(), null);
 			fis.close();
 		}
@@ -303,6 +298,7 @@ public class SettingsService extends BasicService implements ISettingsService
 				try
 				{
 					// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
+					File file = getFile(filename);
 					FileOutputStream os = new FileOutputStream(file);
 					PropertiesXMLHelper.getPropertyWriter().write(props, os, getClass().getClassLoader(), null);
 					os.close();
@@ -335,5 +331,16 @@ public class SettingsService extends BasicService implements ISettingsService
 		}
 		
 		return ret;
+	}
+	
+	//-------- Helper methods --------
+	
+	/**
+	 * Returns the File object for a path to a file.
+	 * @param path Path to the file
+	 * @return The File Object for the given path.
+	 */
+	protected File getFile(String path) {
+		return new File(path);
 	}
 }

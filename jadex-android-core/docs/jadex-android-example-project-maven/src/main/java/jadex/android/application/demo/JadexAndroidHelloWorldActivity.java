@@ -1,5 +1,6 @@
 package jadex.android.application.demo;
 
+import jadex.android.JadexAndroidActivity;
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -29,7 +30,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class JadexAndroidHelloWorldActivity extends Activity {
+public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 	
 	private Button startAgentButton;
 	
