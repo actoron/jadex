@@ -25,4 +25,12 @@
     <servlet-name>PuzzleDispatcher</servlet-name>
     <url-pattern>/puzzle/*</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>Jadexdoc</servlet-name>
+    <servlet-class>jadex.web.tools.jadexdoc.JadexdocServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Jadexdoc</servlet-name>
+    <url-pattern>/jadexdoc/*</url-pattern>
+  </servlet-mapping>
 </web-app>

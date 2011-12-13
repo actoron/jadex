@@ -168,12 +168,12 @@ public class SReflect
 					}
 					catch(ClassNotFoundException e)
 					{
-	//					e.printStackTrace();
+//						e.printStackTrace();
 					}
 					// Also handled by dynamic url class loader, but not in applets/webstart.
 					catch(LinkageError e)
 					{
-	//					e.printStackTrace();
+						e.printStackTrace();
 					}
 				}
 				

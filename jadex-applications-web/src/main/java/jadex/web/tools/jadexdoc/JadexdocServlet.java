@@ -65,11 +65,27 @@ public class JadexdocServlet extends HttpServlet
 		
 //		if(fut.isDone())
 //		{
-			int	timeout	= 30000;
-			ThreadSuspendable	sus	= new ThreadSuspendable();
-			IModelInfo	model	= SComponentFactory.loadModel(platform, request.getServletPath(), null).get(sus, timeout);
-			request.setAttribute("model", model);
-			view	= "/WEB-INF/jsp/jadexdoc/model.jsp";
+			try
+			{
+				int	timeout	= 30000;
+				ThreadSuspendable	sus	= new ThreadSuspendable();
+				IModelInfo	model	= SComponentFactory.loadModel(platform, request.getPathInfo(), null).get(sus, timeout);
+				if(model!=null)
+				{
+					request.setAttribute("model", model);
+					view	= "/WEB-INF/jsp/jadexdoc/model.jsp";
+				}
+				else
+				{
+					request.setAttribute("model", request.getPathInfo());
+					view	= "/WEB-INF/jsp/jadexdoc/notfound.jsp";
+				}
+			}
+			catch(Exception e)
+			{
+				request.setAttribute("exception", e);
+				view	= "/WEB-INF/jsp/jadexdoc/exception.jsp";				
+			}
 //		}
 //		else
 //		{
