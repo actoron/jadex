@@ -17,6 +17,10 @@
 			<outputDirectory>jadex-android-example-project</outputDirectory>
 		</fileSet>
 		<fileSet>
+			<directory>jadex-android-core/docs/jadex-android-example-project-maven/src/main/java</directory>
+			<outputDirectory>jadex-android-example-project/src</outputDirectory>
+		</fileSet>
+		<fileSet>
 			<directory>jadex-android-core/docs/jadex-android-example-project-maven</directory>
 			<outputDirectory>jadex-android-example-project-maven</outputDirectory>
 		</fileSet>
