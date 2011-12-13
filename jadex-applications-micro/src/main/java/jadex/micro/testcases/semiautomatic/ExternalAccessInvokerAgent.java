@@ -2,6 +2,7 @@ package jadex.micro.testcases.semiautomatic;
 
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ComponentSelectorDialog;
+import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -31,21 +32,19 @@ public class ExternalAccessInvokerAgent extends MicroAgent
 		{
 			public void run()
 			{
-				final ComponentSelectorDialog agentselector	= new ComponentSelectorDialog(null, getExternalAccess(), new CMSUpdateHandler(getExternalAccess()));
+				final ComponentSelectorDialog agentselector	= new ComponentSelectorDialog(null, getExternalAccess(), new CMSUpdateHandler(getExternalAccess()), new ComponentIconCache(getExternalAccess()));
 				final IComponentIdentifier cid = agentselector.selectAgent(null);
 				if(cid!=null)
 				{
 					SServiceProvider.getServiceUpwards(getExternalAccess().getServiceProvider(), IComponentManagementService.class)
-						.addResultListener(new DefaultResultListener()
+						.addResultListener(new DefaultResultListener<IComponentManagementService>()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(IComponentManagementService cms)
 						{
-							IComponentManagementService cms = (IComponentManagementService)result;
-							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener()
+							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
 							{
-								public void resultAvailable(Object result)
+								public void resultAvailable(IExternalAccess ea)
 								{
-									IExternalAccess ea = (IExternalAccess)result;
 									ea.scheduleStep(new IComponentStep<Void>()
 									{
 										@XMLClassname("exe")

@@ -26,7 +26,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -35,9 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
-
-import javax.swing.Timer;
 
 /**
  *  The tcp transport for sending messages over
@@ -108,6 +107,9 @@ public class TCPTransport implements ITransport
 	
 	/** The library service. */
 	protected ILibraryService libservice;
+	
+	/** The cleanup timer. */
+	protected Timer	timer;
 	
 	//-------- constructors --------
 	
@@ -569,20 +571,15 @@ public class TCPTransport implements ITransport
 	 *  Class for cleaning output connections after 
 	 *  max keep alive time has been reached.
 	 */
-	/* $if !android $ */
-	protected class Cleaner implements ActionListener
-	/* $else $
-	protected class Cleaner implements TimerListener
-	$endif $ */
+	protected class Cleaner
 	{
 		//-------- attributes --------
 		
 		/** The address of the connection. */
 		protected String address;
 		
-		/** The timer. */
-		// Hack!!! java.util.timer does not support cancellation of scheduled tasks.
-		protected Timer timer;
+		/** The timer task. */
+		protected TimerTask timertask;
 		
 		//-------- constructors --------
 		
@@ -598,32 +595,28 @@ public class TCPTransport implements ITransport
 		//-------- methods --------
 		
 		/**
-		 *  Called when timepoint was reached.
-		 */
-		/* $if !android $ */
-	    public void actionPerformed(ActionEvent e)
-		/* $else       
-		public void actionPerformed()
-	    $endif $ */
-		{
-			logger.info("Timeout reached for: "+address);
-			removeConnection(address);
-		}
-		
-		/**
 		 *  Refresh the timeout.
 		 */
 		public void refresh()
 		{
 			if(timer==null)
 			{
-				timer	= new Timer(MAX_KEEPALIVE, this);
-				timer.start();
+				timer	= new Timer(true);
 			}
-			else
+			
+			if(timertask!=null)
 			{
-				timer.restart();
+				timertask.cancel();
 			}
+			timertask	= new TimerTask()
+			{
+				public void run()
+				{
+					logger.info("Timeout reached for: "+address);
+					removeConnection(address);						
+				}
+			};
+			timer.schedule(timertask, MAX_KEEPALIVE);
 		}
 		
 		/**
@@ -631,8 +624,10 @@ public class TCPTransport implements ITransport
 		 */
 		public void remove()
 		{
-			if(timer!=null)
-				timer.stop();
+			if(timertask!=null)
+			{
+				timertask.cancel();
+			}
 		}
 	}
 }

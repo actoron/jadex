@@ -3,8 +3,8 @@ package jadex.tools.jcc;
 import jadex.base.Starter;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ExceptionSwingDelegationResultListener;
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
+import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.bridge.IExternalAccess;
@@ -17,11 +17,9 @@ import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -518,5 +516,13 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	public CMSUpdateHandler getCMSHandler()
 	{
 		return controlcenter.getCMSHandler();
+	}
+
+	/**
+	 *  Get the component icon cache shared by all tools.
+	 */
+	public ComponentIconCache getIconCache()
+	{
+		return controlcenter.getIconCache();
 	}
 }

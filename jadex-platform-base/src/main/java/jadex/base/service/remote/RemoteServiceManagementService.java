@@ -36,7 +36,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.IMicroExternalAccess;
 import jadex.xml.IContext;
-import jadex.xml.IPostProcessor;
 import jadex.xml.IPreProcessor;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
@@ -61,10 +60,17 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
+/* $else $
+import javaxx.xml.namespace.QName;
+import javaxx.xml.stream.Location;
+import javaxx.xml.stream.XMLReporter;
+import javaxx.xml.stream.XMLStreamException;
+$endif $ */
 
 
 /**

@@ -3,6 +3,7 @@ package jadex.tools.convcenter;
 import jadex.base.fipa.SFipa;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ComponentSelectorDialog;
+import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.SUtil;
@@ -92,7 +93,8 @@ public class FipaMessagePanel extends JPanel
 	 *  @param cmshandler	The shared CMS update handler.
 	 *  @param comptree	The comptree (if any) will be repainted when new receivers are set in the panel.
 	 */
-	public FipaMessagePanel(Map message, IExternalAccess access, CMSUpdateHandler cmshandler, final Component comptree)
+	public FipaMessagePanel(Map message, IExternalAccess access, CMSUpdateHandler cmshandler,
+		ComponentIconCache iconcache,  final Component comptree)
 	{
 		super(new GridBagLayout());
 		this.editable	= true;
@@ -298,7 +300,7 @@ public class FipaMessagePanel extends JPanel
 
 
 		// Actions for agent selection.
-		final ComponentSelectorDialog	agentselector	= new ComponentSelectorDialog(this, access, cmshandler);
+		final ComponentSelectorDialog	agentselector	= new ComponentSelectorDialog(this, access, cmshandler, iconcache);
 		setsender.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)

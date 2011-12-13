@@ -2,6 +2,7 @@ package jadex.base.gui;
 
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.bridge.ComponentIdentifier;
@@ -67,6 +68,9 @@ public class ComponentSelectorDialog
 	/** The cms handler. */
 	protected CMSUpdateHandler cmshandler;
 	
+	/** The icon cache. */
+	protected ComponentIconCache iconcache;
+	
 	/** The selected agents. */
 	protected DefaultListModel	sels;
 	
@@ -94,11 +98,12 @@ public class ComponentSelectorDialog
 	/**
 	 *  Create a new AgentSelectorDialog.
 	 */
-	public ComponentSelectorDialog(Component parent, IExternalAccess access, CMSUpdateHandler cmshandler)
+	public ComponentSelectorDialog(Component parent, IExternalAccess access, CMSUpdateHandler cmshandler, ComponentIconCache iconcache)
 	{
 		this.parent	= parent;
 		this.access	= access;
 		this.cmshandler	= cmshandler;
+		this.iconcache	= iconcache;
 	}
 
 	//-------- methods --------
@@ -203,7 +208,7 @@ public class ComponentSelectorDialog
 		
 		final JList	list = new JList(sels);
 		
-		this.comptree = new ComponentTreePanel(access, cmshandler);
+		this.comptree = new ComponentTreePanel(access, cmshandler, iconcache);
 		comptree.setPreferredSize(new Dimension(200, 100));
 		comptree.addNodeHandler(new INodeHandler()
 		{

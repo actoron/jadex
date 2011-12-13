@@ -3,6 +3,7 @@ package jadex.bdi.examples.blackjack.manager;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ComponentSelectorDialog;
 import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.player.strategies.AbstractStrategy;
@@ -175,7 +176,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		
 		final	CMSUpdateHandler	cmsuh	= new CMSUpdateHandler(access);
 		
-		final	ComponentSelectorDialog	csd	= new ComponentSelectorDialog(ManagerFrame.this, access, cmsuh);
+		final	ComponentSelectorDialog	csd	= new ComponentSelectorDialog(ManagerFrame.this, access, cmsuh, new ComponentIconCache(access));
 		JButton	dealerbut	= new JButton("...");
 		dealerbut.addActionListener(new ActionListener()
 		{

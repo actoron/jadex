@@ -112,7 +112,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	 */
 	public Icon	getIcon()
 	{
-		Icon	icon	= iconcache.getIcon(this, desc.getType());
+		Icon	icon	= iconcache.getIcon(desc.getType(), this, getModel());
 		if(broken)
 		{
 			icon	= icon!=null ? new CombiIcon(new Icon[]{icon, icons.getIcon("overlay_check")}) : icons.getIcon("overlay_check");
@@ -440,7 +440,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		this.listenercid	= cid;
 		this.cmslistener	= new ICMSComponentListener()
 		{
-			public IFuture componentRemoved(final IComponentDescription desc, Map results)
+			public IFuture<Void> componentRemoved(final IComponentDescription desc, Map<String, Object> results)
 			{
 				final ITreeNode node = getModel().getNodeOrAddZombie(desc.getName());
 //				if(desc.getName().toString().startsWith("ANDTest@"))
@@ -463,7 +463,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 				return IFuture.DONE;
 			}
 			
-			public IFuture componentChanged(final IComponentDescription desc)
+			public IFuture<Void> componentChanged(final IComponentDescription desc)
 			{
 				SwingUtilities.invokeLater(new Runnable()
 				{
@@ -480,7 +480,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 				return IFuture.DONE;
 			}
 			
-			public IFuture componentAdded(final IComponentDescription desc)
+			public IFuture<Void> componentAdded(final IComponentDescription desc)
 			{
 //				System.out.println("Component added0: "+desc.getName().getName());
 //				System.err.println(""+model.hashCode()+" Panel->addChild queued: "+desc.getName()+", "+desc.getParent());

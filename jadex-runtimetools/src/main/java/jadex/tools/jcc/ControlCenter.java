@@ -4,15 +4,12 @@ import jadex.base.Starter;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
+import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
@@ -75,6 +72,9 @@ public class ControlCenter
 
 	/** The CMS update handler shared by all tools. */
 	protected CMSUpdateHandler	cmshandler;
+	
+	/** The component icon cache shared by all tools. */
+	protected ComponentIconCache	iconcache;
 	
 	/** The save on exit flag. */
 	protected boolean	saveonexit;
@@ -456,6 +456,20 @@ public class ControlCenter
 		return cmshandler;
 	}
 	
+	/**
+	 *  Get the component icon cache shared by all tools.
+	 */
+	public ComponentIconCache getIconCache()
+	{
+		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
+		
+		if(iconcache==null)
+		{
+			iconcache	= new ComponentIconCache(jccaccess);
+		}
+		return iconcache;
+	}
+
 	/**
 	 *  Get the control center window.
 	 */

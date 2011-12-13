@@ -1,24 +1,26 @@
 package jadex.base.gui.componenttree;
 
-import jadex.base.gui.CMSUpdateHandler;
+import jadex.base.SComponentFactory;
 import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.AsyncTreeModel;
-import jadex.bridge.IComponentStep;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.component.ComponentFactorySelector;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.factory.IComponentFactory;
+import jadex.commons.Tuple2;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.xml.annotation.XMLClassname;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
-import javax.swing.JTree;
-import javax.swing.tree.TreeModel;
+import javax.swing.SwingUtilities;
 
 /**
  *  Cache for component icons.
@@ -31,22 +33,22 @@ public class ComponentIconCache
 	/** The icon cache. */
 	private final Map<String, Icon>	icons;
 	
-	/** The cms handler. */
-	private final CMSUpdateHandler cmshandler;
+	/** The ongoing icon lookups (type -> (icon future, platform list)). */
+	private final Map<String, Tuple2<IFuture<Icon>, List<IComponentIdentifier>>>	lookups;
 	
-	/** The tree. */
-	private final JTree	tree;
+	/** The local jcc platform access. */
+	private final IExternalAccess jccaccess;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create an icon cache.
 	 */
-	public ComponentIconCache(CMSUpdateHandler cmshandler, JTree tree)
+	public ComponentIconCache(IExternalAccess jccaccess)
 	{
 		this.icons	= new HashMap<String, Icon>();
-		this.cmshandler	= cmshandler;
-		this.tree	= tree;
+		this.lookups	= new HashMap<String, Tuple2<IFuture<Icon>, List<IComponentIdentifier>>>();
+		this.jccaccess	= jccaccess;
 	}
 	
 	//-------- methods --------
@@ -54,92 +56,103 @@ public class ComponentIconCache
 	/**
 	 *  Get an icon.
 	 */
-	public Icon	getIcon(final IActiveComponentTreeNode node, final String type)
+	public Icon	getIcon(final String type, final IActiveComponentTreeNode node, final AsyncTreeModel model)
 	{
-		Icon	ret	= null;
+		assert SwingUtilities.isEventDispatchThread();
 		
+		Icon	ret	= null;
+		IFuture<Icon>	fut	= null;
+		
+		// Use cached icon, if available.
 		if(icons.containsKey(type))
 		{
 			ret	= (Icon)icons.get(type);
 		}
+		
+		// Add listener to ongoing search, if any.
+		else if(lookups.containsKey(type))
+		{
+			Tuple2<IFuture<Icon>, List<IComponentIdentifier>>	lookup	= lookups.get(type);
+			if(!lookup.getSecondEntity().contains(node.getComponentIdentifier().getRoot()))
+				lookup.getSecondEntity().add(node.getComponentIdentifier().getRoot());
+			fut	= lookup.getFirstEntity();
+		}
+		
+		// Start new search.
 		else
 		{
-			// Todo: remember ongoing searches for efficiency?
-//			System.out.println("getIcon: "+type);
+			List<IComponentIdentifier>	todo	= new ArrayList<IComponentIdentifier>();
+			todo.add(jccaccess.getComponentIdentifier().getRoot());	// Search local first.
+			if(!jccaccess.getComponentIdentifier().getRoot().equals(node.getComponentIdentifier().getRoot()))
+				todo.add(node.getComponentIdentifier().getRoot());	// Search remote if not found locally.
 			
-			cmshandler.getLocalCMS().addResultListener(new SwingDefaultResultListener<IComponentManagementService>()
+			Future<Icon>	ifut	= new Future<Icon>();
+			doSearch(ifut, type, todo, 0);
+			lookups.put(type, new Tuple2<IFuture<Icon>, List<IComponentIdentifier>>(ifut, todo));
+			fut	= ifut;			
+		}
+		
+		// Update node if icon is found.
+		if(fut!=null)
+		{
+			fut.addResultListener(new SwingDefaultResultListener<Icon>()
 			{
-				public void customResultAvailable(IComponentManagementService cms)
+				public void customResultAvailable(Icon result)
 				{
-					cms.getExternalAccess(node.getComponentIdentifier()).addResultListener(new SwingDefaultResultListener<IExternalAccess>()
-					{
-						public void customResultAvailable(IExternalAccess exta)
-						{
-							final String	remtype	= type;	// inner final variable for remote step.
-							exta.scheduleStep(new IComponentStep<IComponentFactory>()
-							{
-								@XMLClassname("getFactoryService")
-								public IFuture<IComponentFactory> execute(IInternalAccess ia)
-								{
-									IFuture<IComponentFactory> ret = SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(remtype));
-									return ret;
-								}
-							}).addResultListener(new SwingDefaultResultListener<IComponentFactory>()
-							{
-								public void customResultAvailable(IComponentFactory fac)
-								{
-									try
-									{
-										fac.getComponentTypeIcon(type)
-											.addResultListener(new SwingDefaultResultListener<Icon>()
-										{
-											public void customResultAvailable(Icon result)
-											{
-												icons.put(type, result);
-												TreeModel	model	= tree.getModel();
-												if(model instanceof AsyncTreeModel)
-												{
-													((AsyncTreeModel)model).fireNodeChanged(node);
-												}
-												else
-												{
-													tree.repaint();
-												}
-											}
-											
-											public void customExceptionOccurred(Exception exception)
-											{
-												// Todo: remember failed searches for efficiency?
-											}
-										});
-									}
-									catch(Exception e)
-									{
-										// could be UnsupportedOpEx in case of remote factory
-									}
-								}
-								
-								public void customExceptionOccurred(Exception exception)
-								{
-									// Todo: remember failed searches for efficiency?
-								}
-							});
-						}
-						
-						public void customExceptionOccurred(Exception exception)
-						{
-							// Todo: remember failed searches for efficiency?
-						}
-					});
+					model.fireNodeChanged(node);
 				}
 				
 				public void customExceptionOccurred(Exception exception)
 				{
-					// Todo: remember failed searches for efficiency?
+					// icon not available ignore.
+					// todo: cache unavailable icons!?
 				}
-			});			
+			});
 		}
 		
 		return ret;
+	}
+		
+	//-------- helper methods --------
+	
+	/**
+	 *  Start/continue a search for a component type icon with an initial platform todo list.
+	 */
+	protected void	doSearch(final Future<Icon> ret, final String type, final List<IComponentIdentifier> todo, final int i)
+	{
+		SServiceProvider.getService(jccaccess.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Icon>(ret)
+		{
+			public void customResultAvailable(IComponentManagementService cms)
+			{
+				cms.getExternalAccess(todo.get(i)).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Icon>(ret)
+				{
+					public void customResultAvailable(IExternalAccess exta)
+					{
+						SComponentFactory.getFileTypeIcon(exta, type)
+							.addResultListener(new SwingDelegationResultListener<Icon>(ret)
+						{
+							public void customResultAvailable(Icon result)
+							{
+								icons.put(type, result);
+								super.customResultAvailable(result);
+							}
+							
+							public void customExceptionOccurred(Exception exception)
+							{
+								if(i<todo.size())
+								{
+									doSearch(ret, type, todo, i+1);
+								}
+								else
+								{
+									super.customExceptionOccurred(exception);
+								}
+							}
+						});
+					}
+				});
+			}			
+		});
 	}
 }

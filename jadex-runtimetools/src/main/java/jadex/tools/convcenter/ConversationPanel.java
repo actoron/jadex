@@ -3,6 +3,7 @@ package jadex.tools.convcenter;
 import jadex.base.Starter;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -102,7 +103,8 @@ public class ConversationPanel extends JSplitPane
 	/**
 	 *  Create the gui.
 	 */
-	public ConversationPanel(final IExternalAccess agent, final CMSUpdateHandler cmshandler, Component comptree, MessageType defaulttype)
+	public ConversationPanel(final IExternalAccess agent, final CMSUpdateHandler cmshandler,
+		final ComponentIconCache iconcache, Component comptree, MessageType defaulttype)
 	{
 		super(JSplitPane.HORIZONTAL_SPLIT, true);
 		setOneTouchExpandable(true);
@@ -114,7 +116,7 @@ public class ConversationPanel extends JSplitPane
 		Map	msg	= new HashMap();
 		msg.put(MESSAGE_TYPE, defaulttype);
 		msg.put(defaulttype.getSenderIdentifier(), agent.getComponentIdentifier());
-		sendpanel = new FipaMessagePanel(msg, agent, cmshandler, comptree);
+		sendpanel = new FipaMessagePanel(msg, agent, cmshandler, iconcache, comptree);
 
 		JButton send = new JButton("Send");
 		send.setToolTipText("Send the specified message");
@@ -204,7 +206,7 @@ public class ConversationPanel extends JSplitPane
 					final Map msg	= (Map)sentmsgs.getModel()
 						.getElementAt(sentmsgs.locationToIndex(e.getPoint()));
 					final JPanel	msgtab	= new JPanel(new BorderLayout());
-					final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent, cmshandler, null);
+					final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent, cmshandler, iconcache, null);
 					msgpanel.setEditable(false);
 					final JScrollPane	scroll	= new JScrollPane(msgtab);
 					scroll.setBorder(null);
@@ -276,7 +278,7 @@ public class ConversationPanel extends JSplitPane
 					{
 						final Map	msg	= (Map)receivedmsgs.getModel().getElementAt(idx);
 						final JPanel msgtab	= new JPanel(new BorderLayout());
-						final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent, cmshandler, null);
+						final FipaMessagePanel	msgpanel = new FipaMessagePanel(msg, agent, cmshandler, iconcache, null);
 						msgpanel.setEditable(false);
 						final JScrollPane	scroll	= new JScrollPane(msgtab);
 						scroll.setBorder(null);

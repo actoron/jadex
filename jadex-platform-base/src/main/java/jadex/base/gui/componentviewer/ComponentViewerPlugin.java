@@ -156,7 +156,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 		this.split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
 		split.setOneTouchExpandable(true);
 
-		comptree = new ComponentTreePanel(getJCC().getPlatformAccess(), getJCC().getCMSHandler());
+		comptree = new ComponentTreePanel(getJCC().getPlatformAccess(), getJCC().getCMSHandler(), getJCC().getIconCache());
 		comptree.setMinimumSize(new Dimension(0, 0));
 		split.add(comptree);
 

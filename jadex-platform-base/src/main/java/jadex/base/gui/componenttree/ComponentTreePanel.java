@@ -168,15 +168,15 @@ public class ComponentTreePanel extends JSplitPane
 	/**
 	 *  Create a new component tree panel.
 	 */
-	public ComponentTreePanel(IExternalAccess access, CMSUpdateHandler cmshandler)
+	public ComponentTreePanel(IExternalAccess access, CMSUpdateHandler cmshandler, ComponentIconCache cic)
 	{
-		this(access, cmshandler, VERTICAL_SPLIT);
+		this(access, cmshandler, cic, VERTICAL_SPLIT);
 	}
 	
 	/**
 	 *  Create a new component tree panel.
 	 */
-	public ComponentTreePanel(final IExternalAccess access, CMSUpdateHandler cmshandler, int orientation)
+	public ComponentTreePanel(final IExternalAccess access, CMSUpdateHandler cmshandler, final ComponentIconCache cic, int orientation)
 	{
 		super(orientation);
 		this.setOneTouchExpandable(true);
@@ -190,7 +190,6 @@ public class ComponentTreePanel extends JSplitPane
 		tree.setShowsRootHandles(true);
 		tree.setToggleClickCount(0);
 		tree.putClientProperty(CMSUpdateHandler.class, cmshandler);
-		final ComponentIconCache	cic	= new ComponentIconCache(cmshandler, tree);
 		JScrollPane	scroll	= new JScrollPane(tree);
 		this.add(scroll);
 		// needed to show tooltips: http://info.michael-simons.eu/2008/08/12/enabling-tooltips-on-a-jtree/
