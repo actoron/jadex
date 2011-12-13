@@ -13,6 +13,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.SGUI;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
 
 /**
  *  Cache for component icons.
@@ -28,6 +30,14 @@ import javax.swing.SwingUtilities;
  */
 public class ComponentIconCache
 {
+	//-------- constants --------
+	
+	/** The default component icons. */
+	protected static final UIDefaults	ICONS	= new UIDefaults(new Object[]
+	{
+		"component", SGUI.makeIcon(ComponentIconCache.class, "/jadex/base/gui/images/component.png")
+	});
+	
 	//-------- attributes --------
 	
 	/** The icon cache. */
@@ -110,7 +120,7 @@ public class ComponentIconCache
 			});
 		}
 		
-		return ret;
+		return ret!=null ? ret: ICONS.getIcon("component");
 	}
 		
 	//-------- helper methods --------
@@ -134,13 +144,20 @@ public class ComponentIconCache
 						{
 							public void customResultAvailable(Icon result)
 							{
-								icons.put(type, result);
-								super.customResultAvailable(result);
+								if(result!=null)
+								{
+									icons.put(type, result);
+									super.customResultAvailable(result);
+								}
+								else
+								{
+									customExceptionOccurred(new RuntimeException("Icon "+type+" not found."));
+								}
 							}
 							
 							public void customExceptionOccurred(Exception exception)
 							{
-								if(i<todo.size())
+								if(i+1<todo.size())
 								{
 									doSearch(ret, type, todo, i+1);
 								}
