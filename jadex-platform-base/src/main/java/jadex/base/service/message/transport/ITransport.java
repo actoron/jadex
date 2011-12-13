@@ -1,5 +1,6 @@
 package jadex.base.service.message.transport;
 
+import jadex.base.service.message.ManagerSendTask;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
 
@@ -27,7 +28,8 @@ public interface ITransport
 	 *  @param message The message to send.
 	 *  @return A future indicating if sending was successful.
 	 */
-	public IFuture<Void>	sendMessage(Map<String, Object> message, String msgtype, IComponentIdentifier[] receivers, byte[] codecids);
+//	public IFuture<Void>	sendMessage(Map<String, Object> message, String msgtype, IComponentIdentifier[] receivers, byte[] codecids);
+	public IFuture<Void>	sendMessage(ManagerSendTask task);
 	
 	/**
 	 *  Returns the prefix of this transport

@@ -92,40 +92,40 @@ public interface IEventbase extends IElement
 	 */
 	public void deregisterMessageEvent(IMessageEvent mevent);
 	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name);
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param parent The parent identifier.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, IComponentIdentifier parent);
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local);
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses);
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name);
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param parent The parent identifier.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name, IComponentIdentifier parent);
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name, boolean local);
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses);
 	
 	//-------- listeners --------
 

@@ -3,6 +3,7 @@ package jadex.bpmn.runtime.handler;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -114,7 +115,8 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 									Object rec = it.next();
 									if(rec instanceof String)
 									{
-										newrecs.add(cms.createComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent(), null));
+//										newrecs.add(cms.createComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent(), null));
+										newrecs.add(new ComponentIdentifier((String)rec, instance.getComponentIdentifier().getParent()));
 									}
 									else
 									{
@@ -126,7 +128,8 @@ public class EventIntermediateMessageActivityHandler	extends DefaultActivityHand
 							{
 								if(recs instanceof String)
 								{
-									newrecs.add(cms.createComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent(), null));
+//									newrecs.add(cms.createComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent(), null));
+									newrecs.add(new ComponentIdentifier((String)recs, instance.getComponentIdentifier().getParent()));
 								}
 								else if(recs!=null)
 								{

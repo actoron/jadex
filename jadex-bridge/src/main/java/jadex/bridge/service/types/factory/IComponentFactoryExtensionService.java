@@ -1,5 +1,7 @@
 package jadex.bridge.service.types.factory;
 
+import java.util.Set;
+
 import jadex.commons.future.IFuture;
 
 /**
@@ -16,6 +18,6 @@ public interface IComponentFactoryExtensionService
 	/**
 	 *  Get extension. 
 	 */
-	public IFuture getExtension(String componenttype);
+	public IFuture getExtension(String componenttype); // <Set<TypeInfo>> 
 	
 }

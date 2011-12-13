@@ -9,10 +9,16 @@ import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.asynctree.TreePopupListener;
+import jadex.base.gui.componentviewer.IAbstractViewerPanel;
+import jadex.base.gui.componentviewer.IComponentViewerPanel;
+import jadex.base.gui.componentviewer.IServiceViewerPanel;
+import jadex.base.gui.plugin.AbstractJCCPlugin;
+import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -20,9 +26,11 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.CombiIcon;
@@ -565,6 +573,51 @@ public class ComponentTreePanel extends JSplitPane
 		};
 		actions.put(setpasswd.getValue(Action.NAME), setpasswd);
 		
+		
+//		final Action showview = new AbstractAction(SHOWVIEW_ACTION, icons.getIcon("show_details"))
+//		{
+//			public void actionPerformed(ActionEvent e)
+//			{
+//				TreePath path = tree.getSelectionPath();
+//				if(path!=null)
+//				{
+//					final ITreeNode node = (ITreeNode)path.getLastPathComponent();
+//					
+//					if(ComponentViewerPlugin.)
+//					
+//					if(node instanceof ProvidedServiceInfoNode)
+//					{
+////						Object obj = ((ProvidedServiceInfoNode)node).getService();
+//						IServiceIdentifier sid = ((ProvidedServiceInfoNode)node).getServiceIdentifier();
+//						IFuture<Object> fut = SServiceProvider.getService(access.getServiceProvider(), sid);
+//						fut.addResultListener(new SwingDefaultResultListener<Object>()
+//						{
+//							public void customResultAvailable(Object obj)
+//							{
+//								JPanel panel = new ObjectInspectorPanel(obj);
+//								showProperties(panel);
+//							}
+//						});
+//					}
+//					else if(node instanceof IActiveComponentTreeNode)
+//					{
+//						//IComponentDescription desc = ((IActiveComponentTreeNode)node).getDescription();
+//						IComponentIdentifier cid = ((IActiveComponentTreeNode)node).getDescription().getName();
+//						cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener((Component)null)
+//						{
+//							public void customResultAvailable(Object result)
+//							{
+//								IExternalAccess	ea	= (IExternalAccess)result;
+//								JPanel panel = new ObjectInspectorPanel(ea);
+//								showProperties(panel);
+//							}
+//						});
+//					}
+//				}
+//			}
+//		};
+//		actions.put(showobject.getValue(Action.NAME), showobject);
+		
 		// Default overlays and popups.
 		model.addNodeHandler(new INodeHandler()
 		{
@@ -953,5 +1006,239 @@ public class ComponentTreePanel extends JSplitPane
 			setDividerLocation(newloc);
 			setLastDividerLocation(currentloc);
 		}
+	}
+	
+	
+
+	
+	//--------------------------------------
+	
+	/**
+	 * 
+	 */
+	public static IFuture<JComponent> createView(final IControlCenter jcc, TreePath path, Map<Object, Boolean> viewables)
+	{
+		final Future<JComponent> ret = new Future<JComponent>();
+		final Object tmp = path.getLastPathComponent();
+		
+		if(isNodeViewable2((ITreeNode)path.getLastPathComponent(), viewables, jcc))
+		{
+			if(tmp instanceof ProvidedServiceInfoNode)
+			{
+				final ProvidedServiceInfoNode node = (ProvidedServiceInfoNode)tmp;
+	//					final IService service = node.getService();
+				
+				SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), node.getServiceIdentifier())
+					.addResultListener(new ExceptionDelegationResultListener<Object, JComponent>(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						final IService service = (IService)result;
+	
+						AbstractJCCPlugin.getClassLoader(((IActiveComponentTreeNode)node.getParent().getParent()).getComponentIdentifier(), jcc)
+							.addResultListener(new ExceptionDelegationResultListener<ClassLoader, JComponent>(ret)
+						{
+							public void customResultAvailable(ClassLoader cl)
+							{
+								final Object clid = service.getPropertyMap()!=null? service.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
+								final Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
+								
+								if(clid!=null)
+								{
+									try
+									{
+//										storeCurrentPanelSettings();
+										final IServiceViewerPanel	panel = (IServiceViewerPanel)clazz.newInstance();
+										panel.init(jcc, service).addResultListener(new ExceptionDelegationResultListener<Void, JComponent>(ret)
+										{
+											public void customResultAvailable(Void result)
+											{
+//												Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+//												if(sub!=null)
+//													panel.setProperties(sub);
+												JComponent comp = panel.getComponent();
+												
+												ret.setResult(comp);
+												// todo: help 
+												//SHelp.setupHelp(comp, getHelpID());
+//												panels.put(node.getServiceIdentifier(), panel);
+//												detail.add(comp, node.getServiceIdentifier());
+//												comptree.getModel().fireNodeChanged(node);
+											}
+										});
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+										jcc.displayError("Error initializing service viewer panel.", "Component viewer panel class: "+clid, e);
+									}
+								}
+							}
+						});
+					}
+				});
+			}
+			else if(tmp instanceof IActiveComponentTreeNode)
+			{
+				final IActiveComponentTreeNode node = (IActiveComponentTreeNode)tmp;
+				final IComponentIdentifier cid = node.getComponentIdentifier();
+				
+				SServiceProvider.getServiceUpwards(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, JComponent>(ret)
+				{
+					public void customResultAvailable(final IComponentManagementService cms)
+					{
+						cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, JComponent>(ret)
+						{
+							public void customResultAvailable(final IExternalAccess exta)
+							{
+								AbstractJCCPlugin.getClassLoader(cid, jcc)
+									.addResultListener(new SwingDefaultResultListener<ClassLoader>()
+								{
+									public void customResultAvailable(ClassLoader cl)
+									{
+										Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+										
+										if(clid instanceof String)
+										{
+											clid = SReflect.classForName0((String)clid, cl);
+										}
+										
+										try
+										{
+											final IComponentViewerPanel panel = (IComponentViewerPanel)((Class)clid).newInstance();
+											panel.init(jcc, exta).addResultListener(new ExceptionDelegationResultListener<Void, JComponent>(ret)
+											{
+												public void customResultAvailable(Void result)
+												{
+	//													Properties	sub	= props!=null ? props.getSubproperty(panel.getId()) : null;
+	//													if(sub!=null)
+	//														panel.setProperties(sub);
+													JComponent comp = panel.getComponent();
+													ret.setResult(comp);
+													// todo: help
+													//SHelp.setupHelp(comp, getHelpID());
+	//													panels.put(exta.getComponentIdentifier(), panel);
+	//													detail.add(comp, exta.getComponentIdentifier());
+	//													comptree.getModel().fireNodeChanged(node);
+												}
+											});
+										}
+										catch(Exception e)
+										{
+											ret.setException(e);
+										}
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Test if a node is viewable.
+	 *  @param node	The node.
+	 *  @return True, if the node is viewable.
+	 */
+	public static boolean isNodeViewable2(final ITreeNode node, final Map<Object, Boolean> viewables, final IControlCenter jcc)
+	{
+//		System.out.println("called isVis: "+node.getId());
+		boolean ret = false;
+		if(node instanceof ProvidedServiceInfoNode)
+		{
+			final IServiceIdentifier sid = ((ProvidedServiceInfoNode)node).getServiceIdentifier();
+			if(sid!=null)
+			{
+				Boolean viewable = (Boolean)viewables.get(sid);
+				if(viewable!=null)
+				{
+					ret = viewable.booleanValue();
+//					System.out.println("isVis result: "+node.getId()+" "+ret);
+				}
+				else
+				{
+					// Unknown -> start search to find out asynchronously
+					SServiceProvider.getService(jcc.getJCCAccess().getServiceProvider(), sid)
+						.addResultListener(new SwingDefaultResultListener<Object>()
+					{
+						public void customResultAvailable(Object result)
+						{
+							IService service = (IService)result;
+							Map	props = service.getPropertyMap();
+							boolean vis = props!=null && props.get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)!=null;
+							viewables.put(sid, vis? Boolean.TRUE: Boolean.FALSE);
+//							System.out.println("isVis first res: "+viewables.get(sid));
+							node.refresh(false);
+						}
+					});
+				}
+			}
+//			Map	props	= ((ProvidedServiceInfoNode)node).getServiceIdentifier().get.getPropertyMap();
+//			ret = props!=null && props.get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS)!=null;
+		}
+		else if(node instanceof IActiveComponentTreeNode)
+		{
+			final IComponentIdentifier cid = ((IActiveComponentTreeNode)node).getComponentIdentifier();
+			
+			// For proxy components the cid could be null if the remote cid has not yet been retrieved
+			// Using a IFuture as return value in not very helpful because this method can't directly
+			// return a result, even if known.
+			// todo: how to initiate a repaint in case the the cid is null
+			if(cid!=null)
+			{
+				Boolean viewable = (Boolean)viewables.get(cid);
+				if(viewable!=null)
+				{
+					ret = viewable.booleanValue();
+//					System.out.println("isVis result: "+node.getId()+" "+ret);
+				}
+				else
+				{
+					// Unknown -> start search to find out asynchronously
+					IFuture<IComponentManagementService> fut = SServiceProvider.getServiceUpwards(jcc.getJCCAccess().getServiceProvider(), IComponentManagementService.class);
+					fut.addResultListener(new DefaultResultListener<IComponentManagementService>()
+					{
+						public void resultAvailable(IComponentManagementService result)
+						{
+							final IComponentManagementService cms = (IComponentManagementService)result;
+							
+							cms.getExternalAccess(cid).addResultListener(new DefaultResultListener<IExternalAccess>()
+							{
+								public void resultAvailable(final IExternalAccess exta)
+								{
+									jcc.getClassLoader(exta.getModel().getResourceIdentifier())
+										.addResultListener(new SwingDefaultResultListener<ClassLoader>()
+									{
+										public void customResultAvailable(ClassLoader cl)
+										{
+											final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+											viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
+//											System.out.println("isVis first res: "+viewables.get(cid));
+											node.refresh(false);
+										}										
+									});
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									// Happens e.g. when remote classes not locally available.
+//									exception.printStackTrace();
+								}
+							});
+						}
+					});
+				}
+			}
+		}
+		return ret;
 	}
 }

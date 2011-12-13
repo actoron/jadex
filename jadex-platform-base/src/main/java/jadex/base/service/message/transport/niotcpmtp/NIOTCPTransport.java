@@ -1,5 +1,6 @@
 package jadex.base.service.message.transport.niotcpmtp;
 
+import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
@@ -224,15 +225,16 @@ public class NIOTCPTransport implements ITransport
 	 *  
 	 *  Can be called concurrently by SendManagers of message service.
 	 */
-	public synchronized IFuture sendMessage(final Map message, final String msgtype, final IComponentIdentifier[] receivers, final byte[] codecids)
+//	public synchronized IFuture sendMessage(final Map message, final String msgtype, final IComponentIdentifier[] receivers, final byte[] codecids)
+	public synchronized IFuture sendMessage2(final ManagerSendTask task)
 	{
 		final Future	ret	= new Future();
 		
 		// Fetch all addresses
 		Set	addrs	= new LinkedHashSet();
-		for(int i=0; i<receivers.length; i++)
+		for(int i=0; i<task.getReceivers().length; i++)
 		{
-			String[]	raddrs	= receivers[i].getAddresses();
+			String[]	raddrs	= task.getReceivers()[i].getAddresses();
 			for(int j=0; j<raddrs.length; j++)
 			{
 				InetSocketAddress	address	= parseAddress(raddrs[j]);
@@ -250,7 +252,47 @@ public class NIOTCPTransport implements ITransport
 			public void customResultAvailable(Object result)
 			{
 				NIOTCPOutputConnection	con	= (NIOTCPOutputConnection)result;
-				selectorthread.sendMessage(con, new MessageEnvelope(message, Arrays.asList(receivers), msgtype), codecids)
+//				selectorthread.sendMessage(con, new MessageEnvelope(message, Arrays.asList(receivers), msgtype), codecids)
+				selectorthread.sendMessage(con, task.getProlog(), task.getData())
+					.addResultListener(new DelegationResultListener(ret));
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Send a message.
+	 *  @param message The message to send.
+	 */
+	public IFuture<Void>	sendMessage(final ManagerSendTask task)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		
+		// Fetch all addresses
+		Set	addrs	= new LinkedHashSet();
+		for(int i=0; i<task.getReceivers().length; i++)
+		{
+			String[]	raddrs	= task.getReceivers()[i].getAddresses();
+			for(int j=0; j<raddrs.length; j++)
+			{
+				InetSocketAddress	address	= parseAddress(raddrs[j]);
+				if(address!=null)
+				{
+					addrs.add(address);
+				}
+			}
+			
+		}
+		InetSocketAddress[]	addresses	= (InetSocketAddress[])addrs.toArray(new InetSocketAddress[addrs.size()]);
+		
+		selectorthread.getConnection(addresses).addResultListener(new DelegationResultListener(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				NIOTCPOutputConnection	con	= (NIOTCPOutputConnection)result;
+//				selectorthread.sendMessage(con, new MessageEnvelope(message, Arrays.asList(receivers), msgtype), codecids)
+				selectorthread.sendMessage(con, task.getProlog(), task.getData())
 					.addResultListener(new DelegationResultListener(ret));
 			}
 		});

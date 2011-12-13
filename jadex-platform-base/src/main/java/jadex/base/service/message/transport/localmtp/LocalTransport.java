@@ -1,5 +1,6 @@
 package jadex.base.service.message.transport.localmtp;
 
+import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceProvider;
@@ -84,20 +85,40 @@ public class LocalTransport implements ITransport
 	 *  Send a message.
 	 *  @param message The message to send.
 	 */
-	public IFuture	sendMessage(Map message, String msgtype, IComponentIdentifier[] recs, byte[] codecids)
+//	public IFuture<Void>	sendMessage(Map message, String msgtype, IComponentIdentifier[] recs, byte[] codecids)
+//	{
+//		IFuture<Void>	ret;
+//		if(recs[0].getPlatformName().equals(((IComponentIdentifier)container.getId()).getPlatformName()))
+//		{
+//			msgservice.deliverMessage(message, msgtype, recs);
+//			ret	= IFuture.DONE;
+//		}
+//		else
+//		{
+//			ret	= new Future<Void>(new RuntimeException("Can only deliver to local agents"));
+//		}
+//		return ret;
+//	}
+	
+	/**
+	 *  Send a message.
+	 *  @param message The message to send.
+	 */
+	public IFuture<Void>	sendMessage(ManagerSendTask task)
 	{
-		IFuture	ret;
-		if(recs[0].getPlatformName().equals(((IComponentIdentifier)container.getId()).getPlatformName()))
+		IFuture<Void>	ret;
+		if(task.getReceivers()[0].getPlatformName().equals(((IComponentIdentifier)container.getId()).getPlatformName()))
 		{
-			msgservice.deliverMessage(message, msgtype, recs);
+			msgservice.deliverMessage(task.getMessage(), task.getMessageType().getName(), task.getReceivers());
 			ret	= IFuture.DONE;
 		}
 		else
 		{
-			ret	= new Future(new RuntimeException("Can only deliver to local agents"));
+			ret	= new Future<Void>(new RuntimeException("Can only deliver to local agents"));
 		}
 		return ret;
 	}
+
 	
 	/**
 	 *  Returns the prefix of this transport

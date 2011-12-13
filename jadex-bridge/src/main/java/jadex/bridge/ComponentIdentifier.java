@@ -29,7 +29,7 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public ComponentIdentifier()
 	{
-		this(null, (String[])null);
+//		this(null, (String[])null);
 	}
 
 	/**
@@ -49,6 +49,8 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	public ComponentIdentifier(String name, String[] addresses)
 	{
 //		this(name, addresses, null);
+		if(name!=null && (name.indexOf("@")!=name.lastIndexOf("@")))
+			throw new IllegalArgumentException("Invalid component identifier: "+name);
 		this.name = name;
 		this.addresses	= addresses;
 	}

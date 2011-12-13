@@ -6,6 +6,7 @@ import jadex.base.service.remote.commands.RemoteGetExternalAccessCommand;
 import jadex.base.service.remote.commands.RemoteSearchCommand;
 import jadex.base.service.remote.xml.RMIPostProcessor;
 import jadex.base.service.remote.xml.RMIPreProcessor;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -26,7 +27,6 @@ import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IRemotable;
-import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
@@ -35,6 +35,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.IMicroExternalAccess;
+import jadex.xml.IContext;
+import jadex.xml.IPostProcessor;
+import jadex.xml.IPreProcessor;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.TypeInfo;
@@ -58,17 +61,10 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/* $if !android $ */
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
-/* $else $
-import javaxx.xml.namespace.QName;
-import javaxx.xml.stream.Location;
-import javaxx.xml.stream.XMLReporter;
-import javaxx.xml.stream.XMLStreamException;
- $endif $ */
 
 
 /**
@@ -124,13 +120,16 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** The marshal service. */
 	protected IMarshalService marshal;
 	
+	/** The message service. */
+	protected IMessageService msgservice;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new remote service management service.
 	 */
 	public RemoteServiceManagementService(IMicroExternalAccess component, 
-		ILibraryService libservice, final IMarshalService marshal)
+		ILibraryService libservice, final IMarshalService marshal, final IMessageService msgservice)
 	{
 		super(component.getServiceProvider().getId(), IRemoteServiceManagementService.class, null);
 
@@ -139,6 +138,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		this.waitingcalls = new HashMap();
 		this.timer	= new Timer(true);
 		this.marshal = marshal;
+		this.msgservice = msgservice;
 		
 		QName[] pr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyReference")};
 		
@@ -152,6 +152,27 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		TypeInfo ti_proxyable = new TypeInfo(new XMLInfo(pr, null, false, preproc), 
 			new ObjectInfo(IRemotable.class));
 		typeinfoswrite.add(ti_proxyable);
+		
+		QName[] ppr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge", "ComponentIdentifier")};
+		final IComponentIdentifier root = component.getComponentIdentifier().getRoot();
+		IPreProcessor pp = new IPreProcessor()
+		{
+			public Object preProcess(IContext context, Object object)
+			{
+				IComponentIdentifier src = (IComponentIdentifier)object;
+				ComponentIdentifier ret = null;
+				if(src.getPlatformName().equals(root.getLocalName()))
+				{
+					String[] addresses = (String[])((Object[])context.getUserContext())[1];
+					ret = new ComponentIdentifier(src.getName(), addresses);
+//					System.out.println("Rewritten cid: "+ret);
+				}
+				
+				return ret==null? src: ret;
+			}
+		};
+		TypeInfo ti_cids = new TypeInfo(new XMLInfo(ppr, pp), new ObjectInfo(IComponentIdentifier.class));
+		typeinfoswrite.add(ti_cids);
 		
 		this.reader = new Reader(new TypeInfoPathManager(typeinfosread), false, false, false, new XMLReporter()
 		{
@@ -236,7 +257,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						IComponentManagementService cms = (IComponentManagementService)result;
 						
 						// Hack! create remote rms cid with "rms" assumption.
-						IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
+//						IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
+						IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteSearchCommand content = new RemoteSearchCommand(cid, manager, 
 							decider, selector, callid);
@@ -333,7 +355,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						IComponentManagementService cms = (IComponentManagementService)result;
 						
 						// Hack! create remote rms cid with "rms" assumption.
-						IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
+//						IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
+						IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 						
@@ -410,6 +433,15 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		return writer;
 	}
 	
+	/**
+	 *  Get the msg service.
+	 *  @return the msg service.
+	 */
+	public IMessageService getMessageService()
+	{
+		return msgservice;
+	}
+
 	/**
 	 *  Add a new waiting call.
 	 *  @param callid The callid.
@@ -523,7 +555,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //												System.out.println("RMS sending to: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
 //												try
 //												{
-													String cont = Writer.objectToXML(getWriter(), content, cl, receiver);
+													String cont = Writer.objectToXML(getWriter(), content, cl, new Object[]{receiver, msgservice.getAddresses()});
 													msg.put(SFipa.CONTENT, cont);
 //												}
 //												catch(RuntimeException e)

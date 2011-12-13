@@ -13,6 +13,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
+import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
@@ -59,16 +60,21 @@ public class RemoteServiceManagementAgent extends MicroAgent
 		{
 			public void customResultAvailable(final ILibraryService libservice)
 			{
-//				final ILibraryService libservice = (ILibraryService)result;
-				
 				SServiceProvider.getService(getServiceContainer(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
 				{
 					public void customResultAvailable(final IMarshalService marshalservice)
 					{
-						rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), libservice, marshalservice);
-						addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
-						ret.setResult(null);
+						SServiceProvider.getService(getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+						{
+							public void customResultAvailable(final IMessageService msgservice)
+							{
+								rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), libservice, marshalservice, msgservice);
+								addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+								ret.setResult(null);
+							}
+						}));
 					}
 				}));
 			}
@@ -274,10 +280,11 @@ public class RemoteServiceManagementAgent extends MicroAgent
 												{
 													public void resultAvailable(Map<String, Object> reply)
 													{
+														final String[] addresses = rms.getMessageService().getAddresses();
 			//											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
 														
 //														ClassLoader cl = ls.getClassLoader(null);//rms.getComponent().getModel().getResourceIdentifier());
-														String content = Writer.objectToXML(rms.getWriter(), result, cl, msg.get(SFipa.SENDER));
+														String content = Writer.objectToXML(rms.getWriter(), result, cl, new Object[]{msg.get(SFipa.SENDER), addresses});
 														reply.put(SFipa.CONTENT, content);
 			//											System.out.println("content: "+content);
 														
@@ -286,11 +293,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 													}
 													public void exceptionOccurred(Exception exception)
 													{
-														// Terminated, when rms killed in mean time
-														if(!(exception instanceof ComponentTerminatedException))
-														{
-															super.exceptionOccurred(exception);
-														}
+														super.exceptionOccurred(exception);
 													}
 												}));
 											}

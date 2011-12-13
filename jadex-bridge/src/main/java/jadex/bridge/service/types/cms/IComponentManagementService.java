@@ -165,64 +165,64 @@ public interface IComponentManagementService //extends IService
 	// todo: remove all following methods 
 	// (they are synchronous and not necessary, direct constructor creation)
 	
-	/**
-	 *  Create component identifier (name assumed being local).
-	 *  @param name The name.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name);
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local);
-
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses);
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, IComponentIdentifier parent, String[] addresses);
-	
-	/**
-	 *  Create a component identifier that is allowed on the platform.
-	 *  @param name The base name.
-	 *  @return The component identifier.
-	 */
-	public IComponentIdentifier generateComponentIdentifier(String name, String platformname);
-	
-	/**
-	 * Create a component description.
-	 * @param id The component identifier.
-	 * @param state The state.
-	 * @param ownership The ownership.
-	 * @param type The component type.
-	 * @param parent The parent.
-	 * @return The component description.
-	 */
-	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, 
-		String ownership, String type, String modelname, String localtype);
-	
-	/**
-	* Create a search constraints object.
-	* @param maxresults The maximum number of results.
-	* @param maxdepth The maximal search depth.
-	* @return The search constraints.
-	*/
-	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth);
+//	/**
+//	 *  Create component identifier (name assumed being local).
+//	 *  @param name The name.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name);
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name, boolean local);
+//
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses);
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name, IComponentIdentifier parent, String[] addresses);
+//	
+//	/**
+//	 *  Create a component identifier that is allowed on the platform.
+//	 *  @param name The base name.
+//	 *  @return The component identifier.
+//	 */
+//	public IComponentIdentifier generateComponentIdentifier(String name, String platformname);
+//	
+//	/**
+//	 * Create a component description.
+//	 * @param id The component identifier.
+//	 * @param state The state.
+//	 * @param ownership The ownership.
+//	 * @param type The component type.
+//	 * @param parent The parent.
+//	 * @return The component description.
+//	 */
+//	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, 
+//		String ownership, String type, String modelname, String localtype);
+//	
+//	/**
+//	* Create a search constraints object.
+//	* @param maxresults The maximum number of results.
+//	* @param maxdepth The maximal search depth.
+//	* @return The search constraints.
+//	*/
+//	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth);
 	
 	/**
 	 *  Get the component adapter for a component identifier.

@@ -1,6 +1,7 @@
 package jadex.micro.examples.ping;
 
 import jadex.base.fipa.SFipa;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -76,20 +77,23 @@ public class PingingAgent extends MicroAgent
 		
 		if(receiver==null)
 		{
-			createComponentIdentifier("Ping").addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					receiver = (IComponentIdentifier)result;
-					scheduleStep(step);
-				}
-			});
+			receiver = new ComponentIdentifier("Ping", getComponentIdentifier().getParent());
 		}
-		else
-		{
-			scheduleStep(step);
-		}
+//			createComponentIdentifier("Ping").addResultListener(new DefaultResultListener()
+//			{
+//				public void resultAvailable(Object result)
+//				{
+//					receiver = (IComponentIdentifier)result;
+//					scheduleStep(step);
+//				}
+//			});
+//		}
+//		else
+//		{
+//			scheduleStep(step);
+//		}
 
+		scheduleStep(step);
 	}
 	
 	/**

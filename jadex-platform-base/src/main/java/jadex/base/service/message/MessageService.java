@@ -3,6 +3,8 @@ package jadex.base.service.message;
 import jadex.base.AbstractComponentAdapter;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.codecs.CodecFactory;
+import jadex.base.service.message.transport.codecs.ICodec;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ContentException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentIdentifier;
@@ -166,11 +168,12 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param message The native message.
 	 */
 	public IFuture<Void> sendMessage(final Map msg, final MessageType type, 
-		final IComponentIdentifier sender, final IResourceIdentifier rid, final byte[] codecids)
+		IComponentIdentifier osender, final IResourceIdentifier rid, final byte[] codecids)
 	{
 //		System.out.println("msgservice sendMessage()");
 		
 		final Future<Void> ret = new Future<Void>();
+		final IComponentIdentifier sender = updateComponentIdentifier(osender);
 		
 		libservice.getClassLoader(rid)
 			.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
@@ -184,6 +187,44 @@ public class MessageService extends BasicService implements IMessageService
 					return;
 				}
 			
+				// Replace own component identifiers.
+				String[] params = type.getParameterNames();
+				for(int i=0; i<params.length; i++)
+				{
+					Object o = msg.get(params[i]);
+					if(o instanceof IComponentIdentifier)
+					{
+						msg.put(params[i], updateComponentIdentifier((IComponentIdentifier)o));
+					}
+				}
+				String[] paramsets = type.getParameterSetNames();
+				for(int i=0; i<paramsets.length; i++)
+				{
+					Object o = msg.get(paramsets[i]);
+					
+					if(SReflect.isIterable(o))
+					{
+						List rep = new ArrayList();
+						for(Iterator it=SReflect.getIterator(o); it.hasNext(); )
+						{
+							Object item = it.next();
+							if(item instanceof IComponentIdentifier)
+							{
+								rep.add(updateComponentIdentifier((IComponentIdentifier)item));
+							}
+							else
+							{
+								rep.add(item);
+							}
+						}
+						msg.put(paramsets[i], rep);
+					}
+					else if(o instanceof IComponentIdentifier)
+					{
+						msg.put(paramsets[i], updateComponentIdentifier((IComponentIdentifier)o));
+					}
+				}
+				
 				// Automatically add optional meta information.
 				String senid = type.getSenderIdentifier();
 				Object sen = msg.get(senid);
@@ -335,15 +376,27 @@ public class MessageService extends BasicService implements IMessageService
 			managers.put(sm, cid);
 		}
 		
+		CodecFactory	codecfac	= (CodecFactory)getCodecFactory();
+		byte[] cids	= codecids;
+		if(cids==null || cids.length==0)
+			cids = codecfac.getDefaultCodecIds();
+		ICodec[] codecs = new ICodec[cids.length];
+		for(int i=0; i<codecs.length; i++)
+		{
+			codecs[i] = codecfac.getCodec(cids[i]);
+		}
+		
 		CollectionResultListener crl = new CollectionResultListener(managers.size(), false, new DelegationResultListener(ret));
 		for(Iterator it=managers.keySet().iterator(); it.hasNext();)
 		{
 			SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm)
 				.toArray(new IComponentIdentifier[0]);
-			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, getTransports(), codecids, tm);
+//			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, getTransports(), codecs);
+			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, getTransports(), cids, codecs);
 //			System.out.println("msgservice adding send task");
-			task.getSendManager().addMessage(task).addResultListener(crl);
+			tm.addMessage(task).addResultListener(crl);
+//			task.getSendManager().addMessage(task).addResultListener(crl);
 		}
 		
 //		sendmsg.addMessage(msgcopy, type, receivers, ret);
@@ -843,6 +896,20 @@ public class MessageService extends BasicService implements IMessageService
 		return codecfactory;
 	}
 	
+	/**
+	 *  Update component identifier.
+	 */
+	public IComponentIdentifier updateComponentIdentifier(IComponentIdentifier src)
+	{
+		ComponentIdentifier ret = null;
+		if(src.getPlatformName().equals(component.getComponentIdentifier().getRoot().getLocalName()))
+		{
+			ret = new ComponentIdentifier(src.getName(), getAddresses());
+//			System.out.println("Rewritten cid: "+ret);
+		}
+		return ret==null? src: ret;
+	}
+	
 	//-------- internal methods --------
 	
 	/**
@@ -1109,7 +1176,8 @@ public class MessageService extends BasicService implements IMessageService
 							{
 								// Try next transport.
 								ITransport transport = (ITransport)task.getTransports().remove(0);
-								transport.sendMessage(task.getMessage(), task.getMessageType().getName(), receivers, task.getCodecIds())
+//								transport.sendMessage(task.getMessage(), task.getMessageType().getName(), receivers, task.getCodecIds())
+								transport.sendMessage(task)
 									.addResultListener(new DelegationResultListener(ret)
 								{
 									public void exceptionOccurred(Exception exception)

@@ -2,7 +2,7 @@ package jadex.bridge.service.types.marshal;
 
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
-import jadex.commons.ICloneProcessor;
+import jadex.commons.traverser.ITraverseProcessor;
 
 import java.util.List;
 
@@ -49,19 +49,19 @@ public interface IMarshalService
 	 *  Get the clone processors.
 	 */
 	@Excluded
-	public List<ICloneProcessor> getCloneProcessors();
+	public List<ITraverseProcessor> getCloneProcessors();
 	
 	/**
 	 *  Add a clone processor.
 	 */
 	@Excluded
-	public void addCloneProcessor(@Reference ICloneProcessor proc);
+	public void addCloneProcessor(@Reference ITraverseProcessor proc);
 		
 	/**
 	 *  Remove a clone processor.
 	 */
 	@Excluded
-	public void removeCloneProcessor(@Reference ICloneProcessor proc);
+	public void removeCloneProcessor(@Reference ITraverseProcessor proc);
 
 	//-------- remote clone processors --------
 

@@ -1,5 +1,6 @@
 package jadex.bdi.testcases.misc;
 
+import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.SFipa;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.IGoal;
@@ -46,9 +47,10 @@ public class EndStatePlan extends Plan
 		// Check if worker agent has been correctly removed.
 		waitFor(1000);	// Hack!!! how to ensure that agent has time to remove itself?
 		IGoal	search	= createGoal("cmscap.cms_search_components");
-		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-			getServiceContainer(), IComponentManagementService.class).get(this);
-		search.getParameter("description").setValue(cms.createComponentDescription(worker, null, null, null, null, null));
+//		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+//			getServiceContainer(), IComponentManagementService.class).get(this);
+//		search.getParameter("description").setValue(cms.createComponentDescription(worker, null, null, null, null, null));
+		search.getParameter("description").setValue(new CMSComponentDescription(worker, null, null, null, null, null, null));
 		dispatchSubgoalAndWait(search);
 		TestReport	report	= new TestReport("termination", "Test if the worker agent has been terminated");
 		if(search.getParameterSet("result").getValues().length==0)
@@ -107,7 +109,8 @@ public class EndStatePlan extends Plan
 			{
 				// Check if deregister agent has been correctly removed.
 				search = createGoal("cmscap.cms_search_components");
-				search.getParameter("description").setValue(cms.createComponentDescription(deregister, null, null, null, null, null));
+//				search.getParameter("description").setValue(cms.createComponentDescription(deregister, null, null, null, null, null));
+				search.getParameter("description").setValue(new CMSComponentDescription(deregister, null, null, null, null, null, null));
 				dispatchSubgoalAndWait(search);
 				if(search.getParameterSet("result").getValues().length!=0)
 				{

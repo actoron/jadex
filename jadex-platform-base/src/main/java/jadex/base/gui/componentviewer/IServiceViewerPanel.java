@@ -15,5 +15,5 @@ public interface IServiceViewerPanel extends IAbstractViewerPanel
 	 *  @param jcc	The jcc.
 	 * 	@param service	The service.
 	 */
-	public IFuture init(IControlCenter jcc, IService service);
+	public IFuture<Void> init(IControlCenter jcc, IService service);
 }

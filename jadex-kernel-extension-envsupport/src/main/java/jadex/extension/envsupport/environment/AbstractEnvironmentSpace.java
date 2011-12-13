@@ -1,6 +1,7 @@
 package jadex.extension.envsupport.environment;
 
 import jadex.base.fipa.CMSComponentDescription;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
@@ -410,12 +411,14 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					IComponentIdentifier	ownerid	= null;
 					
 					// HACK!!! Do not use ThreadSuspendable
-					IComponentManagementService ces = ((IComponentManagementService)SServiceProvider.getServiceUpwards
-						(ia.getServiceContainer(), IComponentManagementService.class).get(new ThreadSuspendable()));
+//					IComponentManagementService ces = ((IComponentManagementService)SServiceProvider.getServiceUpwards
+//						(ia.getServiceContainer(), IComponentManagementService.class).get(new ThreadSuspendable()));
 					if(owner.indexOf("@")!=-1)
-						ownerid	= ces.createComponentIdentifier((String)owner, false);
+//						ownerid	= ces.createComponentIdentifier((String)owner, false);
+						ownerid	= new ComponentIdentifier((String)owner);
 					else
-						ownerid	= ces.createComponentIdentifier((String)owner, true);
+//						ownerid	= ces.createComponentIdentifier((String)owner, true);
+						ownerid	= new ComponentIdentifier((String)owner, ia.getComponentIdentifier());
 					
 					Map props = MEnvSpaceType.convertProperties(mprops, fetcher);
 					this.addInitialAvatar(ownerid, (String)MEnvSpaceType.getProperty(mobj, "type"), props);
@@ -1562,7 +1565,9 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 									// the cid must be the final cid of the component hence it creates unique ids
 ///									IComponentIdentifier cid = cms.generateComponentIdentifier(SUtil.createUniqueId(compotype, 3), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
 									// SUtil.createUniqueId(compotype, 3) might lead to conflicts due to race conditions. Use object id as it is really unique.
-									IComponentIdentifier cid = cms.generateComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
+//									IComponentIdentifier cid = cms.generateComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getComponentIdentifier().getName().replace("@", "."));
+									// todo: can fail?
+									IComponentIdentifier cid = new ComponentIdentifier(compotype+"_"+ret.getId(), getExternalAccess().getComponentIdentifier());
 //									IComponentIdentifier cid = new ComponentIdentifier("dummy@hummy");
 									// Hack!!! Should have actual description and not just name and local type!?
 									CMSComponentDescription desc = new CMSComponentDescription();

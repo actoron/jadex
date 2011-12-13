@@ -12,7 +12,6 @@ import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.marshal.IMarshalService;
-import jadex.commons.Cloner;
 import jadex.commons.IFilter;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -21,6 +20,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.traverser.FilterProcessor;
+import jadex.commons.traverser.Traverser;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -95,6 +96,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		this.ea = ea;
 		this.adapter = adapter;
 		this.copy = copy;
+//		System.out.println("copy: "+copy);
 	}
 	
 	//-------- methods --------
@@ -176,7 +178,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 							}
 						} : this.filter;
 						
-						copyargs.add(Cloner.deepCloneObject(args[i], marshal.getCloneProcessors(), filter));
+						List procs = marshal.getCloneProcessors();
+						procs.add(procs.size()-2, new FilterProcessor(filter));
+						copyargs.add(Traverser.traverseObject(args[i], procs));
+//						copyargs.add(Traverser.traverseObject(args[i], marshal.getCloneProcessors(), filter));
 					}
 					else
 					{
@@ -271,7 +276,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						return obj==value ? false : deffilter.filter(obj);
 					}
 				} : deffilter;
-				res = Cloner.deepCloneObject(value, marshal.getCloneProcessors(), filter);
+				List procs = marshal.getCloneProcessors();
+				procs.add(procs.size()-1, new FilterProcessor(filter));
+				res = Traverser.traverseObject(value, procs);
+//				res = Traverser.deepCloneObject(value, marshal.getCloneProcessors(), filter);
 			}
 		}
 		return res;
@@ -398,7 +406,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			{
 				Method method = sic.getMethod();
 				Reference ref = method.getAnnotation(Reference.class);
-				final boolean copy = !marshal.isRemoteObject(sic.getObject()) && (ref!=null? !ref.local(): true);
+				final boolean copy = DecouplingInterceptor.this.copy && !marshal.isRemoteObject(sic.getObject()) && (ref!=null? !ref.local(): true);
 				final IFilter	deffilter = new IFilter()
 				{
 					public boolean filter(Object object)

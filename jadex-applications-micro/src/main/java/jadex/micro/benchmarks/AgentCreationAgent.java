@@ -1,5 +1,6 @@
 package jadex.micro.benchmarks;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -150,7 +151,8 @@ public class AgentCreationAgent extends MicroAgent
 							{
 								IComponentManagementService	cms	= (IComponentManagementService)result;
 								String	initial	= createPeerName(1, getComponentIdentifier());
-								IComponentIdentifier	cid	= cms.createComponentIdentifier(initial, true);
+//								IComponentIdentifier	cid	= cms.createComponentIdentifier(initial, true);
+								IComponentIdentifier	cid	= new ComponentIdentifier(initial, getComponentIdentifier().getRoot());
 								cms.getExternalAccess(cid).addResultListener(createResultListener(new DefaultResultListener()
 								{
 									public void resultAvailable(Object result)
@@ -207,7 +209,8 @@ public class AgentCreationAgent extends MicroAgent
 			public void resultAvailable(final Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
-				IComponentIdentifier aid = cms.createComponentIdentifier(name, true, null);
+//				IComponentIdentifier aid = cms.createComponentIdentifier(name, true, null);
+				IComponentIdentifier aid = new ComponentIdentifier(name, getComponentIdentifier().getRoot());
 				cms.destroyComponent(aid).addResultListener(createResultListener(new DefaultResultListener()
 				{
 					public void resultAvailable(Object result)

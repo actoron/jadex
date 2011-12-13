@@ -503,52 +503,52 @@ public abstract class MicroAgent implements IMicroAgent, IInternalAccess
 		interpreter.removeMessageHandler(handler);
 	}
 	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IFuture<IComponentIdentifier> createComponentIdentifier(String name)
-	{
-		return createComponentIdentifier(name, true, null);
-	}
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IFuture<IComponentIdentifier> createComponentIdentifier(String name, boolean local)
-	{
-		return createComponentIdentifier(name, local, null);
-	}
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IFuture<IComponentIdentifier> createComponentIdentifier(final String name, final boolean local, final String[] addresses)
-	{
-		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
-		
-		getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
-		{
-			public void customResultAvailable(IComponentManagementService cms)
-			{
-				ret.setResult(cms.createComponentIdentifier(name, local, addresses));
-			}
-		});
-		
-		return ret;
-	}
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IFuture<IComponentIdentifier> createComponentIdentifier(String name)
+//	{
+//		return createComponentIdentifier(name, true, null);
+//	}
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IFuture<IComponentIdentifier> createComponentIdentifier(String name, boolean local)
+//	{
+//		return createComponentIdentifier(name, local, null);
+//	}
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IFuture<IComponentIdentifier> createComponentIdentifier(final String name, final boolean local, final String[] addresses)
+//	{
+//		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+//		
+//		getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+//		{
+//			public void customResultAvailable(IComponentManagementService cms)
+//			{
+//				ret.setResult(cms.createComponentIdentifier(name, local, addresses));
+//			}
+//		});
+//		
+//		return ret;
+//	}
 	
 	/**
 	 *  Create a reply to this message event.

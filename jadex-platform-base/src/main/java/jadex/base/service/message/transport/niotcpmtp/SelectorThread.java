@@ -1,5 +1,6 @@
 package jadex.base.service.message.transport.niotcpmtp;
 
+import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.base.service.message.transport.codecs.ICodec;
@@ -338,10 +339,12 @@ public class SelectorThread implements Runnable
 	 *  @param codecids	The codec ids.
 	 *  @return	A future indicating success.
 	 */
-	public IFuture sendMessage(final NIOTCPOutputConnection con, final MessageEnvelope msg, final byte[] codecids)
+//	public IFuture sendMessage(final NIOTCPOutputConnection con, final MessageEnvelope msg, final byte[] codecids)
+//	public IFuture<Void> sendMessage(ManagerSendTask task)
+	public IFuture<Void> sendMessage(final NIOTCPOutputConnection con, final byte[] prolog, final byte[] data)
 	{
-		final Future	ret	= new Future();
-		Runnable	task	= new Runnable()
+		final Future<Void>	ret	= new Future<Void>();
+		Runnable	run	= new Runnable()
 		{
 			public void run()
 			{
@@ -349,26 +352,25 @@ public class SelectorThread implements Runnable
 				{
 					// Convert message into buffers.
 					List	buffers	= new ArrayList();
-					byte[]	codecs	= codecids==null || codecids.length==0 ? codecfac.getDefaultCodecIds() : codecids;
-			
-					Object enc_msg = msg;
-					for(int i=0; i<codecs.length; i++)
-					{
-						ICodec codec = codecfac.getCodec(codecs[i]);
-						// todo: which resource identifier to use for incoming connections?
-						ClassLoader cl = getClass().getClassLoader(); // libservice.getClassLoader(null)
-						enc_msg	= codec.encode(enc_msg, cl);
-					}
-					byte[] data = (byte[])enc_msg;
+//					byte[]	codecs	= codecids==null || codecids.length==0 ? codecfac.getDefaultCodecIds() : codecids;
+//			
+//					Object enc_msg = msg;
+//					for(int i=0; i<codecs.length; i++)
+//					{
+//						ICodec codec = codecfac.getCodec(codecs[i]);
+//						// todo: which resource identifier to use for incoming connections?
+//						ClassLoader cl = getClass().getClassLoader(); // libservice.getClassLoader(null)
+//						enc_msg	= codec.encode(enc_msg, cl);
+//					}
+//					byte[] data = (byte[])enc_msg;
 					
-					byte[] prolog = new byte[1+codecs.length+NIOTCPTransport.PROLOG_SIZE];
-					prolog[0] = (byte)codecs.length;
-					System.arraycopy(codecs, 0, prolog, 1, codecs.length);
-					System.arraycopy(SUtil.intToBytes(prolog.length+data.length), 0, prolog, codecs.length+1, 4);
+//					byte[] prolog = new byte[1+codecs.length+NIOTCPTransport.PROLOG_SIZE];
+//					prolog[0] = (byte)codecs.length;
+//					System.arraycopy(codecs, 0, prolog, 1, codecs.length);
+//					System.arraycopy(SUtil.intToBytes(prolog.length+data.length), 0, prolog, codecs.length+1, 4);
 					
 					buffers.add(ByteBuffer.wrap(prolog));
 					buffers.add(ByteBuffer.wrap(data));
-					
 					
 					// Add buffers as new write task.
 					Tuple	task	= new Tuple(buffers, ret);
@@ -395,7 +397,7 @@ public class SelectorThread implements Runnable
 		
 		synchronized(tasks)
 		{
-			tasks.add(task);
+			tasks.add(run);
 		}
 		selector.wakeup();
 

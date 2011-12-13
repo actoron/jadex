@@ -103,6 +103,7 @@ public abstract class ReceiveHandler
 												{
 													ia.getLogger().warning("Could not decode discovery message: "+e);//+"\n"+new String(GZIPCodec.decodeBytes((byte[])packet[2], 
 														//agent.getMicroAgent().getClassLoader())));
+//													DiscoveryState.decodeObject((byte[])packet[2], agent.getMicroAgent().getClassLoader());
 												}
 												return IFuture.DONE;
 											}

@@ -74,36 +74,62 @@ class TCPOutputConnection
 
 	//-------- methods --------
 	
+//	/**
+//	 *  Send a message.
+//	 *  @param msg The message.
+//	 *  (todo: relax synchronization by performing sends 
+//	 *  on extra sender thread of transport)
+//	 */
+//	public synchronized boolean send(MessageEnvelope msg, byte[] codecids)
+//	{
+//		boolean ret = false;
+//		
+//		try
+//		{
+//			if(codecids==null || codecids.length==0)
+//				codecids = codecfac.getDefaultCodecIds();
+//
+//			Object enc_msg = msg;
+//			for(int i=0; i<codecids.length; i++)
+//			{
+//				ICodec codec = codecfac.getCodec(codecids[i]);
+//				enc_msg	= codec.encode(enc_msg, classloader);
+//			}
+//			byte[] res = (byte[])enc_msg;
+//			
+//			int dynlen = TCPTransport.PROLOG_SIZE+1+codecids.length;
+//			int size = res.length+dynlen;
+////			System.out.println("len: "+size);
+//			sos.write((byte)codecids.length);
+//			sos.write(codecids);
+//			sos.write(SUtil.intToBytes(size));
+//			sos.write(res);
+//			sos.flush();
+//			ret = true;
+//			cleaner.refresh();
+//		}
+//		catch(IOException e)
+//		{
+//			close();
+//		}
+//		
+//		return ret;
+//	}
+	
 	/**
 	 *  Send a message.
 	 *  @param msg The message.
 	 *  (todo: relax synchronization by performing sends 
 	 *  on extra sender thread of transport)
 	 */
-	public synchronized boolean send(MessageEnvelope msg, byte[] codecids)
+	public synchronized boolean send(byte[] prolog, byte[] data)
 	{
 		boolean ret = false;
 		
 		try
 		{
-			if(codecids==null || codecids.length==0)
-				codecids = codecfac.getDefaultCodecIds();
-
-			Object enc_msg = msg;
-			for(int i=0; i<codecids.length; i++)
-			{
-				ICodec codec = codecfac.getCodec(codecids[i]);
-				enc_msg	= codec.encode(enc_msg, classloader);
-			}
-			byte[] res = (byte[])enc_msg;
-			
-			int dynlen = TCPTransport.PROLOG_SIZE+1+codecids.length;
-			int size = res.length+dynlen;
-//			System.out.println("len: "+size);
-			sos.write((byte)codecids.length);
-			sos.write(codecids);
-			sos.write(SUtil.intToBytes(size));
-			sos.write(res);
+			sos.write(prolog);
+			sos.write(data);
 			sos.flush();
 			ret = true;
 			cleaner.refresh();

@@ -93,7 +93,8 @@ public class ComponentIdentifierPanel extends JPanel
 					public void customResultAvailable(Object result)
 					{
 						IComponentManagementService cms = (IComponentManagementService)result;
-						ComponentIdentifierPanel.this.cid = cms.createComponentIdentifier(ComponentIdentifierPanel.this.cid.getName(), false, taddresses.getEntries());
+//						ComponentIdentifierPanel.this.cid = cms.createComponentIdentifier(ComponentIdentifierPanel.this.cid.getName(), false, taddresses.getEntries());
+						ComponentIdentifierPanel.this.cid = new ComponentIdentifier(ComponentIdentifierPanel.this.cid.getName(), taddresses.getEntries());
 						cidChanged();
 					}
 				});
@@ -244,7 +245,8 @@ public class ComponentIdentifierPanel extends JPanel
 				{
 					IComponentManagementService cms = (IComponentManagementService)result;
 					nameediting	= true;
-					ComponentIdentifierPanel.this.cid	= cms.createComponentIdentifier(tfname.getText(), false, cid.getAddresses());
+//					ComponentIdentifierPanel.this.cid	= cms.createComponentIdentifier(tfname.getText(), false, cid.getAddresses());
+					ComponentIdentifierPanel.this.cid	= new ComponentIdentifier(tfname.getText(), cid.getAddresses());
 					cidChanged();
 					nameediting	= false;
 				}

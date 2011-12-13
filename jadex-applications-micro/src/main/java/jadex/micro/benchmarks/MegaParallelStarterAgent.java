@@ -1,5 +1,6 @@
 package jadex.micro.benchmarks;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -151,7 +152,8 @@ public class MegaParallelStarterAgent extends MicroAgent
 			public void resultAvailable(final Object result)
 			{
 				IComponentManagementService cms = (IComponentManagementService)result;
-				IComponentIdentifier aid = cms.createComponentIdentifier(name, getComponentIdentifier(), null);
+//				IComponentIdentifier aid = cms.createComponentIdentifier(name, getComponentIdentifier(), null);
+				IComponentIdentifier aid = new ComponentIdentifier(name, getComponentIdentifier());
 				IResultListener lis = new IResultListener()
 				{
 					public void resultAvailable(Object result)

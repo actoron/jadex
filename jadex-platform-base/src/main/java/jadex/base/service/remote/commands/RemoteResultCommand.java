@@ -83,7 +83,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 					if(isref || rrm.getMarshalService().isRemoteReference(result))
 					{
 						RMIPreProcessor preproc = new RMIPreProcessor(rrm);
-						WriteContext context = new WriteContext(null, target, null, null);
+						WriteContext context = new WriteContext(null, new Object[]{target, null}, null, null);
 						result = preproc.preProcess(context, result);
 					}
 				}

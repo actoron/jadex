@@ -961,41 +961,41 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 		return capability;
 	}*/
 
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name)
-	{
-		return createComponentIdentifier(name, true, null);
-	}
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
-	{
-		return createComponentIdentifier(name, local, null);
-	}
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
-	{
-		return interpreter.getCMS().createComponentIdentifier(name, local, addresses);
-	}
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name)
+//	{
+//		return createComponentIdentifier(name, true, null);
+//	}
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
+//	{
+//		return createComponentIdentifier(name, local, null);
+//	}
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
+//	{
+//		return interpreter.getCMS().createComponentIdentifier(name, local, addresses);
+//	}
 	
 	/**
 	 *  Create a component result listener.

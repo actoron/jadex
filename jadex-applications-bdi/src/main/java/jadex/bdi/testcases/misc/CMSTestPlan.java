@@ -1,11 +1,14 @@
 package jadex.bdi.testcases.misc;
 
+import jadex.base.fipa.CMSComponentDescription;
 import jadex.base.fipa.SFipa;
+import jadex.base.fipa.SearchConstraints;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.service.search.SServiceProvider;
@@ -28,9 +31,10 @@ public class CMSTestPlan extends Plan
 		num = performTests(num, null); // test locally
 		
 		// Todo: support remote CMS agent!?
-		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
-			getScope().getServiceContainer(), IComponentManagementService.class).get(this);
-		IComponentIdentifier aa = ces.createComponentIdentifier(SFipa.CMS_COMPONENT, getComponentIdentifier(), null);
+//		IComponentManagementService ces = (IComponentManagementService)SServiceProvider.getServiceUpwards(
+//			getScope().getServiceContainer(), IComponentManagementService.class).get(this);
+//		IComponentIdentifier aa = ces.createComponentIdentifier(SFipa.CMS_COMPONENT, getComponentIdentifier(), null);
+		IComponentIdentifier aa = new ComponentIdentifier(SFipa.CMS_COMPONENT, getComponentIdentifier());
 		performTests(num, aa); // test remotely
 	}
 
@@ -56,8 +60,10 @@ public class CMSTestPlan extends Plan
 		getLogger().info("\nSearching for all agents.");
 		IComponentManagementService amsservice = (IComponentManagementService)SServiceProvider.getServiceUpwards(
 			getServiceContainer(), IComponentManagementService.class).get(this);
-		IComponentDescription desc = amsservice.createComponentDescription(null, null, null, null, null, null);
-		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
+		IComponentDescription desc = new CMSComponentDescription(null, null, null, null, null, null, null);
+//		IComponentDescription desc = amsservice.createComponentDescription(null, null, null, null, null, null);
+		ISearchConstraints constraints = new SearchConstraints(-1, 0);
+//		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
 		
 		IGoal	search	= createGoal("cmscap.cms_search_components");
 		search.getParameter("description").setValue(desc);
@@ -108,8 +114,10 @@ public class CMSTestPlan extends Plan
 		{
 			getLogger().info("\nSearching for agent.");
 			
-			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null);
-			constraints = amsservice.createSearchConstraints(-1, 0);
+//			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null);
+			desc = new CMSComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null, null);
+//			constraints = amsservice.createSearchConstraints(-1, 0);
+			constraints = new SearchConstraints(-1, 0);
 		
 			search	= createGoal("cmscap.cms_search_components");
 			search.getParameter("description").setValue(desc);
@@ -205,9 +213,11 @@ public class CMSTestPlan extends Plan
 		{
 			getLogger().info("\nSearching for agent again.");
 			
-			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null);
-			constraints = amsservice.createSearchConstraints(-1, 0);
-	
+//			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null);
+//			constraints = amsservice.createSearchConstraints(-1, 0);
+			desc = new CMSComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null, null);
+			constraints = new SearchConstraints(-1, 0);
+			
 			search	= createGoal("cmscap.cms_search_components");
 			search.getParameter("description").setValue(desc);
 			search.getParameter("constraints").setValue(constraints);

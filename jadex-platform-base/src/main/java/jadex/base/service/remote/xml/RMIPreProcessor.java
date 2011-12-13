@@ -37,6 +37,15 @@ public class RMIPreProcessor implements IPreProcessor
 	 */
 	public Object preProcess(IContext context, Object object)
 	{
-		return rrm.getProxyReference(object, (IComponentIdentifier)context.getUserContext(), context.getClassLoader());
+		try
+		{
+			Object[] uc = (Object[])context.getUserContext();
+			return rrm.getProxyReference(object, (IComponentIdentifier)uc[0], context.getClassLoader());
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 }

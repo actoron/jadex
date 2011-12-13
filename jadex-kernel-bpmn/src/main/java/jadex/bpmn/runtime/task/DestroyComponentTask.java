@@ -3,6 +3,7 @@ package jadex.bpmn.runtime.task;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ITask;
 import jadex.bpmn.runtime.ITaskContext;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -20,7 +21,7 @@ public class DestroyComponentTask implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public IFuture execute(final ITaskContext context, BpmnInterpreter instance)
+	public IFuture execute(final ITaskContext context, final BpmnInterpreter instance)
 	{
 		final Future ret = new Future();
 		
@@ -37,7 +38,11 @@ public class DestroyComponentTask implements ITask
 				if(cid==null)
 				{
 					String name = (String)context.getParameterValue("name");
-					cid = ces.createComponentIdentifier(name, true, null);
+//					cid = ces.createComponentIdentifier(name, true, null);
+					if(name.indexOf("@")==-1)
+						cid = new ComponentIdentifier(name);
+					else
+						cid = new ComponentIdentifier(name, instance.getComponentIdentifier().getParent());
 				}
 				
 				IFuture tmp = ces.destroyComponent(cid);

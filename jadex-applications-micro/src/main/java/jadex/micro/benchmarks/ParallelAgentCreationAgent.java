@@ -1,5 +1,6 @@
 package jadex.micro.benchmarks;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -74,7 +75,8 @@ public class ParallelAgentCreationAgent extends MicroAgent
 											for(int i=num; i>0; i--)
 											{
 												String name = createPeerName(i);
-												IComponentIdentifier cid = cms.createComponentIdentifier(name, true, null);
+//												IComponentIdentifier cid = cms.createComponentIdentifier(name, true, null);
+												IComponentIdentifier cid = new ComponentIdentifier(name, getComponentIdentifier().getRoot());
 												cms.destroyComponent(cid);	// Kill listener already added on create.
 											}		
 											return IFuture.DONE;

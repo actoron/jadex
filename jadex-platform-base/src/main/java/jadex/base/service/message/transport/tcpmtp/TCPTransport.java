@@ -1,9 +1,9 @@
 package jadex.base.service.message.transport.tcpmtp;
 
+import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -19,10 +19,8 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
-/* $if !android $ */
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-/* $endif $ */
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -39,12 +37,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
-/* $if !android $ */
 import javax.swing.Timer;
-/* $else $
-import jadex.base.service.message.Timer;
-import jadex.base.service.message.TimerListener;
-$endif $ */
 
 /**
  *  The tcp transport for sending messages over
@@ -178,12 +171,17 @@ public class TCPTransport implements ITransport
 			InetAddress[] laddrs = InetAddress.getAllByName(lhostname);
 	
 			Set addrs = new HashSet();
-			for(Enumeration nis = NetworkInterface.getNetworkInterfaces(); nis.hasMoreElements(); )
+			for(Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces(); nis.hasMoreElements(); )
 			{
-				NetworkInterface ni = (NetworkInterface)nis.nextElement();
-				for(Enumeration iadrs = ni.getInetAddresses(); iadrs.hasMoreElements(); )
+				NetworkInterface ni = nis.nextElement();
+				for(Enumeration<InetAddress> iadrs = ni.getInetAddresses(); iadrs.hasMoreElements(); )
 				{
-					addrs.add(getAddress(((InetAddress)iadrs.nextElement()).getHostAddress(), this.port));
+					InetAddress addr = iadrs.nextElement();
+//					System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress());
+					if(!addr.isAnyLocalAddress() && !addr.isLinkLocalAddress() && !addr.isLoopbackAddress() && !addr.isSiteLocalAddress()) // or only addr.isLoopbackAddress() ?
+					{
+						addrs.add(getAddress(addr.getHostAddress(), this.port));
+					}
 				}
 			}
 			
@@ -333,18 +331,52 @@ public class TCPTransport implements ITransport
 	
 	//-------- methods --------
 	
+//	/**
+//	 *  Send a message.
+//	 *  @param message The message to send.
+//	 *  (todo: On which thread this should be done?)
+//	 */
+//	public IFuture sendMessage(Map msg, String type, IComponentIdentifier[] receivers, byte[] codecids)
+//	{
+//		// Fetch all addresses
+//		Set	addresses	= new LinkedHashSet();
+//		for(int i=0; i<receivers.length; i++)
+//		{
+//			String[]	raddrs	= receivers[i].getAddresses();
+//			for(int j=0; j<raddrs.length; j++)
+//			{
+//				addresses.add(raddrs[j]);
+//			}			
+//		}
+//
+//		// Iterate over all different addresses and try to send
+//		// to missing and appropriate receivers
+//		String[] addrs = (String[])addresses.toArray(new String[addresses.size()]);
+//		boolean	delivered	= false;
+//		for(int i=0; !delivered && i<addrs.length; i++)
+//		{
+//			TCPOutputConnection con = getConnection(addrs[i]);
+//			if(con!=null)
+//			{
+//				delivered	= con.send(new MessageEnvelope(msg, Arrays.asList(receivers), type), codecids);
+//			}
+//		}
+//		
+//		return delivered ? IFuture.DONE : new Future(new RuntimeException("Could not deliver message"));
+//	}
+	
 	/**
 	 *  Send a message.
 	 *  @param message The message to send.
 	 *  (todo: On which thread this should be done?)
 	 */
-	public IFuture sendMessage(Map msg, String type, IComponentIdentifier[] receivers, byte[] codecids)
+	public IFuture sendMessage(ManagerSendTask task)
 	{
 		// Fetch all addresses
 		Set	addresses	= new LinkedHashSet();
-		for(int i=0; i<receivers.length; i++)
+		for(int i=0; i<task.getReceivers().length; i++)
 		{
-			String[]	raddrs	= receivers[i].getAddresses();
+			String[]	raddrs	= task.getReceivers()[i].getAddresses();
 			for(int j=0; j<raddrs.length; j++)
 			{
 				addresses.add(raddrs[j]);
@@ -360,7 +392,8 @@ public class TCPTransport implements ITransport
 			TCPOutputConnection con = getConnection(addrs[i]);
 			if(con!=null)
 			{
-				delivered	= con.send(new MessageEnvelope(msg, Arrays.asList(receivers), type), codecids);
+//				delivered	= con.send(new MessageEnvelope(msg, Arrays.asList(receivers), type), codecids);
+				delivered	= con.send(task.getProlog(), task.getData());
 			}
 		}
 		

@@ -13,7 +13,6 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.commons.IChangeListener;
-import jadex.commons.ICloneProcessor;
 import jadex.commons.IRemotable;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SReflect;
@@ -23,6 +22,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.traverser.ITraverseProcessor;
+import jadex.commons.traverser.Traverser;
+import jadex.xml.TypeInfo;
 
 import java.lang.reflect.Proxy;
 import java.net.Inet4Address;
@@ -65,6 +67,7 @@ public class MarshalService extends BasicService implements IMarshalService
 		refs.put(Inet6Address.class, tf);
 		refs.put(IComponentIdentifier.class, tf);
 		refs.put(ComponentIdentifier.class, tf);
+		refs.put(TypeInfo.class, tf);
 		
 		REFERENCES = Collections.unmodifiableMap(refs);
 	}
@@ -75,7 +78,7 @@ public class MarshalService extends BasicService implements IMarshalService
 	protected IExternalAccess	access;
 	
 	/** The clone processors. */
-	protected List<ICloneProcessor> processors;
+	protected List<ITraverseProcessor> processors;
 	
 	/** The reference class cache (clazz->boolean (is reference)). */
 	protected Map<Class<?>, boolean[]> references;
@@ -101,22 +104,27 @@ public class MarshalService extends BasicService implements IMarshalService
 	public IFuture<Void>	startService()
 	{
 		references = Collections.synchronizedMap(new LRU<Class<?>, boolean[]>(500));
-		processors = Collections.synchronizedList(new ArrayList<ICloneProcessor>());
+//		processors = Collections.synchronizedList(new ArrayList<ITraverseProcessor>());
+		processors = Collections.synchronizedList(Traverser.getDefaultProcessors(true));
 				
 		// Problem: if micro agent implements a service it cannot
 		// be determined if the service or the agent should be transferred.
 		// Per default a service is assumed.
-		processors.add(new ICloneProcessor()
+		
+		// Insert before FieldProcessor that is always applicable
+		processors.add(processors.size()-1, new ITraverseProcessor()
 		{
-			public Object process(Object object, List processors)
-			{
-				return BasicServiceInvocationHandler.getPojoServiceProxy(object);
-			}
-			
-			public boolean isApplicable(Object object)
+			public boolean isApplicable(Object object, Class clazz)
 			{
 				return object!=null && !(object instanceof BasicService) 
 					&& object.getClass().isAnnotationPresent(Service.class);
+			}
+			
+			public Object process(Object object, Class clazz,
+				List<ITraverseProcessor> processors, Traverser traverser,
+				Map<Object, Object> traversed)
+			{
+				return BasicServiceInvocationHandler.getPojoServiceProxy(object);
 			}
 		});
 		
@@ -204,15 +212,15 @@ public class MarshalService extends BasicService implements IMarshalService
 	/**
 	 *  Get the clone processors.
 	 */
-	public List<ICloneProcessor> getCloneProcessors()
+	public List<ITraverseProcessor> getCloneProcessors()
 	{
-		return processors;
+		return new ArrayList(processors);
 	}
 	
 	/**
 	 *  Add a clone processor.
 	 */
-	public void addCloneProcessor(@Reference ICloneProcessor proc)
+	public void addCloneProcessor(@Reference ITraverseProcessor proc)
 	{
 		this.processors.add(proc);
 	}
@@ -220,7 +228,7 @@ public class MarshalService extends BasicService implements IMarshalService
 	/**
 	 *  Remove a clone processor.
 	 */
-	public void removeCloneProcessor(@Reference ICloneProcessor proc)
+	public void removeCloneProcessor(@Reference ITraverseProcessor proc)
 	{
 		this.processors.remove(proc);
 	}
@@ -279,23 +287,23 @@ public class MarshalService extends BasicService implements IMarshalService
 			boolean remoteret = ret;
 			
 			Class cl = object.getClass();
-			List todo = new ArrayList();
-			todo.add(cl);
-			
-			boolean[] isref = null;
-			while(todo.size()>0 && isref==null)
+			// Avoid creating list for frequent case that class is already contained
+			boolean[] isref = (boolean[])references.get(cl);
+			if(isref!=null)
 			{
-				Class clazz = (Class)todo.remove(0);
-				isref = (boolean[])references.get(clazz);
-				if(isref!=null)
+				localret = isref[0];
+				remoteret = isref[1];
+//				System.out.println("cont: "+cl+" "+references.get(cl));
+			}
+			else
+			{
+				List todo = new ArrayList();
+				todo.add(cl);
+				isref = null;
+				while(todo.size()>0 && isref==null)
 				{
-					localret = isref[0];
-					remoteret = isref[1];
-					break;
-				}
-				else
-				{
-					isref = (boolean[])REFERENCES.get(clazz);
+					Class clazz = (Class)todo.remove(0);
+					isref = (boolean[])references.get(clazz);
 					if(isref!=null)
 					{
 						localret = isref[0];
@@ -304,23 +312,33 @@ public class MarshalService extends BasicService implements IMarshalService
 					}
 					else
 					{
-						remoteret	= remoteret || SReflect.isSupertype(IRemotable.class, clazz);
-						Reference ref = (Reference)clazz.getAnnotation(Reference.class);
-						if(ref!=null)
+						isref = (boolean[])REFERENCES.get(clazz);
+						if(isref!=null)
 						{
-							localret = ref.local();
-							remoteret = remoteret || ref.remote();
+							localret = isref[0];
+							remoteret = isref[1];
 							break;
 						}
 						else
 						{
-							Class superclazz = clazz.getSuperclass();
-							if(superclazz!=null && !superclazz.equals(Object.class))
-								todo.add(superclazz);
-							Class[] interfaces = clazz.getInterfaces();
-							for(int i=0; i<interfaces.length; i++)
+							remoteret	= remoteret || SReflect.isSupertype(IRemotable.class, clazz);
+							Reference ref = (Reference)clazz.getAnnotation(Reference.class);
+							if(ref!=null)
 							{
-								todo.add(interfaces[i]);
+								localret = ref.local();
+								remoteret = remoteret || ref.remote();
+								break;
+							}
+							else
+							{
+								Class superclazz = clazz.getSuperclass();
+								if(superclazz!=null && !superclazz.equals(Object.class))
+									todo.add(superclazz);
+								Class[] interfaces = clazz.getInterfaces();
+								for(int i=0; i<interfaces.length; i++)
+								{
+									todo.add(interfaces[i]);
+								}
 							}
 						}
 					}

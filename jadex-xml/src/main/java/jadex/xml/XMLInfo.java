@@ -39,7 +39,7 @@ public class XMLInfo
 	 */
 	public XMLInfo(String xmlpath)
 	{
-		this(xmlpath, null);
+		this(xmlpath, (IFilter)null);
 	}
 	
 	/**
@@ -47,7 +47,7 @@ public class XMLInfo
 	 */
 	public XMLInfo(QName xmltag)
 	{
-		this(new QName[]{xmltag}, null);
+		this(new QName[]{xmltag}, (IFilter)null);
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class XMLInfo
 	 */
 	public XMLInfo(QName[] xmlpathelements)
 	{
-		this(xmlpathelements, null);
+		this(xmlpathelements, (IFilter)null);
 	}
 
 	/**
@@ -80,6 +80,22 @@ public class XMLInfo
 	public XMLInfo(QName[] xmlpathelements, IFilter filter)
 	{
 		this(xmlpathelements, filter, false);
+	}
+	
+	/**
+	 *  Create a new xml info.
+	 */
+	public XMLInfo(String xmlpath, IPreProcessor preprocessor)
+	{
+		this(xmlpath, null, false, preprocessor);
+	}
+	
+	/**
+	 *  Create a new xml info.
+	 */
+	public XMLInfo(QName[] xmlpathelements, IPreProcessor preprocessor)
+	{
+		this(xmlpathelements, null, false, preprocessor);
 	}
 
 	/**

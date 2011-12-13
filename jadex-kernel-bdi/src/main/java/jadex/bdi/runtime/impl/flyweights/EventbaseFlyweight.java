@@ -390,80 +390,80 @@ public class EventbaseFlyweight extends ElementFlyweight implements IEventbase
 		}
 	}
 	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name)
-	{
-		return createComponentIdentifier(name, true, null);
-	}
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param parent The parent identifier.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(final String name, final IComponentIdentifier parent)
-	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
-		{
-			AgentInvocation ai = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = getInterpreter().getCMS().createComponentIdentifier(name, parent, parent.getAddresses());
-				}
-			};
-			return (IComponentIdentifier)ai.object;
-		}
-		else
-		{
-			return getInterpreter().getCMS().createComponentIdentifier(name, parent, parent.getAddresses());
-		}
-	}
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
-	{
-		return createComponentIdentifier(name, local, null);
-	}
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(final String name, final boolean local, final String[] addresses)
-	{
-		if(getInterpreter().getComponentAdapter().isExternalThread())
-		{
-			AgentInvocation ai = new AgentInvocation()
-			{
-				public void run()
-				{
-					object = getInterpreter().getCMS().createComponentIdentifier(name, local, addresses);
-				}
-			};
-			return (IComponentIdentifier)ai.object;
-		}
-		else
-		{
-			return getInterpreter().getCMS().createComponentIdentifier(name, local, addresses);
-		}
-	}
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name)
+//	{
+//		return createComponentIdentifier(name, true, null);
+//	}
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param parent The parent identifier.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(final String name, final IComponentIdentifier parent)
+//	{
+//		if(getInterpreter().getComponentAdapter().isExternalThread())
+//		{
+//			AgentInvocation ai = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					object = getInterpreter().getCMS().createComponentIdentifier(name, parent, parent.getAddresses());
+//				}
+//			};
+//			return (IComponentIdentifier)ai.object;
+//		}
+//		else
+//		{
+//			return getInterpreter().getCMS().createComponentIdentifier(name, parent, parent.getAddresses());
+//		}
+//	}
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
+//	{
+//		return createComponentIdentifier(name, local, null);
+//	}
+//	
+//	/**
+//	 *  Create component identifier.
+//	 *  @param name The name.
+//	 *  @param local True for local name.
+//	 *  @param addresses The addresses.
+//	 *  @return The new component identifier.
+//	 */
+//	public IComponentIdentifier createComponentIdentifier(final String name, final boolean local, final String[] addresses)
+//	{
+//		if(getInterpreter().getComponentAdapter().isExternalThread())
+//		{
+//			AgentInvocation ai = new AgentInvocation()
+//			{
+//				public void run()
+//				{
+//					object = getInterpreter().getCMS().createComponentIdentifier(name, local, addresses);
+//				}
+//			};
+//			return (IComponentIdentifier)ai.object;
+//		}
+//		else
+//		{
+//			return getInterpreter().getCMS().createComponentIdentifier(name, local, addresses);
+//		}
+//	}
 	
 	//-------- element interface --------
 	

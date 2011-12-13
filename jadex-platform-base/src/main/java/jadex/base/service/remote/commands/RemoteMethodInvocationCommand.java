@@ -90,7 +90,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				{
 					RMIPreProcessor preproc = new RMIPreProcessor(rrm);
 					boolean[] refs = SServiceProvider.getRemoteReferenceInfo(method, false);
-					WriteContext context = new WriteContext(null, target, null, null);
+					WriteContext context = new WriteContext(null, new Object[]{target, null}, null, null);
 					for(int i=0; i<parametertypes.length; i++)
 					{
 						if(refs[i] || rrm.getMarshalService().isRemoteReference(parametervalues[i]))

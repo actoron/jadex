@@ -29,6 +29,16 @@ public class SearchConstraints implements ISearchConstraints, Serializable
 	public SearchConstraints()
 	{
 	}
+	
+	/**
+	 *  Default Constructor. <br>
+	 *  Create a new <code>SearchConstraints</code>.
+	 */
+	public SearchConstraints(int maxresults, int maxdepth)
+	{
+		this.maxresults = maxresults;
+		this.maxdepth = maxdepth;
+	}
 
 	//-------- accessor methods --------
 
