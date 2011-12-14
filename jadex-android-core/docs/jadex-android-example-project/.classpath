@@ -7,9 +7,10 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="lib/jadex-android-core-0.0.4-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="lib/jadex-android-woodstox-0.0.4-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="lib/jadex-android-misc-0.0.4-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="lib/jadex-android-beans-0.0.4-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/jadex-android-core-0.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jadex-android-woodstox-0.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jadex-android-misc-0.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jadex-android-beans-0.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/jadex-android-antlr-0.0.4.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

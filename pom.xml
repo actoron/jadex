@@ -668,7 +668,7 @@
 		<profile>
 			<id>jadex-android-dist</id>
 			<build>
-			<finalName>jadex-android-0.0.4-SNAPSHOT</finalName>
+			<finalName>jadex-android-0.0.4</finalName>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
