@@ -1,9 +1,7 @@
 package jadex.base.service.message.transport.niotcpmtp;
 
-import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
-import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -13,10 +11,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
-/* $if !android $ */
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-/* $endif $ */
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -29,14 +23,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
-/* $if !android $ */
-import javax.swing.Timer;
-/* $else $
-import jadex.base.service.message.Timer;
-import jadex.base.service.message.TimerListener;
-$endif $ */
 
 /**
  * The selector thread waits for NIO events and issues the appropriate actions
@@ -75,6 +65,9 @@ public class SelectorThread implements Runnable
 
 	/** The write tasks of data waiting to be written to a connection (socketchannel->tuple{buffers, future}). */
 	protected Map	writetasks;
+	
+	/** The cleanup timer. */
+	protected Timer	timer;
 
 	// -------- constructors --------
 
@@ -575,24 +568,108 @@ public class SelectorThread implements Runnable
 	
 	//-------- helper classes --------
 
+//	/**
+//	 *  Class for cleaning output connections after 
+//	 *  max keep alive time has been reached.
+//	 */
+//	/* $if !android $ */
+//	protected class Cleaner	implements	ActionListener
+//	/* $else $
+//	protected class Cleaner implements TimerListener
+//	$endif $ */
+//	{
+//		//-------- attributes --------
+//		
+//		/** The address of the connection. */
+//		protected InetSocketAddress address;
+//		
+//		/** The timer. */
+//		// Hack!!! java.util.Timer does not support cancellation of scheduled tasks, grrr.
+//		protected Timer timer;
+//		
+//		//-------- constructors --------
+//		
+//		/**
+//		 *  Cleaner for a specified output connection.
+//		 *  @param address The address.
+//		 */
+//		public Cleaner(InetSocketAddress address)
+//		{
+//			this.address = address;
+//		}
+//		
+//		//-------- methods --------
+//		
+//		
+//		/**
+//		 *  Called when timepoint was reached.
+//		 */
+//		/* $if !android $ */
+//	    public void actionPerformed(ActionEvent event)
+//	    /* $else    
+//	    public void actionPerformed()
+//	    $endif $ */
+//		{
+//			Object	con;
+//			synchronized(connections)
+//			{
+//				con	= connections.remove(address);
+//			}
+//			if(con instanceof NIOTCPOutputConnection)
+//			{
+//				try
+//				{
+//					((NIOTCPOutputConnection)con).getSocketChannel().close();
+//				}
+//				catch(Exception e)
+//				{
+//				}
+//				logger.info("Removed connection to : "+address);
+//			}
+//		}
+//		
+//		/**
+//		 *  Refresh the timeout.
+//		 */
+//		public void refresh()
+//		{
+//			if(timer==null)
+//			{
+//				timer = new Timer(NIOTCPTransport.MAX_KEEPALIVE, this);
+//				timer.start();
+//			}
+//			else
+//			{
+//				timer.restart();
+//			}
+//		}
+//		
+//		/**
+//		 *  Remove this cleaner.
+//		 */
+//		public void remove()
+//		{
+//			if(timer!=null)
+//			{
+//				timer.stop();
+//			}
+//		}
+//	}
+
+	
 	/**
 	 *  Class for cleaning output connections after 
 	 *  max keep alive time has been reached.
 	 */
-	/* $if !android $ */
-	protected class Cleaner	implements	ActionListener
-	/* $else $
-	protected class Cleaner implements TimerListener
-	$endif $ */
+	protected class Cleaner
 	{
 		//-------- attributes --------
 		
 		/** The address of the connection. */
 		protected InetSocketAddress address;
 		
-		/** The timer. */
-		// Hack!!! java.util.Timer does not support cancellation of scheduled tasks, grrr.
-		protected Timer timer;
+		/** The timer task. */
+		protected TimerTask timertask;
 		
 		//-------- constructors --------
 		
@@ -607,34 +684,6 @@ public class SelectorThread implements Runnable
 		
 		//-------- methods --------
 		
-		
-		/**
-		 *  Called when timepoint was reached.
-		 */
-		/* $if !android $ */
-	    public void actionPerformed(ActionEvent event)
-	    /* $else    
-	    public void actionPerformed()
-	    $endif $ */
-		{
-			Object	con;
-			synchronized(connections)
-			{
-				con	= connections.remove(address);
-			}
-			if(con instanceof NIOTCPOutputConnection)
-			{
-				try
-				{
-					((NIOTCPOutputConnection)con).getSocketChannel().close();
-				}
-				catch(Exception e)
-				{
-				}
-				logger.info("Removed connection to : "+address);
-			}
-		}
-		
 		/**
 		 *  Refresh the timeout.
 		 */
@@ -642,13 +691,37 @@ public class SelectorThread implements Runnable
 		{
 			if(timer==null)
 			{
-				timer = new Timer(NIOTCPTransport.MAX_KEEPALIVE, this);
-				timer.start();
+				timer	= new Timer(true);
 			}
-			else
+			
+			if(timertask!=null)
 			{
-				timer.restart();
+				timertask.cancel();
 			}
+			timertask	= new TimerTask()
+			{
+				public void run()
+				{
+					logger.info("Timeout reached for: "+address);
+					Object	con;
+					synchronized(connections)
+					{
+						con	= connections.remove(address);
+					}
+					if(con instanceof NIOTCPOutputConnection)
+					{
+						try
+						{
+							((NIOTCPOutputConnection)con).getSocketChannel().close();
+						}
+						catch(Exception e)
+						{
+						}
+						logger.info("Removed connection to : "+address);
+					}
+				}
+			};
+			timer.schedule(timertask, NIOTCPTransport.MAX_KEEPALIVE);
 		}
 		
 		/**
@@ -656,9 +729,9 @@ public class SelectorThread implements Runnable
 		 */
 		public void remove()
 		{
-			if(timer!=null)
+			if(timertask!=null)
 			{
-				timer.stop();
+				timertask.cancel();
 			}
 		}
 	}
