@@ -20,6 +20,7 @@ import java.net.InterfaceAddress;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -2013,6 +2014,111 @@ public class SUtil
 		
 		return ret;
 	}
+	
+	/**
+	 *  Get the addresses to be used for transports.
+	 */
+	public static String[]	getNetworkAddresses() throws SocketException
+	{
+		// Determine useful transport addresses.
+		Set<String>	addresses	= new HashSet<String>();	// global network addresses (uses all)
+		Set<InetAddress>	sitelocal	= new HashSet<InetAddress>();	// local network addresses e.g. 192.168.x.x (use one v4 and one v6 if no global)
+		Set<InetAddress>	linklocal	= new HashSet<InetAddress>();	// link-local fallback addresses e.g. 169.254.x.x (use one v4 and one v6 if no global or local)
+		Set<InetAddress>	loopback	= new HashSet<InetAddress>();	// loopback addresses e.g. 127.0.0.1 (use one v4 and one v6 if no global or local or link-local)
+		
+		boolean	v4	= false;	// true when one v4 address was added.
+		boolean	v6	= false;	// true when one v6 address was added.
+		
+		for(Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces(); nis.hasMoreElements(); )
+		{
+			NetworkInterface ni = nis.nextElement();
+			for(Enumeration<InetAddress> iadrs = ni.getInetAddresses(); iadrs.hasMoreElements(); )
+			{
+				InetAddress addr = iadrs.nextElement();
+//				System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress()+", "+ni.getDisplayName());
+				if(addr.isLoopbackAddress())
+				{
+					loopback.add(addr);
+				}
+				else if(addr.isLinkLocalAddress())
+				{
+					linklocal.add(addr);
+				}
+				else if(addr.isSiteLocalAddress())
+				{
+					sitelocal.add(addr);
+				}
+				else
+				{
+					v4	= v4 || addr instanceof Inet4Address;
+					v6	= v6 || addr instanceof Inet6Address;
+					addresses.add(addr.getHostAddress());
+				}
+			}
+		}
+
+		boolean	tmpv4	= v4;
+		boolean	tmpv6	= v6;
+		for(Iterator<InetAddress> it=sitelocal.iterator(); it.hasNext(); )
+		{
+			InetAddress	addr	= it.next();
+			if(!tmpv4 && addr instanceof Inet4Address || !tmpv6 && addr instanceof Inet6Address)
+			{
+				v4	= v4 || addr instanceof Inet4Address;
+				v6	= v6 || addr instanceof Inet6Address;
+				addresses.add(addr.getHostAddress());
+			}
+		}
+		
+		tmpv4	= v4;
+		tmpv6	= v6;
+		for(Iterator<InetAddress> it=linklocal.iterator(); it.hasNext(); )
+		{
+			InetAddress	addr	= it.next();
+			if(!tmpv4 && addr instanceof Inet4Address || !tmpv6 && addr instanceof Inet6Address)
+			{
+				v4	= v4 || addr instanceof Inet4Address;
+				v6	= v6 || addr instanceof Inet6Address;
+				addresses.add(addr.getHostAddress());
+			}
+		}
+		
+		tmpv4	= v4;
+		tmpv6	= v6;
+		for(Iterator<InetAddress> it=loopback.iterator(); it.hasNext(); )
+		{
+			InetAddress	addr	= it.next();
+			if(!tmpv4 && addr instanceof Inet4Address || !tmpv6 && addr instanceof Inet6Address)
+			{
+				v4	= v4 || addr instanceof Inet4Address;
+				v6	= v6 || addr instanceof Inet6Address;
+				addresses.add(addr.getHostAddress());
+			}
+		}
+		
+//		InetAddress iaddr = InetAddress.getLocalHost();
+//		String lhostname = iaddr.getCanonicalHostName();
+//		InetAddress[] laddrs = InetAddress.getAllByName(lhostname);
+//
+//		addrs.add(getAddress(iaddr.getHostAddress(), this.port));
+//		// Get the ip addresses
+//		for(int i=0; i<laddrs.length; i++)
+//		{
+//			String hostname = laddrs[i].getHostName().toLowerCase();
+//			String ip_addr = laddrs[i].getHostAddress();
+//			addrs.add(getAddress(ip_addr, this.port));
+//			if(!ip_addr.equals(hostname))
+//			{
+//				// We have a fully qualified domain name.
+//				addrs.add(getAddress(hostname, this.port));
+//			}
+//		}
+		
+//		System.out.println("addresses: "+addresses);
+		
+		return (String[])addresses.toArray(new String[addresses.size()]);		
+	}
+	
 	
 	/**
 	 *  An subclass of print stream to allow accessing the underlying stream.

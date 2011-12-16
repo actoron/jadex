@@ -10,6 +10,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.commons.SUtil;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
@@ -19,16 +20,11 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -167,48 +163,12 @@ public class TCPTransport implements ITransport
 			this.port = serversocket.getLocalPort();
 
 			
-			// Determine all transport addresses.
-			InetAddress iaddr = InetAddress.getLocalHost();
-			String lhostname = iaddr.getCanonicalHostName();
-			InetAddress[] laddrs = InetAddress.getAllByName(lhostname);
-	
-			Set addrs = new HashSet();
-			for(Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces(); nis.hasMoreElements(); )
+			String[]	addresses	= SUtil.getNetworkAddresses();
+			this.addresses	= new String[addresses.length];
+			for(int i=0; i<addresses.length; i++)
 			{
-				NetworkInterface ni = nis.nextElement();
-				for(Enumeration<InetAddress> iadrs = ni.getInetAddresses(); iadrs.hasMoreElements(); )
-				{
-					InetAddress addr = iadrs.nextElement();
-//					System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress());
-					if(!addr.isAnyLocalAddress() && !addr.isLinkLocalAddress() && !addr.isLoopbackAddress() && !addr.isSiteLocalAddress()) // or only addr.isLoopbackAddress() ?
-					{
-						addrs.add(getAddress(addr.getHostAddress(), this.port));
-					}
-				}
+				this.addresses[i]	= getAddress(addresses[i], port);
 			}
-			
-//			// Determine all transport addresses.
-//			InetAddress iaddr = InetAddress.getLocalHost();
-//			String lhostname = iaddr.getHostName().toLowerCase();
-//			InetAddress[] laddrs = InetAddress.getAllByName(lhostname);
-//
-//			Set addrs = new HashSet();
-//			addrs.add(getAddress(iaddr.getHostAddress(), this.port));
-//			
-//			// Get the ip addresses
-//			for(int i=0; i<laddrs.length; i++)
-//			{
-//				String hostname = laddrs[i].getHostName().toLowerCase();
-//				String ip_addr = laddrs[i].getHostAddress();
-//				addrs.add(getAddress(ip_addr, this.port));
-//				if(!ip_addr.equals(hostname))
-//				{
-//					// We have a fully qualified domain name.
-//					addrs.add(getAddress(hostname, this.port));
-//				}
-//			}
-			
-			addresses = (String[])addrs.toArray(new String[addrs.size()]);
 			
 			// Start the receiver thread.
 			
