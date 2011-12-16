@@ -1,5 +1,6 @@
 package jadex.bpmn.model;
 
+import jadex.bpmn.BpmnFactory;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
@@ -158,6 +159,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	public MBpmnModel()
 	{
 		this.modelinfo = new ModelInfo();
+		modelinfo.setType(BpmnFactory.FILETYPE_BPMNPROCESS);
 	}
 	
 	/**

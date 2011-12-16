@@ -47,6 +47,9 @@ public class ModelInfo extends Startable implements IModelInfo
 	/** The filename. */
 	protected String filename;
 	
+	/** The type. */
+	protected String type;
+	
 	/** The full name (cached for speed). */
 	protected String fullname;
 	
@@ -323,7 +326,10 @@ public class ModelInfo extends Startable implements IModelInfo
 	 *  Get the model type.
 	 *  @return The model type (kernel specific).
 	 */
-//	public String getType();
+	public String getType()
+	{
+		return type;
+	}
 	
 	/**
 	 *  Get the filename.
@@ -509,6 +515,15 @@ public class ModelInfo extends Startable implements IModelInfo
 	public void setFilename(String filename)
 	{
 		this.filename = filename;
+	}
+
+	/**
+	 *  Set the component type.
+	 *  @param type The component type to set.
+	 */
+	public void setType(String type)
+	{
+		this.type = type;
 	}
 
 	/**

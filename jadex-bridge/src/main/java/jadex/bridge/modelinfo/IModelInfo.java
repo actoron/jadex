@@ -112,10 +112,10 @@ public interface IModelInfo
 	public boolean isStartable();
 	
 	/**
-	 *  Get the model type.
-	 *  @return The model type (kernel specific).
+	 *  Get the component type (i.e. kernel).
+	 *  @return The component type.
 	 */
-//	public String getType();
+	public String getType();
 	
 	/**
 	 *  Get the filename.

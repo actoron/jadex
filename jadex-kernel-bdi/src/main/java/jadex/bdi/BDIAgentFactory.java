@@ -537,6 +537,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 		{
 			loader.createAgentModelEntry(ret, (ModelInfo)ret.getModelInfo());
 			((ModelInfo)ret.getModelInfo()).setFilename(filename);
+			((ModelInfo)ret.getModelInfo()).setType(ret instanceof OAVAgentModel ? FILETYPE_BDIAGENT : FILETYPE_BDICAPABILITY);
 			loader.registerModel(filename, ret);
 			fut.setResult(ret.getModelInfo());
 		}

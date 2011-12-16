@@ -227,6 +227,7 @@ public class ComponentXMLReader
 		if(mi!=null)
 		{
 			mi.setFilename(rinfo.getFilename());
+			mi.setType(ComponentComponentFactory.FILETYPE_COMPONENT);
 //			mi.setClassloader(classloader);
 			mi.setStartable(true);
 			if(rid==null)
@@ -297,7 +298,7 @@ public class ComponentXMLReader
 	 */
 	public static Set getXMLMapping(Set[] mappings)
 	{
-		Set types = new HashSet();
+		Set<TypeInfo> types = new HashSet<TypeInfo>();
 		
 		String uri = "http://jadex.sourceforge.net/jadex";
 		
@@ -335,7 +336,7 @@ public class ComponentXMLReader
 			}), null, new BeanObjectReaderHandler()));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "configuration")), new ObjectInfo(ConfigurationInfo.class), 
-			new MappingInfo(null, new AttributeInfo[]{
+			new MappingInfo(null, "description", null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),
 				new AttributeInfo(new AccessInfo("autoshutdown", "autoShutdown"))},
 				new SubobjectInfo[]{

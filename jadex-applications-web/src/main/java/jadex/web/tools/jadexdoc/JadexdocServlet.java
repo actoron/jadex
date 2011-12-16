@@ -37,7 +37,8 @@ public class JadexdocServlet extends HttpServlet
 //			"-logging_level", "java.util.logging.Level.INFO",
 			"-awareness", "false",
 			"-gui", "false",
-			"-extensions", "null"
+			"-extensions", "null",
+			"-welcome", "false"
 		};
 		int	timeout	= 30000;
 		ThreadSuspendable	sus	= new ThreadSuspendable();

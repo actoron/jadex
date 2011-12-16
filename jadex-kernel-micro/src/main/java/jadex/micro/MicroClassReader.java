@@ -102,6 +102,7 @@ public class MicroClassReader
 		modelinfo.setPackage(packagename);
 		String src = SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation());
 		modelinfo.setFilename(src+File.separatorChar+model);
+		modelinfo.setType(MicroAgentFactory.FILETYPE_MICROAGENT);
 		modelinfo.setStartable(true);
 		if(rid==null)
 		{

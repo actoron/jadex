@@ -3,6 +3,7 @@ package jadex.gpmn.model;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.ICacheableModel;
 import jadex.commons.SReflect;
+import jadex.gpmn.GpmnFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,6 +80,7 @@ public class MGpmnModel implements ICacheableModel//, IModelInfo
 		this.activationedges = new ArrayList();
 		this.planedges = new ArrayList();
 		this.modelinfo = new ModelInfo();
+		modelinfo.setType(GpmnFactory.FILETYPE_GPMNPROCESS);
 	}
 	
 	/**

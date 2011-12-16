@@ -207,6 +207,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			IResourceIdentifier rid = (IResourceIdentifier)((Object[])context)[0];
 			IComponentIdentifier root = (IComponentIdentifier)((Object[])context)[1];
 			mi.setFilename(info.getFilename());
+			mi.setType(ret instanceof OAVAgentModel ? BDIAgentFactory.FILETYPE_BDIAGENT : BDIAgentFactory.FILETYPE_BDICAPABILITY);
 			if(rid==null)
 			{
 				String src = SUtil.getCodeSource(mi.getFilename(), mi.getPackage());

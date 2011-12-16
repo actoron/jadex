@@ -89,8 +89,8 @@
 		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
 		<argument name="awareness" class="boolean">true</argument>
 		<!-- Start the awareness agent discovery mechanisms. -->
-		<!-- <argument name="awamechanisms" class="String[]">new String[]{"Broadcast"}</argument>-->
 		<argument name="awamechanisms" class="String[]">new String[]{"Broadcast", "Multicast"}</argument>
+		<!-- <argument name="awamechanisms" class="String[]">new String[]{"Broadcast"}</argument>-->
 		<!-- Start the JCC agent to open the platform GUI? -->
 		<argument name="gui" class="boolean">true</argument>
 		<!-- The file name(s) of extension component(s) to load (separated by comma). -->
@@ -118,7 +118,7 @@
 		<argument name="parametercopy" class="boolean">true</argument>
 		<!-- Flag if nio type or normal tcp transport should be used. -->
 		<argument name="niotransport" class="boolean">true</argument>
-		<!-- Logging level for platform (default SEVERE). -->
+		<!-- Logging level for platform. -->
 		<argument name="logging_level" class="Level">Level.SEVERE</argument>
 		
 		<!-- <argument name="platform_shutdown_time">1000</argument> -->
@@ -246,6 +246,7 @@
 	</properties>
 	
 	<configurations>
+		<!-- Autoassigned name and port. Dynamically loads kernels as required. -->
 		<configuration name="auto">
 			<arguments>
 				<argument name="tcpport">0</argument>
@@ -275,6 +276,7 @@
 			</components>
 		</configuration>
 		
+		<!-- Fixed name and port.  Dynamically loads kernels as required.-->
 		<configuration name="fixed">
 			<components>
 				<component name="extensions" type="extensions" daemon="true" number="$args.extensions!=null ? 1 : 0">
@@ -299,6 +301,7 @@
 			</components>
 		</configuration>
 	
+		<!-- Autoassigned name and port. Starts all kernels immediately. -->
 		<configuration name="allkernels">
 			<arguments>
 				<argument name="tcpport">0</argument>
@@ -334,6 +337,7 @@
 			</components>
 		</configuration>
 		
+		<!-- Fixed name and port. Starts all kernels immediately. -->
 		<configuration name="allkernels_fixed">
 			<components>
 				<component name="extensions" type="extensions" daemon="true" number="$args.extensions!=null ? 1 : 0">
