@@ -56,7 +56,8 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 		String[] imports	= interpreter.getModel(rcapability).getAllImports();
 		
 		// is rid of parent ok?
-		MBpmnModel bodymodel = loader.loadBpmnModel(impl, imports, interpreter.getClassLoader(), interpreter.getModel().getResourceIdentifier()); 
+		MBpmnModel bodymodel = loader.loadBpmnModel(impl, imports, interpreter.getClassLoader(), 
+			new Object[]{interpreter.getModel().getResourceIdentifier(), interpreter.getComponentIdentifier().getRoot()}); 
 
 		if(bodymodel==null)
 		{

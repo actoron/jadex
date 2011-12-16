@@ -175,6 +175,12 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	 *  @return The send date identifier.
 	 */
 	public abstract String getTimestampIdentifier();
+	
+	/**
+	 *  Get the identifier for fetching the resource identifier id.
+	 *  @return The resource identifier id.
+	 */
+	public abstract String getResourceIdIdentifier();
 
 	/**
 	 *  Get the en/decode info (important) for a parameter/set.

@@ -5,6 +5,10 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.ILocalResourceIdentifier;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -25,7 +29,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 
+import java.io.File;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -231,8 +237,11 @@ public class Starter
 			
 			compargs.put(COMPONENT_FACTORY, cfac);
 			
-			// todo: null as rid?
-			cfac.loadModel(configfile, null, null)
+			// Hack: what to use as rid? should not have dependency to standalone.
+//			final ResourceIdentifier rid = new ResourceIdentifier(null, 
+//				"net.sourceforge.jadex:jadex-standalone-launch:2.1-SNAPSHOT");
+			
+			cfac.loadModel(configfile, null, null)//rid)
 				.addResultListener(new ExceptionDelegationResultListener<IModelInfo, IExternalAccess>(ret)
 			{
 				public void customResultAvailable(final IModelInfo model) 
@@ -270,9 +279,17 @@ public class Starter
 					if(IComponentIdentifier.LOCAL.get()==null)
 						IComponentIdentifier.LOCAL.set(cid);
 					// Hack!!! Autoshutdown!?
+
+					// Hack: change rid afterwards?!
+//					String src = SUtil.getCodeSource(model.getFilename(), model.getPackage());
+//					URL url = SUtil.toURL(src);
+//					rid.setLocalIdentifier(new LocalResourceIdentifier(cid, url));
+//					URL url = model.getClass().getProtectionDomain().getCodeSource().getLocation();
+					ResourceIdentifier rid = (ResourceIdentifier)model.getResourceIdentifier();
+					ILocalResourceIdentifier lid = rid.getLocalIdentifier();
+					rid.setLocalIdentifier(new LocalResourceIdentifier(cid, lid.getUrl()));
 					
-					// todo: null as rid?
-					cfac.getComponentType(configfile, null, null)
+					cfac.getComponentType(configfile, null, model.getResourceIdentifier())
 						.addResultListener(new ExceptionDelegationResultListener<String, IExternalAccess>(ret)
 					{
 						public void customResultAvailable(String ctype) 
@@ -280,7 +297,8 @@ public class Starter
 							try
 							{
 								Boolean autosd = (Boolean)getArgumentValue(AUTOSHUTDOWN, model, cmdargs, compargs);
-								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, autosd, model.getFullName(), null);
+								final CMSComponentDescription desc = new CMSComponentDescription(cid, ctype, null, null, 
+									autosd, model.getFullName(), null, model.getResourceIdentifier());
 								
 								Object	af = getArgumentValue(ADAPTER_FACTORY, model, cmdargs, compargs);
 								if(af==null)
@@ -371,7 +389,7 @@ public class Starter
 		
 		return ret;
 	}
-
+	
 	/**
 	 *  Get an argument value from the command line or the model.
 	 *  Also puts parsed value into component args to be available at instance.

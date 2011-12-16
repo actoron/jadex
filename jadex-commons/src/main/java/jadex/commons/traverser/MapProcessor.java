@@ -8,14 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  A map processor allows for traversing maps.
  */
 public class MapProcessor implements ITraverseProcessor
 {
+	/** The clone falg. */
 	protected boolean clone;
 	
 	/**
-	 * 
+	 *  Create a new map processor.
 	 */
 	public MapProcessor()
 	{
@@ -23,7 +24,7 @@ public class MapProcessor implements ITraverseProcessor
 	}
 	
 	/**
-	 * 
+	 *  Create a new map processor.
 	 */
 	public MapProcessor(boolean clone)
 	{

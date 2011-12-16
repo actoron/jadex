@@ -119,14 +119,14 @@ public interface IComponentManagementService //extends IService
      *  @param comp  The component to be listened on (or null for listening on all components).
      *  @param listener  The listener to be added.
      */
-    public void addComponentListener(IComponentIdentifier comp, ICMSComponentListener listener);
+    public IFuture<Void> addComponentListener(IComponentIdentifier comp, ICMSComponentListener listener);
     
     /**
      *  Remove a listener.
      *  @param comp  The component to be listened on (or null for listening on all components).
      *  @param listener  The listener to be removed.
      */
-    public void removeComponentListener(IComponentIdentifier comp, ICMSComponentListener listener);
+    public IFuture<Void> removeComponentListener(IComponentIdentifier comp, ICMSComponentListener listener);
 
     //-------- external access methods --------
     

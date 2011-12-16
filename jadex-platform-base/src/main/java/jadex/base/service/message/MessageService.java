@@ -43,6 +43,8 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.traverser.ITraverseProcessor;
+import jadex.commons.traverser.Traverser;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -167,10 +169,12 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public IFuture<Void> sendMessage(final Map msg, final MessageType type, 
+	public IFuture<Void> sendMessage(final Map origmsg, final MessageType type, 
 		IComponentIdentifier osender, final IResourceIdentifier rid, final byte[] codecids)
 	{
-//		System.out.println("msgservice sendMessage()");
+		final Map msg = new HashMap(origmsg);
+		if(rid==null)
+			System.out.println("msgservice sendMessage(): "+rid);
 		
 		final Future<Void> ret = new Future<Void>();
 		final IComponentIdentifier sender = updateComponentIdentifier(osender);
@@ -188,59 +192,63 @@ public class MessageService extends BasicService implements IMessageService
 				}
 			
 				// Replace own component identifiers.
-				String[] params = type.getParameterNames();
-				for(int i=0; i<params.length; i++)
-				{
-					Object o = msg.get(params[i]);
-					if(o instanceof IComponentIdentifier)
-					{
-						msg.put(params[i], updateComponentIdentifier((IComponentIdentifier)o));
-					}
-				}
-				String[] paramsets = type.getParameterSetNames();
-				for(int i=0; i<paramsets.length; i++)
-				{
-					Object o = msg.get(paramsets[i]);
-					
-					if(SReflect.isIterable(o))
-					{
-						List rep = new ArrayList();
-						for(Iterator it=SReflect.getIterator(o); it.hasNext(); )
-						{
-							Object item = it.next();
-							if(item instanceof IComponentIdentifier)
-							{
-								rep.add(updateComponentIdentifier((IComponentIdentifier)item));
-							}
-							else
-							{
-								rep.add(item);
-							}
-						}
-						msg.put(paramsets[i], rep);
-					}
-					else if(o instanceof IComponentIdentifier)
-					{
-						msg.put(paramsets[i], updateComponentIdentifier((IComponentIdentifier)o));
-					}
-				}
+				// Now done just before send
+//				String[] params = type.getParameterNames();
+//				for(int i=0; i<params.length; i++)
+//				{
+//					Object o = msg.get(params[i]);
+//					if(o instanceof IComponentIdentifier)
+//					{
+//						msg.put(params[i], updateComponentIdentifier((IComponentIdentifier)o));
+//					}
+//				}
+//				String[] paramsets = type.getParameterSetNames();
+//				for(int i=0; i<paramsets.length; i++)
+//				{
+//					Object o = msg.get(paramsets[i]);
+//					
+//					if(SReflect.isIterable(o))
+//					{
+//						List rep = new ArrayList();
+//						for(Iterator it=SReflect.getIterator(o); it.hasNext(); )
+//						{
+//							Object item = it.next();
+//							if(item instanceof IComponentIdentifier)
+//							{
+//								rep.add(updateComponentIdentifier((IComponentIdentifier)item));
+//							}
+//							else
+//							{
+//								rep.add(item);
+//							}
+//						}
+//						msg.put(paramsets[i], rep);
+//					}
+//					else if(o instanceof IComponentIdentifier)
+//					{
+//						msg.put(paramsets[i], updateComponentIdentifier((IComponentIdentifier)o));
+//					}
+//				}
 				
 				// Automatically add optional meta information.
 				String senid = type.getSenderIdentifier();
-				Object sen = msg.get(senid);
-				if(sen==null)
+				if(msg.get(senid)==null)
 					msg.put(senid, sender);
 				
 				final String idid = type.getIdIdentifier();
-				Object id = msg.get(idid);
-				if(id==null)
+				if(msg.get(idid)==null)
 					msg.put(idid, SUtil.createUniqueId(sender.getLocalName()));
 
 				final String sd = type.getTimestampIdentifier();
-				final Object senddate = msg.get(sd);
-				if(senddate==null)
+				if(msg.get(sd)==null)
 				{
 					msg.put(sd, ""+clockservice.getTime());
+				}
+				
+				final String ridid = type.getResourceIdIdentifier();
+				if(msg.get(ridid)==null)
+				{
+					msg.put(ridid, rid);
 				}
 				
 				// External access of sender required for content encoding etc.
@@ -273,6 +281,7 @@ public class MessageService extends BasicService implements IMessageService
 	protected void doSendMessage(Map msg, MessageType type, IExternalAccess comp, ClassLoader cl, Future ret, byte[] codecids)
 	{
 		Map msgcopy	= new HashMap(msg);
+		
 		Object tmp = msgcopy.get(type.getReceiverIdentifier());
 		if(tmp==null || SReflect.isIterable(tmp) &&	!SReflect.getIterator(tmp).hasNext())
 		{
@@ -292,11 +301,29 @@ public class MessageService extends BasicService implements IMessageService
 		}
 
 		// Conversion via platform specific codecs
+		// Hack?! Preprocess content to enhance component identifiers.
 		IContentCodec[] compcodecs = getContentCodecs(comp.getModel(), cl);
+		List<ITraverseProcessor> procs = Traverser.getDefaultProcessors(false);
+		procs.add(1, new ITraverseProcessor()
+		{
+			public Object process(Object object, Class clazz,
+				List<ITraverseProcessor> processors, Traverser traverser,
+				Map<Object, Object> traversed)
+			{
+				return updateComponentIdentifier((IComponentIdentifier)object);
+			}
+			
+			public boolean isApplicable(Object object, Class clazz)
+			{
+				return object instanceof IComponentIdentifier;
+			}
+		});
+		
 		for(Iterator it=msgcopy.keySet().iterator(); it.hasNext(); )
 		{
 			String	name	= (String)it.next();
 			Object	value	= msgcopy.get(name);
+			value = Traverser.traverseObject(value, procs);
 			
 			IContentCodec codec = type.findContentCodec(compcodecs, msg, name);
 			if(codec==null)
@@ -307,7 +334,8 @@ public class MessageService extends BasicService implements IMessageService
 				msgcopy.put(name, codec.encode(value, cl));
 			}
 			else if(value!=null && !(value instanceof String) 
-				&& !(name.equals(type.getSenderIdentifier()) || name.equals(type.getReceiverIdentifier())))
+				&& !(name.equals(type.getSenderIdentifier()) || name.equals(type.getReceiverIdentifier())
+					|| name.equals(type.getResourceIdIdentifier())))
 			{	
 				ret.setException(new ContentException("No content codec found for: "+name+", "+msgcopy));
 				return;
@@ -392,7 +420,6 @@ public class MessageService extends BasicService implements IMessageService
 			SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm)
 				.toArray(new IComponentIdentifier[0]);
-//			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, getTransports(), codecs);
 			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, getTransports(), cids, codecs);
 //			System.out.println("msgservice adding send task");
 			tm.addMessage(task).addResultListener(crl);
@@ -920,120 +947,161 @@ public class MessageService extends BasicService implements IMessageService
 		final MessageType	messagetype	= getMessageType(type);
 		final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 		
-		SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-			.addResultListener(new DefaultResultListener()
+		getRIDClassLoader(msg, getMessageType(type)).addResultListener(new DefaultResultListener<ClassLoader>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(final ClassLoader classloader)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				for(int i = 0; i < receivers.length; i++)
+				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+					.addResultListener(new DefaultResultListener()
 				{
-//					final int cnt = i; 
-					AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(receivers[i]);
-					if(component != null)
+					public void resultAvailable(Object result)
 					{
-						ClassLoader cl = component.getComponentInstance().getClassLoader();
-						Map	message	= (Map) decoded.get(cl);
-						if(message==null)
+						IComponentManagementService cms = (IComponentManagementService)result;
+						for(int i = 0; i < receivers.length; i++)
 						{
-							if(receivers.length>1)
+	//						final int cnt = i; 
+							AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(receivers[i]);
+							if(component != null)
 							{
-								message	= new HashMap(msg);
-								decoded.put(cl, message);
+								ClassLoader cl = classloader!=null? classloader: component.getComponentInstance().getClassLoader();
+								Map	message	= (Map)decoded.get(cl);
+								
+								if(message==null)
+								{
+									if(receivers.length>1)
+									{
+										message	= new HashMap(msg);
+										decoded.put(cl, message);
+									}
+									else
+									{
+										// Skip creation of copy when only one receiver.
+										message	= msg;
+									}
+	
+									// Conversion via platform specific codecs
+									IContentCodec[] compcodecs = getContentCodecs(component.getModel(), cl);
+									for(Iterator it=message.keySet().iterator(); it.hasNext(); )
+									{
+										String name = (String)it.next();
+										Object value = message.get(name);
+																			
+										IContentCodec codec = messagetype.findContentCodec(compcodecs, message, name);
+										if(codec==null)
+											codec = messagetype.findContentCodec(getContentCodecs(), message, name);
+										
+										if(codec!=null)
+										{
+											try
+											{
+												Object val = codec.decode((byte[])value, cl);
+												message.put(name, val);
+											}
+											catch(Exception e)
+											{
+												ContentException ce = new ContentException(new String((byte[])value), e);
+												message.put(name, ce);
+											}
+										}
+									}
+								}
+	
+								try
+								{
+									component.receiveMessage(message, messagetype);
+								}
+								catch(Exception e)
+								{
+									logger.warning("Message could not be delivered to receiver: " + receivers[i] + ", "+ message.get(messagetype.getIdIdentifier())+", "+e);
+	
+									// todo: notify sender that message could not be delivered!
+									// Problem: there is no connection back to the sender, so that
+									// the only chance is sending a separate failure message.
+								}
 							}
 							else
 							{
-								// Skip creation of copy when only one receiver.
-								message	= msg;
+								logger.warning("Message could not be delivered to receiver: " + receivers[i] + ", "+ msg.get(messagetype.getIdIdentifier()));
+	
+								// todo: notify sender that message could not be delivered!
+								// Problem: there is no connection back to the sender, so that
+								// the only chance is sending a separate failure message.
 							}
-
-							// Conversion via platform specific codecs
-							IContentCodec[] compcodecs = getContentCodecs(component.getModel(), cl);
-							for(Iterator it=message.keySet().iterator(); it.hasNext(); )
+						}
+	
+						IFilter[] fils;
+						IMessageListener[] lis;
+						synchronized(this)
+						{
+							fils = listeners==null? null: (IFilter[])listeners.values().toArray(new IFilter[listeners.size()]);
+							lis = listeners==null? null: (IMessageListener[])listeners.keySet().toArray(new IMessageListener[listeners.size()]);
+						}
+						
+						if(lis!=null)
+						{
+							// Hack?! Use message decoded for some component. What if listener has different class loader? 
+							Map	message	= decoded.isEmpty() ? msg : (Map)decoded.get(decoded.keySet().iterator().next());
+							IMessageAdapter msg = new DefaultMessageAdapter(message, messagetype);
+							for(int i=0; i<lis.length; i++)
 							{
-								String name = (String)it.next();
-								Object value = message.get(name);
-																	
-								IContentCodec codec = messagetype.findContentCodec(compcodecs, message, name);
-								if(codec==null)
-									codec = messagetype.findContentCodec(getContentCodecs(), message, name);
-								
-								if(codec!=null)
+								IMessageListener li = (IMessageListener)lis[i];
+								boolean	match	= false;
+								try
 								{
-//									byte[] val;
-//									if(value instanceof byte[])
-//										val = (byte[])value;
-//									else if(value instanceof String)
-//										val = ((String)value).getBytes();
-									message.put(name, codec.decode((byte[])value, cl));
+									match	= fils[i]==null || fils[i].filter(msg);
+								}
+								catch(Exception e)
+								{
+									logger.warning("Filter threw exception: "+fils[i]+", "+e);
+								}
+								if(match)
+								{
+									try
+									{
+										li.messageReceived(msg);
+									}
+									catch(Exception e)
+									{
+										logger.warning("Listener threw exception: "+li+", "+e);
+									}
 								}
 							}
 						}
-
-						try
-						{
-							component.receiveMessage(message, messagetype);
-						}
-						catch(Exception e)
-						{
-							logger.warning("Message could not be delivered to receiver: " + receivers[i] + ", "+ message.get(messagetype.getIdIdentifier())+", "+e);
-
-							// todo: notify sender that message could not be delivered!
-							// Problem: there is no connection back to the sender, so that
-							// the only chance is sending a separate failure message.
-						}
-					}
-					else
-					{
-						logger.warning("Message could not be delivered to receiver: " + receivers[i] + ", "+ msg.get(messagetype.getIdIdentifier()));
-
-						// todo: notify sender that message could not be delivered!
-						// Problem: there is no connection back to the sender, so that
-						// the only chance is sending a separate failure message.
-					}
-				}
-
-				IFilter[] fils;
-				IMessageListener[] lis;
-				synchronized(this)
-				{
-					fils = listeners==null? null: (IFilter[])listeners.values().toArray(new IFilter[listeners.size()]);
-					lis = listeners==null? null: (IMessageListener[])listeners.keySet().toArray(new IMessageListener[listeners.size()]);
-				}
-				
-				if(lis!=null)
-				{
-					// Hack?! Use message decoded for some component. What if listener has different class loader? 
-					Map	message	= decoded.isEmpty() ? msg : (Map)decoded.get(decoded.keySet().iterator().next());
-					IMessageAdapter msg = new DefaultMessageAdapter(message, messagetype);
-					for(int i=0; i<lis.length; i++)
-					{
-						IMessageListener li = (IMessageListener)lis[i];
-						boolean	match	= false;
-						try
-						{
-							match	= fils[i]==null || fils[i].filter(msg);
-						}
-						catch(Exception e)
-						{
-							logger.warning("Filter threw exception: "+fils[i]+", "+e);
-						}
-						if(match)
-						{
-							try
-							{
-								li.messageReceived(msg);
-							}
-							catch(Exception e)
-							{
-								logger.warning("Listener threw exception: "+li+", "+e);
-							}
-						}
-					}
-				}
-			}	
+					}	
+				});
+			}
 		});
 	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<ClassLoader> getRIDClassLoader(Map msg, MessageType mt)
+	{
+		final Future<ClassLoader> ret = new Future<ClassLoader>();
+		
+//		MessageType mt = getMessageType(type);
+		String ridid = mt.getResourceIdIdentifier();
+		final IResourceIdentifier rid = (IResourceIdentifier)msg.get(ridid);
+		if(rid!=null)
+		{
+			IFuture<ILibraryService> fut = SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class);
+			fut.addResultListener(new DefaultResultListener<ILibraryService>()
+			{
+				public void resultAvailable(ILibraryService ls)
+				{
+					ls.getClassLoader(rid).addResultListener(new DelegationResultListener<ClassLoader>(ret));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
 	
 //	/**
 //	 * 

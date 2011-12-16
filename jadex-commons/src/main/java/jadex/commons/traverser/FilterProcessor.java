@@ -6,14 +6,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  Filter processor for directly returning specific objects as is.
+ *  If filter return true, the processors applies and returns the
+ *  object as is.
  */
 public class FilterProcessor implements ITraverseProcessor
 {
+	/** The filter. */
 	protected IFilter filter;
 	
 	/**
-	 * 
+	 *  Create a new filter processor.
 	 */
 	public FilterProcessor(IFilter filter)
 	{

@@ -115,6 +115,7 @@ public class ResourceIdentifier implements IResourceIdentifier
 	 */
 	public String	toString()
 	{
-		return "ResourceIdentifier("+gid+", "+(lid!=null?lid.toString(): "")+")";
+//		return "ResourceIdentifier(globalid="+gid==null? "n/a": gid+", localid"+(lid!=null?lid.toString(): "n/a")+")";
+		return "global="+(gid==null? "n/a": gid)+", local="+(lid!=null? lid.toString(): "n/a");
 	}
 }

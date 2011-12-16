@@ -132,6 +132,15 @@ public class BasicService implements IInternalService
 	}*/
 	
 	/**
+	 *  Get the providerid.
+	 *  @return the providerid.
+	 */
+	public IComponentIdentifier getProviderId()
+	{
+		return providerid;
+	}
+
+	/**
 	 *  Get a service property.
 	 *  @return The service property (if any).
 	 */

@@ -159,26 +159,27 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			new ObjectInfo(IRemotable.class));
 		typeinfoswrite.add(ti_proxyable);
 		
-		QName[] ppr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge", "ComponentIdentifier")};
-		final IComponentIdentifier root = component.getComponentIdentifier().getRoot();
-		IPreProcessor pp = new IPreProcessor()
-		{
-			public Object preProcess(IContext context, Object object)
-			{
-				IComponentIdentifier src = (IComponentIdentifier)object;
-				ComponentIdentifier ret = null;
-				if(src.getPlatformName().equals(root.getLocalName()))
-				{
-					String[] addresses = (String[])((Object[])context.getUserContext())[1];
-					ret = new ComponentIdentifier(src.getName(), addresses);
-//					System.out.println("Rewritten cid: "+ret);
-				}
-				
-				return ret==null? src: ret;
-			}
-		};
-		TypeInfo ti_cids = new TypeInfo(new XMLInfo(ppr, pp), new ObjectInfo(IComponentIdentifier.class));
-		typeinfoswrite.add(ti_cids);
+		// Component identifier enhancement now done in MessageService sendMessage
+//		QName[] ppr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge", "ComponentIdentifier")};
+//		final IComponentIdentifier root = component.getComponentIdentifier().getRoot();
+//		IPreProcessor pp = new IPreProcessor()
+//		{
+//			public Object preProcess(IContext context, Object object)
+//			{
+//				IComponentIdentifier src = (IComponentIdentifier)object;
+//				ComponentIdentifier ret = null;
+//				if(src.getPlatformName().equals(root.getLocalName()))
+//				{
+//					String[] addresses = (String[])((Object[])context.getUserContext())[1];
+//					ret = new ComponentIdentifier(src.getName(), addresses);
+////					System.out.println("Rewritten cid: "+ret);
+//				}
+//				
+//				return ret==null? src: ret;
+//			}
+//		};
+//		TypeInfo ti_cids = new TypeInfo(new XMLInfo(ppr, pp), new ObjectInfo(IComponentIdentifier.class));
+//		typeinfoswrite.add(ti_cids);
 		
 		this.reader = new Reader(new TypeInfoPathManager(typeinfosread), false, false, false, new XMLReporter()
 		{

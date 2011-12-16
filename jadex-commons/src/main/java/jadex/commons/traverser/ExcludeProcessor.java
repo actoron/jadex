@@ -6,7 +6,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 
+ *  The exclude processor allows for excluding specific classes from further traversing.
+ *  Similar to the filter processor but based on predefined classes.
  */
 public class ExcludeProcessor implements ITraverseProcessor
 {

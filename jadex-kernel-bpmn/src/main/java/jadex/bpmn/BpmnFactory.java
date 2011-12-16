@@ -183,7 +183,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 				{
 					try
 					{
-						MBpmnModel amodel = loader.loadBpmnModel(model, imports, cl, rid);
+						MBpmnModel amodel = loader.loadBpmnModel(model, imports, cl, new Object[]{rid, getProviderId().getRoot()});
 						ret.setResult(amodel.getModelInfo());
 					}
 					catch(Exception e)
@@ -198,7 +198,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 			try
 			{
 				ClassLoader cl = getClass().getClassLoader();
-				MBpmnModel amodel = loader.loadBpmnModel(model, imports, cl, rid);
+				MBpmnModel amodel = loader.loadBpmnModel(model, imports, cl, new Object[]{rid, getProviderId().getRoot()});
 				ret.setResult(amodel.getModelInfo());
 			}
 			catch(Exception e)
@@ -288,7 +288,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 				{
 					try
 					{
-						MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
+						MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, cl, new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
 						BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, inited);
 						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 					}
@@ -304,7 +304,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 			try
 			{
 				ClassLoader cl = getClass().getClassLoader();
-				MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
+				MBpmnModel model = loader.loadBpmnModel(modelinfo.getFilename(), null, cl, new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
 				BpmnInterpreter interpreter = new BpmnInterpreter(desc, factory, model, arguments, config, parent, null, null, null, bindings, copy, inited);
 				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 			}

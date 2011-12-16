@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.cms;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
 
 
 /**
@@ -47,11 +48,11 @@ public interface IComponentDescription
 	 */
 	public String getModelName();
 	
-//	/**
-//	 *  Get the identifier of the parent component (if any).
-//	 *  @return The parent component identifier.
-//	 */
-//	public IComponentIdentifier getParent();
+	/**
+	 *  Get the resource identifier.
+	 *  @return The resource identifier.
+	 */
+	public IResourceIdentifier getResourceIdentifier();
 	
 	/**
 	 *  Get the ownership string of the component.

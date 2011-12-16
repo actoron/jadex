@@ -112,6 +112,6 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	 */
 	public String	toString()
 	{
-		return url+" @"+cid;
+		return url+"@"+cid;
 	}
 }

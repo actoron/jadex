@@ -210,7 +210,8 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 				{
 					try
 					{
-						ret.setResult(loader.loadComponentModel(model, imports, cl, rid).getModelInfo());
+						ret.setResult(loader.loadComponentModel(model, imports, cl, 
+							new Object[]{rid, getServiceIdentifier().getProviderId().getRoot()}).getModelInfo());
 					}
 					catch(Exception e)
 					{
@@ -224,7 +225,8 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 			try
 			{
 				ClassLoader cl = getClass().getClassLoader();
-				ret.setResult(loader.loadComponentModel(model, imports, cl, rid).getModelInfo());
+				ret.setResult(loader.loadComponentModel(model, imports, cl, 
+					new Object[]{rid, getProviderId().getRoot()}).getModelInfo());
 			}
 			catch(Exception e)
 			{
@@ -273,7 +275,8 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 				{
 					try
 					{
-						CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
+						CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, 
+							new Object[]{modelinfo.getResourceIdentifier(), getServiceIdentifier().getProviderId().getRoot()});
 						ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent, arguments, bindings, copy, init, cl);
 						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 					}
@@ -291,7 +294,8 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 			try
 			{
 				ClassLoader cl = getClass().getClassLoader();
-				CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
+				CacheableKernelModel model = loader.loadComponentModel(modelinfo.getFilename(), null, cl, 
+					new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
 				ComponentInterpreter interpreter = new ComponentInterpreter(desc, model.getModelInfo(), config, factory, parent, arguments, bindings, copy, init, cl);
 				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 			}

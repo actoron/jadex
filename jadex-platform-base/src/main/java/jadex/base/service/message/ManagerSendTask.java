@@ -42,9 +42,6 @@ public class ManagerSendTask
 	/** The transports to be tried. */
 	protected List transports;
 
-	/** The target manager. */
-//	protected SendManager manager;
-	
 	/**
 	 *  Create a new manager send task.
 	 */
@@ -62,7 +59,6 @@ public class ManagerSendTask
 		this.transports = new ArrayList(Arrays.asList(transports));
 		this.codecs = codecs;
 		this.codecids = codecids;
-//		this.manager = manager;
 	}
 	
 	
@@ -111,23 +107,6 @@ public class ManagerSendTask
 		return codecs;
 	}
 	
-//	/**
-//	 *  Set the receivers.
-//	 */
-//	public void	setReceivers(IComponentIdentifier[] receivers)
-//	{
-//		this.receivers	= receivers;
-//	}
-
-//	/**
-//	 *  Get the manager.
-//	 *  @return the manager.
-//	 */
-//	public SendManager getSendManager()
-//	{
-//		return manager;
-//	}
-
 	/**
 	 *  Get the codecids.
 	 *  @return the codecids.
@@ -137,15 +116,6 @@ public class ManagerSendTask
 		return codecids;
 	}
 
-//	/**
-//	 *  Set the codecids.
-//	 *  @param codecids The codecids to set.
-//	 */
-//	public void setCodecIds(byte[] codecids)
-//	{
-//		this.codecids = codecids;
-//	}
-	
 	/**
 	 *  Get the encoded message.
 	 *  Saves the message to avoid multiple encoding with different transports.
@@ -173,15 +143,25 @@ public class ManagerSendTask
 	}
 	
 	/**
-	 * 
+	 *  Get the prolog bytes.
+	 *  @return The prolog bytes.
 	 */
 	public byte[] getProlog()
 	{
-		byte[] data = getData();
-		byte[] prolog = new byte[1+codecids.length+4];
-		prolog[0] = (byte)codecids.length;
-		System.arraycopy(codecids, 0, prolog, 1, codecids.length);
-		System.arraycopy(SUtil.intToBytes(prolog.length+data.length), 0, prolog, codecids.length+1, 4);
+		if(prolog==null)
+		{
+			synchronized(this)
+			{
+				if(prolog==null)
+				{
+					byte[] data = getData();
+					prolog = new byte[1+codecids.length+4];
+					prolog[0] = (byte)codecids.length;
+					System.arraycopy(codecids, 0, prolog, 1, codecids.length);
+					System.arraycopy(SUtil.intToBytes(prolog.length+data.length), 0, prolog, codecids.length+1, 4);
+				}
+			}
+		}
 		return prolog;
 	}
 }

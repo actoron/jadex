@@ -8,12 +8,28 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  The traverser allows to traverse an object graph deeply.
+ *  Traversal processors can be used to perform specific actions
+ *  on traversed object, e.g. object modifications. Does currently
+ *  not allow transforming objects to other objects of another type
+ *  (replacements), because objects have to be saved in the graph itself
+ *  (no extra table for exchanged objects).
+ *  
+ *  The traverser can be used as a cloner when processors always return
+ *  copies of the original objects.
+ *  
+ *  todo: introduce classloaders to allows for creating objects with other
+ *  classloaders (e.g. convert a parameter from a sender to a receiver resource id).
  */
 public class Traverser
 {
+	/** The default cloner. */
+	protected static Traverser instance;
+	
+	/** The default traversal processors with no special actions. */
 	protected static List<ITraverseProcessor> traversalprocessors;
 	
+	/** The default cloner processors with clone actions. */
 	protected static List<ITraverseProcessor> cloneprocessors;
 	
 	static
@@ -39,17 +55,26 @@ public class Traverser
 	}
 	
 	/**
-	 * 
+	 *  Get the default traversal processors.
+	 *  @return The traversal processors.
 	 */
-	public static List<ITraverseProcessor> getDefaultProcessors(boolean clone)
+	public static List<ITraverseProcessor> getDefaultTraversalProcessors()
 	{
 		List ret = new ArrayList();
-		ret.addAll(clone? cloneprocessors: traversalprocessors);
+		ret.addAll(traversalprocessors);
 		return ret;
 	}
 	
-	/** The default cloner. */
-	protected static Traverser instance;
+	/**
+	 *  Get the default clone processors.
+	 *  @return The clone processors.
+	 */
+	public static List<ITraverseProcessor> getDefaultCloneProcessors()
+	{
+		List ret = new ArrayList();
+		ret.addAll(cloneprocessors);
+		return ret;
+	}
 	
 	/**
 	 *  Get the default cloner instance.
@@ -69,16 +94,11 @@ public class Traverser
 		return instance;
 	}
 	
-//	/**
-//	 *  Traverse an object.
-//	 */
-//	public static Object traverseObject(Object object)
-//	{
-//		return getInstance().traverse(object, null, new HashMap<Object, Object>(), null);
-//	}
-	
 	/**
 	 *  Traverse an object.
+	 *  @param object The object to traverse.
+	 *  @param processors The processors to apply.
+	 *  @return The traversed (or modified) object.
 	 */
 	public static Object traverseObject(Object object, List<ITraverseProcessor> processors)
 	{
@@ -94,7 +114,7 @@ public class Traverser
 	}
 	
 	/**
-	 *  Deep clone an object.
+	 *  Traverse an object.
 	 */
 	public Object traverse(Object object, Class<?> clazz, Map<Object, Object> traversed, 
 		List<ITraverseProcessor> processors)

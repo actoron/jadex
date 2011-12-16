@@ -10,12 +10,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ *  A collection processor allows for traversing collections.
+ */
 public class CollectionProcessor implements ITraverseProcessor
 {
+	/** The clone falg. */
 	protected boolean clone;
 	
 	/**
-	 * 
+	 *  Create a new collection processor.
 	 */
 	public CollectionProcessor()
 	{
@@ -23,7 +27,7 @@ public class CollectionProcessor implements ITraverseProcessor
 	}
 	
 	/**
-	 * 
+	 *  Create a new collection processor.
 	 */
 	public CollectionProcessor(boolean clone)
 	{

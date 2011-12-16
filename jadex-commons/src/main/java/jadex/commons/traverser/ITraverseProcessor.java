@@ -4,12 +4,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  Interface for traverse processors.
+ *  
  */
 public interface ITraverseProcessor
 {
 	/**
-	 *  Test if the processor is appliable.
+	 *  Test if the processor is applicable.
 	 *  @param object The object.
 	 *  @return True, if is applicable. 
 	 */
@@ -22,5 +23,4 @@ public interface ITraverseProcessor
 	 */
 	public Object process(Object object, Class clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed);
-
 }

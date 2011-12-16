@@ -1,5 +1,7 @@
 package jadex.base.gui.componenttree;
 
+import jadex.bridge.ILocalResourceIdentifier;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SUtil;
 import jadex.commons.gui.PropertiesPanel;
@@ -30,6 +32,8 @@ public class ComponentProperties	extends	PropertiesPanel
 		
 		createTextField("Type");
 		createTextField("Model name");
+		createTextField("Resource Identifier");
+		createTextField("(global / local)");
 		createTextField("Ownership");
 		createTextField("State");
 		createTextField("Processing state");
@@ -51,6 +55,10 @@ public class ComponentProperties	extends	PropertiesPanel
 		getTextField("Model name").setText(desc.getModelName());
 		getTextField("Ownership").setText(desc.getOwnership());
 		getTextField("State").setText(desc.getState());
+		String gid = desc.getResourceIdentifier().getGlobalIdentifier();
+		ILocalResourceIdentifier lid = desc.getResourceIdentifier().getLocalIdentifier();
+		getTextField("Resource Identifier").setText(gid==null? "n/a": gid);
+		getTextField("(global / local)").setText(lid==null? "n/a": lid.toString());
 //		getTextField("Processing state").setText(desc.getProcessingState());
 		getCheckBox("Master").setSelected(desc.getMaster()==null? false: desc.getMaster().booleanValue());
 		getCheckBox("Daemon").setSelected(desc.getDaemon()==null? false: desc.getDaemon().booleanValue());

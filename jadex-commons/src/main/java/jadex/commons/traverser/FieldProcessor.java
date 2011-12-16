@@ -6,14 +6,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  Processor that traverses all fields of an object.
  */
 class FieldProcessor implements ITraverseProcessor
 {
+	/** The clone flag. */
 	protected boolean clone;
 	
 	/**
-	 * 
+	 *  Create a new field processor.
 	 */
 	public FieldProcessor()
 	{
@@ -21,7 +22,7 @@ class FieldProcessor implements ITraverseProcessor
 	}
 	
 	/**
-	 * 
+	 *  Create a new field processor.
 	 */
 	public FieldProcessor(boolean clone)
 	{
@@ -109,7 +110,7 @@ class FieldProcessor implements ITraverseProcessor
 	}
 	
 	/**
-	 * 
+	 *  Get the object that is returned.
 	 */
 	public Object getReturnObject(Object object, Class clazz)
 	{

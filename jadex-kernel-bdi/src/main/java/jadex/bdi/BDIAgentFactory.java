@@ -201,8 +201,8 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 					try
 					{
 				//		OAVAgentModel amodel = (OAVAgentModel)model;
-						OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, 
-							cl, modelinfo.getResourceIdentifier());
+						OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, cl, 
+							new Object[]{modelinfo.getResourceIdentifier(), component.getComponentIdentifier().getRoot()});
 						
 						// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 						OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
@@ -230,8 +230,8 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 			{
 				ClassLoader cl = getClass().getClassLoader();
 		//		OAVAgentModel amodel = (OAVAgentModel)model;
-				OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, 
-					cl, modelinfo.getResourceIdentifier());
+				OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, cl, 
+					new Object[]{modelinfo.getResourceIdentifier(), component.getComponentIdentifier().getRoot()});
 				
 				// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 				OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
@@ -299,7 +299,8 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 					try
 					{
 //						System.out.println("loading bdi: "+filename);
-						OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, cl, rid);
+						OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, cl, 
+							new Object[]{rid, component.getComponentIdentifier().getRoot()});
 						ret.setResult(loaded.getModelInfo());
 					}
 					catch(Exception e)
@@ -317,7 +318,8 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 			{
 //				System.out.println("loading bdi: "+filename);
 				ClassLoader cl = getClass().getClassLoader();
-				OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, cl, rid);
+				OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, cl,
+					new Object[]{rid, component.getComponentIdentifier().getRoot()});
 				ret.setResult(loaded.getModelInfo());
 			}
 			catch(Exception e)

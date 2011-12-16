@@ -8,14 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  Processor for handling iterators.
  */
 public class IteratorProcessor implements ITraverseProcessor
 {
+	/** The clone flag. */
 	protected boolean clone;
 	
 	/**
-	 * 
+	 *  Create a new iterator processor.
 	 */
 	public IteratorProcessor()
 	{
@@ -23,7 +24,7 @@ public class IteratorProcessor implements ITraverseProcessor
 	}
 	
 	/**
-	 * 
+	 *  Create a new iterator processor.
 	 */
 	public IteratorProcessor(boolean clone)
 	{

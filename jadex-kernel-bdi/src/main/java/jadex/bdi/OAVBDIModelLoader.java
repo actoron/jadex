@@ -11,11 +11,15 @@ import jadex.bdi.runtime.interpreter.GoalLifecycleRules;
 import jadex.bdi.runtime.interpreter.GoalProcessingRules;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
@@ -47,6 +51,7 @@ import jadex.rules.state.javaimpl.OAVStateFactory;
 import jadex.xml.StackElement;
 import jadex.xml.reader.Reader;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -199,8 +204,16 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			
 			// Need to set class loader before create agent model entry to load subcapabilities.
 //			mi.setClassloader(classloader);
+			IResourceIdentifier rid = (IResourceIdentifier)((Object[])context)[0];
+			IComponentIdentifier root = (IComponentIdentifier)((Object[])context)[1];
 			mi.setFilename(info.getFilename());
-			mi.setResourceIdentifier((IResourceIdentifier)context);
+			if(rid==null)
+			{
+				String src = SUtil.getCodeSource(mi.getFilename(), mi.getPackage());
+				URL url = SUtil.toURL(src);
+				rid = new ResourceIdentifier(new LocalResourceIdentifier(root, url), null);
+			}
+			mi.setResourceIdentifier(rid);
 			if(!mi.checkName())
 			{
 				entries.put(new Tuple(new Object[]{new StackElement(new QName("capability"), handle)}), "Name '"+mi.getName()+"' does not match file name '"+mi.getFilename()+"'.");				

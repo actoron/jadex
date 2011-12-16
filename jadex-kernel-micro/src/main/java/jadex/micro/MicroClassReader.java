@@ -1,6 +1,9 @@
 package jadex.micro;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
@@ -17,6 +20,7 @@ import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.javaparser.SJavaParser;
 import jadex.kernelbase.CacheableKernelModel;
 import jadex.micro.annotation.Agent;
@@ -44,8 +48,10 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 import jadex.micro.annotation.Value;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -65,7 +71,7 @@ public class MicroClassReader
 	 *  @param The imports (if any).
 	 *  @return The loaded model.
 	 */
-	public MicroModel read(String model, String[] imports, ClassLoader classloader, IResourceIdentifier rid)
+	public MicroModel read(String model, String[] imports, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root)
 	{
 //		System.out.println("loading micro: "+model);
 		String clname = model;
@@ -78,15 +84,14 @@ public class MicroClassReader
 		
 		Class cma = getMicroAgentClass(clname, imports, classloader);
 		
-		return read(model, cma, classloader, rid);
+		return read(model, cma, classloader, rid, root);
 	}
 	
 	/**
 	 *  Load the model.
 	 */
-	protected MicroModel read(String model, Class cma, ClassLoader classloader, IResourceIdentifier rid)
-	{
-		ModelInfo modelinfo = new ModelInfo();
+	protected MicroModel read(String model, Class cma, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root)
+	{		ModelInfo modelinfo = new ModelInfo();
 		MicroModel ret = new MicroModel(modelinfo);
 		
 		String name = SReflect.getUnqualifiedClassName(cma);
@@ -95,8 +100,14 @@ public class MicroClassReader
 		String packagename = cma.getPackage()!=null? cma.getPackage().getName(): null;
 		modelinfo.setName(name);
 		modelinfo.setPackage(packagename);
-		modelinfo.setFilename(model);
+		String src = SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation());
+		modelinfo.setFilename(src+File.separatorChar+model);
 		modelinfo.setStartable(true);
+		if(rid==null)
+		{
+			URL url = cma.getProtectionDomain().getCodeSource().getLocation();
+			rid = new ResourceIdentifier(new LocalResourceIdentifier(root, url), null);
+		}
 		modelinfo.setResourceIdentifier(rid);
 		ret.setClassloader(classloader);
 		

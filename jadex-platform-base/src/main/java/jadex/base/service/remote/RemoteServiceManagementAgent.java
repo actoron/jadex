@@ -126,6 +126,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					// Hack!!! Manual decoding for using custom class loader.
 					// todo: use classloader of receiver
 					// currently just uses the 'global' platform classloader 
+					
 //					ClassLoader cl = ls.getClassLoader(null);//rms.getComponent().getModel().getResourceIdentifier());
 					ls.getClassLoader(null).addResultListener(new DefaultResultListener<ClassLoader>()
 					{
@@ -134,8 +135,6 @@ public class RemoteServiceManagementAgent extends MicroAgent
 							Object content = msg.get(SFipa.CONTENT);
 							final String callid = (String)msg.get(SFipa.CONVERSATION_ID);
 							final Future<IRemoteCommand>	reply	= new Future<IRemoteCommand>();
-
-							
 		//					System.out.println("received: "+rms.getServiceIdentifier()+" "+callid);
 		//					
 		//					if(((String)content).indexOf("store")!=-1)

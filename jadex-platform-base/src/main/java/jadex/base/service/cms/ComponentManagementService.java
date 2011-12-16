@@ -335,6 +335,7 @@ public abstract class ComponentManagementService extends BasicService implements
 									{
 										public void customResultAvailable(final IComponentFactory factory)
 										{
+//											System.out.println("model is: "+model+" "+modelname);
 											factory.loadModel(model, cinfo.getImports(), rid)
 												.addResultListener(new ExceptionDelegationResultListener<IModelInfo, IComponentIdentifier>(inited)
 											{
@@ -388,7 +389,8 @@ public abstract class ComponentManagementService extends BasicService implements
 																Boolean master = cinfo.getMaster()!=null? cinfo.getMaster(): lmodel.getMaster(cinfo.getConfiguration());
 																Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
 																Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
-																final CMSComponentDescription ad = new CMSComponentDescription(cid, type, master, daemon, autosd, lmodel.getFullName(), cinfo.getLocalType());
+																final CMSComponentDescription ad = new CMSComponentDescription(cid, type, master, daemon, autosd, 
+																	lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier());
 																
 																logger.info("Starting component: "+cid.getName());
 						//										System.err.println("Pre-Init: "+cid);
@@ -1556,12 +1558,13 @@ public abstract class ComponentManagementService extends BasicService implements
      *  @param comp  The component to be listened on (or null for listening on all components).
      *  @param listener  The listener to be added.
      */
-    public void addComponentListener(IComponentIdentifier comp, ICMSComponentListener listener)
+    public IFuture<Void> addComponentListener(IComponentIdentifier comp, ICMSComponentListener listener)
     {
 		synchronized(listeners)
 		{
 			listeners.put(comp, listener);
 		}
+		return IFuture.DONE;
     }
     
     /**
@@ -1569,12 +1572,13 @@ public abstract class ComponentManagementService extends BasicService implements
      *  @param comp  The component to be listened on (or null for listening on all components).
      *  @param listener  The listener to be removed.
      */
-    public void removeComponentListener(IComponentIdentifier comp, ICMSComponentListener listener)
+    public IFuture<Void> removeComponentListener(IComponentIdentifier comp, ICMSComponentListener listener)
     {
 		synchronized(listeners)
 		{
 			listeners.remove(comp, listener);
 		}
+		return IFuture.DONE;
     }
     
     //-------- helper classes --------
@@ -2172,22 +2176,22 @@ public abstract class ComponentManagementService extends BasicService implements
 		return ret;
 	}
 	
-	/**
-	 * Create a component description.
-	 * @param id The component identifier.
-	 * @param state The state.
-	 * @param ownership The ownership.
-	 * @param type The component type.
-	 * @param parent The parent.
-	 * @return The component description.
-	 */
-	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, String modelname, String localtype)
-	{
-		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, null, null, null, modelname, localtype);
-		ret.setState(state);
-		ret.setOwnership(ownership);
-		return ret;
-	}
+//	/**
+//	 * Create a component description.
+//	 * @param id The component identifier.
+//	 * @param state The state.
+//	 * @param ownership The ownership.
+//	 * @param type The component type.
+//	 * @param parent The parent.
+//	 * @return The component description.
+//	 */
+//	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, String modelname, String localtype, IResourceIdentifier rid)
+//	{
+//		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, null, null, null, modelname, localtype);
+//		ret.setState(state);
+//		ret.setOwnership(ownership);
+//		return ret;
+//	}
 	
 	//--------- information methods --------
 	

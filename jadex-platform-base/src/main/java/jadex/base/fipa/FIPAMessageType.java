@@ -92,6 +92,15 @@ public class FIPAMessageType extends MessageType
 	}
 	
 	/**
+	 *  Get the identifier for fetching the resource identifier id.
+	 *  @return The resource identifier id.
+	 */
+	public String getResourceIdIdentifier()
+	{
+		return SFipa.X_RID;
+	}
+	
+	/**
 	 *  Get the en/decode info (important) for a parameter/set.
 	 *  @param The name of the parameter/set.
 	 *  @return The en/decode infos.

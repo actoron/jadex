@@ -2,8 +2,11 @@ package jadex.component;
 
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -18,6 +21,7 @@ import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
@@ -40,6 +44,7 @@ import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -211,7 +216,7 @@ public class ComponentXMLReader
 	 *  @param info	The resource info.
 	 *  @param classloader The classloader.
  	 */
-	public CacheableKernelModel read(ResourceInfo rinfo, ClassLoader classloader, IResourceIdentifier rid) throws Exception
+	public CacheableKernelModel read(ResourceInfo rinfo, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root) throws Exception
 	{
 		Map	user	= new HashMap();
 		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
@@ -224,6 +229,12 @@ public class ComponentXMLReader
 			mi.setFilename(rinfo.getFilename());
 //			mi.setClassloader(classloader);
 			mi.setStartable(true);
+			if(rid==null)
+			{
+				String src = SUtil.getCodeSource(rinfo.getFilename(), mi.getPackage());
+				URL url = SUtil.toURL(src);
+				rid = new ResourceIdentifier(new LocalResourceIdentifier(root, url), null);
+			}
 			mi.setResourceIdentifier(rid);
 
 			if(!mi.checkName())

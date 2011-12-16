@@ -7,12 +7,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+/**
+ *  An enumeration processor allows for traversing enumerations.
+ */
 public class EnumerationProcessor implements ITraverseProcessor
 {
+	/** The clone falg. */
 	protected boolean clone;
 	
 	/**
-	 * 
+	 *  Create a new enumeration processor.
 	 */
 	public EnumerationProcessor()
 	{
@@ -20,7 +24,7 @@ public class EnumerationProcessor implements ITraverseProcessor
 	}
 	
 	/**
-	 * 
+	 *  Create a new enumeration processor.
 	 */
 	public EnumerationProcessor(boolean clone)
 	{

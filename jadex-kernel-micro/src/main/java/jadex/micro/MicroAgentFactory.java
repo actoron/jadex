@@ -168,7 +168,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 				{
 					try
 					{
-						IModelInfo mi = loader.loadComponentModel(model, imports, cl, rid).getModelInfo();
+						IModelInfo mi = loader.loadComponentModel(model, imports, cl, new Object[]{rid, getProviderId().getRoot()}).getModelInfo();
 						ret.setResult(mi);
 					}
 					catch(Exception e)
@@ -183,7 +183,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			try
 			{
 				ClassLoader cl = getClass().getClassLoader();
-				IModelInfo mi = loader.loadComponentModel(model, imports, cl, rid).getModelInfo();
+				IModelInfo mi = loader.loadComponentModel(model, imports, cl, new Object[]{rid, getProviderId().getRoot()}).getModelInfo();
 				ret.setResult(mi);
 			}
 			catch(Exception e)
@@ -333,7 +333,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 				{
 					try
 					{
-						MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, model.getResourceIdentifier());
+						MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
 						MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
 							null, cl), arguments, config, parent, binding, copy, inited);
 						res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));
@@ -352,7 +352,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 			try
 			{
 				ClassLoader	cl	= getClass().getClassLoader();
-				MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, model.getResourceIdentifier());
+				MicroModel mm = loader.loadComponentModel(model.getFilename(), null, cl, new Object[]{model.getResourceIdentifier(), getProviderId().getRoot()});
 				MicroAgentInterpreter mai = new MicroAgentInterpreter(desc, factory, mm, getMicroAgentClass(model.getFullName()+"Agent", 
 					null, cl), arguments, config, parent, binding, copy, inited);
 				res.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(mai, mai.getComponentAdapter()));

@@ -484,6 +484,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 			{
 //				System.out.println("Component added0: "+desc.getName().getName());
 //				System.err.println(""+model.hashCode()+" Panel->addChild queued: "+desc.getName()+", "+desc.getParent());
+				
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()

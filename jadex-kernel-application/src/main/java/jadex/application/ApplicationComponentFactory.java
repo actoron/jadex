@@ -214,7 +214,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			{
 				try
 				{
-					ret.setResult(loader.loadApplicationModel(model, imports, cl, rid).getModelInfo());
+					ret.setResult(loader.loadApplicationModel(model, imports, cl, 
+						new Object[]{rid, getProviderId().getRoot()}).getModelInfo());
 				}
 				catch(Exception e)
 				{
@@ -250,7 +251,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 				{
 					try
 					{
-						CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
+						CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, 
+							new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
 						ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, init, cl);
 						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 					}
@@ -268,7 +270,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			try
 			{
 				ClassLoader cl = getClass().getClassLoader();
-				CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, modelinfo.getResourceIdentifier());
+				CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, 
+					new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
 				ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, init, cl);
 				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 			}

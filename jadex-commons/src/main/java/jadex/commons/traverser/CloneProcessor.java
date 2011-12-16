@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  Processor that clones cloneable objects.
  */
 public class CloneProcessor implements ITraverseProcessor
 {

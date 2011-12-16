@@ -1,5 +1,6 @@
 package jadex.component;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
@@ -57,6 +58,7 @@ public class ComponentModelLoader extends AbstractModelLoader
 	protected ICacheableModel doLoadModel(String name, String[] imports, ResourceInfo info, 
 			ClassLoader classloader, Object context) throws Exception
 	{
-		return (ICacheableModel)reader.read(info, classloader, (IResourceIdentifier)context);
+		return (ICacheableModel)reader.read(info, classloader, 
+			(IResourceIdentifier)((Object[])context)[0], (IComponentIdentifier)((Object[])context)[1]);
 	}
 }

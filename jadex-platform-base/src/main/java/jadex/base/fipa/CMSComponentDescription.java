@@ -2,6 +2,7 @@ package jadex.base.fipa;
 
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.cms.IComponentDescription;
 
 import java.io.Serializable;
@@ -26,8 +27,8 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/** Attribute for slot component identifier. */
 	protected IComponentIdentifier name;
 
-//	/** Attribute for slot parent. */
-//	protected IComponentIdentifier parent;
+	/** The resource identifier. */
+	protected IResourceIdentifier rid;
 	
 	/** Attribute for children. */
 	protected Set children;
@@ -69,8 +70,8 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/**
 	 *  Create a new CESComponentDescription.
 	 */
-	public CMSComponentDescription(IComponentIdentifier cid, String type, //IComponentIdentifier parent, 
-		Boolean master, Boolean daemon, Boolean autoshutdown, String modelname, String localtype)
+	public CMSComponentDescription(IComponentIdentifier cid, String type, Boolean master, 
+		Boolean daemon, Boolean autoshutdown, String modelname, String localtype, IResourceIdentifier rid)
 	{
 //		System.out.println("created desc: "+cid+" "+hashCode());
 		setName(cid);
@@ -83,6 +84,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setAutoShutdown(autoshutdown);
 		setModelName(modelname);
 		setLocalType(localtype);
+		setResourceIdentifier(rid);
 	}
 
 	//-------- accessor methods --------
@@ -142,23 +144,23 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		this.name = name;
 	}
 
-//	/**
-//	 *  Get the identifier of the parent component (if any).
-//	 *  @return The parent component identifier.
-//	 */
-//	public IComponentIdentifier getParent()
-//	{
-//		return this.parent;
-//	}
-//	
-//	/**
-//	 *  Set the parent of this component description.
-//	 * @param parent the value to be set
-//	 */
-//	public void setParent(IComponentIdentifier parent)
-//	{
-//		this.parent = parent;
-//	}
+	/**
+	 *  Get the resource identifier.
+	 *  @return The resource identifier.
+	 */
+	public IResourceIdentifier getResourceIdentifier()
+	{
+		return rid;
+	}
+
+	/**
+	 *  Set the resource identifier.
+	 *  @param rid The resource identifier.
+	 */
+	public void setResourceIdentifier(IResourceIdentifier rid)
+	{
+		this.rid = rid;
+	}
 	
 	/**
 	 *  Add a child component.

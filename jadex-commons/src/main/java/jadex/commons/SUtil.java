@@ -2016,6 +2016,47 @@ public class SUtil
 	}
 	
 	/**
+	 *  Get the source code base using a packagename and a filename.
+	 *  Looks at the filename and subtracts the package name.
+	 *  @param filename The filename.
+	 *  @param pck The package name.
+	 *  @return The source base. 
+	 */
+	public static String getCodeSource(String filename, String pck)
+	{
+		int occ = pck!=null? countOccurrences(pck, '.')+2: 1;
+		String ret = filename;
+		for(int i=0; i<occ; i++)
+		{
+			int idx = ret.lastIndexOf(File.separatorChar);
+			if(idx>0)
+				ret = ret.substring(0, idx);
+			else
+				throw new RuntimeException("Corrupt filename: "+filename);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Count the occurrences of a char in a string.
+	 *  @param string The string.
+	 *  @param find The char to find.
+	 *  @return The number of occurrences.
+	 */
+	public static int countOccurrences(String string, char find)
+	{
+	    int count = 0;
+	    for(int i=0; i < string.length(); i++)
+	    {
+	        if(string.charAt(i) == find)
+	        {
+	             count++;
+	        }
+	    }
+	    return count;
+	}
+	
+	/**
 	 *  Get the addresses to be used for transports.
 	 */
 	public static String[]	getNetworkAddresses() throws SocketException

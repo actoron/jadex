@@ -5,14 +5,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  An array processor allows for traversing arrays.
  */
 class ArrayProcessor implements ITraverseProcessor
 {
+	/** The array processor. */
 	protected boolean clone;
 	
 	/**
-	 * 
+	 *  Create a new array processor.
 	 */
 	public ArrayProcessor()
 	{
@@ -20,7 +21,7 @@ class ArrayProcessor implements ITraverseProcessor
 	}
 	
 	/**
-	 * 
+	 *  Create a new array processor.
 	 */
 	public ArrayProcessor(boolean clone)
 	{

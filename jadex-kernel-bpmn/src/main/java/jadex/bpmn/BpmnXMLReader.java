@@ -16,8 +16,11 @@ import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bridge.AbstractErrorReportBuilder;
 import jadex.bridge.ClassInfo;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.ComponentInstanceInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -34,6 +37,7 @@ import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.IFilter;
 import jadex.commons.ResourceInfo;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
@@ -56,6 +60,7 @@ import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -190,20 +195,27 @@ public class BpmnXMLReader
 	 *  @param info	The resource info.
 	 *  @param classloader The classloader.
  	 */
-	public static MBpmnModel read(ResourceInfo rinfo, ClassLoader classloader, IResourceIdentifier rid) throws Exception
+	public static MBpmnModel read(ResourceInfo rinfo, ClassLoader classloader, IResourceIdentifier rid, IComponentIdentifier root) throws Exception
 	{
 		Map	user	= new HashMap();
 		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
 		user.put(CONTEXT_ENTRIES, report);
 		MBpmnModel ret = (MBpmnModel)reader.read(rinfo.getInputStream(), classloader, user);
-		
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
-		ret.setResourceIdentifier(rid);
 //		ret.setClassloader(classloader);
 		String name = new File(rinfo.getFilename()).getName();
 		name = name.substring(0, name.length()-5);
-		ret.setName(name);	
+		ret.setName(name);
+		
+		if(rid==null)
+		{
+			String src = SUtil.getCodeSource(rinfo.getFilename(), ((ModelInfo)ret.getModelInfo()).getPackage());
+			URL url = SUtil.toURL(src);
+			rid = new ResourceIdentifier(new LocalResourceIdentifier(root, url), null);
+		}
+		ret.setResourceIdentifier(rid);
+		
 		ret.initModelInfo();
 		rinfo.getInputStream().close();
 		
@@ -216,7 +228,6 @@ public class BpmnXMLReader
 			report.put(new Tuple(new Object[]{new StackElement(new QName("BpmnDiagram"), ret)}), "Package '"+ret.getModelInfo().getPackage()+"' does not match file name '"+ret.getModelInfo().getFilename()+"'.");				
 		}
 
-		
 		if(report.size()>0)
 		{
 //			System.out.println("Error loading model: "+rinfo.getFilename()+" "+report);
