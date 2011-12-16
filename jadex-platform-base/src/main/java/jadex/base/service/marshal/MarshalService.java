@@ -105,7 +105,7 @@ public class MarshalService extends BasicService implements IMarshalService
 	{
 		references = Collections.synchronizedMap(new LRU<Class<?>, boolean[]>(500));
 //		processors = Collections.synchronizedList(new ArrayList<ITraverseProcessor>());
-		processors = Collections.synchronizedList(Traverser.getDefaultProcessors(true));
+		processors = Collections.synchronizedList(Traverser.getDefaultCloneProcessors());
 				
 		// Problem: if micro agent implements a service it cannot
 		// be determined if the service or the agent should be transferred.

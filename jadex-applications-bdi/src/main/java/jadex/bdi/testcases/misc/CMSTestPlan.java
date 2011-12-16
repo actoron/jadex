@@ -60,7 +60,7 @@ public class CMSTestPlan extends Plan
 		getLogger().info("\nSearching for all agents.");
 		IComponentManagementService amsservice = (IComponentManagementService)SServiceProvider.getServiceUpwards(
 			getServiceContainer(), IComponentManagementService.class).get(this);
-		IComponentDescription desc = new CMSComponentDescription(null, null, null, null, null, null, null);
+		IComponentDescription desc = new CMSComponentDescription(null, null, null, null, null, null, null, null);
 //		IComponentDescription desc = amsservice.createComponentDescription(null, null, null, null, null, null);
 		ISearchConstraints constraints = new SearchConstraints(-1, 0);
 //		ISearchConstraints constraints = amsservice.createSearchConstraints(-1, 0);
@@ -115,7 +115,7 @@ public class CMSTestPlan extends Plan
 			getLogger().info("\nSearching for agent.");
 			
 //			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null);
-			desc = new CMSComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null, null);
+			desc = new CMSComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null, null, null);
 //			constraints = amsservice.createSearchConstraints(-1, 0);
 			constraints = new SearchConstraints(-1, 0);
 		
@@ -215,7 +215,7 @@ public class CMSTestPlan extends Plan
 			
 //			desc = amsservice.createComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null);
 //			constraints = amsservice.createSearchConstraints(-1, 0);
-			desc = new CMSComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null, null);
+			desc = new CMSComponentDescription((IComponentIdentifier)create.getParameter("componentidentifier").getValue(), null, null, null, null, null, null, null);
 			constraints = new SearchConstraints(-1, 0);
 			
 			search	= createGoal("cmscap.cms_search_components");

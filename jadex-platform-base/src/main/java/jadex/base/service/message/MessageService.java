@@ -303,7 +303,7 @@ public class MessageService extends BasicService implements IMessageService
 		// Conversion via platform specific codecs
 		// Hack?! Preprocess content to enhance component identifiers.
 		IContentCodec[] compcodecs = getContentCodecs(comp.getModel(), cl);
-		List<ITraverseProcessor> procs = Traverser.getDefaultProcessors(false);
+		List<ITraverseProcessor> procs = Traverser.getDefaultTraversalProcessors();
 		procs.add(1, new ITraverseProcessor()
 		{
 			public Object process(Object object, Class clazz,
