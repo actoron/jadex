@@ -3,7 +3,6 @@ package sodekovs.util.test;
 import java.io.IOException;
 import java.sql.Connection;
 
-import sodekovs.util.misc.WalkingStrategyEnum;
 
 public class Test1 {
 
@@ -16,7 +15,7 @@ public class Test1 {
 //			
 //		}
 //		WalkingStrategyEnum p = WalkingStrategyEnum.randomly;
-		System.out.println(WalkingStrategyEnum.valueOf("randomly").ordinal());
+//		System.out.println(WalkingStrategyEnum.valueOf("randomly").ordinal());
 		
 		// TODO Auto-generated method stub
 		
