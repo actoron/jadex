@@ -1,0 +1,17 @@
+.desc
+{
+	font-style: italic;
+}
+
+.even
+{
+	background-color: silver;
+}
+.odd
+{
+	background-color: menu;
+}
+.highlight
+{
+	background-color: highlight;
+}

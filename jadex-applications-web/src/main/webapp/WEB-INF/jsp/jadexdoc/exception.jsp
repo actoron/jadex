@@ -1,5 +1,5 @@
 <%
-	Exception	exception	= (Exception)request.getAttribute("exception");
+	Exception	exception	= (Exception)request.getSession().getAttribute("exception");
 %>
 <html>
 	<head>

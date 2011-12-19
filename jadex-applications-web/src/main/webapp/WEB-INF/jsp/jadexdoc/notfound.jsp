@@ -1,5 +1,5 @@
 <%
-	String	model	= (String)request.getAttribute("model");
+	String	model	= (String)request.getSession().getAttribute("model");
 %>
 <html>
 	<head>

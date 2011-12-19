@@ -70,21 +70,23 @@ public class JadexdocServlet extends HttpServlet
 			{
 				int	timeout	= 30000;
 				ThreadSuspendable	sus	= new ThreadSuspendable();
-				IModelInfo	model	= SComponentFactory.loadModel(platform, request.getPathInfo(), null).get(sus, timeout);
+//				String	file	= request.getPathInfo();
+				String	file	= request.getParameter("model");
+				IModelInfo	model	= SComponentFactory.loadModel(platform, file, null).get(sus, timeout);
 				if(model!=null)
 				{
-					request.setAttribute("model", model);
+					request.getSession().setAttribute("model", model);
 					view	= "/WEB-INF/jsp/jadexdoc/model.jsp";
 				}
 				else
 				{
-					request.setAttribute("model", request.getPathInfo());
+					request.getSession().setAttribute("model", request.getPathInfo());
 					view	= "/WEB-INF/jsp/jadexdoc/notfound.jsp";
 				}
 			}
 			catch(Exception e)
 			{
-				request.setAttribute("exception", e);
+				request.getSession().setAttribute("exception", e);
 				view	= "/WEB-INF/jsp/jadexdoc/exception.jsp";				
 			}
 //		}

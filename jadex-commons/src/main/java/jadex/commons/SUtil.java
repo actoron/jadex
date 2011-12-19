@@ -2024,16 +2024,25 @@ public class SUtil
 	 */
 	public static String getCodeSource(String filename, String pck)
 	{
+		// Use unix separator for file or jar URLs.
+		char	sep	= filename.startsWith("file:") || filename.startsWith("jar:file:") ? '/' : File.separatorChar;
 		int occ = pck!=null? countOccurrences(pck, '.')+2: 1;
 		String ret = filename;
 		for(int i=0; i<occ; i++)
 		{
-			int idx = ret.lastIndexOf(File.separatorChar);
+			int idx = ret.lastIndexOf(sep);
 			if(idx>0)
 				ret = ret.substring(0, idx);
 			else
 				throw new RuntimeException("Corrupt filename: "+filename);
 		}
+		
+		if(ret.startsWith("jar:file:") && ret.endsWith("!"))
+		{
+			// Strip 'jar:' and '!', because java.net.URL doesn't like jar URLs without...
+			ret	= ret.substring(4, ret.length()-1);
+		}
+		
 		return ret;
 	}
 	

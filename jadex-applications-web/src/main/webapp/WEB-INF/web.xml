@@ -26,6 +26,18 @@
     <url-pattern>/puzzle/*</url-pattern>
   </servlet-mapping>
   <servlet>
+    <servlet-name>Jaxcent</servlet-name>
+    <servlet-class>jadex.web.tools.jadexdoc.JaxcentFixServlet</servlet-class>
+    <init-param>
+    	<param-name>JaxcentConfigXML</param-name>
+    	<param-value>WEB-INF/jsp/jadexdoc/jaxcent_config.xml</param-value>
+    </init-param>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Jaxcent</servlet-name>
+    <url-pattern>/jaxcent/JaxcentServlet21</url-pattern>
+  </servlet-mapping>
+  <servlet>
     <servlet-name>Jadexdoc</servlet-name>
     <servlet-class>jadex.web.tools.jadexdoc.JadexdocServlet</servlet-class>
   </servlet>
