@@ -19,6 +19,7 @@ import java.net.InetAddress;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -1884,6 +1885,151 @@ public class SUtil
 		{
 			((ListenableStream)((AccessiblePrintStream)System.err).out).removeLineListener(listener);
 		}
+	}
+	
+	/**
+	 *  Get the source code base using a packagename and a filename.
+	 *  Looks at the filename and subtracts the package name.
+	 *  @param filename The filename.
+	 *  @param pck The package name.
+	 *  @return The source base. 
+	 */
+	public static String getCodeSource(String filename, String pck)
+	{
+		int occ = pck!=null? countOccurrences(pck, '.')+2: 1;
+		String ret = filename;
+		for(int i=0; i<occ; i++)
+		{
+			int idx = ret.lastIndexOf(File.separatorChar);
+			if(idx>0)
+				ret = ret.substring(0, idx);
+			else
+				throw new RuntimeException("Corrupt filename: "+filename);
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Count the occurrences of a char in a string.
+	 *  @param string The string.
+	 *  @param find The char to find.
+	 *  @return The number of occurrences.
+	 */
+	public static int countOccurrences(String string, char find)
+	{
+	    int count = 0;
+	    for(int i=0; i < string.length(); i++)
+	    {
+	        if(string.charAt(i) == find)
+	        {
+	             count++;
+	        }
+	    }
+	    return count;
+	}
+	
+	/**
+	 *  Get the addresses to be used for transports.
+	 */
+	public static String[]	getNetworkAddresses() throws SocketException
+	{
+		// Determine useful transport addresses.
+		Set<String>	addresses	= new HashSet<String>();	// global network addresses (uses all)
+		Set<InetAddress>	sitelocal	= new HashSet<InetAddress>();	// local network addresses e.g. 192.168.x.x (use one v4 and one v6 if no global)
+		Set<InetAddress>	linklocal	= new HashSet<InetAddress>();	// link-local fallback addresses e.g. 169.254.x.x (use one v4 and one v6 if no global or local)
+		Set<InetAddress>	loopback	= new HashSet<InetAddress>();	// loopback addresses e.g. 127.0.0.1 (use one v4 and one v6 if no global or local or link-local)
+		
+		boolean	v4	= false;	// true when one v4 address was added.
+		boolean	v6	= false;	// true when one v6 address was added.
+		
+		for(Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces(); nis.hasMoreElements(); )
+		{
+			NetworkInterface ni = nis.nextElement();
+			for(Enumeration<InetAddress> iadrs = ni.getInetAddresses(); iadrs.hasMoreElements(); )
+			{
+				InetAddress addr = iadrs.nextElement();
+//				System.out.println("addr: "+addr+" "+addr.isAnyLocalAddress()+" "+addr.isLinkLocalAddress()+" "+addr.isLoopbackAddress()+" "+addr.isSiteLocalAddress()+", "+ni.getDisplayName());
+				if(addr.isLoopbackAddress())
+				{
+					loopback.add(addr);
+				}
+				else if(addr.isLinkLocalAddress())
+				{
+					linklocal.add(addr);
+				}
+				else if(addr.isSiteLocalAddress())
+				{
+					sitelocal.add(addr);
+				}
+				else
+				{
+					v4	= v4 || addr instanceof Inet4Address;
+					v6	= v6 || addr instanceof Inet6Address;
+					addresses.add(addr.getHostAddress());
+				}
+			}
+		}
+
+		boolean	tmpv4	= v4;
+		boolean	tmpv6	= v6;
+		for(Iterator<InetAddress> it=sitelocal.iterator(); it.hasNext(); )
+		{
+			InetAddress	addr	= it.next();
+			if(!tmpv4 && addr instanceof Inet4Address || !tmpv6 && addr instanceof Inet6Address)
+			{
+				v4	= v4 || addr instanceof Inet4Address;
+				v6	= v6 || addr instanceof Inet6Address;
+				addresses.add(addr.getHostAddress());
+			}
+		}
+		
+		tmpv4	= v4;
+		tmpv6	= v6;
+		for(Iterator<InetAddress> it=linklocal.iterator(); it.hasNext(); )
+		{
+			InetAddress	addr	= it.next();
+			if(!tmpv4 && addr instanceof Inet4Address || !tmpv6 && addr instanceof Inet6Address)
+			{
+				v4	= v4 || addr instanceof Inet4Address;
+				v6	= v6 || addr instanceof Inet6Address;
+				addresses.add(addr.getHostAddress());
+			}
+		}
+		
+		tmpv4	= v4;
+		tmpv6	= v6;
+		for(Iterator<InetAddress> it=loopback.iterator(); it.hasNext(); )
+		{
+			InetAddress	addr	= it.next();
+			if(!tmpv4 && addr instanceof Inet4Address || !tmpv6 && addr instanceof Inet6Address)
+			{
+				v4	= v4 || addr instanceof Inet4Address;
+				v6	= v6 || addr instanceof Inet6Address;
+				addresses.add(addr.getHostAddress());
+			}
+		}
+		
+//		InetAddress iaddr = InetAddress.getLocalHost();
+//		String lhostname = iaddr.getCanonicalHostName();
+//		InetAddress[] laddrs = InetAddress.getAllByName(lhostname);
+//
+//		addrs.add(getAddress(iaddr.getHostAddress(), this.port));
+//		// Get the ip addresses
+//		for(int i=0; i<laddrs.length; i++)
+//		{
+//			String hostname = laddrs[i].getHostName().toLowerCase();
+//			String ip_addr = laddrs[i].getHostAddress();
+//			addrs.add(getAddress(ip_addr, this.port));
+//			if(!ip_addr.equals(hostname))
+//			{
+//				// We have a fully qualified domain name.
+//				addrs.add(getAddress(hostname, this.port));
+//			}
+//		}
+		
+//		System.out.println("addresses: "+addresses);
+		
+		return (String[])addresses.toArray(new String[addresses.size()]);		
 	}
 	
 	/**
