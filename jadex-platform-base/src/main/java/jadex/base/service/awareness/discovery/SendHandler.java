@@ -4,6 +4,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
@@ -56,15 +58,25 @@ public abstract class SendHandler
 			@XMLClassname("send")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				final IComponentStep<Void> step = this;
+				final Future<Void> ret = new Future<Void>();
 				if(!agent.isKilled() && sendid.equals(getSendId()))
 				{
 //						System.out.println(System.currentTimeMillis()+" sending: "+getComponentIdentifier());
-					send(createAwarenessInfo());
+					createAwarenessInfo().addResultListener(agent.getMicroAgent()
+						.createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
+					{
+						public void customResultAvailable(AwarenessInfo info)
+						{
+							send(info);
+							if(agent.getDelay()>0)
+								agent.doWaitFor(agent.getDelay(), step);
+							ret.setResult(null);
+						}
+					}));
 					
-					if(agent.getDelay()>0)
-						agent.doWaitFor(agent.getDelay(), this);
 				}
-				return IFuture.DONE;
+				return ret;
 			}
 		});
 	}
@@ -90,7 +102,7 @@ public abstract class SendHandler
 	/**
 	 *  Create the awareness info.
 	 */
-	public AwarenessInfo createAwarenessInfo()
+	public IFuture<AwarenessInfo> createAwarenessInfo()
 	{
 		return agent.createAwarenessInfo();
 	}

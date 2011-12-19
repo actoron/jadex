@@ -3,9 +3,10 @@ package jadex.base.service.awareness.discovery;
 import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -14,8 +15,10 @@ import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -24,8 +27,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * 
+ *  Base class for different kinds of discovery agents.
  */
+@RequiredServices(@RequiredService(name="ms", type=IMessageService.class, 
+	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 public abstract class DiscoveryAgent
 {
 	//-------- attributes --------
@@ -128,19 +133,28 @@ public abstract class DiscoveryAgent
 	 *  @return The result of the component.
 	 */
 	@AgentKilled
-	public IFuture agentKilled()
+	public IFuture<Void> agentKilled()
 	{
+		final Future<Void> ret = new Future<Void>();
 		setKilled(true);
 		
 		if(sender!=null)
 		{
-			sender.send(createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId()));
+			createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId())
+				.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
+			{
+				public void customResultAvailable(AwarenessInfo info)
+				{
+					sender.send(info);
+					terminateNetworkRessource();
+					ret.setResult(null);
+				}
+			}));
 		}
 		
-		terminateNetworkRessource();
 //		System.out.println("killed set to true: "+getComponentIdentifier());
 		
-		return IFuture.DONE;
+		return ret;
 	}
 	
 	/**
@@ -389,17 +403,51 @@ public abstract class DiscoveryAgent
 	/**
 	 *  Create awareness info of myself.
 	 */
-	public AwarenessInfo createAwarenessInfo()
+	public IFuture<AwarenessInfo> createAwarenessInfo()
 	{
-		return new AwarenessInfo(getRoot(), AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), getExcludes(), null);
+		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
+		IFuture<IMessageService> fut = agent.getServiceContainer().getRequiredService("ms");
+		fut.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IMessageService, AwarenessInfo>(ret)
+		{
+			public void customResultAvailable(IMessageService cms)
+			{
+				cms.updateComponentIdentifier(getRoot()).addResultListener(agent.createResultListener(
+					new ExceptionDelegationResultListener<IComponentIdentifier, AwarenessInfo>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier root)
+					{
+						AwarenessInfo info = new AwarenessInfo(root, AwarenessInfo.STATE_ONLINE, getDelay(), getIncludes(), getExcludes(), null);
+						ret.setResult(info);
+					}
+				}));
+			}
+		}));
+		return ret;
 	}
 	
 	/**
 	 *  Create awareness info of myself.
 	 */
-	public AwarenessInfo createAwarenessInfo(String state, String masterid)
+	public IFuture<AwarenessInfo> createAwarenessInfo(final String state, final String masterid)
 	{
-		return new AwarenessInfo(getRoot(), state, getDelay(), getIncludes(), getExcludes(), masterid);
+		final Future<AwarenessInfo> ret = new Future<AwarenessInfo>();
+		IFuture<IMessageService> fut = agent.getServiceContainer().getRequiredService("ms");
+		fut.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IMessageService, AwarenessInfo>(ret)
+		{
+			public void customResultAvailable(IMessageService cms)
+			{
+				cms.updateComponentIdentifier(getRoot()).addResultListener(agent.createResultListener(
+					new ExceptionDelegationResultListener<IComponentIdentifier, AwarenessInfo>(ret)
+				{
+					public void customResultAvailable(IComponentIdentifier root)
+					{
+						AwarenessInfo info = new AwarenessInfo(getRoot(), state, getDelay(), getIncludes(), getExcludes(), masterid);
+						ret.setResult(info);
+					}
+				}));
+			}
+		}));
+		return ret;
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package jadex.xml.writer;
 
 import jadex.xml.IContext;
+import jadex.xml.IPreProcessor;
 import jadex.xml.TypeInfo;
 
 /* $if !android $ */
@@ -40,4 +41,10 @@ public interface IObjectWriterHandler
 	 *  @param typeinfo The Typeinfo.
 	 */
 	public WriteObjectInfo getObjectWriteInfo(Object object, TypeInfo typeinfo, IContext context) throws Exception;
+
+	/**
+	 *  Get the pre-processor.
+	 *  @return The pre-processor
+	 */
+	public IPreProcessor[] getPreProcessors(Object object, Object typeinfo);
 }

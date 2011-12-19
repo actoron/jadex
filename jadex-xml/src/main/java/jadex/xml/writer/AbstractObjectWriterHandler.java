@@ -5,6 +5,8 @@ import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectStringConverter;
+import jadex.xml.IPostProcessor;
+import jadex.xml.IPreProcessor;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.SubobjectInfo;
@@ -435,6 +437,16 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			ret = ((AttributeInfo)property).getAccessInfo().getDefaultValue();
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Get the pre-processors.
+	 *  @return The pre-processors.
+	 */
+	public IPreProcessor[] getPreProcessors(Object object, Object typeinfo)
+	{
+		IPreProcessor pp = typeinfo instanceof TypeInfo? ((TypeInfo)typeinfo).getPreProcessor(): null;
+		return pp==null? null: new IPreProcessor[]{pp};
 	}
 	
 	/**

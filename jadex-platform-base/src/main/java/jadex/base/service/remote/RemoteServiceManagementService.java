@@ -26,6 +26,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
+import jadex.commons.IFilter;
 import jadex.commons.IRemotable;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
@@ -146,41 +147,16 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		this.marshal = marshal;
 		this.msgservice = msgservice;
 		
+		
+		// Reader that supports conversion of proxyinfo to proxy.
+		
 		QName[] pr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyReference")};
 		
 		Set typeinfosread = JavaReader.getTypeInfos();
 		TypeInfo ti_rr = new TypeInfo(new XMLInfo(pr), 
 			new ObjectInfo(ProxyReference.class, new RMIPostProcessor(rrm)));
 		typeinfosread.add(ti_rr);
-		
-		Set typeinfoswrite = JavaWriter.getTypeInfos();
-		final RMIPreProcessor preproc = new RMIPreProcessor(rrm);
-		TypeInfo ti_proxyable = new TypeInfo(new XMLInfo(pr, null, false, preproc), 
-			new ObjectInfo(IRemotable.class));
-		typeinfoswrite.add(ti_proxyable);
-		
-		// Component identifier enhancement now done in MessageService sendMessage
-//		QName[] ppr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge", "ComponentIdentifier")};
-//		final IComponentIdentifier root = component.getComponentIdentifier().getRoot();
-//		IPreProcessor pp = new IPreProcessor()
-//		{
-//			public Object preProcess(IContext context, Object object)
-//			{
-//				IComponentIdentifier src = (IComponentIdentifier)object;
-//				ComponentIdentifier ret = null;
-//				if(src.getPlatformName().equals(root.getLocalName()))
-//				{
-//					String[] addresses = (String[])((Object[])context.getUserContext())[1];
-//					ret = new ComponentIdentifier(src.getName(), addresses);
-////					System.out.println("Rewritten cid: "+ret);
-//				}
-//				
-//				return ret==null? src: ret;
-//			}
-//		};
-//		TypeInfo ti_cids = new TypeInfo(new XMLInfo(ppr, pp), new ObjectInfo(IComponentIdentifier.class));
-//		typeinfoswrite.add(ti_cids);
-		
+				
 		this.reader = new Reader(new TypeInfoPathManager(typeinfosread), false, false, false, new XMLReporter()
 		{
 			public void report(String message, String error, Object info, Location location)
@@ -190,47 +166,113 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				errors.add(new Tuple(new Object[]{message, error, info, location}));
 			}
 		}, new BeanObjectReaderHandler(typeinfosread));
-		this.writer = new Writer(new BeanObjectWriterHandler(typeinfoswrite, true))
+		
+		
+		// Writer that supports conversion :
+		// isRemoteReference to remote reference
+		// pojo services to underlying service proxies 
+		// enhance component identifier with addresses
+		
+		Set typeinfoswrite = JavaWriter.getTypeInfos();
+		final RMIPreProcessor preproc = new RMIPreProcessor(rrm);
+		
+//		TypeInfo ti_proxyable = new TypeInfo(new XMLInfo(pr, null, false, preproc), 
+//			new ObjectInfo(IRemotable.class));
+//		typeinfoswrite.add(ti_proxyable);
+		
+		// Component identifier enhancement now done in MessageService sendMessage
+		QName[] ppr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge", "ComponentIdentifier")};
+		final IComponentIdentifier root = component.getComponentIdentifier().getRoot();
+		IPreProcessor cidpp = new IPreProcessor()
 		{
-			public void writeObject(WriteContext wc, Object object, QName tag) throws Exception 
+			public Object preProcess(IContext context, Object object)
 			{
-				// todo: cleanup rmi pre/postprocessing 
-				// extra preprocessing of commands should be removed
-				// should instead use ifReference() with context information (how/where to express?)
-				
-//				System.out.println("object: "+object);
-//				if(object instanceof RemoteResultCommand)
-//					System.out.println("huhuhu");
-				
-				if(marshal.isRemoteReference(object))
+				IComponentIdentifier src = (IComponentIdentifier)object;
+				ComponentIdentifier ret = null;
+				if(src.getPlatformName().equals(root.getLocalName()))
 				{
-//					System.out.println("changed: "+object.getClass()+" "+object);
-					object = preproc.preProcess(wc, object);
-				}
-//				else
-//				{
-//					System.out.println("kept: "+object.getClass()+" "+object);
-//				}
-				
-				// Perform pojo service replacement (for local and remote calls).
-				// Test if it is pojo service impl.
-				// Has to be mapped to new proxy then
-				
-				if(object!=null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class))
-				{
-//					System.out.println("test");
-					// Check if the argument type refers to the pojo service
-//					Service ser = object.getClass().getAnnotation(Service.class);
-//					if(SReflect.isSupertype(ser.value(), sic.getMethod().getParameterTypes()[i]))
-					{
-						object = BasicServiceInvocationHandler.getPojoServiceProxy(object);
-//						System.out.println("proxy: "+object);
-					}
+					Object[] oa = (Object[])context.getUserContext();
+					if(!(oa[1] instanceof String[]))
+						System.out.println("schrott3");
+					String[] addresses = (String[])((Object[])context.getUserContext())[1];
+					ret = new ComponentIdentifier(src.getName(), addresses);
+//					System.out.println("Rewritten cid: "+ret);
 				}
 				
-				super.writeObject(wc, object, tag);
-			};
+				return ret==null? src: ret;
+			}
 		};
+		TypeInfo ti_cids = new TypeInfo(new XMLInfo(ppr, cidpp), new ObjectInfo(IComponentIdentifier.class));
+		typeinfoswrite.add(ti_cids);
+		
+		BeanObjectWriterHandler wh = new BeanObjectWriterHandler(typeinfoswrite, true);
+		
+		// Add pre processor thst maps pojo services to underlying service proxies 
+		// (have to be processed further with RMIPreprocessor)
+		wh.addPreProcessor(new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+				return obj!=null && !(obj instanceof BasicService) && obj.getClass().isAnnotationPresent(Service.class);
+			}
+		}, new IPreProcessor()
+		{
+			public Object preProcess(IContext context, Object object)
+			{
+				return BasicServiceInvocationHandler.getPojoServiceProxy(object);
+			}
+		});
+		
+		// Add preprocessor that tests if is remote reference and replaces with 
+		wh.addPreProcessor(new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+				return marshal.isRemoteReference(obj);
+			}
+		}, preproc);
+		
+		this.writer = new Writer(wh);
+//		{
+//			public void writeObject(WriteContext wc, Object object, QName tag) throws Exception 
+//			{
+//				// todo: cleanup rmi pre/postprocessing 
+//				// extra preprocessing of commands should be removed
+//				// should instead use ifReference() with context information (how/where to express?)
+//				
+////				System.out.println("object: "+object);
+////				if(object instanceof RemoteResultCommand)
+////					System.out.println("huhuhu");
+//				
+//				if(marshal.isRemoteReference(object))
+//				{
+////					System.out.println("changed: "+object.getClass()+" "+object);
+//					object = preproc.preProcess(wc, object);
+//				}
+////				else
+////				{
+////					System.out.println("kept: "+object.getClass()+" "+object);
+////				}
+//				
+//				// Perform pojo service replacement (for local and remote calls).
+//				// Test if it is pojo service impl.
+//				// Has to be mapped to new proxy then
+//				
+//				if(object!=null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class))
+//				{
+////					System.out.println("test");
+//					// Check if the argument type refers to the pojo service
+////					Service ser = object.getClass().getAnnotation(Service.class);
+////					if(SReflect.isSupertype(ser.value(), sic.getMethod().getParameterTypes()[i]))
+//					{
+//						object = BasicServiceInvocationHandler.getPojoServiceProxy(object);
+////						System.out.println("proxy: "+object);
+//					}
+//				}
+//				
+//				super.writeObject(wc, object, tag);
+//			};
+//		};
 	}
 	
 	//-------- methods --------
@@ -551,7 +593,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 										{
 											public void resultAvailable(Object result)
 											{
-												ClassLoader cl = (ClassLoader)result;
+												final ClassLoader cl = (ClassLoader)result;
 												
 												// todo: use rid of sender?! (not important as writer does not use classloader, only nuggets)
 		//										ClassLoader cl = ls.getClassLoader(component.getModel().getResourceIdentifier());
@@ -562,8 +604,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //												System.out.println("RMS sending to: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
 //												try
 //												{
-													String cont = Writer.objectToXML(getWriter(), content, cl, new Object[]{receiver, msgservice.getAddresses()});
-													msg.put(SFipa.CONTENT, cont);
+													msgservice.getAddresses().addResultListener(new DefaultResultListener<String[]>()
+													{
+														public void resultAvailable(String[] addresses)
+														{
+															String cont = Writer.objectToXML(getWriter(), content, cl, new Object[]{receiver, addresses});
+															msg.put(SFipa.CONTENT, cont);
+														}
+													});
 //												}
 //												catch(RuntimeException e)
 //												{

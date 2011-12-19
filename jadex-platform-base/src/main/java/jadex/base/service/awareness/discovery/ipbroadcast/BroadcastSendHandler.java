@@ -1,15 +1,16 @@
 package jadex.base.service.awareness.discovery.ipbroadcast;
 
+import jadex.base.service.awareness.discovery.DiscoveryAgent;
+import jadex.base.service.awareness.discovery.MasterSlaveSendHandler;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
+
 import java.net.DatagramPacket;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-
-import jadex.base.service.awareness.discovery.DiscoveryState;
-import jadex.base.service.awareness.discovery.MasterSlaveSendHandler;
-import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.commons.SUtil;
 
 /**
  *  Handle sending.
@@ -27,7 +28,7 @@ public class BroadcastSendHandler extends MasterSlaveSendHandler
 	/**
 	 *  Create the awareness info.
 	 */
-	public AwarenessInfo createAwarenessInfo()
+	public IFuture<AwarenessInfo> createAwarenessInfo()
 	{
 		return agent.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, getAgent().createMasterId());
 	}
@@ -39,7 +40,7 @@ public class BroadcastSendHandler extends MasterSlaveSendHandler
 	{
 		try
 		{
-			byte[] data = DiscoveryState.encodeObject(info, getAgent().getMicroAgent().getClassLoader());
+			byte[] data = DiscoveryAgent.encodeObject(info, getAgent().getMicroAgent().getClassLoader());
 	
 //			System.out.println("packet size: "+data.length);
 

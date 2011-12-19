@@ -1,6 +1,7 @@
 package jadex.base.service.message;
 
 import jadex.base.AbstractComponentAdapter;
+import jadex.base.fipa.SFipa;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.base.service.message.transport.codecs.ICodec;
@@ -177,7 +178,7 @@ public class MessageService extends BasicService implements IMessageService
 			System.out.println("msgservice sendMessage(): "+rid);
 		
 		final Future<Void> ret = new Future<Void>();
-		final IComponentIdentifier sender = updateComponentIdentifier(osender);
+		final IComponentIdentifier sender = internalUpdateComponentIdentifier(osender);
 		
 		libservice.getClassLoader(rid)
 			.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
@@ -310,7 +311,7 @@ public class MessageService extends BasicService implements IMessageService
 				List<ITraverseProcessor> processors, Traverser traverser,
 				Map<Object, Object> traversed)
 			{
-				return updateComponentIdentifier((IComponentIdentifier)object);
+				return internalUpdateComponentIdentifier((IComponentIdentifier)object);
 			}
 			
 			public boolean isApplicable(Object object, Class clazz)
@@ -324,6 +325,7 @@ public class MessageService extends BasicService implements IMessageService
 			String	name	= (String)it.next();
 			Object	value	= msgcopy.get(name);
 			value = Traverser.traverseObject(value, procs);
+			msgcopy.put(name, value);
 			
 			IContentCodec codec = type.findContentCodec(compcodecs, msg, name);
 			if(codec==null)
@@ -341,7 +343,11 @@ public class MessageService extends BasicService implements IMessageService
 				return;
 			}
 		}
-
+		
+		IComponentIdentifier sender = (IComponentIdentifier)msgcopy.get(type.getSenderIdentifier());
+		if(sender.getAddresses()==null || sender.getAddresses().length==0)
+			System.out.println("schrott2");
+		
 		IFilter[] fils;
 		IMessageListener[] lis;
 		synchronized(this)
@@ -526,7 +532,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Get the adresses of a component.
 	 *  @return The addresses of this component.
 	 */
-	public String[] getAddresses()
+	public String[] internalGetAddresses()
 	{
 		if(addresses == null)
 		{
@@ -542,6 +548,15 @@ public class MessageService extends BasicService implements IMessageService
 		}
 
 		return addresses;
+	}
+	
+	/**
+	 *  Get the adresses of a component.
+	 *  @return The addresses of this component.
+	 */
+	public IFuture<String[]> getAddresses()
+	{
+		return new Future<String[]>(internalGetAddresses());
 	}
 	
 	/**
@@ -925,16 +940,28 @@ public class MessageService extends BasicService implements IMessageService
 	
 	/**
 	 *  Update component identifier.
+	 *  @param cid The component identifier.
+	 *  @return The component identifier.
 	 */
-	public IComponentIdentifier updateComponentIdentifier(IComponentIdentifier src)
+	public IComponentIdentifier internalUpdateComponentIdentifier(IComponentIdentifier cid)
 	{
 		ComponentIdentifier ret = null;
-		if(src.getPlatformName().equals(component.getComponentIdentifier().getRoot().getLocalName()))
+		if(cid.getPlatformName().equals(component.getComponentIdentifier().getRoot().getLocalName()))
 		{
-			ret = new ComponentIdentifier(src.getName(), getAddresses());
-//			System.out.println("Rewritten cid: "+ret);
+			ret = new ComponentIdentifier(cid.getName(), internalGetAddresses());
+//			System.out.println("Rewritten cid: "+ret+" :"+SUtil.arrayToString(ret.getAddresses()));
 		}
-		return ret==null? src: ret;
+		return ret==null? cid: ret;
+	}
+	
+	/**
+	 *  Update component identifier.
+	 *  @param cid The component identifier.
+	 *  @return The component identifier.
+	 */
+	public IFuture<IComponentIdentifier> updateComponentIdentifier(IComponentIdentifier cid)
+	{
+		return new Future<IComponentIdentifier>(internalUpdateComponentIdentifier(cid));
 	}
 	
 	//-------- internal methods --------
@@ -946,6 +973,11 @@ public class MessageService extends BasicService implements IMessageService
 	{
 		final MessageType	messagetype	= getMessageType(type);
 		final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
+		
+		// Content decoding works as follows:
+		// Find correct classloader for each receiver by
+		// a) if message contains rid ask library service for classloader (global rids are resolved with maven, locals possibly with peer to peer jar transfer)
+		// b) if library service could not resolve rid or message does not contain rid the receiver classloader can be used
 		
 		getRIDClassLoader(msg, getMessageType(type)).addResultListener(new DefaultResultListener<ClassLoader>()
 		{
@@ -1074,7 +1106,7 @@ public class MessageService extends BasicService implements IMessageService
 	}
 	
 	/**
-	 * 
+	 *  Get the classloader for a resource identifier.
 	 */
 	protected IFuture<ClassLoader> getRIDClassLoader(Map msg, MessageType mt)
 	{
@@ -1086,11 +1118,15 @@ public class MessageService extends BasicService implements IMessageService
 		if(rid!=null)
 		{
 			IFuture<ILibraryService> fut = SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class);
-			fut.addResultListener(new DefaultResultListener<ILibraryService>()
+			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
 			{
-				public void resultAvailable(ILibraryService ls)
+				public void customResultAvailable(ILibraryService ls)
 				{
 					ls.getClassLoader(rid).addResultListener(new DelegationResultListener<ClassLoader>(ret));
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					super.resultAvailable(null);
 				}
 			});
 		}
@@ -1395,6 +1431,10 @@ public class MessageService extends BasicService implements IMessageService
 		 */
 		public void addMessage(Map message, String type, IComponentIdentifier[] receivers)
 		{
+			IComponentIdentifier sender = (IComponentIdentifier)message.get(getMessageType(type).getSenderIdentifier());
+			if(sender.getAddresses()==null || sender.getAddresses().length==0)
+				System.out.println("schrott: "+sender);
+			
 			synchronized(this)
 			{
 				messages.add(new Object[]{message, type, receivers});

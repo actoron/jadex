@@ -1,5 +1,6 @@
 package jadex.xml.bean;
 
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.xml.AccessInfo;
@@ -7,6 +8,8 @@ import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
 import jadex.xml.IAttributeConverter;
 import jadex.xml.IContext;
+import jadex.xml.IPostProcessor;
+import jadex.xml.IPreProcessor;
 import jadex.xml.ISubObjectConverter;
 import jadex.xml.Namespace;
 import jadex.xml.ObjectInfo;
@@ -23,10 +26,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-/* $if !android $ */
 import javax.xml.namespace.QName;
 /* $else $
 import javaxx.xml.namespace.QName;
@@ -50,6 +55,9 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/** No type infos. */
 	protected Set no_typeinfos;
 		
+	/** The filter based post processors. */
+	protected Map<IFilter, IPreProcessor> preprocessors;
+	
 	//-------- constructors --------
 	
 	/**
@@ -501,6 +509,55 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 *  Get the pre-processor.
+	 *  @return The pre-processor
+	 */
+	public synchronized IPreProcessor[] getPreProcessors(Object object, Object typeinfo)
+	{
+		List<IPreProcessor> ret = new ArrayList<IPreProcessor>();
+		
+		IPreProcessor tiproc = typeinfo instanceof TypeInfo? ((TypeInfo)typeinfo).getPreProcessor(): null;
+		if(tiproc!=null)
+			ret.add(tiproc);
+		
+		if(preprocessors!=null)
+		{
+			for(Iterator<IFilter> it = preprocessors.keySet().iterator(); it.hasNext(); )
+			{
+				IFilter fil = it.next();
+				if(fil.filter(object))
+				{
+					ret.add(preprocessors.get(fil));
+				}
+			}
+		}
+		
+		return ret.toArray(new IPreProcessor[ret.size()]);
+	}
+	
+	/**
+	 *  Add a pre processor.
+	 *  @param filter The filter.
+	 *  @param processor The pre processor.
+	 */
+	public synchronized void addPreProcessor(IFilter filter, IPreProcessor processor)
+	{
+		if(preprocessors==null)
+			preprocessors = new LinkedHashMap<IFilter, IPreProcessor>();
+		preprocessors.put(filter, processor);
+	}
+	/**
+	 *  Remove a pre processor.
+	 *  @param filter The filter.
+	 *  @param processor The pre processor.
+	 */
+	public synchronized void removePreProcessor(IFilter filter)
+	{
+		if(preprocessors!=null)
+			preprocessors.remove(filter);
 	}
 }
 

@@ -7,6 +7,7 @@ import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IManagementService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -95,7 +96,7 @@ public abstract class ReceiveHandler
 											{
 												try
 												{
-													AwarenessInfo info = (AwarenessInfo)DiscoveryState.decodeObject((byte[])packet[2], agent.getMicroAgent().getClassLoader());
+													AwarenessInfo info = (AwarenessInfo)DiscoveryAgent.decodeObject((byte[])packet[2], agent.getMicroAgent().getClassLoader());
 //													System.out.println("received info: "+info);
 													handleReceivedPacket((InetAddress)packet[0], ((Integer)packet[1]).intValue(), (byte[])packet[2], info);
 												}
@@ -209,14 +210,23 @@ public abstract class ReceiveHandler
 									int	cnt;
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
+										final Future<Void> ret = new Future<Void>();
+										final IComponentStep<Void> step = this;
 										if(!received_self)
 										{
 											cnt++;
 		//									System.out.println("CSMACD try #"+(++cnt));
-											agent.sender.send(agent.createAwarenessInfo());
-											agent.doWaitFor((long)(Math.random()*500*cnt), this);
+											agent.createAwarenessInfo().addResultListener(agent.getMicroAgent()
+												.createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
+											{
+												public void customResultAvailable(AwarenessInfo info)
+												{
+													agent.sender.send(info);
+													agent.doWaitFor((long)(Math.random()*500*cnt), step);
+												}
+											}));
 										}
-										return IFuture.DONE;
+										return ret;
 									}
 								});
 							}

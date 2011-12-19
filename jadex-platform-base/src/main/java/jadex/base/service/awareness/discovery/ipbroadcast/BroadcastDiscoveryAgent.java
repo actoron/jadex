@@ -1,8 +1,8 @@
 package jadex.base.service.awareness.discovery.ipbroadcast;
 
 import jadex.base.service.awareness.discovery.ConnectionException;
+import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.DiscoveryService;
-import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
@@ -12,6 +12,7 @@ import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.awareness.IManagementService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
+import jadex.commons.future.DefaultResultListener;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -186,13 +187,21 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 						// and send this port to the master.
 						socket = new DatagramSocket();
 						socket.setBroadcast(true);
-						InetAddress address = SUtil.getInetAddress();
-						AwarenessInfo info = createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId());
-//						byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
-						byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getClassLoader());
-						((BroadcastSendHandler)sender).send(data, address, port);
-//						System.out.println("local slave at: "+SUtil.getInet4Address()+" "+socket.getLocalPort());
-						getMicroAgent().getLogger().info("local slave at: "+SUtil.getInetAddress()+" "+socket.getLocalPort());
+						
+						createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId())
+							.addResultListener(agent.createResultListener(new DefaultResultListener<AwarenessInfo>()
+						{
+							public void resultAvailable(AwarenessInfo info)
+							{
+								InetAddress address = SUtil.getInetAddress();
+//								AwarenessInfo info = createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId());
+//								byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
+								byte[] data = DiscoveryAgent.encodeObject(info, getMicroAgent().getClassLoader());
+								((BroadcastSendHandler)sender).send(data, address, port);
+//								System.out.println("local slave at: "+SUtil.getInet4Address()+" "+socket.getLocalPort());
+								getMicroAgent().getLogger().info("local slave at: "+SUtil.getInetAddress()+" "+socket.getLocalPort());
+							}
+						}));
 					}
 					catch(Exception e2)
 					{

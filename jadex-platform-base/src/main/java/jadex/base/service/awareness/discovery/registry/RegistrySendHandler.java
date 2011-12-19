@@ -2,13 +2,13 @@ package jadex.base.service.awareness.discovery.registry;
 
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.DiscoveryEntry;
-import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.MasterSlaveSendHandler;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.commons.IFilter;
 import jadex.commons.SUtil;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 
@@ -46,30 +46,41 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 				@XMLClassname("send")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
+					final Future<Void> ret = new Future<Void>();
+					final IComponentStep<Void> step = this;
+					
 					if(!getAgent().isKilled() && sendid.equals(getSendId()))
 					{
 //						System.out.println(System.currentTimeMillis()+" sending: "+getComponentIdentifier());
-						send(createAwarenessInfo());
-						
-						// Additionally send all knowns to all other masters and local (not remote) slaves
-						if(getAgent().isRegistry())
+						createAwarenessInfo().addResultListener(agent.getMicroAgent()
+							.createResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(ret)
 						{
-							DiscoveryEntry[] rems = getAgent().getRemotes().getEntries();
-							for(int i=0; i<rems.length; i++)
+							public void customResultAvailable(AwarenessInfo info)
 							{
-								send(rems[i].getInfo());
+								send(info);
+								
+								// Additionally send all knowns to all other masters and local (not remote) slaves
+								if(getAgent().isRegistry())
+								{
+									DiscoveryEntry[] rems = getAgent().getRemotes().getEntries();
+									for(int i=0; i<rems.length; i++)
+									{
+										send(rems[i].getInfo());
+									}
+									DiscoveryEntry[] locs = getAgent().getLocals().getEntries();
+									for(int i=0; i<locs.length; i++)
+									{
+										send(locs[i].getInfo());
+									}
+								}
+								
+								if(getAgent().getDelay()>0)
+									getAgent().doWaitFor(getAgent().getDelay(), step);
 							}
-							DiscoveryEntry[] locs = getAgent().getLocals().getEntries();
-							for(int i=0; i<locs.length; i++)
-							{
-								send(locs[i].getInfo());
-							}
-						}
-						
-						if(getAgent().getDelay()>0)
-							getAgent().doWaitFor(getAgent().getDelay(), this);
+						}));
 					}
-					return IFuture.DONE;
+					
+					return ret;
 				}
 			});
 		}
@@ -113,7 +124,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 	{
 		try
 		{
-			byte[] data = DiscoveryState.encodeObject(info, getAgent().getMicroAgent().getClassLoader());
+			byte[] data = DiscoveryAgent.encodeObject(info, getAgent().getMicroAgent().getClassLoader());
 	
 //			System.out.println("packet size: "+data.length);
 

@@ -1,7 +1,9 @@
 package jadex.xml.bean;
 
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
@@ -30,17 +32,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-/* $if !android $ */
 import javax.xml.namespace.QName;
-/* $else $
-import javaxx.xml.namespace.QName;
-$endif $ */
 
 /**
  *  Handler for reading XML into Java beans.
@@ -67,6 +67,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	/** The bean introspector. */
 	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
 //	protected IBeanIntrospector introspector = new BeanInfoIntrospector();
+	
+	/** The filter based post processors. */
+	protected Map<IFilter, IPostProcessor> postprocessors;
 	
 	//-------- constructors --------
 	
@@ -1652,8 +1655,48 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	 *  Get the post-processor.
 	 *  @return The post-processor
 	 */
-	public IPostProcessor getPostProcessor(Object object, Object typeinfo)
+	public synchronized IPostProcessor[] getPostProcessors(Object object, Object typeinfo)
 	{
-		return typeinfo instanceof TypeInfo? ((TypeInfo)typeinfo).getPostProcessor(): null;
+		List<IPostProcessor> ret = new ArrayList<IPostProcessor>();
+		IPostProcessor tiproc = typeinfo instanceof TypeInfo? ((TypeInfo)typeinfo).getPostProcessor(): null;
+		if(tiproc!=null)
+			ret.add(tiproc);
+		
+		if(postprocessors!=null)
+		{
+			for(Iterator<IFilter> it = postprocessors.keySet().iterator(); it.hasNext(); )
+			{
+				IFilter fil = it.next();
+				if(fil.filter(object))
+				{
+					ret.add(postprocessors.get(fil));
+				}
+			}
+		}
+		
+		return ret.toArray(new IPostProcessor[ret.size()]);
 	}
+	
+	/**
+	 *  Add a post processor.
+	 *  @param filter The filter.
+	 *  @param processor The post processor.
+	 */
+	public synchronized void addPostProcessor(IFilter filter, IPostProcessor processor)
+	{
+		if(postprocessors==null)
+			postprocessors = new LinkedHashMap<IFilter, IPostProcessor>();
+		postprocessors.put(filter, processor);
+	}
+	/**
+	 *  Remove a post processor.
+	 *  @param filter The filter.
+	 *  @param processor The post processor.
+	 */
+	public synchronized void removePostProcessor(IFilter filter)
+	{
+		if(postprocessors!=null)
+			postprocessors.remove(filter);
+	}
+	
 }

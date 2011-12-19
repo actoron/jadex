@@ -1,7 +1,6 @@
 package jadex.base.service.awareness.discovery.ipscanner;
 
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
-import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.MasterSlaveSendHandler;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
@@ -38,7 +37,7 @@ public class ScannerSendHandler extends MasterSlaveSendHandler
 	{
 		try
 		{
-			byte[] data = DiscoveryState.encodeObject(info, getAgent().getMicroAgent().getClassLoader());
+			byte[] data = DiscoveryAgent.encodeObject(info, getAgent().getMicroAgent().getClassLoader());
 			
 			int maxsend = getAgent().getChannel().socket().getSendBufferSize()/data.length;
 			int sent = 0;

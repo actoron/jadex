@@ -72,5 +72,5 @@ public interface IObjectReaderHandler extends IObjectLinker, IBulkObjectLinker
 	 *  Get the post-processor.
 	 *  @return The post-processor
 	 */
-	public IPostProcessor getPostProcessor(Object object, Object typeinfo);
+	public IPostProcessor[] getPostProcessors(Object object, Object typeinfo);
 }

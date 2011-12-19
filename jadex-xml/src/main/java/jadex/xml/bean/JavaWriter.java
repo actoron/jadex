@@ -83,6 +83,42 @@ public class JavaWriter extends Writer
 	
 	/**
 	 *  Get the java type infos.
+	 *  
+	 *  Supported types:
+	 *  
+	 *  - java.util.Map
+	 *  - jadex.commons.collection.MultiCollection
+	 *  - java.util.List
+	 *  - java.util.Set
+	 *  - Array
+	 *  - java.util.Color
+	 *  - java.util.Date
+	 *  - java.lang.Class
+	 *  - java.net.URL
+	 *  - java.logging.Level
+	 *  - java.logging.LogRecord
+	 *  - java.net.InetAddress
+	 *  - java.awt.image.RenderedImage
+	 *  - java.lang.String
+	 *  - java.lang.Boolean
+	 *	- java.lang.Integer
+	 *	- java.lang.Double
+	 *	- java.lang.Float
+	 *	- java.lang.Long
+	 *	- java.lang.Short
+	 *	- java.lang.Byte
+	 *	- java.lang.Character
+	 *	- java.lang.enum
+	 *	- boolean/Boolean Array
+	 *	- int/Integer Array
+	 *	- double/Double Array
+	 *	- float/Float array
+	 *	- long/Long array
+	 *	- short/Short Array
+	 *	- byte/Byte Array
+	 *	- java.lang.Character
+	 *	- jadex.commons.Tuple
+	 *	- jadex.commons.Tuple2
 	 */
 	public static Set getTypeInfos()
 	{
@@ -146,7 +182,6 @@ public class JavaWriter extends Writer
 //			}));
 //			typeinfos.add(ti_unlist);
 			// java.util.UnmodifyableMap
-			
 			
 			// java.util.Color
 			IObjectStringConverter coconv = new IObjectStringConverter()
@@ -236,7 +271,6 @@ public class JavaWriter extends Writer
 				null
 			));
 			typeinfos.add(ti_record);
-			
 			
 			// java.net.InetAddress
 			// The following hack ensures that all subclasses of InetAdress will be stored using the same tag

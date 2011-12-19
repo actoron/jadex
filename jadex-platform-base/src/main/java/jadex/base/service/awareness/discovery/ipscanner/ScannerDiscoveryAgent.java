@@ -1,17 +1,19 @@
 package jadex.base.service.awareness.discovery.ipscanner;
 
 import jadex.base.service.awareness.discovery.ConnectionException;
+import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.DiscoveryService;
-import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
+import jadex.base.service.awareness.discovery.ipbroadcast.BroadcastSendHandler;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.awareness.IManagementService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
+import jadex.commons.future.DefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
@@ -224,10 +226,23 @@ public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
 							channel.register(selector, SelectionKey.OP_READ);
 						}
 						InetAddress address = SUtil.getInetAddress();
-						AwarenessInfo info = createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId());
-//						byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
-						byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getClassLoader());
-						((ScannerSendHandler)sender).send(data, address, port);
+						
+						createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId())
+							.addResultListener(agent.createResultListener(new DefaultResultListener<AwarenessInfo>()
+						{
+							public void resultAvailable(AwarenessInfo info)
+							{
+								InetAddress address = SUtil.getInetAddress();
+//								byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
+								byte[] data = DiscoveryAgent.encodeObject(info, getMicroAgent().getClassLoader());
+								((ScannerSendHandler)sender).send(data, address, port);
+							}
+						}));
+						
+//						AwarenessInfo info = createAwarenessInfo(AwarenessInfo.STATE_OFFLINE, createMasterId());
+////						byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
+//						byte[] data = DiscoveryAgent.encodeObject(info, getMicroAgent().getClassLoader());
+//						((ScannerSendHandler)sender).send(data, address, port);
 						
 //						System.out.println("local slave at: "+SUtil.getInet4Address()+" "+channel.socket().getLocalPort());
 //						getLogger().warning("Running in local mode: "+e);

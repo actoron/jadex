@@ -396,9 +396,10 @@ public class OAVObjectReaderHandler implements IObjectReaderHandler
 	 *  Get the post-processor.
 	 *  @return The post-processor
 	 */
-	public IPostProcessor getPostProcessor(Object object, Object typeinfo)
+	public IPostProcessor[] getPostProcessors(Object object, Object typeinfo)
 	{
-		return typeinfo instanceof TypeInfo? ((TypeInfo)typeinfo).getPostProcessor(): null;
+		IPostProcessor pp = typeinfo instanceof TypeInfo? ((TypeInfo)typeinfo).getPostProcessor(): null;
+		return pp==null? null: new IPostProcessor[]{pp};
 	}
 
 }

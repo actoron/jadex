@@ -1,7 +1,6 @@
 package jadex.base.service.awareness.discovery.ipmulticast;
 
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
-import jadex.base.service.awareness.discovery.DiscoveryState;
 import jadex.base.service.awareness.discovery.SendHandler;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 
@@ -29,7 +28,7 @@ public class MulticastSendHandler extends SendHandler
 	{
 		try
 		{
-			byte[] data = DiscoveryState.encodeObject(info, getAgent().getMicroAgent().getClassLoader());
+			byte[] data = DiscoveryAgent.encodeObject(info, getAgent().getMicroAgent().getClassLoader());
 			Object[] ai = getAgent().getAddressInfo();
 			send(data, (InetAddress)ai[0], ((Integer)ai[1]).intValue());
 //			System.out.println(getComponentIdentifier()+" sent '"+info+"' ("+data.length+" bytes)"+" "+port+" "+address);

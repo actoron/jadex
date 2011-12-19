@@ -582,46 +582,50 @@ public class Reader
 			}
 				
 			// Handle post-processing			
-			final IPostProcessor postproc = topse.getReaderHandler().getPostProcessor(topse.getObject(), typeinfo);
-			if(postproc!=null)
+			final IPostProcessor[] postprocs = topse.getReaderHandler().getPostProcessors(topse.getObject(), typeinfo);
+			if(postprocs!=null && postprocs.length>0)
 			{
-				if(postproc.getPass()==0)
+				for(int i=0; i<postprocs.length; i++)
 				{
-					try
+					if(postprocs[i].getPass()==0)
 					{
-						Object changed = postproc.postProcess(readcontext, topse.getObject());
-						if(changed!=null)
-							topse.setObject(changed);
-					}
-					catch(RuntimeException e)
-					{
-//						e.printStackTrace();
-						readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", topse, topse.getLocation());																				
-					}
-				}
-				else
-				{
-					final StackElement	ftopse	= topse;
-					final StackElement[]	stack	= readcontext.getStack();	// Use snapshot of stack for error report, as stack isn't available in delayed post processors.
-					readcontext.getPostProcessors().put(new Integer(postproc.getPass()), new IPostProcessorCall()
-					{
-						public void callPostProcessor() throws XMLStreamException
+						try
 						{
-							try
+							Object changed = postprocs[i].postProcess(readcontext, topse.getObject());
+							if(changed!=null)
+								topse.setObject(changed);
+						}
+						catch(RuntimeException e)
+						{
+	//						e.printStackTrace();
+							readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", topse, topse.getLocation());																				
+						}
+					}
+					else
+					{
+						final StackElement	ftopse	= topse;
+						final StackElement[]	stack	= readcontext.getStack();	// Use snapshot of stack for error report, as stack isn't available in delayed post processors.
+						final int fi = i;
+						readcontext.getPostProcessors().put(new Integer(postprocs[i].getPass()), new IPostProcessorCall()
+						{
+							public void callPostProcessor() throws XMLStreamException
 							{
-								Object check = postproc.postProcess(readcontext, ftopse.getObject());
-								if(check!=null)
+								try
 								{
-									readcontext.getReporter().report("Object replacement only possible in first pass.", "postprocessor error", ftopse, ftopse!=null ? ftopse.getLocation() : readcontext.getParser().getLocation());																				
+									Object check = postprocs[fi].postProcess(readcontext, ftopse.getObject());
+									if(check!=null)
+									{
+										readcontext.getReporter().report("Object replacement only possible in first pass.", "postprocessor error", ftopse, ftopse!=null ? ftopse.getLocation() : readcontext.getParser().getLocation());																				
+									}
+								}
+								catch(RuntimeException e)
+								{
+	//								e.printStackTrace();
+									readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", stack, ftopse!=null ? ftopse.getLocation() : readcontext.getParser().getLocation());																				
 								}
 							}
-							catch(RuntimeException e)
-							{
-//								e.printStackTrace();
-								readcontext.getReporter().report("Error during postprocessing: "+e, "postprocessor error", stack, ftopse!=null ? ftopse.getLocation() : readcontext.getParser().getLocation());																				
-							}
-						}
-					});
+						});
+					}
 				}
 			}
 			

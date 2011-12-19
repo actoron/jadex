@@ -157,11 +157,14 @@ public class Writer
 		QName[] path = new QName[0];
 		
 		// Preprocess object.
-		IPreProcessor preproc = typeinfo==null? null: (IPreProcessor)typeinfo.getPreProcessor();
-		if(preproc!=null)
+		IPreProcessor[] preprocs = handler.getPreProcessors(object, typeinfo);
+		if(preprocs!=null && preprocs.length>0)
 		{
 //			System.out.println("found: "+object);
-			object = preproc.preProcess(wc, object);
+			for(int i=0; i<preprocs.length; i++)
+			{
+				object = preprocs[i].preProcess(wc, object);
+			}
 		}
 
 		// Only use typeinfo for getting tag (path) when not set in method call (subobject)
@@ -352,14 +355,7 @@ public class Writer
 			}
 			else
 			{
-				try
-				{
 				writeObject(wc, ((Object[])tmp)[1], (QName)((Object[])tmp)[0]);
-				}
-				catch(StackOverflowError e)
-				{
-					e.printStackTrace();
-				}
 //				writeObject(wc, ((Object[])tmp)[1]);
 			}
 		}

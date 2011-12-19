@@ -1,8 +1,6 @@
 package jadex.base.service.cms;
 
 import jadex.base.fipa.CMSComponentDescription;
-import jadex.base.fipa.SearchConstraints;
-import jadex.base.service.library.LibraryService;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
@@ -47,10 +45,10 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.RemoteDelegationResultListener;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -84,9 +82,6 @@ public abstract class ComponentManagementService extends BasicService implements
 	/** The cleanup futures for the components (component id -> cleanup future). */
 	protected Map cfs;
 	
-	/** The children of a component (component id -> children ids). */
-//	protected MultiCollection	children;
-	
 	/** The logger. */
 	protected Logger logger;
 
@@ -95,9 +90,6 @@ public abstract class ComponentManagementService extends BasicService implements
 	
 	/** The result (kill listeners). */
 	protected Map<IComponentIdentifier, IResultListener<Map<String, Object>>> killresultlisteners;
-	
-//	/** The exception of a component during execution (if any). */
-//	protected Map exceptions;
 	
 	/** The execution service (cached to avoid using futures). */
 	protected IExecutionService	exeservice;
@@ -110,9 +102,6 @@ public abstract class ComponentManagementService extends BasicService implements
 	
 	/** The root component. */
 	protected IComponentAdapter root;
-	
-//	/** The map of initing futures of components (created but not yet visible). */
-//	protected Map initfutures;
 	
 	/** The init adapters and descriptions, i.e. adapters and desc of initing components, 
 	 *  are only visible for the component and child components in their init. */
@@ -132,9 +121,6 @@ public abstract class ComponentManagementService extends BasicService implements
 	
 	/** The default copy parameters flag for service calls. */
 	protected boolean copy;
-	
-//	/** The classloader cache. */
-//	protected Map classloadercache;
 	
     //-------- constructors --------
 
@@ -374,10 +360,10 @@ public abstract class ComponentManagementService extends BasicService implements
 																			return;
 		//																	throw new RuntimeException("Component "+cid+" already exists.");
 																		}
-																		if(msgservice!=null)
-																		{
-																			cid.setAddresses(msgservice.getAddresses());
-																		}
+//																		if(msgservice!=null)
+//																		{
+//																			cid.setAddresses(msgservice.getAddresses());
+//																		}
 																	}
 																	else
 																	{
@@ -2112,87 +2098,6 @@ public abstract class ComponentManagementService extends BasicService implements
 		return ret;
 	}
 	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name)
-	{
-		return createComponentIdentifier(name, true);
-	}
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local)
-	{
-		return createComponentIdentifier(name, local, msgservice!=null ? msgservice.getAddresses() : null);		
-	}
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param local True for local name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, boolean local, String[] addresses)
-	{
-		if(local)
-			name = name + "@" + ((IComponentIdentifier)exta.getServiceProvider().getId()).getPlatformName(); // Hack?!
-		return new ComponentIdentifier(name, addresses);		
-	}
-	
-	/**
-	 *  Create component identifier.
-	 *  @param name The name.
-	 *  @param addresses The addresses.
-	 *  @return The new component identifier.
-	 */
-	public IComponentIdentifier createComponentIdentifier(String name, IComponentIdentifier parent, String[] addresses)
-	{
-		String paname = parent.getName().replace('@', '.');
-		return new ComponentIdentifier(name+"@"+paname, addresses);
-	}
-
-	/**
-	 *  Create a search constraints object.
-	 *  @param maxresults The maximum number of results.
-	 *  @param maxdepth The maximal search depth.
-	 *  @return The search constraints.
-	 */
-	public ISearchConstraints createSearchConstraints(int maxresults, int maxdepth)
-	{
-		SearchConstraints	ret	= new SearchConstraints();
-		ret.setMaxResults(maxresults);
-		ret.setMaxDepth(maxdepth);
-		return ret;
-	}
-	
-//	/**
-//	 * Create a component description.
-//	 * @param id The component identifier.
-//	 * @param state The state.
-//	 * @param ownership The ownership.
-//	 * @param type The component type.
-//	 * @param parent The parent.
-//	 * @return The component description.
-//	 */
-//	public IComponentDescription createComponentDescription(IComponentIdentifier id, String state, String ownership, String type, String modelname, String localtype, IResourceIdentifier rid)
-//	{
-//		CMSComponentDescription	ret	= new CMSComponentDescription(id, type, null, null, null, modelname, localtype);
-//		ret.setState(state);
-//		ret.setOwnership(ownership);
-//		return ret;
-//	}
-	
 	//--------- information methods --------
 	
 	/**
@@ -2217,35 +2122,43 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 		else
 		{
-			IComponentDescription desc;
-			synchronized(adapters)
+			msgservice.updateComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 			{
-				desc = (IComponentDescription)getDescription(cid);
+				public void customResultAvailable(IComponentIdentifier rcid)
+				{
+//					System.out.println("desc: "+SUtil.arrayToString(rcid.getAddresses()));
+					CMSComponentDescription desc;
+					synchronized(adapters)
+					{
+						desc = (CMSComponentDescription)getDescription(cid);
 
-				// Hack, to retrieve description from component itself in init phase
-				if(desc==null)
-				{
-					InitInfo ii= getInitInfo(cid);
-					if(ii!=null)
-						desc = ii.getDescription();
+						// Hack, to retrieve description from component itself in init phase
+						if(desc==null)
+						{
+							InitInfo ii= getInitInfo(cid);
+							if(ii!=null)
+								desc = (CMSComponentDescription)ii.getDescription();
+						}
+						
+						if(desc!=null)
+						{
+							// addresses required for communication across platforms.
+							// ret.setName(refreshComponentIdentifier(aid));
+							desc.setName(rcid);
+							desc = (CMSComponentDescription)((CMSComponentDescription)desc).clone();
+						}
+					}
+					
+					if(desc!=null)
+					{
+						ret.setResult(desc);
+					}
+					else
+					{
+						ret.setException(new RuntimeException("No description available for: "+cid));
+					}
 				}
-				
-				// Todo: addresses required for communication across platforms.
-		//		ret.setName(refreshComponentIdentifier(aid));
-				if(desc!=null)
-				{
-					desc = (IComponentDescription)((CMSComponentDescription)desc).clone();
-				}
-			}
-			
-			if(desc!=null)
-			{
-				ret.setResult(desc);
-			}
-			else
-			{
-				ret.setException(new RuntimeException("No description available for: "+cid));
-			}
+			});
 		}			
 		
 		return ret;
@@ -2282,19 +2195,36 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IFuture<IComponentIdentifier[]> getComponentIdentifiers()
 	{
-		Future<IComponentIdentifier[]> fut = new Future<IComponentIdentifier[]>();
+		final Future<IComponentIdentifier[]> fut = new Future<IComponentIdentifier[]>();
 		
 		IComponentIdentifier[] ret;
-		
-		synchronized(adapters)
+
+		msgservice.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], IComponentIdentifier[]>(fut)
 		{
-			ret = (IComponentIdentifier[])adapters.keySet().toArray(new IComponentIdentifier[adapters.size()]);
-			// Todo: addresses required for inter-platform comm.
-//			for(int i=0; i<ret.length; i++)
-//				ret[i] = refreshComponentIdentifier(ret[i]); // Hack!
-		}
+			public void customResultAvailable(String[] addresses)
+			{
+				IComponentIdentifier[] ret;
+				
+				synchronized(adapters)
+				{
+					ret = (IComponentIdentifier[])adapters.keySet().toArray(new IComponentIdentifier[adapters.size()]);
+					
+					if(ret.length>0)
+					{
+						if(!Arrays.equals(ret[0].getAddresses(), addresses))
+						{
+							// addresses required for inter-platform comm.
+							for(int i=0; i<ret.length; i++)
+								ret[i] = new ComponentIdentifier(ret[i].getName(), addresses);
+//								ret[i] = refreshComponentIdentifier(ret[i]); // Hack!
+						}
+					}
+				}
+				
+				fut.setResult(ret);
+			}
+		});
 		
-		fut.setResult(ret);
 		return fut;
 	}
 	
@@ -2458,10 +2388,11 @@ public abstract class ComponentManagementService extends BasicService implements
 			}
 		}
 		
-		if(msgservice!=null)
-		{
-			ret.setAddresses(msgservice.getAddresses());
-		}
+//		if(msgservice!=null)
+//		{
+//			ret.setAddresses(msgservice.getAddresses());
+//		}
+		
 //		else
 //		{
 //			SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -2572,48 +2503,15 @@ public abstract class ComponentManagementService extends BasicService implements
 									{
 										msgservice	= (IMessageService)result;
 										
-		//								boolean	setresult;
-		//								synchronized(services)
-		//								{
-		//									services[1]	= true;
-		//									setresult	= services[0] && services[1];
-		//								}
-										
 										// add root adapter and register root component
 										if(root!=null)
 										{
-											if(msgservice!=null)
+											synchronized(adapters)
 											{
-		//										msgservice.signalStarted().addResultListener(new IResultListener()
-		//										{
-		//											public void resultAvailable(Object result)
-		//											{
-														synchronized(adapters)
-														{
-															// Hack?! Need to set transport addresses on root id.
-															((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(msgservice.getAddresses());
-		//													System.out.println("root: "+SUtil.arrayToString(msgservice.getAddresses())+" "+root.getComponentIdentifier().hashCode());
-															adapters.put(root.getComponentIdentifier(), root);
-														}
-		//											}
-													
-		//											public void exceptionOccurred(Exception exception)
-		//											{
-		//											}
-		//										});
-											}
-											else
-											{
-												synchronized(adapters)
-												{
-													adapters.put(root.getComponentIdentifier(), root);
-												}
+												adapters.put(root.getComponentIdentifier(), root);
 											}
 										}
 										
-		//								if(setresult)
-		//									ret.setResult(null);
-		//									ret.setResult(getServiceIdentifier());
 										ret.setResult(null);
 									}
 								});
@@ -3014,17 +2912,6 @@ public abstract class ComponentManagementService extends BasicService implements
 		return ret;
 	}
 	
-//	/**
-//	 *  Get the init info for a component identifier.
-//	 */
-//	protected Object[] getInitInfo(IComponentIdentifier cid)
-//	{
-//		Object[] ret = (Object[])initinfos.get(cid);
-//		if(ret!=null && ret.length==0)
-//			ret = null;
-//		return ret;
-//	}
-	
 	/**
 	 *  Get the init info for a component identifier.
 	 */
@@ -3048,6 +2935,53 @@ public abstract class ComponentManagementService extends BasicService implements
 	{
 		return (InitInfo)initinfos.remove(cid);
 	}
+	
+//	/**
+//	 *  Refresh all 
+//	 */
+//	protected IFuture<Void> refresh()
+//	{
+//		final Future ret = new Future();
+//		
+//		msgservice.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
+//		{
+//			public void customResultAvailable(String[] addresses)
+//			{
+//				synchronized(adapters)
+//				{
+//					IComponentIdentifier[] cids = adapters.keySet().toArray(new IComponentIdentifier[0]);
+//					for(int i=0; i<cids.length; i++)
+//					{
+//						ComponentIdentifier cid = new ComponentIdentifier(cids[i]);
+//						adapters.put(cid, adapters.get(cids[i]));
+//					}
+//					
+//					cids = initinfos.keySet().toArray(new IComponentIdentifier[0]);
+//					for(int i=0; i<cids.length; i++)
+//					{
+//						ComponentIdentifier cid = new ComponentIdentifier(cids[i]);
+//						adapters.put(cid, initinfos.get(cids[i]));
+//					}
+//				}
+//				ret.setResult(null);
+//			}
+//		});
+//		
+//		return ret;
+//	}
+	
+//	/**
+//	 *  Refresh a component identifier based on new addresses.
+//	 */
+//	protected IComponentIdentifier refreshComponentIdentifier(IComponentIdentifier cid, String[] addresses)
+//	{
+//		IComponentIdentifier ret = cid;
+//		if(!Arrays.equals(this.addresses, addresses))
+//		{
+//			ret = new ComponentIdentifier(cid.getName(), addresses);
+//		}
+//		return ret;
+//	}
 	
 	static class InitInfo
 	{

@@ -273,25 +273,29 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										{
 											public void resultAvailable(Void v)
 											{
-												createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener<Map<String, Object>>()
+												rms.getMessageService().getAddresses()
+													.addResultListener(createResultListener(new DefaultResultListener<String[]>()
 												{
-													public void resultAvailable(Map<String, Object> reply)
+													public void resultAvailable(final String[] addresses) 
 													{
-														final String[] addresses = rms.getMessageService().getAddresses();
-			//											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
-														
-//														ClassLoader cl = ls.getClassLoader(null);//rms.getComponent().getModel().getResourceIdentifier());
-														String content = Writer.objectToXML(rms.getWriter(), result, cl, new Object[]{msg.get(SFipa.SENDER), addresses});
-														reply.put(SFipa.CONTENT, content);
-			//											System.out.println("content: "+content);
-														
-//														System.out.println("reply: "+callid);
-														sendMessage(reply, mt);
-													}
-													public void exceptionOccurred(Exception exception)
-													{
-														super.exceptionOccurred(exception);
-													}
+														createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener<Map<String, Object>>()
+														{
+															public void resultAvailable(Map<String, Object> reply)
+															{
+					//											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
+//																ClassLoader cl = ls.getClassLoader(null);//rms.getComponent().getModel().getResourceIdentifier());
+																String content = Writer.objectToXML(rms.getWriter(), result, cl, new Object[]{msg.get(SFipa.SENDER), addresses});
+																reply.put(SFipa.CONTENT, content);
+					//											System.out.println("content: "+content);
+//																System.out.println("reply: "+callid);
+																sendMessage(reply, mt);
+															}
+															public void exceptionOccurred(Exception exception)
+															{
+																super.exceptionOccurred(exception);
+															}
+														}));
+													};
 												}));
 											}
 										});

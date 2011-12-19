@@ -1,6 +1,7 @@
 package jadex.base.service.awareness.discovery;
 
 import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.commons.future.IFuture;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -21,7 +22,7 @@ public abstract class MasterSlaveSendHandler extends SendHandler
 	/**
 	 *  Create the awareness info.
 	 */
-	public AwarenessInfo createAwarenessInfo()
+	public IFuture<AwarenessInfo> createAwarenessInfo()
 	{
 		return agent.createAwarenessInfo(AwarenessInfo.STATE_ONLINE, getAgent().createMasterId());
 	}
@@ -33,7 +34,7 @@ public abstract class MasterSlaveSendHandler extends SendHandler
 	{
 		try
 		{
-			byte[] data = DiscoveryState.encodeObject(info, getAgent().getMicroAgent().getClassLoader());
+			byte[] data = DiscoveryAgent.encodeObject(info, getAgent().getMicroAgent().getClassLoader());
 	
 //			System.out.println("packet size: "+data.length);
 

@@ -239,6 +239,8 @@ public class NIOTCPTransport implements ITransport
 		for(int i=0; i<task.getReceivers().length; i++)
 		{
 			String[]	raddrs	= task.getReceivers()[i].getAddresses();
+			if(raddrs==null)
+				System.out.println("tester");
 			for(int j=0; j<raddrs.length; j++)
 			{
 				InetSocketAddress	address	= parseAddress(raddrs[j]);

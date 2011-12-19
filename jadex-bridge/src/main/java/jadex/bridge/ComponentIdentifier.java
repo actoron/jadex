@@ -76,7 +76,15 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	{
 		this(name+"@"+parent.getName().replace('@', '.'), addresses);
 	}
-
+	
+	/**
+	 *  Create component identifier. 
+	 */
+	public ComponentIdentifier(IComponentIdentifier cid)
+	{
+		this(cid.getName(), cid.getAddresses());
+	}
+	
 //	/**
 //	 *  Create a new component identifier.
 //	 *  @param name A local or global name.
