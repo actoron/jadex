@@ -104,7 +104,9 @@ public class MicroClassReader
 		modelinfo.setName(name);
 		modelinfo.setPackage(packagename);
 		String src = SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation());
-		modelinfo.setFilename(src+File.separatorChar+model);
+//		modelinfo.setFilename(src+File.separatorChar+model);
+		modelinfo.setFilename(src+File.separator+SReflect.getClassName(cma)+".class");
+//		System.out.println("mircor: "+src+File.separatorChar+model);
 		modelinfo.setType(MicroAgentFactory.FILETYPE_MICROAGENT);
 		modelinfo.setStartable(true);
 		if(rid==null)
