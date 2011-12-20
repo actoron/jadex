@@ -7,6 +7,7 @@ import jadex.base.test.TestReport;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -19,6 +20,7 @@ import jadex.micro.annotation.Results;
 @ProvidedServices(@ProvidedService(type=IAService.class, implementation=@Implementation(expression="$component")))
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IAService.class)
+@Agent
 public class AAgent extends MicroAgent implements IAService
 {
 	/**

@@ -53,6 +53,12 @@ public class ManagerSendTask
 		if(codecs==null || codecs.length==0)
 			throw new IllegalArgumentException("Codecs must not null.");
 		
+		for(int i=0; i<receivers.length; i++)
+		{
+			if(receivers[i].getAddresses()==null)
+				throw new IllegalArgumentException("Addresses must not null");
+		}
+		
 		this.message = message;
 		this.messagetype = messagetype;
 		this.receivers = receivers;

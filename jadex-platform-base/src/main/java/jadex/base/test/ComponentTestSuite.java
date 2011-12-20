@@ -127,11 +127,12 @@ public class ComponentTestSuite extends TestSuite
 				else
 				{
 					// Should support/use libservice.getClassLoader(abspath) 
-					if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath, rootcomp.getModel().getResourceIdentifier()).get(ts)).booleanValue())
+					// rootcomp.getModel().getResourceIdentifier()
+					if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath, null).get(ts)).booleanValue())
 					{
 						try
 						{
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath, rootcomp.getModel().getResourceIdentifier()).get(ts);
+							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath, null).get(ts);
 							boolean istest = false;
 							if(model!=null && model.getReport()==null)
 							{

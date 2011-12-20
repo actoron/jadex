@@ -76,6 +76,9 @@ public class MicroClassReader
 //		System.out.println("loading micro: "+model);
 		String clname = model;
 		
+		// Note: it is ok if it is an absolute path with dots even it looks strange.
+		// getMicroAgentClass will strip away parts until the model name is clear. 
+		
 		// Hack! for extracting clear classname
 		if(clname.endsWith(".class"))
 			clname = model.substring(0, model.indexOf(".class"));

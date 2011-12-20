@@ -1,11 +1,13 @@
 package jadex.bpmn.testcases;
 
+import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
  * 
  */
+@Service
 public class AService implements IAService
 {
 	/** The test string. */

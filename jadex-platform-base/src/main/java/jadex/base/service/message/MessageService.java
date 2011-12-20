@@ -252,6 +252,32 @@ public class MessageService extends BasicService implements IMessageService
 					msg.put(ridid, rid);
 				}
 				
+				// Check receivers.
+				Object tmp = msg.get(type.getReceiverIdentifier());
+				if(tmp==null || SReflect.isIterable(tmp) &&	!SReflect.getIterator(tmp).hasNext())
+				{
+					ret.setException(new RuntimeException("Receivers must not be empty: "+msg));
+					return;
+				}
+				
+				if(SReflect.isIterable(tmp))
+				{
+					for(Iterator it=SReflect.getIterator(tmp); it.hasNext(); )
+					{
+						IComponentIdentifier rec = (IComponentIdentifier)it.next();
+						if(rec==null)
+						{
+							ret.setException(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
+							return;
+						}
+						else if(rec.getAddresses()==null)
+						{
+							ret.setException(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));
+							return;
+						}
+					}
+				}
+				
 				// External access of sender required for content encoding etc.
 				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(new DelegationResultListener(ret)
@@ -283,24 +309,6 @@ public class MessageService extends BasicService implements IMessageService
 	{
 		Map msgcopy	= new HashMap(msg);
 		
-		Object tmp = msgcopy.get(type.getReceiverIdentifier());
-		if(tmp==null || SReflect.isIterable(tmp) &&	!SReflect.getIterator(tmp).hasNext())
-		{
-			ret.setException(new RuntimeException("Receivers must not be empty: "+msgcopy));
-			return;
-		}
-		if(SReflect.isIterable(tmp))
-		{
-			for(Iterator it=SReflect.getIterator(tmp); it.hasNext(); )
-			{
-				if(it.next()==null)
-				{
-					ret.setException(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
-					return;
-				}
-			}
-		}
-
 		// Conversion via platform specific codecs
 		// Hack?! Preprocess content to enhance component identifiers.
 		IContentCodec[] compcodecs = getContentCodecs(comp.getModel(), cl);
@@ -393,7 +401,7 @@ public class MessageService extends BasicService implements IMessageService
 		// Determine manager tasks
 		MultiCollection managers = new MultiCollection();
 		String recid = type.getReceiverIdentifier();
-		tmp	= msgcopy.get(recid);
+		Object tmp	= msgcopy.get(recid);
 		if(SReflect.isIterable(tmp))
 		{
 			for(Iterator it = SReflect.getIterator(tmp); it.hasNext(); )
@@ -1137,86 +1145,6 @@ public class MessageService extends BasicService implements IMessageService
 		
 		return ret;
 	}
-	
-	
-//	/**
-//	 * 
-//	 */
-//	protected IFuture getCMS()
-//	{
-//		return SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class);
-//	}
-	
-//	/**
-//	 *  Send message(s) executable.
-//	 */
-//	protected class SendMessage implements IExecutable
-//	{
-//		//-------- attributes --------
-//		
-//		/** The list of messages to send. */
-//		protected List messages;
-//		
-//		//-------- constructors --------
-//		
-//		/**
-//		 *  Create a new send message executable.
-//		 */
-//		public SendMessage()
-//		{
-//			this.messages = new ArrayList();
-//		}
-//		
-//		//-------- methods --------
-//		
-//		/**
-//		 *  Send a message.
-//		 */
-//		public boolean execute()
-//		{
-//			Object[] tmp = null;
-//			boolean isempty;
-//			
-//			synchronized(this)
-//			{
-//				if(!messages.isEmpty())
-//					tmp = (Object[])messages.remove(0);
-//				isempty = messages.isEmpty();
-//			}
-//			
-//			if(tmp!=null)
-//				internalSendMessage((Map)tmp[0], (MessageType)tmp[1], (IComponentIdentifier[])tmp[2], (Future)tmp[3]);
-//
-//			return !isempty;
-//		}
-//		
-//		/**
-//		 *  Add a message to be sent.
-//		 *  @param message The message.
-//		 */
-//		public void addMessage(Map message, MessageType type, IComponentIdentifier[] receivers, Future ret)
-//		{
-//			synchronized(this)
-//			{
-//				messages.add(new Object[]{message, type, receivers, ret});
-//			}
-//			
-//			SServiceProvider.getService(provider, IExecutionService.class).addResultListener(new DefaultResultListener()
-//			{
-//				public void resultAvailable(Object source, Object result)
-//				{
-//					try
-//					{
-//						((IExecutionService)result).execute(SendMessage.this);
-//					}
-//					catch(RuntimeException e)
-//					{
-//						// ignore if execution service is shutting down.
-//					}						
-//				}
-//			});
-//		}
-//	}
 	
 	/**
 	 *  Send message(s) executable.
