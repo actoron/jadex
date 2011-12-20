@@ -1,12 +1,7 @@
+<jsp:include page="header.jsp" flush="true"/>
 <%
-	String	model	= (String)request.getSession().getAttribute("model");
+	String	file	= (String)request.getAttribute("file");
 %>
-<html>
-	<head>
-		<title>Jadexdoc: Error</title>
-	</head>
-	<body>
-		<h1>Jadexdoc Problem</h1>
-		<%= model %> could not be found.
-	</body>	
-</html>
+<h1>Jadexdoc Problem</h1>
+<%= file %> could not be found.
+<jsp:include page="footer.jsp" flush="true"/>

@@ -16,6 +16,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.Collection;
@@ -45,7 +46,7 @@ public class SComponentFactory
 			@XMLClassname("loadModel")
 			public IFuture<IModelInfo> execute(final IInternalAccess ia)
 			{
-				final Future ret = new Future();
+				final Future<IModelInfo> ret = new Future<IModelInfo>();
 				
 //				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 //					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)

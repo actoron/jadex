@@ -5,7 +5,14 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +20,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import jaxcent.HtmlDiv;
 import jaxcent.HtmlElement;
 import jaxcent.HtmlTableCell;
 import jaxcent.HtmlTableRow;
@@ -48,29 +56,115 @@ public class JaxcentHandler extends JaxcentPage
 	{
 		try
 		{
-			this.model	= (IModelInfo)((HttpSession)getHttpSession()).getAttribute("model");
-			ConfigurationInfo[]	mconfigs	= model.getConfigurations();
-			configs	= new ArrayList<ConfigTableRow>();
-			args	= new ArrayList<HtmlTableCell>();
-			ress	= new ArrayList<HtmlTableCell>();
-			
-			for(int i=0; checkElementExists(SearchType.searchById, "config"+i, 0); i++)
+			IFuture<IModelInfo>	future	= (IFuture<IModelInfo>)((HttpSession)getHttpSession()).getAttribute("model");
+			final String url	= (String)((HttpSession)getHttpSession()).getAttribute("url");
+			final String file	= (String)((HttpSession)getHttpSession()).getAttribute("file");
+			future.addResultListener(new IResultListener<IModelInfo>()
 			{
-				configs.add(new ConfigTableRow(this, SearchType.searchById, "config"+i, i%2==0 ? "even" : "odd", mconfigs[i]));
-			}
-			for(int i=0; checkElementExists(SearchType.searchById, "arg"+i, 0); i++)
-			{
-				args.add(new HtmlTableCell(this, SearchType.searchById, "arg"+i));
-			}
-			for(int i=0; checkElementExists(SearchType.searchById, "res"+i, 0); i++)
-			{
-				ress.add(new HtmlTableCell(this, SearchType.searchById, "res"+i));
-			}
+				public void resultAvailable(final IModelInfo model)
+				{
+					// Decouple from result listener running on component factory thread,
+					// otherwise deadlocks when trying to retrieve URL.
+					new Thread(new Runnable()
+					{
+						public void run()
+						{
+							try
+							{
+								if(model!=null)
+								{
+									JaxcentHandler.this.model	= model;
+									
+									String	txt	= "Jadexdoc: "+model.getFullName();
+									HtmlDiv	title	= new HtmlDiv(JaxcentHandler.this, "title");
+									title.setInnerHTML(txt);
+									execJavaScriptCode("document.title =\""+txt+"\"");
+									
+									HtmlDiv	loading	= new HtmlDiv(JaxcentHandler.this, "loading");
+									String	contents	= getURLContent(url);
+									loading.setInnerHTML(contents);
+									
+									ConfigurationInfo[]	mconfigs	= model.getConfigurations();
+									configs	= new ArrayList<ConfigTableRow>();
+									args	= new ArrayList<HtmlTableCell>();
+									ress	= new ArrayList<HtmlTableCell>();
+									
+									for(int i=0; checkElementExists(SearchType.searchById, "config"+i, 0); i++)
+									{
+										configs.add(new ConfigTableRow(JaxcentHandler.this, SearchType.searchById, "config"+i, i%2==0 ? "even" : "odd", mconfigs[i]));
+									}
+									for(int i=0; checkElementExists(SearchType.searchById, "arg"+i, 0); i++)
+									{
+										args.add(new HtmlTableCell(JaxcentHandler.this, SearchType.searchById, "arg"+i));
+									}
+									for(int i=0; checkElementExists(SearchType.searchById, "res"+i, 0); i++)
+									{
+										ress.add(new HtmlTableCell(JaxcentHandler.this, SearchType.searchById, "res"+i));
+									}
+								}
+								else
+								{
+									String	txt	= "Jadexdoc: File not found.";
+									HtmlDiv	title	= new HtmlDiv(JaxcentHandler.this, "title");
+									title.setInnerHTML(txt);
+									execJavaScriptCode("document.title =\""+txt+"\"");
+									
+									HtmlDiv	loading	= new HtmlDiv(JaxcentHandler.this, "loading");
+									loading.setInnerHTML("<h1>Jadexdoc Problem</h1>"
+										+file+" could not be found.");
+								}
+							}
+							catch(Exception e)
+							{
+								e.printStackTrace();
+							}
+						}
+					}).start();
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					try
+					{
+						String	txt	= "Jadexdoc: File could not be loaded.";
+						HtmlDiv	title	= new HtmlDiv(JaxcentHandler.this, "title");
+						title.setInnerHTML(txt);
+						execJavaScriptCode("document.title =\""+txt+"\"");
+						
+						StringWriter	trace	= new StringWriter();
+						exception.printStackTrace(new PrintWriter(trace));
+						HtmlDiv	loading	= new HtmlDiv(JaxcentHandler.this, "loading");
+						loading.setInnerHTML("<h1>Jadexdoc Problem</h1><pre>"+trace+"</pre>");
+					}
+					catch(Jaxception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			});
 		}
 		catch(Jaxception e)
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Get URL text content.
+	 */
+	protected String	getURLContent(String url) throws Exception
+	{
+		ByteArrayOutputStream	os	= new ByteArrayOutputStream();
+		InputStream	is	= new URL(url).openStream();
+		byte[]	buffer	= new byte[8192];
+		int	size	= 0;
+		while((size=is.read(buffer))!=-1)
+		{
+		    os.write(buffer, 0, size);
+		}
+		return os.toString();		
 	}
 
 	//-------- helper classes --------
@@ -155,10 +249,12 @@ public class JaxcentHandler extends JaxcentPage
 					if(cargs.containsKey(margs[i].getName()))
 					{
 						args.get(i).setInnerText(cargs.get(margs[i].getName()));
+						args.get(i).setCssClass("changed");
 					}
 					else
 					{
 						args.get(i).setInnerText(SUtil.arrayToString(margs[i].getDefaultValue()));
+						args.get(i).setCssClass("");
 					}
 				}
 				if(checkElementExists(SearchType.searchById, id, 0))
@@ -172,6 +268,7 @@ public class JaxcentHandler extends JaxcentPage
 				for(int i=0; i<margs.length; i++)
 				{
 					args.get(i).setInnerText(SUtil.arrayToString(margs[i].getDefaultValue()));
+					args.get(i).setCssClass("");
 				}					
 				if(checkElementExists(SearchType.searchById, id, 0))
 				{
