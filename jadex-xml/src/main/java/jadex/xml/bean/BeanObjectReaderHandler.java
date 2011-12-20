@@ -40,7 +40,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+/* $if !android $ */
 import javax.xml.namespace.QName;
+/* $else $
+import javaxx.xml.namespace.QName;
+$endif $ */
+
 
 /**
  *  Handler for reading XML into Java beans.

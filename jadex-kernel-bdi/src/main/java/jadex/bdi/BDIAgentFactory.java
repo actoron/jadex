@@ -116,22 +116,6 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	public BDIAgentFactory(Map props)
 	{
 		this.props = props;
-		this.loader	= new OAVBDIModelLoader(props);
-		this.mtypes	= Collections.synchronizedMap(new WeakHashMap());
-		this.libservicelistener = new ILibraryServiceListener()
-		{
-			public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
-			{
-				loader.clearModelCache();
-				return IFuture.DONE;
-			}
-			
-			public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
-			{
-				loader.clearModelCache();
-				return IFuture.DONE;
-			}
-		};
 	}
 	
 	/**
@@ -147,6 +131,22 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 			public void customResultAvailable(Object result)
 			{
 				libservice = (ILibraryService) result;
+				loader	= new OAVBDIModelLoader(props, component.getComponentIdentifier().getRoot());
+				mtypes	= Collections.synchronizedMap(new WeakHashMap());
+				libservicelistener = new ILibraryServiceListener()
+				{
+					public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
+					{
+						loader.clearModelCache();
+						return IFuture.DONE;
+					}
+					
+					public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
+					{
+						loader.clearModelCache();
+						return IFuture.DONE;
+					}
+				};
 				libservice.addLibraryServiceListener(libservicelistener);
 				super.customResultAvailable(null);
 			}

@@ -91,7 +91,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		this.properties	= properties;
 		this.ia = access;
 		this.loader = new GpmnModelLoader();
-		this.converter = new GpmnBDIConverter();
+		this.converter = new GpmnBDIConverter(access.getComponentIdentifier().getRoot());
 	}
 	
 	public IFuture<Void> startService()

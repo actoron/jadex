@@ -101,16 +101,20 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	/** The reader (cached for speed, todo: weak for memory). */
 	protected Reader	reader;
 	
+	/** The platform root. */
+	protected IComponentIdentifier	root;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create an OAV BDI Model loader.
 	 */
-	public OAVBDIModelLoader(Map properties)
+	public OAVBDIModelLoader(Map properties, IComponentIdentifier root)
 	{
 		super(new String[]{FILE_EXTENSION_AGENT, FILE_EXTENSION_CAPABILITY, FILE_EXTENSION_PROPERTIES});
 		this.properties	= properties;
 		this.reader	= OAVBDIXMLReader.getReader();
+		this.root	= root;
 	}
 
 	//-------- methods --------
@@ -132,7 +136,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 	 */
 	public OAVCapabilityModel	loadCapabilityModel(String name, String[] imports, ClassLoader classloader, Object context) throws Exception
 	{
-		return (OAVCapabilityModel)loadModel(name, FILE_EXTENSION_CAPABILITY, imports, classloader, (IResourceIdentifier)context);
+		return (OAVCapabilityModel)loadModel(name, FILE_EXTENSION_CAPABILITY, imports, classloader, context);
 	}
 
 	//-------- AbstractModelLoader methods --------
@@ -260,7 +264,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				String	file	= (String)state.getAttributeValue(mcrs[i], OAVBDIMetaModel.capabilityref_has_file);
 				try
 				{
-					OAVCapabilityModel	cmodel	= loadCapabilityModel(file, imports, model.getState().getTypeModel().getClassLoader(), info.getResourceIdentifier());
+					OAVCapabilityModel	cmodel	= loadCapabilityModel(file, imports, model.getState().getTypeModel().getClassLoader(), new Object[]{info.getResourceIdentifier(), root});
 					model.addSubcapabilityModel(cmodel);
 					if(cmodel.getModelInfo().getReport()!=null)
 					{

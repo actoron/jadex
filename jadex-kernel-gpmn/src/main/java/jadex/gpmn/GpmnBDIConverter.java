@@ -7,6 +7,7 @@ import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.impl.JavaStandardPlanExecutor;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdibpmn.BpmnPlanExecutor;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
@@ -59,7 +60,7 @@ public class GpmnBDIConverter
 	/**
 	 *  Create a new converter.
 	 */
-	public GpmnBDIConverter()
+	public GpmnBDIConverter(IComponentIdentifier root)
 	{
 		// Todo: use original OAVBDIModelLoader (via service?) for accurate properties.
 		this.loader = new OAVBDIModelLoader(SUtil.createHashMap(new String[]
@@ -71,7 +72,7 @@ public class GpmnBDIConverter
 			{
 				null,
 				null
-			}));
+			}), root);
 	}
 	
 	//-------- methods --------
