@@ -270,11 +270,12 @@ public class MessageService extends BasicService implements IMessageService
 							ret.setException(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
 							return;
 						}
-						else if(rec.getAddresses()==null)
-						{
-							ret.setException(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));
-							return;
-						}
+						// Is correct for local messages
+//						else if(rec.getAddresses()==null)
+//						{
+//							ret.setException(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));
+//							return;
+//						}
 					}
 				}
 				
