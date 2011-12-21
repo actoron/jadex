@@ -320,7 +320,10 @@
 						<env:object type="experimentID">
 							<env:property name="experimentID">$args.Experiment_id</env:property>
 						</env:object>
-
+	
+						<env:object type="walkingStrategy">					
+							<env:property name="strategy">$args.walkingStrategy</env:property>
+						</env:object>
 					</env:objects>
 
 					<!-- <env:dataproviders> <env:dataprovider name="homebase_ore"> <env:source 
@@ -408,6 +411,9 @@
 						<env:object type="experimentID">
 							<env:property name="experimentID">$args.Experiment_id</env:property>
 						</env:object>
+						<env:object type="walkingStrategy">					
+							<env:property name="strategy">$args.walkingStrategy</env:property>
+						</env:object>
 
 					</env:objects>
 
@@ -491,6 +497,9 @@
 						<env:object type="experimentID">
 							<env:property name="experimentID">$args.Experiment_id</env:property>
 						</env:object>
+						<env:object type="walkingStrategy">					
+							<env:property name="strategy">$args.walkingStrategy</env:property>
+						</env:object>
 
 					</env:objects>
 				
@@ -556,6 +565,9 @@
 						<!-- TMP-HACK! -->
 						<env:object type="experimentID">
 							<env:property name="experimentID">$args.Experiment_id</env:property>
+						</env:object>
+						<env:object type="walkingStrategy">					
+							<env:property name="strategy">$args.walkingStrategy</env:property>
 						</env:object>
 
 					</env:objects>
