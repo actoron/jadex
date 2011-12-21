@@ -907,7 +907,7 @@ public class StarterPanel extends JLayeredPane
 			config.getModel().setSelectedItem(confignames[0]);
 		}
 		
-		if(model!=null && model.isStartable())
+		if(model!=null && model.isStartable() && model.getReport()==null)
 		{
 			createArguments();
 			createResults();
@@ -931,8 +931,8 @@ public class StarterPanel extends JLayeredPane
 		}
 		else
 		{
-			createRequiredServices();
-			createProvidedServices();
+//			createRequiredServices();
+//			createProvidedServices();
 			arguments.setVisible(false);
 			results.setVisible(false);
 			componentpanel.setVisible(false);
