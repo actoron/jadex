@@ -160,6 +160,8 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						? (IComponentIdentifier)thread.getPropertyValue("parent")
 						: instance.getComponentIdentifier();
 					
+//					System.out.println("parent is: "+parent.getAddresses());	
+						
 					IFuture<IComponentIdentifier> ret = cms.createComponent(null, file,
 						new CreationInfo(null, args, parent, false, instance.getModelElement().getModelInfo().getAllImports()), 
 						new IResultListener<Map<String, Object>>()

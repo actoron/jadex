@@ -2418,19 +2418,22 @@ public abstract class ComponentManagementService extends BasicService implements
 			public void customResultAvailable(Object result)
 			{
 //				final boolean[]	services = new boolean[2];
-				SServiceProvider.getService(exta.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+				SServiceProvider.getService(exta.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(Object result)
 					{
 						exeservice	= (IExecutionService)result;
 						
-						SServiceProvider.getService(exta.getServiceProvider(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+						SServiceProvider.getService(exta.getServiceProvider(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new DelegationResultListener(ret)
 						{
-							public void resultAvailable(Object result)
+							public void customResultAvailable(Object result)
 							{
 								marshalservice	= (IMarshalService)result;
 						
-								SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DelegationResultListener(ret)
+								SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(new DelegationResultListener(ret)
 								{
 									public void customResultAvailable(Object result)
 									{
@@ -2439,13 +2442,19 @@ public abstract class ComponentManagementService extends BasicService implements
 										// add root adapter and register root component
 										if(root!=null)
 										{
-											synchronized(adapters)
+											msgservice.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
 											{
-												adapters.put(root.getComponentIdentifier(), root);
-											}
+												public void customResultAvailable(String[] addresses)
+												{
+													((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(addresses);
+													synchronized(adapters)
+													{
+														adapters.put(root.getComponentIdentifier(), root);
+													}
+													ret.setResult(null);
+												}
+											});
 										}
-										
-										ret.setResult(null);
 									}
 								});
 							}
