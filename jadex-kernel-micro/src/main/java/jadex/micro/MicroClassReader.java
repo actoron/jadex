@@ -51,6 +51,7 @@ import jadex.micro.annotation.Value;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -103,15 +104,31 @@ public class MicroClassReader
 		String packagename = cma.getPackage()!=null? cma.getPackage().getName(): null;
 		modelinfo.setName(name);
 		modelinfo.setPackage(packagename);
-		String src = SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation());
+//		System.out.println("pd1: "+cma);
+//		System.out.println("pd2: "+cma.getProtectionDomain());
+//		System.out.println("pd3: "+cma.getProtectionDomain().getCodeSource());
+//		System.out.println("pd4: "+cma.getProtectionDomain().getCodeSource().getLocation());
+		String src = cma.getProtectionDomain()!=null
+			? SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation()) + File.separator
+			: '/' + cma.getPackage().getName().replace('.', '/') + '/';
 //		modelinfo.setFilename(src+File.separatorChar+model);
-		modelinfo.setFilename(src+File.separator+SReflect.getClassName(cma)+".class");
+		modelinfo.setFilename(src+SReflect.getClassName(cma)+".class");
 //		System.out.println("mircor: "+src+File.separatorChar+model);
 		modelinfo.setType(MicroAgentFactory.FILETYPE_MICROAGENT);
 		modelinfo.setStartable(true);
 		if(rid==null)
 		{
-			URL url = cma.getProtectionDomain().getCodeSource().getLocation();
+			URL url	= null;
+			try
+			{
+				url	= cma.getProtectionDomain()!=null
+						? cma.getProtectionDomain().getCodeSource().getLocation()
+						: new URL("class://" + cma.getPackage().getName().replace('.', '/') + '/');
+			}
+			catch(MalformedURLException e)
+			{
+				e.printStackTrace();
+			}
 			rid = new ResourceIdentifier(new LocalResourceIdentifier(root, url), null);
 		}
 		modelinfo.setResourceIdentifier(rid);

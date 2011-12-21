@@ -108,6 +108,7 @@ public class JadexAndroidBenchmarkActivity extends Activity
 					
 					public void exceptionOccurred(final Exception exception)
 					{
+						exception.printStackTrace();
 						runOnUiThread(new Runnable()
 						{
 							public void run()
