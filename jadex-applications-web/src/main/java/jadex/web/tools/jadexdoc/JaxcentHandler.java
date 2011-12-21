@@ -114,9 +114,28 @@ public class JaxcentHandler extends JaxcentPage
 										+file+" could not be found.");
 								}
 							}
-							catch(Exception e)
+							catch(Jaxception e)
 							{
 								e.printStackTrace();
+							}
+							catch(Exception exception)
+							{
+								try
+								{
+									String	txt	= "Jadexdoc: File could not be loaded.";
+									HtmlDiv	title	= new HtmlDiv(JaxcentHandler.this, "title");
+									title.setInnerHTML(txt);
+									execJavaScriptCode("document.title =\""+txt+"\"");
+									
+									StringWriter	trace	= new StringWriter();
+									exception.printStackTrace(new PrintWriter(trace));
+									HtmlDiv	loading	= new HtmlDiv(JaxcentHandler.this, "loading");
+									loading.setInnerHTML("<h1>Jadexdoc Problem</h1><pre>"+trace+"</pre>");
+								}
+								catch(Jaxception e)
+								{
+									e.printStackTrace();
+								}
 							}
 						}
 					}).start();
