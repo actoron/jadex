@@ -19,21 +19,14 @@ public class ExecuteStepTask extends AbstractTask
 	{
 		Object[] step = (Object[])context.getParameterValue("step");
 		Future ret = (Future)step[1];
-		try
+		Object res = ((IComponentStep)step[0]).execute(instance); 
+		if(res instanceof IFuture)
 		{
-			Object res = ((IComponentStep)step[0]).execute(instance); 
-			if(res instanceof IFuture)
-			{
-				((IFuture)res).addResultListener(new DelegationResultListener(((Future)step[1])));
-			}
-			else
-			{
-				ret.setResult(res);
-			}
+			((IFuture)res).addResultListener(new DelegationResultListener(((Future)step[1])));
 		}
-		catch(Exception e)
+		else
 		{
-			ret.setException(e);
+			ret.setResult(res);
 		}
 	}
 	
