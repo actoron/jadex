@@ -127,6 +127,8 @@ public class RelayServlet extends HttpServlet
 				queue	= 	new ArrayBlockingQueue<Tuple2<InputStream, Future<Void>>>();
 			}
 			map.put(id, queue);
+			response.getOutputStream().flush();	// Let client know that it is connected.
+			
 	//		System.out.println("Added to map. New size: "+map.size());
 			try
 			{

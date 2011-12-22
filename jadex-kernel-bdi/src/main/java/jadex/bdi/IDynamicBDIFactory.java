@@ -11,6 +11,8 @@ import jadex.commons.future.IFuture;
  */
 public interface IDynamicBDIFactory
 {
+	// todo: support dynamic capability also
+	
 	/**
 	 *  Create a new agent model, which can be manually edited before
 	 *  starting.

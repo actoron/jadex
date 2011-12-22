@@ -492,6 +492,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 						info.setName(name);
 						info.setPackage(pkg);
 						info.setImports(imports);
+						info.setResourceIdentifier(rid);
 
 						ret.setResult(new MCapabilityFlyweight(state, handle, info));
 					}

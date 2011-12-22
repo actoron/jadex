@@ -1,4 +1,4 @@
-package jadex.base.relay;
+package jadex.base.service.message.transport.httprelaymtp;
 
 import java.net.InetAddress;
 import java.util.Date;

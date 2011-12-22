@@ -379,8 +379,7 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public IResourceIdentifier getResourceIdentifier()
 	{
-		if(rid==null)
-			System.out.println("herehere");
+		assert rid!=null;
 		return rid;
 	}
 

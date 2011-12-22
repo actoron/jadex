@@ -45,7 +45,7 @@ public class PlatformsTest extends TestCase
 	public static void main(String[] args)
 	{
 		PlatformsTest test = new PlatformsTest();
-		for(int i=0; i<100; i++)
+		for(int i=0; i<10000; i++)
 		{
 			System.out.println("Run: "+i);
 			test.testPlatforms();
