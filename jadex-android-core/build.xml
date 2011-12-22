@@ -21,9 +21,6 @@
 	<property name="jadex-applications-micro" location="../jadex-applications-micro/src/main/java" />
 	
 	
-	<!-- this is for fixed source files -->
-	<property name="src-fix" location="./src-fix" />
-
 	<!-- target source directory -->
 	<property name="src_android" location="src/main/java" />
 
@@ -118,7 +115,8 @@
 		ProvidedServiceInfoProperties.java,
 		ProvidedServiceData.java,
 		publish,
-		test
+		test,
+		PlatformApplet.java
 		" />
 
 	<property name="exclude-jadex-xml" value="
@@ -144,7 +142,6 @@
 		jtable,
 		jtreetable, 
 		FixedJComboBox.java,
-		SUtil.java,
 		BrowserLauncher2.java" />
 
 	
@@ -237,13 +234,6 @@
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess> 
-		
-		<echo level="info">preprocessing ${src-fix}</echo>
-		<preprocess indir="${src-fix}" outdir="${src_android}" out="merge" except="${exclude}">
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
-			<var name="android" value="${android}" />
-			<var name="androidVersion" value="${androidVersion}" />
-		</preprocess>
 	</target>
 
 	<!-- This target preprocesses and applies changes IN-PLACE. 

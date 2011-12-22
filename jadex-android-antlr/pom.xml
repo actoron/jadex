@@ -14,6 +14,10 @@
 	<name>jadex-android-antlr</name>
 	<packaging>jar</packaging>
 
+	<description>
+	This Project contains the ANTLR Runtime Libraries for Android.
+	</description>
+
 	<build>
 		<resources>
 			<resource>

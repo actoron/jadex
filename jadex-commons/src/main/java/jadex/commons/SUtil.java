@@ -65,7 +65,7 @@ public class SUtil
 	 * Mapping from single characters to encoded version for displaying on
 	 * xml-style interfaces.
 	 */
-	protected static Map			htmlwraps;
+	protected static Map<String, String>			htmlwraps;
 
 	/** Holds the single characters. */
 	protected static String			seps;
@@ -93,65 +93,66 @@ public class SUtil
 
 	static
 	{
-		htmlwraps = new Hashtable();
-		htmlwraps.put("\"", "&quot;");
-		htmlwraps.put("&", "&amp;"); // Hmm???
-		htmlwraps.put("'", "&apos;");
-		htmlwraps.put("<", "&lt;");
-		htmlwraps.put(">", "&gt;");
-		htmlwraps.put("ä", "&auml;");
-		htmlwraps.put("Ä", "&Auml;");
-		htmlwraps.put("ü", "&uuml;");
-		htmlwraps.put("Ü", "&Uuml;");
-		htmlwraps.put("ö", "&ouml;");
-		htmlwraps.put("Ö", "&Ouml;");
+		htmlwraps = new Hashtable<String, String>();
+		htmlwraps.put("\\u0022", "&quot;");
+		htmlwraps.put("\u0026", "&amp;"); // Hmm???
+		htmlwraps.put("\u0027", "&apos;");
+		htmlwraps.put("\u003C", "&lt;");
+		htmlwraps.put("\u003E", "&gt;");
+		htmlwraps.put("\u00E4", "&auml;");
+		htmlwraps.put("\u00C4", "&Auml;");
+		htmlwraps.put("\u00FC", "&uuml;");
+		htmlwraps.put("\u00DC", "&Uuml;");
+		htmlwraps.put("\u00F6", "&ouml;");
+		htmlwraps.put("\u00D6", "&Ouml;");
 
-		htmlwraps.put("ï¿½", "&acute;");
-		htmlwraps.put("ï¿½", "&agrave;");
-		htmlwraps.put("ï¿½", "&aring;");
-		htmlwraps.put("ï¿½", "&acirc;");
-		htmlwraps.put("ï¿½", "&Acute;");
-		htmlwraps.put("ï¿½", "&Agrave;");
-		htmlwraps.put("ï¿½", "&Aring;");
-		htmlwraps.put("ï¿½", "&Acirc;");
+		htmlwraps.put("\u00B4", "&acute;");
+		htmlwraps.put("\u00E1", "&aacute;");
+		htmlwraps.put("\u00C1", "&Aacute;");
+		htmlwraps.put("\u00E0", "&agrave;");
+		htmlwraps.put("\u00C0", "&Agrave;");
+		htmlwraps.put("\u00E5", "&aring;");
+		htmlwraps.put("\u00C5", "&Aring;l");
+		htmlwraps.put("\u00E2", "&acirc;");
+		htmlwraps.put("\u00C2", "&Acirc;");
 
-		htmlwraps.put("ï¿½", "&ecute;");
-		htmlwraps.put("ï¿½", "&egrave;");
-		htmlwraps.put("ï¿½", "&ecirc;");
-		htmlwraps.put("ï¿½", "&Ecute;");
-		htmlwraps.put("ï¿½", "&Egrave;");
-		htmlwraps.put("ï¿½", "&Ecirc;");
+		htmlwraps.put("\u00E9", "&eacute;");
+		htmlwraps.put("\u00C9", "&Eacute;");
+		htmlwraps.put("\u00E8", "&egrave;");
+		htmlwraps.put("\u00C8", "&Egrave;");
+		htmlwraps.put("\u00EA", "&ecirc;");
+		htmlwraps.put("\u00CA", "&Ecirc;");
 
-		htmlwraps.put("ï¿½", "&icute;");
-		htmlwraps.put("ï¿½", "&igrave;");
-		htmlwraps.put("ï¿½", "&icirc;");
-		htmlwraps.put("ï¿½", "&Icute;");
-		htmlwraps.put("ï¿½", "&Igrave;");
-		htmlwraps.put("ï¿½", "&Icirc;");
+		htmlwraps.put("\u00ED", "&iacute;");
+		htmlwraps.put("\u00CD", "&Iacute;");
+		htmlwraps.put("\u00EC", "&igrave;");
+		htmlwraps.put("\u00CC", "&Igrave;");
+		htmlwraps.put("\u00EE", "&icirc;");
+		htmlwraps.put("\u00CE", "&Icirc;");
 
-		htmlwraps.put("ï¿½", "&ocute;");
-		htmlwraps.put("ï¿½", "&ograve;");
-		htmlwraps.put("ï¿½", "&ocirc;");
-		htmlwraps.put("ï¿½", "&otilde;");
-		htmlwraps.put("ï¿½", "&Ocute;");
-		htmlwraps.put("ï¿½", "&Ograve;");
-		htmlwraps.put("ï¿½", "&Ocirc;");
-		htmlwraps.put("ï¿½", "&Otilde;");
+		htmlwraps.put("\u00F3", "&oacute;");
+		htmlwraps.put("\u00D3", "&Oacute;");
+		htmlwraps.put("\u00F2", "&ograve;");
+		htmlwraps.put("\u00D2", "&Ograve;");
+		htmlwraps.put("\u00F4", "&ocirc;");
+		htmlwraps.put("\u00D4", "&Ocirc;");
+		htmlwraps.put("\u00F5", "&otilde;");
+		htmlwraps.put("\u00D5", "&Otilde;");
 
-		htmlwraps.put("ï¿½", "&ucute;");
-		htmlwraps.put("ï¿½", "&ugrave;");
-		htmlwraps.put("ï¿½", "&ucirc;");
-		htmlwraps.put("ï¿½", "&Ucute;");
-		htmlwraps.put("ï¿½", "&Ugrave;");
-		htmlwraps.put("ï¿½", "&Ucirc;");
+		htmlwraps.put("\u00FA", "&uacute;");
+		htmlwraps.put("\u00DA", "&Uacute;");
+		htmlwraps.put("\u00F9", "&ugrave;");
+		htmlwraps.put("\u00D9", "&Ugrave;");
+		htmlwraps.put("\u00FB", "&ucirc;");
+		htmlwraps.put("\u00DB", "&Ucirc;");
 
-		htmlwraps.put("ï¿½", "&cccedil;");
-		htmlwraps.put("ï¿½", "&Ccedil;");
+		htmlwraps.put("\u00E7", "&ccedil;");
+		htmlwraps.put("\u00C7", "&Ccedil;");
 
 		seps = "";
-		Iterator it = htmlwraps.keySet().iterator();
+		Iterator<String> it = htmlwraps.keySet().iterator();
 		while(it.hasNext())
-			seps += (String)it.next();
+			seps += it.next();
 	}
 
 	/**
@@ -234,7 +235,7 @@ public class SUtil
 	{
 		List ar1 = arrayToList(a1);
 		List ar2 = arrayToList(a2);
-		List ret = new ArrayList();
+		List<Object> ret = new ArrayList<Object>();
 		Object tmp;
 
 		for(int i = 0; i < ar1.size(); i++)
@@ -707,7 +708,7 @@ public class SUtil
 				String tmp = stok.nextToken();
 				String rep = null;
 				if(!(tmp.equals("&") && flag == CONVERT_ALL_EXCEPT_AMP))
-					rep = (String)htmlwraps.get(tmp);
+					rep = htmlwraps.get(tmp);
 				if(rep != null)
 					res += rep;
 				else
@@ -1449,9 +1450,9 @@ public class SUtil
 	 * @param values The values.
 	 * @return The map.
 	 */
-	public static Map createHashMap(Object[] keys, Object[] values)
+	public static Map<Object, Object> createHashMap(Object[] keys, Object[] values)
 	{
-		HashMap ret = new HashMap();
+		HashMap<Object, Object> ret = new HashMap<Object, Object>();
 		for(int i = 0; i < keys.length; i++)
 		{
 			ret.put(keys[i], values[i]);
@@ -1465,9 +1466,9 @@ public class SUtil
 	 * @param values The values.
 	 * @return The map.
 	 */
-	public static Set createHashSet(Object[] values)
+	public static Set<Object> createHashSet(Object[] values)
 	{
-		Set ret = new HashSet();
+		Set<Object> ret = new HashSet<Object>();
 		for(int i = 0; i < values.length; i++)
 		{
 			ret.add(values[i]);
@@ -1481,9 +1482,9 @@ public class SUtil
 	 * @param values The values.
 	 * @return The map.
 	 */
-	public static List createArrayList(Object[] values)
+	public static List<Object> createArrayList(Object[] values)
 	{
-		List ret = new ArrayList();
+		List<Object> ret = new ArrayList<Object>();
 		for(int i = 0; i < values.length; i++)
 		{
 			ret.add(values[i]);
@@ -1532,7 +1533,7 @@ public class SUtil
 	public static void main(String[] args)
 	{
 //		System.out.println("Here: " + createUniqueId("test", 3));
-		
+		System.out.println(htmlwraps);
 		testIntByteConversion();
 	}
 	
@@ -1572,7 +1573,7 @@ public class SUtil
 		
 		// Build path as list of files (directories).
 		File basedir = new File(System.getProperty("user.dir"));
-		List basedirs = new ArrayList();
+		List<File> basedirs = new ArrayList<File>();
 		while(basedir != null)
 		{
 			basedirs.add(0, basedir);
@@ -1581,7 +1582,7 @@ public class SUtil
 
 		// Build path as list of files (directories).
 		File target = new File(absolute);
-		List targets = new ArrayList();
+		List<File> targets = new ArrayList<File>();
 		while(target != null)
 		{
 			targets.add(0, target);
@@ -1608,7 +1609,7 @@ public class SUtil
 			}
 			for(int i = index; i < targets.size(); i++)
 			{
-				buf.append(((File)targets.get(i)).getName());
+				buf.append(targets.get(i).getName());
 				if(i != targets.size() - 1)
 					buf.append(File.separatorChar);
 			}
@@ -2166,7 +2167,7 @@ public class SUtil
 		
 //		System.out.println("addresses: "+addresses);
 		
-		return (String[])addresses.toArray(new String[addresses.size()]);		
+		return addresses.toArray(new String[addresses.size()]);		
 	}
 	
 	
@@ -2191,4 +2192,5 @@ public class SUtil
 			this.out	= out;
 		}
 	}
+	
 }
