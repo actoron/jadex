@@ -3,8 +3,10 @@ package jadex.android.benchmarks;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.ComponentIdentifier;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.xml.bean.JavaWriter;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,7 +31,7 @@ public class RelayBenchmark
 	/**
 	 *  Open the connection.
 	 */
-	public static InputStream	startReceiving(Object id) throws Exception
+	public static Tuple2<InputStream, URLConnection>	startReceiving(Object id) throws Exception
 	{
 //		System.out.println("Connecting as: "+id);
 		String	xmlid	= JavaWriter.objectToXML(id, RelayBenchmark.class.getClassLoader());
@@ -37,7 +39,8 @@ public class RelayBenchmark
 //		System.out.println("Connecting to: "+url);
 		URLConnection	con	= url.openConnection();
 		con.setUseCaches(false);
-		return con.getInputStream();
+		InputStream in = new BufferedInputStream(con.getInputStream());
+		return new Tuple2<InputStream, URLConnection>(in, con);
 	}
 
 	/**
@@ -97,6 +100,7 @@ public class RelayBenchmark
 				con.setRequestMethod("POST");
 				con.setDoOutput(true);
 				con.setChunkedStreamingMode(0);
+				con.setRequestProperty("Accept-Encoding", "identity");
 				con.setUseCaches(false);
 				OutputStream	out	= new BufferedOutputStream(con.getOutputStream());
 				SRelay.writeObject(id, out);
@@ -118,21 +122,22 @@ public class RelayBenchmark
 	{
 		int	setup	= 10;
 		int	benchmark	= 100;
+		int	data	= 1242;	// 1308;
 		
 		System.out.println("Benchmark setup:");
 		System.out.print("simple");
-		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, 1308, false, false);
+		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, data, false, false);
 		System.out.print("\nencoding");
-		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, 1308, true, false);
+		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, data, true, false);
 		System.out.print("\ndecoding");
-		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, 1308, true, true);
+		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, data, true, true);
 		
 		System.out.print("\n\nRunning simple benchmark.");
-		long	simple	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, 1308, false, false);
+		long	simple	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, data, false, false);
 		System.out.print("\nRunning encoding benchmark.");
-		long	encoding	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, 1308, true, false);
+		long	encoding	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, data, true, false);
 		System.out.print("\nRunning encoding/decoding benchmark.");
-		long	decoding	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, 1308, true, true);
+		long	decoding	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, data, true, true);
 		
 		System.out.println("\nSimple benchmark took: "+(simple*100/benchmark)/100.0+" ms per message");
 		System.out.println("Encoding benchmark took: "+(encoding*100/benchmark)/100.0+" ms per message ("+(encoding*100/simple)+"%)");
@@ -144,7 +149,7 @@ public class RelayBenchmark
 	 */
 	public static long runTest(final Object id, final int num, final int size, final boolean encode, boolean decode) throws Exception
 	{
-		InputStream	in	= startReceiving(id);
+		Tuple2<InputStream, URLConnection>	con	= startReceiving(id);
 		long	start	= System.currentTimeMillis();
 		new Thread(new Runnable()
 		{
@@ -160,7 +165,8 @@ public class RelayBenchmark
 				}
 			}
 		}).start();
-		receive(id, in, num, decode);
+		receive(id, con.getFirstEntity(), num, decode);
+		((HttpURLConnection)con.getSecondEntity()).disconnect();
 		return System.currentTimeMillis() - start;
 	}
 }
