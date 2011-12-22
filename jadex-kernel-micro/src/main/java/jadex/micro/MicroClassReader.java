@@ -123,7 +123,7 @@ public class MicroClassReader
 			{
 				url	= cma.getProtectionDomain()!=null
 						? cma.getProtectionDomain().getCodeSource().getLocation()
-						: new URL("class://" + cma.getPackage().getName().replace('.', '/') + '/');
+						: new URL("file://" + cma.getPackage().getName().replace('.', '/') + '/');
 			}
 			catch(MalformedURLException e)
 			{

@@ -4,35 +4,35 @@ import jadex.android.bluetooth.util.Helper;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.SendHandler;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.commons.future.IFuture;
 import android.util.Log;
 
 /**
- *  Handle sending.
+ * Handle sending.
  */
-public class BluetoothP2PSendHandler extends SendHandler
-{
+public class BluetoothP2PSendHandler extends SendHandler {
 	/**
-	 *  Create a new lease time handling object.
+	 * Create a new lease time handling object.
 	 */
-	public BluetoothP2PSendHandler(DiscoveryAgent agent)
-	{
+	public BluetoothP2PSendHandler(DiscoveryAgent agent) {
 		super(agent);
 		Log.d(Helper.LOG_TAG, "BluetoothP2PSendHandler created.");
 	}
-	
+
 	/**
-	 *  Method to send messages.
+	 * Method to send messages.
 	 */
 	@Override
-	public void send(AwarenessInfo info)
-	{
-//		Log.d(Helper.LOG_TAG, "BluetoothP2PSendHandler: sending Awareness Info");
-		byte[] data = DiscoveryAgent.encodeObject(createAwarenessInfo(), getAgent().getMicroAgent().getClassLoader());
+	public void send(AwarenessInfo info) {
+		// Log.d(Helper.LOG_TAG,
+		// "BluetoothP2PSendHandler: sending Awareness Info");
+		byte[] data = DiscoveryAgent.encodeObject(info,
+				getAgent().getMicroAgent().getClassLoader());
 		getAgent().sendAwarenessInfo(data);
 	}
-	
+
 	/**
-	 *  Send a packet.
+	 * Send a packet.
 	 */
 //	public boolean send(byte[] data, InetAddress address, int port)
 //	{
@@ -51,10 +51,9 @@ public class BluetoothP2PSendHandler extends SendHandler
 //	}
 	
 	/**
-	 *  Get the agent.
+	 * Get the agent.
 	 */
-	protected BluetoothP2PDiscoveryAgent getAgent()
-	{
-		return (BluetoothP2PDiscoveryAgent)agent;
+	protected BluetoothP2PDiscoveryAgent getAgent() {
+		return (BluetoothP2PDiscoveryAgent) agent;
 	}
 }
