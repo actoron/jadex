@@ -151,6 +151,10 @@ public abstract class DiscoveryAgent
 				}
 			}));
 		}
+		else
+		{
+			ret.setResult(null);
+		}
 		
 //		System.out.println("killed set to true: "+getComponentIdentifier());
 		
