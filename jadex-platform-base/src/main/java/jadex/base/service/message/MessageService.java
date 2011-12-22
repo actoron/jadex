@@ -146,7 +146,11 @@ public class MessageService extends BasicService implements IMessageService
 		this.component = component;
 		this.transports = SCollection.createArrayList();
 		for(int i=0; i<transports.length; i++)
-			this.transports.add(transports[i]);
+		{
+			// Allow nulls to make it easier to exclude transports via platform configuration.
+			if(transports[i]!=null)
+				this.transports.add(transports[i]);
+		}
 		this.messagetypes	= SCollection.createHashMap();
 		for(int i=0; i<messagetypes.length; i++)
 			this.messagetypes.put(messagetypes[i].getName(), messagetypes[i]);		
