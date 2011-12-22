@@ -1450,9 +1450,9 @@ public class SUtil
 	 * @param values The values.
 	 * @return The map.
 	 */
-	public static Map<Object, Object> createHashMap(Object[] keys, Object[] values)
+	public static <K,T>	Map<K, T> createHashMap(K[] keys, T[] values)
 	{
-		HashMap<Object, Object> ret = new HashMap<Object, Object>();
+		HashMap<K, T> ret = new HashMap<K, T>();
 		for(int i = 0; i < keys.length; i++)
 		{
 			ret.put(keys[i], values[i]);
