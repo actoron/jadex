@@ -7,6 +7,7 @@ import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.factory.IComponentFactoryExtensionService;
+import jadex.bridge.service.types.library.IDependencyService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
@@ -103,6 +104,7 @@ import jadex.micro.annotation.RequiredServices;
 	@ProvidedService(type=IDF.class, implementation=@Implementation(expression="new DirectoryFacilitatorService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(expression="new SimulationService($component)")),
 	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService($component.getServiceProvider())")),
+	@ProvidedService(type=IDependencyService.class, implementation=@Implementation(expression="new BasicDependencyService()")),
 	@ProvidedService(name="envextension", type=IComponentFactoryExtensionService.class, implementation=@Implementation(expression="new EnvSupportExtensionService()")),	// expression to avoid compile-time dependency
 	@ProvidedService(name="agrextension", type=IComponentFactoryExtensionService.class, implementation=@Implementation(expression="new AGRExtensionService()"))	// expression to avoid compile-time dependency
 })

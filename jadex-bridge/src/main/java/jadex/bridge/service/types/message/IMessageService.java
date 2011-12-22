@@ -86,11 +86,13 @@ public interface IMessageService extends IService
 	 */
 	public String[] getAddressSchemes();
 
+	// todo: remove these method or futurize the first
 	/**
 	 *  Get the message type.
 	 *  @param type The type name.
 	 *  @return The message type.
 	 */
+	@Excluded
 	public MessageType getMessageType(String type);
 	
 	/**

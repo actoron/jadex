@@ -174,8 +174,6 @@ public class MessageService extends BasicService implements IMessageService
 		IComponentIdentifier osender, final IResourceIdentifier rid, final byte[] codecids)
 	{
 		final Map msg = new HashMap(origmsg);
-		if(rid==null)
-			System.out.println("msgservice sendMessage(): "+rid);
 		
 		final Future<Void> ret = new Future<Void>();
 		final IComponentIdentifier sender = internalUpdateComponentIdentifier(osender);
@@ -270,12 +268,13 @@ public class MessageService extends BasicService implements IMessageService
 							ret.setException(new MessageFailureException(msg, type, null, "A receiver nulls: "+msg));
 							return;
 						}
-						// Is correct for local messages
-//						else if(rec.getAddresses()==null)
-//						{
-//							ret.setException(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));
-//							return;
-//						}
+						// Addresses may only null for local messages, i.e. intra platform communication
+						else if(rec.getAddresses()==null && 
+							!(rec.getPlatformName().equals(component.getComponentIdentifier().getPlatformName())))
+						{
+							ret.setException(new MessageFailureException(msg, type, null, "A receiver addresses nulls: "+msg));
+							return;
+						}
 					}
 				}
 				

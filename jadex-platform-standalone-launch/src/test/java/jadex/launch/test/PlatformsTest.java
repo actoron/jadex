@@ -36,13 +36,32 @@ public class PlatformsTest extends TestCase
 		"-gui", "false",
 		"-saveonexit", "false",
 		"-welcome", "false",
-		"-autoshutdown", "false"
+		"-autoshutdown", "false",
+		"-logging_level", "java.util.logging.Level.INFO"
 	};
 
-	public void	testBPMNPlatform()
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args)
 	{
-		long timeout	= 10000;
+		PlatformsTest test = new PlatformsTest();
+		for(int i=0; i<100; i++)
+		{
+			System.out.println("Run: "+i);
+			test.testPlatforms();
+		}
+	}
+	
+	/**
+	 *  Test the platforms.
+	 */
+	public void	testPlatforms()
+	{
+		long timeout	= 20000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
+		long[] starttimes = new long[PLATFORMS.length/2+1];
+		long[] shutdowntimes = new long[PLATFORMS.length/2+1];
 		
 		for(int i=0; i<=PLATFORMS.length/2; i++)
 		{
@@ -56,29 +75,27 @@ public class PlatformsTest extends TestCase
 				});
 			}
 			
+			long start = System.currentTimeMillis();
 			final IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(args).get(sus, timeout);
+			starttimes[i] = System.currentTimeMillis()-start;
+			System.out.println("Started platform: "+i);
+			
 			final Future<Void>	fut	= new Future<Void>();
-			SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class)
-				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut)
+			IComponentManagementService cms = SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
+			cms.addComponentListener(platform.getComponentIdentifier(), new ICMSComponentListener()
 			{
-				public void customResultAvailable(IComponentManagementService	cms)
+				public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
 				{
-					cms.addComponentListener(platform.getComponentIdentifier(), new ICMSComponentListener()
-					{
-						public IFuture<Void> componentRemoved(IComponentDescription desc, Map<String, Object> results)
-						{
-							fut.setResult(null);
-							return IFuture.DONE;
-						}
-						public IFuture<Void> componentAdded(IComponentDescription desc)
-						{
-							return IFuture.DONE;
-						}
-						public IFuture<Void> componentChanged(IComponentDescription desc)
-						{
-							return IFuture.DONE;
-						}
-					});
+					fut.setResult(null);
+					return IFuture.DONE;
+				}
+				public IFuture<Void> componentAdded(IComponentDescription desc)
+				{
+					return IFuture.DONE;
+				}
+				public IFuture<Void> componentChanged(IComponentDescription desc)
+				{
+					return IFuture.DONE;
 				}
 			});
 			
@@ -92,9 +109,14 @@ public class PlatformsTest extends TestCase
 //				}
 //			}, 3000);
 			
+			start = System.currentTimeMillis();
 			platform.killComponent().get(sus, timeout);
-
 			fut.get(sus, timeout);
+			shutdowntimes[i] = System.currentTimeMillis()-start;
+			System.out.println("Stopped platform: "+i);
 		}
+		
+		System.out.println("Startup times: "+SUtil.arrayToString(starttimes));
+		System.out.println("Sutdown times: "+SUtil.arrayToString(shutdowntimes));
 	}
 }
