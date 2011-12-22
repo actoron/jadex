@@ -36,8 +36,8 @@ public class PlatformsTest extends TestCase
 		"-gui", "false",
 		"-saveonexit", "false",
 		"-welcome", "false",
-		"-autoshutdown", "false",
-		"-logging_level", "java.util.logging.Level.INFO"
+		"-autoshutdown", "false"
+//		"-logging_level", "java.util.logging.Level.INFO"
 	};
 
 	/**
@@ -58,7 +58,7 @@ public class PlatformsTest extends TestCase
 	 */
 	public void	testPlatforms()
 	{
-		long timeout	= 20000;
+		long timeout = 10000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		long[] starttimes = new long[PLATFORMS.length/2+1];
 		long[] shutdowntimes = new long[PLATFORMS.length/2+1];
