@@ -6,7 +6,6 @@
 	<!-- The transports between the robots and also the producer and consumer result implicitly -->
 	<!-- from this specification. -->
 	<tasks>
-		<!--
 		<task id="1">
 			<steps>
 				<step robot="Robot1" action="A" />
@@ -60,26 +59,6 @@
 				<step robot="Robot5" action="E" />
 			</steps>
 		</task>
-		-->
-		
-		<task id="1" noSteps="20" noCaps="20"/>
-		<task id="2" noSteps="20" noCaps="20"/>
-		<!--
-		<task id="3" noSteps="20" noCaps="20"/>
-		<task id="4" noSteps="20" noCaps="20"/>
-		<task id="5" noSteps="20" noCaps="20"/>
-		<task id="6" noSteps="20" noCaps="20"/>
-		<task id="7" noSteps="20" noCaps="20"/>
-		<task id="8" noSteps="20" noCaps="20"/>
-		<task id="9" noSteps="20" noCaps="20"/>
-		<task id="10" noSteps="20" noCaps="20"/>
-		<task id="11" noSteps="20" noCaps="20"/>
-		<task id="12" noSteps="20" noCaps="20"/>
-		<task id="13" noSteps="20" noCaps="20"/>
-		<task id="14" noSteps="20" noCaps="20"/>
-		<task id="15" noSteps="20" noCaps="20"/>
-		<task id="16" noSteps="20" noCaps="20"/>
-		-->
 	</tasks>
 	
 	<!-- Specifies whether the capabilities in the tasks should be repeated if there is more then one task. -->
@@ -87,18 +66,18 @@
 	<repeat_caps>false</repeat_caps>
 	
 	<!-- Specifies whether workpieces should be simulated or not. -->
-	<simulate_workpieces>false</simulate_workpieces>
+	<simulate_workpieces>true</simulate_workpieces>
 	
 	<!-- Specifies the amount of different capabilities in each robot. -->
 	<!-- For each robot a random value between min and max is used. -->
 	<!-- min must be greater or equals than 1 and max must be greater or equals than min -->
 	<!-- Default: min=1, max=1 -->
-	<redundancy min="16" max="16" />
+	<redundancy min="1" max="1" />
 	
 	<!-- Specifies the amount of work pieces to be processed by the system in each run. -->
 	<!-- Set to 0 for unlimited amount. -->
 	<!-- Default: 0 -->
-	<workpieces>1</workpieces>
+	<workpieces>100</workpieces>
 	
 	<!-- Specifies the processing time in each agent (robot and transporter). -->
 	<!-- For each agent a random value between min and max is used. -->
@@ -113,11 +92,11 @@
 	<!-- For each robot a random value between min and max is used. -->
 	<!-- max must be greater or equals than min. If not, the default is assumed-->
 	<!-- Default: min=5, max=5 -->
-	<buffer_size min="8" max="8" />
+	<buffer_size min="62" max="62" />
 	
 	<!-- Specifies how often this configuration is automatically executed by the system. -->
 	<!-- Default: 1 -->
-	<runs>2</runs>
+	<runs>10</runs>
 	
 	<!-- Specifies the logging interval for the timelord agent. Specify a value of 0 for a event driven simulation. -->
 	<!-- Default: 0 -->

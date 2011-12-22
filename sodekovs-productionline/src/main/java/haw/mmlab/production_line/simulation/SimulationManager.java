@@ -28,11 +28,11 @@ import java.util.List;
  */
 public class SimulationManager {
 
-	private static final int NUMBER_OF_RUNS_PER_CONFIG = 4;
+	private static final int NUMBER_OF_RUNS_PER_CONFIG = 40;
 
 	private static final int NUMBER_OF_TASKS = 10;
 
-	private static final int NUMBER_OF_ROBOTS = 100;
+	private static final int NUMBER_OF_ROBOTS = 7;
 
 	private static final int NUMBER_OF_WORKPIECES = 0;
 
@@ -42,13 +42,13 @@ public class SimulationManager {
 
 	private static final int MAX_PROCESSING_TIME = 0;
 
-	private static final int START_REDUNDANCY_RATE = 10;
+	private static final int START_REDUNDANCY_RATE = 60;
 
-	private static final int START_WORKLOAD = 30;
+	private static final int START_WORKLOAD = 70;
 
-	private static final int STOP_REDUNDANCY_RATE = 10;
+	private static final int STOP_REDUNDANCY_RATE = 60;
 
-	private static final int STOP_WORKLOAD = 30;
+	private static final int STOP_WORKLOAD = 100;
 
 	private static final int RECONF_MSG_DELAY_TIME = 0;
 
@@ -61,7 +61,7 @@ public class SimulationManager {
 	private static int run = 1;
 
 	/**
-	 * @param args
+	 * @param argsq
 	 */
 	public static void main(String[] args) {
 		final SimulationManager manager = new SimulationManager();
@@ -82,6 +82,8 @@ public class SimulationManager {
 					run++;
 					manager.startSimulation(cms, this, manager.redRate, manager.workload);
 				} else {
+					run = 1;
+
 					if (manager.redRate <= STOP_REDUNDANCY_RATE) {
 						if (manager.workload >= STOP_WORKLOAD) {
 							manager.workload = START_WORKLOAD;

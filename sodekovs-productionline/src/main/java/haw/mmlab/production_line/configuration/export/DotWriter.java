@@ -112,13 +112,13 @@ public class DotWriter {
 	 *            the name of the file (for both .dot and .png extension)
 	 */
 	public void generatePNG(String fileName) {
-		String command = "C:/development/Graphviz2.26.3/bin/dot.exe -Tpng " + fileName + ".dot -o " + fileName + ".png";
-
-		try {
-			Runtime.getRuntime().exec(command);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		// String command = "C:/development/Graphviz2.26.3/bin/dot.exe -Tpng " + fileName + ".dot -o " + fileName + ".png";
+		//
+		// try {
+		// Runtime.getRuntime().exec(command);
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
 	}
 
 	/**

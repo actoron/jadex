@@ -11,11 +11,11 @@ import java.math.BigInteger;
  */
 public class MathmaticModel {
 
-	private static final long R = 50;
+	private static final long R = 70;
 
-	private static final long C = 50;
+	private static final long C = R;
 
-	private static final long N = 150;
+	private static final long N = R * 3;
 
 	// private static final double DELTA = 0.35;
 
@@ -32,7 +32,7 @@ public class MathmaticModel {
 		//
 		// distributionFunction(300, redRate, workload, KAPPA, C, k, t);
 
-		System.out.println("redRate\tworkload\texpectationValue\tdistributionFunction");
+		System.out.println("redRate\tworkload\texpectationValue\tdistributionFunction\tvariance\tstandardDeviation\ttwoSigma\tlower\tupper");
 
 		for (int r = 1; r <= 10; r++) {
 			double redRate = r / 10.0;
@@ -43,11 +43,24 @@ public class MathmaticModel {
 				double workload = w / 10.0;
 				double expValue = expectationValue(N, redRate, workload, kappa(workload), C, k, t);
 				double df = distributionFunction(N, redRate, workload, kappa(workload), C, k, t);
+				double variance = variance(N, redRate, workload, kappa(workload), C, k, t);
+				double sd = standardDeviation(variance);
+				double twoSig = twoSigma(sd);
+				double lower = expValue - twoSig;
+				double upper = expValue + twoSig;
 
-				System.out.println(redRate + "\t" + workload + "\t" + expValue + "\t" + df);
+				System.out.println(redRate + "\t" + workload + "\t" + expValue + "\t" + df + "\t" + variance + "\t" + sd + "\t" + twoSig + "\t" + lower + "\t" + upper);
 			}
 		}
 
+	}
+
+	private static double twoSigma(double sd) {
+		return 2 * sd;
+	}
+
+	private static double standardDeviation(double variance) {
+		return Math.sqrt(variance);
 	}
 
 	private static double delta(double redRate) {
@@ -56,6 +69,15 @@ public class MathmaticModel {
 
 	private static double kappa(double workload) {
 		return workload * 10;
+	}
+
+	private static double variance(long n, double redRate, double workload, double kappa, long c, long k, long t) {
+		double result = 0.0;
+		for (int i = 1; i <= n; i++) {
+			result += Math.pow(i - expectationValue(i, redRate, workload, kappa, c, k, t), 2) * p(i, redRate, workload, kappa, c, k, t);
+		}
+
+		return result;
 	}
 
 	private static double expectationValue(long n, double redRate, double workload, double kappa, long c, long k, long t) {
@@ -106,7 +128,7 @@ public class MathmaticModel {
 		BigInteger fractionDown = binomialCoefficient(BigInteger.valueOf(c), BigInteger.valueOf(t));
 		double fraction = fractionTop.doubleValue() / fractionDown.doubleValue();
 
-		return (redRate) * fraction;
+		return redRate * fraction;
 	}
 
 	private static BigInteger binomialCoefficient(BigInteger n, BigInteger k) {
