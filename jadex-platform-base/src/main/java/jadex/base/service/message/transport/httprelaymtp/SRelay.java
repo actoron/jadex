@@ -83,7 +83,7 @@ public class SRelay
 	/**
 	 *  Read data into a byte array.
 	 */
-	protected static byte[] readData(InputStream is, int length) throws IOException
+	public static byte[] readData(InputStream is, int length) throws IOException
 	{
 		int num	= 0;
 		byte[]	buffer	= new byte[length];
