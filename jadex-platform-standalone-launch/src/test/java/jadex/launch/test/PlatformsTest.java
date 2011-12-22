@@ -7,7 +7,6 @@ import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.SUtil;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
@@ -78,7 +77,7 @@ public class PlatformsTest extends TestCase
 			long start = System.currentTimeMillis();
 			final IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(args).get(sus, timeout);
 			starttimes[i] = System.currentTimeMillis()-start;
-			System.out.println("Started platform: "+i);
+//			System.out.println("Started platform: "+i);
 			
 			final Future<Void>	fut	= new Future<Void>();
 			IComponentManagementService cms = SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
@@ -113,10 +112,10 @@ public class PlatformsTest extends TestCase
 			platform.killComponent().get(sus, timeout);
 			fut.get(sus, timeout);
 			shutdowntimes[i] = System.currentTimeMillis()-start;
-			System.out.println("Stopped platform: "+i);
+//			System.out.println("Stopped platform: "+i);
 		}
 		
-		System.out.println("Startup times: "+SUtil.arrayToString(starttimes));
-		System.out.println("Sutdown times: "+SUtil.arrayToString(shutdowntimes));
+//		System.out.println("Startup times: "+SUtil.arrayToString(starttimes));
+//		System.out.println("Sutdown times: "+SUtil.arrayToString(shutdowntimes));
 	}
 }
