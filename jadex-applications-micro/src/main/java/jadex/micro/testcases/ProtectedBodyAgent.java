@@ -18,7 +18,7 @@ public class ProtectedBodyAgent
 	@AgentCreated
 	public void agentCreated()
 	{
-		System.out.println("invoked created");
+//		System.out.println("invoked created");
 	}
 	
 	/**
