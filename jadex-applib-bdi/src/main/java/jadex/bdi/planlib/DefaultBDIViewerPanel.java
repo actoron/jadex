@@ -10,7 +10,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SReflect;
-import jadex.commons.future.CollectionResultListener;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -95,14 +95,14 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 	/**
 	 *  Create the panels.
 	 */
-	protected void createPanels(IBDIInternalAccess scope, String[] subcapnames, Future ret)
+	protected void createPanels(IBDIInternalAccess scope, String[] subcapnames, Future<Void> ret)
 	{
-		final List panels = new ArrayList();
+		final List<Object[]> panels = new ArrayList<Object[]>();
 		
-		final CollectionResultListener lis = new CollectionResultListener(
-			subcapnames.length+1, true, new DelegationResultListener(ret)
+		final CounterResultListener<Void> lis = new CounterResultListener<Void>(
+			subcapnames.length+1, true, new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 //				if(subpanels.size()==1)
 //				{
@@ -129,7 +129,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 		{
 			try
 			{
-				Class clazz	= SReflect.classForName(clname, scope.getClassLoader());
+				Class<?> clazz	= SReflect.classForName(clname, scope.getClassLoader());
 				IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();
 				panels.add(new Object[]{"agent", panel});
 				panel.init(jcc, getActiveComponent()).addResultListener(lis);
@@ -151,7 +151,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 			{
 				ICapability subcap = (ICapability)scope.getSubcapability(subcapnames[i]);
 				Object clid = subcap.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
-				Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, subcap.getClassLoader()): null;
+				Class<?> clazz = clid instanceof Class? (Class<?>)clid: clid instanceof String? SReflect.classForName0((String)clid, subcap.getClassLoader()): null;
 				try
 				{
 					IComponentViewerPanel panel = (IComponentViewerPanel)clazz.newInstance();

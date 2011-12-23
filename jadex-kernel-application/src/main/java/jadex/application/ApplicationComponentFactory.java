@@ -114,9 +114,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	public IFuture<Void> startService()
 	{
 		final Future<Void> ret = new Future<Void>();
-		super.startService().addResultListener(new DelegationResultListener(ret)
+		super.startService().addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 				SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new DelegationResultListener(ret)
