@@ -11,6 +11,7 @@ import jadex.micro.annotation.AgentCreated;
 /**
  * 
  */
+@Agent
 public class CreatedBodyAgent 
 {
 	/** The agent. */

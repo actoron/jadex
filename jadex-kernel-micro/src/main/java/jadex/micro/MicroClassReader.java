@@ -729,10 +729,20 @@ public class MicroClassReader
 		{
 			throw new RuntimeException("Micro agent class not found: " + clname);
 		}
-		else if(!MicroAgent.class.isAssignableFrom(ret)
-			&& !ret.isAnnotationPresent(Agent.class))
+		else if(!MicroAgent.class.isAssignableFrom(ret))
 		{
-			throw new RuntimeException("Not a Micro agent class: " + clname);
+			boolean	found	= false;
+			Class	cma	= ret;
+			while(!found && cma!=null)
+			{
+				found	= cma.isAnnotationPresent(Agent.class);
+				cma	= cma.getSuperclass();
+			}
+
+			if(!found)
+			{
+				throw new RuntimeException("Not a Micro agent class: " + clname);
+			}
 		}
 		return ret;
 	}

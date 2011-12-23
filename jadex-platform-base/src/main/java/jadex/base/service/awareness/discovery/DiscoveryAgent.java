@@ -31,6 +31,7 @@ import java.util.TimerTask;
  */
 @RequiredServices(@RequiredService(name="ms", type=IMessageService.class, 
 	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@Agent
 public abstract class DiscoveryAgent
 {
 	//-------- attributes --------
