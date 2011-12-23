@@ -30,7 +30,7 @@ a:hover
 .horbar {
 	background-color: #EAD085;
 	background-attachment: fixed;
-	background-image: url(shadebar.gif);
+	background-image: url(shadebar.png);
 	background-repeat: repeat-y;
 	background-position: left top;
 	border-bottom-width: 1px;
@@ -44,7 +44,7 @@ a:hover
 .horbar2 {
 	background-color: #EAD085;
 	background-attachment: fixed;
-	background-image: url(shadebar.gif);
+	background-image: url(shadebar.png);
 	background-repeat: repeat-y;
 	background-position: left top;
 	border-top-width: 1px;

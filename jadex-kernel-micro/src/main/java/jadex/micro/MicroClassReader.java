@@ -703,29 +703,37 @@ public class MicroClassReader
 	}
 	
 	/**
-	 *  Get the mirco agent class.
+	 * Get the mirco agent class.
 	 */
 	// todo: make use of cache
 	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
 	{
 		Class ret = SReflect.findClass0(clname, imports, classloader);
-//		System.out.println(clname+" "+cma+" "+ret);
+		// System.out.println(clname+" "+cma+" "+ret);
 		int idx;
-		while(ret==null && (idx=clname.indexOf('.'))!=-1)
+		while(ret == null && (idx = clname.indexOf('.')) != -1)
 		{
-			clname	= clname.substring(idx+1);
+			clname = clname.substring(idx + 1);
 			try
 			{
 				ret = SReflect.findClass0(clname, imports, classloader);
 			}
 			catch(IllegalArgumentException iae)
 			{
-				// Hack!!! Sun URL class loader doesn't like if classnames start with (e.g.) 'C:'.
+				// Hack!!! Sun URL class loader doesn't like if classnames start
+				// with (e.g.) 'C:'.
 			}
-//			System.out.println(clname+" "+cma+" "+ret);
+			// System.out.println(clname+" "+cma+" "+ret);
 		}
-		if(ret==null)// || !cma.isAssignableFrom(IMicroAgent.class))
-			throw new RuntimeException("No micro agent file: "+clname);
+		if(ret == null)
+		{
+			throw new RuntimeException("Micro agent class not found: " + clname);
+		}
+		else if(!MicroAgent.class.isAssignableFrom(ret)
+			&& !ret.isAnnotationPresent(Agent.class))
+		{
+			throw new RuntimeException("Not a Micro agent class: " + clname);
+		}
 		return ret;
 	}
 }

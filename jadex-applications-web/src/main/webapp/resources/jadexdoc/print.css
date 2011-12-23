@@ -1,0 +1,5 @@
+/** Do not print nav bar. */
+.navblock, .titleblock
+{
+	display:none;
+}

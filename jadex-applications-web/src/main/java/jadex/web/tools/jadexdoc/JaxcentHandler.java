@@ -6,7 +6,9 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -22,7 +24,6 @@ import javax.servlet.http.HttpSession;
 
 import jaxcent.HtmlDiv;
 import jaxcent.HtmlElement;
-import jaxcent.HtmlTableCell;
 import jaxcent.HtmlTableRow;
 import jaxcent.JaxcentPage;
 import jaxcent.Jaxception;
@@ -42,10 +43,10 @@ public class JaxcentHandler extends JaxcentPage
 	protected List<ConfigTableRow>	configs;
 
 	/** The argument elements. */
-	protected List<HtmlTableCell>	args;
+	protected List<HtmlElement>	args;
 
 	/** The result elements. */
-	protected List<HtmlTableCell>	ress;
+	protected List<HtmlElement>	ress;
 
 	//-------- methods --------
 	
@@ -57,6 +58,7 @@ public class JaxcentHandler extends JaxcentPage
 		try
 		{
 			IFuture<IModelInfo>	future	= (IFuture<IModelInfo>)((HttpSession)getHttpSession()).getAttribute("model");
+			IIntermediateFuture<IModelInfo>	models	= (IIntermediateFuture<IModelInfo>)((HttpSession)getHttpSession()).getAttribute("models");
 			final String url	= (String)((HttpSession)getHttpSession()).getAttribute("url");
 			final String file	= (String)((HttpSession)getHttpSession()).getAttribute("file");
 			future.addResultListener(new IResultListener<IModelInfo>()
@@ -86,8 +88,8 @@ public class JaxcentHandler extends JaxcentPage
 									
 									ConfigurationInfo[]	mconfigs	= model.getConfigurations();
 									configs	= new ArrayList<ConfigTableRow>();
-									args	= new ArrayList<HtmlTableCell>();
-									ress	= new ArrayList<HtmlTableCell>();
+									args	= new ArrayList<HtmlElement>();
+									ress	= new ArrayList<HtmlElement>();
 									
 									for(int i=0; checkElementExists(SearchType.searchById, "config"+i, 0); i++)
 									{
@@ -95,11 +97,11 @@ public class JaxcentHandler extends JaxcentPage
 									}
 									for(int i=0; checkElementExists(SearchType.searchById, "arg"+i, 0); i++)
 									{
-										args.add(new HtmlTableCell(JaxcentHandler.this, SearchType.searchById, "arg"+i));
+										args.add(new HtmlElement(JaxcentHandler.this, SearchType.searchById, "arg"+i));
 									}
 									for(int i=0; checkElementExists(SearchType.searchById, "res"+i, 0); i++)
 									{
-										ress.add(new HtmlTableCell(JaxcentHandler.this, SearchType.searchById, "res"+i));
+										ress.add(new HtmlElement(JaxcentHandler.this, SearchType.searchById, "res"+i));
 									}
 								}
 								else
@@ -154,6 +156,107 @@ public class JaxcentHandler extends JaxcentPage
 						exception.printStackTrace(new PrintWriter(trace));
 						HtmlDiv	loading	= new HtmlDiv(JaxcentHandler.this, "loading");
 						loading.setInnerHTML("<h1>Jadexdoc Problem</h1><pre>"+trace+"</pre>");
+					}
+					catch(Jaxception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			});
+			
+			// Handle scanning for models.
+			models.addResultListener(new IntermediateDefaultResultListener<IModelInfo>()
+			{
+				StringBuffer	navtext	= new StringBuffer("<table class=\"printtable\">");
+				String	lastpackage	= null;
+				
+				public void intermediateResultAvailable(final IModelInfo model)
+				{
+					try
+					{
+						boolean	pkg	= !SUtil.equals(lastpackage, model.getPackage());
+						if(pkg)
+						{
+							lastpackage	= model.getPackage();
+							navtext.append("<tr id=\"idpackage_");
+							navtext.append(model.getPackage());
+							navtext.append("\" class=\"package\"><td colspan=\"2\">");
+							navtext.append(model.getPackage());
+							navtext.append("</td></tr>");
+						}
+						navtext.append("<tr name=\"namepackage_");
+						navtext.append(model.getPackage());
+						navtext.append("\" class=\"model\"><td><img src=\"icon?type=");
+						navtext.append(model.getType());
+						navtext.append("\"/></td><td><a href=\"view?model=");
+						navtext.append(model.getFilename());
+						navtext.append("\">");
+						navtext.append(model.getName());
+						navtext.append("</a></td></tr>");
+						HtmlDiv	nav	= new HtmlDiv(JaxcentHandler.this, "nav");
+						nav.setInnerHTML(navtext.toString()+"</table>");
+						
+						if(pkg)
+						{
+							new HtmlElement(JaxcentHandler.this, "idpackage_"+model.getPackage())
+							{
+								boolean	visible	= true;
+								protected void onClick()
+								{
+									try
+									{
+										visible	= !visible;
+										for(int i=0; checkElementExists(SearchType.searchByName, "namepackage_"+model.getPackage(), i); i++)
+										{
+											HtmlElement	row	= new HtmlElement(JaxcentHandler.this, SearchType.searchByName, "namepackage_"+model.getPackage(), i);
+											row.setVisible(visible);
+										}
+									}
+									catch(Jaxception e)
+									{
+										e.printStackTrace();
+									}
+								}
+							};
+						}
+					}
+					catch(Jaxception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				
+				public void finished()
+				{
+					try
+					{
+						HtmlDiv	scan	= new HtmlDiv(JaxcentHandler.this, "scan");
+						if(navtext.length()==0)
+						{
+							scan.setInnerHTML("No models found.");
+						}
+						else
+						{
+							scan.deleteElement();
+						}
+					}
+					catch(Jaxception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					try
+					{
+						HtmlDiv	scan	= new HtmlDiv(JaxcentHandler.this, "scan");
+						scan.deleteElement();
+						
+						StringWriter	trace	= new StringWriter();
+						exception.printStackTrace(new PrintWriter(trace));
+						HtmlDiv	nav	= new HtmlDiv(JaxcentHandler.this, "nav");
+						nav.setInnerHTML("<h2>Jadexdoc Problem</h2><pre>"+trace+"</pre>");
 					}
 					catch(Jaxception e)
 					{
@@ -307,20 +410,35 @@ public class JaxcentHandler extends JaxcentPage
 			Boolean	master	= model.getMaster(selected ? config.getName() : null);
 			Boolean	suspend	= model.getSuspend(selected ? config.getName() : null);
 			
-			new HtmlElement(JaxcentHandler.this, SearchType.searchById, "autoshutdown")
-				.setInnerText(autoshutdown!=null ? autoshutdown.toString() : "false");
+			if(checkElementExists(SearchType.searchById, "autoshutdown", 0))
+			{
+				new HtmlElement(JaxcentHandler.this, SearchType.searchById, "autoshutdown")
+					.setInnerText(autoshutdown!=null ? autoshutdown.toString() : "false");
+			}
 			
-			new HtmlElement(JaxcentHandler.this, SearchType.searchById, "daemon")
-				.setInnerText(daemon!=null ? daemon.toString() : "false");
+			if(checkElementExists(SearchType.searchById, "daemon", 0))
+			{
+				new HtmlElement(JaxcentHandler.this, SearchType.searchById, "daemon")
+					.setInnerText(daemon!=null ? daemon.toString() : "false");
+			}
 			
-			new HtmlElement(JaxcentHandler.this, SearchType.searchById, "master")
-				.setInnerText(master!=null ? master.toString() : "false");
+			if(checkElementExists(SearchType.searchById, "master", 0))
+			{
+				new HtmlElement(JaxcentHandler.this, SearchType.searchById, "master")
+					.setInnerText(master!=null ? master.toString() : "false");
+			}
 			
-			new HtmlElement(JaxcentHandler.this, SearchType.searchById, "suspend")
-				.setInnerText(suspend!=null ? suspend.toString() : "false");
+			if(checkElementExists(SearchType.searchById, "suspend", 0))
+			{
+				new HtmlElement(JaxcentHandler.this, SearchType.searchById, "suspend")
+					.setInnerText(suspend!=null ? suspend.toString() : "false");
+			}
 
-			new HtmlElement(JaxcentHandler.this, SearchType.searchById, "flags")
-				.setInnerText(selected ? "Flags ("+config.getName()+")" : "Flags");
+			if(checkElementExists(SearchType.searchById, "flags", 0))
+			{
+				new HtmlElement(JaxcentHandler.this, SearchType.searchById, "flags")
+					.setInnerText(selected ? "Flags ("+config.getName()+")" : "Flags");
+			}
 		}
 		
 		/**
