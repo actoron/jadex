@@ -105,10 +105,10 @@ public class SCollection
 	/**
 	 *  Return a fresh linked hash map.
 	 */
-	public static HashMap createLinkedHashMap()
+	public static <T,E> HashMap<T,E> createLinkedHashMap()
 	{
 		// note for mobile version: change LinkedHashMap to HashMap
-		LinkedHashMap ret = new LinkedHashMap();
+		LinkedHashMap<T,E> ret = new LinkedHashMap<T,E>();
 		if(DEBUG)
 			addCollection(ret);
 		return ret;

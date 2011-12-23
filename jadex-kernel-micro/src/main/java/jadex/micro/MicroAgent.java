@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 /**
  *  Base class for application agents.
  */
-public abstract class MicroAgent implements IMicroAgent, IInternalAccess
+public class MicroAgent implements IMicroAgent, IInternalAccess
 {
 	//-------- attributes --------
 	

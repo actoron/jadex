@@ -77,10 +77,10 @@ public abstract class ComponentManagementService extends BasicService implements
 	protected Map<IComponentIdentifier, IComponentAdapter> adapters;
 	
 	/** The cleanup commands for the components (component id -> cleanup command). */
-	protected Map ccs;
+	protected Map<IComponentIdentifier, CleanupCommand> ccs;
 	
 	/** The cleanup futures for the components (component id -> cleanup future). */
-	protected Map cfs;
+	protected Map<IComponentIdentifier, IFuture<Map<String, Object>>> cfs;
 	
 	/** The logger. */
 	protected Logger logger;
@@ -111,10 +111,10 @@ public abstract class ComponentManagementService extends BasicService implements
 	protected Map<IComponentIdentifier, Integer> childcounts;
 	
 	/**	The local filename cache (tuple(parent filename, child filename) -> local typename)*/
-	protected Map	localtypes;
+	protected Map<Tuple, String> localtypes;
 	
 	/** The cached factories. */
-	protected Collection factories;
+	protected Collection<IComponentFactory> factories;
 	
 	/** The bootstrap component factory. */
 	protected IComponentFactory componentfactory;
@@ -224,19 +224,16 @@ public abstract class ComponentManagementService extends BasicService implements
 					final Future<IModelInfo> ret = new Future<IModelInfo>();
 					
 					SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+						.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<ILibraryService, IModelInfo>(ret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(final ILibraryService ls)
 						{
-							final ILibraryService ls = (ILibraryService)result;
-							
-							SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(filename, null, rid))
-								.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+							IFuture<IComponentFactory> fut = SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(filename, null, rid));
+							fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentFactory, IModelInfo>(ret)
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(IComponentFactory factory)
 								{
-									IComponentFactory fac = (IComponentFactory)result;
-									fac.loadModel(filename, null, rid)
+									factory.loadModel(filename, null, rid)
 										.addResultListener(new DelegationResultListener<IModelInfo>(ret));
 								}
 								
@@ -257,7 +254,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					
 					return ret;
 				}
-			}).addResultListener(new DelegationResultListener(ret));
+			}).addResultListener(new DelegationResultListener<IModelInfo>(ret));
 		}
 		return ret;
 	}
@@ -470,14 +467,14 @@ public abstract class ComponentManagementService extends BasicService implements
 																						
 																						inited.setResult(cid);
 																						
-																						Future	killfut;
+																						Future<Map<String, Object>>	killfut;
 																						synchronized(adapters)
 																						{
-																							killfut	= (Future)cfs.get(cid);
+																							killfut	= (Future<Map<String, Object>>)cfs.get(cid);
 																							if(killfut!=null)
 																							{
 																								// Remove init infos otherwise done in resume()
-																								List	cids	= new ArrayList();
+																								List<IComponentIdentifier>	cids	= new ArrayList<IComponentIdentifier>();
 																								cids.add(cid);
 																								for(int i=0; i<cids.size(); i++)
 																								{
@@ -537,7 +534,7 @@ public abstract class ComponentManagementService extends BasicService implements
 																							removeInitInfo(cid);
 																						}
 																						
-																						IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
+																						IResultListener<Map<String, Object>> reslis = (IResultListener<Map<String, Object>>)killresultlisteners.remove(cid);
 																						if(reslis!=null)
 																						{
 																							reslis.exceptionOccurred(exception);
@@ -552,10 +549,10 @@ public abstract class ComponentManagementService extends BasicService implements
 																				IComponentIdentifier[]	children	= ad.getChildren();
 																				if(children.length>0)
 																				{
-																					CounterResultListener	crl	= new CounterResultListener(children.length, true,
-																						new IResultListener()
+																					CounterResultListener<Map<String, Object>>	crl	= new CounterResultListener<Map<String, Object>>(children.length, true,
+																						new IResultListener<Void>()
 																						{
-																							public void resultAvailable(Object result)
+																							public void resultAvailable(Void result)
 																							{
 																								cleanup.run();
 																							}
@@ -584,11 +581,11 @@ public abstract class ComponentManagementService extends BasicService implements
 																		String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 																			: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 																		factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-																			config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, resfut).addResultListener(new IResultListener()
+																			config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, resfut)
+																			.addResultListener(new IResultListener<Tuple2<IComponentInstance, IComponentAdapter>>()
 																		{
-																			public void resultAvailable(Object result)
+																			public void resultAvailable(Tuple2<IComponentInstance, IComponentAdapter> comp)
 																			{
-																				Tuple2<IComponentInstance, IComponentAdapter> comp = (Tuple2<IComponentInstance, IComponentAdapter>)result;
 																				// Store (invalid) desc, adapter and info for children
 																				synchronized(adapters)
 																				{
@@ -749,13 +746,13 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(nofac)
 		{
-			SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DelegationResultListener(ret)
+			IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM);
+			fut.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, IComponentFactory>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Collection<IComponentFactory> facts)
 				{
-					factories = (Collection)result;
-					getComponentFactory(model, cinfo, rid).addResultListener(new DelegationResultListener(ret));
+					factories = facts;//(Collection)result;
+					getComponentFactory(model, cinfo, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
 				}
 			});
 		}
@@ -764,7 +761,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //			System.out.println("create start2: "+model+" "+cinfo.getParent());
 						
 			selectComponentFactory(factories==null? null: (IComponentFactory[])factories.toArray(new IComponentFactory[factories.size()]), model, cinfo, rid, 0)
-				.addResultListener(new DelegationResultListener(ret)
+				.addResultListener(new DelegationResultListener<IComponentFactory>(ret)
 			{
 //				public void customResultAvailable(Object result)
 //				{
@@ -775,14 +772,14 @@ public abstract class ComponentManagementService extends BasicService implements
 				public void exceptionOccurred(Exception exception)
 				{
 //					System.out.println("factory ex: "+exception);
-					SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(new DelegationResultListener(ret)
+					IFuture<Collection<IComponentFactory>> fut = SServiceProvider.getServices(exta.getServiceProvider(), IComponentFactory.class, RequiredServiceInfo.SCOPE_PLATFORM);
+					fut.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactory>, IComponentFactory>(ret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(Collection<IComponentFactory> facts)
 						{	
-							factories = (Collection)result;
+							factories = facts;
 							selectComponentFactory((IComponentFactory[])factories.toArray(new IComponentFactory[factories.size()]), model, cinfo, rid, 0)
-								.addResultListener(new DelegationResultListener(ret));
+								.addResultListener(new DelegationResultListener<IComponentFactory>(ret));
 						}
 					});
 				}
@@ -801,37 +798,37 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param cl The classloader.
 	 *  @return The component factory.
 	 */
-	protected IFuture selectComponentFactory(final IComponentFactory[] factories, 
+	protected IFuture<IComponentFactory> selectComponentFactory(final IComponentFactory[] factories, 
 		final String model, final CreationInfo cinfo, final IResourceIdentifier rid, final int idx)
 	{
-		final Future ret = new Future();
+		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
 		if(factories!=null && factories.length>0)
 		{
 			factories[idx].isLoadable(model, cinfo.getImports(), rid)
-				.addResultListener(new DelegationResultListener(ret)
+				.addResultListener(new ExceptionDelegationResultListener<Boolean, IComponentFactory>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Boolean res)
 				{
-					if(((Boolean)result).booleanValue())
+					if(res.booleanValue())
 					{
 						ret.setResult(factories[idx]);
 					}
 					else if(idx+1<factories.length)
 					{
 						selectComponentFactory(factories, model, cinfo, rid, idx+1)
-							.addResultListener(new DelegationResultListener(ret));
+							.addResultListener(new DelegationResultListener<IComponentFactory>(ret));
 					}
 					else
 					{
-						selectFallbackFactory(model, cinfo, rid).addResultListener(new DelegationResultListener(ret));
+						selectFallbackFactory(model, cinfo, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
 					}
 				}		
 			});
 		}
 		else
 		{
-			selectFallbackFactory(model, cinfo, rid).addResultListener(new DelegationResultListener(ret));
+			selectFallbackFactory(model, cinfo, rid).addResultListener(new DelegationResultListener<IComponentFactory>(ret));
 		}
 		
 		return ret;
@@ -840,18 +837,18 @@ public abstract class ComponentManagementService extends BasicService implements
 	/**
 	 * 
 	 */
-	protected IFuture selectFallbackFactory(final String model, final CreationInfo cinfo, final IResourceIdentifier rid)
+	protected IFuture<IComponentFactory> selectFallbackFactory(final String model, final CreationInfo cinfo, final IResourceIdentifier rid)
 	{
-		final Future ret = new Future();
+		final Future<IComponentFactory> ret = new Future<IComponentFactory>();
 		
 		if(componentfactory!=null)
 		{
 			componentfactory.isLoadable(model, cinfo.getImports(), rid)
-				.addResultListener(new DelegationResultListener(ret)
+				.addResultListener(new ExceptionDelegationResultListener<Boolean, IComponentFactory>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Boolean res)
 				{
-					if(((Boolean)result).booleanValue())
+					if(res.booleanValue())
 					{
 						ret.setResult(componentfactory);
 					}
@@ -987,11 +984,11 @@ public abstract class ComponentManagementService extends BasicService implements
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
 		boolean contains = false;
-		Future tmp;
+		Future<Map<String, Object>> tmp;
 		synchronized(adapters)
 		{
 			contains = cfs.containsKey(cid);
-			tmp = contains? (Future)cfs.get(cid): new Future();
+			tmp = contains? (Future<Map<String, Object>>)cfs.get(cid): new Future<Map<String, Object>>();
 //			System.out.println("destroy0: "+cid+" "+cfs.containsKey(cid));
 //			Thread.currentThread().dumpStack();
 			
@@ -1000,7 +997,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				cfs.put(cid, tmp);
 			}
 		}
-		final Future ret = tmp;
+		final Future<Map<String, Object>> ret = tmp;
 		
 		if(!contains)
 		{
@@ -1015,16 +1012,16 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *	@param cid The component to destroy.
 	 *  @param ret The future to be informed.
 	 */
-	protected void destroyComponent(final IComponentIdentifier cid,	final Future<Map> ret)
+	protected void destroyComponent(final IComponentIdentifier cid,	final Future<Map<String, Object>> ret)
 	{
 		if(isRemoteComponent(cid))
 		{
-			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					final IComponentManagementService rcms = (IComponentManagementService)result;
-					rcms.destroyComponent(cid).addResultListener(new DelegationResultListener(ret));
+//					final IComponentManagementService rcms = (IComponentManagementService)result;
+					rcms.destroyComponent(cid).addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 				}
 			});
 		}
@@ -1079,13 +1076,13 @@ public abstract class ComponentManagementService extends BasicService implements
 					
 //						System.out.println("kill childs: "+cid+" "+SUtil.arrayToString(achildren));
 					
-					destroyComponentLoop(cid, achildren, achildren.length-1).addResultListener(new IResultListener()
+					destroyComponentLoop(cid, achildren, achildren.length-1).addResultListener(new IResultListener<List<Exception>>()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(List<Exception> result)
 						{
 							logger.info("Terminated component structure: "+cid.getName());
 							CleanupCommand	cc	= null;
-							IFuture	fut	= null;
+							IFuture<Void>	fut	= null;
 							synchronized(adapters)
 							{
 								try
@@ -1154,10 +1151,10 @@ public abstract class ComponentManagementService extends BasicService implements
 	/**
 	 *  Exit the destroy method by setting description state and resetting maps.
 	 */
-	protected void exitDestroy(IComponentIdentifier cid, IComponentDescription desc, Exception ex, Map results)
+	protected void exitDestroy(IComponentIdentifier cid, IComponentDescription desc, Exception ex, Map<String, Object> results)
 	{
 //		Thread.dumpStack();
-		Future	ret;
+		Future<Map<String, Object>>	ret;
 		synchronized(adapters)
 		{
 			if(desc instanceof CMSComponentDescription)
@@ -1165,7 +1162,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				((CMSComponentDescription)desc).setState(IComponentDescription.STATE_TERMINATED);
 			}
 			ccs.remove(cid);
-			ret	= (Future)cfs.remove(cid);
+			ret	= (Future<Map<String, Object>>)cfs.remove(cid);
 		}
 		if(ret!=null)
 		{
@@ -1183,20 +1180,20 @@ public abstract class ComponentManagementService extends BasicService implements
 	/**
 	 *  Loop for destroying subcomponents.
 	 */
-	protected IFuture destroyComponentLoop(final IComponentIdentifier cid, final IComponentIdentifier[] achildren, final int i)
+	protected IFuture<List<Exception>> destroyComponentLoop(final IComponentIdentifier cid, final IComponentIdentifier[] achildren, final int i)
 	{
-		final Future ret = new Future();
+		final Future<List<Exception>> ret = new Future<List<Exception>>();
 		
 		if(achildren.length>0)
 		{
-			final List exceptions = new ArrayList();
-			destroyComponent(achildren[i]).addResultListener(new IResultListener()
+			final List<Exception> exceptions = new ArrayList<Exception>();
+			destroyComponent(achildren[i]).addResultListener(new IResultListener<Map<String, Object>>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Map<String, Object> result)
 				{
 					if(i>0)
 					{
-						destroyComponentLoop(cid, achildren, i-1).addResultListener(new DelegationResultListener(ret));
+						destroyComponentLoop(cid, achildren, i-1).addResultListener(new DelegationResultListener<List<Exception>>(ret));
 					}
 					else
 					{
@@ -1230,12 +1227,11 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					final IComponentManagementService rcms = (IComponentManagementService)result;
-					rcms.suspendComponent(cid).addResultListener(new DelegationResultListener(ret));
+					rcms.suspendComponent(cid).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -1273,7 +1269,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				}
 				
 				desc.setState(IComponentDescription.STATE_SUSPENDED);
-				cancel(adapter).addResultListener(new DelegationResultListener(ret));
+				cancel(adapter).addResultListener(new DelegationResultListener<Void>(ret));
 //					exeservice.cancel(adapter).addResultListener(new DelegationResultListener(ret));
 			}
 			
@@ -1304,12 +1300,11 @@ public abstract class ComponentManagementService extends BasicService implements
 		if(isRemoteComponent(cid))
 		{
 			assert !initresume;
-			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					final IComponentManagementService rcms = (IComponentManagementService)result;
-					rcms.resumeComponent(cid).addResultListener(new DelegationResultListener(ret));
+					rcms.resumeComponent(cid).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -1325,9 +1320,9 @@ public abstract class ComponentManagementService extends BasicService implements
 			}
 			if(desc!=null)
 			{
-				CounterResultListener lis = new CounterResultListener(achildren.length, true, new DefaultResultListener()
+				CounterResultListener<Void> lis = new CounterResultListener<Void>(achildren.length, true, new DefaultResultListener<Void>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Void result)
 					{
 						IComponentAdapter adapter = (IComponentAdapter)adapters.get(cid);
 						boolean	changed	= false;
@@ -1342,7 +1337,7 @@ public abstract class ComponentManagementService extends BasicService implements
 							{
 								boolean	wakeup	= false;
 								IComponentInstance instance	= null;
-								Future	destroy	= null;
+								Future<Map<String, Object>>	destroy	= null;
 								synchronized(adapters)
 								{
 									// Not killed during init.
@@ -1368,7 +1363,7 @@ public abstract class ComponentManagementService extends BasicService implements
 									else if(initinfos.containsKey(cid))
 									{
 										removeInitInfo(cid);
-										destroy	= (Future)cfs.remove(cid);
+										destroy	= (Future<Map<String, Object>>)cfs.remove(cid);
 									}									
 								}
 								
@@ -1459,12 +1454,11 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					final IComponentManagementService rcms = (IComponentManagementService)result;
-					rcms.stepComponent(cid).addResultListener(new DelegationResultListener(ret));
+					rcms.stepComponent(cid).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -1484,7 +1478,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					return ret;
 				}
 				
-				doStep(adapter).addResultListener(new DelegationResultListener(ret));
+				doStep(adapter).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		}
 		
@@ -1504,12 +1498,11 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					final IComponentManagementService rcms = (IComponentManagementService)result;
-					rcms.setComponentBreakpoints(cid, breakpoints).addResultListener(new DelegationResultListener(ret));
+					rcms.setComponentBreakpoints(cid, breakpoints).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
@@ -1566,7 +1559,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	/**
 	 *  Command that is executed on component cleanup.
 	 */
-	class CleanupCommand implements IResultListener
+	class CleanupCommand implements IResultListener<Void>
 	{
 		protected IComponentIdentifier cid;
 		
@@ -1576,7 +1569,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			this.cid = cid;
 		}
 		
-		public void resultAvailable(Object result)
+		public void resultAvailable(Void result)
 		{
 			doCleanup(null);
 		}
@@ -1594,7 +1587,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			IComponentAdapter adapter = null;
 			IComponentAdapter pad = null;
 			CMSComponentDescription desc;
-			Map results = null;
+			Map<String, Object> results = null;
 			synchronized(adapters)
 			{
 				logger.info("Terminated component: "+cid.getName());
@@ -1682,7 +1675,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //				ex	= (Exception)exceptions.get(cid);
 //				exceptions.remove(cid);
 //			}
-			IResultListener reslis = (IResultListener)killresultlisteners.remove(cid);
+			IResultListener<Map<String, Object>> reslis = (IResultListener<Map<String, Object>>)killresultlisteners.remove(cid);
 			if(reslis!=null)
 			{
 //				System.out.println("kill lis: "+cid+" "+results+" "+ex);
@@ -1721,7 +1714,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener.
 	 */
-	public IFuture getExternalAccess(final IComponentIdentifier cid)
+	public IFuture<IExternalAccess> getExternalAccess(final IComponentIdentifier cid)
 	{
 		return getExternalAccess(cid, false);
 	}
@@ -1731,9 +1724,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param cid The component identifier.
 	 *  @param listener The result listener.
 	 */
-	protected IFuture getExternalAccess(final IComponentIdentifier cid, boolean internal)
+	protected IFuture<IExternalAccess> getExternalAccess(final IComponentIdentifier cid, boolean internal)
 	{
-		final Future ret = new Future();
+		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		if(cid==null)
 		{
@@ -1743,12 +1736,11 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
-			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					final IComponentManagementService rcms = (IComponentManagementService)result;
-					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret));
+					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 				}
 			});
 		}
@@ -1770,10 +1762,10 @@ public abstract class ComponentManagementService extends BasicService implements
 						{
 //							System.out.println("delayed");
 							delayed = true;
-							IFuture fut = ii.getInitFuture();
-							fut.addResultListener(new DelegationResultListener(ret)
+							IFuture<Void> fut = ii.getInitFuture();
+							fut.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(Void result)
 								{
 									try
 									{
@@ -1840,11 +1832,10 @@ public abstract class ComponentManagementService extends BasicService implements
 //			&& !Boolean.TRUE.equals(ci.getPlatformloader()))
 			)
 		{
-			getExternalAccess(ci.getParent(), true).addResultListener(new DelegationResultListener(ret)
+			getExternalAccess(ci.getParent(), true).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IResourceIdentifier>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IExternalAccess ea)
 				{
-					IExternalAccess	ea	= (IExternalAccess)result;
 //					System.err.println("Model class loader: "+ea.getModel().getName()+", "+ea.getModel().getClassLoader());
 //						classloadercache.put(ci.getParent(), ea.getModel().getClassLoader());
 					ret.setResult(ea.getModel().getResourceIdentifier());
@@ -1905,18 +1896,17 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param cid The component identifier.
 	 *  @return The parent component identifier.
 	 */
-	public IFuture getParent(final IComponentIdentifier cid)
+	public IFuture<IComponentIdentifier> getParent(final IComponentIdentifier cid)
 	{
-		final Future	ret	= new Future();
+		final Future<IComponentIdentifier>	ret	= new Future<IComponentIdentifier>();
 		
 		if(isRemoteComponent(cid))
 		{
-			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					final IComponentManagementService rcms = (IComponentManagementService)result;
-					rcms.getParent(cid).addResultListener(new DelegationResultListener(ret));
+					rcms.getParent(cid).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 				}
 			});
 		}
@@ -1933,18 +1923,17 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param cid The component identifier.
 	 *  @return The children component identifiers.
 	 */
-	public IFuture getChildren(final IComponentIdentifier cid)
+	public IFuture<IComponentIdentifier[]> getChildren(final IComponentIdentifier cid)
 	{
-		final Future	ret	= new Future();
+		final Future<IComponentIdentifier[]>	ret	= new Future<IComponentIdentifier[]>();
 		
 		if(isRemoteComponent(cid))
 		{
-			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier[]>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					final IComponentManagementService rcms = (IComponentManagementService)result;
-					rcms.getChildren(cid).addResultListener(new DelegationResultListener(ret));
+					rcms.getChildren(cid).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
 				}
 				public void exceptionOccurred(Exception exception)
 				{
@@ -1955,15 +1944,16 @@ public abstract class ComponentManagementService extends BasicService implements
 		else
 		{
 	//		System.out.println("getChildren: "+this+" "+isValid());
+			IComponentIdentifier[] tmp;
 			synchronized(adapters)
 			{
 				CMSComponentDescription desc = (CMSComponentDescription)getDescription(cid);
 //				System.out.println("desc: "+desc.getName()+" "+desc.hashCode());
-				IComponentIdentifier[] tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
+				tmp = desc!=null? desc.getChildren()!=null? desc.getChildren(): 
 					IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS: IComponentIdentifier.EMPTY_COMPONENTIDENTIFIERS;
-				ret.setResult(tmp);
 //				System.out.println(getServiceIdentifier()+" "+desc.getName()+" "+SUtil.arrayToString(tmp));
 			}
+			ret.setResult(tmp);
 			
 			// Nice style to check for valid?
 	//		checkValid().addResultListener(new IResultListener()
@@ -1992,18 +1982,17 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param cid The component identifier.
 	 *  @return The children component descriptions.
 	 */
-	public IFuture getChildrenDescriptions(final IComponentIdentifier cid)
+	public IFuture<IComponentDescription[]> getChildrenDescriptions(final IComponentIdentifier cid)
 	{
-		final Future	ret	= new Future();
+		final Future<IComponentDescription[]>	ret	= new Future<IComponentDescription[]>();
 		
 		if(isRemoteComponent(cid))
 		{
-			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentDescription[]>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					final IComponentManagementService rcms = (IComponentManagementService)result;
-					rcms.getChildrenDescriptions(cid).addResultListener(new DelegationResultListener(ret));
+					rcms.getChildrenDescriptions(cid).addResultListener(new DelegationResultListener<IComponentDescription[]>(ret));
 				}
 				public void exceptionOccurred(Exception exception)
 				{
@@ -2038,24 +2027,23 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param cid The component identifier.
 	 *  @return The component description of this component.
 	 */
-	public IFuture getComponentDescription(final IComponentIdentifier cid)
+	public IFuture<IComponentDescription> getComponentDescription(final IComponentIdentifier cid)
 	{
-		final Future ret = new Future();
+		final Future<IComponentDescription> ret = new Future<IComponentDescription>();
 		
 		if(isRemoteComponent(cid))
 		{
-			getRemoteCMS(cid).addResultListener(new DelegationResultListener(ret)
+			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentDescription>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(IComponentManagementService rcms)
 				{
-					final IComponentManagementService rcms = (IComponentManagementService)result;
-					rcms.getComponentDescription(cid).addResultListener(new DelegationResultListener(ret));
+					rcms.getComponentDescription(cid).addResultListener(new DelegationResultListener<IComponentDescription>(ret));
 				}
 			});
 		}
 		else
 		{
-			msgservice.updateComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+			msgservice.updateComponentIdentifier(cid).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, IComponentDescription>(ret)
 			{
 				public void customResultAvailable(IComponentIdentifier rcid)
 				{
@@ -2101,16 +2089,16 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  Get the component descriptions.
 	 *  @return The component descriptions.
 	 */
-	public IFuture getComponentDescriptions()
+	public IFuture<IComponentDescription[]> getComponentDescriptions()
 	{
-		Future fut = new Future();
+		Future<IComponentDescription[]> fut = new Future<IComponentDescription[]>();
 		
 		IComponentDescription[] ret;
 		synchronized(adapters)
 		{
 			ret = new IComponentDescription[adapters.size()];
 			int i=0;
-			for(Iterator it=adapters.values().iterator(); i<ret.length; i++)
+			for(Iterator<IComponentAdapter> it=adapters.values().iterator(); i<ret.length; i++)
 			{
 				ret[i] = (IComponentDescription)((CMSComponentDescription)((IComponentAdapter)it.next()).getDescription()).clone();
 			}
@@ -2130,8 +2118,6 @@ public abstract class ComponentManagementService extends BasicService implements
 	{
 		final Future<IComponentIdentifier[]> fut = new Future<IComponentIdentifier[]>();
 		
-		IComponentIdentifier[] ret;
-
 		msgservice.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], IComponentIdentifier[]>(fut)
 		{
 			public void customResultAvailable(String[] addresses)
@@ -2188,7 +2174,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		final Future<IComponentDescription[]> fut = new Future<IComponentDescription[]>();
 		
 //		System.out.println("search: "+components);
-		final List ret = new ArrayList();
+		final List<IComponentDescription> ret = new ArrayList<IComponentDescription>();
 
 		// If name is supplied, just lookup description.
 		if(adesc!=null && adesc.getName()!=null)
@@ -2208,7 +2194,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			synchronized(adapters)
 			{
-				for(Iterator it=adapters.values().iterator(); it.hasNext(); )
+				for(Iterator<IComponentAdapter> it=adapters.values().iterator(); it.hasNext(); )
 				{
 					CMSComponentDescription	test	= (CMSComponentDescription)((IComponentAdapter)it.next()).getDescription();
 					if(adesc==null ||
@@ -2231,21 +2217,22 @@ public abstract class ComponentManagementService extends BasicService implements
 //		open.add(fut);
 		if(remote)
 		{
-			SServiceProvider.getServices(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(new IResultListener()
+			IFuture<Collection<IComponentManagementService>> futi = SServiceProvider.getServices(exta.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL);
+			futi.addResultListener(new IResultListener<Collection<IComponentManagementService>>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Collection<IComponentManagementService> result)
 				{
-					Collection coll = (Collection)result;
 //					System.out.println("cms: "+coll);
 					// Ignore search failures of remote dfs
-					CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new IResultListener()
+					CollectionResultListener<IComponentDescription[]> lis = new CollectionResultListener<IComponentDescription[]>(result.size(), true, 
+						new IResultListener<Collection<IComponentDescription[]>>()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(Collection<IComponentDescription[]> result)
 						{
 							// Add all services of all remote dfs
-							for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+							for(Iterator<IComponentDescription[]> it=result.iterator(); it.hasNext(); )
 							{
-								IComponentDescription[] res = (IComponentDescription[])it.next();
+								IComponentDescription[] res = it.next();
 								if(res!=null)
 								{
 									for(int i=0; i<res.length; i++)
@@ -2266,9 +2253,9 @@ public abstract class ComponentManagementService extends BasicService implements
 //								fut.setResult(ret.toArray(new DFComponentDescription[ret.size()]));
 						}
 					});
-					for(Iterator it=coll.iterator(); it.hasNext(); )
+					for(Iterator<IComponentManagementService> it=result.iterator(); it.hasNext(); )
 					{
-						IComponentManagementService remotecms = (IComponentManagementService)it.next();
+						IComponentManagementService remotecms = it.next();
 						if(remotecms!=ComponentManagementService.this)
 						{
 							remotecms.searchComponents(adesc, con, false).addResultListener(lis);
@@ -2413,31 +2400,31 @@ public abstract class ComponentManagementService extends BasicService implements
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		super.startService().addResultListener(new DelegationResultListener(ret)
+		super.startService().addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
 //				final boolean[]	services = new boolean[2];
 				SServiceProvider.getService(exta.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new DelegationResultListener(ret)
+					.addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(IExecutionService result)
 					{
-						exeservice	= (IExecutionService)result;
+						exeservice	= result;
 						
 						SServiceProvider.getService(exta.getServiceProvider(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new DelegationResultListener(ret)
+							.addResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(IMarshalService result)
 							{
-								marshalservice	= (IMarshalService)result;
+								marshalservice	= result;
 						
 								SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(new DelegationResultListener(ret)
+									.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 								{
-									public void customResultAvailable(Object result)
+									public void customResultAvailable(IMessageService result)
 									{
-										msgservice	= (IMessageService)result;
+										msgservice	= result;
 										
 										// add root adapter and register root component
 										if(root!=null)
@@ -2742,7 +2729,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				ICMSComponentListener[]	alisteners;
 				synchronized(listeners)
 				{
-					Set	slisteners	= new HashSet(listeners.getCollection(null));
+					Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
 					slisteners.addAll(listeners.getCollection(cid));
 					alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 				}
@@ -2754,9 +2741,9 @@ public abstract class ComponentManagementService extends BasicService implements
 				for(int i=0; i<alisteners.length; i++)
 				{
 					final ICMSComponentListener lis = alisteners[i];
-					lis.componentChanged(newdesc).addResultListener(new IResultListener()
+					lis.componentChanged(newdesc).addResultListener(new IResultListener<Void>()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(Void result)
 						{
 						}
 						
@@ -2786,7 +2773,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				
 				synchronized(listeners)
 				{
-					Set	slisteners	= new HashSet(listeners.getCollection(null));
+					Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
 					slisteners.addAll(listeners.getCollection(cid));
 					alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 				}
@@ -2798,9 +2785,9 @@ public abstract class ComponentManagementService extends BasicService implements
 				for(int i=0; i<alisteners.length; i++)
 				{
 					final ICMSComponentListener lis = alisteners[i];
-					lis.componentRemoved(newdesc, results).addResultListener(new IResultListener()
+					lis.componentRemoved(newdesc, results).addResultListener(new IResultListener<Void>()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(Void result)
 						{
 						}
 						
@@ -2827,7 +2814,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				ICMSComponentListener[]	alisteners;
 				synchronized(listeners)
 				{
-					Set	slisteners	= new HashSet(listeners.getCollection(null));
+					Set<ICMSComponentListener>	slisteners	= new HashSet<ICMSComponentListener>(listeners.getCollection(null));
 					slisteners.addAll(listeners.getCollection(cid));
 					alisteners	= (ICMSComponentListener[])slisteners.toArray(new ICMSComponentListener[slisteners.size()]);
 				}
@@ -2839,9 +2826,9 @@ public abstract class ComponentManagementService extends BasicService implements
 				for(int i=0; i<alisteners.length; i++)
 				{
 					final ICMSComponentListener lis = alisteners[i];
-					lis.componentAdded(newdesc).addResultListener(new IResultListener()
+					lis.componentAdded(newdesc).addResultListener(new IResultListener<Void>()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(Void result)
 						{
 						}
 						
@@ -2889,13 +2876,12 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	protected IFuture<IComponentManagementService>	getRemoteCMS(final IComponentIdentifier cid)
 	{
-		final Future	ret	= new Future();
+		final Future<IComponentManagementService>	ret	= new Future<IComponentManagementService>();
 		SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DelegationResultListener(ret)
+			.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IComponentManagementService>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IRemoteServiceManagementService rms)
 			{
-				IRemoteServiceManagementService rms = (IRemoteServiceManagementService)result;
 				rms.getServiceProxy(cid, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 					.addResultListener(new DelegationResultListener(ret));
 			}
