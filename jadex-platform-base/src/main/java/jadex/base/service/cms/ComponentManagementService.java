@@ -122,6 +122,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	/** The default copy parameters flag for service calls. */
 	protected boolean copy;
 	
+	/** The locked components. */
+	protected Map<IComponentIdentifier, LockEntry> lockentries;
+
     //-------- constructors --------
 
 	 /**
@@ -171,6 +174,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		this.initinfos = Collections.synchronizedMap(initinfos);
 		this.childcounts = SCollection.createHashMap();
 		this.localtypes	= Collections.synchronizedMap(new LRU(100));
+		this.lockentries = SCollection.createHashMap();
 //		this.classloadercache = Collections.synchronizedMap(new LRU(1000));
    }
     
@@ -282,6 +286,45 @@ public abstract class ComponentManagementService extends BasicService implements
 			final Future<Void> resfut = new Future<Void>();
 			
 			final CreationInfo cinfo = new CreationInfo(info);	// Dummy default info, if null. Must be cloned as localtype is set on info later.
+			
+			if(cinfo.getParent()!=null)
+			{
+				// Lock the parent while creating
+				synchronized(adapters)
+				{
+					final String lockkey = SUtil.createUniqueId("lock");
+					LockEntry kt = lockentries.get(cinfo.getParent());
+					if(kt==null)
+					{
+						kt= new LockEntry(cinfo.getParent());
+						lockentries.put(cinfo.getParent(), kt);
+					}
+					kt.addLocker(lockkey);
+					inited.addResultListener(new IResultListener<IComponentIdentifier>()
+					{
+						public void resultAvailable(IComponentIdentifier result)
+						{
+							synchronized(adapters)
+							{
+								LockEntry kt = lockentries.get(cinfo.getParent());
+								kt.removeLocker(lockkey);
+								if(kt.getLockerCount()==0)
+									lockentries.remove(cinfo.getParent());
+							}
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+							synchronized(adapters)
+							{
+								LockEntry kt = lockentries.get(cinfo.getParent());
+								kt.removeLocker(lockkey);
+								if(kt.getLockerCount()==0)
+									lockentries.remove(cinfo.getParent());
+							}
+						}
+					});
+				}
+			}
 			
 			if(cinfo.getParent()!=null && isRemoteComponent(cinfo.getParent()))
 			{				
@@ -984,7 +1027,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
 		boolean contains = false;
+		boolean locked = false;
 		Future<Map<String, Object>> tmp;
+		
 		synchronized(adapters)
 		{
 			contains = cfs.containsKey(cid);
@@ -992,14 +1037,24 @@ public abstract class ComponentManagementService extends BasicService implements
 //			System.out.println("destroy0: "+cid+" "+cfs.containsKey(cid));
 //			Thread.currentThread().dumpStack();
 			
+			// If destroyComponent has not called before
 			if(!contains)
 			{
 				cfs.put(cid, tmp);
 			}
+			
+			// Is the component locked?
+			LockEntry kt = lockentries.get(cid);
+			if(kt!=null && kt.getLockerCount()>0)
+			{
+				kt.setKillFuture(tmp);
+				locked = true;
+			}
+
 		}
 		final Future<Map<String, Object>> ret = tmp;
 		
-		if(!contains)
+		if(!contains && !locked)
 		{
 			destroyComponent(cid, ret);
 		}
@@ -3119,4 +3174,74 @@ public abstract class ComponentManagementService extends BasicService implements
 			this.instance = instance;
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	class LockEntry
+	{
+		/** The locked component. */
+		protected IComponentIdentifier locked;
+		
+		/** The components that have a lock. */
+		protected Set<String> lockers;
+		
+		/** The kill flag. */
+		protected Future<Map<String, Object>> killfuture;
+		
+		/**
+		 * 
+		 */
+		public LockEntry(IComponentIdentifier locked)
+		{
+			this.locked = locked;
+		}
+		
+		/**
+		 * 
+		 */
+		public void addLocker(String locker)
+		{
+			if(lockers==null)
+				lockers = new HashSet<String>();
+			lockers.add(locker);
+		}
+		
+		/**
+		 * 
+		 */
+		public void removeLocker(String locker)
+		{
+			lockers.remove(locker);
+			if(lockers.isEmpty() && killfuture!=null)
+				destroyComponent(locked, killfuture);
+		}
+		
+		/**
+		 * 
+		 */
+		public int getLockerCount()
+		{
+			return lockers==null? 0: lockers.size();
+		}
+
+		/**
+		 *  Get the killfuture.
+		 *  @return the killfuture.
+		 */
+		public Future<Map<String, Object>> getKillFuture()
+		{
+			return killfuture;
+		}
+
+		/**
+		 *  Set the killfuture.
+		 *  @param killfuture The killfuture to set.
+		 */
+		public void setKillFuture(Future<Map<String, Object>> killfuture)
+		{
+			this.killfuture = killfuture;
+		}
+	}
+
 }
