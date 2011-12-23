@@ -113,13 +113,13 @@
 		<argument name="awaexcludes" class="String">""</argument>
 		
 		<!-- Flag if local transport is enabled. -->
-		<argument name="localtransport">true</argument>
+		<argument name="localtransport" class="boolean">true</argument>
 		<!-- Flag if tcp transport is enabled. -->
-		<argument name="tcptransport">false</argument>
+		<argument name="tcptransport" class="boolean">false</argument>
 		<!-- Flag if niotcp transport is enabled. -->
-		<argument name="niotcptransport">true</argument>
+		<argument name="niotcptransport" class="boolean">true</argument>
 		<!-- Flag if relay transport is enabled. -->
-		<argument name="relaytransport">true</argument>
+		<argument name="relaytransport" class="boolean">true</argument>
 		<!-- Port for TCP transport. -->
 		<argument name="tcpport" class="int">9876</argument>
 		<!-- Port for NIOTCP transport. -->
