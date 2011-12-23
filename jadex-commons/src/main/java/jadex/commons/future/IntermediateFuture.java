@@ -145,7 +145,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
      */
-    public void	setResultIfUndone(Collection<E> result)
+    public boolean	setResultIfUndone(Collection<E> result)
     {
     	boolean ex = false;
     	synchronized(this)
@@ -166,7 +166,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
     		else
     		{
     			this.results = (Collection)result;
-    			super.setResultIfUndone(result);
+    			return super.setResultIfUndone(result);
     		}
     	}
     }

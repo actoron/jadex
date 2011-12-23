@@ -1,16 +1,17 @@
 package jadex.micro;
 
 import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.SReflect;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentMessageArrived;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	/**
 	 *  Called once after agent creation.
 	 */
-	public IFuture agentCreated()
+	public IFuture<Void> agentCreated()
 	{
 		return invokeMethod(AgentCreated.class, null);
 	}
@@ -52,12 +53,20 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	 */
 	public void executeBody()
 	{
-		invokeMethod(AgentBody.class, null).addResultListener(new DefaultResultListener()
+		invokeMethod(AgentBody.class, null).addResultListener(
+			interpreter.createResultListener(new IResultListener<Void>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Void result)
 			{
 			}
-		});
+			public void exceptionOccurred(Exception exception)
+			{
+				if(exception instanceof RuntimeException)
+					throw (RuntimeException)exception;
+				else
+					throw new RuntimeException(exception);
+			}
+		}));
 	}
 
 	/**
@@ -67,19 +76,27 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	 */
 	public void messageArrived(Map msg, MessageType mt)
 	{
-		invokeMethod(AgentMessageArrived.class, new Object[]{msg, mt}).addResultListener(new DefaultResultListener()
+		invokeMethod(AgentMessageArrived.class, new Object[]{msg, mt}).addResultListener(
+			interpreter.createResultListener(new IResultListener<Void>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Void result)
 			{
 			}
-		});
+			public void exceptionOccurred(Exception exception)
+			{
+				if(exception instanceof RuntimeException)
+					throw (RuntimeException)exception;
+				else
+					throw new RuntimeException(exception);
+			}
+		}));
 	}
 
 	/**
 	 *  Called just before the agent is removed from the platform.
 	 *  @return The result of the component.
 	 */
-	public IFuture agentKilled()
+	public IFuture<Void> agentKilled()
 	{
 		return invokeMethod(AgentKilled.class, null);
 	}
@@ -97,9 +114,9 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	 *  Invoke double methods.
 	 *  The boolean 'firstorig' determines if basicservice method is called first.
 	 */
-	protected IFuture invokeMethod(Class annotation, Object[] args)
+	protected IFuture<Void> invokeMethod(Class<? extends Annotation> annotation, Object[] args)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		Method[] methods = agent.getClass().getMethods();
 		boolean found = false;
@@ -115,7 +132,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 					if(res instanceof IFuture)
 					{
 						((IFuture)res).addResultListener(createResultListener(
-							new DelegationResultListener(ret)));
+							new DelegationResultListener<Void>(ret)));
 					}
 					else
 					{
@@ -124,6 +141,8 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 				}
 				catch(Exception e)
 				{
+					e = (Exception)(e instanceof InvocationTargetException && ((InvocationTargetException)e)
+						.getCause() instanceof Exception? ((InvocationTargetException)e).getCause(): e);
 					ret.setException(e);
 					break;
 				}

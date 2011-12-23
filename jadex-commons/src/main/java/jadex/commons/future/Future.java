@@ -224,19 +224,21 @@ public class Future<E> implements IFuture<E>
      *  Listener notifications occur on calling thread of this method.
      *  @param exception The exception.
      */
-    public void	setExceptionIfUndone(Exception exception)
+    public boolean setExceptionIfUndone(Exception exception)
     {
     	if(exception==null)
     		throw new IllegalArgumentException();
     	synchronized(this)
 		{
-    		// If done propagate exception.
+    		// Return if is done. Should implement same logic as setResultIfUndone().
         	if(isDone())
         	{
-        		if(exception instanceof RuntimeException)
-        			throw (RuntimeException)exception;
-        		else
-        			throw new RuntimeException(exception);
+        		return false;
+        		// If done propagate exception.
+//        		if(exception instanceof RuntimeException)
+//        			throw (RuntimeException)exception;
+//        		else
+//        			throw new RuntimeException(exception);
         	}
         		
 //        	System.out.println(this+" setResult: "+result);
@@ -245,6 +247,7 @@ public class Future<E> implements IFuture<E>
 		}
     	
     	resume();
+    	return true;
     }
 
     /**
@@ -294,13 +297,14 @@ public class Future<E> implements IFuture<E>
      *  Set the result. 
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
+     *  @return True if result was set.
      */
-    public void	setResultIfUndone(E result)
+    public boolean	setResultIfUndone(E result)
     {
     	synchronized(this)
 		{
         	if(isDone())
-        		return;
+        		return false;
         	
 //        	System.out.println(this+" setResult: "+result);
         	this.result = result;
@@ -308,6 +312,7 @@ public class Future<E> implements IFuture<E>
 		}
     	
     	resume();
+    	return true;
     }
 
 	/**

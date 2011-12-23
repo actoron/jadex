@@ -60,7 +60,7 @@ public class ExtendedBaseAgent extends BaseAgent
 	@AgentBody
 	public void body()
 	{
-		List results = new ArrayList();
+		List<TestReport> results = new ArrayList<TestReport>();
 		
 		TestReport tr = new TestReport("#1", "Test if top-level description is used");
 		String desc = agent.getModel().getDescription();

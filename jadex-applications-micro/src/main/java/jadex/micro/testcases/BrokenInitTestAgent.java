@@ -3,10 +3,9 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -32,10 +31,11 @@ public class BrokenInitTestAgent extends MicroAgent
 	public void executeBody()
 	{
 		final TestReport	tr1	= new TestReport("#1", "Direct subcomponent.");
+		
 		testBrokenComponent(BrokenInitAgent.class.getName()+".class")
-			.addResultListener(createResultListener(new IResultListener()
+			.addResultListener(createResultListener(new IResultListener<Void>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(Void result)
 			{
 				tr1.setSucceeded(true);
 				next();
@@ -51,9 +51,9 @@ public class BrokenInitTestAgent extends MicroAgent
 			{
 				final TestReport	tr2	= new TestReport("#2", "Nested subcomponent.");
 				testBrokenComponent("jadex/micro/testcases/BrokenInit.component.xml")
-					.addResultListener(createResultListener(new IResultListener()
+					.addResultListener(createResultListener(new IResultListener<Void>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(Void result)
 					{
 						tr2.setSucceeded(true);
 						next();
@@ -67,32 +67,53 @@ public class BrokenInitTestAgent extends MicroAgent
 					
 					protected void next()
 					{
-						setResultValue("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
-						killAgent();
+						final TestReport	tr3	= new TestReport("#3", "Exception in agent created.");
+						testBrokenComponent(PojoBrokenInitAgent.class.getName()+".class")
+							.addResultListener(createResultListener(new IResultListener<Void>()
+						{
+							public void resultAvailable(Void result)
+							{
+								tr3.setSucceeded(true);
+								next();
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								tr3.setFailed(exception.getMessage());
+								next();
+							}
+							
+							protected void next()
+							{
+								setResultValue("testresults", new Testcase(3, new TestReport[]{tr1, tr2, tr3}));
+								killAgent();
+							}
+						}));
 					}
 				}));
 			}
 		}));
 	}
+	
 
 	/**
 	 *  Create subcomponent and check if init produces exception.
 	 */
-	protected IFuture testBrokenComponent(final String model)
+	protected IFuture<Void> testBrokenComponent(final String model)
 	{
-		final Future	fut1	= new Future();
-		getRequiredService("cms").addResultListener(new DelegationResultListener(fut1)
+		final Future<Void>	fut1	= new Future<Void>();
+		IFuture<IComponentManagementService> fut = getRequiredService("cms");
+		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(fut1)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				final IComponentManagementService	cms	= (IComponentManagementService)result;
 				cms.createComponent(null, model, new CreationInfo(getComponentIdentifier()), null)
-					.addResultListener(createResultListener(new IResultListener()
+					.addResultListener(createResultListener(new IResultListener<IComponentIdentifier>()
 				{
-					public void resultAvailable(Object result)
+					public void resultAvailable(IComponentIdentifier result)
 					{
 						fut1.setException(new RuntimeException("Creation unexpectedly succeded."));
-						cms.destroyComponent((IComponentIdentifier) result);
+						cms.destroyComponent(result);
 					}
 					
 					public void exceptionOccurred(Exception exception)

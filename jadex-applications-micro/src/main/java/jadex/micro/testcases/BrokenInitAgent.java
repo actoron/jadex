@@ -13,7 +13,7 @@ public class BrokenInitAgent extends MicroAgent
 	/**
 	 *  Init the agent.
 	 */
-	public IFuture agentCreated()
+	public IFuture<Void> agentCreated()
 	{
 		throw new RuntimeException("Exception in init.");
 	}

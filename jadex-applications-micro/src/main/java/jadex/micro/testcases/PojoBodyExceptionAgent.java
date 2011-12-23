@@ -14,7 +14,7 @@ public class PojoBodyExceptionAgent
 	 */
 	public PojoBodyExceptionAgent()
 	{
-		throw new RuntimeException("Exception in constructor");
+//		throw new RuntimeException("Exception in constructor");
 	}
 	
 	/**
