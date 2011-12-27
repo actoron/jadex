@@ -127,7 +127,10 @@ public class RelayServlet extends HttpServlet
 				queue	= 	new ArrayBlockingQueue<Tuple2<InputStream, Future<Void>>>();
 			}
 			map.put(id, queue);
-			response.getOutputStream().flush();	// Let client know that it is connected.
+			
+			// Ping to let client know that it is connected.
+			response.getOutputStream().write(SRelay.MSGTYPE_PING);  
+			response.getOutputStream().flush();
 			
 	//		System.out.println("Added to map. New size: "+map.size());
 			try

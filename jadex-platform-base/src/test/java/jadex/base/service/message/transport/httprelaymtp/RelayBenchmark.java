@@ -20,8 +20,8 @@ import java.util.Random;
  */
 public class RelayBenchmark
 {
-//	public static String	ADDRESS = SRelay.DEFAULT_ADDRESS;
-	public static String	ADDRESS = "http://localhost:8080/jadex-platform-relay-web/";
+	public static String	ADDRESS = SRelay.DEFAULT_ADDRESS;
+//	public static String	ADDRESS = "http://localhost:8080/jadex-platform-relay-web/";
 	
 	/**
 	 *  Open the connection.
@@ -68,17 +68,19 @@ public class RelayBenchmark
 	/**
 	 *  Send a number of messages.
 	 */
-	public static void	send(Object id, int num, int size, boolean encode) throws Exception
+	public static void	send(Object id, int num, boolean encode, boolean binary) throws Exception
 	{
 		Map<String, Object>	msg	= new LinkedHashMap<String, Object>();
 		Object obj	= new BenchmarkMessage("test message", true);
 		msg.put("content", obj);
 		msg.put("sender", new ComponentIdentifier(""+id));
 		msg.put("receiver", new ComponentIdentifier(""+id));
-//		int datasize	= JavaWriter.objectToXML(msg, RelayBenchmark.class.getClassLoader()).getBytes().length;
+		byte[]	data	= JavaWriter.objectToXML(msg, RelayBenchmark.class.getClassLoader()).getBytes();
 //		System.out.println("data size: "+datasize);
-		byte[]	data	= new byte[size];
-		new Random().nextBytes(data);
+		if(binary)
+		{
+			new Random().nextBytes(data);
+		}
 		
 		for(int i=0; i<num; i++)
 		{
@@ -116,28 +118,38 @@ public class RelayBenchmark
 		
 		System.out.println("Benchmark setup:");
 		System.out.print("simple");
-		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, 1308, false, false);
+		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, false, false, false);
 		System.out.print("\nencoding");
-		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, 1308, true, false);
+		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, true, false, false);
 		System.out.print("\ndecoding");
-		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, 1308, true, true);
+		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, false, true, false);
+		System.out.print("\nen/decoding");
+		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, true, true, false);
+		System.out.print("\nbinary");
+		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, false, false, true);
 		
 		System.out.print("\n\nRunning simple benchmark.");
-		long	simple	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, 1308, false, false);
+		long	simple	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, false, false, false);
 		System.out.print("\nRunning encoding benchmark.");
-		long	encoding	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, 1308, true, false);
+		long	encoding	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, true, false, false);
+		System.out.print("\nRunning decoding benchmark.");
+		long	decoding	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, false, true, false);
 		System.out.print("\nRunning encoding/decoding benchmark.");
-		long	decoding	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, 1308, true, true);
+		long	endecoding	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, true, true, false);
+		System.out.print("\nRunning binary benchmark.");
+		long	binary	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, true, true, false);
 		
 		System.out.println("\nSimple benchmark took: "+(simple*100/benchmark)/100.0+" ms per message");
 		System.out.println("Encoding benchmark took: "+(encoding*100/benchmark)/100.0+" ms per message ("+(encoding*100/simple)+"%)");
-		System.out.println("En/decoding benchmark took: "+(decoding*100/benchmark)/100.0+" ms per message ("+(decoding*100/simple)+"%)");
+		System.out.println("Decoding benchmark took: "+(decoding*100/benchmark)/100.0+" ms per message ("+(decoding*100/simple)+"%)");
+		System.out.println("En/decoding benchmark took: "+(decoding*100/benchmark)/100.0+" ms per message ("+(endecoding*100/simple)+"%)");
+		System.out.println("Binary benchmark took: "+(decoding*100/benchmark)/100.0+" ms per message ("+(binary*100/simple)+"%)");
 	}
 	
 	/**
 	 *  Run a given test.
 	 */
-	public static long runTest(final Object id, final int num, final int size, final boolean encode, boolean decode) throws Exception
+	public static long runTest(final Object id, final int num, final boolean encode, boolean decode, final boolean binary) throws Exception
 	{
 		InputStream	in	= startReceiving(id);
 		long	start	= System.currentTimeMillis();
@@ -147,7 +159,7 @@ public class RelayBenchmark
 			{
 				try
 				{
-					send(id, num, size, encode);
+					send(id, num, encode, binary);
 				}
 				catch(Exception e)
 				{
