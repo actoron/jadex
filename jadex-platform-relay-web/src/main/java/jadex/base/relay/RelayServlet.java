@@ -130,7 +130,7 @@ public class RelayServlet extends HttpServlet
 			
 			// Ping to let client know that it is connected.
 			response.getOutputStream().write(SRelay.MSGTYPE_PING);  
-			response.getOutputStream().flush();
+			response.flushBuffer();
 			
 	//		System.out.println("Added to map. New size: "+map.size());
 			try

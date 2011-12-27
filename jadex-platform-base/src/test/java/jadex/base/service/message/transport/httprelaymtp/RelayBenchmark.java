@@ -28,13 +28,16 @@ public class RelayBenchmark
 	 */
 	public static InputStream	startReceiving(Object id) throws Exception
 	{
-//		System.out.println("Connecting as: "+id);
+		System.out.println("Connecting as: "+id);
 		String	xmlid	= JavaWriter.objectToXML(id, RelayBenchmark.class.getClassLoader());
 		URL	url	= new URL(ADDRESS+"?id="+URLEncoder.encode(xmlid, "UTF-8"));
-//		System.out.println("Connecting to: "+url);
+		System.out.println("Connecting to: "+url);
 		URLConnection	con	= url.openConnection();
 		con.setUseCaches(false);
-		return con.getInputStream();
+		InputStream	is	= con.getInputStream();
+		is.read();	// Read first ping.
+		System.out.println("Connected.");
+		return is;
 	}
 
 	/**
@@ -76,7 +79,7 @@ public class RelayBenchmark
 		msg.put("sender", new ComponentIdentifier(""+id));
 		msg.put("receiver", new ComponentIdentifier(""+id));
 		byte[]	data	= JavaWriter.objectToXML(msg, RelayBenchmark.class.getClassLoader()).getBytes();
-//		System.out.println("data size: "+datasize);
+		System.out.println("data size: "+data.length);
 		if(binary)
 		{
 			new Random().nextBytes(data);
@@ -84,7 +87,7 @@ public class RelayBenchmark
 		
 		for(int i=0; i<num; i++)
 		{
-//			System.out.println("Sending to: "+id);
+			System.out.println("Sending to: "+id);
 			if(encode)
 			{
 				SRelay.sendData(id, ADDRESS, msg);
