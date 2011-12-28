@@ -20,23 +20,25 @@ import java.util.Random;
  */
 public class RelayBenchmark
 {
-	public static String	ADDRESS = SRelay.DEFAULT_ADDRESS;
+//	public static String	ADDRESS = SRelay.DEFAULT_ADDRESS;
 //	public static String	ADDRESS = "http://localhost:8080/jadex-platform-relay-web/";
+	public static String	ADDRESS = "http://grisougarfield.dyndns.org:52339/relay/";
 	
 	/**
 	 *  Open the connection.
 	 */
 	public static InputStream	startReceiving(Object id) throws Exception
 	{
-		System.out.println("Connecting as: "+id);
+//		System.out.println("Connecting as: "+id);
 		String	xmlid	= JavaWriter.objectToXML(id, RelayBenchmark.class.getClassLoader());
 		URL	url	= new URL(ADDRESS+"?id="+URLEncoder.encode(xmlid, "UTF-8"));
-		System.out.println("Connecting to: "+url);
+//		System.out.println("Connecting to: "+url);
 		URLConnection	con	= url.openConnection();
 		con.setUseCaches(false);
 		InputStream	is	= con.getInputStream();
-		is.read();	// Read first ping.
-		System.out.println("Connected.");
+//		System.out.println("Got stream.");
+//		is.read();	// Read first ping.
+//		System.out.println("Connected.");
 		return is;
 	}
 
@@ -47,24 +49,22 @@ public class RelayBenchmark
 	{
 		for(int i=0; i<num; i++)
 		{
-			if(in.read()!=SRelay.MSGTYPE_DEFAULT)
+			if(in.read()==SRelay.MSGTYPE_DEFAULT)
 			{
-				throw new RuntimeException("no messages to receive.");
+				if(decode)
+				{
+					SRelay.readObject(in);
+				}
+				else
+				{
+					byte[]	len	= SRelay.readData(in, 4);
+					int	length	= SUtil.bytesToInt(len);
+					SRelay.readData(in, length);
+				}
+				
+//				if(i%100==50)
+//					System.out.print(".");
 			}
-			
-			if(decode)
-			{
-				SRelay.readObject(in);
-			}
-			else
-			{
-				byte[]	len	= SRelay.readData(in, 4);
-				int	length	= SUtil.bytesToInt(len);
-				SRelay.readData(in, length);
-			}
-			
-			if(i%100==50)
-				System.out.print(".");
 		}
 	}
 
@@ -79,7 +79,7 @@ public class RelayBenchmark
 		msg.put("sender", new ComponentIdentifier(""+id));
 		msg.put("receiver", new ComponentIdentifier(""+id));
 		byte[]	data	= JavaWriter.objectToXML(msg, RelayBenchmark.class.getClassLoader()).getBytes();
-		System.out.println("data size: "+data.length);
+//		System.out.println("data size: "+data.length);
 		if(binary)
 		{
 			new Random().nextBytes(data);
@@ -87,7 +87,7 @@ public class RelayBenchmark
 		
 		for(int i=0; i<num; i++)
 		{
-			System.out.println("Sending to: "+id);
+//			System.out.println("Sending to: "+id);
 			if(encode)
 			{
 				SRelay.sendData(id, ADDRESS, msg);
@@ -99,14 +99,19 @@ public class RelayBenchmark
 				con.setRequestMethod("POST");
 				con.setDoOutput(true);
 				con.setUseCaches(false);
+				con.setRequestProperty("Content-Type", "application/octet-stream");
+				byte[]	iddata	= JavaWriter.objectToByteArray(id, SRelay.class.getClassLoader());
+				con.setFixedLengthStreamingMode(4+iddata.length+4+data.length);
+				con.connect();
 				OutputStream	out	= con.getOutputStream();
-				SRelay.writeObject(id, out);
+				out.write(SUtil.intToBytes(iddata.length));
+				out.write(iddata);
 				out.write(SUtil.intToBytes(data.length));
 				out.write(data);
 				out.flush();		
 				out.close();
-				con.connect();
-				con.getInputStream();	// Required, otherwise servlet will not be executed.				
+				con.getInputStream().close();	// Required, otherwise servlet will not be executed.				
+				con.disconnect();
 			}
 		}
 	}
@@ -116,37 +121,37 @@ public class RelayBenchmark
 	 */
 	public static void	main(String[] args) throws Exception
 	{
-		int	setup	= 100;
-		int	benchmark	= 2000;
+		int	setup	= 10;
+		int	benchmark	= 100;
 		
 		System.out.println("Benchmark setup:");
-		System.out.print("simple");
+		System.out.println("simple");
 		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, false, false, false);
-		System.out.print("\nencoding");
+		System.out.println("\nencoding");
 		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, true, false, false);
-		System.out.print("\ndecoding");
+		System.out.println("\ndecoding");
 		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, false, true, false);
-		System.out.print("\nen/decoding");
+		System.out.println("\nen/decoding");
 		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, true, true, false);
-		System.out.print("\nbinary");
+		System.out.println("\nbinary");
 		runTest(SUtil.createUniqueId("relay_benchmark", 3), setup, false, false, true);
 		
-		System.out.print("\n\nRunning simple benchmark.");
+		System.out.println("\n\nRunning simple benchmark.");
 		long	simple	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, false, false, false);
-		System.out.print("\nRunning encoding benchmark.");
+		System.out.println("\nRunning encoding benchmark.");
 		long	encoding	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, true, false, false);
-		System.out.print("\nRunning decoding benchmark.");
+		System.out.println("\nRunning decoding benchmark.");
 		long	decoding	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, false, true, false);
-		System.out.print("\nRunning encoding/decoding benchmark.");
+		System.out.println("\nRunning encoding/decoding benchmark.");
 		long	endecoding	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, true, true, false);
-		System.out.print("\nRunning binary benchmark.");
+		System.out.println("\nRunning binary benchmark.");
 		long	binary	= runTest(SUtil.createUniqueId("relay_benchmark", 3), benchmark, true, true, false);
 		
 		System.out.println("\nSimple benchmark took: "+(simple*100/benchmark)/100.0+" ms per message");
 		System.out.println("Encoding benchmark took: "+(encoding*100/benchmark)/100.0+" ms per message ("+(encoding*100/simple)+"%)");
 		System.out.println("Decoding benchmark took: "+(decoding*100/benchmark)/100.0+" ms per message ("+(decoding*100/simple)+"%)");
-		System.out.println("En/decoding benchmark took: "+(decoding*100/benchmark)/100.0+" ms per message ("+(endecoding*100/simple)+"%)");
-		System.out.println("Binary benchmark took: "+(decoding*100/benchmark)/100.0+" ms per message ("+(binary*100/simple)+"%)");
+		System.out.println("En/decoding benchmark took: "+(endecoding*100/benchmark)/100.0+" ms per message ("+(endecoding*100/simple)+"%)");
+		System.out.println("Binary benchmark took: "+(binary*100/benchmark)/100.0+" ms per message ("+(binary*100/simple)+"%)");
 	}
 	
 	/**
