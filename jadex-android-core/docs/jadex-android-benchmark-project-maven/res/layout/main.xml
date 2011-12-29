@@ -13,10 +13,15 @@
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:text="Start Receiving Benchmark"
-	android:id="@+id/startMB1"/>	
+	android:id="@+id/startMB1"/>
 <Button 
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:text="Start Sending Benchmark"
 	android:id="@+id/startMB2"/>	
+<Button 
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="Single Con Sending Benchmark"
+	android:id="@+id/startMB3"/>	
 </LinearLayout>

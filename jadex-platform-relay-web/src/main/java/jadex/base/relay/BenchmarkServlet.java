@@ -59,14 +59,21 @@ public class BenchmarkServlet extends HttpServlet
 	{
 		try
 		{
-			InputStream	in	= request.getInputStream();
-			byte[]	len	= SRelay.readData(in, 4);
-			int	length	= SUtil.bytesToInt(len);
-			SRelay.readData(in, length);
+			while(true)
+			{
+				InputStream	in	= request.getInputStream();
+				byte[]	len	= SRelay.readData(in, 4);
+				int	length	= SUtil.bytesToInt(len);
+				SRelay.readData(in, length);
+				
+				// Send achnowledgement.
+				response.getOutputStream().write(SRelay.MSGTYPE_PING);
+				response.getOutputStream().flush();
+			}
 		}
 		catch(Exception e)
 		{			
-			response.sendError(404);
+//			response.sendError(404);
 		}
 	}
 }

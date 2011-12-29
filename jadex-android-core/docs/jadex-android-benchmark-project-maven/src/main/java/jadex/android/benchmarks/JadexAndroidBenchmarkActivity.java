@@ -21,6 +21,9 @@ public class JadexAndroidBenchmarkActivity extends Activity
 	/** Button to start the second message performance test. */
 	private Button startMB2;
 	
+	/** Button to start the third message performance test. */
+	private Button startMB3;
+	
 	/** The text view for showing results. */
 	private TextView textView;
 	
@@ -36,8 +39,10 @@ public class JadexAndroidBenchmarkActivity extends Activity
 
 		startMB1 = (Button)findViewById(R.id.startMB1);
 		startMB2 = (Button)findViewById(R.id.startMB2);
+		startMB3 = (Button)findViewById(R.id.startMB3);
 		startMB1.setOnClickListener(buttonListener);
 		startMB2.setOnClickListener(buttonListener);
+		startMB3.setOnClickListener(buttonListener);
 		
 		textView = (TextView) findViewById(R.id.infoTextView);
 	}
@@ -54,6 +59,7 @@ public class JadexAndroidBenchmarkActivity extends Activity
 		{
 			startMB1.setEnabled(false);
 			startMB2.setEnabled(false);
+			startMB3.setEnabled(false);
 			String	text	= textView.getText().toString();
 			if(view==startMB1)
 			{
@@ -62,6 +68,10 @@ public class JadexAndroidBenchmarkActivity extends Activity
 			else if(view==startMB2)
 			{
 				text	+= "\nRunning sending benchmark...";
+			}
+			else if(view==startMB3)
+			{
+				text	+= "\nRunning single con sending benchmark...";
 			}
 			textView.setText(text);
 			
@@ -81,6 +91,10 @@ public class JadexAndroidBenchmarkActivity extends Activity
 						{
 							text	+= "\n"+SendingBenchmark.runBenchmark();
 						}
+						else if(view==startMB3)
+						{
+							text	+= "\n"+SingleConSendingBenchmark.runBenchmark();
+						}
 					}
 					catch(Exception e)
 					{
@@ -95,6 +109,7 @@ public class JadexAndroidBenchmarkActivity extends Activity
 							textView.setText(ftext);
 							startMB1.setEnabled(true);
 							startMB2.setEnabled(true);
+							startMB3.setEnabled(true);
 						}
 					});
 				}
