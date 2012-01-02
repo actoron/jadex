@@ -2,15 +2,23 @@ package jadex.examples.shop;
 
 import jadex.bdi.examples.shop.IShopService;
 import jadex.bdi.examples.shop.ItemInfo;
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Imports;
 
 /**
  *  Micro agent implementation of the shop.
  */
+@Description("This agent exposes a shop interface.")
+@Imports("jadex.bdi.examples.shop.*")
+@Arguments({
+	@Argument(name="name", clazz=String.class, defaultvalue="\"Microshop\"", description="The name of the shop."),
+	@Argument(name="catalog", clazz=ItemInfo[].class, defaultvalue="new jadex.bdi.examples.shop.ItemInfo[]{new jadex.bdi.examples.shop.ItemInfo(\"Micro turbo\", 99.99, 9)}", description="The catalog of the shop.")
+//	@Argument(name="catalog", clazz=ItemInfo[].class, defaultvalue="new ItemInfo[]{new ItemInfo(\"Micro turbo\", 99.99, 9)}", description="The catalog of the shop.")
+})
 public class ShopAgent extends MicroAgent
 {
 	//-------- attributes --------
@@ -87,16 +95,16 @@ public class ShopAgent extends MicroAgent
 	
 	//-------- static methods --------
 	
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static MicroAgentMetaInfo getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("This agent exposes a shop interface.", 
-			new String[]{}, 
-			new IArgument[]{
-				new Argument("name", "The name of the shop.", "String", "Microshop"),	
-				new Argument("catalog", "The catalog of the shop.", "ItemInfo[]", new ItemInfo[]{new ItemInfo("Micro turbo", 99.99, 9)}),	
-			}, null, null, null);
-	}
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static MicroAgentMetaInfo getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("This agent exposes a shop interface.", 
+//			new String[]{}, 
+//			new IArgument[]{
+//				new Argument("name", "The name of the shop.", "String", "Microshop"),	
+//				new Argument("catalog", "The catalog of the shop.", "ItemInfo[]", new ItemInfo[]{new ItemInfo("Micro turbo", 99.99, 9)}),	
+//			}, null, null, null);
+//	}
 }

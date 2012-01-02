@@ -1166,4 +1166,12 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 		return modelinfo.getResourceIdentifier();
 	}
 	
+	/**
+	 *  Get the filename.
+	 *  @return The filename.
+	 */
+	public String getFilename()
+	{
+		return modelinfo.getFilename();
+	}
 }

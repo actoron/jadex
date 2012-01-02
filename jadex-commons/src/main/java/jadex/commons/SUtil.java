@@ -1031,8 +1031,7 @@ public class SUtil
 		// Classpath...
 		if(ret == null)
 		{
-			URL url = classloader.getResource(name.startsWith("/") ? name
-					.substring(1) : name);
+			URL url = classloader.getResource(name.startsWith("/") ? name.substring(1) : name);
 			// System.out.println("Classloader: "+classloader+" "+name+" "+url+" "+classloader.getParent());
 			// if(classloader instanceof URLClassLoader)
 			// System.out.println("URLs: "+SUtil.arrayToString(((URLClassLoader)classloader).getURLs()));
@@ -1055,8 +1054,7 @@ public class SUtil
 
 					try
 					{
-						file = new File(URLDecoder.decode(url.getFile(),
-								encoding)); // does only work since 1.4.
+						file = new File(URLDecoder.decode(url.getFile(), encoding)); // does only work since 1.4.
 						// file = new File(URLDecoder.decode(url.getFile())); //
 						// problem decode is deprecated.
 						if(file.exists())
@@ -1078,10 +1076,8 @@ public class SUtil
 							{
 								try
 								{
-									ret = new ResourceInfo(
-											file.getCanonicalPath(),
-											new FileInputStream(file),
-											file.lastModified());
+									ret = new ResourceInfo(file.getCanonicalPath(),
+										new FileInputStream(file), file.lastModified());
 								}
 								catch(FileNotFoundException fnfe)
 								{

@@ -2,9 +2,9 @@ package jadex.tools.daemon;
 
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.GuiClass;
+import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -18,7 +18,13 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 import java.io.File;
 import java.io.FilterOutputStream;
@@ -32,9 +38,15 @@ import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
+
 /**
  *  Daemon agent provides functionalities for managing platforms.
  */
+@Description("This agent offers the daemon service.")
+@GuiClass(DaemonViewerPanel.class)
+@RequiredServices(@RequiredService(name="libservice", type=ILibraryService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
+@ProvidedServices(@ProvidedService(type=IDaemonService.class, implementation=@Implementation(
+	expression="new DaemonService($component.getExternalAccess())")))
 public class DaemonAgent extends MicroAgent
 {	
 	//-------- attributes --------
@@ -54,7 +66,7 @@ public class DaemonAgent extends MicroAgent
 	{
 		platforms = Collections.synchronizedMap(new HashMap());
 		listeners = Collections.synchronizedList(new ArrayList());
-		addService("daemonservice", IDaemonService.class, new DaemonService(getExternalAccess()), BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
+//		addService("daemonservice", IDaemonService.class, new DaemonService(getExternalAccess()), BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
@@ -396,16 +408,16 @@ public class DaemonAgent extends MicroAgent
 	
 	//-------- static methods --------
 
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static MicroAgentMetaInfo getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("This agent offers the daemon service.", null, 
-			new IArgument[]{}//new Argument("infos", "Initial information records.", "InformationEntry[]")}
-			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.tools.daemon.DaemonViewerPanel"}),
-			new RequiredServiceInfo[]{new RequiredServiceInfo("libservice", ILibraryService.class)}
-			, new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, IDaemonService.class, null, null)});
-	}
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static MicroAgentMetaInfo getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("This agent offers the daemon service.", null, 
+//			new IArgument[]{}//new Argument("infos", "Initial information records.", "InformationEntry[]")}
+//			, null, null, SUtil.createHashMap(new String[]{"componentviewer.viewerclass"}, new Object[]{"jadex.tools.daemon.DaemonViewerPanel"}),
+//			new RequiredServiceInfo[]{new RequiredServiceInfo("libservice", ILibraryService.class)}
+//			, new ProvidedServiceInfo[]{new ProvidedServiceInfo(null, IDaemonService.class, null, null)});
+//	}
 
 }

@@ -29,6 +29,7 @@ import jadex.micro.annotation.AgentService;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Breakpoints;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
@@ -104,15 +105,12 @@ public class MicroClassReader
 		String packagename = cma.getPackage()!=null? cma.getPackage().getName(): null;
 		modelinfo.setName(name);
 		modelinfo.setPackage(packagename);
-//		System.out.println("pd1: "+cma);
-//		System.out.println("pd2: "+cma.getProtectionDomain());
-//		System.out.println("pd3: "+cma.getProtectionDomain().getCodeSource());
-//		System.out.println("pd4: "+cma.getProtectionDomain().getCodeSource().getLocation());
+		
 		String src = cma.getProtectionDomain()!=null
-			? SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation()) + File.separator
-			: '/' + cma.getPackage().getName().replace('.', '/') + '/';
+			? SUtil.convertURLToString(cma.getProtectionDomain().getCodeSource().getLocation()) + File.separator: "/";
+//			: ('/' + cma.getPackage().getName().replace('.', '/') + '/');
 //		modelinfo.setFilename(src+File.separatorChar+model);
-		modelinfo.setFilename(src+SReflect.getClassName(cma)+".class");
+		modelinfo.setFilename(src+SReflect.getClassName(cma).replace('.', cma.getProtectionDomain()!=null? File.separatorChar: '/')+".class");
 //		System.out.println("mircor: "+src+File.separatorChar+model);
 		modelinfo.setType(MicroAgentFactory.FILETYPE_MICROAGENT);
 		modelinfo.setStartable(true);
@@ -122,8 +120,8 @@ public class MicroClassReader
 			try
 			{
 				url	= cma.getProtectionDomain()!=null
-						? cma.getProtectionDomain().getCodeSource().getLocation()
-						: new URL("file://" + cma.getPackage().getName().replace('.', '/') + '/');
+					? cma.getProtectionDomain().getCodeSource().getLocation()
+					: new URL("file://" + cma.getPackage().getName().replace('.', '/') + '/');
 			}
 			catch(MalformedURLException e)
 			{
@@ -134,81 +132,82 @@ public class MicroClassReader
 		modelinfo.setResourceIdentifier(rid);
 		ret.setClassloader(classloader);
 		
-		try
-		{
-			Method m = cma.getMethod("getMetaInfo", new Class[0]);
-			if(m!=null)
-			{
-				MicroAgentMetaInfo metainfo = (MicroAgentMetaInfo)m.invoke(null, new Object[0]);
-				fillMicroModelFromMetaInfo(ret, model, cma, classloader, metainfo);
-			}
-		}
-		catch(Exception e)
-		{
-		}
+		// not supported any longer
+//		try
+//		{
+//			Method m = cma.getMethod("getMetaInfo", new Class[0]);
+//			if(m!=null)
+//			{
+//				MicroAgentMetaInfo metainfo = (MicroAgentMetaInfo)m.invoke(null, new Object[0]);
+//				fillMicroModelFromMetaInfo(ret, model, cma, classloader, metainfo);
+//			}
+//		}
+//		catch(Exception e)
+//		{
+//		}
 		
 		fillMicroModelFromAnnotations(ret, model, cma, classloader);
 		
 		return ret;
 	}
 	
-	/**
-	 *  Fill the model details using meta info.
-	 */
-	protected void fillMicroModelFromMetaInfo(CacheableKernelModel micromodel, String model, Class cma, ClassLoader classloader, MicroAgentMetaInfo metainfo)
-	{
-		try
-		{
-			ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
-			Method m = cma.getMethod("getMetaInfo", new Class[0]);
-			if(m!=null)
-				metainfo = (MicroAgentMetaInfo)m.invoke(null, new Object[0]);
-			
-			String description = metainfo!=null && metainfo.getDescription()!=null? metainfo.getDescription(): null;
-			String[] configurations = metainfo!=null? metainfo.getConfigurations(): null;
-			IArgument[] arguments = metainfo!=null? metainfo.getArguments(): null;
-			IArgument[] results = metainfo!=null? metainfo.getResults(): null;
-			Map properties = metainfo!=null && metainfo.getProperties()!=null? new HashMap(metainfo.getProperties()): new HashMap();
-			RequiredServiceInfo[] required = metainfo!=null? metainfo.getRequiredServices(): null;
-			ProvidedServiceInfo[] provided = metainfo!=null? metainfo.getProvidedServices(): null;
-			IModelValueProvider master = metainfo!=null? metainfo.getMaster(): null;
-			IModelValueProvider daemon= metainfo!=null? metainfo.getDaemon(): null;
-			IModelValueProvider autosd = metainfo!=null? metainfo.getAutoShutdown(): null;
-			
-			// Add debugger breakpoints
-			List names = new ArrayList();
-			for(int i=0; metainfo!=null && i<metainfo.getBreakpoints().length; i++)
-				names.add(metainfo.getBreakpoints()[i]);
-			properties.put("debugger.breakpoints", names);
-			
-			ConfigurationInfo[] cinfo = null;
-			if(configurations!=null)
-			{
-				cinfo = new ConfigurationInfo[configurations.length];
-				for(int i=0; i<configurations.length; i++)
-				{
-					cinfo[i] = new ConfigurationInfo(configurations[i]);
-					cinfo[i].setMaster((Boolean)master.getValue(configurations[i]));
-					cinfo[i].setDaemon((Boolean)daemon.getValue(configurations[i]));
-					cinfo[i].setAutoShutdown((Boolean)autosd.getValue(configurations[i]));
-					// suspend?
-					// todo
-//					cinfo[i].addArgument(argument)
-				}
-			}
-			modelinfo.setDescription(description);
-			modelinfo.setArguments(arguments);
-			modelinfo.setResults(results);
-			modelinfo.setProperties(properties);
-			modelinfo.setRequiredServices(required);
-			modelinfo.setProvidedServices(provided);
-			modelinfo.setConfigurations(cinfo);
-		}
-		catch(Exception e)
-		{
-//			e.printStackTrace();
-		}
-	}
+//	/**
+//	 *  Fill the model details using meta info.
+//	 */
+//	protected void fillMicroModelFromMetaInfo(CacheableKernelModel micromodel, String model, Class cma, ClassLoader classloader, MicroAgentMetaInfo metainfo)
+//	{
+//		try
+//		{
+//			ModelInfo modelinfo = (ModelInfo)micromodel.getModelInfo();
+////			Method m = cma.getMethod("getMetaInfo", new Class[0]);
+////			if(m!=null)
+////				metainfo = (MicroAgentMetaInfo)m.invoke(null, new Object[0]);
+//			
+//			String description = metainfo!=null && metainfo.getDescription()!=null? metainfo.getDescription(): null;
+//			String[] configurations = metainfo!=null? metainfo.getConfigurations(): null;
+//			IArgument[] arguments = metainfo!=null? metainfo.getArguments(): null;
+//			IArgument[] results = metainfo!=null? metainfo.getResults(): null;
+//			Map properties = metainfo!=null && metainfo.getProperties()!=null? new HashMap(metainfo.getProperties()): new HashMap();
+//			RequiredServiceInfo[] required = metainfo!=null? metainfo.getRequiredServices(): null;
+//			ProvidedServiceInfo[] provided = metainfo!=null? metainfo.getProvidedServices(): null;
+//			IModelValueProvider master = metainfo!=null? metainfo.getMaster(): null;
+//			IModelValueProvider daemon= metainfo!=null? metainfo.getDaemon(): null;
+//			IModelValueProvider autosd = metainfo!=null? metainfo.getAutoShutdown(): null;
+//			
+//			// Add debugger breakpoints
+//			List names = new ArrayList();
+//			for(int i=0; metainfo!=null && i<metainfo.getBreakpoints().length; i++)
+//				names.add(metainfo.getBreakpoints()[i]);
+//			properties.put("debugger.breakpoints", names);
+//			
+//			ConfigurationInfo[] cinfo = null;
+//			if(configurations!=null)
+//			{
+//				cinfo = new ConfigurationInfo[configurations.length];
+//				for(int i=0; i<configurations.length; i++)
+//				{
+//					cinfo[i] = new ConfigurationInfo(configurations[i]);
+//					cinfo[i].setMaster((Boolean)master.getValue(configurations[i]));
+//					cinfo[i].setDaemon((Boolean)daemon.getValue(configurations[i]));
+//					cinfo[i].setAutoShutdown((Boolean)autosd.getValue(configurations[i]));
+//					// suspend?
+//					// todo
+////					cinfo[i].addArgument(argument)
+//				}
+//			}
+//			modelinfo.setDescription(description);
+//			modelinfo.setArguments(arguments);
+//			modelinfo.setResults(results);
+//			modelinfo.setProperties(properties);
+//			modelinfo.setRequiredServices(required);
+//			modelinfo.setProvidedServices(provided);
+//			modelinfo.setConfigurations(cinfo);
+//		}
+//		catch(Exception e)
+//		{
+////			e.printStackTrace();
+//		}
+//	}
 	
 	/**
 	 *  Fill the model details using annotation.
@@ -228,6 +227,7 @@ public class MicroClassReader
 		boolean resudone = false;
 		boolean confdone = false;
 		boolean compdone = false;
+		boolean breaksdone = false;
 		
 		while(cma!=null && !cma.equals(Object.class) && !cma.equals(MicroAgent.class))
 		{
@@ -325,6 +325,27 @@ public class MicroClassReader
 				}
 			}
 			
+			// Take all (if not replace)
+			if(!breaksdone && cma.isAnnotationPresent(Breakpoints.class))
+			{
+				Breakpoints val = (Breakpoints)cma.getAnnotation(Breakpoints.class);
+				breaksdone = val.replace();
+				String[] vals = val.value();
+				
+				List bps = (List)toset.get("breakpoints");
+				if(bps==null)
+				{
+					bps = new ArrayList();
+					toset.put("breakpoints", bps);
+				}
+				
+				for(int i=0; i<vals.length; i++)
+				{
+					if(!bps.contains(vals[i]))
+						bps.add(vals[i]);
+				}
+			}
+			
 			// Take all but new overrides old
 			if(!reqsdone && cma.isAnnotationPresent(RequiredServices.class))
 			{
@@ -413,6 +434,8 @@ public class MicroClassReader
 				
 				for(int i=0; i<vals.length; i++)
 				{
+					try
+					{
 	//				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
 					IArgument tmparg = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
 						vals[i].description(), SReflect.getClassName(vals[i].clazz()),
@@ -421,6 +444,11 @@ public class MicroClassReader
 					if(!args.containsKey(vals[i].name()))
 					{
 						args.put(vals[i].name(), tmparg);
+					}
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
 					}
 				}
 			}
@@ -620,12 +648,19 @@ public class MicroClassReader
 			
 			cma = cma.getSuperclass();
 		}
-		
+				
 		Set imp = (Set)toset.get("imports");
 		if(imp!=null)
 			modelinfo.setImports((String[])imp.toArray(new String[imp.size()]));
 		
 		Map props = (Map)toset.get("properties");
+		List bps = (List)toset.get("breakpoints");
+		if(bps!=null)
+		{
+			if(props==null)
+				props = new HashMap();
+			props.put("debugger.breakpoints", bps);
+		}
 		if(props!=null)
 			modelinfo.setProperties(props);
 		
@@ -653,7 +688,7 @@ public class MicroClassReader
 		Map cfs = (Map)toset.get("configurations");
 		if(cfs!=null)
 			modelinfo.setConfigurations((ConfigurationInfo[])cfs.values().toArray(new ConfigurationInfo[cfs.size()]));
-		
+
 	}
 	
 	/**

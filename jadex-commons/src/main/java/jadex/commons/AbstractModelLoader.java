@@ -276,7 +276,10 @@ public abstract class AbstractModelLoader
 				cached	= doLoadModel(name, imports, info, classloader, context);
 	
 				// Store by filename also, to avoid reloading with different imports.
-				modelcache.put(info.getFilename(), cached);
+//				modelcache.put(info.getFilename(), cached);
+				modelcache.put(cached.getFilename(), cached);
+//				System.out.println("cached: "+info.getFilename()+" "+cached.getFilename()+" "+classloader);
+//				System.out.println("cached: "+cached.getFilename()+" "+classloader);
 				
 				// Associate cached model to new key (name/extension/imports).
 				modelcache.put(keytuple, cached);

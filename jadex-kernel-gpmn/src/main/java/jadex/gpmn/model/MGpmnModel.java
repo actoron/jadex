@@ -556,4 +556,13 @@ public class MGpmnModel implements ICacheableModel//, IModelInfo
 	{
 		return modelinfo;
 	}
+	
+	/**
+	 *  Get the filename.
+	 *  @return The filename.
+	 */
+	public String getFilename()
+	{
+		return modelinfo.getFilename();
+	}
 }

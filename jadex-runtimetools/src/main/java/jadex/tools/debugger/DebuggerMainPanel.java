@@ -259,23 +259,31 @@ public class DebuggerMainPanel extends JSplitPane
 										{
 											public void resultAvailable(Object result)
 											{
-												updatePanel((IComponentDescription)result);
+												ces.getComponentDescription(DebuggerMainPanel.this.desc.getName())
+													.addResultListener(new IResultListener<IComponentDescription>()
+												{
+													public void resultAvailable(IComponentDescription result)
+													{
+														updatePanel(result);
+													}
+													
+													public void exceptionOccurred(Exception exception)
+													{
+														error();
+													}
+												});
 											}
 											
 											public void exceptionOccurred(Exception exception)
 											{
-												step.setEnabled(true);
-												run.setEnabled(true);
-												pause.setEnabled(false);
+												error();
 											}
 										});
 									}
 									
 									public void exceptionOccurred(Exception exception)
 									{
-										step.setEnabled(true);
-										run.setEnabled(true);
-										pause.setEnabled(false);
+										error();
 									}
 								});
 							}
@@ -387,6 +395,22 @@ public class DebuggerMainPanel extends JSplitPane
 				step.setEnabled(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
 //					&& IComponentDescription.PROCESSINGSTATE_READY.equals(desc.getProcessingState()));
 				run.setEnabled(IComponentDescription.STATE_SUSPENDED.equals(desc.getState()));
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	protected void error()
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				step.setEnabled(true);
+				run.setEnabled(true);
+				pause.setEnabled(false);
 			}
 		});
 	}

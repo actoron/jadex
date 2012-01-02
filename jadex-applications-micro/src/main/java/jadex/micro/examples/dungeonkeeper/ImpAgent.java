@@ -100,13 +100,4 @@ public class ImpAgent extends MicroAgent
 		
 		waitForTick(com);
 	}
-	
-	//-------- static methods --------
-	
-	/**
-	 *  Get the meta information about the agent.
-	 * /
-	public static Object getMetaInfo()
-	{
-	}*/
 }

@@ -73,4 +73,13 @@ public class CacheableKernelModel implements ICacheableModel
 	{
 		this.lastchecked = lastchecked;
 	}
+	
+	/**
+	 *  Get the filename.
+	 *  @return The filename.
+	 */
+	public String getFilename()
+	{
+		return modelinfo.getFilename();
+	}
 }

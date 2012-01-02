@@ -4,7 +4,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Breakpoints;
+import jadex.micro.annotation.Description;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -14,6 +15,8 @@ import java.util.Set;
  *  An agent that is counting to infinity.
  *  Used to demonstrate "semantic" breakpoints.
  */
+@Description("A simple agent showing how to use breakpoints in the micro kernel.")
+@Breakpoints(value={"2", "5", "odd", "even", "every tenth"})
 public class CountingAgent extends MicroAgent
 {
 	/** The counter. */
@@ -75,12 +78,12 @@ public class CountingAgent extends MicroAgent
 		return isatbreakpoint;
 	}
 	
-	/**
-	 *  Add the 'testresults' marking this agent as a testcase. 
-	 */
-	public static Object getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("A simple agent showing how to use breakpoints in the micro kernel.", 
-			null, null, null, new String[]{"2", "5", "odd", "even", "every tenth"}, null);
-	}
+//	/**
+//	 *  Add the 'testresults' marking this agent as a testcase. 
+//	 */
+//	public static Object getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("A simple agent showing how to use breakpoints in the micro kernel.", 
+//			null, null, null, new String[]{"2", "5", "odd", "even", "every tenth"}, null);
+//	}
 }

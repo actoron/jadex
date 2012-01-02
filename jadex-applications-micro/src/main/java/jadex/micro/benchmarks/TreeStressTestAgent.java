@@ -1,13 +1,13 @@
 package jadex.micro.benchmarks;
 
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Description;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +15,8 @@ import java.util.Map;
 /**
  *  Creates a complex tree structure of sub components.
  */
+@Description("<h1>Tree Stress Test</h1>Creates a complex tree structure of sub components.")
+@Arguments(@Argument(name="depth", clazz=int.class, defaultvalue="5", description="Depth of the tree."))
 public class TreeStressTestAgent extends MicroAgent
 {
 	/**
@@ -54,12 +56,12 @@ public class TreeStressTestAgent extends MicroAgent
 		});
 	}
 	
-	/**
-	 *  Info about the agent.
-	 */
-	public static Object	getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("<h1>Tree Stress Test</h1>Creates a complex tree structure of sub components.", null,
-			new IArgument[]{new Argument("depth", "Depth of the tree.", "int", new Integer(5))}, null);
-	}
+//	/**
+//	 *  Info about the agent.
+//	 */
+//	public static Object	getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("<h1>Tree Stress Test</h1>Creates a complex tree structure of sub components.", null,
+//			new IArgument[]{new Argument("depth", "Depth of the tree.", "int", new Integer(5))}, null);
+//	}
 }

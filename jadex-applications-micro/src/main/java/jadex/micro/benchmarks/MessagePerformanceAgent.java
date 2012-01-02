@@ -4,20 +4,30 @@ import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  *  Test message performance. 
  */
+@Description("This agents benchmarks agent message sending.")
+@Arguments(
+{
+	@Argument(name="max", clazz=int.class, defaultvalue="1000", description="Maximum number of messages to send."),
+	@Argument(name="codec", clazz=boolean.class, defaultvalue="false", description="Use content codec for message content."),
+})
+@Results(@Result(name="result", clazz=String.class, description="The benchmark results as text."))
 public class MessagePerformanceAgent extends MicroAgent
 {
 	//-------- attributes --------
@@ -128,50 +138,50 @@ public class MessagePerformanceAgent extends MicroAgent
 	}
 	
 
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static Object getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("This agents benchmarks agent message sending.", 
-			new String[0], new IArgument[]
-			{
-				new Argument("max", "Maximum number of messages to send.", "Integer", new Integer(1000))
-				{
-					public boolean validate(String input)
-					{
-						boolean ret = true;
-						try
-						{
-							Integer.parseInt(input);
-						}
-						catch(Exception e)
-						{
-							ret = false;
-						}
-						return ret;
-					}
-				},
-				new Argument("codec", "Use content codec for message content.", "boolean", Boolean.FALSE)
-				{
-					public boolean validate(String input)
-					{
-						boolean ret = true;
-						try
-						{
-							Boolean.valueOf(input);
-						}
-						catch(Exception e)
-						{
-							ret = false;
-						}
-						return ret;
-					}
-				}
-			}, new IArgument[]
-			{
-				new Argument("result", "The benchmark results as text.", "String")
-			}, null, null
-		);
-	}
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static Object getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("This agents benchmarks agent message sending.", 
+//			new String[0], new IArgument[]
+//			{
+//				new Argument("max", "Maximum number of messages to send.", "Integer", new Integer(1000))
+//				{
+//					public boolean validate(String input)
+//					{
+//						boolean ret = true;
+//						try
+//						{
+//							Integer.parseInt(input);
+//						}
+//						catch(Exception e)
+//						{
+//							ret = false;
+//						}
+//						return ret;
+//					}
+//				},
+//				new Argument("codec", "Use content codec for message content.", "boolean", Boolean.FALSE)
+//				{
+//					public boolean validate(String input)
+//					{
+//						boolean ret = true;
+//						try
+//						{
+//							Boolean.valueOf(input);
+//						}
+//						catch(Exception e)
+//						{
+//							ret = false;
+//						}
+//						return ret;
+//					}
+//				}
+//			}, new IArgument[]
+//			{
+//				new Argument("result", "The benchmark results as text.", "String")
+//			}, null, null
+//		);
+//	}
 }

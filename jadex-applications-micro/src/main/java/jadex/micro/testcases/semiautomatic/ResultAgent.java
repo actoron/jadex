@@ -8,10 +8,15 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 
 /**
- * 
+ *  Agent that shows how to use results.
  */
+@Description("This agent starts a subagent and fetches its result.")
+@Results(@Result(name="result", clazz=String.class, defaultvalue="0", description="Result value."))
 public class ResultAgent extends MicroAgent
 {
 	//-------- methods --------

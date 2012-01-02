@@ -18,6 +18,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +31,8 @@ import java.util.Map;
  *  Test DF usage from micro agent.
  *  @author Dirk, Alex
  */
+@Description("Test DF usage from micro agent.")
+@Results(@Result(name="testresults", clazz=Testcase.class))
 public class DFTestAgent extends MicroAgent
 {
 	//-------- attributes --------
@@ -197,12 +202,12 @@ public class DFTestAgent extends MicroAgent
 	}
 
 	
-	/**
-	 *  Add the 'testresults' marking this agent as a testcase. 
-	 */
-	public static Object getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("Test DF usage from micro agent.", 
-			null, null, new IArgument[]{new Argument("testresults", null, "Testcase")});
-	}
+//	/**
+//	 *  Add the 'testresults' marking this agent as a testcase. 
+//	 */
+//	public static Object getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("Test DF usage from micro agent.", 
+//			null, null, new IArgument[]{new Argument("testresults", null, "Testcase")});
+//	}
 }

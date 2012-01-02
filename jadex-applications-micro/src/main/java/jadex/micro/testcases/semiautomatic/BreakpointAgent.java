@@ -4,7 +4,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Breakpoints;
+import jadex.micro.annotation.Description;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -12,6 +13,8 @@ import java.util.HashSet;
 /**
  *  A simple agent showing how to use breakpoints in the micro kernel.
  */
+@Description("A simple agent showing how to use breakpoints in the micro kernel.")
+@Breakpoints(value={"hop", "step", "jump"})
 public class BreakpointAgent extends MicroAgent
 {
 	/** The current step. */
@@ -69,12 +72,12 @@ public class BreakpointAgent extends MicroAgent
 		return new HashSet(Arrays.asList(breakpoints)).contains(step);
 	}
 	
-	/**
-	 *  Add the 'testresults' marking this agent as a testcase. 
-	 */
-	public static Object getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("A simple agent showing how to use breakpoints in the micro kernel.", 
-			null, null, null, new String[]{"hop", "step", "jump"}, null);
-	}
+//	/**
+//	 *  Add the 'testresults' marking this agent as a testcase. 
+//	 */
+//	public static Object getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("A simple agent showing how to use breakpoints in the micro kernel.", 
+//			null, null, null, new String[]{"hop", "step", "jump"}, null);
+//	}
 }

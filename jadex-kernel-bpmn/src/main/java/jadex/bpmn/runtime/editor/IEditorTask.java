@@ -5,10 +5,7 @@ package jadex.bpmn.runtime.editor;
 
 /**
  * <h1>This is only a COPY from the BPMN editor</h1>
- * 
  * Marker Interface for Jadex BPMN tasks
- * 
- * @author Claas
  */
 public interface IEditorTask
 {

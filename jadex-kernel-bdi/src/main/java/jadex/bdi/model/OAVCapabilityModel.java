@@ -1142,4 +1142,14 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 		
 		return ret;
 	}
+	
+	/**
+	 *  Get the filename.
+	 *  @return The filename.
+	 */
+	public String getFilename()
+	{
+		return modelinfo.getFilename();
+	}
+
 }

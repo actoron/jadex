@@ -5,14 +5,13 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Description;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,6 +21,13 @@ import java.util.Set;
 /**
  *  Agent that pings another and waits for its replies.
  */
+@Description("A simple agent that sends pings to another agent and waits for replies.")
+@Arguments({
+	@Argument(name="receiver", clazz=IComponentIdentifier.class, description="The component receiver of the ping target."),
+	@Argument(name="missed_max", clazz=int.class, description="Maximum number of allowed missed replies", defaultvalue="3"),
+	@Argument(name="timeout", clazz=long.class, description="Timeout for reply", defaultvalue="1000"),
+	@Argument(name="content", clazz=String.class, description="Ping message content", defaultvalue="\"ping\"")
+})
 public class PingingAgent extends MicroAgent
 {
 	//-------- attributes --------
@@ -112,19 +118,19 @@ public class PingingAgent extends MicroAgent
 		}
 	}
 	
-	/**
-	 *  Get the agent meta info. 
-	 */
-	public static Object getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("A simple agent that sends pings to another agent and waits for replies.", 
-			null, new IArgument[]
-			{
-				new Argument("receiver", "The component receiver of the ping target.", "IComponentIdentifier"),
-				new Argument("missed_max", "Maximum number of allowed missed replies", "int", new Integer(3)),
-				new Argument("timeout", "Timeout for reply", "long", new Long(1000)),
-				new Argument("content", "Ping message content", "String", "ping"),
-				
-			}, null);
-	}
+//	/**
+//	 *  Get the agent meta info. 
+//	 */
+//	public static Object getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("A simple agent that sends pings to another agent and waits for replies.", 
+//			null, new IArgument[]
+//			{
+//				new Argument("receiver", "The component receiver of the ping target.", "IComponentIdentifier"),
+//				new Argument("missed_max", "Maximum number of allowed missed replies", "int", new Integer(3)),
+//				new Argument("timeout", "Timeout for reply", "long", new Long(1000)),
+//				new Argument("content", "Ping message content", "String", "ping"),
+//				
+//			}, null);
+//	}
 }

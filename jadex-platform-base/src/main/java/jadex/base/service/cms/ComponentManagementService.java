@@ -212,6 +212,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	public IFuture<IModelInfo> loadComponentModel(final String filename, final IResourceIdentifier rid)
 	{
+//		if(filename!=null && filename.indexOf("RemoteServiceManagementAgent")!=-1)
+//			System.out.println("cache miss: "+filename);
+		
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		
 		if(filename==null)
@@ -272,13 +275,16 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
 	public IFuture<IComponentIdentifier> createComponent(final String name, final String modelname, CreationInfo info, final IResultListener<Map<String, Object>> killlistener)
-	{	
+	{			
 		if(modelname==null)
 		{
 			return new Future<IComponentIdentifier>(new IllegalArgumentException("Modelname must not null."));
 		}
 		else
 		{
+//			if(modelname.indexOf("RemoteServiceManagementAgent")!=-1 || modelname.indexOf("rms")!=-1)
+//				System.out.println("cache miss: "+modelname);
+			
 //			final DebugException	de	= new DebugException();
 		
 //			System.out.println("create component: "+modelname+" "+name);
@@ -1479,7 +1485,7 @@ public abstract class ComponentManagementService extends BasicService implements
 								notifyListenersChanged(cid, desc);
 						
 							ret.setResult(null);
-							//ret.setResult(desc);
+//							ret.setResult(desc);
 						}
 					}
 				});
@@ -1879,9 +1885,9 @@ public abstract class ComponentManagementService extends BasicService implements
 			ret.setResult(ci.getResourceIdentifier());
 		}
 		
-		// Local parent but not platform.
+		// Local parent //(but not platform -> platform now has valid rid).
 		else if(ci!=null && ci.getParent()!=null
-			&& !ci.getParent().equals(root.getComponentIdentifier())
+//			&& !ci.getParent().equals(root.getComponentIdentifier())
 			&& !isRemoteComponent(ci.getParent())
 //			&& !initinfos.containsKey(ci.getParent())	// does not work during init as external access is not available!?
 //			&& !Boolean.TRUE.equals(ci.getPlatformloader()))

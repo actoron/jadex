@@ -2,18 +2,20 @@ package jadex.micro.testcases;
 
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.IService;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 
 import java.util.Collections;
 
 /**
  *  Test searching for services that don't exist. 
  */
+@Description("Test searching for services that don't exist.")
+@Results(@Result(name="testresults", clazz=Testcase.class))
 public class NoServiceAgent extends MicroAgent
 {
 	public void executeBody()
@@ -48,12 +50,12 @@ public class NoServiceAgent extends MicroAgent
 	/** Test service interface. */
 	public static interface	INoService	extends IService {}
 	
-	/**
-	 *  Add the 'testresults' marking this agent as a testcase. 
-	 */
-	public static Object getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("Test searching for services that don't exist.", 
-			null, null, new IArgument[]{new Argument("testresults", null, "Testcase")});
-	}
+//	/**
+//	 *  Add the 'testresults' marking this agent as a testcase. 
+//	 */
+//	public static Object getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("Test searching for services that don't exist.", 
+//			null, null, new IArgument[]{new Argument("testresults", null, "Testcase")});
+//	}
 }

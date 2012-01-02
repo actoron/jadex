@@ -4,8 +4,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -14,7 +13,9 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Description;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
@@ -23,6 +24,11 @@ import java.util.Map;
 /**
  *  Agent creation benchmark. 
  */
+@Description("This agents benchmarks parallel agent creation and termination.")
+@Arguments(
+{
+	@Argument(name="num", clazz=Integer.class, defaultvalue="10000", description="Maximum number of agents to create.")
+})
 public class ParallelAgentCreationAgent extends MicroAgent
 {
 	//-------- methods --------
@@ -41,7 +47,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 				public void resultAvailable(Object result)
 				{
 					final IComponentManagementService	cms	= (IComponentManagementService)result;
-					getServiceContainer().searchService(IClockService.class).addResultListener(new DefaultResultListener()
+					getServiceContainer().searchService(IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 					{
 						public void resultAvailable(Object result)
 						{
@@ -185,28 +191,28 @@ public class ParallelAgentCreationAgent extends MicroAgent
 		return getComponentIdentifier().getLocalName() + "Peer_#" + num;
 	}
 	
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static Object getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("This agents benchmarks parallel agent creation and termination.", 
-			new String[0],
-			new IArgument[]{new Argument("num", "Number of agents to create.", "Integer", new Integer(10000))
-			{
-				public boolean validate(String input)
-				{
-					boolean ret = true;
-					try
-					{
-						Integer.parseInt(input);
-					}
-					catch(Exception e)
-					{
-						ret = false;
-					}
-					return ret;
-				}
-			}}, null, null, null);
-	}
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static Object getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("This agents benchmarks parallel agent creation and termination.", 
+//			new String[0],
+//			new IArgument[]{new Argument("num", "Number of agents to create.", "Integer", new Integer(10000))
+//			{
+//				public boolean validate(String input)
+//				{
+//					boolean ret = true;
+//					try
+//					{
+//						Integer.parseInt(input);
+//					}
+//					catch(Exception e)
+//					{
+//						ret = false;
+//					}
+//					return ret;
+//				}
+//			}}, null, null, null);
+//	}
 }

@@ -22,4 +22,10 @@ public interface ICacheableModel
 	 *  @return The last modification time of the model.
 	 */
 	public long getLastModified();
+	
+	/**
+	 *  Get the filename.
+	 *  @return The filename.
+	 */
+	public String getFilename();
 }
