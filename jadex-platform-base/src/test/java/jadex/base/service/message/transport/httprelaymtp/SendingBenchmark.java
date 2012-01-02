@@ -52,8 +52,8 @@ public class SendingBenchmark
 	public static void	main(String[] args) throws Exception
 	{
 		int	size	= 1234;
-		int	setup	= 100;
-		int	benchmark	= 1000;
+		int	setup	= 10;
+		int	benchmark	= 100;
 		
 		System.out.println("Benchmark setup...");
 		runTest(size, setup);
