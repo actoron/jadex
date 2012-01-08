@@ -4,9 +4,6 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -15,7 +12,9 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Description;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
@@ -27,6 +26,12 @@ import de.unihamburg.vsis.jadexAndroid_test.Helper;
 /**
  *  Agent creation benchmark. 
  */
+@Description("This agents benchmarks agent creation and termination.")
+@Arguments(
+{
+	@Argument(name="max", clazz=Integer.class, defaultvalue="100", description="Maximum number of agents to create."),
+	@Argument(name="nested", clazz=Boolean.class, defaultvalue="Boolean.FALSE", description="If true, each agent is created as a subcomponent of the previous agent.")
+})
 public class AgentCreationAgent extends MicroAgent
 {
 	//-------- attributes --------
@@ -283,8 +288,8 @@ public class AgentCreationAgent extends MicroAgent
 		IFuture ret = null;	// Uncomment for no caching.
 		if(ret==null)
 		{
-			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class);  // Raw service
-//			ret	= getServiceContainer().searchServiceUpwards(IComponentManagementService.class); // Decoupled service proxy
+//			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IComponentManagementService.class);  // Raw service
+			ret	= getServiceContainer().searchServiceUpwards(IComponentManagementService.class); // Decoupled service proxy
 //			cms	= getRequiredService("cmsservice");	// Required service proxy
 		}
 		return ret;
@@ -296,42 +301,42 @@ public class AgentCreationAgent extends MicroAgent
 		IFuture ret = null;	// Uncomment for no caching.
 		if(ret==null)
 		{
-			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IClockService.class);  // Raw service
-//			ret	= getServiceContainer().searchServiceUpwards(IClockService.class); // Decoupled service proxy
+//			ret	= SServiceProvider.getServiceUpwards(getServiceProvider(), IClockService.class);  // Raw service
+			ret	= getServiceContainer().searchServiceUpwards(IClockService.class); // Decoupled service proxy
 //			clock	= getRequiredService("clockservice");	// Required service proxy
 		}
 		return ret;
 	}
 	
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static Object getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("This agents benchmarks agent creation and termination.", 
-			new String[0],
-			new IArgument[]{new Argument("max", "Maximum number of agents to create.", "Integer", new Integer(100))
-			{
-				@XMLClassname("argument")
-				public boolean validate(String input)
-				{
-					boolean ret = true;
-					try
-					{
-						Integer.parseInt(input);
-					}
-					catch(Exception e)
-					{
-						ret = false;
-					}
-					return ret;
-				}
-			}, new Argument("nested", "If true, each agent is created as a subcomponent of the previous agent.", "boolean", Boolean.FALSE)}, 
-		null, null, null,
-		null,	// Uncomment this when using required services below.
-//		new RequiredServiceInfo[]{
-//			new RequiredServiceInfo("clockservice", IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM),
-//			new RequiredServiceInfo("cmsservice", IComponentManagementService.class, RequiredServiceInfo.SCOPE_UPWARDS)},
-		null);
-	}
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static Object getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("This agents benchmarks agent creation and termination.", 
+//			new String[0],
+//			new IArgument[]{new Argument("max", "Maximum number of agents to create.", "Integer", new Integer(10000))
+//			{
+//				@XMLClassname("argument")
+//				public boolean validate(String input)
+//				{
+//					boolean ret = true;
+//					try
+//					{
+//						Integer.parseInt(input);
+//					}
+//					catch(Exception e)
+//					{
+//						ret = false;
+//					}
+//					return ret;
+//				}
+//			}, new Argument("nested", "If true, each agent is created as a subcomponent of the previous agent.", "boolean", Boolean.FALSE)}, 
+//		null, null, null,
+//		null,	// Uncomment this when using required services below.
+////		new RequiredServiceInfo[]{
+////			new RequiredServiceInfo("clockservice", IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM),
+////			new RequiredServiceInfo("cmsservice", IComponentManagementService.class, RequiredServiceInfo.SCOPE_UPWARDS)},
+//		null);
+//	}
 }
