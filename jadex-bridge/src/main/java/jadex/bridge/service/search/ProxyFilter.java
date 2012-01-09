@@ -19,14 +19,38 @@ public class ProxyFilter implements IRemoteFilter
 	//-------- methods --------
 	
 	/**
-	 *  Test if service is a proxy.
+	 *  Test if service is a remote proxy.
 	 */
 	public IFuture<Boolean> filter(Object obj)
 	{
-		return new Future<Boolean>(!Proxy.isProxyClass(obj.getClass()) || 
-			// todo: fix this Hack	
-			!(Proxy.getInvocationHandler(obj).getClass().getName().indexOf("RemoteMethodInvocationHandler")!=-1));
-//			!(Proxy.getInvocationHandler(obj) instanceof RemoteMethodInvocationHandler));
+		try
+		{
+		boolean ret = Proxy.isProxyClass(obj.getClass()) && Proxy.getInvocationHandler(obj).getClass()
+			.getName().indexOf("RemoteMethodInvocationHandler")!=-1;
+//		System.out.println("obj: "+obj==null? "null": obj.getClass()+" "+!ret);
+		return new Future<Boolean>(!ret);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		
+//		try
+//		{
+//		System.out.println("obj: "+obj==null? "null": obj.getClass());
+//		if(obj!=null)
+//			System.out.println("filter: "+Proxy.isProxyClass(obj.getClass())+" "+Proxy.getInvocationHandler(obj));
+//		return new Future<Boolean>(!Proxy.isProxyClass(obj.getClass()) || 
+//			// todo: fix this Hack	
+//			!(Proxy.getInvocationHandler(obj).getClass().getName().indexOf("RemoteMethodInvocationHandler")!=-1));
+////			!(Proxy.getInvocationHandler(obj) instanceof RemoteMethodInvocationHandler));
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//			throw new RuntimeException(e);
+//		}
 	}
 	
 	/**

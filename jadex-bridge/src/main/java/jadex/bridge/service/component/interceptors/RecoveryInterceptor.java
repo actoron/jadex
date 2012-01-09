@@ -1,6 +1,8 @@
 package jadex.bridge.service.component.interceptors;
 
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.IRequiredServiceFetcher;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -29,7 +31,7 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 	//-------- attributes --------
 	
 	/** The external access. */
-//	protected IExternalAccess ea;
+	protected IExternalAccess ea;
 		
 	/** The service info. */
 	protected RequiredServiceInfo info;
@@ -45,10 +47,10 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public RecoveryInterceptor(RequiredServiceInfo info, 
+	public RecoveryInterceptor(IExternalAccess ea, RequiredServiceInfo info, 
 		RequiredServiceBinding binding, IRequiredServiceFetcher fetcher)
 	{
-//		this.ea = ea;
+		this.ea = ea;
 		this.info = info;
 		this.binding = binding;
 		this.fetcher = fetcher;
@@ -63,17 +65,20 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 	public IFuture<Void> execute(final ServiceInvocationContext sic)
 	{
 		final Future<Void> ret = new Future<Void>();
+		System.out.println("invoke: "+sic.getMethod());
 		sic.invoke().addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
+				System.out.println("invoked: "+sic.getMethod().getName());
 				Object res = sic.getResult();
 				if(res instanceof IFuture)
 				{
-					((IFuture)res).addResultListener(new DelegationResultListener(ret)
+					((IFuture)res).addResultListener(new TimeoutResultListener(10000, ea, new DelegationResultListener(ret)
 					{
 						public void exceptionOccurred(Exception exception)
 						{
+							System.out.println("ex: "+exception);
 							if(exception instanceof ComponentTerminatedException 
 								|| exception instanceof ServiceInvalidException)
 							{
@@ -85,7 +90,7 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 								super.exceptionOccurred(exception);
 							}
 						}
-					});
+					}));
 				}
 				else
 				{
@@ -107,9 +112,21 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 	 */
 	public IFuture rebind(final ServiceInvocationContext sic)
 	{
-//		System.out.println("rebind1: "+Thread.currentThread());
+		System.out.println("rebind1: "+Thread.currentThread());
 		final Future ret = new Future();
 		
+		ret.addResultListener(new IResultListener()
+		{
+			public void resultAvailable(Object result)
+			{
+				System.out.println("rebind res: "+result);
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("rebind ex: "+exception);
+				exception.printStackTrace();
+			}
+		});
 		// todo: problem, search delivers failed service as result again
 		
 		fetcher.getService(info, binding, false)

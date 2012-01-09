@@ -2,8 +2,10 @@ package jadex.rules.eca;
 
 import jadex.commons.IResultCommand;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.rules.eca.annotations.Action;
 import jadex.rules.eca.annotations.Condition;
+import jadex.rules.eca.annotations.RuleObject;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -40,7 +42,7 @@ public class RuleSystem
 	protected IRulebase rulebase;
 	
 	/** The rules generated for an object. */
-	protected Map<Object, IRule[]> rules;
+	protected IdentityHashMap<Object, Tuple2<Object, IRule[]>> rules;
 
 	/** The Java beans property change listeners. */
 	protected Map<Object, PropertyChangeListener> pcls;
@@ -54,7 +56,7 @@ public class RuleSystem
 	{
 		this.events = new ArrayList<IEvent>();
 		this.rulebase = new Rulebase();
-		this.rules = new IdentityHashMap<Object, IRule[]>(); // objects may change
+		this.rules = new IdentityHashMap<Object, Tuple2<Object, IRule[]>>(); // objects may change
 	}
 
 	//-------- methods --------
@@ -85,23 +87,7 @@ public class RuleSystem
 				{
 					jadex.rules.eca.annotations.Event event = methods[i].getAnnotation(jadex.rules.eca.annotations.Event.class);
 					final String type = event.value();
-					IResultCommand com = new IResultCommand()
-					{
-						public Object execute(Object args)
-						{
-							try
-							{
-								Field f = object.getClass().getDeclaredField(type);
-								f.setAccessible(true);
-								Object content = f.get(object);
-								return new Event(type, content);
-							}
-							catch(Exception e)
-							{
-								throw new RuntimeException(e);
-							}
-						}
-					};
+					FetchFieldCommand com = new FetchFieldCommand(object, type);
 					eventcreators.put(methods[i], com);
 				}
 				else if(methods[i].isAnnotationPresent(Condition.class))
@@ -137,24 +123,7 @@ public class RuleSystem
 					
 					rule.setEvents(events);
 					
-					rule.setCondition(new ICondition()
-					{
-						public boolean evaluate(IEvent event)
-						{
-							boolean ret = false;
-							try
-							{
-								m.setAccessible(true);
-								Object result = m.invoke(object, ((Event)event).getContent());
-								ret = ((Boolean)result).booleanValue();
-							}
-							catch(Exception e)
-							{
-								throw new RuntimeException(e);
-							}
-							return ret;
-						}
-					});
+					rule.setCondition(new jadex.rules.eca.Condition(object, m));
 				}
 				else if(methods[i].isAnnotationPresent(Action.class))
 				{
@@ -169,21 +138,7 @@ public class RuleSystem
 						rules.put(name, rule);
 					}
 					
-					rule.setAction(new IAction()
-					{
-						public void execute(IEvent event)
-						{
-							try
-							{
-								m.setAccessible(true);
-								Object result = m.invoke(object, new Object[0]);
-							}
-							catch(Exception e)
-							{
-								throw new RuntimeException(e);
-							}
-						}
-					});
+					rule.setAction(new jadex.rules.eca.Action(object, m));
 				}
 			}
 			clazz = clazz.getSuperclass();
@@ -219,8 +174,28 @@ public class RuleSystem
 		
 		Object proxy = pf.getProxy();
 
-		this.rules.put(proxy, rules.values().toArray(new IRule[rules.size()]));
+		this.rules.put(object, new Tuple2(proxy, rules.values().toArray(new IRule[rules.size()])));
 
+		// Recusrively call observe object on all direct monitored fields.
+		clazz = object.getClass();
+		Field[] fields = clazz.getDeclaredFields();
+		for(int i=0; i<fields.length; i++)
+		{
+			if(fields[i].isAnnotationPresent(RuleObject.class))
+			{
+				fields[i].setAccessible(true);
+				try
+				{
+					Object subobject = fields[i].get(object);
+					observeObject(subobject);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		
 		return proxy;
 	}
 
@@ -230,10 +205,34 @@ public class RuleSystem
 	public void unobserveObject(final Object object)
 	{
 //		removePropertyChangeListener(object);
-		IRule[] rls = rules.remove(object);
-		for(int i=0; i<rls.length; i++)
+		Tuple2<Object, IRule[]> tup = rules.remove(object);
+		if(tup!=null)
 		{
-			rulebase.removeRule(rls[i]);
+			IRule[] rls = tup.getSecondEntity();
+			for(int i=0; i<rls.length; i++)
+			{
+				rulebase.removeRule(rls[i]);
+			}
+		}
+		
+		// Recusrively call unobserve object on all direct monitored fields.
+		Class clazz = object.getClass();
+		Field[] fields = clazz.getDeclaredFields();
+		for(int i=0; i<fields.length; i++)
+		{
+			if(fields[i].isAnnotationPresent(RuleObject.class))
+			{
+				fields[i].setAccessible(true);
+				try
+				{
+					Object subobject = fields[i].get(object);
+					unobserveObject(subobject);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	
@@ -351,4 +350,32 @@ public class RuleSystem
 		events.add(event);
 	}
 	
+}
+
+class FetchFieldCommand implements IResultCommand
+{
+	protected Object object;
+	
+	protected String name;
+	
+	public FetchFieldCommand(Object object, String name)
+	{
+		this.object = object;
+		this.name = name;
+	}
+
+	public Object execute(Object args)
+	{
+		try
+		{
+			Field f = object.getClass().getDeclaredField(name);
+			f.setAccessible(true);
+			Object content = f.get(object);
+			return new Event(name, content);
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
 }

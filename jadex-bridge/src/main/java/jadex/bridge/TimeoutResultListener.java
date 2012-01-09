@@ -44,28 +44,41 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 		// Initialize timeout
 		if(timeout>0)
 		{
-			SServiceProvider.getService(exta.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			SServiceProvider.getServiceUpwards(exta.getServiceProvider(), IClockService.class)
 				.addResultListener(new DefaultResultListener<IClockService>()
 			{
 				public void resultAvailable(IClockService clock)
 				{
-					clock.createTimer(timeout, new ITimedObject()
+					try
 					{
-						public void timeEventOccurred(long currenttime)
+						clock.createTimer(timeout, new ITimedObject()
 						{
-							boolean notify = false;
-							synchronized(TimeoutResultListener.this)
+							public void timeEventOccurred(long currenttime)
 							{
-								if(!notified)
+								boolean notify = false;
+								synchronized(TimeoutResultListener.this)
 								{
-									notify = true;
-									notified = true;
+									if(!notified)
+									{
+										notify = true;
+										notified = true;
+									}
 								}
+								if(notify)
+									listener.exceptionOccurred(new TimeoutException());
 							}
-							if(notify)
-								listener.exceptionOccurred(new TimeoutException());
-						}
-					});
+						});
+					}
+					catch(Exception e)
+					{
+						// todo: should not happen
+						// causes null pointer exception on clock
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					System.out.println("Could not get clock service.");
 				}
 			});
 		}

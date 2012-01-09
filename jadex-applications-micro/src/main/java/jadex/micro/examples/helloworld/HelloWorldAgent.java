@@ -1,12 +1,19 @@
 package jadex.micro.examples.helloworld;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
+
+import java.util.Iterator;
 
 /**
  *  The micro version of the hello world agent.
@@ -33,6 +40,30 @@ public class HelloWorldAgent extends MicroAgent
 				return IFuture.DONE;
 			}
 		});
+	}
+	
+	public IFuture<Void> loop(final Iterator<IComponentManagementService> it)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		if(it.hasNext())
+		{
+			IComponentManagementService cms = it.next();
+			cms.createComponent(null, "HelloWorldAgent.class", null, null)
+				.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+			{
+				public void customResultAvailable(IComponentIdentifier result)
+				{
+					loop(it).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 	
 	//-------- static methods --------

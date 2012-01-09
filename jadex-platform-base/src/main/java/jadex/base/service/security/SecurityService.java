@@ -64,6 +64,23 @@ public class SecurityService implements ISecurityService
 	//-------- setup --------
 	
 	/**
+	 *  Create a security service.
+	 */
+	public SecurityService()
+	{
+		this(true);
+	}
+	
+	/**
+	 *  Create a security service.
+	 */
+	public SecurityService(boolean usepass)
+	{
+		System.out.println("Use password: "+usepass);
+		this.usepass = usepass;
+	}
+	
+	/**
 	 *  Start the service.
 	 */
 	@ServiceStart
@@ -90,7 +107,7 @@ public class SecurityService implements ISecurityService
 							/* $if android $
 							Log.i("jadex-android", "Generated platform password: "+password);
 							$endif $ */
-							usepass	= true;
+//							usepass	= true;
 						}
 						
 						final IExternalAccess	access	= component.getExternalAccess();
@@ -104,6 +121,7 @@ public class SecurityService implements ISecurityService
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										usepass	= props.getProperty("usepass")==null || props.getBooleanProperty("usepass");
+//										System.out.println("up: "+usepass);
 										password	= props.getStringProperty("password");
 										if(props.getProperty("passwords")!=null)
 										{
@@ -154,7 +172,7 @@ public class SecurityService implements ISecurityService
 		
 		return ret;
 	}
-	
+
 	/**
 	 *  Shutdown the service.
 	 */

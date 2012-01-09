@@ -1036,18 +1036,25 @@ public class StarterPanel extends JLayeredPane
 			{
 				Future	ret	= new Future();
 				// lastrid ok?
-				SComponentFactory.loadModel(ia.getExternalAccess(), name, rid)
-					.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+				if(name.length()>0)
 				{
-					public void customResultAvailable(Object result)
+					SComponentFactory.loadModel(ia.getExternalAccess(), name, rid)
+						.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
 					{
-						super.customResultAvailable(SUtil.convertPathToRelative(name));
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						super.customResultAvailable(null);
-					}
-				}));
+						public void customResultAvailable(Object result)
+						{
+							super.customResultAvailable(SUtil.convertPathToRelative(name));
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+							super.customResultAvailable(null);
+						}
+					}));
+				}
+				else
+				{
+					ret.setResult(null);
+				}
 				return ret;
 			}
 		}).addResultListener(new SwingDelegationResultListener(ret)
@@ -1056,7 +1063,8 @@ public class StarterPanel extends JLayeredPane
 			{
 				Properties	props	= new Properties();
 				
-				if(result!=null) props.addProperty(new Property("model", (String)result));
+				if(result!=null) 
+					props.addProperty(new Property("model", (String)result));
 
 				String c = (String)config.getSelectedItem();
 				if(c!=null) props.addProperty(new Property("config", c));

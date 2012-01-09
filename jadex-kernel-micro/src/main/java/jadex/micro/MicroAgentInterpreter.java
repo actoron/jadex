@@ -80,35 +80,8 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		try
 		{
 			this.classloader = model.getClassloader();
-			final Object agent = microclass.newInstance();
-			if(agent instanceof MicroAgent)
-			{
-				this.microagent = (MicroAgent)agent;
-				this.microagent.init(MicroAgentInterpreter.this);
-			}
-			else // if pojoagent
-			{
-				PojoMicroAgent magent = new PojoMicroAgent();
-				magent.init(MicroAgentInterpreter.this, agent);
-				this.microagent = magent;
-
-				Field[] fields = model.getAgentInjections();
-				for(int i=0; i<fields.length; i++)
-				{
-					if(fields[i].isAnnotationPresent(Agent.class))
-					{
-						try
-						{
-							fields[i].setAccessible(true);
-							fields[i].set(agent, microagent);
-						}
-						catch(Exception e)
-						{
-							getLogger().warning("Agent injection failed: "+e);
-						}
-					}
-				}
-			}
+			this.microagent = createAgent(microclass, model);
+			final Object agent = microagent instanceof IPojoMicroAgent? ((IPojoMicroAgent)microagent).getPojoAgent(): microagent;
 
 			this.container = createMyServiceContainer(args);
 						
@@ -154,6 +127,45 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				throw new RuntimeException(e);
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected MicroAgent createAgent(Class microclass, MicroModel model) throws Exception
+	{
+		MicroAgent ret = null;
+		
+		final Object agent = microclass.newInstance();
+		if(agent instanceof MicroAgent)
+		{
+			ret = (MicroAgent)agent;
+			ret.init(MicroAgentInterpreter.this);
+		}
+		else // if pojoagent
+		{
+			PojoMicroAgent pa = new PojoMicroAgent();
+			pa.init(this, agent);
+			ret = pa;
+
+			Field[] fields = model.getAgentInjections();
+			for(int i=0; i<fields.length; i++)
+			{
+				if(fields[i].isAnnotationPresent(Agent.class))
+				{
+					try
+					{
+						fields[i].setAccessible(true);
+						fields[i].set(agent, ret);
+					}
+					catch(Exception e)
+					{
+						getLogger().warning("Agent injection failed: "+e);
+					}
+				}
+			}
+		}
+		return ret;
 	}
 	
 	/**
@@ -509,7 +521,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public <T> IFuture<T> scheduleStep(final IComponentStep<T> step)
 	{
-		final Future ret = new Future();
+		final Future<T> ret = new Future<T>();
 //		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 		try
 		{

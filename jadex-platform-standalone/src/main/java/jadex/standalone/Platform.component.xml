@@ -111,6 +111,8 @@
 		<argument name="awaincludes" class="String">""</argument>
 		<!-- Exclude entries for awareness agent. -->
 		<argument name="awaexcludes" class="String">""</argument>
+		<!-- Flag if the platform should be protceted with password. -->
+		<argument name="usepass" class="boolean">true</argument>
 		
 		<!-- Flag if local transport is enabled. -->
 		<argument name="localtransport" class="boolean">true</argument>
@@ -141,6 +143,7 @@
 		<componenttype filename="jadex/application/KernelApplication.component.xml" name="kernel_application"/>
 		<componenttype filename="jadex/micro/KernelMicro.component.xml" name="kernel_micro"/>
 		<componenttype filename="jadex/bdi/KernelBDI.component.xml" name="kernel_bdi"/>
+		<componenttype filename="jadex/bdiv3/KernelBDI.component.xml" name="kernel_bdiv3"/>
 		<componenttype filename="jadex/bdibpmn/KernelBDIBPMN.component.xml" name="kernel_bdibpmn"/>
 		<componenttype filename="jadex/bpmn/KernelBPMN.component.xml" name="kernel_bpmn"/>
 		<componenttype filename="jadex/gpmn/KernelGPMN.component.xml" name="kernel_gpmn"/>
@@ -239,7 +242,7 @@
 			<implementation class="DefaultWebServicePublishService"/>
 		</providedservice>
 		<providedservice class="ISecurityService">
-			<implementation class="SecurityService"/>
+			<implementation>new SecurityService($args.usepass)</implementation>
 		</providedservice>
 		
 		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true">
@@ -331,6 +334,7 @@
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true"/>
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true"/>
 				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true"/>
+				<component name="kernel_bdiv3" type="kernel_bdiv3" daemon="true"/>
 				<component name="rms" type="rms" daemon="true"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>

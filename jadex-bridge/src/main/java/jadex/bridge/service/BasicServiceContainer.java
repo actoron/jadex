@@ -363,6 +363,33 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/**
 	 *  Do shutdown the services.
 	 */
+//	protected IFuture<Void> doShutdown(final Iterator<IInternalService> services)
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		if(services.hasNext())
+//		{
+//			final IInternalService ser = services.next();
+//			final IServiceIdentifier sid = ser.getServiceIdentifier();
+//
+//			// Shutdown services in reverse order as later services might depend on earlier ones.
+//			doShutdown(services).addResultListener(new DelegationResultListener<Void>(ret)
+//			{
+//				public void customResultAvailable(Void result)
+//				{
+//					removeService(sid).addResultListener(new DelegationResultListener<Void>(ret));
+//				}
+//			});
+//		}
+//		else
+//		{
+//			ret.setResult(null);
+//		}
+//		return ret;
+//	}
+	
+	/**
+	 *  Do shutdown the services.
+	 */
 	protected IFuture<Void> doShutdown(final Iterator<IInternalService> services)
 	{
 		final Future<Void> ret = new Future<Void>();
@@ -371,7 +398,15 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			final IInternalService ser = services.next();
 			final IServiceIdentifier sid = ser.getServiceIdentifier();
 
-			// Shutdown services in reverse order as later services might depend on earlier ones.
+//			removeService(sid).addResultListener(new DelegationResultListener<Void>(ret)
+//			{
+//				public void customResultAvailable(Void result)
+//				{
+//					doShutdown(services).addResultListener(new DelegationResultListener<Void>(ret));
+//				}
+//			});
+
+//			// Shutdown services in reverse order as later services might depend on earlier ones.
 			doShutdown(services).addResultListener(new DelegationResultListener<Void>(ret)
 			{
 				public void customResultAvailable(Void result)

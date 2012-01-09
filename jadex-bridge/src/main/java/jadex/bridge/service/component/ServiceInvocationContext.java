@@ -162,32 +162,40 @@ public class ServiceInvocationContext
 	/**
 	 *  Invoke the next interceptor.
 	 */
-	public IFuture<Void> invoke(Object object, Method method, List args)
+	public IFuture<Void> invoke(Object object, final Method method, List args)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		if(method.getName().equals("add"))
-//			System.out.println("invoke: "+Thread.currentThread());
+		if(method.getName().equals("add"))
+			System.out.println("invoke: "+Thread.currentThread());
 		
 		push(object, method, args, null);
 		
-		IServiceInvocationInterceptor interceptor = getNextInterceptor();
+		final IServiceInvocationInterceptor interceptor = getNextInterceptor();
 
 //		if(method.getName().equals("add"))
 //			System.out.println("add: "+used.get(used.size()-1)+" "+interceptor+" "+Thread.currentThread());
 		
 		if(interceptor!=null)
 		{
+//			if(method.getName().equals("isValid"))
+//				System.out.println("interceptor1: "+interceptor);
 			interceptor.execute(this).addResultListener(new IResultListener<Void>()
 			{
 				public void resultAvailable(Void result)
 				{
+//					if(method.getName().equals("isValid"))
+//						System.out.println("interceptor2: "+interceptor);
+
 					pop();
 					ret.setResult(null);
 				}
 				
 				public void exceptionOccurred(Exception exception)
 				{
+//					if(method.getName().equals("isValid"))
+//						System.out.println("interceptor(ex): "+interceptor);
+
 					pop();
 					ret.setException(exception);
 				}

@@ -546,7 +546,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			BasicServiceInvocationHandler handler = new BasicServiceInvocationHandler(service, adapter.getLogger());
 			handler.addFirstServiceInterceptor(new MethodInvocationInterceptor());
 			if(binding!=null && binding.isRecover())
-				handler.addFirstServiceInterceptor(new RecoveryInterceptor(info, binding, fetcher));
+				handler.addFirstServiceInterceptor(new RecoveryInterceptor(ea, info, binding, fetcher));
 			if(binding==null || PROXYTYPE_DECOUPLED.equals(binding.getProxytype()))
 				handler.addFirstServiceInterceptor(new DecouplingReturnInterceptor(ea, adapter));
 			UnparsedExpression[] interceptors = binding!=null ? binding.getInterceptors() : null;

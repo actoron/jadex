@@ -52,6 +52,7 @@ public class CorruptAdderAgent extends MicroAgent
 							{
 								public void resultAvailable(Object result)
 								{
+									System.out.println("agent terminated: "+getComponentIdentifier());
 									ret.setResult(null);
 								}
 								public void exceptionOccurred(Exception exception)

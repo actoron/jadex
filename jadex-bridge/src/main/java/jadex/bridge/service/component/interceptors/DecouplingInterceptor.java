@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
@@ -227,7 +228,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //			if(sic.getMethod().getName().equals("add"))
 //				System.out.println("direct: "+Thread.currentThread());
 			pushToCallStack(IComponentIdentifier.LOCAL.get());
-			sic.invoke().addResultListener(new CopyReturnValueResultListener(ret, sic));
+			sic.invoke().addResultListener(new TimeoutResultListener<Void>(10000, ea, 
+				new CopyReturnValueResultListener(ret, sic)));
+//			sic.invoke().addResultListener(new CopyReturnValueResultListener(ret, sic));
 			popFromCallStack();
 		}
 		else

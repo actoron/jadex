@@ -99,6 +99,8 @@ public class MicroClassReader
 	{		ModelInfo modelinfo = new ModelInfo();
 		MicroModel ret = new MicroModel(modelinfo);
 		
+		System.out.println("read micro: "+cma);
+		
 		String name = SReflect.getUnqualifiedClassName(cma);
 		if(name.endsWith("Agent"))
 			name = name.substring(0, name.lastIndexOf("Agent"));

@@ -32,6 +32,9 @@ import junit.framework.TestCase;
  */
 public class MicroCreationTest extends TestCase
 {
+	/**
+	 *  Test method.
+	 */
 	public void	testMicroCreation()
 	{
 		long timeout	= 300000;

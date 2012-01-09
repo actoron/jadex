@@ -8,14 +8,17 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import javassist.CannotCompileException;
 import javassist.ClassClassPath;
 import javassist.ClassPath;
 import javassist.ClassPool;
+import javassist.CodeConverter;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
@@ -24,6 +27,9 @@ import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.StringMemberValue;
+import javassist.expr.ExprEditor;
+import javassist.expr.FieldAccess;
+import javassist.expr.MethodCall;
 
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
@@ -250,24 +256,88 @@ public class DefaultWebServicePublishService implements IPublishService
 		return ret;	
 	}
 	
-//	/**
-//	 *  Main for testing-
-//	 */
-//	public static void main(String[] args)
-//	{
-//		// Bug in javassist: created package is null.
-//		try
-//		{
+	/**
+	 *  Main for testing.
+	 */
+	public static void main(String[] args)
+	{
+		// Bug in javassist: created package is null.
+		try
+		{
+			ClassPool cp = ClassPool.getDefault();
+			CtClass bean = cp.get("jadex.base.service.publish.TestBean");
+			CtClass called = cp.get("jadex.base.service.publish.DefaultWebServicePublishService");
+//			MyCodeConverter cc = new MyCodeConverter();
+//			cc.replaceFieldWrite(bean.getDeclaredField("name"), called, "writeField");
+//			cc.replaceFieldRead(bean.getDeclaredField("name"), called, "readField");
+//			bean.instrument(cc);
+
+			bean.instrument(new ExprEditor() 
+			{
+				public void edit(FieldAccess f) throws CannotCompileException
+				{
+					if(f.isWriter())
+					{
+//						f.replace("System.out.println(\"new: \"+$1); $proceed($$);");
+//						f.replace("jadex.base.service.publish.DefaultWebServicePublishService.writeField($0, $1,\""+f.getFieldName()+"\");");
+						f.replace("$0.writeField($1,\""+f.getFieldName()+"\");");
+					}
+				}
+				
+//				public void edit(MethodCall m) throws CannotCompileException 
+//				{
+//					if(m.getClassName().equals("Point") && m.getMethodName().equals("move"))
+//						m.replace("{ System.out.println(\"move\"); $_ = $proceed($$); }");
+//				}
+			});
+			
+			
+			Class bc = bean.toClass();
+			TestBean tb = new TestBean("Willy");
+			tb.setName("Willy2");
+			System.out.println(tb.getName());
+			
 //			ClassPool pool = ClassPool.getDefault();
 //			CtClass ctcl = pool.makeClass("a.b.C");
 //			Class cl = ctcl.toClass();
 //			System.out.println("pck: "+ctcl.getPackageName()+" "+cl.getPackage());
 //			Object obj = cl.newInstance();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+//	protected static void writeField(Object o, Object val, String fieldname)
+//	{
+//		try
+//		{
+//			System.out.println("write: "+o+" "+val+" "+fieldname);
+//			Field f = o.getClass().getDeclaredField(fieldname);
+//			f.setAccessible(true);
+//			f.set(o, val);
 //		}
 //		catch(Exception e)
 //		{
 //			e.printStackTrace();
+//			throw new RuntimeException(e);
 //		}
 //	}
-	
+//	
+//	protected static Object readField(Object o)
+//	{
+//		try
+//		{
+//			System.out.println("read: "+o);
+//			Field f = o.getClass().getDeclaredField("name");
+//			f.setAccessible(true);
+//			return (String)f.get(o);
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//			throw new RuntimeException(e);
+//		}
+//	}
 }
