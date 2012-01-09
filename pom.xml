@@ -604,6 +604,7 @@
 				<module>jadex-kernel-extension-envsupport</module>
 				<module>jadex-kernel-extension-envsupport-opengl</module>
 				<module>jadex-kernel-extension-agr</module>
+				<module>jadex-kernel-bdiv3</module>
 
 				<!--<module>jadex-kernel-bdi-continuations</module>-->
 
