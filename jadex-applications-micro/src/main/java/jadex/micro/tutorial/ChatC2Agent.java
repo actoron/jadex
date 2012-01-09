@@ -1,7 +1,10 @@
 package jadex.micro.tutorial;
 
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
@@ -12,6 +15,8 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
 import java.util.Date;
+
+import javax.swing.JTextField;
 
 /**
  *  Chat micro agent that uses the clock service. 

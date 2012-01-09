@@ -436,8 +436,8 @@ public class MicroClassReader
 				
 				for(int i=0; i<vals.length; i++)
 				{
-					try
-					{
+//					try
+//					{
 	//				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
 					IArgument tmparg = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
 						vals[i].description(), SReflect.getClassName(vals[i].clazz()),
@@ -447,11 +447,12 @@ public class MicroClassReader
 					{
 						args.put(vals[i].name(), tmparg);
 					}
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
+//					}
+//					catch(Exception e)
+//					{
+						// Currently a type not present exception can occur with the applications.mixed.ShopAgent
+//						e.printStackTrace();
+//					}
 				}
 			}
 			
