@@ -181,8 +181,8 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 	{
 		try
 		{
-			ReceivingBenchmark.main(null);
-			SendingBenchmark.main(null);
+//			ReceivingBenchmark.main(null);
+//			SendingBenchmark.main(null);
 			Map<String, Object>	ret	= Collections.emptyMap();
 			return new Future<Map<String, Object>>(ret);
 		}

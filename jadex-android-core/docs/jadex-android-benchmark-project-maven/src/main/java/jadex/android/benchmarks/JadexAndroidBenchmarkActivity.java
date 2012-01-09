@@ -1,5 +1,9 @@
 package jadex.android.benchmarks;
 
+import jadex.base.service.message.transport.httprelaymtp.benchmark.*;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
+import jadex.commons.SUtil;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -45,6 +49,19 @@ public class JadexAndroidBenchmarkActivity extends Activity
 		startMB3.setOnClickListener(buttonListener);
 		
 		textView = (TextView) findViewById(R.id.infoTextView);
+		SUtil.addSystemOutListener(new IChangeListener<String>()
+		{
+			public void changeOccurred(final ChangeEvent<String> event)
+			{
+				runOnUiThread(new Runnable()
+				{
+					public void run()
+					{
+						textView.append(event.getValue() + "\n");
+					}
+				});
+			}
+		});
 	}
 	
 	//-------- helper methods --------
@@ -60,53 +77,35 @@ public class JadexAndroidBenchmarkActivity extends Activity
 			startMB1.setEnabled(false);
 			startMB2.setEnabled(false);
 			startMB3.setEnabled(false);
-			String	text	= textView.getText().toString();
-			if(view==startMB1)
-			{
-				text	+= "\nRunning receiving benchmark...";
-			}
-			else if(view==startMB2)
-			{
-				text	+= "\nRunning sending benchmark...";
-			}
-			else if(view==startMB3)
-			{
-				text	+= "\nRunning single con sending benchmark...";
-			}
-			textView.setText(text);
 			
-			final String	ftext	= text;
 			new Thread(new Runnable()
 			{
 				public void run()
 				{
-					String	text	= ftext;
 					try
 					{
 						if(view==startMB1)
 						{
-							text	+= "\n"+ReceivingBenchmark.runBenchmark();
+							ReceivingBenchmark.main(new String[]{ReceivingBenchmark.class.getName()});
 						}
 						else if(view==startMB2)
 						{
-							text	+= "\n"+SendingBenchmark.runBenchmark();
+							SendingBenchmark.main(new String[]{SendingBenchmark.class.getName()});
 						}
 						else if(view==startMB3)
 						{
-							text	+= "\n"+SingleConSendingBenchmark.runBenchmark();
+							AbstractRelayBenchmark.main(SUtil.EMPTY_STRING_ARRAY);
 						}
 					}
 					catch(Exception e)
 					{
-						text	+= "\nBenchmark failed: "+e;
+						System.out.println("Benchmark failed: "+e);
 					}
-
-					final String	ftext	= text;
+					
 					runOnUiThread(new Runnable()
 					{
 						public void run()
 						{
-							textView.setText(ftext);
 							startMB1.setEnabled(true);
 							startMB2.setEnabled(true);
 							startMB3.setEnabled(true);

@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    >
-<TextView 
-	android:id="@+id/infoTextView" 
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    />
-<Button 
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:text="Start Receiving Benchmark"
-	android:id="@+id/startMB1"/>
-<Button 
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:text="Start Sending Benchmark"
-	android:id="@+id/startMB2"/>	
-<Button 
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:text="Single Con Sending Benchmark"
-	android:id="@+id/startMB3"/>	
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/infoTextView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:isScrollContainer="true"/>
+
+    <Button
+        android:id="@+id/startMB1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Run Receiving Benchmark" />
+
+    <Button
+        android:id="@+id/startMB2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Run Sending Benchmark" />
+
+    <Button
+        android:id="@+id/startMB3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Run All Benchmarks" />
+
 </LinearLayout>
