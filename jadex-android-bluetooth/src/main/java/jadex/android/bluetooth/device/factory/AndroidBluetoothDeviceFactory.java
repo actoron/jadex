@@ -4,7 +4,7 @@ import jadex.android.bluetooth.device.AndroidBluetoothDeviceWrapper;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 
 /**
- * @author  8kalinow
+ * @author Julian Kalinowski
  */
 public class AndroidBluetoothDeviceFactory implements IBluetoothDeviceFactory {
 
@@ -13,6 +13,9 @@ public class AndroidBluetoothDeviceFactory implements IBluetoothDeviceFactory {
 	private AndroidBluetoothDeviceFactory() {
 	}
 
+	/**
+	 * @return An instance of {@link IBluetoothDeviceFactory}
+	 */
 	public static IBluetoothDeviceFactory getInstance() {
 		if (instance == null) {
 			instance = new AndroidBluetoothDeviceFactory();

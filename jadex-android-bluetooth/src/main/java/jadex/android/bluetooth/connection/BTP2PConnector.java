@@ -18,7 +18,7 @@ import jadex.android.bluetooth.routing.IPacketRouter;
 import jadex.android.bluetooth.routing.dsdv.DsdvRouter;
 import jadex.android.bluetooth.service.Future;
 import jadex.android.bluetooth.service.IFuture;
-import jadex.android.bluetooth.service.IResultListener;
+import jadex.android.bluetooth.service.IFuture.IResultListener;
 import jadex.android.bluetooth.util.Helper;
 
 import java.io.IOException;
@@ -33,11 +33,15 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.os.Handler;
 import android.util.Log;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 
+/**
+ * This Class initializes the Connection to the Bluetooth Ad-Hoc Network.
+ * 
+ * @author Julian Kalinowski
+ */
 public class BTP2PConnector implements IBluetoothStateListener {
 
 	/**
@@ -85,7 +89,17 @@ public class BTP2PConnector implements IBluetoothStateListener {
 	/**
 	 * This listener gets informed when there are new reachable devices.
 	 */
-	private ProximityDeviceChangedListener listener;
+	private KnownDevicesChangedListener listener;
+
+	/**
+	 * Listener Interface
+	 */
+	public interface KnownDevicesChangedListener {
+		/**
+		 * Called, if there are new reachable devices.
+		 */
+		public void knownDevicesChanged();
+	}
 
 	/**
 	 * List of Unbonded devices in range, could be unconnectable
@@ -106,6 +120,17 @@ public class BTP2PConnector implements IBluetoothStateListener {
 	 * Listeners for incoming Messages for specific devices
 	 */
 	private Map<IBluetoothDevice, List<MessageListener>> listeners;
+	
+	/**
+	 * Listener Interface
+	 */
+	public interface MessageListener {
+		/**
+		 * Called when a Message was received.
+		 * @param msg
+		 */
+		void messageReceived(BluetoothMessage msg);
+	}
 
 	/**
 	 * Indicates wether automatic connection to new devices is activated.
@@ -123,8 +148,8 @@ public class BTP2PConnector implements IBluetoothStateListener {
 	private TimerTask discoveryTimerTask;
 
 	/**
-	 * The period, which is used by discoveryTimer (can be increased during in
-	 * runtime)
+	 * The period (in ms), which is used by discoveryTimer (can be increased
+	 * during in runtime)
 	 */
 	private int autoDiscoveryPeriod = 30000;
 
@@ -145,13 +170,10 @@ public class BTP2PConnector implements IBluetoothStateListener {
 	 * 
 	 * @param stateInformer
 	 *            The stateInformer where we register as listener
-	 * @param mHandler
-	 *            the handler which is used to show Toasts
 	 * @param btAdapter
 	 *            the local BluetoothAdapter
 	 */
-	public BTP2PConnector(IBluetoothStateInformer stateInformer,
-			Handler mHandler, IBluetoothAdapter btAdapter) {
+	public BTP2PConnector(IBluetoothStateInformer stateInformer, IBluetoothAdapter btAdapter) {
 		this.btAdapter = btAdapter;
 		this.stateInformer = stateInformer;
 
@@ -169,7 +191,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 			bondedDevices.add(btd);
 		}
 
-		btServer = new BTServer(stateInformer, mHandler, btAdapter);
+		btServer = new BTServer(stateInformer, btAdapter);
 		btServer.setConnectionEstablishedListener(new ConnectionEstablishedListener() {
 			@Override
 			public void connectionEstablished(IConnection con) {
@@ -328,7 +350,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		final Future future = new Future();
 		// establish new connection
 		IBluetoothDevice destinationDevice = msg.getDestinationDevice();
-		if (getConnections().containsKey(destinationDevice.getAddress())) {
+		if (getConnections().containsConnection(destinationDevice.getAddress())) {
 			future.setException(new AlreadyConnectedToDeviceException(
 					destinationDevice));
 			return future;
@@ -570,10 +592,19 @@ public class BTP2PConnector implements IBluetoothStateListener {
 
 	protected void notifyKnownDevicesChanged() {
 		if (listener != null) {
-			listener.proximityDevicesChanged();
+			listener.knownDevicesChanged();
 		}
 	}
 
+	/**
+	 * Scans the Bluetooth Environment for connectable Devices. Ignores all
+	 * already reachable devices.
+	 * 
+	 * @param discoverNewDevices
+	 *            true if unpaired devices should be tried, too
+	 * @return Set of connectable Devices or
+	 *         {@link DiscoveryAlreadyRunningException}
+	 */
 	public IFuture scanEnvironment(boolean discoverNewDevices) {
 		final Future result = new Future();
 		if (scanning) {
@@ -593,7 +624,7 @@ public class BTP2PConnector implements IBluetoothStateListener {
 					if (packetRouter.getReachableDeviceAddresses().contains(
 							device.getAddress())
 							|| getConnections()
-									.containsKey(device.getAddress())) {
+									.containsConnection(device.getAddress())) {
 						if (i == last) {
 							scanning = false;
 							Log.d(Helper.LOG_TAG,
@@ -749,6 +780,15 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		}
 	}
 
+	/**
+	 * Adds a Message Listener which will be informed when a Message from device
+	 * remoteDevice is received.
+	 * 
+	 * @param remoteDevice
+	 *            The remote device from which to receive Messages
+	 * @param l
+	 *            The Listener to be informed
+	 */
 	public void addMessageListener(IBluetoothDevice remoteDevice,
 			MessageListener l) {
 		List<MessageListener> list = listeners.get(remoteDevice);
@@ -761,6 +801,12 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		}
 	}
 
+	/**
+	 * Removes a Message Listener
+	 * 
+	 * @param remoteDevice
+	 * @param l
+	 */
 	public void removeMessageListener(final IBluetoothDevice remoteDevice,
 			final MessageListener l) {
 		new Thread(new Runnable() {
@@ -777,18 +823,38 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		}).start();
 	}
 
+	/**
+	 * Adds a ConnectionListener which will be informed about new and broken
+	 * Connections.
+	 * 
+	 * @param connectionsListener
+	 */
 	public void addConnectionsListener(ConnectionsListener connectionsListener) {
 		getConnections().addConnectionsListener(connectionsListener);
 	}
 
+	/**
+	 * Removes the specified ConnectionsListener.
+	 * 
+	 * @param l
+	 */
 	public void removeConnectionsListener(ConnectionsListener l) {
 		getConnections().removeConnectionsListener(l);
 	}
 
-	public void setKnownDevicesChangedListener(ProximityDeviceChangedListener l) {
+	/**
+	 * Sets the Listener, which will be informed when the List of Known Devices
+	 * in the P2P Network changes.
+	 * 
+	 * @param l
+	 */
+	public void setKnownDevicesChangedListener(KnownDevicesChangedListener l) {
 		listener = l;
 	}
 
+	/**
+	 * @return An Array of Connected and Reachable Devices in the Network.
+	 */
 	public IBluetoothDevice[] getKnownDevices() {
 		HashSet<String> hashSet = new HashSet<String>(
 				packetRouter.getReachableDeviceAddresses());
@@ -802,14 +868,30 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		return arr;
 	}
 
+	/**
+	 * Sets the period after which the auto discovery mechanism is launched
+	 * again.
+	 * 
+	 * @param autoDiscoveryPeriod
+	 *            time in ms
+	 */
 	public void setAutoDiscoveryPeriod(int autoDiscoveryPeriod) {
 		this.autoDiscoveryPeriod = autoDiscoveryPeriod;
 	}
 
+	/**
+	 * @return Auto Discovery Period in ms.
+	 */
 	public int getAutoDiscoveryPeriod() {
 		return autoDiscoveryPeriod;
 	}
 
+	/**
+	 * Enables/Disables the Auto Connect Mechanism.
+	 * 
+	 * @param b
+	 *            true to enable, false to disable
+	 */
 	public synchronized void setAutoConnect(boolean b) {
 		if (b != autoConnect) {
 			autoConnect = b;
@@ -859,20 +941,26 @@ public class BTP2PConnector implements IBluetoothStateListener {
 		}
 	}
 
+	/**
+	 * @return the {@link ConnectionManager} which handles all Incoming/Outgoing
+	 *         Connections.
+	 */
 	public ConnectionManager getConnections() {
 		return connections;
 	}
 
+	/**
+	 * @return All bonded Devices that are in Range
+	 */
 	public Set<IBluetoothDevice> getBondedDevicesInRange() {
 		return bondedDevicesInRange;
 	}
 
+	/**
+	 * @return All unbonded Devices that are in Range
+	 */
 	public Set<IBluetoothDevice> getUnbondedDevicesInRange() {
 		return unbondedDevicesInRange;
-	}
-
-	public interface ProximityDeviceChangedListener {
-		public void proximityDevicesChanged();
 	}
 
 }

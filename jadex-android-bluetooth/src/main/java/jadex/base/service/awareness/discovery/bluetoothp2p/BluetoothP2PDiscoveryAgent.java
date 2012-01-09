@@ -1,6 +1,6 @@
 package jadex.base.service.awareness.discovery.bluetoothp2p;
 
-import jadex.android.AndroidContextChangeListener;
+import jadex.android.JadexAndroidActivity.AndroidContextChangeListener;
 import jadex.android.bluetooth.JadexBluetoothActivity;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.message.BluetoothMessage;
@@ -39,7 +39,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 /**
- *  Agent that sends multicasts to locate other Jadex awareness agents.
+ *  Agent that uses the Bluetooth Connection Service to locate other Jadex awareness agents.
  */
 @Description("This agent looks for other awareness agents in the local net.")
 @Arguments(
@@ -71,6 +71,9 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent implements Androi
 	protected IBluetoothDevice[] _knownDevices;
 	private Context context;
 	
+	/**
+	 * Constructor
+	 */
 	public BluetoothP2PDiscoveryAgent() {
 		intent = new Intent();
 		_knownDevices = new IBluetoothDevice[0];
@@ -178,6 +181,10 @@ public class BluetoothP2PDiscoveryAgent extends DiscoveryAgent implements Androi
 		}
 	};
 	
+	/**
+	 * Sends Awareness Info to all (by the Connection service) known devices.
+	 * @param data
+	 */
 	public void sendAwarenessInfo(byte[] data) {
 		BluetoothMessage btMsg = new BluetoothMessage("", data, DataPacket.TYPE_AWARENESS_INFO);
 		for (IBluetoothDevice d : _knownDevices) {

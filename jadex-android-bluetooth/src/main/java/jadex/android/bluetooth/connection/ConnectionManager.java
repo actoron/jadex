@@ -11,22 +11,45 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+/**
+ * The ConnectionManager manages In- and Outgoing connections. It is a HashMap
+ * String->Connection and can inform Listeners of added and removed Connections.
+ * 
+ * @author Julian Kalinowski
+ * 
+ */
 public class ConnectionManager extends HashMap<String, IConnection> implements
 		IPacketSender {
 
+	/**
+	 * SUID
+	 */
+	private static final long serialVersionUID = -2699630997693616455L;
+
+	/**
+	 * Listener Interface
+	 * @author Julian Kalinowski
+	 */
 	public interface ConnectionsListener {
+		/**
+		 * Called when a Connection is removed.
+		 * @param address of the remote device which has been disconnected
+		 */
 		void connectionRemoved(String address);
 
+		/**
+		 * Called when a Connection is added.
+		 * @param address Address of the remote device
+		 * @param connection the new Connection
+		 */
 		void connectionAdded(String address, IConnection connection);
 	}
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
 	private List<ConnectionsListener> listeners;
 
+	/**
+	 * Constructor
+	 */
 	public ConnectionManager() {
 		super();
 		listeners = new ArrayList<ConnectionsListener>();
@@ -52,14 +75,27 @@ public class ConnectionManager extends HashMap<String, IConnection> implements
 		}
 	}
 
-	public boolean containsKey(String deviceID) {
-		return super.containsKey(deviceID);
+	/**
+	 * Checks whether a Connection to the given devices address already exists.
+	 * @param deviceAddress
+	 * @return true, if a connection with the given address already exists.
+	 */
+	public boolean containsConnection(String deviceAddress) {
+		return super.containsKey(deviceAddress);
 	}
 
+	/**
+	 * Adds a Listener
+	 * @param l
+	 */
 	public void addConnectionsListener(ConnectionsListener l) {
 		listeners.add(l);
 	}
 
+	/**
+	 * Removes a Listener
+	 * @param l
+	 */
 	public void removeConnectionsListener(ConnectionsListener l) {
 		listeners.remove(l);
 	}
@@ -76,6 +112,9 @@ public class ConnectionManager extends HashMap<String, IConnection> implements
 		}
 	}
 
+	/**
+	 * Terminates all Connections.
+	 */
 	public void stopAll() {
 		for (Entry<String, IConnection> entry : entrySet()) {
 			IConnection value = entry.getValue();
@@ -86,7 +125,7 @@ public class ConnectionManager extends HashMap<String, IConnection> implements
 		clear();
 		String[] keys = keySet().toArray(new String[keySet().size()]);
 		for (String address : keys) {
-		for (ConnectionsListener l : listeners) {
+			for (ConnectionsListener l : listeners) {
 				l.connectionRemoved(address);
 			}
 		}

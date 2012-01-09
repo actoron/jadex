@@ -4,11 +4,10 @@ import jadex.android.bluetooth.util.Helper;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.SendHandler;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.commons.future.IFuture;
 import android.util.Log;
 
 /**
- * Handle sending.
+ * Handle sending through the Bluetooth Connection Service
  */
 public class BluetoothP2PSendHandler extends SendHandler {
 	/**
@@ -20,7 +19,7 @@ public class BluetoothP2PSendHandler extends SendHandler {
 	}
 
 	/**
-	 * Method to send messages.
+	 * Method to send messages via the Bluetooth Connection Service
 	 */
 	@Override
 	public void send(AwarenessInfo info) {
@@ -31,25 +30,6 @@ public class BluetoothP2PSendHandler extends SendHandler {
 		getAgent().sendAwarenessInfo(data);
 	}
 
-	/**
-	 * Send a packet.
-	 */
-//	public boolean send(byte[] data, InetAddress address, int port)
-//	{
-////		System.out.println("sent packet: "+address+" "+port);
-//		boolean ret = true;
-//		try
-//		{
-//			DatagramPacket p = new DatagramPacket(data, data.length, new InetSocketAddress(address, port));
-//			getAgent().send(data, address
-//		}
-//		catch(Exception e)
-//		{
-//			ret = false;
-//		}
-//		return ret;
-//	}
-	
 	/**
 	 * Get the agent.
 	 */

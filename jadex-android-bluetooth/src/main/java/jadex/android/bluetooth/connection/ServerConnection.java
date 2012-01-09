@@ -10,11 +10,21 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * This class represents a Connection, in which this End acts as the Server.
+ * @author Julian Kalinowski
+ *
+ */
 public class ServerConnection extends AConnection {
 
 	private IBluetoothSocket socket;
 	private Timer timer;
 
+	/**
+	 * Constructor
+	 * @param adapter {@link IBluetoothAdapter} to use
+	 * @param socket {@link IBluetoothSocket} to use for listening
+	 */
 	public ServerConnection(IBluetoothAdapter adapter, IBluetoothSocket socket) {
 		super(adapter, socket.getRemoteDevice());
 		this.socket = socket;

@@ -5,8 +5,18 @@ import jadex.android.bluetooth.service.ConnectionService;
 import android.content.Intent;
 import android.os.Bundle;
 
+/**
+ * This is the base Activity Class an Android Main Activity MUST extend if it
+ * wants to use the Bluetooth Connection Service
+ * 
+ * @author Julian Kalinowski
+ * 
+ */
 public class JadexBluetoothActivity extends JadexAndroidActivity {
 
+	/**
+	 * Constructor
+	 */
 	public JadexBluetoothActivity() {
 	}
 

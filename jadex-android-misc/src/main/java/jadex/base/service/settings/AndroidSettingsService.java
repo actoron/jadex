@@ -8,10 +8,21 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 
+/**
+ * 
+ * @author Julian Kalinowski
+ *
+ */
 public class AndroidSettingsService extends SettingsService {
 
 	protected IAndroidContextService contextService;
 
+	/**
+	 * Constructor
+	 * @param prefix
+	 * @param access
+	 * @param saveonexit
+	 */
 	public AndroidSettingsService(String prefix, IInternalAccess access,
 			boolean saveonexit) {
 		super(prefix, access, saveonexit);

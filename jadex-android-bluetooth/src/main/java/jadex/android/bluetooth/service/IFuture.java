@@ -1,6 +1,27 @@
 package jadex.android.bluetooth.service;
 
+/**
+ * Used to pass asynchronous results.
+ * @author Julian Kalinowski
+ */
 public interface IFuture {
+	
+	/**
+	 * Result Listener for the Future
+	 */
+	public interface IResultListener {
+		/**
+		 * Called when a result is available
+		 * @param result
+		 */
+		void resultAvailable(Object result);
+		
+		/**
+		 * Called when an exception occurred during execution
+		 * @param exception
+		 */
+		void exceptionOccurred(Exception exception);
+	}
 
 	/**
 	 *  Set the result. 

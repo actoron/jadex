@@ -21,14 +21,21 @@ import java.util.Set;
 
 import android.util.Log;
 
+/**
+ * This Router uses a simple flooding mechanism to route Pakets.
+ * @author Julian Kalinowski
+ *
+ */
 public class FloodingPacketRouter extends AbstractPacketRouter implements IPacketRouter {
 
 	private static final RoutingType ROUTING_TYPE = RoutingType.Flooding;
 	private Set<String> connectedDevices;
 
 	private Set<String> reachableDevices;
-	
 
+	/**
+	 * Constructor
+	 */
 	public FloodingPacketRouter() {
 		super();
 		connectedDevices = new HashSet<String>();

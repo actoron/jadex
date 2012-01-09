@@ -1,6 +1,6 @@
 package jadex.base.service.message.transport.btmtp;
 
-import jadex.android.AndroidContextChangeListener;
+import jadex.android.JadexAndroidActivity.AndroidContextChangeListener;
 import jadex.android.bluetooth.JadexBluetoothActivity;
 import jadex.android.bluetooth.exceptions.ActivityIsNotJadexBluetoothActivityException;
 import jadex.android.bluetooth.message.BluetoothMessage;
@@ -20,7 +20,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
@@ -30,9 +29,7 @@ import jadex.commons.future.IFuture;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -46,12 +43,10 @@ import android.os.RemoteException;
 import android.util.Log;
 
 /**
- * The tcp transport for sending messages over tcp/ip connections. Initiates one
- * receiving tcp/ip port under the specified settings and opens outgoing
- * connections for all remote platforms on demand.
+ * The Bluetooth transport for sending messages over Bluetooth.
+ * Uses the Bluetooth Connection Service to send and receive Messages.
  * 
- * For the receiving side a separate listener thread is necessary as it must be
- * continuously listened for incoming transmission requests.
+ * It will start the Service if its not already running.
  */
 public class BTTransport implements ITransport, AndroidContextChangeListener {
 	// -------- constants --------
@@ -68,12 +63,6 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	/** The prolog size. */
 	protected final static int PROLOG_SIZE = 4;
 
-	/** 2MB as message buffer */
-	protected final static int BUFFER_SIZE = 1024 * 1024 * 2;
-
-	/** Maximum number of outgoing connections */
-	protected final static int MAX_CONNECTIONS = 20;
-
 	// -------- attributes --------
 
 	/** The platform. */
@@ -82,18 +71,8 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	/** The addresses. */
 	protected String[] addresses;
 
-	/**
-	 * Should be received asynchronously? One thread for receiving is
-	 * unavoidable. Async defines if the receival should be done on a new thread
-	 * always or on the one receiver thread.
-	 */
-	protected boolean async;
-
 	/** The codec factory. */
 	protected CodecFactory codecfac;
-
-	/** The logger. */
-	protected Logger logger;
 
 	/** The library service. */
 	protected ILibraryService libservice;
@@ -120,28 +99,9 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 
 	/**
 	 * Init the transport.
-	 * 
-	 * @param platform
-	 *            The platform.
-	 * @param settings
-	 *            The settings.
 	 */
 	public BTTransport(final IServiceProvider container) {
-		this(container, true);
-	}
-
-	/**
-	 * Init the transport.
-	 * 
-	 * @param platform
-	 *            The platform.
-	 * @param settings
-	 *            The settings.
-	 */
-	public BTTransport(final IServiceProvider container, final boolean async) {
-		this.logger = Logger.getLogger("BTTransport" + this);
 		this.container = container;
-		this.async = async;
 		JadexBluetoothActivity.addContextChangeListener(this);
 	}
 
@@ -292,35 +252,6 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 				});
 	}
 
-//	protected byte[] encodeMessage(MessageEnvelope msg, byte[] codecids) {
-//
-//		ByteArrayOutputStream os = new ByteArrayOutputStream();
-//		if (codecids == null || codecids.length == 0)
-//			codecids = codecfac.getDefaultCodecIds();
-//
-//		Object enc_msg = msg;
-//		for (int i = 0; i < codecids.length; i++) {
-//			ICodec codec = codecfac.getCodec(codecids[i]);
-//			enc_msg = codec.encode(enc_msg, classLoader);
-//		}
-//		byte[] res = (byte[]) enc_msg;
-//
-//		int dynlen = BTTransport.PROLOG_SIZE + 1 + codecids.length;
-//		int size = res.length + dynlen;
-//		try {
-//			os.write((byte) codecids.length);
-//				os.write(codecids);
-//			os.write(SUtil.intToBytes(size));
-//			os.write(res);
-//			os.flush();
-//		} catch (IOException e) {
-//			Log.e(Helper.LOG_TAG, "Could not encode Message: " + e.toString());
-//		}
-//
-//		Log.i(Helper.LOG_TAG, "Encoded message byte array is: " + os.size());
-//		return os.toByteArray();
-//	}
-
 	/**
 	 * Returns the prefix of this transport
 	 * 
@@ -400,7 +331,7 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	}
 
 	/**
-	 * Deliver messages to local message service for disptaching to the
+	 * Deliver messages to local message service for dispatching to the
 	 * components.
 	 * 
 	 * @param con

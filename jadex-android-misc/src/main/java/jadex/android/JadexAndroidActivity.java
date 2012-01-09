@@ -7,19 +7,53 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 
+/**
+ * This is an Android Activity Class which passes the current Android Context to
+ * the Jadex Android Services. It MUST be extended by every Jadex-Android
+ * Activity
+ * 
+ * @author Julian Kalinowski
+ */
 public class JadexAndroidActivity extends Activity {
 
 	private static List<AndroidContextChangeListener> listeners = new ArrayList<AndroidContextChangeListener>();
+	
+	/**
+	 * Listener Interface
+	 */
+	public interface AndroidContextChangeListener {
+		/**
+		 * Called when an Android Context is destroyed
+		 * @param ctx
+		 */
+		void onContextDestroy(Context ctx);
+		
+		/**
+		 * Called when an Android Context is created
+		 * @param ctx
+		 */
+		void onContextCreate(Context ctx);
+	}
+
 	private static Context lastContext;
 
+	/**
+	 * Adds a new Context Change Listener
+	 * @param l
+	 */
 	public static void addContextChangeListener(AndroidContextChangeListener l) {
 		listeners.add(l);
 		if (lastContext != null) {
 			l.onContextCreate(lastContext);
 		}
 	}
-	
-	public static void removeContextChangeListener(AndroidContextChangeListener l) {
+
+	/**
+	 * Removes a Context Change Listener
+	 * @param l
+	 */
+	public static void removeContextChangeListener(
+			AndroidContextChangeListener l) {
 		listeners.remove(l);
 		l.onContextDestroy(lastContext);
 	}

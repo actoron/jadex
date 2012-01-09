@@ -13,16 +13,18 @@ import java.util.concurrent.TimeUnit;
 
 import android.util.Log;
 
+/**
+ * This class represents a Connection, in which this End acts as the Client.
+ * 
+ * @author Julian Kalinowski
+ */
 public class ClientConnection extends AConnection {
 
-//	public ClientConnection(IBluetoothAdapter adapter, IBluetoothDevice dev) {
-//		this(
-//				adapter,
-//				dev instanceof AndroidBluetoothDeviceWrapper ? ((AndroidBluetoothDeviceWrapper) dev)
-//						.getDevice() : adapter
-//						.getRemoteDevice(dev.getAddress()));
-//	}
-
+	/**
+	 * Constructor
+	 * @param adapter BluetoothAdapter to use
+	 * @param dev remote BluetoothDevice to connect to 
+	 */
 	public ClientConnection(IBluetoothAdapter adapter, IBluetoothDevice dev) {
 		super(adapter, dev);
 	}
@@ -41,7 +43,9 @@ public class ClientConnection extends AConnection {
 		@Override
 		public void run() {
 			Log.e(Helper.LOG_TAG, "Connection to " + remoteDevice.getAddress()
-					+ " timed out after " + (System.currentTimeMillis() - lastPingReceivedTime) + "ms");
+					+ " timed out after "
+					+ (System.currentTimeMillis() - lastPingReceivedTime)
+					+ "ms");
 			close();
 		}
 	};
@@ -50,12 +54,12 @@ public class ClientConnection extends AConnection {
 
 	private long lastPingReceivedTime;
 
-	public void manageConnectedSocket(IBluetoothSocket mmSocket) {
+	private void manageConnectedSocket(IBluetoothSocket mmSocket) {
 		connectedThread = new ConnectedThread(mmSocket);
 		connectedThread.start();
-//		timer = new ResettableTimer(
-//				Executors.newSingleThreadScheduledExecutor(),
-//				CONNECTION_TIMEOUT * 2, TimeUnit.MILLISECONDS, receivePingTask);
+		// timer = new ResettableTimer(
+		// Executors.newSingleThreadScheduledExecutor(),
+		// CONNECTION_TIMEOUT * 2, TimeUnit.MILLISECONDS, receivePingTask);
 	}
 
 	@Override
@@ -108,7 +112,11 @@ public class ClientConnection extends AConnection {
 						// close the socket and connect using another UUID.
 						mmSocket.close();
 						uuidNum++;
-						Log.d(Helper.LOG_TAG, "Device " + mmDevice.getName() + " seems to be available. Trying to connect on UUID #" + uuidNum);
+						Log.d(Helper.LOG_TAG,
+								"Device "
+										+ mmDevice.getName()
+										+ " seems to be available. Trying to connect on UUID #"
+										+ uuidNum);
 						mmSocket = mmDevice
 								.createRfcommSocketToServiceRecord(BTServer.UUIDS[uuidNum]);
 						mmSocket.connect();
@@ -120,7 +128,7 @@ public class ClientConnection extends AConnection {
 					while (BTServer.usedUUIDnums.contains(uuidNum)) {
 						uuidNum++;
 					}
-					
+
 					// cancel connection if tried UUID was the first
 					// (because then no server is running on remote device)
 					if (uuidNum != 1 && (uuidNum < BTServer.UUIDS.length)) {
@@ -128,7 +136,11 @@ public class ClientConnection extends AConnection {
 							mmSocket.close();
 							mmSocket = mmDevice
 									.createRfcommSocketToServiceRecord(BTServer.UUIDS[uuidNum]);
-							Log.d(Helper.LOG_TAG, "Device " + mmDevice.getName() + " seems to be available. Trying to connect on UUID #" + uuidNum);
+							Log.d(Helper.LOG_TAG,
+									"Device "
+											+ mmDevice.getName()
+											+ " seems to be available. Trying to connect on UUID #"
+											+ uuidNum);
 						} catch (IOException e2) {
 							try {
 								mmSocket.close();

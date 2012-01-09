@@ -4,6 +4,11 @@ import jadex.android.bluetooth.device.IBluetoothAdapter.BluetoothState;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.device.IBluetoothDevice.BluetoothBondState;
 
+/**
+ * Adapter for {@link IBluetoothStateListener}.
+ * @author Julian Kalinowski
+ *
+ */
 public class BluetoothStateListenerAdapter implements IBluetoothStateListener{
 
 	@Override

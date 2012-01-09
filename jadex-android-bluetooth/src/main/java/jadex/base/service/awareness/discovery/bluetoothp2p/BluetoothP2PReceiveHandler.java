@@ -11,14 +11,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import android.util.Log;
 
 /**
- * 
+ * Receive Handler for the Bluetooth Connection Service
  */
 public class BluetoothP2PReceiveHandler extends ReceiveHandler {
-	/** The receive buffer. */
-	protected byte[] buffer;
-
 	protected IBTP2PAwarenessInfoCallback awarenessCallback;
-
 	private BlockingQueue<byte[]> awarenessQueue;
 
 	/**
@@ -36,8 +32,10 @@ public class BluetoothP2PReceiveHandler extends ReceiveHandler {
 	public Object[] receive() {
 
 		try {
+			// blocks until Awarenessinfo is available:
 			byte[] take = awarenessQueue.take();
 
+			// create object to be handled by Jadex
 			Object[] ret = new Object[3];
 			// address:
 			ret[0] = null;
@@ -49,31 +47,6 @@ public class BluetoothP2PReceiveHandler extends ReceiveHandler {
 		} catch (InterruptedException e) {
 			return null;
 		}
-
-		// try
-		// {
-		//
-		// if(buffer==null)
-		// {
-		// // todo: max ip datagram length (is there a better way to determine
-		// length?)
-		// buffer = new byte[8192];
-		// }
-		//
-		// final DatagramPacket pack = new DatagramPacket(buffer,
-		// buffer.length);
-		// getAgent().getSocket().receive(pack);
-		// byte[] data = new byte[pack.getLength()];
-		// System.arraycopy(buffer, 0, data, 0, pack.getLength());
-		// ret = new Object[]{pack.getAddress(), new Integer(pack.getPort()),
-		// data};
-		// }
-		// catch(Exception e)
-		// {
-		// //
-		// getAgent().getMicroAgent().getLogger().warning("Message receival error: "+e);
-		// }
-		//
 	}
 
 	/**
@@ -83,11 +56,12 @@ public class BluetoothP2PReceiveHandler extends ReceiveHandler {
 		return (BluetoothP2PDiscoveryAgent) agent;
 	}
 
+	/**
+	 * Add Awarenessinfo to the Queue
+	 * @param data
+	 */
 	public void addReceivedAwarenessInfo(byte[] data) {
 		Log.d(Helper.LOG_TAG, "AwarenessInfo received.");
 		awarenessQueue.add(data);
-		// synchronized (awarenessQueue) {
-		// awarenessQueue.notifyAll();
-		// }
 	}
 }

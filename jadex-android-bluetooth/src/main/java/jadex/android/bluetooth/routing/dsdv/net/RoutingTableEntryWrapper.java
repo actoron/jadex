@@ -5,9 +5,10 @@ import jadex.android.bluetooth.message.MessageProtos.RoutingTableEntry;
 import jadex.android.bluetooth.routing.dsdv.info.CurrentInfo;
 
 /**
- * Represents one entry in the Routing table
+ * Represents one entry in the Routing table,
+ * wraps the MessageProto Builder
  * 
- * @author Arnar
+ * @author 8kalinow
  */
 public class RoutingTableEntryWrapper {
 
@@ -25,6 +26,10 @@ public class RoutingTableEntryWrapper {
 		entryBuilder.setRouteCreationTime(System.currentTimeMillis());
 	}
 	
+	/**
+	 * Constructor
+	 * @param rte
+	 */
 	public RoutingTableEntryWrapper(RoutingTableEntry rte) {
 		/**
 		 * log when route is created for cleanup
@@ -192,6 +197,10 @@ public class RoutingTableEntryWrapper {
 
 	}
 	
+	/**
+	 * Builds the RoutingTableEntry
+	 * @return {@link RoutingTableEntry}
+	 */
 	public RoutingTableEntry build() {
 		return entryBuilder.build();
 	}

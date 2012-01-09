@@ -7,12 +7,20 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+/**
+ * Abstract Packet Router Class, provides basic Listener functionality.
+ * @author Julian Kalinowski
+ *
+ */
 public abstract class AbstractPacketRouter implements IPacketRouter {
 
 	private IPacketSender sender;
 	protected String ownAddress;
 	private Set<RoutingEntriesChangeListener> listeners;
 
+	/**
+	 * Constructor
+	 */
 	public AbstractPacketRouter() {
 		listeners = new CopyOnWriteArraySet<IPacketRouter.RoutingEntriesChangeListener>();
 	}

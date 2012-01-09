@@ -5,15 +5,12 @@ import jadex.android.bluetooth.connection.ConnectionManager;
 import jadex.android.bluetooth.connection.IBluetoothStateInformer;
 import jadex.android.bluetooth.connection.IBluetoothStateListener;
 import jadex.android.bluetooth.connection.IConnection;
-import jadex.android.bluetooth.connection.MessageListener;
 import jadex.android.bluetooth.device.AndroidBluetoothAdapterWrapper;
 import jadex.android.bluetooth.device.AndroidBluetoothDeviceWrapper;
 import jadex.android.bluetooth.device.IBluetoothAdapter;
 import jadex.android.bluetooth.device.IBluetoothAdapter.BluetoothState;
 import jadex.android.bluetooth.device.IBluetoothDevice;
 import jadex.android.bluetooth.device.IBluetoothDevice.BluetoothBondState;
-import jadex.android.bluetooth.device.factory.AndroidBluetoothAdapterFactory;
-import jadex.android.bluetooth.device.factory.AndroidBluetoothDeviceFactory;
 import jadex.android.bluetooth.message.BluetoothMessage;
 import jadex.android.bluetooth.message.DataPacket;
 import jadex.android.bluetooth.util.Helper;
@@ -39,10 +36,15 @@ import android.os.RemoteException;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * Android Service for Applications that want to use the Bluetooth Connection
+ * Framework
+ * 
+ * @author Julian Kalinowski
+ * 
+ */
 public class ConnectionService extends Service implements
 		IBluetoothStateInformer {
-
-	public static final int SHOW_TOAST = 0;
 
 	private IBluetoothAdapter btAdapter;
 
@@ -50,7 +52,7 @@ public class ConnectionService extends Service implements
 
 	private IBTP2PAwarenessInfoCallback awarenessCallback;
 
-	public static Context CONTEXT = null;
+//	public static Context CONTEXT = null;
 
 	private Thread uiThread;
 
@@ -76,13 +78,14 @@ public class ConnectionService extends Service implements
 	public void onCreate() {
 		super.onCreate();
 
-		CONTEXT = this;
+//		CONTEXT = this;
 		btAdapter = Helper.getBluetoothAdapterFactory()
 				.getDefaultBluetoothAdapter();
 		if (btAdapter == null) {
-			showToast("No BT Adapter found! This will cause exceptions.");
+			Log.e(Helper.LOG_TAG,
+					"No BT Adapter found! This will cause exceptions.");
 		}
-		btp2pConnector = new BTP2PConnector(this, mHandler, btAdapter);
+		btp2pConnector = new BTP2PConnector(this, btAdapter);
 
 		stateListeners = new CopyOnWriteArrayList<IBluetoothStateListener>();
 		addBluetoothStateListener(btp2pConnector);
@@ -108,29 +111,32 @@ public class ConnectionService extends Service implements
 					}
 				});
 
-		btp2pConnector.addMessageListener(null, new MessageListener() {
-
-			@Override
-			public synchronized void messageReceived(BluetoothMessage msg) {
-				try {
-					if (msg.getType() == DataPacket.TYPE_AWARENESS_INFO
-							&& awarenessCallback != null) {
-						awarenessCallback.awarenessInfoReceived(msg.getData());
-					} else if (msgCallback != null) {
-						// showToast(msg.getDataAsString());
-						msgCallback.messageReceived(msg.getData());
-					}
-				} catch (RemoteException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-
-		btp2pConnector
-				.setKnownDevicesChangedListener(new BTP2PConnector.ProximityDeviceChangedListener() {
+		btp2pConnector.addMessageListener(null,
+				new BTP2PConnector.MessageListener() {
 
 					@Override
-					public void proximityDevicesChanged() {
+					public synchronized void messageReceived(
+							BluetoothMessage msg) {
+						try {
+							if (msg.getType() == DataPacket.TYPE_AWARENESS_INFO
+									&& awarenessCallback != null) {
+								awarenessCallback.awarenessInfoReceived(msg
+										.getData());
+							} else if (msgCallback != null) {
+								// showToast(msg.getDataAsString());
+								msgCallback.messageReceived(msg.getData());
+							}
+						} catch (RemoteException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+
+		btp2pConnector
+				.setKnownDevicesChangedListener(new BTP2PConnector.KnownDevicesChangedListener() {
+
+					@Override
+					public void knownDevicesChanged() {
 						ConnectionService.this.knownDevicesChanged();
 					}
 				});
@@ -143,26 +149,26 @@ public class ConnectionService extends Service implements
 		this.receiverRegistered = true;
 	}
 
-	private Handler mHandler = new Handler() {
+	// private Handler mHandler = new Handler() {
+	//
+	// @Override
+	// public void handleMessage(Message msg) {
+	// if (msg.what == SHOW_TOAST) {
+	// Toast.makeText(ConnectionService.this, msg.obj.toString(),
+	// Toast.LENGTH_SHORT).show();
+	// }
+	// }
+	// };
 
-		@Override
-		public void handleMessage(Message msg) {
-			if (msg.what == SHOW_TOAST) {
-				Toast.makeText(ConnectionService.this, msg.obj.toString(),
-						Toast.LENGTH_SHORT).show();
-			}
-		}
-	};
-
-	private void showToast(String s) {
-		if (Thread.currentThread() != uiThread) {
-			mHandler.obtainMessage(ConnectionService.SHOW_TOAST, s)
-					.sendToTarget();
-		} else {
-			Toast.makeText(ConnectionService.this, s, Toast.LENGTH_SHORT)
-					.show();
-		}
-	}
+	// private void showToast(String s) {
+	// if (Thread.currentThread() != uiThread) {
+	// mHandler.obtainMessage(ConnectionService.SHOW_TOAST, s)
+	// .sendToTarget();
+	// } else {
+	// Toast.makeText(ConnectionService.this, s, Toast.LENGTH_SHORT)
+	// .show();
+	// }
+	// }
 
 	@Override
 	public IBinder onBind(Intent arg0) {

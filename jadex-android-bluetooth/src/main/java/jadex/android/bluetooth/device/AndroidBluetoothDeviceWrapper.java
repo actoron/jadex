@@ -9,6 +9,10 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.Parcel;
 
+/**
+ * A Wrapper to abstract from the Android BluetoothDevice Implementation. 
+ * @author Julian Kalinowski
+ */
 public class AndroidBluetoothDeviceWrapper implements IBluetoothDevice {
 
 	private BluetoothDevice dev;
@@ -30,6 +34,10 @@ public class AndroidBluetoothDeviceWrapper implements IBluetoothDevice {
 	// }
 	// };
 	
+	/**
+	 * Constructor
+	 * @param dev {@link IBluetoothDevice} to be wrapped.
+	 */
 	public AndroidBluetoothDeviceWrapper(IBluetoothDevice dev) {
 		IBluetoothAdapter bluetoothAdapter = Helper.getBluetoothAdapterFactory().getDefaultBluetoothAdapter();
 		if (bluetoothAdapter instanceof AndroidBluetoothAdapterWrapper) {
@@ -44,6 +52,10 @@ public class AndroidBluetoothDeviceWrapper implements IBluetoothDevice {
 		}
 	}
 
+	/**
+	 * Constructor
+	 * @param dev {@link BluetoothDevice} to be wrapped
+	 */
 	public AndroidBluetoothDeviceWrapper(BluetoothDevice dev) {
 		this.address = dev.getAddress();
 		this.name = dev.getName();
@@ -55,6 +67,9 @@ public class AndroidBluetoothDeviceWrapper implements IBluetoothDevice {
 		return dev.getName() + " [" + dev.getAddress() + "]";
 	}
 
+	/**
+	 * @return the wrapped {@link BluetoothDevice}
+	 */
 	public BluetoothDevice getDevice() {
 		return dev;
 	}
@@ -86,6 +101,11 @@ public class AndroidBluetoothDeviceWrapper implements IBluetoothDevice {
 		return new AndroidBluetoothSocketWrapper(socket);
 	}
 	
+	/**
+	 * Converts from Android Bond States to the device-independent states in {@link BluetoothBondState}
+	 * @param androidBondState
+	 * @return {@link BluetoothBondState}
+	 */
 	public static BluetoothBondState convertFromAndroidBondState(int androidBondState) {
 		switch (androidBondState) {
 		case BluetoothDevice.BOND_BONDED:

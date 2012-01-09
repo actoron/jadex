@@ -9,10 +9,20 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 
+/**
+ * A Wrapper to abstract from the Android BluetoothAdapter Implementation.
+ * 
+ * @author Julian Kalinowski
+ */
 public class AndroidBluetoothAdapterWrapper implements IBluetoothAdapter {
 
 	private BluetoothAdapter mAdapter;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param adapter
+	 */
 	public AndroidBluetoothAdapterWrapper(BluetoothAdapter adapter) {
 		mAdapter = adapter;
 	}
@@ -62,6 +72,9 @@ public class AndroidBluetoothAdapterWrapper implements IBluetoothAdapter {
 		mAdapter.cancelDiscovery();
 	}
 
+	/**
+	 * @return The wrapped BluetoothAdapter
+	 */
 	public BluetoothAdapter getBluetoothAdapter() {
 		return mAdapter;
 	}
@@ -79,12 +92,20 @@ public class AndroidBluetoothAdapterWrapper implements IBluetoothAdapter {
 
 	@Override
 	public boolean isDeviceBonded(IBluetoothDevice device) {
-		return (device instanceof AndroidBluetoothDeviceWrapper) 
-				? ((AndroidBluetoothDeviceWrapper) device).getDevice().getBondState() == BluetoothDevice.BOND_BONDED
+		return (device instanceof AndroidBluetoothDeviceWrapper) ? ((AndroidBluetoothDeviceWrapper) device)
+				.getDevice().getBondState() == BluetoothDevice.BOND_BONDED
 				: mAdapter.getBondedDevices().contains(device);
 	}
-	
-	public static BluetoothState convertFromAndroidAdapterState(int androidAdapterState) {
+
+	/**
+	 * Converts an Android BluetoothAdapterState to the States specified in the
+	 * device-independent class {@link BluetoothState}.
+	 * 
+	 * @param androidAdapterState
+	 * @return {@link BluetoothState}
+	 */
+	public static BluetoothState convertFromAndroidAdapterState(
+			int androidAdapterState) {
 		switch (androidAdapterState) {
 		case BluetoothAdapter.STATE_ON:
 			return BluetoothState.on;
@@ -96,7 +117,7 @@ public class AndroidBluetoothAdapterWrapper implements IBluetoothAdapter {
 		default:
 			return BluetoothState.off;
 		}
-		
+
 	}
 
 }

@@ -7,7 +7,7 @@ import jadex.android.bluetooth.exceptions.JadexBluetoothRuntimeError;
 import android.bluetooth.BluetoothAdapter;
 
 /**
- * @author  8kalinow
+ * @author Julian Kalinowski
  */
 public class AndroidBluetoothAdapterFactory implements IBluetoothAdapterFactory {
 
@@ -18,6 +18,9 @@ public class AndroidBluetoothAdapterFactory implements IBluetoothAdapterFactory 
 	private AndroidBluetoothAdapterFactory() {
 	}
 	
+	/**
+	 * @return An instance of {@link IBluetoothAdapterFactory}
+	 */
 	public static IBluetoothAdapterFactory getInstance() {
 		if (instance == null) {
 			instance = new AndroidBluetoothAdapterFactory();

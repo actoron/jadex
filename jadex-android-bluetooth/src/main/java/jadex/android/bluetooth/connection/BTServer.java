@@ -19,87 +19,112 @@ import java.util.UUID;
 import android.os.Handler;
 import android.util.Log;
 
+/**
+ * This is the Bluetooth Server class. It can start several Threads to listen
+ * for incoming Bluetooth Connections.
+ * 
+ * @author Julian Kalinowski
+ */
 public class BTServer {
 	private IBluetoothAdapter adapter;
 
 	private boolean listening;
 
-	private Handler guiHandler;
-
 	private List<AcceptThread> listenThreads;
-	
-	private ConnectionEstablishedListener estListener;
 
-	public List<ServerConnection> connectedThreads;
+	private ConnectionEstablishedListener estListener;
+	
+	/**
+	 * Listener Class
+	 */
+	public interface ConnectionEstablishedListener {
+		/**
+		 * Called, when a new Connection is established. 
+		 * @param con The {@link IConnection}
+		 */
+		void connectionEstablished(IConnection con);
+	}
+
+	private List<ServerConnection> connectedThreads;
 
 	private IBluetoothStateInformer stateInformer;
 
-	public static final String SERVICE_NAME = "";
-	
-	public static Set<Integer> usedUUIDnums;
+	private static final String SERVICE_NAME = "";
 
-	public static final UUID[] UUIDS = new UUID[] { UUID.fromString("8050a070-bcf2-11e0-962b-0800200c9a66"),
+	static Set<Integer> usedUUIDnums;
+
+	static final UUID[] UUIDS = new UUID[] {
+			UUID.fromString("8050a070-bcf2-11e0-962b-0800200c9a66"),
 			UUID.fromString("8050a071-bcf2-11e0-962b-0800200c9a66"),
 			UUID.fromString("8050a072-bcf2-11e0-962b-0800200c9a66"),
 			UUID.fromString("8050a073-bcf2-11e0-962b-0800200c9a66"),
 			UUID.fromString("8050c780-bcf2-11e0-962b-0800200c9a66"),
 			UUID.fromString("8050c781-bcf2-11e0-962b-0800200c9a66"),
 			UUID.fromString("8050c782-bcf2-11e0-962b-0800200c9a66"),
-//			UUID.fromString("8050c783-bcf2-11e0-962b-0800200c9a66"),
-//			UUID.fromString("8050c784-bcf2-11e0-962b-0800200c9a66"),
-//			UUID.fromString("8050c785-bcf2-11e0-962b-0800200c9a66") 
-			};
+	// UUID.fromString("8050c783-bcf2-11e0-962b-0800200c9a66"),
+	// UUID.fromString("8050c784-bcf2-11e0-962b-0800200c9a66"),
+	// UUID.fromString("8050c785-bcf2-11e0-962b-0800200c9a66")
+	};
 
-	public static final int MESSAGE_READ = 0;
+	private static final int MESSAGE_READ = 0;
 
-	public interface ConnectionEstablishedListener {
-		void connectionEstablished(IConnection con);
-	}
-	
-	public BTServer(IBluetoothStateInformer stateInformer, Handler handler, IBluetoothAdapter adapter) {
+
+
+	/**
+	 * Constructor
+	 * @param stateInformer The instance which is able to inform the BTServer about BT State changes.
+	 * @param adapter The BluetoothAdapter to use to listen for connections
+	 */
+	public BTServer(IBluetoothStateInformer stateInformer,
+			IBluetoothAdapter adapter) {
 		this.adapter = adapter;
-		this.guiHandler = handler;
 		this.stateInformer = stateInformer;
 		listenThreads = new ArrayList<AcceptThread>();
 		connectedThreads = new ArrayList<ServerConnection>();
 		usedUUIDnums = new HashSet<Integer>();
 	}
-	
+
+	/**
+	 * Starts UUIDS.length() Server Threads.
+	 */
 	public void listen() {
 		if (!adapter.isEnabled()) {
-			stateInformer.addBluetoothStateListener(new BluetoothStateListenerAdapter() {
-				@Override
-				public void bluetoothStateChanged(BluetoothState newState,
-						BluetoothState oldState) {
-					if (newState == BluetoothState.on) {
-						_listen();
-						stateInformer.removeBluetoothStateListener(this);
-					}
-				}
-			});
+			stateInformer
+					.addBluetoothStateListener(new BluetoothStateListenerAdapter() {
+						@Override
+						public void bluetoothStateChanged(
+								BluetoothState newState, BluetoothState oldState) {
+							if (newState == BluetoothState.on) {
+								_listen();
+								stateInformer
+										.removeBluetoothStateListener(this);
+							}
+						}
+					});
 			adapter.enable();
 		} else {
 			_listen();
 		}
-		
-		stateInformer.addBluetoothStateListener(new BluetoothStateListenerAdapter() {
-			@Override
-			public void bluetoothStateChanged(BluetoothState newState,
-					BluetoothState oldState) {
-				if (newState == BluetoothState.switching_off) {
-					for (AcceptThread listenThread : listenThreads) {
-						listenThread.cancel();
-					}
-					for (IConnection con: connectedThreads) {
-						if (con instanceof ServerConnection) {
-							con.close();
+
+		stateInformer
+				.addBluetoothStateListener(new BluetoothStateListenerAdapter() {
+					@Override
+					public void bluetoothStateChanged(BluetoothState newState,
+							BluetoothState oldState) {
+						if (newState == BluetoothState.switching_off) {
+							for (AcceptThread listenThread : listenThreads) {
+								listenThread.cancel();
+							}
+							for (IConnection con : connectedThreads) {
+								if (con instanceof ServerConnection) {
+									con.close();
+								}
+							}
+							listening = false;
+							stateInformer.removeBluetoothStateListener(this);
 						}
 					}
-					listening = false;
-					stateInformer.removeBluetoothStateListener(this);
-				}
-			}
-		});
+				});
 	}
 
 	private void _listen() {
@@ -111,15 +136,12 @@ public class BTServer {
 				Log.d(Helper.LOG_TAG, "AcceptThread #" + i + " started");
 			}
 			listening = true;
-			guiHandler.obtainMessage(ConnectionService.SHOW_TOAST, "Server Threads started").sendToTarget();
+			Log.d(Helper.LOG_TAG, "Server Threads started");
 		} else {
-			guiHandler.obtainMessage(ConnectionService.SHOW_TOAST, "BTServer already started.").sendToTarget();
+			Log.d(Helper.LOG_TAG, "BTServer already started.");
 		}
 	}
-	
-	public void setConnectionEstablishedListener(ConnectionEstablishedListener estListener) {
-		this.estListener = estListener;
-	}
+
 
 	class AcceptThread extends Thread {
 		private IBluetoothServerSocket mmServerSocket;
@@ -136,73 +158,80 @@ public class BTServer {
 		public void run() {
 			IBluetoothSocket socket = null;
 			// Keep listening until exception occurs or a socket is returned
-//			while (true) {
-				try {
-					IBluetoothServerSocket tmp = null;
-					tmp = adapter.listenUsingRfcommWithServiceRecord(SERVICE_NAME, uuid);
-					mmServerSocket = tmp;
-					Log.d(Helper.LOG_TAG, "Socket listening with uuid: " + uuidNum);
-					socket = mmServerSocket.accept();
-				} catch (IOException e) {
-					//e.printStackTrace();
-					Log.e(Helper.LOG_TAG,"Could not start Bluetooth Server: " + e.toString());
-//					break;
-					return;
-				}
-				// If a connection was accepted
-				if (socket != null) {
-					// Do work to manage the connection (in a separate thread)
-					if (uuidNum == 0) {
-						try {
-							Log.d(Helper.LOG_TAG, "Incoming Connection on first UUID. Dropping...");
-							Thread.sleep(500);
-							socket.close();
-						} catch (IOException e) {
-						} catch (InterruptedException e) {
-							try {
-								socket.close();
-							} catch (IOException e1) {
-							}
-						} finally {
-							run();
-						}
-					} else {
-						Log.d(Helper.LOG_TAG, "Incoming Connection accepted on UUID " + uuidNum);
-						usedUUIDnums.add(uuidNum);
-						ServerConnection connection = new ServerConnection(adapter, socket);
-						connectedThreads.add(connection);
-						connection.addConnectionListener(new IConnectionListener() {
-							
-							@Override
-							public void messageReceived(DataPacket pkt, IBluetoothDevice fromDevice,
-									IConnection incomingConnection) {
-							}
-							
-							@Override
-							public void connectionStateChanged(IConnection connection) {
-								if (!connection.isAlive()) {
-									connection.removeConnectionListener(this);
-									usedUUIDnums.remove(uuidNum);
-									run();
-								}
-							}
-
-							@Override
-							public void messageNotSent(DataPacket pkt) {
-							}
-						});
-						connection.connect();
-						estListener.connectionEstablished(connection);
-					}
-					
+			// while (true) {
+			try {
+				IBluetoothServerSocket tmp = null;
+				tmp = adapter.listenUsingRfcommWithServiceRecord(SERVICE_NAME,
+						uuid);
+				mmServerSocket = tmp;
+				Log.d(Helper.LOG_TAG, "Socket listening with uuid: " + uuidNum);
+				socket = mmServerSocket.accept();
+			} catch (IOException e) {
+				// e.printStackTrace();
+				Log.e(Helper.LOG_TAG,
+						"Could not start Bluetooth Server: " + e.toString());
+				// break;
+				return;
+			}
+			// If a connection was accepted
+			if (socket != null) {
+				// Do work to manage the connection (in a separate thread)
+				if (uuidNum == 0) {
 					try {
-						mmServerSocket.close();
+						Log.d(Helper.LOG_TAG,
+								"Incoming Connection on first UUID. Dropping...");
+						Thread.sleep(500);
+						socket.close();
 					} catch (IOException e) {
-						e.printStackTrace();
+					} catch (InterruptedException e) {
+						try {
+							socket.close();
+						} catch (IOException e1) {
+						}
+					} finally {
+						run();
 					}
-					// break;
+				} else {
+					Log.d(Helper.LOG_TAG,
+							"Incoming Connection accepted on UUID " + uuidNum);
+					usedUUIDnums.add(uuidNum);
+					ServerConnection connection = new ServerConnection(adapter,
+							socket);
+					connectedThreads.add(connection);
+					connection.addConnectionListener(new IConnectionListener() {
+
+						@Override
+						public void messageReceived(DataPacket pkt,
+								IBluetoothDevice fromDevice,
+								IConnection incomingConnection) {
+						}
+
+						@Override
+						public void connectionStateChanged(
+								IConnection connection) {
+							if (!connection.isAlive()) {
+								connection.removeConnectionListener(this);
+								usedUUIDnums.remove(uuidNum);
+								run();
+							}
+						}
+
+						@Override
+						public void messageNotSent(DataPacket pkt) {
+						}
+					});
+					connection.connect();
+					estListener.connectionEstablished(connection);
 				}
-//			}
+
+				try {
+					mmServerSocket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				// break;
+			}
+			// }
 		}
 
 		/** Will cancel the listening socket, and cause the thread to finish */
@@ -214,6 +243,19 @@ public class BTServer {
 		}
 	}
 	
+	/**
+	 * Sets the Listener to be informed when new Connections are made.
+	 * @param estListener
+	 */
+	public void setConnectionEstablishedListener(
+			ConnectionEstablishedListener estListener) {
+		this.estListener = estListener;
+	}
+
+
+	/**
+	 * @return true, if the Server is already running.
+	 */
 	public boolean isListening() {
 		return listening;
 	}

@@ -3,18 +3,28 @@ package jadex.android.bluetooth.service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Used to pass asynchronous results.
+ * @author Julian Kalinowski
+ *
+ */
 public class Future implements IFuture {
 	
 	protected Object result;
 	
 	protected Exception exception;
 	
+	/**
+	 * True, if a result is available, els false
+	 */
 	public boolean resultAvailable;
 	
 	protected List<IResultListener> listeners;
 	
+	/**
+	 * Constructor
+	 */
 	public Future() {
-		// TODO Auto-generated constructor stub
 	}
 	
     /* (non-Javadoc)
@@ -145,11 +155,11 @@ public class Future implements IFuture {
     	return resultAvailable;
     }
     
-    public synchronized void waitForResult() {
-    	try {
-			this.wait();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-    }
+//    public synchronized void waitForResult() {
+//    	try {
+//			this.wait();
+//		} catch (InterruptedException e) {
+//			e.printStackTrace();
+//		}
+//    }
 }

@@ -34,9 +34,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import android.util.Log;
 
 /**
- * Implementation of the DSDV routing algorithm
- * 
- * @author Arnar http://code.google.com/p/beddernet/
+ * Implementation of the DSDV routing algorithm.
+ * Includes Code from http://code.google.com/p/beddernet/
+ * @author 8kalinow
  */
 public class DsdvRouter extends AbstractPacketRouter implements IPacketRouter {
 

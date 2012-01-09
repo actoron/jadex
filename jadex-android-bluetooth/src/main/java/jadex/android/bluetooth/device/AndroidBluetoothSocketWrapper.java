@@ -7,10 +7,18 @@ import java.io.OutputStream;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 
+/**
+ * A Wrapper to abstract from the Android BluetoothSocket Implementation. 
+ * @author Julian Kalinowski
+ */
 public class AndroidBluetoothSocketWrapper implements IBluetoothSocket {
 
 	private BluetoothSocket mSocket;
 
+	/**
+	 * Constructor
+	 * @param socket {@link BluetoothSocket} to be wrapped
+	 */
 	public AndroidBluetoothSocketWrapper(BluetoothSocket socket) {
 		mSocket = socket;
 	}

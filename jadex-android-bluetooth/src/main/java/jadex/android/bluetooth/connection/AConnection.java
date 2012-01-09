@@ -18,6 +18,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import android.util.Log;
 
+/**
+ * Abstract Class which provides basic functionality for Client/Server
+ * Connections.
+ * 
+ * @author Julian Kalinowski
+ */
 public abstract class AConnection implements IConnection {
 
 	/**
@@ -39,7 +45,7 @@ public abstract class AConnection implements IConnection {
 	 * The Thread which is used to manage the connection.
 	 */
 	protected ConnectedThread connectedThread;
-	
+
 	/**
 	 * Indicates wether this connection is alive or closed.
 	 */
@@ -69,8 +75,11 @@ public abstract class AConnection implements IConnection {
 
 	/**
 	 * Creates a new Connection.
-	 * @param adapter local {@link IBluetoothAdapter}
-	 * @param remoteDevice remote {@link IBluetoothDevice}
+	 * 
+	 * @param adapter
+	 *            local {@link IBluetoothAdapter}
+	 * @param remoteDevice
+	 *            remote {@link IBluetoothDevice}
 	 */
 	public AConnection(IBluetoothAdapter adapter, IBluetoothDevice remoteDevice) {
 		this.adapter = adapter;
@@ -154,7 +163,7 @@ public abstract class AConnection implements IConnection {
 			}
 			if (running) {
 				running = false;
-			
+
 				try {
 					// this wakes up the writer thread
 					// which will then terminate
@@ -324,23 +333,19 @@ public abstract class AConnection implements IConnection {
 				if (lastPacketBytesRead >= totalSize) {
 					// read one packet successfully
 					dataPacket = new DataPacket(lastReceivedPacket);
-					// Log.d(Helper.LOG_TAG,
-					// "(Connection) received a DataPacket of Size: "
-					// + totalSize);
 					receivedPackets.add(dataPacket);
 					if (bytes > missingBytes) {
 						// received more than one packet.
 						// the while-loop will continue to read the input buffer
-						// and
-						// build more packets
+						// and build more packets
 						byteIndexInPacket = 0;
 						// next packet starts at byteIndexInBuffer
-						// TODO: this will fail if the first 58 bytes of the
-						// next packet are not transmitted yet!!
 						totalSize = getTotalPacketSize(buffer,
 								byteIndexInBuffer, buffer.length);
 						if (totalSize == -1) {
-							// just make the loop read the beginning of the
+							// don't know the totalSize yet, because the header
+							// is missing.
+							// make the loop read the beginning of the
 							// packet into cache.
 							totalSize = Short.MAX_VALUE;
 							missingBytes = bytes;
@@ -408,8 +413,11 @@ public abstract class AConnection implements IConnection {
 	}
 
 	/**
-	 * Sets the status of this connection and informs listeners if the status has changed
-	 * @param alive new status of this connection
+	 * Sets the status of this connection and informs listeners if the status
+	 * has changed
+	 * 
+	 * @param alive
+	 *            new status of this connection
 	 */
 	protected void setConnectionAlive(boolean alive) {
 		if (connectionAlive != alive) {
@@ -449,7 +457,9 @@ public abstract class AConnection implements IConnection {
 
 	/**
 	 * Notifies Listeners that a {@link DataPacket} has been received
-	 * @param dataPacket that was received
+	 * 
+	 * @param dataPacket
+	 *            that was received
 	 */
 	protected void notifyMessageReceived(DataPacket dataPacket) {
 		synchronized (listeners) {

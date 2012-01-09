@@ -1,30 +1,33 @@
 package jadex.android.service;
 
-import jadex.android.AndroidContextChangeListener;
 import jadex.android.JadexAndroidActivity;
+import jadex.android.JadexAndroidActivity.AndroidContextChangeListener;
 import jadex.android.JadexAndroidContextNotFoundError;
-import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.commons.future.IFuture;
-import jadex.micro.annotation.Description;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.util.Map;
 
 import android.content.Context;
 
-
+/**
+ * Provides Access to the Android Application Context and 
+ * Android Resources such as Files and Properties 
+ * @author Julian Kalinowski
+ *
+ */
 public class AndroidContextService extends BasicService implements AndroidContextChangeListener, IAndroidContextService{
 
 	private Context context;
 
+	/**
+	 * Constructor
+	 * @param provider
+	 */
 	public AndroidContextService(IServiceProvider provider) {
 		super(provider.getId(), IAndroidContextService.class, null);
 		JadexAndroidActivity.addContextChangeListener(this);

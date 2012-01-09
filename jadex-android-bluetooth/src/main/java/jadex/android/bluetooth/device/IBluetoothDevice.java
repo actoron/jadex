@@ -10,20 +10,45 @@ import java.util.UUID;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Interface for Bluetooth Devices
+ * 
+ * @author Julian Kalinowski
+ */
 public interface IBluetoothDevice extends Parcelable {
-	
+
+	/**
+	 * Bond states for Bluetooth Devices
+	 * 
+	 * @author Julian Kalinowski
+	 */
 	public enum BluetoothBondState {
-		bonded, none, bonding
+		/**
+		 * Bonded state
+		 */
+		bonded,
+		/**
+		 * Not Bonded state
+		 */
+		none,
+		/**
+		 * Binding in progress state
+		 */
+		bonding
 	}
-	
-	public static Map<String, String> deviceNames = new HashMap<String, String>();
-	
+
+	/**
+	 * Cached device names
+	 */
+	static Map<String, String> deviceNames = new HashMap<String, String>();
+
 	public static final Parcelable.Creator<IBluetoothDevice> CREATOR = new Parcelable.Creator<IBluetoothDevice>() {
 
 		public IBluetoothDevice createFromParcel(Parcel in) {
 			String address = in.readString();
 			String name = in.readString();
-			return Helper.getBluetoothDeviceFactory().createBluetoothDevice(address);
+			return Helper.getBluetoothDeviceFactory().createBluetoothDevice(
+					address);
 		}
 
 		@Override
@@ -31,11 +56,37 @@ public interface IBluetoothDevice extends Parcelable {
 			return new IBluetoothDevice[size];
 		}
 	};
+
+	/**
+	 * @return Name of this Bluetooth Device
+	 */
 	String getName();
+
+	/**
+	 * @return Address of this Bluetooth Device
+	 */
 	String getAddress();
-	
+
+	/**
+	 * Sets the Name of this device
+	 * 
+	 * @param name
+	 */
 	void setName(String name);
+
+	/**
+	 * Sets the Address of this device
+	 * 
+	 * @param address
+	 */
 	void setAddress(String address);
-	
-	IBluetoothSocket createRfcommSocketToServiceRecord(UUID uuid) throws IOException;
+
+	/**
+	 * Try to Connect to this device using RFcomm and the specified UUID
+	 * @param uuid 
+	 * @return {@link IBluetoothSocket}
+	 * @throws IOException if connection failed
+	 */
+	IBluetoothSocket createRfcommSocketToServiceRecord(UUID uuid)
+			throws IOException;
 }
