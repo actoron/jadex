@@ -18,11 +18,11 @@ public interface IIntermediateResultListener<E> extends IResultListener<Collecti
 	 */
 	public void resultAvailable(Collection<E> result);
 	
-	/**
-	 *  Called when an exception occurred.
-	 *  @param exception The exception.
-	 */
-	public void exceptionOccurred(Exception exception);
+//	/**
+//	 *  Called when an exception occurred.
+//	 *  @param exception The exception.
+//	 */
+//	public void exceptionOccurred(Exception exception);
 	
 	/**
 	 *  Called when an intermediate result is available.

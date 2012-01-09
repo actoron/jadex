@@ -55,7 +55,7 @@ public class CounterResultListener<E> implements IResultListener<E>
 	
 	/**
 	 *  Called when the result is available.
-	 * @param result The result.
+	 *  @param result The result.
 	 */
 	public void resultAvailable(E result)
 	{

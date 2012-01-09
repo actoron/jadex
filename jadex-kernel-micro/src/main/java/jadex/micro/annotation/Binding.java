@@ -41,8 +41,8 @@ public @interface Binding
 	/** The raw proxy type (i.e. no proxy). */
 	public static final String	PROXYTYPE_RAW	= BasicServiceInvocationHandler.PROXYTYPE_RAW;
 	
-//	/** The direct proxy type (supports custom interceptors, but uses caller thread). */
-//	public static final String	PROXYTYPE_DIRECT	= BasicServiceInvocationHandler.PROXYTYPE_DIRECT;
+	/** The direct proxy type (supports custom interceptors, but uses caller thread). */
+	public static final String	PROXYTYPE_DIRECT	= BasicServiceInvocationHandler.PROXYTYPE_DIRECT;
 	
 	/** The (default) decoupled proxy type (decouples from component thread to caller thread). */
 	public static final String	PROXYTYPE_DECOUPLED	= BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED;

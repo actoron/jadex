@@ -1,7 +1,5 @@
 package jadex.commons.future;
 
-import java.util.Collections;
-
 
 /**
  * Interface for futures. Similar to Java Future interface but adds a listener

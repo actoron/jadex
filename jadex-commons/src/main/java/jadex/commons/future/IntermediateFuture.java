@@ -19,6 +19,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 	/** Flag indicating that addIntermediateResult()has been called. */
 	protected boolean intermediate;
 	
+	/** The scheduled notifications. */
+	protected List	scheduled;
+	
+	/** Flag if notifying. */
+    protected boolean notifying;
+	
 	//-------- constructors--------
 	
 	/**
@@ -291,7 +297,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 //    	}
     }
     
-    List	scheduled;
     /**
      *  Schedule a listener notification.
      *  @param listener The listener to be notified.
@@ -310,7 +315,6 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
     	}
     }
     
-    boolean	notifying;
     /**
      *  Start scheduled listener notifications if not already running.
      *  Must not be called from synchronized block.
