@@ -24,6 +24,7 @@
 		<import>java.util.*</import>
 		<import>java.util.logging.Level</import>
 		<import>java.lang.reflect.*</import>
+		<import>java.net.*</import>
 		<import>jadex.benchmarking.services.*</import>
 		
 		<import>jadex.bridge.service.types.awareness.*</import>
@@ -190,7 +191,8 @@
 		</providedservice>
 		<providedservice class="ILibraryService">
 			<implementation> <!-- proxytype="raw" -->
-				new LibraryService($args.libpath, $args.baseclassloader)
+				$args.baseclassloader==null? new LibraryService(new URLClassLoader($args.libpath==null? new URL[0]: SUtil.toURLs($args.libpath))):
+				new LibraryService(new URLClassLoader($args.libpath==null? new URL[0]: SUtil.toURLs($args.libpath), $args.baseclassloader))
 			</implementation>
 		</providedservice>
 		<providedservice class="IClockService">

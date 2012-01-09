@@ -91,7 +91,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */ 
 	public LibraryService()
 	{
-		this(null);
+		this((ClassLoader)null);
 	}
 	
 	/** 
@@ -103,6 +103,15 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public LibraryService(Object[] urls)
 	{
 		this(urls, null);
+	}
+	
+	/** 
+	 *  Creates a new LibraryService.
+	 *  @param baseloader The base classloader that is parent of all subloaders.
+	 */ 
+	public LibraryService(ClassLoader baseloader)
+	{
+		this(null, baseloader, null);
 	}
 	
 	/** 

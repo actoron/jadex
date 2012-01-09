@@ -1620,6 +1620,24 @@ public class SUtil
 	}
 	
 	/**
+	 *  Convert a file/string/url array.
+	 *  @param urls The url strings.
+	 *  @return The urls.
+	 */
+	public static URL[] toURLs(Object[] urls)
+	{
+		if(urls==null)
+			return null;
+		
+		URL[] ret = new URL[urls.length];
+		for(int i=0; i<urls.length; i++)
+		{
+			ret[i] = toURL(urls[i]);
+		}
+		return ret;
+	}
+		
+	/**
 	 *  Convert a file/string/url.
 	 */
 	public static URL toURL(Object url)

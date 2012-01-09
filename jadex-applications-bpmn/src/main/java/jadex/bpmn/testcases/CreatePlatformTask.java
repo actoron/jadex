@@ -1,5 +1,7 @@
 package jadex.bpmn.testcases;
 
+import java.net.URLClassLoader;
+
 import jadex.base.Starter;
 import jadex.bpmn.annotation.Task;
 import jadex.bpmn.annotation.TaskParameter;
@@ -46,6 +48,7 @@ public class CreatePlatformTask implements ITask
 				ret.setResult(null);
 			}
 		}));
+		
 		return ret;
 	}
 	

@@ -1095,6 +1095,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					}
 					catch(RuntimeException e)
 					{
+						e.printStackTrace();
 						throw new RuntimeException("Service creation error: "+info, e);
 					}
 				}
