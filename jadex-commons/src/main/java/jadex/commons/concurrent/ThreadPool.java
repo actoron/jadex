@@ -234,7 +234,7 @@ public class ThreadPool implements IThreadPool
 					task = null;
 					terminate	= true;
 				}
-				catch(IBlockingQueue.TimeoutException e)
+				catch(TimeoutException e)
 				{
 					task = null;
 					terminate = strategy.threadTimeoutOccurred();

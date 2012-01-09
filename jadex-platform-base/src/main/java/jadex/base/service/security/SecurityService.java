@@ -55,6 +55,9 @@ public class SecurityService implements ISecurityService
 	/** Flag to enable / disable password protection. */
 	protected Boolean	usepass;
 	
+	/** Print password on startup or change. */
+	protected boolean	printpass;
+	
 	/** The local password (if any). */
 	protected String	password;
 	
@@ -68,16 +71,16 @@ public class SecurityService implements ISecurityService
 	 */
 	public SecurityService()
 	{
-		this(Boolean.TRUE);
+		this(Boolean.TRUE, true);
 	}
 	
 	/**
 	 *  Create a security service.
 	 */
-	public SecurityService(Boolean usepass)
+	public SecurityService(Boolean usepass, boolean printpass)
 	{
-		System.out.println("Use password: "+usepass);
 		this.usepass = usepass;
+		this.printpass = printpass;
 	}
 	
 	/**
@@ -104,9 +107,6 @@ public class SecurityService implements ISecurityService
 						if(genpass)
 						{
 							password	= UUID.randomUUID().toString().substring(0, 12);
-							/* $if android $
-							Log.i("jadex-android", "Generated platform password: "+password);
-							$endif $ */
 //							usepass	= true;
 						}
 						
@@ -124,7 +124,7 @@ public class SecurityService implements ISecurityService
 										{
 											boolean up = props.getBooleanProperty("usepass");
 											usepass	= up? Boolean.TRUE: Boolean.FALSE;
-											System.out.println("usepass: "+usepass);
+//											System.out.println("usepass: "+usepass);
 										}
 										password	= props.getStringProperty("password");
 										if(props.getProperty("passwords")!=null)
@@ -161,10 +161,26 @@ public class SecurityService implements ISecurityService
 								// If new password was generated, save settings such that new platform instances use it.
 								if(genpass)
 								{
+									if(printpass && (usepass==null || usepass.booleanValue()))
+									{
+										/* $if android $
+										Log.i("jadex-android", "Generated platform password: "+password);
+										$else $ */
+										System.out.println("Generated platform password: "+password);
+										/* $endif $ */
+									}
 									settings.saveProperties().addResultListener(new DelegationResultListener<Void>(ret));
 								}
 								else
 								{
+									if(printpass && (usepass==null || usepass.booleanValue()))
+									{
+										/* $if android $
+										Log.i("jadex-android", "Using stored platform password: "+password);
+										$else $ */
+										System.out.println("Using stored platform password: "+password);
+										/* $endif $ */
+									}
 									super.customResultAvailable(result);
 								}
 							}
@@ -238,6 +254,15 @@ public class SecurityService implements ISecurityService
 		{
 			this.usepass	= enable? Boolean.TRUE: Boolean.FALSE;
 			ret	= IFuture.DONE;
+			
+			if(printpass && (usepass==null || usepass.booleanValue()))
+			{
+				/* $if android $
+				Log.i("jadex-android", "Using stored platform password: "+password);
+				$else $ */
+				System.out.println("Using stored platform password: "+password);
+				/* $endif $ */
+			}
 		}
 		return ret;
 	}
@@ -269,6 +294,14 @@ public class SecurityService implements ISecurityService
 		{
 			this.password	= password;
 			ret	= IFuture.DONE;
+			if(printpass && (usepass==null || usepass.booleanValue()))
+			{
+				/* $if android $
+				Log.i("jadex-android", "Using new platform password: "+password);
+				$else $ */
+				System.out.println("Using new platform password: "+password);
+				/* $endif $ */
+			}
 		}
 		return ret;
 	}

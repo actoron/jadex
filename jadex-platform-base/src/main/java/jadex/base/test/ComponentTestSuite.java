@@ -54,7 +54,8 @@ public class ComponentTestSuite extends TestSuite
 	{
 		this(new String[]{"-platformname", "testcases", "-configname", "allkernels", "-simulation", "true",
 //			"-logging_level", "java.util.logging.Level.INFO",
-			"-gui", "false", "-awareness", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"},
+			"-gui", "false", "-awareness", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false",
+			"-printpass", "false"},
 			path, root, excludes, timeout);
 	}
 	

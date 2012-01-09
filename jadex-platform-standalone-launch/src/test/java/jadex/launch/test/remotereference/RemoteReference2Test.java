@@ -26,12 +26,12 @@ public class RemoteReference2Test extends TestCase
 		
 		// Start platform1 used for remote access. (underscore in name assures both platforms use same password)
 		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases_1",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false"
+			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false"
 			}).get(sus, timeout);
 		
 		// Start platform2 with services. (underscore in name assures both platforms use same password)
 		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", "testcases_2",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false",
+			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class",
 			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(sus, timeout);
 		

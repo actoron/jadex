@@ -35,7 +35,8 @@ public class PlatformsTest extends TestCase
 		"-gui", "false",
 		"-saveonexit", "false",
 		"-welcome", "false",
-		"-autoshutdown", "false"
+		"-autoshutdown", "false",
+		 "-printpass", "false"
 //		"-logging_level", "java.util.logging.Level.INFO"
 	};
 

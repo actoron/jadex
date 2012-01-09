@@ -3,7 +3,7 @@ package jadex.base.relay;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
-import jadex.commons.collection.IBlockingQueue.TimeoutException;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.Future;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.xml.bean.JavaReader;

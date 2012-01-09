@@ -32,7 +32,7 @@ import java.util.Iterator;
 })
 public class ChatD1Agent
 {
-	/** The underlying mirco agent. */
+	/** The underlying micro agent. */
 	@Agent
 	protected MicroAgent agent;
 	

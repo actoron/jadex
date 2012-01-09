@@ -113,9 +113,11 @@
 		<!-- Exclude entries for awareness agent. -->
 		<argument name="awaexcludes" class="String">""</argument>
 		
-		<!-- Flag if the platform should be protceted with password. -->
-		<!-- If a value is provided this value overrides the settings value. -->
-		<argument name="usepass" class="Boolean"></argument>
+		<!-- Flag if the platform should be protected with password.
+		     If a value is provided this value overrides the settings value. -->
+		<argument name="usepass" class="Boolean"/>
+		<!-- Flag if the platform password should be printed to the console. -->
+		<argument name="printpass" class="boolean">true</argument>
 		
 		<!-- Flag if local transport is enabled. -->
 		<argument name="localtransport" class="boolean">true</argument>
@@ -246,7 +248,7 @@
 			<implementation class="DefaultWebServicePublishService"/>
 		</providedservice>
 		<providedservice class="ISecurityService">
-			<implementation>new SecurityService($args.usepass)</implementation>
+			<implementation>new SecurityService($args.usepass, $args.printpass)</implementation>
 		</providedservice>
 		
 		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true">

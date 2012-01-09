@@ -1,5 +1,7 @@
 package jadex.commons.collection;
 
+import jadex.commons.concurrent.TimeoutException;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -127,7 +129,7 @@ public class ArrayBlockingQueue<T>	implements IBlockingQueue<T>
 				if(closed)
 					throw new IBlockingQueue.ClosedException("Queue closed.");
 				if(size==0 && timeout==0)
-					throw new IBlockingQueue.TimeoutException("Timeout during dequeue().");
+					throw new TimeoutException("Timeout during dequeue().");
 			}
             
             Object	ret	= elements[start];

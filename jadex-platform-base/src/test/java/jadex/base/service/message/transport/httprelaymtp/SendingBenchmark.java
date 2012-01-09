@@ -14,8 +14,9 @@ import java.util.Random;
 public class SendingBenchmark
 {
 //	public static String	ADDRESS = SRelay.DEFAULT_ADDRESS+"benchmark";
-//	public static String	ADDRESS = "http://localhost:8080/jadex-platform-relay-web/benchmark";
-	public static String	ADDRESS = "http://grisougarfield.dyndns.org:52339/relay/benchmark";
+	public static String	ADDRESS = "http://localhost:8080/jadex-platform-relay-web/benchmark";
+//	public static String	ADDRESS = "http://grisougarfield.dyndns.org:52339/relay/benchmark";
+//	public static String	ADDRESS = "http://77.6.184.35:52339/relay/benchmark";
 	
 	/**
 	 *  Send a number of messages.
@@ -41,7 +42,7 @@ public class SendingBenchmark
 			out.write(data);
 			out.flush();		
 			out.close();
-			con.getInputStream().close();	// Required, otherwise servlet will not be executed.				
+//			con.getInputStream().close();	// Required, otherwise servlet will not be executed.				
 			con.disconnect();
 		}
 	}

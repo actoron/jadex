@@ -1,5 +1,7 @@
 package jadex.commons.collection;
 
+import jadex.commons.concurrent.TimeoutException;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collections;
@@ -80,7 +82,7 @@ public class BlockingQueue implements IBlockingQueue
 					if(closed)
 						throw new IBlockingQueue.ClosedException("Queue closed.");
 					if(elems.isEmpty())
-						throw new IBlockingQueue.TimeoutException("Timeout during dequeue().");
+						throw new TimeoutException("Timeout during dequeue().");
 				}
 			}
 			else

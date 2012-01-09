@@ -2,6 +2,7 @@ package jadex.commons.future;
 
 
 import jadex.commons.DebugException;
+import jadex.commons.concurrent.TimeoutException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -113,7 +114,6 @@ public class Future<E> implements IFuture<E>
     	return get(caller, -1);
     }
 
-    // todo: this are always realtime timeouts, what about simulation clocks!
     /**
      *  Get the result - blocking call.
      *  @param timeout The timeout in millis.
@@ -180,7 +180,7 @@ public class Future<E> implements IFuture<E>
 	    	}
 	    	else
 	    	{
-	    		throw new RuntimeException("Timeout while waiting for future.");
+	    		throw new TimeoutException("Timeout while waiting for future.");
 	    	}
     	}
     }

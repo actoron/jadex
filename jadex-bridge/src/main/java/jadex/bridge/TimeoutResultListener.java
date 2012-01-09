@@ -4,10 +4,10 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
 
-import java.util.concurrent.TimeoutException;
 
 /**
  *  Listener that allows to automatically trigger a timeout when

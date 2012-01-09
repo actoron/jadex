@@ -1,5 +1,7 @@
 package jadex.commons.collection;
 
+import jadex.commons.concurrent.TimeoutException;
+
 import java.util.List;
 
 /**
@@ -61,19 +63,4 @@ public interface IBlockingQueue<T>
 			super(text);
 		}
 	}
-
-	/**
-	 *  Timeout exception.
-	 */
-	public static class TimeoutException extends RuntimeException
-	{
-		/**
-		 *  Create a new closed exception.
-		 */
-		public TimeoutException(String text)
-		{
-			super(text);
-		}
-	}
-
 }
