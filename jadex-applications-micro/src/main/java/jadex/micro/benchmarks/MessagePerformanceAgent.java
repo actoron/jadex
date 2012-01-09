@@ -25,7 +25,7 @@ import java.util.Map;
 @Arguments(
 {
 	@Argument(name="max", clazz=int.class, defaultvalue="1000", description="Maximum number of messages to send."),
-	@Argument(name="codec", clazz=boolean.class, defaultvalue="false", description="Use content codec for message content."),
+	@Argument(name="codec", clazz=boolean.class, defaultvalue="false", description="Use content codec for message content.")
 })
 @Results(@Result(name="result", clazz=String.class, description="The benchmark results as text."))
 public class MessagePerformanceAgent extends MicroAgent
