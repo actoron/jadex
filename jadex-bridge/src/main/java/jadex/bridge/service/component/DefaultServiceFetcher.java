@@ -360,21 +360,22 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		
 		if(result instanceof IService)
 		{
-			final String sname = ((IService)result).getServiceIdentifier().getServiceName();
-			if(sname.indexOf("Add")!=-1)
-				System.out.println("checkRes: "+((IService)result).getServiceIdentifier());
+//			final String sname = ((IService)result).getServiceIdentifier().getServiceName();
+//			if(sname.indexOf("Add")!=-1)
+//				System.out.println("checkRes: "+((IService)result).getServiceIdentifier());
 			((IService)result).isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Object>(ret)
 			{
 				public void customResultAvailable(Boolean result)
 				{
-					if(sname.indexOf("Add")!=-1)
-						System.out.println("checkRes2: "+sname);
+//					if(sname.indexOf("Add")!=-1)
+//						System.out.println("checkRes2: "+sname);
 					ret.setResult(result.booleanValue()? res: null);
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("kaputtt");
-					super.exceptionOccurred(exception);
+//					System.out.println("kaputtt: "+exception);
+//					super.exceptionOccurred(exception);
+					ret.setResult(null);
 				}
 			});
 		}

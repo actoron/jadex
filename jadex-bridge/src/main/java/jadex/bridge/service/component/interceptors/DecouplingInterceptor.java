@@ -228,9 +228,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //			if(sic.getMethod().getName().equals("add"))
 //				System.out.println("direct: "+Thread.currentThread());
 			pushToCallStack(IComponentIdentifier.LOCAL.get());
-			sic.invoke().addResultListener(new TimeoutResultListener<Void>(10000, ea, 
-				new CopyReturnValueResultListener(ret, sic)));
-//			sic.invoke().addResultListener(new CopyReturnValueResultListener(ret, sic));
+//			sic.invoke().addResultListener(new TimeoutResultListener<Void>(10000, ea, 
+//				new CopyReturnValueResultListener(ret, sic)));
+			sic.invoke().addResultListener(new CopyReturnValueResultListener(ret, sic));
 			popFromCallStack();
 		}
 		else

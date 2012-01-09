@@ -111,8 +111,10 @@
 		<argument name="awaincludes" class="String">""</argument>
 		<!-- Exclude entries for awareness agent. -->
 		<argument name="awaexcludes" class="String">""</argument>
+		
 		<!-- Flag if the platform should be protceted with password. -->
-		<argument name="usepass" class="boolean">true</argument>
+		<!-- If a value is provided this value overrides the settings value. -->
+		<argument name="usepass" class="Boolean"></argument>
 		
 		<!-- Flag if local transport is enabled. -->
 		<argument name="localtransport" class="boolean">true</argument>

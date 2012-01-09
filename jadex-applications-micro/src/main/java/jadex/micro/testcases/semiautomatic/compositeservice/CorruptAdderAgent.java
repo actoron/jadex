@@ -43,7 +43,7 @@ public class CorruptAdderAgent extends MicroAgent
 					if(context.getMethod().equals(IAddService.class.getMethod("add", new Class[]{double.class, double.class})))
 					{
 						context.setResult(new Future(new ComponentTerminatedException(getComponentIdentifier())));
-						System.out.println("hello interceptor");
+//						System.out.println("hello interceptor");
 //						if(calls++>0)
 						{
 							// Wait till agent has terminated to ensure that its
@@ -52,12 +52,13 @@ public class CorruptAdderAgent extends MicroAgent
 							{
 								public void resultAvailable(Object result)
 								{
-									System.out.println("agent terminated: "+getComponentIdentifier());
+//									System.out.println("agent terminated: "+getComponentIdentifier());
 									ret.setResult(null);
 								}
 								public void exceptionOccurred(Exception exception)
 								{
 									System.out.println("cannot terminate, already terminated");
+									ret.setException(exception);
 								}
 							});
 						}

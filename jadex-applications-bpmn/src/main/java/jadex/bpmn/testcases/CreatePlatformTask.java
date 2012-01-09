@@ -34,7 +34,7 @@ public class CreatePlatformTask implements ITask
 		
 		Starter.createPlatform(new String[]{"-platformname", "testcases_1", "-libpath", url,
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-			"-gui", "false",
+			"-gui", "false", "-usepass", "false"
 //			"-logging_level", "java.util.logging.Level.INFO"
 			})
 			.addResultListener(process.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)

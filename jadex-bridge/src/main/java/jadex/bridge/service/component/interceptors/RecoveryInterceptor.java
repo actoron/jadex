@@ -65,20 +65,22 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 	public IFuture<Void> execute(final ServiceInvocationContext sic)
 	{
 		final Future<Void> ret = new Future<Void>();
-		System.out.println("invoke: "+sic.getMethod());
+//		System.out.println("invoke: "+sic.getMethod());
 		sic.invoke().addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
-				System.out.println("invoked: "+sic.getMethod().getName());
+//				System.out.println("invoked: "+sic.getMethod().getName());
+				
 				Object res = sic.getResult();
-				if(res instanceof IFuture)
+				if(!ResolveInterceptor.SERVICEMETHODS.contains(sic.getMethod()) && res instanceof IFuture)
 				{
-					((IFuture)res).addResultListener(new TimeoutResultListener(10000, ea, new DelegationResultListener(ret)
+//					((IFuture)res).addResultListener(new TimeoutResultListener(10000, ea, new DelegationResultListener(ret)
+					((IFuture)res).addResultListener(new DelegationResultListener(ret)
 					{
 						public void exceptionOccurred(Exception exception)
 						{
-							System.out.println("ex: "+exception);
+//							System.out.println("ex: "+exception);
 							if(exception instanceof ComponentTerminatedException 
 								|| exception instanceof ServiceInvalidException)
 							{
@@ -90,7 +92,7 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 								super.exceptionOccurred(exception);
 							}
 						}
-					}));
+					});
 				}
 				else
 				{
@@ -100,7 +102,14 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				rebind(sic).addResultListener(new DelegationResultListener(ret));
+				if(!ResolveInterceptor.SERVICEMETHODS.contains(sic.getMethod()))
+				{
+					rebind(sic).addResultListener(new DelegationResultListener(ret));
+				}
+				else
+				{
+					ret.setException(exception);
+				}
 			}
 		});
 		return ret;
@@ -112,21 +121,22 @@ public class RecoveryInterceptor extends AbstractApplicableInterceptor
 	 */
 	public IFuture rebind(final ServiceInvocationContext sic)
 	{
-		System.out.println("rebind1: "+Thread.currentThread());
+//		System.out.println("rebind1: "+Thread.currentThread());
 		final Future ret = new Future();
 		
-		ret.addResultListener(new IResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				System.out.println("rebind res: "+result);
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("rebind ex: "+exception);
-				exception.printStackTrace();
-			}
-		});
+		// for debugging
+//		ret.addResultListener(new IResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				System.out.println("rebind res: "+result);
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("rebind ex: "+exception);
+//				exception.printStackTrace();
+//			}
+//		});
 		// todo: problem, search delivers failed service as result again
 		
 		fetcher.getService(info, binding, false)

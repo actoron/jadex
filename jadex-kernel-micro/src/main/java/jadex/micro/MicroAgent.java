@@ -392,7 +392,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 				{
 					public void	customResultAvailable(Map<String, Object> result)
 					{
-						System.out.println("killed: "+getComponentIdentifier());
+//						System.out.println("killed: "+getComponentIdentifier());
 						ret.setResult(null);
 					}
 				});

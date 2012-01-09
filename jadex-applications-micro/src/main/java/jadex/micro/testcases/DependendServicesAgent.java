@@ -9,12 +9,15 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Component;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -23,6 +26,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.ws.BindingType;
 
 /**
  *  Starts two agents a and b

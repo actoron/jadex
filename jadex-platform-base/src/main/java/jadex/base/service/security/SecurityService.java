@@ -53,7 +53,7 @@ public class SecurityService implements ISecurityService
 	protected IInternalAccess	component;
 	
 	/** Flag to enable / disable password protection. */
-	protected boolean	usepass;
+	protected Boolean	usepass;
 	
 	/** The local password (if any). */
 	protected String	password;
@@ -68,13 +68,13 @@ public class SecurityService implements ISecurityService
 	 */
 	public SecurityService()
 	{
-		this(true);
+		this(Boolean.TRUE);
 	}
 	
 	/**
 	 *  Create a security service.
 	 */
-	public SecurityService(boolean usepass)
+	public SecurityService(Boolean usepass)
 	{
 		System.out.println("Use password: "+usepass);
 		this.usepass = usepass;
@@ -120,8 +120,12 @@ public class SecurityService implements ISecurityService
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										usepass	= props.getProperty("usepass")==null || props.getBooleanProperty("usepass");
-//										System.out.println("up: "+usepass);
+										if(usepass==null)
+										{
+											boolean up = props.getBooleanProperty("usepass");
+											usepass	= up? Boolean.TRUE: Boolean.FALSE;
+											System.out.println("usepass: "+usepass);
+										}
 										password	= props.getStringProperty("password");
 										if(props.getProperty("passwords")!=null)
 										{
@@ -143,7 +147,7 @@ public class SecurityService implements ISecurityService
 									public IFuture<Properties> execute(IInternalAccess ia)
 									{
 										Properties	ret	= new Properties();
-										ret.addProperty(new Property("usepass", Boolean.toString(usepass)));
+										ret.addProperty(new Property("usepass", usepass==null? Boolean.TRUE.toString(): usepass.toString()));
 										ret.addProperty(new Property("password", password));
 										ret.addProperty(new Property("passwords", JavaWriter.objectToXML(passwords, ia.getClassLoader())));
 										return new Future<Properties>(ret);
@@ -215,7 +219,7 @@ public class SecurityService implements ISecurityService
 	 */
 	public IFuture<Boolean>	isUsePassword()
 	{
-		return new Future<Boolean>(Boolean.valueOf(usepass));
+		return new Future<Boolean>(usepass==null? Boolean.TRUE: usepass);
 	}
 
 	/**
@@ -232,7 +236,7 @@ public class SecurityService implements ISecurityService
 		}
 		else
 		{
-			this.usepass	= enable;
+			this.usepass	= enable? Boolean.TRUE: Boolean.FALSE;
 			ret	= IFuture.DONE;
 		}
 		return ret;
@@ -257,7 +261,7 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void>	setLocalPassword(String password)
 	{
 		IFuture<Void>	ret;
-		if(password==null && usepass)
+		if(password==null && usepass!=null && usepass.booleanValue())
 		{
 			ret	= new Future<Void>(new IllegalStateException("Cannot set password to null, when password protection is enabled."));
 		}
@@ -331,7 +335,7 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void>	validateRequest(IAuthorizable request)
 	{
 		String	error	= null;
-		if(usepass && password!=null)
+		if(usepass!=null && usepass.booleanValue() && password!=null)
 		{
 			if(request.getAuthenticationData()!=null)
 			{

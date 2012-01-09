@@ -9,6 +9,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.modelinfo.Argument;
 import jadex.bridge.modelinfo.IArgument;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
@@ -60,7 +61,7 @@ public class DFTestAgent extends MicroAgent
 		setResultValue("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
 
 		// Deregister agent.
-		getServiceContainer().searchService(IDF.class).addResultListener(new DefaultResultListener()
+		getServiceContainer().searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -80,7 +81,7 @@ public class DFTestAgent extends MicroAgent
 		final TestReport tr	= new TestReport("#1", "Test DF registration.");
 		reports.add(tr);
 
-		getServiceContainer().searchService(IDF.class).addResultListener(new DefaultResultListener()
+		getServiceContainer().searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -118,7 +119,7 @@ public class DFTestAgent extends MicroAgent
 		reports.add(tr);
 
 		// Create a service description to search for.
-		getServiceContainer().searchService(IDF.class).addResultListener(new DefaultResultListener()
+		getServiceContainer().searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

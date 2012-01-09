@@ -1,5 +1,6 @@
 package jadex.bridge.service.component;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -49,6 +50,24 @@ public class ComponentFuture<E> extends Future<E>
 				{
 					ComponentFuture.super.notifyListener(listener);
 					return IFuture.DONE;
+				}
+			}).addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					// Component terminated exception can occur
+//					System.out.println("Exe: "+exception);
+					if(exception instanceof ComponentTerminatedException)
+					{
+						ComponentFuture.super.notifyListener(listener);
+					}
+					else
+					{
+						System.out.println("Exception during schedule step: "+exception);
+					}
 				}
 			});
 		}

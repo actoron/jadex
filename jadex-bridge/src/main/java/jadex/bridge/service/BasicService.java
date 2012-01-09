@@ -99,8 +99,8 @@ public class BasicService implements IInternalService
 	 */
 	public synchronized IFuture<Boolean> isValid()
 	{
-		if(getServiceIdentifier().getServiceName().indexOf("Add")!=-1)
-			System.out.println("isValid: "+getServiceIdentifier()+": "+(started && !shutdowned));
+//		if(getServiceIdentifier().getServiceName().indexOf("Add")!=-1)
+//			System.out.println("isValid: "+getServiceIdentifier()+": "+(started && !shutdowned));
 		return new Future<Boolean>(started && !shutdowned? Boolean.TRUE: Boolean.FALSE);
 	}
 	
@@ -222,7 +222,7 @@ public class BasicService implements IInternalService
 		// Deregister pojo->sid mapping in shutdown.
 		BasicServiceInvocationHandler.removePojoServiceProxy(sid);
 		
-		System.out.println("shutdown service: "+getServiceIdentifier());
+//		System.out.println("shutdown service: "+getServiceIdentifier());
 		
 		final Future<Void> ret = new Future<Void>();
 		isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
@@ -237,7 +237,7 @@ public class BasicService implements IInternalService
 				{
 					shutdowned = true;
 					ret.setResult(null);
-					System.out.println("shutdowned service: "+getServiceIdentifier());
+//					System.out.println("shutdowned service: "+getServiceIdentifier());
 				}
 			}
 		});

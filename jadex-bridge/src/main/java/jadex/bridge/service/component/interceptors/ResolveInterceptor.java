@@ -31,7 +31,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	//-------- constants --------
 	
 	/** The static map of subinterceptors (method -> interceptor). */
-	protected static Set SERVICEMETHODS;
+	public static Set SERVICEMETHODS;
 	protected static Method START_METHOD;
 	protected static Method SHUTDOWN_METHOD;
 	protected static Method CREATESID_METHOD;

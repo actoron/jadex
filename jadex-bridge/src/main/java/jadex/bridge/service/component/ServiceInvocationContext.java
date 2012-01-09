@@ -166,8 +166,8 @@ public class ServiceInvocationContext
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		if(method.getName().equals("add"))
-			System.out.println("invoke: "+Thread.currentThread());
+//		if(method.getName().equals("add"))
+//			System.out.println("invoke: "+Thread.currentThread());
 		
 		push(object, method, args, null);
 		
