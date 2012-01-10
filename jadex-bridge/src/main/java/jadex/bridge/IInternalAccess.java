@@ -31,16 +31,22 @@ public interface IInternalAccess
 	public String getConfiguration();
 	
 	/**
-	 *  Get the parent (if any).
-	 *  @return The parent.
+	 *  Get the parent access (if any).
+	 *  @return The parent access.
 	 */
-	public IExternalAccess getParent();
-	
+	public IExternalAccess getParentAccess();
+
+	/**
+	 *  Get the children access (if any).
+	 *  @return The children access.
+	 */
+	public IFuture<Collection<IExternalAccess>> getChildrenAccesses();
+
 	/**
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture<Collection<IExternalAccess>> getChildren();
+	public IFuture<IComponentIdentifier[]> getChildrenIdentifiers();
 	
 	/**
 	 *  Get the id of the component.
@@ -57,7 +63,7 @@ public interface IInternalAccess
 	/**
 	 *  Kill the component.
 	 */
-	public IFuture<Void> killComponent();
+	public IFuture<Map<String, Object>> killComponent();
 	
 	/**
 	 *  Create a result listener that is executed on the

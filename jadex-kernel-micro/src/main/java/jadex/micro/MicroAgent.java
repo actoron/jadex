@@ -157,9 +157,9 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Get the parent component.
 	 *  @return The parent (if any).
 	 */
-	public IExternalAccess getParent()
+	public IExternalAccess getParentAccess()
 	{
-		return interpreter.getParent();
+		return interpreter.getParentAccess();
 	}
 	
 	/**
@@ -379,23 +379,16 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	/**
 	 *  Kill the agent.
 	 */
-	public IFuture<Void> killAgent()
+	public IFuture<Map<String, Object>> killAgent()
 	{
-		final Future<Void> ret = new Future<Void>();
+		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
 				cms.destroyComponent(getComponentIdentifier())
-					.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
-				{
-					public void	customResultAvailable(Map<String, Object> result)
-					{
-//						System.out.println("killed: "+getComponentIdentifier());
-						ret.setResult(null);
-					}
-				});
+					.addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 			}
 		});
 		return ret;
@@ -683,15 +676,24 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture<Collection<IExternalAccess>> getChildren()
+	public IFuture<Collection<IExternalAccess>> getChildrenAccesses()
 	{
 		return interpreter.getAgentAdapter().getChildrenAccesses();
 	}
 	
 	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture<IComponentIdentifier[]> getChildrenIdentifiers()
+	{
+		return interpreter.getAgentAdapter().getChildrenIdentifiers();
+	}
+	
+	/**
 	 *  Kill the component.
 	 */
-	public IFuture<Void> killComponent()
+	public IFuture<Map<String, Object>> killComponent()
 	{
 		return killAgent();
 	}

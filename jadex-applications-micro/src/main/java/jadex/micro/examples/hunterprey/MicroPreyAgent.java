@@ -47,7 +47,7 @@ public class MicroPreyAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		getParent().getExtension("my2dspace").addResultListener(createResultListener(new DefaultResultListener()
+		getParentAccess().getExtension("my2dspace").addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

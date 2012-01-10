@@ -41,7 +41,7 @@ public class FireflyAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		IExternalAccess	paexta = (IExternalAccess)getParent();
+		IExternalAccess	paexta = (IExternalAccess)getParentAccess();
 		paexta.getExtension("mygc2dspace")
 			.addResultListener(createResultListener(new DefaultResultListener()
 		{

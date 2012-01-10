@@ -44,7 +44,7 @@ public class HeatbugAgent extends MicroAgent
 	 */
 	public void executeBody()
 	{
-		getParent().getExtension("mygc2dspace").addResultListener(createResultListener(new DefaultResultListener()
+		getParentAccess().getExtension("mygc2dspace").addResultListener(createResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

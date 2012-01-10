@@ -9,7 +9,6 @@ import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -43,12 +42,15 @@ public class InvokerAgent
 		{
 			public void resultAvailable(TestReport result)
 			{
+//				System.out.println("tests finished");
+
 				agent.setResultValue("testresults", tc);
-				System.out.println("tests finished");
+				agent.killAgent();				
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				agent.setResultValue("testresults", tc);
+				agent.killAgent();	
 			}
 		});
 			
@@ -78,7 +80,7 @@ public class InvokerAgent
 					public void customResultAvailable(TestReport result)
 					{
 						tc.addReport(result);
-						
+						ret.setResult(null);
 					}
 				}));
 			}
@@ -110,10 +112,24 @@ public class InvokerAgent
 		}).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
-			public void customResultAvailable(IExternalAccess platform)
+			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getServiceProvider(), testno, delay, max).addResultListener(
-					agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
+				performTest(platform.getServiceProvider(), testno, delay, max)
+					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+				{
+					public void customResultAvailable(final TestReport result)
+					{
+						platform.killComponent();
+//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+//						{
+//							public void customResultAvailable(Map<String, Object> v)
+//							{
+//								ret.setResult(result);
+//							}
+//						});
+						ret.setResult(result);
+					}
+				}));
 			}
 		}));
 		
@@ -126,6 +142,18 @@ public class InvokerAgent
 	protected IFuture<TestReport> performTest(final IServiceProvider provider, final int testno, final long delay, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
+
+		final Future<TestReport> res = new Future<TestReport>();
+		
+		ret.addResultListener(new DelegationResultListener<TestReport>(res)
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
+				tr.setReason(exception.getMessage());
+				super.resultAvailable(tr);
+			}
+		});
 		
 		// Start service agent
 		IFuture<IComponentManagementService> fut = SServiceProvider.getServiceUpwards(
@@ -144,7 +172,7 @@ public class InvokerAgent
 						cms.createComponent(null, "jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class", null, null)
 							.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 						{	
-							public void customResultAvailable(IComponentIdentifier cid)
+							public void customResultAvailable(final IComponentIdentifier cid)
 							{
 								System.out.println("cid is: "+cid);
 								SServiceProvider.getService(agent.getServiceProvider(), cid, IIntermediateResultService.class)
@@ -167,10 +195,11 @@ public class InvokerAgent
 											public void finished()
 											{
 												long needed = clock.getTime()-start[0].longValue();
-												System.out.println("finished: "+needed);
+//												System.out.println("finished: "+needed);
 												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
 												long expected = delay*(max-1);
-												if(needed>=expected)
+												// deviation can happen because receival of results is measured
+												if(needed*1.1>=expected) // 10% deviation allowed
 												{
 													System.out.println("Results did arrive in (needed/expected): ("+needed+" / "+expected+")");
 													tr.setSucceeded(true);
@@ -179,6 +208,7 @@ public class InvokerAgent
 												{
 													tr.setReason("Results did arrive too fast (in bunch at the end (needed/expected): ("+needed+" / "+expected);
 												}
+												cms.destroyComponent(cid);
 												ret.setResult(tr);
 											}
 											public void resultAvailable(Collection<String> result)
@@ -186,6 +216,7 @@ public class InvokerAgent
 												System.out.println("resultAvailable: "+result);
 												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
 												tr.setReason("resultAvailable was called");
+												cms.destroyComponent(cid);
 												ret.setResult(tr);
 											}
 											public void exceptionOccurred(Exception exception)
@@ -206,6 +237,6 @@ public class InvokerAgent
 			}	
 		}));
 		
-		return ret;
+		return res;
 	}
 }

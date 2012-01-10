@@ -1204,17 +1204,19 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Kill the component.
 	 */
-	public IFuture killComponent()
+	public IFuture<Map<String, Object>> killComponent()
 	{
-		final Future ret = new Future();
+		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
-		SServiceProvider.getService(getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DefaultResultListener()
+		IFuture<IComponentManagementService> fut = SServiceProvider.getService(getServiceContainer(), 
+			IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		
+		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				((IComponentManagementService)result).destroyComponent(getComponentAdapter().getComponentIdentifier())
-					.addResultListener(new DelegationResultListener(ret));
+				cms.destroyComponent(getComponentAdapter().getComponentIdentifier())
+					.addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 			}
 		});
 		
@@ -1538,9 +1540,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture getChildren(final String type)
+	public IFuture<IComponentIdentifier[]> getChildren(final String type)
 	{
-		final Future ret = new Future();
+		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
 		final String filename = getComponentFilename(type);
 		
 		if(filename==null)
@@ -1563,7 +1565,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 							IModelInfo model = (IModelInfo)result;
 							final String modelname = model.getFullName();
 						
-							getChildren().addResultListener(createResultListener(new DelegationResultListener(ret)
+							getChildrenAccesses().addResultListener(createResultListener(new DelegationResultListener(ret)
 							{
 								public void customResultAvailable(Object result)
 								{
@@ -1577,7 +1579,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 											res.add(subcomp.getComponentIdentifier());
 										}
 									}
-									super.customResultAvailable(res);
+									super.customResultAvailable((IComponentIdentifier[])res.toArray(new IComponentIdentifier[0]));
 								}
 							}));
 						}
@@ -1593,7 +1595,16 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture<Collection<IExternalAccess>> getChildren()
+	public IFuture<IComponentIdentifier[]> getChildrenIdentifiers()
+	{
+		return getComponentAdapter().getChildrenIdentifiers();
+	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture<Collection<IExternalAccess>> getChildrenAccesses()
 	{
 		return getComponentAdapter().getChildrenAccesses();
 	}

@@ -105,7 +105,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Get the parent (if any).
 	 *  @return The parent.
 	 */
-	public IExternalAccess getParent()
+	public IExternalAccess getParentAccess()
 	{
 		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
@@ -673,7 +673,7 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture getChildren()
+	public IFuture<Collection<IExternalAccess>> getChildrenAccesses()
 	{
 		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
@@ -689,6 +689,29 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		else
 		{
 			return getInterpreter().getAgentAdapter().getChildrenAccesses();
+		}
+	}
+	
+	/**
+	 *  Get the children (if any).
+	 *  @return The children.
+	 */
+	public IFuture<IComponentIdentifier[]> getChildrenIdentifiers()
+	{
+		if(getInterpreter().getComponentAdapter().isExternalThread())
+		{
+			AgentInvocation invoc = new AgentInvocation()
+			{
+				public void run()
+				{
+					object = getInterpreter().getAgentAdapter().getChildrenIdentifiers();
+				}
+			};
+			return (IFuture)invoc.object;
+		}
+		else
+		{
+			return getInterpreter().getAgentAdapter().getChildrenIdentifiers();
 		}
 	}
 	

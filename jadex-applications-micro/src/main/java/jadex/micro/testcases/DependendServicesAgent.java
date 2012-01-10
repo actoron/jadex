@@ -55,7 +55,7 @@ public class DependendServicesAgent extends MicroAgent
     public IFuture agentCreated()
     {
         final Future ret = new Future();
-        getChildren().addResultListener(createResultListener(new DefaultResultListener()
+        getChildrenAccesses().addResultListener(createResultListener(new DefaultResultListener()
         {
             public void resultAvailable(Object result)
             {
@@ -110,7 +110,7 @@ public class DependendServicesAgent extends MicroAgent
      */
     public void executeBody()
     {
-        getChildren().addResultListener(createResultListener(new DefaultResultListener()
+        getChildrenAccesses().addResultListener(createResultListener(new DefaultResultListener()
         {
             public void resultAvailable(Object result)
             {

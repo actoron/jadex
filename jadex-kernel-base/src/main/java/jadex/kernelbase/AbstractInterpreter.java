@@ -233,7 +233,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  Get the parent.
 	 *  @return The parent.
 	 */
-	public IExternalAccess getParent()
+	public IExternalAccess getParentAccess()
 	{
 		return parent;
 	}

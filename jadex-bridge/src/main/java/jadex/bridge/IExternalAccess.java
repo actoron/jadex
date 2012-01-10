@@ -1,5 +1,9 @@
 package jadex.bridge;
 
+import java.util.Collection;
+import java.util.Map;
+
+import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.annotation.Reference;
@@ -85,25 +89,25 @@ public interface IExternalAccess //extends IRemotable
 	 *  Get the children (if any) component identifiers.
 	 *  @return The children.
 	 */
-	public IFuture getChildren();
+	public IFuture<IComponentIdentifier[]> getChildren();
 	
 	/**
 	 *  Kill the component.
 	 */
-	public IFuture killComponent();
+	public IFuture<Map<String, Object>> killComponent();
 	
 	/**
 	 *  Get the children (if any) component identifiers.
 	 *  @return The children component identifiers.
 	 */
-	public IFuture getChildren(String type);
+	public IFuture<IComponentIdentifier[]> getChildren(String type);
 	
 	/**
 	 *  Get the model name of a component type.
 	 *  @param ctype The component type.
 	 *  @return The model name of this component type.
 	 */
-	public IFuture getFileName(String ctype);
+	public IFuture<String> getFileName(String ctype);
 	
 	/**
 	 *  Get the local type name of this component as defined in the parent.
@@ -115,25 +119,25 @@ public interface IExternalAccess //extends IRemotable
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
-	public IFuture addComponentListener(IComponentListener listener);
+	public IFuture<Void> addComponentListener(IComponentListener listener);
 	
 	/**
 	 *  Remove a component listener.
 	 *  @param listener The listener.
 	 */
-	public IFuture removeComponentListener(IComponentListener listener);
+	public IFuture<Void> removeComponentListener(IComponentListener listener);
 
 	/**
 	 *  Get the component results.
 	 *  @return The results.
 	 */
-	public IFuture getResults();
+	public IFuture<Map<String, Object>> getResults();
 	
 	/**
 	 *  Get the arguments.
 	 *  @return The arguments.
 	 */
-	public IFuture getArguments();
+	public IFuture<Map<String, Object>> getArguments();
 	
 	//-------- exclude --------
 	
@@ -142,7 +146,7 @@ public interface IExternalAccess //extends IRemotable
 	 *  @param name	The name of the space.
 	 *  @return	The space.
 	 */
-	public IFuture getExtension(final String name);
+	public IFuture<IExtensionInstance> getExtension(final String name);
 	
 	// todo: do we want this? should getArg() deliver only args supplied from
 	// outside or also values that are default/initial values in the model.

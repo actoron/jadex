@@ -1,9 +1,12 @@
 package jadex.kernelbase;
 
+import java.util.Map;
+
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -113,7 +116,7 @@ public class ExternalAccess implements IExternalAccess
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture getChildren()
+	public IFuture<IComponentIdentifier[]> getChildren()
 	{
 		return adapter.getChildrenIdentifiers();
 	}
@@ -129,9 +132,9 @@ public class ExternalAccess implements IExternalAccess
 	/**
 	 *  Kill the component.
 	 */
-	public IFuture killComponent()
+	public IFuture<Map<String, Object>> killComponent()
 	{
-		final Future ret = new Future();
+		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
 		if(adapter.isExternalThread())
 		{
@@ -141,7 +144,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.killComponent().addResultListener(new DelegationResultListener(ret));
+						interpreter.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 					}
 				});
 			}
@@ -152,7 +155,7 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			interpreter.killComponent().addResultListener(new DelegationResultListener(ret));
+			interpreter.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 		}
 		
 		return ret;
@@ -173,9 +176,9 @@ public class ExternalAccess implements IExternalAccess
 	 *  Get the children (if any).
 	 *  @return The children.
 	 */
-	public IFuture getChildren(final String type)
+	public IFuture<IComponentIdentifier[]> getChildren(final String type)
 	{
-		final Future ret = new Future();
+		final Future<IComponentIdentifier[]> ret = new Future<IComponentIdentifier[]>();
 		
 		if(adapter.isExternalThread())
 		{
@@ -185,7 +188,7 @@ public class ExternalAccess implements IExternalAccess
 				{
 					public void run() 
 					{
-						interpreter.getChildren(type).addResultListener(new DelegationResultListener(ret));
+						interpreter.getChildren(type).addResultListener(new DelegationResultListener<IComponentIdentifier[]>(ret));
 					}
 				});
 			}
@@ -207,9 +210,9 @@ public class ExternalAccess implements IExternalAccess
 	 *  @param ctype The component type.
 	 *  @return The file name of this component type.
 	 */
-	public IFuture getFileName(final String ctype)
+	public IFuture<String> getFileName(final String ctype)
 	{
-		final Future ret = new Future();
+		final Future<String> ret = new Future<String>();
 		
 		if(adapter.isExternalThread())
 		{
@@ -348,9 +351,9 @@ public class ExternalAccess implements IExternalAccess
 	 *  @param delay The delay to wait before step should be done.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleStep(final IComponentStep step, final long delay)
+	public <T>	IFuture<T> scheduleStep(final IComponentStep<T> step, final long delay)
 	{
-		final Future ret = new Future();
+		final Future<T> ret = new Future<T>();
 		
 		SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
@@ -379,9 +382,9 @@ public class ExternalAccess implements IExternalAccess
 	 *  @param delay The delay to wait before step should be done.
 	 *  @return The result of the step.
 	 */
-	public IFuture scheduleImmediate(final IComponentStep step, final long delay)
+	public <T> IFuture<T> scheduleImmediate(final IComponentStep<T> step, final long delay)
 	{
-		final Future ret = new Future();
+		final Future<T> ret = new Future<T>();
 		
 		SServiceProvider.getService(interpreter.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(interpreter.createResultListener(new DelegationResultListener(ret)
@@ -407,9 +410,9 @@ public class ExternalAccess implements IExternalAccess
 	 *  @param name	The name of the space.
 	 *  @return	The space.
 	 */
-	public IFuture getExtension(final String name)
+	public IFuture<IExtensionInstance> getExtension(final String name)
 	{
-		final Future ret = new Future();
+		final Future<IExtensionInstance> ret = new Future<IExtensionInstance>();
 		
 		if(adapter.isExternalThread())
 		{
@@ -440,9 +443,9 @@ public class ExternalAccess implements IExternalAccess
 	 *  Add an component listener.
 	 *  @param listener The listener.
 	 */
-	public IFuture addComponentListener(final IComponentListener listener)
+	public IFuture<Void> addComponentListener(final IComponentListener listener)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		if(adapter.isExternalThread())
 		{
@@ -453,7 +456,7 @@ public class ExternalAccess implements IExternalAccess
 					public void run() 
 					{
 						interpreter.addComponentListener(listener)
-							.addResultListener(new DelegationResultListener(ret));
+							.addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 			}
@@ -465,7 +468,7 @@ public class ExternalAccess implements IExternalAccess
 		else
 		{
 			interpreter.addComponentListener(listener)
-				.addResultListener(new DelegationResultListener(ret));
+				.addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		
 		return ret;
@@ -475,9 +478,9 @@ public class ExternalAccess implements IExternalAccess
 	 *  Remove a component listener.
 	 *  @param listener The listener.
 	 */
-	public IFuture removeComponentListener(final IComponentListener listener)
+	public IFuture<Void> removeComponentListener(final IComponentListener listener)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 		if(adapter.isExternalThread())
 		{
@@ -488,7 +491,7 @@ public class ExternalAccess implements IExternalAccess
 					public void run() 
 					{
 						interpreter.removeComponentListener(listener)
-							.addResultListener(new DelegationResultListener(ret));
+							.addResultListener(new DelegationResultListener<Void>(ret));
 					}
 				});
 			}
@@ -500,7 +503,7 @@ public class ExternalAccess implements IExternalAccess
 		else
 		{
 			interpreter.removeComponentListener(listener)
-				.addResultListener(new DelegationResultListener(ret));
+				.addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		
 		return ret;
@@ -510,9 +513,9 @@ public class ExternalAccess implements IExternalAccess
 	 *  Get the arguments.
 	 *  @return The arguments.
 	 */
-	public IFuture getArguments()
+	public IFuture<Map<String, Object>> getArguments()
 	{
-		final Future ret = new Future();
+		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
 		if(adapter.isExternalThread())
 		{
@@ -543,9 +546,9 @@ public class ExternalAccess implements IExternalAccess
 	 *  Get the component results.
 	 *  @return The results.
 	 */
-	public IFuture getResults()
+	public IFuture<Map<String, Object>> getResults()
 	{
-		final Future ret = new Future();
+		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
 		if(adapter.isExternalThread())
 		{

@@ -35,7 +35,7 @@ public interface ICapability	extends IElement
 	 *  Get the parent (if any).
 	 *  @return The parent.
 	 */
-	public IExternalAccess getParent();
+	public IExternalAccess getParentAccess();
 
 	/**
 	 *  Get the belief base.

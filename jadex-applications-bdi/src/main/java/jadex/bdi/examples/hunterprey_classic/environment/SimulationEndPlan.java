@@ -40,6 +40,6 @@ public class SimulationEndPlan extends Plan {
 
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider
 			.getService(getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
-		cms.destroyComponent(getScope().getParent().getComponentIdentifier());
+		cms.destroyComponent(getScope().getParentAccess().getComponentIdentifier());
 	}
 }

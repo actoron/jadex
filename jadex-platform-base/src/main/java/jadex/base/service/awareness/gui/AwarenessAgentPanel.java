@@ -396,7 +396,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 						@XMLClassname("deoractivateDiscoveryMechanism")
 						public IFuture<Void> execute(final IInternalAccess ia)
 						{
-							ia.getChildren().addResultListener(ia.createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
+							ia.getChildrenAccesses().addResultListener(ia.createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
 							{
 								public void resultAvailable(Collection<IExternalAccess> subs) 
 								{
@@ -651,7 +651,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			{
 				final Future<Set<String>> ret = new Future<Set<String>>();
 				
-				ia.getChildren().addResultListener(ia.createResultListener(
+				ia.getChildrenAccesses().addResultListener(ia.createResultListener(
 					new ExceptionDelegationResultListener<Collection<IExternalAccess>, Set<String>>(ret)
 				{
 					public void customResultAvailable(Collection<IExternalAccess> result)
