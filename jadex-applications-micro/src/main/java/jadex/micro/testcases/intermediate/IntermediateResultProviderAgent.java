@@ -29,19 +29,20 @@ public class IntermediateResultProviderAgent implements IIntermediateResultServi
 	 *  Get the results.
 	 *  @return The results.
 	 */
-	public IIntermediateFuture<String> getResults()
+	public IIntermediateFuture<String> getResults(final long delay, final int max)
 	{
 		final IntermediateFuture<String> ret = new IntermediateFuture<String>();
 
 		cnt = 0;
-		final int max = 5;
-		final long delay = 1000;
+//		final int max = 5;
+//		final long delay = 200;
 		
+		System.out.println("start: "+System.currentTimeMillis());
 		agent.waitFor(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("setting intermediate result: "+cnt);
+				System.out.println("setting intermediate result: "+cnt+" - "+System.currentTimeMillis());
 				ret.addIntermediateResult("step("+(cnt++)+"/"+max+")");
 				if(cnt==max)
 				{

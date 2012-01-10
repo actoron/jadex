@@ -11,5 +11,5 @@ public interface IIntermediateResultService
 	 *  Get the results.
 	 *  @return The results.
 	 */
-	public IIntermediateFuture<String> getResults();
+	public IIntermediateFuture<String> getResults(long delay, int max);
 }
