@@ -417,7 +417,7 @@ public abstract class ComponentManagementService extends BasicService implements
 																			}
 																			else
 																			{
-																				cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname);
+																				cid = (ComponentIdentifier)generateComponentIdentifier(lmodel.getName(), paname, addresses);
 																			}
 																			initinfos.put(cid, new InitInfo(null, null, cinfo, null, resfut, null));
 																		}
@@ -2350,7 +2350,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param name The base name.
 	 *  @return The component identifier.
 	 */
-	public IComponentIdentifier generateComponentIdentifier(String localname, String platformname)
+	public IComponentIdentifier generateComponentIdentifier(String localname, String platformname, String[] addresses)
 	{
 		ComponentIdentifier ret = null;
 
@@ -2358,7 +2358,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			platformname = ((IComponentIdentifier)exta.getServiceProvider().getId()).getName();
 		synchronized(adapters)
 		{
-			ret = new ComponentIdentifier(localname+"@"+platformname);
+			ret = new ComponentIdentifier(localname+"@"+platformname, addresses);
 			if(adapters.containsKey(ret) || initinfos.containsKey(ret))
 			{
 				do

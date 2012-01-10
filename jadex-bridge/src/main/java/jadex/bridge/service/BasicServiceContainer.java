@@ -470,18 +470,16 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	{
 		final Future<T> ret = new Future<T>();
 		SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
-			.addResultListener(new DelegationResultListener(ret)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getExternalAccess(cid).addResultListener(new DelegationResultListener(ret)
+				cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(IExternalAccess ea)
 					{
-						IExternalAccess	ea	= (IExternalAccess)result;
-						SServiceProvider.getService(ea.getServiceProvider(), type)
-							.addResultListener(new DelegationResultListener(ret));
+						SServiceProvider.getDeclaredService(ea.getServiceProvider(), type)
+							.addResultListener(new DelegationResultListener<T>(ret));
 					}
 				});
 			}

@@ -296,9 +296,9 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	/**
 	 *  Wait for an specified amount of time.
 	 *  @param time The time.
-	 *  @param run The runnable.
+	 *  @param step The runnable.
 	 */
-	public IFuture<TimerWrapper> waitFor(final long time, final IComponentStep<Void> run)
+	public IFuture<TimerWrapper> waitFor(final long time, final IComponentStep<Void> step)
 	{
 //		longtime	= Math.max(longtime, time);
 		final Future<TimerWrapper> ret = new Future<TimerWrapper>();
@@ -313,7 +313,7 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						interpreter.scheduleStep(new ExecuteWaitForStep(ts[0], run));
+						interpreter.scheduleStep(new ExecuteWaitForStep(ts[0], step));
 					}
 					
 					public String toString()

@@ -135,7 +135,11 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			{
 				public void customResultAvailable(Collection result)
 				{
-					if(sic.getResult() instanceof IFuture)
+					if(sic.getResult() instanceof IIntermediateFuture)
+					{
+						((IIntermediateFuture)sic.getResult()).addResultListener(new IntermediateDelegationResultListener(fut));
+					}
+					else if(sic.getResult() instanceof IFuture)
 					{
 						((IFuture)sic.getResult()).addResultListener(new DelegationResultListener(fut));
 					}

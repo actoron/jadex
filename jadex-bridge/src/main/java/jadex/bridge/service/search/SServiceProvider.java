@@ -1,12 +1,18 @@
 package jadex.bridge.service.search;
 
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -281,6 +287,36 @@ public class SServiceProvider
 	}
 	
 	/**
+	 *  Get a service from a specific component.
+	 *  @param provider A service provider.
+	 *  @param cid The target component identifier.
+	 *  @param type The service type.
+	 *  @return The corresponding service.
+	 */
+	public static <T> IFuture<T> getService(IServiceProvider provider, final IComponentIdentifier cid, final Class<T> type)
+	{
+		final Future<T> ret = new Future<T>();
+		
+		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
+		{
+			public void customResultAvailable(IComponentManagementService cms)
+			{
+				cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+				{
+					public void customResultAvailable(IExternalAccess ea)
+					{
+						SServiceProvider.getDeclaredService(ea.getServiceProvider(), type)
+							.addResultListener(new DelegationResultListener<T>(ret));
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
 	 *  Get one service of a type.
 	 *  @param clazz The class.
 	 *  @return The corresponding service.
@@ -490,6 +526,15 @@ public class SServiceProvider
 //		
 //		return ret;
 //	}
+	
+	/**
+	 *  Get all declared services of the given provider.
+	 *  @return The corresponding services.
+	 */
+	public static <T> IFuture<T> getDeclaredService(IServiceProvider provider, Class<T> type)
+	{
+		return SServiceProvider.getService(provider, type, RequiredServiceInfo.SCOPE_LOCAL);
+	}
 	
 	/**
 	 *  Get all declared services of the given provider.
@@ -721,6 +766,8 @@ public class SServiceProvider
 //		
 //		return ret;
 //	}
+	
+	// todo: remove these methods, move to marshal service
 	
 	/**
 	 *  Get the copy info for method parameters.
