@@ -23,12 +23,17 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -134,7 +139,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						{
 							Object content = msg.get(SFipa.CONTENT);
 							final String callid = (String)msg.get(SFipa.CONVERSATION_ID);
-							final Future<IRemoteCommand>	reply	= new Future<IRemoteCommand>();
+							final IntermediateFuture<IRemoteCommand>	reply	= new IntermediateFuture<IRemoteCommand>();
 		//					System.out.println("received: "+rms.getServiceIdentifier()+" "+callid);
 		//					
 		//					if(((String)content).indexOf("store")!=-1)
@@ -146,7 +151,6 @@ public class RemoteServiceManagementAgent extends MicroAgent
 							// Decode content.
 							if(content instanceof String)
 							{
-								
 								// Catch decode problems.
 								// Should be ignored or be a warning.
 								try
@@ -162,14 +166,15 @@ public class RemoteServiceManagementAgent extends MicroAgent
 //										System.out.println("Error: "+contentcopy);
 										if(content instanceof RemoteResultCommand)
 										{
-		//										System.out.println("corrupt content: "+content);
-		//										System.out.println("errors: "+errors);
+		//									System.out.println("corrupt content: "+content);
+		//									System.out.println("errors: "+errors);
 											((RemoteResultCommand)content).setExceptionInfo(new ExceptionInfo(new RuntimeException("Errors during XML decoding: "+errors)));
 										}
 										else
 										{
 											content	= null;
-											reply.setResult(new RemoteResultCommand(null, new RuntimeException("Errors during XML decoding: "+errors+"\n"+orig), callid, false));
+											reply.addIntermediateResult(new RemoteResultCommand(null, new RuntimeException("Errors during XML decoding: "+errors+"\n"+orig), callid, false));
+											reply.setFinished();
 										}
 										getLogger().info("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
 //										getLogger().info("Remote service management service could not decode message. callid: "+callid+"\nerrors: "+errors+"\n"+orig);
@@ -178,7 +183,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								catch(Exception e)
 								{
 									content	= null;
-									reply.setResult(new RemoteResultCommand(null, e, callid, false));
+									reply.addIntermediateResult(new RemoteResultCommand(null, e, callid, false));
+									reply.setFinished();
 									getLogger().info("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));
 //									getLogger().info("Remote service management service could not decode message. callid: "+callid+"\n"+orig);
 		//								e.printStackTrace();
@@ -233,13 +239,14 @@ public class RemoteServiceManagementAgent extends MicroAgent
 									{
 //										System.out.println("Command valid: "+com);
 										com.execute((IMicroExternalAccess)getExternalAccess(), rms)
-											.addResultListener(createResultListener(new DelegationResultListener<IRemoteCommand>(reply)));
+											.addResultListener(createResultListener(new IntermediateDelegationResultListener<IRemoteCommand>(reply)));
 									}
 									
 									public void exceptionOccurred(Exception exception)
 									{
 										getLogger().info("RMS rejected unauthorized command: "+com);
-										reply.setResult(new RemoteResultCommand(null, exception, callid, false));
+										reply.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false));
+										reply.setFinished();
 									}
 								});								
 							}
@@ -249,12 +256,30 @@ public class RemoteServiceManagementAgent extends MicroAgent
 							}
 
 							// Send reply.
-							reply.addResultListener(new DefaultResultListener<IRemoteCommand>()
+							reply.addResultListener(new IntermediateDefaultResultListener<IRemoteCommand>()
 							{
-								public void resultAvailable(final IRemoteCommand result)
+								public void intermediateResultAvailable(IRemoteCommand result)
+								{
+									sendCommand(result);
+								}
+								
+//								public void finished()
+//								{
+//									super.finished();
+//								}
+								
+								public void resultAvailable(Collection<IRemoteCommand> result)
+								{
+									for(Iterator<IRemoteCommand> it=result.iterator(); it.hasNext(); )
+										sendCommand(it.next());
+								}
+								
+								public void sendCommand(final IRemoteCommand result)
 								{
 //									if(((String)orig).indexOf("store")!=-1)
 //										System.out.println("result of command: "+com+" "+result);
+//									System.out.println("send command: "+result);
+									
 									if(result!=null)
 									{
 										Future<Void>	pre	= new Future<Void>(); 

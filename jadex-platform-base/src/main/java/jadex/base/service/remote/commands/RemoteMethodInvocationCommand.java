@@ -1,7 +1,5 @@
 package jadex.base.service.remote.commands;
 
-import jadex.base.service.remote.IRemoteCommand;
-import jadex.base.service.remote.ProxyReference;
 import jadex.base.service.remote.RemoteReference;
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.base.service.remote.RemoteServiceManagementService;
@@ -9,16 +7,19 @@ import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
 import jadex.xml.writer.WriteContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 
 /**
  *  Command for executing a remote method.
@@ -113,9 +114,9 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
+	public IIntermediateFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
-		final Future ret = new Future();
+		final IntermediateFuture ret = new IntermediateFuture();
 		
 		rsms.getRemoteReferenceModule().getTargetObject(getRemoteReference())
 			.addResultListener(new IResultListener() // todo: createResultListener?!
@@ -127,8 +128,11 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setResult(new RemoteResultCommand(null, new RuntimeException(
+//				ret.setResult(new RemoteResultCommand(null, new RuntimeException(
+//					"Target object not found: "+getRemoteReference()), callid, false, methodname));
+				ret.addIntermediateResult(new RemoteResultCommand(null, new RuntimeException(
 					"Target object not found: "+getRemoteReference()), callid, false, methodname));
+				ret.setFinished();
 			}
 		});
 		
@@ -214,7 +218,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  @param target The target object.
 	 *  @param ret The result future.
 	 */
-	public void invokeMethod(Object target, final Future ret)
+	public void invokeMethod(Object target, final IntermediateFuture ret)
 	{
 //		if("addMessageListener".equals(methodname))
 //			System.out.println("remote addMessageListener");
@@ -232,24 +236,66 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			
 			Object res = m.invoke(target, parametervalues);
 			
-			if(res instanceof IFuture)
+			if(res instanceof IIntermediateFuture)
+			{
+				((IIntermediateFuture)res).addResultListener(new IIntermediateResultListener()
+				{
+					public void intermediateResultAvailable(Object result)
+					{
+//						System.out.println("inter: "+result);
+						ret.addIntermediateResult(new RemoteIntermediateResultCommand(result, callid, returnisref, methodname, false));
+					}
+					
+					public void finished()
+					{
+//						System.out.println("fin");
+						ret.addIntermediateResult(new RemoteIntermediateResultCommand(null, callid, returnisref, methodname, true));
+						ret.setFinished();
+					}
+					
+					public void resultAvailable(Object result)
+					{
+//						System.out.println("ra");
+						ret.addIntermediateResult(new RemoteResultCommand(result, null, callid, returnisref, methodname));
+						ret.setFinished();
+					}
+					
+					public void resultAvailable(Collection result)
+					{
+//						System.out.println("ra");
+						ret.addIntermediateResult(new RemoteResultCommand(result, null, callid, returnisref, methodname));
+						ret.setFinished();
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+//						System.out.println("ex: "+exception);
+						ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false, methodname));
+						ret.setFinished();
+					}
+				});
+			}
+			else if(res instanceof IFuture)
 			{
 				((IFuture)res).addResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
-						ret.setResult(new RemoteResultCommand(result, null, callid, returnisref, methodname));
+						ret.addIntermediateResult(new RemoteResultCommand(result, null, callid, returnisref, methodname));
+						ret.setFinished();
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						ret.setResult(new RemoteResultCommand(null, exception, callid, false, methodname));
+						ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false, methodname));
+						ret.setFinished();
 					}
 				});
 			}
 			else
 			{
-				ret.setResult(new RemoteResultCommand(res, null, callid, returnisref, methodname));
+				ret.addIntermediateResult(new RemoteResultCommand(res, null, callid, returnisref, methodname));
+				ret.setFinished();
 			}
 		}
 		catch(Exception exception)
@@ -259,7 +305,8 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			{
 				exception	= (Exception)((InvocationTargetException)exception).getTargetException();
 			}
-			ret.setResult(new RemoteResultCommand(null, exception, callid, false, methodname));
+			ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false, methodname));
+			ret.setFinished();
 		}
 	}
 	

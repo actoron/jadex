@@ -3,6 +3,8 @@ package jadex.micro.testcases.intermediate;
 import java.util.Collection;
 
 import jadex.base.Starter;
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceProvider;
@@ -20,6 +22,7 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 
 @Agent
+//@Results(@Result(name="testresults", clazz=Testcase.class))
 public class InvokerAgent
 {
 	@Agent
@@ -28,10 +31,12 @@ public class InvokerAgent
 	@AgentBody
 	public void body()
 	{
-		final Future<Void> ret = new Future<Void>();
-		ret.addResultListener(new IResultListener<Void>()
+		final Testcase tc = new Testcase();
+		
+		final Future<TestReport> ret = new Future<TestReport>();
+		ret.addResultListener(new IResultListener<TestReport>()
 		{
-			public void resultAvailable(Void result)
+			public void resultAvailable(TestReport result)
 			{
 				System.out.println("fini");
 			}
@@ -57,13 +62,13 @@ public class InvokerAgent
 //			}
 //		}));
 		
-		testLocal().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)
+		testLocal().addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 		{
-			public void customResultAvailable(Void result)
+			public void customResultAvailable(TestReport result)
 			{
-				testRemote().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)
+				testRemote().addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
-					public void customResultAvailable(Void result)
+					public void customResultAvailable(TestReport result)
 					{
 						System.out.println("tests finished");
 					}
@@ -75,7 +80,7 @@ public class InvokerAgent
 	/**
 	 * 
 	 */
-	protected IFuture<Void> testLocal()
+	protected IFuture<TestReport> testLocal()
 	{
 		return performTest(agent.getServiceProvider());
 	}
@@ -83,9 +88,9 @@ public class InvokerAgent
 	/**
 	 * 
 	 */
-	protected IFuture<Void> testRemote()
+	protected IFuture<TestReport> testRemote()
 	{
-		final Future<Void> ret = new Future<Void>();
+		final Future<TestReport> ret = new Future<TestReport>();
 		
 		// Start platform
 		String url	= "new String[]{\"../jadex-applications-micro/target/classes\"}";	// Todo: support RID for all loaded models.
@@ -95,12 +100,12 @@ public class InvokerAgent
 			"-gui", "false", "-usepass", "false", "-simulation", "false"
 //			"-logging_level", "java.util.logging.Level.INFO"
 		}).addResultListener(agent.createResultListener(
-			new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
+			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
 			public void customResultAvailable(IExternalAccess platform)
 			{
 				performTest(platform.getServiceProvider()).addResultListener(
-					agent.createResultListener(new DelegationResultListener<Void>(ret)));
+					agent.createResultListener(new DelegationResultListener<TestReport>(ret)));
 			}
 		}));
 		
@@ -110,26 +115,26 @@ public class InvokerAgent
 	/**
 	 * 
 	 */
-	protected IFuture<Void> performTest(IServiceProvider provider)
+	protected IFuture<TestReport> performTest(IServiceProvider provider)
 	{
-		final Future<Void> ret = new Future<Void>();
+		final Future<TestReport> ret = new Future<TestReport>();
 		
 		// Start service agent
 		IFuture<IComponentManagementService> fut = SServiceProvider.getServiceUpwards(
 			provider, IComponentManagementService.class);
 		fut.addResultListener(agent.createResultListener(
-			new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 				cms.createComponent(null, "jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class", null, null)
-					.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+					.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 				{	
 					public void customResultAvailable(IComponentIdentifier cid)
 					{
 						System.out.println("cid is: "+cid);
 						SServiceProvider.getService(agent.getServiceProvider(), cid, IIntermediateResultService.class)
-							.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IIntermediateResultService, Void>(ret)
+							.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IIntermediateResultService, TestReport>(ret)
 						{
 							public void customResultAvailable(IIntermediateResultService service)
 							{
@@ -158,7 +163,7 @@ public class InvokerAgent
 										ret.setException(exception);
 									}
 								}));
-								System.out.println("Added listener");
+//								System.out.println("Added listener");
 							}		
 						}));
 					}

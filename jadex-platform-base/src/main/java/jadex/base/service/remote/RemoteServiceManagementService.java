@@ -425,19 +425,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	}
 	
 	/**
-	 *  Get the local password.
-	 *  @return 
-	 */
-	// Save to be allowed remotely, as it can only be called, when password is already known.
-	// Putting method in service allows passwords to be administered using remote JCCs.
-	public IFuture<String>	getLocalPassword()
-	{
-		return new Future<String>("dummy");
-//		return new Future<String>((String)null);
-	}
-
-
-	/**
 	 *  Get the component.
 	 *  @return the component.
 	 */
@@ -660,7 +647,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 															}
 														}, timeout);
 														
-		
+														// Removes waiting call when done with result.
 														future.addResultListener(ia.createResultListener(new IResultListener()
 														{
 															public void resultAvailable(Object result)

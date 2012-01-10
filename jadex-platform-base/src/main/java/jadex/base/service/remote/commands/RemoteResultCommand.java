@@ -6,9 +6,10 @@ import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
 import jadex.xml.writer.WriteContext;
 
@@ -29,7 +30,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	/** The callid. */
 	protected String callid;
 	
-	/** The falg if result is declared as reference. */
+	/** The flag if result is declared as reference. */
 	protected boolean isref;
 	
 	/** The method name. For debugging. */
@@ -38,7 +39,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	//-------- constructors --------
 	
 	/**
-	 * 
+	 *  Create a new remote result command.
 	 */
 	public RemoteResultCommand()
 	{
@@ -99,7 +100,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
+	public IIntermediateFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
 //		System.out.println("result command: "+result+" "+exceptioninfo+" "+callid);
 //		if(callid.equals(RemoteMethodInvocationHandler.debugcallid))
@@ -129,7 +130,7 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 			}
 		}
 		
-		return IFuture.DONE;
+		return IIntermediateFuture.DONE;
 	}
 	
 	//-------- getter/setter methods --------
@@ -211,6 +212,6 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 */
 	public String toString()
 	{
-		return "RemoteResultCommand(result="+result+", exception="+exceptioninfo+", callid="+callid;
+		return SReflect.getInnerClassName(getClass())+"(result="+result+", exception="+exceptioninfo+", callid="+callid+")";
 	}
 }

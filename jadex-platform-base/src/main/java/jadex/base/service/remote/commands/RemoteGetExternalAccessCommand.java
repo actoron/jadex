@@ -6,9 +6,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
 
 /**
@@ -50,9 +50,9 @@ public class RemoteGetExternalAccessCommand extends AbstractRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IFuture<IRemoteCommand> execute(final IMicroExternalAccess component, RemoteServiceManagementService rsms)
+	public IIntermediateFuture<IRemoteCommand> execute(final IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
-		final Future<IRemoteCommand> ret = new Future<IRemoteCommand>();
+		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
 		
 		// fetch component via provider/component id
 		final IComponentIdentifier compid = cid!=null? 
@@ -71,19 +71,25 @@ public class RemoteGetExternalAccessCommand extends AbstractRemoteCommand
 					{
 //						IExternalAccess exta = (IExternalAccess)result;
 //						ProxyInfo pi = RemoteServiceManagementService.getProxyInfo(component.getComponentIdentifier(), cid, exta);
-						ret.setResult(new RemoteResultCommand(exta, null, callid, true));
+//						ret.setResult(new RemoteResultCommand(exta, null, callid, true));
+						ret.addIntermediateResult(new RemoteResultCommand(exta, null, callid, true));
+						ret.setFinished();
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						ret.setResult(new RemoteResultCommand(null, exception, callid, false));
+//						ret.setResult(new RemoteResultCommand(null, exception, callid, false));
+						ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false));
+						ret.setFinished();
 					}
 				});
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				ret.setResult(new RemoteResultCommand(null, exception, callid, false));
+//				ret.setResult(new RemoteResultCommand(null, exception, callid, false));
+				ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false));
+				ret.setFinished();
 			}
 		});
 		
