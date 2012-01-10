@@ -1,14 +1,26 @@
 package jadex.android.benchmarks;
 
+import jadex.base.Starter;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.cms.CreationInfo;
+import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.ChangeEvent;
+import jadex.commons.IChangeListener;
+import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.benchmarks.MessagePerformanceAgent;
+import jadex.xml.annotation.XMLClassname;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -51,66 +63,72 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.agntmain);
 
-		startMB1 = (Button)findViewById(R.id.startMB1);
-		startMB2 = (Button)findViewById(R.id.startMB2);
-//		startMB3 = (Button)findViewById(R.id.startMB3);
+		startMB1 = (Button)findViewById(R.id.startAB1);
+		startMB2 = (Button)findViewById(R.id.startAB2);
+		startMB3 = (Button)findViewById(R.id.startAB3);
 		startMB1.setOnClickListener(buttonListener);
 		startMB2.setOnClickListener(buttonListener);
 		startMB3.setOnClickListener(buttonListener);
-//		startMB1.setEnabled(false);
+		startMB1.setEnabled(false);
 		startMB2.setEnabled(false);
 		startMB3.setEnabled(false);
 		
-		textView = (TextView) findViewById(R.id.infoTextView);
+		textView = (TextView) findViewById(R.id.agntTextView);
+		SUtil.addSystemOutListener(new IChangeListener<String>()
+		{
+			public void changeOccurred(final ChangeEvent<String> event)
+			{
+				runOnUiThread(new Runnable()
+				{
+					public void run()
+					{
+						textView.append(event.getValue() + "\n");
+					}
+				});
+			}
+		});
 		
-//		// Start the platform
-//		textView.setText("Starting Jadex Platform...");
-//		new Thread(new Runnable()
-//		{
-//			public void run()
-//			{
-//				Starter.createPlatform(new String[]
-//				{
-//					"-conf",
-//					"jadex/android/benchmarks/Platform.component.xml",
-//					"-configname", "android_fixed",
-//					"-logging_level", "java.util.logging.Level.INFO",
-//					"-platformname", "and-" + createRandomPlattformID(),
-//					"-saveonexit", "false", "-gui", "false",
-//					"-autoshutdown", "false"
-//				}).addResultListener(new IResultListener<IExternalAccess>()
-//				{
-//					public void resultAvailable(IExternalAccess result)
-//					{
-//						platform = result;
-//						runOnUiThread(new Runnable()
-//						{
-//							public void run()
-//							{
-//								startMB1.setEnabled(true);
-//								startMB2.setEnabled(true);
-//								startMB3.setEnabled(true);
-//								textView.setText("Platform started.");
-//							}
-//						});
-//					}
-//					
-//					public void exceptionOccurred(final Exception exception)
-//					{
-//						exception.printStackTrace();
-//						runOnUiThread(new Runnable()
-//						{
-//							public void run()
-//							{
-//								textView.setText("Start of platform failed: "+exception);
-//							}
-//						});
-//					}
-//				});
-//			}
-//		}).start();
+		// Start the platform
+		System.out.println("Starting Jadex Platform...");
+		new Thread(new Runnable()
+		{
+			public void run()
+			{
+				Starter.createPlatform(new String[]
+				{
+					"-conf",
+					"jadex/android/benchmarks/Platform.component.xml",
+					"-configname", "android_fixed",
+					"-logging_level", "java.util.logging.Level.INFO",
+					"-platformname", "and-" + createRandomPlattformID(),
+					"-saveonexit", "false", "-gui", "false",
+					"-autoshutdown", "false"
+				}).addResultListener(new IResultListener<IExternalAccess>()
+				{
+					public void resultAvailable(IExternalAccess result)
+					{
+						platform = result;
+						runOnUiThread(new Runnable()
+						{
+							public void run()
+							{
+								startMB1.setEnabled(true);
+								startMB2.setEnabled(true);
+								startMB3.setEnabled(true);
+							}
+						});
+					}
+					
+					public void exceptionOccurred(final Exception exception)
+					{
+						exception.printStackTrace();
+						System.out.println("Start of platform failed: "+exception);
+					}
+				});
+			}
+		}).start();
 	}
 	
 	//-------- helper methods --------
@@ -145,11 +163,11 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 			{
 				public void resultAvailable(final Map<String, Object> result)
 				{
+					System.out.println(result);
 					runOnUiThread(new Runnable()
 					{
 						public void run()
 						{
-							textView.setText(result.toString());
 							startMB1.setEnabled(true);
 							startMB2.setEnabled(true);
 							startMB3.setEnabled(true);
@@ -159,11 +177,12 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 				
 				public void exceptionOccurred(final Exception exception)
 				{
+					exception.printStackTrace();
+					System.out.println("Benchmark failed: "+exception);
 					runOnUiThread(new Runnable()
 					{
 						public void run()
 						{
-							textView.setText("Benchmark failed: "+exception);
 							startMB1.setEnabled(true);
 							startMB2.setEnabled(true);
 							startMB3.setEnabled(true);
@@ -179,42 +198,31 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 	 */
 	protected IFuture<Map<String, Object>>	runBenchmark(final String agent, final Map<String, Object> args)
 	{
-		try
+		return platform.scheduleStep(new IComponentStep<Map<String, Object>>()
 		{
-//			ReceivingBenchmark.main(null);
-//			SendingBenchmark.main(null);
-			Map<String, Object>	ret	= Collections.emptyMap();
-			return new Future<Map<String, Object>>(ret);
-		}
-		catch(Exception e)
-		{
-			return new Future<Map<String, Object>>(e);
-		}
-//		return platform.scheduleStep(new IComponentStep<Map<String, Object>>()
-//		{
-//			@XMLClassname("create-component")
-//			public IFuture<Map<String, Object>> execute(IInternalAccess ia)
-//			{
-//				final Future<Map<String, Object>>	fut	= new Future<Map<String, Object>>();
-//				ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(fut)
-//				{
-//					public void customResultAvailable(IComponentManagementService cms)
-//					{
-//						cms.createComponent(null, agent, new CreationInfo(args), new DelegationResultListener<Map<String,Object>>(fut))
-//							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Map<String, Object>>(fut)
-//						{
-//							public void customResultAvailable(IComponentIdentifier result)
-//							{
-//								// ignore (wait for agent termination)
-//							}
-//						});
-//					}
-//				});
-//				
-//				return fut;
-//			}
-//		});
+			@XMLClassname("create-component")
+			public IFuture<Map<String, Object>> execute(IInternalAccess ia)
+			{
+				final Future<Map<String, Object>>	fut	= new Future<Map<String, Object>>();
+				ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(fut)
+				{
+					public void customResultAvailable(IComponentManagementService cms)
+					{
+						cms.createComponent(null, agent, new CreationInfo(args), new DelegationResultListener<Map<String,Object>>(fut))
+							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Map<String, Object>>(fut)
+						{
+							public void customResultAvailable(IComponentIdentifier result)
+							{
+								// ignore (wait for agent termination)
+							}
+						});
+					}
+				});
+				
+				return fut;
+			}
+		});
 	}
 	
 	/**

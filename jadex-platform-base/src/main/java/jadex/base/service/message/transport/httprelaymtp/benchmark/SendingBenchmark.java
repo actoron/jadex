@@ -3,7 +3,7 @@ package jadex.base.service.message.transport.httprelaymtp.benchmark;
 import jadex.commons.SUtil;
 import jadex.xml.bean.JavaWriter;
 
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -23,7 +23,7 @@ public class SendingBenchmark	extends AbstractRelayBenchmark
 	 */
 	protected void setUp() throws Exception
 	{
-		times	= new long[11];
+		times	= new long[8];
 	}
 	
 	/**
@@ -54,6 +54,8 @@ public class SendingBenchmark	extends AbstractRelayBenchmark
 		rnd.nextBytes(data);
 		times[step++]	+= System.nanoTime() - start;
 		
+		//======== HTTPUrlConnection ========
+		
 		// Step 2: Create connection.
 		URL	url	= new URL(ADDRESS);
 		HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
@@ -64,6 +66,7 @@ public class SendingBenchmark	extends AbstractRelayBenchmark
 		con.setDoOutput(true);
 		con.setUseCaches(false);
 		con.setRequestProperty("Content-Type", "application/octet-stream");
+		con.setRequestProperty("Connection", "Close");
 		con.setFixedLengthStreamingMode(4+id.length+4+data.length);
 		times[step++]	+= System.nanoTime() - start;
 
@@ -86,20 +89,10 @@ public class SendingBenchmark	extends AbstractRelayBenchmark
 		out.flush();
 		times[step++]	+= System.nanoTime() - start;
 		
-		// Step 8: Close stream.
-		out.close();
-		times[step++]	+= System.nanoTime() - start;
-		
-		// Step 9: Get response. 
-		InputStream	is	= con.getInputStream(); // Required, otherwise servlet will not be executed.
-		times[step++]	+= System.nanoTime() - start;
-		
-		// Step 10: Close stream pt. 2
-		is.close();
-		times[step++]	+= System.nanoTime() - start;
-
-		// Step 11: Disconnect.
-		con.disconnect();
+		// Step 8: Get response. 
+		int	code	= con.getResponseCode();
+		if(code!=HttpURLConnection.HTTP_OK)
+			throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
 		times[step++]	+= System.nanoTime() - start;
 	}
 }

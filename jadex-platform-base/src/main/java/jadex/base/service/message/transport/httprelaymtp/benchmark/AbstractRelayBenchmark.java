@@ -38,7 +38,8 @@ public abstract class AbstractRelayBenchmark	extends AbstractBenchmark
 		AbstractBenchmark.main(new String[]
 		{
 			ReceivingBenchmark.class.getName(),
-//			SingleConSendingBenchmark.class.getName(),
+			KeepaliveSendingBenchmark.class.getName(),
+			CustomSendingBenchmark.class.getName(),
 			SendingBenchmark.class.getName()
 		});
 	}

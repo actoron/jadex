@@ -39,7 +39,7 @@ public class JadexAndroidBenchmarkActivity extends Activity
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.msgmain);
 
 		startMB1 = (Button)findViewById(R.id.startMB1);
 		startMB2 = (Button)findViewById(R.id.startMB2);
@@ -48,7 +48,7 @@ public class JadexAndroidBenchmarkActivity extends Activity
 		startMB2.setOnClickListener(buttonListener);
 		startMB3.setOnClickListener(buttonListener);
 		
-		textView = (TextView) findViewById(R.id.infoTextView);
+		textView = (TextView) findViewById(R.id.msgTextView);
 		SUtil.addSystemOutListener(new IChangeListener<String>()
 		{
 			public void changeOccurred(final ChangeEvent<String> event)
