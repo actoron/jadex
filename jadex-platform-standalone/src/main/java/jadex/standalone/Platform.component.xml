@@ -193,8 +193,9 @@
 		</providedservice>
 		<providedservice class="ILibraryService">
 			<implementation> <!-- proxytype="raw" -->
-				$args.baseclassloader==null? new LibraryService(new URLClassLoader($args.libpath==null? new URL[0]: SUtil.toURLs($args.libpath))):
-				new LibraryService(new URLClassLoader($args.libpath==null? new URL[0]: SUtil.toURLs($args.libpath), $args.baseclassloader))
+				$args.libpath==null ? new LibraryService() :
+					new LibraryService(new URLClassLoader(SUtil.toURLs($args.libpath),
+						$args.baseclassloader==null ? LibraryService.class.getClassLoader() : $args.baseclassloader))
 			</implementation>
 		</providedservice>
 		<providedservice class="IClockService">

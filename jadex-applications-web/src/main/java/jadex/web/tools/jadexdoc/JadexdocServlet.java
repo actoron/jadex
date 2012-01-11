@@ -62,7 +62,9 @@ public class JadexdocServlet extends HttpServlet
 			"-awareness", "false",
 			"-gui", "false",
 			"-extensions", "null",
-			"-welcome", "false"
+			"-welcome", "false",
+			"-relaytransport", "false",
+			"-niotransport", "false"
 		};
 		platform	= Starter.createPlatform(args);
 		models	= loadModels();
