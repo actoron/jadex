@@ -16,6 +16,8 @@ public class KeepaliveSendingBenchmark	extends AbstractRelayBenchmark
 {
 	protected long[]	times;
 	protected Socket	sock;
+	protected InputStream	is;
+	protected OutputStream	out;
 	protected String	host;
 	protected String	path;
 	protected int	port;
@@ -28,7 +30,7 @@ public class KeepaliveSendingBenchmark	extends AbstractRelayBenchmark
 	 */
 	protected void setUp() throws Exception
 	{
-		times	= new long[9];
+		times	= new long[7];
 
 		// Create Connection.
 		if(!ADDRESS.startsWith("http://"))
@@ -95,14 +97,12 @@ public class KeepaliveSendingBenchmark	extends AbstractRelayBenchmark
 		{
 //			System.out.println("(re)connect");
 			sock	= new Socket(host, port);
+			out	= sock.getOutputStream();
+			is	= sock.getInputStream();
 		}
 		times[step++]	+= System.nanoTime() - start;
 		
-		// Step 3: Get stream.
-		OutputStream	out	= sock.getOutputStream();
-		times[step++]	+= System.nanoTime() - start;
-		
-		// Step 4: Send header.
+		// Step 3: Send header.
 		out.write(("POST "+path+" HTTP/1.1\r\n").getBytes());
 		out.write(("Content-Type: application/octet-stream\r\n").getBytes());
 		out.write(("Host: "+host+":"+port+"\r\n").getBytes());
@@ -110,22 +110,18 @@ public class KeepaliveSendingBenchmark	extends AbstractRelayBenchmark
 		out.write(("\r\n").getBytes());
 		times[step++]	+= System.nanoTime() - start;
 		
-		// Step 5: Write data.
+		// Step 4: Write data.
 		out.write(SUtil.intToBytes(id.length));
 		out.write(id);
 		out.write(SUtil.intToBytes(data.length));
 		out.write(data);
 		times[step++]	+= System.nanoTime() - start;
 		
-		// Step 6: Send data.
+		// Step 5: Send data.
 		out.flush();
 		times[step++]	+= System.nanoTime() - start;
 		
-		// Step 7: Get response stream.
-		InputStream	is	= sock.getInputStream();
-		times[step++]	+= System.nanoTime() - start;
-		
-		// Step 8: Get response.
+		// Step 6: Get response.
 		byte[]	buf	= new byte[256];
 		String	response	= "";
 		for(int read; (read=is.read(buf))!=-1; )
@@ -146,7 +142,7 @@ public class KeepaliveSendingBenchmark	extends AbstractRelayBenchmark
 			throw new IOException("HTTP response: "+response);
 		times[step++]	+= System.nanoTime() - start;
 		
-		// Step 9: Close connection.
+		// Step 7: Close connection.
 		if(close)
 		{
 			sock.close();
