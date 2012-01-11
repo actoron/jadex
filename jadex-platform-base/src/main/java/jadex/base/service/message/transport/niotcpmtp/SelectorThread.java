@@ -487,7 +487,7 @@ public class SelectorThread implements Runnable
 				connections.put(address, new NIOTCPDeadConnection());
 			}
 			ret.setException(e);
-			logger.info("NIOTCP receiving error while opening connection: "+address+", "+e);
+			logger.info("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPDeadConnection.DEADSPAN/1000+" seconds): "+address+", "+e);
 //			e.printStackTrace();
 			key.cancel();
 		}
@@ -547,7 +547,8 @@ public class SelectorThread implements Runnable
 			con.getCleaner().remove();
 			synchronized(connections)
 			{
-				connections.put(con.getAddress(), new NIOTCPDeadConnection());
+				// Connection lost, try to reconnect before marking as dead connection.
+				connections.remove(con.getAddress());
 			}
 			
 			// Connection failure: notify all open tasks.
