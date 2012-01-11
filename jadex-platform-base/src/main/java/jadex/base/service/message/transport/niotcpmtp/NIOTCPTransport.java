@@ -112,6 +112,9 @@ public class NIOTCPTransport implements ITransport
 			// ANDROID: the following line causes an exception in a 2.2
 			// emulator, see:
 			// http://code.google.com/p/android/issues/detail?id=9431
+			// try this:
+//			java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
+//    		java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
 			
 			// Causes problem with maven too (only with Win firewall?)
 			// http://www.thatsjava.com/java-core-apis/28232/

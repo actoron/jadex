@@ -1,12 +1,13 @@
 package jadex.base.service.message.transport.httprelaymtp.benchmark;
 
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
-import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -30,6 +31,19 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	/** The open futures. */
 	protected List<IFuture<Void>>	open;
 	
+	/** The NIO selector. */
+	protected Selector	selector;
+	
+	/** The socket channel (if any). */
+	protected SocketChannel	sc;
+	
+	/** The messages to be sent. */
+	protected List<byte[]>	messages;
+	
+	protected String	host;
+	protected String	path;
+	protected int	port;
+	
 	//-------- template methods --------
 		
 	/**
@@ -39,6 +53,35 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	protected void setUp() throws Exception
 	{
 		open	= new LinkedList<IFuture<Void>>();
+		messages	= new LinkedList<byte[]>();
+		
+		// ANDROID: the following line causes an exception in a 2.2
+		// emulator, see:
+		// http://code.google.com/p/android/issues/detail?id=9431
+		// try this:
+//		java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
+//		java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
+		
+		// Causes problem with maven too (only with Win firewall?)
+		// http://www.thatsjava.com/java-core-apis/28232/
+		selector	= Selector.open();
+		
+		if(!ADDRESS.startsWith("http://"))
+			throw new IOException("Unknown URL scheme: "+ADDRESS);
+		path	= "";
+		port	= 80;
+		host	= ADDRESS.substring(7);
+		if(host.indexOf('/')!=-1)
+		{
+			path	= host.substring(host.indexOf('/'));
+			host	= host.substring(0, host.indexOf('/'));
+		}
+		if(host.indexOf(':')!=-1)
+		{
+			port	= Integer.parseInt(host.substring(host.indexOf(':')+1));
+			host	= host.substring(0, host.indexOf(':'));			
+		}
+
 	}
 	
 	/**
@@ -58,17 +101,11 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	protected void doSingleRun() throws Exception
 	{
 		// Prepare data.
-		byte[]	id	= JavaWriter.objectToByteArray("benchmark", getClass().getClassLoader());
 		byte[]	data	= new byte[SIZE];
 		Random	rnd	= new Random();
 		rnd.nextBytes(data);
-		byte[]	msg	= new byte[4+id.length+4+data.length];
-		System.arraycopy(SUtil.intToBytes(id.length), 0, msg, 0, 4);
-		System.arraycopy(id, 0, msg, 4, id.length);
-		System.arraycopy(SUtil.intToBytes(data.length), 0, msg, 4+id.length, 4);
-		System.arraycopy(data, 0, msg,  4+id.length+4, data.length);
 		
-		open.add(sendMessage(msg));
+		sendMessage("benchmark", data);
 		
 		while(open.size()>MAX)
 		{
@@ -79,11 +116,62 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	//-------- helper methods --------
 	
 	/**
-	 *  Asynchronoulsy send a message.
+	 *  Asynchronously send a message.
 	 */
-	protected IFuture<Void>	sendMessage(byte[] msg)
+	protected void	sendMessage(Object oid, byte[] data)
 	{
-		return IFuture.DONE;
+		open.add(new Future<Void>());
+
+		byte[]	id	= JavaWriter.objectToByteArray(oid, getClass().getClassLoader());
+
+		byte[]	header	= 
+			( "POST "+path+" HTTP/1.1\r\n"
+			+ "Content-Type: application/octet-stream\r\n"
+			+ "Host: "+host+":"+port+"\r\n"
+			+ "Content-Length: "+(4+id.length+4+data.length)+"\r\n"
+			+ "\r\n"
+			).getBytes();
+		
+		byte[]	msg	= new byte[header.length+4+id.length+4+data.length];
+		System.arraycopy(header, 0, msg, 0, header.length);
+		System.arraycopy(SUtil.intToBytes(id.length), 0, msg, header.length, 4);
+		System.arraycopy(id, 0, msg, header.length+4, id.length);
+		System.arraycopy(SUtil.intToBytes(data.length), 0, msg, header.length+4+id.length, 4);
+		System.arraycopy(data, 0, msg,  header.length+4+id.length+4, data.length);
+
+		// Inform NIO that we want to write data.
+		Runnable	run	= new Runnable()
+		{
+			public void run()
+			{
+				if(sc!=null)
+				{
+					SelectionKey	key	= sc.keyFor(selector);
+					key.interestOps(SelectionKey.OP_WRITE);
+				}
+				else
+				{
+					try
+					{
+						sc	= SocketChannel.open();
+						sc.configureBlocking(false);
+						sc.connect(new InetSocketAddress(host, port));
+						sc.register(selector, SelectionKey.OP_CONNECT);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}			
+		};
+		
+//		synchronized(tasks)
+		{
+//			tasks.add(run);
+		}
+		selector.wakeup();
+	
 	}
 	
 	//-------- NIO handler --------
@@ -110,21 +198,17 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 
 						if(key.isValid())
 						{
-//							if(key.isAcceptable())
-//							{
-//								this.handleAccept(key);
-//							}
-							if(key.isReadable())
-							{
-								this.handleRead(key);
-							}
-							else if(key.isConnectable())
+							if(key.isConnectable())
 							{
 								this.handleConnect(key);
 							}
 							else if(key.isWritable())
 							{
 								this.handleWrite(key);
+							}
+							else if(key.isReadable())
+							{
+								this.handleRead(key);
 							}
 						}
 						else
@@ -153,8 +237,16 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 			{
 				boolean	finished	= sc.finishConnect();
 				assert finished;
-				// Keep channel on hold until we are ready to write.
-			    key.interestOps(0);
+				
+				if(messages.isEmpty())
+				{
+					// Keep channel on hold until we are ready to write.
+				    key.interestOps(0);
+				}
+				else
+				{
+					key.interestOps(SelectionKey.OP_WRITE);
+				}
 			}
 			catch(Exception e)
 			{ 
