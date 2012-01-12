@@ -8,6 +8,8 @@ import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -23,10 +25,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
 
 import javax.imageio.ImageIO;
 import javax.servlet.RequestDispatcher;
@@ -108,7 +111,7 @@ public class JadexdocServlet extends HttpServlet
 			
 			try
 			{
-				IFuture<IModelInfo>	model	= loadModel(file);
+				IFuture<IModelInfo>	model	= file!=null ? loadModel(file) : null;
 				request.setAttribute("model", model);
 				
 				// Async page.
@@ -120,6 +123,7 @@ public class JadexdocServlet extends HttpServlet
 					request.getSession().setAttribute("model", model);
 					request.getSession().setAttribute("models", models);
 					request.getSession().setAttribute("url", getContentUrl(request));
+					request.getSession().setAttribute("murl", getModelsUrl(request));
 					request.getSession().setAttribute("file", file);
 				}
 				
@@ -131,6 +135,14 @@ public class JadexdocServlet extends HttpServlet
 					ThreadSuspendable	sus	= new ThreadSuspendable();
 					title	= model.get(sus, timeout).getFullName();
 					view	= "/WEB-INF/jsp/jadexdoc/modelcontents.jsp";
+				}
+				
+				// Model overview page (nonblocking, based on available results).
+				else if("/models".equals(request.getPathInfo()))
+				{
+					title	= "Overview";
+					view	= "/WEB-INF/jsp/jadexdoc/modellist.jsp";
+					request.setAttribute("models", models);
 				}
 				
 				// Blocking page.
@@ -172,6 +184,8 @@ public class JadexdocServlet extends HttpServlet
 	 */
 	public IFuture<IModelInfo>	loadModel(final String file)
 	{
+		if(file==null)
+			throw new NullPointerException();
 		final Future<IModelInfo>	ret	= new Future<IModelInfo>();
 		platform.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IModelInfo>(ret)
 		{
@@ -209,7 +223,35 @@ public class JadexdocServlet extends HttpServlet
 						{
 							public void customResultAvailable(List<URL> urls)
 							{
-								scanForModels(ea, new LinkedList<File>(), urls, ret, new HashSet<String>());
+								Set<File>	files	= scanForModels(urls);
+								final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(files.size(), new DefaultResultListener<Void>()
+								{
+									public void resultAvailable(Void result)
+									{
+										ret.setFinished();
+									}
+								});
+								for(Iterator<File> it=files.iterator(); it.hasNext(); )
+								{
+									SComponentFactory.loadModel(ea, it.next().getAbsolutePath(), null)
+										.addResultListener(new IResultListener<IModelInfo>()
+									{
+										public void resultAvailable(IModelInfo result)
+										{
+											if(result!=null)
+											{
+												ret.addIntermediateResult(result);
+											}
+											crl.resultAvailable(null);
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											crl.resultAvailable(null);
+//											System.out.println("Exception: "+exception);
+										}
+									});
+								}
 							}
 						});
 					}
@@ -223,73 +265,59 @@ public class JadexdocServlet extends HttpServlet
 	/**
 	 *  Scan classpath URLs for loadable models.
 	 */
-	protected void	scanForModels(final IExternalAccess ea, final List<File> files,
-		final List<URL> urls, final IntermediateFuture<IModelInfo> fut, final Set<String> done_urls)
+	protected Set<File>	scanForModels(List<URL> urls)
 	{
-		if(files.isEmpty() && urls.isEmpty())
+		Set<String> done_urls	=  new LinkedHashSet<String>();
+		Set<File> dirs	=  new LinkedHashSet<File>();
+		Set<File> files	=  new LinkedHashSet<File>();
+		while(!dirs.isEmpty() || !urls.isEmpty())
 		{
-			fut.setFinished();
-		}
-		else if(files.isEmpty())
-		{
-			URL	url	= urls.remove(0);
-			System.out.println("URL: "+url);
-			try
+			if(!dirs.isEmpty())
 			{
-				String	abs	= new File(url.getFile()).getCanonicalPath();
-				if(!done_urls.contains(abs))
+				Iterator<File>	it	= dirs.iterator();
+				File	file	= it.next();
+				it.remove();
+				if(file.isDirectory())
 				{
-					if(url.getFile().endsWith(".jar"))
-					{
-						JarAsDirectory	jar	= new JarAsDirectory(url.getFile());
-						jar.refresh();
-						files.add(jar);
-					}
-					else
-					{
-						files.add(new File(url.getFile()));
-					}
-					done_urls.add(abs);
+//					System.out.println("Directory: "+file);
+					dirs.addAll(Arrays.asList(file.listFiles()));
 				}
-				scanForModels(ea, files, urls, fut, done_urls);
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}
-		}
-		else
-		{
-			File	file	= files.remove(0);
-			if(file.isDirectory())
-			{
-				System.out.println("Directory: "+file);
-				files.addAll(Arrays.asList(file.listFiles()));
-				scanForModels(ea, files, urls, fut, done_urls);
-			}
-			else
-			{
-				System.out.println("File: "+file);
-				SComponentFactory.loadModel(ea, file.getAbsolutePath(), null)
-					.addResultListener(new IResultListener<IModelInfo>()
+				else
 				{
-					public void resultAvailable(IModelInfo result)
+//					System.out.println("File: "+file);
+					files.add(file);
+				}
+			}
+			else if(!urls.isEmpty())
+			{
+				URL	url	= urls.remove(0);
+//				System.out.println("URL: "+url);
+				try
+				{
+					String	path	= url.toURI().getPath();
+					String	abs	= new File(path).getCanonicalPath();
+					if(!done_urls.contains(abs))
 					{
-						if(result!=null)
+						if(abs.endsWith(".jar"))
 						{
-							fut.addIntermediateResult(result);
+							JarAsDirectory	jar	= new JarAsDirectory(abs);
+							jar.refresh();
+							dirs.add(jar);
 						}
-						scanForModels(ea, files, urls, fut, done_urls);
+						else
+						{
+							dirs.add(new File(abs));
+						}
+						done_urls.add(abs);
 					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						System.out.println("Exception: "+exception);
-						scanForModels(ea, files, urls, fut, done_urls);
-					}
-				});
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
+		return files;
 	}
 	
 	/**
@@ -299,5 +327,14 @@ public class JadexdocServlet extends HttpServlet
 	{
 	    return req.getScheme()+"://"+req.getServerName()+":"+req.getServerPort()
 	    	+req.getContextPath()+req.getServletPath()+"/contents?"+req.getQueryString();
+	}
+	
+	/**
+	 *  Get model list request.
+	 */
+	public static String getModelsUrl(HttpServletRequest req)
+	{
+	    return req.getScheme()+"://"+req.getServerName()+":"+req.getServerPort()
+	    	+req.getContextPath()+req.getServletPath()+"/models";
 	}
 }

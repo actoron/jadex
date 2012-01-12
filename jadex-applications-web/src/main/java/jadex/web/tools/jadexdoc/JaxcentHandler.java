@@ -60,6 +60,7 @@ public class JaxcentHandler extends JaxcentPage
 			IFuture<IModelInfo>	future	= (IFuture<IModelInfo>)((HttpSession)getHttpSession()).getAttribute("model");
 			IIntermediateFuture<IModelInfo>	models	= (IIntermediateFuture<IModelInfo>)((HttpSession)getHttpSession()).getAttribute("models");
 			final String url	= (String)((HttpSession)getHttpSession()).getAttribute("url");
+			final String murl	= (String)((HttpSession)getHttpSession()).getAttribute("murl");
 			final String file	= (String)((HttpSession)getHttpSession()).getAttribute("file");
 			future.addResultListener(new IResultListener<IModelInfo>()
 			{
@@ -167,62 +168,56 @@ public class JaxcentHandler extends JaxcentPage
 			// Handle scanning for models.
 			models.addResultListener(new IntermediateDefaultResultListener<IModelInfo>()
 			{
-				StringBuffer	navtext	= new StringBuffer("<table class=\"printtable\">");
-				String	lastpackage	= null;
-				
+			
 				public void intermediateResultAvailable(final IModelInfo model)
 				{
 					try
 					{
-						boolean	pkg	= !SUtil.equals(lastpackage, model.getPackage());
-						if(pkg)
-						{
-							lastpackage	= model.getPackage();
-							navtext.append("<tr id=\"idpackage_");
-							navtext.append(model.getPackage());
-							navtext.append("\" class=\"package\"><td colspan=\"2\">");
-							navtext.append(model.getPackage());
-							navtext.append("</td></tr>");
-						}
-						navtext.append("<tr name=\"namepackage_");
-						navtext.append(model.getPackage());
-						navtext.append("\" class=\"model\"><td><img src=\"icon?type=");
-						navtext.append(model.getType());
-						navtext.append("\"/></td><td><a href=\"view?model=");
-						navtext.append(model.getFilename());
-						navtext.append("\">");
-						navtext.append(model.getName());
-						navtext.append("</a></td></tr>");
+						String	contents	= getURLContent(murl);
 						HtmlDiv	nav	= new HtmlDiv(JaxcentHandler.this, "nav");
-						nav.setInnerHTML(navtext.toString()+"</table>");
+						nav.setInnerHTML(contents);
 						
-						if(pkg)
-						{
-							new HtmlElement(JaxcentHandler.this, "idpackage_"+model.getPackage())
-							{
-								boolean	visible	= true;
-								protected void onClick()
-								{
-									try
-									{
-										visible	= !visible;
-										for(int i=0; checkElementExists(SearchType.searchByName, "namepackage_"+model.getPackage(), i); i++)
-										{
-											HtmlElement	row	= new HtmlElement(JaxcentHandler.this, SearchType.searchByName, "namepackage_"+model.getPackage(), i);
-											row.setVisible(visible);
-										}
-									}
-									catch(Jaxception e)
-									{
-										e.printStackTrace();
-									}
-								}
-							};
-						}
+//						if(pkg)
+//						{
+//							new HtmlElement(JaxcentHandler.this, "idpackage_"+model.getPackage())
+//							{
+//								boolean	visible	= true;
+//								protected void onClick()
+//								{
+//									try
+//									{
+//										visible	= !visible;
+//										for(int i=0; checkElementExists(SearchType.searchByName, "namepackage_"+model.getPackage(), i); i++)
+//										{
+//											HtmlElement	row	= new HtmlElement(JaxcentHandler.this, SearchType.searchByName, "namepackage_"+model.getPackage(), i);
+//											row.setVisible(visible);
+//										}
+//									}
+//									catch(Jaxception e)
+//									{
+//										e.printStackTrace();
+//									}
+//								}
+//							};
+//						}
 					}
 					catch(Jaxception e)
 					{
 						e.printStackTrace();
+					}
+					catch(Exception e)
+					{
+						try
+						{
+							StringWriter	trace	= new StringWriter();
+							e.printStackTrace(new PrintWriter(trace));
+							HtmlDiv	nav	= new HtmlDiv(JaxcentHandler.this, "nav");
+							nav.setInnerHTML("<pre>"+trace+"</pre>");
+						}
+						catch(Jaxception ex)
+						{
+							ex.printStackTrace();
+						}						
 					}
 				}
 				
@@ -231,14 +226,14 @@ public class JaxcentHandler extends JaxcentPage
 					try
 					{
 						HtmlDiv	scan	= new HtmlDiv(JaxcentHandler.this, "scan");
-						if(navtext.length()==0)
-						{
-							scan.setInnerHTML("No models found.");
-						}
-						else
-						{
+//						if(navtext.length()==0)
+//						{
+//							scan.setInnerHTML("No models found.");
+//						}
+//						else
+//						{
 							scan.deleteElement();
-						}
+//						}
 					}
 					catch(Jaxception e)
 					{

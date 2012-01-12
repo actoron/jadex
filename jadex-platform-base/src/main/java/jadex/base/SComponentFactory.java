@@ -41,6 +41,8 @@ public class SComponentFactory
 	 */
 	public static IFuture<IModelInfo> loadModel(IExternalAccess exta, final String model, final IResourceIdentifier rid)
 	{
+		if(model==null)
+			throw new NullPointerException();
 		return exta.scheduleStep(new IComponentStep<IModelInfo>()
 		{
 			@XMLClassname("loadModel")
