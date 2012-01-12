@@ -233,7 +233,7 @@ public class JadexdocServlet extends HttpServlet
 		else if(files.isEmpty())
 		{
 			URL	url	= urls.remove(0);
-//			System.out.println("URL: "+url);
+			System.out.println("URL: "+url);
 			try
 			{
 				String	abs	= new File(url.getFile()).getCanonicalPath();
@@ -263,11 +263,13 @@ public class JadexdocServlet extends HttpServlet
 			File	file	= files.remove(0);
 			if(file.isDirectory())
 			{
+				System.out.println("Directory: "+file);
 				files.addAll(Arrays.asList(file.listFiles()));
 				scanForModels(ea, files, urls, fut, done_urls);
 			}
 			else
 			{
+				System.out.println("File: "+file);
 				SComponentFactory.loadModel(ea, file.getAbsolutePath(), null)
 					.addResultListener(new IResultListener<IModelInfo>()
 				{
@@ -282,6 +284,7 @@ public class JadexdocServlet extends HttpServlet
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						System.out.println("Exception: "+exception);
 						scanForModels(ea, files, urls, fut, done_urls);
 					}
 				});
