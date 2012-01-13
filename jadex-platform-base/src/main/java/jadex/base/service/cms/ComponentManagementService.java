@@ -1,5 +1,6 @@
 package jadex.base.service.cms;
 
+import jadex.base.AbstractComponentAdapter;
 import jadex.base.fipa.CMSComponentDescription;
 import jadex.bridge.ComponentCreationException;
 import jadex.bridge.ComponentIdentifier;
@@ -165,7 +166,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		this.ccs = SCollection.createLinkedHashMap();
 		this.cfs = SCollection.createLinkedHashMap();
 //		this.children	= SCollection.createMultiCollection();
-		this.logger = Logger.getLogger(exta.getModel().getFullName()+"."+exta.getServiceProvider().getId()+".cms");
+		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(exta.getComponentIdentifier())+".cms");
 		this.listeners = SCollection.createMultiCollection();
 		this.killresultlisteners = SCollection.createHashMap();
 		this.killresultlisteners = Collections.synchronizedMap(killresultlisteners);

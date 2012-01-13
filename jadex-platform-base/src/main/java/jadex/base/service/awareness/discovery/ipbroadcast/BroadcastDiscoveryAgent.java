@@ -98,6 +98,7 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 	 */
 	protected boolean isMaster()
 	{
+//		System.out.println("isMaster: "+(getSocket()!=null && this.port==getSocket().getLocalPort()));
 		return getSocket()!=null && this.port==getSocket().getLocalPort();
 	}
 	

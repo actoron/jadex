@@ -223,10 +223,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			// todo: problem: loggers can cause memory leaks
 			// http://bugs.sun.com/view_bug.do;jsessionid=bbdb212815ddc52fcd1384b468b?bug_id=4811930
 			
-			// Todo: include parent name for nested loggers.
-//			String name = getComponentIdentifier().getLocalName();
-			String name = getModel().getFullName()+"."+getComponentIdentifier().getLocalName();
-//			System.out.println("logname: "+name);
+			String name = getLoggerName(getComponentIdentifier());
 			logger = LogManager.getLogManager().getLogger(name);
 			
 			// if logger does not already exists, create it
@@ -252,6 +249,20 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		return logger;
 	}
+
+	public static String getLoggerName(IComponentIdentifier cid)
+	{
+		//String name = getComponentIdentifier().getLocalName();
+		//String name = getModel().getFullName()+"."+getComponentIdentifier().getLocalName();
+		// Prepend parent names for nested loggers.
+		String	name	= null;
+		for(; cid!=null; cid=cid.getParent())
+		{
+			name	= name==null ? cid.getLocalName() : cid.getLocalName() + "." +name;
+		}
+		// System.out.println("logname: "+name);
+		return name;
+	}
 	
 	/**
 	 *  Init the logger with capability settings.
@@ -264,8 +275,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		// can be Integer or Level
 		
 		Object prop = component.getProperty("logging.level");
-//		Level level = prop==null? Level.INFO: (Level)prop;
-		Level level = prop==null? Level.WARNING: (Level)prop;
+		Level level = prop!=null? (Level)prop : logger.getParent()!=null ? logger.getParent().getLevel() : Level.SEVERE;
 		logger.setLevel(level);
 		
 //		System.out.println("set: "+logger.getName()+" "+level);

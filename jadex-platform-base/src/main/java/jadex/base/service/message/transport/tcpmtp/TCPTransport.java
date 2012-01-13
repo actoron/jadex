@@ -1,5 +1,6 @@
 package jadex.base.service.message.transport.tcpmtp;
 
+import jadex.base.AbstractComponentAdapter;
 import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
@@ -127,7 +128,7 @@ public class TCPTransport implements ITransport
 	 */
 	public TCPTransport(final IServiceProvider container, int port, final boolean async)
 	{
-		this.logger = Logger.getLogger("TCPTransport" + this);
+		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(container.getId())+".TCPTransport");
 		
 		this.container = container;
 		this.async = async;
