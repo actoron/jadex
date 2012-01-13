@@ -1,6 +1,8 @@
 package jadex.bdi.runtime.interpreter;
 
 import jadex.bdi.model.OAVBDIMetaModel;
+import jadex.bdi.runtime.IBeliefbase;
+import jadex.bdi.runtime.impl.flyweights.BeliefbaseFlyweight;
 import jadex.bridge.CheckedAction;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.commons.SReflect;
@@ -18,6 +20,7 @@ import jadex.rules.rulesystem.rules.OrConstraint;
 import jadex.rules.rulesystem.rules.Variable;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.OAVAttributeType;
+import jadex.rules.state.OAVObjectType;
 
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
@@ -45,7 +48,7 @@ public class BeliefRules
 	 *  @param rbeliefset	The belief set handle.
 	 *  @param neworigfacts	The new set of facts (some iterable object).
 	 */
-	protected static void updateBeliefSet(IOAVState state, Object rbeliefset, Object neworigfacts)
+	protected static void updateBeliefSet(IOAVState state, Object rbeliefset, Object neworigfacts, Object scope)
 	{
 		Collection newfacts = null;
 		
@@ -77,7 +80,7 @@ public class BeliefRules
 			{
 				Object newfact = it.next();
 				if(oldfacts==null || !oldfacts.contains(newfact))
-					addBeliefSetValue(state, rbeliefset, newfact);
+					addBeliefSetValue(state, rbeliefset, newfact, scope);
 			}
 		}
 		if(oldfacts!=null)
@@ -86,7 +89,7 @@ public class BeliefRules
 			{
 				Object oldfact = it.next();
 				if(newfacts==null || !newfacts.contains(oldfact))
-					removeBeliefSetValue(state, rbeliefset, oldfact);
+					removeBeliefSetValue(state, rbeliefset, oldfact, scope);
 			}
 		}
 		
@@ -98,7 +101,7 @@ public class BeliefRules
 	 *  Set the value of a belief.
 	 *  belief_has_fact should only be modified through this method!
 	 */
-	public static void	setBeliefValue(IOAVState state, Object rbelief, Object fact)
+	public static void	setBeliefValue(IOAVState state, Object rbelief, Object fact, Object scope)
 	{
 		// Convert wrapped basic values to desired class (e.g. Integer to Long).
 		Object	mbel	= state.getAttributeValue(rbelief, OAVBDIRuntimeModel.element_has_model);
@@ -110,6 +113,46 @@ public class BeliefRules
 		if(oldfact!=fact)	// Update state, even when facts are equal (state will take care of not throwing event).
 		{
 			state.setAttributeValue(rbelief, OAVBDIRuntimeModel.belief_has_fact, fact);
+			
+			// Set belief value as result
+			BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+			Object magent = state.getAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.element_has_model);
+			Collection mbels = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefs);
+			
+			// case 1: belief is defined in agent -> check if belief is declared as result 
+			if(mbels!=null && mbels.contains(mbel))
+			{
+				boolean result = ((Boolean)state.getAttributeValue(mbel, OAVBDIMetaModel.belief_has_result)).booleanValue();
+				if(result)
+				{
+					String name = (String)state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name);
+					BDIInterpreter.getInterpreter(state).setResultValue(name, fact);
+				}
+			}
+			// case 2: check if agent belief references map to target belief
+			else
+			{
+				String belname = (String)state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name);
+				Collection mbelrefs = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefrefs);
+				if(mbelrefs!=null)
+				{
+					for(Iterator it=mbelrefs.iterator(); it.hasNext(); )
+					{
+						Object mbelref = it.next();
+						boolean result = ((Boolean)state.getAttributeValue(mbelref, OAVBDIMetaModel.beliefreference_has_result)).booleanValue();
+						if(result)
+						{
+							String ref = (String)state.getAttributeValue(mbelref, OAVBDIMetaModel.elementreference_has_concrete);
+							Object[] tmp = AgentRules.resolveCapability(ref, OAVBDIRuntimeModel.belief_type, ip.getAgent(), state);
+							if(belname.equals(tmp[0]) && scope.equals(tmp[1]))
+							{
+								String name = (String)state.getAttributeValue(mbelref, OAVBDIMetaModel.modelelement_has_name);
+								BDIInterpreter.getInterpreter(state).setResultValue(name, fact);
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -145,16 +188,66 @@ public class BeliefRules
 	 *  Add a value to a belief set.
 	 *  beliefset_has_facts should only be modified through this method!
 	 */
-	public static void	addBeliefSetValue(IOAVState state, Object rbeliefset, Object fact)
+	public static void	addBeliefSetValue(IOAVState state, Object rbeliefset, Object fact, Object scope)
 	{
 		// Convert wrapped basic values to desired class (e.g. Integer to Long).
-		Object	mbel	= state.getAttributeValue(rbeliefset, OAVBDIRuntimeModel.element_has_model);
-		Class	clazz	= (Class)state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_class);
+		Object	mbelset	= state.getAttributeValue(rbeliefset, OAVBDIRuntimeModel.element_has_model);
+		Class	clazz	= (Class)state.getAttributeValue(mbelset, OAVBDIMetaModel.typedelement_has_class);
 		fact	= SReflect.convertWrappedValue(fact, clazz);
 
 		state.addAttributeValue(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts, fact);
 		
+		storeBeliefSetResults(state, rbeliefset, scope);
 //		System.out.println("Added bel val: "+rbeliefset+" "+fact);
+	}
+	
+	/**
+	 *  Store belief set values as results of component.
+	 */
+	public static void storeBeliefSetResults(IOAVState state, Object rbeliefset, Object scope)
+	{
+		// Set beliefset value as result
+		Object	mbelset	= state.getAttributeValue(rbeliefset, OAVBDIRuntimeModel.element_has_model);
+		BDIInterpreter ip = BDIInterpreter.getInterpreter(state);
+		Object magent = state.getAttributeValue(ip.getAgent(), OAVBDIRuntimeModel.element_has_model);
+		Collection mbelsets = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefsets);
+		
+		// case 1: belief is defined in agent -> check if belief is declared as result 
+		if(mbelsets!=null && mbelsets.contains(mbelset))
+		{
+			boolean result = ((Boolean)state.getAttributeValue(mbelset, OAVBDIMetaModel.beliefset_has_result)).booleanValue();
+			if(result)
+			{
+				String name = (String)state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name);
+				Collection facts = state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts);
+				BDIInterpreter.getInterpreter(state).setResultValue(name, facts);
+			}
+		}
+		// case 2: check if agent belief references map to target belief
+		else
+		{
+			String belname = (String)state.getAttributeValue(mbelset, OAVBDIMetaModel.modelelement_has_name);
+			Collection mbelsetrefs = state.getAttributeValues(magent, OAVBDIMetaModel.capability_has_beliefsetrefs);
+			if(mbelsetrefs!=null)
+			{
+				for(Iterator it=mbelsetrefs.iterator(); it.hasNext(); )
+				{
+					Object mbelref = it.next();
+					boolean result = ((Boolean)state.getAttributeValue(mbelref, OAVBDIMetaModel.beliefsetreference_has_result)).booleanValue();
+					if(result)
+					{
+						String ref = (String)state.getAttributeValue(mbelref, OAVBDIMetaModel.elementreference_has_concrete);
+						Object[] tmp = AgentRules.resolveCapability(ref, OAVBDIRuntimeModel.beliefset_type, ip.getAgent(), state);
+						if(belname.equals(tmp[0]) && scope.equals(tmp[1]))
+						{
+							String name = (String)state.getAttributeValue(mbelref, OAVBDIMetaModel.modelelement_has_name);
+							Collection facts = state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts);
+							BDIInterpreter.getInterpreter(state).setResultValue(name, facts);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -162,7 +255,7 @@ public class BeliefRules
 	 *  Takes care of registering / deregistering.
 	 *  beliefset_has_facts should only be modified through this method!
 	 */
-	public static void	removeBeliefSetValue(IOAVState state, Object rbeliefset, Object fact)
+	public static void	removeBeliefSetValue(IOAVState state, Object rbeliefset, Object fact, Object scope)
 	{
 		// Convert wrapped basic values to desired class (e.g. Integer to Long).
 		Object	mbel	= state.getAttributeValue(rbeliefset, OAVBDIRuntimeModel.element_has_model);
@@ -170,6 +263,8 @@ public class BeliefRules
 		fact	= SReflect.convertWrappedValue(fact, clazz);
 
 		state.removeAttributeValue(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts, fact);
+		
+		storeBeliefSetResults(state, rbeliefset, scope);
 	}
 	
 	
@@ -196,9 +291,10 @@ public class BeliefRules
 			public void execute(IOAVState state, IVariableAssignments assignments)
 			{
 				Object	rbelief	= assignments.getVariableValue("?rbelief");
+				Object	rcapa	= assignments.getVariableValue("?rcapa");
 				Object	fact	= assignments.getVariableValue(var.getName());
 							
-				BeliefRules.setBeliefValue(state, rbelief, fact);
+				BeliefRules.setBeliefValue(state, rbelief, fact, rcapa);
 
 //				System.out.println("Belief "+state.getAttributeValue(state.getAttributeValue(rbelief, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+" "+state.getAttributeValue(rbelief, OAVBDIRuntimeModel.belief_has_fact));
 			}
@@ -229,9 +325,10 @@ public class BeliefRules
 				public void execute(IOAVState state, IVariableAssignments assignments)
 				{
 					Object rbeliefset	= assignments.getVariableValue("?rbeliefset");
+					Object rcapa = assignments.getVariableValue("?rcapa");
 					Object neworigfacts	= assignments.getVariableValue(var.getName());
 					
-					updateBeliefSet(state, rbeliefset, neworigfacts);
+					updateBeliefSet(state, rbeliefset, neworigfacts, rcapa);
 					
 //					System.out.println("Beliefset "+state.getAttributeValue(state.getAttributeValue(rbeliefset, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name)+" "+state.getAttributeValues(rbeliefset, OAVBDIRuntimeModel.beliefset_has_facts));
 				}
@@ -474,7 +571,7 @@ public class BeliefRules
 						try
 						{
 							Object values	= AgentRules.evaluateExpression(state, exp, fet);
-							BeliefRules.updateBeliefSet(state, rparamset, values);
+							BeliefRules.updateBeliefSet(state, rparamset, values, rcapa);
 						}
 						catch(Exception e)
 						{

@@ -11,6 +11,7 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 
 import java.util.Map;
 
@@ -100,9 +101,10 @@ public interface IComponentFactory
 	 * @return An instance of a component and the corresponding adapter.
 	 */
 	@Excluded
-	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference IComponentDescription desc, IComponentAdapterFactory factory, 
-		IModelInfo model, String config, Map<String, Object> arguments, IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, 
-		boolean copy, Future<Void> init);
+	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference IComponentDescription desc, 
+		IComponentAdapterFactory factory, IModelInfo model, String config, Map<String, Object> arguments, 
+		IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, boolean copy, 
+		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> init);
 
 }
 

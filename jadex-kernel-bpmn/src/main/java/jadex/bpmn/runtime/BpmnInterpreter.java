@@ -53,6 +53,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
@@ -205,7 +206,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		IValueFetcher fetcher, IComponentManagementService cms, IClockService cs, IMessageService ms,
 		IServiceContainer container)
 	{
-		super(null, model.getModelInfo(), config, null, parent, null, true, new Future<Void>());
+		super(null, model.getModelInfo(), config, null, parent, null, true, null, new Future<Void>());
 		construct(model, activityhandlers, stephandlers);		
 		this.fetcher = fetcher!=null? new BpmnInstanceFetcher(this, fetcher) :null;
 		this.adapter = adapter;
@@ -233,9 +234,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	// Constructor for self-contained bpmn components
 	public BpmnInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, MBpmnModel model, final Map arguments, 
 		String config, final IExternalAccess parent, Map activityhandlers, Map stephandlers, 
-		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, final Future<Void> inited)
+		IValueFetcher fetcher, RequiredServiceBinding[] bindings, boolean copy, 
+		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
-		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, inited);
+		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, resultlistener, inited);
 		this.inited = inited;
 		this.variables	= new HashMap();
 		construct(model, activityhandlers, stephandlers);
@@ -1102,6 +1104,11 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 			else if(coll instanceof Map)
 			{
 				((Map)coll).put(key, value);
+			}
+			if(isres)
+			{
+				// Trigger event notification
+				setResultValue(name, coll);
 			}
 //				else
 //				{

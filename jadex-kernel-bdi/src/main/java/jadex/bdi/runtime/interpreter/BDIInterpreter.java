@@ -17,7 +17,6 @@ import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -46,6 +45,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 import jadex.rules.rulesystem.Activation;
@@ -120,14 +120,17 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	protected Map kernelprops;
 	
 	/** The extensions. */
-	protected Map extensions;
+	protected Map<String, IExtensionInstance> extensions;
 	
 	/** The properties. */
-	protected Map properties;
+	protected Map<String, Object> properties;
 	
 	/** The arguments. */
-	protected Map arguments;
+	protected Map<String, Object> arguments;
 	
+	/** The results. */
+	protected Map<String, Object> results;
+
 	/** The external service bindings. */
 	protected RequiredServiceBinding[] bindings;
 	
@@ -218,6 +221,9 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/** The parameter copy flag. */
 	protected boolean copy;
 	
+	/** The result listener. */
+	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
+	
 	//-------- constructors --------
 	
 	/**
@@ -229,7 +235,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
 		final String config, final Map<String, Object> arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, 
-		final Map kernelprops, boolean copy, final Future<Void> inited)
+		final Map kernelprops, boolean copy, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{	
 		this.initthread = Thread.currentThread();
 		
@@ -243,6 +249,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		this.microplansteps = true;
 		this.externalthreads	= Collections.synchronizedSet(SCollection.createLinkedHashSet());
 		this.copy = copy;
+		this.resultlistener = resultlistener;
 		this.inited = inited;
 		
 		// Hack! todo:
@@ -738,15 +745,15 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		return model.getState().getTypeModel().getClassLoader();
 	}
 	
-	/**
-	 *  Get the results of the component (considering it as a functionality).
-	 *  @return The results map (name -> value). 
-	 */
-	public Map getResults()
-	{
-		Map	res	= (Map)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_results);
-		return res!=null ? Collections.unmodifiableMap(res) : Collections.EMPTY_MAP;
-	}
+//	/**
+//	 *  Get the results of the component (considering it as a functionality).
+//	 *  @return The results map (name -> value). 
+//	 */
+//	public Map getResults()
+//	{
+//		Map	res	= (Map)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_results);
+//		return res!=null ? Collections.unmodifiableMap(res) : Collections.EMPTY_MAP;
+//	}
 
 	/**
 	 *  Called when the agent is removed from the platform.
@@ -2008,4 +2015,32 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		return new ComponentServiceContainer(adapter, getComponentAdapter().getDescription().getType(), getInternalAccess());
 	}
 	
+	/**
+	 *  Get the results of the component (considering it as a functionality).
+	 *  Note: The method cannot make use of the asynchrnonous result listener
+	 *  mechanism, because the it is called when the component is already
+	 *  terminated (i.e. no invokerLater can be used).
+	 *  @return The results map (name -> value). 
+	 */
+	public Map<String, Object> getResults()
+	{
+		return results!=null? Collections.unmodifiableMap(results): Collections.EMPTY_MAP;
+	}
+	
+	/**
+	 *  Set a result value.
+	 *  @param name The result name.
+	 *  @param value The result value.
+	 */
+	public void setResultValue(String name, Object value)
+	{
+		assert !getComponentAdapter().isExternalThread();
+		
+		// todo: store results only within listener?!
+		if(results==null)
+			results	= new HashMap<String, Object>();
+		results.put(name, value);
+		
+		resultlistener.intermediateResultAvailable(new Tuple2<String, Object>(name, value));
+	}
 }

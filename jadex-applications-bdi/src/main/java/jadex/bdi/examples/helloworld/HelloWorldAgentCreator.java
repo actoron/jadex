@@ -11,8 +11,10 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -62,9 +64,9 @@ public class HelloWorldAgentCreator
 											public void resultAvailable(IComponentManagementService cms)
 											{
 												cms.createComponent("hw1", "helloagent.agent.xml", null,
-													new DefaultResultListener<Map<String, Object>>()
+													new DefaultResultListener<Collection<Tuple2<String, Object>>>()
 												{
-													public void resultAvailable(Map<String, Object> result)
+													public void resultAvailable(Collection<Tuple2<String, Object>> result)
 													{
 														System.out.println("finished.");
 													}

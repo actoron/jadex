@@ -220,7 +220,7 @@ public class SFlyweightFunctionality
 	 * @param handle
 	 * @param fact
 	 */
-	public static void setFact(IOAVState state, Object handle, Object fact)
+	public static void setFact(IOAVState state, Object handle, Object fact, Object scope)
 	{
 		Object	mbel	= state.getAttributeValue(handle, OAVBDIRuntimeModel.element_has_model);
 		Object	evamode = state.getAttributeValue(mbel, OAVBDIMetaModel.typedelement_has_evaluationmode);
@@ -229,7 +229,7 @@ public class SFlyweightFunctionality
 			throw new RuntimeException("Setting value not supported for dynamic belief: "
 				+ state.getAttributeValue(mbel, OAVBDIMetaModel.modelelement_has_name));
 		}
-		BeliefRules.setBeliefValue(state, handle, fact);
+		BeliefRules.setBeliefValue(state, handle, fact, scope);
 	}
 	
 	/**
@@ -276,14 +276,14 @@ public class SFlyweightFunctionality
 	 * @param handle
 	 * @param fact
 	 */
-	public static void removeFact(IOAVState state, Object handle, Object fact)
+	public static void removeFact(IOAVState state, Object handle, Object fact, Object scope)
 	{
 		Object me = state.getAttributeValue(handle, OAVBDIRuntimeModel.element_has_model);
 		Object	evamode	= state.getAttributeValue(me, OAVBDIMetaModel.typedelement_has_evaluationmode);
 		if(!OAVBDIMetaModel.EVALUATIONMODE_STATIC.equals(evamode))
 			throw new RuntimeException("Removing value on dynamic beliefset not allowed: "+me);
 		
-		BeliefRules.removeBeliefSetValue(state, handle, fact);
+		BeliefRules.removeBeliefSetValue(state, handle, fact, scope);
 	}
 	
 	/**
@@ -292,7 +292,7 @@ public class SFlyweightFunctionality
 	 * @param handle
 	 * @param facts
 	 */
-	public static void addFacts(IOAVState state, Object handle, Object[] facts)
+	public static void addFacts(IOAVState state, Object handle, Object[] facts, Object scope)
 	{
 		Object me = state.getAttributeValue(handle, OAVBDIRuntimeModel.element_has_model);
 		Object	evamode	= state.getAttributeValue(me, OAVBDIMetaModel.typedelement_has_evaluationmode);
@@ -300,7 +300,7 @@ public class SFlyweightFunctionality
 			throw new RuntimeException("Adding values on dynamic beliefset not allowed: "+me);
 
 		for(int i=0; facts!=null && i<facts.length; i++)
-			BeliefRules.addBeliefSetValue(state, handle, facts[i]);
+			BeliefRules.addBeliefSetValue(state, handle, facts[i], scope);
 	}
 	
 	/**
@@ -308,7 +308,7 @@ public class SFlyweightFunctionality
 	 * @param state
 	 * @param handle
 	 */
-	public static void removeFacts(IOAVState state, Object handle)
+	public static void removeFacts(IOAVState state, Object handle, Object scope)
 	{
 		Object me = state.getAttributeValue(handle, OAVBDIRuntimeModel.element_has_model);
 		Object	evamode	= state.getAttributeValue(me, OAVBDIMetaModel.typedelement_has_evaluationmode);
@@ -321,7 +321,7 @@ public class SFlyweightFunctionality
 			Object[] facts = coll.toArray();
 			
 			for(int i=0; i<facts.length; i++)
-				BeliefRules.removeBeliefSetValue(state, handle, facts[i]);
+				BeliefRules.removeBeliefSetValue(state, handle, facts[i], scope);
 		}
 	}
 	
@@ -404,11 +404,11 @@ public class SFlyweightFunctionality
 	 * @param handle
 	 * @param newfact
 	 */
-	public static void updateFact(IOAVState state, Object handle, Object newfact)
+	public static void updateFact(IOAVState state, Object handle, Object newfact, Object scope)
 	{
 		if(containsFact(state, handle, newfact))
-			BeliefRules.removeBeliefSetValue(state, handle, newfact);
-		BeliefRules.addBeliefSetValue(state, handle, newfact);
+			BeliefRules.removeBeliefSetValue(state, handle, newfact, scope);
+		BeliefRules.addBeliefSetValue(state, handle, newfact, scope);
 	}
 
 	

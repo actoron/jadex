@@ -58,14 +58,14 @@ public class BeliefFlyweight extends ElementFlyweight implements IBelief
 			{
 				public void run()
 				{
-					SFlyweightFunctionality.setFact(getState(), getHandle(), fact);
+					SFlyweightFunctionality.setFact(getState(), getHandle(), fact, getScope());
 				}
 			};
 		}
 		else
 		{
 			getInterpreter().startMonitorConsequences();
-			SFlyweightFunctionality.setFact(getState(), getHandle(), fact);
+			SFlyweightFunctionality.setFact(getState(), getHandle(), fact, getScope());
 			getInterpreter().endMonitorConsequences();
 		}
 	}

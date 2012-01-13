@@ -19,6 +19,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.kernelbase.AbstractInterpreter;
 
 import java.util.ArrayList;
@@ -57,10 +58,11 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	 */
 	public ComponentInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map<String, Object> arguments, 
-		final RequiredServiceBinding[] bindings, boolean copy, final Future<Void> inited,
+		final RequiredServiceBinding[] bindings, boolean copy, 
+		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited,
 		ClassLoader classloader)
 	{
-		super(desc, model, config, factory, parent, bindings, copy, inited);
+		super(desc, model, config, factory, parent, bindings, copy, resultlistener, inited);
 		this.steps = new ArrayList();
 		this.classloader = classloader;
 	

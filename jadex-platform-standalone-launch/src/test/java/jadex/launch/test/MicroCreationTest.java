@@ -10,6 +10,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Tuple;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -20,6 +21,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -56,11 +58,11 @@ public class MicroCreationTest extends TestCase
 			throw new RuntimeException(e);
 		}
 		
-		final Future<Map<String, Object>>	fut	= new Future<Map<String, Object>>();
+		final Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
 		args.put("max", new Integer(10000));
-		cms.createComponent(null, "jadex/micro/benchmarks/AgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Map<String, Object>>(fut))
-			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Map<String, Object>>(fut)
+		cms.createComponent(null, "jadex/micro/benchmarks/AgentCreationAgent.class", new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<Tuple2<String, Object>>>(fut)
 		{
 			public void customResultAvailable(IComponentIdentifier result)
 			{
@@ -69,16 +71,17 @@ public class MicroCreationTest extends TestCase
 		});
 		
 		// Write values to property files for hudson plot plugin.
-		Map<String, Object>	results	= fut.get(sus, timeout);
-		for(Iterator<String> it=results.keySet().iterator(); it.hasNext(); )
+		Collection<Tuple2<String, Object>>	results	= fut.get(sus, timeout);
+		for(Iterator<Tuple2<String, Object>> it=results.iterator(); it.hasNext(); )
 		{
-			String	key	= it.next();
-			Tuple	value	= (Tuple)results.get(key);
+			Tuple2<String, Object> tup = it.next();
+//			String	key	= it.next();
+//			Tuple	value	= (Tuple)results.get(key);
 			try
 			{
-				FileWriter	fw	= new FileWriter(new File("../"+key+".properties"));
+				FileWriter	fw	= new FileWriter(new File("../"+tup.getFirstEntity()+".properties"));
 				Properties	props	=	new Properties();
-				props.setProperty("YVALUE", ""+value.get(0));
+				props.setProperty("YVALUE", ""+((Tuple)tup.getSecondEntity()).get(0));
 				props.store(fw, null);
 				fw.close();
 			}

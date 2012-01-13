@@ -22,12 +22,12 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.FixedJComboBox;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DelegationResultListener;
@@ -38,7 +38,6 @@ import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.JValidatorTextField;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.jtable.ClassRenderer;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.annotation.XMLClassname;
 
@@ -62,6 +61,7 @@ import java.awt.event.ItemListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -1596,7 +1596,7 @@ public class StarterPanel extends JLayeredPane
 	/**
 	 *  Listener that is called on component kill.
 	 */
-	public class KillListener extends SwingDefaultResultListener
+	public class KillListener extends SwingDefaultResultListener<Collection<Tuple2<String, Object>>>
 	{
 		/** The model info. */
 		protected IModelInfo model;
@@ -1633,13 +1633,25 @@ public class StarterPanel extends JLayeredPane
 		/**
 		 *  Called when result is available.
 		 */
-		public void customResultAvailable(Object result)
+		public void customResultAvailable(Collection<Tuple2<String, Object>> result)
 		{
 //			System.out.println("fullname: "+fullname+" "+model.getFilename());
+			
+			Map<String, Object> res = null;
+			if(result!=null)
+			{
+				res = new HashMap<String, Object>();
+				for(Iterator<Tuple2<String, Object>> it=result.iterator(); it.hasNext(); )
+				{
+					Tuple2<String, Object> tup = it.next();
+					res.put(tup.getFirstEntity(), tup.getSecondEntity());
+				}
+			}
+			
 			if(cid!=null)
 			{
 				String tmp = (String)model.getFullName();
-				resultsets.put(tmp, new Object[]{cid, result});
+				resultsets.put(tmp, new Object[]{cid, res});
 				if(model!=null && fullname.equals(model.getFullName()))
 				{
 					selectavail.addItem(cid);

@@ -45,6 +45,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.xml.annotation.XMLClassname;
 
@@ -52,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -90,7 +92,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	protected MultiCollection listeners;
 	
 	/** The result (kill listeners). */
-	protected Map<IComponentIdentifier, IResultListener<Map<String, Object>>> killresultlisteners;
+	protected Map<IComponentIdentifier, IIntermediateResultListener<Tuple2<String, Object>>> resultlisteners;
 	
 	/** The execution service (cached to avoid using futures). */
 	protected IExecutionService	exeservice;
@@ -168,8 +170,8 @@ public abstract class ComponentManagementService extends BasicService implements
 //		this.children	= SCollection.createMultiCollection();
 		this.logger = Logger.getLogger(AbstractComponentAdapter.getLoggerName(exta.getComponentIdentifier())+".cms");
 		this.listeners = SCollection.createMultiCollection();
-		this.killresultlisteners = SCollection.createHashMap();
-		this.killresultlisteners = Collections.synchronizedMap(killresultlisteners);
+		this.resultlisteners = SCollection.createHashMap();
+		this.resultlisteners = Collections.synchronizedMap(resultlisteners);
 //		this.initfutures = Collections.synchronizedMap(SCollection.createHashMap());
 		this.initinfos = SCollection.createHashMap();
 		this.initinfos = Collections.synchronizedMap(initinfos);
@@ -273,9 +275,10 @@ public abstract class ComponentManagementService extends BasicService implements
 	 *  @param model The model identifier (e.g. file name).
 	 *  @param info	The creation info, if any.
 	 *  @param listener The result listener (if any). Will receive the id of the component as result, when the component has been created.
-	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
+	 *  @param resultlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 */
-	public IFuture<IComponentIdentifier> createComponent(final String name, final String modelname, CreationInfo info, final IResultListener<Map<String, Object>> killlistener)
+	public IFuture<IComponentIdentifier> createComponent(final String name, final String modelname, CreationInfo info, 
+		final IResultListener<Collection<Tuple2<String, Object>>> resultlistener)
 	{			
 		if(modelname==null)
 		{
@@ -293,6 +296,8 @@ public abstract class ComponentManagementService extends BasicService implements
 			final Future<Void> resfut = new Future<Void>();
 			
 			final CreationInfo cinfo = new CreationInfo(info);	// Dummy default info, if null. Must be cloned as localtype is set on info later.
+			
+			final IIntermediateResultListener<Tuple2<String, Object>> reslis = new IntermediateResultListener(resultlistener);
 			
 			if(cinfo.getParent()!=null)
 			{
@@ -340,7 +345,7 @@ public abstract class ComponentManagementService extends BasicService implements
 				{
 					public void customResultAvailable(IComponentManagementService rcms)
 					{
-						rcms.createComponent(name, modelname, cinfo, killlistener).addResultListener(new DelegationResultListener<IComponentIdentifier>(inited));
+						rcms.createComponent(name, modelname, cinfo, resultlistener).addResultListener(new DelegationResultListener<IComponentIdentifier>(inited));
 					}
 				});
 			}
@@ -512,8 +517,9 @@ public abstract class ComponentManagementService extends BasicService implements
 				//																		System.out.println("created: "+cid.getLocalName());//+" "+(parent!=null?parent.getComponentIdentifier().getLocalName():"null"));
 								//														System.out.println("added: "+descs.size()+", "+aid);
 																						
-																						if(killlistener!=null)
-																							killresultlisteners.put(cid, killlistener);
+																						resultlisteners.put(cid, reslis);
+//																						if(resultlistener!=null)
+//																							resultlisteners.put(cid, resultlistener);
 																						
 																						inited.setResult(cid);
 																						
@@ -584,7 +590,7 @@ public abstract class ComponentManagementService extends BasicService implements
 																							removeInitInfo(cid);
 																						}
 																						
-																						IResultListener<Map<String, Object>> reslis = (IResultListener<Map<String, Object>>)killresultlisteners.remove(cid);
+																						IIntermediateResultListener<Tuple2<String, Object>> reslis = (IIntermediateResultListener<Tuple2<String, Object>>)resultlisteners.remove(cid);
 																						if(reslis!=null)
 																						{
 																							reslis.exceptionOccurred(exception);
@@ -630,8 +636,9 @@ public abstract class ComponentManagementService extends BasicService implements
 																		// Use first configuration if no config specified.
 																		String config	= cinfo.getConfiguration()!=null ? cinfo.getConfiguration()
 																			: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
+																							
 																		factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-																			config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, resfut)
+																			config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, reslis, resfut)
 																			.addResultListener(new IResultListener<Tuple2<IComponentInstance, IComponentAdapter>>()
 																		{
 																			public void resultAvailable(Tuple2<IComponentInstance, IComponentAdapter> comp)
@@ -1616,6 +1623,48 @@ public abstract class ComponentManagementService extends BasicService implements
 		return IFuture.DONE;
     }
     
+    /**
+	 *  Add a result listener. Also intermediate result listeners can be
+	 *  added. In this case results are immediately fed back when set.
+	 *  @param listener The result (or intermediate) result listener.
+	 */
+	public IFuture<Void> addComponentResultListener(IResultListener<Collection<Tuple2<String, Object>>> listener, IComponentIdentifier cid)
+	{
+		Future<Void> ret = new Future<Void>();
+		IntermediateResultListener lis = (IntermediateResultListener)resultlisteners.get(cid);
+		if(lis!=null)
+		{
+			lis.addListener(listener);
+			ret.setResult(null);
+		}
+		else
+		{
+			ret.setException(new RuntimeException("Component has no registered listener: "+cid));
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Add a previously added result listener. 
+	 *  @param listener The result (or intermediate) result listener.
+	 */
+	public IFuture<Void> removeComponentResultListener(IResultListener<Collection<Tuple2<String, Object>>> listener, IComponentIdentifier cid)
+	{
+		Future<Void> ret = new Future<Void>();
+		IntermediateResultListener lis = (IntermediateResultListener)resultlisteners.get(cid);
+		if(lis!=null)
+		{
+			lis.removeListener(listener);
+			ret.setResult(null);
+		}
+		else
+		{
+			ret.setException(new RuntimeException("Component has no registered listener: "+cid));
+		}
+		return ret;
+	}
+
+    
     //-------- helper classes --------
 
 	/**
@@ -1737,7 +1786,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //				ex	= (Exception)exceptions.get(cid);
 //				exceptions.remove(cid);
 //			}
-			IResultListener<Map<String, Object>> reslis = (IResultListener<Map<String, Object>>)killresultlisteners.remove(cid);
+			IIntermediateResultListener<Tuple2<String, Object>> reslis = (IIntermediateResultListener<Tuple2<String, Object>>)resultlisteners.remove(cid);
 			if(reslis!=null)
 			{
 //				System.out.println("kill lis: "+cid+" "+results+" "+ex);
@@ -1747,7 +1796,8 @@ public abstract class ComponentManagementService extends BasicService implements
 				}
 				else
 				{
-					reslis.resultAvailable(results);
+					reslis.finished();
+//					reslis.resultAvailable(results);
 				}
 			}
 			else if(ex!=null)
@@ -2906,7 +2956,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	}
 	
 	/**
-	 * 
+	 *  Update a component description according to another one.
 	 */
 	protected IFuture<IComponentDescription> updateComponentDescription(final CMSComponentDescription origdesc)
 	{
@@ -2949,30 +2999,6 @@ public abstract class ComponentManagementService extends BasicService implements
 			}
 		});
 		return ret;
-	}
-	
-	/**
-	 *  Get the init info for a component identifier.
-	 */
-	protected InitInfo getInitInfo(IComponentIdentifier cid)
-	{
-		return (InitInfo)initinfos.get(cid);
-	}
-	
-	/**
-	 *  Put an init info.
-	 */
-	protected void putInitInfo(IComponentIdentifier cid, InitInfo info)
-	{
-		initinfos.put(cid, info);
-	}
-	
-	/**
-	 *  Remove an init info.
-	 */
-	protected InitInfo removeInitInfo(IComponentIdentifier cid)
-	{
-		return (InitInfo)initinfos.remove(cid);
 	}
 	
 //	/**
@@ -3036,8 +3062,39 @@ public abstract class ComponentManagementService extends BasicService implements
 //		return ret;
 //	}
 	
+	/**
+	 *  Get the init info for a component identifier.
+	 */
+	protected InitInfo getInitInfo(IComponentIdentifier cid)
+	{
+		return (InitInfo)initinfos.get(cid);
+	}
+	
+	/**
+	 *  Put an init info.
+	 */
+	protected void putInitInfo(IComponentIdentifier cid, InitInfo info)
+	{
+		initinfos.put(cid, info);
+	}
+	
+	/**
+	 *  Remove an init info.
+	 */
+	protected InitInfo removeInitInfo(IComponentIdentifier cid)
+	{
+		return (InitInfo)initinfos.remove(cid);
+	}
+	
+	
+	
+	/**
+	 *  Struct that stores information about initing components.
+	 */
 	static class InitInfo
 	{
+		//-------- attributes --------
+		
 		// 0: description, 1: adapter, 2: creation info, 3: model, 4: initfuture, 5: component instance
 		
 		/** The component description. */
@@ -3058,6 +3115,8 @@ public abstract class ComponentManagementService extends BasicService implements
 		/** The component instance. */
 		protected IComponentInstance instance;
 
+		//-------- constructors --------
+		
 		/**
 		 *  Create a new init info.
 		 */
@@ -3073,6 +3132,8 @@ public abstract class ComponentManagementService extends BasicService implements
 			this.instance = instance;
 		}
 
+		//-------- methods --------
+		
 		/**
 		 *  Get the description.
 		 *  @return The description.
@@ -3183,10 +3244,13 @@ public abstract class ComponentManagementService extends BasicService implements
 	}
 	
 	/**
-	 * 
+	 *  Entry that represents a lock for a component.
+	 *  Is used to lock the parent while a child is created.
 	 */
 	class LockEntry
 	{
+		//-------- attributes --------
+		
 		/** The locked component. */
 		protected IComponentIdentifier locked;
 		
@@ -3196,16 +3260,21 @@ public abstract class ComponentManagementService extends BasicService implements
 		/** The kill flag. */
 		protected Future<Map<String, Object>> killfuture;
 		
+		//-------- constructors --------
+		
 		/**
-		 * 
+		 *  Create a new lock entry.
 		 */
 		public LockEntry(IComponentIdentifier locked)
 		{
 			this.locked = locked;
 		}
 		
+		//-------- methods --------
+		
 		/**
-		 * 
+		 *  Add a locker id.
+		 *  @param locker The locker id.
 		 */
 		public void addLocker(String locker)
 		{
@@ -3215,7 +3284,8 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 		
 		/**
-		 * 
+		 *  Remove a locker id.
+		 *  @param locker The locker id.
 		 */
 		public void removeLocker(String locker)
 		{
@@ -3225,7 +3295,8 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 		
 		/**
-		 * 
+		 *  Get the locker count.
+		 *  @return The number of lockers.
 		 */
 		public int getLockerCount()
 		{

@@ -1673,7 +1673,7 @@ public class AgentRules
 			{
 				public void customResultAvailable(Object result)
 				{
-					BeliefRules.setBeliefValue(state, rbel, result);
+					BeliefRules.setBeliefValue(state, rbel, result, rcapa);
 					
 					// Set also argument value if belief is declared as argument.
 					if(state.getType(rcapa).equals(OAVBDIRuntimeModel.agent_type))
@@ -1720,7 +1720,7 @@ public class AgentRules
 										{
 											public void resultAvailable(Object result)
 											{
-												BeliefRules.setBeliefValue(state, rbel, result);
+												BeliefRules.setBeliefValue(state, rbel, result, rcapa);
 												state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
 														BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
 											}
@@ -1736,7 +1736,7 @@ public class AgentRules
 									}
 									else
 									{
-										BeliefRules.setBeliefValue(state, rbel, value);
+										BeliefRules.setBeliefValue(state, rbel, value, rcapa);
 										state.setAttributeValue(rbel, OAVBDIRuntimeModel.typedelement_has_timer, 
 												BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
 									}
@@ -1978,7 +1978,7 @@ public class AgentRules
 				{
 					for(Iterator it=SReflect.getIterator(result); it.hasNext(); )
 					{
-						BeliefRules.addBeliefSetValue(state, rbelset, it.next());
+						BeliefRules.addBeliefSetValue(state, rbelset, it.next(), rcapa);
 					}
 					
 					// Set also argument values if beliefset is declared as argument.
@@ -2025,7 +2025,7 @@ public class AgentRules
 										{
 											public void resultAvailable(Object result)
 											{
-												BeliefRules.updateBeliefSet(state, rbelset, result);
+												BeliefRules.updateBeliefSet(state, rbelset, result, rcapa);
 												state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
 											}
 											public void exceptionOccurred(Exception exception)
@@ -2038,7 +2038,7 @@ public class AgentRules
 									}
 									else
 									{
-										BeliefRules.updateBeliefSet(state, rbelset, values);
+										BeliefRules.updateBeliefSet(state, rbelset, values, rcapa);
 										state.setAttributeValue(rbelset, OAVBDIRuntimeModel.typedelement_has_timer, BDIInterpreter.getInterpreter(state).getClockService().createTimer(update.longValue(), to[0]));
 									}
 								}
@@ -3411,8 +3411,45 @@ public class AgentRules
 
 //				System.out.println("terminated: "+BDIInterpreter.getInterpreter(state).getAgentAdapter().getComponentIdentifier().getLocalName());
 		
-		// Collect results for agent.
+		// Trigger pull beliefs if declared as result
+		// todo: currently updates all beliefs/sets, should only update pull beliefs
+		Map<String, Object> resultvals = collectResults(state, ragent);
+		IArgument[] results = interpreter.getModel().getResults();
+		for(int i=0; i<results.length; i++)
+		{
+			interpreter.setResultValue(results[i].getName(), resultvals.get(results[i].getName()));
+		}
 		
+		// Cleanup timers.
+		cleanupCapability(state, ragent);
+
+		// Cleanup interpreter resources
+		interpreter.cleanup();
+		
+		// Remove kill listeners.
+		Collection	killlisteners	= state.getAttributeValues(ragent, OAVBDIRuntimeModel.agent_has_killlisteners);
+
+		// Clean up state listeners.
+		state.dispose();
+		
+		// Inform kill listeners.		
+		if(killlisteners!=null)
+		{
+			for(Iterator it=killlisteners.iterator(); it.hasNext(); )
+			{
+				((IResultListener)it.next()).resultAvailable(interpreter.getAgentAdapter().getComponentIdentifier());
+			}
+		}
+	}
+	
+	/**
+	 *  Collect the results.
+	 */
+	protected static Map<String, Object> collectResults(IOAVState state, Object ragent)
+	{
+		// Collect results for agent.
+		Object magent = state.getAttributeValue(ragent, OAVBDIRuntimeModel.element_has_model);
+		BDIInterpreter	interpreter	= BDIInterpreter.getInterpreter(state);
 		IArgument[] results = interpreter.getModel().getResults();
 		Map res = new HashMap();
 		
@@ -3518,27 +3555,7 @@ public class AgentRules
 				throw new RuntimeException("Could not resolve result belief/set: "+resname);
 		}
 		
-		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_results, res);
-		
-		// Cleanup timers.
-		cleanupCapability(state, ragent);
-
-		// Cleanup interpreter resources
-		interpreter.cleanup();
-		
-		// Remove kill listeners.
-		Collection	killlisteners	= state.getAttributeValues(ragent, OAVBDIRuntimeModel.agent_has_killlisteners);
-
-		// Clean up state listeners.
-		state.dispose();
-		
-		// Inform kill listeners.		
-		if(killlisteners!=null)
-		{
-			for(Iterator it=killlisteners.iterator(); it.hasNext(); )
-			{
-				((IResultListener)it.next()).resultAvailable(interpreter.getAgentAdapter().getComponentIdentifier());
-			}
-		}
+		return res;
+//		state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_results, res);
 	}
 }

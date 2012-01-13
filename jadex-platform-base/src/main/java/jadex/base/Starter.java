@@ -345,7 +345,8 @@ public class Starter
 								});
 								
 								boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
-								cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs), compargs, null, null, copy, future)
+								// what about platform result listener?!
+								cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs), compargs, null, null, copy, null, future)
 									.addResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInstance, IComponentAdapter>, IExternalAccess>(ret)
 								{
 									public void customResultAvailable(Tuple2<IComponentInstance, IComponentAdapter> root)

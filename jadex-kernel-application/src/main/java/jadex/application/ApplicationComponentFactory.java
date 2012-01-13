@@ -24,6 +24,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.component.ComponentInterpreter;
 import jadex.kernelbase.CacheableKernelModel;
 
@@ -238,7 +239,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	 */
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
 		final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, final IExternalAccess parent, 
-		final RequiredServiceBinding[] bindings, final boolean copy, final Future<Void> init)
+		final RequiredServiceBinding[] bindings, final boolean copy, 
+		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init)
 	{
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>>	ret	= new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		
@@ -253,7 +255,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 					{
 						CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, 
 							new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
-						ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, init, cl);
+						ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, 
+							resultlistener, init, cl);
 						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 					}
 					catch(Exception e)
@@ -272,7 +275,8 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 				ClassLoader cl = getClass().getClassLoader();
 				CacheableKernelModel apptype = loader.loadApplicationModel(modelinfo.getFilename(), null, cl, 
 					new Object[]{modelinfo.getResourceIdentifier(), getProviderId().getRoot()});
-				ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, init, cl);
+				ComponentInterpreter interpreter = new ComponentInterpreter(desc, apptype.getModelInfo(), config, factory, parent, arguments, bindings, copy, 
+					resultlistener, init, cl);
 				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(interpreter, interpreter.getComponentAdapter()));
 			}
 			catch(Exception e)

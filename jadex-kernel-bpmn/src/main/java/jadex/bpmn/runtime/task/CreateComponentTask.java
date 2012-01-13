@@ -10,11 +10,16 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -27,12 +32,12 @@ import java.util.Set;
 public class CreateComponentTask implements ITask
 {
 	/** Future called when the component is created to allow compensation (i.e. killing the component). */
-	protected Future creationFuture = new Future();
+	protected Future creationfuture = new Future();
 	
-	static Set reserved;
+	static Set<String> reserved;
 	static
 	{
-		reserved = new HashSet();
+		reserved = new HashSet<String>();
 		reserved.add("name");
 		reserved.add("model");
 		reserved.add("configuration");
@@ -48,15 +53,15 @@ public class CreateComponentTask implements ITask
 	/**
 	 *  Execute the task.
 	 */
-	public IFuture execute(final ITaskContext context, final BpmnInterpreter instance)
+	public IFuture<Void> execute(final ITaskContext context, final BpmnInterpreter instance)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(instance.createResultListener(new IResultListener()
+		SServiceProvider.getService(instance.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+			instance.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				IComponentManagementService	cms	= (IComponentManagementService)result;
 				String name = (String)context.getParameterValue("name");
 				String model = (String)context.getParameterValue("model");
 				String config = (String)context.getParameterValue("configuration");
@@ -64,7 +69,7 @@ public class CreateComponentTask implements ITask
 				boolean sub = context.getParameterValue("subcomponent")!=null? ((Boolean)context.getParameterValue("subcomponent")).booleanValue(): false;
 				final IResultListener killlistener = (IResultListener)context.getParameterValue("killlistener");
 				final String[] resultmapping = (String[])context.getParameterValue("resultmapping");
-				boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): resultmapping!=null;
+				final boolean wait = context.getParameterValue("wait")!=null? ((Boolean)context.getParameterValue("wait")).booleanValue(): resultmapping!=null;
 				Boolean master = context.getParameterValue("master")!=null? (Boolean)context.getParameterValue("master"): null;
 				Boolean daemon = context.getParameterValue("daemon")!=null? (Boolean)context.getParameterValue("daemon"): null;
 				Boolean autoshutdown = context.getParameterValue("autoshutdown")!=null? (Boolean)context.getParameterValue("autoshutdown"): null;
@@ -86,55 +91,107 @@ public class CreateComponentTask implements ITask
 					}
 				}
 //				System.out.println("args: "+args);
-				IResultListener lis = killlistener;
-				if(wait)
+				
+				IIntermediateResultListener<Tuple2<String, Object>> lis = new IIntermediateResultListener<Tuple2<String, Object>>()
 				{
-					lis = new IResultListener()
+					protected Map<String, Object> results;
+					
+					public void intermediateResultAvailable(Tuple2<String, Object> result)
 					{
-						public void resultAvailable(Object result)
+						addResult(result.getFirstEntity(), result.getSecondEntity());
+						
+						for(int i=0; i<resultmapping.length/2; i++)
 						{
-							if(result!=null)
+							if(resultmapping[i].equals(result.getFirstEntity()))
 							{
-								Map results = (Map)result;
-								for(int i=0; i<resultmapping.length/2; i++)
-								{
-									Object value = results.get(resultmapping[i]);
-									context.setParameterValue(resultmapping[i+1], value);
-									
-//									System.out.println("Mapped result value: "+value+" "+resultmapping[i]+" "+resultmapping[i+1]);
-								}
+								context.setParameterValue(resultmapping[i+1], result.getSecondEntity());
+								break;
 							}
-							if(killlistener!=null)
-								killlistener.resultAvailable(result);
-//							listener.resultAvailable(CreateComponentTask.this, null);
-							ret.setResult(null);
 						}
 						
-						public void exceptionOccurred(Exception exception)
+						if(killlistener instanceof IIntermediateResultListener)
+							((IIntermediateResultListener<Tuple2<String, Object>>)killlistener).intermediateResultAvailable(result);
+					}
+					
+					public void finished()
+					{
+						if(killlistener instanceof IIntermediateResultListener)
 						{
-							if(killlistener!=null)
-								killlistener.exceptionOccurred(exception);
-//							listener.exceptionOccurred(CreateComponentTask.this, exception);
-							ret.setException(exception);
+							((IIntermediateResultListener)killlistener).finished();
 						}
-					};
-				}
+						else if(killlistener!=null)
+						{
+							killlistener.resultAvailable(getResultCollection());
+						}
+						
+						if(wait)
+							ret.setResult(null);
+					}
+					
+					public void resultAvailable(Collection<Tuple2<String, Object>> result)
+					{
+						if(result!=null)
+						{
+							Map results = (Map)result;
+							for(int i=0; i<resultmapping.length/2; i++)
+							{
+								Object value = results.get(resultmapping[i]);
+								context.setParameterValue(resultmapping[i+1], value);
+								
+//								System.out.println("Mapped result value: "+value+" "+resultmapping[i]+" "+resultmapping[i+1]);
+							}
+						}
+						if(killlistener!=null)
+							killlistener.resultAvailable(result);
+//						listener.resultAvailable(CreateComponentTask.this, null);
+						
+						if(wait)
+							ret.setResult(null);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						if(killlistener!=null)
+							killlistener.exceptionOccurred(exception);
+//						listener.exceptionOccurred(CreateComponentTask.this, exception);
+						ret.setException(exception);
+					}
+					
+					protected void addResult(String name, Object value)
+					{
+						if(results==null)
+						{
+							results = new HashMap<String, Object>();
+						}
+						results.put(name, value);
+					}
+					
+					public synchronized Collection<Tuple2<String, Object>> getResultCollection()
+					{
+						Collection<Tuple2<String, Object>> ret = null;
+						if(results!=null)
+						{
+							ret = new ArrayList<Tuple2<String, Object>>();
+							for(Iterator<String> it=results.keySet().iterator(); it.hasNext(); )
+							{
+								String key = it.next();
+								ret.add(new Tuple2<String, Object>(key, results.get(key)));
+							}
+						}
+						return ret;
+					}
+				};
 				
 				cms.createComponent(name, model,
 					new CreationInfo(config, args, sub ? instance.getComponentAdapter().getComponentIdentifier() : null, 
-						suspend, master, daemon, autoshutdown, instance.getModelElement().getModelInfo().getAllImports(), bindings), lis).addResultListener(instance.createResultListener(new DelegationResultListener(creationFuture)));
+						suspend, master, daemon, autoshutdown, instance.getModelElement().getModelInfo().getAllImports(), bindings), lis)
+					.addResultListener(instance.createResultListener(new DelegationResultListener(creationfuture)));
 
 				if(!wait)
 				{
 					ret.setResult(null);
 //					listener.resultAvailable(this, null);
 				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-//				listener.exceptionOccurred(source, exception);
 			}
 		}));
 		
@@ -148,7 +205,7 @@ public class CreateComponentTask implements ITask
 	public IFuture compensate(final BpmnInterpreter instance)
 	{
 		final Future ret = new Future();
-		creationFuture.addResultListener(instance.createResultListener(new IResultListener()
+		creationfuture.addResultListener(instance.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{

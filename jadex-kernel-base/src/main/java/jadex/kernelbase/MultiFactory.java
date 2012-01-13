@@ -38,6 +38,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 /* $if !android $ */
 import jadex.commons.gui.SGUI;
@@ -563,13 +564,14 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc,
 			final IComponentAdapterFactory factory, final IModelInfo model, final String config,
 			final Map<String, Object> arguments, final IExternalAccess parent,
-			final RequiredServiceBinding[] bindings, final boolean copy, final Future<Void> ret)
+			final RequiredServiceBinding[] bindings, final boolean copy, 
+			final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> ret)
 	{
 //		System.out.println("createComponentInstance: "+model.getName());
 		
 		IComponentFactory fac = (IComponentFactory)factorycache.get(getModelExtension(model.getFilename()));
 		if(fac != null)
-			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, ret);
+			return fac.createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, resultlistener, ret);
 		
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>> res = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 		
@@ -577,7 +579,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 		{
 			public void customResultAvailable(Object result)
 			{
-				((IComponentFactory)result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, ret).addResultListener(new DelegationResultListener(res));
+				((IComponentFactory)result).createComponentInstance(desc, factory, model, config, arguments, parent, bindings, copy, resultlistener, ret).addResultListener(new DelegationResultListener(res));
 			}
 		}));
 		return res;

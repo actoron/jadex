@@ -6,9 +6,11 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -30,10 +32,11 @@ public interface IComponentManagementService //extends IService
 	 *  @param name The component name or null for automatic generation.
 	 *  @param model The model identifier (e.g. file name).
 	 *  @param info Additional start information such as parent component or arguments (optional).
-	 *  @param killlistener The kill listener (if any). Will receive the results of the component execution, after the component has terminated.
+	 *  @param resultlistener The result listener (if any). Will receive the results of the component execution, after the component has terminated.
 	 *  @return The id of the component as future result, when the component has been created and initialized.
 	 */
-	public IFuture<IComponentIdentifier> createComponent(String name, String model, CreationInfo info, IResultListener<Map<String, Object>> killlistener);
+	public IFuture<IComponentIdentifier> createComponent(String name, String model, CreationInfo info, 
+		IResultListener<Collection<Tuple2<String, Object>>> resultlistener);
 		
 	/**
 	 *  Destroy (forcefully terminate) an component on the platform.
@@ -52,6 +55,20 @@ public interface IComponentManagementService //extends IService
 	 *  @param componentid The component identifier.
 	 */
 	public IFuture<Void> resumeComponent(IComponentIdentifier componentid);
+	
+	/**
+	 *  Add a result listener. Also intermediate result listeners can be
+	 *  added. In this case results are immediately fed back when set.
+	 *  @param listener The result (or intermediate) result listener.
+	 */
+	public IFuture<Void> addComponentResultListener(IResultListener<Collection<Tuple2<String, Object>>> listener, IComponentIdentifier cid);
+	
+	/**
+	 *  Add a previously added result listener. 
+	 *  @param listener The result (or intermediate) result listener.
+	 */
+	public IFuture<Void> removeComponentResultListener(IResultListener<Collection<Tuple2<String, Object>>> listener, IComponentIdentifier cid);
+
 	
 	//-------- debugging methods --------
 	

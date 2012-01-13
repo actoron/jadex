@@ -6,6 +6,8 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Tuple;
+import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -19,6 +21,7 @@ import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -115,10 +118,10 @@ public class BrokenTestAgent extends MicroAgent
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				IResultListener<Map<String, Object>> lis = new TimeoutResultListener<Map<String, Object>>(3000, 
-					getExternalAccess(), new IResultListener<Map<String, Object>>()
+				IResultListener<Collection<Tuple2<String, Object>>> lis = new TimeoutResultListener<Collection<Tuple2<String, Object>>>(3000, 
+					getExternalAccess(), new IResultListener<Collection<Tuple2<String, Object>>>()
 				{
-					public void resultAvailable(Map<String, Object> result)
+					public void resultAvailable(Collection<Tuple2<String, Object>> result)
 					{
 //						System.out.println("res: "+result);
 						ret.setException(new RuntimeException("Terminated gracefully."));

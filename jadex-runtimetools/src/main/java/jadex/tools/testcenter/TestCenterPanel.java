@@ -11,10 +11,10 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -45,6 +45,7 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -1161,7 +1162,7 @@ public class TestCenterPanel extends JSplitPanel
 		/**
 		 *  Callback result listener for (local or remote) test results.
 		 */
-		public class TestResultListener		implements IRemoteResultListener
+		public class TestResultListener		implements IRemoteResultListener<Collection<Tuple2<String, Object>>>
 		{
 			//-------- attributes --------
 			
@@ -1193,9 +1194,21 @@ public class TestCenterPanel extends JSplitPanel
 			/**
 			 *  Result of test execution.
 			 */
-			public void resultAvailable(Object result)
+			public void resultAvailable(Collection<Tuple2<String, Object>> result)
 			{
-				Testcase	res	= (Testcase)((Map)result).get("testresults");
+				Map<String, Object> resmap = null;
+				Testcase res = null;
+				if(result!=null)
+				{
+					resmap = new HashMap<String, Object>();
+					for(Iterator<Tuple2<String, Object>> it=result.iterator(); it.hasNext(); )
+					{
+						Tuple2<String, Object> tup = it.next();
+						resmap.put(tup.getFirstEntity(), tup.getSecondEntity());
+					}
+					res = (Testcase)resmap.get("testresults");
+				}
+//				Testcase	res	= (Testcase)((Map)result).get("testresults");
 				if(res==null)
 				{
 					res	= new Testcase(1, new TestReport[]{new TestReport("#1", "Test execution",

@@ -991,16 +991,27 @@ public class MessageService extends BasicService implements IMessageService
 		// a) if message contains rid ask library service for classloader (global rids are resolved with maven, locals possibly with peer to peer jar transfer)
 		// b) if library service could not resolve rid or message does not contain rid the receiver classloader can be used
 		
-		getRIDClassLoader(msg, getMessageType(type)).addResultListener(new DefaultResultListener<ClassLoader>()
+		final Future<Void> ret = new Future<Void>();
+		ret.addResultListener(new IResultListener<Void>()
 		{
-			public void resultAvailable(final ClassLoader classloader)
+			public void resultAvailable(Void result)
+			{
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		});
+		
+		getRIDClassLoader(msg, getMessageType(type)).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
+		{
+			public void customResultAvailable(final ClassLoader classloader)
 			{
 				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-					.addResultListener(new DefaultResultListener()
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(IComponentManagementService cms)
 					{
-						IComponentManagementService cms = (IComponentManagementService)result;
 						for(int i = 0; i < receivers.length; i++)
 						{
 	//						final int cnt = i; 

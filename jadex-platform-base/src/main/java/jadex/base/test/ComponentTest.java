@@ -3,10 +3,12 @@ package jadex.base.test;
 
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.Tuple2;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 
-import java.util.Map;
+import java.util.Collection;
+import java.util.Iterator;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.Test;
@@ -99,7 +101,8 @@ public class ComponentTest implements	Test
 	/**
 	 *  Listener to capture component execution results.
 	 */
-	class TestResultListener implements IResultListener<Map<String, Object>>
+//	class TestResultListener implements IResultListener<Map<String, Object>>
+	class TestResultListener implements IResultListener<Collection<Tuple2<String, Object>>>
 	{
 		//-------- attributes --------
 		
@@ -107,7 +110,7 @@ public class ComponentTest implements	Test
 		protected boolean	finished;
 		
 		/** The result of the execution (if not exception). */
-		protected Map<String, Object>	result;
+		protected Collection<Tuple2<String, Object>>	result;
 		
 		/** The exception of the execution (if any). */
 		protected Exception	exception;
@@ -131,7 +134,7 @@ public class ComponentTest implements	Test
 		/**
 		 *  Called when the component has terminated.
 		 */
-		public void resultAvailable(Map<String, Object> res)
+		public void resultAvailable(Collection<Tuple2<String, Object>> res)
 		{
 			synchronized(this)
 			{
@@ -149,7 +152,7 @@ public class ComponentTest implements	Test
 		 */
 		public Testcase	waitForResult() throws Exception
 		{
-			Testcase	ret;
+			Testcase	ret = null;
 			
 			// Wait for the component execution to finish.
 			synchronized(this)
@@ -167,7 +170,16 @@ public class ComponentTest implements	Test
 			}
 			else
 			{
-				ret	= (Testcase)result.get("testresults");
+				for(Iterator<Tuple2<String, Object>> it=result.iterator(); it.hasNext(); )
+				{
+					Tuple2<String, Object> tup = it.next();
+					if(tup.getFirstEntity().equals("testresults"))
+					{
+						ret = (Testcase)tup.getSecondEntity();
+						break;
+					}
+				}
+//				ret	= (Testcase)result.get("testresults");
 			}
 
 			return ret;

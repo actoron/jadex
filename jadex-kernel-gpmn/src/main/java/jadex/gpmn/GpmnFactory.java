@@ -29,6 +29,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.gpmn.model.MGpmnModel;
 
@@ -255,7 +256,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, 
 		final IModelInfo modelinfo, final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, 
-		final boolean copy, final Future<Void> inited)
+		final boolean copy, final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
 
@@ -274,7 +275,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 						MGpmnModel amodel = (MGpmnModel)loader.loadModel(modelinfo.getFilename(), null, 
 							cl, modelinfo.getResourceIdentifier());
 						OAVAgentModel agmodel = converter.convertGpmnModelToBDIAgents(amodel, amodel.getClassLoader());
-						ret.setResult(GpmnFactory.this.factory.createComponentInstance(desc, factory, agmodel, config, arguments, parent, bindings, copy, inited));
+						ret.setResult(GpmnFactory.this.factory.createComponentInstance(desc, factory, agmodel, config, arguments, parent, bindings, copy, resultlistener, inited));
 					}
 					catch(Exception e)
 					{
@@ -291,7 +292,7 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 				MGpmnModel amodel = (MGpmnModel)loader.loadModel(modelinfo.getFilename(), null, 
 					cl, modelinfo.getResourceIdentifier());
 				OAVAgentModel agmodel = converter.convertGpmnModelToBDIAgents(amodel, amodel.getClassLoader());
-				ret.setResult(GpmnFactory.this.factory.createComponentInstance(desc, factory, agmodel, config, arguments, parent, bindings, copy, inited));
+				ret.setResult(GpmnFactory.this.factory.createComponentInstance(desc, factory, agmodel, config, arguments, parent, bindings, copy, resultlistener, inited));
 			}
 			catch(Exception e)
 			{

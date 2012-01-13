@@ -15,10 +15,12 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -164,9 +166,9 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						
 					IFuture<IComponentIdentifier> ret = cms.createComponent(null, file,
 						new CreationInfo(null, args, parent, false, instance.getModelElement().getModelInfo().getAllImports()), 
-						new IResultListener<Map<String, Object>>()
+						new IResultListener<Collection<Tuple2<String, Object>>>()
 					{
-						public void resultAvailable(final Map<String, Object> results)
+						public void resultAvailable(final Collection<Tuple2<String, Object>> results)
 						{
 							instance.getComponentAdapter().invokeLater(new Runnable()
 							{
@@ -175,7 +177,17 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 //									System.out.println("end1: "+instance.getComponentIdentifier()+" "+file);
 									
 									// Store results in out parameters.
-									thread.setParameterValue("$results", results);	// Hack???
+									Map<String, Object> res = new HashMap<String, Object>();
+									if(results!=null)
+									{
+										for(Iterator<Tuple2<String, Object>> it=results.iterator(); it.hasNext(); )
+										{
+											Tuple2<String, Object> tup = it.next();
+											res.put(tup.getFirstEntity(), tup.getSecondEntity());
+										}
+									}
+									
+									thread.setParameterValue("$results", res);	// Hack???
 									
 									List<MParameter>	params	= activity.getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
 									if(params!=null && !params.isEmpty())
@@ -198,9 +210,9 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 													throw new RuntimeException("Error evaluating parameter value: "+instance+", "+activity+", "+param.getName()+", "+param.getInitialValue(), e);
 												}
 											}
-											else if(results.containsKey(param.getName()))
+											else if(res.containsKey(param.getName()))
 											{
-												thread.setParameterValue(param.getName(), results.get(param.getName()));
+												thread.setParameterValue(param.getName(), res.get(param.getName()));
 											}
 										}
 									}

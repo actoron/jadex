@@ -1835,7 +1835,7 @@ public class SUtil
 		{
 			f	= new File(url.toURI());
 		}
-		catch(URISyntaxException e)
+		catch(Exception e)
 		{
 			f	= new File(url.getPath());
 		}

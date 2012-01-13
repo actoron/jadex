@@ -23,6 +23,7 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
@@ -73,9 +74,10 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	 */
 	public MicroAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
 		final MicroModel model, Class microclass, final Map args, final String config, 
-		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, final Future<Void> inited)
+		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, 
+		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
-		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, inited);
+		super(desc, model.getModelInfo(), config, factory, parent, bindings, copy, resultlistener, inited);
 		
 		try
 		{

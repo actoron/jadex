@@ -12,8 +12,10 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.IValueFetcher;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -38,13 +40,13 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	protected String config;
 	
 	/** The arguments. */
-	private Map arguments;
+	private Map<String, Object> arguments;
 	
-	/** The arguments. */
-	protected Map results;
+	/** The results. */
+	protected Map<String, Object> results;
 	
 	/** The properties. */
-	protected Map properties;
+	protected Map<String, Object> properties;
 	
 	/** The parent component. */
 	protected IExternalAccess parent;
@@ -62,7 +64,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	protected IServiceContainer container;
 	
 	/** The component listeners. */
-	protected List componentlisteners;
+	protected List<IComponentListener> componentlisteners;
 	
 	/** The external access (cached). */
 	protected IExternalAccess access;
@@ -71,10 +73,13 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	protected RequiredServiceBinding[] bindings;
 	
 	/** The extension instances. */
-	protected Map extensions;
+	protected Map<String, IExtensionInstance> extensions;
 
 	/** The parameter copy allowed flag. */
 	protected boolean copy;
+	
+	/** The result listener. */
+	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
 	
 	//-------- constructors --------
 	
@@ -83,7 +88,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, 
-		final RequiredServiceBinding[] bindings, boolean copy, final Future<Void> inited)
+		final RequiredServiceBinding[] bindings, boolean copy, 
+		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
 		this.config = config!=null? config: model.getConfigurationNames().length>0? 
 			model.getConfigurationNames()[0]: null;
@@ -91,6 +97,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		this.parent = parent;
 		this.bindings = bindings;
 		this.copy = copy;
+		this.resultlistener = resultlistener;
 		if(factory != null)
 			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		this.container = createServiceContainer();
@@ -154,16 +161,19 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
+		// todo: store results only within listener?!
 		if(results==null)
-			results	= new HashMap();
+			results	= new HashMap<String, Object>();
 		results.put(name, value);
+		
+		resultlistener.intermediateResultAvailable(new Tuple2<String, Object>(name, value));
 	}
 	
 	/**
 	 *  Get the properties.
 	 *  @return the properties.
 	 */
-	public Map getProperties()
+	public Map<String, Object> getProperties()
 	{
 		return properties;
 	}
@@ -177,7 +187,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		assert !getComponentAdapter().isExternalThread();
 		
 		if(componentlisteners==null)
-			componentlisteners = new ArrayList();
+			componentlisteners = new ArrayList<IComponentListener>();
 		
 		// Hack! How to find out if remote listener?
 		if(Proxy.isProxyClass(listener.getClass()))
@@ -222,7 +232,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 *  Get the component listeners.
 	 *  @return The component listeners.
 	 */
-	public Collection getInternalComponentListeners()
+	public Collection<IComponentListener> getInternalComponentListeners()
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
@@ -294,7 +304,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		
 		if(arguments==null)
 		{
-			arguments	= new HashMap();
+			arguments	= new HashMap<String, Object>();
 		}
 		if(!arguments.containsKey(name))
 		{
@@ -317,7 +327,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		
 		if(results==null)
 		{
-			results	= new HashMap();
+			results	= new HashMap<String, Object>();
 		}
 		results.put(name, value);
 	}
@@ -333,7 +343,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		
 		if(extensions==null)
 		{
-			extensions = new HashMap();
+			extensions = new HashMap<String, IExtensionInstance>();
 		}
 		extensions.put(name, value);
 	}
@@ -348,7 +358,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		assert !getComponentAdapter().isExternalThread();
 		
 		if(properties==null)
-			properties = new HashMap();
+			properties = new HashMap<String, Object>();
 		properties.put(name, val);
 	}
 	
