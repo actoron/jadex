@@ -12,16 +12,17 @@ import jadex.rules.eca.RuleSystem;
 public class BDIAgent extends MicroAgent
 {
 	/**
-	 * 
+	 *  Method that is called automatically when a belief 
+	 *  is written as field access.
 	 */
-	protected void writeField(Object val, String fieldname)
+	public void writeField(Object val, String fieldname, Object obj)
 	{
 		try
 		{
-			System.out.println("write: "+this+" "+val+" "+fieldname);
-			Field f = this.getClass().getDeclaredField(fieldname);
+			System.out.println("write: "+val+" "+fieldname+" "+obj);
+			Field f = obj.getClass().getDeclaredField(fieldname);
 			f.setAccessible(true);
-			f.set(this, val);
+			f.set(obj, val);
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 			RuleSystem rs = ip.getRuleSystem();
 			rs.addEvent(new Event(fieldname, val));

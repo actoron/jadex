@@ -29,16 +29,9 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtMethod;
-import javassist.CtNewMethod;
-import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
-import javassist.bytecode.ConstPool;
-import javassist.bytecode.annotation.Annotation;
-import javassist.bytecode.annotation.StringMemberValue;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
-
-import javax.jws.WebService;
 
 /**
  *  Reads micro agent classes and generates a model from metainfo and annotations.
@@ -150,11 +143,10 @@ public class BDIClassReader extends MicroClassReader
 				ClassPool pool = new ClassPool(null);
 				pool.appendSystemPath();
 				CtClass clazz = pool.getAndRename(cma.getName(), clname);
-				new CtField(getCtClass(BDIAgent.class, pool), "__agent", clazz);
+				clazz.addField(new CtField(getCtClass(BDIAgent.class, pool), "__agent", clazz));
 				
 				CtMethod[] methods = clazz.getDeclaredMethods();
 				Field[] agents = micromodel.getAgentInjections();
-				final String agent = agents[0].getName();
 			
 				// rewrite methods in which beliefs are written
 				for(int i=0; i<methods.length; i++)
@@ -171,7 +163,7 @@ public class BDIClassReader extends MicroClassReader
 									if(f.isWriter() && beliefnames.contains(f.getFieldName()))
 									{
 //										f.replace("{System.out.println($1); $_ = $proceed($$);}");
-										String rep = "{((jadex.bdiv3.BDIAgent)$0.getClass().getDeclaredField(\"__agent\").get($0)).writeField(jadex.commons.SReflect.wrapValue($1), \""+f.getFieldName()+"\");}"; // $_ = $proceed($$)
+										String rep = "{((jadex.bdiv3.BDIAgent)$0.getClass().getDeclaredField(\"__agent\").get($0)).writeField(jadex.commons.SReflect.wrapValue($1), \""+f.getFieldName()+"\", $0);}"; // $_ = $proceed($$)
 //										System.out.println("replace: "+rep);
 										f.replace(rep); // $_ = $proceed($$)
 									}
@@ -188,6 +180,7 @@ public class BDIClassReader extends MicroClassReader
 				ClassFile cf = clazz.getClassFile();
 				
 				Class ret = clazz.toClass(classloader, cma.getProtectionDomain());
+//				System.out.println("fields: "+SUtil.arrayToString(ret.getDeclaredFields()));
 //				System.out.println("created: "+ret+" "+classloader);
 				clazz.freeze();
 		//		System.out.println("name: "+ret.getName()+" "+ret.getPackage()+" "+proxyclazz.getPackageName());
