@@ -4,7 +4,9 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
 import jadex.micro.MicroModel;
@@ -27,9 +29,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	public BDIAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
 		final MicroModel model, Class microclass, final Map args, final String config, 
-		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, final Future<Void> inited)
+		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, 
+		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited)
 	{
-		super(desc, factory, model, microclass, args, config, parent, bindings, copy, inited);
+		super(desc, factory, model, microclass, args, config, parent, bindings, copy, listener, inited);
 		this.rulesystem = new RuleSystem();
 	}
 	
@@ -69,6 +72,19 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 						getLogger().warning("Agent injection failed: "+e);
 					}
 				}
+			}
+			
+			// Additionally inject agent to hidden agent field
+			try
+			{
+				// todo: cannot use fields as they are from the 'not enhanced' class
+				Field field = agent.getClass().getDeclaredField("__agent");
+				field.setAccessible(true);
+				field.set(agent, ret);
+			}
+			catch(Exception e)
+			{
+				getLogger().warning("Hidden agent injection failed: "+e);
 			}
 		}
 		return ret;

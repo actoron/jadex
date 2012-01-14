@@ -19,18 +19,32 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 import java.util.Collection;
 
+/**
+ *  The invoker agent tests if intermediate results are directly delivered 
+ *  back to the invoker in local and remote case.
+ */
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
+@Description("The invoker agent tests if intermediate results are directly " +
+	"delivered back to the invoker in local and remote case.")
 public class InvokerAgent
 {
+	//-------- attributes --------
+	
 	@Agent
 	protected MicroAgent agent;
+
+	//-------- methods --------
 	
+	/**
+	 *  The agent body.
+	 */
 	@AgentBody
 	public void body()
 	{
@@ -88,7 +102,8 @@ public class InvokerAgent
 	}
 	
 	/**
-	 * 
+	 *  Test if local intermediate results are correctly delivered
+	 *  (not as bunch when finished has been called). 
 	 */
 	protected IFuture<TestReport> testLocal(int testno, long delay, int max)
 	{
@@ -96,7 +111,8 @@ public class InvokerAgent
 	}
 	
 	/**
-	 * 
+	 *  Test if remote intermediate results are correctly delivered
+	 *  (not as bunch when finished has been called). 
 	 */
 	protected IFuture<TestReport> testRemote(final int testno, final long delay, final int max)
 	{
@@ -137,7 +153,10 @@ public class InvokerAgent
 	}
 	
 	/**
-	 * 
+	 *  Perform the test. Consists of the following steps:
+	 *  - start an agent that offers the service
+	 *  - invoke the service
+	 *  - wait with intermediate listener for results 
 	 */
 	protected IFuture<TestReport> performTest(final IServiceProvider provider, final int testno, final long delay, final int max)
 	{

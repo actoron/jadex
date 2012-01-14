@@ -64,7 +64,6 @@ import java.util.jar.JarFile;
 
 /**
  *  Kernel that delegates calls to sub-kernels it finds using on-demand searches.
- *
  */
 @Service
 public class MultiFactory implements IComponentFactory, IMultiKernelNotifierService
@@ -1310,12 +1309,22 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 			return null;
 		
 		String ext = model.substring(firstpoint + 1);
-		if (ext.equals("class"))
+		
+		// Hack! todo: fix me
+		if(ext.equals("class"))
 		{
-			if (model.endsWith("Agent.class"))
+			if(model.endsWith("Agent.class"))
+			{
 				ext = "Agent.class";
+			}
+			else if(model.endsWith("BDI.class"))
+			{
+				ext = "BDI.class";
+			}
 			else
+			{
 				return null;
+			}
 		}
 		
 		return ext;

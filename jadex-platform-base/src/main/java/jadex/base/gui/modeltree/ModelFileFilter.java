@@ -161,7 +161,7 @@ public class ModelFileFilter implements IRemoteFilter
 				if(rid==null)
 				{
 					// Shouldn't happen!?
-					System.out.println("no rid fur url: "+furl+", "+rids);
+					System.out.println("no rid for url: "+furl+", "+rids);
 				}
 				
 				SComponentFactory.isModelType(exta, file.getAbsolutePath(), getSelectedComponents(), rid)

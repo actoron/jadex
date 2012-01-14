@@ -30,7 +30,7 @@ public class HelloWorldBDI
 	protected String text;
 	
 	@Belief
-	protected boolean sayhello;
+	private boolean sayhello;
 	
 //	public HelloWorldBDI()
 //	{

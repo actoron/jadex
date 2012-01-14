@@ -8,6 +8,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -18,22 +19,28 @@ import jadex.micro.annotation.ProvidedServices;
 @Agent
 @Service
 @ProvidedServices(@ProvidedService(type=IIntermediateResultService.class, implementation=@Implementation(expression="$pojoagent")))
+@Description("Agent that provides a service with intermediate results")
 public class IntermediateResultProviderAgent implements IIntermediateResultService
 {
+	//-------- attributes ---------
+	
+	/** The agent. */
 	@Agent
 	protected MicroAgent agent;
 	
-	protected int cnt;
-	
+	//-------- constructors ---------
+
 	/**
 	 *  Get the results.
+	 *  @param delay The delay that is waited between intermediate results.
+	 *  @param max The number of intermediate results that will be returned.
 	 *  @return The results.
 	 */
 	public IIntermediateFuture<String> getResults(final long delay, final int max)
 	{
 		final IntermediateFuture<String> ret = new IntermediateFuture<String>();
 
-		cnt = 0;
+		final int[] cnt = new int[1];
 //		final int max = 5;
 //		final long delay = 200;
 		
@@ -43,8 +50,8 @@ public class IntermediateResultProviderAgent implements IIntermediateResultServi
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				System.out.println("setting intermediate result: "+cnt);//+" - "+System.currentTimeMillis());
-				ret.addIntermediateResult("step("+(cnt++)+"/"+max+")");
-				if(cnt==max)
+				ret.addIntermediateResult("step("+(cnt[0]++)+"/"+max+")");
+				if(cnt[0]==max)
 				{
 					ret.setFinished();
 				}

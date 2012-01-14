@@ -150,14 +150,12 @@ public class BDIClassReader extends MicroClassReader
 				ClassPool pool = new ClassPool(null);
 				pool.appendSystemPath();
 				CtClass clazz = pool.getAndRename(cma.getName(), clname);
-
+				new CtField(getCtClass(BDIAgent.class, pool), "__agent", clazz);
+				
 				CtMethod[] methods = clazz.getDeclaredMethods();
-				
 				Field[] agents = micromodel.getAgentInjections();
-				if(agents==null || agents.length==0)
-					throw new RuntimeException("Must have agents.");
 				final String agent = agents[0].getName();
-				
+			
 				// rewrite methods in which beliefs are written
 				for(int i=0; i<methods.length; i++)
 				{
@@ -173,8 +171,8 @@ public class BDIClassReader extends MicroClassReader
 									if(f.isWriter() && beliefnames.contains(f.getFieldName()))
 									{
 //										f.replace("{System.out.println($1); $_ = $proceed($$);}");
-										String rep = "{$0.getClass().getDeclaredField(\""+agent+"\").writeField($1, \""+f.getFieldName()+"\");}"; // $_ = $proceed($$)
-										System.out.println("replace: "+rep);
+										String rep = "{((jadex.bdiv3.BDIAgent)$0.getClass().getDeclaredField(\"__agent\").get($0)).writeField(jadex.commons.SReflect.wrapValue($1), \""+f.getFieldName()+"\");}"; // $_ = $proceed($$)
+//										System.out.println("replace: "+rep);
 										f.replace(rep); // $_ = $proceed($$)
 									}
 								}
@@ -190,7 +188,7 @@ public class BDIClassReader extends MicroClassReader
 				ClassFile cf = clazz.getClassFile();
 				
 				Class ret = clazz.toClass(classloader, cma.getProtectionDomain());
-//				System.out.println("created: "+ret+" "+ret.getSuperclass());
+//				System.out.println("created: "+ret+" "+classloader);
 				clazz.freeze();
 		//		System.out.println("name: "+ret.getName()+" "+ret.getPackage()+" "+proxyclazz.getPackageName());
 			}

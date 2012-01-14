@@ -95,6 +95,41 @@ public class SReflect
 		return wrappedtypes.get(clazz)!=null;
 	}
 
+	public static Object wrapValue(boolean val)
+	{
+		return val? Boolean.TRUE: Boolean.FALSE;
+	}
+	
+	public static Object wrapValue(int val)
+	{
+		return new Integer(val);
+	}
+	
+	public static Object wrapValue(long val)
+	{
+		return new Long(val);
+	}
+	
+	public static Object wrapValue(byte val)
+	{
+		return new Byte(val);
+	}
+	
+	public static Object wrapValue(char val)
+	{
+		return new Character(val);
+	}
+	
+	public static Object wrapValue(float val)
+	{
+		return new Float(val);
+	}
+	
+	public static Object wrapValue(short val)
+	{
+		return new Short(val);
+	}
+	
 	/**
 	 *  Extension for Class.forName(), because primitive
 	 *  types are not supported.

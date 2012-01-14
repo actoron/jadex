@@ -368,6 +368,7 @@ public abstract class ComponentManagementService extends BasicService implements
 							{
 								public void customResultAvailable(final IResourceIdentifier rid)
 								{
+//									System.out.println("loading: "+modelname+" "+rid);
 									resolveFilename(modelname, cinfo, rid).addResultListener(new ExceptionDelegationResultListener<String, IComponentIdentifier>(inited)
 									{
 										public void customResultAvailable(final String model)
@@ -1937,14 +1938,15 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 		
 		// Local parent //(but not platform -> platform now has valid rid).
-		else if(ci!=null && ci.getParent()!=null
+		else if(ci!=null 
 //			&& !ci.getParent().equals(root.getComponentIdentifier())
-			&& !isRemoteComponent(ci.getParent())
+			&& (ci.getParent()==null || !isRemoteComponent(ci.getParent()))
 //			&& !initinfos.containsKey(ci.getParent())	// does not work during init as external access is not available!?
 //			&& !Boolean.TRUE.equals(ci.getPlatformloader()))
 			)
 		{
-			getExternalAccess(ci.getParent(), true).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IResourceIdentifier>(ret)
+			getExternalAccess(ci.getParent()==null? root.getComponentIdentifier(): ci.getParent(), true)
+				.addResultListener(new ExceptionDelegationResultListener<IExternalAccess, IResourceIdentifier>(ret)
 			{
 				public void customResultAvailable(IExternalAccess ea)
 				{

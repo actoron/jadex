@@ -18,6 +18,6 @@ public interface IComponentFactoryExtensionService
 	/**
 	 *  Get extension. 
 	 */
-	public IFuture getExtension(String componenttype); // <Set<TypeInfo>> 
+	public IFuture getExtension(String componenttype); // <Set<TypeInfo>> -> no what about annotation based extensions
 	
 }
