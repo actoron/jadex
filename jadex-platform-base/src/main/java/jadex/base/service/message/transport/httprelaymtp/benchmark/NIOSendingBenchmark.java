@@ -2,15 +2,17 @@ package jadex.base.service.message.transport.httprelaymtp.benchmark;
 
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,16 +31,21 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	//-------- attributes --------
 	
 	/** The open futures. */
-	protected List<IFuture<Void>>	open;
+	protected List<Future<Void>>	open;
 	
 	/** The NIO selector. */
 	protected Selector	selector;
+	protected List<Runnable>	tasks;
 	
 	/** The socket channel (if any). */
 	protected SocketChannel	sc;
 	
 	/** The messages to be sent. */
 	protected List<byte[]>	messages;
+	
+	/** The currently sending message (if any). */
+	protected ByteBuffer	buf;
+	protected StringBuffer	response;
 	
 	protected String	host;
 	protected String	path;
@@ -52,8 +59,9 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	 */
 	protected void setUp() throws Exception
 	{
-		open	= new LinkedList<IFuture<Void>>();
+		open	= new LinkedList<Future<Void>>();
 		messages	= new LinkedList<byte[]>();
+		tasks	= new ArrayList<Runnable>();
 		
 		// ANDROID: the following line causes an exception in a 2.2
 		// emulator, see:
@@ -65,6 +73,9 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		// Causes problem with maven too (only with Win firewall?)
 		// http://www.thatsjava.com/java-core-apis/28232/
 		selector	= Selector.open();
+		SelectorThread	thread	= new SelectorThread();
+		thread.selector	= selector;
+		new Thread(thread).start();
 		
 		if(!ADDRESS.startsWith("http://"))
 			throw new IOException("Unknown URL scheme: "+ADDRESS);
@@ -93,6 +104,7 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		{
 			open.remove(0).get(new ThreadSuspendable(), 20000);
 		}
+		selector.close();
 	}
 	
 	/**
@@ -109,7 +121,8 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		
 		while(open.size()>MAX)
 		{
-			open.remove(0).get(new ThreadSuspendable(), 20000);			
+			open.get(0).get(new ThreadSuspendable(), 2000000);
+			open.remove(0);
 		}
 	}
 	
@@ -132,7 +145,7 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 			+ "\r\n"
 			).getBytes();
 		
-		byte[]	msg	= new byte[header.length+4+id.length+4+data.length];
+		final byte[]	msg	= new byte[header.length+4+id.length+4+data.length];
 		System.arraycopy(header, 0, msg, 0, header.length);
 		System.arraycopy(SUtil.intToBytes(id.length), 0, msg, header.length, 4);
 		System.arraycopy(id, 0, msg, header.length+4, id.length);
@@ -144,10 +157,15 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		{
 			public void run()
 			{
+				System.out.println("adding message");
+				messages.add(msg);
+				
 				if(sc!=null)
 				{
 					SelectionKey	key	= sc.keyFor(selector);
-					key.interestOps(SelectionKey.OP_WRITE);
+					if((key.interestOps()&SelectionKey.OP_WRITE)==0)
+						key.interestOps(key.interestOps()|SelectionKey.OP_WRITE);
+//					System.out.println("ops1w: "+key.interestOps());
 				}
 				else
 				{
@@ -157,6 +175,7 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 						sc.configureBlocking(false);
 						sc.connect(new InetSocketAddress(host, port));
 						sc.register(selector, SelectionKey.OP_CONNECT);
+//						System.out.println("ops0c: "+sc.keyFor(selector).interestOps());
 					}
 					catch(Exception e)
 					{
@@ -166,12 +185,12 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 			}			
 		};
 		
-//		synchronized(tasks)
+		synchronized(tasks)
 		{
-//			tasks.add(run);
+			System.out.println("adding task");
+			tasks.add(run);
 		}
 		selector.wakeup();
-	
 	}
 	
 	//-------- NIO handler --------
@@ -182,10 +201,33 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		
 		public void run()
 		{
-			while(true)
+			System.out.println("starting selector thread");
+			while(selector.isOpen())
 			{
+//				System.out.println("running selector thread");
 				try
 				{
+					Runnable[]	atasks	= null;
+					synchronized(tasks)
+					{
+						if(!tasks.isEmpty())
+						{
+							atasks	= tasks.toArray(new Runnable[tasks.size()]);
+							tasks.clear();
+						}
+					}
+					for(int i=0; atasks!=null && i<atasks.length; i++)
+					{
+						try
+						{
+							atasks[i].run();
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
+					
 					// Wait for an event one of the registered channels
 					selector.select();
 
@@ -223,6 +265,7 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 					e.printStackTrace();
 				}
 			}
+			System.out.println("leaving selector thread");
 		}
 		
 		//-------- handler methods --------
@@ -232,6 +275,7 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		 */
 		protected void	handleConnect(SelectionKey key)
 		{
+			System.out.println("Opening connection");
 			SocketChannel	sc	= (SocketChannel)key.channel();
 			try
 			{
@@ -246,6 +290,7 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 				else
 				{
 					key.interestOps(SelectionKey.OP_WRITE);
+//					System.out.println("ops2w: "+key.interestOps());
 				}
 			}
 			catch(Exception e)
@@ -260,52 +305,51 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		 */
 		protected void handleWrite(SelectionKey key)
 		{
-//			SocketChannel	sc	= (SocketChannel)key.channel();
-//			NIOTCPOutputConnection	con	= (NIOTCPOutputConnection)key.attachment();
-//			List	queue	= (List)this.writetasks.get(sc);
-//
-//			try
-//			{
-//				boolean	more	= true;
-//				while(more)
-//				{
-//					if(queue.isEmpty())
-//					{
-//						more	= false;
-//						// We wrote away all data, so we're no longer interested in
-//						// writing on this socket.
-//						key.interestOps(0);
-//					}
-//					else
-//					{
-//						Tuple	task	= (Tuple)queue.get(0);
-//						List	buffers	= (List)task.get(0);	
-//						Future	fut	= (Future)task.get(1);	
-//						ByteBuffer buf = (ByteBuffer)buffers.get(0);
-//						sc.write(buf);
-//						if(buf.remaining()>0)
-//						{
-//							// Output buffer is full: stop sending for now.
-//							more	= false;
-//						}
-//						else
-//						{
-//							// Buffer written: remove task and inform future, when no more buffers for this task.
-//							buffers.remove(buf);
-//							if(buffers.isEmpty())
-//							{
-//								queue.remove(task);
-//								fut.setResult(null);
-//							}
-//						}
-//					}
-//				}
-//			}
-//			catch(Exception e)
-//			{
-//				e.printStackTrace();
-//				key.cancel();
-//			}
+			System.out.println("Sending message");
+			SocketChannel	sc	= (SocketChannel)key.channel();
+
+			try
+			{
+				boolean	more	= true;
+				while(more)
+				{
+					if(buf==null && messages.isEmpty())
+					{
+						more	= false;
+						// We wrote away all data, deregister writing interest.
+						assert (key.interestOps()&SelectionKey.OP_WRITE)!=0;
+						key.interestOps(key.interestOps()-SelectionKey.OP_WRITE);
+//						System.out.println("ops3-w: "+key.interestOps());
+					}
+					else if(buf!=null)
+					{
+						sc.write(buf);
+						if(buf.remaining()>0)
+						{
+							// Output buffer is full: stop sending for now, but keep interest.
+							more	= false;
+						}
+						else
+						{
+							// Buffer written, register interest in answer.
+							System.out.println("Message sent.");
+							key.interestOps(key.interestOps()|SelectionKey.OP_READ);
+//							System.out.println("ops4r: "+key.interestOps());
+							buf	= null;
+						}
+					}
+					else
+					{
+						byte[]	msg	= messages.remove(0);
+						buf	= ByteBuffer.wrap(msg);
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+				key.cancel();
+			}
 		}
 		
 		/**
@@ -313,15 +357,61 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		 */
 		protected void	handleRead(SelectionKey key)
 		{
-//			try
-//			{
-//				ReadableByteChannel	rbc	= (ReadableByteChannel)key.channel();
-//			}
-//			catch(Exception e)
-//			{ 
-//				e.printStackTrace();
-//				key.cancel();
-//			}
+			System.out.println("Reading response");
+			try
+			{
+				ReadableByteChannel	rbc	= (ReadableByteChannel)key.channel();
+				ByteBuffer	inbuf = ByteBuffer.allocate(256);
+				int	read	= rbc.read(inbuf);
+				while(read>0)
+				{
+					if(response==null)
+						response	= new StringBuffer();
+					response.append(new String(inbuf.array(), 0, read));
+					inbuf.clear();
+					read	= rbc.read(inbuf);
+				}
+				
+				// All available data read.
+				assert (key.interestOps()&SelectionKey.OP_READ)!=0;
+				key.interestOps(key.interestOps()-SelectionKey.OP_READ);
+//				System.out.println("ops5-r: "+key.interestOps());
+				
+				// Extract HTTP responses
+				int	idx;
+				while((idx=response.indexOf("\r\n\r\n"))!=-1)
+				{
+					String	resp	= response.substring(0, idx);
+					response.delete(0, idx+4);
+					boolean	close	= resp.indexOf("Connection: close")!=-1;
+					if(close)
+						System.out.print("Close requested.");
+					if(resp.indexOf("\r\n")!=-1)
+					{
+						resp	= resp.substring(0, resp.indexOf("\r\n"));
+					}
+					if(!"HTTP/1.1 200 OK".equals(resp))
+						throw new IOException("HTTP response: "+resp);
+					
+					boolean	result	= false;
+					for(int i=0; !result && i<open.size(); i++)
+					{
+						if(!open.get(i).isDone())
+						{
+							open.get(i).setResult(null);
+							result	= true;
+						}
+					}
+					
+					// Make sure that future was found.
+					assert result;
+				}
+			}
+			catch(Exception e)
+			{ 
+				e.printStackTrace();
+				key.cancel();
+			}
 		}
 	}
 }

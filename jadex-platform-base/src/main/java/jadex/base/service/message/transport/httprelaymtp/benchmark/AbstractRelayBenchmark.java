@@ -38,7 +38,8 @@ public abstract class AbstractRelayBenchmark	extends AbstractBenchmark
 		AbstractBenchmark.main(new String[]
 		{
 			ReceivingBenchmark.class.getName(),
-			AsyncSendingBenchmark.class.getName(),
+			NIOSendingBenchmark.class.getName(),
+//			AsyncSendingBenchmark.class.getName(),	// Hangs on android!?
 			KeepaliveSendingBenchmark.class.getName(),
 			CustomSendingBenchmark.class.getName(),
 			SendingBenchmark.class.getName()
