@@ -27,7 +27,7 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	//-------- constants --------
 	
 	/** The max number of open messages. */
-	protected final int	MAX	= 10;
+	protected final int	MAX	= 2;
 	
 	//-------- attributes --------
 	
@@ -149,6 +149,8 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		synchronized(open)
 		{
 			open.add(m);
+			added++;
+			System.out.println("open: "+open.size()+" of "+added);
 		}
 		sendMessage(m);
 		
@@ -166,6 +168,7 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 			synchronized(open)
 			{
 				open.remove(0);
+				System.out.println("open-: "+open.size()+" of "+added);
 			}
 		}
 	}
@@ -254,7 +257,7 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 					}
 					
 					// Wait for an event one of the registered channels
-					System.out.println("selector idle");
+//					System.out.println("selector idle");
 					selector.select();
 
 					// Iterate over the set of keys for which events are available
@@ -322,7 +325,6 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 			catch(Exception e)
 			{ 
 				e.printStackTrace();
-				key.cancel();
 			}
 		}
 		
@@ -332,7 +334,7 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		protected void handleWrite(SelectionKey key)
 		{
 			SocketChannel	sc	= (SocketChannel)key.channel();
-			System.out.println("Sending on "+sc);
+//			System.out.println("Sending on "+sc);
 
 			try
 			{
@@ -376,45 +378,12 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 			}
 			catch(Exception e)
 			{
-				System.out.println("reconnect: "+e);
-				key.cancel();
+				// Remove writing interest from connection.
+				assert (key.interestOps()&SelectionKey.OP_WRITE)!=0;
+				key.interestOps(key.interestOps()-SelectionKey.OP_WRITE);
 				
-				try
-				{
-					sc.close();
-					
-					sc	= SocketChannel.open();
-					sc.configureBlocking(false);
-					sc.connect(new InetSocketAddress(host, port));
-					sc.register(selector, SelectionKey.OP_CONNECT);
-	//				System.out.println("ops0c: "+sc.keyFor(selector).interestOps());
-					
-					// Recover already sent but not acknowledged messages.
-					buf	= null;
-					List<Message>	resend	= new ArrayList<Message>();
-					synchronized(open)
-					{
-						for(int i=0; i<open.size(); i++)
-						{
-							if(!open.get(i).fut.isDone() && open.get(i).sent)
-							{
-								resend.add(open.get(i));
-								open.get(i).sent	= false;
-								sent--;
-							}
-						}
-					}
-					
-					System.out.println("Resending "+resend.size()+" messages.");
-					for(int i=0; i<resend.size(); i++)
-					{
-						sendMessage(resend.get(i));
-					}
-				}
-				catch(Exception e2)
-				{
-					e2.printStackTrace();
-				}
+				System.out.println("reconnect: "+e);
+				reconnect();
 			}
 		}
 		
@@ -423,10 +392,10 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		 */
 		protected void	handleRead(SelectionKey key)
 		{
+			ReadableByteChannel	rbc	= (ReadableByteChannel)key.channel();
+//			System.out.println("Reading from "+rbc);
 			try
 			{
-				ReadableByteChannel	rbc	= (ReadableByteChannel)key.channel();
-				System.out.println("Reading from "+rbc);
 				ByteBuffer	inbuf = ByteBuffer.allocate(256);
 				int	read	= rbc.read(inbuf);
 				while(read>0)
@@ -473,52 +442,74 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 					
 					if(close)
 					{
-						System.out.println("Close requested.");
-						try
+						rbc.close();
+						if(rbc==sc)
 						{
-							sc.close();
-							
-							sc	= SocketChannel.open();
-							sc.configureBlocking(false);
-							sc.connect(new InetSocketAddress(host, port));
-							sc.register(selector, SelectionKey.OP_CONNECT);
-//							System.out.println("ops0c: "+sc.keyFor(selector).interestOps());
-							
-							// Recover already sent but not acknowledged messages.
-							buf	= null;
-							List<Message>	resend	= new ArrayList<Message>();
-							synchronized(open)
-							{
-								for(int i=0; i<open.size(); i++)
-								{
-									if(!open.get(i).fut.isDone() && open.get(i).sent)
-									{
-										resend.add(open.get(i));
-										open.get(i).sent	= false;
-										sent--;
-									}
-								}
-							}
-							
-							System.out.println("Resending "+resend.size()+" messages.");
-							for(int i=0; i<resend.size(); i++)
-							{
-								sendMessage(resend.get(i));
-							}
+							System.out.println("Close requested.");
+							reconnect();
 						}
-						catch(Exception e)
+						else
 						{
-							e.printStackTrace();
+							System.out.println("Already reconnected.");							
 						}
 					}
 				}
 			}
 			catch(Exception e)
-			{ 
-				e.printStackTrace();
+			{
+				// No more interest in this connection.
 				key.cancel();
+
+				if(rbc==sc)
+				{
+					System.out.println("Close forced: "+e);
+					reconnect();
+				}
+				else
+				{
+					System.out.println("Already forced reconnected.");							
+				}
 			}
 		}
+	}
+	
+	protected void	reconnect()
+	{
+		try
+		{
+			sc	= SocketChannel.open();
+			sc.configureBlocking(false);
+			sc.connect(new InetSocketAddress(host, port));
+			sc.register(selector, SelectionKey.OP_CONNECT);
+//			System.out.println("ops0c: "+sc.keyFor(selector).interestOps());
+			
+			// Recover already sent but not acknowledged messages.
+			assert buf==null || msg!=null;
+			buf	= msg!=null ? ByteBuffer.wrap(msg.data) : null;
+			List<Message>	resend	= new ArrayList<Message>();
+			synchronized(open)
+			{
+				for(int i=0; i<open.size(); i++)
+				{
+					if(!open.get(i).fut.isDone() && open.get(i).sent)
+					{
+						resend.add(open.get(i));
+						open.get(i).sent	= false;
+						sent--;
+					}
+				}
+			}
+			
+			System.out.println("Resending "+resend.size()+" messages.");
+			for(int i=0; i<resend.size(); i++)
+			{
+				sendMessage(resend.get(i));
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}		
 	}
 	
 	public static class	Message
