@@ -40,6 +40,8 @@ import jadex.commons.gui.JValidatorTextField;
 import jadex.commons.gui.SGUI;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.annotation.XMLClassname;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -1066,6 +1068,8 @@ public class StarterPanel extends JLayeredPane
 				if(result!=null) 
 					props.addProperty(new Property("model", (String)result));
 
+				props.addProperty(new Property("rid", JavaWriter.objectToXML(rid, null)));
+				
 				String c = (String)config.getSelectedItem();
 				if(c!=null) props.addProperty(new Property("config", c));
 
@@ -1098,6 +1102,9 @@ public class StarterPanel extends JLayeredPane
 		// Settings are invoke later'd due to getting overridden otherwise.!?
 		
 //		System.out.println("setP: "+Thread.currentThread().getName());
+		
+		String rid = props.getStringProperty("rid");
+		lastrid =  JavaReader.objectFromXML(rid, null);
 		
 		Property[]	aargs	= props.getProperties("argument");
 		this.loadargs = new String[aargs.length];

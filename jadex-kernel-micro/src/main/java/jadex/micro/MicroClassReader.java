@@ -747,7 +747,7 @@ public class MicroClassReader
 	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
 	{
 		Class ret = SReflect.findClass0(clname, imports, classloader);
-		// System.out.println(clname+" "+cma+" "+ret);
+//		System.out.println(clname+" "+ret+" "+classloader);
 		int idx;
 		while(ret == null && (idx = clname.indexOf('.')) != -1)
 		{

@@ -7,11 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  Component instance information.
  */
 public class ComponentInstanceInfo extends Startable
 {
 	//-------- attributes --------
+	
+	// todo: allow rid definition 
 	
 	/** The name. */
 	protected String name;

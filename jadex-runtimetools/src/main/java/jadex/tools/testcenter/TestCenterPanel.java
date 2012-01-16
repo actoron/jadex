@@ -7,6 +7,7 @@ import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -22,6 +23,7 @@ import jadex.commons.future.IRemoteResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.EditableList;
+import jadex.commons.gui.EditableListEvent;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ScrollablePanel;
@@ -45,9 +47,11 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
@@ -67,10 +71,15 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 /**
  *  The test center panel for running tests and viewing the results.
  */
+
+// todo: fix allowduplicates to work of the 'tests' tuple list and not on the filename strings
+
 public class TestCenterPanel extends JSplitPanel
 {
 	//-------- constants --------
@@ -122,6 +131,9 @@ public class TestCenterPanel extends JSplitPanel
 	/** The testcase timeout. */
 	protected long	timeout;
 	
+	/** The list of tests. */
+	protected List<Tuple2<String, IResourceIdentifier>> tests;
+	
 	//-------- constructors --------
 
 	/**
@@ -131,6 +143,7 @@ public class TestCenterPanel extends JSplitPanel
 	{
 		this.plugin = plugin;
 		this.concurrency	= 1;
+		this.tests = new ArrayList<Tuple2<String, IResourceIdentifier>>();
 		this.setResizeWeight(0.5);
 	
 		final JFileChooser loadsavechooser = new JFileChooser(".");
@@ -170,7 +183,21 @@ public class TestCenterPanel extends JSplitPanel
 		JPanel testcases = new ScrollablePanel(null, false, true);
 		testcases.setLayout(new GridBagLayout());
 		testcases.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Test suite settings "));
+		
 		this.teststable = new EditableList("Test cases", true);
+		teststable.getModel().addTableModelListener(new TableModelListener()
+		{
+			public void tableChanged(TableModelEvent e)
+			{
+//				System.out.println("table: "+e);
+				if(e.getType()==TableModelEvent.DELETE)
+				{
+					int row = e.getFirstRow();
+					if(row!=-1)
+						tests.remove(row);
+				}
+			}
+		});
 		
 		JScrollPane	scroll	= new JScrollPane(teststable);
 		teststable.setPreferredScrollableViewportSize(new Dimension(400, 200)); // todo: hack
@@ -308,7 +335,8 @@ public class TestCenterPanel extends JSplitPanel
 									FileWriter fos = new FileWriter(file);
 //									fos.write(JavaWriter.objectToXML(teststable.getEntries(), ((ILibraryService)result).getClassLoader()));
 //									fos.write(JavaWriter.objectToXML(teststable.getEntries(), plugin.getJCC().getJCCAccess().getModel().getClassLoader()));
-									fos.write(JavaWriter.objectToXML(teststable.getEntries(), cl));//plugin.getJCC().getClassLoader(null)));
+//									fos.write(JavaWriter.objectToXML(teststable.getEntries(), cl));//plugin.getJCC().getClassLoader(null)));
+									fos.write(JavaWriter.objectToXML(tests, cl));//plugin.getJCC().getClassLoader(null)));
 									fos.close();
 								}
 							}
@@ -353,8 +381,9 @@ public class TestCenterPanel extends JSplitPanel
 									}
 //									String[] names = (String[])JavaReader.objectFromXML(out.toString(), ((ILibraryService)result).getClassLoader());
 //									String[] names = (String[])JavaReader.objectFromXML(out.toString(), plugin.getJCC().getJCCAccess().getModel().getClassLoader());
-									String[] names = (String[])JavaReader.objectFromXML(out.toString(), cl);//plugin.getJCC().getClassLoader(null));
-									teststable.setEntries(names);
+//									String[] names = (String[])JavaReader.objectFromXML(out.toString(), cl);//plugin.getJCC().getClassLoader(null));
+									List tests = (List)JavaReader.objectFromXML(out.toString(), cl);//plugin.getJCC().getClassLoader(null));
+									setTests(tests);
 								}
 								catch(Exception e)
 								{
@@ -383,7 +412,7 @@ public class TestCenterPanel extends JSplitPanel
 		{
 			public void actionPerformed(ActionEvent ae)
 			{
-				teststable.setEntries(new String[0]);
+				clearTests();
 			}
 		});
 
@@ -393,7 +422,8 @@ public class TestCenterPanel extends JSplitPanel
 			{
 				if(testsuite==null || !testsuite.isRunning())
 				{
-					testsuite	= new TestSuite(teststable.getEntries());
+//					testsuite	= new TestSuite(teststable.getEntries());
+					testsuite	= new TestSuite((Tuple2<String, IResourceIdentifier>[])tests.toArray(new Tuple2[0]));
 					testsuite.start();
 				}
 				else
@@ -476,9 +506,16 @@ public class TestCenterPanel extends JSplitPanel
 		teststable.setAllowDuplicates(props.getBooleanProperty("allowduplicates"));
 		allowduplicates.setSelected(props.getBooleanProperty("allowduplicates"));
 		
-		Property[]	entries	= props.getProperties("entry");
-		for(int i=0; i<entries.length; i++)
-			teststable.addEntry(entries[i].getValue());
+		String entries = props.getStringProperty("entries");
+		if(entries!=null)
+			setTests((List)JavaReader.objectFromXML(entries, null));
+		
+//		Property[]	entries	= props.getProperties("entry");
+//		for(int i=0; i<entries.length; i++)
+//		{
+//			Tuple2<String, IResourceIdentifier> tup = JavaReader.objectFromXML(entries[i].getValue(), null);
+//			addTest(tup.getFirstEntity(), tup.getSecondEntity());
+//		}
 		
 		String timeout;
 		if(props.getProperty("timeout")!=null)
@@ -505,13 +542,28 @@ public class TestCenterPanel extends JSplitPanel
 	}
 
 	/**
+	 *  Get the testcase names.
+	 */
+	protected String[] getTestNames()
+	{
+		final String[]	ret	= new String[tests.size()];
+		for(int i=0; i<tests.size(); i++)
+		{
+			ret[i] = tests.get(i).getFirstEntity();
+		}
+		return ret;
+	}
+	
+	/**
 	 * Save the properties.
 	 */
 	public IFuture	getProperties()
 	{
 		final Future ret	= new Future();
 		
-		final String[]	entries	= teststable.getEntries();
+//		final String[]	entries	= teststable.getEntries();
+		final String[]	entries	= getTestNames();
+		
 		plugin.getJCC().getPlatformAccess().scheduleStep(new IComponentStep<String[]>()
 		{
 			@XMLClassname("convertPathToRelative")
@@ -528,10 +580,13 @@ public class TestCenterPanel extends JSplitPanel
 			public void customResultAvailable(String[] entries)
 			{
 				Properties	props	= new Properties();
+				List mytests = new ArrayList();
 				for(int i=0; i<entries.length; i++)
 				{
-					props.addProperty(new Property("entry", entries[i]));
+					Tuple2<String, IResourceIdentifier> tup = new Tuple2<String, IResourceIdentifier>(entries[i], tests.get(i).getSecondEntity());
+					mytests.add(tup);
 				}
+				props.addProperty(new Property("entries", JavaWriter.objectToXML(mytests, null)));
 				props.addProperty(new Property("timeout", tfto.getText()));
 				props.addProperty(new Property("concurrency", ""+concurrency));
 				props.addProperty(new Property("allowduplicates", ""+allowduplicates.isSelected()));
@@ -634,7 +689,7 @@ public class TestCenterPanel extends JSplitPanel
 	 */
 	protected String generateReport(TestSuite suite)
 	{
-		String[]	names	= suite.getTestcaseNames();
+		Tuple2<String, IResourceIdentifier>[]	names	= suite.getTestcaseNames();
 		Testcase[]	testcases	= suite.getTestcases();
 		int performed	= 0;
 //		int failed	= 0;
@@ -764,7 +819,7 @@ public class TestCenterPanel extends JSplitPanel
 				text.append(names[i]);
 				text.append(i);
 				text.append("\"></a>\n");
-				text.append(testcases[i].getHTMLFragment(i+1, names[i]));
+				text.append(testcases[i].getHTMLFragment(i+1, names[i].getFirstEntity()));
 				text.append("<a href=\"#top\">Back to top.</a> &nbsp;\n");
 			}
 		}
@@ -820,13 +875,49 @@ public class TestCenterPanel extends JSplitPanel
 		}
 	}
 	
+//	/**
+//	 *  Get the list of tests.
+//	 *  @return The list.
+//	 */
+//	public EditableList getTestList()
+//	{
+//		return teststable;
+//	}
+	
 	/**
-	 *  Get the list of tests.
-	 *  @return The list.
+	 *  Add a test.
 	 */
-	public EditableList getTestList()
+	public void addTest(String model, IResourceIdentifier rid)
 	{
-		return teststable;
+		tests.add(new Tuple2<String, IResourceIdentifier>(model, rid));
+		teststable.addEntry(model);
+	}
+	
+	/**
+	 *  Remove a test.
+	 */
+	public void removeTest(String model, IResourceIdentifier rid)
+	{
+		tests.remove(new Tuple2<String, IResourceIdentifier>(model, rid));
+		teststable.addEntry(model);
+	}
+	
+	/**
+	 * 
+	 */
+	public void clearTests()
+	{
+		tests.clear();
+		teststable.setEntries(new String[0]);
+	}
+	
+	/**
+	 * 
+	 */
+	public void setTests(List<Tuple2<String, IResourceIdentifier>> tests)
+	{
+		this.tests = tests;
+		teststable.setEntries(getTestNames());
 	}
 
 	/**
@@ -843,7 +934,8 @@ public class TestCenterPanel extends JSplitPanel
 		updateProgress();
 		updateDetails();
 		
-		teststable.setEntries(new String[0]);
+		clearTests();
+//		teststable.setEntries(new String[0]);
 		teststable.setAllowDuplicates(false);
 		allowduplicates.setSelected(false);
 		
@@ -949,7 +1041,7 @@ public class TestCenterPanel extends JSplitPanel
 		f.pack();
 		f.setVisible(true);
 
-		p.teststable.setEntries(new String[]{"a","b","c"});
+//		p.teststable.setEntries(new String[]{"a","b","c"});
 	}
 
 	//-------- helper classes --------
@@ -962,7 +1054,7 @@ public class TestCenterPanel extends JSplitPanel
 		//-------- attributes --------
 		
 		/** The names of the testcases. */
-		protected String[]	names;
+		protected Tuple2<String, IResourceIdentifier>[]	names;
 		
 		/** The results of the testcases. */
 		protected Testcase[]	results;
@@ -984,7 +1076,7 @@ public class TestCenterPanel extends JSplitPanel
 		/**
 		 *  Create a new test suite for the given test cases.
 		 */
-		public TestSuite(String[] names)
+		public TestSuite(Tuple2<String, IResourceIdentifier>[] names)
 		{
 			this.names	= names;
 			this.results	= new Testcase[names.length];
@@ -1013,7 +1105,7 @@ public class TestCenterPanel extends JSplitPanel
 		/**
 		 *  Get the testcase names array.
 		 */
-		public String[]	getTestcaseNames()
+		public Tuple2<String, IResourceIdentifier>[]	getTestcaseNames()
 		{
 			return names;
 		}
@@ -1090,7 +1182,7 @@ public class TestCenterPanel extends JSplitPanel
 			{
 				if(!testcases.containsKey(names[i]) && results[i]==null)
 				{
-					final String	name	= names[i];
+					final Tuple2<String, IResourceIdentifier>	name	= names[i];
 					testcases.put(name, null);
 					
 					final IResultListener	res	= new TestResultListener(name);
@@ -1106,7 +1198,9 @@ public class TestCenterPanel extends JSplitPanel
 							Map	args	= new HashMap();
 							args.put("timeout", timeout);
 							// Todo: Use remote component for parent if any
-							cms.createComponent(null, name, new CreationInfo(args, plugin.getJCC().getPlatformAccess().getComponentIdentifier()), res)
+							CreationInfo ci = new CreationInfo(args, plugin.getJCC().getPlatformAccess().getComponentIdentifier());
+							ci.setResourceIdentifier(name.getSecondEntity());
+							cms.createComponent(null, name.getFirstEntity(), ci, res)
 								.addResultListener(new SwingDelegationResultListener(ret));
 							
 							// Todo: timeout -> force destroy of component
@@ -1167,14 +1261,14 @@ public class TestCenterPanel extends JSplitPanel
 			//-------- attributes --------
 			
 			/** The testcase name. */
-			protected String	name;
+			protected Tuple2<String, IResourceIdentifier>	name;
 			
 			//-------- constructors --------
 			
 			/**
 			 *  Create a test result listener
 			 */
-			public TestResultListener(String name)
+			public TestResultListener(Tuple2<String, IResourceIdentifier> name)
 			{
 				this.name	= name;
 			}

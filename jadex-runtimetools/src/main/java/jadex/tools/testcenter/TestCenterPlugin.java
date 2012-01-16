@@ -275,7 +275,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 								createResourceIdentifier((IFileNode)selpath.getPathComponent(1))
 									.addResultListener(new SwingDefaultResultListener<IResourceIdentifier>(mpanel)
 								{
-									public void customResultAvailable(IResourceIdentifier rid)
+									public void customResultAvailable(final IResourceIdentifier rid)
 									{
 										STestCenter.isTestcase(model, getJCC().getPlatformAccess(), rid)
 											.addResultListener(new SwingDefaultResultListener(mpanel)
@@ -283,9 +283,14 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 											public void customResultAvailable(Object result)
 											{
 												if(((Boolean)result).booleanValue())
-													tcpanel.getTestList().addEntry(model);
+												{
+//													tcpanel.getTestList().addEntry(model);
+													tcpanel.addTest(model, rid);
+												}
 												else
+												{
 													jcc.setStatusText("Component is not a testcase: "+model);
+												}
 												mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 											}
 										});
@@ -513,7 +518,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 					createResourceIdentifier((IFileNode)base)
 						.addResultListener(new SwingDefaultResultListener<IResourceIdentifier>(mpanel)
 					{
-						public void customResultAvailable(IResourceIdentifier rid)
+						public void customResultAvailable(final IResourceIdentifier rid)
 						{
 							STestCenter.isTestcase(model, getJCC().getPlatformAccess(), rid)
 								.addResultListener(new SwingDefaultResultListener(mpanel)
@@ -525,7 +530,8 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 									getJCC().setStatusText(text);
 									if(((Boolean)result).booleanValue())
 									{
-										tcpanel.getTestList().addEntry(model);
+										tcpanel.addTest(model, rid);
+//										tcpanel.getTestList().addEntry(model);
 									}
 								}
 							});
@@ -541,26 +547,33 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 	 *  Remove testcases for a file or directory recusively.
 	 *  @param node The file/dir node to start.
 	 */
-	protected void removeTestcases(IFileNode node)
+	protected void removeTestcases(final IFileNode node)
 	{
-		java.util.List nodes = SCollection.createArrayList();
-		nodes.add(node);
-		while(nodes.size()>0)
+		createResourceIdentifier(node).addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
 		{
-			node	= (IFileNode)nodes.remove(0);
-			if(node.isDirectory())
+			public void customResultAvailable(IResourceIdentifier rid)
 			{
-				for(int i=0; i<node.getChildCount(); i++)
+				java.util.List nodes = SCollection.createArrayList();
+				nodes.add(node);
+				while(nodes.size()>0)
 				{
-					nodes.add(node.getChild(i));
+					IFileNode n	= (IFileNode)nodes.remove(0);
+					if(n.isDirectory())
+					{
+						for(int i=0; i<n.getChildCount(); i++)
+						{
+							nodes.add(n.getChild(i));
+						}
+					}
+					else
+					{
+						String model = n.getFilePath();
+//						tcpanel.getTestList().removeEntry(model);
+						tcpanel.removeTest(model, rid);
+					}
 				}
 			}
-			else
-			{
-				String model = node.getFilePath();
-				tcpanel.getTestList().removeEntry(model);
-			}
-		}
+		});
 	}
 	
 	/**

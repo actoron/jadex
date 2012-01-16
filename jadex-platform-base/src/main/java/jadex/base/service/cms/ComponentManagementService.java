@@ -53,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -130,7 +129,7 @@ public abstract class ComponentManagementService extends BasicService implements
 
     //-------- constructors --------
 
-	 /**
+	/**
      *  Create a new component execution service.
      *  @param provider	The service provider.
      */
@@ -1144,7 +1143,7 @@ public abstract class ComponentManagementService extends BasicService implements
 						achildren = desc.getChildren();
 					}
 					
-//						System.out.println("kill childs: "+cid+" "+SUtil.arrayToString(achildren));
+//					System.out.println("kill childs: "+cid+" "+SUtil.arrayToString(achildren));
 					
 					destroyComponentLoop(cid, achildren, achildren.length-1).addResultListener(new IResultListener<List<Exception>>()
 					{

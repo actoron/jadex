@@ -8,6 +8,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -188,7 +189,7 @@ public class InvokerAgent
 				{
 					public void customResultAvailable(final IClockService clock)
 					{
-						cms.createComponent(null, "jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class", null, null)
+						cms.createComponent(null, "jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class", new CreationInfo(agent.getModel().getResourceIdentifier()), null)
 							.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 						{	
 							public void customResultAvailable(final IComponentIdentifier cid)

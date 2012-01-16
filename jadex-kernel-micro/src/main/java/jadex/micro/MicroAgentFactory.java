@@ -252,8 +252,6 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 */
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-		if(model==null)
-			System.out.println("test");
 		boolean ret = model.toLowerCase().endsWith("agent.class");
 //		if(model.toLowerCase().endsWith("Agent.class"))
 //		{

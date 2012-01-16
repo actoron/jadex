@@ -26,6 +26,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
@@ -341,7 +342,7 @@ public class StarterPluginPanel extends JPanel
 	public IFuture<IResourceIdentifier> createResourceIdentifier()
 	{
 		// Get the first child of selection path as url
-		TreePath selpath = mpanel.getTree().getSelectionModel().getSelectionPath();
+		final TreePath selpath = mpanel.getTree().getSelectionModel().getSelectionPath();
 		ITreeNode root = (ITreeNode)selpath.getPathComponent(1);
 //		while(root.getParent()!=null && root.getParent().getParent()!=null)
 //			root = root.getParent();
@@ -349,6 +350,19 @@ public class StarterPluginPanel extends JPanel
 		final URL url = SUtil.toURL(((IFileNode)root).getFilePath());
 		
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
+		
+//		ret.addResultListener(new IResultListener<IResourceIdentifier>()
+//		{
+//			public void resultAvailable(IResourceIdentifier result)
+//			{
+//				System.out.println("try loading with:"+result);
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//			}
+//		});
+		
 		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
 		{

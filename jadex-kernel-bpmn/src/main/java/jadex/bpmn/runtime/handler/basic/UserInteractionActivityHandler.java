@@ -51,7 +51,7 @@ public class UserInteractionActivityHandler extends DefaultActivityHandler
 			public void windowClosing(WindowEvent e)
 			{
 				instance.notify(activity, thread, null);
-				System.exit(0);
+//				System.exit(0);
 			}
 		});
 		

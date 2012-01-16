@@ -154,17 +154,17 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 
 		ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), null);
 		
-		startEndSteps().addResultListener(createResultListener(new DelegationResultListener(ret)
+		startEndSteps().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
-				terminateExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
+				terminateExtensions().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Void result)
 					{
 						ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
 					}
@@ -1320,9 +1320,10 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					Boolean	daemon = components[i].getDaemon()!=null ? components[i].getDaemon() : type.getDaemon();
 					Boolean	autoshutdown = components[i].getAutoShutdown()!=null ? components[i].getAutoShutdown() : type.getAutoShutdown();
 					RequiredServiceBinding[] bindings = components[i].getBindings();
+					// todo: rid
 					cms.createComponent(getName(components[i], model, j+1), type.getName(),
 						new CreationInfo(components[i].getConfiguration(), getArguments(components[i], model), getComponentAdapter().getComponentIdentifier(),
-						suspend, master, daemon, autoshutdown, model.getAllImports(), bindings), null).addResultListener(crl);
+						suspend, master, daemon, autoshutdown, model.getAllImports(), bindings, null), null).addResultListener(crl);
 				}
 				else
 				{

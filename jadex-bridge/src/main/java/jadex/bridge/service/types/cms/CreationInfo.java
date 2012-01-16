@@ -78,6 +78,7 @@ public class CreationInfo
 			this.autoshutdown = info.getAutoShutdown();
 			this.imports	= info.getImports();
 			this.bindings = info.getRequiredServiceBindings();
+			this.rid = info.getResourceIdentifier();
 		}
 	}
 
@@ -97,6 +98,15 @@ public class CreationInfo
 	public CreationInfo(Map<String, Object> args)
 	{
 		this(null, args);
+	}
+	
+	/**
+	 *  Create a new creation info.
+	 *  @param args	The arguments.
+	 */
+	public CreationInfo(IResourceIdentifier rid)
+	{
+		this(null, null, null, null, null, null, null, null, null, rid);
 	}
 	
 	/**
@@ -155,7 +165,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, String[] imports)
 	{
-		this(config, args, parent, null, null, null, null, imports, null);
+		this(config, args, parent, null, null, null, null, imports, null, null);
 	}
 	
 	/**
@@ -195,7 +205,7 @@ public class CreationInfo
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, 
 		Boolean master, Boolean daemon, Boolean autoshutdown)
 	{
-		this(config, args, parent, suspend, master, daemon, autoshutdown, null, null);
+		this(config, args, parent, suspend, master, daemon, autoshutdown, null, null, null);
 	}
 	
 	/**
@@ -209,7 +219,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, 
 		Boolean suspend, Boolean master, Boolean daemon, Boolean autoshutdown, 
-		String[] imports, RequiredServiceBinding[] bindings)
+		String[] imports, RequiredServiceBinding[] bindings, IResourceIdentifier rid)
 	{
 		this.config	= config;
 		this.args	= args;
@@ -220,6 +230,7 @@ public class CreationInfo
 		this.autoshutdown = autoshutdown;
 		this.imports	= imports;
 		this.bindings = bindings;
+		this.rid = rid;
 	}
 	
 	//-------- methods --------
