@@ -41,9 +41,15 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+/* $if !android $ */
 import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLReporter;
+/* $else $
+import javaxx.xml.namespace.QName;
+import javaxx.xml.stream.XMLReporter;
+$endif $ */ 
+
 
 /**
  *  Java specific reader that supports collection classes and arrays.
