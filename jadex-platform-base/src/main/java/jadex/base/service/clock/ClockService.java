@@ -48,25 +48,29 @@ public class ClockService extends BasicService implements IClockService, IProper
 	/** The clock type. */
 	protected ClockCreationInfo cinfo;
 	
+	/** Was simulation set via argument? */
+	protected Boolean simulation;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new clock service.
 	 */
-	public ClockService(ClockCreationInfo cinfo, IServiceProvider provider)
+	public ClockService(ClockCreationInfo cinfo, IServiceProvider provider, Boolean simulation)
 	{
-		this(cinfo, provider, null);
+		this(cinfo, provider, null, simulation);
 	}
 	
 	/**
 	 *  Create a new clock service.
 	 */
-	public ClockService(ClockCreationInfo cinfo, IServiceProvider provider, Map properties)
+	public ClockService(ClockCreationInfo cinfo, IServiceProvider provider, Map properties, Boolean simulation)
 	{
 		super(provider.getId(), IClockService.class, properties);
 
 		this.cinfo = cinfo;
 		this.provider = provider;
+		this.simulation = simulation;
 		this.listeners = Collections.synchronizedList(new ArrayList());
 	}
 	
@@ -413,14 +417,18 @@ public class ClockService extends BasicService implements IClockService, IProper
 	 */
 	public IFuture<Void> setProperties(Properties props)
 	{
-		String	type	= props.getStringProperty("type");
-		long	delta	= props.getLongProperty("delta");
-		double	dilation	= props.getDoubleProperty("dilation");
-		
-		setClock(type, threadpool);
-		clock.setDelta(delta);
-		if(clock instanceof ContinuousClock)
-			((ContinuousClock)clock).setDilation(dilation);
+		// Do not change clock when explicitly started in specific mode
+		if(simulation==null)
+		{
+			String	type	= props.getStringProperty("type");
+			long	delta	= props.getLongProperty("delta");
+			double	dilation	= props.getDoubleProperty("dilation");
+			
+			setClock(type, threadpool);
+			clock.setDelta(delta);
+			if(clock instanceof ContinuousClock)
+				((ContinuousClock)clock).setDilation(dilation);
+		}
 		
 		return IFuture.DONE;
 	}
