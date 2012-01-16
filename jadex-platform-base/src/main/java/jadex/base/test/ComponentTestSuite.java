@@ -55,21 +55,21 @@ public class ComponentTestSuite extends TestSuite
 		this(new String[]{"-platformname", "testcases",
 //			"-kernels", "all",
 			"-simulation", "true",
+			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
 //			"-logging_level", "java.util.logging.Level.INFO",
 			"-gui", "false", "-awareness", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false",
 			"-printpass", "false"},
-			path, root, excludes, timeout);
+			path, excludes, timeout);
 	}
 	
 	/**
 	 * Create a component test suite for components contained in a given path.
 	 * @param args	The platform arguments.
 	 * @param path	The path to look for test cases in.
-	 * @param root	The classpath root corresponding to the path.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
 	 * @param timeout	The test suite timeout (if tests are not completed, execution will be aborted). 
 	 */
-	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final long timeout) throws Exception
+	public ComponentTestSuite(String[] args, File path, String[] excludes, final long timeout) throws Exception
 	{
 		super(path.toString());
 		
@@ -95,15 +95,16 @@ public class ComponentTestSuite extends TestSuite
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(rootcomp.getServiceProvider(), IComponentManagementService.class).get(ts);
 		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(rootcomp.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(ts);
 		
-		try
-		{
-			URL url = root.toURI().toURL();
-			libsrv.addURL(url);
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+		// Does not work because if urls are added the models must use rids to identify the resources
+//		try
+//		{
+//			URL url = root.toURI().toURL();
+//			libsrv.addURL(url);
+//		}
+//		catch(Exception e)
+//		{
+//			throw new RuntimeException(e);
+//		}
 		
 		// Scan for test cases.
 		List<File>	todo	= new LinkedList<File>();

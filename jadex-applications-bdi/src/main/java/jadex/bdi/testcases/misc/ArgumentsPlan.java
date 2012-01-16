@@ -24,6 +24,7 @@ public class ArgumentsPlan extends Plan
 		{
 			IGoal ca = createGoal("cmscap.cms_create_component");
 			ca.getParameter("type").setValue("/jadex/bdi/testcases/misc/ArgumentsWorker.agent.xml");
+			ca.getParameter("parent").setValue(getComponentIdentifier());
 			Map args = SCollection.createHashMap();
 			args.put("creator", getComponentIdentifier());
 			ca.getParameter("arguments").setValue(args);

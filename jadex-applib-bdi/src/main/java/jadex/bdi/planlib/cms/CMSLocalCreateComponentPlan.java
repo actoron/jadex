@@ -11,6 +11,9 @@ import java.util.Map;
 /**
  *  Plan for creating a Jadex component on the platform.
  */
+
+// todo: refactor parameters according to the new cms interface with CreationInfo
+
 public class CMSLocalCreateComponentPlan extends Plan
 {
 
