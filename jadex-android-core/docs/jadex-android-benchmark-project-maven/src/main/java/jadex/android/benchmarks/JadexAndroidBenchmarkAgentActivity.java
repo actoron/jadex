@@ -100,11 +100,14 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 			{
 				Starter.createPlatform(new String[]
 				{
-					"-conf",
-					"jadex/android/benchmarks/Platform.component.xml",
-					"-configname", "android_fixed",
 					"-logging_level", "java.util.logging.Level.INFO",
 					"-platformname", "and-" + createRandomPlattformID(),
+					"-extensions", "null",
+					"-wspublish", "false",
+					"-kernels", "\"component, micro\"",
+					"-tcptransport", "false",
+					"-niotransport", "false",
+					"-relaytransport", "true",
 					"-saveonexit", "false", "-gui", "false",
 					"-autoshutdown", "false"
 				}).addResultListener(new IResultListener<IExternalAccess>()

@@ -98,7 +98,7 @@
 		<argument name="simulation" class="Boolean"/>
 		<!-- Flag if copying parameters for local service calls is allowed. -->
 		<argument name="parametercopy" class="boolean">true</argument>
-		
+
 		<!-- Additional library paths (classpath entries) for loading agent models and classes. -->
 		<argument name="libpath" class="String"></argument>
 		<!-- The base classloader. -->
@@ -138,6 +138,9 @@
 			"jadex/extension/envsupport/EnvSupport.component.xml, "
 			+"jadex/extension/agr/AGR.component.xml"
 		</argument>
+
+		<!-- Flag if web service publishing is enabled. -->
+		<argument name="wspublish" class="boolean">true</argument>
 		
 		<!-- The name(s) of kernel(s) to load (separated by comma).
 		     Currently supports 'component', 'micro', 'bpmn', 'bdi', 'gpmn' and 'application' kernel.
@@ -255,7 +258,9 @@
 			</implementation>		
 		</providedservice>
 		<providedservice class="IPublishService">
-			<implementation class="DefaultWebServicePublishService"/>
+			<implementation>
+				Boolean.TRUE.equals($args.wspublish) ? DefaultWebServicePublishService.class.newInstance() : null
+			</implementation>
 		</providedservice>
 		<providedservice class="ISecurityService">
 			<implementation>new SecurityService($args.usepass, $args.printpass)</implementation>
@@ -282,6 +287,7 @@
 				<argument name="niotcpport">0</argument>
 				<argument name="platformname">null</argument>
 			</arguments>
+			
 			<components>
 				<component name="extensions" type="extensions" daemon="true" number="$args.extensions!=null ? 1 : 0">
 					<arguments>

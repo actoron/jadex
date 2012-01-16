@@ -1104,11 +1104,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					ser = impl.getImplementation().getType(getClassLoader()).newInstance();
 				}
 				
-				if(ser==null)
-				{
-					ret.setException(new RuntimeException("Service creation error: "+info));
-				}
-				else
+				// Implementation may null to disable service in some configurations.
+				if(ser!=null)
 				{
 					UnparsedExpression[] ins = info.getImplementation().getInterceptors();
 					IServiceInvocationInterceptor[] ics = null;
@@ -1137,6 +1134,10 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 							ret.setResult(null);
 						}
 					});
+				}
+				else
+				{
+					ret.setResult(null);
 				}
 			}
 		}
