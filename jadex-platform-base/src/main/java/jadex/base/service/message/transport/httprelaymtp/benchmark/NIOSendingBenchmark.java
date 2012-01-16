@@ -2,14 +2,12 @@ package jadex.base.service.message.transport.httprelaymtp.benchmark;
 
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -27,7 +25,7 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	//-------- constants --------
 	
 	/** The max number of open messages. */
-	protected final int	MAX	= 2;
+	protected final int	MAX	= 10;
 	
 	//-------- attributes --------
 	
@@ -36,24 +34,21 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	
 	/** The NIO selector. */
 	protected Selector	selector;
+	
+	/** The tasks for the NIO thread. */
 	protected List<Runnable>	tasks;
 	
-	/** The socket channel (if any). */
-	protected SocketChannel	sc;
+//	/** The queue for the NIO thread (messages waiting for a free or new connection). */
+//	protected List<Message>	queue;
 	
-	/** The messages to be sent. */
-	protected List<Message>	messages;
-	protected Message	msg;
-	
-	/** The currently sending message (if any). */
-	protected ByteBuffer	buf;
-	protected StringBuffer	response;
+	/** The idle connections to be reused. */
+	protected List<SocketChannel>	idle;
 	
 	protected String	host;
 	protected String	path;
 	protected int	port;
 	
-	protected int	added, sent, received;
+	protected int	added, sent, received, connections;
 	
 	//-------- template methods --------
 		
@@ -64,9 +59,9 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	protected void setUp() throws Exception
 	{
 		open	= new LinkedList<Message>();
-		messages	= new LinkedList<Message>();
 		tasks	= new ArrayList<Runnable>();
-		added	= sent	= received	= 0;
+		idle	= new ArrayList<SocketChannel>();
+		added	= sent	= received	= connections	= 0;
 		
 		// ANDROID: the following line causes an exception in a 2.2
 		// emulator, see:
@@ -105,20 +100,16 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	 */
 	protected void tearDown() throws Exception
 	{
-		Message[]	futs;
-		synchronized(open)
-		{
-			futs	= open.toArray(new Message[open.size()]);
-		}
+		Message[]	futs	= open.toArray(new Message[open.size()]);
 		for(int i=0; i<futs.length; i++)
 		{
-			System.out.println("sent "+i+": "+sent);
-			System.out.println("received "+i+": "+received);
+//			System.out.println("sent "+i+": "+sent);
+//			System.out.println("received "+i+": "+received);
 			futs[i].fut.get(new ThreadSuspendable(), 20000);
 		}
 		selector.close();
-		System.out.println("sent: "+sent);
-		System.out.println("received: "+received);
+//		System.out.println("sent: "+sent);
+//		System.out.println("received: "+received);
 	}
 	
 	/**
@@ -146,30 +137,15 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		System.arraycopy(data, 0, msg,  header.length+4+id.length+4, data.length);
 		
 		Message	m	= new Message(new Future<Void>(), msg);
-		synchronized(open)
-		{
-			open.add(m);
-			added++;
-			System.out.println("open: "+open.size()+" of "+added);
-		}
+		open.add(m);
+		added++;
+//		System.out.println("open: "+open.size()+" of "+added);
 		sendMessage(m);
 		
-		IFuture<Void>	fut	= null;
-		synchronized(open)
+		if(open.size()>=MAX)
 		{
-			if(open.size()>MAX)
-			{
-				fut	= open.get(0).fut;
-			}			
-		}
-		if(fut!=null)
-		{
-			fut.get(new ThreadSuspendable(), 2000000);
-			synchronized(open)
-			{
-				open.remove(0);
-				System.out.println("open-: "+open.size()+" of "+added);
-			}
+			open.remove(0).fut.get(new ThreadSuspendable(), 20000);
+//			System.out.println("open-: "+open.size()+" of "+added);
 		}
 	}
 	
@@ -185,30 +161,28 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		{
 			public void run()
 			{
-//				System.out.println("adding message: "+added++);
-				messages.add(msg);
-				
-				if(sc!=null)
+				if(idle.isEmpty())
 				{
-					SelectionKey	key	= sc.keyFor(selector);
-					if((key.interestOps()&SelectionKey.OP_WRITE)==0)
-						key.interestOps(key.interestOps()|SelectionKey.OP_WRITE);
-//					System.out.println("ops1w: "+key.interestOps());
-				}
-				else
-				{
+					connections++;
+					System.out.println("connections: "+connections);
 					try
 					{
-						sc	= SocketChannel.open();
+						SocketChannel	sc	= SocketChannel.open();
 						sc.configureBlocking(false);
 						sc.connect(new InetSocketAddress(host, port));
-						sc.register(selector, SelectionKey.OP_CONNECT);
-//						System.out.println("ops0c: "+sc.keyFor(selector).interestOps());
+						sc.register(selector, SelectionKey.OP_CONNECT, msg);
 					}
 					catch(Exception e)
 					{
 						e.printStackTrace();
 					}
+				}
+				else
+				{
+					SocketChannel	sc	= idle.remove(0);
+					SelectionKey	key	= sc.keyFor(selector);
+					key.attach(msg);
+					key.interestOps(SelectionKey.OP_WRITE);
 				}
 			}			
 		};
@@ -291,10 +265,10 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 				catch(Exception e)
 				{
 					// Key may be cancelled just after isValid() has been tested.
-					e.printStackTrace();
+//					e.printStackTrace();
 				}
 			}
-			System.out.println("leaving selector thread");
+//			System.out.println("leaving selector thread");
 		}
 		
 		//-------- handler methods --------
@@ -304,23 +278,14 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		 */
 		protected void	handleConnect(SelectionKey key)
 		{
-			System.out.println("Opening connection");
+//			System.out.println("Opening connection");
 			SocketChannel	sc	= (SocketChannel)key.channel();
 			try
 			{
 				boolean	finished	= sc.finishConnect();
 				assert finished;
 				
-				if(messages.isEmpty())
-				{
-					// Keep channel on hold until we are ready to write.
-				    key.interestOps(0);
-				}
-				else
-				{
-					key.interestOps(SelectionKey.OP_WRITE);
-//					System.out.println("ops2w: "+key.interestOps());
-				}
+				key.interestOps(SelectionKey.OP_WRITE);
 			}
 			catch(Exception e)
 			{ 
@@ -334,56 +299,30 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		protected void handleWrite(SelectionKey key)
 		{
 			SocketChannel	sc	= (SocketChannel)key.channel();
+			Message	msg	= (Message)key.attachment();
 //			System.out.println("Sending on "+sc);
 
 			try
 			{
-				boolean	more	= true;
-				while(more)
+				if(msg.buf==null)
+					msg.buf	= ByteBuffer.wrap(msg.data);
+
+				sc.write(msg.buf);
+				if(msg.buf.remaining()>0)
 				{
-					if(buf==null && messages.isEmpty())
-					{
-						more	= false;
-						// We wrote away all data, deregister writing interest.
-						assert (key.interestOps()&SelectionKey.OP_WRITE)!=0;
-						key.interestOps(key.interestOps()-SelectionKey.OP_WRITE);
-//						System.out.println("ops3-w: "+key.interestOps());
-					}
-					else if(buf!=null)
-					{
-						sc.write(buf);
-						if(buf.remaining()>0)
-						{
-							// Output buffer is full: stop sending for now, but keep interest.
-							more	= false;
-						}
-						else
-						{
-							// Buffer written, register interest in answer.
-							sent++;
-							System.out.println("Message sent: "+sent);
-							key.interestOps(key.interestOps()|SelectionKey.OP_READ);
-//							System.out.println("ops4r: "+key.interestOps());
-							buf	= null;
-							msg.sent	= true;
-							msg	= null;
-						}
-					}
-					else
-					{
-						msg	= messages.remove(0);
-						buf	= ByteBuffer.wrap(msg.data);
-					}
+					// Output buffer is full: stop sending for now, but keep interest.
+				}
+				else
+				{
+					// Buffer written, register interest in answer.
+					sent++;
+//					System.out.println("Message sent: "+sent);
+					key.interestOps(SelectionKey.OP_READ);
 				}
 			}
 			catch(Exception e)
 			{
-				// Remove writing interest from connection.
-				assert (key.interestOps()&SelectionKey.OP_WRITE)!=0;
-				key.interestOps(key.interestOps()-SelectionKey.OP_WRITE);
-				
-				System.out.println("reconnect: "+e);
-				reconnect();
+				e.printStackTrace();
 			}
 		}
 		
@@ -392,132 +331,69 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		 */
 		protected void	handleRead(SelectionKey key)
 		{
-			ReadableByteChannel	rbc	= (ReadableByteChannel)key.channel();
-//			System.out.println("Reading from "+rbc);
+			SocketChannel	sc	= (SocketChannel)key.channel();
+			Message	msg	= (Message)key.attachment();
+//			System.out.println("Reading from "+sc);
 			try
 			{
+				StringBuffer	response	= new StringBuffer();
 				ByteBuffer	inbuf = ByteBuffer.allocate(256);
-				int	read	= rbc.read(inbuf);
+				int	read	= sc.read(inbuf);
 				while(read>0)
 				{
-					if(response==null)
-						response	= new StringBuffer();
 					response.append(new String(inbuf.array(), 0, read));
 					inbuf.clear();
-					read	= rbc.read(inbuf);
+					read	= sc.read(inbuf);
 				}
 				
-				// All available data read.
-				assert (key.interestOps()&SelectionKey.OP_READ)!=0;
-				key.interestOps(key.interestOps()-SelectionKey.OP_READ);
-//				System.out.println("ops5-r: "+key.interestOps());
-				
-				// Extract HTTP responses
-				int	idx;
-				while((idx=response.indexOf("\r\n\r\n"))!=-1)
+				// Extract HTTP response
+				int	idx	= response.indexOf("\r\n\r\n");
+				if(idx==-1)
+					throw new RuntimeException("HTTP response: "+response);
+				String	resp	= response.substring(0, idx);
+				boolean	close	= resp.indexOf("Connection: close")!=-1;
+				if(close)
 				{
-					String	resp	= response.substring(0, idx);
-					response.delete(0, idx+4);
-					boolean	close	= resp.indexOf("Connection: close")!=-1;
-					if(resp.indexOf("\r\n")!=-1)
-					{
-						resp	= resp.substring(0, resp.indexOf("\r\n"));
-					}
-					if(!"HTTP/1.1 200 OK".equals(resp))
-						throw new IOException("HTTP response: "+resp);
-					
-					received++;
-					System.out.println("Received response: "+received);
-					
-					Future<Void>	fut	= null;
-					synchronized(open)
-					{
-						for(int i=0; fut==null && i<open.size(); i++)
-						{
-							if(!open.get(i).fut.isDone())
-								fut	= open.get(i).fut;
-						}
-					}
-					fut.setResult(null);
-					
-					if(close)
-					{
-						rbc.close();
-						if(rbc==sc)
-						{
-							System.out.println("Close requested.");
-							reconnect();
-						}
-						else
-						{
-							System.out.println("Already reconnected.");							
-						}
-					}
-				}
-			}
-			catch(Exception e)
-			{
-				// No more interest in this connection.
-				key.cancel();
-
-				if(rbc==sc)
-				{
-					System.out.println("Close forced: "+e);
-					reconnect();
+					sc.close();
+					key.cancel();
 				}
 				else
 				{
-					System.out.println("Already forced reconnected.");							
+					idle.add(sc);
 				}
-			}
-		}
-	}
-	
-	protected void	reconnect()
-	{
-		try
-		{
-			sc	= SocketChannel.open();
-			sc.configureBlocking(false);
-			sc.connect(new InetSocketAddress(host, port));
-			sc.register(selector, SelectionKey.OP_CONNECT);
-//			System.out.println("ops0c: "+sc.keyFor(selector).interestOps());
-			
-			// Recover already sent but not acknowledged messages.
-			assert buf==null || msg!=null;
-			buf	= msg!=null ? ByteBuffer.wrap(msg.data) : null;
-			List<Message>	resend	= new ArrayList<Message>();
-			synchronized(open)
-			{
-				for(int i=0; i<open.size(); i++)
+				
+				if(resp.indexOf("\r\n")!=-1)
 				{
-					if(!open.get(i).fut.isDone() && open.get(i).sent)
-					{
-						resend.add(open.get(i));
-						open.get(i).sent	= false;
-						sent--;
-					}
+					resp	= resp.substring(0, resp.indexOf("\r\n"));
 				}
+				if(!"HTTP/1.1 200 OK".equals(resp))
+					throw new IOException("HTTP response: "+resp);
+					
+				received++;
+				msg.fut.setResult(null);
+//				System.out.println("Received response: "+received);
 			}
-			
-			System.out.println("Resending "+resend.size()+" messages.");
-			for(int i=0; i<resend.size(); i++)
+			catch(Exception e)
 			{
-				sendMessage(resend.get(i));
+				e.printStackTrace();
 			}
 		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}		
 	}
 	
 	public static class	Message
 	{
+		/** To be notified when the message was sent. */
 		public Future<Void>	fut;
-		public byte[]	data;
-		public boolean	sent;
 		
+		/** The message content. */
+		public byte[]	data;
+		
+		/** The wrapped message content. */
+		public ByteBuffer	buf;
+		
+		/**
+		 *  Create a new message.
+		 */
 		public Message(Future<Void> fut, byte[] data)
 		{
 			this.fut	= fut;
