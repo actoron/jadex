@@ -1,10 +1,8 @@
 package jadex.base.service.message.transport;
 
 import jadex.base.service.message.ManagerSendTask;
-import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.IFuture;
 
-import java.util.Map;
 
 /**
  *  Interface for Jadex Standalone transports.

@@ -750,7 +750,7 @@ public class Reader
 	 */
 	public static Object objectFromByteArray(Reader reader, byte[] val, ClassLoader classloader)
 	{
-		return objectFromByteArray(reader, val, classloader, null);
+		return objectFromInputStream(reader, new ByteArrayInputStream(val), classloader, null);
 	}
 	
 	/**
@@ -759,10 +759,27 @@ public class Reader
 	 */
 	public static Object objectFromByteArray(Reader reader, byte[] val, ClassLoader classloader, Object context)
 	{
-		InputStream bis = null;
+		return objectFromInputStream(reader, new ByteArrayInputStream(val), classloader, context);		
+	}
+
+	
+	/**
+	 *  @param val The string value.
+	 *  @return The encoded object.
+	 */
+	public static Object objectFromInputStream(Reader reader, InputStream val, ClassLoader classloader)
+	{
+		return objectFromInputStream(reader, val, classloader, null);
+	}
+	
+	/**
+	 *  @param val The string value.
+	 *  @return The encoded object.
+	 */
+	public static Object objectFromInputStream(Reader reader, InputStream bis, ClassLoader classloader, Object context)
+	{
 		try
 		{
-			bis = new ByteArrayInputStream(val);
 			Object ret = reader.read(bis, classloader, context);
 			return ret;
 		}

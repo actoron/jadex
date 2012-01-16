@@ -4,6 +4,7 @@ import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  *  The Jadex XML codec. Codec supports parallel
@@ -46,7 +47,9 @@ public class JadexXMLCodec implements ICodec
 //	public Object decode(byte[] bytes, ClassLoader classloader)
 	public Object decode(Object bytes, ClassLoader classloader)
 	{
-		Object ret = JavaReader.objectFromByteArray((byte[])bytes, classloader);
+		Object ret = bytes instanceof byte[]
+			? JavaReader.objectFromByteArray((byte[])bytes, classloader)
+			: JavaReader.objectFromInputStream((InputStream)bytes, classloader);
 		if(DEBUG)
 			System.out.println("decode message: "+(new String((byte[])bytes)));
 		return ret;

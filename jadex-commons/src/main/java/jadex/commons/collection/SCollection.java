@@ -117,9 +117,9 @@ public class SCollection
 		/**
 	 *  Return a fresh linked hash map.
 	 */
-	public static LRU createLRU(int max)
+	public static <T,E> LRU<T,E> createLRU(int max)
 	{
-		LRU ret = new LRU(max);
+		LRU<T,E> ret = new LRU<T,E>(max);
 		if(DEBUG)
 			addCollection(ret);
 		return ret;

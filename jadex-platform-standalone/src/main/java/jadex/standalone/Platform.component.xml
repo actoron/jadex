@@ -66,7 +66,7 @@
 		<import>jadex.base.service.message.transport.localmtp.*</import>
 		<import>jadex.base.service.message.transport.tcpmtp.*</import>
 		<import>jadex.base.service.message.transport.niotcpmtp.*</import>
-		<import>jadex.base.service.message.transport.httprelaymtp.*</import>
+		<import>jadex.base.service.message.transport.httprelaymtp.io.*</import>
 		<import>jadex.base.service.message.transport.codecs.*</import>
 	</imports>
 	

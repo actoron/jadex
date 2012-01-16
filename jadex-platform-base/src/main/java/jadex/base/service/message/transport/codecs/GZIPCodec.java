@@ -18,15 +18,12 @@ public class GZIPCodec implements ICodec
 	/** The gzip codec id. */
 	public static final byte CODEC_ID = 5;
 
-	/** The debug flag. */
-	protected static boolean DEBUG = false;
-	
 	//-------- methods --------
 	
 	/**
 	 *  Create a new codec.
 	 */
-	protected GZIPCodec()
+	public GZIPCodec()
 	{
 	}
 	
@@ -47,7 +44,7 @@ public class GZIPCodec implements ICodec
 	 */
 	public Object decode(Object bytes, ClassLoader classloader)
 	{
-		return decodeBytes((byte[])bytes, classloader);
+		return decodeBytes(bytes instanceof byte[] ? new ByteArrayInputStream((byte[])bytes) : (ByteArrayInputStream)bytes, classloader);
 	}
 	
 	/**
@@ -61,27 +58,18 @@ public class GZIPCodec implements ICodec
 
 		try
 		{
-			int origlen = ret.length;
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			baos.write(SUtil.intToBytes(val.length));
 			GZIPOutputStream gzos = new GZIPOutputStream(baos);
-			gzos.write(ret);
+			gzos.write(val);
 			gzos.close();
-			ret = new byte[baos.size()+4];
-			byte[] tmp = baos.toByteArray();
-			System.arraycopy(tmp, 0, ret, 4, tmp.length);
-			byte[] len = SUtil.intToBytes(origlen);	
-			for(int i=0; i<len.length; i++)
-			{
-				ret[i] = len[i];
-			}
+			ret = baos.toByteArray();
 		}
 		catch (Exception e) 
 		{
 			e.printStackTrace();
 		}
 		
-		if(DEBUG)
-			System.out.println("encode message: "+(new String(ret)));
 		return ret;
 	}
 
@@ -92,12 +80,27 @@ public class GZIPCodec implements ICodec
 	 */
 	public static byte[] decodeBytes(byte[] bytes, ClassLoader classloader)
 	{
+		return decodeBytes(new ByteArrayInputStream(bytes), classloader);
+	}
+	
+	/**
+	 *  Decode bytes.
+	 *  @return The decoded bytes.
+	 *  @throws IOException
+	 */
+	public static byte[] decodeBytes(ByteArrayInputStream bais, ClassLoader classloader)
+	{
 		byte[] ret = null;
 		try
 		{
 			byte[] buf = new byte[4];
-			ByteArrayInputStream bais = new ByteArrayInputStream((byte[])bytes);
-			bais.read(buf);
+			int	read;
+			int count	= 0;
+			while(count<4 && (read=bais.read(buf, count, 4-count))!=-1)
+			{
+				count	+= read;
+			}
+			
 			int len = SUtil.bytesToInt(buf);
 			ret = new byte[len];
 			GZIPInputStream gzis = new GZIPInputStream(bais);
@@ -113,8 +116,6 @@ public class GZIPCodec implements ICodec
 			e.printStackTrace();
 		}
 	
-		if(DEBUG)
-			System.out.println("decode message: "+(new String((byte[])bytes)));
 		return ret;
 	}
 }

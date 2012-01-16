@@ -18,8 +18,8 @@ public interface ICodec
 	
 	/**
 	 *  Decode data with the codec.
-	 *  @param bytes The value bytes.
-	 *  @return The encoded object.
+	 *  @param bytes The value bytes as byte array or input stream.
+	 *  @return The decoded object or byte array (for intermediate codecs).
 	 */
 //	public Object decode(byte[] bytes, ClassLoader classloader);
 	public Object decode(Object bytes, ClassLoader classloader);

@@ -25,7 +25,7 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	//-------- constants --------
 	
 	/** The max number of open messages. */
-	protected final int	MAX	= 10;
+	protected final int	MAX	= 100;
 	
 	//-------- attributes --------
 	
@@ -38,8 +38,11 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	/** The tasks for the NIO thread. */
 	protected List<Runnable>	tasks;
 	
-//	/** The queue for the NIO thread (messages waiting for a free or new connection). */
-//	protected List<Message>	queue;
+	/** The queue for the NIO thread (messages waiting for a free or new connection). */
+	protected List<Message>	queue;
+	
+	/** True, if a new connection is currently established (only one at a time). */
+	protected boolean	connecting;
 	
 	/** The idle connections to be reused. */
 	protected List<SocketChannel>	idle;
@@ -59,6 +62,7 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 	protected void setUp() throws Exception
 	{
 		open	= new LinkedList<Message>();
+		queue	= new LinkedList<Message>();
 		tasks	= new ArrayList<Runnable>();
 		idle	= new ArrayList<SocketChannel>();
 		added	= sent	= received	= connections	= 0;
@@ -161,8 +165,16 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 		{
 			public void run()
 			{
-				if(idle.isEmpty())
+				if(!idle.isEmpty())
 				{
+					SocketChannel	sc	= idle.remove(0);
+					SelectionKey	key	= sc.keyFor(selector);
+					key.attach(msg);
+					key.interestOps(SelectionKey.OP_WRITE);
+				}
+				else if(!connecting)
+				{
+					connecting	= true;
 					connections++;
 					System.out.println("connections: "+connections);
 					try
@@ -179,12 +191,9 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 				}
 				else
 				{
-					SocketChannel	sc	= idle.remove(0);
-					SelectionKey	key	= sc.keyFor(selector);
-					key.attach(msg);
-					key.interestOps(SelectionKey.OP_WRITE);
+					queue.add(msg);
 				}
-			}			
+			}
 		};
 		
 		synchronized(tasks)
@@ -284,8 +293,14 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 			{
 				boolean	finished	= sc.finishConnect();
 				assert finished;
-				
 				key.interestOps(SelectionKey.OP_WRITE);
+				connecting	= false;
+				
+				// Check if more messages are waiting
+				if(!queue.isEmpty())
+				{
+					sendMessage(queue.remove(0));
+				}
 			}
 			catch(Exception e)
 			{ 
@@ -354,12 +369,19 @@ public class NIOSendingBenchmark	extends AbstractRelayBenchmark
 				boolean	close	= resp.indexOf("Connection: close")!=-1;
 				if(close)
 				{
+					connections--;
+					System.out.println("connections-: "+connections);
 					sc.close();
 					key.cancel();
 				}
 				else
 				{
 					idle.add(sc);
+					// Check if more messages are waiting
+					if(!queue.isEmpty())
+					{
+						sendMessage(queue.remove(0));
+					}
 				}
 				
 				if(resp.indexOf("\r\n")!=-1)

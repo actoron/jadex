@@ -3,20 +3,16 @@ package jadex.base.service.message.transport.tcpmtp;
 import jadex.base.AbstractComponentAdapter;
 import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.MessageEnvelope;
-import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -62,9 +58,6 @@ public class TCPTransport implements ITransport
 	/** How long to keep output connections alive (5 min). */
 	protected final static int	MAX_KEEPALIVE	= 300000;
 
-	/** The prolog size. */
-	protected final static int PROLOG_SIZE = 4;
-	
 	/** 2MB as message buffer */
 	protected final static int BUFFER_SIZE	= 1024 * 1024 * 2;
 	
@@ -89,21 +82,15 @@ public class TCPTransport implements ITransport
 	protected ServerSocket serversocket;
 	
 	/** The opened connections for addresses. (aid address -> connection). */
-	protected Map connections;
+	protected Map<String, Object> connections;
 	
 	/** Should be received asynchronously? One thread for receiving is
 		unavoidable. Async defines if the receival should be done on a
 		new thread always or on the one receiver thread. */
 	protected boolean async;
 	
-	/** The codec factory. */
-	protected CodecFactory codecfac;
-	
 	/** The logger. */
 	protected Logger logger;
-	
-	/** The library service. */
-	protected ILibraryService libservice;
 	
 	/** The cleanup timer. */
 	protected Timer	timer;
@@ -136,9 +123,9 @@ public class TCPTransport implements ITransport
 		
 		// Set up sending side.
 		this.connections = SCollection.createLRU(MAX_CONNECTIONS);
-		((LRU)this.connections).setCleaner(new ILRUEntryCleaner()
+		((LRU<String, Object>)this.connections).setCleaner(new ILRUEntryCleaner<String, Object>()
 		{
-			public void cleanupEldestEntry(Entry eldest)
+			public void cleanupEldestEntry(Entry<String, Object> eldest)
 			{
 				Object con = eldest.getValue();
 				if(con instanceof TCPOutputConnection)
@@ -153,9 +140,9 @@ public class TCPTransport implements ITransport
 	/**
 	 *  Start the transport.
 	 */
-	public IFuture start()
+	public IFuture<Void> start()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		try
 		{
 			// Set up receiver side.
@@ -172,102 +159,79 @@ public class TCPTransport implements ITransport
 			}
 			
 			// Start the receiver thread.
-			
-			SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DelegationResultListener(ret)
+			SServiceProvider.getService(container, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(final IThreadPoolService tp)
 				{
-					IMessageService ms = (IMessageService)result;
-					codecfac = (CodecFactory)ms.getCodecFactory();
-					SServiceProvider.getService(container, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(new DelegationResultListener(ret)
+					ret.setResult(null);
+					tp.execute(new Runnable()
 					{
-						public void customResultAvailable(Object result)
+						List<Object> openincons = Collections.synchronizedList(new ArrayList<Object>());
+						public void run()
 						{
-							libservice = (ILibraryService)result;
-		
-							SServiceProvider.getService(container, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-								.addResultListener(new DelegationResultListener(ret)
+							//try{serversocket.setSoTimeout(10000);} catch(SocketException e) {}
+							while(!serversocket.isClosed())
 							{
-								public void customResultAvailable(Object result)
+								try
 								{
-									ret.setResult(null);
-									final IThreadPoolService tp = (IThreadPoolService)result;
-									tp.execute(new Runnable()
+									final TCPInputConnection con = new TCPInputConnection(serversocket.accept());
+									openincons.add(con);
+									if(!async)
 									{
-										List openincons = Collections.synchronizedList(new ArrayList());
-										public void run()
+										TCPTransport.this.deliverMessages(con)
+											.addResultListener(new IResultListener<Void>()
 										{
-											//try{serversocket.setSoTimeout(10000);} catch(SocketException e) {}
-											while(!serversocket.isClosed())
+											public void resultAvailable(Void result)
 											{
-												try
-												{
-		//											ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
-		//											System.out.println("accepting");
-													
-													// todo: which resource identifier to use for incoming connections?
-													ClassLoader cl = getClass().getClassLoader(); // libservice.getClassLoader(null)
-													final TCPInputConnection con = new TCPInputConnection(serversocket.accept(), codecfac, cl);
-													openincons.add(con);
-													if(!async)
-													{
-														TCPTransport.this.deliverMessages(con).addResultListener(new IResultListener()
-														{
-															public void resultAvailable(Object result)
-															{
-																openincons.remove(con);
-															}
-															
-															public void exceptionOccurred(Exception exception)
-															{
-																openincons.remove(con);
-															}
-														});
-													}
-													else
-													{
-														// Each accepted incoming connection request is handled
-														// in a separate thread in async mode.
-														tp.execute(new Runnable()
-														{
-															public void run()
-															{
-																TCPTransport.this.deliverMessages(con).addResultListener(new IResultListener()
-																{
-																	public void resultAvailable(Object result)
-																	{
-																		openincons.remove(con);
-																	}
-																	
-																	public void exceptionOccurred(Exception exception)
-																	{
-																		openincons.remove(con);
-																	}
-																});
-															}
-														});
-													}
-												}
-												catch(IOException e)
-												{
-													//logger.warning("TCPTransport receiver connect error: "+e);
-													//e.printStackTrace();
-												}
+												openincons.remove(con);
 											}
 											
-											TCPInputConnection[] incons = (TCPInputConnection[])openincons.toArray(new TCPInputConnection[0]);
-											for(int i=0; i<incons.length; i++)
+											public void exceptionOccurred(Exception exception)
 											{
-//												System.out.println("close: "+incons[i]);
-												incons[i].close();
+												openincons.remove(con);
 											}
-//											logger.warning("TCPTransport serversocket closed.");
-										}
-									});
+										});
+									}
+									else
+									{
+										// Each accepted incoming connection request is handled
+										// in a separate thread in async mode.
+										tp.execute(new Runnable()
+										{
+											public void run()
+											{
+												TCPTransport.this.deliverMessages(con)
+													.addResultListener(new IResultListener<Void>()
+												{
+													public void resultAvailable(Void result)
+													{
+														openincons.remove(con);
+													}
+													
+													public void exceptionOccurred(Exception exception)
+													{
+														openincons.remove(con);
+													}
+												});
+											}
+										});
+									}
 								}
-							});
+								catch(IOException e)
+								{
+									//logger.warning("TCPTransport receiver connect error: "+e);
+									//e.printStackTrace();
+								}
+							}
+							
+							TCPInputConnection[] incons = (TCPInputConnection[])openincons.toArray(new TCPInputConnection[0]);
+							for(int i=0; i<incons.length; i++)
+							{
+//								System.out.println("close: "+incons[i]);
+								incons[i].close();
+							}
+//							logger.warning("TCPTransport serversocket closed.");
 						}
 					});
 				}
@@ -285,58 +249,24 @@ public class TCPTransport implements ITransport
 	/**
 	 *  Perform cleanup operations (if any).
 	 */
-	public IFuture shutdown()
+	public IFuture<Void> shutdown()
 	{
 		try{this.serversocket.close();}catch(Exception e){}
 		connections = null; // Help gc
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	//-------- methods --------
-	
-//	/**
-//	 *  Send a message.
-//	 *  @param message The message to send.
-//	 *  (todo: On which thread this should be done?)
-//	 */
-//	public IFuture sendMessage(Map msg, String type, IComponentIdentifier[] receivers, byte[] codecids)
-//	{
-//		// Fetch all addresses
-//		Set	addresses	= new LinkedHashSet();
-//		for(int i=0; i<receivers.length; i++)
-//		{
-//			String[]	raddrs	= receivers[i].getAddresses();
-//			for(int j=0; j<raddrs.length; j++)
-//			{
-//				addresses.add(raddrs[j]);
-//			}			
-//		}
-//
-//		// Iterate over all different addresses and try to send
-//		// to missing and appropriate receivers
-//		String[] addrs = (String[])addresses.toArray(new String[addresses.size()]);
-//		boolean	delivered	= false;
-//		for(int i=0; !delivered && i<addrs.length; i++)
-//		{
-//			TCPOutputConnection con = getConnection(addrs[i]);
-//			if(con!=null)
-//			{
-//				delivered	= con.send(new MessageEnvelope(msg, Arrays.asList(receivers), type), codecids);
-//			}
-//		}
-//		
-//		return delivered ? IFuture.DONE : new Future(new RuntimeException("Could not deliver message"));
-//	}
 	
 	/**
 	 *  Send a message.
 	 *  @param message The message to send.
 	 *  (todo: On which thread this should be done?)
 	 */
-	public IFuture sendMessage(ManagerSendTask task)
+	public IFuture<Void> sendMessage(ManagerSendTask task)
 	{
 		// Fetch all addresses
-		Set	addresses	= new LinkedHashSet();
+		Set<String>	addresses	= new LinkedHashSet<String>();
 		for(int i=0; i<task.getReceivers().length; i++)
 		{
 			String[]	raddrs	= task.getReceivers()[i].getAddresses();
@@ -360,7 +290,7 @@ public class TCPTransport implements ITransport
 			}
 		}
 		
-		return delivered ? IFuture.DONE : new Future(new RuntimeException("Could not deliver message"));
+		return delivered ? IFuture.DONE : new Future<Void>(new RuntimeException("Could not deliver message"));
 	}
 	
 	/**
@@ -461,11 +391,8 @@ public class TCPTransport implements ITransport
 					iport = DEFAULT_PORT;
 				}
 
-//				ClassLoader cl = ((ILibraryService)container.getService(ILibraryService.class)).getClassLoader();
-				
 				// todo: which resource identifier to use for outgoing connections?
-				ClassLoader cl = getClass().getClassLoader(); // libservice.getClassLoader(null)
-				ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, codecfac, new Cleaner(address), cl);
+				ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, new Cleaner(address));
 				connections.put(address, ret);
 			}
 			catch(Exception e)
@@ -495,22 +422,22 @@ public class TCPTransport implements ITransport
 	
 	/**
 	 *  Deliver messages to local message service
-	 *  for disptaching to the components.
+	 *  for dispatching to the components.
 	 *  @param con The connection.
 	 */
-	protected IFuture deliverMessages(final TCPInputConnection con)
+	protected IFuture<Void> deliverMessages(final TCPInputConnection con)
 	{
-		final Future ret = new Future();
-		SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		final Future<Void> ret = new Future<Void>();
+		SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IMessageService ms)
 			{
-				IMessageService ms = (IMessageService)result;
 				try
 				{
-					for(MessageEnvelope msg=con.read(); msg!=null; msg=con.read())
+					for(byte[] msg=con.read(); msg!=null; msg=con.read())
 					{
-						ms.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
+						ms.deliverMessage(msg);
 					}
 					con.close();
 					ret.setResult(null);

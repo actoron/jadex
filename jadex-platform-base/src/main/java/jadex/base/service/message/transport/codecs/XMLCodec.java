@@ -13,6 +13,7 @@ $endif $ */
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  *  The XML codec.
@@ -62,7 +63,7 @@ public class XMLCodec implements ICodec
 //	public Object decode(byte[] bytes, ClassLoader classloader)
 	public Object decode(Object bytes, ClassLoader classloader)
 	{
-		final ByteArrayInputStream bais = new ByteArrayInputStream((byte[])bytes);
+		final InputStream bais = bytes instanceof byte[] ? new ByteArrayInputStream((byte[])bytes) : (InputStream)bytes;
 		
 		XMLDecoder dec = new XMLDecoder(bais, null, new ExceptionListener()
 		{

@@ -3,6 +3,7 @@ package jadex.base.service.message.transport.codecs;
 import jadex.commons.SReflect;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 
 //import nuggets.Nuggets;
@@ -80,7 +81,24 @@ public class NuggetsCodec implements ICodec
 		
 		try
 		{
-			return ofx.invoke(null, new Object[]{new String((byte[])bytes), classloader});
+			String	input;
+			if(bytes instanceof byte[])
+			{
+				input	= new String((byte[])bytes);
+			}
+			else
+			{
+				InputStream	is	= (InputStream)bytes;
+				byte[]	buf	= new byte[Math.max(is.available(), 1024)];
+				StringBuffer	sbuf	= new StringBuffer();
+				int read;
+				while((read=is.read(buf))!=-1)
+				{
+					sbuf.append(new String(buf, 0, read));
+				}
+				input	= sbuf.toString();
+			}
+			return ofx.invoke(null, new Object[]{input, classloader});
 		}
 		catch(Exception e)
 		{

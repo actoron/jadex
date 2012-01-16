@@ -17,11 +17,10 @@ public class MessageEnvelope
 	//-------- attributes --------
 
 	/** The message. */
-	protected Map message;
+	protected Map<String, Object> message;
 	
 	/** The receivers. */
-	//protected IComponentIdentifier[] receivers;
-	protected Collection receivers;
+	protected Collection<IComponentIdentifier> receivers;
 	
 	/** The message type. */
 	protected String message_type;
@@ -39,7 +38,7 @@ public class MessageEnvelope
 	/**
 	 *  Create a new message envelope.
 	 */
-	public MessageEnvelope(Map message, Collection receivers, String message_type)
+	public MessageEnvelope(Map<String, Object> message, Collection<IComponentIdentifier> receivers, String message_type)
 	{
 		this.message = message;
 		this.receivers = receivers;
@@ -52,7 +51,7 @@ public class MessageEnvelope
 	 *  Get native message.
 	 *  @return The native message.
 	 */
-	public Map getMessage()
+	public Map<String, Object> getMessage()
 	{
 		return message;
 	}
@@ -61,7 +60,7 @@ public class MessageEnvelope
 	 *  Set native message.
 	 *  @param message The native message.
 	 */
-	public void setMessage(Map message)
+	public void setMessage(Map<String, Object> message)
 	{
 		this.message = message;
 	}
@@ -71,7 +70,7 @@ public class MessageEnvelope
 	 */
 	public IComponentIdentifier[] getReceivers()
 	{
-		return receivers==null? new IComponentIdentifier[0]: (IComponentIdentifier[])receivers.toArray(new IComponentIdentifier[receivers.size()]);
+		return receivers==null? new IComponentIdentifier[0]: receivers.toArray(new IComponentIdentifier[receivers.size()]);
 	}
 	
 	/**
@@ -79,8 +78,7 @@ public class MessageEnvelope
 	 */
 	public void setReceivers(IComponentIdentifier[] receivers)
 	{
-//		this.receivers = receivers;
-		this.receivers = new ArrayList();
+		this.receivers = new ArrayList<IComponentIdentifier>();
 		if(receivers!=null)
 		{
 			for(int i=0; i<receivers.length; i++)
@@ -96,7 +94,7 @@ public class MessageEnvelope
 	public void addReceiver(IComponentIdentifier receiver)
 	{
 		if(receivers==null)
-			receivers = new ArrayList();
+			receivers = new ArrayList<IComponentIdentifier>();
 		receivers.add(receiver);
 	}
 

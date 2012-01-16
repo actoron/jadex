@@ -4,6 +4,7 @@ import jadex.commons.ObjectInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.ObjectOutputStream;
 
 /**
@@ -61,7 +62,7 @@ public class SerialCodec implements ICodec
 		Object ret = null;
 		try
 		{
-			ByteArrayInputStream baos = new ByteArrayInputStream((byte[])bytes);
+			InputStream baos = bytes instanceof byte[] ? new ByteArrayInputStream((byte[])bytes) : (InputStream)bytes;
 			ObjectInputStream ois = new ObjectInputStream(baos, classloader);
 			ret = ois.readObject();
 			baos.close();

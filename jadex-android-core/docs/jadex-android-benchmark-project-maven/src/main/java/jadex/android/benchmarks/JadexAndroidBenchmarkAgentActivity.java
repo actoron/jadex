@@ -13,6 +13,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -21,6 +22,7 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.benchmarks.MessagePerformanceAgent;
 import jadex.xml.annotation.XMLClassname;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -159,9 +161,9 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 			startMB2.setEnabled(false);
 			startMB3.setEnabled(false);
 			
-			runBenchmark(agent, args).addResultListener(new IResultListener<Map<String,Object>>()
+			runBenchmark(agent, args).addResultListener(new IResultListener<Collection<Tuple2<String, Object>>>()
 			{
-				public void resultAvailable(final Map<String, Object> result)
+				public void resultAvailable(final Collection<Tuple2<String, Object>> result)
 				{
 					System.out.println(result);
 					runOnUiThread(new Runnable()
@@ -196,21 +198,21 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 	/**
 	 *  Run a benchmark and return the results.
 	 */
-	protected IFuture<Map<String, Object>>	runBenchmark(final String agent, final Map<String, Object> args)
+	protected IFuture<Collection<Tuple2<String, Object>>>	runBenchmark(final String agent, final Map<String, Object> args)
 	{
-		return platform.scheduleStep(new IComponentStep<Map<String, Object>>()
+		return platform.scheduleStep(new IComponentStep<Collection<Tuple2<String, Object>>>()
 		{
 			@XMLClassname("create-component")
-			public IFuture<Map<String, Object>> execute(IInternalAccess ia)
+			public IFuture<Collection<Tuple2<String, Object>>> execute(IInternalAccess ia)
 			{
-				final Future<Map<String, Object>>	fut	= new Future<Map<String, Object>>();
+				final Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 				ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Map<String, Object>>(fut)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<Tuple2<String, Object>>>(fut)
 				{
 					public void customResultAvailable(IComponentManagementService cms)
 					{
-						cms.createComponent(null, agent, new CreationInfo(args), new DelegationResultListener<Map<String,Object>>(fut))
-							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Map<String, Object>>(fut)
+						cms.createComponent(null, agent, new CreationInfo(args), new DelegationResultListener<Collection<Tuple2<String, Object>>>(fut))
+							.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<Tuple2<String, Object>>>(fut)
 						{
 							public void customResultAvailable(IComponentIdentifier result)
 							{

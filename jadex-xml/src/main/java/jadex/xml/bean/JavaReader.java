@@ -10,7 +10,6 @@ import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectObjectConverter;
-import jadex.xml.IObjectStringConverter;
 import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
@@ -23,12 +22,11 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.reader.Reader;
 
-/* $if !android $ */
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
-/* $endif $ */
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
@@ -43,14 +41,9 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-/* $if !android $ */
 import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLReporter;
-/* $else $
-import javaxx.xml.namespace.QName;
-import javaxx.xml.stream.XMLReporter;
-$endif $ */
 
 /**
  *  Java specific reader that supports collection classes and arrays.
@@ -843,6 +836,17 @@ public class JavaReader
 	public static Object objectFromByteArray(byte[] val, ClassLoader classloader)
 	{
 		return Reader.objectFromByteArray(getInstance(), val, classloader);
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The input stream.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	public static Object objectFromInputStream(InputStream val, ClassLoader classloader)
+	{
+		return Reader.objectFromInputStream(getInstance(), val, classloader);
 	}
 	
 	/**

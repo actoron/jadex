@@ -1,8 +1,6 @@
-package jadex.base.service.message.transport.httprelaymtp;
+package jadex.base.service.message.transport.httprelaymtp.io;
 
-import jadex.base.service.message.transport.MessageEnvelope;
-import jadex.base.service.message.transport.codecs.CodecFactory;
-import jadex.base.service.message.transport.codecs.ICodec;
+import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -37,7 +35,6 @@ public class HttpReceiver
 	protected HttpURLConnection	con;
 	
 	IExternalAccess access;
-	CodecFactory codecfac;
 	String address;
 	
 	//-------- constructors --------
@@ -45,10 +42,9 @@ public class HttpReceiver
 	/**
 	 *  Create and start a new receiver.
 	 */
-	public HttpReceiver(IExternalAccess access_, CodecFactory codecfac_, String address_)
+	public HttpReceiver(IExternalAccess access_, String address_)
 	{
 		this.access	= access_;
-		this.codecfac	= codecfac_;
 		this.address	= address_;
 		thread	= new Thread(new Runnable()
 		{
@@ -90,18 +86,6 @@ public class HttpReceiver
 								{
 									// Read message header (codes + size)
 									int msg_size;
-									b	= in.read();
-									if(b==-1) 
-										throw new IOException("Stream closed");
-									byte[] codec_ids = new byte[b];
-									for(int i=0; i<codec_ids.length; i++)
-									{
-										b	= in.read();
-										if(b==-1) 
-											throw new IOException("Stream closed");
-										codec_ids[i] = (byte)b;
-									}
-									
 									byte[] asize = new byte[4];
 									for(int i=0; i<asize.length; i++)
 									{
@@ -113,10 +97,9 @@ public class HttpReceiver
 									
 									msg_size = SUtil.bytesToInt(asize);
 		//							System.out.println("reclen: "+msg_size);
-									msg_size = msg_size-4-codec_ids.length-1; // Remove prolog.
 									if(msg_size>0)
 									{
-										byte[] rawmsg = new byte[msg_size];
+										final byte[] rawmsg = new byte[msg_size];
 										int count = 0;
 										while(count<msg_size) 
 										{
@@ -125,14 +108,6 @@ public class HttpReceiver
 												throw new IOException("Stream closed");
 											count += bytes_read;
 										}
-										
-										Object tmp = rawmsg;
-										for(int i=codec_ids.length-1; i>-1; i--)
-										{
-											ICodec dec = codecfac.getCodec(codec_ids[i]);
-											tmp = dec.decode((byte[])tmp, getClass().getClassLoader());
-										}
-										final MessageEnvelope	msg = (MessageEnvelope)tmp;
 										
 										access.scheduleStep(new IComponentStep<Void>()
 										{
@@ -145,17 +120,17 @@ public class HttpReceiver
 													{
 														try
 														{
-															ms.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
+															ms.deliverMessage(rawmsg);
 														}
 														catch(Exception e)
 														{
-															ia.getLogger().warning("Exception when delivering message: "+e+", "+msg);													
+															ia.getLogger().warning("Exception when delivering message: "+e+", "+rawmsg);													
 														}
 													}
 													
 													public void exceptionOccurred(Exception e)
 													{
-														ia.getLogger().warning("Exception when delivering message: "+e+", "+msg);
+														ia.getLogger().warning("Exception when delivering message: "+e+", "+rawmsg);
 													}
 												});
 												return IFuture.DONE;
@@ -218,7 +193,6 @@ public class HttpReceiver
 //			System.out.println("Closed connection.");
 //		}
 		access	= null;
-		codecfac	= null;
 		address	= null;
 		thread	= null;
 	}

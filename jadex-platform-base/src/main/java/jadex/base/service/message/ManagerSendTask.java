@@ -3,10 +3,8 @@ package jadex.base.service.message;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.ICodec;
-import jadex.base.service.message.transport.niotcpmtp.NIOTCPTransport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.SUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +17,7 @@ import java.util.Map;
 public class ManagerSendTask
 {
 	/** The message. */
-	protected Map message;
+	protected Map<String, Object> message;
 	
 	/** The encoded message envelope. */
 	protected byte[] data;
@@ -40,12 +38,12 @@ public class ManagerSendTask
 	protected IComponentIdentifier[] receivers;
 
 	/** The transports to be tried. */
-	protected List transports;
+	protected List<ITransport> transports;
 
 	/**
 	 *  Create a new manager send task.
 	 */
-	public ManagerSendTask(Map message, MessageType messagetype, IComponentIdentifier[] receivers, 
+	public ManagerSendTask(Map<String, Object> message, MessageType messagetype, IComponentIdentifier[] receivers, 
 		ITransport[] transports, byte[] codecids, ICodec[] codecs)//, SendManager manager)
 	{
 		if(codecids==null || codecids.length==0)
@@ -62,7 +60,7 @@ public class ManagerSendTask
 		this.message = message;
 		this.messagetype = messagetype;
 		this.receivers = receivers;
-		this.transports = new ArrayList(Arrays.asList(transports));
+		this.transports = new ArrayList<ITransport>(Arrays.asList(transports));
 		this.codecs = codecs;
 		this.codecids = codecids;
 	}
@@ -72,7 +70,7 @@ public class ManagerSendTask
 	 *  Get the message.
 	 *  @return the message.
 	 */
-	public Map getMessage()
+	public Map<String, Object> getMessage()
 	{
 		return message;
 	}
@@ -99,7 +97,7 @@ public class ManagerSendTask
 	 *  Get the transports.
 	 *  @return the transports.
 	 */
-	public List getTransports()
+	public List<ITransport> getTransports()
 	{
 		return transports;
 	}
@@ -150,6 +148,8 @@ public class ManagerSendTask
 	
 	/**
 	 *  Get the prolog bytes.
+	 *  Separated from data to avoid array copies.
+	 *  Message service expects messages to be delivered in the form {prolog}{data}. 
 	 *  @return The prolog bytes.
 	 */
 	public byte[] getProlog()
@@ -160,11 +160,9 @@ public class ManagerSendTask
 			{
 				if(prolog==null)
 				{
-					byte[] data = getData();
-					prolog = new byte[1+codecids.length+4];
+					prolog = new byte[1+codecids.length];
 					prolog[0] = (byte)codecids.length;
 					System.arraycopy(codecids, 0, prolog, 1, codecids.length);
-					System.arraycopy(SUtil.intToBytes(prolog.length+data.length), 0, prolog, codecids.length+1, 4);
 				}
 			}
 		}

@@ -23,12 +23,18 @@ public interface IMessageService extends IService
 	 *  @param cl The class loader used by the sending component (i.e. corresponding to classes of objects in the message map).
 	 *  @return Future that indicates an exception when messages could not be delivered to components. 
 	 */
-	public IFuture<Void> sendMessage(Map message, MessageType msgtype, IComponentIdentifier sender, IResourceIdentifier rid, byte[] codecids);
+	public IFuture<Void> sendMessage(Map<String, Object> message, MessageType msgtype, IComponentIdentifier sender, IResourceIdentifier rid, byte[] codecids);
 	
 	/**
 	 *  Deliver a message to some components.
 	 */
-	public void deliverMessage(Map message, String msgtype, IComponentIdentifier[] receivers);
+	public void deliverMessage(Map<String, Object> msg, String type, IComponentIdentifier[] receivers);
+			
+	/**
+	 *  Deliver a raw message to some components.
+	 *  @param msg	Byte array containing a message in the form {prolog}{data}.
+	 */
+	public void deliverMessage(byte[] msg);
 			
 	/**
 	 *  Add a message listener.
@@ -94,19 +100,4 @@ public interface IMessageService extends IService
 	 */
 	@Excluded
 	public MessageType getMessageType(String type);
-	
-	/**
-	 *  Get the codec factory
-	 *  @return The codec factory.
-	 */
-	@Excluded
-	// Hack should be CodecFactory
-	public Object getCodecFactory();
-	
-//	/**
-//	 *  Get a codec.
-//	 *  @param codecid The codec id.
-//	 *  @return The codec.
-//	 */
-//	public IFuture getCodecFactory(byte id);
 }

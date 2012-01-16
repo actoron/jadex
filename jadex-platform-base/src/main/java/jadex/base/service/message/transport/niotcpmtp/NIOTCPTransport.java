@@ -11,6 +11,7 @@ import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -44,9 +45,6 @@ public class NIOTCPTransport implements ITransport
 	/** How long to keep connections alive (5 min). */
 	protected static final int	MAX_KEEPALIVE	= 300000;
 
-	/** The prolog size. */
-	protected static final int PROLOG_SIZE = 4;
-	
 	/** Default port. */
 	protected static final int DEFAULT_PORT	= 8765;
 	
@@ -66,12 +64,6 @@ public class NIOTCPTransport implements ITransport
 	
 	/** The logger. */
 	protected Logger logger;
-	
-	/** The library service. */
-	protected ILibraryService libservice;
-	
-	/** The codec factory. */
-	protected CodecFactory codecfac;
 	
 	/** The selector thread. */
 	protected SelectorThread	selectorthread;
@@ -96,9 +88,9 @@ public class NIOTCPTransport implements ITransport
 	/**
 	 *  Start the transport.
 	 */
-	public IFuture start()
+	public IFuture<Void> start()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		try
 		{
 			// Set up receiver side.
@@ -131,32 +123,20 @@ public class NIOTCPTransport implements ITransport
 			
 			// Start receiver thread.
 			SServiceProvider.getService(container, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DelegationResultListener(ret)
+				.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(final IMessageService ms)
 				{
-					final IMessageService ms = (IMessageService)result;
-					codecfac = (CodecFactory)ms.getCodecFactory();
-					SServiceProvider.getService(container, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(new DelegationResultListener(ret)
+					SServiceProvider.getService(container, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, Void>(ret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(IThreadPoolService tp)
 						{
-							libservice = (ILibraryService)result;
-							
-							SServiceProvider.getService(container, IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-								.addResultListener(new DelegationResultListener(ret)
-							{
-								public void customResultAvailable(Object result)
-								{
-									selectorthread	= new SelectorThread(selector, ms, codecfac, libservice, logger, container);
-									IThreadPoolService tp = (IThreadPoolService)result;
-									tp.execute(selectorthread);
-									ret.setResult(null);
-								}
-							});
+							selectorthread	= new SelectorThread(selector, ms, logger, container);
+							tp.execute(selectorthread);
+							ret.setResult(null);
 						}
-					});		
+					});
 				}
 			});
 			//platform.getLogger().info("Local address: "+getServiceSchema()+lhostname+":"+listen_port);
@@ -174,12 +154,12 @@ public class NIOTCPTransport implements ITransport
 	/**
 	 *  Perform cleanup operations (if any).
 	 */
-	public IFuture shutdown()
+	public IFuture<Void> shutdown()
 	{
 		try{this.ssc.close();}catch(Exception e){}
 		selectorthread.setRunning(false);
 		this.shutdown	= true;
-		return new Future(null);
+		return IFuture.DONE;
 	}
 	
 	//-------- methods --------

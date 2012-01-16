@@ -1,8 +1,5 @@
 package jadex.base.service.message.transport.tcpmtp;
 
-import jadex.base.service.message.transport.MessageEnvelope;
-import jadex.base.service.message.transport.codecs.CodecFactory;
-import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.base.service.message.transport.tcpmtp.TCPTransport.Cleaner;
 import jadex.commons.SUtil;
 
@@ -31,14 +28,8 @@ class TCPOutputConnection
 	/** The output stream. */
 	protected OutputStream sos;
 	
-	/** The codec factory. */
-	protected CodecFactory codecfac;
-	
 	/** The cleaner. */
 	protected Cleaner cleaner;
-	
-	/** The classloader. */
-	protected ClassLoader classloader;
 	
 	//-------- constructors --------
 	
@@ -49,8 +40,7 @@ class TCPOutputConnection
 	 *  @param enc
 	 *  @throws IOException
 	 */
-	public TCPOutputConnection(InetAddress iaddr, int iport, CodecFactory codecfac, 
-		Cleaner cleaner, ClassLoader classloader) throws IOException
+	public TCPOutputConnection(InetAddress iaddr, int iport, Cleaner cleaner) throws IOException
 	{
 //		try
 //		{
@@ -66,55 +56,11 @@ class TCPOutputConnection
 //			throw e;
 //		}
 		this.sos = new BufferedOutputStream(sock.getOutputStream());
-		this.codecfac = codecfac;
 		this.cleaner = cleaner;
-		this.classloader = classloader;
 		//address = SMTransport.SERVICE_SCHEMA+iaddr.getHostAddress()+":"+iport;
 	}
 
 	//-------- methods --------
-	
-//	/**
-//	 *  Send a message.
-//	 *  @param msg The message.
-//	 *  (todo: relax synchronization by performing sends 
-//	 *  on extra sender thread of transport)
-//	 */
-//	public synchronized boolean send(MessageEnvelope msg, byte[] codecids)
-//	{
-//		boolean ret = false;
-//		
-//		try
-//		{
-//			if(codecids==null || codecids.length==0)
-//				codecids = codecfac.getDefaultCodecIds();
-//
-//			Object enc_msg = msg;
-//			for(int i=0; i<codecids.length; i++)
-//			{
-//				ICodec codec = codecfac.getCodec(codecids[i]);
-//				enc_msg	= codec.encode(enc_msg, classloader);
-//			}
-//			byte[] res = (byte[])enc_msg;
-//			
-//			int dynlen = TCPTransport.PROLOG_SIZE+1+codecids.length;
-//			int size = res.length+dynlen;
-////			System.out.println("len: "+size);
-//			sos.write((byte)codecids.length);
-//			sos.write(codecids);
-//			sos.write(SUtil.intToBytes(size));
-//			sos.write(res);
-//			sos.flush();
-//			ret = true;
-//			cleaner.refresh();
-//		}
-//		catch(IOException e)
-//		{
-//			close();
-//		}
-//		
-//		return ret;
-//	}
 	
 	/**
 	 *  Send a message.
@@ -128,6 +74,7 @@ class TCPOutputConnection
 		
 		try
 		{
+			sos.write(SUtil.intToBytes(prolog.length+data.length));
 			sos.write(prolog);
 			sos.write(data);
 			sos.flush();

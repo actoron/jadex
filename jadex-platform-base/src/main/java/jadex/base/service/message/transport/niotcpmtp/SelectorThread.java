@@ -1,12 +1,9 @@
 package jadex.base.service.message.transport.niotcpmtp;
 
-import jadex.base.service.message.transport.MessageEnvelope;
-import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -45,12 +42,6 @@ public class SelectorThread implements Runnable
 	/** The message service for delivering received messages. */
 	protected IMessageService msgservice;
 	
-	/** The codec factory for encoding/decoding messages. */
-	protected CodecFactory codecfac;
-	
-	/** The library service for encoding/decoding messages. */
-	protected ILibraryService libservice;
-	
 	/** The logger. */
 	protected Logger	logger;
 	
@@ -60,11 +51,11 @@ public class SelectorThread implements Runnable
 	/** The tasks enqueued from external threads. */
 	protected List<Runnable>	tasks;
 
-	/** The pool of output connections (InetSocketAddress -> NIOTCPOutputConnection). */
-	protected Map	connections;
+	/** The pool of output connections (address -> Future|NIOTCPOutputConnection|DeadConnection). */
+	protected Map<InetSocketAddress, Object>	connections;
 
-	/** The write tasks of data waiting to be written to a connection (socketchannel->tuple{buffers, future}). */
-	protected Map	writetasks;
+	/** The write tasks of data waiting to be written to a connection. */
+	protected Map<SocketChannel, List<Tuple2<List<ByteBuffer>, Future<Void>>>>	writetasks;
 	
 	/** The cleanup timer. */
 	protected Timer	timer;
@@ -74,18 +65,16 @@ public class SelectorThread implements Runnable
 	/**
 	 * Create a NIO selector thread.
 	 */
-	public SelectorThread(Selector selector, IMessageService msgsservice, CodecFactory codecfac, ILibraryService libservice, Logger logger, IServiceProvider provider)
+	public SelectorThread(Selector selector, IMessageService msgsservice, Logger logger, IServiceProvider provider)
 	{
 		this.running = true;
 		this.selector	= selector;
 		this.msgservice	= msgsservice;
-		this.codecfac	= codecfac;
-		this.libservice	= libservice;
 		this.logger	= logger;
 		this.provider	= provider;
 		this.tasks	= new ArrayList<Runnable>();
-		this.connections	= new LinkedHashMap();
-		this.writetasks	= new LinkedHashMap();
+		this.connections	= new LinkedHashMap<InetSocketAddress, Object>();
+		this.writetasks	= new LinkedHashMap<SocketChannel, List<Tuple2<List<ByteBuffer>, Future<Void>>>>();
 	}
 
 	// -------- Runnable interface --------
@@ -154,7 +143,7 @@ public class SelectorThread implements Runnable
 			}
 		}
 		
-		for(Iterator it=connections.values().iterator(); it.hasNext(); )
+		for(Iterator<Object> it=connections.values().iterator(); it.hasNext(); )
 		{
 			Object	con	= it.next();
 			if(con instanceof NIOTCPOutputConnection)
@@ -183,13 +172,13 @@ public class SelectorThread implements Runnable
 	 *  @param addresses	The addresses to connect to.
 	 *  @return A future containing a connection to the first responsive address.
 	 */
-	public IFuture	getConnection(final InetSocketAddress[] addresses)
+	public IFuture<NIOTCPOutputConnection>	getConnection(final InetSocketAddress[] addresses)
 	{
-		final Future	ret	= new Future();
+		final Future<NIOTCPOutputConnection>	ret	= new Future<NIOTCPOutputConnection>();
 		
 		NIOTCPOutputConnection	con	= null;
 		List<Runnable>	todo	= null;
-		List	futures	= null;
+		List<IFuture<NIOTCPOutputConnection>>	futures	= null;
 		synchronized(connections)
 		{
 			// Try to find existing connection.
@@ -217,7 +206,7 @@ public class SelectorThread implements Runnable
 					
 					if(val==null)
 					{
-						final Future	fut	= new Future();
+						final Future<NIOTCPOutputConnection>	fut	= new Future<NIOTCPOutputConnection>();
 						connections.put(addresses[i], fut);
 						final InetSocketAddress	address	= addresses[i];
 						Runnable	task	= new Runnable()
@@ -229,7 +218,7 @@ public class SelectorThread implements Runnable
 									SocketChannel	sc	= SocketChannel.open();
 									sc.configureBlocking(false);
 									sc.connect(address);
-									sc.register(selector, SelectionKey.OP_CONNECT, new Tuple(address, fut));
+									sc.register(selector, SelectionKey.OP_CONNECT, new Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>(address, fut));
 									logger.info("Attempting connection to: "+address);
 								}
 								catch(Exception e)
@@ -245,7 +234,7 @@ public class SelectorThread implements Runnable
 						todo.add(task);
 						if(futures==null)
 						{
-							futures	= new ArrayList();
+							futures	= new ArrayList<IFuture<NIOTCPOutputConnection>>();
 						}
 						futures.add(fut);
 					}
@@ -253,9 +242,9 @@ public class SelectorThread implements Runnable
 					{
 						if(futures==null)
 						{
-							futures	= new ArrayList();
+							futures	= new ArrayList<IFuture<NIOTCPOutputConnection>>();
 						}
-						futures.add(val);						
+						futures.add((IFuture<NIOTCPOutputConnection>)val);						
 					}
 				}
 			}
@@ -287,11 +276,11 @@ public class SelectorThread implements Runnable
 			{
 				// Listener called on NIO thread only
 				final int	num	= futures.size();
-				IResultListener	lis	= new IResultListener()
+				IResultListener<NIOTCPOutputConnection>	lis	= new IResultListener<NIOTCPOutputConnection>()
 				{
 					protected int	cnt;
 					
-					public void resultAvailable(Object result)
+					public void resultAvailable(NIOTCPOutputConnection result)
 					{
 						cnt++;
 						if(!ret.isDone())
@@ -312,7 +301,7 @@ public class SelectorThread implements Runnable
 				
 				for(int i=0; i<futures.size(); i++)
 				{
-					((IFuture)futures.get(i)).addResultListener(lis);
+					futures.get(i).addResultListener(lis);
 				}
 			}
 			else
@@ -344,33 +333,18 @@ public class SelectorThread implements Runnable
 				try
 				{
 					// Convert message into buffers.
-					List	buffers	= new ArrayList();
-//					byte[]	codecs	= codecids==null || codecids.length==0 ? codecfac.getDefaultCodecIds() : codecids;
-//			
-//					Object enc_msg = msg;
-//					for(int i=0; i<codecs.length; i++)
-//					{
-//						ICodec codec = codecfac.getCodec(codecs[i]);
-//						// todo: which resource identifier to use for incoming connections?
-//						ClassLoader cl = getClass().getClassLoader(); // libservice.getClassLoader(null)
-//						enc_msg	= codec.encode(enc_msg, cl);
-//					}
-//					byte[] data = (byte[])enc_msg;
+					List<ByteBuffer>	buffers	= new ArrayList<ByteBuffer>();
 					
-//					byte[] prolog = new byte[1+codecs.length+NIOTCPTransport.PROLOG_SIZE];
-//					prolog[0] = (byte)codecs.length;
-//					System.arraycopy(codecs, 0, prolog, 1, codecs.length);
-//					System.arraycopy(SUtil.intToBytes(prolog.length+data.length), 0, prolog, codecs.length+1, 4);
-					
+					buffers.add(ByteBuffer.wrap(SUtil.intToBytes(prolog.length+data.length)));
 					buffers.add(ByteBuffer.wrap(prolog));
 					buffers.add(ByteBuffer.wrap(data));
 					
 					// Add buffers as new write task.
-					Tuple	task	= new Tuple(buffers, ret);
-					List	queue	= (List)writetasks.get(con.getSocketChannel());
+					Tuple2<List<ByteBuffer>, Future<Void>>	task	= new Tuple2<List<ByteBuffer>, Future<Void>>(buffers, ret);
+					List<Tuple2<List<ByteBuffer>, Future<Void>>>	queue	= (List<Tuple2<List<ByteBuffer>, Future<Void>>>)writetasks.get(con.getSocketChannel());
 					if(queue==null)
 					{
-						queue	= new LinkedList();
+						queue	= new LinkedList<Tuple2<List<ByteBuffer>, Future<Void>>>();
 						writetasks.put(con.getSocketChannel(), queue);
 					}
 					queue.add(task);
@@ -416,9 +390,7 @@ public class SelectorThread implements Runnable
 			// Register the new SocketChannel with our Selector, indicating
 			// we'd like to be notified when there's data waiting to be read
 			
-			// todo: which resource identifier to use for outgoing connections?
-			ClassLoader cl = getClass().getClassLoader(); // libservice.getClassLoader(null)
-			sc.register(this.selector, SelectionKey.OP_READ, new NIOTCPInputConnection(sc, codecfac, cl));
+			sc.register(this.selector, SelectionKey.OP_READ, new NIOTCPInputConnection(sc));
 			
 			logger.info("Accepted connection from: "+sc.socket().getRemoteSocketAddress());
 		}
@@ -439,10 +411,10 @@ public class SelectorThread implements Runnable
 		try
 		{
 			// Read as much messages as available (if any).
-			for(MessageEnvelope msg=con.read(); msg!=null; msg=con.read())
+			for(byte[] msg=con.read(); msg!=null; msg=con.read())
 			{
 //				System.out.println("Read message from: "+con);
-				msgservice.deliverMessage(msg.getMessage(), msg.getTypeName(), msg.getReceivers());
+				msgservice.deliverMessage(msg);
 			}
 		}
 		catch(Exception e)
@@ -461,9 +433,9 @@ public class SelectorThread implements Runnable
 	protected void	handleConnect(SelectionKey key)
 	{
 		SocketChannel	sc	= (SocketChannel)key.channel();
-		Tuple	tuple	= (Tuple)key.attachment();
+		Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>	tuple	= (Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>)key.attachment();
 		InetSocketAddress	address	= (InetSocketAddress)tuple.get(0);
-		Future	ret	= (Future)tuple.get(1);
+		Future<NIOTCPOutputConnection>	ret	= tuple.getSecondEntity();
 		try
 		{
 			boolean	finished	= sc.finishConnect();
@@ -500,7 +472,7 @@ public class SelectorThread implements Runnable
 	{
 		SocketChannel	sc	= (SocketChannel)key.channel();
 		NIOTCPOutputConnection	con	= (NIOTCPOutputConnection)key.attachment();
-		List	queue	= (List)this.writetasks.get(sc);
+		List<Tuple2<List<ByteBuffer>, Future<Void>>>	queue	= (List<Tuple2<List<ByteBuffer>, Future<Void>>>)this.writetasks.get(sc);
 
 		try
 		{
@@ -516,10 +488,10 @@ public class SelectorThread implements Runnable
 				}
 				else
 				{
-					Tuple	task	= (Tuple)queue.get(0);
-					List	buffers	= (List)task.get(0);	
-					Future	fut	= (Future)task.get(1);	
-					ByteBuffer buf = (ByteBuffer)buffers.get(0);
+					Tuple2<List<ByteBuffer>, Future<Void>>	task	= queue.get(0);
+					List<ByteBuffer>	buffers	= task.getFirstEntity();	
+					Future<Void>	fut	= task.getSecondEntity();	
+					ByteBuffer buf = buffers.get(0);
 					sc.write(buf);
 					if(buf.remaining()>0)
 					{
@@ -552,10 +524,10 @@ public class SelectorThread implements Runnable
 			}
 			
 			// Connection failure: notify all open tasks.
-			for(Iterator it=queue.iterator(); it.hasNext(); )
+			for(Iterator<Tuple2<List<ByteBuffer>, Future<Void>>> it=queue.iterator(); it.hasNext(); )
 			{
-				Tuple	task	= (Tuple)it.next();
-				Future	fut	= (Future)task.get(1);	
+				Tuple2<List<ByteBuffer>, Future<Void>>	task	= (Tuple2<List<ByteBuffer>, Future<Void>>)it.next();
+				Future<Void>	fut	= task.getSecondEntity();
 				fut.setException(e);
 				it.remove();
 			}
