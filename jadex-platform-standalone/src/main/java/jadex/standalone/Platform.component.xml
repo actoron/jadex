@@ -192,9 +192,9 @@
 		</providedservice>
 		<providedservice class="IExecutionService">
 			<implementation proxytype="raw">
-				$args.simulation
-				? new SyncExecutionService($component.getServiceProvider())
-				: new AsyncExecutionService($component.getServiceProvider())
+				$args.simulation==null || !$args.simulation.booleanValue()
+				? new AsyncExecutionService($component.getServiceProvider())
+				: new SyncExecutionService($component.getServiceProvider())
 			</implementation>
 		</providedservice>
 			<providedservice class="IDependencyService">
