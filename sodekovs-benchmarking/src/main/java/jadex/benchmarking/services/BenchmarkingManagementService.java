@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import sodekovs.util.gnuplot.CreateImagesThread;
+import sodekovs.util.gnuplot.persistence.LogDAO;
 import sodekovs.util.misc.GlobalConstants;
 import sodekovs.util.model.benchmarking.description.BenchmarkingDescription;
 import sodekovs.util.model.benchmarking.description.HistoricDataDescription;
@@ -98,7 +100,8 @@ public class BenchmarkingManagementService extends BasicService implements IBenc
 					IBenchmarkingExecutionService benchServ = (IBenchmarkingExecutionService) it.next();
 					// if(remotedf!=DirectoryFacilitatorService.this)
 					// {
-					benchServ.getBenchmarkStatus().addResultListener(lis);
+					// benchServ.getBenchmarkStatus().addResultListener(lis);
+					benchServ.getWorkload().addResultListener(lis);
 					// }
 					// else
 					// {
