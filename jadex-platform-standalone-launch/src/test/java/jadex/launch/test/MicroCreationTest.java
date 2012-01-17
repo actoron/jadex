@@ -4,11 +4,9 @@ import jadex.base.Starter;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -20,7 +18,6 @@ import jadex.commons.future.ThreadSuspendable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,26 +34,15 @@ public class MicroCreationTest extends TestCase
 	/**
 	 *  Test method.
 	 */
-	public void	testMicroCreation()
+	public void	testMicroCreation() throws Exception
 	{
 		long timeout	= 300000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks",
 //			"-kernels", "all",
+			"-libpath", "new String[]{\""+new File("../jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "true", "-printpass", "false"}).get(sus, timeout);
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
-		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(platform.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(sus, timeout);
-		
-		try
-		{
-			File	root	= new File("../jadex-applications-micro/target/classes");
-			URL url = root.toURI().toURL();
-			libsrv.addURL(url);
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
 		
 		final Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
 		Map<String, Object>	args	= new HashMap<String, Object>();
