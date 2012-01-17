@@ -16,7 +16,6 @@ import jadex.commons.IChangeListener;
 import jadex.commons.IRemotable;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.SReflect;
-import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -114,13 +113,13 @@ public class MarshalService extends BasicService implements IMarshalService
 		// Insert before FieldProcessor that is always applicable
 		processors.add(processors.size()-1, new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Class clazz)
+			public boolean isApplicable(Object object, Class<?> clazz)
 			{
 				return object!=null && !(object instanceof BasicService) 
 					&& object.getClass().isAnnotationPresent(Service.class);
 			}
 			
-			public Object process(Object object, Class clazz,
+			public Object process(Object object, Class<?> clazz,
 				List<ITraverseProcessor> processors, Traverser traverser,
 				Map<Object, Object> traversed)
 			{

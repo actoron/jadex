@@ -36,7 +36,7 @@ public class MapProcessor implements ITraverseProcessor
 	 *  @param object The object.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class clazz)
+	public boolean isApplicable(Object object, Class<?> clazz)
 	{
 		return SReflect.isSupertype(Map.class, clazz);
 	}
@@ -46,7 +46,7 @@ public class MapProcessor implements ITraverseProcessor
 	 *  @param object The object.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed)
 	{
 		Map ret = (Map)getReturnObject(object, clazz);

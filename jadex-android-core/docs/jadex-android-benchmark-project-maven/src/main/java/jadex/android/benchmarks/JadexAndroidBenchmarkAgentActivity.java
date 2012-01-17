@@ -1,7 +1,6 @@
 package jadex.android.benchmarks;
 
 import jadex.base.Starter;
-import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -106,8 +105,9 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 					"-wspublish", "false",
 					"-kernels", "\"component, micro\"",
 					"-tcptransport", "false",
-					"-niotransport", "false",
+					"-niotcptransport", "false",
 					"-relaytransport", "true",
+					"-relayaddress", "\"http://10.0.2.2:8080/jadex-platform-relay-web/\"",					
 					"-saveonexit", "false", "-gui", "false",
 					"-autoshutdown", "false"
 				}).addResultListener(new IResultListener<IExternalAccess>()
@@ -156,8 +156,11 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 			else if(view == startMB3)
 			{
 				args	= new HashMap<String, Object>();
+				args.put("max", new Integer(2));
 				args.put("codec", Boolean.TRUE);
-				args.put("echo", new ComponentIdentifier("echo@echo", new String[]{SRelay.DEFAULT_ADDRESS}));
+				args.put("echo", new ComponentIdentifier("echo@echo",
+//					new String[]{SRelay.DEFAULT_ADDRESS}));
+					new String[]{"http://10.0.2.2:8080/jadex-platform-relay-web/"}));
 			}
 			
 			startMB1.setEnabled(false);

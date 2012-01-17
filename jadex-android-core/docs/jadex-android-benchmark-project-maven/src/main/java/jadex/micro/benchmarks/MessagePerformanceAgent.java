@@ -7,6 +7,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -89,7 +90,19 @@ public class MessagePerformanceAgent extends MicroAgent
 								request.put(SFipa.CONTENT, new BenchmarkMessage("message: "+i, true));
 							}
 							
-							sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
+							sendMessage(request, SFipa.FIPA_MESSAGE_TYPE).addResultListener(new IResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+									System.out.println("message sent");
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									System.out.println("message not sent: "+exception);
+									exception.printStackTrace();
+								}
+							});
 							if(i%100==0)
 							{
 								break;

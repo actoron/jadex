@@ -42,7 +42,7 @@ public class ExcludeProcessor implements ITraverseProcessor
 	 *  @param object The object.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class clazz)
+	public boolean isApplicable(Object object, Class<?> clazz)
 	{
 		return excluded.contains(clazz);
 	}
@@ -52,7 +52,7 @@ public class ExcludeProcessor implements ITraverseProcessor
 	 *  @param object The object.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed)
 	{
 		return object;

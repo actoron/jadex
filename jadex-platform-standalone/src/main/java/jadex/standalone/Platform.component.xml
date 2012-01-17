@@ -124,14 +124,16 @@
 		<argument name="localtransport" class="boolean">true</argument>
 		<!-- Flag if tcp transport is enabled. -->
 		<argument name="tcptransport" class="boolean">false</argument>
-		<!-- Flag if niotcp transport is enabled. -->
-		<argument name="niotcptransport" class="boolean">true</argument>
-		<!-- Flag if relay transport is enabled. -->
-		<argument name="relaytransport" class="boolean">true</argument>
 		<!-- Port for TCP transport. -->
 		<argument name="tcpport" class="int">9876</argument>
+		<!-- Flag if niotcp transport is enabled. -->
+		<argument name="niotcptransport" class="boolean">true</argument>
 		<!-- Port for NIOTCP transport. -->
 		<argument name="niotcpport" class="int">8765</argument>
+		<!-- Flag if relay transport is enabled. -->
+		<argument name="relaytransport" class="boolean">true</argument>
+		<!-- Address for relay transport. -->
+		<argument name="relayaddress" class="String">SRelay.DEFAULT_ADDRESS</argument>
 		
 		<!-- The file name(s) of extension component(s) to load (separated by comma). -->
 		<argument name="extensions" class="String">
@@ -224,8 +226,7 @@
 					$args.localtransport? new LocalTransport($component.getServiceProvider()): null,
 					$args.tcptransport? new TCPTransport($component.getServiceProvider(), $args.tcpport): null,
 					$args.niotcptransport? new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null,
-					$args.relaytransport? new HttpRelayTransport($component, SRelay.DEFAULT_ADDRESS): null
-					//new HttpRelayTransport($component, "http://localhost:8080/jadex-platform-relay-web/")
+					$args.relaytransport? new HttpRelayTransport($component, $args.relayaddress): null
 				},
 				new MessageType[]
 				{

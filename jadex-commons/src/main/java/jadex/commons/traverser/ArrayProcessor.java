@@ -33,7 +33,7 @@ class ArrayProcessor implements ITraverseProcessor
 	 *  @param object The object.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class clazz)
+	public boolean isApplicable(Object object, Class<?> clazz)
 	{
 		return object.getClass().isArray();
 	}
@@ -43,7 +43,7 @@ class ArrayProcessor implements ITraverseProcessor
 	 *  @param object The object.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed)
 	{
 		Object ret = getReturnObject(object, clazz);

@@ -31,6 +31,7 @@ import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
@@ -79,9 +80,6 @@ public class MessageService extends BasicService implements IMessageService
         new jadex.base.contentcodecs.NuggetsXMLContentCodec()
     };
 
-    /** No addresses constant. */
-    protected String LOCAL = "local";
-    
 	//-------- attributes --------
 
 	/** The component. */
@@ -103,7 +101,7 @@ public class MessageService extends BasicService implements IMessageService
 	protected Logger	logger;
 	
 	/** The listeners (listener->filter). */
-	protected Map listeners;
+	protected Map<IMessageListener, IFilter> listeners;
 	
 	/** The cashed clock service. */
 	protected IClockService	clockservice;
@@ -117,8 +115,8 @@ public class MessageService extends BasicService implements IMessageService
 //	/** The cashed clock service. */
 //	protected IComponentManagementService cms;
 	
-	/** The target managers. */
-	protected LRU managers;
+	/** The target managers (platform id->manager). */
+	protected LRU<IComponentIdentifier, SendManager> managers;
 	
 	/** The content codecs. */
 	protected List contentcodecs;
@@ -161,7 +159,7 @@ public class MessageService extends BasicService implements IMessageService
 		this.delivermsg = new DeliverMessage();
 		this.logger = logger;
 		
-		this.managers = new LRU(800);
+		this.managers = new LRU<IComponentIdentifier, SendManager>(800);
 		if(contentcodecs!=null)
 		{
 			for(int i=0; i<contentcodecs.length; i++)
@@ -178,10 +176,10 @@ public class MessageService extends BasicService implements IMessageService
 	 *  Send a message.
 	 *  @param message The native message.
 	 */
-	public IFuture<Void> sendMessage(final Map origmsg, final MessageType type, 
+	public IFuture<Void> sendMessage(final Map<String, Object> origmsg, final MessageType type, 
 		IComponentIdentifier osender, final IResourceIdentifier rid, final byte[] codecids)
 	{
-		final Map msg = new HashMap(origmsg);
+		final Map<String, Object> msg = new HashMap<String, Object>(origmsg);
 		
 		final Future<Void> ret = new Future<Void>();
 		final IComponentIdentifier sender = internalUpdateComponentIdentifier(osender);
@@ -268,7 +266,7 @@ public class MessageService extends BasicService implements IMessageService
 				
 				if(SReflect.isIterable(tmp))
 				{
-					for(Iterator it=SReflect.getIterator(tmp); it.hasNext(); )
+					for(Iterator<?> it=SReflect.getIterator(tmp); it.hasNext(); )
 					{
 						IComponentIdentifier rec = (IComponentIdentifier)it.next();
 						if(rec==null)
@@ -288,16 +286,14 @@ public class MessageService extends BasicService implements IMessageService
 				
 				// External access of sender required for content encoding etc.
 				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-					.addResultListener(new DelegationResultListener(ret)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(IComponentManagementService cms)
 					{
-						IComponentManagementService cms = (IComponentManagementService)result;
-						cms.getExternalAccess(sender).addResultListener(new DelegationResultListener(ret)
+						cms.getExternalAccess(sender).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(IExternalAccess exta)
 							{
-								IExternalAccess exta = (IExternalAccess)result;
 //								System.out.println("msgservice calling doSendMessage()");
 								doSendMessage(msg, type, exta, cl, ret, codecids);
 							}
@@ -313,9 +309,9 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Extracted method to be callable from listener.
 	 */
-	protected void doSendMessage(Map msg, MessageType type, IExternalAccess comp, ClassLoader cl, Future ret, byte[] codecids)
+	protected void doSendMessage(Map<String, Object> msg, MessageType type, IExternalAccess comp, ClassLoader cl, Future<Void> ret, byte[] codecids)
 	{
-		Map msgcopy	= new HashMap(msg);
+		Map<String, Object> msgcopy	= new HashMap<String, Object>(msg);
 		
 		// Conversion via platform specific codecs
 		// Hack?! Preprocess content to enhance component identifiers.
@@ -323,22 +319,22 @@ public class MessageService extends BasicService implements IMessageService
 		List<ITraverseProcessor> procs = Traverser.getDefaultTraversalProcessors();
 		procs.add(1, new ITraverseProcessor()
 		{
-			public Object process(Object object, Class clazz,
+			public Object process(Object object, Class<?> clazz,
 				List<ITraverseProcessor> processors, Traverser traverser,
 				Map<Object, Object> traversed)
 			{
 				return internalUpdateComponentIdentifier((IComponentIdentifier)object);
 			}
 			
-			public boolean isApplicable(Object object, Class clazz)
+			public boolean isApplicable(Object object, Class<?> clazz)
 			{
 				return object instanceof IComponentIdentifier;
 			}
 		});
 		
-		for(Iterator it=msgcopy.keySet().iterator(); it.hasNext(); )
+		for(Iterator<String> it=msgcopy.keySet().iterator(); it.hasNext(); )
 		{
-			String	name	= (String)it.next();
+			String	name	= it.next();
 			Object	value	= msgcopy.get(name);
 			value = Traverser.traverseObject(value, procs);
 			msgcopy.put(name, value);
@@ -368,8 +364,8 @@ public class MessageService extends BasicService implements IMessageService
 		IMessageListener[] lis;
 		synchronized(this)
 		{
-			fils = listeners==null? null: (IFilter[])listeners.values().toArray(new IFilter[listeners.size()]);
-			lis = listeners==null? null: (IMessageListener[])listeners.keySet().toArray(new IMessageListener[listeners.size()]);
+			fils = listeners==null? null: listeners.values().toArray(new IFilter[listeners.size()]);
+			lis = listeners==null? null: listeners.keySet().toArray(new IMessageListener[listeners.size()]);
 		}
 		
 		if(lis!=null)
@@ -412,7 +408,7 @@ public class MessageService extends BasicService implements IMessageService
 		Object tmp	= msgcopy.get(recid);
 		if(SReflect.isIterable(tmp))
 		{
-			for(Iterator it = SReflect.getIterator(tmp); it.hasNext(); )
+			for(Iterator<?> it = SReflect.getIterator(tmp); it.hasNext(); )
 			{
 				IComponentIdentifier cid = (IComponentIdentifier)it.next();
 				SendManager sm = getSendManager(cid); 
@@ -435,12 +431,11 @@ public class MessageService extends BasicService implements IMessageService
 			codecs[i] = codecfactory.getCodec(cids[i]);
 		}
 		
-		CollectionResultListener crl = new CollectionResultListener(managers.size(), false, new DelegationResultListener(ret));
-		for(Iterator it=managers.keySet().iterator(); it.hasNext();)
+		CounterResultListener<Void> crl = new CounterResultListener<Void>(managers.size(), false, new DelegationResultListener<Void>(ret));
+		for(Iterator<?> it=managers.keySet().iterator(); it.hasNext();)
 		{
 			SendManager tm = (SendManager)it.next();
-			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm)
-				.toArray(new IComponentIdentifier[0]);
+			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm).toArray(new IComponentIdentifier[0]);
 			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, getTransports(), cids, codecs);
 //			System.out.println("msgservice adding send task");
 			tm.addMessage(task).addResultListener(crl);
@@ -614,37 +609,12 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public SendManager getSendManager(IComponentIdentifier cid)
 	{
-		SendManager ret = null;
-		
-		String[] adrs = cid.getAddresses();
-		
-		if(adrs==null || adrs.length==0)
-		{
-			ret = (SendManager)managers.get(LOCAL);
-		}
-		else
-		{
-			for(int i=0; i<adrs.length && ret==null; i++)
-			{
-				ret = (SendManager)managers.get(adrs[i]);
-			}
-		}
+		SendManager ret = managers.get(cid.getRoot());
 		
 		if(ret==null)
 		{
 			ret = new SendManager();
-			
-			if(adrs==null || adrs.length==0)
-			{
-				managers.put(LOCAL, ret);
-			}
-			else
-			{
-				for(int i=0; i<adrs.length; i++)
-				{
-					managers.put(adrs[i], ret);
-				}
-			}
+			managers.put(cid.getRoot(), ret);
 		}
 		
 		return ret;
@@ -1206,7 +1176,7 @@ public class MessageService extends BasicService implements IMessageService
 		//-------- attributes --------
 		
 		/** The list of messages to send. */
-		protected List messages;
+		protected List<Tuple2<ManagerSendTask, Future<Void>>> messages;
 		
 		//-------- constructors --------
 		
@@ -1215,7 +1185,7 @@ public class MessageService extends BasicService implements IMessageService
 		 */
 		public SendManager()
 		{
-			this.messages = new ArrayList();
+			this.messages = new ArrayList<Tuple2<ManagerSendTask, Future<Void>>>();
 		}
 		
 		//-------- methods --------
@@ -1225,28 +1195,31 @@ public class MessageService extends BasicService implements IMessageService
 		 */
 		public boolean execute()
 		{
-			Object[] tmp = null;
+			Tuple2<ManagerSendTask, Future<Void>> tmp = null;
 			boolean isempty;
 			
 			synchronized(this)
 			{
 				if(!messages.isEmpty())
-					tmp = (Object[])messages.remove(0);
+					tmp = messages.remove(0);
 				isempty = messages.isEmpty();
 			}
-			final Object[] ftmp = tmp;
+			final Tuple2<ManagerSendTask, Future<Void>> ftmp = tmp;
 			
-			isValid().addResultListener(new IResultListener()
+			// Todo: move back to send manager thread after isValid()
+			// (hack!!! currently only works because message service is raw)
+			// hack!!! doesn't make much sense to check isValid as send manager executes on different thread.
+			isValid().addResultListener(new IResultListener<Boolean>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(Boolean result)
 				{
-					if(((Boolean)result).booleanValue())
+					if(result.booleanValue())
 					{
 //						System.err.println("MessageService SendManager.execute");
 						if(ftmp!=null)
 						{
-							final ManagerSendTask task = (ManagerSendTask)ftmp[0];
-							final Future ret = (Future)ftmp[1];
+							final ManagerSendTask task = ftmp.getFirstEntity();
+							final Future<Void> ret = ftmp.getSecondEntity();
 							
 							IComponentIdentifier[] receivers = task.getReceivers();
 //							System.out.println("recs: "+SUtil.arrayToString(receivers)+" "+task.hashCode());
@@ -1262,12 +1235,12 @@ public class MessageService extends BasicService implements IMessageService
 								ITransport transport = (ITransport)task.getTransports().remove(0);
 //								transport.sendMessage(task.getMessage(), task.getMessageType().getName(), receivers, task.getCodecIds())
 								transport.sendMessage(task)
-									.addResultListener(new DelegationResultListener(ret)
+									.addResultListener(new DelegationResultListener<Void>(ret)
 								{
 									public void exceptionOccurred(Exception exception)
 									{
 										// On success re-add message with original receivers. 
-										addMessage(task).addResultListener(new DelegationResultListener(ret));
+										addMessage(task).addResultListener(new DelegationResultListener<Void>(ret));
 									}
 								});
 							}
@@ -1280,8 +1253,8 @@ public class MessageService extends BasicService implements IMessageService
 //						System.out.println("send message not executed");
 						if(ftmp!=null)
 						{
-							ManagerSendTask task = (ManagerSendTask)ftmp[0];
-							Future ret = (Future)ftmp[1];
+							ManagerSendTask task = ftmp.getFirstEntity();
+							Future<Void> ret = ftmp.getSecondEntity();
 							ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), null, "Message service terminated."));
 						}
 //						isempty	= true;
@@ -1294,8 +1267,8 @@ public class MessageService extends BasicService implements IMessageService
 //					System.out.println("send message not executed");
 					if(ftmp!=null)
 					{
-						ManagerSendTask task = (ManagerSendTask)ftmp[0];
-						Future ret = (Future)ftmp[1];
+						ManagerSendTask task = ftmp.getFirstEntity();
+						Future<Void> ret = ftmp.getSecondEntity();
 						ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), null, "Message service terminated."));
 					}
 //					isempty	= true;
@@ -1310,34 +1283,27 @@ public class MessageService extends BasicService implements IMessageService
 		 *  Add a message to be sent.
 		 *  @param message The message.
 		 */
-		public IFuture addMessage(final ManagerSendTask task)
+		public IFuture<Void> addMessage(final ManagerSendTask task)
 		{
-			final Future ret = new Future();
+			final Future<Void> ret = new Future<Void>();
 			
-			isValid().addResultListener(new DelegationResultListener(ret)
+			isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Boolean result)
 				{
-					if(((Boolean)result).booleanValue())
+					if(result.booleanValue())
 					{
 						synchronized(SendManager.this)
 						{
-							messages.add(new Object[]{task, ret});
+							messages.add(new Tuple2<ManagerSendTask, Future<Void>>(task, ret));
 						}
 						
 						SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, 
-							RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+							RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
 						{
-							public void resultAvailable(Object result)
+							public void customResultAvailable(IExecutionService result)
 							{
-								try
-								{
-									((IExecutionService)result).execute(SendManager.this);
-								}
-								catch(RuntimeException e)
-								{
-									// ignore if execution service is shutting down.
-								}						
+								result.execute(SendManager.this);
 							}
 						});
 					}

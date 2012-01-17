@@ -34,7 +34,7 @@ class FieldProcessor implements ITraverseProcessor
 	 *  @param object The object.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class clazz)
+	public boolean isApplicable(Object object, Class<?> clazz)
 	{
 		return true;
 	}
@@ -44,7 +44,7 @@ class FieldProcessor implements ITraverseProcessor
 	 *  @param object The object.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class clazz, List<ITraverseProcessor> processors, 
+	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed)
 	{
 //		System.out.println("fp: "+object);
@@ -91,6 +91,7 @@ class FieldProcessor implements ITraverseProcessor
 						val = fields[i].get(object);
 						if(val!=null) 
 						{
+							System.out.println("traversing "+fields[i]);
 							Object newval = traverser.traverse(val, fields[i].getType(), cloned, processors);
 							if(clone || val!=newval)
 								fields[i].set(ret, newval);

@@ -2,12 +2,12 @@ package jadex.base.service.message.transport.httprelaymtp.io;
 
 import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -73,6 +73,7 @@ public class HttpRelayTransport implements ITransport
 			// Message service only calls transport.sendMessage() with receivers on same destination
 			// so just use first to fetch platform id.
 			IComponentIdentifier	targetid	= task.getReceivers()[0].getRoot();
+			byte[]	iddata	= JavaWriter.objectToByteArray(targetid, HttpRelayTransport.class.getClassLoader());
 			
 			URL	url	= new URL(address);
 			HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
@@ -80,11 +81,12 @@ public class HttpRelayTransport implements ITransport
 			con.setDoOutput(true);
 			con.setUseCaches(false);
 			con.setRequestProperty("Content-Type", "application/octet-stream");
-			con.setRequestProperty("Content-Length", ""+(4+task.getProlog().length+task.getData().length));
+			con.setRequestProperty("Content-Length", ""+(4+iddata.length+4+task.getProlog().length+task.getData().length));
 			con.connect();
 			
 			OutputStream	out	= con.getOutputStream();
-			SRelay.writeObject(targetid, out);
+			out.write(SUtil.intToBytes(iddata.length));
+			out.write(iddata);
 			out.write(SUtil.intToBytes(task.getProlog().length+task.getData().length));
 			out.write(task.getProlog());
 			out.write(task.getData());
