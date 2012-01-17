@@ -90,21 +90,20 @@ public class MessagePerformanceAgent extends MicroAgent
 							}
 							
 							sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
-//							if(i>0 && i%10 == 0)
-//							{
-//								System.out.print('.');
-								if(i%100==0)
-								{
-									System.out.println(".");
-									break;
-								}
-//							}
+							if(i%100==0)
+							{
+								break;
+							}
 						}
 						
 						current = i+1;
 						if(current<=msgcnt)
 						{
 							waitFor(0, this);
+						}
+						else
+						{
+							System.out.println("sending finished");
 						}
 						
 						return IFuture.DONE;
@@ -123,7 +122,7 @@ public class MessagePerformanceAgent extends MicroAgent
 	{
 //		if(received%10 == 0)
 //		{
-			System.out.println("received: "+received);
+//			System.out.println("received: "+received);
 //		}
 		received++;
 		final int msgcnt = ((Integer)getArgument("max")).intValue();

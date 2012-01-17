@@ -18,9 +18,9 @@ public class EchoAgent extends MicroAgent
 	 *  @param msg The message.
 	 *  @param mt The message type.
 	 */
-	public void messageArrived(Map msg, MessageType mt)
+	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
-		Map reply = new HashMap(msg);
+		Map<String, Object> reply = new HashMap<String, Object>(msg);
 		IComponentIdentifier sender = (IComponentIdentifier)msg.get(SFipa.SENDER);
 		reply.put(SFipa.SENDER, getComponentIdentifier());
 		reply.put(SFipa.RECEIVERS, new IComponentIdentifier[]{sender});
