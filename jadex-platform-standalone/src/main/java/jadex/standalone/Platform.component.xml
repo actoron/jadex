@@ -146,9 +146,7 @@
 		     Currently supports 'component', 'micro', 'bpmn', 'bdi', 'gpmn' and 'application' kernel.
 		     Alternatively, the 'multi' can be used to start any available kernels on demand.
 		     Specifying 'all' will start all available kernels directly. -->
-		<argument name="kernels" class="String">
-			"multi"
-		</argument>
+		<argument name="kernels" class="String">"multi"</argument>
 		
 		<!-- <argument name="platform_shutdown_time">1000</argument> -->
 	</arguments>

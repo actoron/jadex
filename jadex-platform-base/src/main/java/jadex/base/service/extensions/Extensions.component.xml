@@ -26,5 +26,4 @@
 			<binding scope="platform"/>
 		</requiredservice>
 	</services>	
-	
 </componenttype>
