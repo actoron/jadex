@@ -15,7 +15,7 @@ public class HelloGoal
 	}
 	
 	@CreationCondition()
-	protected boolean create(@Event("sayhello") boolean sayhello)
+	protected static boolean create(@Event("sayhello") boolean sayhello)
 	{
 		return sayhello;
 	}

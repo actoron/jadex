@@ -199,6 +199,106 @@ public class RuleSystem
 		return proxy;
 	}
 
+//	/**
+//	 * 
+//	 */
+//	protected void test(Method method)
+//	{
+//		if(method.isAnnotationPresent(jadex.rules.eca.annotations.Event.class))
+//		{
+//			jadex.rules.eca.annotations.Event event = method.getAnnotation(jadex.rules.eca.annotations.Event.class);
+//			final String type = event.value();
+//			FetchFieldCommand com = new FetchFieldCommand(object, type);
+//			eventcreators.put(methods[i], com);
+//		}
+//		else if(methods[i].isAnnotationPresent(Condition.class))
+//		{
+//			Condition cond = methods[i].getAnnotation(Condition.class);
+//			final String name = cond.value();
+//			final Method m = methods[i];
+//
+//			Rule rule = rules.get(name);
+//			if(rule==null)
+//			{
+//				rule = new Rule(name);
+//				rules.put(name, rule);
+//			}
+//			
+//			// Find event types
+//			Annotation[][] paramannos = m.getParameterAnnotations();
+//			List<String> events = new ArrayList<String>();
+//			for(int j=0; j<paramannos.length; j++)
+//			{
+//				Annotation[] annos = paramannos[j];
+//				for(int k=0; k<annos.length; k++)
+//				{
+//					if(annos[k] instanceof jadex.rules.eca.annotations.Event)
+//					{
+//						String type = ((jadex.rules.eca.annotations.Event)annos[k]).value();
+//						events.add(type);
+//					}
+//				}
+//			}
+//			if(events.size()==0)
+//				throw new RuntimeException("Event type not found: "+methods[i]);
+//			
+//			rule.setEvents(events);
+//			
+//			rule.setCondition(new jadex.rules.eca.Condition(object, m));
+//		}
+//		else if(methods[i].isAnnotationPresent(Action.class))
+//		{
+//			Action cond = methods[i].getAnnotation(Action.class);
+//			final String name = cond.value();
+//			final Method m = methods[i];
+//			
+//			Rule rule = rules.get(name);
+//			if(rule==null)
+//			{
+//				rule = new Rule(name);
+//				rules.put(name, rule);
+//			}
+//			
+//			rule.setAction(new jadex.rules.eca.Action(object, m));
+//		}
+//	}
+//	clazz = clazz.getSuperclass();
+//}
+//
+//for(Iterator<Rule> it=rules.values().iterator(); it.hasNext(); )
+//{
+//	Rule rule = it.next();
+//	if(rule.getAction()==null || rule.getCondition()==null 
+//		|| rule.getEvents()==null || rule.getEvents().size()==0)
+//	{
+//		throw new RuntimeException("Rule is incomplete: "+rule.getName());
+//	}
+//	rulebase.addRule(rule);
+//}
+//
+//ProxyFactory pf = new ProxyFactory(object);
+//pf.addAdvice(new MethodInterceptor()
+//{
+//	public Object invoke(MethodInvocation mi) throws Throwable
+//	{
+//		Object ret = mi.getMethod().invoke(mi.getThis(), mi.getArguments());
+//		IResultCommand creator = (IResultCommand)eventcreators.get(mi.getMethod());
+//		if(creator!=null)
+//		{
+//			Event event = (Event)creator.execute(null);
+//			addEvent(event);
+////			System.out.println("created event: "+event);
+//		}
+//		return ret;
+//    }
+//});
+//
+//Object proxy = pf.getProxy();
+//
+//this.rules.put(object, new Tuple2(proxy, rules.values().toArray(new IRule[rules.size()])));
+//
+//	}
+	
 	/**
 	 *  Unobserve an object.
 	 */

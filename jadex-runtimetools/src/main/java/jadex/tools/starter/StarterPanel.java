@@ -384,7 +384,7 @@ public class StarterPanel extends JLayeredPane
 						{
 							Map args = (Map)result;
 							final String typename = /*ac!=null? ac.getComponentType(filename.getText()):*/ filename.getText();
-							final String fullname = model.getPackage()+"."+model.getName();
+							final String fullname = model.getFullName();//model.getPackage()+"."+model.getName();
 							final IModelInfo mymodel = model;
 							final boolean dokilllis = storeresults!=null && storeresults.isSelected();
 							final String an = genname.isSelected()?  null: componentname.getText();
