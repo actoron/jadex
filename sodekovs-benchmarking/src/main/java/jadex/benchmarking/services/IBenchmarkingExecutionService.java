@@ -7,6 +7,8 @@ import jadex.commons.future.IFuture;
 import java.util.HashMap;
 import java.util.Map;
 
+import sodekovs.util.model.benchmarking.description.BenchmarkingDescription;
+
 
 
 /**
@@ -29,7 +31,14 @@ public interface IBenchmarkingExecutionService	extends IService
 	/**
 	 *  Get information about the status of the benchmark.
 	 */
-	public IFuture getBenchmarkStatus();
+	public IFuture getWorkload();
+	
+	/**
+	 *  TODO: Merge this method and the method "getWorkload" into one...
+	 *  Get information about the status of the benchmark.
+	 * 
+	 */
+	public IFuture<BenchmarkingDescription> getBenchmarkStatus();
 	
 	/**
 	 *  Get information about results of performed benchmarks from database.
