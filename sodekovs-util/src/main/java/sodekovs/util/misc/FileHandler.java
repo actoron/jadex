@@ -110,14 +110,14 @@ public class FileHandler {
 
 	/**
 	 * 
-	 * @param filePath
+	 * @param path
 	 * @return
 	 */
-	public static String readFileAsString(String filePath) {
+	public static String readFileAsString(String path) {
 		StringBuilder fileData = new StringBuilder(1000);
 		BufferedReader reader;
 		try {
-			reader = new BufferedReader(new FileReader(filePath));
+			reader = new BufferedReader(new FileReader(path));
 
 			char[] buf = new char[1024];
 			int numRead = 0;

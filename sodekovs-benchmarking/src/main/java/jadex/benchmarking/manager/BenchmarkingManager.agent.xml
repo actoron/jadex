@@ -38,20 +38,21 @@
 		<belief name="schedule" class="Schedule" />
 
 		<!-- Information about the SuT. -->
-		<belief name="suTinfo" class="SuTinfo" />
+		<!--  <belief name="suTinfo" class="SuTinfo" />-->
 
 		<!-- Reference to the XML file that contains the schedule description. 
 			This file is parsed on agent start. The reference to the file is passes by 
 			the surrounding application file description. -->
-		<belief name="scheduleDescriptionFile" class="String">
+		<!-- <belief name="scheduleDescriptionFile" class="String">
 			<fact>"../sodekovs-benchmarking/src/main/java/jadex/benchmarking/examples/TestBenchmark2.xml"
 			</fact>
-		</belief>
+		</belief> -->
 
 		<!-- Store information about the status of the executed benchmark: preparing_start, 
-			running, terminated. -->
-		<belief name="benchmarkStatus" class="String">
-			<fact>preparing_start</fact>
+			running, terminated. -->			
+		<belief name="benchmarkStatus" class="Map">
+		<!-- HashMap used as: new HashMap<Integer,String> Integer is the localID of the benchmark -->
+			<fact>new HashMap()</fact>
 		</belief>
 
 		<!-- Reference to the memory Loger Capability -->
@@ -79,6 +80,12 @@
 			<fact>new HashMap()</fact>
 		</belief>
 		
+		<!--  Maps the benchmarks to the local ID of the benchmark -->
+		<belief name="allBenchmarks" class="Map">
+		<!-- HashMap used as: new HashMap<Int,Schedule> -->
+			<fact>new HashMap()</fact>
+		</belief>
+				
 		
 		<!-- Counts the number of benchmark that have been executed. Is also used as ID for the benchmarks to enable parallel execution. -->
 		<belief name="benchmarkCounter" class="int">

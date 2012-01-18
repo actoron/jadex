@@ -1,6 +1,5 @@
 package jadex.simulation.analysis.common.superClasses.service.view.session.subprocess;
 
-import jadex.base.gui.componenttree.ProvidedServiceProperties;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInterpreter;

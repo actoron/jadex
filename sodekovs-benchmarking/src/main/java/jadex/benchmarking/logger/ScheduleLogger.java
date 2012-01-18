@@ -30,11 +30,11 @@ public class ScheduleLogger {
 	public ScheduleLogger() {
 	}
 
-	public ScheduleLogger(long starttime, IClockService clockService) {
-		this.starttime = starttime;
-		this.clockService = clockService;
-		init();
-	}
+//	public ScheduleLogger(long starttime, IClockService clockService) {
+//		this.starttime = starttime;
+//		this.clockService = clockService;
+//		init();
+//	}
 
 	public void log(String log) {
 		scheduleLogger.info(log);

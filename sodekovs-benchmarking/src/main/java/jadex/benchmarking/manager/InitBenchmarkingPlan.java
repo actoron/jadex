@@ -87,32 +87,40 @@ public class InitBenchmarkingPlan extends Plan {
 		// Get local id for this benchmark to be conducted and increment counter
 		localBenchmarkingCounter = (Integer) getBeliefbase().getBelief("benchmarkCounter").getFact();
 		getBeliefbase().getBelief("benchmarkCounter").setFact(localBenchmarkingCounter + 1);
+		
+		//log status of benchmark
+		HashMap<Integer,String> benchmarkStatusMap = (HashMap<Integer, String>) getBeliefbase().getBelief("benchmarkStatus").getFact();
+		benchmarkStatusMap.put(localBenchmarkingCounter, Constants.PREPARING_START);
+		getBeliefbase().getBelief("benchmarkStatus").setFact(benchmarkStatusMap);
 
 		// init mapping between calling service and the executed benchmark. needed in order to be able to execute benchmarks in parallel.
 		HashMap<Long, Integer> callerBenchmarkReference = (HashMap<Long, Integer>) getBeliefbase().getBelief("callerBenchmarkReference").getFact();
 		callerBenchmarkReference.put((Long) getParameter("callerID").getValue(), localBenchmarkingCounter);
 		getBeliefbase().getBelief("callerBenchmarkReference").setFact(callerBenchmarkReference);
 
-		HashMap<String, Object> clientConfMap = (HashMap<String, Object>) getParameter("clientConf").getValue();
-		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXMLFromString((String) clientConfMap.get(GlobalConstants.CONFIGURATION_FILE_AS_XML_STRING),
-				SimulationConfiguration.class);
-		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
+//		HashMap<String, Object> clientConfMap = (HashMap<String, Object>) getParameter("clientConf").getValue();
+//		SimulationConfiguration simConf = (SimulationConfiguration) XMLHandler.parseXMLFromString((String) clientConfMap.get(GlobalConstants.CONFIGURATION_FILE_AS_XML_STRING),
+//				SimulationConfiguration.class);
+//		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 
-		startApplication((Map) getParameter("applicationConf").getValue(), clientConfMap, simConf);
-		System.out.println("#RumtimeManagerPlan# Startet Simulation Experiment Nr.:" + clientConfMap.get(GlobalConstants.EXPERIMENT_ID) + ") with Optimization Values: "
-				+ clientConfMap.get(GlobalConstants.CURRENT_PARAMETER_CONFIGURATION));
-		System.out.println("Number of Exp at this agent: " + (Integer) getBeliefbase().getBelief("numberOfRunningExperiments").getFact());
+//		startApplication((Map) getParameter("applicationConf").getValue(), clientConfMap, simConf);
+//		System.out.println("#RumtimeManagerPlan# Startet Simulation Experiment Nr.:" + clientConfMap.get(GlobalConstants.EXPERIMENT_ID) + ") with Optimization Values: "
+//				+ clientConfMap.get(GlobalConstants.CURRENT_PARAMETER_CONFIGURATION));
+//		System.out.println("Number of Exp at this agent: " + (Integer) getBeliefbase().getBelief("numberOfRunningExperiments").getFact());
 
 		// NEW ********************************************
 
 		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
-//		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		clockservice = (IClockService) getScope().getServiceContainer().getRequiredService("clockservice").get(this);
 
-		String benchmarkDescription = (String) getBeliefbase().getBelief("scheduleDescriptionFile").getFact();
-		System.out.println("#InitBench# Init Benchmark Agent with configuration file: " + benchmarkDescription);
-		Schedule benchConf = (Schedule) XMLHandler.parseXMLFromXMLFile(benchmarkDescription, Schedule.class);
-		getBeliefbase().getBelief("schedule").setFact(benchConf);
+//		String benchmarkDescription = (String) getBeliefbase().getBelief("scheduleDescriptionFile").getFact();
+		String benchmarkDescription = (String) getParameter("benchmarkingDefinitionFile").getValue();
+		System.out.println("#InitBench# Init Benchmark Agent with configuration file: " + benchmarkDescription + " and local BenchID: " + localBenchmarkingCounter);
+		Schedule benchConf = (Schedule) XMLHandler.parseXMLFromString(benchmarkDescription, Schedule.class);
+ 
+		HashMap<Integer,Schedule> allBenchmarks = (HashMap<Integer, Schedule>) getBeliefbase().getBelief("allBenchmarks").getFact();
+		allBenchmarks.put(localBenchmarkingCounter, benchConf);
+		getBeliefbase().getBelief("allBenchmarks").setFact(allBenchmarks);
 
 		// Create list of sequences, ordered by their start time
 		sortedSequenceList = (ArrayList<Sequence>) benchConf.getSequences().getSequence();
@@ -124,7 +132,7 @@ public class InitBenchmarkingPlan extends Plan {
 			startSuT(benchConf);
 		}
 
-		getBeliefbase().getBelief("suTinfo").setFact(new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));
+//		getBeliefbase().getBelief("suTinfo").setFact(new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));
 
 		// initLogger
 		// Attention: Logger has still to be initialized! (starttime and clockservice)
@@ -159,12 +167,17 @@ public class InitBenchmarkingPlan extends Plan {
 
 		// Resume scheduler
 		cms.resumeComponent(schedulerCID).get(this);
-		getBeliefbase().getBelief("benchmarkStatus").setFact(Constants.RUNNING);
+		
+		benchmarkStatusMap = (HashMap<Integer, String>) getBeliefbase().getBelief("benchmarkStatus").getFact();
+		benchmarkStatusMap.put(localBenchmarkingCounter, Constants.RUNNING);
+		getBeliefbase().getBelief("benchmarkStatus").setFact(benchmarkStatusMap);
 		// myLogger.log("Resumed Scheduler");
 
 		// Handle termination of benchmark
 		terminateBenchmark(benchConf);
-		getBeliefbase().getBelief("benchmarkStatus").setFact(Constants.TERMINATED);
+		benchmarkStatusMap = (HashMap<Integer, String>) getBeliefbase().getBelief("benchmarkStatus").getFact();
+		benchmarkStatusMap.put(localBenchmarkingCounter, Constants.TERMINATED);
+		getBeliefbase().getBelief("benchmarkStatus").setFact(benchmarkStatusMap);
 		scheduleLogger.log(Constants.PREPARE_GNUPLOT_SUFFIX);
 		persistLogs(scheduleLogger.getFileName(), benchConf);
 		// ConnectionManager.getInstance().executeStatement("Over and out");
@@ -175,7 +188,7 @@ public class InitBenchmarkingPlan extends Plan {
 	 */
 	private void startSuT(Schedule schedule) {
 
-		HashMap<String, String> sutProperties = Methods.propertyListToHashMap(schedule.getSytemUnderTest().getProperties().getProperty());
+		HashMap<String, String> sutProperties = Methods.propertyListToHashMapforString(schedule.getSytemUnderTest().getProperties().getProperty());
 
 		// create SuT in suspended modus
 		IFuture fut = cms.createComponent(schedule.getName() + GetRandom.getRandom(100000), sutProperties.get(Constants.APPLICATION_FILE_PATH),

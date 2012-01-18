@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import sodekovs.util.model.benchmarking.description.BenchmarkingDescription;
+import sodekovs.util.model.benchmarking.description.IHistoricDataDescription;
 
 
 
@@ -25,13 +26,13 @@ public interface IBenchmarkingExecutionService	extends IService
 	 *  @param clientArgs can be defined if service is called by ClientSimulator; null if only benchmark has to be executed without parameter sweeping etc.
 	 *  @param benchmarkingDefinitionFile reference to the file with the benchmarking definition
 	 */
-	public IFuture executeBenchmark(Map applicationArgs, HashMap<String,Object> clientArgs, String benchmarkingDefinitionFile);
+	public IFuture<Void> executeBenchmark(Map applicationArgs, HashMap<String,Object> clientArgs, String benchmarkingDefinitionFile);
 	
 	
 	/**
 	 *  Get information about the status of the benchmark.
 	 */
-	public IFuture getWorkload();
+	public IFuture<Void> getWorkload();
 	
 	/**
 	 *  TODO: Merge this method and the method "getWorkload" into one...
@@ -43,6 +44,6 @@ public interface IBenchmarkingExecutionService	extends IService
 	/**
 	 *  Get information about results of performed benchmarks from database.
 	 */
-	public IFuture getResultsFromDB();
+	public IFuture<IHistoricDataDescription[]> getResultsFromDB();
 	
 }

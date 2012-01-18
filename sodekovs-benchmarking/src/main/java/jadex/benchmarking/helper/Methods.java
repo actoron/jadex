@@ -20,7 +20,21 @@ public class Methods {
 	 * @param list
 	 * @return
 	 */
-	public static HashMap<String,Object> propertyListToHashMap(List<Property> list){
+	public static HashMap<String,String> propertyListToHashMapforString(List<Property> list){
+		HashMap<String,String> map = new HashMap<String,String>();
+		
+		for(Property property : list){
+			map.put(property.getName(), property.getValue());
+		}		
+		return map;
+	}
+	
+	/**
+	 * Turn a list of properties into a hash map.
+	 * @param list
+	 * @return
+	 */
+	public static HashMap<String,Object> propertyListToHashMapforObject(List<Property> list){
 		HashMap<String,Object> map = new HashMap<String,Object>();
 		
 		for(Property property : list){

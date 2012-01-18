@@ -162,7 +162,7 @@ public class MicroBehaviourObservationComponent extends BehaviorObservationCompo
 		final CoordinationInfo coordInfo = createCoordinationInfo(value, parameterDataMappings, agentElementName, agentElementType, dmlRealizationName);
 		coordInfo.addValue(CoordinationSpaceObject.AGENT_ARCHITECTURE, "Micro");
 
-		IExternalAccess parent = ma.getParent();
+		IExternalAccess parent = ma.getParentAccess();
 		for (String spaceName : spaces) {
 			parent.getExtension(spaceName).addResultListener(new DefaultResultListener<CoordinationSpace>() {
 
