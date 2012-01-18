@@ -1,6 +1,5 @@
 package jadex.standalone;
 
-import jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.deployment.IDeploymentService;
@@ -147,7 +146,7 @@ import java.util.logging.Level;
 
 @Properties(
 {
-	@NameValue(name="componentviewer.viewerclass", clazz=DefaultComponentServiceViewerPanel.class),
+	@NameValue(name="componentviewer.viewerclass", value="jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel.class"),
 	@NameValue(name="logging.level", value="$args.logging_level")
 })
 
