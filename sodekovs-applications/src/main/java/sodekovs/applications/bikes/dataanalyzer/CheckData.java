@@ -30,10 +30,10 @@ public class CheckData {
 		ArrayList<SystemSnapshot> snapshotList = stationsDAO.loadAllLogsForCity(cityName);
 
 		ArrayList<CheckDataResult> results = new ArrayList<CheckDataResult>();
-		for (int i = 1; i < 24; i++) {
+		for (int i = 1; i < 31; i++) {
 			Calendar day = Calendar.getInstance();
 			day.setTime(new Date(System.currentTimeMillis()));
-			day.set(Calendar.MONTH, Calendar.SEPTEMBER);
+			day.set(Calendar.MONTH, Calendar.NOVEMBER);
 			day.set(Calendar.DAY_OF_MONTH, i);
 
 			// System.out.println(new Date(day.getTimeInMillis()).toString());

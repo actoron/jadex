@@ -30,7 +30,7 @@ public class EvaluateWorkflowPlan extends Plan {
 				//*************************************************************
 				// This is a hack for this special application.xml -> AgentNegotiation
 				//: save result also to space in order to enable evaluation by automated simulation component
-				AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) getScope().getParent().getExtension("mycoordspace"));
+				AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) getScope().getParentAccess().getExtension("mycoordspace"));
 				space.getSpaceObjectsByType("KIVSeval")[0].setProperty("moneyBankSMA", new Double ((Math.round(money))).intValue());
 				int counter = (Integer) space.getSpaceObjectsByType("KIVSeval")[0].getProperty("executedWorkflows");
 				space.getSpaceObjectsByType("KIVSeval")[0].setProperty("executedWorkflows", counter+1);

@@ -21,7 +21,7 @@
 	<beliefs>
 		<!-- Environment. -->
 		<belief name="env" class="CoordinationSpace">
-			<fact>(CoordinationSpace)$scope.getParent().getExtension("mycoordspace").get(new ThreadSuspendable())</fact>
+			<fact>(CoordinationSpace)$scope.getParentAccess().getExtension("mycoordspace").get(new ThreadSuspendable())</fact>
 		</belief>
 	</beliefs>
 	

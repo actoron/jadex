@@ -173,7 +173,7 @@ public class ManagerAgent extends MicroAgent {
 
 		System.out.println("Manager is killing the application.");
 		// kill the application
-		IExternalAccess application = getParent();
+		IExternalAccess application = getParentAccess();
 		application.killComponent();
 
 		return IFuture.DONE;
@@ -216,7 +216,7 @@ public class ManagerAgent extends MicroAgent {
 		future.addResultListener(new DefaultResultListener<IComponentManagementService>() {
 
 			public void resultAvailable(IComponentManagementService cms) {
-				IExternalAccess parent = ManagerAgent.this.getParent();
+				IExternalAccess parent = ManagerAgent.this.getParentAccess();
 
 				// start the robot agents
 				getLogger().info("Manager agent is starting robots...");
@@ -458,7 +458,7 @@ public class ManagerAgent extends MicroAgent {
 				getLogger().info("Manager agent is starting the dropout agent...");
 				Map<String, Object> args = new HashMap<String, Object>();
 				args.put("configuration_model", dropOutConfFile);
-				CreationInfo ci = new CreationInfo(args, ManagerAgent.this.getParent().getComponentIdentifier());
+				CreationInfo ci = new CreationInfo(args, ManagerAgent.this.getParentAccess().getComponentIdentifier());
 
 				cms.createComponent("Dropout", "haw/mmlab/production_line/dropout/DropoutAgent.class", ci, null).addResultListener(new DefaultResultListener<IComponentIdentifier>() {
 

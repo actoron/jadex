@@ -1,5 +1,7 @@
 package jadex.simulation.examples.marsworld.producer;
 
+import java.util.ArrayList;
+
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
@@ -76,7 +78,7 @@ public class ProducerPlan extends Plan
 	 */
 	protected void callCarryAgent(ISpaceObject target)
 	{
-		AGRSpace agrs = (AGRSpace)((IExternalAccess)getScope().getParent()).getExtension("myagrspace").get(this);		
+		AGRSpace agrs = (AGRSpace)((IExternalAccess)getScope().getParentAccess()).getExtension("myagrspace").get(this);		
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[]	carriers	= group.getAgentsForRole("carrier");
 		
@@ -92,7 +94,8 @@ public class ProducerPlan extends Plan
 //			int walkingStrategyProperty = (Integer) ((Space2D) getBeliefbase().getBelief("environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
 			int walkingStrategyProperty = (Integer) ((IEnvironmentSpace) getBeliefbase().getBelief("move.environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
 			if (walkingStrategyProperty == 2) {
-				mevent.getParameterSet(SFipa.RECEIVERS).addValues(getClosestCarrierAgent());
+//				mevent.getParameterSet(SFipa.RECEIVERS).addValue(new ArrayList<IComponentIdentifier>().add(getClosestCarrierAgent()));
+				mevent.getParameterSet(SFipa.RECEIVERS).addValue(getClosestCarrierAgent());
 			}else{
 				mevent.getParameterSet(SFipa.RECEIVERS).addValues(carriers);	
 			}		
@@ -101,12 +104,13 @@ public class ProducerPlan extends Plan
 		}
 	}
 	
-	private IComponentIdentifier[] getClosestCarrierAgent() {
-		ContinuousSpace2D space = (ContinuousSpace2D) ((IExternalAccess) getScope().getParent()).getExtension("my2dspace").get(this);
+	private IComponentIdentifier getClosestCarrierAgent() {
+		ContinuousSpace2D space = (ContinuousSpace2D) ((IExternalAccess) getScope().getParentAccess()).getExtension("my2dspace").get(this);
 		IVector2 myPos = (IVector2) getBeliefbase().getBelief("myPos").getFact();
 		ISpaceObject nearestCarrier = space.getNearestObject(myPos, null, "carry");
 		IComponentIdentifier[] ret =  new IComponentIdentifier[1];
-		ret[0] = space.getOwner(nearestCarrier.getId()).getName();		
-		return ret;
+//		ret[0] = space.getOwner(nearestCarrier.getId()).getName();		
+//		return ret;
+		return  space.getOwner(nearestCarrier.getId()).getName();				
 	}
 }

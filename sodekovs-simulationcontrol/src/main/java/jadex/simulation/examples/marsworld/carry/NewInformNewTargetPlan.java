@@ -28,16 +28,16 @@ public class NewInformNewTargetPlan extends Plan
 		IChangeEvent	reason	= (IChangeEvent)getReason();
 		ISpaceObject	target	= (ISpaceObject)reason.getValue();
 				
-		AGRSpace agrs = (AGRSpace)((IExternalAccess)getScope().getParent()).getExtension("myagrspace").get(this);
+		AGRSpace agrs = (AGRSpace)((IExternalAccess)getScope().getParentAccess()).getExtension("myagrspace").get(this);
 		Group group = agrs.getGroup("mymarsteam");
-		IComponentIdentifier[]	sentries	= group.getAgentsForRole("sentry");
+//		IComponentIdentifier[]	sentries	= group.getAgentsForRole("sentry");
 		
 		//send only to one sentry
 //		IComponentIdentifier randomSentry = sentries[GetRandom.getRandom(sentries.length)];
 //		System.out.println("Sending target from:  " + getComponentName() + " to " + randomSentry.getLocalName());
 		
 		//to closest sentry
-		ContinuousSpace2D space = (ContinuousSpace2D) ((IExternalAccess) getScope().getParent()).getExtension("my2dspace").get(this);
+		ContinuousSpace2D space = (ContinuousSpace2D) ((IExternalAccess) getScope().getParentAccess()).getExtension("my2dspace").get(this);
 		IVector2 myPos = (IVector2) getBeliefbase().getBelief("myPos").getFact();
 		ISpaceObject nearestSentry = space.getNearestObject(myPos, null, "sentry");
 //		ISpaceObject[] tmp = space.getSpaceObjectsByType("sentry");
@@ -53,7 +53,9 @@ public class NewInformNewTargetPlan extends Plan
 		{
 			IMessageEvent mevent = createMessageEvent("inform_target");
 			mevent.getParameterSet(SFipa.RECEIVERS).addValue(space.getOwner(nearestSentry.getId()).getName());
+//			mevent.getParameterSet(SFipa.RECEIVERS).addValue(new ArrayList<IComponentIdentifier>().add(space.getOwner(nearestSentry.getId()).getName()));
 			mevent.getParameter(SFipa.CONTENT).setValue(target);
+			System.out.println("#Carry.NewInfTarget#");
 			sendMessage(mevent);
 		}
 

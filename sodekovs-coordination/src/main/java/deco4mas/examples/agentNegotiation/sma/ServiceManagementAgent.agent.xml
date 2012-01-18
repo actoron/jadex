@@ -32,7 +32,7 @@
 	<beliefs>
 		<!-- coordinationSpace (needed by deco implementation) -->
 		<belief name="env" class="CoordinationSpace">
-			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")</fact>
+			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParentAccess()).getSpace("mycoordspace")</fact>
 		</belief>
 
 		<!-- negotiation types witch should be used -->

@@ -53,11 +53,11 @@
 							<mapping ref="message" name="message"/>
 						</parameter_mappings>
 					</agent_element>
-					<agent_element element="sayhello" agent_id="ExampleBDI" type="BDI_GOAL">
+					<!-- <agent_element element="sayhello" agent_id="ExampleBDI" type="BDI_GOAL">
 						<parameter_mappings>
 							<mapping ref="message" name="message"/>
 						</parameter_mappings>
-					</agent_element>
+					</agent_element> -->
 				</from>
 				<!-- Coordination Medium configuration: -->
 				<mechanism_configuration
@@ -70,7 +70,7 @@
 							<mapping ref="message" name="message"/>
 						</parameter_mappings>
 					</agent_element>
-					<agent_element element="ReceiveHelloStep" agent_id="ExampleMicro" type="MICRO_STEP">
+					 <agent_element element="ReceiveHelloStep" agent_id="ExampleMicro" type="MICRO_STEP">
 						<parameter_mappings>
 							<mapping ref="message" name="message"/>
 						</parameter_mappings>

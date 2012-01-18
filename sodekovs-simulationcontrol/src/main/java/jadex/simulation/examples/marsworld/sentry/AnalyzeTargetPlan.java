@@ -17,6 +17,7 @@ import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.simulation.examples.marsworld.RequestProduction;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,7 +64,7 @@ public class AnalyzeTargetPlan extends Plan {
 	 */
 	private void callProducerAgent(ISpaceObject target) {
 		// System.out.println("Calling some Production Agent...");
-		AGRSpace agrs = (AGRSpace) ((IExternalAccess) getScope().getParent()).getExtension("myagrspace").get(this);
+		AGRSpace agrs = (AGRSpace) ((IExternalAccess) getScope().getParentAccess()).getExtension("myagrspace").get(this);
 		Group group = agrs.getGroup("mymarsteam");
 		IComponentIdentifier[] producers = group.getAgentsForRole("producer");
 
@@ -78,19 +79,21 @@ public class AnalyzeTargetPlan extends Plan {
 //			int walkingStrategyProperty = (Integer) ((Space2D) getBeliefbase().getBelief("environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
 			int walkingStrategyProperty = (Integer) ((IEnvironmentSpace) getBeliefbase().getBelief("move.environment").getFact()).getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
 			if (walkingStrategyProperty == 2) {
-				mevent.getParameterSet(SFipa.RECEIVERS).addValue(getClosestProducerAgent());				
+//				mevent.getParameterSet(SFipa.RECEIVERS).addValue(new ArrayList<IComponentIdentifier>().add(getClosestProducerAgent()));				
+				mevent.getParameterSet(SFipa.RECEIVERS).addValue(getClosestProducerAgent());
 			}else{
 				mevent.getParameterSet(SFipa.RECEIVERS).addValue(producers[sel]);				
 			}
 
 			mevent.getParameter(SFipa.CONTENT).setValue(rp);
+			System.out.println("#Sentr.AnaTargPlan#");
 			sendMessage(mevent);
 			// System.out.println("Sentry Agent: sent location to: "+producers[sel].getName());
 		}
 	}
 
 	private IComponentIdentifier getClosestProducerAgent() {
-		ContinuousSpace2D space = (ContinuousSpace2D) ((IExternalAccess) getScope().getParent()).getExtension("my2dspace").get(this);		
+		ContinuousSpace2D space = (ContinuousSpace2D) ((IExternalAccess) getScope().getParentAccess()).getExtension("my2dspace").get(this);		
 		IVector2 myPos = (IVector2) getBeliefbase().getBelief("myPos").getFact();
 		ISpaceObject nearestProducer = space.getNearestObject(myPos, null, "producer");
 

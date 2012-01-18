@@ -37,8 +37,8 @@ public class DatabaseConnection {
 				
 				Properties properties = new Properties();
 				//Version for server
-				properties.load(new FileInputStream(DB_FILE));
-//				properties.load(new FileInputStream("../sodekovs-applications/src/main/java/sodekovs/applications/bikes/datafetcher/database.properties"));
+//				properties.load(new FileInputStream(DB_FILE));
+				properties.load(new FileInputStream("../sodekovs-applications/src/main/java/sodekovs/applications/bikes/datafetcher/database.properties"));
 				
 
 				String dbUrl = properties.getProperty("database.url");

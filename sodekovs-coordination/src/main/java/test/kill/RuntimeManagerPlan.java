@@ -11,7 +11,7 @@ public class RuntimeManagerPlan extends Plan {
 		System.out.println("## New Runtime Manager");
 		waitFor(4000);
 		IComponentManagementService ces = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class).get(this);
-		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) getScope().getParent().getExtension("mycoordspace");
+		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) getScope().getParentAccess().getExtension("mycoordspace");
 		ces.destroyComponent(space.getExternalAccess().getComponentIdentifier());
 	}
 }

@@ -28,7 +28,7 @@
 	<beliefs>
 		<!-- Environment imported inherited from move capability. -->
 		<belief name="environment" class="ContinuousSpace2D">
- 			<fact class="IFuture">$scope.getParent().getExtension("my2dspace")</fact>
+ 			<fact class="IFuture">$scope.getParentAccess().getExtension("my2dspace")</fact>
 		</belief>
 		
 		<!-- Required to have disasters in OAV state. -->

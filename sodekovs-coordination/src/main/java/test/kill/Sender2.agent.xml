@@ -21,7 +21,7 @@
 		<!-- Environment. DO NOT CHANGE the name "env". -->
 		<!-- Environment. -->
 		<belief name="env" class="CoordinationSpace">
-			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParent()).getSpace("mycoordspace")
+			<fact>(CoordinationSpace)((IApplicationExternalAccess)$scope.getParentAccess()).getSpace("mycoordspace")
 			</fact>
 		</belief>
 

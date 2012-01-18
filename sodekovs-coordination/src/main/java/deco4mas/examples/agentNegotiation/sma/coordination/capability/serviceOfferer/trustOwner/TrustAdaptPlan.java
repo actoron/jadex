@@ -39,7 +39,7 @@ public class TrustAdaptPlan extends Plan {
 			((HistorytimeTrustFunction) getBeliefbase().getBelief("trustFunction").getFact()).logTrust(getTime());
 
 			// Hack for this special Negotation.application.xml
-			AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) getScope().getParent().getExtension("mycoordspace"));
+			AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) getScope().getParentAccess().getExtension("mycoordspace"));
 			HistorytimeTrustFunction trustFunction = (HistorytimeTrustFunction) getBeliefbase().getBelief("trustFunction").getFact();
 			Iterator<String> it = trustFunction.getHistory().getSas().iterator();
 			IClockService clock = (IClockService) SServiceProvider.getServiceUpwards(space.getExternalAccess().getServiceProvider(), IClockService.class).get(this);
