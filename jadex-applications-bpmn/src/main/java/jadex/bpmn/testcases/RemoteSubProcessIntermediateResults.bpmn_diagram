@@ -124,7 +124,7 @@
     <styles xmi:type="notation:FillStyle" xmi:id="_dRFo80EGEeGYyvkANn-TCw" fillColor="16771304"/>
     <styles xmi:type="notation:LineStyle" xmi:id="_dRFo9EEGEeGYyvkANn-TCw" lineColor="11119017"/>
     <element xmi:type="bpmn:Pool" href="RemoteSubProcessIntermediateResults.bpmn#_dQi2YUEGEeGYyvkANn-TCw"/>
-    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_dRIsREEGEeGYyvkANn-TCw" x="16" y="16" width="1500" height="360"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_dRIsREEGEeGYyvkANn-TCw" x="16" y="16" width="1500" height="277"/>
   </children>
   <styles xmi:type="notation:PageStyle" xmi:id="_dPuXAUEGEeGYyvkANn-TCw"/>
   <styles xmi:type="notation:GuideStyle" xmi:id="_dPuXAkEGEeGYyvkANn-TCw"/>

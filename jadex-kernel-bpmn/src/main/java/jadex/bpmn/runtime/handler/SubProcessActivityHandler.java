@@ -1,7 +1,9 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MParameter;
+import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
@@ -18,6 +20,7 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 
 import java.util.Collection;
@@ -166,81 +169,116 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						
 					IFuture<IComponentIdentifier> ret = cms.createComponent(null, file,
 						new CreationInfo(null, args, parent, false, instance.getModelElement().getModelInfo().getAllImports()), 
-						new IResultListener<Collection<Tuple2<String, Object>>>()
+						instance.createResultListener(new IIntermediateResultListener<Tuple2<String, Object>>()
 					{
+						public void intermediateResultAvailable(Tuple2<String, Object> result)
+						{
+							Map<String, Object> res = (Map<String, Object>)thread.getParameterValue("$results");
+							if(res==null)
+							{
+								res = new HashMap<String, Object>();
+								thread.setParameterValue("$results", res);
+							}
+							res.put(result.getFirstEntity(), result.getSecondEntity());
+							
+							List<MActivity> handlers = activity.getEventHandlers();
+							if(handlers!=null)
+							{
+								for(int i=0; i<handlers.size(); i++)
+								{
+									MActivity act = handlers.get(i);
+									if(act.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_SIGNAL))
+									{
+										ProcessThread newthread	= thread.createCopy();
+										updateParameters(newthread);
+										// todo: allow this, does not work because handler is used for waiting for service calls!
+//										newthread.setActivity(act);
+										newthread.setLastEdge((MSequenceEdge)act.getOutgoingSequenceEdges().get(0));
+										thread.getThreadContext().addThread(newthread);
+										ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
+											thread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(newthread));
+										instance.notifyListeners(cce);
+									}
+								}
+							}
+						}
+
+						public void finished()
+						{
+							updateParameters(thread);
+							
+							thread.setNonWaiting();
+							instance.step(activity, instance, thread, null);
+						}
+						
 						public void resultAvailable(final Collection<Tuple2<String, Object>> results)
 						{
-							instance.getComponentAdapter().invokeLater(new Runnable()
+//							System.out.println("end1: "+instance.getComponentIdentifier()+" "+file);
+							
+							// Store results in out parameters.
+							Map<String, Object> res = new HashMap<String, Object>();
+							if(results!=null)
 							{
-								public void run()
+								for(Iterator<Tuple2<String, Object>> it=results.iterator(); it.hasNext(); )
 								{
-//									System.out.println("end1: "+instance.getComponentIdentifier()+" "+file);
-									
-									// Store results in out parameters.
-									Map<String, Object> res = new HashMap<String, Object>();
-									if(results!=null)
-									{
-										for(Iterator<Tuple2<String, Object>> it=results.iterator(); it.hasNext(); )
-										{
-											Tuple2<String, Object> tup = it.next();
-											res.put(tup.getFirstEntity(), tup.getSecondEntity());
-										}
-									}
-									
-									thread.setParameterValue("$results", res);	// Hack???
-									
-									List<MParameter>	params	= activity.getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
-									if(params!=null && !params.isEmpty())
-									{
-										IValueFetcher fetcher	=null;
-		
-										for(int i=0; i<params.size(); i++)
-										{
-											MParameter	param	= params.get(i);
-											if(param.getInitialValue()!=null)
-											{
-												if(fetcher==null)
-													fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
-												try
-												{
-													thread.setParameterValue(param.getName(), param.getInitialValue().getValue(fetcher));
-												}
-												catch(RuntimeException e)
-												{
-													throw new RuntimeException("Error evaluating parameter value: "+instance+", "+activity+", "+param.getName()+", "+param.getInitialValue(), e);
-												}
-											}
-											else if(res.containsKey(param.getName()))
-											{
-												thread.setParameterValue(param.getName(), res.get(param.getName()));
-											}
-										}
-									}
-									thread.setNonWaiting();
-									instance.step(activity, instance, thread, null);
+									Tuple2<String, Object> tup = it.next();
+									res.put(tup.getFirstEntity(), tup.getSecondEntity());
 								}
-							});
+							}
+							thread.setParameterValue("$results", res);	// Hack???
+							
+							updateParameters(thread);
+							
+							thread.setNonWaiting();
+							instance.step(activity, instance, thread, null);
 						}
 						
 						public void exceptionOccurred(final Exception exception)
 						{
-							instance.getComponentAdapter().invokeLater(new Runnable()
+//							System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
+							thread.setNonWaiting();
+							thread.setException(exception);
+							instance.step(activity, instance, thread, null);
+						}
+						
+						protected void updateParameters(ProcessThread thread)
+						{
+							Map<String, Object> res = (Map<String, Object>)thread.getParameterValue("$results");
+							
+							List<MParameter>	params	= activity.getParameters(new String[]{MParameter.DIRECTION_OUT, MParameter.DIRECTION_INOUT});
+							if(params!=null && !params.isEmpty())
 							{
-								public void run()
+								IValueFetcher fetcher	=null;
+
+								for(int i=0; i<params.size(); i++)
 								{
-//									System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
-									thread.setNonWaiting();
-									thread.setException(exception);
-									instance.step(activity, instance, thread, null);
+									MParameter	param	= params.get(i);
+									if(param.getInitialValue()!=null)
+									{
+										if(fetcher==null)
+											fetcher	= new ProcessThreadValueFetcher(thread, false, instance.getFetcher());
+										try
+										{
+											thread.setParameterValue(param.getName(), param.getInitialValue().getValue(fetcher));
+										}
+										catch(RuntimeException e)
+										{
+											throw new RuntimeException("Error evaluating parameter value: "+instance+", "+activity+", "+param.getName()+", "+param.getInitialValue(), e);
+										}
+									}
+									else if(res.containsKey(param.getName()))
+									{
+										thread.setParameterValue(param.getName(), res.get(param.getName()));
+									}
 								}
-							});
+							}
 						}
 						
 						public String toString()
 						{
 							return "lis: "+instance.getComponentIdentifier()+" "+file;
 						}
-					});
+					}));
 					
 					IResultListener<IComponentIdentifier> lis = new IResultListener<IComponentIdentifier>()
 					{

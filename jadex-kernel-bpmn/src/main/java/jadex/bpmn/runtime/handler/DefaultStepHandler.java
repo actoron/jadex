@@ -1,6 +1,7 @@
 package jadex.bpmn.runtime.handler;
 
 import jadex.bpmn.model.MActivity;
+import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.model.MNamedIdElement;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
@@ -90,7 +91,7 @@ public class DefaultStepHandler implements IStepHandler
 					for(int i=0; handlers!=null && next==null && i<handlers.size(); i++)
 					{
 						MActivity	handler	= (MActivity) handlers.get(i);
-						if(handler.getActivityType().equals("EventIntermediateError"))
+						if(handler.getActivityType().equals(MBpmnModel.EVENT_INTERMEDIATE_ERROR))//"EventIntermediateError"))
 						{
 							// Todo: match exception types.
 	//						Class	clazz	= handler.getName()!=null ? SReflect.findClass0(clname, imports, classloader);

@@ -1092,7 +1092,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 			{
 				int index = key==null? -1: ((Number)key).intValue();
 				if(index>=0)
-					((List)coll).set(index, value);
+					((List)coll).add(index, value);
 				else
 					((List)coll).add(value);
 			}
