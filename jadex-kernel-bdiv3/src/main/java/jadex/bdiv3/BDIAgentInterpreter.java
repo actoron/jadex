@@ -15,6 +15,7 @@ import jadex.rules.eca.RuleSystem;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -23,6 +24,12 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 {
 	/** The rule system. */
 	protected RuleSystem rulesystem;
+	
+	/** The runtime plans. */
+	protected Set<Object> plans;
+	
+	/** The runtime goals. */
+	protected Set<Object> goals;
 	
 	/**
 	 *  Create a new agent.
