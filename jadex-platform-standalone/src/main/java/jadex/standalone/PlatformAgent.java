@@ -105,7 +105,7 @@ import java.util.logging.Level;
 
 	@Argument(name="extensions", clazz=String.class, defaultvalue="\"jadex/extension/envsupport/EnvSupportAgent.class, jadex/extension/agr/AGRAgent.class\""),
 
-	@Argument(name="kernels", clazz=String.class, defaultvalue="\"multi\""),
+	@Argument(name="kernels", clazz=String.class, defaultvalue="\"multi\"")
 })
 
 @ComponentTypes({
@@ -137,7 +137,7 @@ import java.util.logging.Level;
 	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(expression="new SimulationService($component)")),
 	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService($component.getServiceProvider())")),
 	@ProvidedService(type=IPublishService.class, implementation=@Implementation(expression="new DefaultWebServicePublishService()")),
-	@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new SecurityService($args.usepass, $args.printpass)")),
+	@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new SecurityService($args.usepass, $args.printpass)"))
 })
 
 @RequiredServices({
@@ -192,7 +192,7 @@ import java.util.logging.Level;
 				@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
 		@Component(name="jcc", type="jcc", daemon=true, number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0", arguments=@NameValue(name="saveonexit", value="$args.saveonexit"))
-	}),
+	})
 })
 public class PlatformAgent extends MicroAgent
 {
