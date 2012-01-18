@@ -63,11 +63,11 @@ public class MathmaticModel {
 		return Math.sqrt(variance);
 	}
 
-	private static double delta(double redRate) {
+	public static double delta(double redRate) {
 		return 1 / (redRate * C);
 	}
 
-	private static double kappa(double workload) {
+	public static double kappa(double workload) {
 		return workload * 10;
 	}
 
@@ -80,7 +80,7 @@ public class MathmaticModel {
 		return result;
 	}
 
-	private static double expectationValue(long n, double redRate, double workload, double kappa, long c, long k, long t) {
+	public static double expectationValue(long n, double redRate, double workload, double kappa, long c, long k, long t) {
 		double result = 0.0;
 		for (int i = 1; i <= n; i++) {
 			result += i * p(i, redRate, workload, kappa, c, k, t);
