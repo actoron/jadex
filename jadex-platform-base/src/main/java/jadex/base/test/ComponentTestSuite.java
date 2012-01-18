@@ -53,7 +53,7 @@ public class ComponentTestSuite extends TestSuite
 	public ComponentTestSuite(File path, File root, String[] excludes, long timeout) throws Exception
 	{
 		this(new String[]{"-platformname", "testcases",
-//			"-kernels", "all",
+			"-kernels", "all",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
 			"-simulation", "true",
 			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
 //			"-logging_level", "java.util.logging.Level.INFO",
