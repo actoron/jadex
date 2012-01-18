@@ -9,7 +9,7 @@ import jadex.micro.annotation.ProvidedServices;
 
 @Imports(
 {
-	"jadex.bridge.service.types.factory.*",
+	"jadex.bridge.service.types.factory.*"
 })
 @ProvidedServices(@ProvidedService(name="envextension", type=IComponentFactoryExtensionService.class, implementation=@Implementation(EnvSupportExtensionService.class)))
 @Agent
