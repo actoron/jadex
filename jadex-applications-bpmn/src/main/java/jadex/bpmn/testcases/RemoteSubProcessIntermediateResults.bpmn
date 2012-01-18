@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_dPbcEUEGEeGYyvkANn-TCw" iD="_dPbcEEEGEeGYyvkANn-TCw">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_-8578EEJEeGYyvkANn-TCw" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-86jAEEJEeGYyvkANn-TCw" key="description" value="&lt;H1>Test execution of intermediate results of a remote subprocess&lt;/H1>"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_-86jAEEJEeGYyvkANn-TCw" key="description" value="&lt;H1>Intermediate Result Events&lt;/H1> Tests if a subprocess can be started that produces intermediate results. These intermediate results will be received by the parent process and can be handled by an activity signal handler."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__-f70EEJEeGYyvkANn-TCw" key="package" value="jadex.bpmn.testcases"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="__-kNQEEJEeGYyvkANn-TCw" key="editor_version" value="1.0"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aBcGwEGuEeGOLNOR3ujudw" key="suspend" value="false"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Ba6PcEEKEeGYyvkANn-TCw" source="jadex_imports_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RzTVAEEcEeGyJLO41zNuGg" key="dimension" value="3:1"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:BpmnDiagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:id="_GaKWsUEVEeGyJLO41zNuGg" iD="_GaKWsEEVEeGyJLO41zNuGg">
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_aXwtkEEVEeGyJLO41zNuGg" source="jadex">
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aXxUoEEVEeGyJLO41zNuGg" key="description" value="Simple process that produces intermediate results."/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_aXxUoEEVEeGyJLO41zNuGg" key="description" value="&lt;h1>Creating intermediate results&lt;/h1>Simple process that produces intermediate results one by one with a time interval in between."/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_61LeUEEZEeGyJLO41zNuGg" key="editor_version" value="1.0"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_0JCEgEEbEeGyJLO41zNuGg" source="jadex_arguments_table">
