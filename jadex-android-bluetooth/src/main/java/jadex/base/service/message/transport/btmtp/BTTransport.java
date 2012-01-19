@@ -71,9 +71,6 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	/** The addresses. */
 	protected String[] addresses;
 
-	/** The codec factory. */
-	protected CodecFactory codecfac;
-
 	/** The library service. */
 	protected ILibraryService libservice;
 
@@ -244,8 +241,7 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 						tp.execute(new Runnable() {
 							public void run() {
 								BTTransport.this
-										.deliverMessage(BTTransport.this
-												.decodeMessage(data));
+										.deliverMessage(data);
 							}
 						});
 					}
@@ -284,51 +280,51 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 		return getServiceSchema() + hostname;
 	}
 
-	protected MessageEnvelope decodeMessage(byte[] data) {
-		
-		Log.i(Helper.LOG_TAG, "Received message byte array is: " + data.length);
-		MessageEnvelope ret = null;
-
-		// Calculate message size by reading the first 4 bytes
-		// Read here is always a blocking call.
-		int msg_size;
-		int pos = 0;
-		byte[] codec_ids = new byte[(int) data[0] & 0xFF];
-
-		pos++;
-		
-		for (int i = 0; i < codec_ids.length; i++) {
-			codec_ids[i] = data[pos];
-			pos++;
-		}
-
-		msg_size = SUtil.bytesToInt(new byte[] { data[pos], data[pos + 1],
-				data[pos + 2], data[pos + 3] });
-
-		pos += 4;
-
-		// readByte() << 24 | readByte() << 16 | readByte() << 8 | readByte();
-		// System.out.println("reclen: "+msg_size);
-		msg_size = msg_size - BTTransport.PROLOG_SIZE - codec_ids.length - 1; // Remove
-																				// prolog.
-		if (msg_size > 0) {
-//			byte[] rawMsg = Arrays.copyOfRange(data, pos, data.length - 1);
-			byte[] rawMsg = new byte[data.length - pos];
-//			System.out.println("rawMsglength: " + rawMsg.length);
-			for (int i = 0; i < msg_size; pos++, i++ ) {
-				rawMsg[i] = data[pos];
-			}
-			
-			Object tmp = rawMsg;
-			for (int i = codec_ids.length - 1; i > -1; i--) {
-				ICodec dec = codecfac.getCodec(codec_ids[i]);
-				tmp = dec.decode((byte[]) tmp, classLoader);
-			}
-			ret = (MessageEnvelope) tmp;
-		}
-
-		return ret;
-	}
+//	protected MessageEnvelope decodeMessage(byte[] data) {
+//		
+//		Log.i(Helper.LOG_TAG, "Received message byte array is: " + data.length);
+//		MessageEnvelope ret = null;
+//
+//		// Calculate message size by reading the first 4 bytes
+//		// Read here is always a blocking call.
+//		int msg_size;
+//		int pos = 0;
+//		byte[] codec_ids = new byte[(int) data[0] & 0xFF];
+//
+//		pos++;
+//		
+//		for (int i = 0; i < codec_ids.length; i++) {
+//			codec_ids[i] = data[pos];
+//			pos++;
+//		}
+//
+//		msg_size = SUtil.bytesToInt(new byte[] { data[pos], data[pos + 1],
+//				data[pos + 2], data[pos + 3] });
+//
+//		pos += 4;
+//
+//		// readByte() << 24 | readByte() << 16 | readByte() << 8 | readByte();
+//		// System.out.println("reclen: "+msg_size);
+//		msg_size = msg_size - BTTransport.PROLOG_SIZE - codec_ids.length - 1; // Remove
+//																				// prolog.
+//		if (msg_size > 0) {
+////			byte[] rawMsg = Arrays.copyOfRange(data, pos, data.length - 1);
+//			byte[] rawMsg = new byte[data.length - pos];
+////			System.out.println("rawMsglength: " + rawMsg.length);
+//			for (int i = 0; i < msg_size; pos++, i++ ) {
+//				rawMsg[i] = data[pos];
+//			}
+//			
+//			Object tmp = rawMsg;
+//			for (int i = codec_ids.length - 1; i > -1; i--) {
+//				ICodec dec = codecfac.getCodec(codec_ids[i]);
+//				tmp = dec.decode((byte[]) tmp, classLoader);
+//			}
+//			ret = (MessageEnvelope) tmp;
+//		}
+//
+//		return ret;
+//	}
 
 	/**
 	 * Deliver messages to local message service for dispatching to the
@@ -337,14 +333,15 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	 * @param con
 	 *            The connection.
 	 */
-	protected IFuture deliverMessage(final MessageEnvelope msg) {
+	protected IFuture deliverMessage(final byte[] rawmsg) {
 		final Future ret = new Future();
 		SServiceProvider.getService(container, IMessageService.class,
 				RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
 				new DefaultResultListener<IMessageService>() {
 					public void resultAvailable(IMessageService ms) {
-						ms.deliverMessage(msg.getMessage(), msg.getTypeName(),
-								msg.getReceivers());
+//						ms.deliverMessage(msg.getMessage(), msg.getTypeName(),
+//								msg.getReceivers());
+						ms.deliverMessage(rawmsg);
 						ret.setResult(null);
 					}
 				});
@@ -433,18 +430,18 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 						}
 					});
 
-			SServiceProvider.getService(container, IMessageService.class,
-					RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
-					new DelegationResultListener<IMessageService>(
-							new Future<IMessageService>()) {
-						@Override
-						public void customResultAvailable(IMessageService ms) {
-							BTTransport.this.codecfac = (CodecFactory) ms
-									.getCodecFactory();
-							Log.d(Helper.LOG_TAG,
-									"(BTTransport) CodecFactory set.");
-						}
-					});
+//			SServiceProvider.getService(container, IMessageService.class,
+//					RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(
+//					new DelegationResultListener<IMessageService>(
+//							new Future<IMessageService>()) {
+//						@Override
+//						public void customResultAvailable(IMessageService ms) {
+//							BTTransport.this.codecfac = (CodecFactory) ms
+//									.getCodecFactory();
+//							Log.d(Helper.LOG_TAG,
+//									"(BTTransport) CodecFactory set.");
+//						}
+//					});
 		}
 	}
 }
