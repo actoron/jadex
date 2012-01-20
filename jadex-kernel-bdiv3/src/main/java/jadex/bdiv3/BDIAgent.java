@@ -45,6 +45,13 @@ public class BDIAgent extends MicroAgent
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 			RuleSystem rs = ip.getRuleSystem();
 			rs.addEvent(new Event(fieldname, val));
+			scheduleStep(new IComponentStep()
+			{
+				public IFuture execute(IInternalAccess ia)
+				{
+					return IFuture.DONE;
+				}
+			});
 		}
 		catch(Exception e)
 		{
