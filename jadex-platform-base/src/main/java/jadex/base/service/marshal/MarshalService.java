@@ -104,7 +104,7 @@ public class MarshalService extends BasicService implements IMarshalService
 	{
 		references = Collections.synchronizedMap(new LRU<Class<?>, boolean[]>(500));
 //		processors = Collections.synchronizedList(new ArrayList<ITraverseProcessor>());
-		processors = Collections.synchronizedList(Traverser.getDefaultCloneProcessors());
+		processors = Collections.synchronizedList(Traverser.getDefaultProcessors());
 				
 		// Problem: if micro agent implements a service it cannot
 		// be determined if the service or the agent should be transferred.
@@ -113,7 +113,7 @@ public class MarshalService extends BasicService implements IMarshalService
 		// Insert before FieldProcessor that is always applicable
 		processors.add(processors.size()-1, new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Class<?> clazz)
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
 			{
 				return object!=null && !(object instanceof BasicService) 
 					&& object.getClass().isAnnotationPresent(Service.class);
@@ -121,7 +121,7 @@ public class MarshalService extends BasicService implements IMarshalService
 			
 			public Object process(Object object, Class<?> clazz,
 				List<ITraverseProcessor> processors, Traverser traverser,
-				Map<Object, Object> traversed)
+				Map<Object, Object> traversed, boolean clone)
 			{
 				return BasicServiceInvocationHandler.getPojoServiceProxy(object);
 			}

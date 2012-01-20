@@ -15,23 +15,11 @@ import java.util.Set;
  */
 public class CollectionProcessor implements ITraverseProcessor
 {
-	/** The clone falg. */
-	protected boolean clone;
-	
 	/**
 	 *  Create a new collection processor.
 	 */
 	public CollectionProcessor()
 	{
-		this(false);
-	}
-	
-	/**
-	 *  Create a new collection processor.
-	 */
-	public CollectionProcessor(boolean clone)
-	{
-		this.clone = clone;
 	}
 	
 	/**
@@ -39,7 +27,7 @@ public class CollectionProcessor implements ITraverseProcessor
 	 *  @param object The object.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz)
+	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
 	{
 		return SReflect.isSupertype(Collection.class, clazz);
 	}
@@ -50,31 +38,26 @@ public class CollectionProcessor implements ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone)
 	{
 		Collection col = (Collection)object;
-		Collection ret = col;
-		
-		List copy = new ArrayList();
-		boolean changed = false;
+		Collection ret = (Collection)getReturnObject(object, clazz);
+
+		traversed.put(object, ret);
+		try
+		{
 		for(Iterator<Object> it=col.iterator(); it.hasNext(); )
 		{
 			Object val = it.next();
 			Class valclazz = val!=null? val.getClass(): null;
-			Object newval = traverser.traverse(val, valclazz, traversed, processors);
-			copy.add(newval);
-			
-			if(val!=newval)
-				changed = true;
+			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone);
+			ret.add(newval);
 		}
-		
-		if(clone || changed)
-		{	
-			ret = (Collection)getReturnObject(object, clazz);
-			ret.addAll(copy);
 		}
-		
-		traversed.put(object, ret);
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 		
 		return ret;
 	}
@@ -103,4 +86,41 @@ public class CollectionProcessor implements ITraverseProcessor
 		}
 		return ret;
 	}
+	
+//	/**
+//	 *  Process an object.
+//	 *  @param object The object.
+//	 *  @return The processed object.
+//	 */
+//	public Object process(Object object, Class clazz, List<ITraverseProcessor> processors, 
+//		Traverser traverser, Map<Object, Object> traversed, boolean clone)
+//	{
+//		Collection col = (Collection)object;
+//		Collection ret = col;
+//		
+//		List copy = new ArrayList();
+//		
+//		boolean changed = false;
+//		
+//		for(Iterator<Object> it=col.iterator(); it.hasNext(); )
+//		{
+//			Object val = it.next();
+//			Class valclazz = val!=null? val.getClass(): null;
+//			Object newval = traverser.traverse(val, valclazz, traversed, processors);
+//			copy.add(newval);
+//			
+//			if(val!=newval)
+//				changed = true;
+//		}
+//		
+//		if(clone || changed)
+//		{	
+//			ret = (Collection)getReturnObject(object, clazz);
+//			ret.addAll(copy);
+//		}
+//		
+//		traversed.put(object, ret);
+//		
+//		return ret;
+//	}
 }

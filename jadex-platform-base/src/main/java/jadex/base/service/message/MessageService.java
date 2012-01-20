@@ -316,17 +316,17 @@ public class MessageService extends BasicService implements IMessageService
 		// Conversion via platform specific codecs
 		// Hack?! Preprocess content to enhance component identifiers.
 		IContentCodec[] compcodecs = getContentCodecs(comp.getModel(), cl);
-		List<ITraverseProcessor> procs = Traverser.getDefaultTraversalProcessors();
+		List<ITraverseProcessor> procs = Traverser.getDefaultProcessors();
 		procs.add(1, new ITraverseProcessor()
 		{
 			public Object process(Object object, Class<?> clazz,
 				List<ITraverseProcessor> processors, Traverser traverser,
-				Map<Object, Object> traversed)
+				Map<Object, Object> traversed, boolean clone)
 			{
 				return internalUpdateComponentIdentifier((IComponentIdentifier)object);
 			}
 			
-			public boolean isApplicable(Object object, Class<?> clazz)
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
 			{
 				return object instanceof IComponentIdentifier;
 			}
@@ -336,12 +336,12 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			String	name	= it.next();
 			Object	value	= msgcopy.get(name);
-			value = Traverser.traverseObject(value, procs);
+			value = Traverser.traverseObject(value, procs, false);
 			msgcopy.put(name, value);
 			
-			IContentCodec codec = type.findContentCodec(compcodecs, msg, name);
+			IContentCodec codec = type.findContentCodec(compcodecs, msgcopy, name);
 			if(codec==null)
-				codec = type.findContentCodec(getContentCodecs(), msg, name);
+				codec = type.findContentCodec(getContentCodecs(), msgcopy, name);
 			
 			if(codec!=null)
 			{
@@ -371,7 +371,7 @@ public class MessageService extends BasicService implements IMessageService
 		if(lis!=null)
 		{
 			// Hack?!
-			IMessageAdapter msgadapter = new DefaultMessageAdapter(msg, type);
+			IMessageAdapter msgadapter = new DefaultMessageAdapter(msgcopy, type);
 			for(int i=0; i<lis.length; i++)
 			{
 				IMessageListener li = (IMessageListener)lis[i];

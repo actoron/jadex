@@ -12,23 +12,11 @@ import java.util.Vector;
  */
 public class EnumerationProcessor implements ITraverseProcessor
 {
-	/** The clone falg. */
-	protected boolean clone;
-	
 	/**
 	 *  Create a new enumeration processor.
 	 */
 	public EnumerationProcessor()
 	{
-		this(false);
-	}
-	
-	/**
-	 *  Create a new enumeration processor.
-	 */
-	public EnumerationProcessor(boolean clone)
-	{
-		this.clone = clone;
 	}
 	
 	/**
@@ -36,7 +24,7 @@ public class EnumerationProcessor implements ITraverseProcessor
 	 *  @param object The object.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz)
+	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
 	{
 		return SReflect.isSupertype(Enumeration.class, clazz);
 	}
@@ -47,29 +35,23 @@ public class EnumerationProcessor implements ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone)
 	{
 		Enumeration en = (Enumeration)object;
-		Enumeration ret = en;
 		Vector copy = new Vector();
+		Enumeration ret = copy.elements();
+		
+		traversed.put(object, ret);
 		
 		boolean changed = false;
 		for(; en.hasMoreElements(); )
 		{
 			Object val = en.nextElement();
 			Class valclazz = val!=null? val.getClass(): null;
-			Object newval = traverser.traverse(val, valclazz, traversed, processors);
+			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone);
 			copy.add(newval);
-			
-			if(newval!=val)
-				changed = true;
 		}
 		
-		if(clone || changed)
-			ret = copy.elements();
-
-		traversed.put(object, ret);
-
 		return ret;
 	}
 }

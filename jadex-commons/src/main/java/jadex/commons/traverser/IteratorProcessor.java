@@ -12,31 +12,12 @@ import java.util.Map;
  */
 public class IteratorProcessor implements ITraverseProcessor
 {
-	/** The clone flag. */
-	protected boolean clone;
-	
-	/**
-	 *  Create a new iterator processor.
-	 */
-	public IteratorProcessor()
-	{
-		this(false);
-	}
-	
-	/**
-	 *  Create a new iterator processor.
-	 */
-	public IteratorProcessor(boolean clone)
-	{
-		this.clone = clone;
-	}
-	
 	/**
 	 *  Test if the processor is appliable.
 	 *  @param object The object.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz)
+	public boolean isApplicable(Object object, Class clazz, boolean clone)
 	{
 		return SReflect.isSupertype(Iterator.class, clazz);
 	}
@@ -47,29 +28,84 @@ public class IteratorProcessor implements ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone)
 	{
 		Iterator it = (Iterator)object;
-		Iterator ret = it;
-		
-		boolean changed = false;
 		List copy = new ArrayList();
+		Iterator ret = new UncheckedIterator(copy);
+
+		traversed.put(object, ret);
+
 		for(; it.hasNext(); )
 		{
 			Object val = it.next();
 			Class valclazz = val!=null? val.getClass(): null;
-			Object newval = traverser.traverse(val, valclazz, traversed, processors);
+			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone);
 			copy.add(newval);
-			
-			if(newval!=val)
-				changed = true;
 		}
-		
-		if(clone || changed)
-			ret = copy.iterator();
-		
-		traversed.put(object, ret);
 		
 		return ret;
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	public static void main(String[] args)
+//	{
+//		ArrayList list = new ArrayList();
+////		Vector list = new Vector();
+//		
+//		Iterator it= new UncheckedIterator(list);
+////		Enumeration it = list.elements();
+//		
+//		list.add("a");
+//		list.add("b");
+//		list.add("c");
+//		
+//		for(; it.hasNext();)
+//		{
+//			System.out.println("elem: "+it.next());
+//		}
+//	}
+	
 }
+
+class UncheckedIterator<E> implements Iterator<E>
+{
+	protected List<E> source;
+	
+	protected int pos;
+	
+	/**
+	 *  Create a new Iterator.
+	 */
+	public UncheckedIterator(List<E> source)
+	{
+		this.source = source;
+	}
+	
+	/**
+	 *  Test if has next element.
+	 */
+    public boolean hasNext()
+    {
+    	return pos<source.size();
+    }
+
+    /**
+     * 
+     */
+    public E next()
+    {
+    	return source.get(pos++);
+    }
+
+    /**
+     * 
+     */
+    public void remove()
+    {
+    	source.remove(--pos);
+    }
+}
+

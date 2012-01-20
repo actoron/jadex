@@ -14,9 +14,9 @@ public class CloneProcessor implements ITraverseProcessor
 	 *  @param object The object.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz)
+	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
 	{
-		return object instanceof Cloneable && !object.getClass().isArray();
+		return clone && (object instanceof Cloneable) && !object.getClass().isArray();
 	}
 	
 	/**
@@ -25,12 +25,14 @@ public class CloneProcessor implements ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone)
 	{
 		try
 		{
-			Method	clone	= clazz.getMethod("clone", new Class[0]);
-			return clone.invoke(object, new Object[0]);
+			Method	m = clazz.getMethod("clone", new Class[0]);
+			Object ret = m.invoke(object, new Object[0]);
+			traversed.put(object, ret);
+			return ret;
 		}
 		catch(Exception e)
 		{

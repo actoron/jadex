@@ -28,9 +28,9 @@ public class FilterProcessor implements ITraverseProcessor
 	 *  @param object The object.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz)
+	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
 	{
-		return filter.filter(object);
+		return filter.filter(object); // && !clone // does not work because also in clone mode some immutable objects should not be cloned
 	}
 	
 	/**
@@ -39,7 +39,7 @@ public class FilterProcessor implements ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone)
 	{
 		return object;
 	}

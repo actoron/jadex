@@ -2,23 +2,15 @@ package jadex.commons.traverser;
 
 import jadex.commons.SReflect;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- *  A map processor allows for traversing maps.
+ *  A list processor allows for traversing lists.
  */
-public class MapProcessor implements ITraverseProcessor
+public class ListProcessor implements ITraverseProcessor
 {
-	/**
-	 *  Create a new map processor.
-	 */
-	public MapProcessor()
-	{
-	}
-	
 	/**
 	 *  Test if the processor is appliable.
 	 *  @param object The object.
@@ -26,7 +18,7 @@ public class MapProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
 	{
-		return SReflect.isSupertype(Map.class, clazz);
+		return SReflect.isSupertype(List.class, clazz);
 	}
 	
 	/**
@@ -37,27 +29,32 @@ public class MapProcessor implements ITraverseProcessor
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone)
 	{
-		Map ret = (Map)getReturnObject(object, clazz, clone);
-		Map map = (Map)object;
+		List ret = (List)getReturnObject(object, clazz, clone);
+		List list = (List)object;
 		
 		traversed.put(object, ret);
 		
-		Object[] keys = map.keySet().toArray(new Object[map.size()]);
-		for(int i=0; i<keys.length; i++)
+		for(int i=0; i<list.size(); i++)
 		{
-			Object val = map.get(keys[i]);
+			Object val = list.get(i);
 			Class valclazz = val!=null? val.getClass(): null;
 			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone);
 			
-			if(clone || newval!=val)
-				ret.put(keys[i], newval);
+			if(clone)
+			{
+				ret.add(newval);
+			}
+			else if(newval!=val)
+			{
+				ret.set(i, newval);
+			}
 		}
 		
 		return ret;
 	}
 	
 	/**
-	 * 
+	 *  Get the return object.
 	 */
 	public Object getReturnObject(Object object, Class clazz, boolean clone)
 	{
@@ -71,8 +68,7 @@ public class MapProcessor implements ITraverseProcessor
 			}
 			catch(Exception e)
 			{
-				// Using linked hash map as default to avoid loosing order if has order.
-				ret = new LinkedHashMap();
+				ret = new ArrayList();
 			}
 		}
 		

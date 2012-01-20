@@ -108,6 +108,40 @@ public class Properties
 	}
 	
 	/**
+	 *  Get all properties.
+	 */
+	public Property[]	getProperties()
+	{
+		return (Property[])properties.toArray(new Property[properties.size()]);
+	}
+	
+	/**
+	 *  Set the properties.
+	 *  @param properties The properties.
+	 */
+	public void setProperties(Property[] properties)
+	{
+		this.properties = new ArrayList(Arrays.asList(properties));
+	}
+	
+	/**
+	 *  Get all subproperties. 
+	 */
+	public Properties[] getSubproperties()
+	{
+		return (Properties[])subproperties.toArray(new Properties[subproperties.size()]);
+	}
+	
+	/**
+	 *  Set the subproperties.
+	 *  @param subproperties The subproperties to set.
+	 */
+	public void setSubproperties(Properties[] subproperties)
+	{
+		this.subproperties = new ArrayList(Arrays.asList(subproperties));
+	}
+	
+	/**
 	 *  Get a properties by type.
 	 *  @param type The type name. 
 	 */
@@ -137,14 +171,6 @@ public class Properties
 		Property[] props = getProperties(type);
 //		System.out.println("here: "+type+" "+SUtil.arrayToString(props));
 		return props.length>0? props[props.length-1]: null;
-	}
-	
-	/**
-	 *  Get all properties.
-	 */
-	public Property[]	getProperties()
-	{
-		return (Property[])properties.toArray(new Property[properties.size()]);
 	}
 	
 	/**
@@ -179,15 +205,6 @@ public class Properties
 		}
 		return (Property[])ret.toArray(new Property[ret.size()]);
 	}
-	
-	/**
-	 *  Set the properties.
-	 *  @param properties The properties.
-	 */
-	public void setProperties(Property[] properties)
-	{
-		this.properties = new ArrayList(Arrays.asList(properties));
-	}
 
 	/**
 	 *  Get a properties by type.
@@ -210,23 +227,6 @@ public class Properties
 //		return ret;
 	}
 	
-	/**
-	 *  Get all subproperties. 
-	 */
-	public Properties[] getSubproperties()
-	{
-		return (Properties[])subproperties.toArray(new Properties[subproperties.size()]);
-	}
-	
-	/**
-	 *  Set the subproperties.
-	 *  @param subproperties The subproperties to set.
-	 */
-	public void setSubproperties(Properties[] subproperties)
-	{
-		this.subproperties = new ArrayList(Arrays.asList(subproperties));
-	}
-
 	/**
 	 *  Get subproperties by type. 
 	 *  @param type The type.

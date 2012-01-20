@@ -9,23 +9,11 @@ import java.util.Map;
  */
 class ArrayProcessor implements ITraverseProcessor
 {
-	/** The array processor. */
-	protected boolean clone;
-	
 	/**
 	 *  Create a new array processor.
 	 */
 	public ArrayProcessor()
 	{
-		this(false);
-	}
-	
-	/**
-	 *  Create a new array processor.
-	 */
-	public ArrayProcessor(boolean clone)
-	{
-		this.clone = clone;
 	}
 	
 	/**
@@ -33,7 +21,7 @@ class ArrayProcessor implements ITraverseProcessor
 	 *  @param object The object.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz)
+	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
 	{
 		return object.getClass().isArray();
 	}
@@ -44,17 +32,18 @@ class ArrayProcessor implements ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone)
 	{
-		Object ret = getReturnObject(object, clazz);
+		Object ret = getReturnObject(object, clazz, clone);
 		int length = Array.getLength(object);
 		Class type = clazz.getComponentType();
 		
 		traversed.put(object, ret);
+		
 		for(int i=0; i<length; i++) 
 		{
 			Object val = Array.get(object, i);
-			Object newval = traverser.traverse(val, type, traversed, processors);
+			Object newval = traverser.traverse(val, type, traversed, processors, clone);
 			if(clone || newval!=val)
 				Array.set(ret, i, newval);
 		}
@@ -64,7 +53,7 @@ class ArrayProcessor implements ITraverseProcessor
 	/**
 	 * 
 	 */
-	public Object getReturnObject(Object object, Class clazz)
+	public Object getReturnObject(Object object, Class clazz, boolean clone)
 	{
 		Object ret = object;
 		

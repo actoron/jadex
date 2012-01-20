@@ -181,7 +181,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						
 						List procs = marshal.getCloneProcessors();
 						procs.add(procs.size()-2, new FilterProcessor(filter));
-						copyargs.add(Traverser.traverseObject(args[i], procs));
+						copyargs.add(Traverser.traverseObject(args[i], procs, true));
 //						copyargs.add(Traverser.traverseObject(args[i], marshal.getCloneProcessors(), filter));
 					}
 					else
@@ -281,7 +281,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				} : deffilter;
 				List procs = marshal.getCloneProcessors();
 				procs.add(procs.size()-1, new FilterProcessor(filter));
-				res = Traverser.traverseObject(value, procs);
+				res = Traverser.traverseObject(value, procs, true);
 //				res = Traverser.deepCloneObject(value, marshal.getCloneProcessors(), filter);
 			}
 		}

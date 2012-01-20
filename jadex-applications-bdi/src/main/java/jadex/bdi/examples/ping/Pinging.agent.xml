@@ -23,7 +23,7 @@
 	<beliefs>
 		<belief name="ping_receiver" class="IComponentIdentifier" exported="true">
 			<fact>
-				$scope.getEventbase().createComponentIdentifier("Ping", $scope.getComponentIdentifier().getParent())
+				$scope.getEventbase().createComponentIdentifier("Ping", $scope.getComponentIdentifier().getParentAccess())
 			</fact>
 		</belief>
 		<beliefref name="ping_delay" exported="true">

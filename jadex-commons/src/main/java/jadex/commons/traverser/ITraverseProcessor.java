@@ -14,7 +14,7 @@ public interface ITraverseProcessor
 	 *  @param object The object.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz);
+	public boolean isApplicable(Object object, Class<?> clazz, boolean clone);
 	
 	/**
 	 *  Process an object.
@@ -22,5 +22,5 @@ public interface ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed);
+		Traverser traverser, Map<Object, Object> traversed, boolean clone);
 }

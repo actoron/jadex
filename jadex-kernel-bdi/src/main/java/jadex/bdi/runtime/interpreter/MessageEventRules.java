@@ -695,7 +695,11 @@ public class MessageEventRules
 						Collection values = state.getAttributeValues(paramset, OAVBDIRuntimeModel.parameterset_has_values);
 											
 						if(values!=null)
-							message.put(name, values);
+						{
+							// Must not expose internal state data structures because they could be changed outside
+							// Example: message receivers list is enhanced before sending.
+							message.put(name, new ArrayList(values));
+						}
 					}
 				}
 
