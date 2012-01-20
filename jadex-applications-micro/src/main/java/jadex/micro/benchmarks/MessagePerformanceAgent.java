@@ -5,18 +5,22 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 import java.util.HashMap;
 import java.util.Map;
-
 
 /**
  *  Test message performance. 
@@ -24,10 +28,18 @@ import java.util.Map;
 @Description("This agents benchmarks agent message sending.")
 @Arguments(
 {
-	@Argument(name="max", clazz=int.class, defaultvalue="1000", description="Maximum number of messages to send."),
-	@Argument(name="codec", clazz=boolean.class, defaultvalue="false", description="Use content codec for message content.")
+	@Argument(name="max", clazz=int.class, defaultvalue="100", description="Maximum number of messages to send."),
+	@Argument(name="codec", clazz=boolean.class, defaultvalue="false", description="Use content codec for message content."),
+	@Argument(name="echo", clazz=IComponentIdentifier.class, description="Address of an echo agent.")
 })
 @Results(@Result(name="result", clazz=String.class, description="The benchmark results as text."))
+@Configurations(
+{
+	@Configuration(name="local"),
+	@Configuration(name="remote", arguments=@NameValue(name="echo",
+//		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\""+SRelay.DEFAULT_ADDRESS+"\"})"))
+		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\"http://localhost:8080/jadex-platform-relay-web/\"})"))
+})
 public class MessagePerformanceAgent extends MicroAgent
 {
 	//-------- attributes --------
@@ -56,8 +68,23 @@ public class MessagePerformanceAgent extends MicroAgent
 				starttime = result.longValue();
 				
 				final int msgcnt = ((Integer)getArgument("max")).intValue();
-				final IComponentIdentifier receiver = getComponentIdentifier();
+				final IComponentIdentifier receiver = getArgument("echo")!=null
+					? (IComponentIdentifier)getArgument("echo") : getComponentIdentifier();
 				final boolean usecodec = ((Boolean)getArgument("codec")).booleanValue();
+				
+				final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(msgcnt, true, new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						System.out.println("sending completed");
+					}
+
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("sending failed: "+exception);
+						exception.printStackTrace();
+					}
+				});
 				
 				IComponentStep<Void> send = new IComponentStep<Void>()
 				{
@@ -88,15 +115,24 @@ public class MessagePerformanceAgent extends MicroAgent
 								request.put(SFipa.CONTENT, new BenchmarkMessage("message: "+i, true));
 							}
 							
-							sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
-							if(i>0 && i%10 == 0)
+							IFuture<Void>	fut	= sendMessage(request, SFipa.FIPA_MESSAGE_TYPE);
+							fut.addResultListener(crl);
+							fut.addResultListener(new IResultListener<Void>()
 							{
-								System.out.print('.');
-								if(i%1000==0)
+								public void resultAvailable(Void result)
 								{
-									System.out.println();
-									break;
+//									System.out.println("message sent");
 								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									System.out.println("message not sent: "+exception);
+									exception.printStackTrace();
+								}
+							});
+							if(i%100==0)
+							{
+								break;
 							}
 						}
 						
@@ -104,6 +140,10 @@ public class MessagePerformanceAgent extends MicroAgent
 						if(current<=msgcnt)
 						{
 							waitFor(0, this);
+						}
+						else
+						{
+							System.out.println("all messages queued for sending");
 						}
 						
 						return IFuture.DONE;
@@ -120,6 +160,10 @@ public class MessagePerformanceAgent extends MicroAgent
 	 */
 	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
+		if(received == 0)
+		{
+			System.out.println("received first message");
+		}
 		received++;
 		final int msgcnt = ((Integer)getArgument("max")).intValue();
 		if(received==msgcnt)
@@ -136,52 +180,4 @@ public class MessagePerformanceAgent extends MicroAgent
 			});
 		}
 	}
-	
-
-//	/**
-//	 *  Get the meta information about the agent.
-//	 */
-//	public static Object getMetaInfo()
-//	{
-//		return new MicroAgentMetaInfo("This agents benchmarks agent message sending.", 
-//			new String[0], new IArgument[]
-//			{
-//				new Argument("max", "Maximum number of messages to send.", "Integer", new Integer(1000))
-//				{
-//					public boolean validate(String input)
-//					{
-//						boolean ret = true;
-//						try
-//						{
-//							Integer.parseInt(input);
-//						}
-//						catch(Exception e)
-//						{
-//							ret = false;
-//						}
-//						return ret;
-//					}
-//				},
-//				new Argument("codec", "Use content codec for message content.", "boolean", Boolean.FALSE)
-//				{
-//					public boolean validate(String input)
-//					{
-//						boolean ret = true;
-//						try
-//						{
-//							Boolean.valueOf(input);
-//						}
-//						catch(Exception e)
-//						{
-//							ret = false;
-//						}
-//						return ret;
-//					}
-//				}
-//			}, new IArgument[]
-//			{
-//				new Argument("result", "The benchmark results as text.", "String")
-//			}, null, null
-//		);
-//	}
 }

@@ -1,6 +1,7 @@
 package jadex.micro.benchmarks;
 
 import jadex.base.fipa.SFipa;
+import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -12,7 +13,10 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
+import jadex.micro.annotation.NameValue;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
@@ -30,6 +34,12 @@ import java.util.Map;
 	@Argument(name="echo", clazz=IComponentIdentifier.class, description="Address of an echo agent.")
 })
 @Results(@Result(name="result", clazz=String.class, description="The benchmark results as text."))
+@Configurations(
+{
+	@Configuration(name="local"),
+	@Configuration(name="remote", arguments=@NameValue(name="echo",
+		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\""+SRelay.DEFAULT_ADDRESS+"\"})"))
+})
 public class MessagePerformanceAgent extends MicroAgent
 {
 	//-------- attributes --------

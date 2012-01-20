@@ -131,7 +131,7 @@ public class HttpSelectorThread
 						}
 						
 						// Wait for an event one of the registered channels
-//						System.out.println("selector idle");
+						System.out.println("selector idle");
 						selector.select();
 
 						// Iterate over the set of keys for which events are available

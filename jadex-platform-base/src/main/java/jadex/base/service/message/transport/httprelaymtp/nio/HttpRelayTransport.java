@@ -22,6 +22,9 @@ public class HttpRelayTransport implements ITransport
 	/** The receiver process. */
 	protected HttpSelectorThread	selectorthread;
 	
+	/** Number of messages to be sent (for testing). */
+	protected int	sent;
+	
 	//-------- constructors --------
 	
 	/**
@@ -80,6 +83,11 @@ public class HttpRelayTransport implements ITransport
 	{
 		Future<Void>	ret	= new Future<Void>();
 		this.selectorthread.addSendTask(task, ret);
+		synchronized(this)
+		{
+			sent++;
+		}
+		System.out.println("queued for sending: "+sent);
 		return ret;
 	}
 	

@@ -324,13 +324,13 @@
 			<artifactId>jadex-kernel-bdi</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
-		
+		<!-- 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-bdiv3</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
-		
+		 -->
 		<!-- 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>

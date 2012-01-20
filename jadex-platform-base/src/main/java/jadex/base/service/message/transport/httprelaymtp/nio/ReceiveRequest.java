@@ -89,6 +89,9 @@ public class ReceiveRequest	implements IHttpRequest
 	/** The amount of data already available (0..data.length). */
 	protected int	msgpos;
 	
+	/** The number of received messages (for testing). */
+	protected int	received;
+	
 	//-------- constructors ---------
 	
 	/**
@@ -163,7 +166,7 @@ public class ReceiveRequest	implements IHttpRequest
 				
 				if(state==STATE_READING_OK_HEADER)
 				{
-//					System.out.println("reading ok header");
+					System.out.println("reading ok header");
 					sc.read(buf);
 					if(buf.remaining()==0)
 					{
@@ -172,7 +175,7 @@ public class ReceiveRequest	implements IHttpRequest
 						state	= STATE_READING_HEADER_REST;
 						buf	= ByteBuffer.allocate(BUFFER_SIZE);
 						matchpos	= 2; // Matched already two characters from potential header end.
-//						System.out.println("found ok header");
+						System.out.println("found ok header");
 					}
 					else
 					{
@@ -183,7 +186,7 @@ public class ReceiveRequest	implements IHttpRequest
 				
 				if(state==STATE_READING_HEADER_REST)
 				{
-//					System.out.println("reading header rest");
+					System.out.println("reading header rest");
 					sc.read(buf);
 					byte[]	bufa	= buf.array();
 					bufpos	= 0;
@@ -210,7 +213,7 @@ public class ReceiveRequest	implements IHttpRequest
 							buf.clear();
 							bufpos	= 0;
 						}
-//						System.out.println("read header rest");
+						System.out.println("read header rest");
 					}
 					else if(buf.remaining()==0)
 					{
@@ -227,7 +230,7 @@ public class ReceiveRequest	implements IHttpRequest
 				
 				if(state==STATE_READING_CHUNK_HEADER)
 				{
-//					System.out.println("reading chunk header");
+					System.out.println("reading chunk header");
 					if(bufpos==0)
 						sc.read(buf);
 					byte[]	bufa	= buf.array();
@@ -262,7 +265,7 @@ public class ReceiveRequest	implements IHttpRequest
 							buf.clear();
 							bufpos	= 0;
 						}
-//						System.out.println("read chunk header");
+						System.out.println("read chunk header");
 					}
 					else if(buf.remaining()==0)
 					{
@@ -279,7 +282,7 @@ public class ReceiveRequest	implements IHttpRequest
 				
 				if(state==STATE_READING_MSG_HEADER)
 				{
-//					System.out.println("reading msg header");
+					System.out.println("reading msg header");
 					if(bufpos==0)
 						sc.read(buf);
 					
@@ -290,12 +293,12 @@ public class ReceiveRequest	implements IHttpRequest
 						chunksize--;
 						if(msghead==SRelay.MSGTYPE_PING)
 						{
-//							System.out.println("read ping msg header");
+							System.out.println("read ping msg header");
 							state	= STATE_READING_MSG_HEADER;
 						}
 						else if(msghead==SRelay.MSGTYPE_DEFAULT)
 						{
-//							System.out.println("read default msg header");
+							System.out.println("read default msg header");
 							state	= STATE_READING_MSG_LENGTH;
 							msg	= new byte[4];
 							msgpos	= 0;
@@ -323,7 +326,7 @@ public class ReceiveRequest	implements IHttpRequest
 
 				if(state==STATE_READING_MSG_LENGTH)
 				{
-//					System.out.println("reading msg length");
+					System.out.println("reading msg length");
 					if(bufpos==0)
 						sc.read(buf);
 					
@@ -336,7 +339,7 @@ public class ReceiveRequest	implements IHttpRequest
 					
 					if(msgpos==4)
 					{
-//						System.out.println("read msg length");
+						System.out.println("read msg length");
 						state	= STATE_READING_MSG_BODY;
 						msg	= new byte[SUtil.bytesToInt(msg)];
 						msgpos	= 0;
@@ -361,7 +364,7 @@ public class ReceiveRequest	implements IHttpRequest
 				
 				if(state==STATE_READING_MSG_BODY)
 				{
-//					System.out.println("reading msg body");
+					System.out.println("reading msg body");
 					if(bufpos==0)
 						sc.read(buf);
 					
@@ -373,7 +376,8 @@ public class ReceiveRequest	implements IHttpRequest
 					
 					if(msgpos==msg.length)
 					{
-//						System.out.println("read msg body");
+						received++;
+						System.out.println("read msg body: "+received);
 						// Message read.
 						ms.deliverMessage(msg);
 						msg	= null;
@@ -400,7 +404,7 @@ public class ReceiveRequest	implements IHttpRequest
 				
 				if(state==STATE_READING_CHUNK_END)
 				{
-//					System.out.println("reading chunk end");
+					System.out.println("reading chunk end");
 					if(bufpos==0)
 						sc.read(buf);
 					
@@ -414,7 +418,7 @@ public class ReceiveRequest	implements IHttpRequest
 					
 					if(matchpos==2)
 					{
-//						System.out.println("read chunk end");
+						System.out.println("read chunk end");
 						state	= STATE_READING_CHUNK_HEADER;
 						matchpos	= 0;
 					}

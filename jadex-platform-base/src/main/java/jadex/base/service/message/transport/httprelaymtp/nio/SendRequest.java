@@ -39,7 +39,7 @@ public class SendRequest	implements IHttpRequest
 		this.buffers	= new LinkedList<ByteBuffer>();
 		this.fut	= fut;
 		
-		// Only called with reveicers on same platform, therefore safe to get root id from first receiver.
+		// Only called with receivers on same platform, therefore safe to get root id from first receiver.
 		IComponentIdentifier	recid	= task.getReceivers()[0].getRoot();
 		byte[]	id	= JavaWriter.objectToByteArray(recid, getClass().getClassLoader());
 		byte[]	prolog	= task.getProlog();
@@ -105,6 +105,7 @@ public class SendRequest	implements IHttpRequest
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			fut.setException(e);
 			key.cancel();
 		}
@@ -161,6 +162,7 @@ public class SendRequest	implements IHttpRequest
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			fut.setException(e);
 			key.cancel();
 		}
