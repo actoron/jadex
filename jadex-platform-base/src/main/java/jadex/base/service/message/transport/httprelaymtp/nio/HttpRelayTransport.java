@@ -3,8 +3,11 @@ package jadex.base.service.message.transport.httprelaymtp.nio;
 import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.message.IMessageService;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.micro.annotation.Binding;
 
 public class HttpRelayTransport implements ITransport
 {
@@ -37,17 +40,24 @@ public class HttpRelayTransport implements ITransport
 	 */
 	public IFuture<Void> start()
 	{
-		Future<Void>	ret	= new Future<Void>();
-		try
+		final Future<Void>	ret	= new Future<Void>();
+		component.getServiceContainer().searchService(IMessageService.class, Binding.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 		{
-			// Create the selector thread (starts automatically).
-			selectorthread	= new HttpSelectorThread(component.getExternalAccess(), address);
-			ret.setResult(null);
-		}
-		catch(Exception e)
-		{
-			ret.setException(e);
-		}
+			public void customResultAvailable(IMessageService ms)
+			{
+				try
+				{
+					// Create the selector thread (starts automatically).
+					selectorthread	= new HttpSelectorThread(component.getComponentIdentifier().getRoot(), address, ms);
+					ret.setResult(null);
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
+		});
 		return ret;
 	}
 

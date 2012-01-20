@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -61,6 +62,20 @@ public class MessagePerformanceAgent extends MicroAgent
 					? (IComponentIdentifier)getArgument("echo") : getComponentIdentifier();
 				final boolean usecodec = ((Boolean)getArgument("codec")).booleanValue();
 				
+				final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(msgcnt, true, new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						System.out.println("sending completed");
+					}
+
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("sending failed: "+exception);
+						exception.printStackTrace();
+					}
+				});
+				
 				IComponentStep<Void> send = new IComponentStep<Void>()
 				{
 					public IFuture<Void> execute(IInternalAccess ia)
@@ -90,19 +105,20 @@ public class MessagePerformanceAgent extends MicroAgent
 								request.put(SFipa.CONTENT, new BenchmarkMessage("message: "+i, true));
 							}
 							
-							sendMessage(request, SFipa.FIPA_MESSAGE_TYPE).addResultListener(new IResultListener<Void>()
-							{
-								public void resultAvailable(Void result)
-								{
-									System.out.println("message sent");
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									System.out.println("message not sent: "+exception);
-									exception.printStackTrace();
-								}
-							});
+							sendMessage(request, SFipa.FIPA_MESSAGE_TYPE).addResultListener(crl);
+//								.addResultListener(new IResultListener<Void>()
+//							{
+//								public void resultAvailable(Void result)
+//								{
+//									System.out.println("message sent");
+//								}
+//								
+//								public void exceptionOccurred(Exception exception)
+//								{
+//									System.out.println("message not sent: "+exception);
+//									exception.printStackTrace();
+//								}
+//							});
 							if(i%100==0)
 							{
 								break;
@@ -116,7 +132,7 @@ public class MessagePerformanceAgent extends MicroAgent
 						}
 						else
 						{
-							System.out.println("sending finished");
+							System.out.println("all messages queued for sending");
 						}
 						
 						return IFuture.DONE;
@@ -133,10 +149,10 @@ public class MessagePerformanceAgent extends MicroAgent
 	 */
 	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
-//		if(received%10 == 0)
-//		{
-//			System.out.println("received: "+received);
-//		}
+		if(received == 0)
+		{
+			System.out.println("received first message");
+		}
 		received++;
 		final int msgcnt = ((Integer)getArgument("max")).intValue();
 		if(received==msgcnt)

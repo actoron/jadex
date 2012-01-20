@@ -53,7 +53,7 @@ import java.util.logging.Level;
 	"jadex.base.service.message.transport.tcpmtp.*",
 	"jadex.base.service.message.transport.niotcpmtp.*",
 	"jadex.base.service.message.transport.httprelaymtp.*",
-	"jadex.base.service.message.transport.httprelaymtp.io.*",
+	"jadex.base.service.message.transport.httprelaymtp.nio.*",
 	"jadex.bridge.*",
 	"jadex.base.fipa.*",
 	"jadex.base.service.message.transport.codecs.*",

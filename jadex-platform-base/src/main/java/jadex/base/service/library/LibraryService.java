@@ -472,13 +472,22 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		}
 		else
 		{
-			getClassLoader(rid, null, null).addResultListener(new ExceptionDelegationResultListener<DelegationURLClassLoader, ClassLoader>(ret)
+			// Resolve global rid or local rid from same platform.
+			if(rid.getGlobalIdentifier()!=null
+				|| rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getComponentIdentifier().equals(component.getComponentIdentifier().getRoot()))
 			{
-				public void customResultAvailable(DelegationURLClassLoader result)
+				getClassLoader(rid, null, null).addResultListener(new ExceptionDelegationResultListener<DelegationURLClassLoader, ClassLoader>(ret)
 				{
-					ret.setResult(result);
-				}
-			});
+					public void customResultAvailable(DelegationURLClassLoader result)
+					{
+						ret.setResult(result);
+					}
+				});
+			}
+			else
+			{
+				ret.setResult(null);
+			}
 		}
 		
 		return ret;
