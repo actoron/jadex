@@ -5,6 +5,9 @@ import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
@@ -90,7 +93,7 @@ public class InvokerAgent
 			public void customResultAvailable(TestReport result)
 			{
 				tc.addReport(result);
-				testRemote(1, 100, 3).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+				testRemote(2, 100, 3).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
 					public void customResultAvailable(TestReport result)
 					{
@@ -108,7 +111,7 @@ public class InvokerAgent
 	 */
 	protected IFuture<TestReport> testLocal(int testno, long delay, int max)
 	{
-		return performTest(agent.getServiceProvider(), testno, delay, max);
+		return performTest(agent.getServiceProvider(), agent.getComponentIdentifier().getRoot(), testno, delay, max);
 	}
 	
 	/**
@@ -131,7 +134,7 @@ public class InvokerAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getServiceProvider(), testno, delay, max)
+				performTest(platform.getServiceProvider(), platform.getComponentIdentifier(), testno, delay, max)
 					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
 					public void customResultAvailable(final TestReport result)
@@ -159,7 +162,7 @@ public class InvokerAgent
 	 *  - invoke the service
 	 *  - wait with intermediate listener for results 
 	 */
-	protected IFuture<TestReport> performTest(final IServiceProvider provider, final int testno, final long delay, final int max)
+	protected IFuture<TestReport> performTest(final IServiceProvider provider, final IComponentIdentifier root, final int testno, final long delay, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
@@ -189,7 +192,9 @@ public class InvokerAgent
 				{
 					public void customResultAvailable(final IClockService clock)
 					{
-						cms.createComponent(null, "jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class", new CreationInfo(agent.getModel().getResourceIdentifier()), null)
+						IResourceIdentifier	rid	= new ResourceIdentifier(
+							new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
+						cms.createComponent(null, "jadex/micro/testcases/intermediate/IntermediateResultProviderAgent.class", new CreationInfo(rid), null)
 							.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 						{	
 							public void customResultAvailable(final IComponentIdentifier cid)
