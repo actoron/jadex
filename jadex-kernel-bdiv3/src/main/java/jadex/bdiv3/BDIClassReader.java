@@ -3,6 +3,7 @@ package jadex.bdiv3;
 import jadex.bdiv3.annotation.Belief;
 import jadex.bdiv3.annotation.Goal;
 import jadex.bdiv3.annotation.Plan;
+import jadex.bdiv3.annotation.Trigger;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
@@ -83,10 +84,10 @@ public class BDIClassReader extends MicroClassReader
 		
 //		System.out.println("todo: read bdi");
 		
-		List<Field> beliefs = new ArrayList<Field>();
+//		List<Field> beliefs = new ArrayList<Field>();
 		final Set<String> beliefnames = new HashSet<String>();
-		List<Class> goals = new ArrayList<Class>();
-		List<Method> plans = new ArrayList<Method>();
+//		List<Class> goals = new ArrayList<Class>();
+//		List<Method> plans = new ArrayList<Method>();
 		
 		Class cl = cma;
 		while(cl!=null && !cl.equals(Object.class) && !cl.equals(BDIAgent.class))
@@ -97,7 +98,8 @@ public class BDIClassReader extends MicroClassReader
 				if(fields[i].isAnnotationPresent(Belief.class))
 				{
 //					System.out.println("found belief: "+fields[i].getName());
-					beliefs.add(fields[i]);
+					micromodel.addBelief(fields[i]);
+//					beliefs.add(fields[i]);
 					beliefnames.add(fields[i].getName());
 				}
 			}
@@ -108,19 +110,26 @@ public class BDIClassReader extends MicroClassReader
 				if(methods[i].isAnnotationPresent(Plan.class))
 				{
 //					System.out.println("found plan: "+methods[i].getName());
-					plans.add(methods[i]);
+					micromodel.addPlan(methods[i]);
+					Plan p = methods[i].getAnnotation(Plan.class);
+					Trigger trigger = p.trigger();
+					Class[] gs = trigger.goals();
+					for(int j=0; j<gs.length; j++)
+					{
+						micromodel.addGoal(gs[j]);
+					}
 				}
 			}
 			
-			Class[] classes = cl.getDeclaredClasses();
-			for(int i=0; i<classes.length; i++)
-			{
-				if(classes[i].isAnnotationPresent(Goal.class))
-				{
-//					System.out.println("found goal: "+classes[i].getName());
-					goals.add(classes[i]);
-				}
-			}
+//			Class[] classes = cl.getDeclaredClasses();
+//			for(int i=0; i<classes.length; i++)
+//			{
+//				if(classes[i].isAnnotationPresent(Goal.class))
+//				{
+////					System.out.println("found goal: "+classes[i].getName());
+//					goals.add(classes[i]);
+//				}
+//			}
 			
 			cl = cl.getSuperclass();
 		}

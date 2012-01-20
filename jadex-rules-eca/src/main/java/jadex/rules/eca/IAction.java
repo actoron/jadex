@@ -9,5 +9,5 @@ public interface IAction
 	 *  Execute the action.
 	 *  @param event The event.
 	 */
-	public void execute(IEvent event);
+	public void execute(IEvent event, Object context);
 }

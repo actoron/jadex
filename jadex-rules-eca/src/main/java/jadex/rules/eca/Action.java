@@ -1,5 +1,7 @@
 package jadex.rules.eca;
 
+import jadex.commons.IValueFetcher;
+
 import java.lang.reflect.Method;
 
 public class Action implements IAction
@@ -22,12 +24,12 @@ public class Action implements IAction
 	/**
 	 * 
 	 */
-	public void execute(IEvent event)
+	public void execute(IEvent event, Object context)
 	{
 		try
 		{
 			method.setAccessible(true);
-			Object result = method.invoke(object, new Object[0]);
+			Object result = method.invoke(object, new Object[]{event, context});
 		}
 		catch(Exception e)
 		{

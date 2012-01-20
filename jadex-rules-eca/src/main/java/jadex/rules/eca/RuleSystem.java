@@ -48,13 +48,17 @@ public class RuleSystem
 	/** The Java beans property change listeners. */
 	protected Map<Object, PropertyChangeListener> pcls;
 	
+	/** The context. */
+	protected Object context;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new rule system.
 	 */
-	public RuleSystem()
+	public RuleSystem(Object context)
 	{
+		this.context = context;
 		this.events = new ArrayList<IEvent>();
 		this.rulebase = new Rulebase();
 		this.rules = new IdentityHashMap<Object, Tuple2<Object, IRule[]>>(); // objects may change
@@ -80,7 +84,7 @@ public class RuleSystem
 		final Map<String, Rule> rules = new HashMap<String, Rule>();
 		
 		// Analyze the dynamic or static methods of the object (static if object is a class)
-		if(object instanceof Class)
+		if(!(object instanceof Class))
 		{
 			while(!clazz.equals(Object.class))
 			{
@@ -107,6 +111,7 @@ public class RuleSystem
 			}
 		}
 		
+		// Add rules to rulebase
 		for(Iterator<Rule> it=rules.values().iterator(); it.hasNext(); )
 		{
 			Rule rule = it.next();
@@ -118,24 +123,28 @@ public class RuleSystem
 			rulebase.addRule(rule);
 		}
 		
-		ProxyFactory pf = new ProxyFactory(object);
-		pf.addAdvice(new MethodInterceptor()
+		// Create proxy object if eventcreators are present
+		Object proxy = object;
+		if(eventcreators.size()>0)
 		{
-			public Object invoke(MethodInvocation mi) throws Throwable
+			ProxyFactory pf = new ProxyFactory(object);
+			pf.addAdvice(new MethodInterceptor()
 			{
-				Object ret = mi.getMethod().invoke(mi.getThis(), mi.getArguments());
-				IResultCommand creator = (IResultCommand)eventcreators.get(mi.getMethod());
-				if(creator!=null)
+				public Object invoke(MethodInvocation mi) throws Throwable
 				{
-					Event event = (Event)creator.execute(null);
-					addEvent(event);
-//					System.out.println("created event: "+event);
-				}
-				return ret;
-		    }
-		});
-		
-		Object proxy = pf.getProxy();
+					Object ret = mi.getMethod().invoke(mi.getThis(), mi.getArguments());
+					IResultCommand creator = (IResultCommand)eventcreators.get(mi.getMethod());
+					if(creator!=null)
+					{
+						Event event = (Event)creator.execute(null);
+						addEvent(event);
+	//					System.out.println("created event: "+event);
+					}
+					return ret;
+			    }
+			});
+			proxy = pf.getProxy();
+		}
 
 		this.rules.put(object, new Tuple2(proxy, rules.values().toArray(new IRule[rules.size()])));
 
@@ -357,7 +366,7 @@ public class RuleSystem
 				IRule rule = rules.get(i);
 				if(rule.getCondition().evaluate(event))
 				{
-					rule.getAction().execute(event);
+					rule.getAction().execute(event, context);
 				}
 			}
 		}

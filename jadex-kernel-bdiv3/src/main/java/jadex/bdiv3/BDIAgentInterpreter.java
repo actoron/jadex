@@ -14,6 +14,7 @@ import jadex.micro.annotation.Agent;
 import jadex.rules.eca.RuleSystem;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,12 +36,11 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 *  Create a new agent.
 	 */
 	public BDIAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
-		final MicroModel model, Class microclass, final Map args, final String config, 
+		final BDIModel model, Class microclass, final Map args, final String config, 
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, 
 		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited)
 	{
 		super(desc, factory, model, microclass, args, config, parent, bindings, copy, listener, inited);
-		this.rulesystem = new RuleSystem();
 	}
 	
 	/**
@@ -94,7 +94,37 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 				getLogger().warning("Hidden agent injection failed: "+e);
 			}
 		}
+
+		this.rulesystem = new RuleSystem(agent);
+		
+		List<Class> goals = ((BDIModel)model).getGoals();
+		for(int i=0; i<goals.size(); i++)
+		{
+			rulesystem.observeObject(goals.get(i));
+		}
+
 		return ret;
+	}
+	
+	/**
+	 *  Can be called on the agent thread only.
+	 * 
+	 *  Main method to perform agent execution.
+	 *  Whenever this method is called, the agent performs
+	 *  one of its scheduled actions.
+	 *  The platform can provide different execution models for agents
+	 *  (e.g. thread based, or synchronous).
+	 *  To avoid idle waiting, the return value can be checked.
+	 *  The platform guarantees that executeAction() will not be called in parallel. 
+	 *  @return True, when there are more actions waiting to be executed. 
+	 */
+	public boolean executeStep()
+	{
+		// Evaluate condition before executing step.
+		if(rulesystem!=null)
+			rulesystem.processAllEvents();
+		
+		return super.executeStep();
 	}
 
 	/**

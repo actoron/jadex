@@ -42,7 +42,7 @@ public class CleanerAgentConditions
 	 */
 	public static void main(String[] args)
 	{
-		RuleSystem rs = new RuleSystem();
+		RuleSystem rs = new RuleSystem(null);
 		CleanerAgentConditions cac = new CleanerAgentConditions();
 		cac = (CleanerAgentConditions)rs.observeObject(cac);
 				
