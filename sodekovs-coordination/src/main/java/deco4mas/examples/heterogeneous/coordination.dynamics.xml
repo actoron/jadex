@@ -48,16 +48,16 @@
 		<deco-link-realizations>
 			<realization id="by_tuple">
 				<from>		<!-- Published behaviors / events: -->
-					<agent_element element="SayHelloStep" agent_id="ExampleMicro" type="MICRO_STEP">
+					<!-- <agent_element element="SayHelloStep" agent_id="ExampleMicro" type="MICRO_STEP">
+						<parameter_mappings>
+							<mapping ref="message" name="message"/>
+						</parameter_mappings>
+					</agent_element>-->
+					<agent_element element="sayhello" agent_id="ExampleBDI" type="BDI_GOAL">
 						<parameter_mappings>
 							<mapping ref="message" name="message"/>
 						</parameter_mappings>
 					</agent_element>
-					<!-- <agent_element element="sayhello" agent_id="ExampleBDI" type="BDI_GOAL">
-						<parameter_mappings>
-							<mapping ref="message" name="message"/>
-						</parameter_mappings>
-					</agent_element> -->
 				</from>
 				<!-- Coordination Medium configuration: -->
 				<mechanism_configuration
@@ -65,11 +65,11 @@
 					agent_type="JADEX">
 				</mechanism_configuration>
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->
-					<agent_element element="receivehello" agent_id="ExampleBDI" type="INTERNAL_EVENT">
+					<!-- <agent_element element="receivehello" agent_id="ExampleBDI" type="INTERNAL_EVENT">
 						<parameter_mappings>
 							<mapping ref="message" name="message"/>
 						</parameter_mappings>
-					</agent_element>
+					</agent_element> -->
 					 <agent_element element="ReceiveHelloStep" agent_id="ExampleMicro" type="MICRO_STEP">
 						<parameter_mappings>
 							<mapping ref="message" name="message"/>

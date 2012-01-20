@@ -22,16 +22,16 @@ public class InitialPlan extends Plan {
 	 */
 	@Override
 	public void body() {
-		System.out.println("ExampleBDIAgent body() in InitalPlan called.");
+//		System.out.println("ExampleBDIAgent body() in InitalPlan called.");
 		String message = "Hello I'm the example BDI agent and it is a pleasure talking with you!";
 
-		waitFor(10000);
+		waitFor(2000);
 
 		IGoal goal = createGoal("sayhello");
 		goal.getParameter("message").setValue(message);
 
-		System.out.println("ExampleBDIAgent body() goal 'sayhello' is going to be dispatched with message:");
-		System.out.println("\t" + message);
+//		System.out.println("ExampleBDIAgent body() goal 'sayhello' is going to be dispatched with message:");
+		System.out.println("BDI sending message" + message);
 		dispatchTopLevelGoal(goal);
 	}
 }

@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
 import deco4mas.coordinate.annotation.CoordinationParameter;
 import deco4mas.coordinate.annotation.CoordinationStep;
 import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
@@ -15,19 +16,20 @@ import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
  * 
  * @author Thomas Preisler
  */
+@Agent
 public class ExampleMicroAgent extends MicroAgent {
 
 	@Override
 	public IFuture<Void> agentCreated() {
-		System.out.println("ExampleMicroAgent created.");
+		System.out.println("ExampleMicroAgent created." + ExampleMicroAgent.this.getAgentName());
 
 		return IFuture.DONE;
 	}
 
 	@Override
 	public void executeBody() {
-		System.out.println("ExampleMicroAgent executeBody() called.");
-		waitFor(2300 , new SayHelloStep("Hello, I'm the example micro agent and it is nice to chat with you!"));
+//		System.out.println("ExampleMicroAgent executeBody() called.");
+//		waitFor(2300 , new SayHelloStep("Hello, I'm the example micro agent and it is nice to chat with you!"));
 //		new SayHelloStep("Hello, I'm the example micro agent and it is nice to chat with you!").execute(this);
 	}
 
@@ -57,7 +59,7 @@ public class ExampleMicroAgent extends MicroAgent {
 
 		@Override
 		public IFuture<Void> execute(IInternalAccess ia) {
-			System.out.println("ExampleMicroAgent execute() in ReceiveHelloStep called with message:");
+			System.out.println("ExampleMicroAgent" + ExampleMicroAgent.this.getAgentName() +" execute() in ReceiveHelloStep called with message:");
 			System.out.println("\t" + message);
 			return IFuture.DONE;
 		}
