@@ -152,6 +152,7 @@ public class BDIClassReader extends MicroClassReader
 				ClassPool pool = new ClassPool(null);
 				pool.appendSystemPath();
 				CtClass clazz = pool.getAndRename(cma.getName(), clname);
+				clazz.setSuperclass(pool.getCtClass(cma.getName()));
 				clazz.addField(new CtField(getCtClass(BDIAgent.class, pool), "__agent", clazz));
 				
 				CtMethod[] methods = clazz.getDeclaredMethods();

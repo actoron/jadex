@@ -22,7 +22,7 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 {
 	//-------- attributes --------
 	
-	/** The agent. */
+	/** The pojo agent object. */
 	protected Object agent;
 
 	//-------- constructors --------

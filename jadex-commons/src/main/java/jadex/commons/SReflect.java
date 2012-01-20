@@ -130,6 +130,11 @@ public class SReflect
 		return new Short(val);
 	}
 	
+	public static Object wrapValue(Object val)
+	{
+		return val;
+	}
+	
 	/**
 	 *  Extension for Class.forName(), because primitive
 	 *  types are not supported.

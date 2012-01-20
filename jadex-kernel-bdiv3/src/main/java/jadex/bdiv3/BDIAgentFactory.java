@@ -51,7 +51,7 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	/* $if !android $ */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		FILETYPE_BDIAGENT, SGUI.makeIcon(BDIAgentFactory.class, "/jadex/bdiv3/images/micro_agent.png"),
+		FILETYPE_BDIAGENT, SGUI.makeIcon(BDIAgentFactory.class, "/jadex/bdiv3/images/bdi_agent.png"),
 	});
 	/* $endif $ */
 

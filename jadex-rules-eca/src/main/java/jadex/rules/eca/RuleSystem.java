@@ -101,7 +101,7 @@ public class RuleSystem
 		}
 		else
 		{
-			Method[] methods = clazz.getDeclaredMethods();
+			Method[] methods = ((Class)object).getDeclaredMethods();
 			for(int i=0; i<methods.length; i++)
 			{
 				if(Modifier.isStatic(methods[i].getModifiers()))
@@ -361,12 +361,15 @@ public class RuleSystem
 		{
 			IEvent event = events.remove(0);
 			List<IRule> rules = rulebase.getRules(event.getType());
-			for(int i=0; i<rules.size(); i++)
+			if(rules!=null)
 			{
-				IRule rule = rules.get(i);
-				if(rule.getCondition().evaluate(event))
+				for(int i=0; i<rules.size(); i++)
 				{
-					rule.getAction().execute(event, context);
+					IRule rule = rules.get(i);
+					if(rule.getCondition().evaluate(event))
+					{
+						rule.getAction().execute(event, context);
+					}
 				}
 			}
 		}

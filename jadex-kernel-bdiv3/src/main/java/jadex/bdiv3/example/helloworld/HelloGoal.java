@@ -1,8 +1,5 @@
 package jadex.bdiv3.example.helloworld;
 
-import jadex.bdiv3.BDIAgent;
-import jadex.bdiv3.BDIAgentInterpreter;
-import jadex.bdiv3.annotation.CreationCondition;
 import jadex.bdiv3.annotation.Goal;
 import jadex.rules.eca.IEvent;
 import jadex.rules.eca.annotations.Action;
@@ -19,18 +16,27 @@ public class HelloGoal
 		this.text = text;
 	}
 	
-//	@CreationCondition()
-	@Condition("creation")
-	protected static boolean create(@Event("sayhello") boolean sayhello)
+	/**
+	 *  Get the text.
+	 *  @return the text.
+	 */
+	public String getText()
 	{
-		return sayhello;
+		return text;
+	}
+
+	//	@CreationCondition()
+	@Condition("creation")
+	protected static boolean create(@Event("sayhello") String sayhello)
+	{
+		return true;
 	}
 	
 	@Action("creation")
-	protected static void action(IEvent event, Object object)
+	protected static void action(IEvent event, Object context)
 	{
-//		BDIAgentInterpreter ip = (BDIAgentInterpreter)agent.getInterpreter();
-		BDIAgent agent = (BDIAgent)object;
-		agent.adoptGoal(new HelloGoal("bla"));
+//		BDIAgentInterpreter ip = (BDIAgentInterpreter)context;
+		HelloWorldBDI agent = (HelloWorldBDI)context;
+		agent.getAgent().adoptGoal(new HelloGoal((String)event.getContent()));
 	}
 }

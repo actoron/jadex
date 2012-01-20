@@ -2,6 +2,7 @@ package jadex.bdiv3;
 
 import java.lang.reflect.Field;
 
+import jadex.bdiv3.actions.AdoptGoalAction;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
@@ -20,14 +21,10 @@ public class BDIAgent extends MicroAgent
 	public void adoptGoal(Object goal)
 	{
 		BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
-		System.out.println("adopt goal");
-//		ip.scheduleStep(new IComponentStep<Void>()
-//		{
-//			public IFuture<Void> execute(IInternalAccess ia)
-//			{
-//				return null;
-//			}
-//		});
+		ip.getRuleSystem().observeObject(goal);
+		
+//		System.out.println("adopt goal");
+		ip.scheduleStep(new AdoptGoalAction(goal));
 	}
 	
 	/**
@@ -38,13 +35,14 @@ public class BDIAgent extends MicroAgent
 	{
 		try
 		{
-			System.out.println("write: "+val+" "+fieldname+" "+obj);
+//			System.out.println("write: "+val+" "+fieldname+" "+obj);
 			Field f = obj.getClass().getDeclaredField(fieldname);
 			f.setAccessible(true);
 			f.set(obj, val);
 			BDIAgentInterpreter ip = (BDIAgentInterpreter)getInterpreter();
 			RuleSystem rs = ip.getRuleSystem();
 			rs.addEvent(new Event(fieldname, val));
+			
 			scheduleStep(new IComponentStep()
 			{
 				public IFuture execute(IInternalAccess ia)
@@ -59,4 +57,5 @@ public class BDIAgent extends MicroAgent
 			throw new RuntimeException(e);
 		}
 	}
+
 }

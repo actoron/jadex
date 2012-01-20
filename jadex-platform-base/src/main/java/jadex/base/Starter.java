@@ -241,6 +241,8 @@ public class Starter
 //			final ResourceIdentifier rid = new ResourceIdentifier(null, 
 //				"net.sourceforge.jadex:jadex-standalone-launch:2.1-SNAPSHOT");
 			
+//			System.out.println("Using config file: "+configfile);
+			
 			cfac.loadModel(configfile, null, null)//rid)
 				.addResultListener(new ExceptionDelegationResultListener<IModelInfo, IExternalAccess>(ret)
 			{

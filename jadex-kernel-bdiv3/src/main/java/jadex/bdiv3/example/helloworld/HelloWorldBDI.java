@@ -27,30 +27,26 @@ public class HelloWorldBDI
 	protected BDIAgent agent;
 	
 	@Belief
-	protected String text;
+	private String sayhello;
 	
-	@Belief
-	private boolean sayhello;
-	
-//	public HelloWorldBDI()
-//	{
-//		System.out.println("created: "+getClass().getName());
-//	}
+	/**
+	 *  Get the agent.
+	 */
+	public BDIAgent getAgent()
+	{
+		return agent;
+	}
 	
 	@AgentBody
 	public void body()
 	{
-		sayhello = true;
-		System.out.println("body end");
-		
-//		HelloGoal g = new HelloGoal(text);
-//		System.out.println("Body: "+agent.getComponentIdentifier());
+		sayhello = "Hello BDI agent V3.";
+//		System.out.println("body end");
 	}
 	
 	@Plan(trigger=@Trigger(goals=HelloGoal.class))
-	protected void printHello()
+	protected void printHello(HelloGoal goal)
 	{
-//		System.out.println(((HelloGoal)getReason()).text);
-		System.out.println(text);
+		System.out.println(goal.getText());
 	}
 }

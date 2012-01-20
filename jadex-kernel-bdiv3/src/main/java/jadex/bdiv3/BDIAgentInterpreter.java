@@ -23,6 +23,9 @@ import java.util.Set;
  */
 public class BDIAgentInterpreter extends MicroAgentInterpreter
 {
+	/** The bdi model. */
+	protected BDIModel bdimodel;
+	
 	/** The rule system. */
 	protected RuleSystem rulesystem;
 	
@@ -36,21 +39,22 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 *  Create a new agent.
 	 */
 	public BDIAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
-		final BDIModel model, Class microclass, final Map args, final String config, 
+		final BDIModel model, Class agentclass, final Map args, final String config, 
 		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, 
 		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited)
 	{
-		super(desc, factory, model, microclass, args, config, parent, bindings, copy, listener, inited);
+		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, listener, inited);
+		this.bdimodel = model;
 	}
 	
 	/**
-	 * 
+	 *  Create the agent.
 	 */
-	protected MicroAgent createAgent(Class microclass, MicroModel model) throws Exception
+	protected MicroAgent createAgent(Class agentclass, MicroModel model) throws Exception
 	{
 		MicroAgent ret = null;
 		
-		final Object agent = microclass.newInstance();
+		final Object agent = agentclass.newInstance();
 		if(agent instanceof MicroAgent)
 		{
 			ret = (MicroAgent)agent;
@@ -95,14 +99,14 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 			}
 		}
 
+		// Init rule system
 		this.rulesystem = new RuleSystem(agent);
-		
 		List<Class> goals = ((BDIModel)model).getGoals();
 		for(int i=0; i<goals.size(); i++)
 		{
 			rulesystem.observeObject(goals.get(i));
 		}
-
+		
 		return ret;
 	}
 	
@@ -126,7 +130,7 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 		
 		return super.executeStep();
 	}
-
+	
 	/**
 	 *  Get the rulesystem.
 	 *  @return The rulesystem.
@@ -134,5 +138,14 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	public RuleSystem getRuleSystem()
 	{
 		return rulesystem;
+	}
+	
+	/**
+	 *  Get the bdimodel.
+	 *  @return the bdimodel.
+	 */
+	public BDIModel getBDIModel()
+	{
+		return bdimodel;
 	}
 }
