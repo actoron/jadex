@@ -87,10 +87,21 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 					public void run() {
 						IFuture<IExternalAccess> future = Starter
 								.createPlatform(new String[] {
-										"-conf",
-										"jadex/android/application/demo/Platform.component.xml",
-										"-configname", "android_fixed",
 										"-logging_level", "java.util.logging.Level.INFO",
+//										"-platformname", "and_" + createRandomPlattformID(),
+										"-extensions", "null",
+										"-wspublish", "false",
+										"-kernels", "\"component, micro\"",
+//										"-tcptransport", "false",
+//										"-niotcptransport", "false",
+//										"-relaytransport", "true",
+//										"-relayaddress", "\"http://134.100.11.200:8080/jadex-platform-relay-web/\"",					
+//										"-saveonexit", "false", "-gui", "false",
+										"-autoshutdown", "false",
+//										"-conf",
+//										"jadex/android/application/demo/Platform.component.xml",
+//										"-configname", "android_fixed",
+//										"-logging_level", "java.util.logging.Level.INFO",
 										"-platformname", "and-" + createRandomPlattformID(),
 										"-saveonexit", "false", "-gui", "false" });
 						future.addResultListener(platformResultListener);
