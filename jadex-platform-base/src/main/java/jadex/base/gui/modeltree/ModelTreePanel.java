@@ -21,6 +21,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.IRemoteFilter;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -269,30 +270,39 @@ public class ModelTreePanel extends FileTreePanel
 			final String filepath = ((IFileNode)node).getFilePath();
 			final String filename = filepath.startsWith("file:") || filepath.startsWith("jar:file:")
 				? filepath : "file:"+filepath;
-			final URL	url	= SUtil.toURL(filepath);
-			exta.scheduleStep(new IComponentStep<IResourceIdentifier>()
+//			final URL	url	= SUtil.toURL(filepath);
+//			System.out.println("adding file: "+url);
+//			System.out.println("adding url: "+url);
+			exta.scheduleStep(new IComponentStep<Tuple2<URL, IResourceIdentifier>>()
 			{
 				@XMLClassname("addurl")
-				public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
+				public IFuture<Tuple2<URL, IResourceIdentifier>> execute(IInternalAccess ia)
 				{
-					final Future<IResourceIdentifier>	ret	= new Future<IResourceIdentifier>();
+					final URL	url	= SUtil.toURL(filename);
+					final Future<Tuple2<URL, IResourceIdentifier>>	ret	= new Future<Tuple2<URL, IResourceIdentifier>>();
 					IFuture<ILibraryService>	libfut	= SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-					libfut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
+					libfut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Tuple2<URL, IResourceIdentifier>>(ret)
 					{
 						public void customResultAvailable(final ILibraryService ls)
 						{
-							ls.addURL(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+							ls.addURL(url).addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Tuple2<URL, IResourceIdentifier>>(ret)
+							{
+								public void customResultAvailable(IResourceIdentifier rid)
+								{
+									ret.setResult(new Tuple2<URL, IResourceIdentifier>(url, rid));
+								}
+							});
 						}
 					});
 					
 					return ret;
 				}
-			}).addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
+			}).addResultListener(new SwingDefaultResultListener<Tuple2<URL, IResourceIdentifier>>()
 			{
-				public void customResultAvailable(IResourceIdentifier rid) 
+				public void customResultAvailable(Tuple2<URL, IResourceIdentifier> tup) 
 				{
 					// Todo: remove entries on remove.
-					rootentries.put(url, rid);
+					rootentries.put(tup.getFirstEntity(), tup.getSecondEntity());
 					
 					ModelTreePanel.super.addNode(node);
 				}
