@@ -22,6 +22,7 @@ import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -365,14 +366,39 @@ public class StarterPluginPanel extends JPanel
 //			}
 //		});
 		
-		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
+		System.out.println("rid a:"+filename);
+		System.out.println("platform access: "+jcc.getPlatformAccess().getComponentIdentifier().getName());
+		System.out.println("local access: "+jcc.getJCCAccess().getComponentIdentifier().getName());
+		
+		jcc.getPlatformAccess().scheduleStep(new IComponentStep<IResourceIdentifier>()
 		{
-			public void customResultAvailable(ILibraryService ls)
+			@XMLClassname("createRid")
+			public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
 			{
-				// Must be done on remote site as SUtil.toURL() uses new File()
-				final URL url = SUtil.toURL(filename);
-				ls.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+				final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
+				
+				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
+				{
+					public void customResultAvailable(ILibraryService ls)
+					{
+						// Must be done on remote site as SUtil.toURL() uses new File()
+						final URL url = SUtil.toURL(filename);
+						System.out.println("url: "+filename);
+						ls.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+					}
+				}));
+				
+				return ret;
+			}
+		}).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+		
+		
+		ret.addResultListener(new DefaultResultListener<IResourceIdentifier>()
+		{
+			public void resultAvailable(IResourceIdentifier result)
+			{
+				System.out.println("rid b:"+result);
 			}
 		});
 		
