@@ -75,6 +75,8 @@ public class ModelTreePanel extends FileTreePanel
 	
 	/** The root entries. */
 	protected Map<URL, IResourceIdentifier>	rootentries;
+	// todo: remove 
+	protected Map<String, IResourceIdentifier>	rootpathentries; 
 	
 //	/** The jcc. */
 //	protected IControlCenter jcc;
@@ -97,8 +99,9 @@ public class ModelTreePanel extends FileTreePanel
 	{
 		super(exta, remote, false);
 		this.localexta = localexta;
-		actions = new HashMap();
+		actions = new HashMap<URL, IResourceIdentifier>();
 		this.rootentries	= new LinkedHashMap<URL, IResourceIdentifier>();
+		this.rootpathentries	= new LinkedHashMap<String, IResourceIdentifier>();
 		
 		final ModelFileFilterMenuItemConstructor mic = new ModelFileFilterMenuItemConstructor(getModel(), exta);
 		setNodeFactory(new DefaultNodeFactory()
@@ -124,8 +127,9 @@ public class ModelTreePanel extends FileTreePanel
 				Icon	overlay	= null;
 				if(getModel().getRoot().equals(node.getParent()) && node instanceof IFileNode)
 				{
-					URL	url	= SUtil.toURL(((IFileNode)node).getFilePath());
-					IResourceIdentifier	rid	= rootentries.get(url);
+//					URL	url	= SUtil.toURL(((IFileNode)node).getFilePath());
+//					IResourceIdentifier	rid	= rootentries.get(url);
+					IResourceIdentifier rid = getRootEntry(((IFileNode)node).getFilePath());
 					if(rid!=null && rid.getGlobalIdentifier()!=null)
 					{
 						overlay	= ModelTreePanel.this.icons.getIcon("gid");
@@ -144,8 +148,9 @@ public class ModelTreePanel extends FileTreePanel
 				String	ret	= null;
 				if(getModel().getRoot().equals(node.getParent()) && node instanceof IFileNode)
 				{
-					URL	url	= SUtil.toURL(((IFileNode)node).getFilePath());
-					IResourceIdentifier	rid	= rootentries.get(url);
+//					URL	url	= SUtil.toURL(((IFileNode)node).getFilePath());
+//					IResourceIdentifier	rid	= rootentries.get(url);
+					IResourceIdentifier rid = getRootEntry(((IFileNode)node).getFilePath());
 					ret	= rid!=null && rid.getGlobalIdentifier()!=null
 						? rid.getGlobalIdentifier().toString() : null;
 					if(ret!=null && ret.indexOf(':')!=-1)
@@ -304,6 +309,7 @@ public class ModelTreePanel extends FileTreePanel
 					// Todo: remove entries on remove.
 //					System.out.println("adding root: "+tup.getFirstEntity()+" "+tup.getSecondEntity());
 					rootentries.put(tup.getFirstEntity(), tup.getSecondEntity());
+					rootpathentries.put(filepath, tup.getSecondEntity());
 					
 					ModelTreePanel.super.addNode(node);
 				}
@@ -382,5 +388,30 @@ public class ModelTreePanel extends FileTreePanel
 	public Map<URL, IResourceIdentifier>	getRootEntries()
 	{
 		return rootentries;
+	}
+	
+	/**
+	 * 
+	 */
+	public void addRootEntry(URL url, String path, IResourceIdentifier rid)
+	{
+		rootentries.put(url, rid);
+		rootpathentries.put(path, rid);
+	}
+	
+	/**
+	 * 
+	 */
+	public IResourceIdentifier getRootEntry(URL url)
+	{
+		return rootentries.get(url);
+	}
+	
+	/**
+	 * 
+	 */
+	public IResourceIdentifier getRootEntry(String path)
+	{
+		return rootpathentries.get(path);
 	}
 }
