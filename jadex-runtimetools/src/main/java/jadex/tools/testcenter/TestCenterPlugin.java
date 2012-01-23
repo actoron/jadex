@@ -695,19 +695,21 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 			root = root.getParent();
 		final String filepath = ((IFileNode)root).getFilePath();
 		
-		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
-		{
-			public void customResultAvailable(ILibraryService ls)
-			{
-				// Must be done on remote site as SUtil.toURL() uses new File()
-				final URL url = SUtil.toURL(filepath);
-
-				ls.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
-			}
-		});
+		return ModelTreePanel.createResourceIdentifier(jcc.getPlatformAccess(), filepath);
 		
-		return ret;
+//		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
+//		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
+//		{
+//			public void customResultAvailable(ILibraryService ls)
+//			{
+//				// Must be done on remote site as SUtil.toURL() uses new File()
+//				final URL url = SUtil.toURL(filepath);
+//
+//				ls.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+//			}
+//		});
+//		
+//		return ret;
 	}
 }

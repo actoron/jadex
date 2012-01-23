@@ -414,4 +414,62 @@ public class ModelTreePanel extends FileTreePanel
 	{
 		return rootpathentries.get(path);
 	}
+	
+	/**
+	 *  Create a resource identifier.
+	 */
+	public static IFuture<IResourceIdentifier> createResourceIdentifier(IExternalAccess exta, final String filename)
+	{
+		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
+		
+//		ret.addResultListener(new IResultListener<IResourceIdentifier>()
+//		{
+//			public void resultAvailable(IResourceIdentifier result)
+//			{
+//				System.out.println("try loading with:"+result);
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//			}
+//		});
+		
+//		System.out.println("rid a:"+filename);
+//		System.out.println("platform access: "+jcc.getPlatformAccess().getComponentIdentifier().getName());
+//		System.out.println("local access: "+jcc.getJCCAccess().getComponentIdentifier().getName());
+		
+		exta.scheduleStep(new IComponentStep<IResourceIdentifier>()
+		{
+			@XMLClassname("createRid")
+			public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
+			{
+				final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
+				
+				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
+				{
+					public void customResultAvailable(ILibraryService ls)
+					{
+						// Must be done on remote site as SUtil.toURL() uses new File()
+						final URL url = SUtil.toURL(filename);
+//						System.out.println("url: "+filename);
+						ls.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+					}
+				}));
+				
+				return ret;
+			}
+		}).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+		
+//		
+//		ret.addResultListener(new DefaultResultListener<IResourceIdentifier>()
+//		{
+//			public void resultAvailable(IResourceIdentifier result)
+//			{
+//				System.out.println("rid b:"+result);
+//			}
+//		});
+		
+		return ret;
+	}
 }

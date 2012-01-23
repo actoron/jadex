@@ -122,7 +122,7 @@ public class ModelIconCache implements IIconCache
 					public void customResultAvailable(IResourceIdentifier rid)
 					{
 						SComponentFactory.getFileType(exta, file, rid)
-						.addResultListener(new SwingDefaultResultListener(tree)
+							.addResultListener(new SwingDefaultResultListener(tree)
 						{
 							public void customResultAvailable(Object result)
 							{
@@ -208,27 +208,29 @@ public class ModelIconCache implements IIconCache
 		while(root.getParent()!=null && root.getParent().getParent()!=null)
 			root = root.getParent();
 		
-//		Tuple2<IComponentIdentifier, URL> lid = null;
-//		if(root instanceof IFileNode)
+		return ModelTreePanel.createResourceIdentifier(exta, ((IFileNode)root).getFilePath());
+		
+////		Tuple2<IComponentIdentifier, URL> lid = null;
+////		if(root instanceof IFileNode)
+////		{
+//		final URL url = SUtil.toURL(((IFileNode)root).getFilePath());
+////			IComponentIdentifier plat = exta.getComponentIdentifier().getRoot();
+////			lid = new Tuple2<IComponentIdentifier, URL>(plat, url);
+////		}
+//		
+//		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
+//		SServiceProvider.getService(exta.getServiceProvider(), IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
 //		{
-		final URL url = SUtil.toURL(((IFileNode)root).getFilePath());
-//			IComponentIdentifier plat = exta.getComponentIdentifier().getRoot();
-//			lid = new Tuple2<IComponentIdentifier, URL>(plat, url);
-//		}
-		
-		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-		SServiceProvider.getService(exta.getServiceProvider(), IDependencyService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IDependencyService, IResourceIdentifier>(ret)
-		{
-			public void customResultAvailable(IDependencyService deps)
-			{
-				deps.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
-			}
-		});
-		
-		return ret;
-//		// todo: construct global identifier
-//		ResourceIdentifier rid = new ResourceIdentifier(lid, null);
-//		return rid;
+//			public void customResultAvailable(IDependencyService deps)
+//			{
+//				deps.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
+//			}
+//		});
+//		
+//		return ret;
+////		// todo: construct global identifier
+////		ResourceIdentifier rid = new ResourceIdentifier(lid, null);
+////		return rid;
 	}
 }

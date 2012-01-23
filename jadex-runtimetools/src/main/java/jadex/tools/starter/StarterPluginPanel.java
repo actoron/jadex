@@ -13,6 +13,7 @@ import jadex.base.gui.plugin.AbstractJCCPlugin.ShowRemoteControlCenterHandler;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.service.library.LibraryService;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -352,58 +353,9 @@ public class StarterPluginPanel extends JPanel
 		
 		final String filename = ((IFileNode)root).getFilePath();
 		
-		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-		
-//		ret.addResultListener(new IResultListener<IResourceIdentifier>()
-//		{
-//			public void resultAvailable(IResourceIdentifier result)
-//			{
-//				System.out.println("try loading with:"+result);
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-//			}
-//		});
-		
-		System.out.println("rid a:"+filename);
-		System.out.println("platform access: "+jcc.getPlatformAccess().getComponentIdentifier().getName());
-		System.out.println("local access: "+jcc.getJCCAccess().getComponentIdentifier().getName());
-		
-		jcc.getPlatformAccess().scheduleStep(new IComponentStep<IResourceIdentifier>()
-		{
-			@XMLClassname("createRid")
-			public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
-			{
-				final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-				
-				SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<ILibraryService, IResourceIdentifier>(ret)
-				{
-					public void customResultAvailable(ILibraryService ls)
-					{
-						// Must be done on remote site as SUtil.toURL() uses new File()
-						final URL url = SUtil.toURL(filename);
-						System.out.println("url: "+filename);
-						ls.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
-					}
-				}));
-				
-				return ret;
-			}
-		}).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
-		
-		
-		ret.addResultListener(new DefaultResultListener<IResourceIdentifier>()
-		{
-			public void resultAvailable(IResourceIdentifier result)
-			{
-				System.out.println("rid b:"+result);
-			}
-		});
-		
-		return ret;
+		return ModelTreePanel.createResourceIdentifier(jcc.getPlatformAccess(), filename);
 	}
+
 	
 //	/**
 //	 *  Dynamically create a new menu item structure for starting components.
