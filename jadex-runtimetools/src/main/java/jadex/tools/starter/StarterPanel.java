@@ -323,7 +323,7 @@ public class StarterPanel extends JLayeredPane
 						@XMLClassname("start")
 						public IFuture<Map> execute(IInternalAccess ia)
 						{
-							System.out.println("b: "+ia.getComponentIdentifier().getName());
+//							System.out.println("b: "+ia.getComponentIdentifier().getName());
 							final Future<Map> ret = new Future<Map>();
 							SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 								.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<ILibraryService, Map>(ret)

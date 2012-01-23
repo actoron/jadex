@@ -206,7 +206,7 @@ public class StarterPluginPanel extends JPanel
 							//  +-classes2
 							//  |  +- MyComponent.component.xml
 
-							System.out.println("loading: "+ffilename+" "+rid);
+//							System.out.println("loading: "+ffilename+" "+rid);
 							
 							SComponentFactory.isLoadable(jcc.getPlatformAccess(), ffilename, rid).addResultListener(new SwingDefaultResultListener(spanel)
 							{
