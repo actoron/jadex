@@ -12,6 +12,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  *  Handler for a send request.
@@ -22,6 +23,12 @@ public class SendRequest	implements IHttpRequest
 
 	/** The data to be sent. */
 	protected List<ByteBuffer>	buffers;
+	
+	/** The logger. */
+	protected Logger	logger;
+	
+	/** The current buffer. */
+	protected int	bufnum;
 	
 	/** The future to be informed, when sending is finished. */
 	protected Future<Void>	fut;
@@ -34,8 +41,9 @@ public class SendRequest	implements IHttpRequest
 	/**
 	 *  Create a send request.
 	 */
-	public SendRequest(ManagerSendTask task, Future<Void> fut, String host, int port, String path)
+	public SendRequest(ManagerSendTask task, Future<Void> fut, String host, int port, String path, Logger logger)
 	{
+		this.logger	= logger;
 		this.buffers	= new LinkedList<ByteBuffer>();
 		this.fut	= fut;
 		
@@ -66,18 +74,22 @@ public class SendRequest	implements IHttpRequest
 	 *  Write the HTTP request to the NIO connection.
 	 *  May be called multiple times, if not all data can be send at once.
 	 *  Has to change the interest to OP_READ, once all data is sent.
+	 *  
+	 *  @return	In case of errors may request to be rescheduled on a new connection:
+	 *    -1 no reschedule, 0 immediate reschedule, >0 reschedule after delay (millis.)
 	 */
-	public void handleWrite(SelectionKey key)
+	public int handleWrite(SelectionKey key)
 	{
+		int reschedule	= -1;
 		SocketChannel	sc	= (SocketChannel)key.channel();
-//		System.out.println("Sending on "+sc);
+//		System.out.println("Sending "+this+" on: "+sc);
 
 		try
 		{
 			boolean	more	= true;
 			while(more)
 			{
-				ByteBuffer	buf	= buffers.get(0);
+				ByteBuffer	buf	= buffers.get(bufnum);
 				sc.write(buf);
 
 				// Output buffer is full: stop sending for now, but keep interest.
@@ -88,9 +100,9 @@ public class SendRequest	implements IHttpRequest
 				}
 				
 				// One buffer written: continue with next.
-				else if(buffers.size()>1)
+				else if(bufnum<buffers.size()-1)
 				{
-					buffers.remove(0);
+					bufnum++;
 				}
 				
 				// All buffers written: stop sending and register interest in answer.
@@ -98,29 +110,36 @@ public class SendRequest	implements IHttpRequest
 				{
 //					System.out.println("Message sent");
 					more	= false;
-					buffers.remove(0);
 					key.interestOps(SelectionKey.OP_READ);
 				}
 			}
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
-			fut.setException(e);
+			// Request problem (e.g. reused connection already closed): try again.
+			reschedule	= 0;
 			key.cancel();
+			logger.info("rescheduling message due to failed request: "+e);
 		}
+		
+		return reschedule;
 	}
+	
 	
 	/**
 	 *  Receive the HTTP response from the NIO connection.
 	 *  May be called multiple times, if not all data can be send at once.
 	 *  Has to deregister interest in the connection, once required data is received.
-	 *  May close the connection or leave it open for reuse if the server supports keepalive.
+	 *  May close the connection or leave it open for reuse if the server supports keep-alive.
+	 *  
+	 *  @return	In case of errors may request to be rescheduled on a new connection:
+	 *    -1 no reschedule, 0 immediate reschedule, >0 reschedule after delay (millis.)
 	 */
-	public void	handleRead(SelectionKey key)
+	public int	handleRead(SelectionKey key)
 	{
+		int reschedule	= -1;
 		SocketChannel	sc	= (SocketChannel)key.channel();
-//		System.out.println("Reading from "+sc);
+//		System.out.println("Receiving "+this+" on: "+sc);
 		
 		try
 		{
@@ -130,11 +149,15 @@ public class SendRequest	implements IHttpRequest
 			// Can read all data available as there can be only one response.
 			ByteBuffer	inbuf = ByteBuffer.allocate(256);
 			int	read	= sc.read(inbuf);
+			if(read==-1)
+				throw new IOException("Stream closed");
 			while(read>0)
 			{
 				response.append(new String(inbuf.array(), 0, read));
 				inbuf.clear();
 				read	= sc.read(inbuf);
+				if(read==-1)
+					throw new IOException("Stream closed");
 			}
 			
 			// Complete HTTP response
@@ -162,9 +185,15 @@ public class SendRequest	implements IHttpRequest
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
-			fut.setException(e);
+			// Message send failed: retry.
+			bufnum	= 0;
+			for(int i=0; i<buffers.size(); i++)
+				buffers.get(i).rewind();
+			reschedule	= 0;
 			key.cancel();
+			logger.info("rescheduling message due to failed response: "+e);
 		}
+		
+		return reschedule;
 	}
 }

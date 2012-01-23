@@ -1,6 +1,7 @@
 package jadex.micro.benchmarks;
 
 import jadex.base.fipa.SFipa;
+import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -37,8 +38,8 @@ import java.util.Map;
 {
 	@Configuration(name="local"),
 	@Configuration(name="remote", arguments=@NameValue(name="echo",
-//		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\""+SRelay.DEFAULT_ADDRESS+"\"})"))
-		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\"http://localhost:8080/jadex-platform-relay-web/\"})"))
+		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\""+SRelay.DEFAULT_ADDRESS+"\"})"))
+//		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\"http://localhost:8080/jadex-platform-relay-web/\"})"))
 })
 public class MessagePerformanceAgent extends MicroAgent
 {

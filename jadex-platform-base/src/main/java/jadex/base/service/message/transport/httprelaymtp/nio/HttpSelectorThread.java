@@ -13,6 +13,7 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  *  The receiver connects to the relay server
@@ -51,14 +52,18 @@ public class HttpSelectorThread
 	/** Connection counter (for testing). */
 	protected int	cons;
 	
+	/** The logger. */
+	protected Logger	logger;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create and start a new receiver.
 	 * @throws IOException 
 	 */
-	public HttpSelectorThread(IComponentIdentifier root, String address, IMessageService ms) throws IOException
+	public HttpSelectorThread(IComponentIdentifier root, String address, IMessageService ms, Logger logger) throws IOException
 	{
+		this.logger	= logger;
 		if(!address.startsWith("http://"))
 			throw new IOException("Unknown URL scheme: "+address);
 		path	= "";
@@ -88,7 +93,7 @@ public class HttpSelectorThread
 		queue	= new ArrayList<IHttpRequest>();
 		idle	= new ArrayList<SocketChannel>();
 		
-		queue.add(new ReceiveRequest(root, host, port, path, ms));
+		queue.add(new ReceiveRequest(root, host, port, path, ms, logger));
 		
 		new Thread(new Runnable()
 		{
@@ -113,8 +118,8 @@ public class HttpSelectorThread
 							if(idle.isEmpty())
 							{
 								cons++;
-								System.out.println("Creating connection: "+cons);
-//								connecting	= true;
+								HttpSelectorThread.this.logger.info("nio-relay creating connection: "+cons);
+								connecting	= true;
 								SocketChannel	sc	= SocketChannel.open();
 								sc.configureBlocking(false);
 								sc.connect(new InetSocketAddress(host, port));
@@ -131,7 +136,7 @@ public class HttpSelectorThread
 						}
 						
 						// Wait for an event one of the registered channels
-						System.out.println("selector idle");
+//						System.out.println("selector idle");
 						selector.select();
 
 						// Iterate over the set of keys for which events are available
@@ -154,12 +159,30 @@ public class HttpSelectorThread
 								else if(key.isWritable())
 								{
 									req	= (IHttpRequest)key.attachment();
-									req.handleWrite(key);
+									int	reschedule	= req.handleWrite(key);
+									if(reschedule==0)
+									{
+										synchronized(queue)
+										{
+											queue.add(0, req);
+										}
+										// Assume connection is closed.
+										cons--;
+									}
 								}
 								else if(key.isReadable())
 								{
 									req	= (IHttpRequest)key.attachment();
-									req.handleRead(key);
+									int	reschedule	= req.handleRead(key);
+									if(reschedule==0)
+									{
+										synchronized(queue)
+										{
+											queue.add(0, req);
+										}
+										// Assume connection is closed.
+										cons--;
+									}
 								}
 								
 								// If connection is open but no longer needed, add to idle list.
@@ -214,7 +237,7 @@ public class HttpSelectorThread
 	 */
 	public void addSendTask(ManagerSendTask task, Future<Void> fut)
 	{
-		SendRequest	req	= new SendRequest(task, fut, host, port, path);
+		SendRequest	req	= new SendRequest(task, fut, host, port, path, logger);
 		synchronized(queue)
 		{
 			queue.add(req);

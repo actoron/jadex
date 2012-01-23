@@ -13,6 +13,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 /**
  *  Handler for a send request.
@@ -62,6 +63,9 @@ public class ReceiveRequest	implements IHttpRequest
 	/** The message service for delivering received messages. */
 	protected IMessageService	ms;
 	
+	/** The logger. */
+	protected Logger	logger;
+	
 	/** The data to be sent or being received. */
 	protected ByteBuffer	buf;
 	
@@ -97,9 +101,10 @@ public class ReceiveRequest	implements IHttpRequest
 	/**
 	 *  Create a send request.
 	 */
-	public ReceiveRequest(IComponentIdentifier cid, String host, int port, String path, IMessageService ms)	throws IOException
+	public ReceiveRequest(IComponentIdentifier cid, String host, int port, String path, IMessageService ms, Logger logger)	throws IOException
 	{
 		this.ms	= ms;
+		this.logger	= logger;
 		String	xmlid	= JavaWriter.objectToXML(cid, getClass().getClassLoader());
 		byte[]	header	= 
 			( "GET "+path+"?id="+URLEncoder.encode(xmlid, "UTF-8")+" HTTP/1.1\r\n"
@@ -116,11 +121,16 @@ public class ReceiveRequest	implements IHttpRequest
 	 *  Write the HTTP request to the NIO connection.
 	 *  May be called multiple times, if not all data can be send at once.
 	 *  Has to change the interest to OP_READ, once all data is sent.
+	 *  
+	 *  @return	In case of errors may request to be rescheduled on a new connection:
+	 *    -1 no reschedule, 0 immediate reschedule, >0 reschedule after delay (millis.)
 	 */
-	public void handleWrite(SelectionKey key)
+	public int handleWrite(SelectionKey key)
 	{
+		int	reschedule	= -1;
+		
 		SocketChannel	sc	= (SocketChannel)key.channel();
-//		System.out.println("Sending on "+sc);
+//		System.out.println("Sending "+this+" on: "+sc);
 
 		try
 		{
@@ -135,22 +145,30 @@ public class ReceiveRequest	implements IHttpRequest
 		}
 		catch(Exception e)
 		{
-			// Todo: reconnect
-			e.printStackTrace();
+			reschedule	= 30000;
+			logger.info("Request error (reconnecting in 30 seconds): "+e);
+//			e.printStackTrace();
 			key.cancel();
 		}
+		
+		return reschedule;
 	}
+	
 	
 	/**
 	 *  Receive the HTTP response from the NIO connection.
 	 *  May be called multiple times, if not all data can be send at once.
 	 *  Has to deregister interest in the connection, once required data is received.
-	 *  May close the connection or leave it open for reuse if the server supports keepalive.
+	 *  May close the connection or leave it open for reuse if the server supports keep-alive.
+	 *  
+	 *  @return	In case of errors may request to be rescheduled on a new connection:
+	 *    -1 no reschedule, 0 immediate reschedule, >0 reschedule after delay (millis.)
 	 */
-	public void	handleRead(SelectionKey key)
+	public int	handleRead(SelectionKey key)
 	{
+		int reschedule	= -1;
 		SocketChannel	sc	= (SocketChannel)key.channel();
-//		System.out.println("Reading from "+sc);
+//		System.out.println("Receiving "+this+" on: "+sc);
 		
 		try
 		{
@@ -166,8 +184,10 @@ public class ReceiveRequest	implements IHttpRequest
 				
 				if(state==STATE_READING_OK_HEADER)
 				{
-					System.out.println("reading ok header");
-					sc.read(buf);
+//					System.out.println("reading ok header");
+					int	r	= sc.read(buf);
+					if(r==-1)
+						throw new IOException("Stream closed");
 					if(buf.remaining()==0)
 					{
 						if(!Arrays.equals(HTTP_OK, buf.array()))
@@ -175,7 +195,7 @@ public class ReceiveRequest	implements IHttpRequest
 						state	= STATE_READING_HEADER_REST;
 						buf	= ByteBuffer.allocate(BUFFER_SIZE);
 						matchpos	= 2; // Matched already two characters from potential header end.
-						System.out.println("found ok header");
+//						System.out.println("found ok header");
 					}
 					else
 					{
@@ -186,8 +206,10 @@ public class ReceiveRequest	implements IHttpRequest
 				
 				if(state==STATE_READING_HEADER_REST)
 				{
-					System.out.println("reading header rest");
-					sc.read(buf);
+//					System.out.println("reading header rest");
+					int	r	= sc.read(buf);
+					if(r==-1)
+						throw new IOException("Stream closed");
 					byte[]	bufa	= buf.array();
 					bufpos	= 0;
 					for(; matchpos!=4 && bufpos<buf.position(); bufpos++)
@@ -213,7 +235,7 @@ public class ReceiveRequest	implements IHttpRequest
 							buf.clear();
 							bufpos	= 0;
 						}
-						System.out.println("read header rest");
+//						System.out.println("read header rest");
 					}
 					else if(buf.remaining()==0)
 					{
@@ -230,9 +252,13 @@ public class ReceiveRequest	implements IHttpRequest
 				
 				if(state==STATE_READING_CHUNK_HEADER)
 				{
-					System.out.println("reading chunk header");
+//					System.out.println("reading chunk header");
 					if(bufpos==0)
-						sc.read(buf);
+					{
+						int	r	= sc.read(buf);
+						if(r==-1)
+							throw new IOException("Stream closed");
+					}
 					byte[]	bufa	= buf.array();
 					for(; matchpos!=2 && bufpos<buf.position(); bufpos++)
 					{
@@ -265,7 +291,7 @@ public class ReceiveRequest	implements IHttpRequest
 							buf.clear();
 							bufpos	= 0;
 						}
-						System.out.println("read chunk header");
+//						System.out.println("read chunk header");
 					}
 					else if(buf.remaining()==0)
 					{
@@ -282,9 +308,13 @@ public class ReceiveRequest	implements IHttpRequest
 				
 				if(state==STATE_READING_MSG_HEADER)
 				{
-					System.out.println("reading msg header");
+//					System.out.println("reading msg header");
 					if(bufpos==0)
-						sc.read(buf);
+					{
+						int	r	= sc.read(buf);
+						if(r==-1)
+							throw new IOException("Stream closed");
+					}
 					
 					if(buf.position()>bufpos)
 					{
@@ -293,12 +323,12 @@ public class ReceiveRequest	implements IHttpRequest
 						chunksize--;
 						if(msghead==SRelay.MSGTYPE_PING)
 						{
-							System.out.println("read ping msg header");
+//							System.out.println("read ping msg header");
 							state	= STATE_READING_MSG_HEADER;
 						}
 						else if(msghead==SRelay.MSGTYPE_DEFAULT)
 						{
-							System.out.println("read default msg header");
+//							System.out.println("read default msg header");
 							state	= STATE_READING_MSG_LENGTH;
 							msg	= new byte[4];
 							msgpos	= 0;
@@ -326,9 +356,13 @@ public class ReceiveRequest	implements IHttpRequest
 
 				if(state==STATE_READING_MSG_LENGTH)
 				{
-					System.out.println("reading msg length");
+//					System.out.println("reading msg length");
 					if(bufpos==0)
-						sc.read(buf);
+					{
+						int	r	= sc.read(buf);
+						if(r==-1)
+							throw new IOException("Stream closed");
+					}
 					
 					byte[]	bufa	= buf.array();
 					for(; chunksize>0 && msgpos<4 && bufpos<buf.position(); bufpos++)
@@ -339,7 +373,7 @@ public class ReceiveRequest	implements IHttpRequest
 					
 					if(msgpos==4)
 					{
-						System.out.println("read msg length");
+//						System.out.println("read msg length");
 						state	= STATE_READING_MSG_BODY;
 						msg	= new byte[SUtil.bytesToInt(msg)];
 						msgpos	= 0;
@@ -364,9 +398,13 @@ public class ReceiveRequest	implements IHttpRequest
 				
 				if(state==STATE_READING_MSG_BODY)
 				{
-					System.out.println("reading msg body");
+//					System.out.println("reading msg body");
 					if(bufpos==0)
-						sc.read(buf);
+					{
+						int	r	= sc.read(buf);
+						if(r==-1)
+							throw new IOException("Stream closed");
+					}
 					
 					int	length	= Math.min(chunksize, Math.min(msg.length-msgpos, buf.position()-bufpos));
 					System.arraycopy(buf.array(), bufpos, msg, msgpos, length);
@@ -377,7 +415,7 @@ public class ReceiveRequest	implements IHttpRequest
 					if(msgpos==msg.length)
 					{
 						received++;
-						System.out.println("read msg body: "+received);
+//						System.out.println("read msg body: "+received);
 						// Message read.
 						ms.deliverMessage(msg);
 						msg	= null;
@@ -404,9 +442,13 @@ public class ReceiveRequest	implements IHttpRequest
 				
 				if(state==STATE_READING_CHUNK_END)
 				{
-					System.out.println("reading chunk end");
+//					System.out.println("reading chunk end");
 					if(bufpos==0)
-						sc.read(buf);
+					{
+						int	r	= sc.read(buf);
+						if(r==-1)
+							throw new IOException("Stream closed");
+					}
 					
 					while(bufpos<buf.position() && matchpos<2)
 					{
@@ -418,7 +460,7 @@ public class ReceiveRequest	implements IHttpRequest
 					
 					if(matchpos==2)
 					{
-						System.out.println("read chunk end");
+//						System.out.println("read chunk end");
 						state	= STATE_READING_CHUNK_HEADER;
 						matchpos	= 0;
 					}
@@ -438,9 +480,11 @@ public class ReceiveRequest	implements IHttpRequest
 		}
 		catch(Exception e)
 		{
-			// Todo: reconnect
-			e.printStackTrace();
+			reschedule	= 0;
+			logger.info("Response error (reconnecting immediately): "+e);
 			key.cancel();
 		}
+		
+		return reschedule;
 	}
 }

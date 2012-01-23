@@ -52,7 +52,7 @@ public class HttpRelayTransport implements ITransport
 				try
 				{
 					// Create the selector thread (starts automatically).
-					selectorthread	= new HttpSelectorThread(component.getComponentIdentifier().getRoot(), address, ms);
+					selectorthread	= new HttpSelectorThread(component.getComponentIdentifier().getRoot(), address, ms, component.getLogger());
 					ret.setResult(null);
 				}
 				catch(Exception e)
@@ -87,7 +87,7 @@ public class HttpRelayTransport implements ITransport
 		{
 			sent++;
 		}
-		System.out.println("queued for sending: "+sent);
+//		System.out.println("queued for sending: "+sent);
 		return ret;
 	}
 	
