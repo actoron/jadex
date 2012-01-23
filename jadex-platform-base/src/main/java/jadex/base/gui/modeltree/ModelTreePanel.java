@@ -302,6 +302,7 @@ public class ModelTreePanel extends FileTreePanel
 				public void customResultAvailable(Tuple2<URL, IResourceIdentifier> tup) 
 				{
 					// Todo: remove entries on remove.
+//					System.out.println("adding root: "+tup.getFirstEntity()+" "+tup.getSecondEntity());
 					rootentries.put(tup.getFirstEntity(), tup.getSecondEntity());
 					
 					ModelTreePanel.super.addNode(node);

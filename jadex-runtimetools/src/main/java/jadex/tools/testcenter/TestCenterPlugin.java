@@ -693,8 +693,7 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		ITreeNode root = node;
 		while(root.getParent()!=null && root.getParent().getParent()!=null)
 			root = root.getParent();
-		
-		final URL url = SUtil.toURL(((IFileNode)root).getFilePath());
+		final String filepath = ((IFileNode)root).getFilePath();
 		
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		SServiceProvider.getService(jcc.getPlatformAccess().getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -702,6 +701,9 @@ public class TestCenterPlugin extends AbstractJCCPlugin
 		{
 			public void customResultAvailable(ILibraryService ls)
 			{
+				// Must be done on remote site as SUtil.toURL() uses new File()
+				final URL url = SUtil.toURL(filepath);
+
 				ls.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
 			}
 		});

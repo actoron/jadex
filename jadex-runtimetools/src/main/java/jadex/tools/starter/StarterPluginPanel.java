@@ -204,6 +204,8 @@ public class StarterPluginPanel extends JPanel
 							//  +-classes2
 							//  |  +- MyComponent.component.xml
 
+							System.out.println("loading: "+ffilename+" "+rid);
+							
 							SComponentFactory.isLoadable(jcc.getPlatformAccess(), ffilename, rid).addResultListener(new SwingDefaultResultListener(spanel)
 							{
 								public void customResultAvailable(Object result)
@@ -347,7 +349,7 @@ public class StarterPluginPanel extends JPanel
 //		while(root.getParent()!=null && root.getParent().getParent()!=null)
 //			root = root.getParent();
 		
-		final URL url = SUtil.toURL(((IFileNode)root).getFilePath());
+		final String filename = ((IFileNode)root).getFilePath();
 		
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		
@@ -368,6 +370,8 @@ public class StarterPluginPanel extends JPanel
 		{
 			public void customResultAvailable(ILibraryService ls)
 			{
+				// Must be done on remote site as SUtil.toURL() uses new File()
+				final URL url = SUtil.toURL(filename);
 				ls.getResourceIdentifier(url).addResultListener(new DelegationResultListener<IResourceIdentifier>(ret));
 			}
 		});
