@@ -375,6 +375,8 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	public IFuture<Properties> getProperties()
 	{
+		if(!SwingUtilities.isEventDispatchThread())
+			System.out.println("dreck");
 		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 		final Future<Properties> ret	= new Future<Properties>();

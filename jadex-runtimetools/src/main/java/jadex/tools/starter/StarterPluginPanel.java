@@ -264,7 +264,7 @@ public class StarterPluginPanel extends JPanel
 											public void customResultAvailable(Object result)
 											{
 												if(((Boolean)result).booleanValue())
-													StarterPanel.createComponent(jcc.getPlatformAccess(), jcc, filename, null, null, null, false, null, null, null, null, null, StarterPluginPanel.this);
+													StarterPanel.createComponent(jcc, filename, null, null, null, false, null, null, null, null, null, StarterPluginPanel.this);
 												mpanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 											}
 										});
@@ -307,7 +307,7 @@ public class StarterPluginPanel extends JPanel
 //		SGUI.setDividerLocation(lsplit, 300);
 
 		csplit.add(lsplit);
-		spanel = new StarterPanel(jcc.getPlatformAccess(), jcc);
+		spanel = new StarterPanel(jcc);
 		csplit.add(spanel);
 //				csplit.setDividerLocation(180);
 		csplit.setResizeWeight(0.3);

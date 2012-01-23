@@ -22,6 +22,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.FixedJComboBox;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -31,6 +32,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -190,9 +192,6 @@ public class StarterPanel extends JLayeredPane
 //	/** The application specific panel. */
 //	protected JPanel apppanel;
 	
-	/** The external access. */
-	protected IExternalAccess exta;
-	
 	/** The jcc. */
 	protected IControlCenter jcc;
 
@@ -221,9 +220,8 @@ public class StarterPanel extends JLayeredPane
 	 * Open the GUI.
 	 * @param starter The starter.
 	 */
-	public StarterPanel(final IExternalAccess exta, final IControlCenter jcc)
+	public StarterPanel(final IControlCenter jcc)
 	{
-		this.exta = exta;
 		this.jcc = jcc;
 		this.resultsets = new MultiCollection();
 		
@@ -318,24 +316,24 @@ public class StarterPanel extends JLayeredPane
 						rawargs.put(argname, argval);
 					}
 					
-					exta.scheduleStep(new IComponentStep<Map>()
+					final IResourceIdentifier modelrid = model.getResourceIdentifier();
+					System.out.println("a: "+modelrid);
+					jcc.getPlatformAccess().scheduleStep(new IComponentStep<Map>()
 					{
 						@XMLClassname("start")
 						public IFuture<Map> execute(IInternalAccess ia)
 						{
-							final Future ret = new Future();
-							jcc.getClassLoader(model.getResourceIdentifier()).addResultListener(new SwingDefaultResultListener<ClassLoader>()
+							System.out.println("b: "+ia.getComponentIdentifier().getName());
+							final Future<Map> ret = new Future<Map>();
+							SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<ILibraryService, Map>(ret)
 							{
-								public void customResultAvailable(ClassLoader cl)
+								public void customResultAvailable(ILibraryService ls)
 								{
-//									SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//									ia.getRequiredService("libservice")
-//										.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
-//									{
-//										public void customResultAvailable(Object result)
+									ls.getClassLoader(modelrid).addResultListener(new SwingDefaultResultListener<ClassLoader>()
+									{
+										public void customResultAvailable(ClassLoader cl)
 										{
-//											ILibraryService ls = (ILibraryService)result;
-											
 											Map args = SCollection.createHashMap();
 											String errortext = null;
 											for(Iterator it = rawargs.keySet().iterator(); it.hasNext(); )
@@ -369,10 +367,9 @@ public class StarterPanel extends JLayeredPane
 												ret.setException(new RuntimeException(errortext));
 											}
 										}
-//									}));
+									});
 								}
-							});
-							
+							}));
 							return ret;
 						}
 					}).addResultListener(new SwingDefaultResultListener(StarterPanel.this)
@@ -397,7 +394,7 @@ public class StarterPanel extends JLayeredPane
 								{
 									Future fut = new Future();
 									IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
-									createComponent(exta, StarterPanel.this.jcc, typename, an, configname, args, 
+									createComponent(StarterPanel.this.jcc, typename, an, configname, args, 
 										suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 										daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
@@ -409,7 +406,7 @@ public class StarterPanel extends JLayeredPane
 							{
 								Future fut = new Future();
 								IResultListener killlistener = dokilllis? new KillListener(mymodel, fullname, fut, StarterPanel.this): null;
-								createComponent(exta, StarterPanel.this.jcc, typename, an, configname, args, 
+								createComponent(StarterPanel.this.jcc, typename, an, configname, args, 
 									suspend.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 									mastercb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
 									daemoncb.isSelected()? Boolean.TRUE: Boolean.FALSE, 
@@ -805,13 +802,13 @@ public class StarterPanel extends JLayeredPane
 			if(adf!=null)
 			{
 				showLoading(ret);
-				SComponentFactory.isLoadable(exta, adf, rid).addResultListener(new SwingDelegationResultListener(ret)
+				SComponentFactory.isLoadable(jcc.getPlatformAccess(), adf, rid).addResultListener(new SwingDelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)
 					{
 						if(((Boolean)result).booleanValue())
 						{
-							SComponentFactory.loadModel(exta, adf, rid).addResultListener(new SwingDelegationResultListener(ret)
+							SComponentFactory.loadModel(jcc.getPlatformAccess(), adf, rid).addResultListener(new SwingDelegationResultListener(ret)
 							{
 								public void customResultAvailable(Object result)
 								{
@@ -1031,7 +1028,7 @@ public class StarterPanel extends JLayeredPane
 		
 		final String	name	= filename.getText();
 		final IResourceIdentifier rid = lastrid;
-		exta.scheduleStep(new IComponentStep<String>()
+		jcc.getPlatformAccess().scheduleStep(new IComponentStep<String>()
 		{
 			@XMLClassname("convertPath")
 			public IFuture<String> execute(IInternalAccess ia)
@@ -1676,11 +1673,11 @@ public class StarterPanel extends JLayeredPane
 	 *  Create a new component on the platform.
 	 *  Any errors will be displayed in a dialog to the user.
 	 */
-	public static IFuture createComponent(final IExternalAccess exta, final IControlCenter jcc, final String type, final String name, final String configname, final Map arguments, final Boolean suspend, 
+	public static IFuture createComponent(final IControlCenter jcc, final String type, final String name, final String configname, final Map arguments, final Boolean suspend, 
 		final Boolean master, final Boolean daemon, final Boolean autosd, final IResultListener killlistener, final IComponentIdentifier parco, final JComponent panel)
 	{
 		final Future ret = new Future(); 
-		exta.scheduleStep(new IComponentStep<IComponentManagementService>()
+		jcc.getPlatformAccess().scheduleStep(new IComponentStep<IComponentManagementService>()
 		{
 			@XMLClassname("create-component")
 			public IFuture<IComponentManagementService> execute(IInternalAccess ia)
