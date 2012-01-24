@@ -19,6 +19,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.ThreadSuspendable;
 
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -59,6 +60,12 @@ public class JadexdocServlet extends HttpServlet
 	 */
 	public void init() throws ServletException
 	{
+		// Force AWT thread on system class loader instead of web app clas loader
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
+		Toolkit.getDefaultToolkit();
+		Thread.currentThread().setContextClassLoader(cl);
+
 		String[]	args	= new String[]
 		{
 //			"-logging_level", "java.util.logging.Level.INFO",

@@ -6,11 +6,11 @@ package jadex.bridge;
 public interface IVersionInfo
 {
 	/** The release number (e.g. 0.96). */
-	public static final String	RELEASE_NUMBER	= "2.0";
+	public static final String	RELEASE_NUMBER	= "2.1-SNAPSHOT";
 
 	/** The release date (e.g. 2007/12/31). */
-	public static final String	RELEASE_DATE	= "2011/09/30";
+	public static final String	RELEASE_DATE	= "2012/01/24";
 
 	/** The release date as text (e.g. 31. December 2007). */
-	public static final String	RELEASE_DATE_TEXT	= "30. September 2011";
+	public static final String	RELEASE_DATE_TEXT	= "24. January 2011";
 }

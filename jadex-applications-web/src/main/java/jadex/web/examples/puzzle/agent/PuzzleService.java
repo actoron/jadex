@@ -12,6 +12,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
@@ -94,7 +95,9 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
-		agent.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		// Does not work, because capability service container no longer available after component cleanup. 
+//		agent.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+		SServiceProvider.getService(exta.getServiceProvider(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<ISettingsService>()
 		{
 			public void resultAvailable(ISettingsService settings)
@@ -108,7 +111,7 @@ public class PuzzleService implements IPuzzleService, IPropertiesProvider
 				ret.setResult(null);
 			}
 		});
-		
+
 		return ret;
 	}
 	

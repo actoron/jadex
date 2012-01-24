@@ -11,6 +11,7 @@ import jadex.web.examples.puzzle.IPuzzleService;
 import jadex.web.examples.puzzle.Move;
 import jadex.web.examples.puzzle.Position;
 
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.List;
 import java.util.SortedSet;
@@ -43,6 +44,12 @@ public class PuzzleDispatcherServlet extends HttpServlet
 	 */
 	public void init() throws ServletException
 	{
+		// Force AWT thread on system class loader instead of web app clas loader
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
+		Toolkit.getDefaultToolkit();
+		Thread.currentThread().setContextClassLoader(cl);
+		
 		String[]	args	= new String[]
 		{
 //			"-logging_level", "java.util.logging.Level.INFO",

@@ -4,6 +4,7 @@ import jadex.base.Starter;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.ThreadSuspendable;
 
+import java.awt.Toolkit;
 import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
@@ -30,15 +31,32 @@ public class JadexDispatcherServlet extends HttpServlet
 	 */
 	public void init() throws ServletException
 	{
+		// Force AWT thread on system class loader instead of web app clas loader
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
+		Toolkit.getDefaultToolkit();
+		Thread.currentThread().setContextClassLoader(cl);
+		
 		String[]	args	= new String[]
 		{
 			"-awareness", "false",
 			"-gui", "false",
-			"-extensions", "null"
+			"-extensions", "null",
+			"-welcome", "false"
 		};
 		ThreadSuspendable	sus	= new ThreadSuspendable();
 		this.platform	= Starter.createPlatform(args).get(sus, 30000);
 	}
+	
+	/**
+	 *  Shut down the platform on exit.
+	 */
+	public void destroy()
+	{
+		int	timeout	= 30000;
+		ThreadSuspendable	sus	= new ThreadSuspendable();
+		platform.killComponent().get(sus, timeout);
+	}	
 	
 	//-------- methods --------
 	

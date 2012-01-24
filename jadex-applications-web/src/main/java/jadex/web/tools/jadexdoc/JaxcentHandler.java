@@ -266,6 +266,13 @@ public class JaxcentHandler extends JaxcentPage
 		}
 	}
 	
+	@Override
+	protected void onUnload()
+	{
+		// TODO Auto-generated method stub
+		super.onUnload();
+	}
+	
 	//-------- helper methods --------
 	
 	/**
