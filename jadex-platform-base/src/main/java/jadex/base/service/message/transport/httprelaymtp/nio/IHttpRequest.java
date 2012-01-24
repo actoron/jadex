@@ -1,5 +1,7 @@
 package jadex.base.service.message.transport.httprelaymtp.nio;
 
+import jadex.commons.Tuple2;
+
 import java.nio.channels.SelectionKey;
 
 /**
@@ -8,14 +10,9 @@ import java.nio.channels.SelectionKey;
 public interface IHttpRequest
 {
 	/**
-	 *  Get the host to connect to.
+	 *  Get the host/port pair to connect to.
 	 */
-	public String	getHost();
-	
-	/**
-	 *  Get the port to connect to.
-	 */
-	public int	getPort();
+	public Tuple2<String, Integer>	getAddress();
 	
 	/**
 	 *  Handle connection success or error.

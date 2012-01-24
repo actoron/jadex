@@ -3,6 +3,7 @@ package jadex.base.service.message.transport.httprelaymtp.nio;
 import jadex.base.service.message.ManagerSendTask;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.xml.bean.JavaWriter;
 
@@ -27,11 +28,8 @@ public class SendRequest	implements IHttpRequest
 	/** The logger. */
 	protected Logger	logger;
 	
-	/** The relay server host. */
-	protected String	host;
-	
-	/** The relay server port. */
-	protected int	port;
+	/** The relay server address (host/port). */
+	protected Tuple2<String, Integer>	address;
 	
 	/** The current buffer. */
 	protected int	bufnum;
@@ -52,8 +50,7 @@ public class SendRequest	implements IHttpRequest
 		this.logger	= logger;
 		this.buffers	= new LinkedList<ByteBuffer>();
 		this.fut	= fut;
-		this.host	= host;
-		this.port	= port;
+		this.address	= new Tuple2<String, Integer>(host, new Integer(port));
 		
 		// Only called with receivers on same platform, therefore safe to get root id from first receiver.
 		IComponentIdentifier	recid	= task.getReceivers()[0].getRoot();
@@ -79,19 +76,11 @@ public class SendRequest	implements IHttpRequest
 	//-------- IHttpRequest interface --------
 	
 	/**
-	 *  Get the host to connect to.
+	 *  Get the host/port pair to connect to.
 	 */
-	public String	getHost()
+	public Tuple2<String, Integer>	getAddress()
 	{
-		return host;
-	}
-	
-	/**
-	 *  Get the port to connect to.
-	 */
-	public int	getPort()
-	{
-		return port;
+		return address;
 	}
 	
 	/**

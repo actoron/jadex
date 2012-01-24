@@ -4,6 +4,7 @@ import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
@@ -69,11 +70,8 @@ public class ReceiveRequest	implements IHttpRequest
 	/** The component id. */
 	protected IComponentIdentifier	cid;
 
-	/** The relay server host. */
-	protected String	host;
-	
-	/** The relay server port. */
-	protected int	port;
+	/** The relay server address (host/port). */
+	protected Tuple2<String, Integer>	address;
 	
 	/** The relay server URL path. */
 	protected String	path;
@@ -118,27 +116,18 @@ public class ReceiveRequest	implements IHttpRequest
 		this.ms	= ms;
 		this.logger	= logger;
 		this.cid	= cid;
-		this.host	= host;
-		this.port	= port;
+		this.address	= new Tuple2<String, Integer>(host, new Integer(port));
 		this.path	= path;
 	}
 	
 	//-------- IHttpRequest interface --------
 	
 	/**
-	 *  Get the host to connect to.
+	 *  Get the host/port pair to connect to.
 	 */
-	public String	getHost()
+	public Tuple2<String, Integer>	getAddress()
 	{
-		return host;
-	}
-	
-	/**
-	 *  Get the port to connect to.
-	 */
-	public int	getPort()
-	{
-		return port;
+		return address;
 	}
 	
 	/**
@@ -160,7 +149,7 @@ public class ReceiveRequest	implements IHttpRequest
 			String	xmlid	= JavaWriter.objectToXML(cid, getClass().getClassLoader());
 			byte[]	header	= 
 				( "GET "+path+"?id="+URLEncoder.encode(xmlid, "UTF-8")+" HTTP/1.1\r\n"
-				+ "Host: "+host+":"+port+"\r\n"
+				+ "Host: "+address.getFirstEntity()+":"+address.getSecondEntity()+"\r\n"
 				+ "\r\n"
 				).getBytes(Charset.forName("UTF-8"));
 			buf	= ByteBuffer.wrap(header);

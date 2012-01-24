@@ -3,6 +3,7 @@ package jadex.base.service.message.transport.httprelaymtp.nio;
 import jadex.base.service.message.ManagerSendTask;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 
 import java.io.IOException;
@@ -11,8 +12,13 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
@@ -36,14 +42,11 @@ public class HttpSelectorThread
 	/** Request for the NIO thread. */
 	protected List<IHttpRequest>	queue;
 	
-	/** True, if there is a pending connection open request (for opening only one connection at a time). */
-	protected boolean	connecting;
+	/** Addresses for there is a pending connection open request (for opening only one connection to a specific address at a time). */
+	protected Set<Tuple2<String, Integer>>	connecting;
 	
-	/** Idle connections available for reuse. */
-	protected List<SocketChannel>	idle;
-	
-	/** Connection counter (for testing). */
-	protected int	cons;
+	/** Idle connections available for reuse (host,port -> channel). */
+	protected Map<Tuple2<String, Integer>, List<SocketChannel>>	idle;
 	
 	/** The logger. */
 	protected Logger	logger;
@@ -85,7 +88,8 @@ public class HttpSelectorThread
 		// http://www.thatsjava.com/java-core-apis/28232/
 		selector	= Selector.open();
 		queue	= new ArrayList<IHttpRequest>();
-		idle	= new ArrayList<SocketChannel>();
+		idle	= new HashMap<Tuple2<String, Integer>, List<SocketChannel>>();
+		connecting	= new HashSet<Tuple2<String, Integer>>();
 		
 		queue.add(new ReceiveRequest(root, host, port, path, ms, logger));
 		
@@ -102,30 +106,34 @@ public class HttpSelectorThread
 						IHttpRequest	req	= null;
 						synchronized(queue)
 						{
-							if(!queue.isEmpty() && (!connecting || !idle.isEmpty()))
+							// Find request ready for connecting.
+							for(int i=0; req==null && i<queue.size(); i++)
 							{
-								req	= queue.remove(0);
+								if(!connecting.contains(queue.get(i).getAddress()) ||
+									idle.containsKey(queue.get(i).getAddress()) && !idle.get(queue.get(i).getAddress()).isEmpty() )
+								{
+									req	= queue.remove(i);
+								}
 							}
 						}
 						if(req!=null)
 						{
-							if(idle.isEmpty())
-							{
-								cons++;
-								HttpSelectorThread.this.logger.info("nio-relay creating connection: "+cons);
-								connecting	= true;
-								SocketChannel	sc	= SocketChannel.open();
-								sc.configureBlocking(false);
-								sc.connect(new InetSocketAddress(req.getHost(), req.getPort()));
-								sc.register(selector, SelectionKey.OP_CONNECT, req);
-							}
-							else
+							if(idle.containsKey(req.getAddress()) && !idle.get(req.getAddress()).isEmpty() )
 							{
 //								System.out.println("Reusing connection");
-								SocketChannel	sc	= idle.remove(0);
+								SocketChannel	sc	= idle.get(req.getAddress()).remove(0);
 								SelectionKey	key	= sc.keyFor(selector);
 								key.interestOps(SelectionKey.OP_WRITE);
 								key.attach(req);
+							}
+							else
+							{
+								HttpSelectorThread.this.logger.info("nio-relay creating connection to: "+req.getAddress().getFirstEntity()+":"+req.getAddress().getSecondEntity());
+								connecting.add(req.getAddress());
+								SocketChannel	sc	= SocketChannel.open();
+								sc.configureBlocking(false);
+								sc.connect(new InetSocketAddress(req.getAddress().getFirstEntity(), req.getAddress().getSecondEntity().intValue()));
+								sc.register(selector, SelectionKey.OP_CONNECT, req);
 							}
 						}
 						
@@ -148,7 +156,7 @@ public class HttpSelectorThread
 								if(key.isConnectable())
 								{
 									reschedule	= req.handleConnect(key);
-									connecting	= false;
+									connecting.remove(req.getAddress());
 								}
 								else if(key.isWritable())
 								{
@@ -191,14 +199,19 @@ public class HttpSelectorThread
 								// If connection is open but no longer needed, add to idle list.
 								if(key.channel().isOpen() && key.interestOps()==0)
 								{
-									idle.add((SocketChannel)key.channel());
+									List<SocketChannel>	cons	= idle.get(req.getAddress());
+									if(cons==null)
+									{
+										cons	= new LinkedList<SocketChannel>();
+										idle.put(req.getAddress(), cons);
+									}
+									cons.add((SocketChannel)key.channel());
 //									System.out.println("Idle connections: "+idle.size()+" of "+cons);
 								}
-								else if(!key.channel().isOpen())
-								{
-									cons--;
+//								else if(!key.channel().isOpen())
+//								{
 //									System.out.println("Closed connection: "+cons);									
-								}
+//								}
 							}
 							else
 							{
