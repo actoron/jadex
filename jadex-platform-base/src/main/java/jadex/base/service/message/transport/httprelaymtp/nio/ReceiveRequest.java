@@ -66,6 +66,9 @@ public class ReceiveRequest	implements IHttpRequest
 	/** The logger. */
 	protected Logger	logger;
 	
+	/** The header (cached for reconnections). */
+	protected byte[]	header;
+	
 	/** The data to be sent or being received. */
 	protected ByteBuffer	buf;
 	
@@ -106,16 +109,43 @@ public class ReceiveRequest	implements IHttpRequest
 		this.ms	= ms;
 		this.logger	= logger;
 		String	xmlid	= JavaWriter.objectToXML(cid, getClass().getClassLoader());
-		byte[]	header	= 
+		header	= 
 			( "GET "+path+"?id="+URLEncoder.encode(xmlid, "UTF-8")+" HTTP/1.1\r\n"
 			+ "Host: "+host+":"+port+"\r\n"
 			+ "\r\n"
 			).getBytes(Charset.forName("UTF-8"));
-
-		buf	= ByteBuffer.wrap(header);
 	}
 	
 	//-------- IHttpRequest interface --------
+	
+	
+	/**
+	 *  Handle connection success or error.
+	 *  Has to change the interest to OP_WRITE, if connection was successful.
+	 *  
+	 *  @return	In case of errors may request to be rescheduled on a new connection:
+	 *    -1 no reschedule, 0 immediate reschedule, >0 reschedule after delay (millis.)
+	 */
+	public int handleConnect(SelectionKey key)
+	{
+		int	reschedule	= -1;
+		try
+		{
+			SocketChannel	sc	= (SocketChannel)key.channel();
+			boolean	finished	= sc.finishConnect();
+			assert finished;
+			key.interestOps(SelectionKey.OP_WRITE);
+			buf	= ByteBuffer.wrap(header);
+			state	= STATE_INITIAL;
+		}
+		catch(Exception e)
+		{
+			logger.info("Could not connect to relay server (re-attempting in 30 seconds): "+e);
+			key.cancel();
+			reschedule	= 30000;
+		}
+		return reschedule;
+	}
 	
 	/**
 	 *  Write the HTTP request to the NIO connection.
@@ -145,8 +175,8 @@ public class ReceiveRequest	implements IHttpRequest
 		}
 		catch(Exception e)
 		{
-			reschedule	= 30000;
-			logger.info("Request error (reconnecting in 30 seconds): "+e);
+			reschedule	= 0;
+			logger.info("Request error (reconnect immediately): "+e);
 //			e.printStackTrace();
 			key.cancel();
 		}
@@ -481,6 +511,7 @@ public class ReceiveRequest	implements IHttpRequest
 		catch(Exception e)
 		{
 			reschedule	= 0;
+//			e.printStackTrace();
 			logger.info("Response error (reconnecting immediately): "+e);
 			key.cancel();
 		}

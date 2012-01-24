@@ -71,6 +71,31 @@ public class SendRequest	implements IHttpRequest
 	//-------- IHttpRequest interface --------
 	
 	/**
+	 *  Handle connection success or error.
+	 *  Has to change the interest to OP_WRITE, if connection was successful.
+	 *  
+	 *  @return	In case of errors may request to be rescheduled on a new connection:
+	 *    -1 no reschedule, 0 immediate reschedule, >0 reschedule after delay (millis.)
+	 */
+	public int handleConnect(SelectionKey key)
+	{
+		try
+		{
+			SocketChannel	sc	= (SocketChannel)key.channel();
+			boolean	finished	= sc.finishConnect();
+			assert finished;
+			key.interestOps(SelectionKey.OP_WRITE);
+		}
+		catch(Exception e)
+		{
+			logger.info("Message could not be sent: "+e);
+			fut.setException(e);
+			key.cancel();
+		}
+		return -1;
+	}
+	
+	/**
 	 *  Write the HTTP request to the NIO connection.
 	 *  May be called multiple times, if not all data can be send at once.
 	 *  Has to change the interest to OP_READ, once all data is sent.
@@ -117,6 +142,9 @@ public class SendRequest	implements IHttpRequest
 		catch(Exception e)
 		{
 			// Request problem (e.g. reused connection already closed): try again.
+			bufnum	= 0;
+			for(int i=0; i<buffers.size(); i++)
+				buffers.get(i).rewind();
 			reschedule	= 0;
 			key.cancel();
 			logger.info("rescheduling message due to failed request: "+e);
@@ -176,10 +204,16 @@ public class SendRequest	implements IHttpRequest
 					key.interestOps(0);
 				}
 				
-				if(!"HTTP/1.1 200 OK".equals(response.substring(0, response.indexOf("\r\n"))))
-					throw new IOException("HTTP response: "+response);
+				if("HTTP/1.1 200 OK".equals(response.substring(0, response.indexOf("\r\n"))))
+				{
+					fut.setResult(null);
 					
-				fut.setResult(null);
+				}
+				else
+				{
+					fut.setException(new IOException("HTTP response: "+response));
+				}
+					
 //				System.out.println("Received response: "+received);
 			}
 		}

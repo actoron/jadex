@@ -8,6 +8,15 @@ import java.nio.channels.SelectionKey;
 public interface IHttpRequest
 {
 	/**
+	 *  Handle connection success or error.
+	 *  Has to change the interest to OP_WRITE, if connection was successful.
+	 *  
+	 *  @return	In case of errors may request to be rescheduled on a new connection:
+	 *    -1 no reschedule, 0 immediate reschedule, >0 reschedule after delay (millis.)
+	 */
+	public int handleConnect(SelectionKey key);
+	
+	/**
 	 *  Write the HTTP request to the NIO connection.
 	 *  May be called multiple times, if not all data can be send at once.
 	 *  Has to change the interest to OP_READ, once all data is sent.

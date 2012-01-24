@@ -6,7 +6,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.ILocalResourceIdentifier;
-import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
@@ -29,9 +28,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.javaparser.SJavaParser;
 
-import java.io.File;
 import java.net.InetAddress;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -205,12 +202,12 @@ public class Starter
 					try
 					{
 						val = SJavaParser.evaluateExpression(args[i+1], null);
-						compargs.put(key, val);
 					}
 					catch(Exception e)
 					{
-						System.out.println("Argument parse exception using as string: "+args[i]+"="+args[i+1]);
+						System.out.println("Argument parse exception using as string: "+args[i]+" \""+args[i+1]+"\"");
 					}
+					compargs.put(key, val);
 				}
 				
 				if(COMPONENT.equals(key))

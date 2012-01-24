@@ -44,10 +44,10 @@ public class RelayServlet extends HttpServlet
 	protected int	opencnt1	= 0;
 	/** Counter for open POST connections (for testing). */
 	protected int	opencnt2	= 0;
-	/** Counter for queued messages (for testing). */	
-	protected int queued;
-	/** Counter for sent messages (for testing). */	
-	protected int sent;
+//	/** Counter for queued messages (for testing). */	
+//	protected int queued;
+//	/** Counter for sent messages (for testing). */	
+//	protected int sent;
 	
 	//-------- constructors --------
 
@@ -168,11 +168,11 @@ public class RelayServlet extends HttpServlet
 								response.getOutputStream().flush();
 								info.addMessage(cnt, System.nanoTime()-start);
 								msg.getSecondEntity().setResult(null);
-								synchronized(this)
-								{
-									sent++;
-								}
-								System.out.println("sent: "+sent);
+//								synchronized(this)
+//								{
+//									sent++;
+//								}
+//								System.out.println("sent: "+sent);
 							}
 							catch(Exception e)
 							{
@@ -258,11 +258,11 @@ public class RelayServlet extends HttpServlet
 				try
 				{
 					queue.enqueue(new Tuple2<InputStream, Future<Void>>(in, fut));
-					synchronized(this)
-					{
-						queued++;
-					}
-					System.out.println("queued: "+queued);
+//					synchronized(this)
+//					{
+//						queued++;
+//					}
+//					System.out.println("queued: "+queued);
 					fut.get(new ThreadSuspendable(), 30000);	// todo: how to set a useful timeout value!?
 					sent	= true;
 				}

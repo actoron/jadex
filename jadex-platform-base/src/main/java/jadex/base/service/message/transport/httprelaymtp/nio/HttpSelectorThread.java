@@ -13,6 +13,8 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 /**
@@ -54,6 +56,9 @@ public class HttpSelectorThread
 	
 	/** The logger. */
 	protected Logger	logger;
+	
+	/** The timer for delayed reconnect attempts. */
+	protected Timer	timer;
 	
 	//-------- constructors --------
 	
@@ -148,41 +153,50 @@ public class HttpSelectorThread
 
 							if(key.isValid())
 							{
+								int	reschedule	= -1;
+								req	= (IHttpRequest)key.attachment();
+								
 								if(key.isConnectable())
 								{
-									SocketChannel	sc	= (SocketChannel)key.channel();
-									boolean	finished	= sc.finishConnect();
-									assert finished;
-									key.interestOps(SelectionKey.OP_WRITE);
+									reschedule	= req.handleConnect(key);
 									connecting	= false;
 								}
 								else if(key.isWritable())
 								{
-									req	= (IHttpRequest)key.attachment();
-									int	reschedule	= req.handleWrite(key);
-									if(reschedule==0)
-									{
-										synchronized(queue)
-										{
-											queue.add(0, req);
-										}
-										// Assume connection is closed.
-										cons--;
-									}
+									reschedule	= req.handleWrite(key);
 								}
 								else if(key.isReadable())
 								{
-									req	= (IHttpRequest)key.attachment();
-									int	reschedule	= req.handleRead(key);
-									if(reschedule==0)
+									reschedule	= req.handleRead(key);
+								}
+								
+								// Reschedule request in case of error.
+								if(reschedule==0)
+								{
+									synchronized(queue)
 									{
-										synchronized(queue)
-										{
-											queue.add(0, req);
-										}
-										// Assume connection is closed.
-										cons--;
+										// Queue at beginning to keep message order in case of outdated idle connections.
+										queue.add(0, req);
 									}
+								}
+								else if(reschedule>0)
+								{
+									if(timer==null)
+									{
+										timer	= new Timer(true);
+									}
+									final IHttpRequest	freq	= req;
+									timer.schedule(new TimerTask()
+									{
+										public void run()
+										{
+											synchronized(queue)
+											{
+												queue.add(freq);
+												selector.wakeup();
+											}
+										}
+									}, reschedule);
 								}
 								
 								// If connection is open but no longer needed, add to idle list.
@@ -209,7 +223,10 @@ public class HttpSelectorThread
 //						e.printStackTrace();
 					}
 				}
+				
 //				System.out.println("leaving selector thread");
+				if(timer!=null)
+					timer.cancel();
 			}
 		}).start();
 	}
