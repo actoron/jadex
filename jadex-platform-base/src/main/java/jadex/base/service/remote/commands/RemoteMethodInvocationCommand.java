@@ -123,7 +123,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		{
 			public void resultAvailable(Object result)
 			{
-				invokeMethod(result).addResultListener(new DelegationResultListener(ret));
+				invokeMethod(result, ret);//.addResultListener(new DelegationResultListener(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -218,9 +218,9 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  @param target The target object.
 	 *  @param ret The result future.
 	 */
-	public IIntermediateFuture invokeMethod(Object target)//, final IntermediateFuture ret)
+	public void invokeMethod(Object target, final IntermediateFuture ret)
 	{
-		final IntermediateFuture ret = new IntermediateFuture();
+//		final IntermediateFuture ret = new IntermediateFuture();
 		
 //		if("addMessageListener".equals(methodname))
 //			System.out.println("remote addMessageListener");
@@ -311,7 +311,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			ret.setFinished();
 		}
 		
-		return ret;
+//		return ret;
 	}
 	
 	//-------- getter/setter methods --------

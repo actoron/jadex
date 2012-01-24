@@ -994,16 +994,17 @@ public class MessageService extends BasicService implements IMessageService
 			// b) if library service could not resolve rid or message does not contain rid the receiver classloader can be used
 			
 			final Future<Void> ret = new Future<Void>();
-			ret.addResultListener(new IResultListener<Void>()
-			{
-				public void resultAvailable(Void result)
-				{
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-					exception.printStackTrace();
-				}
-			});
+			// todo: what to do with exception here?
+//			ret.addResultListener(new IResultListener<Void>()
+//			{
+//				public void resultAvailable(Void result)
+//				{
+//				}
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					exception.printStackTrace();
+//				}
+//			});
 			
 			getRIDClassLoader(msg, getMessageType(type)).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 			{

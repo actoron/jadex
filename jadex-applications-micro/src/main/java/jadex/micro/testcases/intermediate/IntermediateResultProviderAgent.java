@@ -44,7 +44,7 @@ public class IntermediateResultProviderAgent implements IIntermediateResultServi
 //		final int max = 5;
 //		final long delay = 200;
 		
-//		System.out.println("start: "+System.currentTimeMillis());
+		System.out.println("start: "+System.currentTimeMillis());
 		agent.waitFor(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)

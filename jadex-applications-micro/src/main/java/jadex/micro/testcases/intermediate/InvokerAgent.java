@@ -224,9 +224,9 @@ public class InvokerAgent
 												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
 												long expected = delay*(max-1);
 												// deviation can happen because receival of results is measured
+												System.out.println("Results did arrive in (needed/expected): ("+needed+" / "+expected+")");
 												if(needed*1.1>=expected) // 10% deviation allowed
 												{
-													System.out.println("Results did arrive in (needed/expected): ("+needed+" / "+expected+")");
 													tr.setSucceeded(true);
 												}
 												else
