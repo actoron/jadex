@@ -25,6 +25,9 @@ public class IntermediateResultListener implements IIntermediateResultListener<T
 	/** The results map. */
 	protected Map<String, Object> results;
 	
+	/** Boolean flag if has initial listener (if yes no exception will be printed in CleanupCommand). */
+	protected boolean initial;
+	
 	//-------- constructors --------
 	
 	/**
@@ -32,6 +35,7 @@ public class IntermediateResultListener implements IIntermediateResultListener<T
 	 */
 	public IntermediateResultListener(IResultListener<Collection<Tuple2<String, Object>>> listener)
 	{
+		this.initial = listener!=null;
 		addListener(listener);
 	}
 	
@@ -256,6 +260,24 @@ public class IntermediateResultListener implements IIntermediateResultListener<T
 	public Map<String, Object> getResultMap()
 	{
 		return results;
+	}
+
+	/**
+	 *  Get the initial.
+	 *  @return the initial.
+	 */
+	public boolean isInitial()
+	{
+		return initial;
+	}
+
+	/**
+	 *  Set the initial.
+	 *  @param initial The initial to set.
+	 */
+	public void setInitial(boolean initial)
+	{
+		this.initial = initial;
 	}
 }
 

@@ -228,7 +228,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						
 						public void resultAvailable(final Collection<Tuple2<String, Object>> results)
 						{
-							System.out.println("end1: "+instance.getComponentIdentifier()+" "+file);
+//							System.out.println("end1: "+instance.getComponentIdentifier()+" "+file);
 							
 							// Store results in out parameters.
 							Map<String, Object> res = new HashMap<String, Object>();
@@ -250,7 +250,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						
 						public void exceptionOccurred(final Exception exception)
 						{
-							System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
+//							System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
 							thread.setNonWaiting();
 							thread.setException(exception);
 							instance.step(activity, instance, thread, null);
@@ -300,7 +300,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						public void resultAvailable(IComponentIdentifier result)
 						{
 							// todo: save component id
-							System.out.println("created: "+result);
+//							System.out.println("created: "+result);
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -308,7 +308,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 							thread.setNonWaiting();
 							thread.setException(exception);
 							instance.step(activity, instance, thread, null);
-							System.out.println("exception: "+exception);
+//							System.out.println("exception: "+exception);
 //							exception.printStackTrace();
 						}
 					};

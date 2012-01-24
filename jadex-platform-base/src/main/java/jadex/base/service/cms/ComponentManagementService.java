@@ -91,7 +91,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	protected MultiCollection listeners;
 	
 	/** The result (kill listeners). */
-	protected Map<IComponentIdentifier, IIntermediateResultListener<Tuple2<String, Object>>> resultlisteners;
+	protected Map<IComponentIdentifier, IntermediateResultListener> resultlisteners;
 	
 	/** The execution service (cached to avoid using futures). */
 	protected IExecutionService	exeservice;
@@ -296,7 +296,7 @@ public abstract class ComponentManagementService extends BasicService implements
 			
 			final CreationInfo cinfo = new CreationInfo(info);	// Dummy default info, if null. Must be cloned as localtype is set on info later.
 			
-			final IIntermediateResultListener<Tuple2<String, Object>> reslis = new IntermediateResultListener(resultlistener);
+			final IntermediateResultListener reslis = new IntermediateResultListener(resultlistener);
 			
 			if(cinfo.getParent()!=null)
 			{
@@ -590,11 +590,8 @@ public abstract class ComponentManagementService extends BasicService implements
 																							removeInitInfo(cid);
 																						}
 																						
-																						IIntermediateResultListener<Tuple2<String, Object>> reslis = (IIntermediateResultListener<Tuple2<String, Object>>)resultlisteners.remove(cid);
-																						if(reslis!=null)
-																						{
-																							reslis.exceptionOccurred(exception);
-																						}
+																						IntermediateResultListener reslis = resultlisteners.remove(cid);
+																						reslis.exceptionOccurred(exception);
 																						
 																						exitDestroy(cid, ad, exception, null);
 																						
@@ -1785,21 +1782,19 @@ public abstract class ComponentManagementService extends BasicService implements
 //				ex	= (Exception)exceptions.get(cid);
 //				exceptions.remove(cid);
 //			}
-			IIntermediateResultListener<Tuple2<String, Object>> reslis = (IIntermediateResultListener<Tuple2<String, Object>>)resultlisteners.remove(cid);
-			if(reslis!=null)
+			IntermediateResultListener reslis = resultlisteners.remove(cid);
+//			System.out.println("kill lis: "+cid+" "+results+" "+ex);
+			if(ex!=null)
 			{
-//				System.out.println("kill lis: "+cid+" "+results+" "+ex);
-				if(ex!=null)
-				{
-					reslis.exceptionOccurred(ex);
-				}
-				else
-				{
-					reslis.finished();
-//					reslis.resultAvailable(results);
-				}
+				reslis.exceptionOccurred(ex);
 			}
-			else if(ex!=null)
+			else
+			{
+				reslis.finished();
+//					reslis.resultAvailable(results);
+			}
+			
+			if(ex!=null && !reslis.isInitial())
 			{
 				// Unhandled component exception
 				// Todo: delegate printing to parent component (if any).

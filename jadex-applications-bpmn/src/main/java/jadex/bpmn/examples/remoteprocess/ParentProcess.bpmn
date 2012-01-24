@@ -26,7 +26,7 @@
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_12FmNAr3EeGP-Kw9N9E5Mw" source="jadex_arguments_table_Initial-Value_6d5185cc-fb79-4d4b-9664-49e2fbbbdbf3_complex"/>
   <pools xmi:type="bpmn:Pool" xmi:id="_eLkLQQrvEeGP-Kw9N9E5Mw" iD="_eLkLQArvEeGP-Kw9N9E5Mw" name="Pool">
-    <vertices xmi:type="bpmn:Activity" xmi:id="_eLkyUArvEeGP-Kw9N9E5Mw" iD="_eLkLQgrvEeGP-Kw9N9E5Mw" outgoingEdges="_U7PvEQryEeGP-Kw9N9E5Mw" name="Choose Platform" activityType="Task">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_eLkyUArvEeGP-Kw9N9E5Mw" iD="_eLkLQgrvEeGP-Kw9N9E5Mw" outgoingEdges="_U7PvEQryEeGP-Kw9N9E5Mw" incomingEdges="_I0nUwUaYEeGu3abGvlI-pQ" name="Choose Platform" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_SBhv8AryEeGP-Kw9N9E5Mw" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_SBiXAAryEeGP-Kw9N9E5Mw" key="class" value="ChoosePlatformTask"/>
       </eAnnotations>
@@ -58,7 +58,7 @@
     <vertices xmi:type="bpmn:SubProcess" xmi:id="_QA5YIQr2EeGP-Kw9N9E5Mw" iD="_QA5YIAr2EeGP-Kw9N9E5Mw" outgoingEdges="_N-mTwQr3EeGP-Kw9N9E5Mw" incomingEdges="_xfdkMQr3EeGP-Kw9N9E5Mw" name="Start Sub Process&#xD;&#xA;" activityType="SubProcess">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_T7XCkAr2EeGP-Kw9N9E5Mw" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_T7XpoAr2EeGP-Kw9N9E5Mw" key="file" value="&quot;SubProcess.bpmn&quot;"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZIvvwEaGEeGu3abGvlI-pQ" key="creation info" value="new CreationInfo(cid, $component.getModel().getResourceIdentifier)"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ZIvvwEaGEeGu3abGvlI-pQ" key="creation info" value="new CreationInfo(cid, $component.getModel().getResourceIdentifier())"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Vb8EgAr2EeGP-Kw9N9E5Mw" source="jadex_parameters_table">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AKrdwEaIEeGu3abGvlI-pQ" key="dimension" value="2:4"/>
@@ -73,8 +73,10 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AKsE1EaIEeGu3abGvlI-pQ" key="1:2" value="IComponentIdentifier"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_AKsE1UaIEeGu3abGvlI-pQ" key="1:3" value="$component.getComponentIdentifier()"/>
       </eAnnotations>
+      <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_FDudEUaYEeGu3abGvlI-pQ" iD="_FDudEEaYEeGu3abGvlI-pQ"/>
+      <eventHandlers xmi:type="bpmn:Activity" xmi:id="_EAihwUaYEeGu3abGvlI-pQ" iD="_EAihwEaYEeGu3abGvlI-pQ" outgoingEdges="_FDudEUaYEeGu3abGvlI-pQ" activityType="EventIntermediateError"/>
     </vertices>
-    <vertices xmi:type="bpmn:Activity" xmi:id="_N-bUoQr3EeGP-Kw9N9E5Mw" iD="_N-bUoAr3EeGP-Kw9N9E5Mw" incomingEdges="_N-mTwQr3EeGP-Kw9N9E5Mw" name="Received value" activityType="Task">
+    <vertices xmi:type="bpmn:Activity" xmi:id="_N-bUoQr3EeGP-Kw9N9E5Mw" iD="_N-bUoAr3EeGP-Kw9N9E5Mw" outgoingEdges="_Kd0uQUaYEeGu3abGvlI-pQ" incomingEdges="_N-mTwQr3EeGP-Kw9N9E5Mw" name="Received value" activityType="Task">
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_RLGE8Ar3EeGP-Kw9N9E5Mw" source="jadex">
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_RLGE8Qr3EeGP-Kw9N9E5Mw" key="class" value="jadex.bpmn.runtime.task.UserInteractionTask"/>
       </eAnnotations>
@@ -106,6 +108,22 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_093kwwr3EeGP-Kw9N9E5Mw" key="1:3" value="cid"/>
       </eAnnotations>
     </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_FDnvYUaYEeGu3abGvlI-pQ" iD="_FDnvYEaYEeGu3abGvlI-pQ" outgoingEdges="_LQ3UwUaYEeGu3abGvlI-pQ" incomingEdges="_FDudEUaYEeGu3abGvlI-pQ" name="Creation Error" activityType="Task">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Nf1GsEaYEeGu3abGvlI-pQ" source="jadex">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Nf1GsUaYEeGu3abGvlI-pQ" key="class" value="jadex.bpmn.runtime.task.UserInteractionTask"/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_PLjosEaYEeGu3abGvlI-pQ" source="jadex_parameters_table">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zF_aQEaZEeGEOeKqGHAmyg" key="dimension" value="1:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zGABUEaZEeGEOeKqGHAmyg" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zGABUUaZEeGEOeKqGHAmyg" key="complexColumns" value="false:false:false:false"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zGABUkaZEeGEOeKqGHAmyg" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zGABU0aZEeGEOeKqGHAmyg" key="0:1" value="value"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zGABVEaZEeGEOeKqGHAmyg" key="0:2" value="String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_zGABVUaZEeGEOeKqGHAmyg" key="0:3" value="&quot;Could not create subprocess: &quot;+$exception.getMessage()"/>
+      </eAnnotations>
+    </vertices>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_IEeRQUaYEeGu3abGvlI-pQ" iD="_IEeRQEaYEeGu3abGvlI-pQ" outgoingEdges="_I0nUwUaYEeGu3abGvlI-pQ" activityType="EventStartEmpty"/>
+    <vertices xmi:type="bpmn:Activity" xmi:id="_JoCVwUaYEeGu3abGvlI-pQ" iD="_JoCVwEaYEeGu3abGvlI-pQ" incomingEdges="_Kd0uQUaYEeGu3abGvlI-pQ _LQ3UwUaYEeGu3abGvlI-pQ" activityType="EventEndEmpty"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_U7PvEQryEeGP-Kw9N9E5Mw" iD="_U7PvEAryEeGP-Kw9N9E5Mw"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_XDgcEQryEeGP-Kw9N9E5Mw" iD="_XDgcEAryEeGP-Kw9N9E5Mw" conditionType="Default" isDefault="true"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_QBJ20Qr2EeGP-Kw9N9E5Mw" iD="_QBJ20Ar2EeGP-Kw9N9E5Mw">
@@ -115,5 +133,8 @@
     </sequenceEdges>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_N-mTwQr3EeGP-Kw9N9E5Mw" iD="_N-mTwAr3EeGP-Kw9N9E5Mw"/>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_xfdkMQr3EeGP-Kw9N9E5Mw" iD="_xfdkMAr3EeGP-Kw9N9E5Mw"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_I0nUwUaYEeGu3abGvlI-pQ" iD="_I0nUwEaYEeGu3abGvlI-pQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_Kd0uQUaYEeGu3abGvlI-pQ" iD="_Kd0uQEaYEeGu3abGvlI-pQ"/>
+    <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_LQ3UwUaYEeGu3abGvlI-pQ" iD="_LQ3UwEaYEeGu3abGvlI-pQ"/>
   </pools>
 </bpmn:BpmnDiagram>
