@@ -1691,7 +1691,6 @@ public abstract class ComponentManagementService extends BasicService implements
 			doCleanup(exception);
 		}
 
-		
 		protected void doCleanup(Exception exception)
 		{
 			boolean	killparent	= false;

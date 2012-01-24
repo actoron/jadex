@@ -13,7 +13,7 @@ public class JadexSubProcessParallelSection extends
 
 	public JadexSubProcessParallelSection()
 	{
-		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, "parallel", "Parallel");
+		super(JadexBpmnPropertiesUtil.JADEX_GLOBAL_ANNOTATION, "parallel", "parallel");
 	}
 
 	

@@ -111,6 +111,15 @@ public class CreationInfo
 	
 	/**
 	 *  Create a new creation info.
+	 *  @param parent	The parent of the component to be created.
+	 */
+	public CreationInfo(IComponentIdentifier parent, IResourceIdentifier rid)
+	{
+		this(null, null, parent, null, null, null, null, null, null, rid);
+	}
+	
+	/**
+	 *  Create a new creation info.
 	 *  @param config	The configuration.
 	 *  @param args	The arguments.
 	 */

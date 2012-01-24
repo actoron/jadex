@@ -372,6 +372,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	{
 		final Future<Void> ret = new Future<Void>();
 		final IServiceIdentifier sid = service.getServiceIdentifier();
+//		System.out.println("shutdown ser: "+service.getServiceIdentifier());
 		getPublishService(instance, type, null).addResultListener(instance.createResultListener(new IResultListener<IPublishService>()
 		{
 			public void resultAvailable(IPublishService ps)

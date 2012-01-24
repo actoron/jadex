@@ -317,7 +317,7 @@ public class StarterPanel extends JLayeredPane
 					}
 					
 					final IResourceIdentifier modelrid = model.getResourceIdentifier();
-					System.out.println("a: "+modelrid);
+//					System.out.println("a: "+modelrid);
 					jcc.getPlatformAccess().scheduleStep(new IComponentStep<Map>()
 					{
 						@XMLClassname("start")

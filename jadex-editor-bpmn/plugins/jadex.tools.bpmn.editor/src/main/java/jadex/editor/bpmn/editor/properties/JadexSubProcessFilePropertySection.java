@@ -11,7 +11,7 @@ public class JadexSubProcessFilePropertySection extends AbstractMultiTextfieldPr
 {
 	// ---- constants ----
 	
-	private static final String[] textFieldNames = new String[]{"file"};
+	private static final String[] textFieldNames = new String[]{"file", "creation info"};
 	
 	// ---- attributes ----
 

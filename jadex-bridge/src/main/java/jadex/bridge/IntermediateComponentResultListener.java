@@ -6,7 +6,7 @@ import jadex.commons.future.IIntermediateResultListener;
 import java.util.Collection;
 
 /**
- * 
+ *  Intermediate listener that invokes listeners on component thread.
  */
 public class IntermediateComponentResultListener<E> extends ComponentResultListener<Collection<E>> implements IIntermediateResultListener<E>
 {
@@ -49,7 +49,9 @@ public class IntermediateComponentResultListener<E> extends ComponentResultListe
 			}
 			catch(Exception e)
 			{
-				listener.exceptionOccurred(e);
+				// listener.exceptionOccurred(e); must not be called more than once!
+				// Will be called in finished.
+//				listener.exceptionOccurred(e);
 			}
 		}
 		else

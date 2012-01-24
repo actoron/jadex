@@ -48,7 +48,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 		List<MActivity> start = proc.getStartActivities();
 		final String	file	= (String)thread.getPropertyValue("file");
 	
-		// Internal subprocess.
+		// Internal subprocess (when no file is given and has start activities).
 		// Todo: cancel timer on normal/exception exit
 		if(start!=null && file==null)
 		{
@@ -161,14 +161,29 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				public void resultAvailable(IComponentManagementService cms)
 				{
 					// Todo: If remote remember subprocess and kill on cancel.
+
+					final CreationInfo	info = thread.hasPropertyValue("creation info")? 
+						(CreationInfo)thread.getPropertyValue("creation info"): new CreationInfo();
+					
+					// todo: other properties of creation info like
+					// instance name and flags like suspend
+
+					if(info.getArguments()==null && args.size()>0)
+						info.setArguments(args);
+					
 					IComponentIdentifier	parent	= thread.hasPropertyValue("parent")
 						? (IComponentIdentifier)thread.getPropertyValue("parent")
 						: instance.getComponentIdentifier();
+					if(info.getParent()==null && parent!=null)
+						info.setParent(parent);
 					
+					String[] imps = instance.getModelElement().getModelInfo().getAllImports();
+					if(info.getImports()==null && imps!=null)
+						info.setImports(imps);
+						
 //					System.out.println("parent is: "+parent.getAddresses());	
 						
-					IFuture<IComponentIdentifier> ret = cms.createComponent(null, file,
-						new CreationInfo(null, args, parent, false, instance.getModelElement().getModelInfo().getAllImports()), 
+					IFuture<IComponentIdentifier> ret = cms.createComponent(null, file, info, 
 						instance.createResultListener(new IIntermediateResultListener<Tuple2<String, Object>>()
 					{
 						public void intermediateResultAvailable(Tuple2<String, Object> result)
@@ -213,7 +228,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						
 						public void resultAvailable(final Collection<Tuple2<String, Object>> results)
 						{
-//							System.out.println("end1: "+instance.getComponentIdentifier()+" "+file);
+							System.out.println("end1: "+instance.getComponentIdentifier()+" "+file);
 							
 							// Store results in out parameters.
 							Map<String, Object> res = new HashMap<String, Object>();
@@ -235,7 +250,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						
 						public void exceptionOccurred(final Exception exception)
 						{
-//							System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
+							System.out.println("end2: "+instance.getComponentIdentifier()+" "+file+" "+exception);
 							thread.setNonWaiting();
 							thread.setException(exception);
 							instance.step(activity, instance, thread, null);
@@ -285,7 +300,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						public void resultAvailable(IComponentIdentifier result)
 						{
 							// todo: save component id
-//							System.out.println("created: "+result);
+							System.out.println("created: "+result);
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -293,7 +308,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 							thread.setNonWaiting();
 							thread.setException(exception);
 							instance.step(activity, instance, thread, null);
-//							System.out.println("exception: "+exception);
+							System.out.println("exception: "+exception);
 //							exception.printStackTrace();
 						}
 					};
