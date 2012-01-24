@@ -66,8 +66,17 @@ public class ReceiveRequest	implements IHttpRequest
 	/** The logger. */
 	protected Logger	logger;
 	
-	/** The header (cached for reconnections). */
-	protected byte[]	header;
+	/** The component id. */
+	protected IComponentIdentifier	cid;
+
+	/** The relay server host. */
+	protected String	host;
+	
+	/** The relay server port. */
+	protected int	port;
+	
+	/** The relay server URL path. */
+	protected String	path;
 	
 	/** The data to be sent or being received. */
 	protected ByteBuffer	buf;
@@ -108,16 +117,29 @@ public class ReceiveRequest	implements IHttpRequest
 	{
 		this.ms	= ms;
 		this.logger	= logger;
-		String	xmlid	= JavaWriter.objectToXML(cid, getClass().getClassLoader());
-		header	= 
-			( "GET "+path+"?id="+URLEncoder.encode(xmlid, "UTF-8")+" HTTP/1.1\r\n"
-			+ "Host: "+host+":"+port+"\r\n"
-			+ "\r\n"
-			).getBytes(Charset.forName("UTF-8"));
+		this.cid	= cid;
+		this.host	= host;
+		this.port	= port;
+		this.path	= path;
 	}
 	
 	//-------- IHttpRequest interface --------
 	
+	/**
+	 *  Get the host to connect to.
+	 */
+	public String	getHost()
+	{
+		return host;
+	}
+	
+	/**
+	 *  Get the port to connect to.
+	 */
+	public int	getPort()
+	{
+		return port;
+	}
 	
 	/**
 	 *  Handle connection success or error.
@@ -135,6 +157,12 @@ public class ReceiveRequest	implements IHttpRequest
 			boolean	finished	= sc.finishConnect();
 			assert finished;
 			key.interestOps(SelectionKey.OP_WRITE);
+			String	xmlid	= JavaWriter.objectToXML(cid, getClass().getClassLoader());
+			byte[]	header	= 
+				( "GET "+path+"?id="+URLEncoder.encode(xmlid, "UTF-8")+" HTTP/1.1\r\n"
+				+ "Host: "+host+":"+port+"\r\n"
+				+ "\r\n"
+				).getBytes(Charset.forName("UTF-8"));
 			buf	= ByteBuffer.wrap(header);
 			state	= STATE_INITIAL;
 		}

@@ -18,7 +18,7 @@ public class SRelay
 	//-------- constants --------
 	
 	/** Default relay address. */
-	public static final String	DEFAULT_ADDRESS	= "http://jadex.informatik.uni-hamburg.de/relay/";
+	public static final String	DEFAULT_ADDRESS	= "relay-http://jadex.informatik.uni-hamburg.de/relay/";
 	
 	/** The default message type (followed by arbitrary message content from some sender). */
 	public static final byte	MSGTYPE_DEFAULT	= 1;

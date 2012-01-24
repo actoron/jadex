@@ -8,6 +8,16 @@ import java.nio.channels.SelectionKey;
 public interface IHttpRequest
 {
 	/**
+	 *  Get the host to connect to.
+	 */
+	public String	getHost();
+	
+	/**
+	 *  Get the port to connect to.
+	 */
+	public int	getPort();
+	
+	/**
 	 *  Handle connection success or error.
 	 *  Has to change the interest to OP_WRITE, if connection was successful.
 	 *  

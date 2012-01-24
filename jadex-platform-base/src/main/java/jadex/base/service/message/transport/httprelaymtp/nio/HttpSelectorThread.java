@@ -30,15 +30,6 @@ public class HttpSelectorThread
 	
 	//-------- attributes --------
 	
-	/** The relay server host. */
-	protected String	host;
-	
-	/** The relay server port. */
-	protected int	port;
-	
-	/** The relay server URL path. */
-	protected String	path;
-	
 	/** The NIO Selector. */
 	protected Selector	selector;
 
@@ -69,11 +60,9 @@ public class HttpSelectorThread
 	public HttpSelectorThread(IComponentIdentifier root, String address, IMessageService ms, Logger logger) throws IOException
 	{
 		this.logger	= logger;
-		if(!address.startsWith("http://"))
-			throw new IOException("Unknown URL scheme: "+address);
-		path	= "";
-		port	= 80;
-		host	= address.substring(7);
+		String	path	= "";
+		int port	= 80;
+		String host	= address.substring(7);
 		if(host.indexOf('/')!=-1)
 		{
 			path	= host.substring(host.indexOf('/'));
@@ -127,7 +116,7 @@ public class HttpSelectorThread
 								connecting	= true;
 								SocketChannel	sc	= SocketChannel.open();
 								sc.configureBlocking(false);
-								sc.connect(new InetSocketAddress(host, port));
+								sc.connect(new InetSocketAddress(req.getHost(), req.getPort()));
 								sc.register(selector, SelectionKey.OP_CONNECT, req);
 							}
 							else
@@ -252,8 +241,22 @@ public class HttpSelectorThread
 	/**
 	 *  Add a send task.
 	 */
-	public void addSendTask(ManagerSendTask task, Future<Void> fut)
+	public void addSendTask(ManagerSendTask task, String address, Future<Void> fut)
 	{
+		String	path	= "";
+		int port	= 80;
+		String host	= address.substring(7);
+		if(host.indexOf('/')!=-1)
+		{
+			path	= host.substring(host.indexOf('/'));
+			host	= host.substring(0, host.indexOf('/'));
+		}
+		if(host.indexOf(':')!=-1)
+		{
+			port	= Integer.parseInt(host.substring(host.indexOf(':')+1));
+			host	= host.substring(0, host.indexOf(':'));			
+		}
+		
 		SendRequest	req	= new SendRequest(task, fut, host, port, path, logger);
 		synchronized(queue)
 		{

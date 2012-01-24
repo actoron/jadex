@@ -10,7 +10,7 @@ public abstract class AbstractRelayBenchmark	extends AbstractBenchmark
 	//-------- constants --------
 	
 	/** The address of the relay servlet under test. */
-//	public static String	ADDRESS = SRelay.DEFAULT_ADDRESS;
+//	public static String	ADDRESS = SRelay.DEFAULT_ADDRESS.substring(6);
 //	public static String	ADDRESS = "http://localhost:8080/jadex-platform-relay-web/";
 	public static String	ADDRESS = "http://grisougarfield.dyndns.org:52339/relay/";
 	

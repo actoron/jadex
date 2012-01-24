@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class HttpRelayTransport implements ITransport
 {
@@ -36,6 +38,8 @@ public class HttpRelayTransport implements ITransport
 	{
 		this.component	= component;
 		this.address	= address;
+		if(!address.startsWith(getServiceSchema()))
+			throw new RuntimeException("Address does not match service schema: "+address+", "+getServiceSchema());
 	}
 	
 	//-------- methods --------
@@ -46,7 +50,7 @@ public class HttpRelayTransport implements ITransport
 	public IFuture<Void> start()
 	{
 		// Create the receiver (starts automatically).
-		receiver	= new HttpReceiver(component.getExternalAccess(), address);
+		receiver	= new HttpReceiver(component.getExternalAccess(), address.substring(6));	// strip 'relay-' prefix.
 		return IFuture.DONE;
 	}
 
@@ -67,42 +71,61 @@ public class HttpRelayTransport implements ITransport
 	 */
 	public IFuture<Void>	sendMessage(final ManagerSendTask task)
 	{
-		final Future<Void>	ret	= new Future<Void>();
-		try
+		// Fetch all addresses
+		Set<String>	addresses	= new LinkedHashSet<String>();
+		for(int i=0; i<task.getReceivers().length; i++)
 		{
-			// Message service only calls transport.sendMessage() with receivers on same destination
-			// so just use first to fetch platform id.
-			IComponentIdentifier	targetid	= task.getReceivers()[0].getRoot();
-			byte[]	iddata	= JavaWriter.objectToByteArray(targetid, HttpRelayTransport.class.getClassLoader());
-			
-			URL	url	= new URL(address);
-			HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
-			con.setRequestMethod("POST");
-			con.setDoOutput(true);
-			con.setUseCaches(false);
-			con.setRequestProperty("Content-Type", "application/octet-stream");
-			con.setRequestProperty("Content-Length", ""+(4+iddata.length+4+task.getProlog().length+task.getData().length));
-			con.connect();
-			
-			OutputStream	out	= con.getOutputStream();
-			out.write(SUtil.intToBytes(iddata.length));
-			out.write(iddata);
-			out.write(SUtil.intToBytes(task.getProlog().length+task.getData().length));
-			out.write(task.getProlog());
-			out.write(task.getData());
-			out.flush();
-			
-			int	code	= con.getResponseCode();
-			if(code!=HttpURLConnection.HTTP_OK)
-				throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
-			
-			ret.setResult(null);
+			String[]	raddrs	= task.getReceivers()[i].getAddresses();
+			for(int j=0; j<raddrs.length; j++)
+			{
+				if(raddrs[i].startsWith(getServiceSchema()))
+					addresses.add(raddrs[j].substring(6));	// strip 'relay-' prefix.
+			}			
 		}
-		catch(Exception e)
+
+		// Iterate over all different addresses and try to send
+		String[] addrs = (String[])addresses.toArray(new String[addresses.size()]);
+		boolean	delivered	= false;
+		Exception	ex	= null;
+		for(int i=0; !delivered && i<addrs.length; i++)
 		{
-			ret.setException(e);
+			try
+			{
+				// Message service only calls transport.sendMessage() with receivers on same destination
+				// so just use first to fetch platform id.
+				IComponentIdentifier	targetid	= task.getReceivers()[0].getRoot();
+				byte[]	iddata	= JavaWriter.objectToByteArray(targetid, HttpRelayTransport.class.getClassLoader());
+				
+				URL	url	= new URL(addrs[i]);
+				HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
+				con.setRequestMethod("POST");
+				con.setDoOutput(true);
+				con.setUseCaches(false);
+				con.setRequestProperty("Content-Type", "application/octet-stream");
+				con.setRequestProperty("Content-Length", ""+(4+iddata.length+4+task.getProlog().length+task.getData().length));
+				con.connect();
+				
+				OutputStream	out	= con.getOutputStream();
+				out.write(SUtil.intToBytes(iddata.length));
+				out.write(iddata);
+				out.write(SUtil.intToBytes(task.getProlog().length+task.getData().length));
+				out.write(task.getProlog());
+				out.write(task.getData());
+				out.flush();
+				
+				int	code	= con.getResponseCode();
+				if(code!=HttpURLConnection.HTTP_OK)
+					throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
+				
+				delivered	= true;
+			}
+			catch(Exception e)
+			{
+				ex	= e;
+			}
 		}
-		return ret;
+		
+		return delivered ? IFuture.DONE : ex!=null ? new Future<Void>(ex) : new Future<Void>(new RuntimeException("Could not deliver message"));
 	}
 	
 	/**
@@ -111,8 +134,7 @@ public class HttpRelayTransport implements ITransport
 	 */
 	public String getServiceSchema()
 	{
-		// As different platform can be reached through the same relay server, the complete address is actually kind of a prefix.
-		return address;
+		return "relay-http://";
 	}
 	
 	/**

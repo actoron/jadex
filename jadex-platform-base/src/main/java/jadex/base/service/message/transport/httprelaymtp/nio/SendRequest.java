@@ -27,6 +27,12 @@ public class SendRequest	implements IHttpRequest
 	/** The logger. */
 	protected Logger	logger;
 	
+	/** The relay server host. */
+	protected String	host;
+	
+	/** The relay server port. */
+	protected int	port;
+	
 	/** The current buffer. */
 	protected int	bufnum;
 	
@@ -46,6 +52,8 @@ public class SendRequest	implements IHttpRequest
 		this.logger	= logger;
 		this.buffers	= new LinkedList<ByteBuffer>();
 		this.fut	= fut;
+		this.host	= host;
+		this.port	= port;
 		
 		// Only called with receivers on same platform, therefore safe to get root id from first receiver.
 		IComponentIdentifier	recid	= task.getReceivers()[0].getRoot();
@@ -69,6 +77,22 @@ public class SendRequest	implements IHttpRequest
 	}
 	
 	//-------- IHttpRequest interface --------
+	
+	/**
+	 *  Get the host to connect to.
+	 */
+	public String	getHost()
+	{
+		return host;
+	}
+	
+	/**
+	 *  Get the port to connect to.
+	 */
+	public int	getPort()
+	{
+		return port;
+	}
 	
 	/**
 	 *  Handle connection success or error.

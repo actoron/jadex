@@ -4,10 +4,16 @@ import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Binding;
+
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class HttpRelayTransport implements ITransport
 {
@@ -22,9 +28,6 @@ public class HttpRelayTransport implements ITransport
 	/** The receiver process. */
 	protected HttpSelectorThread	selectorthread;
 	
-	/** Number of messages to be sent (for testing). */
-	protected int	sent;
-	
 	//-------- constructors --------
 	
 	/**
@@ -34,6 +37,8 @@ public class HttpRelayTransport implements ITransport
 	{
 		this.component	= component;
 		this.address	= address;
+		if(!address.startsWith(getServiceSchema()))
+			throw new RuntimeException("Address does not match service schema: "+address+", "+getServiceSchema());
 	}
 	
 	//-------- ITransport  interface --------
@@ -52,7 +57,7 @@ public class HttpRelayTransport implements ITransport
 				try
 				{
 					// Create the selector thread (starts automatically).
-					selectorthread	= new HttpSelectorThread(component.getComponentIdentifier().getRoot(), address, ms, component.getLogger());
+					selectorthread	= new HttpSelectorThread(component.getComponentIdentifier().getRoot(), address.substring(6), ms, component.getLogger());
 					ret.setResult(null);
 				}
 				catch(Exception e)
@@ -79,15 +84,56 @@ public class HttpRelayTransport implements ITransport
 	 *  @param message The message to send.
 	 *  @return A future indicating if sending was successful.
 	 */
-	public IFuture<Void>	sendMessage(ManagerSendTask task)
+	public IFuture<Void>	sendMessage(final ManagerSendTask task)
 	{
-		Future<Void>	ret	= new Future<Void>();
-		this.selectorthread.addSendTask(task, ret);
-		synchronized(this)
+		final Future<Void>	ret	= new Future<Void>();
+		
+		// Fetch all addresses
+		Set<String>	addresses	= new LinkedHashSet<String>();
+		for(int i=0; i<task.getReceivers().length; i++)
 		{
-			sent++;
+			String[]	raddrs	= task.getReceivers()[i].getAddresses();
+			for(int j=0; j<raddrs.length; j++)
+			{
+				if(raddrs[i].startsWith(getServiceSchema()))
+					addresses.add(raddrs[j].substring(6));	// strip 'relay-' prefix.
+			}			
 		}
-//		System.out.println("queued for sending: "+sent);
+
+		// Iterate over all different addresses and try to send
+		if(!addresses.isEmpty())
+		{
+			if(addresses.size()==1)
+			{
+				this.selectorthread.addSendTask(task, addresses.iterator().next(), ret);
+			}
+			else
+			{
+				final Iterator<String>	it	= addresses.iterator();
+				IResultListener<Void>	rl	= new DelegationResultListener<Void>(ret)
+				{
+					public void exceptionOccurred(Exception exception)
+					{
+						if(it.hasNext())
+						{
+							Future<Void>	fut	= new Future<Void>();
+							selectorthread.addSendTask(task, it.next(), fut);
+							fut.addResultListener(this);
+						}
+						else
+						{
+							ret.setException(exception);
+						}
+					}
+				};
+				rl.exceptionOccurred(null);	// First call to start iteration of addresses.
+			}
+		}
+		else
+		{
+			ret.setException(new RuntimeException("Could not deliver message"));
+		}
+		
 		return ret;
 	}
 	
@@ -97,8 +143,7 @@ public class HttpRelayTransport implements ITransport
 	 */
 	public String getServiceSchema()
 	{
-		// As different platform can be reached through the same relay server, the complete address is actually kind of a prefix.
-		return address;
+		return "relay-http://";
 	}
 	
 	/**
