@@ -591,7 +591,8 @@ public abstract class ComponentManagementService extends BasicService implements
 																						}
 																						
 																						IntermediateResultListener reslis = resultlisteners.remove(cid);
-																						reslis.exceptionOccurred(exception);
+																						if(reslis!=null)
+																							reslis.exceptionOccurred(exception);
 																						
 																						exitDestroy(cid, ad, exception, null);
 																						
@@ -1783,7 +1784,7 @@ public abstract class ComponentManagementService extends BasicService implements
 //				exceptions.remove(cid);
 //			}
 			IntermediateResultListener reslis = resultlisteners.remove(cid);
-//			System.out.println("kill lis: "+cid+" "+results+" "+ex);
+//			System.out.println("kill lis: "+cid+" "+reslis+" "+results+" "+ex);
 			if(ex!=null)
 			{
 				reslis.exceptionOccurred(ex);
