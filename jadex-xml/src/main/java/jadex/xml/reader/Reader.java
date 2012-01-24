@@ -56,6 +56,9 @@ public class Reader
 	 *  e.g. from the XML reporter, if required. */
 	public static final ThreadLocal	READ_CONTEXT	= new ThreadLocal();
 	
+	/** The null object. */
+	public static final Object NULL = new Object();
+	
 	//-------- attributes --------
 	
 	/** The type info manager. */
@@ -243,7 +246,7 @@ public class Reader
 			parser.close();
 		}
 
-		return readcontext.getRootObject();
+		return readcontext.getRootObject()==NULL ? null : readcontext.getRootObject();
 	}
 	
 	/**

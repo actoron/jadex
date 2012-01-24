@@ -53,11 +53,6 @@ $endif $ */
 // Todo: report warnings when method invocations fail?
 public class BeanObjectReaderHandler implements IObjectReaderHandler
 {
-	//-------- constants --------
-	
-	/** The null object. */
-	public static final Object NULL = new Object();
-	
 	//-------- attributes --------
 	
 	/** The type info manager. */
@@ -191,7 +186,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			QName tag = (QName)type;
 			if(tag.equals(SXML.NULL))
 			{	
-				ret = NULL;
+				ret = Reader.NULL;
 			}
 			else
 			{
@@ -492,7 +487,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 		{
 			int cnt = context.getArrayCount(parent);
 			
-			if(!NULL.equals(object))
+			if(!Reader.NULL.equals(object))
 				Array.set(parent, cnt, object);
 			
 			linked = true;
@@ -571,7 +566,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 				int cnt = context.getArrayCount(parent);
 				
 				Object object = childs.get(i);
-				if(!NULL.equals(object))
+				if(!Reader.NULL.equals(object))
 					Array.set(parent, cnt, object);
 			}
 			
@@ -793,7 +788,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	{
 		boolean	set	= false;
 		
-		if(NULL.equals(val))
+		if(Reader.NULL.equals(val))
 		{
 			set	= true;
 		}

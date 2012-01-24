@@ -768,7 +768,7 @@ public class StarterPanel extends JLayeredPane
 		IResourceIdentifier rid = lastrid;
 		lastfile = null;
 		lastrid = null;
-		loadModel(toload, lastrid);
+		loadModel(toload, rid);
 	}
 	
 	/**
@@ -795,6 +795,7 @@ public class StarterPanel extends JLayeredPane
 			numcomponents.setValue(new Integer(1));
 			
 			lastfile	= adf;
+			lastrid	= rid;
 			
 	//		System.out.println("loadModel: "+adf);
 	//		String	error	= null;
