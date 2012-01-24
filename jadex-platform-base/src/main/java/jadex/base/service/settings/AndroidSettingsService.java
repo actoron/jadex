@@ -1,24 +1,22 @@
 package jadex.base.service.settings;
 
-import java.io.File;
-
-import jadex.android.service.IAndroidContextService;
+import jadex.base.service.android.IAndroidContextService;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 
+import java.io.File;
+
 /**
- * 
- * @author Julian Kalinowski
- *
+ *  Android settings service implementation.
  */
 public class AndroidSettingsService extends SettingsService {
 
 	protected IAndroidContextService contextService;
 
 	/**
-	 * Constructor
+	 * Creates an Android Settings Service
 	 * @param prefix
 	 * @param access
 	 * @param saveonexit

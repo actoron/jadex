@@ -1,4 +1,4 @@
-package jadex.android.service;
+package jadex.base.service.android;
 
 import java.io.File;
 import java.io.FileInputStream;

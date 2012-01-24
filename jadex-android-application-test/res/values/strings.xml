@@ -9,7 +9,7 @@
     <string name="log_clearLogButton">clear log</string>
     <string name="log_exitButton">exit</string>
         <string name="main_exitButton">Quit</string>
-    <string name="app_name">jadexAndroid-test</string>
+    <string name="app_name">JA-Test</string>
     <string name="configurationSpinnerPrompt">Please choose a configuration</string>
 
 	<string name="agent_activity:launchAgent">launch Agent</string>
