@@ -59,7 +59,7 @@
 			</extensions>
 			<components>
 				<component type="ExampleMicro" number="1"/>
-  				<component type="ExampleBDI" number="2"/>				
+  				<component type="ExampleBDI" number="1"/>				
 			</components>
  		</application>
 	</applications>

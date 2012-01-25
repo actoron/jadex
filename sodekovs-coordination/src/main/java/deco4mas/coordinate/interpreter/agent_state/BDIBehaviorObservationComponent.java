@@ -286,7 +286,7 @@ public class BDIBehaviorObservationComponent extends BehaviorObservationComponen
 				}
 
 				public void goalFinished(AgentEvent ae) {
-					checkAndPublishIfApplicable(ae, AgentElementType.BDI_GOAL);
+					// checkAndPublishIfApplicable(ae, AgentElementType.BDI_GOAL);
 				}
 			});
 		} else {

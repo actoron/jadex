@@ -16,12 +16,10 @@ import jadex.extension.envsupport.environment.EnvironmentEvent;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.PerceptType;
-import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector1;
-import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
-import jadex.extension.envsupport.math.Vector2Double;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -84,17 +82,19 @@ public class DefaultCoordinationEventGenerator extends SimplePropertyObject impl
 	 * @param event
 	 *            The event.
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void dispatchEnvironmentEvent(EnvironmentEvent event) {
 		CoordinationSpace space = (CoordinationSpace) event.getSpace();
 
 		IComponentDescription eventowner = (IComponentDescription) event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 
 		if (CoordinationEvent.COORDINATE_BROADCAST.equals(event.getType())) {
-			ISpaceObject[] objects = (ISpaceObject[]) space.getNearObjects(new Vector2Double(0.0, 0.0), new Vector1Double(20.0)).toArray(new ISpaceObject[0]);
+			Collection spaceObjects = space.getSpaceObjectsCollection();
+			ISpaceObject[] objects = (ISpaceObject[]) spaceObjects.toArray(new ISpaceObject[spaceObjects.size()]);
 
 			for (int i = 0; i < objects.length; i++) {
 				IComponentDescription owner = (IComponentDescription) objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
-				IVector2 objpos = (IVector2) objects[i].getProperty(Space2D.PROPERTY_POSITION);
+				// IVector2 objpos = (IVector2) objects[i].getProperty(Space2D.PROPERTY_POSITION);
 				if (owner != null) {
 					String percepttype = getPerceptType(space, owner.getLocalType(), event.getSpaceObject().getType(), COORDINATE_INFO);
 					if (percepttype != null) {

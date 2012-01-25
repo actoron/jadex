@@ -12,11 +12,11 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.envsupport.MEnvSpaceInstance;
 import jadex.extension.envsupport.MObjectType;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.EnvironmentEvent;
 import jadex.extension.envsupport.environment.IPerceptGenerator;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
-import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.micro.IMicroExternalAccess;
 
 import java.util.ArrayList;
@@ -31,7 +31,8 @@ import deco4mas.helper.Constants;
 import deco4mas.mechanism.CoordinationInformation;
 import deco4mas.mechanism.ICoordinationMechanism;
 
-public class CoordinationSpace extends Grid2D {
+@SuppressWarnings("unchecked")
+public class CoordinationSpace extends AbstractEnvironmentSpace {
 
 	/** The list of currently supported / active coordination mechanisms. */
 	private ArrayList<ICoordinationMechanism> activeCoordinationMechanisms = new ArrayList<ICoordinationMechanism>();
@@ -59,8 +60,8 @@ public class CoordinationSpace extends Grid2D {
 	 *            the size of the 2D area
 	 */
 	public CoordinationSpace() {
-		super(CoordinationSpace.class.getName(), null);
-
+		// super(CoordinationSpace.class.getName(), null);
+		this.setProperty("name", CoordinationSpace.class.getName());
 	}
 
 	/**
@@ -218,7 +219,6 @@ public class CoordinationSpace extends Grid2D {
 	public void componentAdded(IComponentDescription owner) {
 		synchronized (monitor) {
 			// Possibly add or create avatar(s) if any.
-			@SuppressWarnings("unchecked")
 			List<ISpaceObject> ownedobjs = (List<ISpaceObject>) spaceobjectsbyowner.get(owner);
 			if (ownedobjs == null) {
 				createAvatar(owner, null, false);

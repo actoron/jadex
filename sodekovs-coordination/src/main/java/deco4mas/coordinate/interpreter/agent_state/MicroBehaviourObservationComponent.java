@@ -164,10 +164,11 @@ public class MicroBehaviourObservationComponent extends BehaviorObservationCompo
 
 		IExternalAccess parent = ma.getParentAccess();
 		for (String spaceName : spaces) {
-			parent.getExtension(spaceName).addResultListener(new DefaultResultListener<CoordinationSpace>() {
+			parent.getExtension(spaceName).addResultListener(new DefaultResultListener() {
 
 				@Override
-				public void resultAvailable(CoordinationSpace space) {
+				public void resultAvailable(Object result) {
+					CoordinationSpace space = (CoordinationSpace) result;
 					eventPublication.publishEvent(coordInfo, space);
 				}
 			});
