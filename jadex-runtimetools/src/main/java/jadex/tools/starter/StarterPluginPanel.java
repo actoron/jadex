@@ -612,8 +612,8 @@ public class StarterPluginPanel extends JPanel
 							{
 								public void customResultAvailable(Object result)
 								{
-									spanel.setProperties(props.getSubproperty("spanel"));
-									ret.setResult(null);
+									spanel.setProperties(props.getSubproperty("spanel"))
+										.addResultListener(new DelegationResultListener(ret));
 								}
 							});
 						}

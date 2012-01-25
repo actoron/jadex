@@ -473,24 +473,22 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 					{
 						IExternalAccess exta = (IExternalAccess)result;
 //						System.out.println("exta: "+exta.getComponentIdentifier()+" "+binding.getComponentType());
-						exta.getChildren(binding.getComponentType()).addResultListener(new IResultListener()
+						exta.getChildren(binding.getComponentType()).addResultListener(new IResultListener<IComponentIdentifier[]>()
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(IComponentIdentifier[] result)
 							{
-								Collection coll = (Collection)result;
-								if(coll!=null && coll.size()>0)
+								if(result!=null && result.length>0)
 								{
-									CollectionResultListener lis = new CollectionResultListener(coll.size(), true, new DefaultResultListener()
+									CollectionResultListener lis = new CollectionResultListener(result.length, true, new DefaultResultListener()
 									{
 										public void resultAvailable(Object result)
 										{
 											ret.setResult(result);
 										}
 									});
-									for(Iterator it=coll.iterator(); it.hasNext(); )
+									for(int i=0; i<result.length; i++ )
 									{
-										IComponentIdentifier cid = (IComponentIdentifier)it.next();
-										cms.getExternalAccess(cid).addResultListener(lis);
+										cms.getExternalAccess(result[i]).addResultListener(lis);
 									}
 								}
 								else

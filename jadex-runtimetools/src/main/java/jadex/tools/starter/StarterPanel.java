@@ -3,6 +3,7 @@ package jadex.tools.starter;
 import jadex.base.SComponentFactory;
 import jadex.base.Starter;
 import jadex.base.gui.ComponentSelectorDialog;
+import jadex.base.gui.ExceptionSwingDelegationResultListener;
 import jadex.base.gui.ParserValidator;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
@@ -10,9 +11,10 @@ import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IErrorReport;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -42,8 +44,6 @@ import jadex.commons.gui.JValidatorTextField;
 import jadex.commons.gui.SGUI;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.annotation.XMLClassname;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -64,6 +64,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -1023,31 +1024,32 @@ public class StarterPanel extends JLayeredPane
 	 *  Get the properties.
 	 *  @param props The properties.
 	 */
-	public IFuture	getProperties()
+	public IFuture<Properties>	getProperties()
 	{
-		final Future	ret	= new Future();
+		final Future<Properties>	ret	= new Future<Properties>();
 		
 		final String	name	= filename.getText();
 		final IResourceIdentifier rid = lastrid;
-		jcc.getPlatformAccess().scheduleStep(new IComponentStep<String>()
+		jcc.getPlatformAccess().scheduleStep(new IComponentStep<Tuple2<String, String>>()
 		{
 			@XMLClassname("convertPath")
-			public IFuture<String> execute(IInternalAccess ia)
+			public IFuture<Tuple2<String, String>> execute(IInternalAccess ia)
 			{
-				Future	ret	= new Future();
+				final Future<Tuple2<String, String>>	ret	= new Future<Tuple2<String, String>>();
 				// lastrid ok?
 				if(name.length()>0)
 				{
 					SComponentFactory.loadModel(ia.getExternalAccess(), name, rid)
-						.addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+						.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, String>>(ret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(IModelInfo result)
 						{
-							super.customResultAvailable(SUtil.convertPathToRelative(name));
+							// Todo: support global rid, if any?
+							ret.setResult(new Tuple2<String, String>(SUtil.convertPathToRelative(name), SUtil.convertPathToRelative(SUtil.convertURLToString(rid.getLocalIdentifier().getUrl()))));
 						}
 						public void exceptionOccurred(Exception exception)
 						{
-							super.customResultAvailable(null);
+							ret.setResult(null);
 						}
 					}));
 				}
@@ -1057,16 +1059,21 @@ public class StarterPanel extends JLayeredPane
 				}
 				return ret;
 			}
-		}).addResultListener(new SwingDelegationResultListener(ret)
+		}).addResultListener(new ExceptionSwingDelegationResultListener<Tuple2<String, String>, Properties>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Tuple2<String, String> result)
 			{
 				Properties	props	= new Properties();
 				
-				if(result!=null) 
-					props.addProperty(new Property("model", (String)result));
+				if(result!=null)
+				{
+					props.addProperty(new Property("model", result.getFirstEntity()));
+					props.addProperty(new Property("ridurl", result.getSecondEntity()));
+					props.addProperty(new Property("globalrid", lastrid!=null ? lastrid.getGlobalIdentifier() : null));
+				}
 
-				props.addProperty(new Property("rid", JavaWriter.objectToXML(rid, null)));
+				// Todo: save global rid, if any.
+//				props.addProperty(new Property("rid", JavaWriter.objectToXML(rid, null)));
 				
 				String c = (String)config.getSelectedItem();
 				if(c!=null) props.addProperty(new Property("config", c));
@@ -1095,34 +1102,55 @@ public class StarterPanel extends JLayeredPane
 	 *  Set the properties.
 	 *  @param props The propoerties.
 	 */
-	public void setProperties(Properties props)
+	public IFuture<Void> setProperties(final Properties props)
 	{
+		final Future<Void>	ret	= new Future<Void>();
 		// Settings are invoke later'd due to getting overridden otherwise.!?
 		
 //		System.out.println("setP: "+Thread.currentThread().getName());
 		
-		String rid = props.getStringProperty("rid");
-		lastrid =  JavaReader.objectFromXML(rid, null);
+		// Todo: read global rid (if any).
+//		String rid = props.getStringProperty("rid");
+//		lastrid =  JavaReader.objectFromXML(rid, null);
+		final String ridurl = props.getStringProperty("ridurl");
+		final String globalrid = props.getStringProperty("globalrid");
+		jcc.getPlatformAccess().scheduleStep(new IComponentStep<IResourceIdentifier>()
+		{
+			public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
+			{
+				URL	url	= SUtil.toURL(ridurl);
+				return new Future<IResourceIdentifier>(new ResourceIdentifier(new LocalResourceIdentifier(ia.getComponentIdentifier().getRoot(), url), globalrid));
+			}
+		}).addResultListener(new ExceptionSwingDelegationResultListener<IResourceIdentifier, Void>(ret)
+		{
+			public void customResultAvailable(IResourceIdentifier rid)
+			{
+				lastrid	= rid;
+				Property[]	aargs	= props.getProperties("argument");
+				loadargs = new String[aargs.length];
+				for(int i=0; i<aargs.length; i++)
+				{
+					loadargs[i] = aargs[i].getValue();
+				}
+
+				final String mo = props.getStringProperty("model");
+				if(mo!=null)
+				{
+					lastfile = mo;
+					loadconfig	= props.getStringProperty("config");
+					loadname	= props.getStringProperty("name");
+					reloadModel();
+				}
+				setStartSuspended(props.getBooleanProperty("startsuspended"));
+
+				setAutoGenerate(props.getBooleanProperty("autogenerate"));
+				numcomponents.setValue(new Integer(props.getIntProperty("number")));
+				
+				ret.setResult(null);
+			}
+		});
 		
-		Property[]	aargs	= props.getProperties("argument");
-		this.loadargs = new String[aargs.length];
-		for(int i=0; i<aargs.length; i++)
-		{
-			loadargs[i] = aargs[i].getValue();
-		}
-
-		final String mo = props.getStringProperty("model");
-		if(mo!=null)
-		{
-			lastfile = mo;
-			loadconfig	= props.getStringProperty("config");
-			loadname	= props.getStringProperty("name");
-			reloadModel();
-		}
-		setStartSuspended(props.getBooleanProperty("startsuspended"));
-
-		setAutoGenerate(props.getBooleanProperty("autogenerate"));
-		numcomponents.setValue(new Integer(props.getIntProperty("number")));
+		return ret;
 	}
 
 	/**

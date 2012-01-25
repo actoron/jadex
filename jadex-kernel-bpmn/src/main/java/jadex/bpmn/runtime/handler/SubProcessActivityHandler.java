@@ -59,7 +59,6 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 			
 			if(MSubProcess.SUBPROCESSTYPE_PARALLEL.equals(proc.getSubprocessType()))
 			{
-				// Todo: use subcontext?
 				Iterator<Object>	it	= SReflect.getIterator(thread.getPropertyValue("items"));
 				// If empty parallel activity (i.e. no items at all) continue process.
 				if(!it.hasNext())
@@ -78,17 +77,48 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 							ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), subcontext, instance);
 							subthread.setParameterValue("item", value);	// Hack!!! parameter not declared?
 							subcontext.addThread(subthread);
-//							instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, subthread);
-							ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, subthread.getClass().getName(), 
-								subthread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(subthread));
-							instance.notifyListeners(cce);
+//							ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, subthread.getClass().getName(), 
+//								subthread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(subthread));
+//							instance.notifyListeners(cce);
 						}
 					}
 				}
 			}
-			else if(MSubProcess.SUBPROCESSTYPE_LOOPING.equals(proc.getSubprocessType()))
+			
+			// Todo: support LOOPING in editor.
+			else if(MSubProcess.SUBPROCESSTYPE_LOOPING.equals(proc.getSubprocessType()) || thread.hasPropertyValue("items"))
 			{
 				throw new UnsupportedOperationException("Looping subprocess not yet supported: "+activity+", "+instance);
+//				Iterator<Object>	it	= SReflect.getIterator(thread.getPropertyValue("items"));
+//				// If empty looping activity (i.e. no items at all) continue process.
+//				if(!it.hasNext())
+//				{
+//					wait	= false;
+//				}
+//				else
+//				{
+//					ThreadContext subcontext = new ThreadContext(proc, thread);
+//					thread.getThreadContext().addSubcontext(subcontext);
+//					boolean	first	= true;
+//					while(it.hasNext())
+//					{
+//						Object	value	= it.next();
+//						for(int i=0; i<start.size(); i++)
+//						{
+//							ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), subcontext, instance);
+//							subthread.setParameterValue("item", value);	// Hack!!! parameter not declared?
+//							subcontext.addThread(subthread);
+//							if(!first)
+//							{
+//								subthread.setWaiting(true);
+//							}
+////							ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, subthread.getClass().getName(), 
+////								subthread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(subthread));
+////							instance.notifyListeners(cce);
+//						}
+//						first	= false;
+//					}
+//				}
 			}
 			else
 			{
@@ -98,10 +128,9 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 				{
 					ProcessThread subthread = new ProcessThread(thread.getId()+":"+thread.idcnt++, (MActivity)start.get(i), subcontext, instance);
 					subcontext.addThread(subthread);
-//					instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, subthread);
-					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, subthread.getClass().getName(), 
-						subthread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(subthread));
-					instance.notifyListeners(cce);
+//					ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, subthread.getClass().getName(), 
+//						subthread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(subthread));
+//					instance.notifyListeners(cce);
 				}
 			}
 			
