@@ -78,7 +78,7 @@ public class ASubProcessService extends ABasicAnalysisSessionService
 			final IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(susThread);
 			cms.createComponent(name + "(S: " + session.toString() + ")", model,
 					new CreationInfo(null, arguments, access.getComponentIdentifier(),
-							false, false, false, false, access.getModel().getAllImports(), null), lis).addResultListener(new IResultListener()
+							false, false, false, false, access.getModel().getAllImports(), null, null), lis).addResultListener(new IResultListener()
 						{
 
 							@Override

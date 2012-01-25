@@ -75,7 +75,7 @@ public class JadexExecuteExperimentsService extends ABasicAnalysisSessionService
 		final IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class).get(susThread);
 		cms.createComponent("dm", "jadex/simulation/analysis/application/jadex/model/disastermanagement/DisasterManagement.application.xml",
 				new CreationInfo("default", null, access.getComponentIdentifier(),
-						false, false, false, false, access.getModel().getAllImports(), null), kill).
+						false, false, false, false, access.getModel().getAllImports(), null, null), kill).
 						addResultListener(new IResultListener()
 						{
 
@@ -129,7 +129,7 @@ public class JadexExecuteExperimentsService extends ABasicAnalysisSessionService
 		final IComponentManagementService cms = (IComponentManagementService) SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class).get(susThread);
 		cms.createComponent("dm", "jadex/simulation/analysis/application/jadex/model/disastermanagement/DisasterManagement.application.xml",
 				new CreationInfo("default", null, access.getComponentIdentifier(),
-						false, false, false, false, access.getModel().getAllImports(), null), kill).addResultListener(new IResultListener()
+						false, false, false, false, access.getModel().getAllImports(), null, null), kill).addResultListener(new IResultListener()
 					{
 
 						@Override

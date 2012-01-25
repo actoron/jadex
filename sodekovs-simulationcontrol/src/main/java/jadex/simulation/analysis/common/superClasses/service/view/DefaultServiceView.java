@@ -1,6 +1,8 @@
 package jadex.simulation.analysis.common.superClasses.service.view;
 
-import jadex.base.gui.componenttree.ProvidedServiceProperties;
+import jadex.base.gui.componenttree.ProvidedServiceInfoProperties;
+import jadex.bridge.ClassInfo;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.simulation.analysis.common.superClasses.events.IAEvent;
 import jadex.simulation.analysis.common.superClasses.events.IAListener;
@@ -41,10 +43,12 @@ public class DefaultServiceView extends JTabbedPane implements IAListener
 			public void run()
 			{
 				//TODO: ADD Workload
-				ProvidedServiceProperties serProp = new ProvidedServiceProperties();
+				ProvidedServiceInfoProperties serProp = new ProvidedServiceInfoProperties();
 				
 //				serProp.createTextField("workload", ((Double)service.getWorkload().get(new ThreadSuspendable(this))).toString());
-				serProp.setService(service);
+				ProvidedServiceInfo info = new ProvidedServiceInfo();
+				info.setType(new ClassInfo(service.getClass()));
+				serProp.setService(info,null,null);
 				serProp.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), " Jadex 'Service' Eigenschaften "));
 				generalcomp = serProp;
 				

@@ -1,5 +1,6 @@
 package jadex.simulation.analysis.common.superClasses.service.view.session.subprocess;
 
+import jadex.base.gui.componenttree.ProvidedServiceInfoProperties;
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInterpreter;
@@ -44,7 +45,7 @@ public class ASubProcessView extends JDesktopPane implements IASessionView, IALi
 	protected JPanel bottom = new JPanel(new GridBagLayout());
 	protected JPanel top = new JPanel(new GridBagLayout());
 	protected SessionProperties prop = null;
-	protected ProvidedServiceProperties serviceProp = null;
+	protected ProvidedServiceInfoProperties serviceProp = null;
 	protected GraphPanel graphPanel = null;
 
 	final protected ASubProcessView me = this;
