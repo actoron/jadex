@@ -59,7 +59,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	/* $if !android $ */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"component", SGUI.makeIcon(ComponentComponentFactory.class, "/jadex/component/images/component.png"),
+		"component", SGUI.makeIcon(ComponentComponentFactory.class, "/jadex/component/images/component.png")
 	});
 	/* $endif $ */
 	
