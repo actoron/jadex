@@ -139,12 +139,15 @@ public class LeaseTimeHandler
 						for(Iterator it=entries.values().iterator(); it.hasNext(); )
 						{
 							DiscoveryEntry entry = (DiscoveryEntry)it.next();
-							 // Have some time buffer before delete
-							if(time>entry.getTime()+entry.getInfo().getDelay()*factor)
+							if(entry.getInfo().getDelay()!=-1)
 							{
-//								System.out.println("Removing: "+entry);
-								it.remove();
-								todel.add(entry);
+								 // Have some time buffer before delete
+								if(time>entry.getTime()+entry.getInfo().getDelay()*factor)
+								{
+	//								System.out.println("Removing: "+entry);
+									it.remove();
+									todel.add(entry);
+								}
 							}
 						}
 					}

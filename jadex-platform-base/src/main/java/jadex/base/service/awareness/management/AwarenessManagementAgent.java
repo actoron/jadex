@@ -292,12 +292,16 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			boolean	remoteexcluded	= !isIncluded(root, info.getIncludes(), info.getExcludes());
 			if(dif==null)
 			{
-				dif = new DiscoveryInfo(sender, null, getClockTime(), getDelay(), remoteexcluded);
+				dif = new DiscoveryInfo(sender, null, getClockTime(), info.getDelay(), remoteexcluded);
 				discovered.put(sender, dif);
 				ret	= true;
 			}
-			
-			dif.setTime(getClockTime());
+			else
+			{
+				dif.setTime(getClockTime());
+				dif.setDelay(info.getDelay());
+				dif.setRemoteExcluded(remoteexcluded);
+			}
 			
 			if(isIncluded(sender, getIncludes(), getExcludes())
 				&& !remoteexcluded && isAutoCreateProxy() && dif.getProxy()==null)
@@ -530,14 +534,17 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 					for(Iterator it=discovered.values().iterator(); it.hasNext(); )
 					{
 						DiscoveryInfo dif = (DiscoveryInfo)it.next();
-						// five seconds buffer
-						if(time>dif.getTime()+dif.getDelay()*3.2) // Have some time buffer before delete
+						if(dif.getDelay()!=-1)
 						{
-//							System.out.println("Removing: "+dif);
-							it.remove();
-							if(autodelete)
+							// five seconds buffer
+							if(time>dif.getTime()+dif.getDelay()*3.2) // Have some time buffer before delete
 							{
-								todel.add(dif);
+	//							System.out.println("Removing: "+dif);
+								it.remove();
+								if(autodelete)
+								{
+									todel.add(dif);
+								}
 							}
 						}
 						

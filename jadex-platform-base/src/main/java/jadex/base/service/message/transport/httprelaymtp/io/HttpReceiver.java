@@ -1,14 +1,22 @@
 package jadex.base.service.message.transport.httprelaymtp.io;
 
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.bridge.service.types.awareness.IManagementService;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SUtil;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.micro.annotation.Binding;
+import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
@@ -46,119 +54,117 @@ public class HttpReceiver
 	{
 		this.access	= access_;
 		this.address	= address_;
-		thread	= new Thread(new Runnable()
+		SServiceProvider.getService(access.getServiceProvider(), IMessageService.class, Binding.SCOPE_PLATFORM)
+			.addResultListener(new DefaultResultListener<IMessageService>()
 		{
-			public void run()
+			public void resultAvailable(IMessageService ms)
 			{
-				long	lasttry	= 0;
-				while(!finished)
+				// Todo: update cid at runtime?
+				ms.updateComponentIdentifier(access.getComponentIdentifier().getRoot())
+					.addResultListener(new DefaultResultListener<IComponentIdentifier>()
 				{
-					try
+					public void resultAvailable(final IComponentIdentifier cid)
 					{
-						// When last connection attempt was less than a second ago, wait some time.
-						if(lasttry!=0 && System.currentTimeMillis()-lasttry<1000)
+						thread	= new Thread(new Runnable()
 						{
-							Thread.sleep(30000);
-						}
-						
-						if(!finished)
-						{
-							lasttry	= System.currentTimeMillis();
-							String	xmlid	= JavaWriter.objectToXML(access.getComponentIdentifier().getRoot(), getClass().getClassLoader());
-							URL	url	= new URL(address+"?id="+URLEncoder.encode(xmlid, "UTF-8"));
-//							System.out.println("Connecting to: "+url);
-							con	= (HttpURLConnection)url.openConnection();
-							con.setUseCaches(false);
-							InputStream	in	= con.getInputStream();
-							while(true)
+							public void run()
 							{
-								// Read message type.
-								int	b	= in.read();
-								if(b==-1)
+								long	lasttry	= 0;
+								while(!finished)
 								{
-									throw new IOException("Stream closed");
-								}
-								else if(b==SRelay.MSGTYPE_PING)
-								{
-//									System.out.println("Received ping");
-								}
-								else if(b==SRelay.MSGTYPE_DEFAULT)
-								{
-									// Read message header (codes + size)
-									int msg_size;
-									byte[] asize = new byte[4];
-									for(int i=0; i<asize.length; i++)
+									try
 									{
-										b	= in.read();
-										if(b==-1) 
-											throw new IOException("Stream closed");
-										asize[i] = (byte)b;
-									}
-									
-									msg_size = SUtil.bytesToInt(asize);
-		//							System.out.println("reclen: "+msg_size);
-									if(msg_size>0)
-									{
-										final byte[] rawmsg = new byte[msg_size];
-										int count = 0;
-										while(count<msg_size) 
+										// When last connection attempt was less than a second ago, wait some time.
+										if(lasttry!=0 && System.currentTimeMillis()-lasttry<1000)
 										{
-											int bytes_read = in.read(rawmsg, count, msg_size-count);
-											if(bytes_read==-1) 
-												throw new IOException("Stream closed");
-											count += bytes_read;
+											Thread.sleep(30000);
 										}
 										
-										access.scheduleStep(new IComponentStep<Void>()
+										if(!finished)
 										{
-											public IFuture<Void> execute(final IInternalAccess ia)
+											lasttry	= System.currentTimeMillis();
+											String	xmlid	= JavaWriter.objectToXML(cid, getClass().getClassLoader());
+											URL	url	= new URL(address+"?id="+URLEncoder.encode(xmlid, "UTF-8"));
+//											System.out.println("Connecting to: "+url);
+											con	= (HttpURLConnection)url.openConnection();
+											con.setUseCaches(false);
+											InputStream	in	= con.getInputStream();
+											while(true)
 											{
-												ia.getServiceContainer().searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-													.addResultListener(new IResultListener<IMessageService>()
+												// Read message type.
+												int	b	= in.read();
+												if(b==-1)
 												{
-													public void resultAvailable(IMessageService ms)
+													throw new IOException("Stream closed");
+												}
+												else if(b==SRelay.MSGTYPE_PING)
+												{
+//													System.out.println("Received ping");
+												}
+												else if(b==SRelay.MSGTYPE_AWAADD || b==SRelay.MSGTYPE_AWAREMOVE)
+												{
+													final byte[] rawmsg = readMessage(in);
+													postAwarenessInfo(rawmsg, b);
+												}
+												else if(b==SRelay.MSGTYPE_DEFAULT)
+												{
+													final byte[] rawmsg = readMessage(in);
+													if(rawmsg!=null)
 													{
-														try
+														access.scheduleStep(new IComponentStep<Void>()
 														{
-															ms.deliverMessage(rawmsg);
-														}
-														catch(Exception e)
-														{
-															ia.getLogger().warning("Exception when delivering message: "+e+", "+rawmsg);													
-														}
+															public IFuture<Void> execute(final IInternalAccess ia)
+															{
+																ia.getServiceContainer().searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+																	.addResultListener(new IResultListener<IMessageService>()
+																{
+																	public void resultAvailable(IMessageService ms)
+																	{
+																		try
+																		{
+																			ms.deliverMessage(rawmsg);
+																		}
+																		catch(Exception e)
+																		{
+																			ia.getLogger().warning("Exception when delivering message: "+e+", "+rawmsg);													
+																		}
+																	}
+																	
+																	public void exceptionOccurred(Exception e)
+																	{
+																		ia.getLogger().warning("Exception when delivering message: "+e+", "+rawmsg);
+																	}
+																});
+																return IFuture.DONE;
+															}
+														});
 													}
-													
-													public void exceptionOccurred(Exception e)
-													{
-														ia.getLogger().warning("Exception when delivering message: "+e+", "+rawmsg);
-													}
-												});
-												return IFuture.DONE;
+												}
 											}
-										});
+										}
+									}
+									catch(final Exception e)
+									{
+										if(!finished)
+										{
+											access.scheduleStep(new IComponentStep<Void>()
+											{
+												public IFuture<Void> execute(IInternalAccess ia)
+												{
+													ia.getLogger().warning("Exception in HTTP releay receiver thread causing reconnect: "+e);
+													return IFuture.DONE;
+												}
+											});
+										}
 									}
 								}
 							}
-						}
+						});
+						thread.start();
 					}
-					catch(final Exception e)
-					{
-						if(!finished)
-						{
-							access.scheduleStep(new IComponentStep<Void>()
-							{
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-									ia.getLogger().warning("Exception in HTTP releay receiver thread causing reconnect: "+e);
-									return IFuture.DONE;
-								}
-							});
-						}
-					}
-				}
+				});
 			}
 		});
-		thread.start();
 	}
 	
 	//-------- methods --------
@@ -195,5 +201,73 @@ public class HttpReceiver
 		access	= null;
 		address	= null;
 		thread	= null;
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Read a complete message from the stream.
+	 */
+	protected byte[]	readMessage(InputStream in) throws IOException
+	{
+		byte[] rawmsg	= null;
+		
+		// Read message header (size)
+		int msg_size;
+		byte[] asize = new byte[4];
+		for(int i=0; i<asize.length; i++)
+		{
+			int	b	= in.read();
+			if(b==-1) 
+				throw new IOException("Stream closed");
+			asize[i] = (byte)b;
+		}
+		
+		msg_size = SUtil.bytesToInt(asize);
+//		System.out.println("reclen: "+msg_size);
+		if(msg_size>0)
+		{
+			rawmsg = new byte[msg_size];
+			int count = 0;
+			while(count<msg_size) 
+			{
+				int bytes_read = in.read(rawmsg, count, msg_size-count);
+				if(bytes_read==-1) 
+					throw new IOException("Stream closed");
+				count += bytes_read;
+			}
+		}
+		
+		return rawmsg;
+	}
+	
+	/**
+	 *  Post a received awareness info to awareness service (if any).
+	 */
+	protected void	postAwarenessInfo(final byte[] data, final int type)
+	{
+		SServiceProvider.getService(access.getServiceProvider(), IManagementService.class, Binding.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<IManagementService>()
+		{
+			public void resultAvailable(IManagementService awa)
+			{
+				try
+				{
+					IComponentIdentifier	id	= (IComponentIdentifier)JavaReader.objectFromByteArray(data, getClass().getClassLoader());
+					String	state	=  type==SRelay.MSGTYPE_AWAADD ? AwarenessInfo.STATE_ONLINE : AwarenessInfo.STATE_OFFLINE;
+					awa.addAwarenessInfo(new AwarenessInfo(id, state, -1, null, null, null));
+				}
+				catch(Exception e)
+				{
+					System.out.println("Error receiving awareness info: "+e);										
+				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// No awa service -> ignore awa infos.
+			}
+		});
+		
 	}
 }

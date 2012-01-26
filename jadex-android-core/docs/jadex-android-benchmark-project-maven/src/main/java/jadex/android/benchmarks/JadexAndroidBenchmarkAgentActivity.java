@@ -108,7 +108,7 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 					"-tcptransport", "false",
 					"-niotcptransport", "false",
 					"-relaytransport", "true",
-//					"-relayaddress", "\"http://134.100.11.200:8080/jadex-platform-relay-web/\"",					
+					"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/\"",					
 					"-saveonexit", "false", "-gui", "false",
 					"-autoshutdown", "false"
 				}).addResultListener(new IResultListener<IExternalAccess>()
@@ -160,8 +160,8 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 //				args.put("max", new Integer(2));
 //				args.put("codec", Boolean.TRUE);
 				args.put("echo", new ComponentIdentifier("echo@echo",
-					new String[]{SRelay.DEFAULT_ADDRESS}));
-//					new String[]{"http://134.100.11.200:8080/jadex-platform-relay-web/"}));
+//					new String[]{SRelay.DEFAULT_ADDRESS}));
+					new String[]{SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/"}));
 			}
 			
 			startMB1.setEnabled(false);

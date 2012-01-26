@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
@@ -96,6 +97,9 @@ public class ReceiveRequest	implements IHttpRequest
 
 	/** The amount of data already available (0..data.length). */
 	protected int	chunkheadpos;
+	
+	/** The currently read msg type. */
+	protected byte	msgtype;
 	
 	/** The currently read msg data. */
 	protected byte[]	msg;
@@ -373,9 +377,10 @@ public class ReceiveRequest	implements IHttpRequest
 //							System.out.println("read ping msg header");
 							state	= STATE_READING_MSG_HEADER;
 						}
-						else if(msghead==SRelay.MSGTYPE_DEFAULT)
+						else if(msghead==SRelay.MSGTYPE_DEFAULT || msghead==SRelay.MSGTYPE_AWAADD || msghead==SRelay.MSGTYPE_AWAREMOVE)
 						{
 //							System.out.println("read default msg header");
+							msgtype	= msghead;
 							state	= STATE_READING_MSG_LENGTH;
 							msg	= new byte[4];
 							msgpos	= 0;
@@ -464,7 +469,36 @@ public class ReceiveRequest	implements IHttpRequest
 						received++;
 //						System.out.println("read msg body: "+received);
 						// Message read.
-						ms.deliverMessage(msg);
+						if(msgtype==SRelay.MSGTYPE_DEFAULT)
+						{
+							ms.deliverMessage(msg);
+						}
+						else if(msgtype==SRelay.MSGTYPE_AWAADD)
+						{
+							Object	id;
+							try
+							{
+								id	= JavaReader.objectFromByteArray(msg, getClass().getClassLoader());
+								System.out.println("Received awareness add: "+id);										
+							}
+							catch(Exception e)
+							{
+								System.out.println("Error receiving awareness add: "+e);										
+							}
+						}
+						else if(msgtype==SRelay.MSGTYPE_AWAREMOVE)
+						{
+							Object	id;
+							try
+							{
+								id	= JavaReader.objectFromByteArray(msg, getClass().getClassLoader());
+								System.out.println("Received awareness remove: "+id);										
+							}
+							catch(Exception e)
+							{
+								System.out.println("Error receiving awareness remove: "+e);										
+							}
+						}
 						msg	= null;
 						msgpos	= 0;
 						state	= STATE_READING_MSG_HEADER;

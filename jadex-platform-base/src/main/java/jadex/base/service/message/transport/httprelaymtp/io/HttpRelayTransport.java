@@ -2,6 +2,7 @@ package jadex.base.service.message.transport.httprelaymtp.io;
 
 import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
+import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
@@ -134,7 +135,7 @@ public class HttpRelayTransport implements ITransport
 	 */
 	public String getServiceSchema()
 	{
-		return "relay-http://";
+		return SRelay.ADDRESS_SCHEME;
 	}
 	
 	/**

@@ -437,7 +437,7 @@ public class MessageService extends BasicService implements IMessageService
 			SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm).toArray(new IComponentIdentifier[0]);
 			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, getTransports(), cids, codecs);
-//			System.out.println("msgservice adding send task");
+//			System.out.println("msgservice adding send task: "+sender+", "+SUtil.arrayToString(recs));
 			tm.addMessage(task).addResultListener(crl);
 //			task.getSendManager().addMessage(task).addResultListener(crl);
 		}
@@ -984,7 +984,7 @@ public class MessageService extends BasicService implements IMessageService
 			final Map<String, Object> msg	= me.getMessage();
 			String type	= me.getTypeName();
 			final IComponentIdentifier[] receivers	= me.getReceivers();
-			
+//			System.out.println("Received message: "+SUtil.arrayToString(receivers));
 			final MessageType	messagetype	= getMessageType(type);
 			final Map	decoded	= new HashMap();	// Decoded messages cached by class loader to avoid decoding the same message more than once, when the same class loader is used.
 			

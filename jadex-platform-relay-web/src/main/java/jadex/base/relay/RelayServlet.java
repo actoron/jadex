@@ -1,16 +1,17 @@
 package jadex.base.relay;
 
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.concurrent.TimeoutException;
-import jadex.commons.future.Future;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,7 +36,7 @@ public class RelayServlet extends HttpServlet
 	//-------- attributes --------
 	
 	/** The relay map (id -> queue for pending requests). */
-	protected Map<Object, IBlockingQueue<Tuple2<InputStream, Future<Void>>>>	map;
+	protected Map<Object, IBlockingQueue<Message>>	map;
 	
 	/** Info about connected platforms.*/
 	protected Map<Object, PlatformInfo>	platforms;
@@ -56,7 +57,7 @@ public class RelayServlet extends HttpServlet
 	 */
 	public void init() throws ServletException
 	{
-		map	= Collections.synchronizedMap(new HashMap<Object, IBlockingQueue<Tuple2<InputStream, Future<Void>>>>());
+		map	= Collections.synchronizedMap(new HashMap<Object, IBlockingQueue<Message>>());
 		platforms	= Collections.synchronizedMap(new LinkedHashMap<Object, PlatformInfo>());
 	}
 	
@@ -67,14 +68,14 @@ public class RelayServlet extends HttpServlet
 	{
 		if(map!=null && !map.isEmpty())
 		{
-			for(Iterator<IBlockingQueue<Tuple2<InputStream, Future<Void>>>> it=map.values().iterator(); it.hasNext(); )
+			for(Iterator<IBlockingQueue<Message>> it=map.values().iterator(); it.hasNext(); )
 			{
-				IBlockingQueue<Tuple2<InputStream, Future<Void>>>	queue	= it.next();
+				IBlockingQueue<Message>	queue	= it.next();
 				it.remove();
-				List<Tuple2<InputStream, Future<Void>>>	items	= queue.setClosed(true);
+				List<Message>	items	= queue.setClosed(true);
 				for(int i=0; i<items.size(); i++)
 				{
-					items.get(i).getSecondEntity().setException(new RuntimeException("Target disconnected."));
+					items.get(i).getFuture().setException(new RuntimeException("Target disconnected."));
 				}
 			}
 		}
@@ -118,13 +119,13 @@ public class RelayServlet extends HttpServlet
 					info.reconnect(request.getRemoteHost());
 				}
 				
-				IBlockingQueue<Tuple2<InputStream, Future<Void>>>	queue	= map.get(id);
-				List<Tuple2<InputStream, Future<Void>>>	items	= null;
+				IBlockingQueue<Message>	queue	= map.get(id);
+				List<Message>	items	= null;
 				if(queue!=null)
 				{
 					// Close old queue to free old servlet request
 					items	= queue.setClosed(true);
-					queue	= 	new ArrayBlockingQueue<Tuple2<InputStream, Future<Void>>>();
+					queue	= 	new ArrayBlockingQueue<Message>();
 					// Add outstanding requests to new queue.
 					for(int i=0; i<items.size(); i++)
 					{
@@ -133,7 +134,7 @@ public class RelayServlet extends HttpServlet
 				}
 				else
 				{
-					queue	= 	new ArrayBlockingQueue<Tuple2<InputStream, Future<Void>>>();
+					queue	= 	new ArrayBlockingQueue<Message>();
 				}
 				map.put(id, queue);
 				
@@ -149,25 +150,25 @@ public class RelayServlet extends HttpServlet
 						try
 						{
 							// Get next request from queue.
-							Tuple2<InputStream, Future<Void>>	msg	= queue.dequeue(30000);	// Todo: make ping delay configurable on per client basis
+							Message	msg	= queue.dequeue(30000);	// Todo: make ping delay configurable on per client basis
 							try
 							{
 								// Send message header.
-								response.getOutputStream().write(SRelay.MSGTYPE_DEFAULT);
+								response.getOutputStream().write(msg.getMessageType());
 								
 								// Copy message to output stream.
 								long	start	= System.nanoTime();
 								byte[]	buf	= new byte[8192];  
 								int	len;
 								int	cnt	= 0;
-								while((len=msg.getFirstEntity().read(buf)) != -1)
+								while((len=msg.getContent().read(buf)) != -1)
 								{
 									response.getOutputStream().write(buf, 0, len);
 									cnt	+= len;
 								}
 								response.getOutputStream().flush();
 								info.addMessage(cnt, System.nanoTime()-start);
-								msg.getSecondEntity().setResult(null);
+								msg.getFuture().setResult(null);
 //								synchronized(this)
 //								{
 //									sent++;
@@ -176,7 +177,7 @@ public class RelayServlet extends HttpServlet
 							}
 							catch(Exception e)
 							{
-								msg.getSecondEntity().setException(e);
+								msg.getFuture().setException(e);
 								throw e;	// rethrow exception to end servlet execution for client.
 							}
 						}
@@ -199,10 +200,11 @@ public class RelayServlet extends HttpServlet
 					items	= queue.setClosed(true);
 					map.remove(id);
 					platforms.remove(id);
+//					sendAwarenessInfos(id, false);
 			//		System.out.println("Removed from map ("+items.size()+" remaining items). New size: "+map.size());
 					for(int i=0; i<items.size(); i++)
 					{
-						items.get(i).getSecondEntity().setException(new RuntimeException("Target disconnected."));
+						items.get(i).getFuture().setException(new RuntimeException("Target disconnected."));
 					}
 				}
 			}
@@ -246,52 +248,155 @@ public class RelayServlet extends HttpServlet
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 		System.out.println("Entering POST request. opencnt="+(++opencnt2)+", mapsize="+map.size());
-		ServletInputStream	in	= request.getInputStream();
-		Object	targetid	= SRelay.readObject(in);
-		boolean	sent	= false;
-		if(!"benchmark".equals(targetid))
+//		String	s;
+//		s	= request.getContextPath();
+//		s	= request.getPathInfo();
+//		s	= request.getQueryString();
+//		s	= request.getServletPath();
+//		s	= request.getRequestURL().toString();
+		if("/awareness".equals(request.getServletPath()))
 		{
-			IBlockingQueue<Tuple2<InputStream, Future<Void>>>	queue	= map.get(targetid);
-			if(queue!=null)
-			{
-				Future<Void>	fut	= new Future<Void>();
-				try
-				{
-					queue.enqueue(new Tuple2<InputStream, Future<Void>>(in, fut));
-//					synchronized(this)
-//					{
-//						queued++;
-//					}
-//					System.out.println("queued: "+queued);
-					fut.get(new ThreadSuspendable(), 30000);	// todo: how to set a useful timeout value!?
-					sent	= true;
-				}
-				catch(Exception e)
-				{
-					// timeout
-				}
-			}
+			ServletInputStream	in	= request.getInputStream();
+			// Read target id.
+			Object	targetid	= readObject(in);
+			
+			// Read total message length.
+			byte[]	len	= readData(in, 4);
+			int	length	= SUtil.bytesToInt(len);
+
+			// Read prolog (1 byte codec length + 1 byte xml codec id)
+			readData(in, 2);
+			
+			// Read message.
+			byte[] buffer = readData(in, length-2);
+			Object	info	= JavaReader.objectFromByteArray(buffer, SRelay.class.getClassLoader());
+			System.out.println("awareness request: "+targetid+", "+info);
 		}
 		else
 		{
-			try
+			ServletInputStream	in	= request.getInputStream();
+			Object	targetid	= readObject(in);
+			boolean	sent	= false;
+			if(!"benchmark".equals(targetid))
 			{
-				byte[]	buf	= new byte[8192];  
-				while(in.read(buf)!=-1)
+				IBlockingQueue<Message>	queue	= map.get(targetid);
+				if(queue!=null)
 				{
+					try
+					{
+						Message	msg	= new Message(SRelay.MSGTYPE_DEFAULT, in);
+						queue.enqueue(msg);
+	//					synchronized(this)
+	//					{
+	//						queued++;
+	//					}
+	//					System.out.println("queued: "+queued);
+						msg.getFuture().get(new ThreadSuspendable(), 30000);	// todo: how to set a useful timeout value!?
+						sent	= true;
+					}
+					catch(Exception e)
+					{
+						// timeout or platform just disconnected
+					}
 				}
-				sent	= true;
 			}
-			catch(Exception e)
-			{			
+			else
+			{
+				try
+				{
+					byte[]	buf	= new byte[8192];  
+					while(in.read(buf)!=-1)
+					{
+					}
+					sent	= true;
+				}
+				catch(Exception e)
+				{			
+				}
 			}
-		}
-		
-		if(!sent)
-		{
-			// Todo: other error msg?
-			response.sendError(404);
+			
+			if(!sent)
+			{
+				// Todo: other error msg?
+				response.sendError(404);
+			}
 		}
 		System.out.println("Leaving POST request. opencnt="+(--opencnt2)+", mapsize="+map.size());
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Send awareness messages about a new (add=true) or disconnected (add=false) platform.
+	 */
+	protected void	sendAwarenessInfos(Object id, boolean add)
+	{
+		byte[]	data	= JavaWriter.objectToByteArray(id, SRelay.class.getClassLoader());
+		byte[]	info	= new byte[data.length+4];
+		System.arraycopy(SUtil.intToBytes(data.length), 0, info, 0, 4);
+		System.arraycopy(data, 0, info, 4, data.length);
+		
+		Map.Entry<Object, IBlockingQueue<Message>>[]	entries	= map.entrySet().toArray(new Map.Entry[0]);
+		for(int i=0; i<entries.length; i++)
+		{
+			if(!id.equals(entries[i].getKey()))	// Don't send awareness to self
+			{
+				try
+				{
+					entries[i].getValue().enqueue(new Message(add ? SRelay.MSGTYPE_AWAADD : SRelay.MSGTYPE_AWAREMOVE ,new ByteArrayInputStream(info)));
+				}
+				catch(Exception e)
+				{
+					// Queue closed, because platform just disconnected.
+				}
+			}
+		}
+	}
+
+	/**
+	 * 	Read an object from the given stream.
+	 *  @param in	The input stream.
+	 *  @return The object.
+	 *  @throws	IOException when the stream is closed.
+	 */
+	public static Object	readObject(InputStream in) throws IOException
+	{
+		byte[]	len	= readData(in, 4);
+		int	length	= SUtil.bytesToInt(len);
+		byte[] buffer = readData(in, length);
+		return JavaReader.objectFromByteArray(buffer, SRelay.class.getClassLoader());
+	}
+	
+	/**
+	 *  Write an object to the given stream.
+	 *  @param obj	The object.
+	 *  @param out	The output stream.
+	 *  @throws	IOException when the stream is closed.
+	 */
+	public static void	writeObject(Object obj, OutputStream out) throws IOException
+	{
+		byte[]	data	= JavaWriter.objectToByteArray(obj, SRelay.class.getClassLoader());
+		out.write(SUtil.intToBytes(data.length));
+		out.write(data);
+		out.flush();		
+	}
+	
+	/**
+	 *  Read data into a byte array.
+	 */
+	protected static byte[] readData(InputStream is, int length) throws IOException
+	{
+		int num	= 0;
+		byte[]	buffer	= new byte[length];
+		while(num<length)
+		{
+			int read	= is.read(buffer, num, length-num);
+			if(read==-1)
+			{
+				throw new IOException("Stream closed.");
+			}
+			num	= num + read;
+		}
+		return buffer;
 	}
 }

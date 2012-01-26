@@ -43,6 +43,14 @@ public class ReceivingBenchmark	extends AbstractRelayBenchmark
 		int	read	= in.read();
 		while(read!=-1 && read!=SRelay.MSGTYPE_DEFAULT)
 		{
+			// Skip awareness content.
+			if(read!=SRelay.MSGTYPE_PING)
+			{
+				byte[]	len	= readData(in, 4);
+				int	length	= SUtil.bytesToInt(len);
+				readData(in, length);				
+			}
+			
 			read	= in.read();
 		}
 		
@@ -51,8 +59,29 @@ public class ReceivingBenchmark	extends AbstractRelayBenchmark
 			throw new IOException("Stream closed.");
 		}
 		
-		byte[]	len	= SRelay.readData(in, 4);
+		byte[]	len	= readData(in, 4);
 		int	length	= SUtil.bytesToInt(len);
-		SRelay.readData(in, length);
+		readData(in, length);
 	}	
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Read data into a byte array.
+	 */
+	public static byte[] readData(InputStream is, int length) throws IOException
+	{
+		int num	= 0;
+		byte[]	buffer	= new byte[length];
+		while(num<length)
+		{
+			int read	= is.read(buffer, num, length-num);
+			if(read==-1)
+			{
+				throw new IOException("Stream closed.");
+			}
+			num	= num + read;
+		}
+		return buffer;
+	}
 }
