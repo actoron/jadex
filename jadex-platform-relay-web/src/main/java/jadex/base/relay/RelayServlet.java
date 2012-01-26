@@ -1,5 +1,8 @@
 package jadex.base.relay;
 
+import jadex.base.fipa.SFipa;
+import jadex.base.service.message.transport.MessageEnvelope;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
@@ -269,7 +272,8 @@ public class RelayServlet extends HttpServlet
 			
 			// Read message.
 			byte[] buffer = readData(in, length-2);
-			Object	info	= JavaReader.objectFromByteArray(buffer, SRelay.class.getClassLoader());
+			MessageEnvelope	msg	= (MessageEnvelope)JavaReader.objectFromByteArray(buffer, SRelay.class.getClassLoader());
+			AwarenessInfo	info	= (AwarenessInfo)msg.getMessage().get(SFipa.CONTENT);
 			System.out.println("awareness request: "+targetid+", "+info);
 		}
 		else
