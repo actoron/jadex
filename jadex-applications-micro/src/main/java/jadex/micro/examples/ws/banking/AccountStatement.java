@@ -1,24 +1,29 @@
 package jadex.micro.examples.ws.banking;
 
 /**
- * 
+ *  Account statement class.
  */
 public class AccountStatement
 {
+	//-------- attributes --------
+	
+	/** The account data. */
 	protected String[] data;
 	
+	/** The request. */
 	protected Request request;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create an account statement.
 	 */
 	public AccountStatement()
 	{
 	}
 
 	/**
-	 * @param bid
-	 * @param ask
+	 *  Create an account statement.
 	 */
 	public AccountStatement(String[] data, Request request)
 	{
@@ -26,6 +31,8 @@ public class AccountStatement
 		this.request = request;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the data.
 	 *  @return the data.

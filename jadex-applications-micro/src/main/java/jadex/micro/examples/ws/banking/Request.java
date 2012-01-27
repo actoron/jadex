@@ -3,16 +3,22 @@ package jadex.micro.examples.ws.banking;
 import java.util.Date;
 
 /**
- * 
+ *  Request that contains start an end date.
  */
 public class Request
 {
+	//-------- attributes --------
+	
+	/** The start date. */
 	protected Date begin;
 	
+	/** The end date. */
 	protected Date end;
 
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a request.
 	 */
 	public Request()
 	{
@@ -28,6 +34,8 @@ public class Request
 		this.end = end;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  Get the begin.
 	 *  @return the begin.
