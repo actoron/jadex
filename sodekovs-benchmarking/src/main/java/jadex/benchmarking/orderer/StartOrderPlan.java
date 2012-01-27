@@ -19,6 +19,8 @@ public class StartOrderPlan extends Plan {
 		String benchConf = FileHandler.readFileAsString(path);
 		
 		IBenchmarkingExecutionService benchServ = (IBenchmarkingExecutionService) getScope().getServiceContainer().getRequiredService("benchmarkingExecutionService").get(this);
+		
+		for(int i=0; i <10; i++){
 		benchServ.executeBenchmark(null, null, benchConf).addResultListener(new IResultListener<Void>() {
 			
 			@Override
@@ -32,6 +34,8 @@ public class StartOrderPlan extends Plan {
 				exception.printStackTrace();
 				
 			}
-		});					
+		});		
+		
+		}
 	}
 }
