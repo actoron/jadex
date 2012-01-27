@@ -353,7 +353,8 @@ public class Vector2Double implements IVector2, Cloneable
 
 	public boolean equals(IVector2 vector)
 	{
-		return (x_ == vector.getXAsDouble() && y_ == vector.getYAsDouble());
+		// Perform null check, to respect equals(Object) contract
+		return vector!=null && (x_ == vector.getXAsDouble() && y_ == vector.getYAsDouble());
 	}
 	
 	/** 

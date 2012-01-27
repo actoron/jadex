@@ -148,7 +148,8 @@ public class Vector1Double implements IVector1
 	
 	public boolean equals(IVector1 vector)
 	{
-		return (x_ == vector.getAsDouble());
+		// Perform null check, to respect equals(Object) contract
+		return vector!=null && (x_ == vector.getAsDouble());
 	}
 	
 	/** 

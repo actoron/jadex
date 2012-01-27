@@ -211,7 +211,8 @@ public class Vector1Long implements IVector1
 	 */
 	public boolean equals(IVector1 vector)
 	{
-		return (x_ == vector.getAsLong());
+		// Perform null check, to respect equals(Object) contract
+		return vector!=null && (x_ == vector.getAsLong());
 	}
 	
 	/** Tests if the vector is greater than another vector.

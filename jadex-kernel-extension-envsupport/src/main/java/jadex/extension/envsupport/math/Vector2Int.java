@@ -504,7 +504,8 @@ public class Vector2Int implements IVector2
 	 */
 	public boolean equals(IVector2 vector)
 	{
-		return ((x_ == vector.getXAsInteger()) && (y_ == vector.getYAsInteger()));
+		// Perform null check, to respect equals(Object) contract
+		return vector!=null && ((x_ == vector.getXAsInteger()) && (y_ == vector.getYAsInteger()));
 	}
 	
 	/** 

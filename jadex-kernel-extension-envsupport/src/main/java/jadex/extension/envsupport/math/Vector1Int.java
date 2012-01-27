@@ -211,7 +211,8 @@ public class Vector1Int implements IVector1
 	 */
 	public boolean equals(IVector1 vector)
 	{
-		return (x_ == vector.getAsInteger());
+		// Perform null check, to respect equals(Object) contract
+		return vector!=null && (x_ == vector.getAsInteger());
 	}
 	
 	/** Tests if the vector is greater than another vector.

@@ -21,6 +21,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.micro.annotation.Binding;
 import jadex.micro.benchmarks.MessagePerformanceAgent;
 import jadex.micro.examples.chat.IChatService;
 import jadex.xml.annotation.XMLClassname;
@@ -181,7 +182,7 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 			{
 				send.setEnabled(false);
 				msg.setEnabled(false);
-				SServiceProvider.getServices(platform.getServiceProvider(), IChatService.class)
+				SServiceProvider.getServices(platform.getServiceProvider(), IChatService.class, Binding.SCOPE_GLOBAL)
 					.addResultListener(new IIntermediateResultListener<IChatService>()
 				{
 					public void intermediateResultAvailable(IChatService result)
@@ -254,7 +255,8 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 					"-tcptransport", "false",
 					"-niotcptransport", "false",
 					"-relaytransport", "true",
-					"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/\"",					
+					"-relayaddress", "\""+SRelay.DEFAULT_ADDRESS+"\"",
+//					"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/\"",					
 					"-saveonexit", "false", "-gui", "false",
 					"-autoshutdown", "false",
 					"-awamechanisms", "new String[]{\"Relay\"}",
@@ -310,8 +312,8 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 //				args.put("max", new Integer(2));
 //				args.put("codec", Boolean.TRUE);
 				args.put("echo", new ComponentIdentifier("echo@echo",
-//					new String[]{SRelay.DEFAULT_ADDRESS}));
-					new String[]{SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/"}));
+					new String[]{SRelay.DEFAULT_ADDRESS}));
+//					new String[]{SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/"}));
 			}
 			
 			startMB1.setEnabled(false);
