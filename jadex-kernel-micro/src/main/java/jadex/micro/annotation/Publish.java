@@ -25,5 +25,5 @@ public @interface Publish
 	/**
 	 * The service type. 
 	 */
-	public Class servicetype();
+	public Class servicetype() default Object.class;
 }

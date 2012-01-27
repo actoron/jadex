@@ -118,7 +118,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		{
 			public void customResultAvailable(Class servicetype)
 			{
-//				System.out.println("Adding service: " + name + " " + type + " " + service);
+//				System.out.println("Adding service: " + info.getName() + " " + service);
 				synchronized(this)
 				{
 					Collection tmp = services!=null? (Collection)services.get(servicetype): null;

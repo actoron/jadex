@@ -1,4 +1,4 @@
-package jadex.base.service.publish;
+package jadex.extension.ws.publish;
 
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -170,10 +170,10 @@ public class DefaultWebServicePublishService implements IPublishService
 		{
 			try
 			{
-				CtClass proxyclazz = pool.makeClass(name, getCtClass(jadex.base.service.publish.Proxy.class, pool));
+				CtClass proxyclazz = pool.makeClass(name, getCtClass(jadex.extension.ws.publish.Proxy.class, pool));
 				proxyclazz.addInterface(getCtClass(type, pool));
 				Method[] ms = type.getMethods();
-				CtMethod invoke = getCtClass(jadex.base.service.publish.Proxy.class, pool).getDeclaredMethod("invoke");
+				CtMethod invoke = getCtClass(jadex.extension.ws.publish.Proxy.class, pool).getDeclaredMethod("invoke");
 				for(int i=0; i<ms.length; i++)
 				{
 					CtMethod m = CtNewMethod.wrapped(getCtClass(ms[i].getReturnType(), pool), ms[i].getName(), 

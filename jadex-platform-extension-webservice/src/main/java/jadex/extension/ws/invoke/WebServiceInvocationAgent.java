@@ -1,4 +1,4 @@
-package jadex.base.service.ws;
+package jadex.extension.ws.invoke;
 
 import jadex.micro.annotation.Agent;
 

@@ -396,6 +396,7 @@
 				<module>jadex-platform-standalone</module>
 				<module>jadex-platform-standalone-launch</module>
 				<module>jadex-platform-relay-web</module>
+				
 				<!-- <module>jadex-apleis</module> -->
 			</modules>
 		</profile>
@@ -645,7 +646,9 @@
 				<module>sodekovs-util</module>
 				<module>sodekovs-productionline</module>
 				<module>sodekovs-applications</module>
-				<module>jadex-distributed</module>
+				<!-- <module>jadex-distributed</module> -->
+				
+				<module>jadex-platform-extension-webservice</module>
 			</modules>
 		</profile>
 		<profile>

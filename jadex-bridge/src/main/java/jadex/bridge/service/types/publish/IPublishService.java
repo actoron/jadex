@@ -13,6 +13,9 @@ public interface IPublishService
 	/** The publish type web service. */
 	public static final String PUBLISH_WS = "ws";
 	
+	/** The publish type rest service. */
+	public static final String PUBLISH_RS = "rs";
+	
 	/**
 	 *  Test if publishing a specific type is supported (e.g. web service).
 	 *  @param publishtype The type to test.

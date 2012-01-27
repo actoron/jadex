@@ -1,4 +1,4 @@
-package jadex.base.service.ws;
+package jadex.extension.ws.invoke;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;

@@ -60,9 +60,11 @@
 		<import>jadex.base.service.settings.*</import>
 		<import>jadex.base.service.simulation.*</import>
 		<import>jadex.base.service.threadpool.*</import>
-		<import>jadex.base.service.publish.*</import>
 		<import>jadex.base.service.dependency.maven.*</import>
 		<import>jadex.base.service.security.*</import>
+
+		<import>jadex.extension.ws.publish.*</import>
+		<import>jadex.extension.rs.publish.*</import>
 		
 		<import>jadex.base.service.message.transport.*</import>
 		<import>jadex.base.service.message.transport.localmtp.*</import>
@@ -147,6 +149,9 @@
 
 		<!-- Flag if web service publishing is enabled. -->
 		<argument name="wspublish" class="boolean">true</argument>
+		
+		<!-- Flag if rest service publishing is enabled. -->
+		<argument name="rspublish" class="boolean">true</argument>
 		
 		<!-- The name(s) of kernel(s) to load (separated by comma).
 		     Currently supports 'component', 'micro', 'bpmn', 'bdi', 'gpmn' and 'application' kernel.
@@ -272,6 +277,11 @@
 		<providedservice class="IPublishService">
 			<implementation>
 				Boolean.TRUE.equals($args.wspublish &amp;&amp; !$args.android) ? DefaultWebServicePublishService.class.newInstance() : null
+			</implementation>
+		</providedservice>
+		<providedservice class="IPublishService">
+			<implementation>
+				Boolean.TRUE.equals($args.rspublish &amp;&amp; !$args.android) ? DefaultRestServicePublishService.class.newInstance() : null
 			</implementation>
 		</providedservice>
 		<providedservice class="ISecurityService">

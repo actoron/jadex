@@ -67,8 +67,9 @@ import java.util.logging.Level;
 	"jadex.benchmarking.services.*",
 	"java.util.logging.Level",
 	"java.net.URLClassLoader",
-	"jadex.base.service.publish.DefaultWebServicePublishService",
-	"jadex.base.service.security.*"
+	"jadex.base.service.security.*",
+	"jadex.extension.ws.publish.*",
+	"jadex.extension.rs.publish.*"
 })
 
 
@@ -137,6 +138,7 @@ import java.util.logging.Level;
 	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(expression="new SimulationService($component)")),
 	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService($component.getServiceProvider())")),
 	@ProvidedService(type=IPublishService.class, implementation=@Implementation(expression="new DefaultWebServicePublishService()")),
+	@ProvidedService(type=IPublishService.class, implementation=@Implementation(expression="new DefaultRestServicePublishService()")),
 	@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new SecurityService($args.usepass, $args.printpass)"))
 })
 

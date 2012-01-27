@@ -1,6 +1,6 @@
 package jadex.micro.examples.ws.quote;
 
-import jadex.base.service.ws.WebServiceAgent;
+import jadex.extension.ws.invoke.WebServiceAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.Imports;

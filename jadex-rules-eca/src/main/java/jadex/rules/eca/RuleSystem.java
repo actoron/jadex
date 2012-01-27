@@ -21,10 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.aopalliance.intercept.MethodInterceptor;
-import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.aop.framework.ProxyFactory;
-
 /**
  *  The rule system is the main entry point. It contains the rulebase
  *  with all rules and knows about the observed objects.
@@ -125,26 +121,29 @@ public class RuleSystem
 		
 		// Create proxy object if eventcreators are present
 		Object proxy = object;
-		if(eventcreators.size()>0)
-		{
-			ProxyFactory pf = new ProxyFactory(object);
-			pf.addAdvice(new MethodInterceptor()
-			{
-				public Object invoke(MethodInvocation mi) throws Throwable
-				{
-					Object ret = mi.getMethod().invoke(mi.getThis(), mi.getArguments());
-					IResultCommand creator = (IResultCommand)eventcreators.get(mi.getMethod());
-					if(creator!=null)
-					{
-						Event event = (Event)creator.execute(null);
-						addEvent(event);
-	//					System.out.println("created event: "+event);
-					}
-					return ret;
-			    }
-			});
-			proxy = pf.getProxy();
-		}
+		
+		//todo: fixme
+		
+//		if(eventcreators.size()>0)
+//		{
+//			ProxyFactory pf = new ProxyFactory(object);
+//			pf.addAdvice(new MethodInterceptor()
+//			{
+//				public Object invoke(MethodInvocation mi) throws Throwable
+//				{
+//					Object ret = mi.getMethod().invoke(mi.getThis(), mi.getArguments());
+//					IResultCommand creator = (IResultCommand)eventcreators.get(mi.getMethod());
+//					if(creator!=null)
+//					{
+//						Event event = (Event)creator.execute(null);
+//						addEvent(event);
+//	//					System.out.println("created event: "+event);
+//					}
+//					return ret;
+//			    }
+//			});
+//			proxy = pf.getProxy();
+//		}
 
 		this.rules.put(object, new Tuple2(proxy, rules.values().toArray(new IRule[rules.size()])));
 

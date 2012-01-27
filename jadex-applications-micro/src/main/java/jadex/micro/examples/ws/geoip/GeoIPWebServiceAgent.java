@@ -1,7 +1,7 @@
 package jadex.micro.examples.ws.geoip;
 
-import jadex.base.service.ws.WebServiceAgent;
 import jadex.commons.future.DefaultResultListener;
+import jadex.extension.ws.invoke.WebServiceAgent;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;

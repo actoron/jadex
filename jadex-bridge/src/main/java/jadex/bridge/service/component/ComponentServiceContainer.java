@@ -356,6 +356,11 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 					ps.publishService(instance.getClassLoader(), service, pi)
 						.addResultListener(instance.createResultListener(new DelegationResultListener<Void>(ret)));
 				}
+				public void exceptionOccurred(Exception exception)
+				{
+					instance.getLogger().severe("Could not publish: "+service.getServiceIdentifier()+" "+exception.getMessage());
+					ret.setResult(null);
+				}
 			}));
 		}
 		else
@@ -368,7 +373,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/**
 	 *  Called after a service has been shutdowned.
 	 */
-	public IFuture<Void> serviceShutdowned(IInternalService service)
+	public IFuture<Void> serviceShutdowned(final IInternalService service)
 	{
 		final Future<Void> ret = new Future<Void>();
 		final IServiceIdentifier sid = service.getServiceIdentifier();
@@ -382,6 +387,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			
 			public void exceptionOccurred(Exception exception)
 			{
+//				instance.getLogger().severe("Could not unpublish: "+sid+" "+exception.getMessage());
+				
 				// ignore, if no publish info
 				ret.setResult(null);
 				// todo: what if publish info but no publish service?
@@ -433,7 +440,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			}
 			else
 			{
-				ret.setException(new ServiceNotFoundException("IPublishService"));
+//				ret.setResult(null);
+				ret.setException(new ServiceNotFoundException("IPublishService not found."));
 			}
 		}
 		

@@ -1,4 +1,4 @@
-package jadex.base.service.publish;
+package jadex.extension.ws.publish;
 
 import jadex.commons.SReflect;
 
