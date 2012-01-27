@@ -23,7 +23,7 @@ import java.net.InetAddress;
 @Description("This agent looks for other awareness agents in the local net.")
 @Arguments(
 {
-	@Argument(name="port", clazz=int.class, defaultvalue="55670", description="The port used for finding other agents."),
+	@Argument(name="port", clazz=int.class, defaultvalue="55670", description="The port used for finding other agents.")
 })
 @Agent
 public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
