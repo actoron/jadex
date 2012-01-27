@@ -10,7 +10,6 @@ import jadex.xml.TypeInfo;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -494,16 +493,15 @@ public class Writer
 	 */
 	public static String objectToXML(Writer writer, Object val, ClassLoader classloader)
 	{
-		/* $if android && androidVersion < 9 $
-		try {
+		try
+		{
 			return new String(objectToByteArray(writer, val, classloader), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			System.err.println("Warning: no UTF-8 available");
 			return new String(objectToByteArray(writer, val, classloader));
 		}
-		$else $ */
-		return new String(objectToByteArray(writer, val, classloader), Charset.forName("UTF-8"));
-		/* $endif $ */
 	}
 	
 	/**
@@ -511,16 +509,15 @@ public class Writer
 	 */
 	public static String objectToXML(Writer writer, Object val, ClassLoader classloader, Object context)
 	{
-		/* $if androidVersion < 9 $ */
-		try {
+		try
+		{
 			return new String(objectToByteArray(writer, val, classloader, context), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			System.err.println("Warning: no UTF-8 available");
 			return new String(objectToByteArray(writer, val, classloader, context));
 		}
-		/* $else $
-		return new String(objectToByteArray(writer, val, classloader, context), Charset.forName("UTF-8"));
-		$endif $ */
 	}
 	
 	/**

@@ -16,11 +16,11 @@ import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -35,13 +35,13 @@ public class ReceiveRequest	implements IHttpRequest
 	static final int BUFFER_SIZE	= 1024 * 2;
 	
 	/** The expected response. */
-	public static final byte[]	HTTP_OK	= "HTTP/1.1 200 OK\r\n".getBytes(Charset.forName("UTF-8"));
+	public static final byte[]	HTTP_OK	= getBytes("HTTP/1.1 200 OK\r\n");
 	
 	/** The end of the header marker. */
-	public static final byte[]	HEADER_END	= "\r\n\r\n".getBytes(Charset.forName("UTF-8"));
+	public static final byte[]	HEADER_END	= getBytes("\r\n\r\n");
 	
 	/** The end of the chunk header marker. */
-	public static final byte[]	CHUNK_HEADER_END	= "\r\n".getBytes(Charset.forName("UTF-8"));
+	public static final byte[]	CHUNK_HEADER_END	= getBytes("\r\n");
 	
 	/** The initial state. */
 	public static final int	STATE_INITIAL	= 0; 
@@ -162,11 +162,10 @@ public class ReceiveRequest	implements IHttpRequest
 			assert finished;
 			key.interestOps(SelectionKey.OP_WRITE);
 			String	xmlid	= JavaWriter.objectToXML(cid, getClass().getClassLoader());
-			byte[]	header	= 
-				( "GET "+path+"?id="+URLEncoder.encode(xmlid, "UTF-8")+" HTTP/1.1\r\n"
+			byte[]	header	= getBytes(
+				"GET "+path+"?id="+URLEncoder.encode(xmlid, "UTF-8")+" HTTP/1.1\r\n"
 				+ "Host: "+address.getFirstEntity()+":"+address.getSecondEntity()+"\r\n"
-				+ "\r\n"
-				).getBytes(Charset.forName("UTF-8"));
+				+ "\r\n");
 			buf	= ByteBuffer.wrap(header);
 			state	= STATE_INITIAL;
 		}
@@ -253,7 +252,7 @@ public class ReceiveRequest	implements IHttpRequest
 					if(buf.remaining()==0)
 					{
 						if(!Arrays.equals(HTTP_OK, buf.array()))
-							throw new IOException("HTTP response: "+new String(buf.array(), Charset.forName("UTF-8")));
+							throw new IOException("HTTP response: "+new String(buf.array(), "UTF-8"));
 						state	= STATE_READING_HEADER_REST;
 						buf	= ByteBuffer.allocate(BUFFER_SIZE);
 						matchpos	= 2; // Matched already two characters from potential header end.
@@ -338,7 +337,7 @@ public class ReceiveRequest	implements IHttpRequest
 					if(matchpos==2)
 					{
 						// Get chunk header as string.
-						String	s	= new String(chunkhead, 0, chunkheadpos-2, Charset.forName("UTF-8"));
+						String	s	= new String(chunkhead, 0, chunkheadpos-2, "UTF-8");
 						// Strip chunk extension (if any).
 						if(s.indexOf(';')!=-1)
 							s.substring(0, s.indexOf(';'));
@@ -579,5 +578,22 @@ public class ReceiveRequest	implements IHttpRequest
 		}
 		
 		return reschedule;
+	}
+	
+	//-------- helper methods --------
+	
+	/**
+	 *  Get the bytes of a string in UTF-8.
+	 */
+	public static byte[]	getBytes(String string)
+	{
+		try
+		{
+			return	string.getBytes("UTF-8");
+		}
+		catch(UnsupportedEncodingException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 }

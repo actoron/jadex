@@ -2,11 +2,9 @@ package jadex.base.service.message.transport.niotcpmtp;
 
 import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
@@ -101,12 +99,13 @@ public class NIOTCPTransport implements ITransport
 			serversocket.bind(new InetSocketAddress(port));
 			this.port = serversocket.getLocalPort();
 			
-			// ANDROID: the following line causes an exception in a 2.2
-			// emulator, see:
+			// ANDROID: Selector.open() causes an exception in a 2.2
+			// emulator due to IPv6 addresses, see:
 			// http://code.google.com/p/android/issues/detail?id=9431
-			// try this:
-//			java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
-//    		java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
+			/* $if android && androidVersion < 9 $
+			java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
+			java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
+			$endif $ */
 			
 			// Causes problem with maven too (only with Win firewall?)
 			// http://www.thatsjava.com/java-core-apis/28232/
