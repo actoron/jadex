@@ -25,6 +25,7 @@ public class GnuPlotHandler {
 	            }  
 	            gp.close();  
 	        } catch (Exception x) {  
+	        	x.printStackTrace();
 	            System.out.println(x.getMessage());  
 	        }  
 	    }  
