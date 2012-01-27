@@ -1,5 +1,6 @@
 package jadex.base.service.message.transport.httprelaymtp.io;
 
+import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -9,7 +10,6 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IManagementService;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
@@ -101,7 +101,7 @@ public class HttpReceiver
 												{
 //													System.out.println("Received ping");
 												}
-												else if(b==SRelay.MSGTYPE_AWAADD || b==SRelay.MSGTYPE_AWAREMOVE)
+												else if(b==SRelay.MSGTYPE_AWAINFO)
 												{
 													final byte[] rawmsg = readMessage(in);
 													postAwarenessInfo(rawmsg, b);
@@ -253,9 +253,9 @@ public class HttpReceiver
 			{
 				try
 				{
-					IComponentIdentifier	id	= (IComponentIdentifier)JavaReader.objectFromByteArray(data, getClass().getClassLoader());
-					String	state	=  type==SRelay.MSGTYPE_AWAADD ? AwarenessInfo.STATE_ONLINE : AwarenessInfo.STATE_OFFLINE;
-					awa.addAwarenessInfo(new AwarenessInfo(id, state, -1, null, null, null));
+					AwarenessInfo	info	= (AwarenessInfo)JavaReader.objectFromByteArray(
+						GZIPCodec.decodeBytes(data, getClass().getClassLoader()), getClass().getClassLoader());
+					awa.addAwarenessInfo(info);
 				}
 				catch(Exception e)
 				{
@@ -267,7 +267,6 @@ public class HttpReceiver
 			{
 				// No awa service -> ignore awa infos.
 			}
-		});
-		
+		});		
 	}
 }

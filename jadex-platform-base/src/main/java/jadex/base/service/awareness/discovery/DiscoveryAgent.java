@@ -5,8 +5,10 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.awareness.IDiscoveryService;
+import jadex.bridge.service.types.awareness.IManagementService;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -16,7 +18,15 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Configuration;
+import jadex.micro.annotation.Configurations;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.NameValue;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.xml.bean.JavaReader;
@@ -29,9 +39,26 @@ import java.util.TimerTask;
 /**
  *  Base class for different kinds of discovery agents.
  */
-@RequiredServices(@RequiredService(name="ms", type=IMessageService.class, 
-	binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)))
 @Agent
+@Arguments({
+	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
+	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior).")
+})
+@Configurations(
+{
+	@Configuration(name="Frequent updates (10s)", arguments=@NameValue(name="delay", value="10000")),
+	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000")),
+	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
+})
+@ProvidedServices(
+	@ProvidedService(type=IDiscoveryService.class, implementation=@Implementation(DiscoveryService.class))
+)
+@RequiredServices(
+{
+	@RequiredService(name="ms", type=IMessageService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="threadpool", type=IThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+	@RequiredService(name="management", type=IManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+})
 public abstract class DiscoveryAgent
 {
 	//-------- attributes --------
@@ -111,22 +138,39 @@ public abstract class DiscoveryAgent
 		
 		this.sender = createSendHandler();
 		this.receiver = createReceiveHandler();
-		receiver.startReceiving().addResultListener(getMicroAgent()
-			.createResultListener(new IResultListener()
+		if(receiver!=null)
 		{
-			public void resultAvailable(Object result)
+			receiver.startReceiving().addResultListener(getMicroAgent()
+				.createResultListener(new IResultListener<Void>()
 			{
-				setStarted(true);
+				public void resultAvailable(Void result)
+				{
+					setStarted(true);
+					if(sender!=null)
+					{
+						sender.startSendBehavior();
+					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					// Send also when receiving does not work?
+					setStarted(true);
+					if(sender!=null)
+					{
+						sender.startSendBehavior();
+					}
+				}
+			}));
+		}
+		else
+		{
+			setStarted(true);			
+			if(sender!=null)
+			{
 				sender.startSendBehavior();
 			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				// Send also when receiving does not work?
-				setStarted(true);
-				sender.startSendBehavior();
-			}
-		}));
+		}
 	}
 	
 	/**
@@ -320,7 +364,10 @@ public abstract class DiscoveryAgent
 		if(getDelay()!=delay)
 		{
 			this.delay = delay;
-			sender.startSendBehavior();
+			if(sender!=null)
+			{
+				sender.startSendBehavior();
+			}
 		}
 	}
 
@@ -353,7 +400,7 @@ public abstract class DiscoveryAgent
 	/**
 	 *  Overriden wait for to not use platform clock.
 	 */
-	public void	doWaitFor(long delay, final IComponentStep step)
+	public void	doWaitFor(long delay, final IComponentStep<?> step)
 	{
 //		waitFor(delay, step);
 		

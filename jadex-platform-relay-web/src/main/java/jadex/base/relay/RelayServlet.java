@@ -2,6 +2,9 @@ package jadex.base.relay;
 
 import jadex.base.fipa.SFipa;
 import jadex.base.service.message.transport.MessageEnvelope;
+import jadex.base.service.message.transport.codecs.GZIPCodec;
+import jadex.base.service.message.transport.httprelaymtp.SRelay;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ArrayBlockingQueue;
@@ -14,7 +17,6 @@ import jadex.xml.bean.JavaWriter;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -105,7 +107,11 @@ public class RelayServlet extends HttpServlet
 		// Handle platform connection.
 		else
 		{
-			System.out.println("Entering GET request. opencnt="+(++opencnt1)+", mapsize="+map.size()+", infosize="+platforms.size());
+			synchronized(this)
+			{
+				opencnt1++;
+			}
+			System.out.println("Entering GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
 			
 			Object	id	= JavaReader.objectFromXML(idstring, getClass().getClassLoader());
 			
@@ -202,8 +208,13 @@ public class RelayServlet extends HttpServlet
 				{
 					items	= queue.setClosed(true);
 					map.remove(id);
-					platforms.remove(id);
-//					sendAwarenessInfos(id, false);
+					PlatformInfo	platform	= platforms.remove(id);
+					AwarenessInfo	awainfo	= platform!=null ? platform.getAwarenessInfo() : null;
+					if(awainfo!=null)
+					{
+						awainfo.setState(AwarenessInfo.STATE_OFFLINE);
+						sendAwarenessInfos(awainfo);
+					}
 			//		System.out.println("Removed from map ("+items.size()+" remaining items). New size: "+map.size());
 					for(int i=0; i<items.size(); i++)
 					{
@@ -241,7 +252,11 @@ public class RelayServlet extends HttpServlet
 				}				
 			}
 			
-			System.out.println("Leaving GET request. opencnt="+(--opencnt1)+", mapsize="+map.size()+", infosize="+platforms.size());
+			synchronized(this)
+			{
+				opencnt1--;
+			}
+			System.out.println("Leaving GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
 		}
 	}
 
@@ -250,7 +265,11 @@ public class RelayServlet extends HttpServlet
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		System.out.println("Entering POST request. opencnt="+(++opencnt2)+", mapsize="+map.size());
+		synchronized(this)
+		{
+			opencnt2++;
+		}
+		System.out.println("Entering POST request. opencnt="+opencnt2+", mapsize="+map.size());
 //		String	s;
 //		s	= request.getContextPath();
 //		s	= request.getPathInfo();
@@ -261,20 +280,21 @@ public class RelayServlet extends HttpServlet
 		{
 			ServletInputStream	in	= request.getInputStream();
 			// Read target id.
-			Object	targetid	= readObject(in);
+			readObject(in);
 			
 			// Read total message length.
 			byte[]	len	= readData(in, 4);
 			int	length	= SUtil.bytesToInt(len);
 
-			// Read prolog (1 byte codec length + 1 byte xml codec id)
-			readData(in, 2);
+			// Read prolog (1 byte codec length + 1 byte xml codec id + 1 byte gzip codec id)
+			readData(in, 3);
 			
-			// Read message.
-			byte[] buffer = readData(in, length-2);
-			MessageEnvelope	msg	= (MessageEnvelope)JavaReader.objectFromByteArray(buffer, SRelay.class.getClassLoader());
-			AwarenessInfo	info	= (AwarenessInfo)msg.getMessage().get(SFipa.CONTENT);
-			System.out.println("awareness request: "+targetid+", "+info);
+			// Read message and extract awareness info content.
+			byte[] buffer = readData(in, length-3);
+			buffer	= GZIPCodec.decodeBytes(buffer, getClass().getClassLoader());
+			MessageEnvelope	msg	= (MessageEnvelope)JavaReader.objectFromByteArray(buffer, getClass().getClassLoader());
+			AwarenessInfo	info	= (AwarenessInfo)JavaReader.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), getClass().getClassLoader());
+			sendAwarenessInfos(info);
 		}
 		else
 		{
@@ -325,33 +345,70 @@ public class RelayServlet extends HttpServlet
 				response.sendError(404);
 			}
 		}
-		System.out.println("Leaving POST request. opencnt="+(--opencnt2)+", mapsize="+map.size());
+		synchronized(this)
+		{
+			opencnt2--;
+		}
+		System.out.println("Leaving POST request. opencnt="+opencnt2+", mapsize="+map.size());
 	}
 	
 	//-------- helper methods --------
 	
 	/**
-	 *  Send awareness messages about a new (add=true) or disconnected (add=false) platform.
+	 *  Send awareness messages for a new or changed awareness info.
 	 */
-	protected void	sendAwarenessInfos(Object id, boolean add)
+	protected void	sendAwarenessInfos(AwarenessInfo awainfo)
 	{
-		byte[]	data	= JavaWriter.objectToByteArray(id, SRelay.class.getClassLoader());
-		byte[]	info	= new byte[data.length+4];
-		System.arraycopy(SUtil.intToBytes(data.length), 0, info, 0, 4);
-		System.arraycopy(data, 0, info, 4, data.length);
-		
-		Map.Entry<Object, IBlockingQueue<Message>>[]	entries	= map.entrySet().toArray(new Map.Entry[0]);
-		for(int i=0; i<entries.length; i++)
+		// Update platform awareness info.
+		IComponentIdentifier	cid	= awainfo.getSender();
+		PlatformInfo	platform	= platforms.get(cid);
+		boolean	initial	= platform!=null && platform.getAwarenessInfo()==null && AwarenessInfo.STATE_ONLINE.equals(awainfo.getState());
+		if(platform!=null)
 		{
-			if(!id.equals(entries[i].getKey()))	// Don't send awareness to self
+			platform.setAwarenessInfo(awainfo);
+		}
+		
+		if(platform!=null ||  AwarenessInfo.STATE_OFFLINE.equals(awainfo.getState()))
+		{
+			byte[]	data	= GZIPCodec.encodeBytes(JavaWriter.objectToByteArray(awainfo, getClass().getClassLoader()), getClass().getClassLoader());
+			byte[]	info	= new byte[data.length+4];
+			System.arraycopy(SUtil.intToBytes(data.length), 0, info, 0, 4);
+			System.arraycopy(data, 0, info, 4, data.length);
+			
+			Map.Entry<Object, IBlockingQueue<Message>>[]	entries	= map.entrySet().toArray(new Map.Entry[0]);
+			for(int i=0; i<entries.length; i++)
 			{
-				try
+				// Send awareness to other platforms with awareness on.
+				PlatformInfo	p2	= platforms.get(entries[i].getKey());
+				AwarenessInfo	awainfo2	= p2!=null ? p2.getAwarenessInfo() : null;
+				if(awainfo2!=null && !cid.equals(entries[i].getKey()))
 				{
-					entries[i].getValue().enqueue(new Message(add ? SRelay.MSGTYPE_AWAADD : SRelay.MSGTYPE_AWAREMOVE ,new ByteArrayInputStream(info)));
-				}
-				catch(Exception e)
-				{
-					// Queue closed, because platform just disconnected.
+					try
+					{
+						entries[i].getValue().enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info)));
+					}
+					catch(Exception e)
+					{
+						// Queue closed, because platform just disconnected.
+					}
+					
+					// Send other awareness infos to newly connected platform.
+					if(initial)
+					{
+						byte[]	data2	= GZIPCodec.encodeBytes(JavaWriter.objectToByteArray(awainfo2, getClass().getClassLoader()), getClass().getClassLoader());
+						byte[]	info2	= new byte[data2.length+4];
+						System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
+						System.arraycopy(data2, 0, info2, 4, data2.length);
+						
+						try
+						{
+							map.get(cid).enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info2)));
+						}
+						catch(Exception e)
+						{
+							// Queue closed, because platform just disconnected.
+						}
+					}
 				}
 			}
 		}
@@ -368,21 +425,7 @@ public class RelayServlet extends HttpServlet
 		byte[]	len	= readData(in, 4);
 		int	length	= SUtil.bytesToInt(len);
 		byte[] buffer = readData(in, length);
-		return JavaReader.objectFromByteArray(buffer, SRelay.class.getClassLoader());
-	}
-	
-	/**
-	 *  Write an object to the given stream.
-	 *  @param obj	The object.
-	 *  @param out	The output stream.
-	 *  @throws	IOException when the stream is closed.
-	 */
-	public static void	writeObject(Object obj, OutputStream out) throws IOException
-	{
-		byte[]	data	= JavaWriter.objectToByteArray(obj, SRelay.class.getClassLoader());
-		out.write(SUtil.intToBytes(data.length));
-		out.write(data);
-		out.flush();		
+		return JavaReader.objectFromByteArray(buffer, RelayServlet.class.getClassLoader());
 	}
 	
 	/**

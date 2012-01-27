@@ -5,15 +5,14 @@
     android:orientation="vertical" >
 
     <ScrollView
-        android:layout_height="wrap_content"
         android:layout_width="fill_parent"
-        android:layout_weight="1">
+        android:layout_height="wrap_content"
+        android:layout_weight="1" >
 
         <TextView
             android:id="@+id/agntTextView"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"/>
-        
+            android:layout_height="fill_parent" />
     </ScrollView>
 
     <Button
@@ -33,5 +32,46 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Echo Msg Performance" />
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+        <TableRow>
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="User Name" />
+	
+	        <EditText
+	            android:id="@+id/chatname"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1" />
+	
+	        <Button
+	            android:id="@+id/chat"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="Enter Chat" />            
+        </TableRow>
+        <TableRow>
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="Chat Msg" />
+	
+	        <EditText
+	            android:id="@+id/chatmsg"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="1" />
+	
+	        <Button
+	            android:id="@+id/send"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="Send" />
+		</TableRow>
+    </TableLayout>
 
 </LinearLayout>

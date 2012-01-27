@@ -8,6 +8,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.ChangeEvent;
@@ -18,8 +19,10 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.micro.benchmarks.MessagePerformanceAgent;
+import jadex.micro.examples.chat.IChatService;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.Collection;
@@ -32,6 +35,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 /**
@@ -57,6 +61,10 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 	/** The text view for showing results. */
 	private TextView textView;
 	
+	/** The chat agent (if any). */
+	private IComponentIdentifier	chatcid;
+
+	
 	//-------- methods --------
 
 	/**
@@ -76,6 +84,144 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 		startMB1.setEnabled(false);
 		startMB2.setEnabled(false);
 		startMB3.setEnabled(false);
+
+		final Button	chat	= (Button)findViewById(R.id.chat);
+		final Button	send	= (Button)findViewById(R.id.send);
+		final EditText	name	= (EditText)findViewById(R.id.chatname);
+		final EditText	msg	= (EditText)findViewById(R.id.chatmsg);
+		chat.setEnabled(false);
+		send.setEnabled(false);
+		name.setEnabled(false);
+		msg.setEnabled(false);
+		
+		chat.setOnClickListener(new OnClickListener()
+		{
+			public void onClick(View v)
+			{
+				chat.setEnabled(false);
+				name.setEnabled(false);
+				send.setEnabled(false);
+				msg.setEnabled(false);
+				platform.scheduleStep(new IComponentStep<IComponentIdentifier>()
+				{
+					public IFuture<IComponentIdentifier> execute(IInternalAccess ia)
+					{
+						final Future<IComponentIdentifier>	fut	= new Future<IComponentIdentifier>();
+						ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(fut)
+						{
+							public void customResultAvailable(IComponentManagementService cms)
+							{
+								if(chatcid==null)
+								{
+									cms.createComponent(null, "jadex.android.benchmarks.ChatAgent.class", null, null)
+										.addResultListener(new DelegationResultListener<IComponentIdentifier>(fut));
+								}
+								else
+								{
+									cms.destroyComponent(chatcid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, IComponentIdentifier>(fut)
+									{
+										public void customResultAvailable(Map<String, Object> result)
+										{
+											fut.setResult(null);
+										}
+									});
+								}
+							}
+						});
+						
+						return fut;
+					}
+				}).addResultListener(new IResultListener<IComponentIdentifier>()
+				{
+					public void resultAvailable(final IComponentIdentifier result)
+					{
+						runOnUiThread(new Runnable()
+						{
+							public void run()
+							{
+								chatcid	= result;
+								chat.setEnabled(true);
+								if(result!=null)
+								{
+									chat.setText("Exit Chat");
+									send.setEnabled(true);
+									msg.setEnabled(true);
+									System.out.println("Connected to chat.");
+								}
+								else
+								{
+									chat.setText("Enter Chat");
+									name.setEnabled(true);
+									System.out.println("Disconnected from chat.");									
+								}
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("Chat connection problem: "+exception);
+						exception.printStackTrace();
+						runOnUiThread(new Runnable()
+						{
+							public void run()
+							{
+								chat.setEnabled(true);
+							}
+						});
+					}
+				});
+			}
+		});
+
+		send.setOnClickListener(new OnClickListener()
+		{
+			public void onClick(View v)
+			{
+				send.setEnabled(false);
+				msg.setEnabled(false);
+				SServiceProvider.getServices(platform.getServiceProvider(), IChatService.class)
+					.addResultListener(new IIntermediateResultListener<IChatService>()
+				{
+					public void intermediateResultAvailable(IChatService result)
+					{
+						result.hear(name.getText().toString(), msg.getText().toString());
+					}
+					
+					public void finished()
+					{
+						runOnUiThread(new Runnable()
+						{
+							public void run()
+							{
+								msg.setText("");
+								send.setEnabled(true);
+								msg.setEnabled(true);								
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("Chat message problem: "+exception);
+						exception.printStackTrace();
+						runOnUiThread(new Runnable()
+						{
+							public void run()
+							{
+								send.setEnabled(true);
+								msg.setEnabled(true);								
+							}
+						});
+					}
+					
+					public void resultAvailable(Collection<IChatService> result)
+					{
+					}
+				});
+			}
+		});
 		
 		textView = (TextView) findViewById(R.id.agntTextView);
 		SUtil.addSystemOutListener(new IChangeListener<String>()
@@ -110,7 +256,9 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 					"-relaytransport", "true",
 					"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/\"",					
 					"-saveonexit", "false", "-gui", "false",
-					"-autoshutdown", "false"
+					"-autoshutdown", "false",
+					"-awamechanisms", "new String[]{\"Relay\"}",
+					"-usepass", "false"
 				}).addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess result)
@@ -123,6 +271,8 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 								startMB1.setEnabled(true);
 								startMB2.setEnabled(true);
 								startMB3.setEnabled(true);
+								chat.setEnabled(true);
+								name.setEnabled(true);
 							}
 						});
 					}

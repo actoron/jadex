@@ -1,10 +1,17 @@
 package jadex.base.service.message.transport.httprelaymtp.nio;
 
+import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.bridge.service.types.awareness.IManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.future.IResultListener;
+import jadex.micro.annotation.Binding;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -68,6 +75,9 @@ public class ReceiveRequest	implements IHttpRequest
 	/** The logger. */
 	protected Logger	logger;
 	
+	/** The component access. */
+	protected IExternalAccess access;
+	
 	/** The component id. */
 	protected IComponentIdentifier	cid;
 
@@ -115,10 +125,11 @@ public class ReceiveRequest	implements IHttpRequest
 	/**
 	 *  Create a send request.
 	 */
-	public ReceiveRequest(IComponentIdentifier cid, String host, int port, String path, IMessageService ms, Logger logger)	throws IOException
+	public ReceiveRequest(IComponentIdentifier cid, String host, int port, String path, IMessageService ms, Logger logger, IExternalAccess access)	throws IOException
 	{
 		this.ms	= ms;
 		this.logger	= logger;
+		this.access	= access;
 		this.cid	= cid;
 		this.address	= new Tuple2<String, Integer>(host, new Integer(port));
 		this.path	= path;
@@ -377,7 +388,7 @@ public class ReceiveRequest	implements IHttpRequest
 //							System.out.println("read ping msg header");
 							state	= STATE_READING_MSG_HEADER;
 						}
-						else if(msghead==SRelay.MSGTYPE_DEFAULT || msghead==SRelay.MSGTYPE_AWAADD || msghead==SRelay.MSGTYPE_AWAREMOVE)
+						else if(msghead==SRelay.MSGTYPE_DEFAULT || msghead==SRelay.MSGTYPE_AWAINFO)
 						{
 //							System.out.println("read default msg header");
 							msgtype	= msghead;
@@ -473,31 +484,31 @@ public class ReceiveRequest	implements IHttpRequest
 						{
 							ms.deliverMessage(msg);
 						}
-						else if(msgtype==SRelay.MSGTYPE_AWAADD)
+						else if(msgtype==SRelay.MSGTYPE_AWAINFO)
 						{
-							Object	id;
-							try
+							final byte[]	awamsg	= msg;
+							SServiceProvider.getService(access.getServiceProvider(), IManagementService.class, Binding.SCOPE_PLATFORM)
+								.addResultListener(new IResultListener<IManagementService>()
 							{
-								id	= JavaReader.objectFromByteArray(msg, getClass().getClassLoader());
-								System.out.println("Received awareness add: "+id);										
-							}
-							catch(Exception e)
-							{
-								System.out.println("Error receiving awareness add: "+e);										
-							}
-						}
-						else if(msgtype==SRelay.MSGTYPE_AWAREMOVE)
-						{
-							Object	id;
-							try
-							{
-								id	= JavaReader.objectFromByteArray(msg, getClass().getClassLoader());
-								System.out.println("Received awareness remove: "+id);										
-							}
-							catch(Exception e)
-							{
-								System.out.println("Error receiving awareness remove: "+e);										
-							}
+								public void resultAvailable(IManagementService awa)
+								{
+									try
+									{
+										AwarenessInfo	info	= (AwarenessInfo)JavaReader.objectFromByteArray(
+											GZIPCodec.decodeBytes(awamsg, getClass().getClassLoader()), getClass().getClassLoader());
+										awa.addAwarenessInfo(info);
+									}
+									catch(Exception e)
+									{
+										logger.warning("Error receiving awareness info: "+e);										
+									}
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									// No awa service -> ignore awa infos.
+								}
+							});
 						}
 						msg	= null;
 						msgpos	= 0;

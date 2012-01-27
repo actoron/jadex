@@ -58,7 +58,7 @@ public class HttpRelayTransport implements ITransport
 				try
 				{
 					// Create the selector thread (starts automatically).
-					selectorthread	= new HttpSelectorThread(component.getComponentIdentifier().getRoot(), address.substring(6), ms, component.getLogger());
+					selectorthread	= new HttpSelectorThread(component.getComponentIdentifier().getRoot(), address.substring(6), ms, component.getLogger(), component.getExternalAccess());
 					ret.setResult(null);
 				}
 				catch(Exception e)

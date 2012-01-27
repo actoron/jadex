@@ -20,9 +20,6 @@ public class SRelay
 	/** The ping message type (just the type byte and no content). */
 	public static final byte	MSGTYPE_PING	= 2;
 	
-	/** The add awareness info message type for a new platform (awareness info content, usually a component id). */
-	public static final byte	MSGTYPE_AWAADD	= 3;
-	
-	/** The remove awareness info message type for a disconnected platform (awareness info content, usually a component id). */
-	public static final byte	MSGTYPE_AWAREMOVE	= 4;
+	/** The awareness info message type (awareness info content). */
+	public static final byte	MSGTYPE_AWAINFO	= 3;
 }

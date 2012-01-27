@@ -1,5 +1,7 @@
 package jadex.base.relay;
 
+import jadex.bridge.service.types.awareness.AwarenessInfo;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -40,6 +42,9 @@ public class PlatformInfo
 	
 	/** The number of messages for the recipient. */
 	protected int	msg_cnt;
+	
+	/** The awareness info (if any). */
+	protected AwarenessInfo	awainfo;
 	
 	//-------- constructors --------
 	
@@ -113,6 +118,14 @@ public class PlatformInfo
 		return bytesToString(val) + " / sec.";
 	}
 	
+	/**
+	 *  Get the awareness info.
+	 */
+	public AwarenessInfo	getAwarenessInfo()
+	{
+		return awainfo;
+	}
+	
 	//-------- modifier methods --------
 	
 	/**
@@ -135,6 +148,14 @@ public class PlatformInfo
 		// Todo: store history of previous values (with max length?)
 		this.host	= host;
 		this.connect_time	= new Date();
+	}
+	
+	/**
+	 *  Set the awareness info.
+	 */
+	public void	setAwarenessInfo(AwarenessInfo awainfo)
+	{
+		this.awainfo	= awainfo;
 	}
 	
 	//-------- helper methods --------

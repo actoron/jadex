@@ -51,7 +51,7 @@ public abstract class ReceiveHandler
 	 *  Start receiving awareness infos.
 	 *  @return A future indicating when the receiver thread is ready.
 	 */
-	public IFuture	startReceiving()
+	public IFuture<Void>	startReceiving()
 	{
 		final Future	ret	= new Future();
 		

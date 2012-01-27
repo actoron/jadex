@@ -2,6 +2,7 @@ package jadex.base.service.message.transport.httprelaymtp.nio;
 
 import jadex.base.service.message.ManagerSendTask;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -60,7 +61,7 @@ public class HttpSelectorThread
 	 *  Create and start a new receiver.
 	 * @throws IOException 
 	 */
-	public HttpSelectorThread(IComponentIdentifier root, String address, IMessageService ms, Logger logger) throws IOException
+	public HttpSelectorThread(IComponentIdentifier root, String address, IMessageService ms, Logger logger, IExternalAccess access) throws IOException
 	{
 		this.logger	= logger;
 		String	path	= "";
@@ -91,7 +92,7 @@ public class HttpSelectorThread
 		idle	= new HashMap<Tuple2<String, Integer>, List<SocketChannel>>();
 		connecting	= new HashSet<Tuple2<String, Integer>>();
 		
-		queue.add(new ReceiveRequest(root, host, port, path, ms, logger));
+		queue.add(new ReceiveRequest(root, host, port, path, ms, logger, access));
 		
 		new Thread(new Runnable()
 		{

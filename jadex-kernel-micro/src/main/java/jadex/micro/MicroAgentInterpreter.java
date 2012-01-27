@@ -177,37 +177,41 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	{
 		Future<Void> ret = new Future<Void>();
 
-		String[] names = model.getArgumentInjectionNames();
-		if(names.length>0)
+		if(getArguments()!=null)
 		{
-			for(int i=0; i<names.length; i++)
+			String[] names = model.getArgumentInjectionNames();
+			if(names.length>0)
 			{
-				Object val = getArguments().get(names[i]);
-				final Tuple2<Field, String>[] infos = model.getArgumentInjections(names[i]);
-				
-				try
+				for(int i=0; i<names.length; i++)
 				{
-					for(int j=0; j<infos.length; j++)
+					Object val = getArguments().get(names[i]);
+					final Tuple2<Field, String>[] infos = model.getArgumentInjections(names[i]);
+					
+					try
 					{
-						Field field = infos[j].getFirstEntity();
-						String convert = infos[j].getSecondEntity();
-						if(val!=null || !SReflect.isBasicType(field.getType()))
+						for(int j=0; j<infos.length; j++)
 						{
-							if(convert!=null)
+							Field field = infos[j].getFirstEntity();
+							String convert = infos[j].getSecondEntity();
+							if(val!=null || !SReflect.isBasicType(field.getType()))
 							{
-								SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
-								fetcher.setValue("$value", val);
-								val = SJavaParser.evaluateExpression(convert, fetcher);
+								if(convert!=null)
+								{
+									SimpleValueFetcher fetcher = new SimpleValueFetcher(getFetcher());
+									fetcher.setValue("$value", val);
+									val = SJavaParser.evaluateExpression(convert, fetcher);
+								}
+								field.setAccessible(true);
+								field.set(agent, val);
 							}
-							field.setAccessible(true);
-							field.set(agent, val);
 						}
 					}
-				}
-				catch(Exception e)
-				{
-					getLogger().warning("Field injection failed: "+e);
-					ret.setException(e);
+					catch(Exception e)
+					{
+						getLogger().warning("Field injection failed: "+e);
+						if(!ret.isDone())
+							ret.setException(e);
+					}
 				}
 			}
 		}

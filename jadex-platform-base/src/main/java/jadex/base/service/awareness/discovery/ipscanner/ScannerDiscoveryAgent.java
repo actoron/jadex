@@ -2,32 +2,17 @@ package jadex.base.service.awareness.discovery.ipscanner;
 
 import jadex.base.service.awareness.discovery.ConnectionException;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
-import jadex.base.service.awareness.discovery.DiscoveryService;
 import jadex.base.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
-import jadex.base.service.awareness.discovery.ipbroadcast.BroadcastSendHandler;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.bridge.service.types.awareness.IDiscoveryService;
-import jadex.bridge.service.types.awareness.IManagementService;
-import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.Configuration;
-import jadex.micro.annotation.Configurations;
 import jadex.micro.annotation.Description;
-import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.NameValue;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -42,24 +27,8 @@ import java.nio.channels.Selector;
 @Arguments(
 {
 	@Argument(name="port", clazz=int.class, defaultvalue="55668", description="The port used for finding other agents."),
-	@Argument(name="delay", clazz=long.class, defaultvalue="10000", description="The delay between sending awareness infos (in milliseconds)."),
-	@Argument(name="fast", clazz=boolean.class, defaultvalue="true", description="Flag for enabling fast startup awareness (pingpong send behavior)."),
 	@Argument(name="scanfactor", clazz=long.class, defaultvalue="1", description="The delay between scanning as factor of delay time, e.g. 1=10000, 2=20000."),
 	@Argument(name="buffersize", clazz=int.class, defaultvalue="1024*1024", description="The size of the send buffer (determines the number of messages that can be sent at once).")
-})
-@Configurations(
-{
-	@Configuration(name="Frequent updates (10s)", arguments=@NameValue(name="delay", value="10000")),
-	@Configuration(name="Medium updates (20s)", arguments=@NameValue(name="delay", value="20000")),
-	@Configuration(name="Seldom updates (60s)", arguments=@NameValue(name="delay", value="60000"))
-})
-@ProvidedServices(
-	@ProvidedService(type=IDiscoveryService.class, implementation=@Implementation(DiscoveryService.class))
-)
-@RequiredServices(
-{
-	@RequiredService(name="threadpool", type=IThreadPoolService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="management", type=IManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 @Agent
 public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
@@ -225,7 +194,6 @@ public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
 							selector.wakeup();
 							channel.register(selector, SelectionKey.OP_READ);
 						}
-						InetAddress address = SUtil.getInetAddress();
 						
 						createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId())
 							.addResultListener(agent.createResultListener(new DefaultResultListener<AwarenessInfo>()

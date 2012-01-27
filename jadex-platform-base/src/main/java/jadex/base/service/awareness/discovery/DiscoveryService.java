@@ -28,7 +28,10 @@ public class DiscoveryService	implements IDiscoveryService
 		if(getDiscoveryAgent().getDelay()!=delay)
 		{
 			getDiscoveryAgent().setDelay(delay);
-			getDiscoveryAgent().getSender().startSendBehavior();
+			if(getDiscoveryAgent().getSender()!=null)
+			{
+				getDiscoveryAgent().getSender().startSendBehavior();
+			}
 		}
 	}
 	
