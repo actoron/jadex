@@ -113,7 +113,7 @@
 		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
 		<argument name="awareness" class="boolean">true</argument>
 		<!-- Start the awareness agent discovery mechanisms. -->
-		<argument name="awamechanisms" class="String[]">new String[]{"Broadcast", "Multicast"}</argument>
+		<argument name="awamechanisms" class="String[]">new String[]{"Broadcast", "Multicast", "Relay"}</argument>
 		<!-- <argument name="awamechanisms" class="String[]">new String[]{"Broadcast"}</argument>-->
 		<!-- Include entries for awareness agent. -->
 		<argument name="awaincludes" class="String">""</argument>
@@ -274,12 +274,12 @@
 				new DeploymentService($component.getServiceProvider())
 			</implementation>		
 		</providedservice>
-		<providedservice class="IPublishService">
+		<providedservice name="pub1" class="IPublishService">
 			<implementation>
 				Boolean.TRUE.equals($args.wspublish &amp;&amp; !$args.android) ? DefaultWebServicePublishService.class.newInstance() : null
 			</implementation>
 		</providedservice>
-		<providedservice class="IPublishService">
+		<providedservice name="pub2" class="IPublishService">
 			<implementation>
 				Boolean.TRUE.equals($args.rspublish &amp;&amp; !$args.android) ? DefaultRestServicePublishService.class.newInstance() : null
 			</implementation>

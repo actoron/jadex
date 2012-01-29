@@ -396,6 +396,7 @@
 				<module>jadex-platform-standalone</module>
 				<module>jadex-platform-standalone-launch</module>
 				<module>jadex-platform-relay-web</module>
+				<module>jadex-platform-extension-webservice</module>
 				
 				<!-- <module>jadex-apleis</module> -->
 			</modules>
@@ -435,6 +436,7 @@
 				<module>jadex-kernel-extension-envsupport</module>
 				<!-- <module>jadex-kernel-extension-envsupport-opengl</module> -->
 				<module>jadex-kernel-extension-agr</module>
+				<module>jadex-platform-extension-webservice</module>
 
 				<module>jadex-applib-bdi</module>
 				<module>jadex-applications-bdi</module>
@@ -584,7 +586,6 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<modules>
-				<module>jadex-xwiki</module>
 				<!-- <module>jadex-kernel-bdi-continuations</module> -->
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
@@ -629,6 +630,7 @@
 				<module>jadex-platform-standalone</module>
 				<module>jadex-platform-standalone-launch</module>
 				<module>jadex-platform-relay-web</module>
+				<module>jadex-platform-extension-webservice</module>
 				
 				<module>jadex-rules-eca</module>
 
@@ -647,8 +649,8 @@
 				<module>sodekovs-productionline</module>
 				<module>sodekovs-applications</module>
 				<!-- <module>jadex-distributed</module> -->
+				<module>jadex-xwiki</module>
 				
-				<module>jadex-platform-extension-webservice</module>
 			</modules>
 		</profile>
 		<profile>
