@@ -41,7 +41,9 @@ public class ADFChecker extends IncrementalProjectBuilder
 	{
 		".agent.xml", "jadex.bdi.BDIAgentFactory",
 		".capability.xml", "jadex.bdi.BDIAgentFactory",
-		".application.xml", "jadex.application.ApplicationComponentFactory"
+		".application.xml", "jadex.application.ApplicationComponentFactory",
+		".component.xml", "jadex.component.ComponentComponentFactory",
+		".bpmn", "jadex.bpmn.BpmnFactory"
 	};
 	
 	//-------- attributes --------
@@ -141,7 +143,8 @@ public class ADFChecker extends IncrementalProjectBuilder
 		boolean	checked	= false;
 		
 		// Only check resources in source folders.
-		if(resource instanceof IFile && JavaCore.create(resource.getProject()).isOnClasspath(resource))
+		if(resource instanceof IFile)
+			if(JavaCore.create(resource.getProject()).isOnClasspath(resource))
 		{
 			IFile file = (IFile)resource;
 			for(int i=0; i<factories.length; i+=2)
