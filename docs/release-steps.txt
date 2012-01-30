@@ -1,3 +1,10 @@
+Make sure that:
+- all tests pass
+- all applications run (also from jar)
+- web apps work (relay, jadexdoc, ...)
+- BPMN/GPMN editors work and are released
+- ADF checker works and is released
+
 Bump Revision:
 - set release number in poms and in jadex.bridge.IVersionInfo
 - update maven project configuration for all projects in eclipse

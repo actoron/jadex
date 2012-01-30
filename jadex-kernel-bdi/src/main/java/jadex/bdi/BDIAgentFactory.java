@@ -7,6 +7,8 @@ import jadex.bdi.model.editable.IMECapability;
 import jadex.bdi.model.impl.flyweights.MCapabilityFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
+import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -26,15 +28,14 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
-/* $if !android $ */
 import jadex.commons.gui.SGUI;
-/* $endif $ */
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
@@ -90,6 +91,9 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	@ServiceComponent
 	protected IInternalAccess component;
 		
+	/** The root id. */
+	protected IComponentIdentifier root;
+		
 	/** The types of a manually edited agent model. */
 	protected Map mtypes;
 	
@@ -104,11 +108,32 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	/**
 	 *  Create a new agent factory.
 	 */
+	// Constructor used by ADF Checker. (hack?)
+	public BDIAgentFactory(String dummy)
+	{
+		this(SUtil.createHashMap(
+				new String[]
+				{
+					"planexecutor_standard",
+					"planexecutor_bpmn"
+				},
+				new Object[]
+				{
+					"dummy",
+					"dummy"
+				}
+			));
+		this.root	= new ComponentIdentifier(dummy);
+		loader	= new OAVBDIModelLoader(props, root);
+	}
+	
+	/**
+	 *  Create a new agent factory.
+	 */
 	// Constructor used by GPMN factory.
 	public BDIAgentFactory(Map props, IInternalAccess component)
 	{
 		this(props);
-		this.component	= component;
 	}
 	
 	/**
@@ -125,6 +150,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	@ServiceStart
 	public synchronized IFuture	startService()
 	{
+		this.root	= component!=null ? component.getComponentIdentifier().getRoot() : root;
 		Future	fut	= new Future();
 		SServiceProvider.getService(component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(component.createResultListener(new DelegationResultListener(fut)
@@ -132,7 +158,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 			public void customResultAvailable(Object result)
 			{
 				libservice = (ILibraryService) result;
-				loader	= new OAVBDIModelLoader(props, component.getComponentIdentifier().getRoot());
+				loader	= new OAVBDIModelLoader(props, root);
 				mtypes	= Collections.synchronizedMap(new WeakHashMap());
 				libservicelistener = new ILibraryServiceListener()
 				{
@@ -204,7 +230,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 					{
 				//		OAVAgentModel amodel = (OAVAgentModel)model;
 						OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, cl, 
-							new Object[]{modelinfo.getResourceIdentifier(), component.getComponentIdentifier().getRoot()});
+							new Object[]{modelinfo.getResourceIdentifier(), root});
 						
 						// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 						OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
@@ -233,7 +259,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 				ClassLoader cl = getClass().getClassLoader();
 		//		OAVAgentModel amodel = (OAVAgentModel)model;
 				OAVAgentModel amodel = (OAVAgentModel)loader.loadModel(modelinfo.getFilename(), null, cl, 
-					new Object[]{modelinfo.getResourceIdentifier(), component.getComponentIdentifier().getRoot()});
+					new Object[]{modelinfo.getResourceIdentifier(), root});
 				
 				// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 				OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
@@ -302,7 +328,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 					{
 //						System.out.println("loading bdi: "+filename);
 						OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, cl, 
-							new Object[]{rid, component.getComponentIdentifier().getRoot()});
+							new Object[]{rid, root});
 						ret.setResult(loaded.getModelInfo());
 					}
 					catch(Exception e)
@@ -321,7 +347,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 //				System.out.println("loading bdi: "+filename);
 				ClassLoader cl = getClass().getClassLoader();
 				OAVCapabilityModel loaded = (OAVCapabilityModel)loader.loadModel(filename, imports, cl,
-					new Object[]{rid, component.getComponentIdentifier().getRoot()});
+					new Object[]{rid, root});
 				ret.setResult(loaded.getModelInfo());
 			}
 			catch(Exception e)

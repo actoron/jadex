@@ -436,7 +436,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 						new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa),
 						new StackElement(new QName(state.getType(mplan).getName()), mplan),
 						new StackElement(new QName(state.getType(mbody).getName()), mbody)});
-					model.addEntry(se, "No executor for plan body type: "+type);					
+					model.addEntry(se, "No executor for plan body type: "+type);
 				}
 				
 				// Create rules for plans

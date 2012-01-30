@@ -25,20 +25,21 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.gui.SGUI;
 import jadex.component.ComponentInterpreter;
 import jadex.kernelbase.CacheableKernelModel;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/* $if !android $ */
-import jadex.commons.gui.SGUI;
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
-/* $endif $ */
 
 /**
  *  Factory for default contexts.
@@ -90,12 +91,30 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	{
 		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		
-		// Todo: hack!!! make mappings configurable also for reflective constructor (how?)
-//		this.loader = new ApplicationModelLoader(new Set[]
-//		{
-//			MEnvSpaceType.getXMLMapping(),
-//			MAGRSpaceType.getXMLMapping()
-//		});
+		// Todo: hack!!! make extensions configurable also for reflective constructor (how?)
+		String[]	extensions	= new String[]
+		{
+			"jadex.extension.envsupport.MEnvSpaceType", "getXMLMapping",
+			"jadex.extension.agr.AGRExtensionService", "getXMLMapping"
+		};
+		List<Set<?>>	mappings	= new ArrayList<Set<?>>();
+		for(int i=0; i<extensions.length; i+=2)
+		{
+			try
+			{
+				Class<?>	clazz	= Class.forName(extensions[i], true, getClass().getClassLoader());
+				Method	m	= clazz.getMethod(extensions[i+1], new Class[0]);
+				mappings.add((Set<?>)m.invoke(null, new Object[0]));
+			}
+			catch(Exception e)
+			{
+//				e.printStackTrace();
+			}
+			
+		}
+		
+		
+		this.loader = new ApplicationModelLoader(mappings.toArray(new Set[0]));
 	}
 	
 	/**
@@ -209,22 +228,39 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 //		System.out.println("filename: "+filename);
 		
-		libservice.getClassLoader(rid).addResultListener(new ExceptionDelegationResultListener<ClassLoader, IModelInfo>(ret)
+		if(libservice!=null)
 		{
-			public void customResultAvailable(ClassLoader cl)
+			libservice.getClassLoader(rid).addResultListener(
+				new ExceptionDelegationResultListener<ClassLoader, IModelInfo>(ret)
 			{
-				try
+				public void customResultAvailable(ClassLoader cl)
 				{
-					ret.setResult(loader.loadApplicationModel(model, imports, cl, 
+					try
+					{
+						ret.setResult(loader.loadApplicationModel(model, imports, cl, 
+								new Object[]{rid, getProviderId().getRoot()}).getModelInfo());
+					}
+					catch(Exception e)
+					{
+						ret.setException(e);
+					}
+				}
+			});
+		}
+		else
+		{
+			try
+			{
+				ClassLoader cl = getClass().getClassLoader();
+				ret.setResult(loader.loadApplicationModel(model, imports, cl, 
 						new Object[]{rid, getProviderId().getRoot()}).getModelInfo());
-				}
-				catch(Exception e)
-				{
-					ret.setException(e);
-				}
 			}
-		});
-		
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}			
+		}
+
 		return ret;
 	}
 	

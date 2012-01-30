@@ -27,9 +27,12 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.kernelbase.CacheableKernelModel;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -88,7 +91,30 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	public ComponentComponentFactory(String providerid)
 	{
 		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
-		this.loader = new ComponentModelLoader(new Set[0]);
+		// Todo: hack!!! make extensions configurable also for reflective constructor (how?)
+		String[]	extensions	= new String[]
+		{
+			"jadex.extension.envsupport.MEnvSpaceType", "getXMLMapping",
+			"jadex.extension.agr.AGRExtensionService", "getXMLMapping"
+		};
+		List<Set<?>>	mappings	= new ArrayList<Set<?>>();
+		for(int i=0; i<extensions.length; i+=2)
+		{
+			try
+			{
+				Class<?>	clazz	= Class.forName(extensions[i], true, getClass().getClassLoader());
+				Method	m	= clazz.getMethod(extensions[i+1], new Class[0]);
+				mappings.add((Set<?>)m.invoke(null, new Object[0]));
+			}
+			catch(Exception e)
+			{
+//				e.printStackTrace();
+			}
+			
+		}
+		
+		
+		this.loader = new ComponentModelLoader(mappings.toArray(new Set[0]));
 	}
 	
 	/**

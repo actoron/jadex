@@ -80,5 +80,6 @@ public abstract class IntermediateDefaultResultListener<E>	extends DefaultResult
 		{
 			intermediateResultAvailable(it.next());
 		}
+		finished();
 	}
 }

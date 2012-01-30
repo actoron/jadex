@@ -51,7 +51,7 @@ public class ADFChecker extends IncrementalProjectBuilder
 	//-------- attributes --------
 	
 	/** The map holding the cache. */
-	protected Map	cache;
+	protected Map<Object, Object>	cache;
 
 	
 	//-------- IncrementalProjectBuilder methods --------
@@ -59,7 +59,7 @@ public class ADFChecker extends IncrementalProjectBuilder
 	/**
 	 *  Called by eclipse, when a project needs building.
 	 */
-	protected IProject[] build(int kind, Map args, final IProgressMonitor monitor) throws CoreException
+	protected IProject[] build(int kind, Map<String, String> args, final IProgressMonitor monitor) throws CoreException
 	{
 //		final int[]	cnt	= new int[2];
 //		long	start	= System.nanoTime();
@@ -144,12 +144,15 @@ public class ADFChecker extends IncrementalProjectBuilder
 	{
 		boolean	checked	= false;
 		
+		if(resource.toString().indexOf(".bpmn")!=-1 && resource.toString().indexOf("src")!=-1)
+			System.out.println("sdfklj hsfopdgh : "+resource);
+		
 		// Only check resources in source folders.
 		if(resource instanceof IFile)
 			if(JavaCore.create(resource.getProject()).isOnClasspath(resource))
 		{
 			IFile file = (IFile)resource;
-			for(int i=0; i<factories.length; i+=2)
+			for(int i=0; !checked && i<factories.length; i+=2)
 			{
 				if(resource.getName().endsWith(factories[i]))
 				{
@@ -186,8 +189,14 @@ public class ADFChecker extends IncrementalProjectBuilder
 							}
 						}
 					}
+					
+					IMarker[]	markers	= file.findMarkers(MARKER_TYPE, false, IResource.DEPTH_ZERO);
+					if(markers.length==0)
+					{
+						addMarker(file, "File validated by Jadex ADF Checker", -1, IMarker.SEVERITY_INFO);
+					}
 				}
-			}			
+			}
 		}
 		
 		return checked;
@@ -235,11 +244,12 @@ public class ADFChecker extends IncrementalProjectBuilder
 			Object	factory	= tmp[0];
 			ClassLoader	cl	= (ClassLoader)tmp[1];
 			Method	loadmodel	= (Method)tmp[2];
-			Object modelfut	= loadmodel.invoke(factory, new Object[]{filename, null, cl});
+			Object modelfut	= loadmodel.invoke(factory, new Object[]{filename, null,
+				loadmodel.getParameterTypes()[2].getName().indexOf("ClassLoader")!=-1 ? cl : null});
 			Object	modelinfo	= modelfut.getClass().getMethod("get", new Class[]{Class.forName("jadex.commons.future.ISuspendable", true, cl)})
-					.invoke(modelfut, new Object[]{null});
+				.invoke(modelfut, new Object[]{Class.forName("jadex.commons.future.ThreadSuspendable", true, cl).newInstance()});
 			Object	report	= modelinfo.getClass().getMethod("getReport", new Class[0])
-					.invoke(modelinfo, new Object[0]);
+				.invoke(modelinfo, new Object[0]);
 			if(report!=null)
 			{
 				ret	= (String)report.getClass().getMethod("getErrorText", new Class[0])
@@ -250,11 +260,13 @@ public class ADFChecker extends IncrementalProjectBuilder
 		{
 //			e.printStackTrace();
 			addMarker(file, "Cannot validate ADF due to: "+e.getTargetException(), -1, IMarker.SEVERITY_WARNING);
+//			addMarker(file, "Cannot validate ADF due to: "+e.getTargetException(), -1, IMarker.SEVERITY_ERROR);
 		}
 		catch(Exception e)
 		{
 //			e.printStackTrace();
 			addMarker(file, "Cannot validate ADF due to: "+e, -1, IMarker.SEVERITY_WARNING);
+//			addMarker(file, "Cannot validate ADF due to: "+e, -1, IMarker.SEVERITY_ERROR);
 		}
 
 		return ret;
@@ -273,14 +285,25 @@ public class ADFChecker extends IncrementalProjectBuilder
 		if(ret==null)
 		{
 			ClassLoader	cl	= getClassLoader(project);
-			Class	clazz	= Class.forName(factoryname, true, cl);
-			Constructor	con	= clazz.getConstructor(new Class[]{String.class});
+			Class<?>	clazz	= Class.forName(factoryname, true, cl);
+			Constructor<?>	con	= clazz.getConstructor(new Class[]{String.class});
 			Object	factory	= con.newInstance(new Object[]{"dummy"});
-			Method	load	= factory.getClass().getMethod("loadModel", new Class[]{String.class, String[].class, ClassLoader.class});
+			Method	load;
+			try
+			{
+				// Jadex 2.0 (use classloader)
+				load	= factory.getClass().getMethod("loadModel", new Class[]{String.class, String[].class, ClassLoader.class});
+			}
+			catch(NoSuchMethodException e)
+			{
+				// Jadex 2.1 (use resource identifier)
+				load	= factory.getClass().getMethod("loadModel", new Class[]{String.class, String[].class, Class.forName("jadex.bridge.IResourceIdentifier", true, cl)});				
+			}
+			
 			ret	= new Object[]{factory, cl, load};
 			if(cache==null)
 			{
-				cache	= new HashMap();
+				cache	= new HashMap<Object, Object>();
 			}
 			cache.put(key, ret);
 		}
@@ -298,7 +321,7 @@ public class ADFChecker extends IncrementalProjectBuilder
 			ret	= SClassLoader.getProjectClassLoader(project);
 			if(cache==null)
 			{
-				cache	= new HashMap();
+				cache	= new HashMap<Object, Object>();
 			}
 			cache.put(project, ret);
 		}

@@ -80,6 +80,17 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	//-------- constructors --------
 	
 	/**
+	 *  Create a new factory for startup.
+	 *  @param platform	The platform.
+	 */
+	// This constructor is used by the Starter class and the ADFChecker plugin. 
+	public BpmnFactory(String providerid)
+	{
+		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
+		this.loader = new BpmnModelLoader();
+	}
+	
+	/**
 	 *  Create a new BpmnProcessService.
 	 */
 	public BpmnFactory(IServiceProvider provider, Map properties)
@@ -124,17 +135,6 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 			}
 		});
 		return ret;
-	}
-	
-	/**
-	 *  Create a new factory for startup.
-	 *  @param platform	The platform.
-	 */
-	// This constructor is used by the Starter class and the ADFChecker plugin. 
-	public BpmnFactory(String providerid)
-	{
-		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
-		this.loader = new BpmnModelLoader();
 	}
 	
 	//-------- methods --------

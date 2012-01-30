@@ -6,6 +6,7 @@ import jadex.bdi.runtime.impl.JavaStandardPlanExecutor;
 import jadex.bdibpmn.BpmnPlanExecutor;
 import jadex.bpmn.model.MBpmnModel;
 import jadex.bpmn.runtime.BpmnInterpreter;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -81,6 +82,18 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 	protected Map properties;
 	
 	//-------- constructors --------
+	
+	/**
+	 *  Create a new GpmnProcessService.
+	 */
+	// This constructor is used by the Starter class and the ADFChecker plugin. 
+	public GpmnFactory(String providerid)
+	{
+		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
+		
+		this.loader = new GpmnModelLoader();
+		this.converter = new GpmnBDIConverter(getProviderId().getRoot());
+	}
 	
 	/**
 	 *  Create a new GpmnProcessService.
