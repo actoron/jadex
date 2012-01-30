@@ -485,7 +485,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 						{
 							public void resultAvailable(Void result)
 							{
-								getServiceContainer().shutdown().addResultListener(new IResultListener<Void>()
+								getServiceContainer().shutdown().addResultListener(microagent.createResultListener(new IResultListener<Void>()
 								{
 									public void resultAvailable(Void result)
 									{
@@ -511,7 +511,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 											}
 										});
 									}
-								});
+								}));
 							}
 							
 							public void exceptionOccurred(final Exception exception)

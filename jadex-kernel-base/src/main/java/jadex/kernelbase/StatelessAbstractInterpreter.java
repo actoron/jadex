@@ -176,7 +176,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 									public void customResultAvailable(Void result)
 									{
 										final Collection<IComponentListener> lis = getInternalComponentListeners();
-										getServiceContainer().shutdown().addResultListener(new IResultListener<Void>()
+										getServiceContainer().shutdown().addResultListener(createResultListener(new IResultListener<Void>()
 										{
 											public void resultAvailable(Void result)
 											{
@@ -198,7 +198,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 													}
 												});
 											}
-										});
+										}));
 									}
 								}));
 							}

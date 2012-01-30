@@ -628,8 +628,32 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 						//							System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
 												}
 												
-												ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), clisteners, clock)
-													.addResultListener(new DelegationResultListener<Void>(ret));
+												getServiceContainer().shutdown().addResultListener(createResultListener(new IResultListener<Void>()
+												{
+													public void resultAvailable(Void result)
+													{
+														ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), getInternalComponentListeners(), clock)
+															.addResultListener(new DelegationResultListener<Void>(ret));
+													}
+													public void exceptionOccurred(final Exception exception)
+													{
+														ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), getInternalComponentListeners(), clock)
+															.addResultListener(new DelegationResultListener<Void>(ret)
+														{
+															public void customResultAvailable(Void result)
+															{
+																ret.setException(exception);
+															}
+															public void exceptionOccurred(Exception exception)
+															{
+																ret.setException(exception);
+															}
+														});
+													}
+												}));
+												
+//												ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), clisteners, clock)
+//													.addResultListener(new DelegationResultListener<Void>(ret));
 											}
 										});
 									}
