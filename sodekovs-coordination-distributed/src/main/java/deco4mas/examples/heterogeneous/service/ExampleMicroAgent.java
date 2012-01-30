@@ -1,4 +1,4 @@
-package deco4mas.examples.heterogeneous;
+package deco4mas.examples.heterogeneous.service;
 
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;

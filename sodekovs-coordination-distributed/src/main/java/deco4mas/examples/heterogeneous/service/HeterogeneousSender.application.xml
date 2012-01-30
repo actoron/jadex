@@ -17,7 +17,7 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd	                    
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
-	name="HeterogeneousSender" package="deco4mas.examples.heterogeneous">	
+	name="HeterogeneousSender" package="deco4mas.examples.heterogeneous.service">	
 
 	<imports>
 		<import>jadex.extension.envsupport.environment.space2d.*</import>
@@ -38,7 +38,7 @@
 			
 	<extensiontypes>
 		<env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">		
-			<env:property name="dynamics_configuration">"sodekovs-coordination-distributed/src/main/java/deco4mas/examples/heterogeneous/coordination.dynamics.xml"</env:property>
+			<env:property name="dynamics_configuration">"sodekovs-coordination-distributed/src/main/java/deco4mas/examples/heterogeneous/service/coordination.dynamics.xml"</env:property>
 
 			<env:spaceexecutor class="DeltaTimeExecutor">
 				<env:property name="space">$space</env:property>
@@ -48,7 +48,7 @@
 	</extensiontypes>
 	
 	<componenttypes>
-		<componenttype name="ExampleBDI" filename="deco4mas/examples/heterogeneous/ExampleBDI.agent.xml" />		
+		<componenttype name="ExampleBDI" filename="deco4mas/examples/heterogeneous/service/ExampleBDI.agent.xml" />		
 	</componenttypes>
 
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package deco4mas.examples.heterogeneous;
+package deco4mas.examples.heterogeneous.cachedservice;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
@@ -23,15 +23,19 @@ public class InitialPlan extends Plan {
 	@Override
 	public void body() {
 		// System.out.println("ExampleBDIAgent body() in InitalPlan called.");
-		String message = "Hello I'm the example BDI agent and it is a pleasure talking with you!";
 
-		waitFor(2000);
+		// repeat 10 times
+		for (int i = 1; i <= 10; i++) {
+			String message = "Hello I'm the example BDI agent and this is message " + i;
 
-		IGoal goal = createGoal("sayhello");
-		goal.getParameter("message").setValue(message);
+			waitFor(10000);
 
-		// System.out.println("ExampleBDIAgent body() goal 'sayhello' is going to be dispatched with message:");
-		System.out.println("BDI sending message: " + message);
-		dispatchTopLevelGoal(goal);
+			IGoal goal = createGoal("sayhello");
+			goal.getParameter("message").setValue(message);
+
+			// System.out.println("ExampleBDIAgent body() goal 'sayhello' is going to be dispatched with message:");
+			System.out.println("BDI sending message: " + message);
+			dispatchTopLevelGoal(goal);
+		}
 	}
 }

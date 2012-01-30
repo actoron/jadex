@@ -20,7 +20,7 @@ import deco4mas.mechanism.CoordinationMechanism;
 public class ServiceMechanism extends CoordinationMechanism {
 
 	/** The applications interpreter */
-	private StatelessAbstractInterpreter applicationInterpreter = null;
+	protected StatelessAbstractInterpreter applicationInterpreter = null;
 
 	/**
 	 * Default Constructor.
@@ -43,7 +43,6 @@ public class ServiceMechanism extends CoordinationMechanism {
 
 	@Override
 	public void perceiveCoordinationEvent(Object obj) {
-		// TODO Service Caching und Unicast implementieren
 		final CoordinationInfo ci = (CoordinationInfo) obj;
 
 		SServiceProvider.getServices(applicationInterpreter.getServiceProvider(), ICoordinationService.class, RequiredServiceInfo.SCOPE_GLOBAL).addResultListener(
