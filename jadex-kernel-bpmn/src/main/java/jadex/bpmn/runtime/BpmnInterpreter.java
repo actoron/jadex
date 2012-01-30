@@ -26,6 +26,7 @@ import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -51,6 +52,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -590,37 +592,51 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	 *  Can be called concurrently (also during executeAction()).
 	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
 	 */
-	public IFuture cleanupComponent()
+	public IFuture<Void> cleanupComponent()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		// Todo: cleanup required???
 		
-		ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), null);
-		
-		startEndSteps().addResultListener(createResultListener(new DelegationResultListener(ret)
+		IFuture<IClockService> fut = SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			final Collection<IComponentListener> clisteners = getInternalComponentListeners();
+			public void customResultAvailable(final IClockService clock)
 			{
-				terminateExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
+				ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners())
+					.addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Void result)
 					{
-						getComponentAdapter().invokeLater(new Runnable()
+						startEndSteps().addResultListener(createResultListener(new DelegationResultListener(ret)
 						{
-							public void run()
-							{	
-								// Call cancel on all running threads.
-								for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+							public void customResultAvailable(Object result)
+							{
+								terminateExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
 								{
-									ProcessThread pt = (ProcessThread)it.next();
-									getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
-		//							System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
-								}
-								
-								ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
+									public void customResultAvailable(Object result)
+									{
+										getComponentAdapter().invokeLater(new Runnable()
+										{
+											public void run()
+											{	
+												// Call cancel on all running threads.
+												for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+												{
+													ProcessThread pt = (ProcessThread)it.next();
+													getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
+						//							System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
+												}
+												
+												ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), clisteners, clock)
+													.addResultListener(new DelegationResultListener<Void>(ret));
+											}
+										});
+									}
+								}));
 							}
-						});
-					}
+						}));
+					}	
 				}));
 			}
 		}));

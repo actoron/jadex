@@ -176,7 +176,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		{
 			public void customResultAvailable(final Class servicetype)
 			{
-				// System.out.println("Removing service: " + type + " " + service);
+//				System.out.println("Removing service: " + servicetype);
 				synchronized(this)
 				{
 					Collection tmp = services!=null? (Collection)services.get(servicetype): null;
@@ -194,11 +194,13 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 								// Todo: fix started/terminated!? (i.e. addService() is ignored, when not started!?)
 //								if(!terminated)
 //								{
+//									System.out.println("Terminating service: "+sid);
 									getLogger().info("Terminating service: "+sid);
 									service.shutdownService().addResultListener(new DelegationResultListener(ret)
 									{
 										public void customResultAvailable(Object result)
 										{
+//											System.out.println("Terminated service: "+sid);
 											getLogger().info("Terminated service: "+sid);
 											serviceShutdowned(tst).addResultListener(new DelegationResultListener<Void>(ret));
 										}
@@ -323,6 +325,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 					requiredserviceinfos	= null;
 					ret.setResult(null);
 				}
+				public void exceptionOccurred(Exception exception)
+				{
+					exception.printStackTrace();
+					super.exceptionOccurred(exception);
+				}
 			});
 			
 //			final IInternalService[]	service	= new IInternalService[1];	// one element array for final variable.
@@ -393,6 +400,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	protected IFuture<Void> doShutdown(final Iterator<IInternalService> services)
 	{
 		final Future<Void> ret = new Future<Void>();
+		
 		if(services.hasNext())
 		{
 			final IInternalService ser = services.next();
@@ -412,6 +420,10 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 				public void customResultAvailable(Void result)
 				{
 					removeService(sid).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					super.exceptionOccurred(exception);
 				}
 			});
 		}

@@ -34,6 +34,7 @@ import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -156,24 +157,89 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		
 		final Future<Void> ret = new Future<Void>();
 
-		ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), null);
-		
-		startEndSteps().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
+		IFuture<IClockService> fut = SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
-			public void customResultAvailable(Void result)
+			public void customResultAvailable(final IClockService clock)
 			{
-				terminateExtensions().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
+				ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners())
+					.addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						ComponentChangeEvent.dispatchTerminatedEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners(), ret);
+						startEndSteps().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
+						{
+							public void customResultAvailable(Void result)
+							{
+								terminateExtensions().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
+								{
+									public void customResultAvailable(Void result)
+									{
+										final Collection<IComponentListener> lis = getInternalComponentListeners();
+										getServiceContainer().shutdown().addResultListener(new IResultListener<Void>()
+										{
+											public void resultAvailable(Void result)
+											{
+												ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), lis, clock)
+													.addResultListener(new DelegationResultListener<Void>(ret));
+											}
+											public void exceptionOccurred(final Exception exception)
+											{
+												ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), lis, clock)
+													.addResultListener(new DelegationResultListener<Void>(ret)
+												{
+													public void customResultAvailable(Void result)
+													{
+														ret.setException(exception);
+													}
+													public void exceptionOccurred(Exception exception)
+													{
+														ret.setException(exception);
+													}
+												});
+											}
+										});
+									}
+								}));
+							}
+						}));
 					}
-				}));
+				});
 			}
 		}));
 		
+		
+		
 		return ret;
 //		return adapter.getServiceContainer().shutdown(); // done in adapter
+	}
+	
+	/**
+	 *  Called from cleanupComponent.
+	 */
+	protected IFuture<Void> terminateServiceContainer()
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		getServiceContainer().shutdown().addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				ret.setResult(null);
+//				listener.resultAvailable(this, getComponentIdentifier());
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+//				exception.printStackTrace();
+//				getLogger().warning("Exception during service container shutdown: "+exception);
+//				listener.resultAvailable(this, getComponentIdentifier());
+//				ret.setResult(getComponentIdentifier());	// Exception should be propagated?
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**

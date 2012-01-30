@@ -274,12 +274,12 @@
 				new DeploymentService($component.getServiceProvider())
 			</implementation>		
 		</providedservice>
-		<providedservice name="pub1" class="IPublishService">
+		<providedservice name="publish_ws" class="IPublishService">
 			<implementation>
 				Boolean.TRUE.equals($args.wspublish &amp;&amp; !$args.android) ? DefaultWebServicePublishService.class.newInstance() : null
 			</implementation>
 		</providedservice>
-		<providedservice name="pub2" class="IPublishService">
+		<providedservice name="publish_rs" class="IPublishService">
 			<implementation>
 				Boolean.TRUE.equals($args.rspublish &amp;&amp; !$args.android) ? DefaultRestServicePublishService.class.newInstance() : null
 			</implementation>

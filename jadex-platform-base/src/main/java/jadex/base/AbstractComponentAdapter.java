@@ -572,20 +572,13 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 									{								
 										public void run()
 										{
-											shutdownContainer().addResultListener(new DelegationResultListener(killfuture)
-											{
-												public void customResultAvailable(Object result)
-												{
-													clock	= null;
-													cms	= null;
-//													component	= null;	// Required by getResults()
-													model	= null;
-//													desc	= null;	// Required by toString()
-													parent	= null;
-													
-													super.customResultAvailable(result);
-												}
-											});
+											clock	= null;
+											cms	= null;
+//											component	= null;	// Required by getResults()
+											model	= null;
+//											desc	= null;	// Required by toString()
+											parent	= null;
+											killfuture.setResult(null);
 											
 //											System.out.println("Checking ext entries after cleanup: "+cid);
 											assert ext_entries==null || ext_entries.isEmpty() : "Ext entries after cleanup: "+desc.getName()+", "+ext_entries;
@@ -601,7 +594,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 							public void exceptionOccurred(Exception exception)
 							{
 								getLogger().warning("Exception during component cleanup: "+exception);
-								shutdownContainer().addResultListener(new DelegationResultListener(killfuture));
+								killfuture.setException(exception);
+//								shutdownContainer().addResultListener(new DelegationResultListener(killfuture));
 							}
 						});
 					}
@@ -619,35 +613,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		// LogManager causes memory leak till Java 7
 		// No way to remove loggers and no weak references. 
 	}
-
-	/**
-	 *  Called from killComponent.
-	 */
-	protected IFuture<Void> shutdownContainer()
-	{
-		final Future<Void> ret = new Future<Void>();
-		
-		getServiceContainer().shutdown().addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-				ret.setResult(null);
-//				listener.resultAvailable(this, getComponentIdentifier());
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-//				exception.printStackTrace();
-//				getLogger().warning("Exception during service container shutdown: "+exception);
-//				listener.resultAvailable(this, getComponentIdentifier());
-//				ret.setResult(getComponentIdentifier());	// Exception should be propagated?
-				ret.setException(exception);
-			}
-		});
-		
-		return ret;
-	}
-
+	
 	/**
 	 *  Called when a message was sent to the component.
 	 *  (Called from message transport).
@@ -953,13 +919,13 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //			System.out.println("Adding to ext entries: "+cid);
 			if(ext_forbidden)
 			{
-				throw new ComponentTerminatedException(desc.getName())
-				{
-					public void printStackTrace()
-					{
-						Thread.dumpStack();
-					}
-				};
+				throw new ComponentTerminatedException(desc.getName());
+//				{
+//					public void printStackTrace()
+//					{
+//						Thread.dumpStack();
+//					}
+//				};
 			}
 			else
 			{

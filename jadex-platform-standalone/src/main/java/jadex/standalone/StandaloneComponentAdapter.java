@@ -82,6 +82,9 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 		return exeservice;
 	}
 	
+	/**
+	 *  Kill the component.
+	 */
 	public IFuture<Void> killComponent()
 	{
 		Future<Void>	ret	= new Future<Void>();

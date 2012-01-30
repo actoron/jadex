@@ -6,7 +6,9 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
-import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -324,29 +326,31 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	 * 	@param provider Service provider of the component.
 	 *  @return Time stamp.
 	 */
-	public static final IFuture getTimeStamp(IServiceProvider provider)
+	public static final IFuture<Long> getTimeStamp(IServiceProvider provider)
 	{
-		final Future ret = new Future();
-		SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		final Future<Long> ret = new Future<Long>();
+		
+		SServiceProvider.getService(provider, IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IClockService, Long>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IClockService result)
 			{
-				ret.setResult(((IClockService)result).getTime());
+				ret.setResult(new Long(((IClockService)result).getTime()));
 			}
 		});
 		
 		return ret;
 	}
 	
-	/**
-	 *  Dispatches a component change event.
-	 *  @param event The event.
-	 *  @param componentlisteners Event listeners.
-	 */
-	public static final void dispatchComponentChangeEvent(IComponentChangeEvent event, Collection componentlisteners)
-	{
-		dispatchComponentChangeEvent(event, componentlisteners, null);
-	}
+//	/**
+//	 *  Dispatches a component change event.
+//	 *  @param event The event.
+//	 *  @param componentlisteners Event listeners.
+//	 */
+//	public static final IFuture<Void> dispatchComponentChangeEvent(IComponentChangeEvent event, Collection<IComponentListener> componentlisteners)
+//	{
+//		return dispatchComponentChangeEvent(event, componentlisteners);
+//	}
 	
 	/**
 	 *  Dispatches a component change event.
@@ -354,32 +358,42 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	 *  @param componentlisteners Event listeners.
 	 *  @param finished Future, called when the event has been dispatched.
 	 */
-	public static final void dispatchComponentChangeEvent(IComponentChangeEvent event, final Collection componentlisteners, Future finished)
+	public static final IFuture<Void> dispatchComponentChangeEvent(IComponentChangeEvent event, final Collection<IComponentListener> componentlisteners)
 	{
+		Future<Void> ret = new Future<Void>();
+		
 		if(componentlisteners!=null)
 		{
 			IComponentListener[] listeners = (IComponentListener[])componentlisteners.toArray(new IComponentListener[componentlisteners.size()]);
+			final CounterResultListener<Void> clis = new CounterResultListener<Void>(listeners.length, true, new DelegationResultListener<Void>(ret));
+			
 			for(int i=0; i<listeners.length; i++)
 			{
 				if(listeners[i].getFilter().filter(event))
 				{
 					final IComponentListener lis = listeners[i];
-					lis.eventOccured(event).addResultListener(new IResultListener()
+					lis.eventOccured(event).addResultListener(new IResultListener<Void>()
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(Void result)
 						{
+							clis.resultAvailable(null);
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
 							componentlisteners.remove(lis);
+							clis.resultAvailable(null);
 						}
 					});
 				}
+				else
+				{
+					clis.resultAvailable(null);
+				}
 			}
 		}
-		if (finished != null)
-			finished.setResult(null);
+		
+		return ret;
 	}
 	
 	/**
@@ -391,25 +405,31 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	 *  @param componentlisteners Listeners of the component.
 	 *  @param finished Future, called when the event has been dispatched.
 	 */
-	public static final void dispatchTerminatedEvent(final IComponentAdapter adapter, final long creationtime, final IModelInfo model,
-		IServiceProvider provider, final Collection componentlisteners, final Future finished)
+	public static final IFuture<Void> dispatchTerminatedEvent(final IComponentIdentifier cid, final long creationtime, final IModelInfo model,
+		final Collection<IComponentListener> componentlisteners, IClockService clock)
 	{
-		if (componentlisteners == null || componentlisteners.isEmpty())
+		final Future<Void> ret = new Future<Void>();
+		
+		if(componentlisteners == null || componentlisteners.isEmpty())
 		{
-			if(finished != null && !finished.isDone())
-				finished.setResult(null);
-			return;
+			ret.setResult(null);
 		}
-		getTimeStamp(provider).addResultListener(new DefaultResultListener()
+		else
 		{
-			public void resultAvailable(Object result)
-			{
-				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
-					IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT, model.getName(), adapter.getComponentIdentifier().getName(),
-					adapter.getComponentIdentifier(), creationtime, null, null, (Long) result);
-				dispatchComponentChangeEvent(event, componentlisteners, finished);
-			}
-		});
+			long time = clock.getTime();
+//			getTimeStamp(provider).addResultListener(new ExceptionDelegationResultListener<Long, Void>(ret)
+//			{
+//				public void customResultAvailable(Long result)
+//				{
+					ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_DISPOSAL,
+						IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT, model.getName(), cid.getName(),
+						cid, creationtime, null, null, time);
+					dispatchComponentChangeEvent(event, componentlisteners).addResultListener(new DelegationResultListener<Void>(ret));
+//				}
+//			});
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -421,24 +441,29 @@ public class ComponentChangeEvent implements IComponentChangeEvent
 	 *  @param componentlisteners Listeners of the component.
 	 *  @param finished Future, called when the event has been dispatched.
 	 */
-	public static final void dispatchTerminatingEvent(final IComponentAdapter adapter, final long creationtime, final IModelInfo model,
-		IServiceProvider provider, final Collection componentlisteners, final Future finished)
+	public static final IFuture<Void> dispatchTerminatingEvent(final IComponentAdapter adapter, final long creationtime, final IModelInfo model,
+		IServiceProvider provider, final Collection<IComponentListener> componentlisteners)
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		if(componentlisteners == null || componentlisteners.isEmpty())
 		{
-			if (finished != null && !finished.isDone())
-				finished.setResult(null);
-			return;
+			ret.setResult(null);
 		}
-		getTimeStamp(provider).addResultListener(new DefaultResultListener()
+		else
 		{
-			public void resultAvailable(Object result)
+			getTimeStamp(provider).addResultListener(new ExceptionDelegationResultListener<Long, Void>(ret)
 			{
-				ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_OCCURRENCE,
-					 IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT, model.getName(), adapter.getComponentIdentifier().getName(),
-					adapter.getComponentIdentifier(), creationtime, null, "terminating", (Long) result);
-				dispatchComponentChangeEvent(event, componentlisteners, finished);
-			}
-		});
+				public void customResultAvailable(Long result)
+				{
+					ComponentChangeEvent event = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_OCCURRENCE,
+						 IComponentChangeEvent.SOURCE_CATEGORY_COMPONENT, model.getName(), adapter.getComponentIdentifier().getName(),
+						adapter.getComponentIdentifier(), creationtime, null, "terminating", result);
+					dispatchComponentChangeEvent(event, componentlisteners).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+			});
+		}
+		
+		return ret;
 	}
 }

@@ -69,22 +69,22 @@ public class ComponentManagementService extends jadex.base.service.cms.Component
 	/**
 	 *  Invoke kill on adapter.
 	 */
-	public IFuture killComponent(IComponentAdapter adapter)
+	public IFuture<Void> killComponent(IComponentAdapter adapter)
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		((StandaloneComponentAdapter)adapter).killComponent()
-			.addResultListener(new DelegationResultListener(ret));
+			.addResultListener(new DelegationResultListener<Void>(ret));
 		return ret;
 	}
 	
 	/**
 	 *  Cancel the execution.
 	 */
-	public IFuture cancel(IComponentAdapter adapter)
+	public IFuture<Void> cancel(IComponentAdapter adapter)
 	{
-		Future ret = new Future();
+		Future<Void> ret = new Future<Void>();
 		getExecutionService().cancel((StandaloneComponentAdapter)adapter)
-			.addResultListener(new DelegationResultListener(ret));
+			.addResultListener(new DelegationResultListener<Void>(ret));
 		return ret;
 	}
 
