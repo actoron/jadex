@@ -583,87 +583,113 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		});
 	}
 
+//	/**
+//	 *  Can be called concurrently (also during executeAction()).
+//	 *   
+//	 *  Request agent to kill itself.
+//	 *  The agent might perform arbitrary cleanup activities during which executeAction()
+//	 *  will still be called as usual.
+//	 *  Can be called concurrently (also during executeAction()).
+//	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
+//	 */
+//	public IFuture<Void> cleanupComponent()
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		// Todo: cleanup required???
+//		
+//		IFuture<IClockService> fut = SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+//		{
+//			public void customResultAvailable(final IClockService clock)
+//			{
+//				ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners())
+//					.addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
+//				{
+//					public void customResultAvailable(Void result)
+//					{
+//						startEndSteps().addResultListener(createResultListener(new DelegationResultListener(ret)
+//						{
+//							public void customResultAvailable(Object result)
+//							{
+//								terminateExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
+//								{
+//									public void customResultAvailable(Object result)
+//									{
+//										getComponentAdapter().invokeLater(new Runnable()
+//										{
+//											public void run()
+//											{	
+//												// Call cancel on all running threads.
+//												for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
+//												{
+//													ProcessThread pt = (ProcessThread)it.next();
+//													getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
+//						//							System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
+//												}
+//												
+//												getServiceContainer().shutdown().addResultListener(createResultListener(new IResultListener<Void>()
+//												{
+//													public void resultAvailable(Void result)
+//													{
+//														ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), getInternalComponentListeners(), clock)
+//															.addResultListener(new DelegationResultListener<Void>(ret));
+//													}
+//													public void exceptionOccurred(final Exception exception)
+//													{
+//														ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), getInternalComponentListeners(), clock)
+//															.addResultListener(new DelegationResultListener<Void>(ret)
+//														{
+//															public void customResultAvailable(Void result)
+//															{
+//																ret.setException(exception);
+//															}
+//															public void exceptionOccurred(Exception exception)
+//															{
+//																ret.setException(exception);
+//															}
+//														});
+//													}
+//												}));
+//												
+////												ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), clisteners, clock)
+////													.addResultListener(new DelegationResultListener<Void>(ret));
+//											}
+//										});
+//									}
+//								}));
+//							}
+//						}));
+//					}	
+//				}));
+//			}
+//		}));
+//		
+//		return ret;
+//	}
+	
 	/**
-	 *  Can be called concurrently (also during executeAction()).
-	 *   
-	 *  Request agent to kill itself.
-	 *  The agent might perform arbitrary cleanup activities during which executeAction()
-	 *  will still be called as usual.
-	 *  Can be called concurrently (also during executeAction()).
-	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
+	 *  Start the end steps of the component.
+	 *  Called as part of cleanup behavior.
 	 */
-	public IFuture<Void> cleanupComponent()
+	public IFuture<Void>	startEndSteps()
 	{
-		final Future<Void> ret = new Future<Void>();
-		// Todo: cleanup required???
+		final Future<Void> ret = new Future<Void>(); 
 		
-		IFuture<IClockService> fut = SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+		getComponentAdapter().invokeLater(new Runnable()
 		{
-			final Collection<IComponentListener> clisteners = getInternalComponentListeners();
-			public void customResultAvailable(final IClockService clock)
-			{
-				ComponentChangeEvent.dispatchTerminatingEvent(getComponentAdapter(), getCreationTime(), getModel(), getServiceProvider(), getInternalComponentListeners())
-					.addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
+			public void run()
+			{	
+				// Call cancel on all running threads.
+				for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
 				{
-					public void customResultAvailable(Void result)
-					{
-						startEndSteps().addResultListener(createResultListener(new DelegationResultListener(ret)
-						{
-							public void customResultAvailable(Object result)
-							{
-								terminateExtensions().addResultListener(createResultListener(new DelegationResultListener(ret)
-								{
-									public void customResultAvailable(Object result)
-									{
-										getComponentAdapter().invokeLater(new Runnable()
-										{
-											public void run()
-											{	
-												// Call cancel on all running threads.
-												for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
-												{
-													ProcessThread pt = (ProcessThread)it.next();
-													getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
-						//							System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
-												}
-												
-												getServiceContainer().shutdown().addResultListener(createResultListener(new IResultListener<Void>()
-												{
-													public void resultAvailable(Void result)
-													{
-														ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), getInternalComponentListeners(), clock)
-															.addResultListener(new DelegationResultListener<Void>(ret));
-													}
-													public void exceptionOccurred(final Exception exception)
-													{
-														ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), getInternalComponentListeners(), clock)
-															.addResultListener(new DelegationResultListener<Void>(ret)
-														{
-															public void customResultAvailable(Void result)
-															{
-																ret.setException(exception);
-															}
-															public void exceptionOccurred(Exception exception)
-															{
-																ret.setException(exception);
-															}
-														});
-													}
-												}));
-												
-//												ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), clisteners, clock)
-//													.addResultListener(new DelegationResultListener<Void>(ret));
-											}
-										});
-									}
-								}));
-							}
-						}));
-					}	
-				}));
+					ProcessThread pt = (ProcessThread)it.next();
+					getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
+//							System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
+				}
+				
+				BpmnInterpreter.super.startEndSteps().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 			}
-		}));
+		});
 		
 		return ret;
 	}

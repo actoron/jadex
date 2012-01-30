@@ -3,9 +3,6 @@ package jadex.micro;
 import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentChangeEvent;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentInstance;
-import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -13,9 +10,6 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.ITransferableStep;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
@@ -25,7 +19,6 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -33,14 +26,12 @@ import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 import jadex.javaparser.SimpleValueFetcher;
 import jadex.kernelbase.AbstractInterpreter;
-import jadex.kernelbase.InterpreterFetcher;
 import jadex.micro.annotation.Agent;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -452,94 +443,141 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		scheduleStep(new HandleMessageStep(message));
 	}
 
+//	/**
+//	 *  Can be called concurrently (also during executeAction()).
+//	 *   
+//	 *  Request agent to kill itself.
+//	 *  The agent might perform arbitrary cleanup activities during which executeAction()
+//	 *  will still be called as usual.
+//	 *  Can be called concurrently (also during executeAction()).
+//	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
+//	 */
+//	public IFuture<Void> cleanupComponent()
+//	{
+//		assert !getComponentAdapter().isExternalThread();
+//		
+////		System.out.println("cleanup: "+getComponentIdentifier());
+//		
+//		final Future<Void> ret = new Future<Void>();
+////		exitState();
+//		
+//		IFuture<IClockService> fut = SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+//		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+//		{
+//			public void customResultAvailable(final IClockService clock)
+//			{
+//				final Collection<IComponentListener> lis = getInternalComponentListeners();
+//				ComponentChangeEvent.dispatchTerminatingEvent(adapter, getCreationTime(), getModel(), getServiceProvider(), componentlisteners)
+//					.addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
+//				{
+//					public void customResultAvailable(Void result) 
+//					{
+//						microagent.agentKilled().addResultListener(microagent.createResultListener(new IResultListener<Void>()
+//						{
+//							public void resultAvailable(Void result)
+//							{
+//								terminateServiceContainer().addResultListener(microagent.createResultListener(new IResultListener<Void>()
+//								{
+//									public void resultAvailable(Void result)
+//									{
+//										nosteps = true;
+//										exitState();
+//										ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), lis, clock)
+//											.addResultListener(new DelegationResultListener<Void>(ret));
+//									}
+//									public void exceptionOccurred(final Exception exception)
+//									{
+//										nosteps = true;
+//										exitState();
+//										ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), lis, clock)
+//											.addResultListener(new IResultListener<Void>()
+//										{
+//											public void resultAvailable(Void result)
+//											{
+//												ret.setException(exception);
+//											}
+//											public void exceptionOccurred(Exception e)
+//											{
+//												ret.setException(exception);
+//											}
+//										});
+//									}
+//								}));
+//							}
+//							
+//							public void exceptionOccurred(final Exception exception)
+//							{
+//								nosteps = true;
+//								exitState();
+//								StringWriter	sw	= new StringWriter();
+//								exception.printStackTrace(new PrintWriter(sw));
+//								microagent.getLogger().severe("Exception during cleanup: "+sw);
+//								ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), lis, clock)
+//									.addResultListener(new IResultListener<Void>()
+//								{
+//									public void resultAvailable(Void result)
+//									{
+//										ret.setException(exception);
+//									}
+//									public void exceptionOccurred(Exception e)
+//									{
+//										ret.setException(exception);
+//									}
+//								});
+//							}
+//						}));
+//					};
+//				}));
+//			}
+//		}));
+//		
+//		return ret;
+//	}
+	
 	/**
-	 *  Can be called concurrently (also during executeAction()).
-	 *   
-	 *  Request agent to kill itself.
-	 *  The agent might perform arbitrary cleanup activities during which executeAction()
-	 *  will still be called as usual.
-	 *  Can be called concurrently (also during executeAction()).
-	 *  @param listener	When cleanup of the agent is finished, the listener must be notified.
+	 *  Start the end steps of the component.
+	 *  Called as part of cleanup behavior.
 	 */
-	public IFuture<Void> cleanupComponent()
+	public IFuture<Void>	startEndSteps()
 	{
-		assert !getComponentAdapter().isExternalThread();
+		final Future<Void> ret = new Future<Void>(); 
 		
-//		System.out.println("cleanup: "+getComponentIdentifier());
-		
-		final Future<Void> ret = new Future<Void>();
-//		exitState();
-		
-		IFuture<IClockService> fut = SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
-		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+		microagent.agentKilled().addResultListener(microagent.createResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(final IClockService clock)
+			public void exceptionOccurred(Exception exception)
 			{
-				final Collection<IComponentListener> lis = getInternalComponentListeners();
-				ComponentChangeEvent.dispatchTerminatingEvent(adapter, getCreationTime(), getModel(), getServiceProvider(), componentlisteners)
-					.addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
-				{
-					public void customResultAvailable(Void result) 
-					{
-						microagent.agentKilled().addResultListener(microagent.createResultListener(new IResultListener<Void>()
-						{
-							public void resultAvailable(Void result)
-							{
-								getServiceContainer().shutdown().addResultListener(microagent.createResultListener(new IResultListener<Void>()
-								{
-									public void resultAvailable(Void result)
-									{
-										nosteps = true;
-										exitState();
-										ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), lis, clock)
-											.addResultListener(new DelegationResultListener<Void>(ret));
-									}
-									public void exceptionOccurred(final Exception exception)
-									{
-										nosteps = true;
-										exitState();
-										ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), lis, clock)
-											.addResultListener(new IResultListener<Void>()
-										{
-											public void resultAvailable(Void result)
-											{
-												ret.setException(exception);
-											}
-											public void exceptionOccurred(Exception e)
-											{
-												ret.setException(exception);
-											}
-										});
-									}
-								}));
-							}
-							
-							public void exceptionOccurred(final Exception exception)
-							{
-								nosteps = true;
-								exitState();
-								StringWriter	sw	= new StringWriter();
-								exception.printStackTrace(new PrintWriter(sw));
-								microagent.getLogger().severe("Exception during cleanup: "+sw);
-								ComponentChangeEvent.dispatchTerminatedEvent(getComponentIdentifier(), getCreationTime(), getModel(), lis, clock)
-									.addResultListener(new IResultListener<Void>()
-								{
-									public void resultAvailable(Void result)
-									{
-										ret.setException(exception);
-									}
-									public void exceptionOccurred(Exception e)
-									{
-										ret.setException(exception);
-									}
-								});
-							}
-						}));
-					};
-				}));
+				nosteps = true;
+				exitState();
+				StringWriter	sw	= new StringWriter();
+				exception.printStackTrace(new PrintWriter(sw));
+				microagent.getLogger().severe("Exception during cleanup: "+sw);
 			}
 		}));
 		
+		return ret;
+	}
+	
+	/**
+	 *  Called from cleanupComponent.
+	 */
+	public IFuture<Void> terminateServiceContainer()
+	{
+		final Future<Void> ret = new Future<Void>();
+		super.terminateServiceContainer().addResultListener(createResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				nosteps = true;
+				exitState();
+				ret.setResult(result);
+			}
+			public void exceptionOccurred(final Exception exception)
+			{
+				nosteps = true;
+				exitState();
+				ret.setException(exception);
+			}
+		}));
 		return ret;
 	}
 	

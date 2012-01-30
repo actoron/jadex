@@ -144,6 +144,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 
 	/**
 	 *  Can be called concurrently (also during executeAction()).
+	 *  
+	 *  -  
 	 *   
 	 *  Request component to kill itself.
 	 *  The component might perform arbitrary cleanup activities during which executeAction()
@@ -176,7 +178,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 									public void customResultAvailable(Void result)
 									{
 										final Collection<IComponentListener> lis = getInternalComponentListeners();
-										getServiceContainer().shutdown().addResultListener(createResultListener(new IResultListener<Void>()
+										terminateServiceContainer().addResultListener(createResultListener(new IResultListener<Void>()
 										{
 											public void resultAvailable(Void result)
 											{
@@ -217,7 +219,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Called from cleanupComponent.
 	 */
-	protected IFuture<Void> terminateServiceContainer()
+	public IFuture<Void> terminateServiceContainer()
 	{
 		final Future<Void> ret = new Future<Void>();
 		
