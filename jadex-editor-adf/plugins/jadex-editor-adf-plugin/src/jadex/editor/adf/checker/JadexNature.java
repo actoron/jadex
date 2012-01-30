@@ -1,9 +1,11 @@
 package jadex.editor.adf.checker;
 
 import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 
@@ -58,6 +60,10 @@ public class JadexNature implements IProjectNature
 	 */
 	public void deconfigure() throws CoreException
 	{
+		// Remove all Jadex markers on  project.
+		int depth = IResource.DEPTH_INFINITE;
+		getProject().deleteMarkers(ADFChecker.MARKER_TYPE, true, depth);
+		
 		boolean	removed	= false;
 		IProjectDescription description = getProject().getDescription();
 		ICommand[] commands = description.getBuildSpec();

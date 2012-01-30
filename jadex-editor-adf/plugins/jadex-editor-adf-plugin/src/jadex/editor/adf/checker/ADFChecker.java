@@ -32,7 +32,7 @@ public class ADFChecker extends IncrementalProjectBuilder
 	public static final String	BUILDER_ID	= "jadex.editor.adf.plugin.adfChecker";
 
 	/** The marker type determines how ADF errors appear in the file and the problems view. */
-	protected static final String	MARKER_TYPE	= IMarker.PROBLEM;
+	protected static final String	MARKER_TYPE	= "jadex.editor.adf.plugin.jadexproblem";
 
 	/** The factories for corresponding file suffixes [suffix1, factoryclass1, suffix2, factoryclass2, ...]. */
 	// Supported factories require a public String constructor!
@@ -43,7 +43,9 @@ public class ADFChecker extends IncrementalProjectBuilder
 		".capability.xml", "jadex.bdi.BDIAgentFactory",
 		".application.xml", "jadex.application.ApplicationComponentFactory",
 		".component.xml", "jadex.component.ComponentComponentFactory",
-		".bpmn", "jadex.bpmn.BpmnFactory"
+		".bpmn", "jadex.bpmn.BpmnFactory",
+		".gpmn", "jadex.gpmn.GpmnFactory"
+		// todo: support .java / .class models (micro, bdiv3)
 	};
 	
 	//-------- attributes --------
@@ -233,9 +235,11 @@ public class ADFChecker extends IncrementalProjectBuilder
 			Object	factory	= tmp[0];
 			ClassLoader	cl	= (ClassLoader)tmp[1];
 			Method	loadmodel	= (Method)tmp[2];
-			Object modelinfo	= loadmodel.invoke(factory, new Object[]{filename, null, cl});
+			Object modelfut	= loadmodel.invoke(factory, new Object[]{filename, null, cl});
+			Object	modelinfo	= modelfut.getClass().getMethod("get", new Class[]{Class.forName("jadex.commons.future.ISuspendable", true, cl)})
+					.invoke(modelfut, new Object[]{null});
 			Object	report	= modelinfo.getClass().getMethod("getReport", new Class[0])
-				.invoke(modelinfo, new Object[0]);
+					.invoke(modelinfo, new Object[0]);
 			if(report!=null)
 			{
 				ret	= (String)report.getClass().getMethod("getErrorText", new Class[0])

@@ -52,8 +52,8 @@
       </objectContribution>
    </extension>
    <extension
-         id="xmlProblem"
-         name="XML Problem"
+         id="jadexproblem"
+         name="Jadex Problem"
          point="org.eclipse.core.resources.markers">
       <super
             type="org.eclipse.core.resources.problemmarker">

@@ -38,8 +38,8 @@ import java.util.Map;
 {
 	@Configuration(name="local"),
 	@Configuration(name="remote", arguments=@NameValue(name="echo",
-//		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\""+SRelay.DEFAULT_ADDRESS+"\"})"))
-		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\""+SRelay.ADDRESS_SCHEME+"localhost:8080/jadex-platform-relay-web/\"})"))
+		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\""+SRelay.DEFAULT_ADDRESS+"\"})"))
+//		value="new jadex.bridge.ComponentIdentifier(\"echo@echo\", new String[]{\""+SRelay.ADDRESS_SCHEME+"jadex.mooo.com/jadex-platform-relay-web-2.1-SNAPSHOT/\"})"))
 })
 public class MessagePerformanceAgent extends MicroAgent
 {
