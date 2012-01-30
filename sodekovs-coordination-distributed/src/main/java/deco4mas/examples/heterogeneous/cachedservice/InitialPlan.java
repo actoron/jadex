@@ -28,7 +28,7 @@ public class InitialPlan extends Plan {
 		for (int i = 1; i <= 10; i++) {
 			String message = "Hello I'm the example BDI agent and this is message " + i;
 
-			waitFor(10000);
+			waitFor(2000);
 
 			IGoal goal = createGoal("sayhello");
 			goal.getParameter("message").setValue(message);

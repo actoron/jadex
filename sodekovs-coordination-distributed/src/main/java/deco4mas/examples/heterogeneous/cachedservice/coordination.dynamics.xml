@@ -61,7 +61,7 @@
 					<properties>
 						<entry>
 							<key>interval</key>
-							<value>5</value>
+							<value>0</value>
 						</entry>
 					</properties>
 				</mechanism_configuration>
