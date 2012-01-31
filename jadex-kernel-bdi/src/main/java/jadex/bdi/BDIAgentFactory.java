@@ -134,6 +134,7 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	public BDIAgentFactory(Map props, IInternalAccess component)
 	{
 		this(props);
+		this.component	= component;
 	}
 	
 	/**
