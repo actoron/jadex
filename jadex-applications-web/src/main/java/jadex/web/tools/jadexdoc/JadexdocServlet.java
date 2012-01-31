@@ -74,7 +74,9 @@ public class JadexdocServlet extends HttpServlet
 			"-extensions", "null",
 			"-welcome", "false",
 			"-relaytransport", "false",
-			"-niotcptransport", "false"
+			"-niotcptransport", "false",
+			"-rspublish", "false",
+			"-wspublish", "false"
 		};
 		platform	= Starter.createPlatform(args);
 		models	= loadModels();
