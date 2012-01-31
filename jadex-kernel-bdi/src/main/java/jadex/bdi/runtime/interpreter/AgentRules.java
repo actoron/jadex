@@ -3426,19 +3426,16 @@ public class AgentRules
 		// Cleanup interpreter resources
 		interpreter.cleanup();
 		
-		// Remove kill listeners.
-		Collection	killlisteners	= state.getAttributeValues(ragent, OAVBDIRuntimeModel.agent_has_killlisteners);
+		// Get kill future.
+		Future<Void>	killfuture	= (Future<Void>)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killfuture);
 
 		// Clean up state listeners.
 		state.dispose();
 		
 		// Inform kill listeners.		
-		if(killlisteners!=null)
+		if(killfuture!=null)
 		{
-			for(Iterator it=killlisteners.iterator(); it.hasNext(); )
-			{
-				((IResultListener)it.next()).resultAvailable(interpreter.getAgentAdapter().getComponentIdentifier());
-			}
+			killfuture.setResult(null);
 		}
 	}
 	

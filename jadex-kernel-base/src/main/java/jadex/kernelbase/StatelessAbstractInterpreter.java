@@ -158,7 +158,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		assert !getComponentAdapter().isExternalThread();
 		
 		final Future<Void> ret = new Future<Void>();
-
+		
 		IFuture<IClockService> fut = SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		fut.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
@@ -214,8 +214,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				});
 			}
 		}));
-		
-		
 		
 		return ret;
 //		return adapter.getServiceContainer().shutdown(); // done in adapter

@@ -659,41 +659,28 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/**
 	 *  Request agent to kill itself.
 	 */
-	public IFuture cleanupComponent()
+	public IFuture<Void> startEndSteps()
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
-		try
+		Object cs = state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
+		if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
 		{
-			getAgentAdapter().invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					Object cs = state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state);
-					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
-					{
-						state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killlisteners, new DelegationResultListener(ret));
-						AgentRules.startTerminating(state, ragent);
-					}
-					else if(cs==null)
-					{
-						// Killed after init (behavior not started)
-						// -> Call cleanup directly as rule engine is not running and end state is not executed.
-						state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED);
-						state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killlisteners, new DelegationResultListener(ret));
-						AgentRules.cleanupAgent(state, ragent);						
-					}
-					else
-					{
-						// Killed after termination.
-						ret.setException(new RuntimeException("Component not running: "+getComponentIdentifier().getName()));
-					}
-				}
-			});
+			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killfuture, ret);
+			AgentRules.startTerminating(state, ragent);
 		}
-		catch(Exception e)
+		else if(cs==null)
 		{
-			ret.setException(e);
+			// Killed after init (behavior not started)
+			// -> Call cleanup directly as rule engine is not running and end state is not executed.
+			state.setAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state, OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_TERMINATED);
+			state.addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killfuture, ret);
+			AgentRules.cleanupAgent(state, ragent);						
+		}
+		else
+		{
+			// Killed after termination.
+			ret.setException(new RuntimeException("Component not running: "+getComponentIdentifier().getName()));
 		}
 		
 		return ret;
@@ -1960,7 +1947,8 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public Collection getInternalComponentListeners()
 	{
-		throw new UnsupportedOperationException();
+		// Todo: support this!?
+		return Collections.EMPTY_LIST;
 	}
 	
 	/**

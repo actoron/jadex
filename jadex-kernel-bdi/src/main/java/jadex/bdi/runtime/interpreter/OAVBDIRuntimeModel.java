@@ -7,7 +7,7 @@ import jadex.bridge.IMessageAdapter;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.IResultCommand;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.Future;
 import jadex.rules.state.OAVAttributeType;
 import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
@@ -199,8 +199,8 @@ public class OAVBDIRuntimeModel
 	/** The timer type. */
 	public static OAVJavaType java_timer_type;
 	
-	/** The timer type. */
-	public static OAVJavaType java_resultlistener_type;
+	/** The future type. */
+	public static OAVJavaType java_future_type;
 	
 	/** The external condition type. */
 	public static OAVJavaType java_externalcondition_type;
@@ -260,8 +260,8 @@ public class OAVBDIRuntimeModel
 	/** The agent has a timer attribute (when waiting for termination). */
 	public static OAVAttributeType agent_has_timer;
 	
-	/** The agent has kill listeners (waiting to be notified after termination). */
-	public static OAVAttributeType agent_has_killlisteners;
+	/** The agent has kill future (waiting to be notified after termination). */
+	public static OAVAttributeType agent_has_killfuture;
 	
 	/** The agent has component listeners (waiting to be notified about component events */
 	public static OAVAttributeType agent_has_componentlisteners;
@@ -780,7 +780,7 @@ public class OAVBDIRuntimeModel
 		java_imessageadapter_type = createJavaType(IMessageAdapter.class, OAVJavaType.KIND_OBJECT);
 		java_propertychangelistener_type	= createJavaType(PropertyChangeListener.class, OAVJavaType.KIND_VALUE);
 		java_timer_type	= createJavaType(ITimer.class, OAVJavaType.KIND_VALUE);
-		java_resultlistener_type	= createJavaType(IResultListener.class, OAVJavaType.KIND_OBJECT);
+		java_future_type	= createJavaType(Future.class, OAVJavaType.KIND_OBJECT);
 		java_componentlistener_type = createJavaType(IComponentListener.class, OAVJavaType.KIND_OBJECT);
 		java_externalcondition_type	= createJavaType(IExternalCondition.class, OAVJavaType.KIND_BEAN);
 		java_serviceprovider_type	= createJavaType(IServiceProvider.class, OAVJavaType.KIND_OBJECT);
@@ -983,7 +983,7 @@ public class OAVBDIRuntimeModel
 //		agent_has_results = agent_type.createAttributeType("agent_has_results", java_map_type);
 		agent_has_initparents = agent_type.createAttributeType("agent_has_initparents", java_map_type);
 		agent_has_timer = agent_type.createAttributeType("agent_has_timer", java_timer_type);
-		agent_has_killlisteners = agent_type.createAttributeType("agent_has_killlisteners", java_resultlistener_type, OAVAttributeType.SET);
+		agent_has_killfuture = agent_type.createAttributeType("agent_has_killfuture", java_future_type);
 		agent_has_componentlisteners = agent_type.createAttributeType("agent_has_componentlisteners", java_componentlistener_type, OAVAttributeType.LIST);
 		agent_has_changeevents = agent_type.createAttributeType("agent_has_changeevents", changeevent_type, OAVAttributeType.LIST);
 //		agent_has_bindings = agent_type.createAttributeType("agent_has_bindings", OAVJavaType.java_object_type);
