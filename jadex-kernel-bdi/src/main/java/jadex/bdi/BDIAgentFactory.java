@@ -187,19 +187,18 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	 *  @param listener The listener.
 	 */
 	@ServiceShutdown
-	public synchronized IFuture	shutdownService()
+	public synchronized IFuture<Void>	shutdownService()
 	{
-		Future	fut	= new Future();
-		SServiceProvider.getService(component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(component.createResultListener(new DelegationResultListener(fut)
+		final Future<Void>	fut	= new Future<Void>();
+		component.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(fut)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(ILibraryService libservice)
 			{
-				ILibraryService libService = (ILibraryService) result;
-				libService.removeLibraryServiceListener(libservicelistener);
-				super.customResultAvailable(null);
+				libservice.removeLibraryServiceListener(libservicelistener)
+					.addResultListener(new DelegationResultListener<Void>(fut));
 			}
-		}));
+		});
 		return fut;
 	}
 	

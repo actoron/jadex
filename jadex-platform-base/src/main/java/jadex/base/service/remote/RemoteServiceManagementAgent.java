@@ -244,9 +244,13 @@ public class RemoteServiceManagementAgent extends MicroAgent
 									
 									public void exceptionOccurred(Exception exception)
 									{
-										getLogger().info("RMS rejected unauthorized command: "+com);
-										reply.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false));
-										reply.setFinished();
+										// RMS might be terminated in mean time.
+										if(!(exception instanceof ComponentTerminatedException))
+										{
+											getLogger().info("RMS rejected unauthorized command: "+com);
+											reply.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false));
+											reply.setFinished();
+										}
 									}
 								});								
 							}
@@ -326,6 +330,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										});
 									}
 								}
+								
 								public void exceptionOccurred(Exception exception)
 								{
 									// Terminated, when rms killed in mean time
@@ -336,7 +341,25 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								}
 							});
 						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// Terminated, when rms killed in mean time
+							if(!(exception instanceof ComponentTerminatedException))
+							{
+								super.exceptionOccurred(exception);
+							}
+						}
 					});
+				}
+
+				public void exceptionOccurred(Exception exception)
+				{
+					// Terminated, when rms killed in mean time
+					if(!(exception instanceof ComponentTerminatedException))
+					{
+						super.exceptionOccurred(exception);
+					}
 				}
 			});
 		}

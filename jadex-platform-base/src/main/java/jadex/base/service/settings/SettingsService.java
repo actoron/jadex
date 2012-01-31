@@ -104,17 +104,17 @@ public class SettingsService extends BasicService implements ISettingsService
 		if(saveonexit)
 		{
 			// Cannot use access.createResultListener() as component is already terminated.
-			saveProperties(true).addResultListener(new DelegationResultListener(ret)
+			saveProperties(true).addResultListener(new DelegationResultListener<Void>(ret)
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Void result)
 				{
-					SettingsService.super.shutdownService().addResultListener(new DelegationResultListener(ret));
+					SettingsService.super.shutdownService().addResultListener(new DelegationResultListener<Void>(ret));
 				}
 			});
 		}
 		else
 		{
-			super.shutdownService().addResultListener(new DelegationResultListener(ret));
+			super.shutdownService().addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		return ret;
 	}

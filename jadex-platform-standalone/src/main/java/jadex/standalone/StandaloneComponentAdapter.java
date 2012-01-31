@@ -64,7 +64,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 				catch(RuntimeException e)
 				{
 					// ignore if service is shutting down.
-//					e.printStackTrace();
+					e.printStackTrace();
 				}
 			}
 		});

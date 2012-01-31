@@ -317,7 +317,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 	/**
 	 * 
 	 */
-	public IFuture<Class> getServiceType(final IServiceIdentifier sid)
+	public IFuture<Class<?>> getServiceType(final IServiceIdentifier sid)
 	{
 		return new Future(new UnsupportedOperationException());
 	}

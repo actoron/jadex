@@ -75,20 +75,20 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture<IService> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
-		return new ComponentFuture<IService>(instance.getExternalAccess(), adapter, 
-			super.getRequiredService(info, binding, rebind));
+		IFuture<T>	fut	= super.getRequiredService(info, binding, rebind);
+		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut);
 	}
 	
 	/**
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public IIntermediateFuture<IService> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
-		return new ComponentIntermediateFuture<IService>(instance.getExternalAccess(), adapter, 
-			super.getRequiredServices(info, binding, rebind));
+		IIntermediateFuture<T>	fut	= super.getRequiredServices(info, binding, rebind);
+		return new ComponentIntermediateFuture<T>(instance.getExternalAccess(), adapter, fut);
 	}
 	
 	/**
@@ -126,6 +126,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 					instance.getExternalAccess(), adapter, (IService)result, null, new RequiredServiceInfo(type), null));
 			}
 		});
+		
 		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut);
 	}
 	
@@ -461,9 +462,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	/**
 	 * 
 	 */
-	public IFuture<Class> getServiceType(final IServiceIdentifier sid)
+	public IFuture<Class<?>> getServiceType(final IServiceIdentifier sid)
 	{
-		final Future<Class> ret = new Future<Class>();
+		final Future<Class<?>> ret = new Future<Class<?>>();
 		if(sid.getServiceType().getType()!=null)
 		{
 			ret.setResult(sid.getServiceType().getType()); // todo: only local? remote would cause nullpointer
@@ -471,12 +472,12 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		else
 		{
 			SServiceProvider.getService(instance.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Class>(ret)
+				.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Class<?>>(ret)
 			{
 				public void customResultAvailable(ILibraryService ls)
 				{
 					ls.getClassLoader(sid.getResourceIdentifier())
-						.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Class>(ret)
+						.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Class<?>>(ret)
 					{
 						public void customResultAvailable(ClassLoader cl)
 						{

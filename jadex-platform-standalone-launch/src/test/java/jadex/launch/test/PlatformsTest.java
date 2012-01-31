@@ -31,13 +31,13 @@ public class PlatformsTest extends TestCase
 	// Base arguments used for every platform.
 	String[]	BASEARGS	= new String[]
     {
+//		"-logging_level", "java.util.logging.Level.INFO",
 		"-platformname", "testcases",
 		"-gui", "false",
 		"-saveonexit", "false",
 		"-welcome", "false",
 		"-autoshutdown", "false",
-		 "-printpass", "false"
-//		"-logging_level", "java.util.logging.Level.INFO"
+		"-printpass", "false"
 	};
 
 	/**
@@ -58,7 +58,7 @@ public class PlatformsTest extends TestCase
 	 */
 	public void	testPlatforms()
 	{
-		long timeout = 10000;
+		long timeout = 1000000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		long[] starttimes = new long[PLATFORMS.length/2+1];
 		long[] shutdowntimes = new long[PLATFORMS.length/2+1];
@@ -71,7 +71,7 @@ public class PlatformsTest extends TestCase
 				args	= (String[])SUtil.joinArrays(args, new String[]
 				{
 					"-componentfactory", PLATFORMS[(i-1)*2],
-					"-conf", PLATFORMS[(i-1)*2+1]					
+					"-conf", PLATFORMS[(i-1)*2+1]
 				});
 			}
 			

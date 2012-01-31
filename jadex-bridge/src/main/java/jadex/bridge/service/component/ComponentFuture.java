@@ -58,15 +58,18 @@ public class ComponentFuture<E> extends Future<E>
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-					// Component terminated exception can occur
-//					System.out.println("Exe: "+exception);
+					// Only component terminated exception can occur
+					assert exception instanceof ComponentTerminatedException;
+					
 					if(exception instanceof ComponentTerminatedException)
 					{
+						// Hack!!! Schedule notification on wrong thread. 
+						ComponentFuture.this.exception	= exception;
 						ComponentFuture.super.notifyListener(listener);
 					}
 					else
 					{
-						System.out.println("Exception during schedule step: "+exception);
+						System.out.println("Unexpected exception during schedule step: "+exception);
 					}
 				}
 			});

@@ -800,14 +800,7 @@ public class MessageService extends BasicService implements IMessageService
 		SendManager[] tmp = (SendManager[])managers.values().toArray(new SendManager[managers.size()]);
 		final SendManager[] sms = (SendManager[])SUtil.arrayToSet(tmp).toArray(new SendManager[0]);
 //		System.err.println("MessageService shutdown start: "+(transports.size()+sms.length+1));
-		final CounterResultListener	crl	= new CounterResultListener(transports.size()+sms.length+1, true,
-			new DelegationResultListener(ret)
-			{
-				public void customResultAvailable(Object result)
-				{
-					super.customResultAvailable(getServiceIdentifier());
-				}
-			})
+		final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(transports.size()+sms.length+1, true, new DelegationResultListener<Void>(ret))
 		{
 //			public void intermediateResultAvailable(Object result)
 //			{
@@ -823,12 +816,10 @@ public class MessageService extends BasicService implements IMessageService
 		super.shutdownService().addResultListener(crl);
 
 		SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DelegationResultListener(ret)
+			.addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IExecutionService exe)
 			{
-				IExecutionService	exe	= (IExecutionService)result;
-				
 				for(int i=0; i<sms.length; i++)
 				{
 //					System.err.println("MessageService executor cancel: "+sms[i]);

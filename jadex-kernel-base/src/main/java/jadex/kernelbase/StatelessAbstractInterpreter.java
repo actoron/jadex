@@ -178,7 +178,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 									public void customResultAvailable(Void result)
 									{
 										final Collection<IComponentListener> lis = getInternalComponentListeners();
-										terminateServiceContainer().addResultListener(createResultListener(new IResultListener<Void>()
+										IResultListener<Void> reslis	= new IResultListener<Void>()
 										{
 											public void resultAvailable(Void result)
 											{
@@ -200,7 +200,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 													}
 												});
 											}
-										}));
+										};
+										// If platform, do not schedule listener on component as execution service already terminated after terminate service container.  
+										if(getComponentIdentifier().getParent()!=null)
+											reslis	= createResultListener(reslis);
+										
+										terminateServiceContainer().addResultListener(reslis);
 									}
 								}));
 							}
@@ -227,6 +232,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		{
 			public void resultAvailable(Void result)
 			{
+//				if("testcases".equals(getName()))
+//					System.out.println("sdkug sdib ");
 				ret.setResult(null);
 //				listener.resultAvailable(this, getComponentIdentifier());
 			}

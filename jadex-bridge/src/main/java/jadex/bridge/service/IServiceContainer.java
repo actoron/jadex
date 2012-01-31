@@ -61,7 +61,7 @@ public interface IServiceContainer extends IServiceProvider
 	 *  @param class The interface.
 	 *  @return The service.
 	 */
-	public IService[] getProvidedServices(Class clazz);
+	public IService[] getProvidedServices(Class<?> clazz);
 	
 	/**
 	 *  Get the required service infos.

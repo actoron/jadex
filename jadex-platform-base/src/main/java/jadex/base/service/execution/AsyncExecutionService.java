@@ -374,7 +374,6 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 					}
 					else
 					{
-//						ret.setResult(getServiceIdentifier());
 						ret.setResult(null);
 					}
 				}

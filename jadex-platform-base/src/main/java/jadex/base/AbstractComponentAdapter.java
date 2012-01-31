@@ -73,7 +73,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	protected boolean	instantiated;
 	
 	/** The kill future to be notified in case of fatal error during shutdown. */
-	protected Future	killfuture;
+	protected Future<Void>	killfuture;
 	
 	//-------- steppable attributes --------
 	
@@ -545,7 +545,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	{
 		assert killfuture==null;
 		
-		killfuture = new Future();
+		killfuture = new Future<Void>();
 		
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 		{
@@ -560,15 +560,15 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					public void run()
 					{
 						component.cleanupComponent()
-							.addResultListener(new IResultListener()
+							.addResultListener(new IResultListener<Void>()
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(Void result)
 							{
 								synchronized(AbstractComponentAdapter.this)
 								{
 									// Do final cleanup step as (last) ext_entry
 									// for allowing previously added entries still be executed.
-									invokeLater(new Runnable()
+									Runnable	laststep	= new Runnable()
 									{								
 										public void run()
 										{
@@ -583,7 +583,16 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //											System.out.println("Checking ext entries after cleanup: "+cid);
 											assert ext_entries==null || ext_entries.isEmpty() : "Ext entries after cleanup: "+desc.getName()+", "+ext_entries;
 										}
-									});
+									};
+									if(getComponentIdentifier().getParent()!=null)
+									{
+										invokeLater(laststep);
+									}
+									else
+									{
+										// Execute last step of platform directly
+										laststep.run();
+									}
 									
 									// No more ext entries after cleanup step allowed.
 									ext_forbidden	= true;
@@ -603,7 +612,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			}
 			else
 			{
-				killfuture.setResult(getComponentIdentifier());
+				killfuture.setResult(null);
 //				listener.resultAvailable(this, getComponentIdentifier());
 			}
 		}

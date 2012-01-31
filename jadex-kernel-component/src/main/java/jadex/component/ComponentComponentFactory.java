@@ -202,7 +202,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	public synchronized IFuture	shutdownService()
+	public synchronized IFuture<Void>	shutdownService()
 	{
 		libservice.removeLibraryServiceListener(libservicelistener);
 //		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()

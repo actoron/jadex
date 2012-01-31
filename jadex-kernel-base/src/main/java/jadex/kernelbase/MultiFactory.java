@@ -36,13 +36,12 @@ import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-/* $if !android $ */
 import jadex.commons.gui.SGUI;
-/* $endif $ */
 
 import java.io.File;
 import java.io.IOException;
@@ -358,18 +357,19 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 *  Stops the service.
 	 */
 	@ServiceShutdown
-	public IFuture shutdownService()
+	public IFuture<Void> shutdownService()
 	{
-		Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
-		SServiceProvider.getService(ia.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(ia.createResultListener(new DelegationResultListener(ret)
+		ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(ILibraryService ls)
 			{
-				ILibraryService ls = (ILibraryService) result;
-				ls.removeLibraryServiceListener(liblistener);
+				ls.removeLibraryServiceListener(liblistener)
+					.addResultListener(new DelegationResultListener<Void>(ret));
 			}
-		}));
+		});
 		
 		return ret;
 	}

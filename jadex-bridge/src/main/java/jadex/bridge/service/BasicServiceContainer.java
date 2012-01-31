@@ -10,7 +10,6 @@ import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -40,7 +39,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	//-------- attributes --------
 	
 	/** The map of platform services. */
-	protected Map services;
+	protected Map<Class<?>, Collection<IInternalService>> services;
 	
 	/** The map of provided service infos. (sid -> provided service info) */
 	protected Map<IServiceIdentifier, ProvidedServiceInfo> serviceinfos;
@@ -114,25 +113,32 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		getServiceType(service.getServiceIdentifier()).addResultListener(new ExceptionDelegationResultListener<Class, Void>(ret)
+		getServiceType(service.getServiceIdentifier()).addResultListener(new ExceptionDelegationResultListener<Class<?>, Void>(ret)
 		{
-			public void customResultAvailable(Class servicetype)
+			public void customResultAvailable(Class<?> servicetype)
 			{
 //				System.out.println("Adding service: " + info.getName() + " " + service);
 				synchronized(this)
 				{
-					Collection tmp = services!=null? (Collection)services.get(servicetype): null;
-					if(tmp == null)
+					if(services==null)
 					{
-						tmp = Collections.synchronizedList(new ArrayList());
-						if(services==null)
-							services = Collections.synchronizedMap(new LinkedHashMap());
+						services = Collections.synchronizedMap(new LinkedHashMap<Class<?>, Collection<IInternalService>>());
+					}
+					
+					Collection<IInternalService> tmp = services.get(servicetype);
+					if(tmp==null)
+					{
+						tmp = Collections.synchronizedList(new ArrayList<IInternalService>());
 						services.put(servicetype, tmp);
-						if(serviceinfos==null)
-							serviceinfos = Collections.synchronizedMap(new HashMap());
-						serviceinfos.put(service.getServiceIdentifier(), info);
 					}
 					tmp.add(service);
+					
+					if(serviceinfos==null)
+					{
+						serviceinfos = Collections.synchronizedMap(new HashMap<IServiceIdentifier, ProvidedServiceInfo>());
+					}
+					serviceinfos.put(service.getServiceIdentifier(), info);
+
 					
 					if(started)
 					{
@@ -172,21 +178,21 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			return ret;
 		}
 		
-		getServiceType(sid).addResultListener(new ExceptionDelegationResultListener<Class, Void>(ret)
+		getServiceType(sid).addResultListener(new ExceptionDelegationResultListener<Class<?>, Void>(ret)
 		{
-			public void customResultAvailable(final Class servicetype)
+			public void customResultAvailable(final Class<?> servicetype)
 			{
 //				System.out.println("Removing service: " + servicetype);
 				synchronized(this)
 				{
-					Collection tmp = services!=null? (Collection)services.get(servicetype): null;
+					Collection<IInternalService> tmp = services!=null? services.get(servicetype): null;
 					
 					IInternalService service = null;
 					if(tmp!=null)
 					{
-						for(Iterator it=tmp.iterator(); it.hasNext() && service==null; )
+						for(Iterator<IInternalService> it=tmp.iterator(); it.hasNext() && service==null; )
 						{
-							final IInternalService tst = (IInternalService)it.next();
+							final IInternalService tst = it.next();
 							if(tst.getServiceIdentifier().equals(sid))
 							{
 								service = tst;
@@ -196,11 +202,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 //								{
 //									System.out.println("Terminating service: "+sid);
 									getLogger().info("Terminating service: "+sid);
-									service.shutdownService().addResultListener(new DelegationResultListener(ret)
+									service.shutdownService().addResultListener(new DelegationResultListener<Void>(ret)
 									{
-										public void customResultAvailable(Object result)
+										public void customResultAvailable(Void result)
 										{
-//											System.out.println("Terminated service: "+sid);
+//											if(sid.toString().indexOf("MarshalService")!=-1)
+//												System.out.println("Terminated service: "+sid);
 											getLogger().info("Terminated service: "+sid);
 											serviceShutdowned(tst).addResultListener(new DelegationResultListener<Void>(ret));
 										}
@@ -242,10 +249,10 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		// Start the services.
 		if(services!=null && services.size()>0)
 		{
-			List allservices = new ArrayList();
-			for(Iterator it=services.values().iterator(); it.hasNext(); )
+			List<IInternalService> allservices = new ArrayList<IInternalService>();
+			for(Iterator<Collection<IInternalService>> it=services.values().iterator(); it.hasNext(); )
 			{
-				allservices.addAll((Collection)it.next());
+				allservices.addAll(it.next());
 			}
 			initServices(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret));
 		}
@@ -311,10 +318,10 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		// Stop the services.
 		if(services!=null && services.size()>0)
 		{
-			final List allservices = new ArrayList();
-			for(Iterator it=services.values().iterator(); it.hasNext(); )
+			final List<IInternalService> allservices = new ArrayList<IInternalService>();
+			for(Iterator<Collection<IInternalService>> it=services.values().iterator(); it.hasNext(); )
 			{
-				allservices.addAll((Collection)it.next());
+				allservices.addAll(it.next());
 			}
 			
 			doShutdown(allservices.iterator()).addResultListener(new DelegationResultListener<Void>(ret)
@@ -463,10 +470,10 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	//-------- provided and required service management --------
 	
 	/** The service fetch method table (name -> fetcher). */
-	protected Map reqservicefetchers;
+	protected Map<String, IRequiredServiceFetcher>	reqservicefetchers;
 
 	/** The required service infos. */
-	protected Map requiredserviceinfos;
+	protected Map<String, RequiredServiceInfo> requiredserviceinfos;
 
 	/** The service bindings. */
 //	protected Map bindings;
@@ -507,12 +514,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	public IService getProvidedService(String name)
 	{
 		IService ret = null;
-		for(Iterator it=services.keySet().iterator(); it.hasNext() && ret==null; )
+		for(Iterator<Class<?>> it=services.keySet().iterator(); it.hasNext() && ret==null; )
 		{
-			Collection sers = (Collection)services.get(it.next());
-			for(Iterator it2=sers.iterator(); it2.hasNext() && ret==null; )
+			Collection<IInternalService> sers = services.get(it.next());
+			for(Iterator<IInternalService> it2=sers.iterator(); it2.hasNext() && ret==null; )
 			{
-				IService ser = (IService)it2.next();
+				IService ser = it2.next();
 				if(ser.getServiceIdentifier().getServiceName().equals(name))
 				{
 					ret = ser;
@@ -528,10 +535,10 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param class The interface.
 	 *  @return The service.
 	 */
-	public IService[] getProvidedServices(Class clazz)
+	public IService[] getProvidedServices(Class<?> clazz)
 	{
-		Collection coll = (Collection)services.get(clazz);
-		return coll==null? new IService[0]:(IService[])coll.toArray(new IService[coll.size()]);
+		Collection<IInternalService> coll = services.get(clazz);
+		return coll==null ? new IService[0] : coll.toArray(new IService[coll.size()]);
 	}
 	
 	/**
@@ -564,7 +571,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		if(requiredservices!=null && requiredservices.length>0)
 		{
 			if(this.requiredserviceinfos==null)
-				this.requiredserviceinfos = new HashMap();
+				this.requiredserviceinfos = new HashMap<String, RequiredServiceInfo>();
 			for(int i=0; i<requiredservices.length; i++)
 			{
 				this.requiredserviceinfos.put(requiredservices[i].getName(), requiredservices[i]);
@@ -630,7 +637,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param name The service name.
 	 *  @return The service.
 	 */
-	public IFuture<IService> getRequiredService(String name)
+	public <T> IFuture<T> getRequiredService(String name)
 	{
 		return getRequiredService(name, false);
 	}
@@ -640,7 +647,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  @param name The services name.
 	 *  @return The service.
 	 */
-	public IIntermediateFuture<IService> getRequiredServices(String name)
+	public <T> IIntermediateFuture<T> getRequiredServices(String name)
 	{
 		return getRequiredServices(name, false);
 	}
@@ -649,12 +656,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture<IService> getRequiredService(String name, boolean rebind)
+	public <T> IFuture<T> getRequiredService(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getRequiredServiceInfo(name);
 		if(info==null)
 		{
-			Future<IService> ret = new Future<IService>();
+			Future<T> ret = new Future<T>();
 			ret.setException(new ServiceNotFoundException(name));
 			return ret;
 		}
@@ -669,12 +676,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get a required services.
 	 *  @return The services.
 	 */
-	public IIntermediateFuture<IService> getRequiredServices(String name, boolean rebind)
+	public <T> IIntermediateFuture<T> getRequiredServices(String name, boolean rebind)
 	{
 		RequiredServiceInfo info = getRequiredServiceInfo(name);
 		if(info==null)
 		{
-			IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
+			IntermediateFuture<T> ret = new IntermediateFuture<T>();
 			ret.setException(new ServiceNotFoundException(name));
 			return ret;
 		}
@@ -689,11 +696,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get a required service.
 	 *  @return The service.
 	 */
-	public IFuture<IService> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
 		if(info==null)
 		{
-			Future<IService> ret = new Future<IService>();
+			Future<T> ret = new Future<T>();
 			ret.setException(new IllegalArgumentException("Info must not null."));
 			return ret;
 		}
@@ -706,11 +713,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 *  Get required services.
 	 *  @return The services.
 	 */
-	public IIntermediateFuture<IService> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
+	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
 		if(info==null)
 		{
-			IntermediateFuture<IService> ret = new IntermediateFuture<IService>();
+			IntermediateFuture<T> ret = new IntermediateFuture<T>();
 			ret.setException(new IllegalArgumentException("Info must not null."));
 			return ret;
 		}
@@ -726,13 +733,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	protected IRequiredServiceFetcher getRequiredServiceFetcher(String name)
 	{
-		IRequiredServiceFetcher ret = reqservicefetchers!=null? 
-			(IRequiredServiceFetcher)reqservicefetchers.get(name): null;
+		IRequiredServiceFetcher ret = reqservicefetchers!=null ? reqservicefetchers.get(name) : null;
 		if(ret==null)
 		{
 			ret = createServiceFetcher(name);
 			if(reqservicefetchers==null)
-				reqservicefetchers = new HashMap();
+				reqservicefetchers = new HashMap<String, IRequiredServiceFetcher>();
 			reqservicefetchers.put(name, ret);
 		}
 		return ret;
@@ -780,7 +786,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/**
 	 * 
 	 */
-	public abstract IFuture<Class> getServiceType(final IServiceIdentifier sid);
+	public abstract IFuture<Class<?>> getServiceType(final IServiceIdentifier sid);
 	
 //	/**
 //	 *  Add a provided service interceptor (at first position in the chain).
