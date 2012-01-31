@@ -563,7 +563,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	public IFuture<Void> terminateServiceContainer()
 	{
 		final Future<Void> ret = new Future<Void>();
-		super.terminateServiceContainer().addResultListener(createResultListener(new IResultListener<Void>()
+		IResultListener<Void>	reslis	= new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
@@ -577,7 +577,11 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				exitState();
 				ret.setException(exception);
 			}
-		}));
+		};
+		// If platform, do not schedule listener on component as execution service already terminated after terminate service container.  
+		if(getComponentIdentifier().getParent()!=null)
+			reslis	= createResultListener(reslis);
+		super.terminateServiceContainer().addResultListener(reslis);
 		return ret;
 	}
 	

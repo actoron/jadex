@@ -224,14 +224,14 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public IFuture<Void> terminateServiceContainer()
 	{
+//		if("testcases".equals(getName()))
+//			System.out.println("sdkug sdib ");
 		final Future<Void> ret = new Future<Void>();
 		
 		getServiceContainer().shutdown().addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
-//				if("testcases".equals(getName()))
-//					System.out.println("sdkug sdib ");
 				ret.setResult(null);
 //				listener.resultAvailable(this, getComponentIdentifier());
 			}
