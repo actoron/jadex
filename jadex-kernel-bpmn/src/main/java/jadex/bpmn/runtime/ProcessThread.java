@@ -7,6 +7,7 @@ import jadex.bpmn.model.MParameter;
 import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
+import jadex.bpmn.runtime.handler.SplitInfo;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -15,10 +16,13 @@ import jadex.javaparser.IParsedExpression;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,8 +99,8 @@ public class ProcessThread	implements ITaskContext
 	/** The id counter for sub processes. */
 	public int	idcnt;
 	
-	/** The split info stack (splitid, threadnumber). */
-	public List splitinfos;
+	/** The split infos. */
+	public List<SplitInfo>	splitinfos;
 	
 	//-------- constructors --------
 
@@ -312,6 +316,7 @@ public class ProcessThread	implements ITaskContext
 		ProcessThread	ret	= new ProcessThread(id+"."+idcnt++, activity, context, instance);
 		ret.edge	= edge;
 		ret.data	= data!=null? new HashMap(data): null;
+		ret.splitinfos	= splitinfos!=null ? new LinkedList<SplitInfo>(splitinfos) : null;
 		return ret;
 	}
 	
@@ -759,78 +764,75 @@ public class ProcessThread	implements ITaskContext
 	}
 	
 	/**
-	 *  Set the split infos.
-	 */
-	public void setSplitInfos(List splitinfos)
-	{
-		this.splitinfos = splitinfos!=null? new ArrayList(splitinfos): null;
-	}
-	
-	/**
 	 *  Get the split infos.
 	 */
-	public List getSplitInfos()
+	public Collection<SplitInfo> getSplitInfos()
 	{
-		return splitinfos;
+		Collection<SplitInfo>	ret;
+		if(splitinfos!=null)
+			ret	= splitinfos;
+		else
+			ret	= Collections.emptyList();
+		return ret;
 	}
 	
 	/**
-	 *  Set the splitid.
-	 *  @param splitid The splitid to set.
+	 *  Add a split info.
 	 */
-	public void pushSplitInfo(int splitid, int splitcount)
+	public void addSplitInfo(SplitInfo spi)
 	{
 		if(splitinfos==null)
-			splitinfos = new ArrayList();
+			splitinfos = new LinkedList<SplitInfo>();
+		assert !splitinfos.contains(spi);
 //		System.out.println("push: "+getId()+" "+splitinfos);
-		splitinfos.add(new int[]{splitid, splitcount});
+		splitinfos.add(0, spi);	// Assure that latest split info is checked first.
 	}
 
 	/**
 	 *  Remove the split info.
 	 *  @return The split info.
 	 */
-	public int[] popSplitInfo()
+	public void	removeSplitInfo(SplitInfo spi)
 	{
 //		System.out.println("pop: "+getId()+" "+splitinfos);
-		return (int[])splitinfos.remove(splitinfos.size()-1);
+		splitinfos.remove(spi);
 	}
-	
-	/**
-	 *  Get the topmost split info.
-	 *  @return The split info.
-	 */
-	public int[] peakSplitInfo()
-	{
-		return (int[])splitinfos.get(splitinfos.size()-1);
-	}
-	
-	/**
-	 *  Get the current split id.
-	 *  @return The split id.
-	 */
-	public int getSplitId()
-	{
-		return splitinfos==null? 0: ((int[])splitinfos.get(splitinfos.size()-1))[0];
-	}
-	
-	/**
-	 *  Get the current split count.
-	 *  @return The split count.
-	 */
-	public int getSplitCount()
-	{
-		return splitinfos==null? 0: ((int[])splitinfos.get(splitinfos.size()-1))[1];
-	}
-	
-	/**
-	 *  Get the current split depth.
-	 *  @return The split depth.
-	 */
-	public int getSplitDepth()
-	{
-		return splitinfos==null? 0: splitinfos.size();
-	}
+//	
+//	/**
+//	 *  Get the topmost split info.
+//	 *  @return The split info.
+//	 */
+//	public int[] peakSplitInfo()
+//	{
+//		return (int[])splitinfos.get(splitinfos.size()-1);
+//	}
+//	
+//	/**
+//	 *  Get the current split id.
+//	 *  @return The split id.
+//	 */
+//	public int getSplitId()
+//	{
+//		return splitinfos==null? 0: ((int[])splitinfos.get(splitinfos.size()-1))[0];
+//	}
+//	
+//	/**
+//	 *  Get the current split count.
+//	 *  @return The split count.
+//	 */
+//	public int getSplitCount()
+//	{
+//		return splitinfos==null? 0: ((int[])splitinfos.get(splitinfos.size()-1))[1];
+//	}
+//	
+//	/**
+//	 *  Get the current split depth.
+//	 *  @return The split depth.
+//	 */
+//	public int getSplitDepth()
+//	{
+//		return splitinfos==null? 0: splitinfos.size();
+//	}
 
 	/**
 	 *  Create a string representation of this process thread.

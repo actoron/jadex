@@ -195,7 +195,7 @@ public class MActivity extends MAssociationTarget
 	 *  Get the outgoing sequence edges.
 	 *  @return The outgoing edges.
 	 */
-	public List getOutgoingSequenceEdges()
+	public List<MSequenceEdge> getOutgoingSequenceEdges()
 	{
 		return outseqedges;
 	}
@@ -225,7 +225,7 @@ public class MActivity extends MAssociationTarget
 	 *  Get the incoming edges.
 	 *  @return The incoming edges.
 	 */
-	public List getIncomingSequenceEdges()
+	public List<MSequenceEdge> getIncomingSequenceEdges()
 	{
 		return inseqedges;
 	}

@@ -153,7 +153,7 @@ public class ThreadContext
 	 *  Get all threads of this context.
 	 *  @return All threads of this context, but not from sub context.
 	 */
-	public Set	getThreads()
+	public Set<ProcessThread>	getThreads()
 	{
 		return threads!=null ? threads.keySet() : null;
 	}

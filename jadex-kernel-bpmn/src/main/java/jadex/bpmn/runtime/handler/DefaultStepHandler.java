@@ -28,6 +28,8 @@ public class DefaultStepHandler implements IStepHandler
 	 */
 	public void step(MActivity activity, BpmnInterpreter instance, ProcessThread thread, Object event)
 	{
+		assert !instance.getComponentAdapter().isExternalThread();
+		
 //		System.out.println(instance.getComponentIdentifier().getLocalName()+": step "+activity+", data "+thread.getData());
 		
 		// Hack!!! Should be in interpreter/thread?

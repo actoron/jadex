@@ -15,6 +15,7 @@ import jadex.javaparser.IParsedExpression;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +28,6 @@ import java.util.StringTokenizer;
  */
 public class GatewayORActivityHandler implements IActivityHandler
 {
-	/** The split id counter. */
-	protected int splitidcnt;
-	
 	/**
 	 *  Execute an activity.
 	 *  @param activity	The activity to execute.
@@ -73,20 +71,19 @@ public class GatewayORActivityHandler implements IActivityHandler
 						ProcessThread	newthread	= thread.createCopy();
 						newthread.setLastEdge((MSequenceEdge)outgoing.get(i));
 						thread.getThreadContext().addThread(newthread);
-		//				instance.notifyListeners(BpmnInterpreter.EVENT_THREAD_ADDED, newthread);
-						ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
-							thread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(newthread));
-						instance.notifyListeners(cce);
+//						ComponentChangeEvent cce = new ComponentChangeEvent(IComponentChangeEvent.EVENT_TYPE_CREATION, BpmnInterpreter.TYPE_THREAD, thread.getClass().getName(), 
+//							thread.getId(), instance.getComponentIdentifier(), instance.getCreationTime(), instance.createProcessThreadInfo(newthread));
+//						instance.notifyListeners(cce);
 						threads.add(newthread);
 					}
 				}
 			}
 			
-			int splitid = getNextSplitId();
+			SplitInfo	spi	= new SplitInfo(threads.size());
 			for(int i=0; i<threads.size(); i++)
 			{
 				ProcessThread pt = (ProcessThread)threads.get(i);
-				pt.pushSplitInfo(splitid, threads.size());
+				pt.addSplitInfo(spi);
 			}
 		}
 		
@@ -94,43 +91,60 @@ public class GatewayORActivityHandler implements IActivityHandler
 		else if(incoming!=null && incoming.size()>1 && outgoing!=null && outgoing.size()==1)
 		{
 			// Try to find threads for all incoming edges.
-			Set	edges	= new HashSet(incoming);
-			Set	threads	= new LinkedHashSet();	// Threads to be deleted.
-			edges.remove(thread.getLastEdge());	// Edge of current thread not required.
+			Map<SplitInfo, Set<MSequenceEdge>>	edges	= new LinkedHashMap<SplitInfo, Set<MSequenceEdge>>();
+			Map<SplitInfo, Set<ProcessThread>>	threads	= new LinkedHashMap<SplitInfo, Set<ProcessThread>>();
+			for(Iterator<SplitInfo> it=thread.getSplitInfos().iterator(); it.hasNext(); )
+			{
+				SplitInfo	spi	= it.next();
+				edges.put(spi, new HashSet<MSequenceEdge>(incoming));	// edges to be found
+				edges.get(spi).remove(thread.getLastEdge());	// Edge of current thread not required.
+				threads.put(spi, new LinkedHashSet<ProcessThread>());	// found threads to be deleted.
+			}
 			
-			// Find threads that belong to my split and have arrived at gate.
-			for(Iterator it=thread.getThreadContext().getThreads().iterator(); !edges.isEmpty() && it.hasNext(); )
+			SplitInfo	joinspi	= null;
+			for(Iterator<ProcessThread> it=thread.getThreadContext().getThreads().iterator(); joinspi==null && it.hasNext(); )
 			{
 				ProcessThread oldthread	= (ProcessThread)it.next();
-				if(oldthread.getSplitId()==thread.getSplitId() && edges.contains(oldthread.getLastEdge()))
+				// Is the thread waiting at an incoming edge? 
+				if(oldthread.isWaiting() && incoming.contains(oldthread.getLastEdge()))
 				{
-					threads.add(oldthread);
-					edges.remove(oldthread.getLastEdge());
+					// Update lists for matching split infos
+					for(Iterator<SplitInfo> it2=thread.getSplitInfos().iterator(); joinspi==null && it2.hasNext(); )
+					{
+						SplitInfo	spi	= it2.next();
+						if(oldthread.getSplitInfos().contains(spi) && edges.get(spi).contains(oldthread.getLastEdge()))
+						{
+							edges.get(spi).remove(oldthread.getLastEdge());							
+							threads.get(spi).add(oldthread);
+							
+							// Found a completed join?
+							if(threads.get(spi).size()==spi.getSplitCount()-1)
+							{
+								joinspi	= spi;
+							}
+						}
+					}
 				}
 			}
 			
-			if(threads.size()==thread.getSplitCount()-1)
+			if(joinspi!=null)
 			{
-				// Find surviving thread (incoming thread has deepest stack).
-				ProcessThread tmp = thread;
-				for(Iterator it=threads.iterator(); it.hasNext(); )
+				// Add additional split infos from joined threads (required for unbalanced split/join situations).
+				for(Iterator<ProcessThread> it=threads.get(joinspi).iterator(); it.hasNext(); )
 				{
-					ProcessThread pt = (ProcessThread)it.next();
-					if(pt.getSplitDepth()>tmp.getSplitDepth())
+					ProcessThread pt = it.next();
+					for(Iterator<SplitInfo> it2=pt.getSplitInfos().iterator(); it2.hasNext(); )
 					{
-						tmp = pt;
+						SplitInfo	spi	= it2.next();
+						if(!thread.getSplitInfos().contains(spi))
+						{
+							thread.addSplitInfo(spi);
+						}
 					}
 				}
-				if(!tmp.equals(thread))
-				{
-					thread.setSplitInfos(tmp.getSplitInfos());
-//					threads.remove(tmp);
-//					threads.add(thread);
-//					thread = tmp;
-				}
 				
-				// Reset split settings.
-				thread.popSplitInfo();
+				// Remove completed split.
+				thread.removeSplitInfo(joinspi);
 				
 				// Handle parameter merging of incoming values.
 				Set	ignore	= null;
@@ -148,10 +162,10 @@ public class GatewayORActivityHandler implements IActivityHandler
 				}
 				
 				thread.setLastEdge((MSequenceEdge)outgoing.get(0));
-				for(Iterator it=threads.iterator(); it.hasNext(); )
+				for(Iterator it=threads.get(joinspi).iterator(); it.hasNext(); )
 				{
 					ProcessThread pt = (ProcessThread)it.next();
-					pt.popSplitInfo();
+					pt.removeSplitInfo(joinspi);
 					
 					Map data = pt.getData();
 					if(data!=null)
@@ -230,14 +244,6 @@ public class GatewayORActivityHandler implements IActivityHandler
 //			e.printStackTrace();
 		}
 		return ret;
-	}
-	
-	/**
-	 *  Get next split id.
-	 */
-	protected int getNextSplitId()
-	{
-		return ++splitidcnt;
 	}
 }
 	
