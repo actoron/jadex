@@ -1,59 +1,59 @@
 package jadex.bpmn.runtime.handler;
 
+import java.util.Set;
+
 /**
  *  Keep information about a thread spawned at a split gateway used later when processing
  *  the corresponding join.
  */
 public class SplitInfo
 {
-	//-------- static part --------
-	
-	/** The id counter. */
-	protected static int	IDCNT;
-	
 	//-------- attributes --------
 	
-	/** The split id. */
-	protected int	id;
+	/** The split id (the same for all threads spawned at the same split). */
+	protected String	splitid;
 	
-	/** The split count (i.e. number of outgoing threads). */
-	protected int	count;
+	/** The path id (unique for each spawned thread). */
+	protected String	pathid;
+	
+	/** All path ids belonging to the split id. */
+	protected Set<String>	pathids;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new split info.
 	 */
-	public SplitInfo(int count)
+	public SplitInfo(String splitid, String pathid, Set<String> pathids)
 	{
-		// Not thread safe, but doesn't matter as ids need only be unique inside component.
-		this.id	= IDCNT++;
-		this.count	= count;
+		this.splitid	= splitid;
+		this.pathid	= pathid;
+		this.pathids	= pathids;
 	}
 	
 	//-------- methods --------
 
 	/**
-	 *  Test for equality.
+	 *  Get the split id.
 	 */
-	public boolean equals(Object obj)
+	public String	getSplitId()
 	{
-		return obj instanceof SplitInfo && id==((SplitInfo)obj).id;
-	}
-
-	/**
-	 *  Get the hash code.  
-	 */
-	public int hashCode()
-	{
-		return 31 + id;
+		return splitid;
 	}
 	
 	/**
-	 *  Get the split count.
+	 *  Get the path id.
 	 */
-	public int getSplitCount()
+	public String	getPathId()
 	{
-		return count;
+		return pathid;
+	}
+	
+	/**
+	 *  Get the path ids of the split.
+	 */
+	public Set<String>	getPathIds()
+	{
+		return pathids;
 	}
 }

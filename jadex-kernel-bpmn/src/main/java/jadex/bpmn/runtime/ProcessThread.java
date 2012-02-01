@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +100,7 @@ public class ProcessThread	implements ITaskContext
 	public int	idcnt;
 	
 	/** The split infos. */
-	public List<SplitInfo>	splitinfos;
+	public Map<String, SplitInfo>	splitinfos;
 	
 	//-------- constructors --------
 
@@ -316,7 +316,7 @@ public class ProcessThread	implements ITaskContext
 		ProcessThread	ret	= new ProcessThread(id+"."+idcnt++, activity, context, instance);
 		ret.edge	= edge;
 		ret.data	= data!=null? new HashMap(data): null;
-		ret.splitinfos	= splitinfos!=null ? new LinkedList<SplitInfo>(splitinfos) : null;
+		ret.splitinfos	= splitinfos!=null ? new LinkedHashMap<String, SplitInfo>(splitinfos) : null;
 		return ret;
 	}
 	
@@ -556,7 +556,7 @@ public class ProcessThread	implements ITaskContext
 	 *  Get the data.
 	 *  @return The data.
 	 */
-	public Map getData()
+	public Map<String, Object> getData()
 	{
 		return this.data;
 	}
@@ -770,10 +770,18 @@ public class ProcessThread	implements ITaskContext
 	{
 		Collection<SplitInfo>	ret;
 		if(splitinfos!=null)
-			ret	= splitinfos;
+			ret	= splitinfos.values();
 		else
 			ret	= Collections.emptyList();
 		return ret;
+	}
+	
+	/**
+	 *  Get a specific split info, if available.
+	 */
+	public SplitInfo getSplitInfo(String id)
+	{
+		return splitinfos!=null ? splitinfos.get(id) : null;
 	}
 	
 	/**
@@ -782,10 +790,10 @@ public class ProcessThread	implements ITaskContext
 	public void addSplitInfo(SplitInfo spi)
 	{
 		if(splitinfos==null)
-			splitinfos = new LinkedList<SplitInfo>();
-		assert !splitinfos.contains(spi);
+			splitinfos = new LinkedHashMap<String, SplitInfo>();
+		assert !splitinfos.containsKey(spi.getSplitId());
 //		System.out.println("push: "+getId()+" "+splitinfos);
-		splitinfos.add(0, spi);	// Assure that latest split info is checked first.
+		splitinfos.put(spi.getSplitId(), spi);
 	}
 
 	/**
@@ -795,7 +803,7 @@ public class ProcessThread	implements ITaskContext
 	public void	removeSplitInfo(SplitInfo spi)
 	{
 //		System.out.println("pop: "+getId()+" "+splitinfos);
-		splitinfos.remove(spi);
+		splitinfos.remove(spi.getSplitId());
 	}
 //	
 //	/**
