@@ -41,7 +41,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.gui.SGUI;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,6 +59,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+/* $if !android $ */
+import jadex.commons.gui.SGUI;
+/* $endif $ */
+
 
 /**
  *  Kernel that delegates calls to sub-kernels it finds using on-demand searches.

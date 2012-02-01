@@ -35,7 +35,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.gui.SGUI;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
@@ -50,6 +49,8 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 /* $if !android $ */
+import jadex.commons.gui.SGUI;
+
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
 /* $endif $ */
