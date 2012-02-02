@@ -706,7 +706,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			{
 				Object key = ps[i].getName()!=null? ps[i].getName(): ps[i].getType().getType(getClassLoader());
 				if(sermap.put(key, ps[i])!=null)
-					throw new RuntimeException("Services with same type must have different name.");
+					throw new RuntimeException("Services with same type must have different name.");  // Is catched and set to ret below
 			}
 			if(config!=null)
 			{

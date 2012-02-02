@@ -146,7 +146,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 						{
 							public void customResultAvailable(Void result)
 							{
-								serviceStarted(service);
+								serviceStarted(service).addResultListener(new DelegationResultListener<Void>(ret));
 							}
 						});
 					}

@@ -45,4 +45,10 @@ public class SJavaParser
 	{
 		return parser.parseExpression(exptxt, imports, null, classloader);
 	}
+	
+//	public static void main(String[] args)
+//	{
+//		Object val = SJavaParser.evaluateExpression("\"abc\\\\rst\"", null);
+//		System.out.println("val is: "+val);
+//	}
 }
