@@ -587,17 +587,17 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 									if(getComponentIdentifier().getParent()!=null)
 									{
 										invokeLater(laststep);
+										// No more ext entries after cleanup step allowed.
+										ext_forbidden	= true;
 									}
 									else
 									{
 										// Execute last step of platform directly
+										// No more ext entries after cleanup step allowed.
+										ext_forbidden	= true;
 										laststep.run();
 									}
-									
-									// No more ext entries after cleanup step allowed.
-									ext_forbidden	= true;
 								}
-								
 							}
 							
 							public void exceptionOccurred(Exception exception)
