@@ -1,4 +1,4 @@
-package deco4mas.coordinate.environment;
+package deco4mas.distributed.coordinate.environment;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IComponentStep;
@@ -13,16 +13,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import deco.lang.dynamics.AgentElementType;
-import deco.lang.dynamics.MASDynamics;
-import deco.lang.dynamics.mechanism.AgentElement;
-import deco.lang.dynamics.mechanism.DecentralizedCausality;
-import deco.lang.dynamics.mechanism.DirectCausality;
-import deco4mas.coordinate.DecentralCoordinationInformation;
-import deco4mas.coordinate.DirectCoordinationInformation;
-import deco4mas.coordinate.ProcessMASDynamics;
-import deco4mas.coordinate.interpreter.agent_state.BDIBehaviorObservationComponent;
-import deco4mas.helper.Constants;
+import deco.distributed.lang.dynamics.AgentElementType;
+import deco.distributed.lang.dynamics.MASDynamics;
+import deco.distributed.lang.dynamics.mechanism.AgentElement;
+import deco.distributed.lang.dynamics.mechanism.DecentralizedCausality;
+import deco.distributed.lang.dynamics.mechanism.DirectCausality;
+import deco4mas.distributed.coordinate.DecentralCoordinationInformation;
+import deco4mas.distributed.coordinate.DirectCoordinationInformation;
+import deco4mas.distributed.coordinate.ProcessMASDynamics;
+import deco4mas.distributed.coordinate.interpreter.agent_state.BDIBehaviorObservationComponent;
+import deco4mas.distributed.helper.Constants;
+
 
 /**
  * This Class is used to init the observer for the agents in order to do the publications and perceptions.
@@ -32,11 +33,11 @@ import deco4mas.helper.Constants;
 
 public class InitBDIAgentForCoordination {
 
-	private BDIBehaviorObservationComponent behObserver = null;
+	private deco4mas.distributed.coordinate.interpreter.agent_state.BDIBehaviorObservationComponent behObserver = null;
 	private IBDIExternalAccess exta = null;
 	private String agentType;
 	private IComponentDescription ai;
-	private MASDynamics masDyn;
+	private deco.distributed.lang.dynamics.MASDynamics masDyn;
 	private AbstractEnvironmentSpace space;
 	private int numberOfPublishPercepts = 0;
 	private int numberOfPerceivePercepts = 0;

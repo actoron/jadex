@@ -1,4 +1,4 @@
-package deco4mas.coordinate.annotation;
+package deco4mas.distributed.coordinate.annotation;
 
 /**
  * This annotation marks a parameter in a micro agent step that is used for the

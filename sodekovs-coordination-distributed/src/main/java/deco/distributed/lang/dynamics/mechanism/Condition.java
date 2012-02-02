@@ -1,4 +1,4 @@
-package deco.lang.dynamics.mechanism;
+package deco.distributed.lang.dynamics.mechanism;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlValue;

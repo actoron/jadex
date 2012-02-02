@@ -1,9 +1,9 @@
-package deco.lang.dynamics.properties;
+package deco.distributed.lang.dynamics.properties;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import deco.lang.dynamics.AgentElementType;
+import deco.distributed.lang.dynamics.AgentElementType;
 
 @XmlRootElement(name="element")
 public class ElementReference {

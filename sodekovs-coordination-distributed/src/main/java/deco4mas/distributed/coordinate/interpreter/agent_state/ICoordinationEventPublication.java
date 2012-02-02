@@ -1,9 +1,8 @@
-package deco4mas.coordinate.interpreter.agent_state;
+package deco4mas.distributed.coordinate.interpreter.agent_state;
 
 
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
-import deco4mas.mechanism.CoordinationInformation;
-
+import deco4mas.distributed.mechanism.CoordinationInformation;
 /**
  * 
  * @author Ante Vilenica

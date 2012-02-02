@@ -13,7 +13,7 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd	                    
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
-	name="Heterogeneous" package="deco4mas.examples.heterogeneous.cachedservice">	
+	name="Heterogeneous" package="sodekovs.coordination.distributed.examples.heterogeneous.cachedservice">	
 
 	<imports>
 		<import>jadex.extension.envsupport.environment.space2d.*</import>
@@ -24,17 +24,17 @@
 		<import>jadex.bdi.planlib.*</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
-		<import>deco4mas.coordinate.interpreter.coordination_information.*</import>
-		<import>deco4mas.coordinate.environment.*</import>
-		<import>deco4mas.annotation.agent.*</import>
-		<import>deco4mas.coordinate.*</import>
-		<import>deco4mas.examples.heterogeneous.*</import>
+		<import>deco4mas.distributed.coordinate.interpreter.coordination_information.*</import>
+		<import>deco4mas.distributed.coordinate.environment.*</import>
+		<import>deco4mas.distributed.annotation.agent.*</import>
+		<import>deco4mas.distributed.coordinate.*</import>
+		<import>sodekovs.coordination.distributed.examples.heterogeneous.cachedservice.*</import>		
 	</imports>	
 
 			
 	<extensiontypes>
 		<env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">		
-			<env:property name="dynamics_configuration">"sodekovs-coordination-distributed/src/main/java/deco4mas/examples/heterogeneous/cachedservice/coordination.dynamics.xml"</env:property>
+			<env:property name="dynamics_configuration">"sodekovs-coordination-distributed/src/main/java/sodekovs/coordination/distributed/examples/heterogeneous/cachedservice/coordination.dynamics.xml"</env:property>
 
 			<env:spaceexecutor class="DeltaTimeExecutor">
 				<env:property name="space">$space</env:property>
@@ -44,8 +44,8 @@
 	</extensiontypes>
 	
 	<componenttypes>
-		<componenttype name="ExampleMicro" filename="deco4mas/examples/heterogeneous/cachedservice/ExampleMicroAgent.class" />
-		<componenttype name="ExampleBDI" filename="deco4mas/examples/heterogeneous/cachedservice/ExampleBDI.agent.xml" />		
+		<componenttype name="ExampleMicro" filename="sodekovs/coordination/distributed/examples/heterogeneous/cachedservice/ExampleMicroAgent.class" />
+		<componenttype name="ExampleBDI" filename="sodekovs/coordination/distributed/examples/heterogeneous/cachedservice/ExampleBDI.agent.xml" />		
 	</componenttypes>
 
 

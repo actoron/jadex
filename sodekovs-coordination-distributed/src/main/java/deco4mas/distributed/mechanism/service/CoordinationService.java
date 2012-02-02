@@ -1,9 +1,9 @@
-package deco4mas.mechanism.service;
+package deco4mas.distributed.mechanism.service;
 
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.IFuture;
-import deco4mas.coordinate.environment.CoordinationSpace;
-import deco4mas.mechanism.CoordinationInfo;
+import deco4mas.distributed.coordinate.environment.CoordinationSpace;
+import deco4mas.distributed.mechanism.CoordinationInfo;
 
 /**
  * A Service which publishes received {@link CoordinationInfo}s to its local {@link CoordinationSpace}.

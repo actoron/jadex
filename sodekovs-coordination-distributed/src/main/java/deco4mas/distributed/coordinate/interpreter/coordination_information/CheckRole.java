@@ -1,7 +1,7 @@
 /**
  * 
  */
-package deco4mas.coordinate.interpreter.coordination_information;
+package deco4mas.distributed.coordinate.interpreter.coordination_information;
 
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIInternalAccess;
@@ -23,14 +23,14 @@ import jadex.rules.state.IOAVState;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
-import deco.lang.dynamics.AgentElementType;
-import deco.lang.dynamics.mechanism.AgentElement;
-import deco.lang.dynamics.properties.AgentReference;
-import deco.lang.dynamics.properties.ElementReference;
-import deco4mas.annotation.agent.DataMapping;
-import deco4mas.annotation.agent.ParameterMapping;
-import deco4mas.helper.Constants;
-import deco4mas.helper.SJavaParser;
+import deco.distributed.lang.dynamics.AgentElementType;
+import deco.distributed.lang.dynamics.mechanism.AgentElement;
+import deco.distributed.lang.dynamics.properties.AgentReference;
+import deco.distributed.lang.dynamics.properties.ElementReference;
+import deco4mas.distributed.annotation.agent.DataMapping;
+import deco4mas.distributed.annotation.agent.ParameterMapping;
+import deco4mas.distributed.helper.Constants;
+import deco4mas.distributed.helper.SJavaParser;
 
 /**
  * Checks, whether the agent is within the role, which is necessary to publish/perceive the specified element(i.e. goal, belief, beliefset)

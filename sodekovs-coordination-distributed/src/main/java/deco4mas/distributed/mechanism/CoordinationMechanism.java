@@ -1,10 +1,10 @@
 /**
  * 
  */
-package deco4mas.mechanism;
+package deco4mas.distributed.mechanism;
 
-import deco.lang.dynamics.mechanism.MechanismConfiguration;
-import deco4mas.coordinate.environment.CoordinationSpace;
+import deco.distributed.lang.dynamics.mechanism.MechanismConfiguration;
+import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 
 /**
  * All implemented mechanisms should use this abstract class.

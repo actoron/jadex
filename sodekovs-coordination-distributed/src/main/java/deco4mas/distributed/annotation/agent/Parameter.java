@@ -1,4 +1,4 @@
-package deco4mas.annotation.agent;
+package deco4mas.distributed.annotation.agent;
 
 /**
  * Store a list of parameter mappings.  

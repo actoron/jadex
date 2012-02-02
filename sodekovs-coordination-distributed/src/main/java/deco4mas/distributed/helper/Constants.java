@@ -1,4 +1,4 @@
-package deco4mas.helper;
+package deco4mas.distributed.helper;
 
 /**
  * Helper class to keep the definition of constants at one place.

@@ -1,4 +1,4 @@
-package deco4mas.annotation.agent;
+package deco4mas.distributed.annotation.agent;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -139,7 +139,7 @@ public class CoordinationAnnotation {
 
 	public CoordinationAnnotation getXMLConfiguration(String file_name){
 		try {
-			return (CoordinationAnnotation) deco4mas.util.xml.XmlUtil.retrieveFromXML(CoordinationAnnotation.class, file_name);
+			return (CoordinationAnnotation) deco4mas.distributed.util.xml.XmlUtil.retrieveFromXML(CoordinationAnnotation.class, file_name);
 		} catch (FileNotFoundException e) {
 			System.out.println("Error: can not read specified configuration file....");
 			e.printStackTrace();

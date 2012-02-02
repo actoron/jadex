@@ -1,11 +1,11 @@
 /**
  * 
  */
-package deco4mas.mechanism.service;
+package deco4mas.distributed.mechanism.service;
 
 import jadex.commons.future.IFuture;
-import deco4mas.coordinate.environment.CoordinationSpace;
-import deco4mas.mechanism.CoordinationInfo;
+import deco4mas.distributed.coordinate.environment.CoordinationSpace;
+import deco4mas.distributed.mechanism.CoordinationInfo;
 
 /**
  * A distributed coordination service interface used to publish {@link CoordinationInfo}s in a distributed Jadex application.

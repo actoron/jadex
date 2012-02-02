@@ -1,4 +1,4 @@
-package deco4mas.coordinate.environment;
+package deco4mas.distributed.coordinate.environment;
 
 import jadex.extension.envsupport.environment.EnvironmentEvent;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;

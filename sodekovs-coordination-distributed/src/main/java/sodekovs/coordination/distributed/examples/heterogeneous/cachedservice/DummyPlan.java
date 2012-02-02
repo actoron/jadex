@@ -1,4 +1,4 @@
-package deco4mas.examples.heterogeneous.cachedservice;
+package sodekovs.coordination.distributed.examples.heterogeneous.cachedservice;
 
 import jadex.bdi.runtime.Plan;
 

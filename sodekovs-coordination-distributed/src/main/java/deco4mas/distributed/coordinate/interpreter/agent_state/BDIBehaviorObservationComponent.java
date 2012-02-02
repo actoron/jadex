@@ -1,7 +1,7 @@
 /**
  * 
  */
-package deco4mas.coordinate.interpreter.agent_state;
+package deco4mas.distributed.coordinate.interpreter.agent_state;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.AgentEvent;
@@ -31,13 +31,13 @@ import jadex.rules.state.IOAVState;
 
 import java.util.HashMap;
 
-import deco.lang.dynamics.AgentElementType;
-import deco.lang.dynamics.MASDynamics;
-import deco.lang.dynamics.mechanism.AgentElement;
-import deco4mas.coordinate.environment.CoordinationSpaceObject;
-import deco4mas.coordinate.interpreter.coordination_information.CheckRole;
-import deco4mas.helper.Constants;
-import deco4mas.mechanism.CoordinationInfo;
+import deco.distributed.lang.dynamics.AgentElementType;
+import deco.distributed.lang.dynamics.MASDynamics;
+import deco.distributed.lang.dynamics.mechanism.AgentElement;
+import deco4mas.distributed.coordinate.environment.CoordinationSpaceObject;
+import deco4mas.distributed.coordinate.interpreter.coordination_information.CheckRole;
+import deco4mas.distributed.helper.Constants;
+import deco4mas.distributed.mechanism.CoordinationInfo;
 
 /**
  * @author Ante Vilenica This component is called on Agent init and observes the agent. If an event occurs that is relevant for the coordination this event is dispatched to the

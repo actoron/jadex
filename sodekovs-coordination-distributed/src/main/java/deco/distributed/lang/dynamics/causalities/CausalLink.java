@@ -1,4 +1,4 @@
-package deco.lang.dynamics.causalities;
+package deco.distributed.lang.dynamics.causalities;
 
 import java.util.ArrayList;
 
@@ -7,8 +7,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import deco.lang.dynamics.properties.SystemProperty;
-import deco4mas.annotation.agent.CoordinationAnnotation.CoordinationType;
+import deco.distributed.lang.dynamics.properties.SystemProperty;
+import deco4mas.distributed.annotation.agent.CoordinationAnnotation.CoordinationType;
 
 /**
  * The representations causal relationships between MAS properties.<br>

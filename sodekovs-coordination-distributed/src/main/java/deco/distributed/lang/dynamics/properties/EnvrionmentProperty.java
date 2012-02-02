@@ -1,4 +1,4 @@
-package deco.lang.dynamics.properties;
+package deco.distributed.lang.dynamics.properties;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

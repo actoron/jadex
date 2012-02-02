@@ -1,7 +1,7 @@
 /**
  * 
  */
-package deco4mas.mechanism.service;
+package deco4mas.distributed.mechanism.service;
 
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -10,8 +10,8 @@ import jadex.commons.future.ThreadSuspendable;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import deco4mas.coordinate.environment.CoordinationSpace;
-import deco4mas.mechanism.CoordinationInfo;
+import deco4mas.distributed.coordinate.environment.CoordinationSpace;
+import deco4mas.distributed.mechanism.CoordinationInfo;
 
 /**
  * Jadex Service based Coordination Medium which allows the coordination of distributed Jadex applications by distributing the {@link CoordinationInfo}s via Jadex Services. This Mechanism caches the

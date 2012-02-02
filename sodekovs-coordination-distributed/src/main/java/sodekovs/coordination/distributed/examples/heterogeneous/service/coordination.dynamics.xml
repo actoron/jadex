@@ -56,7 +56,7 @@
 				</from>
 				<!-- Coordination Medium configuration: -->
 				<mechanism_configuration
-					mechanism_id="deco4mas.mechanism.service.ServiceMechanism"
+					mechanism_id="deco4mas.distributed.mechanism.service.ServiceMechanism"
 					agent_type="JADEX">
 				</mechanism_configuration>
 				<to>		<!-- Behaviors / events to be triggered upon reception: -->

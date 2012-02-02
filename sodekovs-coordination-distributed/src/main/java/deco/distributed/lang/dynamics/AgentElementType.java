@@ -1,4 +1,4 @@
-package deco.lang.dynamics;
+package deco.distributed.lang.dynamics;
 
 /**
  * The available agent-element types:

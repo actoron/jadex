@@ -1,8 +1,8 @@
-package deco4mas.coordinate.environment;
+package deco4mas.distributed.coordinate.environment;
 
 
 import jadex.commons.SimplePropertyObject;
-import deco4mas.mechanism.CoordinationInformation;
+import deco4mas.distributed.mechanism.CoordinationInformation;
 
 public class CoordinationSpaceObject extends SimplePropertyObject{
 

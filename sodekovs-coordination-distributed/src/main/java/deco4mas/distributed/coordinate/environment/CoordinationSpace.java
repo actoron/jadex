@@ -1,4 +1,4 @@
-package deco4mas.coordinate.environment;
+package deco4mas.distributed.coordinate.environment;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bridge.IExternalAccess;
@@ -26,10 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import deco.lang.dynamics.MASDynamics;
-import deco4mas.helper.Constants;
-import deco4mas.mechanism.CoordinationInformation;
-import deco4mas.mechanism.CoordinationMechanism;
+import deco.distributed.lang.dynamics.MASDynamics;
+import deco4mas.distributed.helper.Constants;
+import deco4mas.distributed.mechanism.CoordinationInformation;
+import deco4mas.distributed.mechanism.CoordinationMechanism;
 
 @SuppressWarnings("unchecked")
 public class CoordinationSpace extends AbstractEnvironmentSpace {

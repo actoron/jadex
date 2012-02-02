@@ -1,4 +1,4 @@
-package deco4mas.annotation.agent;
+package deco4mas.distributed.annotation.agent;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import deco4mas.annotation.agent.CoordinationAnnotation.DirectionType;
+import deco4mas.distributed.annotation.agent.CoordinationAnnotation.DirectionType;
 
 /**
  * The coordination configuration of a single agent.<br>
@@ -63,7 +63,7 @@ public class AgentCoordinationConfiguration {
 	
 	public AgentCoordinationConfiguration getXMLConfiguration(String file_name){
 		try {
-			return (AgentCoordinationConfiguration) deco4mas.util.xml.XmlUtil.retrieveFromXML(AgentCoordinationConfiguration.class, file_name);
+			return (AgentCoordinationConfiguration) deco4mas.distributed.util.xml.XmlUtil.retrieveFromXML(AgentCoordinationConfiguration.class, file_name);
 		} catch (FileNotFoundException e) {
 			System.err.println("Error: can not read specified configuration file....");
 			e.printStackTrace();

@@ -56,7 +56,7 @@
 				</from>
 				<!-- Coordination Medium configuration: -->
 				<mechanism_configuration
-					mechanism_id="deco4mas.mechanism.service.CachedServiceMechanism"
+					mechanism_id="deco4mas.distributed.mechanism.service.CachedServiceMechanism"
 					agent_type="JADEX">
 					<properties>
 						<entry>

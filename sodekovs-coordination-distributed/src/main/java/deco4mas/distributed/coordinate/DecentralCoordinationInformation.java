@@ -1,8 +1,8 @@
-package deco4mas.coordinate;
+package deco4mas.distributed.coordinate;
 
-import deco.lang.dynamics.causalities.DecentralMechanismLink;
-import deco.lang.dynamics.properties.AgentReference;
-import deco4mas.annotation.agent.CoordinationAnnotation.DirectionType;
+import deco.distributed.lang.dynamics.causalities.DecentralMechanismLink;
+import deco.distributed.lang.dynamics.properties.AgentReference;
+import deco4mas.distributed.annotation.agent.CoordinationAnnotation.DirectionType;
 
 /**
  * Intermediate data format. 

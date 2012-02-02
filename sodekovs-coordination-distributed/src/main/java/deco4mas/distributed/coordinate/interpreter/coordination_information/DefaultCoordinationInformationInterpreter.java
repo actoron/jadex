@@ -1,7 +1,7 @@
 /**
  * 
  */
-package deco4mas.coordinate.interpreter.coordination_information;
+package deco4mas.distributed.coordinate.interpreter.coordination_information;
 
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.IBDIInternalAccess;
@@ -43,15 +43,15 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import deco.lang.dynamics.AgentElementType;
-import deco.lang.dynamics.Causalities;
-import deco.lang.dynamics.MASDynamics;
-import deco.lang.dynamics.mechanism.AgentElement;
-import deco.lang.dynamics.mechanism.DecentralizedCausality;
-import deco4mas.annotation.agent.CoordinationAnnotation.CoordinationType;
-import deco4mas.annotation.agent.ParameterMapping;
-import deco4mas.coordinate.CoordinationInformation;
-import deco4mas.helper.Constants;
+import deco.distributed.lang.dynamics.AgentElementType;
+import deco.distributed.lang.dynamics.Causalities;
+import deco.distributed.lang.dynamics.MASDynamics;
+import deco.distributed.lang.dynamics.mechanism.AgentElement;
+import deco.distributed.lang.dynamics.mechanism.DecentralizedCausality;
+import deco4mas.distributed.annotation.agent.CoordinationAnnotation.CoordinationType;
+import deco4mas.distributed.annotation.agent.ParameterMapping;
+import deco4mas.distributed.coordinate.CoordinationInformation;
+import deco4mas.distributed.helper.Constants;
 
 /**
  * The default coordination information interpreter interprets received perceptions from the coordination space and maps them to the according agent elements.

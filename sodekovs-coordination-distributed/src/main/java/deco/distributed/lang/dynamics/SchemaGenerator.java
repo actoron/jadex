@@ -1,10 +1,10 @@
-package deco.lang.dynamics;
+package deco.distributed.lang.dynamics;
 
 import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
 
-import deco4mas.util.xml.XmlUtil;
+import deco4mas.distributed.util.xml.XmlUtil;
 
 /**
  * Generate a Schema (.xsd) for the MASDynamics language (deco.lang.dynamics.MasDynamics).<br>

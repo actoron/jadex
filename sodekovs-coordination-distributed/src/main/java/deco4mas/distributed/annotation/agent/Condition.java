@@ -1,4 +1,4 @@
-package deco4mas.annotation.agent;
+package deco4mas.distributed.annotation.agent;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;

@@ -1,4 +1,4 @@
-package deco.lang.dynamics.mechanism;
+package deco.distributed.lang.dynamics.mechanism;
 
 import java.util.ArrayList;
 

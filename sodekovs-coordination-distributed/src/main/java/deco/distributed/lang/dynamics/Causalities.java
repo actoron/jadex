@@ -1,4 +1,4 @@
-package deco.lang.dynamics;
+package deco.distributed.lang.dynamics;
 
 import java.util.ArrayList;
 
@@ -6,11 +6,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import deco.lang.dynamics.causalities.DecentralMechanismLink;
-import deco.lang.dynamics.causalities.DirectLink;
-import deco.lang.dynamics.mechanism.DecentralizedCausality;
-import deco.lang.dynamics.mechanism.DirectCausality;
-import deco.lang.dynamics.mechanism.MechanismConfiguration;
+import deco.distributed.lang.dynamics.causalities.DecentralMechanismLink;
+import deco.distributed.lang.dynamics.causalities.DirectLink;
+import deco.distributed.lang.dynamics.mechanism.DecentralizedCausality;
+import deco.distributed.lang.dynamics.mechanism.DirectCausality;
+import deco.distributed.lang.dynamics.mechanism.MechanismConfiguration;
 
 /**
  * Causal link definitions.<br>
@@ -25,7 +25,7 @@ public class Causalities {
 	// ----------attributes----------
 
 	/** The direct coordination links. */
-	ArrayList<DirectLink> direct_links = new ArrayList<DirectLink>();
+	ArrayList<deco.distributed.lang.dynamics.causalities.DirectLink> direct_links = new ArrayList<DirectLink>();
 
 	/** The decentralized coordination links. */
 	ArrayList<DecentralMechanismLink> dml = new ArrayList<DecentralMechanismLink>();

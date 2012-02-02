@@ -1,7 +1,7 @@
 /**
  * 
  */
-package deco4mas.coordinate.interpreter.coordination_information;
+package deco4mas.distributed.coordinate.interpreter.coordination_information;
 
 import jadex.extension.envsupport.environment.EnvironmentEvent;
 import jadex.extension.envsupport.environment.IPerceptGenerator;

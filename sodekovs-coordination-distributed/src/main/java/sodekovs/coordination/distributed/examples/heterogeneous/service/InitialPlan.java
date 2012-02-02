@@ -1,7 +1,7 @@
 /**
  * 
  */
-package deco4mas.examples.heterogeneous.service;
+package sodekovs.coordination.distributed.examples.heterogeneous.service;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;

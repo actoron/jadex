@@ -1,10 +1,10 @@
-package deco4mas.examples.heterogeneous.service;
+package sodekovs.coordination.distributed.examples.heterogeneous.service;
 
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
-import deco4mas.coordinate.interpreter.agent_state.CoordinationComponentStep;
+import deco4mas.distributed.coordinate.interpreter.agent_state.CoordinationComponentStep;
 
 /**
  * The example micro agent. The {@link ReceiveHelloStep} is called by the coordination framework if an according event occurs. The parameter {@link ReceiveHelloStep#message} is received over the

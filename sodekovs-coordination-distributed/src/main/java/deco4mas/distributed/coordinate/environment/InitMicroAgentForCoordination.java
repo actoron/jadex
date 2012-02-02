@@ -1,4 +1,4 @@
-package deco4mas.coordinate.environment;
+package deco4mas.distributed.coordinate.environment;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -15,18 +15,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import deco.lang.dynamics.AgentElementType;
-import deco.lang.dynamics.Causalities;
-import deco.lang.dynamics.MASDynamics;
-import deco.lang.dynamics.causalities.DecentralMechanismLink;
-import deco.lang.dynamics.mechanism.AgentElement;
-import deco.lang.dynamics.mechanism.DecentralizedCausality;
-import deco.lang.dynamics.mechanism.DirectCausality;
-import deco4mas.coordinate.DecentralCoordinationInformation;
-import deco4mas.coordinate.DirectCoordinationInformation;
-import deco4mas.coordinate.ProcessMASDynamics;
-import deco4mas.coordinate.interpreter.agent_state.MicroBehaviourObservationComponent;
-import deco4mas.helper.Constants;
+import deco.distributed.lang.dynamics.AgentElementType;
+import deco.distributed.lang.dynamics.Causalities;
+import deco.distributed.lang.dynamics.MASDynamics;
+import deco.distributed.lang.dynamics.causalities.DecentralMechanismLink;
+import deco.distributed.lang.dynamics.mechanism.AgentElement;
+import deco.distributed.lang.dynamics.mechanism.DecentralizedCausality;
+import deco.distributed.lang.dynamics.mechanism.DirectCausality;
+import deco4mas.distributed.coordinate.DecentralCoordinationInformation;
+import deco4mas.distributed.coordinate.DirectCoordinationInformation;
+import deco4mas.distributed.coordinate.ProcessMASDynamics;
+import deco4mas.distributed.coordinate.interpreter.agent_state.MicroBehaviourObservationComponent;
+import deco4mas.distributed.helper.Constants;
 
 /**
  * This Class is used to init the observer for the micro agents in order to do the publications and perceptions.

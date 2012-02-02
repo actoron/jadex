@@ -1,4 +1,4 @@
-package deco4mas.coordinate;
+package deco4mas.distributed.coordinate;
 
 import jadex.bridge.IExternalAccess;
 
@@ -7,14 +7,14 @@ import java.util.ArrayList;
 
 import javax.xml.bind.JAXBException;
 
-import deco.lang.dynamics.MASDynamics;
-import deco.lang.dynamics.causalities.DecentralMechanismLink;
-import deco.lang.dynamics.causalities.DirectLink;
-import deco.lang.dynamics.properties.AgentReference;
-import deco.lang.dynamics.properties.GroupMembership;
-import deco.lang.dynamics.properties.RoleOccupation;
-import deco.lang.dynamics.properties.SystemProperty;
-import deco4mas.annotation.agent.CoordinationAnnotation.DirectionType;
+import deco.distributed.lang.dynamics.MASDynamics;
+import deco.distributed.lang.dynamics.causalities.DecentralMechanismLink;
+import deco.distributed.lang.dynamics.causalities.DirectLink;
+import deco.distributed.lang.dynamics.properties.AgentReference;
+import deco.distributed.lang.dynamics.properties.GroupMembership;
+import deco.distributed.lang.dynamics.properties.RoleOccupation;
+import deco.distributed.lang.dynamics.properties.SystemProperty;
+import deco4mas.distributed.annotation.agent.CoordinationAnnotation.DirectionType;
 
 /**
  * Processing a given MASDynamic model: <br>
@@ -75,7 +75,7 @@ public class ProcessMASDynamics {
 	public static MASDynamics getMASDynamicsModell(String fileName) {
 		if (fileName.length() > 0)
 			try {
-				return (MASDynamics) deco4mas.util.xml.XmlUtil.retrieveFromXML(MASDynamics.class, fileName);
+				return (MASDynamics) deco4mas.distributed.util.xml.XmlUtil.retrieveFromXML(MASDynamics.class, fileName);
 			} catch (FileNotFoundException e) {
 				System.out.println("#ProcessMASDynamics#" + ":");
 				System.out.println("\t file: " + fileName + " could not be found...");

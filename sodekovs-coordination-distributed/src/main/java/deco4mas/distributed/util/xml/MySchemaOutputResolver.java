@@ -1,4 +1,4 @@
-package deco4mas.util.xml;
+package deco4mas.distributed.util.xml;
 
 import java.io.File;
 import java.io.IOException;

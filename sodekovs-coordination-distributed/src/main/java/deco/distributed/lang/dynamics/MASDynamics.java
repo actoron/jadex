@@ -1,4 +1,4 @@
-package deco.lang.dynamics;
+package deco.distributed.lang.dynamics;
 
 import java.util.ArrayList;
 
@@ -6,25 +6,25 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import deco.lang.dynamics.causalities.DecentralMechanismLink;
-import deco.lang.dynamics.causalities.DirectLink;
-import deco.lang.dynamics.defines.AgentModel;
-import deco.lang.dynamics.defines.Define;
-import deco.lang.dynamics.defines.MechanismModel;
-import deco.lang.dynamics.defines.AgentModel.AgentModelType;
-import deco.lang.dynamics.mechanism.AgentElement;
-import deco.lang.dynamics.mechanism.DecentralizedCausality;
-import deco.lang.dynamics.mechanism.MechanismConfiguration;
-import deco.lang.dynamics.mechanism.MechanismParameterMapping;
-import deco.lang.dynamics.properties.AgentReference;
-import deco.lang.dynamics.properties.ElementReference;
-import deco.lang.dynamics.properties.EnvrionmentProperty;
-import deco.lang.dynamics.properties.Group;
-import deco.lang.dynamics.properties.GroupMembership;
-import deco.lang.dynamics.properties.RoleOccupation;
-import deco.lang.dynamics.properties.SystemProperty;
-import deco4mas.annotation.agent.ParameterMapping;
-import deco4mas.annotation.agent.CoordinationAnnotation.CoordinationType;
+import deco.distributed.lang.dynamics.causalities.DecentralMechanismLink;
+import deco.distributed.lang.dynamics.causalities.DirectLink;
+import deco.distributed.lang.dynamics.defines.AgentModel;
+import deco.distributed.lang.dynamics.defines.AgentModel.AgentModelType;
+import deco.distributed.lang.dynamics.defines.Define;
+import deco.distributed.lang.dynamics.defines.MechanismModel;
+import deco.distributed.lang.dynamics.mechanism.AgentElement;
+import deco.distributed.lang.dynamics.mechanism.DecentralizedCausality;
+import deco.distributed.lang.dynamics.mechanism.MechanismConfiguration;
+import deco.distributed.lang.dynamics.mechanism.MechanismParameterMapping;
+import deco.distributed.lang.dynamics.properties.AgentReference;
+import deco.distributed.lang.dynamics.properties.ElementReference;
+import deco.distributed.lang.dynamics.properties.EnvrionmentProperty;
+import deco.distributed.lang.dynamics.properties.Group;
+import deco.distributed.lang.dynamics.properties.GroupMembership;
+import deco.distributed.lang.dynamics.properties.RoleOccupation;
+import deco.distributed.lang.dynamics.properties.SystemProperty;
+import deco4mas.distributed.annotation.agent.CoordinationAnnotation.CoordinationType;
+import deco4mas.distributed.annotation.agent.ParameterMapping;
 
 /**
  * This class represents the dynamics of a Multi-Agent System (MASDynamics language).<br>
@@ -151,7 +151,7 @@ public class MASDynamics {
 
 		RoleOccupation prop2 = new RoleOccupation();
 		AgentReference ar = new AgentReference("agent_1");
-		ar.addElement(new ElementReference("element-name", deco.lang.dynamics.AgentElementType.BDI_GOAL));
+		ar.addElement(new ElementReference("element-name", deco.distributed.lang.dynamics.AgentElementType.BDI_GOAL));
 		prop2.addAgentReference(ar);
 		prop2.addAgentReference(ar);
 		prop2.setMultiple(false);
@@ -163,12 +163,12 @@ public class MASDynamics {
 		g.setName("g");
 		AgentReference member = new AgentReference();
 		member.setAgent_id("agent-id");
-		member.addElement(new ElementReference("element-name", deco.lang.dynamics.AgentElementType.BDI_GOAL));
+		member.addElement(new ElementReference("element-name", deco.distributed.lang.dynamics.AgentElementType.BDI_GOAL));
 		g.addAgentElement(member);
 
 		AgentReference member2 = new AgentReference();
 		member2.setAgent_id("agent2-id");
-		member2.addElement(new ElementReference("element-name", deco.lang.dynamics.AgentElementType.BDI_GOAL));
+		member2.addElement(new ElementReference("element-name", deco.distributed.lang.dynamics.AgentElementType.BDI_GOAL));
 		g.addAgentElement(member2);
 
 		mas_dyn.addGroupProperty(g);
@@ -177,12 +177,12 @@ public class MASDynamics {
 		gm.setName("gm");
 		AgentReference member3 = new AgentReference();
 		member3.setAgent_id("agent3-id");
-		member3.addElement(new ElementReference("element-name", deco.lang.dynamics.AgentElementType.BDI_GOAL));
+		member3.addElement(new ElementReference("element-name", deco.distributed.lang.dynamics.AgentElementType.BDI_GOAL));
 		gm.addAgentElement(member3);
 
 		AgentReference member4 = new AgentReference();
 		member4.setAgent_id("agent4-id");
-		member4.addElement(new ElementReference("element-name", deco.lang.dynamics.AgentElementType.BDI_GOAL));
+		member4.addElement(new ElementReference("element-name", deco.distributed.lang.dynamics.AgentElementType.BDI_GOAL));
 		gm.addAgentElement(member4);
 
 		sys_prop.add(gm);
@@ -205,10 +205,10 @@ public class MASDynamics {
 		dml.addTo(g);
 
 		DecentralizedCausality c = new DecentralizedCausality();
-		AgentElement ae = new AgentElement("id", "element_id", deco.lang.dynamics.AgentElementType.INTERNAL_EVENT.toString());
+		AgentElement ae = new AgentElement("id", "element_id", deco.distributed.lang.dynamics.AgentElementType.INTERNAL_EVENT.toString());
 		ae.addParameterMapping(new ParameterMapping("local_name", "ref", "clazz"));
 		c.addFrom_agents(ae);
-		c.addTo_agents(new AgentElement("id", "element_id", deco.lang.dynamics.AgentElementType.INTERNAL_EVENT.toString()));
+		c.addTo_agents(new AgentElement("id", "element_id", deco.distributed.lang.dynamics.AgentElementType.INTERNAL_EVENT.toString()));
 		c.setId("id");
 		MechanismConfiguration mc = new MechanismConfiguration();
 		mc.addParameterMapping(new MechanismParameterMapping("from_name", "to_id", "class", "agent_id"));
@@ -221,19 +221,19 @@ public class MASDynamics {
 		mas_dyn.addDecentralmechanismLink(dml);
 
 		// write XML:
-		deco4mas.util.xml.XmlUtil.saveAsXML(mas_dyn, "example.xml");
+		deco4mas.distributed.util.xml.XmlUtil.saveAsXML(mas_dyn, "example.xml");
 		System.out.println("saved...");
 
 		// read from XML:
-		MASDynamics mas_dyn2 = (MASDynamics) deco4mas.util.xml.XmlUtil.retrieveFromXML(MASDynamics.class, "foraging.dynamics.xml");
+		MASDynamics mas_dyn2 = (MASDynamics) deco4mas.distributed.util.xml.XmlUtil.retrieveFromXML(MASDynamics.class, "foraging.dynamics.xml");
 		System.out.println("Read conf file: " + mas_dyn2);
 
 		// write XML:
-		deco4mas.util.xml.XmlUtil.saveAsXML(mas_dyn2, "example2.xml");
+		deco4mas.distributed.util.xml.XmlUtil.saveAsXML(mas_dyn2, "example2.xml");
 		System.out.println("saved...");
 
 		// generate the XML-Schema (.xsd) that represents the language meta-model.
-		deco4mas.util.xml.XmlUtil.generateSchema(MASDynamics.class);
+		deco4mas.distributed.util.xml.XmlUtil.generateSchema(MASDynamics.class);
 
 	}
 

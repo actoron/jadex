@@ -1,4 +1,4 @@
-package deco.lang.dynamics.causalities;
+package deco.distributed.lang.dynamics.causalities;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

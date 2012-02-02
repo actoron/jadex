@@ -1,4 +1,4 @@
-package deco4mas.coordinate.interpreter.agent_state;
+package deco4mas.distributed.coordinate.interpreter.agent_state;
 
 import jadex.bridge.IComponentStep;
 

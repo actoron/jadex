@@ -1,4 +1,4 @@
-package deco4mas.mechanism.service;
+package deco4mas.distributed.mechanism.service;
 
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -8,9 +8,9 @@ import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.Collection;
 
-import deco4mas.coordinate.environment.CoordinationSpace;
-import deco4mas.mechanism.CoordinationInfo;
-import deco4mas.mechanism.CoordinationMechanism;
+import deco4mas.distributed.coordinate.environment.CoordinationSpace;
+import deco4mas.distributed.mechanism.CoordinationInfo;
+import deco4mas.distributed.mechanism.CoordinationMechanism;
 
 /**
  * Jadex Service based Coordination Medium which allows the coordination of distributed Jadex applications by distributing the {@link CoordinationInfo}s via Jadex Services.

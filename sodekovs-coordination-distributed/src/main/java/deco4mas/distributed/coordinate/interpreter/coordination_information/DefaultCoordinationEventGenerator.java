@@ -1,7 +1,7 @@
 /**
  * 
  */
-package deco4mas.coordinate.interpreter.coordination_information;
+package deco4mas.distributed.coordinate.interpreter.coordination_information;
 
 /**
  * @author Ante Vilenica
@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import deco4mas.coordinate.environment.CoordinationEvent;
-import deco4mas.coordinate.environment.CoordinationSpace;
+import deco4mas.distributed.coordinate.environment.CoordinationEvent;
+import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 
 /**
  * Percept generator for agents that have to be coordinated.

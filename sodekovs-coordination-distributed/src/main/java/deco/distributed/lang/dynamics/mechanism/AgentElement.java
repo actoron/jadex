@@ -1,4 +1,4 @@
-package deco.lang.dynamics.mechanism;
+package deco.distributed.lang.dynamics.mechanism;
 
 import java.util.ArrayList;
 
@@ -7,9 +7,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-//import deco.lang.Causality.AgentElementType;
-import deco4mas.annotation.agent.DataMapping;
-import deco4mas.annotation.agent.ParameterMapping;
+import deco4mas.distributed.annotation.agent.DataMapping;
+import deco4mas.distributed.annotation.agent.ParameterMapping;
 
 /** 
  * An agent element reference.

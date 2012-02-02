@@ -1,4 +1,4 @@
-package deco4mas.mechanism;
+package deco4mas.distributed.mechanism;
 
 import java.util.HashMap;
 

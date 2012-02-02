@@ -1,4 +1,4 @@
-package deco.lang.dynamics;
+package deco.distributed.lang.dynamics;
 
 import java.util.ArrayList;
 
@@ -6,11 +6,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import deco.lang.dynamics.properties.EnvrionmentProperty;
-import deco.lang.dynamics.properties.Group;
-import deco.lang.dynamics.properties.GroupMembership;
-import deco.lang.dynamics.properties.RoleOccupation;
-import deco.lang.dynamics.properties.SystemProperty;
+import deco.distributed.lang.dynamics.properties.EnvrionmentProperty;
+import deco.distributed.lang.dynamics.properties.Group;
+import deco.distributed.lang.dynamics.properties.GroupMembership;
+import deco.distributed.lang.dynamics.properties.RoleOccupation;
+import deco.distributed.lang.dynamics.properties.SystemProperty;
 
 /**
  * System properties. Four system property types are distinguished.

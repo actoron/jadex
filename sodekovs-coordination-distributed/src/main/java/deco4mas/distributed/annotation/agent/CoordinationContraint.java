@@ -1,4 +1,4 @@
-package deco4mas.annotation.agent;
+package deco4mas.distributed.annotation.agent;
 
 import java.util.ArrayList;
 

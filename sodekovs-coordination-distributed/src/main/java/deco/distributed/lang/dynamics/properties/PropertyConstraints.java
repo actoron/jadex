@@ -1,7 +1,7 @@
 /**
  * 
  */
-package deco.lang.dynamics.properties;
+package deco.distributed.lang.dynamics.properties;
 
 import java.util.ArrayList;
 

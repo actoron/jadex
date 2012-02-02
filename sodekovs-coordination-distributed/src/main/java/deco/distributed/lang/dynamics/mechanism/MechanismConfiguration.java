@@ -1,4 +1,4 @@
-package deco.lang.dynamics.mechanism;
+package deco.distributed.lang.dynamics.mechanism;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
-import deco.lang.dynamics.defines.AgentModel.AgentModelType;
+import deco.distributed.lang.dynamics.defines.AgentModel.AgentModelType;
 
 public class MechanismConfiguration {
 

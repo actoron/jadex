@@ -1,4 +1,4 @@
-package deco4mas.coordinate.interpreter.agent_state;
+package deco4mas.distributed.coordinate.interpreter.agent_state;
 
 import jadex.bridge.IExternalAccess;
 
@@ -8,13 +8,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import deco.lang.dynamics.AgentElementType;
-import deco.lang.dynamics.MASDynamics;
-import deco.lang.dynamics.mechanism.AgentElement;
-import deco.lang.dynamics.properties.AgentReference;
-import deco4mas.coordinate.environment.CoordinationSpaceObject;
-import deco4mas.helper.Constants;
-import deco4mas.mechanism.CoordinationInfo;
+import deco.distributed.lang.dynamics.AgentElementType;
+import deco.distributed.lang.dynamics.MASDynamics;
+import deco.distributed.lang.dynamics.mechanism.AgentElement;
+import deco.distributed.lang.dynamics.properties.AgentReference;
+import deco4mas.distributed.coordinate.environment.CoordinationSpaceObject;
+import deco4mas.distributed.helper.Constants;
+import deco4mas.distributed.mechanism.CoordinationInfo;
 
 public abstract class BehaviorObservationComponent {
 

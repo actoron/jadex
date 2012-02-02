@@ -1,4 +1,4 @@
-package deco4mas.coordinate.environment;
+package deco4mas.distributed.coordinate.environment;
 
 import jadex.extension.envsupport.MObjectType;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
@@ -17,15 +17,15 @@ import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
-import deco.lang.dynamics.MASDynamics;
-import deco.lang.dynamics.causalities.DecentralMechanismLink;
-import deco.lang.dynamics.causalities.DirectLink;
-import deco.lang.dynamics.mechanism.AgentElement;
-import deco.lang.dynamics.mechanism.DecentralizedCausality;
-import deco.lang.dynamics.mechanism.MechanismConfiguration;
-import deco4mas.coordinate.interpreter.coordination_information.DefaultCoordinationEventGenerator;
-import deco4mas.coordinate.interpreter.coordination_information.DefaultCoordinationInformationInterpreter;
-import deco4mas.mechanism.CoordinationMechanism;
+import deco.distributed.lang.dynamics.MASDynamics;
+import deco.distributed.lang.dynamics.causalities.DecentralMechanismLink;
+import deco.distributed.lang.dynamics.causalities.DirectLink;
+import deco.distributed.lang.dynamics.mechanism.AgentElement;
+import deco.distributed.lang.dynamics.mechanism.DecentralizedCausality;
+import deco.distributed.lang.dynamics.mechanism.MechanismConfiguration;
+import deco4mas.distributed.coordinate.interpreter.coordination_information.DefaultCoordinationEventGenerator;
+import deco4mas.distributed.coordinate.interpreter.coordination_information.DefaultCoordinationInformationInterpreter;
+import deco4mas.distributed.mechanism.CoordinationMechanism;
 
 /**
  * Responsible for starting all things necessary for deco4mas
@@ -64,7 +64,7 @@ public class InitDeco4mas {
 		try {
 			if (masFile.exists()) {
 				// 1: fetch conf.:
-				masDyn = (MASDynamics) deco4mas.util.xml.XmlUtil.retrieveFromXML(MASDynamics.class, masFile);
+				masDyn = (MASDynamics) deco4mas.distributed.util.xml.XmlUtil.retrieveFromXML(MASDynamics.class, masFile);
 			}
 
 		} catch (FileNotFoundException e) {
