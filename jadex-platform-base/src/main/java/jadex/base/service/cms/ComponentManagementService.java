@@ -45,7 +45,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.xml.annotation.XMLClassname;
 
@@ -175,7 +174,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		this.initinfos = SCollection.createHashMap();
 		this.initinfos = Collections.synchronizedMap(initinfos);
 		this.childcounts = SCollection.createHashMap();
-		this.localtypes	= Collections.synchronizedMap(new LRU(100));
+		this.localtypes	= Collections.synchronizedMap(new LRU<Tuple, String>(100));
 		this.lockentries = SCollection.createHashMap();
 //		this.classloadercache = Collections.synchronizedMap(new LRU(1000));
    }

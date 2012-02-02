@@ -1,8 +1,9 @@
 package jadex.bridge.service.types.factory;
 
+import jadex.commons.future.IFuture;
+
 import java.util.Set;
 
-import jadex.commons.future.IFuture;
 
 /**
  *  Extension mechanism for kernel factories.
@@ -16,8 +17,9 @@ import jadex.commons.future.IFuture;
 public interface IComponentFactoryExtensionService
 {
 	/**
-	 *  Get extension. 
+	 *  Get extension.
+	 *  @return A set of jadex.xml.TypeInfo objects. 
 	 */
-	public IFuture getExtension(String componenttype); // <Set<TypeInfo>> -> no what about annotation based extensions
+	public IFuture<Set<Object>>	getExtension(String componenttype); // <Set<TypeInfo>> -> no what about annotation based extensions
 	
 }

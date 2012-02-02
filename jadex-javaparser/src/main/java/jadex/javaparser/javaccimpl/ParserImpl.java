@@ -3,9 +3,8 @@ package jadex.javaparser.javaccimpl;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-
-import java.util.ArrayList;
 import java.util.Map;
+import java.util.ArrayList;
 
 
 /**
@@ -135,20 +134,34 @@ class ParserImpl/*@bgen(jjtree)*/implements ParserImplTreeConstants, ParserImplC
 	 *  Unescape a string.
 	 */
         protected String        unescape(String str)
+    {
+        StringBuffer    buf     = new StringBuffer(str);
+        int     idx     = buf.indexOf("\\");
+        while(idx!=-1 && buf.length()>idx+1)
         {
-                str     = SUtil.replace(str, "\\b", "\b");
-                str     = SUtil.replace(str, "\\t", "\t");
-                str     = SUtil.replace(str, "\\n", "\n");
-                str     = SUtil.replace(str, "\\f", "\f");
-                str     = SUtil.replace(str, "\\r", "\r");
-                str     = SUtil.replace(str, "\\\"", "\"");
-                str     = SUtil.replace(str, "\\'", "'");
-                str     = SUtil.replace(str, "\\\\", "\\");
+                if(buf.charAt(idx+1)=='b')
+                        buf.replace(idx, idx+2, "\b");
+                else if(buf.charAt(idx+1)=='t')
+                        buf.replace(idx, idx+2, "\t");
+                else if(buf.charAt(idx+1)=='n')
+                        buf.replace(idx, idx+2, "\n");
+                else if(buf.charAt(idx+1)=='f')
+                        buf.replace(idx, idx+2, "\f");
+                else if(buf.charAt(idx+1)=='r')
+                        buf.replace(idx, idx+2, "\r");
+                else if(buf.charAt(idx+1)=='"')
+                        buf.replace(idx, idx+2, "\"");
+                else if(buf.charAt(idx+1)=='\'')
+                        buf.replace(idx, idx+2, "'");
+                else if(buf.charAt(idx+1)=='\\')
+                        buf.replace(idx, idx+2, "\\");
 
-                // Todo: escape octal codes.
-
-                return str;
+                idx     = str.indexOf('\\', idx+1);
         }
+
+       // Todo: escape octal codes.
+       return buf.toString();
+    }
 
 /*
 TOKEN : /* OPERATORS * /
@@ -2526,41 +2539,6 @@ TOKEN : /* OPERATORS * /
     finally { jj_save(28, xla); }
   }
 
-  final private boolean jj_3R_39() {
-    if (jj_scan_token(74)) return true;
-    if (jj_3R_94()) return true;
-    return false;
-  }
-
-  final private boolean jj_3R_27() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_39()) {
-    jj_scanpos = xsp;
-    if (jj_3R_40()) {
-    jj_scanpos = xsp;
-    if (jj_3R_41()) {
-    jj_scanpos = xsp;
-    if (jj_3_16()) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  final private boolean jj_3R_104() {
-    if (jj_scan_token(LBRACE)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_27()) jj_scanpos = xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3R_109()) { jj_scanpos = xsp; break; }
-    }
-    if (jj_scan_token(RBRACE)) return true;
-    return false;
-  }
-
   final private boolean jj_3_14() {
     if (jj_3R_27()) return true;
     return false;
@@ -3632,6 +3610,41 @@ TOKEN : /* OPERATORS * /
   final private boolean jj_3R_40() {
     if (jj_scan_token(75)) return true;
     if (jj_3R_94()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_39() {
+    if (jj_scan_token(74)) return true;
+    if (jj_3R_94()) return true;
+    return false;
+  }
+
+  final private boolean jj_3R_27() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_39()) {
+    jj_scanpos = xsp;
+    if (jj_3R_40()) {
+    jj_scanpos = xsp;
+    if (jj_3R_41()) {
+    jj_scanpos = xsp;
+    if (jj_3_16()) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  final private boolean jj_3R_104() {
+    if (jj_scan_token(LBRACE)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_27()) jj_scanpos = xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_109()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_scan_token(RBRACE)) return true;
     return false;
   }
 

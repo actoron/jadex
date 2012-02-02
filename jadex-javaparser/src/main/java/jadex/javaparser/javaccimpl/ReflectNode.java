@@ -421,8 +421,15 @@ public class ReflectNode	extends ExpressionNode
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
-					throw new RuntimeException(e);
+//					e.printStackTrace();
+					if(e instanceof RuntimeException)
+					{
+						throw (RuntimeException)e;
+					}
+					else
+					{
+						throw new RuntimeException(e);
+					}
 				}
 			}
 
@@ -668,10 +675,10 @@ public class ReflectNode	extends ExpressionNode
 			else
 				throw e;
 		}
-		catch(IllegalArgumentException e)
-		{
-			e.printStackTrace();
-		}
+//		catch(IllegalArgumentException e)
+//		{
+//			e.printStackTrace();
+//		}
 //		catch(Exception e)
 //		{
 //			e.printStackTrace();

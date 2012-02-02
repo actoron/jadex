@@ -82,14 +82,7 @@ public class SelectionNode	extends ExpressionNode
 		Object	array	= ((ExpressionNode)jjtGetChild(0)).getValue(fetcher);
 		Object	index	= ((ExpressionNode)jjtGetChild(1)).getValue(fetcher);
 
-		try
-		{
-			Array.get(array, ((Number)index).intValue());
-		}
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-		}
+		Array.get(array, ((Number)index).intValue());
 		
 		return Array.get(array, ((Number)index).intValue());
 	}

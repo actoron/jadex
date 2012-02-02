@@ -21,11 +21,11 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
 
 import java.net.InetAddress;
@@ -120,7 +120,7 @@ public class Starter
 	 */
 	public static void main(String[] args)
 	{
-		createPlatform(args).addResultListener(new DefaultResultListener<IExternalAccess>()
+		createPlatform(args).addResultListener(new IResultListener<IExternalAccess>()
 		{
 			public void resultAvailable(final IExternalAccess access)
 			{

@@ -5,6 +5,7 @@ import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
@@ -196,7 +197,7 @@ public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
 						}
 						
 						createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId())
-							.addResultListener(agent.createResultListener(new DefaultResultListener<AwarenessInfo>()
+							.addResultListener(agent.createResultListener(new DefaultResultListener<AwarenessInfo>(agent.getLogger())
 						{
 							public void resultAvailable(AwarenessInfo info)
 							{
@@ -204,6 +205,12 @@ public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
 //								byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
 								byte[] data = DiscoveryAgent.encodeObject(info, getMicroAgent().getClassLoader());
 								((ScannerSendHandler)sender).send(data, address, port);
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								if(!(exception instanceof ComponentTerminatedException))
+									super.exceptionOccurred(exception);
 							}
 						}));
 						

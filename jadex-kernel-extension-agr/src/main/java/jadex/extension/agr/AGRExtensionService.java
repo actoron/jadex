@@ -32,9 +32,9 @@ public class AGRExtensionService implements IComponentFactoryExtensionService
 	/**
 	 *  Get extension. 
 	 */
-	public IFuture getExtension(String componenttype)
+	public IFuture<Set<Object>> getExtension(String componenttype)
 	{
-		return new Future(getXMLMapping());
+		return new Future<Set<Object>>(getXMLMapping());
 	}
 
 	//-------- static part --------
@@ -42,7 +42,7 @@ public class AGRExtensionService implements IComponentFactoryExtensionService
 	/**
 	 *  Get the XML mapping.
 	 */
-	public static Set getXMLMapping()
+	public static Set<Object> getXMLMapping()
 	{
 		Set types = new HashSet();
 		String uri = "http://jadex.sourceforge.net/jadex-agrspace";

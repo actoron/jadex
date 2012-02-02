@@ -19,7 +19,6 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CollectionResultListener;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -143,25 +142,22 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 			public void customResultAvailable(Void result)
 			{
 				SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new DelegationResultListener(ret)
+					.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(ILibraryService result)
 					{
-						libservice = (ILibraryService)result;
+						libservice = result;
 						
 						SServiceProvider.getServices(provider, IComponentFactoryExtensionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new DelegationResultListener(ret)
+							.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactoryExtensionService>, Void>(ret)
 						{
-							public void customResultAvailable(Object result)
+							public void customResultAvailable(Collection<IComponentFactoryExtensionService> fes)
 							{
-								Collection fes = (Collection)result;
-								
-								CollectionResultListener lis = new CollectionResultListener(fes.size(), true, new DefaultResultListener()
+								CollectionResultListener<Set<Object>> lis = new CollectionResultListener<Set<Object>>(fes.size(), true, new ExceptionDelegationResultListener<Collection<Set<Object>>, Void>(ret)
 								{
-									public void resultAvailable(Object result)
+									public void customResultAvailable(Collection<Set<Object>> exts)
 									{
-										Collection exts = (Collection)result;
-										Set[] mappings = (Set[])exts.toArray(new Set[exts.size()]);
+										Set<Object>[] mappings = (Set<Object>[])exts.toArray(new Set[exts.size()]);
 										
 										loader = new ApplicationModelLoader(mappings);
 										
@@ -173,7 +169,7 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 												return IFuture.DONE;
 											}
 											
-											public IFuture resourceIdentifierAdded(IResourceIdentifier rid)
+											public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
 											{
 												loader.clearModelCache();
 												return IFuture.DONE;
@@ -186,9 +182,9 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 									}
 								});
 								
-								for(Iterator it=fes.iterator(); it.hasNext(); )
+								for(Iterator<IComponentFactoryExtensionService> it=fes.iterator(); it.hasNext(); )
 								{
-									IComponentFactoryExtensionService fex = (IComponentFactoryExtensionService)it.next();
+									IComponentFactoryExtensionService fex = it.next();
 									fex.getExtension(FILETYPE_APPLICATION).addResultListener(lis);
 								}
 							}	

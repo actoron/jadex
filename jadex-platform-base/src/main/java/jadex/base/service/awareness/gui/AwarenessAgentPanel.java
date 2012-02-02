@@ -18,7 +18,6 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -44,6 +43,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -396,9 +396,10 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 						@XMLClassname("deoractivateDiscoveryMechanism")
 						public IFuture<Void> execute(final IInternalAccess ia)
 						{
-							ia.getChildrenAccesses().addResultListener(ia.createResultListener(new DefaultResultListener<Collection<IExternalAccess>>()
+							final Future<Void>	ret	= new Future<Void>();
+							ia.getChildrenAccesses().addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Collection<IExternalAccess>, Void>(ret)
 							{
-								public void resultAvailable(Collection<IExternalAccess> subs) 
+								public void customResultAvailable(Collection<IExternalAccess> subs) 
 								{
 									IComponentIdentifier found = null;
 									for(Iterator<IExternalAccess> it=subs.iterator(); it.hasNext();)
@@ -411,39 +412,55 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 										}
 									}
 									
-									if(on)
+									// Start relay mechanism agent
+									if(on && found==null)
 									{
-										if(found==null)
+										SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+											.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 										{
-											SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-												.addResultListener(ia.createResultListener(new DefaultResultListener<IComponentManagementService>()
+											public void customResultAvailable(IComponentManagementService cms) 
 											{
-												public void resultAvailable(IComponentManagementService cms) 
+												CreationInfo info = new CreationInfo(ia.getComponentIdentifier());
+												cms.createComponent(null, localtype, info, null)
+													.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 												{
-													CreationInfo info = new CreationInfo(ia.getComponentIdentifier());
-													cms.createComponent(null, localtype, info, null);
-												};
-											}));
-										}
+													public void customResultAvailable(IComponentIdentifier result)
+													{
+														ret.setResult(null);
+													}
+												});
+											};
+										}));
 									}
+									
+									// Stop relay mechanism agent
+									else if(!on && found!=null)
+									{
+										final IComponentIdentifier cid = found;
+										SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
+											.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+										{
+											public void customResultAvailable(IComponentManagementService cms) 
+											{
+												cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, Void>(ret)
+												{
+													public void customResultAvailable(Map<String,Object> result)
+													{
+														ret.setResult(null);
+													}
+												});
+											};
+										}));
+									}
+									
+									// No change required.
 									else
 									{
-										if(found!=null)
-										{
-											final IComponentIdentifier cid = found;
-											SServiceProvider.getService(ia.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-												.addResultListener(ia.createResultListener(new DefaultResultListener<IComponentManagementService>()
-											{
-												public void resultAvailable(IComponentManagementService cms) 
-												{
-													cms.destroyComponent(cid);
-												};
-											}));
-										}
+										ret.setResult(null);
 									}
 								};
 							}));
-							return null;
+							return ret;
 						}
 					});
 				}

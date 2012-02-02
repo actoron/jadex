@@ -5,6 +5,7 @@ import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.MasterSlaveDiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
@@ -162,7 +163,7 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 						socket.setBroadcast(true);
 						
 						createAwarenessInfo(AwarenessInfo.STATE_ONLINE, createMasterId())
-							.addResultListener(agent.createResultListener(new DefaultResultListener<AwarenessInfo>()
+							.addResultListener(agent.createResultListener(new DefaultResultListener<AwarenessInfo>(agent.getLogger())
 						{
 							public void resultAvailable(AwarenessInfo info)
 							{
@@ -173,6 +174,12 @@ public class BroadcastDiscoveryAgent extends MasterSlaveDiscoveryAgent
 								((BroadcastSendHandler)sender).send(data, address, port);
 //								System.out.println("local slave at: "+SUtil.getInet4Address()+" "+socket.getLocalPort());
 								getMicroAgent().getLogger().info("local slave at: "+SUtil.getInetAddress()+" "+socket.getLocalPort());
+							}
+
+							public void exceptionOccurred(Exception exception)
+							{
+								if(!(exception instanceof ComponentTerminatedException))
+									super.exceptionOccurred(exception);
 							}
 						}));
 					}

@@ -1,5 +1,6 @@
 package jadex.base.service.awareness.management;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -15,6 +16,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Property;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -43,6 +45,7 @@ import jadex.xml.annotation.XMLClassname;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -616,17 +619,16 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 */
 	public IFuture<IComponentIdentifier> createProxy(final IComponentIdentifier cid)
 	{
-		final Map	args = new HashMap();
+		final Map<String, Object>	args = new HashMap<String, Object>();
 		args.put("component", cid);
 		
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
 		
-		getServiceContainer().getRequiredService("cms").addResultListener(createResultListener(new DelegationResultListener(ret)
+		IFuture<IComponentManagementService>	cmsfut	= getServiceContainer().getRequiredService("cms");
+		cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				
 				if(cid.equals(root))
 				{
 					ret.setException(new RuntimeException("Proxy for local components not allowed"));
@@ -636,16 +638,22 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 					CreationInfo ci = new CreationInfo(args);
 					ci.setDaemon(true);
 					cms.createComponent(cid.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
-						createResultListener(new DefaultResultListener()
+						createResultListener(new DefaultResultListener<Collection<Tuple2<String, Object>>>(getLogger())
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(Collection<Tuple2<String, Object>> result)
 						{
 //							System.out.println("Proxy killed: "+source);
 							DiscoveryInfo dif = getDiscoveryInfo(cid);
 							if(dif!=null)
 								dif.setProxy(null);
 						}
-					})).addResultListener(createResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							if(!(exception instanceof ComponentTerminatedException))
+								super.exceptionOccurred(exception);
+						}
+					})).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier result)
 						{
@@ -654,10 +662,10 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 								dif.setProxy((IComponentIdentifier)result);
 							ret.setResult(result);
 						}
-					}));
+					});
 				}
 			}
-		}));
+		});
 		
 		return ret;
 	}

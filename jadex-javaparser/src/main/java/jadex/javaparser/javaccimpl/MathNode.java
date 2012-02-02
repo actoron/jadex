@@ -185,7 +185,7 @@ public class MathNode	extends ExpressionNode
 				}
 			}
 			else if((cleft==null || String.class==cleft)
-			&& (cright==null || String.class==cright)
+//			&& (cright==null || String.class==cright)
 			&& op==ADD)
 			{
 				// String concatenation: ok.

@@ -191,16 +191,16 @@ public abstract class ReceiveHandler
 			
 //			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
 			
-			agent.getMicroAgent().getRequiredService("management").addResultListener(new DefaultResultListener()
+			IFuture<IManagementService>	msfut	= agent.getMicroAgent().getRequiredService("management");
+			msfut.addResultListener(new DefaultResultListener<IManagementService>(agent.getMicroAgent().getLogger())
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(IManagementService ms)
 				{
-					IManagementService ms = (IManagementService)result;
-					ms.addAwarenessInfo(info).addResultListener(new DefaultResultListener()
+					ms.addAwarenessInfo(info).addResultListener(new DefaultResultListener<Boolean>(agent.getMicroAgent().getLogger())
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(Boolean result)
 						{
-							boolean initial = ((Boolean)result).booleanValue();
+							boolean initial = result.booleanValue();
 							if(initial && agent.isFast() && agent.isStarted() && !agent.isKilled())
 							{
 		//						System.out.println(System.currentTimeMillis()+" fast discovery: "+getComponentIdentifier()+", "+sender);
@@ -231,7 +231,19 @@ public abstract class ReceiveHandler
 								});
 							}
 						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							if(!(exception instanceof ComponentTerminatedException))
+								super.exceptionOccurred(exception);
+						}
 					});
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					if(!(exception instanceof ComponentTerminatedException))
+						super.exceptionOccurred(exception);
 				}
 			});
 		}

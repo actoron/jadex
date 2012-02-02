@@ -153,12 +153,18 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		if(clock==null)
 		{
 			SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DefaultResultListener()
+				.addResultListener(new DefaultResultListener<IClockService>(logger)
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(IClockService result)
 				{
-					clock = (IClockService)result;
+					clock = result;
 					wakeup();
+				}
+
+				public void exceptionOccurred(Exception exception)
+				{
+					if(!(exception instanceof ComponentTerminatedException))
+						super.exceptionOccurred(exception);
 				}
 			});
 		}
@@ -772,11 +778,19 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				if(component.isAtBreakpoint(desc.getBreakpoints()))
 				{
 					breakpoint_triggered	= true;
-					getCMS().addResultListener(new DefaultResultListener()
+					getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>(logger)
 					{
-						public void resultAvailable(Object result)
+						public void resultAvailable(IComponentManagementService cms)
 						{
-							((IComponentManagementService)result).suspendComponent(desc.getName());
+							cms.suspendComponent(desc.getName());
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							if(!(exception instanceof ComponentTerminatedException))
+							{
+								super.exceptionOccurred(exception);
+							}
 						}
 					});
 				}
@@ -808,11 +822,19 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					if(component.isAtBreakpoint(desc.getBreakpoints()))
 					{
 						breakpoint_triggered	= true;
-						getCMS().addResultListener(new DefaultResultListener()
+						getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>(logger)
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(IComponentManagementService cms)
 							{
-								((IComponentManagementService)result).suspendComponent(desc.getName());
+								cms.suspendComponent(desc.getName());
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								if(!(exception instanceof ComponentTerminatedException))
+								{
+									super.exceptionOccurred(exception);
+								}
 							}
 						});
 					}
@@ -875,13 +897,20 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		else
 		{
 			// Remove component from platform.
-			getCMS().addResultListener(new DefaultResultListener()
+			getCMS().addResultListener(new DefaultResultListener<IComponentManagementService>(logger)
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(IComponentManagementService cms)
 				{
-					IComponentManagementService	cms	= (IComponentManagementService)result;
-	//				cms.setComponentException(cid, e);
+//					cms.setComponentException(cid, e);
 					cms.destroyComponent(desc.getName());
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					if(!(exception instanceof ComponentTerminatedException))
+					{
+						super.exceptionOccurred(exception);
+					}
 				}
 			});
 		}
