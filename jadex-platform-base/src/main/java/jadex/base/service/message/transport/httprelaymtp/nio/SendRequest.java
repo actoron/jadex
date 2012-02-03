@@ -77,7 +77,7 @@ public class SendRequest	implements IHttpRequest
 		buffers.add(ByteBuffer.wrap(prolog));
 		buffers.add(ByteBuffer.wrap(data));
 		
-		System.out.println("Try sending with relay: "+SUtil.arrayToString(task.getReceivers()));
+//		System.out.println("Try sending with relay: "+SUtil.arrayToString(task.getReceivers()));
 
 	}
 	
@@ -132,7 +132,7 @@ public class SendRequest	implements IHttpRequest
 
 		if(token.acquire())
 		{
-			System.out.println("Sending with relay: "+address);
+//			System.out.println("Sending with relay: "+address);
 			try
 			{
 				boolean	more	= true;
@@ -176,7 +176,7 @@ public class SendRequest	implements IHttpRequest
 		}
 		else
 		{
-			System.out.println("Not sending with relay: "+address);
+//			System.out.println("Not sending with relay: "+address);
 			key.interestOps(0);
 			fut.setException(new RuntimeException("Not sending."));
 		}

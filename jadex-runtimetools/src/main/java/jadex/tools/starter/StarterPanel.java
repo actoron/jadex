@@ -1116,6 +1116,7 @@ public class StarterPanel extends JLayeredPane
 		final String globalrid = props.getStringProperty("globalrid");
 		jcc.getPlatformAccess().scheduleStep(new IComponentStep<IResourceIdentifier>()
 		{
+			@XMLClassname("getrid")
 			public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
 			{
 				URL	url	= SUtil.toURL(ridurl);

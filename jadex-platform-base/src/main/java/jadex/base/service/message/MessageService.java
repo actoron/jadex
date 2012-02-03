@@ -1214,7 +1214,7 @@ public class MessageService extends BasicService implements IMessageService
 							final ManagerSendTask task = ftmp.getFirstEntity();
 							final Future<Void> ret = ftmp.getSecondEntity();
 							
-							IComponentIdentifier[] receivers = task.getReceivers();
+							final IComponentIdentifier[] receivers = task.getReceivers();
 //							System.out.println("recs: "+SUtil.arrayToString(receivers)+" "+task.hashCode());
 							
 							if(task.getTransports().isEmpty())
@@ -1248,14 +1248,13 @@ public class MessageService extends BasicService implements IMessageService
 										// All transports failed.
 										if(last)
 										{
-											ret.setException(exception);
+											ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
+												"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())));
 										}
 									}
 								};
 								
 								Token	token	= new Token();
-								if(SUtil.arrayToString(task.getReceivers()).indexOf("alex")!=-1)
-									System.out.println("try sending: "+SUtil.arrayToString(task.getReceivers())+", "+SUtil.arrayToString(task.getTransports()));
 								for(int i=0; i<task.getTransports().size(); i++)
 								{
 									ITransport transport = (ITransport)task.getTransports().get(i);

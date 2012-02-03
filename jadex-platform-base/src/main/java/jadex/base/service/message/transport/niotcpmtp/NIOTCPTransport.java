@@ -189,13 +189,13 @@ public class NIOTCPTransport implements ITransport
 			{
 				if(token.acquire())
 				{
-					System.out.println("Sending with niotcp: "+SUtil.arrayToString(task.getReceivers()));
+//					System.out.println("Sending with niotcp: "+SUtil.arrayToString(task.getReceivers()));
 					selectorthread.sendMessage(con, task.getProlog(), task.getData())
 						.addResultListener(new DelegationResultListener<Void>(ret));
 				}
 				else
 				{
-					System.out.println("Not sending with niotcp: "+SUtil.arrayToString(task.getReceivers()));
+//					System.out.println("Not sending with niotcp: "+SUtil.arrayToString(task.getReceivers()));
 					ret.setException(new RuntimeException("Not sending."));
 				}
 			}
