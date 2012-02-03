@@ -220,9 +220,11 @@ public class SelectorThread implements Runnable
 									sc.connect(address);
 									sc.register(selector, SelectionKey.OP_CONNECT, new Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>(address, fut));
 									logger.info("Attempting connection to: "+address);
+//									System.out.println(new Date()+": Attempting connection to: "+address+", "+ret.hashCode());
 								}
 								catch(Exception e)
 								{
+//									System.out.println(new Date()+": Failed connection to: "+address+", "+ret.hashCode());
 									fut.setException(e);
 								}
 							}			
@@ -283,6 +285,7 @@ public class SelectorThread implements Runnable
 					public void resultAvailable(NIOTCPOutputConnection result)
 					{
 						cnt++;
+//						System.out.println(new Date()+": Got connection "+cnt+" of "+num+", "+ret.hashCode());
 						if(!ret.isDone())
 						{
 							ret.setResult(result);
@@ -292,6 +295,7 @@ public class SelectorThread implements Runnable
 					public void exceptionOccurred(Exception exception)
 					{
 						cnt++;
+//						System.out.println(new Date()+": No connection "+cnt+" of "+num+", "+ret.hashCode());
 						if(cnt==num && !ret.isDone())
 						{
 							ret.setExceptionIfUndone(new RuntimeException("Cannot open connection: no working addresses. "+SUtil.arrayToString(addresses)));
@@ -321,8 +325,6 @@ public class SelectorThread implements Runnable
 	 *  @param codecids	The codec ids.
 	 *  @return	A future indicating success.
 	 */
-//	public IFuture sendMessage(final NIOTCPOutputConnection con, final MessageEnvelope msg, final byte[] codecids)
-//	public IFuture<Void> sendMessage(ManagerSendTask task)
 	public IFuture<Void> sendMessage(final NIOTCPOutputConnection con, final byte[] prolog, final byte[] data)
 	{
 		final Future<Void>	ret	= new Future<Void>();

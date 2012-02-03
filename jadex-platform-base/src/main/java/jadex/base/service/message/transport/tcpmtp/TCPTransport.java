@@ -12,6 +12,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
+import jadex.commons.concurrent.Token;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -259,12 +260,23 @@ public class TCPTransport implements ITransport
 	//-------- methods --------
 	
 	/**
-	 *  Send a message.
-	 *  @param message The message to send.
-	 *  (todo: On which thread this should be done?)
+	 *  Send a message to receivers on the same platform.
+	 *  This method is called concurrently for all transports.
+	 *  Each transport should try to connect to the target platform
+	 *  (or reuse an existing connection) and afterwards acquire the token.
+	 *  
+	 *  The one transport that acquires the token (i.e. the first connected transport) gets to send the message.
+	 *  All other transports ignore the current message and return an exception,
+	 *  but may keep any established connections open for later messages.
+	 *  
+	 *  @param task The message to send.
+	 *  @param token The token to be acquired before sending. 
+	 *  @return A future indicating successful sending or exception, when the message was not send by this transport.
 	 */
-	public IFuture<Void> sendMessage(ManagerSendTask task)
+	public IFuture<Void>	sendMessage(ManagerSendTask task, Token token)
 	{
+		IFuture<Void>	ret	= null;
+		
 		// Fetch all addresses
 		Set<String>	addresses	= new LinkedHashSet<String>();
 		for(int i=0; i<task.getReceivers().length; i++)
@@ -279,18 +291,35 @@ public class TCPTransport implements ITransport
 		// Iterate over all different addresses and try to send
 		// to missing and appropriate receivers
 		String[] addrs = (String[])addresses.toArray(new String[addresses.size()]);
-		boolean	delivered	= false;
-		for(int i=0; !delivered && i<addrs.length; i++)
+		for(int i=0; ret==null && i<addrs.length; i++)
 		{
-			TCPOutputConnection con = getConnection(addrs[i]);
+			TCPOutputConnection con = getConnection(addrs[i], true);
 			if(con!=null)
 			{
-//				delivered	= con.send(new MessageEnvelope(msg, Arrays.asList(receivers), type), codecids);
-				delivered	= con.send(task.getProlog(), task.getData());
+				if(token.acquire())
+				{
+					if(con.send(task.getProlog(), task.getData()))
+					{
+						ret	= IFuture.DONE;
+					}
+					else
+					{
+						ret	= new Future<Void>(new RuntimeException("Send failed: "+con));
+					}
+				}
+				else
+				{
+					ret	= new Future<Void>(new RuntimeException("Not sending."));
+				}
 			}
 		}
 		
-		return delivered ? IFuture.DONE : new Future<Void>(new RuntimeException("Could not deliver message"));
+		if(ret==null)
+		{
+			ret	= new Future<Void>(new RuntimeException("No working connection."));			
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -330,7 +359,7 @@ public class TCPTransport implements ITransport
 	 *  @param address
 	 *  @return a connection of this type
 	 */
-	protected TCPOutputConnection getConnection(String address)
+	protected TCPOutputConnection getConnection(String address, boolean create)
 	{
 		address = address.toLowerCase();
 		
@@ -352,7 +381,7 @@ public class TCPTransport implements ITransport
 			}
 		}
 		
-		if(ret==null)
+		if(ret==null && create)
 			ret = createConnection(address);
 		if(ret instanceof TCPDeadConnection)
 			ret = null;

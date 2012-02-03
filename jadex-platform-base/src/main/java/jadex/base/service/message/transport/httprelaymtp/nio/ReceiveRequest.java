@@ -125,13 +125,13 @@ public class ReceiveRequest	implements IHttpRequest
 	/**
 	 *  Create a send request.
 	 */
-	public ReceiveRequest(IComponentIdentifier cid, String host, int port, String path, IMessageService ms, Logger logger, IExternalAccess access)	throws IOException
+	public ReceiveRequest(IComponentIdentifier cid, Tuple2<String, Integer> address, String path, IMessageService ms, Logger logger, IExternalAccess access)	throws IOException
 	{
 		this.ms	= ms;
 		this.logger	= logger;
 		this.access	= access;
 		this.cid	= cid;
-		this.address	= new Tuple2<String, Integer>(host, new Integer(port));
+		this.address	= address;
 		this.path	= path;
 	}
 	

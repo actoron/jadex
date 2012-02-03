@@ -36,6 +36,7 @@ import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IExecutable;
+import jadex.commons.concurrent.Token;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -436,8 +437,8 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm).toArray(new IComponentIdentifier[0]);
+			
 			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, getTransports(), cids, codecs);
-//			System.out.println("msgservice adding send task: "+sender+", "+SUtil.arrayToString(recs));
 			tm.addMessage(task).addResultListener(crl);
 //			task.getSendManager().addMessage(task).addResultListener(crl);
 		}
@@ -1223,18 +1224,41 @@ public class MessageService extends BasicService implements IMessageService
 							}
 							else
 							{
-								// Try next transport.
-								ITransport transport = (ITransport)task.getTransports().remove(0);
-//								transport.sendMessage(task.getMessage(), task.getMessageType().getName(), receivers, task.getCodecIds())
-								transport.sendMessage(task)
-									.addResultListener(new DelegationResultListener<Void>(ret)
+								// Let transports work asynchronously if possible.
+								// Make sure that either the result is set or the exception is propagated on last transport return.
+								IResultListener<Void>	crl	= new IResultListener<Void>()
 								{
+									int	countdown	= task.getTransports().size();
+									
+									public void resultAvailable(Void result)
+									{
+										// One transport succeeded.
+										// Do not increase counter so exception will never be last.
+										ret.setResult(result);
+									}
 									public void exceptionOccurred(Exception exception)
 									{
-										// On success re-add message with original receivers. 
-										addMessage(task).addResultListener(new DelegationResultListener<Void>(ret));
+										boolean	last;
+										synchronized(this)
+										{
+											countdown--;
+											last	= countdown==0;
+										}
+										
+										// All transports failed.
+										if(last)
+										{
+											ret.setException(exception);
+										}
 									}
-								});
+								};
+								
+								Token	token	= new Token();
+								for(int i=0; i<task.getTransports().size(); i++)
+								{
+									ITransport transport = (ITransport)task.getTransports().get(i);
+									transport.sendMessage(task, token).addResultListener(crl);
+								}
 							}
 						}
 					}

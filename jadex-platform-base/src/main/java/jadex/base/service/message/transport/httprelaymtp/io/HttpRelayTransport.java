@@ -6,6 +6,7 @@ import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.Token;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.xml.bean.JavaWriter;
@@ -67,10 +68,19 @@ public class HttpRelayTransport implements ITransport
 	
 	/**
 	 *  Send a message to receivers on the same platform.
-	 *  @param message The message to send.
-	 *  @return A future indicating if sending was successful.
+	 *  This method is called concurrently for all transports.
+	 *  Each transport should try to connect to the target platform
+	 *  (or reuse an existing connection) and afterwards acquire the token.
+	 *  
+	 *  The one transport that acquires the token (i.e. the first connected transport) gets to send the message.
+	 *  All other transports ignore the current message and return an exception,
+	 *  but may keep any established connections open for later messages.
+	 *  
+	 *  @param task The message to send.
+	 *  @param token The token to be acquired before sending. 
+	 *  @return A future indicating successful sending or exception, when the message was not send by this transport.
 	 */
-	public IFuture<Void>	sendMessage(final ManagerSendTask task)
+	public IFuture<Void>	sendMessage(ManagerSendTask task, Token token)
 	{
 		// Fetch all addresses
 		Set<String>	addresses	= new LinkedHashSet<String>();
@@ -84,45 +94,48 @@ public class HttpRelayTransport implements ITransport
 			}			
 		}
 
-		// Iterate over all different addresses and try to send
-		String[] addrs = (String[])addresses.toArray(new String[addresses.size()]);
 		boolean	delivered	= false;
 		Exception	ex	= null;
-		for(int i=0; !delivered && i<addrs.length; i++)
+		if(token.acquire())
 		{
-			try
+			// Iterate over all different addresses and try to send
+			String[] addrs = (String[])addresses.toArray(new String[addresses.size()]);
+			for(int i=0; !delivered && i<addrs.length; i++)
 			{
-				// Message service only calls transport.sendMessage() with receivers on same destination
-				// so just use first to fetch platform id.
-				IComponentIdentifier	targetid	= task.getReceivers()[0].getRoot();
-				byte[]	iddata	= JavaWriter.objectToByteArray(targetid, HttpRelayTransport.class.getClassLoader());
-				
-				URL	url	= new URL(addrs[i]);
-				HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
-				con.setRequestMethod("POST");
-				con.setDoOutput(true);
-				con.setUseCaches(false);
-				con.setRequestProperty("Content-Type", "application/octet-stream");
-				con.setRequestProperty("Content-Length", ""+(4+iddata.length+4+task.getProlog().length+task.getData().length));
-				con.connect();
-				
-				OutputStream	out	= con.getOutputStream();
-				out.write(SUtil.intToBytes(iddata.length));
-				out.write(iddata);
-				out.write(SUtil.intToBytes(task.getProlog().length+task.getData().length));
-				out.write(task.getProlog());
-				out.write(task.getData());
-				out.flush();
-				
-				int	code	= con.getResponseCode();
-				if(code!=HttpURLConnection.HTTP_OK)
-					throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
-				
-				delivered	= true;
-			}
-			catch(Exception e)
-			{
-				ex	= e;
+				try
+				{
+					// Message service only calls transport.sendMessage() with receivers on same destination
+					// so just use first to fetch platform id.
+					IComponentIdentifier	targetid	= task.getReceivers()[0].getRoot();
+					byte[]	iddata	= JavaWriter.objectToByteArray(targetid, HttpRelayTransport.class.getClassLoader());
+					
+					URL	url	= new URL(addrs[i]);
+					HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
+					con.setRequestMethod("POST");
+					con.setDoOutput(true);
+					con.setUseCaches(false);
+					con.setRequestProperty("Content-Type", "application/octet-stream");
+					con.setRequestProperty("Content-Length", ""+(4+iddata.length+4+task.getProlog().length+task.getData().length));
+					con.connect();
+					
+					OutputStream	out	= con.getOutputStream();
+					out.write(SUtil.intToBytes(iddata.length));
+					out.write(iddata);
+					out.write(SUtil.intToBytes(task.getProlog().length+task.getData().length));
+					out.write(task.getProlog());
+					out.write(task.getData());
+					out.flush();
+					
+					int	code	= con.getResponseCode();
+					if(code!=HttpURLConnection.HTTP_OK)
+						throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
+					
+					delivered	= true;
+				}
+				catch(Exception e)
+				{
+					ex	= e;
+				}
 			}
 		}
 		

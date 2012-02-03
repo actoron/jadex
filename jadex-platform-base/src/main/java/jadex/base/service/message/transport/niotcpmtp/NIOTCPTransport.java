@@ -2,12 +2,14 @@ package jadex.base.service.message.transport.niotcpmtp;
 
 import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SUtil;
+import jadex.commons.concurrent.Token;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -164,65 +166,56 @@ public class NIOTCPTransport implements ITransport
 	//-------- methods --------
 	
 	/**
-	 *  Send a message to receivers, which are all on the same platform.
-	 *  @param message The message to send.
-	 *  @param msgtype The message type.
-	 *  @param receivers	The intended receivers.
-	 *  @param codecids	codecs to be used (if any).
+	 *  Send a message to receivers on the same platform.
+	 *  This method is called concurrently for all transports.
+	 *  Each transport should try to connect to the target platform
+	 *  (or reuse an existing connection) and afterwards acquire the token.
 	 *  
-	 *  Can be called concurrently by SendManagers of message service.
+	 *  The one transport that acquires the token (i.e. the first connected transport) gets to send the message.
+	 *  All other transports ignore the current message and return an exception,
+	 *  but may keep any established connections open for later messages.
+	 *  
+	 *  @param task The message to send.
+	 *  @param token The token to be acquired before sending. 
+	 *  @return A future indicating successful sending or exception, when the message was not send by this transport.
 	 */
-//	public synchronized IFuture sendMessage(final Map message, final String msgtype, final IComponentIdentifier[] receivers, final byte[] codecids)
-	public synchronized IFuture sendMessage2(final ManagerSendTask task)
+	public IFuture<Void>	sendMessage(final ManagerSendTask task, final Token token)
 	{
-		final Future	ret	= new Future();
-		
-		// Fetch all addresses
-		Set	addrs	= new LinkedHashSet();
-		for(int i=0; i<task.getReceivers().length; i++)
+		final Future<Void>	ret	= new Future<Void>();
+		InetSocketAddress[] addresses = fetchAddresses(task.getReceivers());
+		selectorthread.getConnection(addresses).addResultListener(new ExceptionDelegationResultListener<NIOTCPOutputConnection, Void>(ret)
 		{
-			String[]	raddrs	= task.getReceivers()[i].getAddresses();
-			for(int j=0; j<raddrs.length; j++)
+			public void customResultAvailable(NIOTCPOutputConnection con)
 			{
-				InetSocketAddress	address	= parseAddress(raddrs[j]);
-				if(address!=null)
+				if(token.acquire())
 				{
-					addrs.add(address);
+					System.out.println("Sending with niotcp: "+SUtil.arrayToString(task.getReceivers()));
+					selectorthread.sendMessage(con, task.getProlog(), task.getData())
+						.addResultListener(new DelegationResultListener<Void>(ret));
 				}
-			}
-			
-		}
-		InetSocketAddress[]	addresses	= (InetSocketAddress[])addrs.toArray(new InetSocketAddress[addrs.size()]);
-		
-		selectorthread.getConnection(addresses).addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				NIOTCPOutputConnection	con	= (NIOTCPOutputConnection)result;
-//				selectorthread.sendMessage(con, new MessageEnvelope(message, Arrays.asList(receivers), msgtype), codecids)
-				selectorthread.sendMessage(con, task.getProlog(), task.getData())
-					.addResultListener(new DelegationResultListener(ret));
+				else
+				{
+					System.out.println("Not sending with niotcp: "+SUtil.arrayToString(task.getReceivers()));
+					ret.setException(new RuntimeException("Not sending."));
+				}
 			}
 		});
 		
 		return ret;
 	}
-	
+
 	/**
-	 *  Send a message.
-	 *  @param message The message to send.
+	 *  Fetch addresses correponding to receivers of a send task.
 	 */
-	public IFuture<Void>	sendMessage(final ManagerSendTask task)
+	protected InetSocketAddress[] fetchAddresses(IComponentIdentifier[] receivers)
 	{
-		final Future<Void>	ret	= new Future<Void>();
-		
 		// Fetch all addresses
-		Set	addrs	= new LinkedHashSet();
-		for(int i=0; i<task.getReceivers().length; i++)
+		Set<InetSocketAddress>	addrs	= new LinkedHashSet<InetSocketAddress>();
+		for(int i=0; i<receivers.length; i++)
 		{
-			String[]	raddrs	= task.getReceivers()[i].getAddresses();
+			String[]	raddrs	= receivers[i].getAddresses();
 			if(raddrs==null || raddrs.length==0)
-				throw new RuntimeException("Adresses must not null: "+task.getReceivers()[i]);
+				throw new RuntimeException("Adresses must not null: "+receivers[i]);
 			for(int j=0; j<raddrs.length; j++)
 			{
 				InetSocketAddress	address	= parseAddress(raddrs[j]);
@@ -233,19 +226,7 @@ public class NIOTCPTransport implements ITransport
 			}
 		}
 		InetSocketAddress[]	addresses	= (InetSocketAddress[])addrs.toArray(new InetSocketAddress[addrs.size()]);
-		
-		selectorthread.getConnection(addresses).addResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				NIOTCPOutputConnection	con	= (NIOTCPOutputConnection)result;
-//				selectorthread.sendMessage(con, new MessageEnvelope(message, Arrays.asList(receivers), msgtype), codecids)
-				selectorthread.sendMessage(con, task.getProlog(), task.getData())
-					.addResultListener(new DelegationResultListener(ret));
-			}
-		});
-		
-		return ret;
+		return addresses;
 	}
 	
 	/**

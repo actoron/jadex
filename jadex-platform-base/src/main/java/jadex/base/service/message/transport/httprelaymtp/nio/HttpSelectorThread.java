@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.Tuple2;
+import jadex.commons.concurrent.Token;
 import jadex.commons.future.Future;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -49,6 +51,9 @@ public class HttpSelectorThread
 	/** Idle connections available for reuse (host,port -> channel). */
 	protected Map<Tuple2<String, Integer>, List<SocketChannel>>	idle;
 	
+	/** List of open connections for ITransport.isConnected. */
+	protected Map<Tuple2<String, Integer>, Set<SocketChannel>>	connections;
+	
 	/** The logger. */
 	protected Logger	logger;
 	
@@ -64,19 +69,7 @@ public class HttpSelectorThread
 	public HttpSelectorThread(IComponentIdentifier root, String address, IMessageService ms, Logger logger, IExternalAccess access) throws IOException
 	{
 		this.logger	= logger;
-		String	path	= "";
-		int port	= 80;
-		String host	= address.substring(7);
-		if(host.indexOf('/')!=-1)
-		{
-			path	= host.substring(host.indexOf('/'));
-			host	= host.substring(0, host.indexOf('/'));
-		}
-		if(host.indexOf(':')!=-1)
-		{
-			port	= Integer.parseInt(host.substring(host.indexOf(':')+1));
-			host	= host.substring(0, host.indexOf(':'));			
-		}
+		Tuple2<Tuple2<String, Integer>, String> tup = HttpRelayTransport.parseAddress(address); 
 		
 		// ANDROID: Selector.open() causes an exception in a 2.2
 		// emulator due to IPv6 addresses, see:
@@ -92,8 +85,9 @@ public class HttpSelectorThread
 		queue	= new ArrayList<IHttpRequest>();
 		idle	= new HashMap<Tuple2<String, Integer>, List<SocketChannel>>();
 		connecting	= new HashSet<Tuple2<String, Integer>>();
+		connections	= Collections.synchronizedMap(new HashMap<Tuple2<String, Integer>, Set<SocketChannel>>());
 		
-		queue.add(new ReceiveRequest(root, host, port, path, ms, logger, access));
+		queue.add(new ReceiveRequest(root, tup.getFirstEntity(), tup.getSecondEntity(), ms, logger, access));
 		
 		new Thread(new Runnable()
 		{
@@ -159,6 +153,15 @@ public class HttpSelectorThread
 								{
 									reschedule	= req.handleConnect(key);
 									connecting.remove(req.getAddress());
+									
+									// Remember open connections
+									Set<SocketChannel>	chs	= connections.get(req.getAddress());
+									if(chs==null)
+									{
+										chs	= new HashSet<SocketChannel>();
+										connections.put(req.getAddress(), chs);
+									}
+									chs.add((SocketChannel)key.channel());
 								}
 								else if(key.isWritable())
 								{
@@ -210,10 +213,17 @@ public class HttpSelectorThread
 									cons.add((SocketChannel)key.channel());
 //									System.out.println("Idle connections: "+idle.size()+" of "+cons);
 								}
-//								else if(!key.channel().isOpen())
-//								{
-//									System.out.println("Closed connection: "+cons);									
-//								}
+								else if(!key.channel().isOpen())
+								{
+//									System.out.println("Closed connection: "+cons);	
+									// Remove from open connections
+									Set<SocketChannel>	chs	= connections.get(req.getAddress());
+									chs.remove((SocketChannel)key.channel());
+									if(chs.isEmpty())
+									{
+										connections.remove(req.getAddress());
+									}
+								}
 							}
 							else
 							{
@@ -224,6 +234,7 @@ public class HttpSelectorThread
 					catch(Exception e)
 					{
 						// Key may be cancelled just after isValid() has been tested.
+						HttpSelectorThread.this.logger.info("Exception in HttpSelectorThread: "+e);
 //						e.printStackTrace();
 					}
 				}
@@ -234,7 +245,7 @@ public class HttpSelectorThread
 			}
 		}).start();
 	}
-	
+
 	//-------- methods --------
 	
 	/**
@@ -256,23 +267,11 @@ public class HttpSelectorThread
 	/**
 	 *  Add a send task.
 	 */
-	public void addSendTask(ManagerSendTask task, String address, Future<Void> fut)
+	public void addSendTask(ManagerSendTask task, Token token, String address, Future<Void> fut)
 	{
-		String	path	= "";
-		int port	= 80;
-		String host	= address.substring(7);
-		if(host.indexOf('/')!=-1)
-		{
-			path	= host.substring(host.indexOf('/'));
-			host	= host.substring(0, host.indexOf('/'));
-		}
-		if(host.indexOf(':')!=-1)
-		{
-			port	= Integer.parseInt(host.substring(host.indexOf(':')+1));
-			host	= host.substring(0, host.indexOf(':'));			
-		}
+		Tuple2<Tuple2<String, Integer>, String> tup = HttpRelayTransport.parseAddress(address); 
+		SendRequest	req	= new SendRequest(task, token, fut, tup.getFirstEntity(), tup.getSecondEntity(), logger);
 		
-		SendRequest	req	= new SendRequest(task, fut, host, port, path, logger);
 		synchronized(queue)
 		{
 			queue.add(req);

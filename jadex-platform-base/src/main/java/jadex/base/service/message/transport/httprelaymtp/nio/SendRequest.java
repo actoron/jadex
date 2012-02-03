@@ -4,6 +4,7 @@ import jadex.base.service.message.ManagerSendTask;
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.concurrent.Token;
 import jadex.commons.future.Future;
 import jadex.xml.bean.JavaWriter;
 
@@ -34,6 +35,9 @@ public class SendRequest	implements IHttpRequest
 	/** The current buffer. */
 	protected int	bufnum;
 	
+	/** The token to acquire for avoiding duplicate sending. */
+	protected Token	token;
+	
 	/** The future to be informed, when sending is finished. */
 	protected Future<Void>	fut;
 	
@@ -45,12 +49,13 @@ public class SendRequest	implements IHttpRequest
 	/**
 	 *  Create a send request.
 	 */
-	public SendRequest(ManagerSendTask task, Future<Void> fut, String host, int port, String path, Logger logger)
+	public SendRequest(ManagerSendTask task, Token token, Future<Void> fut, Tuple2<String, Integer> address, String path, Logger logger)
 	{
 		this.logger	= logger;
 		this.buffers	= new LinkedList<ByteBuffer>();
 		this.fut	= fut;
-		this.address	= new Tuple2<String, Integer>(host, new Integer(port));
+		this.token	= token;
+		this.address	= address;
 		
 		// Only called with receivers on same platform, therefore safe to get root id from first receiver.
 		IComponentIdentifier	recid	= task.getReceivers()[0].getRoot();
@@ -60,7 +65,7 @@ public class SendRequest	implements IHttpRequest
 		byte[]	header	= 
 			( "POST "+path+" HTTP/1.1\r\n"
 			+ "Content-Type: application/octet-stream\r\n"
-			+ "Host: "+host+":"+port+"\r\n"
+			+ "Host: "+address.getFirstEntity()+":"+address.getSecondEntity()+"\r\n"
 			+ "Content-Length: "+(4+id.length+4+prolog.length+data.length)+"\r\n"
 			+ "\r\n"
 			).getBytes();
@@ -97,7 +102,16 @@ public class SendRequest	implements IHttpRequest
 			SocketChannel	sc	= (SocketChannel)key.channel();
 			boolean	finished	= sc.finishConnect();
 			assert finished;
-			key.interestOps(SelectionKey.OP_WRITE);
+			if(token.acquire())
+			{
+				System.out.println("Sending with relay: "+address);
+				key.interestOps(SelectionKey.OP_WRITE);
+			}
+			else
+			{
+				System.out.println("Not sending with relay: "+address);
+				key.interestOps(0);
+			}
 		}
 		catch(Exception e)
 		{
