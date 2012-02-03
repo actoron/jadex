@@ -37,7 +37,7 @@
 	
 	<arguments>
 		<!--Context ID. -->
-		<argument name="CoordinationContextID" class="String">"sodekovs-2"</argument>		
+		<argument name="CoordinationContextID" class="String">"sodekovs-1"</argument>		
 	</arguments>
 
 			

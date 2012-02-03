@@ -3,7 +3,10 @@
  */
 package sodekovs.coordination.distributed.examples.heterogeneous.service;
 
-import jadex.bdi.runtime.IGoal;
+import java.util.HashMap;
+
+import deco4mas.distributed.coordinate.environment.CoordinationSpace;
+import jadex.bdi.runtime.IGoal; 
 import jadex.bdi.runtime.Plan;
 
 /**
@@ -23,7 +26,12 @@ public class InitialPlan extends Plan {
 	@Override
 	public void body() {
 		// System.out.println("ExampleBDIAgent body() in InitalPlan called.");
-		String message = "Hello I'm the example BDI agent and it is a pleasure talking with you!";
+		//Get the CoordinationContextID
+		CoordinationSpace coordSpace = (CoordinationSpace) getBeliefbase().getBelief("env").getFact();		
+		HashMap<String,Object> appArgs = (HashMap<String, Object>) coordSpace.getExternalAccess().getArguments().get(this);
+		String coordinationContextID = (String) appArgs.get("CoordinationContextID");
+		
+		String message = "#I belong to CoordinationContext: "+ coordinationContextID+ "# Hello I'm the example BDI agent and it is a pleasure talking with you!";
 
 		waitFor(2000);
 
