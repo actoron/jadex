@@ -67,6 +67,12 @@ public class CachedServiceMechanism extends ServiceMechanism {
 			services = SServiceProvider.getServices(applicationInterpreter.getServiceProvider(), ICoordinationService.class, RequiredServiceInfo.SCOPE_GLOBAL).get(new ThreadSuspendable(this));
 			perceiveCount = 0;
 
+			for (ICoordinationService service : services) {
+				if (!service.getCoordinationContextID().equalsIgnoreCase(coordinationContextID)) {
+					services.remove(service);
+				}
+			}
+			
 			System.out.println("Updated service cache.");
 		}
 

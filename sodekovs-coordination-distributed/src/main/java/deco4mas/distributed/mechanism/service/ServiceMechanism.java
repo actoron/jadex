@@ -33,12 +33,12 @@ public class ServiceMechanism extends CoordinationMechanism {
 		super(space);
 
 		// TODO Der Cast ist ein Hack bis Lars und Alex die Schnittstellen von Jadex anpassen
-		this.applicationInterpreter = (StatelessAbstractInterpreter) space.getApplicatioInternalAccess();		
-		
-		//If it's a distributed application, then it has a contextID.
-		HashMap<String,Object> appArgs = (HashMap<String, Object>) this.applicationInterpreter.getArguments();
+		this.applicationInterpreter = (StatelessAbstractInterpreter) space.getApplicatioInternalAccess();
+
+		// If it's a distributed application, then it has a contextID.
+		HashMap<String, Object> appArgs = (HashMap<String, Object>) this.applicationInterpreter.getArguments();
 		this.coordinationContextID = (String) appArgs.get("CoordinationContextID");
-		
+
 	}
 
 	@Override
@@ -57,10 +57,10 @@ public class ServiceMechanism extends CoordinationMechanism {
 					@Override
 					public void resultAvailable(Collection<ICoordinationService> result) {
 						for (ICoordinationService service : result) {
-							
-							if(service.getCoordinationContextID().equalsIgnoreCase(coordinationContextID)){
-							service.publish(ci);
-							}else{
+
+							if (service.getCoordinationContextID().equalsIgnoreCase(coordinationContextID)) {
+								service.publish(ci);
+							} else {
 								System.out.println("Service does not belong to context.");
 							}
 						}
