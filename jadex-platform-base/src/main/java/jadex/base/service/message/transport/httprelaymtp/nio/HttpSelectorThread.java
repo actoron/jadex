@@ -144,7 +144,7 @@ public class HttpSelectorThread
 						
 						// Wait for an event one of the registered channels
 //						System.out.println("selector idle");
-						selector.select();
+						selector.select();	// Todo: use selector.select(timeout) and get rid of timer!? spares one thread and avoids need for synchronization.
 
 						// Iterate over the set of keys for which events are available
 						Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
@@ -320,11 +320,25 @@ public class HttpSelectorThread
 				try
 				{
 					logger.info("nio-relay closing connection due to inactivity: "+sc);
+					
+					// close() cancels the key and does not generate nio event.
+					// therefore we need manual cleanup and re-add request request 
+//					SelectionKey	key	= sc.keyFor(selector);
+//					IHttpRequest	req	= (IHttpRequest)key.attachment();
+//					connecting.remove(req.getAddress());
+//					if(idle.get(req.getAddress())!=null)
+//						idle.get(req.getAddress()).remove(sc);
+//					synchronized(queue)
+//					{
+//						queue.add(req);
+//					}
+//					key.cancel();
 					sc.close();
+					selector.wakeup();	// close() takes effect on next selector.select()
 				}
 				catch(IOException e)
 				{
-//					e.printStackTrace();
+					e.printStackTrace();
 				}
 			}
 		};
