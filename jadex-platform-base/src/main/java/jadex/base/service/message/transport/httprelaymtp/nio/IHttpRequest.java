@@ -15,13 +15,10 @@ public interface IHttpRequest
 	public Tuple2<String, Integer>	getAddress();
 	
 	/**
-	 *  Handle connection success or error.
-	 *  Has to change the interest to OP_WRITE, if connection was successful.
-	 *  
-	 *  @return	In case of errors may request to be rescheduled on a new connection:
-	 *    -1 no reschedule, 0 immediate reschedule, >0 reschedule after delay (millis.)
+	 *  Called after (re-)connection success.
+	 *  Here, the request should be re-inited.
 	 */
-	public int handleConnect(SelectionKey key);
+	public void	handleConnect();
 	
 	/**
 	 *  Write the HTTP request to the NIO connection.

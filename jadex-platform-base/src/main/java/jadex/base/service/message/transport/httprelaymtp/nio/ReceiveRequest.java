@@ -146,21 +146,13 @@ public class ReceiveRequest	implements IHttpRequest
 	}
 	
 	/**
-	 *  Handle connection success or error.
-	 *  Has to change the interest to OP_WRITE, if connection was successful.
-	 *  
-	 *  @return	In case of errors may request to be rescheduled on a new connection:
-	 *    -1 no reschedule, 0 immediate reschedule, >0 reschedule after delay (millis.)
+	 *  Called after (re-)connection success.
+	 *  Here, the request should be re-inited.
 	 */
-	public int handleConnect(SelectionKey key)
+	public void	handleConnect()
 	{
-		int	reschedule	= -1;
 		try
 		{
-			SocketChannel	sc	= (SocketChannel)key.channel();
-			boolean	finished	= sc.finishConnect();
-			assert finished;
-			key.interestOps(SelectionKey.OP_WRITE);
 			String	xmlid	= JavaWriter.objectToXML(cid, getClass().getClassLoader());
 			byte[]	header	= getBytes(
 				"GET "+path+"?id="+URLEncoder.encode(xmlid, "UTF-8")+" HTTP/1.1\r\n"
@@ -169,13 +161,10 @@ public class ReceiveRequest	implements IHttpRequest
 			buf	= ByteBuffer.wrap(header);
 			state	= STATE_INITIAL;
 		}
-		catch(Exception e)
+		catch(UnsupportedEncodingException e)
 		{
-			logger.info("Could not connect to relay server (re-attempting in 30 seconds): "+e);
-			key.cancel();
-			reschedule	= 30000;
+			throw new RuntimeException(e);
 		}
-		return reschedule;
 	}
 	
 	/**

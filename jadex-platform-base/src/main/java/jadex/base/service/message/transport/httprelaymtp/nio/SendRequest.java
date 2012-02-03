@@ -92,28 +92,11 @@ public class SendRequest	implements IHttpRequest
 	}
 	
 	/**
-	 *  Handle connection success or error.
-	 *  Has to change the interest to OP_WRITE, if connection was successful.
-	 *  
-	 *  @return	In case of errors may request to be rescheduled on a new connection:
-	 *    -1 no reschedule, 0 immediate reschedule, >0 reschedule after delay (millis.)
+	 *  Called after (re-)connection success.
+	 *  Here, the request should be re-inited.
 	 */
-	public int handleConnect(SelectionKey key)
+	public void	handleConnect()
 	{
-		try
-		{
-			SocketChannel	sc	= (SocketChannel)key.channel();
-			boolean	finished	= sc.finishConnect();
-			assert finished;
-			key.interestOps(SelectionKey.OP_WRITE);
-		}
-		catch(Exception e)
-		{
-			logger.info("Message could not be sent: "+e);
-			fut.setException(e);
-			key.cancel();
-		}
-		return -1;
 	}
 	
 	/**

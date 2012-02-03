@@ -84,7 +84,7 @@ public class HttpSelectorThread
 		selector	= Selector.open();
 		queue	= new ArrayList<IHttpRequest>();
 		idle	= new HashMap<Tuple2<String, Integer>, List<SocketChannel>>();
-		connecting	= new HashSet<Tuple2<String, Integer>>();
+		connecting	= Collections.synchronizedSet(new HashSet<Tuple2<String, Integer>>());
 		connections	= Collections.synchronizedMap(new HashMap<Tuple2<String, Integer>, Set<SocketChannel>>());
 		
 		queue.add(new ReceiveRequest(root, tup.getFirstEntity(), tup.getSecondEntity(), ms, logger, access));
@@ -116,8 +116,9 @@ public class HttpSelectorThread
 						{
 							if(idle.containsKey(req.getAddress()) && !idle.get(req.getAddress()).isEmpty() )
 							{
-//								System.out.println("Reusing connection");
 								SocketChannel	sc	= idle.get(req.getAddress()).remove(0);
+								// Can not find out if connection still works!? Just try request and reschedule on connection problems.
+//								System.out.println("Reusing connection: "+sc.isOpen()+", "+sc.isConnected());
 								SelectionKey	key	= sc.keyFor(selector);
 								key.interestOps(SelectionKey.OP_WRITE);
 								key.attach(req);
@@ -151,18 +152,32 @@ public class HttpSelectorThread
 								
 								if(key.isConnectable())
 								{
-									reschedule	= req.handleConnect(key);
-									connecting.remove(req.getAddress());
-									HttpSelectorThread.this.logger.info("nio-relay connected to: "+req.getAddress().getFirstEntity()+":"+req.getAddress().getSecondEntity());
-									
-									// Remember open connections
-									Set<SocketChannel>	chs	= connections.get(req.getAddress());
-									if(chs==null)
+									try
 									{
-										chs	= new HashSet<SocketChannel>();
-										connections.put(req.getAddress(), chs);
+										SocketChannel	sc	= (SocketChannel)key.channel();
+										boolean	finished	= sc.finishConnect();
+										assert finished;
+										key.interestOps(SelectionKey.OP_WRITE);
+
+										req.handleConnect();
+										HttpSelectorThread.this.logger.info("nio-relay connected to: "+req.getAddress().getFirstEntity()+":"+req.getAddress().getSecondEntity());
+										connecting.remove(req.getAddress());
+										
+										// Remember open connections
+										Set<SocketChannel>	chs	= connections.get(req.getAddress());
+										if(chs==null)
+										{
+											chs	= new HashSet<SocketChannel>();
+											connections.put(req.getAddress(), chs);
+										}
+										chs.add((SocketChannel)key.channel());
 									}
-									chs.add((SocketChannel)key.channel());
+									catch(Exception e)
+									{
+										HttpSelectorThread.this.logger.info("Could not connect to relay server (re-attempting in 30 seconds): "+e);
+										key.cancel();
+										reschedule	= 30000;
+									}
 								}
 								else if(key.isWritable())
 								{
@@ -195,6 +210,7 @@ public class HttpSelectorThread
 										{
 											synchronized(queue)
 											{
+												connecting.remove(freq.getAddress());
 												queue.add(freq);
 												selector.wakeup();
 											}
@@ -219,10 +235,13 @@ public class HttpSelectorThread
 //									System.out.println("Closed connection: "+cons);	
 									// Remove from open connections
 									Set<SocketChannel>	chs	= connections.get(req.getAddress());
-									chs.remove((SocketChannel)key.channel());
-									if(chs.isEmpty())
+									if(chs!=null)
 									{
-										connections.remove(req.getAddress());
+										chs.remove((SocketChannel)key.channel());
+										if(chs.isEmpty())
+										{
+											connections.remove(req.getAddress());
+										}
 									}
 								}
 							}
