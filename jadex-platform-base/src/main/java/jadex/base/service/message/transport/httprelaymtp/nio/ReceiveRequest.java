@@ -1,5 +1,6 @@
 package jadex.base.service.message.transport.httprelaymtp.nio;
 
+import jadex.base.service.awareness.discovery.relay.IRelayAwarenessService;
 import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
@@ -276,6 +277,22 @@ public class ReceiveRequest	implements IHttpRequest
 					
 					if(matchpos==4)
 					{
+						// Connected to relay.
+						SServiceProvider.getService(access.getServiceProvider(), IRelayAwarenessService.class, Binding.SCOPE_PLATFORM)
+							.addResultListener(new IResultListener<IRelayAwarenessService>()
+						{
+							public void resultAvailable(IRelayAwarenessService ras)
+							{
+								ras.connected(SRelay.ADDRESS_SCHEME+address.getFirstEntity()+":"+address.getSecondEntity()+path);
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								// No awa service -> ignore awa infos.
+							}
+						});
+
+						
 						state	= STATE_READING_CHUNK_HEADER;
 						oldstate	= STATE_READING_MSG_HEADER;	// After chunk header start reading messages.
 						matchpos	= 0;
@@ -560,6 +577,24 @@ public class ReceiveRequest	implements IHttpRequest
 		}
 		catch(Exception e)
 		{
+			// Disconnected from relay.
+			if(state>STATE_READING_HEADER_REST)
+			{
+				SServiceProvider.getService(access.getServiceProvider(), IRelayAwarenessService.class, Binding.SCOPE_PLATFORM)
+					.addResultListener(new IResultListener<IRelayAwarenessService>()
+				{
+					public void resultAvailable(IRelayAwarenessService ras)
+					{
+						ras.connected(SRelay.ADDRESS_SCHEME+address.getFirstEntity()+":"+address.getSecondEntity()+path);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// No awa service -> ignore awa infos.
+					}
+				});
+			}
+			
 			reschedule	= 0;
 //			e.printStackTrace();
 			logger.info("Response error (reconnecting immediately): "+e);

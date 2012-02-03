@@ -9,8 +9,11 @@ import jadex.base.service.message.transport.codecs.JadexXMLCodec;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.TimeoutResultListener;
+import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -19,6 +22,9 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.Implementation;
+import jadex.micro.annotation.ProvidedService;
+import jadex.micro.annotation.ProvidedServices;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,14 +36,17 @@ import java.util.Map;
  * Control the discovery mechanism of the relay transport.
  */
 @Agent
-public class RelayDiscoveryAgent extends DiscoveryAgent
+@ProvidedServices(@ProvidedService(type=IRelayAwarenessService.class,
+	implementation=@Implementation(expression="$component.getPojoAgent()")))
+@Service
+public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarenessService
 {
 	//-------- attributes --------
 	
 	/** True, if currently sending an info. */
 	protected boolean	sending;
 	
-	//-------- methods --------
+	//-------- agent methods --------
 	
 	/**
 	 *  After starting, perform initial registration at server.
@@ -56,8 +65,49 @@ public class RelayDiscoveryAgent extends DiscoveryAgent
 	@AgentKilled
 	public IFuture<Void>	agentkilled()
 	{
-		return sendInfo(true);
+		// Only wait 5 seconds for disconnect message.
+		Future<Void>	ret	= new Future<Void>();
+		sendInfo(true).addResultListener(new TimeoutResultListener<Void>(5000, agent.getExternalAccess(), new DelegationResultListener<Void>(ret)
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				if(exception instanceof TimeoutException)
+				{
+					// Ignore timeout exception.
+					super.resultAvailable(null);
+				}
+				else
+				{
+					super.exceptionOccurred(exception);
+				}
+			}
+		}));
+		return ret;
 	}
+	
+	//-------- service methods --------
+	
+	/**
+	 *  Let the awareness now that the transport connected to an address.
+	 *  @param address	The relay address.
+	 */
+	public IFuture<Void>	connected(String address)
+	{
+		agent.getLogger().info("Awareness connected: "+address);
+		return IFuture.DONE;
+	}
+
+	/**
+	 *  Let the awareness now that the transport was disconnected from an address.
+	 *  @param address	The relay address.
+	 */
+	public IFuture<Void>	disconnected(String address)
+	{
+		agent.getLogger().info("Awareness disconnected: "+address);
+		return IFuture.DONE;		
+	}
+
+	//-------- internal methods --------
 	
 	/**
 	 *  Send an awareness info.
@@ -123,7 +173,6 @@ public class RelayDiscoveryAgent extends DiscoveryAgent
 					agent.getLogger().info("Sending awareness info to server...success");
 				}
 				
-				@Override
 				public void exceptionOccurred(Exception exception)
 				{
 					agent.getLogger().info("Sending awareness info to server...failed: "+exception);
