@@ -19,5 +19,10 @@
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:text="Start Jadex Agent"
-	android:id="@+id/startAgentButton"/>	
+	android:id="@+id/startAgentButton"/>
+<Button 
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:text="Start Jadex BPMN Component"
+	android:id="@+id/startBpmnButton"/>
 </LinearLayout>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:bpmn="http://stp.eclipse.org/bpmn" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.2/notation" xmi:id="_rxcZ8E29EeGhL9ZmcZLCEw" type="Bpmn" name="SimpleWorkflow.bpmn_diagram" measurementUnit="Pixel">
+  <children xmi:type="notation:Node" xmi:id="_ryI9gE29EeGhL9ZmcZLCEw" type="1001">
+    <children xmi:type="notation:Node" xmi:id="_ryKysE29EeGhL9ZmcZLCEw" type="4008"/>
+    <children xmi:type="notation:Node" xmi:id="_ryMA0E29EeGhL9ZmcZLCEw" type="5001">
+      <children xmi:type="notation:Node" xmi:id="_ryPEIE29EeGhL9ZmcZLCEw" type="2001">
+        <children xmi:type="notation:Node" xmi:id="_ryPrME29EeGhL9ZmcZLCEw" type="4001"/>
+        <styles xmi:type="notation:FontStyle" xmi:id="_ryPEIU29EeGhL9ZmcZLCEw" fontName="Arial"/>
+        <styles xmi:type="notation:DescriptionStyle" xmi:id="_ryPEIk29EeGhL9ZmcZLCEw"/>
+        <styles xmi:type="notation:FillStyle" xmi:id="_ryPEI029EeGhL9ZmcZLCEw"/>
+        <styles xmi:type="notation:LineStyle" xmi:id="_ryPEJE29EeGhL9ZmcZLCEw" lineColor="0"/>
+        <element xmi:type="bpmn:Activity" href="SimpleWorkflow.bpmn#_ryEsEU29EeGhL9ZmcZLCEw"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ryQSQE29EeGhL9ZmcZLCEw" x="55" y="70" width="111" height="61"/>
+      </children>
+      <styles xmi:type="notation:DrawerStyle" xmi:id="_ryMA0U29EeGhL9ZmcZLCEw"/>
+      <styles xmi:type="notation:SortingStyle" xmi:id="_ryMA0k29EeGhL9ZmcZLCEw"/>
+      <styles xmi:type="notation:FilteringStyle" xmi:id="_ryMA0029EeGhL9ZmcZLCEw"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_ryI9gU29EeGhL9ZmcZLCEw" fontName="Arial"/>
+    <styles xmi:type="notation:DescriptionStyle" xmi:id="_ryI9gk29EeGhL9ZmcZLCEw"/>
+    <styles xmi:type="notation:FillStyle" xmi:id="_ryI9g029EeGhL9ZmcZLCEw" fillColor="16771304"/>
+    <styles xmi:type="notation:LineStyle" xmi:id="_ryI9hE29EeGhL9ZmcZLCEw" lineColor="11119017"/>
+    <element xmi:type="bpmn:Pool" href="SimpleWorkflow.bpmn#_ryEFAU29EeGhL9ZmcZLCEw"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ryMn4E29EeGhL9ZmcZLCEw" x="16" y="16" width="1500" height="200"/>
+  </children>
+  <styles xmi:type="notation:PageStyle" xmi:id="_rxcZ8U29EeGhL9ZmcZLCEw"/>
+  <styles xmi:type="notation:GuideStyle" xmi:id="_rxcZ8k29EeGhL9ZmcZLCEw"/>
+  <styles xmi:type="notation:DescriptionStyle" xmi:id="_rxcZ8029EeGhL9ZmcZLCEw"/>
+  <element xmi:type="bpmn:BpmnDiagram" href="SimpleWorkflow.bpmn#_rxRa0U29EeGhL9ZmcZLCEw"/>
+</notation:Diagram>

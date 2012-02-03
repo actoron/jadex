@@ -22,6 +22,12 @@
 		</dependency>
 
 		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-bpmn</artifactId>
+			<version>0.0.5-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>
 			<version>2.2.1</version>
@@ -48,6 +54,7 @@
 				</excludes>
 				<includes>
 					<include>**/*.xml</include>
+					<include>**/*.bpmn</include>
 				</includes>
 			</resource>
 		</resources>

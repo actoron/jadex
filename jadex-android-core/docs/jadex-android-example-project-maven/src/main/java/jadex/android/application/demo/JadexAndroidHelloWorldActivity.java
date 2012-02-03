@@ -2,6 +2,7 @@ package jadex.android.application.demo;
 
 import jadex.android.JadexAndroidActivity;
 import jadex.base.Starter;
+import jadex.bpmn.runtime.task.PrintTask;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -20,7 +21,6 @@ import jadex.xml.annotation.XMLClassname;
 import java.util.HashMap;
 import java.util.UUID;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -33,6 +33,7 @@ import android.widget.Toast;
 public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 	
 	private Button startAgentButton;
+	private Button startBPMNButton;
 	
 	private IExternalAccess extAcc;
 	
@@ -60,6 +61,10 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 		startAgentButton = (Button) findViewById(R.id.startAgentButton);
 		startAgentButton.setOnClickListener(buttonListener);
 		startAgentButton.setEnabled(false);
+		
+		startBPMNButton = (Button) findViewById(R.id.startBpmnButton);
+		startBPMNButton.setOnClickListener(buttonListener);
+		startBPMNButton.setEnabled(false);
 		
 		textView = (TextView) findViewById(R.id.infoTextView);
 		
@@ -91,7 +96,7 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 										"-extensions", "null",
 										"-wspublish", "false",
 										"-android", "true",
-										"-kernels", "\"component, micro\"",
+										"-kernels", "\"component, micro, bpmn\"",
 //										"-tcptransport", "false",
 //										"-niotcptransport", "false",
 //										"-relaytransport", "true",
@@ -137,6 +142,35 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 								agentCreatedResultListener);
 					}
 				});
+			} else if (view == startBPMNButton) {
+				startBPMNButton.setEnabled(false);
+				
+				IFuture<IComponentManagementService> scheduleStep = extAcc
+						.scheduleStep(new IComponentStep() {
+							@XMLClassname("create-component")
+							public IFuture<IComponentManagementService> execute(IInternalAccess ia) {
+								Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
+								SServiceProvider.getService(
+										ia.getServiceContainer(),
+										IComponentManagementService.class,
+										RequiredServiceInfo.SCOPE_PLATFORM)
+										.addResultListener(
+												ia.createResultListener(new DelegationResultListener<IComponentManagementService>(
+														ret)));
+
+								return ret;
+							}
+						});
+				scheduleStep.addResultListener(new DefaultResultListener<IComponentManagementService>() {
+
+					public void resultAvailable(IComponentManagementService cms) {
+						HashMap<String, Object> args = new HashMap<String, Object>();
+
+						args.put("androidContext", JadexAndroidHelloWorldActivity.this);
+						cms.createComponent("SimpleWorkflow " + num,
+								"jadex/android/application/demo/bpmn/SimpleWorkflow.bpmn", new CreationInfo(args), null).addResultListener(bpmnCreatedResultListener);
+					}
+				});
 			}
 		}
 	};
@@ -149,6 +183,7 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 
 				public void run() {
 					startAgentButton.setEnabled(true);
+					startBPMNButton.setEnabled(true);
 					textView.setText("Platform started");
 				}
 			});
@@ -164,6 +199,20 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 					textView.setText("Agents started: " + num);
 					num++;
 					startAgentButton.setEnabled(true);
+				}
+			});
+		}
+	};
+	
+	private IResultListener<IComponentIdentifier> bpmnCreatedResultListener = new DefaultResultListener<IComponentIdentifier>() {
+
+		public void resultAvailable(IComponentIdentifier arg0) {
+			runOnUiThread(new Runnable() {
+
+				public void run() {
+					textView.setText("BPMN component started: " + num);
+					num++;
+					startBPMNButton.setEnabled(true);
 				}
 			});
 		}
