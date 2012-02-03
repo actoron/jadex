@@ -154,7 +154,7 @@ public class SendRequest	implements IHttpRequest
 					buffers.get(i).rewind();
 				reschedule	= 0;
 				key.cancel();
-				logger.info("rescheduling message due to failed request: "+e);
+				logger.info("nio-relay rescheduling message due to failed request: "+e);
 			}
 		}
 		else
@@ -239,7 +239,7 @@ public class SendRequest	implements IHttpRequest
 				buffers.get(i).rewind();
 			reschedule	= 0;
 			key.cancel();
-			logger.info("rescheduling message due to failed response: "+e);
+			logger.info("nio-relay rescheduling message due to failed response: "+e);
 		}
 		
 		return reschedule;

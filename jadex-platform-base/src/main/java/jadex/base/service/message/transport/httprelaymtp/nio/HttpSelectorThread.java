@@ -1,6 +1,7 @@
 package jadex.base.service.message.transport.httprelaymtp.nio;
 
 import jadex.base.service.message.ManagerSendTask;
+import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.message.IMessageService;
@@ -54,6 +55,9 @@ public class HttpSelectorThread
 	/** List of open connections for ITransport.isConnected. */
 	protected Map<Tuple2<String, Integer>, Set<SocketChannel>>	connections;
 	
+	/** The timeout tasks for the connections. */
+	protected Map<SocketChannel, TimerTask>	timeouts;
+	
 	/** The logger. */
 	protected Logger	logger;
 	
@@ -86,6 +90,8 @@ public class HttpSelectorThread
 		idle	= new HashMap<Tuple2<String, Integer>, List<SocketChannel>>();
 		connecting	= Collections.synchronizedSet(new HashSet<Tuple2<String, Integer>>());
 		connections	= Collections.synchronizedMap(new HashMap<Tuple2<String, Integer>, Set<SocketChannel>>());
+		timeouts	= new HashMap<SocketChannel, TimerTask>();
+		timer	= new Timer(true);
 		
 		queue.add(new ReceiveRequest(root, tup.getFirstEntity(), tup.getSecondEntity(), ms, logger, access));
 		
@@ -127,10 +133,12 @@ public class HttpSelectorThread
 							{
 								HttpSelectorThread.this.logger.info("nio-relay creating connection to: "+req.getAddress().getFirstEntity()+":"+req.getAddress().getSecondEntity());
 								connecting.add(req.getAddress());
-								SocketChannel	sc	= SocketChannel.open();
+								final SocketChannel	sc	= SocketChannel.open();
 								sc.configureBlocking(false);
 								sc.connect(new InetSocketAddress(req.getAddress().getFirstEntity(), req.getAddress().getSecondEntity().intValue()));
 								sc.register(selector, SelectionKey.OP_CONNECT, req);
+								
+								addTimeoutTask(sc);
 							}
 						}
 						
@@ -149,12 +157,15 @@ public class HttpSelectorThread
 							{
 								int	reschedule	= -1;
 								req	= (IHttpRequest)key.attachment();
+								SocketChannel	sc	= (SocketChannel)key.channel();
+								TimerTask	timeout	= timeouts.get(sc);
+								timeout.cancel();
+								addTimeoutTask(sc);
 								
 								if(key.isConnectable())
 								{
 									try
 									{
-										SocketChannel	sc	= (SocketChannel)key.channel();
 										boolean	finished	= sc.finishConnect();
 										assert finished;
 										key.interestOps(SelectionKey.OP_WRITE);
@@ -174,7 +185,7 @@ public class HttpSelectorThread
 									}
 									catch(Exception e)
 									{
-										HttpSelectorThread.this.logger.info("Could not connect to relay server (re-attempting in 30 seconds): "+e);
+										HttpSelectorThread.this.logger.info("nio-relay could not connect to relay server (re-attempting in 30 seconds): "+e);
 										key.cancel();
 										reschedule	= 30000;
 									}
@@ -199,10 +210,6 @@ public class HttpSelectorThread
 								}
 								else if(reschedule>0)
 								{
-									if(timer==null)
-									{
-										timer	= new Timer(true);
-									}
 									final IHttpRequest	freq	= req;
 									timer.schedule(new TimerTask()
 									{
@@ -232,7 +239,9 @@ public class HttpSelectorThread
 								}
 								else if(!key.channel().isOpen())
 								{
-//									System.out.println("Closed connection: "+cons);	
+//									System.out.println("Closed connection: "+cons);
+									timeouts.remove(sc);
+									
 									// Remove from open connections
 									Set<SocketChannel>	chs	= connections.get(req.getAddress());
 									if(chs!=null)
@@ -254,7 +263,7 @@ public class HttpSelectorThread
 					catch(Exception e)
 					{
 						// Key may be cancelled just after isValid() has been tested.
-						HttpSelectorThread.this.logger.info("Exception in HttpSelectorThread: "+e);
+						HttpSelectorThread.this.logger.info("nio-relay exception in HttpSelectorThread: "+e);
 //						e.printStackTrace();
 					}
 				}
@@ -297,5 +306,31 @@ public class HttpSelectorThread
 			queue.add(req);
 		}
 		selector.wakeup();
+	}
+
+	/**
+	 *  Add a task to close a socket channel after some period of inactivity.
+	 */
+	protected void addTimeoutTask(final SocketChannel sc)
+	{
+		TimerTask	timeout	= new TimerTask()
+		{
+			public void run()
+			{
+				try
+				{
+					logger.info("nio-relay closing connection due to inactivity: "+sc);
+					sc.close();
+				}
+				catch(IOException e)
+				{
+//					e.printStackTrace();
+				}
+			}
+		};
+		
+		// Add 25% to ping delay (30 sec) for timeout.
+		timer.schedule(timeout, (long)(SRelay.PING_DELAY*1.25));
+		timeouts.put(sc, timeout);
 	}
 }

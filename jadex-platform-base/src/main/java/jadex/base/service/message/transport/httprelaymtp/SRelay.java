@@ -22,4 +22,7 @@ public class SRelay
 	
 	/** The awareness info message type (awareness info content). */
 	public static final byte	MSGTYPE_AWAINFO	= 3;
+	
+	/** The delay (ms) between server pings (for checking if receiving connection is still active). */
+	public static final long	PING_DELAY	= 30000;
 }

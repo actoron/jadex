@@ -159,7 +159,7 @@ public class RelayServlet extends HttpServlet
 						try
 						{
 							// Get next request from queue.
-							Message	msg	= queue.dequeue(30000);	// Todo: make ping delay configurable on per client basis
+							Message	msg	= queue.dequeue(SRelay.PING_DELAY);	// Todo: make ping delay configurable on per client basis
 							try
 							{
 								// Send message header.

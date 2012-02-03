@@ -197,7 +197,7 @@ public class ReceiveRequest	implements IHttpRequest
 		catch(Exception e)
 		{
 			reschedule	= 0;
-			logger.info("Request error (reconnect immediately): "+e);
+			logger.info("nio-relay request error (reconnect immediately): "+e);
 //			e.printStackTrace();
 			key.cancel();
 		}
@@ -505,7 +505,7 @@ public class ReceiveRequest	implements IHttpRequest
 									}
 									catch(Exception e)
 									{
-										logger.warning("Error receiving awareness info: "+e);										
+										logger.warning("nio-relay error receiving awareness info: "+e);										
 									}
 								}
 								
@@ -585,7 +585,7 @@ public class ReceiveRequest	implements IHttpRequest
 				{
 					public void resultAvailable(IRelayAwarenessService ras)
 					{
-						ras.connected(SRelay.ADDRESS_SCHEME+address.getFirstEntity()+":"+address.getSecondEntity()+path);
+						ras.disconnected(SRelay.ADDRESS_SCHEME+address.getFirstEntity()+":"+address.getSecondEntity()+path);
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -597,7 +597,7 @@ public class ReceiveRequest	implements IHttpRequest
 			
 			reschedule	= 0;
 //			e.printStackTrace();
-			logger.info("Response error (reconnecting immediately): "+e);
+			logger.info("nio-relay response error (reconnecting immediately): "+e);
 			key.cancel();
 		}
 		
