@@ -75,7 +75,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	 */
 	public <T> IFuture<T> getService(final RequiredServiceInfo info, RequiredServiceBinding bd, final boolean rebind)
 	{
-		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internal!?
+		// Hack!!! Only works for local infos, but DefaultServiceFetcher only used internally!?
 		final Class	type	= info.getType().getType();
 		
 //		if(info.getType().toString().indexOf("IDis")!=-1)

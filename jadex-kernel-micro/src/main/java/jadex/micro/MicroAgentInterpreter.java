@@ -230,14 +230,16 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 		
 		if(sernames.length>0)
 		{
-			CounterResultListener lis = new CounterResultListener(sernames.length, new DelegationResultListener(ret));
+			CounterResultListener<Void> lis = new CounterResultListener<Void>(sernames.length, 
+				new DelegationResultListener<Void>(ret));
 	
 			for(int i=0; i<sernames.length; i++)
 			{
 				final Field[] fields = model.getServiceInjections(sernames[i]);
-				final Future fut = new Future();
+				final Future<Void> fut = new Future<Void>();
 				fut.addResultListener(lis);
-				getServiceContainer().getRequiredService(sernames[i]).addResultListener(new DelegationResultListener(fut)
+				getServiceContainer().getRequiredService(sernames[i])
+					.addResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -256,6 +258,12 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 							fut.setException(e);
 						}	
 					}
+					
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						exception.printStackTrace();
+//						fut.setException(exception);
+//					}
 				});
 			}
 		}

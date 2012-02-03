@@ -2,9 +2,7 @@ package jadex.base.gui;
 
 import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
@@ -14,11 +12,8 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.xml.annotation.XMLClassname;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -116,7 +111,7 @@ public class CMSUpdateHandler
 	/**
 	 *  Add a CMS listener.
 	 */
-	public IFuture	addCMSListener(final IComponentIdentifier cid, final ICMSComponentListener listener)
+	public IFuture<Void> addCMSListener(final IComponentIdentifier cid, final ICMSComponentListener listener)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
@@ -139,7 +134,7 @@ public class CMSUpdateHandler
 			return installLocalCMSListener(listener);
 		}
 		
-		Future	ret	= new Future();
+		Future<Void>	ret	= new Future<Void>();
 		if(listeners==null)
 		{
 			this.listeners	= new MultiCollection();
@@ -171,14 +166,16 @@ public class CMSUpdateHandler
 			futures.put(cid, ret);
 			listeners.put(cid, listener);
 
-			SRemoteGui.installRemoteCMSListener(access, cid, rcl, buildId(cid)).addResultListener(new SwingDefaultResultListener()
+			SRemoteGui.installRemoteCMSListener(access, cid, rcl, buildId(cid))
+				.addResultListener(new SwingDefaultResultListener()
 			{
 				public void customResultAvailable(Object result)
 				{
+					assert SwingUtilities.isEventDispatchThread();
 //					if(cid==null)
 //						System.out.println("result cid: "+cid);
-//					if(futures==null)
-//						System.out.println("result futures: "+futures);
+					if(futures==null)
+						System.out.println("result futures: "+futures);
 					Collection coll	= futures.getCollection(cid);
 //					if(coll==null)
 //						System.out.println("result coll: "+coll);
@@ -192,9 +189,13 @@ public class CMSUpdateHandler
 				}
 				public void customExceptionOccurred(Exception exception)
 				{
+					assert SwingUtilities.isEventDispatchThread();
 //					System.out.println("remove: "+cid+", "+listener+", "+this);
 					if(listeners!=null)
 						listeners.remove(cid, listener);
+					
+					if(futures==null)
+						System.out.println("results futures: "+futures);
 					
 					Collection coll	= futures.getCollection(cid);
 					for(Iterator it=coll.iterator(); it.hasNext(); )
@@ -214,13 +215,13 @@ public class CMSUpdateHandler
 	/**
 	 *  Remove a CMS listener.
 	 */
-	public IFuture	removeCMSListener(IComponentIdentifier cid, ICMSComponentListener listener)
+	public IFuture<Void>	removeCMSListener(IComponentIdentifier cid, ICMSComponentListener listener)
 	{
 		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
 		
 //		System.out.println("removed lis: "+cid+" "+listener+" "+this);
 		
-		IFuture	ret	= IFuture.DONE;
+		IFuture<Void>	ret	= IFuture.DONE;
 		
 		// For local component use direct listener.
 		if(cid.getPlatformName().equals(access.getComponentIdentifier().getPlatformName()))
@@ -234,7 +235,7 @@ public class CMSUpdateHandler
 			listeners.remove(cid, listener);
 			if(!listeners.containsKey(cid))
 			{
-				Future	fut	= new Future();
+				Future<Void>	fut	= new Future<Void>();
 				ret	= fut;
 				SRemoteGui.deregisterRemoteCMSListener(access, cid, buildId(cid))
 					.addResultListener(new SwingDelegationResultListener<Void>(fut));
@@ -255,8 +256,6 @@ public class CMSUpdateHandler
 		return ret;
 	}
 	
-
-	
 	//-------- helper methods --------
 	
 	/**
@@ -272,9 +271,9 @@ public class CMSUpdateHandler
 			{
 				final ICMSComponentListener lis = cls[i];
 				lis.componentAdded((IComponentDescription)event.getValue())
-					.addResultListener(new SwingDefaultResultListener()
+					.addResultListener(new SwingDefaultResultListener<Void>()
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Void result)
 					{
 					}
 					
@@ -291,9 +290,9 @@ public class CMSUpdateHandler
 			{
 				final ICMSComponentListener lis = cls[i];
 				lis.componentChanged((IComponentDescription)event.getValue())
-					.addResultListener(new SwingDefaultResultListener()
+					.addResultListener(new SwingDefaultResultListener<Void>()
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Void result)
 					{
 					}
 					
@@ -312,9 +311,9 @@ public class CMSUpdateHandler
 				final ICMSComponentListener lis = cls[i];
 //				System.out.println("rem compo: "+((IComponentDescription)event.getValue()).getName());
 				cls[i].componentRemoved((IComponentDescription)event.getValue(), null)
-					.addResultListener(new SwingDefaultResultListener()
+					.addResultListener(new SwingDefaultResultListener<Void>()
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(Void result)
 					{
 					}
 					
@@ -327,10 +326,10 @@ public class CMSUpdateHandler
 		}
 		else if(RemoteCMSListener.EVENT_BULK.equals(event.getType()))
 		{
-			Collection	events	= (Collection)event.getValue();
-			for(Iterator it=events.iterator(); it.hasNext(); )
+			Collection<ChangeEvent>	events	= (Collection<ChangeEvent>)event.getValue();
+			for(Iterator<ChangeEvent> it=events.iterator(); it.hasNext(); )
 			{
-				informListeners((ChangeEvent)it.next(), cls);
+				informListeners(it.next(), cls);
 			}
 		}
 	}

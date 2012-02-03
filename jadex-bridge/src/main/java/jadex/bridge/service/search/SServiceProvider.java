@@ -16,6 +16,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 
@@ -193,7 +194,7 @@ public class SServiceProvider
 	 */
 	public static <T> IFuture<T> getService(final IServiceProvider provider, final Class<T> type, final String scope)
 	{
-//		if(type.toString().indexOf("IReg")!=-1 && scope.equals("local"))
+//		if(type.toString().indexOf("IFile")!=-1)// && scope.equals("local"))
 //			System.out.println("here22");
 		
 //		synchronized(profiling)
@@ -201,7 +202,7 @@ public class SServiceProvider
 //			Integer	cnt	= (Integer)profiling.get(type);
 //			profiling.put(type, new Integer(cnt!=null ? cnt.intValue()+1 : 1)); 
 //		}
-		final Future<T> ret = new Future<T>();
+		final Future ret = new Future();
 		
 		// Hack->remove
 //		IVisitDecider abortdecider = new DefaultVisitDecider();
@@ -211,12 +212,24 @@ public class SServiceProvider
 		{
 			provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
 				new TypeResultSelector(type, true, RequiredServiceInfo.SCOPE_GLOBAL.equals(scope)))
-					.addResultListener(new DelegationResultListener(ret)
+					.addResultListener(new IIntermediateResultListener<IService>()
 			{
-				public void customResultAvailable(Object result)
+				public void intermediateResultAvailable(IService result)
 				{
-	//				System.out.println("Search result: "+result);
-					Collection res = (Collection)result;
+					ret.setResult(result);
+				}
+				
+				public void finished()
+				{
+					if(!ret.isDone())
+						ret.setException(new ServiceNotFoundException(type.getName()));
+				}
+				
+				public void resultAvailable(Collection<IService> result)
+				{
+					if(type.toString().indexOf("IFile")!=-1)
+						System.out.println("Search result: "+result);
+					Collection<IService> res = (Collection<IService>)result;
 					if(res==null || res.size()==0)
 					{
 	//					provider.getServices(getSearchManager(false, scope), getVisitDecider(true, scope), 
@@ -232,8 +245,15 @@ public class SServiceProvider
 					}
 					else
 					{
-						super.customResultAvailable(res.iterator().next());
+						ret.setResult(res.iterator().next());
 					}
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					if(type.toString().indexOf("IFile")!=-1)
+						System.out.println("Ex result: "+exception);
+					ret.setException(exception);
 				}
 			});
 		}

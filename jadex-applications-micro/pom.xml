@@ -226,6 +226,7 @@
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
 		
+		<!--  
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-extension-webservice</artifactId>
@@ -237,6 +238,7 @@
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.9.3</version>
 		</dependency>
+		-->
 		
 	</dependencies>
 </project>
