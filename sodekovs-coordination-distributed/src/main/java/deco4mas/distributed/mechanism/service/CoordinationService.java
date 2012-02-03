@@ -14,9 +14,13 @@ import deco4mas.distributed.mechanism.CoordinationInfo;
 public class CoordinationService implements ICoordinationService {
 
 	private CoordinationSpace space = null;
+	
+	//Used for distributed case: denotes the context of a distributed application.
+	private String coordinationContextID;
 
-	public CoordinationService(CoordinationSpace space) {
+	public CoordinationService(CoordinationSpace space, String coordinationContextID) {
 		this.space = space;
+		setCoordinationContextID(coordinationContextID);
 	}
 
 	@Override
@@ -24,5 +28,16 @@ public class CoordinationService implements ICoordinationService {
 		space.publishCoordinationEvent(ci);
 
 		return IFuture.DONE;
+	}
+
+	@Override
+	public void setCoordinationContextID(String id) {
+		this.coordinationContextID = id;
+		
+	}
+
+	@Override
+	public String getCoordinationContextID() { 
+		return this.coordinationContextID;
 	}
 }

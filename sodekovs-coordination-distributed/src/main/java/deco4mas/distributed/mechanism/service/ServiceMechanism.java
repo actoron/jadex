@@ -7,6 +7,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.kernelbase.StatelessAbstractInterpreter;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 import deco4mas.distributed.mechanism.CoordinationInfo;
@@ -32,13 +33,18 @@ public class ServiceMechanism extends CoordinationMechanism {
 		super(space);
 
 		// TODO Der Cast ist ein Hack bis Lars und Alex die Schnittstellen von Jadex anpassen
-		this.applicationInterpreter = (StatelessAbstractInterpreter) space.getApplicatioInternalAccess();
+		this.applicationInterpreter = (StatelessAbstractInterpreter) space.getApplicatioInternalAccess();		
+		
+		//If it's a distributed application, then it has a contextID.
+		HashMap<String,Object> appArgs = (HashMap<String, Object>) this.applicationInterpreter.getArguments();
+		this.coordinationContextID = (String) appArgs.get("CoordinationContextID");
+		
 	}
 
 	@Override
 	public void start() {
 		String name = "CoordinationService@" + applicationInterpreter.getComponentIdentifier().toString();
-		addService(name, ICoordinationService.class, new CoordinationService(space));
+		addService(name, ICoordinationService.class, new CoordinationService(space, this.coordinationContextID));
 	}
 
 	@Override
@@ -51,7 +57,12 @@ public class ServiceMechanism extends CoordinationMechanism {
 					@Override
 					public void resultAvailable(Collection<ICoordinationService> result) {
 						for (ICoordinationService service : result) {
+							
+							if(service.getCoordinationContextID().equalsIgnoreCase(coordinationContextID)){
 							service.publish(ci);
+							}else{
+								System.out.println("Service does not belong to context.");
+							}
 						}
 					}
 				});

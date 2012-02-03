@@ -30,6 +30,11 @@
 		<import>deco4mas.distributed.coordinate.*</import>
 		<import>sodekovs.coordination.distributed.examples.heterogeneous.service.*</import>
 	</imports>	
+	
+	<arguments>
+		<!--Context ID. -->
+		<argument name="CoordinationContextID" class="String">"sodekovs-2"</argument>		
+	</arguments>
 
 			
 	<extensiontypes>

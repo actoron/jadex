@@ -22,6 +22,9 @@ public abstract class CoordinationMechanism implements ICoordinationMechanism {
 	protected MechanismConfiguration mechanismConfiguration;
 
 	protected String realisationName;
+	
+	//Used for distributed case: denotes the context of a distributed application.
+	protected String coordinationContextID ;
 
 	// -- constructor ---
 	/**

@@ -22,4 +22,20 @@ public interface ICoordinationService {
 	 * @return {@link IFuture#DONE}
 	 */
 	public IFuture<Void> publish(CoordinationInfo ci);
+
+	/**
+	 * Used for distributed case: denotes the context of a distributed application. In order to recognize, all instances of a distributed application have to use the same CoordinationCotextID, which
+	 * is defined in the *.application.xml.
+	 * 
+	 * @param id
+	 */
+	public void setCoordinationContextID(String id);
+	
+	/**
+	 * Used for distributed case: denotes the context of a distributed application. In order to recognize, all instances of a distributed application have to use the same CoordinationCotextID, which
+	 * is defined in the *.application.xml.
+	 * @return
+	 */
+	public String getCoordinationContextID();
+
 }
