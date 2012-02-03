@@ -21,7 +21,8 @@ import jadex.micro.annotation.Publish;
 @Agent
 //@Imports({"jadex.base.service.ws.*", "jadex.micro.examples.ws.offerquote.gen.*"})
 @ProvidedServices(@ProvidedService(type=IBankingService.class, implementation=@Implementation(BankingService.class),
-	publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/", servicetype=RSBankingService.class)))
+	publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/")))
+//	publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/", servicetype=RSBankingService.class)))
 public class BankingAgent
 {
 }

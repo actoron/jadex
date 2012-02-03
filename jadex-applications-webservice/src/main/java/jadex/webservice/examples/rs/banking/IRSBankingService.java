@@ -27,7 +27,7 @@ public interface IRSBankingService
 	 *  @return The account statement.
 	 */
 	@GET
-	@Path("getAccountStatement/{request}")
+	@Path("getAccountStatements/{request}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getAccountStatementJSON(@PathParam("request") String request);
 	

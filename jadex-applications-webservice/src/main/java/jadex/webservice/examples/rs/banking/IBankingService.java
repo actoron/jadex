@@ -9,6 +9,12 @@ import jadex.commons.future.IFuture;
 public interface IBankingService
 {
 	/**
+	 *  Get all account statements.
+	 *  @return The account statements.
+	 */
+	public IFuture<AccountStatement> getAccountStatement();
+	
+	/**
 	 *  Get the account statement.
 	 *  @param request The request.
 	 *  @return The account statement.

@@ -25,6 +25,7 @@ import jadex.xml.writer.Writer;
 import java.awt.Color;
 import java.awt.Image;
 /* $endif $ */
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.Date;
@@ -746,6 +747,17 @@ public class JavaWriter extends Writer
 			createWriter();
 		return Writer.objectToByteArray(writer, val, classloader);
 	}
+	
+	/**
+	 *  Write to output stream.
+	 */
+	public static void objectToOutputStream(Object val, OutputStream os, ClassLoader classloader)
+	{
+		if(writer==null)
+			createWriter();
+		Writer.objectToOutputStream(writer, val, os, classloader, null);
+	}
+	
 	
 	/**
 	 *  Get the default Java writer.

@@ -528,6 +528,8 @@ public class Writer
 		return objectToByteArray(writer, val, classloader, null);
 	}
 	
+	
+	
 	/**
 	 *  Convert to a byte array.
 	 */
@@ -540,6 +542,23 @@ public class Writer
 			byte[] ret = bos.toByteArray();
 			bos.close();
 			return ret;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+//			System.out.println("Exception writing: "+val);
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 *  Write to output stream.
+	 */
+	public static void objectToOutputStream(Writer writer, Object val, OutputStream os, ClassLoader classloader, Object context)
+	{
+		try
+		{
+			writer.write(val, os, classloader, context);
 		}
 		catch(Exception e)
 		{

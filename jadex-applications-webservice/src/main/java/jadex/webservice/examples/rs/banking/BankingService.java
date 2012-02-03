@@ -30,6 +30,16 @@ public class BankingService implements IBankingService
 	}
 	
 	/**
+	 *  Get account statement.
+	 *  @return The account statement.
+	 */
+	public IFuture<AccountStatement> getAccountStatement()
+	{
+		AccountStatement as = new AccountStatement(data.toArray(new String[data.size()]), null);
+		return new Future<AccountStatement>(as);
+	}
+	
+	/**
 	 *  Get an account statement.
 	 *  @param request The request.
 	 *  @return The account statement.

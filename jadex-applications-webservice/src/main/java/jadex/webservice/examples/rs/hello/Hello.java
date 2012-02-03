@@ -1,5 +1,6 @@
 package jadex.webservice.examples.rs.hello;
 
+import jadex.extension.rs.publish.JadexXMLBodyReader;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.StringWriter;
@@ -108,6 +109,15 @@ public class Hello
 //		A ao = JavaReader.objectFromXML(a, null);
 		return "yes";
 	}
+	
+	@GET
+	@Path("getXML")
+	@Produces(MediaType.APPLICATION_XML)
+	public A getXML()
+	{
+		System.out.println("getXML"+context.getQueryParameters());
+		return new A("hallo");
+	}
 		
 	
 	/**
@@ -121,9 +131,9 @@ public class Hello
 			URI uri = new URI("http://localhost:8080/");
 			
 			Map<String, Object> props = new HashMap<String, Object>();
-			props.put("com.sun.jersey.config.property.packages", "jadex.webservice.examples.rs.hello");
+			props.put("com.sun.jersey.config.property.packages", "jadex.webservice.examples.rs.hello, jadex.extension.rs.publish");
 			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-//			props.put("hallo", "hallo");
+			props.put("hallo", "hallo");
 			// "com.sun.jersey.config.property.packages", 
 			PackagesResourceConfig config = new PackagesResourceConfig(props);
 //			PackagesResourceConfig config = new PackagesResourceConfig(new String[]{"jadex.micro.examples.rs.banking"});
@@ -136,6 +146,7 @@ public class Hello
 			ClientConfig cc = new DefaultClientConfig();
 //			cc.getClasses().add(JAXBProvider.class);
 			cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+			cc.getClasses().add(JadexXMLBodyReader.class);
 			Client client = Client.create(cc);
 			WebResource service = client.resource(uri); 
 //			String res = service.path("hello").accept(MediaType.TEXT_PLAIN).get(String.class);
@@ -162,7 +173,9 @@ public class Hello
 //			System.out.println("jaxb json: "+sw.toString());
 			
 			// .accept(MediaType.APPLICATION_JSON)
-			service.path("hello/getJSON").type(MediaType.APPLICATION_JSON).post(String.class, a);
+//			service.path("hello/getJSON").type(MediaType.APPLICATION_JSON).post(String.class, a);
+			A res = service.path("hello/getXML").type(MediaType.APPLICATION_XML).get(A.class);
+			System.out.println("got: "+res);
 //			String res = service.path("hello/getJSON").type(MediaType.APPLICATION_XML).post(String.class, f);
 			
 //			JAXBContext context = JAXBContext.newInstance(A.class);
