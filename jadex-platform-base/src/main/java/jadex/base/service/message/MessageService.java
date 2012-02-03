@@ -1254,6 +1254,8 @@ public class MessageService extends BasicService implements IMessageService
 								};
 								
 								Token	token	= new Token();
+								if(SUtil.arrayToString(task.getReceivers()).indexOf("alex")!=-1)
+									System.out.println("try sending: "+SUtil.arrayToString(task.getReceivers())+", "+SUtil.arrayToString(task.getTransports()));
 								for(int i=0; i<task.getTransports().size(); i++)
 								{
 									ITransport transport = (ITransport)task.getTransports().get(i);

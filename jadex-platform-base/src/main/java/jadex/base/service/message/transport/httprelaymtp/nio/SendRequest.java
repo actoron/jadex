@@ -76,6 +76,9 @@ public class SendRequest	implements IHttpRequest
 		buffers.add(ByteBuffer.wrap(SUtil.intToBytes(prolog.length+data.length)));
 		buffers.add(ByteBuffer.wrap(prolog));
 		buffers.add(ByteBuffer.wrap(data));
+		
+		System.out.println("Try sending with relay: "+SUtil.arrayToString(task.getReceivers()));
+
 	}
 	
 	//-------- IHttpRequest interface --------

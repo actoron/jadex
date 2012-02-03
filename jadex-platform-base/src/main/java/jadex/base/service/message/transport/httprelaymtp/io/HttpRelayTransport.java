@@ -89,7 +89,7 @@ public class HttpRelayTransport implements ITransport
 			String[]	raddrs	= task.getReceivers()[i].getAddresses();
 			for(int j=0; j<raddrs.length; j++)
 			{
-				if(raddrs[i].startsWith(getServiceSchema()))
+				if(raddrs[j].startsWith(getServiceSchema()))
 					addresses.add(raddrs[j].substring(6));	// strip 'relay-' prefix.
 			}			
 		}
