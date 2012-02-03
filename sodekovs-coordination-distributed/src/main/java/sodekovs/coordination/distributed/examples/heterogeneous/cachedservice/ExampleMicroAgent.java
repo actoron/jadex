@@ -1,9 +1,13 @@
 package sodekovs.coordination.distributed.examples.heterogeneous.cachedservice;
 
+import java.util.HashMap;
+
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 import deco4mas.distributed.coordinate.interpreter.agent_state.CoordinationComponentStep;
 
 /**
@@ -32,7 +36,13 @@ public class ExampleMicroAgent extends MicroAgent {
 
 		@Override
 		public IFuture<Void> execute(IInternalAccess ia) {
-			System.out.println("ExampleMicroAgent" + ExampleMicroAgent.this.getAgentName() + " execute() in ReceiveHelloStep called with message:");
+			
+			//check CoordinationContext			
+			CoordinationSpace coordSpace = (CoordinationSpace) getParentAccess().getExtension("mycoordspace").get(new ThreadSuspendable());			
+			HashMap<String, Object> appArgs = (HashMap<String, Object>) coordSpace.getExternalAccess().getArguments().get(new ThreadSuspendable());		
+			String coordinationContextID = (String) appArgs.get("CoordinationContextID");
+			
+			System.out.println("#ExampleMicroAgent " + ExampleMicroAgent.this.getAgentName() + " - I belong to CoordinationContext: "+ coordinationContextID+ "#  execute() in ReceiveHelloStep called with message:");
 			System.out.println("\t" + message);
 			return IFuture.DONE;
 		}

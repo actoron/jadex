@@ -31,6 +31,10 @@
 		<import>sodekovs.coordination.distributed.examples.heterogeneous.cachedservice.*</import>		
 	</imports>	
 
+	<arguments>
+		<!--Context ID. -->
+		<argument name="CoordinationContextID" class="String">"sodekovs-3"</argument>		
+	</arguments>
 			
 	<extensiontypes>
 		<env:envspacetype name="coordspace" width="11" height="11" class="CoordinationSpace">		
