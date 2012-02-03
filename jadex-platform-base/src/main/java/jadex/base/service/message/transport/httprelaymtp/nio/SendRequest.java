@@ -102,16 +102,7 @@ public class SendRequest	implements IHttpRequest
 			SocketChannel	sc	= (SocketChannel)key.channel();
 			boolean	finished	= sc.finishConnect();
 			assert finished;
-			if(token.acquire())
-			{
-				System.out.println("Sending with relay: "+address);
-				key.interestOps(SelectionKey.OP_WRITE);
-			}
-			else
-			{
-				System.out.println("Not sending with relay: "+address);
-				key.interestOps(0);
-			}
+			key.interestOps(SelectionKey.OP_WRITE);
 		}
 		catch(Exception e)
 		{
@@ -136,45 +127,55 @@ public class SendRequest	implements IHttpRequest
 		SocketChannel	sc	= (SocketChannel)key.channel();
 //		System.out.println("Sending "+this+" on: "+sc);
 
-		try
+		if(token.acquire())
 		{
-			boolean	more	= true;
-			while(more)
+			System.out.println("Sending with relay: "+address);
+			try
 			{
-				ByteBuffer	buf	= buffers.get(bufnum);
-				sc.write(buf);
-
-				// Output buffer is full: stop sending for now, but keep interest.
-				if(buf.remaining()>0)
+				boolean	more	= true;
+				while(more)
 				{
+					ByteBuffer	buf	= buffers.get(bufnum);
+					sc.write(buf);
+	
 					// Output buffer is full: stop sending for now, but keep interest.
-					more	= false;
-				}
-				
-				// One buffer written: continue with next.
-				else if(bufnum<buffers.size()-1)
-				{
-					bufnum++;
-				}
-				
-				// All buffers written: stop sending and register interest in answer.
-				else
-				{
-//					System.out.println("Message sent");
-					more	= false;
-					key.interestOps(SelectionKey.OP_READ);
+					if(buf.remaining()>0)
+					{
+						// Output buffer is full: stop sending for now, but keep interest.
+						more	= false;
+					}
+					
+					// One buffer written: continue with next.
+					else if(bufnum<buffers.size()-1)
+					{
+						bufnum++;
+					}
+					
+					// All buffers written: stop sending and register interest in answer.
+					else
+					{
+	//					System.out.println("Message sent");
+						more	= false;
+						key.interestOps(SelectionKey.OP_READ);
+					}
 				}
 			}
+			catch(Exception e)
+			{
+				// Request problem (e.g. reused connection already closed): try again.
+				bufnum	= 0;
+				for(int i=0; i<buffers.size(); i++)
+					buffers.get(i).rewind();
+				reschedule	= 0;
+				key.cancel();
+				logger.info("rescheduling message due to failed request: "+e);
+			}
 		}
-		catch(Exception e)
+		else
 		{
-			// Request problem (e.g. reused connection already closed): try again.
-			bufnum	= 0;
-			for(int i=0; i<buffers.size(); i++)
-				buffers.get(i).rewind();
-			reschedule	= 0;
-			key.cancel();
-			logger.info("rescheduling message due to failed request: "+e);
+			System.out.println("Not sending with relay: "+address);
+			key.interestOps(0);
+			fut.setException(new RuntimeException("Not sending."));
 		}
 		
 		return reschedule;
