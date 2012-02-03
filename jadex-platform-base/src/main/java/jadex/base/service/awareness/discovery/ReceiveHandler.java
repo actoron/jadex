@@ -53,16 +53,14 @@ public abstract class ReceiveHandler
 	 */
 	public IFuture<Void>	startReceiving()
 	{
-		final Future	ret	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
 		
 		// Start the receiver thread.
-		agent.getMicroAgent().getServiceContainer().getRequiredService("threadpool")
-			.addResultListener(new IResultListener()
+		IFuture<IThreadPoolService>	tpfut	= agent.getMicroAgent().getServiceContainer().getRequiredService("threadpool");
+		tpfut.addResultListener(new IResultListener<IThreadPoolService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(final IThreadPoolService tp)
 			{
-				final IThreadPoolService tp = (IThreadPoolService)result;
-				
 				tp.execute(new Runnable()
 				{
 					public void run()

@@ -1,5 +1,6 @@
 package jadex.base.service.awareness.discovery;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
@@ -31,7 +32,7 @@ public class LeaseTimeHandler
 	protected DiscoveryAgent agent;
 	
 	/** The entries. */
-	protected Map entries;
+	protected Map<IComponentIdentifier, DiscoveryEntry>	entries;
 	
 	/** The timer. */
 	protected Timer	timer;
@@ -71,10 +72,10 @@ public class LeaseTimeHandler
 //		System.out.println("add: "+entry);
 		
 		if(entries==null)
-			entries = new LinkedHashMap();
+			entries = new LinkedHashMap<IComponentIdentifier, DiscoveryEntry>();
 		
 		// If already contained update old entry (to not loose fixed entries like master flag).
-		DiscoveryEntry oldentry = (DiscoveryEntry)entries.get(entry.getInfo().getSender());
+		DiscoveryEntry oldentry = entries.get(entry.getInfo().getSender());
 		if(oldentry!=null)
 		{
 			oldentry.setInfo(entry.getInfo());
@@ -130,15 +131,15 @@ public class LeaseTimeHandler
 			@XMLClassname("rem")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				List todel = new ArrayList();
+				List<DiscoveryEntry> todel = new ArrayList<DiscoveryEntry>();
 				synchronized(LeaseTimeHandler.this)
 				{
 					long time = getClockTime();
 					if(entries!=null)
 					{
-						for(Iterator it=entries.values().iterator(); it.hasNext(); )
+						for(Iterator<DiscoveryEntry> it=entries.values().iterator(); it.hasNext(); )
 						{
-							DiscoveryEntry entry = (DiscoveryEntry)it.next();
+							DiscoveryEntry entry = it.next();
 							if(entry.getInfo().getDelay()!=-1)
 							{
 								 // Have some time buffer before delete
@@ -157,7 +158,7 @@ public class LeaseTimeHandler
 				{
 					for(int i=0; i<todel.size(); i++)
 					{
-						DiscoveryEntry entry = (DiscoveryEntry)todel.get(i);
+						DiscoveryEntry entry = todel.get(i);
 						entryDeleted(entry);
 					}
 				}
@@ -171,7 +172,7 @@ public class LeaseTimeHandler
 	/**
 	 *  Overriden wait for to not use platform clock.
 	 */
-	protected void	doWaitFor(long delay, final IComponentStep step)
+	protected void	doWaitFor(long delay, final IComponentStep<?> step)
 	{
 //		waitFor(delay, step);
 		

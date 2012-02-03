@@ -153,6 +153,7 @@ public class HttpSelectorThread
 								{
 									reschedule	= req.handleConnect(key);
 									connecting.remove(req.getAddress());
+									HttpSelectorThread.this.logger.info("nio-relay connected to: "+req.getAddress().getFirstEntity()+":"+req.getAddress().getSecondEntity());
 									
 									// Remember open connections
 									Set<SocketChannel>	chs	= connections.get(req.getAddress());
