@@ -27,7 +27,7 @@ public class HttpRelayTransport implements ITransport
 	protected String	address;
 	
 	/** The receiver process. */
-	protected HttpSelectorThread	selectorthread;
+	protected NIOSelectorThread	selectorthread;
 	
 	//-------- constructors --------
 	
@@ -58,7 +58,7 @@ public class HttpRelayTransport implements ITransport
 				try
 				{
 					// Create the selector thread (starts automatically).
-					selectorthread	= new HttpSelectorThread(component.getComponentIdentifier().getRoot(), address, ms, component.getLogger(), component.getExternalAccess());
+					selectorthread	= new NIOSelectorThread(component.getComponentIdentifier().getRoot(), address, ms, component.getLogger(), component.getExternalAccess());
 					ret.setResult(null);
 				}
 				catch(Exception e)

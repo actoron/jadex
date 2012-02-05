@@ -147,6 +147,24 @@ public class ReceiveRequest	implements IHttpRequest
 	}
 	
 	/**
+	 *  Let the request know that it is running on a (potentially closed) idle connection.
+	 *  The request might want to reschedule, e.g. only if an error occured on an idle connection.
+	 */
+	public void	setIdle(boolean idle)
+	{
+		// ignored -> receiver always reconnects
+	}
+	
+	/**
+	 *  Reschedule the request in case of connection inactivity?
+	 */
+	public boolean	reschedule()
+	{
+		// Reschedule always.
+		return true;
+	}
+
+	/**
 	 *  Called after (re-)connection success.
 	 *  Here, the request should be re-inited.
 	 */

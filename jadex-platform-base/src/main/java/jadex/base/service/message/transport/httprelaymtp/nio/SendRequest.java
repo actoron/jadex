@@ -44,6 +44,9 @@ public class SendRequest	implements IHttpRequest
 	/** The HTTP response as it becomes available. */
 	protected StringBuffer	response;
 	
+	/** The idle flag. */
+	protected boolean	idle;
+	
 	//-------- constructors ---------
 	
 	/**
@@ -89,6 +92,24 @@ public class SendRequest	implements IHttpRequest
 	public Tuple2<String, Integer>	getAddress()
 	{
 		return address;
+	}
+	
+	/**
+	 *  Let the request know that it is running on a (potentially closed) idle connection.
+	 *  The request might want to reschedule, e.g. only if an error occured on an idle connection.
+	 */
+	public void	setIdle(boolean idle)
+	{
+		this.idle	= idle;
+	}
+	
+	/**
+	 *  Reschedule the request in case of connection inactivity?
+	 */
+	public boolean	reschedule()
+	{
+		// Reschedule when idle.
+		return idle;
 	}
 	
 	/**
@@ -152,9 +173,16 @@ public class SendRequest	implements IHttpRequest
 				bufnum	= 0;
 				for(int i=0; i<buffers.size(); i++)
 					buffers.get(i).rewind();
-				reschedule	= 0;
 				key.cancel();
-				logger.info("nio-relay rescheduling message due to failed request: "+e);
+				if(idle)
+				{
+					reschedule	= 0;
+					logger.info("nio-relay rescheduling message due to failed request on idle connection: "+e);
+				}
+				else
+				{
+					fut.setException(e);
+				}
 			}
 		}
 		else
@@ -237,9 +265,16 @@ public class SendRequest	implements IHttpRequest
 			bufnum	= 0;
 			for(int i=0; i<buffers.size(); i++)
 				buffers.get(i).rewind();
-			reschedule	= 0;
 			key.cancel();
-			logger.info("nio-relay rescheduling message due to failed response: "+e);
+			if(idle)
+			{
+				reschedule	= 0;
+				logger.info("nio-relay rescheduling message due to failed response on idle connection: "+e);
+			}
+			else
+			{
+				fut.setException(e);
+			}
 		}
 		
 		return reschedule;

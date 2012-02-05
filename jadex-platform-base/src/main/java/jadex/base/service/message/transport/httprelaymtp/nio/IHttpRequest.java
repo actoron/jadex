@@ -15,6 +15,17 @@ public interface IHttpRequest
 	public Tuple2<String, Integer>	getAddress();
 	
 	/**
+	 *  Let the request know that it is running on a (potentially closed) idle connection.
+	 *  The request might want to reschedule, e.g. only if an error occured on an idle connection.
+	 */
+	public void	setIdle(boolean idle);
+	
+	/**
+	 *  Reschedule the request in case of connection inactivity?
+	 */
+	public boolean	reschedule();
+	
+	/**
 	 *  Called after (re-)connection success.
 	 *  Here, the request should be re-inited.
 	 */
