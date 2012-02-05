@@ -1,15 +1,6 @@
 package jadex.webservice.examples.rs.banking;
 
-import jadex.commons.future.ThreadSuspendable;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
-
-import java.util.Date;
-
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -20,7 +11,7 @@ import com.sun.jersey.api.core.ResourceConfig;
 /**
  * 
  */
-@Path("/banking")
+//@Path("/banking")
 public class RSBankingService
 {
 	@Context 
@@ -28,33 +19,7 @@ public class RSBankingService
 	
 	@Context
 	public UriInfo uriinfo;
-		
-	/**
-	 *  Get the account statement.
-	 *  @param request The request.
-	 *  @return The account statement.
-	 */
-	@POST
-	@Path("getAccountStatement")
-	@Produces(MediaType.TEXT_XML)
-	public String getAccountStatement(@PathParam("request") String request)
-	{
-		System.out.println("getAccountStatement");
-		String url = uriinfo.getBaseUri().toString();
-		IBankingService bs = (IBankingService)rc.getProperties().get(url);
-		Request req;
-		try
-		{
-			req = JavaReader.objectFromXML(request, null);
-		}
-		catch(Exception e)
-		{
-			req = new Request(new Date(), new Date());
-		}
-		AccountStatement ret = bs.getAccountStatement(req).get(new ThreadSuspendable(this));
-		
-		return JavaWriter.objectToXML(ret, null);
-	}
+
 	
 	/**
 	 *  Get the account statement.
@@ -62,17 +27,56 @@ public class RSBankingService
 	 *  @return The account statement.
 	 */
 	@GET
-	@Path("getAccountStatement/{request}")
-	@Produces(MediaType.APPLICATION_XML)
-	public String getAccountStatement(@PathParam("request") Request request)
+	@Produces(MediaType.TEXT_HTML)
+	public String getServiceInfo()
 	{
-		System.out.println("getAccountStatement");
-		String url = uriinfo.getBaseUri().toString();
-		IBankingService bs = (IBankingService)rc.getProperties().get(url);
-		AccountStatement ret = bs.getAccountStatement(request).get(new ThreadSuspendable(this));
-		
-		return JavaWriter.objectToXML(ret, null);
-	}	
+		return "<html><body></body><h1>info</h1></html>";
+	}
+	
+//	/**
+//	 *  Get the account statement.
+//	 *  @param request The request.
+//	 *  @return The account statement.
+//	 */
+//	@POST
+//	@Path("getAccountStatement")
+//	@Produces(MediaType.TEXT_XML)
+//	public String getAccountStatement(@PathParam("request") String request)
+//	{
+//		System.out.println("getAccountStatement");
+//		String url = uriinfo.getBaseUri().toString();
+//		IBankingService bs = (IBankingService)rc.getProperties().get(url);
+//		Request req;
+//		try
+//		{
+//			req = JavaReader.objectFromXML(request, null);
+//		}
+//		catch(Exception e)
+//		{
+//			req = new Request(new Date(), new Date());
+//		}
+//		AccountStatement ret = bs.getAccountStatement(req).get(new ThreadSuspendable(this));
+//		
+//		return JavaWriter.objectToXML(ret, null);
+//	}
+	
+//	/**
+//	 *  Get the account statement.
+//	 *  @param request The request.
+//	 *  @return The account statement.
+//	 */
+//	@GET
+//	@Path("getAccountStatement/{request}")
+//	@Produces(MediaType.APPLICATION_XML)
+//	public String getAccountStatement(@PathParam("request") Request request)
+//	{
+//		System.out.println("getAccountStatement");
+//		String url = uriinfo.getBaseUri().toString();
+//		IBankingService bs = (IBankingService)rc.getProperties().get(url);
+//		AccountStatement ret = bs.getAccountStatement(request).get(new ThreadSuspendable(this));
+//		
+//		return JavaWriter.objectToXML(ret, null);
+//	}	
 	
 //	
 //	/**

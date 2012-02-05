@@ -99,16 +99,15 @@ public class DefaultRestServicePublishService implements IPublishService
 			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 			props.put("__service", service);
 			PackagesResourceConfig config = new PackagesResourceConfig(props);
+			URI uri = new URI(pi.getPublishId());
 			
 			// If no service type was specified it has to be generated.
 			Class proxy = null;
-			if(pi.getServiceType().getType(cl).equals(Object.class))
-			{
-				proxy = createProxyClass(service, cl);
-				config.getClasses().add(proxy);
-			}
+			proxy = createProxyClass(service, cl, uri.getPath(), pi.getServiceType().getType(cl));
+			config.getClasses().add(proxy);
 			
-			HttpServer endpoint = GrizzlyServerFactory.createHttpServer(new URI(pi.getPublishId()), config);
+			URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
+			HttpServer endpoint = GrizzlyServerFactory.createHttpServer(baseuri.toString(), config);
 			endpoint.start();
 	
 			Thread.currentThread().setContextClassLoader(ccl);
@@ -155,9 +154,13 @@ public class DefaultRestServicePublishService implements IPublishService
 	 *  @param type The web service interface type.
 	 *  @return The proxy object.
 	 */
-	protected Class createProxyClass(IService service, ClassLoader classloader) throws Exception
+	protected Class createProxyClass(IService service, ClassLoader classloader, 
+		String apppath, Class baseclass) throws Exception
 	{
 		Class ret = null;
+
+		if(baseclass==null || Object.class.equals(baseclass))
+			baseclass = Proxy.class;
 		
 		ClassPool pool = ClassPool.getDefault();
 //		String pck = type.getPackage().getName();
@@ -173,7 +176,8 @@ public class DefaultRestServicePublishService implements IPublishService
 		}
 		catch(Exception e)
 		{
-			CtClass proxyclazz = pool.makeClass(name, getCtClass(jadex.extension.ws.publish.Proxy.class, pool));
+//			CtClass proxyclazz = pool.makeClass(name, getCtClass(jadex.extension.ws.publish.Proxy.class, pool));
+			CtClass proxyclazz = pool.makeClass(name, getCtClass(baseclass, pool));
 			ClassFile cf = proxyclazz.getClassFile();
 			ConstPool constpool = cf.getConstPool();
 	
@@ -203,7 +207,7 @@ public class DefaultRestServicePublishService implements IPublishService
 						throw new RuntimeException("Cannot unwrap futurized method due to more than one generic type: "+SUtil.arrayToString(pt.getActualTypeArguments()));
 					rt = (Class)pts[0];
 				}
-	//					System.out.println("rt: "+pt.getRawType()+" "+SUtil.arrayToString(pt.getActualTypeArguments()));
+//				System.out.println("rt: "+pt.getRawType()+" "+SUtil.arrayToString(pt.getActualTypeArguments()));
 				
 				String methodname = ms[i].getName();
 				CtClass rettype = getCtClass((Class)rt, pool);
@@ -244,7 +248,7 @@ public class DefaultRestServicePublishService implements IPublishService
 					attr.addAnnotation(annot);
 					
 					m.getMethodInfo().addAttribute(attr);
-	//						System.out.println("m: "+m.getName());
+//					System.out.println("m: "+m.getName());
 					
 					proxyclazz.addMethod(m);
 				}
@@ -253,14 +257,30 @@ public class DefaultRestServicePublishService implements IPublishService
 			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
 			annot = new Annotation(constpool, getCtClass(Path.class, pool));
 			
-			//todo: extract name from package
-			annot.addMemberValue("value", new StringMemberValue("hello", constpool));
+			// If no explicit url path extract last name from package
+			if(apppath==null || apppath.length()==0 || apppath.equals("/"))
+			{
+				if(type.getPackage()!=null)
+				{
+					String pck = type.getPackage().getName();
+					int idx = pck.lastIndexOf(".");
+					if(idx>0)
+					{
+						apppath = pck.substring(idx+1);
+					}
+					else
+					{
+						apppath = pck;
+					}
+				}
+			}
+			annot.addMemberValue("value", new StringMemberValue(apppath, constpool));
 			attr.addAnnotation(annot);
 			cf.addAttribute(attr);
 			
 			ret = proxyclazz.toClass(classloader, type.getProtectionDomain());
 			proxyclazz.freeze();
-			System.out.println("create proxy class: "+ret.getName()+" "+ret.getPackage()+" "+proxyclazz.getPackageName());
+			System.out.println("create proxy class: "+ret.getName()+" "+apppath);
 		}
 		
 		return ret;
@@ -311,7 +331,6 @@ public class DefaultRestServicePublishService implements IPublishService
 		{
 			try
 			{
-				
 				ClassPath cp = new ClassClassPath(clazz);
 				pool.insertClassPath(cp);
 				ret = pool.get(clazz.getName());
@@ -338,5 +357,13 @@ public class DefaultRestServicePublishService implements IPublishService
 			ret[i] = getCtClass(classes[i], pool);
 		}
 		return ret;	
+	}
+	
+	public static void main(String[] args) throws Exception
+	{
+		URI uri = new URI("http://localhost:8080/bank");
+//		URI newuri = new URI(uri.getScheme(), uri.getAuthority(), null);
+		URI newuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
+		System.out.println(newuri);
 	}
 }

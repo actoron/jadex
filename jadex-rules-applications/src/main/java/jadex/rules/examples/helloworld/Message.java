@@ -48,4 +48,14 @@ public class Message
 	{
 		this.text = text;
 	}
+	
+	/**
+	 *  Get the text.
+	 *  @return The text.
+	 */
+	public static boolean getText2(String a)
+	{
+		return false;
+//		return "hello";
+	}
 }
