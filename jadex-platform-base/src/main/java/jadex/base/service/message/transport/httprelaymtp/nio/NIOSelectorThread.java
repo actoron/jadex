@@ -304,7 +304,7 @@ public class NIOSelectorThread
 					{
 						// Key may be cancelled just after isValid() has been tested.
 						NIOSelectorThread.this.logger.info("nio-relay exception in HttpSelectorThread: "+e);
-						e.printStackTrace();
+//						e.printStackTrace();
 					}
 				}
 			}
