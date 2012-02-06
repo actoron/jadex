@@ -134,7 +134,7 @@ public class NIOSelectorThread
 								updateTimer(sc);
 								
 								// Can not find out if connection still works!? Just try request and reschedule on connection problems.
-								System.out.println("Reusing connection: "+sc.isOpen()+", "+sc.isConnected());
+//								System.out.println("Reusing connection: "+sc.isOpen()+", "+sc.isConnected());
 								SelectionKey	key	= sc.keyFor(selector);
 								key.attach(req);
 								key.interestOps(SelectionKey.OP_WRITE);
@@ -165,7 +165,7 @@ public class NIOSelectorThread
 											if(idle.get(address)!=null)
 											{
 												idle.get(address).remove(sc);
-												System.out.println("Idle connections-: "+idle.get(address));
+//												System.out.println("Idle connections-: "+idle.get(address));
 												if(idle.get(address).isEmpty())
 												{
 													idle.remove(address);
@@ -174,9 +174,7 @@ public class NIOSelectorThread
 											channeltimers.remove(sc);
 											
 											SelectionKey	key	= sc.keyFor(selector);
-											if(key==null)
-												System.out.println("sdk jgvilk");
-											IHttpRequest	req	= key!=null ? (IHttpRequest)key.attachment() : null;
+											IHttpRequest	req	= (IHttpRequest)key.attachment();
 											if(req!=null)
 											{
 												if(req.reschedule())
@@ -304,7 +302,7 @@ public class NIOSelectorThread
 										}
 										cons.add((SocketChannel)key.channel());
 										key.attach(null);
-										System.out.println("Idle connections+: "+cons);
+//										System.out.println("Idle connections+: "+cons);
 									}
 									else if(!key.isValid() || !key.channel().isOpen() || !((SocketChannel)key.channel()).isConnected())
 									{
