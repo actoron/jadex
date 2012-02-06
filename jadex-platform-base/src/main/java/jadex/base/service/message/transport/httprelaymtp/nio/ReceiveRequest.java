@@ -160,6 +160,24 @@ public class ReceiveRequest	implements IHttpRequest
 	 */
 	public boolean	reschedule()
 	{
+		// Disconnected from relay.
+		if(state>STATE_READING_HEADER_REST)
+		{
+			SServiceProvider.getService(access.getServiceProvider(), IRelayAwarenessService.class, Binding.SCOPE_PLATFORM)
+				.addResultListener(new IResultListener<IRelayAwarenessService>()
+			{
+				public void resultAvailable(IRelayAwarenessService ras)
+				{
+					ras.disconnected(SRelay.ADDRESS_SCHEME+address.getFirstEntity()+":"+address.getSecondEntity()+path);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					// No awa service -> ignore awa infos.
+				}
+			});
+		}
+		
 		// Reschedule always.
 		return true;
 	}
