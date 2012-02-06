@@ -21,12 +21,6 @@ public class UnparsedExpression
 	/** The clazz info. */
 	protected ClassInfo clazz;
 	
-//	/** The class name. */
-//	protected String classname;
-//	
-//	/** The class. */
-//	protected Class<?> clazz;
-	
 	/** The value. */
 	protected String value;
 	
@@ -83,56 +77,6 @@ public class UnparsedExpression
 	{
 		this.name = name;
 	}
-
-//	/**
-//	 *  Get the clazz name.
-//	 *  @return The clazz name.
-//	 */
-//	public String getClassName()
-//	{
-//		return classname;
-//	}
-//
-//	/**
-//	 *  Set the clazz name.
-//	 *  @param clazz The clazz name.
-//	 */
-//	public void setClassName(String classname)
-//	{
-//		this.classname = classname;
-//	}
-
-//	/**
-//	 *  Get the clazz.
-//	 *  @return The clazz.
-//	 */
-//	public Class getClazz()
-//	{
-//		return clazz;
-//	}
-	
-//	/**
-//	 *  Get the clazz.
-//	 *  @return The clazz.
-//	 */
-//	public Class<?> getClazz(ClassLoader classloader, String[] imports)
-//	{
-//		if(clazz==null && classname!=null)
-//		{
-//			clazz = SReflect.findClass0(classname, imports, classloader);
-//		}
-//		return clazz;
-//	}
-
-	// Excluded to avoid sending per xml 
-//	/**
-//	 *  Set the clazz.
-//	 *  @param clazz The clazz to set.
-//	 */
-//	public void setClazz(Class clazz)
-//	{
-//		this.clazz = clazz;
-//	}
 
 	/**
 	 *  Get the clazz.

@@ -283,11 +283,15 @@ public class SUtil
 	 */
 	public static <T> List<T> arrayToList(Object a)
 	{
-		int l = Array.getLength(a);
-		ArrayList ret = SCollection.createArrayList();
-		for(int i = 0; i < l; i++)
+		ArrayList ret = null;
+		if(a!=null)
 		{
-			ret.add(Array.get(a, i));
+			int l = Array.getLength(a);
+			ret = SCollection.createArrayList();
+			for(int i = 0; i < l; i++)
+			{
+				ret.add(Array.get(a, i));
+			}
 		}
 		return ret;
 	}

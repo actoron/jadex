@@ -1,20 +1,25 @@
 package jadex.extension.rs.publish;
 
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,13 +45,35 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Providers;
 
+import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.http.server.ServerConfiguration;
 
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.ApplicationAdapter;
+import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.server.impl.container.grizzly.GrizzlyContainer;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderFactory;
+import com.sun.jersey.spi.MessageBodyWorkers;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseWriter;
+import com.sun.jersey.spi.container.ExceptionMapperContext;
+import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.container.WebApplicationFactory;
+import com.sun.jersey.spi.monitoring.DispatchingListener;
+import com.sun.jersey.spi.monitoring.RequestListener;
+import com.sun.jersey.spi.monitoring.ResponseListener;
 
 /**
  *  The default web service publish service.
@@ -55,10 +82,33 @@ import com.sun.jersey.api.json.JSONConfiguration;
 @Service
 public class DefaultRestServicePublishService implements IPublishService
 {
+	//-------- constants --------
+	
+	/** Constant for boolean flag if automatic generation should be used.*/ 
+	public static String GENERATE = "generate";
+	
+	/** Constant for String[] for supported parameter media types.*/ 
+	public static String FORMATS = "formats";
+	
+	/** The default media formats. */
+	public static String[] DEFAULT_FORMATS = new String[]{"xml", "json"};
+
+	/** The format -> media type mapping. */
+	public static Map<String, String> formatmap = SUtil.createHashMap(DEFAULT_FORMATS, 
+		new String[]{MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON});
+	
 	//-------- attributes --------
 	
-	/** The published endpoints. */
-	protected Map<IServiceIdentifier, HttpServer> endpoints;
+	/** The component. */
+	@ServiceComponent
+	protected IInternalAccess component;
+	
+	/** The servers per service id. */
+	protected Map<IServiceIdentifier, HttpServer> sidservers;
+	
+	/** The servers per uri. */
+	protected Map<URI, HttpServer> uriservers;
+
 	
 	//-------- methods --------
 	
@@ -87,10 +137,36 @@ public class DefaultRestServicePublishService implements IPublishService
 			// Jaxb seems to use the context classloader so it needs to be set :-(
 			ClassLoader ccl = Thread.currentThread().getContextClassLoader();
 			Thread.currentThread().setContextClassLoader(cl);
-
+			URI uri = new URI(pi.getPublishId());
+						
+			// Note: the expression evaluation is done on another component so that no original imports and classes can be used 
+			// Should not be a problem because only basic properties are used (String, boolean)
+			Map<String, Object> mapprops = new HashMap<String, Object>();
+			if(pi.getProperties()!=null)
+			{
+				for(int i=0; i<pi.getProperties().size(); i++)
+				{
+					Object val = UnparsedExpression.getParsedValue(pi.getProperties().get(i), null, component.getFetcher(), component.getClassLoader());
+					mapprops.put(pi.getProperties().get(i).getName(), val);
+				}
+			}
+			
+			// If no service type was specified it has to be generated.
+			Class<?> rsimpl = null;
+			Boolean gen = (Boolean)mapprops.get(GENERATE);
+			if(gen!=null && !gen.booleanValue())
+			{
+				rsimpl = pi.getServiceType().getType(cl);
+			}
+			else
+			{
+				rsimpl = createProxyClass(service, cl, uri.getPath(), pi.getServiceType()!=null? 
+					pi.getServiceType().getType(cl): null, mapprops);
+			}
+			
 			Map<String, Object> props = new HashMap<String, Object>();
 			String jerseypack = "com.sun.jersey.config.property.packages";
-			String pack = pi.getServiceType().getType(cl).getPackage().getName();
+			String pack = rsimpl.getPackage().getName();
 			props.put(pi.getPublishId(), service);
 			StringBuilder strb = new StringBuilder("jadex.extension.rs.publish"); // Add Jadex XML body reader/writer
 			strb.append(", ");
@@ -99,22 +175,36 @@ public class DefaultRestServicePublishService implements IPublishService
 			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 			props.put("__service", service);
 			PackagesResourceConfig config = new PackagesResourceConfig(props);
-			URI uri = new URI(pi.getPublishId());
 			
-			// If no service type was specified it has to be generated.
-			Class proxy = null;
-			proxy = createProxyClass(service, cl, uri.getPath(), pi.getServiceType().getType(cl));
-			config.getClasses().add(proxy);
+			config.getClasses().add(rsimpl);
 			
+//			URI baseuri = uri;
 			URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
-			HttpServer endpoint = GrizzlyServerFactory.createHttpServer(baseuri.toString(), config);
-			endpoint.start();
-	
-			Thread.currentThread().setContextClassLoader(ccl);
 			
-			if(endpoints==null)
-				endpoints = new HashMap<IServiceIdentifier, HttpServer>();
-			endpoints.put(service.getServiceIdentifier(), endpoint);
+			HttpServer server = uriservers==null? null: uriservers.get(baseuri);
+			if(server==null)
+			{
+				server = GrizzlyServerFactory.createHttpServer(uri.toString(), config);
+				server.start();
+				
+				if(uriservers==null)
+					uriservers = new HashMap<URI, HttpServer>();
+				uriservers.put(baseuri, server);
+			}
+			else
+			{
+				HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, config);
+				ServerConfiguration sc = server.getServerConfiguration();
+				sc.addHttpHandler(handler, uri.getPath());
+//				Map h = sc.getHttpHandlers();
+//				System.out.println("handlers: "+h);
+			}
+			
+			if(sidservers==null)
+				sidservers = new HashMap<IServiceIdentifier, HttpServer>();
+			sidservers.put(service.getServiceIdentifier(), server);
+
+			Thread.currentThread().setContextClassLoader(ccl);
 		}
 		catch(Exception e)
 		{
@@ -132,9 +222,9 @@ public class DefaultRestServicePublishService implements IPublishService
 	{
 		Future<Void> ret = new Future<Void>();
 		boolean stopped = false;
-		if(endpoints!=null)
+		if(sidservers!=null)
 		{
-			HttpServer ep = endpoints.remove(sid);
+			HttpServer ep = sidservers.remove(sid);
 			if(ep!=null)
 			{
 				ep.stop();
@@ -154,17 +244,15 @@ public class DefaultRestServicePublishService implements IPublishService
 	 *  @param type The web service interface type.
 	 *  @return The proxy object.
 	 */
-	protected Class createProxyClass(IService service, ClassLoader classloader, 
-		String apppath, Class baseclass) throws Exception
+	protected Class<?> createProxyClass(IService service, ClassLoader classloader, 
+		String apppath, Class<?> baseclass, Map<String, Object> mapprops) throws Exception
 	{
-		Class ret = null;
+		Class<?> ret = null;
 
-		if(baseclass==null || Object.class.equals(baseclass))
+		if(baseclass==null)
 			baseclass = Proxy.class;
 		
-		ClassPool pool = ClassPool.getDefault();
-//		String pck = type.getPackage().getName();
-//		pool.importPackage(pck);
+		String[] formats = mapprops.get(FORMATS)==null? DEFAULT_FORMATS: (String[])mapprops.get(FORMATS);
 		
 		Class type = service.getServiceIdentifier().getServiceType().getType(classloader);
 		String name = type.getPackage().getName()+".Proxy"+type.getSimpleName();
@@ -176,6 +264,7 @@ public class DefaultRestServicePublishService implements IPublishService
 		}
 		catch(Exception e)
 		{
+			ClassPool pool = ClassPool.getDefault();
 //			CtClass proxyclazz = pool.makeClass(name, getCtClass(jadex.extension.ws.publish.Proxy.class, pool));
 			CtClass proxyclazz = pool.makeClass(name, getCtClass(baseclass, pool));
 			ClassFile cf = proxyclazz.getClassFile();
@@ -205,52 +294,55 @@ public class DefaultRestServicePublishService implements IPublishService
 					Type[] pts = pt.getActualTypeArguments();
 					if(pts.length>1)
 						throw new RuntimeException("Cannot unwrap futurized method due to more than one generic type: "+SUtil.arrayToString(pt.getActualTypeArguments()));
-					rt = (Class)pts[0];
+					rt = (Class<?>)pts[0];
 				}
 //				System.out.println("rt: "+pt.getRawType()+" "+SUtil.arrayToString(pt.getActualTypeArguments()));
 				
 				String methodname = ms[i].getName();
-				CtClass rettype = getCtClass((Class)rt, pool);
-				CtClass[] paramtypes = getCtClasses(ms[i].getParameterTypes(), pool);
-				CtClass[] exceptions = getCtClasses(ms[i].getExceptionTypes(), pool);
 				
-				// todo: what about pure string variants?
-				// todo: what about mixed variants (in json out xml or plain)
-				String[] exts = new String[]{"XML", "JSON"};
-				String[] mtypes = new String[]{MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON};
-				
-				for(int j=0; j<exts.length; j++)
+				// Do not generate method if user has implemented it by herself
+				Method ovmethod = baseclass.getMethod(name, ms[i].getParameterTypes());
+				if(ovmethod==null)
 				{
-					String mtname = methodname+exts[j];
-					String path = mtname;
-					for(int k=1; paths.contains(path); k++)
+					CtClass rettype = getCtClass((Class)rt, pool);
+					CtClass[] paramtypes = getCtClasses(ms[i].getParameterTypes(), pool);
+					CtClass[] exceptions = getCtClasses(ms[i].getExceptionTypes(), pool);
+					
+					// todo: what about pure string variants?
+					// todo: what about mixed variants (in json out xml or plain)
+					for(int j=0; j<formats.length; j++)
 					{
-						path = mtname+"#"+k;
-					}
-					paths.add(path);
+						String mtname = formats.length>1? methodname+formats[j].toUpperCase(): methodname;
+						String path = mtname;
+						for(int k=1; paths.contains(path); k++)
+						{
+							path = mtname+"#"+k;
+						}
+						paths.add(path);
+							
+						CtMethod m = CtNewMethod.wrapped(rettype, mtname, 
+							paramtypes, exceptions, invoke, null, proxyclazz);
 						
-					CtMethod m = CtNewMethod.wrapped(rettype, mtname, 
-						paramtypes, exceptions, invoke, null, proxyclazz);
-					
-					attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-					annot = new Annotation(constpool, getCtClass(getHttpType(ms[i], (Class)rt, ms[i].getParameterTypes()), pool));
-					attr.addAnnotation(annot);
-					annot = new Annotation(constpool, getCtClass(Path.class, pool));
-					annot.addMemberValue("value", new StringMemberValue(path, constpool));
-					attr.addAnnotation(annot);
-					annot = new Annotation(constpool, getCtClass(Consumes.class, pool));
-					ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
-					vals.setValue(new MemberValue[]{new StringMemberValue(mtypes[j], constpool)});
-					annot.addMemberValue("value", vals);
-					attr.addAnnotation(annot);
-					annot = new Annotation(constpool, getCtClass(Produces.class, pool));
-					annot.addMemberValue("value", vals);
-					attr.addAnnotation(annot);
-					
-					m.getMethodInfo().addAttribute(attr);
-//					System.out.println("m: "+m.getName());
-					
-					proxyclazz.addMethod(m);
+						attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+						annot = new Annotation(constpool, getCtClass(getHttpType(ms[i], (Class)rt, ms[i].getParameterTypes()), pool));
+						attr.addAnnotation(annot);
+						annot = new Annotation(constpool, getCtClass(Path.class, pool));
+						annot.addMemberValue("value", new StringMemberValue(path, constpool));
+						attr.addAnnotation(annot);
+						annot = new Annotation(constpool, getCtClass(Consumes.class, pool));
+						ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
+						vals.setValue(new MemberValue[]{new StringMemberValue(formatmap.get(formats[j]), constpool)});
+						annot.addMemberValue("value", vals);
+						attr.addAnnotation(annot);
+						annot = new Annotation(constpool, getCtClass(Produces.class, pool));
+						annot.addMemberValue("value", vals);
+						attr.addAnnotation(annot);
+						
+						m.getMethodInfo().addAttribute(attr);
+	//					System.out.println("m: "+m.getName());
+						
+						proxyclazz.addMethod(m);
+					}
 				}
 			}
 			

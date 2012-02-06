@@ -409,7 +409,10 @@ public class MicroClassReader
 					}
 					ProvidedServiceImplementation impl = createImplementation(im);
 					Publish p = vals[i].publish();
-					PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.servicetype());
+					NameValue[] props = p.properties();
+					UnparsedExpression[] exps = createUnparsedExpressions(props);
+					
+					PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), Object.class.equals(p.servicetype())? null: p.servicetype(), exps);
 					ProvidedServiceInfo psis = new ProvidedServiceInfo(vals[i].name().length()>0? 
 						vals[i].name(): null, vals[i].type(), impl, pi);
 				
@@ -565,7 +568,8 @@ public class MicroClassReader
 							ProvidedServiceImplementation impl = new ProvidedServiceImplementation(!im.value().equals(Object.class)? im.value(): null, 
 								im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 							Publish p = provs[j].publish();
-							PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), p.servicetype());
+							PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), 
+								p.servicetype(), createUnparsedExpressions(p.properties()));
 							psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, pi);
 							configinfo.setProvidedServices(psis);
 						}
@@ -602,11 +606,7 @@ public class MicroClassReader
 							NameValue[] args = comps[j].arguments();
 							if(args.length>0)
 							{
-								UnparsedExpression[] exps = new UnparsedExpression[args.length];
-								for(int k=0; k<args.length; k++)
-								{
-									exps[k] = new UnparsedExpression(args[k].name(), args[k].clazz(), args[k].value(), null);
-								}
+								UnparsedExpression[] exps = createUnparsedExpressions(args);
 								comp.setArguments(exps);
 							}
 							
@@ -724,7 +724,7 @@ public class MicroClassReader
 	}
 	
 	/**
-	 *  Create an unparsed expression.
+	 *  Create unparsed expressions.
 	 */
 	protected UnparsedExpression[] createUnparsedExpressions(Value[] values)
 	{
@@ -732,9 +732,26 @@ public class MicroClassReader
 		if(values.length>0)
 		{
 			ret = new UnparsedExpression[values.length];
-			for(int j=0; j<values.length; j++)
+			for(int i=0; i<values.length; i++)
 			{
-				ret[j] = new UnparsedExpression(null, values[j].clazz(), values[j].value(), null);
+				ret[i] = new UnparsedExpression(null, values[i].clazz(), values[i].value(), null);
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 *  Create unparsed expressions.
+	 */
+	protected UnparsedExpression[] createUnparsedExpressions(NameValue[] values)
+	{
+		UnparsedExpression[] ret = null;
+		if(values.length>0)
+		{
+			ret = new UnparsedExpression[values.length];
+			for(int i=0; i<values.length; i++)
+			{
+				ret[i] = new UnparsedExpression(values[i].name(), values[i].clazz(), values[i].value(), null);
 			}
 		}
 		return ret;

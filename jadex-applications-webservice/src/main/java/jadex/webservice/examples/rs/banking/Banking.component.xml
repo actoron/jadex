@@ -13,18 +13,25 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
-	name="Banking" package="jadex.micro.examples.rs.banking">
+	name="Banking" package="jadex.webservice.examples.rs.banking">
 	
 	<imports>
-		<import>jadex.base.service.ws.*</import>
-		<import>jadex.micro.examples.ws.offerquote.gen.*</import>
+		<import>jadex.bridge.service.types.publish.*</import>
 	</imports>
 	
 	<services>
-		<providedservice class="IBankingService">
+		<!-- a) Generate everything (no own implementation) -->
+		<providedservice name="banking1" class="IBankingService">
 			<implementation class="BankingService"/>
-			<publish publishtype="rs" publishid="http://localhost:8080/banking"/>
+			<publish publishtype="rs" publishid="http://localhost:8080/wanking1">
+				<properties>
+					<property name="formats">new String[]{"xml", "json"}</property>
+				</properties>
+			</publish>
 		</providedservice>
+		<!--  <providedservice name="banking1" class="IBankingService">
+			<implementation class="BankingService"/>
+			<publish publishtype="rs" publishid="http://localhost:8080/" servicetype="RSBankingService.class"/>
+		</providedservice>-->
 	</services>
 </componenttype>	
-

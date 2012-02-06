@@ -25,5 +25,10 @@ public @interface Publish
 	/**
 	 * The service type. 
 	 */
-	public Class servicetype() default Object.class;
+	public Class<?> servicetype() default Object.class;
+	
+	/**
+	 *  The mapping properties. 
+	 */
+	public NameValue[] properties() default {};
 }

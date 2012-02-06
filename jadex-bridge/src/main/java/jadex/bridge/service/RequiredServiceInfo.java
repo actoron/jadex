@@ -41,12 +41,6 @@ public class RequiredServiceInfo
 	/** The component internal service name. */
 	protected String name;
 	
-//	/** The service interface type as string. */
-//	protected String typename;
-	
-//	/** The service interface type. */
-//	protected Class<T> type;
-
 	/** The type. */
 	protected ClassInfo type;
 	

@@ -1,6 +1,10 @@
 package jadex.bridge.service;
 
 import jadex.bridge.ClassInfo;
+import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.commons.SUtil;
+
+import java.util.List;
 
 /**
  *  Info struct for service publishing details.
@@ -17,6 +21,9 @@ public class PublishInfo
 	
 	/** The service type. */
 	protected ClassInfo servicetype;
+	
+	/** The mapping properties. */
+	protected List<UnparsedExpression> properties;
 
 	//-------- constructors --------
 
@@ -32,13 +39,15 @@ public class PublishInfo
 	 *  @param pid The publish id, e.g. url.
 	 *  @param publishtype The publish type.
 	 */
-	public PublishInfo(String pid, String publishtype, Class servicetype)
+	public PublishInfo(String pid, String publishtype, 
+		Class<?> servicetype, UnparsedExpression[] properties)
 	{
 		this.pid = pid;
 		this.publishtype = publishtype;
-		this.servicetype = new ClassInfo(servicetype);
+		this.servicetype = servicetype==null? null: new ClassInfo(servicetype);
+		this.properties = SUtil.arrayToList(properties);
 	}
-
+	
 	//-------- methods --------
 
 	/**
@@ -93,5 +102,23 @@ public class PublishInfo
 	public void setServiceType(ClassInfo servicetype)
 	{
 		this.servicetype = servicetype;
+	}
+
+	/**
+	 *  Get the properties.
+	 *  @return the properties.
+	 */
+	public List<UnparsedExpression> getProperties()
+	{
+		return properties;
+	}
+
+	/**
+	 *  Set the properties.
+	 *  @param properties The properties to set.
+	 */
+	public void setProperties(List<UnparsedExpression> properties)
+	{
+		this.properties = properties;
 	}
 }
