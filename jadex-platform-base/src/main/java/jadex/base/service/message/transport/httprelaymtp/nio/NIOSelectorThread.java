@@ -150,6 +150,7 @@ public class NIOSelectorThread
 								sc.register(selector, SelectionKey.OP_CONNECT, req);
 								
 								// Create inactivity timer for connection.
+								final Tuple2<String, Integer>	address	= req.getAddress();
 								SelectorTimer	timer	= new SelectorTimer()
 								{
 									public void	run()
@@ -159,15 +160,17 @@ public class NIOSelectorThread
 											NIOSelectorThread.this.logger.info("nio-relay closing connection due to inactivity: "+sc);
 											
 											// close() cancels the key and does not generate nio event.
-											// therefore we need manual cleanup and re-add request 
+											// therefore we need manual cleanup and re-add request, if any
 											SelectionKey	key	= sc.keyFor(selector);
+											connecting.remove(address);
+											if(idle.get(address)!=null)
+												idle.get(address).remove(sc);
+											sc.close();
+											channeltimers.remove(sc);
+											
 											IHttpRequest	req	= (IHttpRequest)key.attachment();
 											if(req!=null)
 											{
-												connecting.remove(req.getAddress());
-												if(idle.get(req.getAddress())!=null)
-													idle.get(req.getAddress()).remove(sc);
-												
 												if(req.reschedule())
 												{
 													synchronized(queue)
@@ -176,8 +179,6 @@ public class NIOSelectorThread
 													}
 												}
 											}
-											sc.close();
-											channeltimers.remove(sc);
 										}
 										catch(IOException e)
 										{
@@ -302,6 +303,10 @@ public class NIOSelectorThread
 										timers.remove(timer);
 										channeltimers.remove(sc);
 									}
+									else if(key.interestOps()==0)
+									{
+										System.out.println("seklh kob");
+									}
 								}
 								else
 								{
@@ -361,6 +366,8 @@ public class NIOSelectorThread
 	{
 		// Update timer.
 		SelectorTimer	timer	= channeltimers.get(sc);
+		if(timer==null)
+			System.out.println("sdvh vk");
 		timers.remove(timer);
 		// Add 25% to ping delay (30 sec) for timeout.
 		timer.setTaskTime(System.currentTimeMillis()+(long)(SRelay.PING_DELAY*1.25));
