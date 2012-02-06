@@ -251,6 +251,7 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 					"-platformname", "and_" + createRandomPlattformID(),
 					"-extensions", "null",
 					"-wspublish", "false",
+					"-rspublish", "false",
 					"-kernels", "\"component, micro\"",
 					"-tcptransport", "false",
 					"-niotcptransport", "false",
@@ -260,6 +261,7 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 					"-saveonexit", "false", "-gui", "false",
 					"-autoshutdown", "false",
 					"-awamechanisms", "new String[]{\"Relay\"}",
+//					"-awareness", "false",
 					"-usepass", "false"
 				}).addResultListener(new IResultListener<IExternalAccess>()
 				{
