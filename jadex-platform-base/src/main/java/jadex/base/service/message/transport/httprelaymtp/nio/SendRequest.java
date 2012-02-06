@@ -38,6 +38,9 @@ public class SendRequest	implements IHttpRequest
 	/** The token to acquire for avoiding duplicate sending. */
 	protected Token	token;
 	
+	/** True, if the token has been acquired. */
+	protected boolean	hastoken;
+	
 	/** The future to be informed, when sending is finished. */
 	protected Future<Void>	fut;
 	
@@ -137,7 +140,8 @@ public class SendRequest	implements IHttpRequest
 		SocketChannel	sc	= (SocketChannel)key.channel();
 //		System.out.println("Sending "+this+" on: "+sc);
 
-		if(token.acquire())
+		hastoken	= hastoken || token.acquire();
+		if(hastoken)
 		{
 //			System.out.println("Sending with relay: "+address);
 			try
