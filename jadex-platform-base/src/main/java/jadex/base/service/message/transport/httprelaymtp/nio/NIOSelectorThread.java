@@ -129,6 +129,7 @@ public class NIOSelectorThread
 							
 							if(idle.containsKey(req.getAddress()) && !idle.get(req.getAddress()).isEmpty() )
 							{
+								req.setIdle(true);
 								SocketChannel	sc	= idle.get(req.getAddress()).remove(0);
 								updateTimer(sc);
 								
@@ -140,6 +141,7 @@ public class NIOSelectorThread
 							}
 							else
 							{
+								req.setIdle(false);
 								NIOSelectorThread.this.logger.info("nio-relay creating connection to: "+req.getAddress().getFirstEntity()+":"+req.getAddress().getSecondEntity());
 								connecting.add(req.getAddress());
 								final SocketChannel	sc	= SocketChannel.open();
