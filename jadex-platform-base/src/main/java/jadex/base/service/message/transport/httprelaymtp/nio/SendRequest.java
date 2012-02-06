@@ -113,11 +113,14 @@ public class SendRequest	implements IHttpRequest
 	}
 	
 	/**
-	 *  Called after (re-)connection success.
-	 *  Here, the request should be re-inited.
+	 *  Called before read/write operations.
+	 *  Also called after the request has been rescheduled in case of errors.
 	 */
-	public void	handleConnect()
+	public void	initRequest()
 	{
+		bufnum	= 0;
+		for(int i=0; i<buffers.size(); i++)
+			buffers.get(i).rewind();
 	}
 	
 	/**
@@ -170,9 +173,6 @@ public class SendRequest	implements IHttpRequest
 			catch(Exception e)
 			{
 				// Request problem (e.g. reused connection already closed): try again.
-				bufnum	= 0;
-				for(int i=0; i<buffers.size(); i++)
-					buffers.get(i).rewind();
 				key.cancel();
 				if(idle)
 				{
@@ -262,9 +262,6 @@ public class SendRequest	implements IHttpRequest
 		catch(Exception e)
 		{
 			// Message send failed: retry.
-			bufnum	= 0;
-			for(int i=0; i<buffers.size(); i++)
-				buffers.get(i).rewind();
 			key.cancel();
 			if(idle)
 			{

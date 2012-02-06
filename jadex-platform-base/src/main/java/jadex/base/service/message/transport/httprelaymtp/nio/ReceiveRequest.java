@@ -165,10 +165,10 @@ public class ReceiveRequest	implements IHttpRequest
 	}
 
 	/**
-	 *  Called after (re-)connection success.
-	 *  Here, the request should be re-inited.
+	 *  Called before read/write operations.
+	 *  Also called after the request has been rescheduled in case of errors.
 	 */
-	public void	handleConnect()
+	public void	initRequest()
 	{
 		try
 		{

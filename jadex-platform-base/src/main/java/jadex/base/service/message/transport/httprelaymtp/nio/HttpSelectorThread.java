@@ -170,7 +170,7 @@ public class HttpSelectorThread
 										assert finished;
 										key.interestOps(SelectionKey.OP_WRITE);
 
-										req.handleConnect();
+										req.initRequest();
 										HttpSelectorThread.this.logger.info("nio-relay connected to: "+req.getAddress().getFirstEntity()+":"+req.getAddress().getSecondEntity());
 										connecting.remove(req.getAddress());
 										

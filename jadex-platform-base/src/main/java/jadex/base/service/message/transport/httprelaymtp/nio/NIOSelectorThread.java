@@ -140,6 +140,8 @@ public class NIOSelectorThread
 						}
 						if(req!=null)
 						{
+							req.initRequest();
+							
 							if(idle.containsKey(req.getAddress()) && !idle.get(req.getAddress()).isEmpty() )
 							{
 								SocketChannel	sc	= idle.get(req.getAddress()).remove(0);
@@ -225,8 +227,6 @@ public class NIOSelectorThread
 										boolean	finished	= sc.finishConnect();
 										assert finished;
 										key.interestOps(SelectionKey.OP_WRITE);
-
-										req.handleConnect();
 										NIOSelectorThread.this.logger.info("nio-relay connected to: "+req.getAddress().getFirstEntity()+":"+req.getAddress().getSecondEntity());
 										connecting.remove(req.getAddress());
 									}
