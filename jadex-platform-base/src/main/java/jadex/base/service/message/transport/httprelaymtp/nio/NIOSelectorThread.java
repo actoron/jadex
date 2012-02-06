@@ -134,7 +134,7 @@ public class NIOSelectorThread
 								updateTimer(sc);
 								
 								// Can not find out if connection still works!? Just try request and reschedule on connection problems.
-//								System.out.println("Reusing connection: "+sc.isOpen()+", "+sc.isConnected());
+								System.out.println("Reusing connection: "+sc.isOpen()+", "+sc.isConnected());
 								SelectionKey	key	= sc.keyFor(selector);
 								key.attach(req);
 								key.interestOps(SelectionKey.OP_WRITE);
@@ -161,14 +161,22 @@ public class NIOSelectorThread
 											
 											// close() cancels the key and does not generate nio event.
 											// therefore we need manual cleanup and re-add request, if any
-											SelectionKey	key	= sc.keyFor(selector);
 											connecting.remove(address);
 											if(idle.get(address)!=null)
+											{
 												idle.get(address).remove(sc);
-											sc.close();
+												System.out.println("Idle connections-: "+idle.get(address));
+												if(idle.get(address).isEmpty())
+												{
+													idle.remove(address);
+												}
+											}
 											channeltimers.remove(sc);
 											
-											IHttpRequest	req	= (IHttpRequest)key.attachment();
+											SelectionKey	key	= sc.keyFor(selector);
+											if(key==null)
+												System.out.println("sdk jgvilk");
+											IHttpRequest	req	= key!=null ? (IHttpRequest)key.attachment() : null;
 											if(req!=null)
 											{
 												if(req.reschedule())
@@ -179,6 +187,8 @@ public class NIOSelectorThread
 													}
 												}
 											}
+											
+											sc.close();
 										}
 										catch(IOException e)
 										{
@@ -294,22 +304,19 @@ public class NIOSelectorThread
 										}
 										cons.add((SocketChannel)key.channel());
 										key.attach(null);
-	//									System.out.println("Idle connections: "+idle.size()+" of "+cons);
+										System.out.println("Idle connections+: "+cons);
 									}
-									else if(!key.channel().isOpen())
+									else if(!key.isValid() || !key.channel().isOpen() || !((SocketChannel)key.channel()).isConnected())
 									{
-										NIOSelectorThread.this.logger.info("nio-relay removed connection: "+sc);
+										NIOSelectorThread.this.logger.info("nio-relay removed connection: "+key.isValid()+", "+!key.channel().isOpen()+", "+((SocketChannel)key.channel()).isConnected()+", "+sc);
 										SelectorTimer	timer	= channeltimers.get(sc);
 										timers.remove(timer);
 										channeltimers.remove(sc);
 									}
-									else if(key.interestOps()==0)
-									{
-										System.out.println("seklh kob");
-									}
 								}
 								else
 								{
+									NIOSelectorThread.this.logger.info("nio-relay cancelling key: "+key.channel());
 									key.cancel();
 								}
 							}
