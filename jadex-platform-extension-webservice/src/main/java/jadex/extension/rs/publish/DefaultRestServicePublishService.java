@@ -9,17 +9,16 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,35 +44,16 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Providers;
 
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
 
-import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
-import com.sun.jersey.api.core.ApplicationAdapter;
-import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
-import com.sun.jersey.core.util.FeaturesAndProperties;
-import com.sun.jersey.server.impl.container.grizzly.GrizzlyContainer;
-import com.sun.jersey.server.impl.inject.ServerInjectableProviderFactory;
-import com.sun.jersey.spi.MessageBodyWorkers;
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseWriter;
-import com.sun.jersey.spi.container.ExceptionMapperContext;
-import com.sun.jersey.spi.container.WebApplication;
-import com.sun.jersey.spi.container.WebApplicationFactory;
-import com.sun.jersey.spi.monitoring.DispatchingListener;
-import com.sun.jersey.spi.monitoring.RequestListener;
-import com.sun.jersey.spi.monitoring.ResponseListener;
 
 /**
  *  The default web service publish service.
@@ -104,7 +84,7 @@ public class DefaultRestServicePublishService implements IPublishService
 	protected IInternalAccess component;
 	
 	/** The servers per service id. */
-	protected Map<IServiceIdentifier, HttpServer> sidservers;
+	protected Map<IServiceIdentifier, Tuple2<HttpServer, HttpHandler>> sidservers;
 	
 	/** The servers per uri. */
 	protected Map<URI, HttpServer> uriservers;
@@ -182,10 +162,12 @@ public class DefaultRestServicePublishService implements IPublishService
 			URI baseuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
 			
 			HttpServer server = uriservers==null? null: uriservers.get(baseuri);
+			HttpHandler handler;
 			if(server==null)
 			{
 				server = GrizzlyServerFactory.createHttpServer(uri.toString(), config);
 				server.start();
+				handler = server.getHttpHandler();
 				
 				if(uriservers==null)
 					uriservers = new HashMap<URI, HttpServer>();
@@ -193,7 +175,7 @@ public class DefaultRestServicePublishService implements IPublishService
 			}
 			else
 			{
-				HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, config);
+				handler = ContainerFactory.createContainer(HttpHandler.class, config);
 				ServerConfiguration sc = server.getServerConfiguration();
 				sc.addHttpHandler(handler, uri.getPath());
 //				Map h = sc.getHttpHandlers();
@@ -201,8 +183,8 @@ public class DefaultRestServicePublishService implements IPublishService
 			}
 			
 			if(sidservers==null)
-				sidservers = new HashMap<IServiceIdentifier, HttpServer>();
-			sidservers.put(service.getServiceIdentifier(), server);
+				sidservers = new HashMap<IServiceIdentifier, Tuple2<HttpServer, HttpHandler>>();
+			sidservers.put(service.getServiceIdentifier(), new Tuple2<HttpServer, HttpHandler>(server, handler));
 
 			Thread.currentThread().setContextClassLoader(ccl);
 		}
@@ -224,11 +206,15 @@ public class DefaultRestServicePublishService implements IPublishService
 		boolean stopped = false;
 		if(sidservers!=null)
 		{
-			HttpServer ep = sidservers.remove(sid);
-			if(ep!=null)
+			Tuple2<HttpServer, HttpHandler> tup = sidservers.remove(sid);
+			if(tup!=null)
 			{
-				ep.stop();
-				stopped = true;
+				HttpServer server = tup.getFirstEntity();
+			    ServerConfiguration config = server.getServerConfiguration();
+			    config.removeHttpHandler(tup.getSecondEntity());
+			    if(config.getHttpHandlers().size()==0)
+			    	server.stop();
+			    stopped = true;
 				ret.setResult(null);
 			}
 		}
@@ -301,8 +287,11 @@ public class DefaultRestServicePublishService implements IPublishService
 				String methodname = ms[i].getName();
 				
 				// Do not generate method if user has implemented it by herself
-				Method ovmethod = baseclass.getMethod(name, ms[i].getParameterTypes());
-				if(ovmethod==null)
+				try
+				{
+					baseclass.getMethod(name, ms[i].getParameterTypes());
+				}
+				catch(Exception ex)
 				{
 					CtClass rettype = getCtClass((Class)rt, pool);
 					CtClass[] paramtypes = getCtClasses(ms[i].getParameterTypes(), pool);
