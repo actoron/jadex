@@ -109,21 +109,6 @@ public class NIOSelectorThread
 //					System.out.println("running selector thread");
 					try
 					{
-						// Perform due tasks and store next timeout.
-						long	timeout	= 0;
-						for(Iterator<SelectorTimer> it= timers.iterator(); it.hasNext(); )
-						{
-							SelectorTimer	timer	= it.next();
-							timeout	= timer.getTaskTime() - System.currentTimeMillis();
-							// If timer is due -> execute task.
-							if(timeout<=0)
-							{
-								it.remove();
-								timer.run();
-								timeout	= 0;	// if last timer -> block on selector.
-							}
-						}
-						
 						// Add outstanding requests from queue
 						IHttpRequest	req	= null;
 						synchronized(queue)
@@ -190,6 +175,7 @@ public class NIOSelectorThread
 												}
 											}
 											sc.close();
+											channeltimers.remove(sc);
 										}
 										catch(IOException e)
 										{
@@ -202,101 +188,120 @@ public class NIOSelectorThread
 							}
 						}
 						
-						// Wait for an event one of the registered channels
-//						System.out.println("selector idle");
-						selector.select(timeout);
-
-						// Iterate over the set of keys for which events are available
-						Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
-						while(selectedKeys.hasNext())
+						// Perform due tasks or store next timeout.
+						long	timeout	= 0;
+						boolean	wait	= true;
+						for(Iterator<SelectorTimer> it= timers.iterator(); it.hasNext(); )
 						{
-							SelectionKey key = selectedKeys.next();
-							selectedKeys.remove();
-
-							if(key.isValid())
+							SelectorTimer	timer	= it.next();
+							timeout	= timer.getTaskTime() - System.currentTimeMillis();
+							// If timer is due -> execute task.
+							if(timeout<=0)
 							{
-								int	reschedule	= -1;
-								req	= (IHttpRequest)key.attachment();
-								SocketChannel	sc	= (SocketChannel)key.channel();
-								updateTimer(sc);
-								
-								if(key.isConnectable())
-								{
-									try
-									{
-										boolean	finished	= sc.finishConnect();
-										assert finished;
-										key.interestOps(SelectionKey.OP_WRITE);
-										NIOSelectorThread.this.logger.info("nio-relay connected to: "+req.getAddress().getFirstEntity()+":"+req.getAddress().getSecondEntity());
-										connecting.remove(req.getAddress());
-									}
-									catch(Exception e)
-									{
-										NIOSelectorThread.this.logger.info("nio-relay could not connect to relay server (re-attempting in 30 seconds): "+e);
-										key.cancel();
-										reschedule	= 30000;
-									}
-								}
-								else if(key.isWritable())
-								{
-									reschedule	= req.handleWrite(key);
-								}
-								else if(key.isReadable())
-								{
-									reschedule	= req.handleRead(key);
-								}
-								
-								// Reschedule request in case of error.
-								if(reschedule==0)
-								{
-									synchronized(queue)
-									{
-										// Queue at beginning to keep message order in case of outdated idle connections.
-										queue.add(0, req);
-									}
-								}
-								else if(reschedule>0)
-								{
-									final IHttpRequest	freq	= req;
-									SelectorTimer	timer	= new SelectorTimer()
-									{
-										public void run()
-										{
-											synchronized(queue)
-											{
-												queue.add(freq);
-											}
-											connecting.remove(freq.getAddress());
-											selector.wakeup();
-										}
-									};
-									timer.setTaskTime(reschedule+System.currentTimeMillis());
-									timers.add(timer);
-								}
-								
-								// If connection is open but no longer needed, add to idle list.
-								if(key.isValid() && key.channel().isOpen() && key.interestOps()==0)
-								{
-									List<SocketChannel>	cons	= idle.get(req.getAddress());
-									if(cons==null)
-									{
-										cons	= new LinkedList<SocketChannel>();
-										idle.put(req.getAddress(), cons);
-									}
-									cons.add((SocketChannel)key.channel());
-//									System.out.println("Idle connections: "+idle.size()+" of "+cons);
-								}
-								else if(!key.channel().isOpen())
-								{
-									NIOSelectorThread.this.logger.info("nio-relay closed connection: "+sc);
-									SelectorTimer	timer	= channeltimers.get(sc);
-									timers.remove(timer);
-									channeltimers.remove(sc);
-								}
+								it.remove();
+								timer.run();
+								wait	= false;	// check queue first, if entries are executed.
 							}
-							else
+						}
+						
+						if(wait)
+						{
+							// Wait for an event one of the registered channels
+	//						System.out.println("selector idle");
+							selector.select(timeout);
+	
+							// Iterate over the set of keys for which events are available
+							Iterator<SelectionKey> selectedKeys = selector.selectedKeys().iterator();
+							while(selectedKeys.hasNext())
 							{
-								key.cancel();
+								SelectionKey key = selectedKeys.next();
+								selectedKeys.remove();
+	
+								if(key.isValid())
+								{
+									int	reschedule	= -1;
+									req	= (IHttpRequest)key.attachment();
+									SocketChannel	sc	= (SocketChannel)key.channel();
+									updateTimer(sc);
+									
+									if(key.isConnectable())
+									{
+										try
+										{
+											boolean	finished	= sc.finishConnect();
+											assert finished;
+											key.interestOps(SelectionKey.OP_WRITE);
+											NIOSelectorThread.this.logger.info("nio-relay connected to: "+req.getAddress().getFirstEntity()+":"+req.getAddress().getSecondEntity());
+											connecting.remove(req.getAddress());
+										}
+										catch(Exception e)
+										{
+											NIOSelectorThread.this.logger.info("nio-relay could not connect to relay server (re-attempting in 30 seconds): "+e);
+											key.cancel();
+											reschedule	= 30000;
+										}
+									}
+									else if(key.isWritable())
+									{
+										reschedule	= req.handleWrite(key);
+									}
+									else if(key.isReadable())
+									{
+										reschedule	= req.handleRead(key);
+									}
+									
+									// Reschedule request in case of error.
+									if(reschedule==0)
+									{
+										synchronized(queue)
+										{
+											// Queue at beginning to keep message order in case of outdated idle connections.
+											queue.add(0, req);
+										}
+									}
+									else if(reschedule>0)
+									{
+										final IHttpRequest	freq	= req;
+										SelectorTimer	timer	= new SelectorTimer()
+										{
+											public void run()
+											{
+												synchronized(queue)
+												{
+													queue.add(0, freq);
+												}
+												connecting.remove(freq.getAddress());
+												selector.wakeup();
+											}
+										};
+										timer.setTaskTime(reschedule+System.currentTimeMillis());
+										timers.add(timer);
+									}
+									
+									// If connection is open but no longer needed, add to idle list.
+									if(key.isValid() && key.channel().isOpen() && key.interestOps()==0)
+									{
+										List<SocketChannel>	cons	= idle.get(req.getAddress());
+										if(cons==null)
+										{
+											cons	= new LinkedList<SocketChannel>();
+											idle.put(req.getAddress(), cons);
+										}
+										cons.add((SocketChannel)key.channel());
+	//									System.out.println("Idle connections: "+idle.size()+" of "+cons);
+									}
+									else if(!key.channel().isOpen())
+									{
+										NIOSelectorThread.this.logger.info("nio-relay removed connection: "+sc);
+										SelectorTimer	timer	= channeltimers.get(sc);
+										timers.remove(timer);
+										channeltimers.remove(sc);
+									}
+								}
+								else
+								{
+									key.cancel();
+								}
 							}
 						}
 					}
