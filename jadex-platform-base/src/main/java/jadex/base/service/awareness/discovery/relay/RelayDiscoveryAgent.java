@@ -94,6 +94,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 	public IFuture<Void>	connected(String address)
 	{
 		agent.getLogger().info("Awareness connected: "+address);
+		sendInfo(false);
 		return IFuture.DONE;
 	}
 
@@ -104,6 +105,7 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 	public IFuture<Void>	disconnected(String address)
 	{
 		agent.getLogger().info("Awareness disconnected: "+address);
+		// Todo: remove discovery infos received from awareness
 		return IFuture.DONE;		
 	}
 

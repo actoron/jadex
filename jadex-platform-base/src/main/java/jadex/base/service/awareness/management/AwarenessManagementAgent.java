@@ -6,7 +6,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.awareness.IManagementService;
@@ -23,6 +22,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.MicroAgent;
@@ -117,7 +117,6 @@ import java.util.TimerTask;
 @RequiredServices(
 {
 	@RequiredService(name="cms", type=IComponentManagementService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-//	@RequiredService(name="clock", type=IClockService.class, scope=RequiredServiceInfo.SCOPE_PLATFORM),
 	@RequiredService(name="settings", type=ISettingsService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="discoveries", type=IDiscoveryService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT))
 })
@@ -148,10 +147,10 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	protected IComponentIdentifier root;
 	
 	/** The includes list. */
-	protected List	includes;
+	protected List<String>	includes;
 	
 	/** The excludes list. */
-	protected List	excludes;
+	protected List<String>	excludes;
 	
 	//-------- methods --------
 	
@@ -167,25 +166,23 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		final Future<Void>	ret	= new Future<Void>();
 		
 		final String[] mechas = (String[])getArgument("mechanisms");
-		SServiceProvider.getService(getServiceProvider(), IComponentManagementService.class, 
-			RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		IFuture<IComponentManagementService>	cmsfut	= getServiceContainer().getRequiredService("cms");
+		cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
 				CounterResultListener<IComponentIdentifier> lis = new CounterResultListener<IComponentIdentifier>(mechas.length, 
-					false, createResultListener(new DelegationResultListener<Void>(ret)
+					false, new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
-						getServiceContainer().getRequiredService("settings").addResultListener(
-							createResultListener(new IResultListener()
+						IFuture<ISettingsService>	setfut	= getServiceContainer().getRequiredService("settings");
+						setfut.addResultListener(new IResultListener<ISettingsService>()
 						{
-							public void resultAvailable(Object result)
+							public void resultAvailable(ISettingsService settings)
 							{
-								ISettingsService	settings	= (ISettingsService)result;
-								
 								settings.registerPropertiesProvider(getAgentName(), AwarenessManagementAgent.this)
-									.addResultListener(new DelegationResultListener(ret));
+									.addResultListener(new DelegationResultListener<Void>(ret));
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -193,9 +190,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 								// No settings service: ignore.
 								ret.setResult(null);
 							}
-						}));
+						});
 					}
-				}));
+				});
 				
 				CreationInfo info = new CreationInfo(getComponentIdentifier());
 				for(int i=0; i<mechas.length; i++)
@@ -204,7 +201,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 					cms.createComponent(null, mechas[i], info, null).addResultListener(lis);
 				}
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -218,14 +215,14 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		this.autocreate = ((Boolean)getArgument("autocreate")).booleanValue();
 		this.autodelete = ((Boolean)getArgument("autodelete")).booleanValue();
 		
-		this.includes	= new ArrayList();
+		this.includes	= new ArrayList<String>();
 		StringTokenizer	stok	= new StringTokenizer((String)getArgument("includes"), ",");
 		while(stok.hasMoreTokens())
 		{
 			includes.add(stok.nextToken().trim());
 		}
 		
-		this.excludes	= new ArrayList();
+		this.excludes	= new ArrayList<String>();
 		stok	= new StringTokenizer((String)getArgument("excludes"), ",");
 		while(stok.hasMoreTokens())
 		{
@@ -247,16 +244,16 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 *  Called just before the agent is removed from the platform.
 	 *  @return The result of the component.
 	 */
-	public IFuture	agentKilled()
+	public IFuture<Void>	agentKilled()
 	{
-		final Future	ret	= new Future();
-		getServiceContainer().getRequiredService("settings").addResultListener(createResultListener(new IResultListener()
+		final Future<Void>	ret	= new Future<Void>();
+		IFuture<ISettingsService>	setfut	= getServiceContainer().getRequiredService("settings");
+		setfut.addResultListener(new IResultListener<ISettingsService>()
 		{
-			public void resultAvailable(Object result)
+			public void resultAvailable(ISettingsService settings)
 			{
-				ISettingsService	settings	= (ISettingsService)result;
 				settings.deregisterPropertiesProvider(getAgentName())
-					.addResultListener(new DelegationResultListener(ret));
+					.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 			
 			public void exceptionOccurred(Exception exception)
@@ -264,7 +261,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				// No settings service: ignore.
 				ret.setResult(null);
 			}
-		}));
+		});
 		
 		return ret;
 	}
@@ -378,11 +375,11 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 //			startSendBehaviour();
 		}
 		
-		getRequiredServices("discoveries").addResultListener(new IntermediateDefaultResultListener()
+		IIntermediateFuture<IDiscoveryService>	disfut	= getRequiredServices("discoveries");
+		disfut.addResultListener(new IntermediateDefaultResultListener<IDiscoveryService>()
 		{
-			public void intermediateResultAvailable(Object result)
+			public void intermediateResultAvailable(IDiscoveryService ds)
 			{
-				IDiscoveryService ds = (IDiscoveryService)result;
 				ds.setDelay(delay);
 			}
 		});
@@ -396,11 +393,11 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	{
 		this.fast = fast;
 
-		getRequiredServices("discoveries").addResultListener(new IntermediateDefaultResultListener()
+		IIntermediateFuture<IDiscoveryService>	disfut	= getRequiredServices("discoveries");
+		disfut.addResultListener(new IntermediateDefaultResultListener<IDiscoveryService>()
 		{
-			public void intermediateResultAvailable(Object result)
+			public void intermediateResultAvailable(IDiscoveryService ds)
 			{
-				IDiscoveryService ds = (IDiscoveryService)result;
 				ds.setFast(fast);
 			}
 		});
@@ -469,14 +466,14 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	{
 		synchronized(this)
 		{
-			this.includes	= new ArrayList(Arrays.asList(includes));
+			this.includes	= new ArrayList<String>(Arrays.asList(includes));
 		}
 		
-		getRequiredServices("discoveries").addResultListener(new IntermediateDefaultResultListener()
+		IIntermediateFuture<IDiscoveryService>	disfut	= getRequiredServices("discoveries");
+		disfut.addResultListener(new IntermediateDefaultResultListener<IDiscoveryService>()
 		{
-			public void intermediateResultAvailable(Object result)
+			public void intermediateResultAvailable(IDiscoveryService ds)
 			{
-				IDiscoveryService ds = (IDiscoveryService)result;
 				ds.setIncludes(includes);
 			}
 		});
@@ -490,14 +487,14 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	{
 		synchronized(this)
 		{
-			this.excludes	= new ArrayList(Arrays.asList(excludes));
+			this.excludes	= new ArrayList<String>(Arrays.asList(excludes));
 		}
 		
-		getRequiredServices("discoveries").addResultListener(new IntermediateDefaultResultListener()
+		IIntermediateFuture<IDiscoveryService>	disfut	= getRequiredServices("discoveries");
+		disfut.addResultListener(new IntermediateDefaultResultListener<IDiscoveryService>()
 		{
-			public void intermediateResultAvailable(Object result)
+			public void intermediateResultAvailable(IDiscoveryService ds)
 			{
-				IDiscoveryService ds = (IDiscoveryService)result;
 				ds.setExcludes(excludes);
 			}
 		});
@@ -531,13 +528,13 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			@XMLClassname("rem")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				List todel = autodelete? new ArrayList(): null;
+				List<DiscoveryInfo> todel = autodelete? new ArrayList<DiscoveryInfo>(): null;
 				synchronized(AwarenessManagementAgent.this)
 				{
 					long time = getClockTime();
-					for(Iterator it=discovered.values().iterator(); it.hasNext(); )
+					for(Iterator<DiscoveryInfo> it=discovered.values().iterator(); it.hasNext(); )
 					{
-						DiscoveryInfo dif = (DiscoveryInfo)it.next();
+						DiscoveryInfo dif = it.next();
 						if(dif.getDelay()!=-1)
 						{
 							// five seconds buffer
@@ -561,7 +558,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				{
 					for(int i=0; i<todel.size(); i++)
 					{
-						DiscoveryInfo dif = (DiscoveryInfo)todel.get(i);
+						DiscoveryInfo dif = todel.get(i);
 						// Ignore deletion failures
 						deleteProxy(dif.getProxy());
 					}
@@ -737,7 +734,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 */
 	protected static String[]	extractNames(IComponentIdentifier cid)
 	{
-		List	ret	= new ArrayList();
+		List<String>	ret	= new ArrayList<String>();
 		ret.add(cid.getName());
 		String[]	addrs	= cid.getAddresses();
 		for(int i=0; i<addrs.length; i++)
@@ -783,7 +780,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	/**
 	 *  Wait for impl.
 	 */
-	protected void	doWaitFor(long delay, final IComponentStep step)
+	protected void	doWaitFor(long delay, final IComponentStep<?> step)
 	{
 //		waitFor(delay, step);
 		

@@ -290,6 +290,7 @@ public class NIOSelectorThread
 											idle.put(req.getAddress(), cons);
 										}
 										cons.add((SocketChannel)key.channel());
+										key.attach(null);
 	//									System.out.println("Idle connections: "+idle.size()+" of "+cons);
 									}
 									else if(!key.channel().isOpen())
