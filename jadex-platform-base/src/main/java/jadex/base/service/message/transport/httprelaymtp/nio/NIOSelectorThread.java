@@ -255,6 +255,7 @@ public class NIOSelectorThread
 									// Reschedule request in case of error.
 									if(reschedule==0)
 									{
+										NIOSelectorThread.this.logger.info("nio-relay rescheduling request immediately: "+req);
 										synchronized(queue)
 										{
 											// Queue at beginning to keep message order in case of outdated idle connections.
@@ -263,6 +264,7 @@ public class NIOSelectorThread
 									}
 									else if(reschedule>0)
 									{
+										NIOSelectorThread.this.logger.info("nio-relay rescheduling request after "+reschedule+" ms: "+req);
 										final IHttpRequest	freq	= req;
 										SelectorTimer	timer	= new SelectorTimer()
 										{
@@ -312,7 +314,7 @@ public class NIOSelectorThread
 					{
 						// Key may be cancelled just after isValid() has been tested.
 						NIOSelectorThread.this.logger.info("nio-relay exception in HttpSelectorThread: "+e);
-//						e.printStackTrace();
+						e.printStackTrace();
 					}
 				}
 			}
