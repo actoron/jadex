@@ -8,22 +8,32 @@
 	<formats>
 		<format>zip</format>
 	</formats>
-	
+
 	<includeBaseDirectory>false</includeBaseDirectory>
-	
+
 	<fileSets>
+		<!-- Include android example project -->
 		<fileSet>
 			<directory>jadex-android-core/docs/jadex-android-example-project</directory>
 			<outputDirectory>jadex-android-example-project</outputDirectory>
 		</fileSet>
-		<fileSet>
-			<directory>jadex-android-core/docs/jadex-android-example-project-maven/src/main/java</directory>
-			<outputDirectory>jadex-android-example-project/src</outputDirectory>
-		</fileSet>
+		<!-- Include android maven example project -->
 		<fileSet>
 			<directory>jadex-android-core/docs/jadex-android-example-project-maven</directory>
 			<outputDirectory>jadex-android-example-project-maven</outputDirectory>
 		</fileSet>
-	</fileSets>	
+
+		<!-- Copy sources from maven example project to non-maven example project -->
+		<fileSet>
+			<directory>jadex-android-core/docs/jadex-android-example-project-maven/src/main/java</directory>
+			<outputDirectory>jadex-android-example-project/src</outputDirectory>
+		</fileSet>
+		<!-- Copy ressources from maven example project to non-maven example project -->
+		<fileSet>
+			<directory>jadex-android-core/docs/jadex-android-example-project-maven/res</directory>
+			<outputDirectory>jadex-android-example-project/res</outputDirectory>
+		</fileSet>
+
+	</fileSets>
 
 </assembly>

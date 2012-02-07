@@ -12,5 +12,8 @@
 	<classpathentry kind="lib" path="lib/jadex-android-misc-0.0.5-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/jadex-android-beans-0.0.5-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/jadex-android-antlr-0.0.5-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/jadex-android-bdi-0.0.5-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/jadex-android-bdibpmn-0.0.5-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/jadex-android-bpmn-0.0.5-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
