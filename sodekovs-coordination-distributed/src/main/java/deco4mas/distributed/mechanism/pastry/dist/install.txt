@@ -1,0 +1,7 @@
+<dependency>
+    <groupId>edu.rice</groupId>
+    <artifactId>freepastry</artifactId>
+    <version>2.1</version>
+</dependency>
+
+Copy freepastry-2.1.jar to: C:\Users\thomas\.m2\repository\edu\rice\freepastry\2.1\

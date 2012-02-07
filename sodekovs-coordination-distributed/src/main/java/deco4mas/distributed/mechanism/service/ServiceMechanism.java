@@ -38,7 +38,6 @@ public class ServiceMechanism extends CoordinationMechanism {
 		// If it's a distributed application, then it has a contextID.
 		HashMap<String, Object> appArgs = (HashMap<String, Object>) this.applicationInterpreter.getArguments();
 		this.coordinationContextID = (String) appArgs.get("CoordinationContextID");
-
 	}
 
 	@Override
