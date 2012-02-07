@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:element name="componenttype" type="componenttype">
 		<xs:annotation>
 			<xs:documentation>A component type specifies the interface, the structure and content of a component.</xs:documentation>
@@ -74,8 +74,8 @@
 	<xs:complexType name="imports">
 		<xs:annotation>
 			<xs:documentation>
-				Imports allow to add packages (e.g. java.util.*)
-				and classes (e.g. java.util.Map) to the class
+Imports allow to add packages (e.g. java.util.*)
+ and classes (e.g. java.util.Map) to the class
 				lookup mechanism.
 			</xs:documentation>
 		</xs:annotation>
@@ -95,8 +95,8 @@
 	<xs:complexType name="arguments">
 		<xs:annotation>
 			<xs:documentation>
-				Container for argument and result
-				specifications.
+Container for argument and result
+ specifications.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
@@ -121,7 +121,7 @@
 	<xs:complexType name="componenttypes">
 		<xs:annotation>
 			<xs:documentation>
-				Container for the used component types.
+Container for the used component types.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
@@ -156,8 +156,8 @@
 	<xs:complexType name="configurations">
 		<xs:annotation>
 			<xs:documentation>
-				In the configurations section, predefined
-				component configurations (i.e. component
+In the configurations section, predefined
+ component configurations (i.e. component
 				instances) can be defined.
 			</xs:documentation>
 		</xs:annotation>
@@ -192,9 +192,9 @@
 	<xs:complexType name="extensiontypes">
 		<xs:annotation>
 			<xs:documentation>
-				In this section, specifications for extensions as required
-				by some specific factory component extension service (e.g.
-				EnvSupport) can be placed.
+In this section, specifications for extensions as required
+ by some specific factory component extension service (e.g.
+ EnvSupport) can be placed.
 			</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
@@ -270,6 +270,9 @@
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="configservices">
+		<xs:annotation>
+			<xs:documentation>Services in a configuration. Allows overriding default service settings.</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="providedservice" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
@@ -296,6 +299,9 @@
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="configsteps">
+		<xs:annotation>
+			<xs:documentation>Container for initial and end steps of a component.</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="initialstep" type="steptype" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="endstep" type="steptype" minOccurs="0" maxOccurs="unbounded"/>
@@ -304,8 +310,8 @@
 	<xs:complexType name="extensions">
 		<xs:annotation>
 			<xs:documentation>
-				In this section, specifications for extensions as required
-				by some specific factory component extension service (e.g.
+In this section, specifications for extensions as required
+ by some specific factory component extension service (e.g.
 				EnvSupport) can be placed.
 			</xs:documentation>
 		</xs:annotation>
@@ -415,6 +421,9 @@
 		<xs:attribute name="autoshutdown" type="xs:boolean" use="optional" default="false"/>
 	</xs:complexType>
 	<xs:complexType name="binding">
+		<xs:annotation>
+			<xs:documentation>The binding of a required service. In a binding it can be defined how a component can retrieve a required service.</xs:documentation>
+		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="interceptor" type="jadex:interceptortype" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
@@ -480,8 +489,14 @@
 		<xs:attribute name="class" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="publish">
+		<xs:annotation>
+			<xs:documentation>Information about how a Jadex service should be made available with other technologies like web services.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="property" type="propertytype" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
 		<xs:attribute name="publishtype" type="xs:string" use="optional" default='"ws"'/>
 		<xs:attribute name="publishid" type="xs:string" use="required"/>
-		<xs:attribute name="servicetype" type="xs:string" use="required"/>
+		<xs:attribute name="servicetype" type="xs:string" use="optional"/>
 	</xs:complexType>
 </xs:schema>

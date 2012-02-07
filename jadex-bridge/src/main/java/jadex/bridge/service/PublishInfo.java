@@ -4,6 +4,7 @@ import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -120,5 +121,16 @@ public class PublishInfo
 	public void setProperties(List<UnparsedExpression> properties)
 	{
 		this.properties = properties;
+	}
+	
+	/**
+	 *  Add a property.
+	 *  @param property The property to add.
+	 */
+	public void addProperty(UnparsedExpression property)
+	{
+		if(properties==null)
+			this.properties = new ArrayList<UnparsedExpression>();
+		properties.add(property);
 	}
 }

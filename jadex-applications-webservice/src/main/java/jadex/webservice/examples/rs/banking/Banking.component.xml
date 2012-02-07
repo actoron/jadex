@@ -24,9 +24,7 @@
 		<providedservice name="banking1" class="IBankingService">
 			<implementation class="BankingService"/>
 			<publish publishtype="rs" publishid="http://localhost:8080/wanking1">
-				<properties>
-					<property name="formats">new String[]{"xml", "json"}</property>
-				</properties>
+				<property name="formats">new String[]{"json"}</property>
 			</publish>
 		</providedservice>
 		<!--  <providedservice name="banking1" class="IBankingService">

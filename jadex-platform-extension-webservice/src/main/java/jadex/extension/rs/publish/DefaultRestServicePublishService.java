@@ -8,6 +8,7 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.publish.IPublishService;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -76,6 +77,9 @@ public class DefaultRestServicePublishService implements IPublishService
 	/** The format -> media type mapping. */
 	public static Map<String, String> formatmap = SUtil.createHashMap(DEFAULT_FORMATS, 
 		new String[]{MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON});
+	
+	/** The service constant. */
+	public static String JADEXSERVICE = "jadexservice"; 
 	
 	//-------- attributes --------
 	
@@ -147,13 +151,13 @@ public class DefaultRestServicePublishService implements IPublishService
 			Map<String, Object> props = new HashMap<String, Object>();
 			String jerseypack = "com.sun.jersey.config.property.packages";
 			String pack = rsimpl.getPackage().getName();
-			props.put(pi.getPublishId(), service);
+//			props.put(uri.toString(), service);
 			StringBuilder strb = new StringBuilder("jadex.extension.rs.publish"); // Add Jadex XML body reader/writer
 			strb.append(", ");
 			strb.append(pack);
 			props.put(jerseypack, strb.toString());
 			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-			props.put("__service", service);
+			props.put(JADEXSERVICE, service);
 			PackagesResourceConfig config = new PackagesResourceConfig(props);
 			
 			config.getClasses().add(rsimpl);
@@ -165,6 +169,7 @@ public class DefaultRestServicePublishService implements IPublishService
 			HttpHandler handler;
 			if(server==null)
 			{
+				System.out.println("Starting new server: "+uri.getPath());
 				server = GrizzlyServerFactory.createHttpServer(uri.toString(), config);
 				server.start();
 				handler = server.getHttpHandler();
@@ -175,6 +180,7 @@ public class DefaultRestServicePublishService implements IPublishService
 			}
 			else
 			{
+				System.out.println("Adding http handler to server: "+uri.getPath());
 				handler = ContainerFactory.createContainer(HttpHandler.class, config);
 				ServerConfiguration sc = server.getServerConfiguration();
 				sc.addHttpHandler(handler, uri.getPath());
@@ -235,14 +241,25 @@ public class DefaultRestServicePublishService implements IPublishService
 	{
 		Class<?> ret = null;
 
-		if(baseclass==null)
-			baseclass = Proxy.class;
-		
 		String[] formats = mapprops.get(FORMATS)==null? DEFAULT_FORMATS: (String[])mapprops.get(FORMATS);
 		
-		Class type = service.getServiceIdentifier().getServiceType().getType(classloader);
-		String name = type.getPackage().getName()+".Proxy"+type.getSimpleName();
+		Class iface = service.getServiceIdentifier().getServiceType().getType(classloader);
 		
+		// The name of the class has to ensure that it represents the different class properties:
+		// - the package+"Proxy"+name of the baseclass or (if not available) interface
+		// - the hashcode of the properties
+		// - only same implclass name + same props => same generated classname
+		
+		StringBuilder builder = new StringBuilder();
+		Class nameclazz = baseclass!=null? baseclass: iface;
+		if(nameclazz.getPackage()!=null)
+			builder.append(nameclazz.getPackage().getName());
+		builder.append(".Proxy");
+		builder.append(nameclazz.getSimpleName());
+		if(mapprops!=null)
+			builder.append(mapprops.hashCode());
+		String name = builder.toString();
+
 		try
 		{
 			ret = classloader.loadClass(name);
@@ -250,9 +267,12 @@ public class DefaultRestServicePublishService implements IPublishService
 		}
 		catch(Exception e)
 		{
-			ClassPool pool = ClassPool.getDefault();
+			System.out.println("Not found, creating new: "+name);
+			ClassPool pool = new ClassPool(null);
+			pool.appendSystemPath();
+//			ClassPool pool = ClassPool.getDefault();
 //			CtClass proxyclazz = pool.makeClass(name, getCtClass(jadex.extension.ws.publish.Proxy.class, pool));
-			CtClass proxyclazz = pool.makeClass(name, getCtClass(baseclass, pool));
+			CtClass proxyclazz = pool.makeClass(name, baseclass==null? null: getCtClass(baseclass, pool));
 			ClassFile cf = proxyclazz.getClassFile();
 			ConstPool constpool = cf.getConstPool();
 	
@@ -263,10 +283,10 @@ public class DefaultRestServicePublishService implements IPublishService
 			rc.getFieldInfo().addAttribute(attr);
 			proxyclazz.addField(rc);
 			
-			proxyclazz.addInterface(getCtClass(type, pool));
-			Method[] ms = type.getMethods();
+			proxyclazz.addInterface(getCtClass(iface, pool));
+			Method[] ms = iface.getMethods();
 			
-			CtMethod invoke = getCtClass(jadex.extension.rs.publish.Proxy.class, pool).getDeclaredMethod("invoke");
+			CtMethod invoke = getCtClass(Proxy.class, pool).getDeclaredMethod("invoke");
 			
 			Set<String> paths = new HashSet<String>();
 	
@@ -287,21 +307,19 @@ public class DefaultRestServicePublishService implements IPublishService
 				String methodname = ms[i].getName();
 				
 				// Do not generate method if user has implemented it by herself
-				try
+				
+				CtClass rettype = getCtClass((Class)rt, pool);
+				CtClass[] paramtypes = getCtClasses(ms[i].getParameterTypes(), pool);
+				CtClass[] exceptions = getCtClasses(ms[i].getExceptionTypes(), pool);
+				
+				// todo: what about pure string variants?
+				// todo: what about mixed variants (in json out xml or plain)
+				for(int j=0; j<formats.length; j++)
 				{
-					baseclass.getMethod(name, ms[i].getParameterTypes());
-				}
-				catch(Exception ex)
-				{
-					CtClass rettype = getCtClass((Class)rt, pool);
-					CtClass[] paramtypes = getCtClasses(ms[i].getParameterTypes(), pool);
-					CtClass[] exceptions = getCtClasses(ms[i].getExceptionTypes(), pool);
+					String mtname = formats.length>1? methodname+formats[j].toUpperCase(): methodname;
 					
-					// todo: what about pure string variants?
-					// todo: what about mixed variants (in json out xml or plain)
-					for(int j=0; j<formats.length; j++)
+					if(baseclass==null || SReflect.getMethod(baseclass, mtname, ms[i].getParameterTypes())==null)
 					{
-						String mtname = formats.length>1? methodname+formats[j].toUpperCase(): methodname;
 						String path = mtname;
 						for(int k=1; paths.contains(path); k++)
 						{
@@ -335,31 +353,41 @@ public class DefaultRestServicePublishService implements IPublishService
 				}
 			}
 			
-			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-			annot = new Annotation(constpool, getCtClass(Path.class, pool));
-			
-			// If no explicit url path extract last name from package
-			if(apppath==null || apppath.length()==0 || apppath.equals("/"))
+			boolean pathpresent = false;
+			Class<?> test = baseclass;
+			while(test!=null && !pathpresent)
 			{
-				if(type.getPackage()!=null)
-				{
-					String pck = type.getPackage().getName();
-					int idx = pck.lastIndexOf(".");
-					if(idx>0)
-					{
-						apppath = pck.substring(idx+1);
-					}
-					else
-					{
-						apppath = pck;
-					}
-				}
+				pathpresent = baseclass.isAnnotationPresent(Path.class);
+				test = test.getSuperclass();
 			}
-			annot.addMemberValue("value", new StringMemberValue(apppath, constpool));
-			attr.addAnnotation(annot);
-			cf.addAttribute(attr);
+			if(!pathpresent)
+			{
+				attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+				annot = new Annotation(constpool, getCtClass(Path.class, pool));
+//				// If no explicit url path extract last name from package
+//				if(apppath==null || apppath.length()==0 || apppath.equals("/"))
+//				{
+//					if(iface.getPackage()!=null)
+//					{
+//						String pck = iface.getPackage().getName();
+//						int idx = pck.lastIndexOf(".");
+//						if(idx>0)
+//						{
+//							apppath = pck.substring(idx+1);
+//						}
+//						else
+//						{
+//							apppath = pck;
+//						}
+//					}
+//				}
+				annot.addMemberValue("value", new StringMemberValue(apppath, constpool));
+				annot.addMemberValue("value", new StringMemberValue("/", constpool));
+				attr.addAnnotation(annot);
+				cf.addAttribute(attr);
+			}
 			
-			ret = proxyclazz.toClass(classloader, type.getProtectionDomain());
+			ret = proxyclazz.toClass(classloader, iface.getProtectionDomain());
 			proxyclazz.freeze();
 			System.out.println("create proxy class: "+ret.getName()+" "+apppath);
 		}

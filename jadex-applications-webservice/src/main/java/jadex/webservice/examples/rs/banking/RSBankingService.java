@@ -1,11 +1,16 @@
 package jadex.webservice.examples.rs.banking;
 
-import jadex.commons.future.IFuture;
+import jadex.commons.future.ThreadSuspendable;
+import jadex.extension.rs.publish.DefaultRestServicePublishService;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
 
-import javax.ws.rs.Consumes;
+import java.util.Date;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -13,12 +18,11 @@ import javax.ws.rs.core.UriInfo;
 import com.sun.jersey.api.core.ResourceConfig;
 
 /**
- * 
+ *  Rest service implementation that provides some methods by itself.
+ *  Using the 'generate=true' option the missing interface methods
+ *  will be automatically added by Jadex Rest publishing. 
  */
-@Path("/banking")
-//Jadex service can be fetched via url from properties
-//String url = uriinfo.getBaseUri().toString();
-//IBankingService bs = (IBankingService)rc.getProperties().get(url);
+@Path("/")
 public class RSBankingService
 {
 	@Context 
@@ -39,84 +43,31 @@ public class RSBankingService
 		return "<html><body></body><h1>info</h1></html>";
 	}
 	
-//	/**
-//	 *  Get the account statement.
-//	 *  @param request The request.
-//	 *  @return The account statement.
-//	 */
-//	@POST
-//	@Path("getAccountStatement")
-//	@Produces(MediaType.TEXT_XML)
-//	public String getAccountStatement(@PathParam("request") String request)
-//	{
-//		System.out.println("getAccountStatement");
-//		String url = uriinfo.getBaseUri().toString();
-//		IBankingService bs = (IBankingService)rc.getProperties().get(url);
-//		Request req;
-//		try
-//		{
-//			req = JavaReader.objectFromXML(request, null);
-//		}
-//		catch(Exception e)
-//		{
-//			req = new Request(new Date(), new Date());
-//		}
-//		AccountStatement ret = bs.getAccountStatement(req).get(new ThreadSuspendable(this));
-//		
-//		return JavaWriter.objectToXML(ret, null);
-//	}
-	
-//	/**
-//	 *  Get the account statement.
-//	 *  @param request The request.
-//	 *  @return The account statement.
-//	 */
-//	@GET
-//	@Path("getAccountStatement/{request}")
-//	@Produces(MediaType.APPLICATION_XML)
-//	public String getAccountStatement(@PathParam("request") Request request)
-//	{
-//		System.out.println("getAccountStatement");
-//		String url = uriinfo.getBaseUri().toString();
-//		IBankingService bs = (IBankingService)rc.getProperties().get(url);
-//		AccountStatement ret = bs.getAccountStatement(request).get(new ThreadSuspendable(this));
-//		
-//		return JavaWriter.objectToXML(ret, null);
-//	}	
-	
-//	
-//	/**
-//	 *  Add an account statement.
-//	 *  @param data The data.
-//	 */
-//	@POST
-//	@Path("addTransactionData")
-//	public void addTransactionData(String data)
-//	{
-//		System.out.println("addTransactionData");	
-//	}
-//	
-//	/**
-//	 *  Remove an account statement.
-//	 *  @param data The data.
-//	 */
-//	@DELETE
-//	@Path("removeTransactionData")
-//	public void removeTransactionData(String data)
-//	{
-//		System.out.println("removeTransactionData");	
-//	}
-	
-//	/**
-//	 *  Get the account statement.
-//	 *  @param request The request.
-//	 *  @return The account statement.
-//	 */
-//	@GET
-//	@Produces(MediaType.TEXT_HTML)
-//	public String getHello()
-//	{
-//		System.out.println("invoked getHello");
-//		return "<html><body><h1>Banking Hello</h1></body></html>";
-//	}	
+	/**
+	 *  Get the account statement.
+	 *  @param request The request.
+	 *  @return The account statement.
+	 */
+	@GET
+	@Path("getAccountStatement")
+	@Produces(MediaType.APPLICATION_XML)
+	public String getAccountStatement(@QueryParam("request") String request)
+	{
+		System.out.println("getAccountStatement: "+request);
+		
+		//Jadex service can be fetched from properties
+		IBankingService bs = (IBankingService)rc.getProperties().get(DefaultRestServicePublishService.JADEXSERVICE);
+		Request req;
+		try
+		{
+			req = JavaReader.objectFromXML(request, null);
+		}
+		catch(Exception e)
+		{
+			req = new Request(new Date(), new Date());
+		}
+		AccountStatement ret = bs.getAccountStatement(req).get(new ThreadSuspendable(this));
+		
+		return JavaWriter.objectToXML(ret, null);
+	}
 }

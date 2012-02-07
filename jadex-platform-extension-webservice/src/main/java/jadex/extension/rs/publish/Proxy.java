@@ -65,7 +65,7 @@ public class Proxy
 			try
 			{
 				ResourceConfig rc = (ResourceConfig)getClass().getDeclaredField("__rc").get(this);
-				Object service = rc.getProperty("__service");
+				Object service = rc.getProperty(DefaultRestServicePublishService.JADEXSERVICE);
 				
 				String mname = method.getName();
 				if(mname.endsWith("XML"))
