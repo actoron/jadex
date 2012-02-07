@@ -55,6 +55,9 @@ public class NIOSelectorThread
 	/** The logger. */
 	protected Logger	logger;
 	
+	/** Limit the number of parallel connections (at least 2 connections required for receive and send). */ 
+	protected int connection_limit	= 5;
+	
 	//-------- constructors --------
 	
 	/**
@@ -116,7 +119,7 @@ public class NIOSelectorThread
 							// Find request ready for connecting.
 							for(int i=0; req==null && i<queue.size(); i++)
 							{
-								if(!connecting.contains(queue.get(i).getAddress()) ||
+								if(connection_limit>0 && !connecting.contains(queue.get(i).getAddress()) ||
 									idle.containsKey(queue.get(i).getAddress()) && !idle.get(queue.get(i).getAddress()).isEmpty() )
 								{
 									req	= queue.remove(i);
@@ -141,6 +144,8 @@ public class NIOSelectorThread
 							}
 							else
 							{
+								connection_limit--;
+//								System.out.println("connection_limit-: "+connection_limit);
 								req.setIdle(false);
 								NIOSelectorThread.this.logger.info("nio-relay creating connection to: "+req.getAddress().getFirstEntity()+":"+req.getAddress().getSecondEntity());
 								connecting.add(req.getAddress());
@@ -187,6 +192,8 @@ public class NIOSelectorThread
 											}
 											
 											sc.close();
+											connection_limit++;
+//											System.out.println("connection_limit+: "+connection_limit);
 										}
 										catch(IOException e)
 										{
@@ -310,6 +317,8 @@ public class NIOSelectorThread
 										SelectorTimer	timer	= channeltimers.get(sc);
 										timers.remove(timer);
 										channeltimers.remove(sc);
+										connection_limit++;
+//										System.out.println("connection_limit+: "+connection_limit);
 									}
 								}
 								else
