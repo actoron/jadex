@@ -333,6 +333,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		}
 		else
 		{
+			discovered.remove(sender);
 			if(dif!=null && dif.getProxy()!=null)
 			{
 				deleteProxy(dif.getProxy());

@@ -173,7 +173,9 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										else
 										{
 											content	= null;
+											// For remote android debugging of jcc steps put xml error into response
 											reply.addIntermediateResult(new RemoteResultCommand(null, new RuntimeException("Errors during XML decoding: "+errors+"\n"+orig), callid, false));
+//											reply.addIntermediateResult(new RemoteResultCommand(null, new RuntimeException("Errors during XML decoding: "+errors), callid, false));
 											reply.setFinished();
 										}
 										getLogger().info("Remote service management service could not decode message from: "+msg.get(SFipa.SENDER));

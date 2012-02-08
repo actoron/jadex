@@ -162,6 +162,7 @@ public class NIOSelectorThread
 								{
 									NIOSelectorThread.this.logger.info("nio-relay could not connect to relay server (re-attempting in 30 seconds): "+e);
 									handleStep(req, null, 30000, sc);
+									sc	= null;
 								}
 								
 								if(sc!=null)

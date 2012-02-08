@@ -548,6 +548,7 @@ public class ReceiveRequest	implements IHttpRequest
 								public void exceptionOccurred(Exception exception)
 								{
 									// No awa service -> ignore awa infos.
+									logger.warning("nio-relay ignoring awareness info (no awa mgmt found): "+exception);										
 								}
 							});
 						}
