@@ -44,7 +44,9 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	 */
 	public static final UIDefaults icons = new UIDefaults(new Object[]
 	{
-		"overlay_check", SGUI.makeIcon(ComponentTreeNode.class, "/jadex/base/gui/images/overlay_check.png")
+		"overlay_check", SGUI.makeIcon(ComponentTreeNode.class, "/jadex/base/gui/images/overlay_check.png"),
+//		"overlay_busy", SGUI.makeIcon(ComponentTreeNode.class, "/jadex/base/gui/images/overlay_busy.png")
+		"overlay_busy", SGUI.makeIcon(ComponentTreeNode.class, "/jadex/base/gui/images/overlay_clock.png")
 	});
 	
 	//-------- attributes --------
@@ -69,6 +71,9 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	
 	/** Flag indicating a broken node (e.g. children could not be searched due to network problems). */
 	protected boolean	broken;
+	
+	/** Flag indicating a busy node (e.g. update in progress). */
+	protected boolean	busy;
 	
 	//-------- constructors --------
 	
@@ -113,7 +118,11 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	public Icon	getIcon()
 	{
 		Icon	icon	= iconcache.getIcon(desc.getType(), this, getModel());
-		if(broken)
+		if(busy)
+		{
+			icon	= icon!=null ? new CombiIcon(new Icon[]{icon, icons.getIcon("overlay_busy")}) : icons.getIcon("overlay_busy");
+		}
+		else if(broken)
 		{
 			icon	= icon!=null ? new CombiIcon(new Icon[]{icon, icons.getIcon("overlay_check")}) : icons.getIcon("overlay_check");
 		}
@@ -135,6 +144,8 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	public void refresh(final boolean recurse)
 	{
 //		System.out.println("CTN refresh: "+getId());
+		busy	= true;
+		getModel().fireNodeChanged(ComponentTreeNode.this);
 		
 		cms.getComponentDescription(desc.getName())
 			.addResultListener(new SwingDefaultResultListener<IComponentDescription>()
@@ -143,6 +154,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 			{
 				ComponentTreeNode.this.desc	= (IComponentDescription)result;
 				broken	= false;
+				busy	= false;
 				getModel().fireNodeChanged(ComponentTreeNode.this);
 				
 				ComponentTreeNode.super.refresh(recurse);
@@ -150,6 +162,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 			public void customExceptionOccurred(Exception exception)
 			{
 				broken	= true;
+				busy	= false;
 				getModel().fireNodeChanged(ComponentTreeNode.this);
 			}
 		});
@@ -161,6 +174,8 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 	 */
 	protected void	searchChildren()
 	{
+		busy	= true;
+		getModel().fireNodeChanged(ComponentTreeNode.this);
 //		if(getComponentIdentifier().getName().indexOf("Garbage")!=-1)
 //			System.out.println("searchChildren: "+getId());
 		searchChildren(cms, getComponentIdentifier())
@@ -169,12 +184,14 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 			public void resultAvailable(List<ITreeNode> result)
 			{
 				broken	= false;
+				busy	= false;
 				getModel().fireNodeChanged(ComponentTreeNode.this);
 				setChildren(result);
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				broken	= true;
+				busy	= false;
 				getModel().fireNodeChanged(ComponentTreeNode.this);
 				List<ITreeNode> res = Collections.emptyList();
 				setChildren(res);

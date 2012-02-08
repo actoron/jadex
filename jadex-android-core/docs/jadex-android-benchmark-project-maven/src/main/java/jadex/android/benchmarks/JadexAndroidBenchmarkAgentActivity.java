@@ -253,16 +253,16 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 					"-wspublish", "false",
 					"-rspublish", "false",
 					"-kernels", "\"component, micro\"",
-					"-tcptransport", "false",
-					"-niotcptransport", "false",
+//					"-tcptransport", "false",
+//					"-niotcptransport", "false",
 					"-relaytransport", "true",
 					"-relayaddress", "\""+SRelay.DEFAULT_ADDRESS+"\"",
 //					"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/\"",					
 					"-saveonexit", "false", "-gui", "false",
 					"-autoshutdown", "false",
-					"-awamechanisms", "new String[]{\"Relay\"}",
+//					"-awamechanisms", "new String[]{\"Relay\"}",
 //					"-awareness", "false",
-					"-usepass", "false"
+//					"-usepass", "false"
 				}).addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess result)

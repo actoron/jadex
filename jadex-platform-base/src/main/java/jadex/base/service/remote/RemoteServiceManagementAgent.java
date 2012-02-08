@@ -247,7 +247,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										// RMS might be terminated in mean time.
 										if(!(exception instanceof ComponentTerminatedException))
 										{
-											getLogger().info("RMS rejected unauthorized command: "+com);
+											getLogger().info("RMS rejected unauthorized command: "+msg.get(SFipa.SENDER)+", "+com);
 											reply.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false));
 											reply.setFinished();
 										}
@@ -256,7 +256,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 							}
 							else if(content!=null)
 							{
-								getLogger().info("RMS unexpected message content: "+content);
+								getLogger().info("RMS unexpected message content: "+msg.get(SFipa.SENDER)+", "+content);
 							}
 
 							// Send reply.

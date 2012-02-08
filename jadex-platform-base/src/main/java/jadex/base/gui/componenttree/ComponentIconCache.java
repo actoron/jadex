@@ -78,28 +78,31 @@ public class ComponentIconCache
 		{
 			ret	= (Icon)icons.get(type);
 		}
-		
-		// Add listener to ongoing search, if any.
-		else if(lookups.containsKey(type))
+
+		else if(node.getComponentIdentifier()!=null)	// Might by null initially for proxy node.
 		{
-			Tuple2<IFuture<Icon>, List<IComponentIdentifier>>	lookup	= lookups.get(type);
-			if(!lookup.getSecondEntity().contains(node.getComponentIdentifier().getRoot()))
-				lookup.getSecondEntity().add(node.getComponentIdentifier().getRoot());
-			fut	= lookup.getFirstEntity();
-		}
-		
-		// Start new search.
-		else
-		{
-			List<IComponentIdentifier>	todo	= new ArrayList<IComponentIdentifier>();
-			todo.add(jccaccess.getComponentIdentifier().getRoot());	// Search local first.
-			if(!jccaccess.getComponentIdentifier().getRoot().equals(node.getComponentIdentifier().getRoot()))
-				todo.add(node.getComponentIdentifier().getRoot());	// Search remote if not found locally.
+			// Add listener to ongoing search, if any.
+			if(lookups.containsKey(type))
+			{
+				Tuple2<IFuture<Icon>, List<IComponentIdentifier>>	lookup	= lookups.get(type);
+				if(!lookup.getSecondEntity().contains(node.getComponentIdentifier().getRoot()))
+					lookup.getSecondEntity().add(node.getComponentIdentifier().getRoot());
+				fut	= lookup.getFirstEntity();
+			}
 			
-			Future<Icon>	ifut	= new Future<Icon>();
-			doSearch(ifut, type, todo, 0);
-			lookups.put(type, new Tuple2<IFuture<Icon>, List<IComponentIdentifier>>(ifut, todo));
-			fut	= ifut;			
+			// Start new search.
+			else
+			{
+				List<IComponentIdentifier>	todo	= new ArrayList<IComponentIdentifier>();
+				todo.add(jccaccess.getComponentIdentifier().getRoot());	// Search local first.
+				if(!jccaccess.getComponentIdentifier().getRoot().equals(node.getComponentIdentifier().getRoot()))
+					todo.add(node.getComponentIdentifier().getRoot());	// Search remote if not found locally.
+				
+				Future<Icon>	ifut	= new Future<Icon>();
+				doSearch(ifut, type, todo, 0);
+				lookups.put(type, new Tuple2<IFuture<Icon>, List<IComponentIdentifier>>(ifut, todo));
+				fut	= ifut;			
+			}
 		}
 		
 		// Update node if icon is found.

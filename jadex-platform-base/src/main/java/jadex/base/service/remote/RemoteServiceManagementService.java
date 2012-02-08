@@ -630,7 +630,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 																		if(!future.isDone())
 																		{
 																			removeWaitingCall(callid);
-																			future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+callid)
+																			future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+SUtil.arrayToString(msg.get(SFipa.RECEIVERS))+", "+callid)
 																			{
 																				public void printStackTrace()
 																				{
@@ -666,7 +666,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		//														System.out.println("Cancel timeout (ex): "+callid+" "+future);
 		//														errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
 		//														ia.getLogger().warning("Remote request failed: "+content);
-																ia.getLogger().info("Remote exception occurred: "+exception.toString());
+																ia.getLogger().info("Remote exception occurred: "+SUtil.arrayToString(msg.get(SFipa.RECEIVERS))+", "+exception.toString());
 															}
 														}));
 													}

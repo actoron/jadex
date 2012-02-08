@@ -1,6 +1,7 @@
 package jadex.base.gui.componenttree;
 
 import jadex.base.gui.SwingDefaultResultListener;
+import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.AsyncTreeModel;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.service.remote.ProxyAgent;
@@ -11,7 +12,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -113,11 +113,10 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 */
 	public Icon	getIcon()
 	{
-		Icon ret = null;
-		Icon base = super.getIcon();
-		if(base!=null)
+		Icon ret = super.getIcon();
+		if(ret!=null && !busy)
 		{
-			ret = new CombiIcon(new Icon[]{base, icons.getIcon(state)});
+			ret = new CombiIcon(new Icon[]{ret, icons.getIcon(state)});
 		}
 		return ret;
 	}
@@ -129,6 +128,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	 */
 	protected void	searchChildren()
 	{
+		busy	= true;
 		// Get remote component identifier before calling searchChildren
 		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener<IComponentIdentifier>()
 		{
@@ -140,11 +140,14 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 					{
 						public void resultAvailable(List<ITreeNode> result)
 						{
+							busy	= false;
 							state	= STATE_CONNECTED;
 							setChildren(result);
+							getModel().fireNodeChanged(ProxyComponentTreeNode.this);					
 						}
 						public void exceptionOccurred(Exception exception)
 						{
+							busy	= false;
 							state	= exception instanceof RemoteException && SecurityException.class.equals(((RemoteException)exception).getType())
 								? STATE_LOCKED : STATE_UNCONNECTED;
 							List<ITreeNode> list	= Collections.emptyList();
@@ -204,11 +207,12 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 							ProxyAgent pa = (ProxyAgent)ia;
 							return new Future<IComponentIdentifier>(pa.getRemotePlatformIdentifier());
 						}
-					}).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
+					}).addResultListener(new SwingDelegationResultListener<IComponentIdentifier>(ret)
 					{
 						public void customResultAvailable(IComponentIdentifier result)
 						{
 							cid = result;
+							model.fireNodeChanged(ProxyComponentTreeNode.this);		// Update in case icon hasn't been painted yet.
 							super.customResultAvailable(result);
 						}
 					});
