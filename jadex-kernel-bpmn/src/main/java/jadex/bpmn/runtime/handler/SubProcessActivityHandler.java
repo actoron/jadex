@@ -310,7 +310,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 											throw new RuntimeException("Error evaluating parameter value: "+instance+", "+activity+", "+param.getName()+", "+param.getInitialValue(), e);
 										}
 									}
-									else if(res.containsKey(param.getName()))
+									else if(res!=null && res.containsKey(param.getName()))
 									{
 										thread.setParameterValue(param.getName(), res.get(param.getName()));
 									}
