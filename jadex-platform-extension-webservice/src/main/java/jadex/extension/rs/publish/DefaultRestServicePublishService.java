@@ -20,6 +20,7 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,6 +32,7 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
@@ -153,13 +155,14 @@ public class DefaultRestServicePublishService implements IPublishService
 			String pack = rsimpl.getPackage().getName();
 //			props.put(uri.toString(), service);
 			StringBuilder strb = new StringBuilder("jadex.extension.rs.publish"); // Add Jadex XML body reader/writer
-			strb.append(", ");
-			strb.append(pack);
+			// Must not add package because a baseclass could be contained with the same path
+			// This leads to an error in jersey
+//			strb.append(pack);
+//			strb.append(", ");
 			props.put(jerseypack, strb.toString());
 			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 			props.put(JADEXSERVICE, service);
 			PackagesResourceConfig config = new PackagesResourceConfig(props);
-			
 			config.getClasses().add(rsimpl);
 			
 //			URI baseuri = uri;
@@ -256,7 +259,7 @@ public class DefaultRestServicePublishService implements IPublishService
 			builder.append(nameclazz.getPackage().getName());
 		builder.append(".Proxy");
 		builder.append(nameclazz.getSimpleName());
-		if(mapprops!=null)
+		if(mapprops!=null && mapprops.size()>0)
 			builder.append(mapprops.hashCode());
 		String name = builder.toString();
 
@@ -272,7 +275,12 @@ public class DefaultRestServicePublishService implements IPublishService
 			pool.appendSystemPath();
 //			ClassPool pool = ClassPool.getDefault();
 //			CtClass proxyclazz = pool.makeClass(name, getCtClass(jadex.extension.ws.publish.Proxy.class, pool));
-			CtClass proxyclazz = pool.makeClass(name, baseclass==null? null: getCtClass(baseclass, pool));
+			
+			Class newbaseclass = baseclass;
+			
+//			CtClass proxyclazz = pool.makeClass(name, baseclass==null? null: ctbc);
+			CtClass proxyclazz = pool.makeClass(name, newbaseclass==null? null: getCtClass(newbaseclass, pool));
+//			CtClass proxyclazz = pool.makeClass(name, baseclass==null? null: getCtClass(baseclass, pool));
 			ClassFile cf = proxyclazz.getClassFile();
 			ConstPool constpool = cf.getConstPool();
 	
@@ -353,39 +361,11 @@ public class DefaultRestServicePublishService implements IPublishService
 				}
 			}
 			
-			boolean pathpresent = false;
-			Class<?> test = baseclass;
-			while(test!=null && !pathpresent)
-			{
-				pathpresent = baseclass.isAnnotationPresent(Path.class);
-				test = test.getSuperclass();
-			}
-			if(!pathpresent)
-			{
-				attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-				annot = new Annotation(constpool, getCtClass(Path.class, pool));
-//				// If no explicit url path extract last name from package
-//				if(apppath==null || apppath.length()==0 || apppath.equals("/"))
-//				{
-//					if(iface.getPackage()!=null)
-//					{
-//						String pck = iface.getPackage().getName();
-//						int idx = pck.lastIndexOf(".");
-//						if(idx>0)
-//						{
-//							apppath = pck.substring(idx+1);
-//						}
-//						else
-//						{
-//							apppath = pck;
-//						}
-//					}
-//				}
-				annot.addMemberValue("value", new StringMemberValue(apppath, constpool));
-				annot.addMemberValue("value", new StringMemberValue("/", constpool));
-				attr.addAnnotation(annot);
-				cf.addAttribute(attr);
-			}
+			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+			annot = new Annotation(constpool, getCtClass(Path.class, pool));
+			annot.addMemberValue("value", new StringMemberValue("/", constpool));
+			attr.addAnnotation(annot);
+			cf.addAttribute(attr);
 			
 			ret = proxyclazz.toClass(classloader, iface.getProtectionDomain());
 			proxyclazz.freeze();
@@ -468,6 +448,9 @@ public class DefaultRestServicePublishService implements IPublishService
 		return ret;	
 	}
 	
+	/**
+	 *  Main for testing.
+	 */
 	public static void main(String[] args) throws Exception
 	{
 		URI uri = new URI("http://localhost:8080/bank");
@@ -476,3 +459,58 @@ public class DefaultRestServicePublishService implements IPublishService
 		System.out.println(newuri);
 	}
 }
+	
+	// Code that removes an annotation
+//	if(baseclass!=null)
+//	{
+//		CtClass ctbc = getCtClass(baseclass, pool);
+//		List attrs = ctbc.getClassFile().getAttributes();
+//		boolean done = false;
+//		for(int i=0; i<attrs.size() && !done; i++)
+//		{
+//			AttributeInfo attr = (AttributeInfo)attrs.get(i);
+//			if(attr instanceof AnnotationsAttribute)
+//			{
+//				AnnotationsAttribute anattr = (AnnotationsAttribute)attr;
+//				Annotation[] ans = anattr.getAnnotations();
+//				for(int j=0; j<ans.length && !done; j++)
+//				{
+//					if(ans[j].getTypeName().equals(Path.class.getName()))
+//					{
+//						attrs.remove(attr);
+//						done = true;
+//					}
+//				}
+//			}
+//		}
+//		ctbc.setName(ctbc.getName()+"New");
+//		newbaseclass = ctbc.toClass(classloader, iface.getProtectionDomain());
+//	}
+	
+//	boolean pathpresent = false;
+//	Class<?> test = newbaseclass;
+//	while(test!=null && !pathpresent)
+//	{
+//		pathpresent = test.isAnnotationPresent(Path.class);
+//		test = test.getSuperclass();
+//	}
+//	System.out.println("found anno: "+pathpresent);
+
+//	// If no explicit url path extract last name from package
+//	if(apppath==null || apppath.length()==0 || apppath.equals("/"))
+//	{
+//		if(iface.getPackage()!=null)
+//		{
+//			String pck = iface.getPackage().getName();
+//			int idx = pck.lastIndexOf(".");
+//			if(idx>0)
+//			{
+//				apppath = pck.substring(idx+1);
+//			}
+//			else
+//			{
+//				apppath = pck;
+//			}
+//		}
+//	}
+//	annot.addMemberValue("value", new StringMemberValue(apppath, constpool));
