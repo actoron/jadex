@@ -11,6 +11,7 @@ import jadex.commons.future.Future;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.channels.ClosedSelectorException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -149,60 +150,24 @@ public class NIOSelectorThread
 								req.setIdle(false);
 								NIOSelectorThread.this.logger.info("nio-relay creating connection to: "+req.getAddress().getFirstEntity()+":"+req.getAddress().getSecondEntity());
 								connecting.add(req.getAddress());
-								final SocketChannel	sc	= SocketChannel.open();
-								sc.configureBlocking(false);
-								sc.connect(new InetSocketAddress(req.getAddress().getFirstEntity(), req.getAddress().getSecondEntity().intValue()));
-								sc.register(selector, SelectionKey.OP_CONNECT, req);
-								
-								// Create inactivity timer for connection.
-								final Tuple2<String, Integer>	address	= req.getAddress();
-								SelectorTimer	timer	= new SelectorTimer()
+								SocketChannel	sc	= null;
+								try
 								{
-									public void	run()
-									{
-										try
-										{
-											NIOSelectorThread.this.logger.info("nio-relay closing connection due to inactivity: "+sc);
-											
-											// close() cancels the key and does not generate nio event.
-											// therefore we need manual cleanup and re-add request, if any
-											connecting.remove(address);
-											if(idle.get(address)!=null)
-											{
-												idle.get(address).remove(sc);
-//												System.out.println("Idle connections-: "+idle.get(address));
-												if(idle.get(address).isEmpty())
-												{
-													idle.remove(address);
-												}
-											}
-											channeltimers.remove(sc);
-											
-											SelectionKey	key	= sc.keyFor(selector);
-											IHttpRequest	req	= (IHttpRequest)key.attachment();
-											if(req!=null)
-											{
-												if(req.reschedule())
-												{
-													synchronized(queue)
-													{
-														queue.add(req);
-													}
-												}
-											}
-											
-											sc.close();
-											connection_limit++;
-//											System.out.println("connection_limit+: "+connection_limit);
-										}
-										catch(IOException e)
-										{
-											e.printStackTrace();
-										}
-									}
-								};
-								channeltimers.put(sc, timer);
-								updateTimer(sc);
+									sc	= SocketChannel.open();
+									sc.configureBlocking(false);
+									sc.connect(new InetSocketAddress(req.getAddress().getFirstEntity(), req.getAddress().getSecondEntity().intValue()));
+									sc.register(selector, SelectionKey.OP_CONNECT, req);
+								}
+								catch(Exception e)
+								{
+									NIOSelectorThread.this.logger.info("nio-relay could not connect to relay server (re-attempting in 30 seconds): "+e);
+									handleStep(req, null, 30000, sc);
+								}
+								
+								if(sc!=null)
+								{
+									createConnectionTimer(sc, req.getAddress());
+								}
 							}
 						}
 						
@@ -268,58 +233,7 @@ public class NIOSelectorThread
 										reschedule	= req.handleRead(key);
 									}
 									
-									// Reschedule request in case of error.
-									if(reschedule==0)
-									{
-										NIOSelectorThread.this.logger.info("nio-relay rescheduling request immediately: "+req);
-										synchronized(queue)
-										{
-											// Queue at beginning to keep message order in case of outdated idle connections.
-											queue.add(0, req);
-										}
-									}
-									else if(reschedule>0)
-									{
-										NIOSelectorThread.this.logger.info("nio-relay rescheduling request after "+reschedule+" ms: "+req);
-										final IHttpRequest	freq	= req;
-										SelectorTimer	timer	= new SelectorTimer()
-										{
-											public void run()
-											{
-												synchronized(queue)
-												{
-													queue.add(0, freq);
-												}
-												connecting.remove(freq.getAddress());
-												selector.wakeup();
-											}
-										};
-										timer.setTaskTime(reschedule+System.currentTimeMillis());
-										timers.add(timer);
-									}
-									
-									// If connection is open but no longer needed, add to idle list.
-									if(key.isValid() && key.channel().isOpen() && key.interestOps()==0)
-									{
-										List<SocketChannel>	cons	= idle.get(req.getAddress());
-										if(cons==null)
-										{
-											cons	= new LinkedList<SocketChannel>();
-											idle.put(req.getAddress(), cons);
-										}
-										cons.add((SocketChannel)key.channel());
-										key.attach(null);
-//										System.out.println("Idle connections+: "+cons);
-									}
-									else if(!key.isValid() || !key.channel().isOpen() || !((SocketChannel)key.channel()).isConnected())
-									{
-										NIOSelectorThread.this.logger.info("nio-relay removed connection: "+key.isValid()+", "+!key.channel().isOpen()+", "+((SocketChannel)key.channel()).isConnected()+", "+sc);
-										SelectorTimer	timer	= channeltimers.get(sc);
-										timers.remove(timer);
-										channeltimers.remove(sc);
-										connection_limit++;
-//										System.out.println("connection_limit+: "+connection_limit);
-									}
+									handleStep(req, key, reschedule, sc);
 								}
 								else
 								{
@@ -328,6 +242,10 @@ public class NIOSelectorThread
 								}
 							}
 						}
+					}
+					catch(ClosedSelectorException e)
+					{
+						// closed on exit -> ignore and thread will exit.
 					}
 					catch(Exception e)
 					{
@@ -387,5 +305,118 @@ public class NIOSelectorThread
 		timer.setTaskTime(System.currentTimeMillis()+(long)(SRelay.PING_DELAY*1.25));
 		timers.add(timer);
 		// Only called from selector thread itself -> no need to wake it up.		
+	}
+
+	/**
+	 *  Called after some part of a request has been executed.
+	 */
+	protected void handleStep(IHttpRequest req, SelectionKey key, int reschedule, SocketChannel sc)
+	{
+		// Reschedule request in case of error.
+		if(reschedule==0)
+		{
+			NIOSelectorThread.this.logger.info("nio-relay rescheduling request immediately: "+req);
+			synchronized(queue)
+			{
+				// Queue at beginning to keep message order in case of outdated idle connections.
+				queue.add(0, req);
+			}
+		}
+		else if(reschedule>0)
+		{
+			NIOSelectorThread.this.logger.info("nio-relay rescheduling request after "+reschedule+" ms: "+req);
+			final IHttpRequest	freq	= req;
+			SelectorTimer	timer	= new SelectorTimer()
+			{
+				public void run()
+				{
+					synchronized(queue)
+					{
+						queue.add(0, freq);
+					}
+					connecting.remove(freq.getAddress());
+					selector.wakeup();
+				}
+			};
+			timer.setTaskTime(reschedule+System.currentTimeMillis());
+			timers.add(timer);
+		}
+		
+		// If connection is open but no longer needed, add to idle list.
+		if(key!=null && key.isValid() && key.channel().isOpen() && key.interestOps()==0)
+		{
+			List<SocketChannel>	cons	= idle.get(req.getAddress());
+			if(cons==null)
+			{
+				cons	= new LinkedList<SocketChannel>();
+				idle.put(req.getAddress(), cons);
+			}
+			cons.add((SocketChannel)key.channel());
+			key.attach(null);
+//			System.out.println("Idle connections+: "+cons);
+		}
+		else if(key!=null && !key.isValid() || key!=null && !key.channel().isOpen() || key!=null && !((SocketChannel)key.channel()).isConnected())
+		{
+			NIOSelectorThread.this.logger.info("nio-relay removed connection: "+key.isValid()+", "+!key.channel().isOpen()+", "+((SocketChannel)key.channel()).isConnected()+", "+sc);
+			SelectorTimer	timer	= channeltimers.get(sc);
+			timers.remove(timer);
+			channeltimers.remove(sc);
+			connection_limit++;
+//			System.out.println("connection_limit+: "+connection_limit);
+		}
+	}
+
+	/**
+	 *  Create inactivity timer for connection.
+	 */
+	protected void createConnectionTimer(final SocketChannel sc, final Tuple2<String, Integer> address)
+	{
+		SelectorTimer	timer	= new SelectorTimer()
+		{
+			public void	run()
+			{
+				try
+				{
+					NIOSelectorThread.this.logger.info("nio-relay closing connection due to inactivity: "+sc);
+					
+					// close() cancels the key and does not generate nio event.
+					// therefore we need manual cleanup and re-add request, if any
+					connecting.remove(address);
+					if(idle.get(address)!=null)
+					{
+						idle.get(address).remove(sc);
+//						System.out.println("Idle connections-: "+idle.get(address));
+						if(idle.get(address).isEmpty())
+						{
+							idle.remove(address);
+						}
+					}
+					channeltimers.remove(sc);
+					
+					SelectionKey	key	= sc.keyFor(selector);
+					IHttpRequest	req	= (IHttpRequest)key.attachment();
+					if(req!=null)
+					{
+						if(req.reschedule())
+						{
+							synchronized(queue)
+							{
+								queue.add(req);
+							}
+						}
+					}
+					
+					sc.close();
+					connection_limit++;
+//					System.out.println("connection_limit+: "+connection_limit);
+				}
+				catch(IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		};
+		channeltimers.put(sc, timer);
+		updateTimer(sc);
 	}
 }

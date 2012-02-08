@@ -284,6 +284,7 @@
 				Boolean.TRUE.equals($args.rspublish &amp;&amp; !$args.android) ? DefaultRestServicePublishService.class.newInstance() : null
 			</implementation>
 		</providedservice>
+		<!-- Todo start before message service because of relay !? -->
 		<providedservice class="ISecurityService">
 			<implementation>new SecurityService($args.usepass, $args.printpass)</implementation>
 		</providedservice>
