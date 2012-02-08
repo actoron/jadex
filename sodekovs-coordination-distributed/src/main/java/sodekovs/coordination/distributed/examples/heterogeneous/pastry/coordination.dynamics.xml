@@ -61,7 +61,7 @@
 					<properties>
 						<entry>
 							<key>bootaddress</key>
-							<value>DeepThought</value>
+							<value>192.168.2.99</value>
 						</entry>
 						<entry>
 							<key>bootport</key>
@@ -69,7 +69,7 @@
 						</entry>
 						<entry>
 							<key>bindport</key>
-							<value>12346</value>
+							<value>12345</value>
 						</entry>
 					</properties>
 				</mechanism_configuration>
