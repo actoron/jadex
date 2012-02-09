@@ -1,10 +1,24 @@
 package jadex.extension.rs.publish;
 
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
+import javax.ws.rs.OPTIONS;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import com.sun.jersey.api.core.ResourceConfig;
 
@@ -94,5 +108,134 @@ public class Proxy
 		
 		return ret;
 	}
+	
+	/**
+	 *  Functionality blueprint for get service info.
+	 *  @return The result.
+	 */
+	public Object getServiceInfo(Object[] params)
+	{
+		StringBuffer ret = new StringBuffer();
+		ret.append("<html><body>");
+		ret.append("<h1>Service Info for: ");
+		ret.append(SReflect.getUnqualifiedClassName(getClass()));
+		ret.append("</h1>");
+	
+		try
+		{
+			UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
+			
+			Method[] methods = getClass().getDeclaredMethods();
+			if(methods!=null)
+			{
+				for(int i=0; i<methods.length; i++)
+				{
+					Annotation restmethod = methods[i].getAnnotation(GET.class);
+					if(restmethod==null)
+						restmethod =  methods[i].getAnnotation(POST.class);
+					if(restmethod==null)
+						restmethod =  methods[i].getAnnotation(PUT.class);
+					if(restmethod==null)
+						restmethod =  methods[i].getAnnotation(DELETE.class);
+					if(restmethod==null)
+						restmethod =  methods[i].getAnnotation(HEAD.class);
+					if(restmethod==null)
+						restmethod =  methods[i].getAnnotation(OPTIONS.class);
+					if(restmethod!=null)
+					{
+						Path path = methods[i].getAnnotation(Path.class);
+						Consumes consumes = methods[i].getAnnotation(Consumes.class);
+						Produces produces = methods[i].getAnnotation(Produces.class);
+						Class[] ptypes = methods[i].getParameterTypes();
+						
+						ret.append("<p>");
+						ret.append("<i>");
+						ret.append(methods[i].getName());
+						ret.append("</i>");
+						if(ptypes!=null && ptypes.length>0)
+						{
+							ret.append("(");
+							for(int j=0; j<ptypes.length; j++)
+							{
+								ret.append(SReflect.getUnqualifiedClassName(ptypes[j]));
+								if(j+1<ptypes.length)
+									ret.append(", ");
+							}
+							ret.append(")");
+						}
+						ret.append("</br>");
+						
+						String resttype = SReflect.getUnqualifiedClassName(restmethod.annotationType());
+						ret.append(resttype).append(" ");
+						if(consumes!=null)
+						{
+							String[] cons = consumes.value();
+							if(cons.length>0)
+							{
+								ret.append("Consumes: ");
+								for(int j=0; j<cons.length; j++)
+								{
+									ret.append(cons[j]);
+									if(j+1<cons.length)
+										ret.append(" ,");
+								}
+								ret.append(" ");
+							}
+						}
+						if(produces!=null)
+						{
+							String[] prods = consumes.value();
+							if(prods.length>0)
+							{
+								ret.append("Produces: ");
+								for(int j=0; j<prods.length; j++)
+								{
+									ret.append(prods[j]);
+									if(j+1<prods.length)
+										ret.append(" ,");
+								}
+								ret.append(" ");
+							}
+						}
+						ret.append("</br>");
 
+						UriBuilder ub = ui.getBaseUriBuilder();
+						if(path!=null)
+							ub.path(path.value());
+						String link = ub.build(null).toString();
+						if(ptypes.length>0 || restmethod.annotationType().equals(POST.class))
+						{
+							ret.append("<form action=\"").append(link).append("\" method=\"")
+								.append(resttype.toLowerCase()).append("\">");
+							for(int j=0; j<ptypes.length; j++)
+							{
+								ret.append("arg").append(j).append(": ");
+								ret.append("<input name=\"arg").append(j).append("\" type=\"text\"/>");
+							}
+							ret.append("<input type=\"submit\" value=\"invoke\"/></form>");
+						}
+						else
+						{
+							ret.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
+						}
+						ret.append("</p>");
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+		
+		ret.append("</body></html>");
+
+		return ret.toString();
+	}
+	
+	public static void main(String[] args)
+	{
+		Proxy p = new Proxy();
+		p.getServiceInfo(null);
+	}
 }

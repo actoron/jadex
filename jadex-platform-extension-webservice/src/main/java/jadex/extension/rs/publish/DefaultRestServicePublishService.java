@@ -47,6 +47,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -73,6 +74,9 @@ public class DefaultRestServicePublishService implements IPublishService
 	/** Constant for String[] for supported parameter media types.*/ 
 	public static String FORMATS = "formats";
 	
+	/** Constant for boolean.*/ 
+	public static String GENERATE_INFO = "generateinfo";
+	
 	/** The default media formats. */
 	public static String[] DEFAULT_FORMATS = new String[]{"xml", "json"};
 
@@ -94,7 +98,6 @@ public class DefaultRestServicePublishService implements IPublishService
 	
 	/** The servers per uri. */
 	protected Map<URI, HttpServer> uriservers;
-
 	
 	//-------- methods --------
 	
@@ -138,27 +141,20 @@ public class DefaultRestServicePublishService implements IPublishService
 			}
 			
 			// If no service type was specified it has to be generated.
-			Class<?> rsimpl = null;
-			Boolean gen = (Boolean)mapprops.get(GENERATE);
-			if(gen!=null && !gen.booleanValue())
-			{
-				rsimpl = pi.getServiceType().getType(cl);
-			}
-			else
-			{
-				rsimpl = createProxyClass(service, cl, uri.getPath(), pi.getServiceType()!=null? 
-					pi.getServiceType().getType(cl): null, mapprops);
-			}
+			Class<?> iface = service.getServiceIdentifier().getServiceType().getType(cl);
+			Class<?> baseclazz = pi.getServiceType()!=null? pi.getServiceType().getType(cl): null;
+			Class<?> rsimpl = createProxyClass(service, cl, uri.getPath(), baseclazz, mapprops);
 			
 			Map<String, Object> props = new HashMap<String, Object>();
 			String jerseypack = "com.sun.jersey.config.property.packages";
-			String pack = rsimpl.getPackage().getName();
 //			props.put(uri.toString(), service);
 			StringBuilder strb = new StringBuilder("jadex.extension.rs.publish"); // Add Jadex XML body reader/writer
 			// Must not add package because a baseclass could be contained with the same path
 			// This leads to an error in jersey
-//			strb.append(pack);
-//			strb.append(", ");
+			String pack = baseclazz!=null && baseclazz.getPackage()!=null? 
+				baseclazz.getPackage().getName(): iface.getPackage()!=null? iface.getPackage().getName(): null;
+			if(pack!=null)
+				strb.append(", ").append(pack);
 			props.put(jerseypack, strb.toString());
 			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 			props.put(JADEXSERVICE, service);
@@ -244,132 +240,164 @@ public class DefaultRestServicePublishService implements IPublishService
 	{
 		Class<?> ret = null;
 
-		String[] formats = mapprops.get(FORMATS)==null? DEFAULT_FORMATS: (String[])mapprops.get(FORMATS);
+		boolean gen = mapprops.get(GENERATE)!=null? ((Boolean)mapprops.get(GENERATE)).booleanValue(): true;
+		boolean emergencygen = baseclass!=null && !baseclass.isAnnotationPresent(Path.class);
+		boolean geninfo = mapprops.get(GENERATE_INFO)!=null? ((Boolean)mapprops.get(GENERATE_INFO)).booleanValue(): true;
 		
-		Class iface = service.getServiceIdentifier().getServiceType().getType(classloader);
-		
-		// The name of the class has to ensure that it represents the different class properties:
-		// - the package+"Proxy"+name of the baseclass or (if not available) interface
-		// - the hashcode of the properties
-		// - only same implclass name + same props => same generated classname
-		
-		StringBuilder builder = new StringBuilder();
-		Class nameclazz = baseclass!=null? baseclass: iface;
-		if(nameclazz.getPackage()!=null)
-			builder.append(nameclazz.getPackage().getName());
-		builder.append(".Proxy");
-		builder.append(nameclazz.getSimpleName());
-		if(mapprops!=null && mapprops.size()>0)
-			builder.append(mapprops.hashCode());
-		String name = builder.toString();
-
-		try
+		// Check if generate is off but the baseclass has no Path annotation
+		// Then a subclass with annotation will be provided
+		if(gen || emergencygen)
 		{
-			ret = classloader.loadClass(name);
-//			ret = SReflect.classForName0(name, classloader); // does not work because SReflect cache saves that not found!
-		}
-		catch(Exception e)
-		{
-			System.out.println("Not found, creating new: "+name);
-			ClassPool pool = new ClassPool(null);
-			pool.appendSystemPath();
-//			ClassPool pool = ClassPool.getDefault();
-//			CtClass proxyclazz = pool.makeClass(name, getCtClass(jadex.extension.ws.publish.Proxy.class, pool));
+			String[] formats = mapprops.get(FORMATS)==null? DEFAULT_FORMATS: (String[])mapprops.get(FORMATS);
+			Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
 			
-			Class newbaseclass = baseclass;
+			// The name of the class has to ensure that it represents the different class properties:
+			// - the package+"Proxy"+name of the baseclass or (if not available) interface
+			// - the hashcode of the properties
+			// - only same implclass name + same props => same generated classname
 			
-//			CtClass proxyclazz = pool.makeClass(name, baseclass==null? null: ctbc);
-			CtClass proxyclazz = pool.makeClass(name, newbaseclass==null? null: getCtClass(newbaseclass, pool));
-//			CtClass proxyclazz = pool.makeClass(name, baseclass==null? null: getCtClass(baseclass, pool));
-			ClassFile cf = proxyclazz.getClassFile();
-			ConstPool constpool = cf.getConstPool();
+			StringBuilder builder = new StringBuilder();
+			Class<?> nameclazz = baseclass!=null? baseclass: iface;
+			if(nameclazz.getPackage()!=null)
+				builder.append(nameclazz.getPackage().getName());
+			builder.append(".Proxy");
+			builder.append(nameclazz.getSimpleName());
+			if(mapprops!=null && mapprops.size()>0)
+				builder.append(mapprops.hashCode());
+			String name = builder.toString();
 	
-			CtField rc = new CtField(getCtClass(ResourceConfig.class, pool), "__rc", proxyclazz);
-			AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-			Annotation annot = new Annotation(constpool, getCtClass(Context.class, pool));
-			attr.addAnnotation(annot);
-			rc.getFieldInfo().addAttribute(attr);
-			proxyclazz.addField(rc);
-			
-			proxyclazz.addInterface(getCtClass(iface, pool));
-			Method[] ms = iface.getMethods();
-			
-			CtMethod invoke = getCtClass(Proxy.class, pool).getDeclaredMethod("invoke");
-			
-			Set<String> paths = new HashSet<String>();
-	
-			for(int i=0; i<ms.length; i++)
+			try
 			{
-				Type rt = ms[i].getGenericReturnType();
+				ret = classloader.loadClass(name);
+	//			ret = SReflect.classForName0(name, classloader); // does not work because SReflect cache saves that not found!
+			}
+			catch(Exception e)
+			{
+				System.out.println("Not found, creating new: "+name);
+				ClassPool pool = new ClassPool(null);
+				pool.appendSystemPath();
 				
-				if(rt instanceof ParameterizedType)
+				CtClass proxyclazz = pool.makeClass(name, baseclass==null? null: getCtClass(baseclass, pool));
+				ClassFile cf = proxyclazz.getClassFile();
+				ConstPool constpool = cf.getConstPool();
+		
+				if(gen)
 				{
-					ParameterizedType pt = (ParameterizedType)rt;
-					Type[] pts = pt.getActualTypeArguments();
-					if(pts.length>1)
-						throw new RuntimeException("Cannot unwrap futurized method due to more than one generic type: "+SUtil.arrayToString(pt.getActualTypeArguments()));
-					rt = (Class<?>)pts[0];
-				}
-//				System.out.println("rt: "+pt.getRawType()+" "+SUtil.arrayToString(pt.getActualTypeArguments()));
-				
-				String methodname = ms[i].getName();
-				
-				// Do not generate method if user has implemented it by herself
-				
-				CtClass rettype = getCtClass((Class)rt, pool);
-				CtClass[] paramtypes = getCtClasses(ms[i].getParameterTypes(), pool);
-				CtClass[] exceptions = getCtClasses(ms[i].getExceptionTypes(), pool);
-				
-				// todo: what about pure string variants?
-				// todo: what about mixed variants (in json out xml or plain)
-				for(int j=0; j<formats.length; j++)
-				{
-					String mtname = formats.length>1? methodname+formats[j].toUpperCase(): methodname;
+					// Add field with annotation for resource context
+					CtField rc = new CtField(getCtClass(ResourceConfig.class, pool), "__rc", proxyclazz);
+					AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+					Annotation annot = new Annotation(constpool, getCtClass(Context.class, pool));
+					attr.addAnnotation(annot);
+					rc.getFieldInfo().addAttribute(attr);
+					proxyclazz.addField(rc);
 					
-					if(baseclass==null || SReflect.getMethod(baseclass, mtname, ms[i].getParameterTypes())==null)
+					// Add field with annotation for uriinfo context
+					CtField ui = new CtField(getCtClass(UriInfo.class, pool), "__ui", proxyclazz);
+					attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+					annot = new Annotation(constpool, getCtClass(Context.class, pool));
+					attr.addAnnotation(annot);
+					ui.getFieldInfo().addAttribute(attr);
+					proxyclazz.addField(ui);
+					
+					// Add methods from the service interface
+					Method[] ms = iface.getMethods();
+					CtMethod invoke = getCtClass(Proxy.class, pool).getDeclaredMethod("invoke");
+					Set<String> paths = new HashSet<String>();
+			
+					for(int i=0; i<ms.length; i++)
 					{
-						String path = mtname;
-						for(int k=1; paths.contains(path); k++)
+						Type rt = ms[i].getGenericReturnType();
+						
+						if(rt instanceof ParameterizedType)
 						{
-							path = mtname+"#"+k;
+							ParameterizedType pt = (ParameterizedType)rt;
+							Type[] pts = pt.getActualTypeArguments();
+							if(pts.length>1)
+								throw new RuntimeException("Cannot unwrap futurized method due to more than one generic type: "+SUtil.arrayToString(pt.getActualTypeArguments()));
+							rt = (Class<?>)pts[0];
 						}
-						paths.add(path);
+		//				System.out.println("rt: "+pt.getRawType()+" "+SUtil.arrayToString(pt.getActualTypeArguments()));
+						
+						String methodname = ms[i].getName();
+						
+						// Do not generate method if user has implemented it by herself
+						
+						CtClass rettype = getCtClass((Class)rt, pool);
+						CtClass[] paramtypes = getCtClasses(ms[i].getParameterTypes(), pool);
+						CtClass[] exceptions = getCtClasses(ms[i].getExceptionTypes(), pool);
+						
+						// todo: what about pure string variants?
+						// todo: what about mixed variants (in json out xml or plain)
+						for(int j=0; j<formats.length; j++)
+						{
+							String mtname = formats.length>1? methodname+formats[j].toUpperCase(): methodname;
 							
-						CtMethod m = CtNewMethod.wrapped(rettype, mtname, 
-							paramtypes, exceptions, invoke, null, proxyclazz);
-						
+							if(baseclass==null || SReflect.getMethod(baseclass, mtname, ms[i].getParameterTypes())==null)
+							{
+								String path = mtname;
+								for(int k=1; paths.contains(path); k++)
+								{
+									path = mtname+"_"+k;
+								}
+								paths.add(path);
+									
+								CtMethod m = CtNewMethod.wrapped(rettype, mtname, 
+									paramtypes, exceptions, invoke, null, proxyclazz);
+								
+								attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+								annot = new Annotation(constpool, getCtClass(getHttpType(ms[i], (Class)rt, ms[i].getParameterTypes()), pool));
+								attr.addAnnotation(annot);
+								annot = new Annotation(constpool, getCtClass(Path.class, pool));
+								annot.addMemberValue("value", new StringMemberValue(path, constpool));
+								attr.addAnnotation(annot);
+								annot = new Annotation(constpool, getCtClass(Consumes.class, pool));
+								ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
+								vals.setValue(new MemberValue[]{
+									new StringMemberValue(formatmap.get(formats[j]), constpool),
+									new StringMemberValue(MediaType.TEXT_HTML, constpool)});
+								annot.addMemberValue("value", vals);
+								attr.addAnnotation(annot);
+								annot = new Annotation(constpool, getCtClass(Produces.class, pool));
+								annot.addMemberValue("value", vals);
+								attr.addAnnotation(annot);
+								
+								m.getMethodInfo().addAttribute(attr);
+			//					System.out.println("m: "+m.getName());
+								
+								proxyclazz.addMethod(m);
+							}
+						}
+					}
+					
+					if(geninfo)
+					{
+						// Add the service info method
+						CtMethod getinfo = getCtClass(Proxy.class, pool).getDeclaredMethod("getServiceInfo");
+						CtMethod m = CtNewMethod.wrapped(getCtClass(String.class, pool), "getServiceInfo", 
+							new CtClass[0], new CtClass[0], getinfo, null, proxyclazz);
 						attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-						annot = new Annotation(constpool, getCtClass(getHttpType(ms[i], (Class)rt, ms[i].getParameterTypes()), pool));
+						annot = new Annotation(constpool, getCtClass(GET.class, pool));
 						attr.addAnnotation(annot);
-						annot = new Annotation(constpool, getCtClass(Path.class, pool));
-						annot.addMemberValue("value", new StringMemberValue(path, constpool));
-						attr.addAnnotation(annot);
-						annot = new Annotation(constpool, getCtClass(Consumes.class, pool));
-						ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
-						vals.setValue(new MemberValue[]{new StringMemberValue(formatmap.get(formats[j]), constpool)});
-						annot.addMemberValue("value", vals);
-						attr.addAnnotation(annot);
-						annot = new Annotation(constpool, getCtClass(Produces.class, pool));
-						annot.addMemberValue("value", vals);
-						attr.addAnnotation(annot);
-						
 						m.getMethodInfo().addAttribute(attr);
-	//					System.out.println("m: "+m.getName());
-						
 						proxyclazz.addMethod(m);
 					}
 				}
+				
+				// Add the path annotation 
+				AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+				Annotation annot = new Annotation(constpool, getCtClass(Path.class, pool));
+				annot.addMemberValue("value", new StringMemberValue("/", constpool));
+				attr.addAnnotation(annot);
+				cf.addAttribute(attr);
+								
+				ret = proxyclazz.toClass(classloader, iface.getProtectionDomain());
+				proxyclazz.freeze();
+				System.out.println("create proxy class: "+ret.getName()+" "+apppath);
 			}
-			
-			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-			annot = new Annotation(constpool, getCtClass(Path.class, pool));
-			annot.addMemberValue("value", new StringMemberValue("/", constpool));
-			attr.addAnnotation(annot);
-			cf.addAttribute(attr);
-			
-			ret = proxyclazz.toClass(classloader, iface.getProtectionDomain());
-			proxyclazz.freeze();
-			System.out.println("create proxy class: "+ret.getName()+" "+apppath);
+		}
+		else
+		{
+			ret = baseclass;
 		}
 		
 		return ret;

@@ -35,6 +35,7 @@ public class BankingService implements IBankingService
 	 */
 	public IFuture<AccountStatement> getAccountStatement()
 	{
+		System.out.println("getAccountStatement()");
 		AccountStatement as = new AccountStatement(data.toArray(new String[data.size()]), null);
 		return new Future<AccountStatement>(as);
 	}
@@ -46,6 +47,7 @@ public class BankingService implements IBankingService
 	 */
 	public IFuture<AccountStatement> getAccountStatement(Request request)
 	{
+		System.out.println("getAccountStatement(Request request)");
 		AccountStatement as = new AccountStatement(data.toArray(new String[data.size()]), request);
 		return new Future<AccountStatement>(as);
 	}
@@ -56,6 +58,7 @@ public class BankingService implements IBankingService
 	 */
 	public IFuture<Void> addTransactionData(String data)
 	{
+		System.out.println("addTransactionData(String data)");
 		this.data.add(data);
 		return IFuture.DONE;
 	}
@@ -66,6 +69,7 @@ public class BankingService implements IBankingService
 	 */
 	public IFuture<Void> removeTransactionData(String data)
 	{
+		System.out.println("removeTransactionData(String data)");
 		this.data.remove(data);
 		return IFuture.DONE;
 	}

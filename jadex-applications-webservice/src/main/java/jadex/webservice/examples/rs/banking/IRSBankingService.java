@@ -17,7 +17,7 @@ public interface IRSBankingService
 	 *  @return The account statement.
 	 */
 	@GET
-	@Path("getAccountStatement/{request}")
+	@Path("getAccountStatement/")
 	@Produces(MediaType.APPLICATION_XML)
 	public String getAccountStatementXML(@PathParam("request") String request);
 	

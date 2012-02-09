@@ -120,6 +120,83 @@ public class Hello
 	}
 		
 	
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args)
+//	{
+//		try
+//		{
+////			URI uri = UriBuilder.fromUri("http://localhost/").port(8080).build();
+//			URI uri = new URI("http://localhost:8080/");
+//			
+//			Map<String, Object> props = new HashMap<String, Object>();
+//			props.put("com.sun.jersey.config.property.packages", "jadex.webservice.examples.rs.hello, jadex.extension.rs.publish");
+//			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+//			props.put("hallo", "hallo");
+//			// "com.sun.jersey.config.property.packages", 
+//			PackagesResourceConfig config = new PackagesResourceConfig(props);
+////			PackagesResourceConfig config = new PackagesResourceConfig(new String[]{"jadex.micro.examples.rs.banking"});
+////			config.setPropertiesAndFeatures(props);
+//			
+//			HttpServer srv = GrizzlyServerFactory.createHttpServer(uri, config);
+//			
+//			srv.start();
+//			
+//			ClientConfig cc = new DefaultClientConfig();
+////			cc.getClasses().add(JAXBProvider.class);
+//			cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+//			cc.getClasses().add(JadexXMLBodyReader.class);
+//			Client client = Client.create(cc);
+//			WebResource service = client.resource(uri); 
+////			String res = service.path("hello").accept(MediaType.TEXT_PLAIN).get(String.class);
+////			String res = service.path("banking").accept(MediaType.TEXT_HTML).get(String.class);
+////			System.out.println("Received: "+res);
+//			
+//			A a = new A("a");
+//			a.getB().add("aa");
+////			a.setB(new String[]{"aa"});
+//			
+//			ObjectMapper mapper = new ObjectMapper();
+//			
+//			// Form parameter can only be of type string 
+////			String res = service.path("hello").
+//			Form f = new Form();
+////			f.add("a", JavaWriter.objectToXML(a, null));
+//			System.out.println("jackson json: "+mapper.writeValueAsString(a));
+//			
+////			Class[] types = {A.class};
+////			JSONJAXBContext contextj = new JSONJAXBContext(JSONConfiguration.mapped().build(), types);
+////			JSONMarshaller ma = contextj.createJSONMarshaller();
+////			StringWriter sw = new StringWriter();
+////			ma.marshallToJSON(a, sw);
+////			System.out.println("jaxb json: "+sw.toString());
+//			
+//			// .accept(MediaType.APPLICATION_JSON)
+////			service.path("hello/getJSON").type(MediaType.APPLICATION_JSON).post(String.class, a);
+//			A res = service.path("hello/getXML").type(MediaType.APPLICATION_XML).get(A.class);
+//			System.out.println("got: "+res);
+////			String res = service.path("hello/getJSON").type(MediaType.APPLICATION_XML).post(String.class, f);
+//			
+////			JAXBContext context = JAXBContext.newInstance(A.class);
+////			Marshaller m = context.createMarshaller();
+////			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+////			m.setProperty(Marshaller.JAXB_ENCODING, Marshaller.)
+////			m.marshal(a, System.out);
+//			
+////			response = service.path("rest").path("todos").type(MediaType.APPLICATION_FORM_URLENCODED)
+////			   .post(ClientResponse.class, form);
+////			System.out.println("Received: "+res);
+//
+//			System.in.read();
+//			srv.stop();
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+//	}
+	
 	/**
 	 *  Main for testing.
 	 */
@@ -127,69 +204,14 @@ public class Hello
 	{
 		try
 		{
-//			URI uri = UriBuilder.fromUri("http://localhost/").port(8080).build();
-			URI uri = new URI("http://localhost:8080/");
-			
-			Map<String, Object> props = new HashMap<String, Object>();
-			props.put("com.sun.jersey.config.property.packages", "jadex.webservice.examples.rs.hello, jadex.extension.rs.publish");
-			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-			props.put("hallo", "hallo");
-			// "com.sun.jersey.config.property.packages", 
-			PackagesResourceConfig config = new PackagesResourceConfig(props);
-//			PackagesResourceConfig config = new PackagesResourceConfig(new String[]{"jadex.micro.examples.rs.banking"});
-//			config.setPropertiesAndFeatures(props);
-			
-			HttpServer srv = GrizzlyServerFactory.createHttpServer(uri, config);
-			
-			srv.start();
-			
 			ClientConfig cc = new DefaultClientConfig();
-//			cc.getClasses().add(JAXBProvider.class);
 			cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 			cc.getClasses().add(JadexXMLBodyReader.class);
 			Client client = Client.create(cc);
-			WebResource service = client.resource(uri); 
-//			String res = service.path("hello").accept(MediaType.TEXT_PLAIN).get(String.class);
-//			String res = service.path("banking").accept(MediaType.TEXT_HTML).get(String.class);
-//			System.out.println("Received: "+res);
-			
-			A a = new A("a");
-			a.getB().add("aa");
-//			a.setB(new String[]{"aa"});
-			
+			WebResource service = client.resource("http://localhost:8080/banking1/"); 
 			ObjectMapper mapper = new ObjectMapper();
-			
-			// Form parameter can only be of type string 
-//			String res = service.path("hello").
-			Form f = new Form();
-//			f.add("a", JavaWriter.objectToXML(a, null));
-			System.out.println("jackson json: "+mapper.writeValueAsString(a));
-			
-//			Class[] types = {A.class};
-//			JSONJAXBContext contextj = new JSONJAXBContext(JSONConfiguration.mapped().build(), types);
-//			JSONMarshaller ma = contextj.createJSONMarshaller();
-//			StringWriter sw = new StringWriter();
-//			ma.marshallToJSON(a, sw);
-//			System.out.println("jaxb json: "+sw.toString());
-			
-			// .accept(MediaType.APPLICATION_JSON)
-//			service.path("hello/getJSON").type(MediaType.APPLICATION_JSON).post(String.class, a);
-			A res = service.path("hello/getXML").type(MediaType.APPLICATION_XML).get(A.class);
-			System.out.println("got: "+res);
-//			String res = service.path("hello/getJSON").type(MediaType.APPLICATION_XML).post(String.class, f);
-			
-//			JAXBContext context = JAXBContext.newInstance(A.class);
-//			Marshaller m = context.createMarshaller();
-//			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-//			m.setProperty(Marshaller.JAXB_ENCODING, Marshaller.)
-//			m.marshal(a, System.out);
-			
-//			response = service.path("rest").path("todos").type(MediaType.APPLICATION_FORM_URLENCODED)
-//			   .post(ClientResponse.class, form);
-//			System.out.println("Received: "+res);
-
-			System.in.read();
-			srv.stop();
+//			System.out.println("jackson json: "+mapper.writeValueAsString(a));
+			service.path("addTransactionDataJSON").type(MediaType.TEXT_PLAIN).post(Void.class, "hallo");
 		}
 		catch(Exception e)
 		{

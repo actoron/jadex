@@ -27,14 +27,14 @@ import jadex.micro.annotation.Publish;
 		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/banking1",
 		properties=@NameValue(name="formats", value="new String[]{\"xml\", \"json\"}"))),
 	
-	// b) Use custom service class (no generation) Note: the publish id here is taken from the implementation class directly
-	@ProvidedService(name="banking2", type=IBankingService.class, implementation=@Implementation(BankingService.class),
-		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/banking2", servicetype=RSBankingService.class, 
-		properties=@NameValue(name="generate", value="false"))),
-
-	// c) Use custom service class (generation of additional methods)
-	@ProvidedService(name="banking3", type=IBankingService.class, implementation=@Implementation(BankingService.class),
-		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/banking3", servicetype=RSBankingService.class))
+//	// b) Use custom service class (no generation) Note: the publish id here is taken from the implementation class directly
+//	@ProvidedService(name="banking2", type=IBankingService.class, implementation=@Implementation(BankingService.class),
+//		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/banking2", servicetype=RSBankingService.class, 
+//		properties=@NameValue(name="generate", value="false"))),
+//
+//	// c) Use custom service class (generation of additional methods)
+//	@ProvidedService(name="banking3", type=IBankingService.class, implementation=@Implementation(BankingService.class),
+//		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/banking3", servicetype=RSBankingService.class))
 
 //	// d) Use annotated interface instead of implementation (generation of interface implementation)
 //	@ProvidedService(name="banking3", type=IBankingService.class, implementation=@Implementation(BankingService.class),
