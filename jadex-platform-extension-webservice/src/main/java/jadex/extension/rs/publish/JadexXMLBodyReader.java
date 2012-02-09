@@ -26,7 +26,10 @@ public class JadexXMLBodyReader implements MessageBodyReader<Object>
 	public boolean isReadable(Class<?> type, Type generictype, 
 		Annotation[] annotations, MediaType mediatype) 
 	{       
-		return mediatype.equals(MediaType.APPLICATION_XML_TYPE);
+		boolean ret = mediatype.equals(MediaType.APPLICATION_XML_TYPE);
+//			||  mediatype.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE);
+		return ret;
+//		||  mediatype.equals(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 	}
 	 
 	/**
@@ -37,7 +40,13 @@ public class JadexXMLBodyReader implements MessageBodyReader<Object>
 		MultivaluedMap<String, String> httpheaders, InputStream entitystream)
 		throws IOException, WebApplicationException
 	{
-		// todo: classloader?
-		return JavaReader.objectFromInputStream(entitystream, null);
+		try
+		{
+			return JavaReader.objectFromInputStream(entitystream, Thread.currentThread().getContextClassLoader());
+		}
+		catch(Exception e)
+		{
+			return null;
+		}
 	}
 }

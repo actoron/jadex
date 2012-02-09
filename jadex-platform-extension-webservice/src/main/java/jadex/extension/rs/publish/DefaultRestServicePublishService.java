@@ -354,9 +354,11 @@ public class DefaultRestServicePublishService implements IPublishService
 								ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
 								vals.setValue(new MemberValue[]{
 									new StringMemberValue(formatmap.get(formats[j]), constpool),
-									new StringMemberValue(MediaType.TEXT_HTML, constpool)});
+									new StringMemberValue(MediaType.MULTIPART_FORM_DATA, constpool)});
 								annot.addMemberValue("value", vals);
 								attr.addAnnotation(annot);
+								vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
+								vals.setValue(new MemberValue[]{new StringMemberValue(formatmap.get(formats[j]), constpool)});
 								annot = new Annotation(constpool, getCtClass(Produces.class, pool));
 								annot.addMemberValue("value", vals);
 								attr.addAnnotation(annot);

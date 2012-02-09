@@ -189,9 +189,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				ComponentIdentifier ret = null;
 				if(src.getPlatformName().equals(root.getLocalName()))
 				{
-					Object[] oa = (Object[])context.getUserContext();
-					if(!(oa[1] instanceof String[]))
-						System.out.println("schrott3");
 					String[] addresses = (String[])((Object[])context.getUserContext())[1];
 					ret = new ComponentIdentifier(src.getName(), addresses);
 //					System.out.println("Rewritten cid: "+ret);

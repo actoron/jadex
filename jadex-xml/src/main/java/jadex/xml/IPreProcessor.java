@@ -1,7 +1,7 @@
 package jadex.xml;
 
 /**
- *  Pre-processes objects before writing them to  XML.
+ *  Pre-processes objects before writing them to XML.
  */
 public interface IPreProcessor
 {

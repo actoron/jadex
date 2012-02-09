@@ -27,6 +27,7 @@ public class JadexXMLBodyWriter implements MessageBodyWriter<Object>
 		Annotation[] annotations, MediaType mediatype)
 	{
 		return mediatype.equals(MediaType.APPLICATION_XML_TYPE);
+//			||  mediatype.equals(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 	}
 	
 	/**
@@ -37,8 +38,7 @@ public class JadexXMLBodyWriter implements MessageBodyWriter<Object>
 		MultivaluedMap<String, Object> httpheaders,
 		OutputStream entityStream) throws IOException, WebApplicationException
 	{
-		// todo: classloader?
-		JavaWriter.objectToOutputStream(t, entityStream, null);
+		JavaWriter.objectToOutputStream(t, entityStream, Thread.currentThread().getContextClassLoader());
 	}
 	
 	/**
@@ -47,7 +47,6 @@ public class JadexXMLBodyWriter implements MessageBodyWriter<Object>
 	public long getSize(Object t, Class<?> type, Type genericType,
 		Annotation[] annotations, MediaType mediaType)
 	{
-		// todo: classloader?
-		return JavaWriter.objectToByteArray(t, null).length;
+		return JavaWriter.objectToByteArray(t, Thread.currentThread().getContextClassLoader()).length;
 	}
 }

@@ -13,7 +13,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -23,6 +25,7 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.multipart.FormDataParam;
 
 /**
  *  Rest service implementation that provides some methods by itself.
@@ -77,46 +80,61 @@ public class RSBankingService
 		return ret;
 	}
 	
+//	/**
+//	 *  Get the account statement.
+//	 *  @param request The request.
+//	 *  @return The account statement.
+//	 */
+//	@GET
+//	@Path("getAccountStatement")
+//	@Produces(MediaType.APPLICATION_XML)
+//	public String getAccountStatement(@QueryParam("begin") String begin, @QueryParam("end") String end)
+//	{
+//		System.out.println("getAccountStatement: "+begin+" "+end);
+//		
+//		//Jadex service can be fetched from properties
+//		IBankingService bs = (IBankingService)rc.getProperties().get(DefaultRestServicePublishService.JADEXSERVICE);
+//		Request req;
+//		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+//		Date b = null;
+//		Date e = null;
+//		if(begin!=null && end!=null)
+//		{
+//			try
+//			{
+//				b = sdf.parse(begin);
+//			}
+//			catch(Exception ex)
+//			{
+//				b = new Date();
+//			}
+//			try
+//			{
+//				e = sdf.parse(end);
+//			}
+//			catch(Exception ex)
+//			{
+//				e = new Date();
+//			}
+//		}
+//		req = new Request(b, e);
+//		AccountStatement ret = bs.getAccountStatement(req).get(new ThreadSuspendable(this));
+//		
+//		return JavaWriter.objectToXML(ret, null);
+//	}
+	
 	/**
 	 *  Get the account statement.
 	 *  @param request The request.
 	 *  @return The account statement.
 	 */
-	@GET
+	@POST
 	@Path("getAccountStatement")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_XML)
-	public String getAccountStatement(@QueryParam("begin") String begin, @QueryParam("end") String end)
+	public String getAccountStatement(@FormDataParam("begin") Date begin, @FormDataParam("end") Date end)
 	{
-		System.out.println("getAccountStatement: "+begin+" "+end);
-		
-		//Jadex service can be fetched from properties
-		IBankingService bs = (IBankingService)rc.getProperties().get(DefaultRestServicePublishService.JADEXSERVICE);
-		Request req;
-		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-		Date b = null;
-		Date e = null;
-		if(begin!=null && end!=null)
-		{
-			try
-			{
-				b = sdf.parse(begin);
-			}
-			catch(Exception ex)
-			{
-				b = new Date();
-			}
-			try
-			{
-				e = sdf.parse(end);
-			}
-			catch(Exception ex)
-			{
-				e = new Date();
-			}
-		}
-		req = new Request(b, e);
-		AccountStatement ret = bs.getAccountStatement(req).get(new ThreadSuspendable(this));
-		
-		return JavaWriter.objectToXML(ret, null);
+		return "called";
 	}
+	
 }

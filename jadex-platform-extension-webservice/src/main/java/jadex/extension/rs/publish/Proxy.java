@@ -17,6 +17,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -184,7 +185,7 @@ public class Proxy
 						}
 						if(produces!=null)
 						{
-							String[] prods = consumes.value();
+							String[] prods = produces.value();
 							if(prods.length>0)
 							{
 								ret.append("Produces: ");
@@ -206,7 +207,8 @@ public class Proxy
 						if(ptypes.length>0 || restmethod.annotationType().equals(POST.class))
 						{
 							ret.append("<form action=\"").append(link).append("\" method=\"")
-								.append(resttype.toLowerCase()).append("\">");
+//								.append(resttype.toLowerCase()).append("\" enctype=\"application/json\" >");
+								.append(resttype.toLowerCase()).append("\" enctype=\"multipart/form-data\" >");
 							for(int j=0; j<ptypes.length; j++)
 							{
 								ret.append("arg").append(j).append(": ");
