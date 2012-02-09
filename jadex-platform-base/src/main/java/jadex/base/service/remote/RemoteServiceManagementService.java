@@ -27,11 +27,10 @@ import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IFilter;
-import jadex.commons.IRemotable;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -50,7 +49,6 @@ import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
-import jadex.xml.writer.WriteContext;
 import jadex.xml.writer.Writer;
 
 import java.util.Collection;
@@ -110,7 +108,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	protected IMicroExternalAccess component;
 	
 	/** The map of waiting calls (callid -> future). */
-	protected Map waitingcalls;
+	protected Map<String, Future<Object>> waitingcalls;
 
 	/** The remote reference module. */
 	protected RemoteReferenceModule rrm;
@@ -142,7 +140,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 
 		this.component = component;
 		this.rrm = new RemoteReferenceModule(this, libservice, marshal);
-		this.waitingcalls = new HashMap();
+		this.waitingcalls = new HashMap<String, Future<Object>>();
 		this.timer	= new Timer(true);
 		this.marshal = marshal;
 		this.msgservice = msgservice;
@@ -152,7 +150,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		QName[] pr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyReference")};
 		
-		Set typeinfosread = JavaReader.getTypeInfos();
+		Set<TypeInfo> typeinfosread = JavaReader.getTypeInfos();
 		TypeInfo ti_rr = new TypeInfo(new XMLInfo(pr), 
 			new ObjectInfo(ProxyReference.class, new RMIPostProcessor(rrm)));
 		typeinfosread.add(ti_rr);
@@ -162,7 +160,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			public void report(String message, String error, Object info, Location location)
 				throws XMLStreamException
 			{
-				List	errors	= (List)((ReadContext)Reader.READ_CONTEXT.get()).getUserContext();
+				List<Tuple>	errors	= (List<Tuple>)((ReadContext)Reader.READ_CONTEXT.get()).getUserContext();
 				errors.add(new Tuple(new Object[]{message, error, info, location}));
 			}
 		}, new BeanObjectReaderHandler(typeinfosread));
@@ -173,7 +171,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		// pojo services to underlying service proxies 
 		// enhance component identifier with addresses
 		
-		Set typeinfoswrite = JavaWriter.getTypeInfos();
+		Set<TypeInfo> typeinfoswrite = JavaWriter.getTypeInfos();
 		final RMIPreProcessor preproc = new RMIPreProcessor(rrm);
 		
 //		TypeInfo ti_proxyable = new TypeInfo(new XMLInfo(pr, null, false, preproc), 
@@ -286,27 +284,23 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param selector The result selector.
 	 *  @return Collection or single result (i.e. service proxies). 
 	 */
-	public IFuture getServiceProxies(final IComponentIdentifier cid, 
+	public IFuture<Object> getServiceProxies(final IComponentIdentifier cid, 
 		final ISearchManager manager, final IVisitDecider decider, final IResultSelector selector)
 	{
-		Future ret = new Future();
+		Future<Object> ret = new Future<Object>();
 		
 		component.scheduleStep(new IComponentStep<Object>()
 		{
 			@XMLClassname("getServiceProxies")
 			public IFuture<Object> execute(IInternalAccess ia)
 			{
-				RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
-				final Future fut = new Future();
-				SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(agent.createResultListener(new IResultListener()
+				final Future<Object> fut = new Future<Object>();
+				ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(fut)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(IComponentManagementService cms)
 					{
-						IComponentManagementService cms = (IComponentManagementService)result;
-						
 						// Hack! create remote rms cid with "rms" assumption.
-//						IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
 						IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteSearchCommand content = new RemoteSearchCommand(cid, manager, 
@@ -314,15 +308,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						
 						sendMessage(rrms, content, callid, -1, fut);
 					}
-					public void exceptionOccurred(Exception exception)
-					{
-						fut.setException(exception);
-					}
-				}));
+				});
 				
 				return fut;
 			}
-		}).addResultListener(new DelegationResultListener(ret));
+		}).addResultListener(new DelegationResultListener<Object>(ret));
 		
 		return ret;
 	}
@@ -335,16 +325,16 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public IFuture getServiceProxy(final IComponentIdentifier cid, final Class service, String scope)
+	public IFuture<Object> getServiceProxy(final IComponentIdentifier cid, final Class<?> service, String scope)
 	{
-		Future	ret	= new Future();
+		Future<Object>	ret	= new Future<Object>();
 		getServiceProxies(cid, SServiceProvider.getSearchManager(false, scope), SServiceProvider.getVisitDecider(true, scope), 
-			new TypeResultSelector(service, true)).addResultListener(new DelegationResultListener(ret)
+			new TypeResultSelector(service, true)).addResultListener(new DelegationResultListener<Object>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				if(result!=null && !((Collection)result).isEmpty())
-					super.customResultAvailable(((Collection)result).iterator().next());
+				if(result!=null && !((Collection<Object>)result).isEmpty())
+					super.customResultAvailable(((Collection<Object>)result).iterator().next());
 				else
 					super.exceptionOccurred(new ServiceNotFoundException("No proxy for service found: "+cid+", "+service.getName()));
 			}
@@ -360,7 +350,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public IFuture getServiceProxies(IComponentIdentifier cid, Class service, String scope)
+	public IFuture<Object> getServiceProxies(IComponentIdentifier cid, Class<?> service, String scope)
 	{
 		return getServiceProxies(cid, SServiceProvider.getSearchManager(true, scope), SServiceProvider.getVisitDecider(false, scope), 
 			new TypeResultSelector(service, true));
@@ -373,7 +363,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param service The service type.
 	 *  @return The service proxy.
 	 */
-	public IFuture getDeclaredServiceProxies(IComponentIdentifier cid)
+	public IFuture<Object> getDeclaredServiceProxies(IComponentIdentifier cid)
 	{
 		return getServiceProxies(cid, SServiceProvider.localmanager, SServiceProvider.contdecider, 
 			new AnyResultSelector(false, false));
@@ -385,24 +375,21 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param cid Component target id.
 	 *  @return External access of remote component. 
 	 */
-	public IFuture getExternalAccessProxy(final IComponentIdentifier cid)
+	public IFuture<Object> getExternalAccessProxy(final IComponentIdentifier cid)
 	{
-		final Future ret = new Future();
+		final Future<Object> ret = new Future<Object>();
 		
 		component.scheduleStep(new IComponentStep<Object>()
 		{
 			@XMLClassname("getExternalAccessProxy")
 			public IFuture<Object> execute(IInternalAccess ia)
 			{
-				final Future fut = new Future();
-				RemoteServiceManagementAgent agent = (RemoteServiceManagementAgent)ia;
-				SServiceProvider.getService(component.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(agent.createResultListener(new IResultListener()
+				final Future<Object> fut = new Future<Object>();
+				ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(fut)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(IComponentManagementService cms)
 					{
-						IComponentManagementService cms = (IComponentManagementService)result;
-						
 						// Hack! create remote rms cid with "rms" assumption.
 //						IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
 						IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
@@ -411,15 +398,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						
 						sendMessage(rrms, content, callid, -1, fut);
 					}
-					public void exceptionOccurred(Exception exception)
-					{
-						fut.setException(exception);
-					}
-				}));
+				});
 				
 				return fut;
 			}
-		}).addResultListener(new DelegationResultListener(ret));
+		}).addResultListener(new DelegationResultListener<Object>(ret));
 		
 		return ret;
 	}
@@ -483,7 +466,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param callid The callid.
 	 *  @param future The future.
 	 */
-	public void putWaitingCall(String callid, Future future)
+	public void putWaitingCall(String callid, Future<Object> future)
 	{
 		getRemoteReferenceModule().checkThread();
 		waitingcalls.put(callid, future);
@@ -494,10 +477,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param callid The callid.
 	 *  @return The future.
 	 */
-	public Future getWaitingCall(String callid)
+	public Future<Object> getWaitingCall(String callid)
 	{
 		getRemoteReferenceModule().checkThread();
-		return (Future)waitingcalls.get(callid);
+		return waitingcalls.get(callid);
 	}
 	
 	/**
@@ -505,10 +488,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param callid The callid.
 	 *  @return The future.
 	 */
-	public Future removeWaitingCall(String callid)
+	public Future<Object> removeWaitingCall(String callid)
 	{
 		getRemoteReferenceModule().checkThread();
-		return (Future)waitingcalls.remove(callid);
+		return waitingcalls.remove(callid);
 	}
 	
 	/**
@@ -524,17 +507,17 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //	public Map interestingcalls = new HashMap();
 	/**
 	 *  Send the request message of a remote method invocation.
-	 *  (Can savely be called from any thread).
+	 *  (Can safely be called from any thread).
 	 */
 	public void sendMessage(final IComponentIdentifier receiver, final Object content,
-		final String callid, final long to, final Future future)
+		final String callid, final long to, Future<Object> future)
 	{
 //		System.out.println("RMS sending: "+content);
 		
-		component.scheduleStep(new IComponentStep<Void>()
+		component.scheduleStep(new IComponentStep<Object>()
 		{
 			@XMLClassname("sendMessage")
-			public IFuture<Void> execute(final IInternalAccess ia)
+			public IFuture<Object> execute(final IInternalAccess ia)
 			{
 				Future<Void>	pre	= new Future<Void>(); 
 				if(content instanceof AbstractRemoteCommand)
@@ -547,183 +530,117 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					pre.setResult(null);
 				}
 				
-				pre.addResultListener(new DefaultResultListener<Void>()
+				final Future<Object>	ret	= new Future<Object>();
+				
+				pre.addResultListener(new ExceptionDelegationResultListener<Void, Object>(ret)
 				{
-					public void resultAvailable(Void v)
+					public void customResultAvailable(Void v)
 					{
 						final long timeout = to<=0? DEFAULT_TIMEOUT: to;
 						
 						putWaitingCall(callid, future);
+						// Remove waiting call when future is done
+						ret.addResultListener(new IResultListener<Object>()
+						{
+							public void resultAvailable(Object result)
+							{
+								removeWaitingCall(callid);
+							}
+							public void exceptionOccurred(Exception exception)
+							{
+								removeWaitingCall(callid);								
+								ia.getLogger().info("Remote exception occurred: "+receiver+", "+exception.toString());
+							}
+						});
 //						System.out.println("Waitingcalls: "+waitingcalls.size());
 						
-						final Map msg = new HashMap();
+						final Map<String, Object> msg = new HashMap<String, Object>();
 						msg.put(SFipa.SENDER, component.getComponentIdentifier());
 						msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
 						msg.put(SFipa.CONVERSATION_ID, callid);
 		//				msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
 						
-						SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(ia.createResultListener(new IResultListener()
+						ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Object>(ret)
 						{
-							public void resultAvailable(Object result)
+							public void customResultAvailable(final ILibraryService ls)
 							{
-								final ILibraryService ls = (ILibraryService)result;
-								
-								SServiceProvider.getService(component.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(ia.createResultListener(new IResultListener()
+								ia.getServiceContainer().searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(new ExceptionDelegationResultListener<IMessageService, Object>(ret)
 								{
-									public void resultAvailable(Object result)
+									public void customResultAvailable(final IMessageService ms)
 									{
-										final IMessageService ms = (IMessageService)result;
-										
-										ls.getClassLoader(component.getModel().getResourceIdentifier()).addResultListener(new IResultListener()
+										// todo: use rid of sender?! (not important as writer does not use classloader, only nuggets)
+										ls.getClassLoader(ia.getModel().getResourceIdentifier())
+											.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Object>(ret)
 										{
-											public void resultAvailable(Object result)
+											public void customResultAvailable(final ClassLoader cl)
 											{
-												final ClassLoader cl = (ClassLoader)result;
-												
-												// todo: use rid of sender?! (not important as writer does not use classloader, only nuggets)
-		//										ClassLoader cl = ls.getClassLoader(component.getModel().getResourceIdentifier());
-												
-												// Hack!!! Manual encoding for using custom class loader at receiver side.
-		//										msg.put(SFipa.CONTENT, JavaWriter.objectToXML(content, ls.getClassLoader()));
-												
-//												System.out.println("RMS sending to: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
-//												try
-//												{
-													msgservice.getAddresses().addResultListener(new DefaultResultListener<String[]>()
-													{
-														public void resultAvailable(String[] addresses)
-														{
-															String cont = Writer.objectToXML(getWriter(), content, cl, new Object[]{receiver, addresses});
-															msg.put(SFipa.CONTENT, cont);
-														}
-													});
-//												}
-//												catch(RuntimeException e)
-//												{
-//													e.printStackTrace();
-//													throw e;
-//												}
-												
-//												System.out.println("RMS sending to2: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
-		//										if(cont.indexOf("getServices")!=-1)
-		//										{
-		//											interestingcalls.put(callid, cont);
-		//										}
-												
-												ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, component.getComponentIdentifier(), component.getModel().getResourceIdentifier(), null)
-													.addResultListener(ia.createResultListener(new IResultListener()
+												msgservice.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], Object>(ret)
 												{
-													public void resultAvailable(Object result)
+													public void customResultAvailable(String[] addresses)
 													{
-//														System.out.println("sent: "+callid);
-														// ok message could be sent.
-														timer.schedule(new TimerTask()
-														{
-															public void run()
-															{
-																ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-																{
-																	public IFuture<Void> execute(IInternalAccess ia)
-																	{
-																		if(!future.isDone())
-																		{
-																			removeWaitingCall(callid);
-																			future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+SUtil.arrayToString(msg.get(SFipa.RECEIVERS))+", "+callid)
-																			{
-																				public void printStackTrace()
-																				{
-																					Thread.dumpStack();
-																					super.printStackTrace();
-																				}
-																			}
-																			);
-																		}
-																		return IFuture.DONE;
-																	}
-																});
-		//														System.out.println("timeout triggered: "+msg);
-															}
-														}, timeout);
+														// Hack!!! Manual encoding for using custom class loader at receiver side.
+														String cont = Writer.objectToXML(getWriter(), content, cl, new Object[]{receiver, addresses});
+														msg.put(SFipa.CONTENT, cont);
+
 														
-														// Removes waiting call when done with result.
-														future.addResultListener(ia.createResultListener(new IResultListener()
+//														System.out.println("RMS sending to2: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
+				//										if(cont.indexOf("getServices")!=-1)
+				//										{
+				//											interestingcalls.put(callid, cont);
+				//										}
+														
+														ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), null)
+															.addResultListener(new ExceptionDelegationResultListener<Void, Object>(ret)
 														{
-															public void resultAvailable(Object result)
+															public void customResultAvailable(Void result)
 															{
-																removeWaitingCall(callid);
-		//														System.out.println("Waitingcalls: "+waitingcalls.size());
-		//														System.out.println("Cancel timeout (res): "+callid+" "+future);
-		//														errors.put(callid, new Object[]{"Cancel timeout (res)", result});
+//																System.out.println("sent: "+callid);
+																// ok message could be sent.
+																timer.schedule(new TimerTask()
+																{
+																	public void run()
+																	{
+																		ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+																		{
+																			public IFuture<Void> execute(IInternalAccess ia)
+																			{
+																				if(!future.isDone())
+																				{
+																					removeWaitingCall(callid);
+																					future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+SUtil.arrayToString(msg.get(SFipa.RECEIVERS))+", "+callid)
+																					{
+																						public void printStackTrace()
+																						{
+																							Thread.dumpStack();
+																							super.printStackTrace();
+																						}
+																					}
+																					);
+																				}
+																				return IFuture.DONE;
+																			}
+																		});
+				//														System.out.println("timeout triggered: "+msg);
+																	}
+																}, timeout);
 															}
-																			
-															public void exceptionOccurred(Exception exception)
-															{
-		//														exception.printStackTrace();
-																removeWaitingCall(callid);
-		//														System.out.println("Waitingcalls: "+waitingcalls.size());
-		//														System.out.println("Cancel timeout (ex): "+callid+" "+future);
-		//														errors.put(callid, new Object[]{"Cancel timeout (ex):", exception});
-		//														ia.getLogger().warning("Remote request failed: "+content);
-																ia.getLogger().info("Remote exception occurred: "+SUtil.arrayToString(msg.get(SFipa.RECEIVERS))+", "+exception.toString());
-															}
-														}));
+														});
 													}
-													
-													public void exceptionOccurred(Exception exception)
-													{
-//														System.out.println("not sent: "+callid);
-														// message could not be sent -> fail immediately.
-		//												System.out.println("Callee could not be reached: "+exception);
-		//												errors.put(callid, new Object[]{"Callee could not be reached", exception});
-														future.setException(exception);
-														removeWaitingCall(callid);
-		//												waitingcalls.remove(callid);
-		//												System.out.println("Waitingcalls: "+waitingcalls.size());
-													}
-												}));
-											}
-											public void exceptionOccurred(Exception exception)
-											{
-		//										System.out.println("Classlooder not found: "+exception);
-		//										errors.put(callid, new Object[]{"No msg service", exception});
-												removeWaitingCall(callid);
-		//										waitingcalls.remove(callid);
-		//										System.out.println("Waitingcalls: "+waitingcalls.size());
-												future.setException(exception);
+												});
 											}
 										});
 									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-		//								System.out.println("Message service not found: "+exception);
-		//								errors.put(callid, new Object[]{"No msg service", exception});
-										removeWaitingCall(callid);
-		//								waitingcalls.remove(callid);
-		//								System.out.println("Waitingcalls: "+waitingcalls.size());
-										future.setException(exception);
-									}
-								}));
+								});
 							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-		//						System.out.println("Library service not found: "+exception);
-		//						errors.put(callid, new Object[]{"No lib service", exception});
-								removeWaitingCall(callid);
-		//						waitingcalls.remove(callid);
-		//						System.out.println("Waitingcalls: "+waitingcalls.size());
-								future.setException(exception);
-							}
-						}));
+						});
 					}
 				});
 				
-				return IFuture.DONE;
+				return ret;
 			}
-		});
+		}).addResultListener(new DelegationResultListener<Object>(future));
 	}
 
 	/**

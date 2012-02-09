@@ -1062,7 +1062,7 @@ public class MessageService extends BasicService implements IMessageService
 									}
 									catch(Exception e)
 									{
-										logger.warning("Message could not be delivered to receiver: " + receivers[i] + ", "+ message.get(messagetype.getIdIdentifier())+", "+e);
+										logger.warning("Message could not be delivered to local receiver: " + receivers[i] + ", "+ message.get(messagetype.getIdIdentifier())+", "+e);
 		
 										// todo: notify sender that message could not be delivered!
 										// Problem: there is no connection back to the sender, so that
@@ -1071,7 +1071,7 @@ public class MessageService extends BasicService implements IMessageService
 								}
 								else
 								{
-									logger.warning("Message could not be delivered to receiver: " + receivers[i] + ", "+ msg.get(messagetype.getIdIdentifier()));
+									logger.warning("Message could not be delivered to local receiver: " + receivers[i] + ", "+ msg.get(messagetype.getIdIdentifier()));
 		
 									// todo: notify sender that message could not be delivered!
 									// Problem: there is no connection back to the sender, so that
@@ -1220,7 +1220,7 @@ public class MessageService extends BasicService implements IMessageService
 							if(task.getTransports().isEmpty())
 							{
 								ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
-									"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())));								
+									"No transports available for sending message: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())));								
 							}
 							else
 							{
@@ -1249,7 +1249,7 @@ public class MessageService extends BasicService implements IMessageService
 										if(last)
 										{
 											ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
-												"Message could not be delivered to (all) receivers: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())));
+												"Transports failed to send message: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())));
 										}
 									}
 								};

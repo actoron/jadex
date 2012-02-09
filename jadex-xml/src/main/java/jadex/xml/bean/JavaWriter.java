@@ -121,7 +121,7 @@ public class JavaWriter extends Writer
 	 *	- jadex.commons.Tuple
 	 *	- jadex.commons.Tuple2
 	 */
-	public static Set getTypeInfos()
+	public static Set<TypeInfo> getTypeInfos()
 	{
 		Set typeinfos = new HashSet();
 		

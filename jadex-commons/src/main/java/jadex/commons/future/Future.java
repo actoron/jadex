@@ -63,6 +63,10 @@ public class Future<E> implements IFuture<E>
 	/** The listeners. */
 	protected List listeners;
 	
+	/** For capturing call stack of future creation. */
+	// Only for debugging;
+	protected Exception creation;
+	
 	/** For capturing call stack of first setResult/Exception call. */
 	// Only for debugging;
 	protected Exception first;
@@ -74,6 +78,10 @@ public class Future<E> implements IFuture<E>
 	 */
 	public Future()
 	{
+    	if(DEBUG)
+    	{
+    		creation	= new DebugException("future creation");
+    	}
 	}
 	
 	/**
@@ -82,6 +90,7 @@ public class Future<E> implements IFuture<E>
 	 */
 	public Future(E result)
 	{
+		this();
 		setResult(result);
 	}
 	
@@ -91,6 +100,7 @@ public class Future<E> implements IFuture<E>
 	 */
 	public Future(Exception exception)
 	{
+		this();
 		setException(exception);
 	}
 	

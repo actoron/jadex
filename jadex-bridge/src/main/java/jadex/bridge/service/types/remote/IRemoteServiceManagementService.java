@@ -22,7 +22,7 @@ public interface IRemoteServiceManagementService extends IService
 	 *  @param selector The result selector.
 	 *  @return Collection or single result (i.e. service proxies). 
 	 */
-	public IFuture getServiceProxies(IComponentIdentifier cid, 
+	public IFuture<Object> getServiceProxies(IComponentIdentifier cid, 
 		ISearchManager manager, IVisitDecider decider, IResultSelector selector);
 	
 	/**
@@ -33,7 +33,7 @@ public interface IRemoteServiceManagementService extends IService
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public IFuture getServiceProxy(IComponentIdentifier cid, Class service, String scope);
+	public IFuture<Object> getServiceProxy(IComponentIdentifier cid, Class<?> service, String scope);
 	
 	/**
 	 *  Get all service proxies from a remote component.
@@ -43,7 +43,7 @@ public interface IRemoteServiceManagementService extends IService
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public IFuture getServiceProxies(IComponentIdentifier cid, Class service, String scope);
+	public IFuture<Object> getServiceProxies(IComponentIdentifier cid, Class<?> service, String scope);
 
 	/**
 	 *  Get all declared service proxies from a remote component.
@@ -52,7 +52,7 @@ public interface IRemoteServiceManagementService extends IService
 	 *  @param service The service type.
 	 *  @return The service proxy.
 	 */
-	public IFuture getDeclaredServiceProxies(IComponentIdentifier cid);
+	public IFuture<Object> getDeclaredServiceProxies(IComponentIdentifier cid);
 	
 	/**
 	 *  Get an external access proxy from a remote component.
@@ -60,5 +60,5 @@ public interface IRemoteServiceManagementService extends IService
 	 *  @param cid Component target id.
 	 *  @return External access of remote component. 
 	 */
-	public IFuture getExternalAccessProxy(IComponentIdentifier cid);
+	public IFuture<Object> getExternalAccessProxy(IComponentIdentifier cid);
 }

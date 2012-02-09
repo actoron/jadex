@@ -79,6 +79,11 @@ public class DuplicateResultException	extends RuntimeException
 	 */
 	public void printStackTrace()
 	{
+		System.err.println("Future: "+future);
+		if(future instanceof Future && ((Future)future).creation!=null)
+		{
+			((Future)future).creation.printStackTrace();
+		}
 		if(future instanceof Future && ((Future)future).first!=null)
 		{
 			((Future)future).first.printStackTrace();
