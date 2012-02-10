@@ -5,6 +5,7 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.publish.IPublishService;
@@ -13,7 +14,10 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ThreadSuspendable;
 
+import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -24,6 +28,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 import javassist.ClassClassPath;
@@ -40,17 +45,23 @@ import javassist.bytecode.ConstPool;
 import javassist.bytecode.ParameterAnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.ArrayMemberValue;
+import javassist.bytecode.annotation.BooleanMemberValue;
 import javassist.bytecode.annotation.ClassMemberValue;
 import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.grizzly.http.server.HttpHandler;
@@ -288,6 +299,10 @@ public class DefaultRestServicePublishService implements IPublishService
 		
 				if(gen)
 				{
+					// Add field with for functionsjs
+					CtField fjs = new CtField(getCtClass(String.class, pool), "__functionsjs", proxyclazz);
+					proxyclazz.addField(fjs);
+					
 					// Add field with annotation for resource context
 					CtField rc = new CtField(getCtClass(ResourceConfig.class, pool), "__rc", proxyclazz);
 					AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
@@ -306,7 +321,7 @@ public class DefaultRestServicePublishService implements IPublishService
 					
 					// Add methods from the service interface
 					Method[] ms = iface.getMethods();
-					CtMethod invoke = getCtClass(Proxy.class, pool).getDeclaredMethod("invoke");
+					CtMethod invoke = getCtClass(getClass(), pool).getDeclaredMethod("invoke");
 					Set<String> paths = new HashSet<String>();
 			
 					for(int i=0; i<ms.length; i++)
@@ -377,41 +392,47 @@ public class DefaultRestServicePublishService implements IPublishService
 								annot.addMemberValue("value", vals);
 								attr.addAnnotation(annot);
 
+								m.getMethodInfo().addAttribute(attr);
+								proxyclazz.addMethod(m);
+								
 								// add @FormDataParam if post
 								if(POST.class.equals(resttype))
 								{
 									int pcnt = ms[i].getParameterTypes().length;
-									for(int k=0; k<pcnt; k++)
+									ConstPool mcp = m.getMethodInfo().getConstPool();
+									if(pcnt==1)
 									{
-										ParameterAnnotationsAttribute pai = (ParameterAnnotationsAttribute)m.getMethodInfo().getAttribute(ParameterAnnotationsAttribute.visibleTag);
-										if(pai==null)
-										{
-											pai = new ParameterAnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-											pai.setAnnotations(new Annotation[pcnt][0]);
-											m.getMethodInfo().addAttribute(pai);
-										}
-	//									ConstPool pcp = pai.getConstPool();
-										annot = new Annotation(constpool, getCtClass(FormDataParam.class, pool));
-	//									ClassMemberValue cmv = new ClassMemberValue(proxyclazz.getName(), pcp);
-	//									annot.addMemberValue("value", cmv);
-										annot.addMemberValue("value", new StringMemberValue("arg"+k, constpool));
-										Annotation[][] par = pai.getAnnotations();
-										Annotation[] an = par[k];
-										Annotation[] newan = null;
-										if(an.length == 0) 
-											newan = new Annotation[1];
-										else 
-											newan = Arrays.copyOf(an, an.length + 1);
-										newan[an.length] = annot;
-										par[k] = newan;
-										pai.setAnnotations(par);
+										ParameterAnnotationsAttribute pai = new ParameterAnnotationsAttribute(mcp, AnnotationsAttribute.visibleTag);
+										annot = new Annotation(mcp, getCtClass(Reference.class, pool));
+										annot.addMemberValue("local", new BooleanMemberValue(true, mcp));
+										annot.addMemberValue("remote", new BooleanMemberValue(true, mcp));
+//										annot.addMemberValue("value", new StringMemberValue("arg", constpool));
+										Annotation[][] dest = new Annotation[pcnt][1];
+										dest[0] = new Annotation[0];//{annot};
+										pai.setAnnotations(dest);
+										
+//										for(int k=0; k<pcnt; k++)
+//										{
+//											annot = new Annotation(mcp, getCtClass(FormDataParam.class, pool));
+//		//									ClassMemberValue cmv = new ClassMemberValue(proxyclazz.getName(), pcp);
+//		//									annot.addMemberValue("value", cmv);
+//											annot.addMemberValue("value", new StringMemberValue("arg"+k, mcp));
+//											Annotation[][] par = pai.getAnnotations();
+//											Annotation[] an = par[k];
+//											Annotation[] newan = null;
+//											if(an.length == 0) 
+//												newan = new Annotation[1];
+//											else 
+//												newan = Arrays.copyOf(an, an.length + 1);
+//											newan[an.length] = annot;
+//											par[k] = newan;
+//											pai.setAnnotations(par);
+//										}
+										
+										m.getMethodInfo().addAttribute(pai);
 									}
 								}
-								
-								m.getMethodInfo().addAttribute(attr);
 			//					System.out.println("m: "+m.getName());
-								
-								proxyclazz.addMethod(m);
 							}
 						}
 					}
@@ -419,7 +440,7 @@ public class DefaultRestServicePublishService implements IPublishService
 					if(geninfo)
 					{
 						// Add the service info method
-						CtMethod getinfo = getCtClass(Proxy.class, pool).getDeclaredMethod("getServiceInfo");
+						CtMethod getinfo = getCtClass(getClass(), pool).getDeclaredMethod("getServiceInfo");
 						CtMethod m = CtNewMethod.wrapped(getCtClass(String.class, pool), "getServiceInfo", 
 							new CtClass[0], new CtClass[0], getinfo, null, proxyclazz);
 						attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
@@ -521,6 +542,242 @@ public class DefaultRestServicePublishService implements IPublishService
 			ret[i] = getCtClass(classes[i], pool);
 		}
 		return ret;	
+	}
+	
+
+	/**
+	 *  Functionality blueprint for all service methods.
+	 *  @param params The parameters.
+	 *  @return The result.
+	 */
+	public Object invoke(Object[] params)
+	{
+		Object ret = null;
+		
+//		System.out.println("called invoke: "+params);
+		
+		try
+		{
+			StackTraceElement[] s = Thread.currentThread().getStackTrace();
+			String name = s[2].getMethodName();
+//			for(int i=0;i<s.length; i++)
+//			{
+//				System.out.println(s[i].getMethodName());
+//			}
+//			String name = SReflect.getMethodName();
+			Method[] methods = SReflect.getMethods(getClass(), name);
+		    Method method = null;
+			if(methods.length>1)
+			{
+			    for(int i=0; i<methods.length && method==null; i++)
+			    {
+			    	Class[] types = methods[i].getParameterTypes();
+			    	if(types.length==params.length)
+			    	{
+			    		// check param types
+			    		method = methods[i];
+			    	}
+			    }
+			}
+			else if(methods.length==1)
+			{
+				method = methods[0];
+			}
+//			System.out.println("call: "+this+" "+method+" "+args+" "+name);
+			
+			try
+			{
+				ResourceConfig rc = (ResourceConfig)getClass().getDeclaredField("__rc").get(this);
+//				Object service = rc.getProperty(JADEXSERVICE);
+				Object service = rc.getProperty("jadexservice");
+						
+				String mname = method.getName();
+				if(mname.endsWith("XML"))
+					mname = mname.substring(0, mname.length()-3);
+				if(mname.endsWith("JSON"))
+					mname = mname.substring(0, mname.length()-4);
+
+				System.out.println("call: "+mname+" on "+service);
+				
+				Method m = service.getClass().getMethod(mname, method.getParameterTypes());
+				ret = m.invoke(service, params);
+				if(ret instanceof IFuture)
+				{
+					ret = ((IFuture)ret).get(new ThreadSuspendable());
+				}
+			}
+			catch(Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		catch(Throwable t)
+		{
+			throw new RuntimeException(t);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Functionality blueprint for get service info.
+	 *  @return The result.
+	 */
+	public Object getServiceInfo(Object[] params)
+	{
+		StringBuffer ret = new StringBuffer();
+		
+		try
+		{
+			Field fjs = getClass().getDeclaredField("__functionsjs");
+			String functionsjs = (String)fjs.get(this);
+			if(functionsjs==null)
+			{
+				try
+				{
+					InputStream is = SUtil.getResource0("jadex/extension/rs/publish/functions.js", 
+						Thread.currentThread().getContextClassLoader());
+					functionsjs = new Scanner(is).useDelimiter("\\A").next();
+					fjs.set(this, functionsjs);
+//					System.out.println(functionsjs);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+			}
+		
+			ret.append("<html>");
+			ret.append("<head>");
+			ret.append(functionsjs);
+	//		ret.append("<script src=\"functions.js\" type=\"text/javascript\"/>");
+			ret.append("<head>");
+			ret.append("</head>");
+			ret.append("<body>");
+			ret.append("<h1>Service Info for: ");
+			ret.append(SReflect.getUnqualifiedClassName(getClass()));
+			ret.append("</h1>");
+	
+			UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
+			
+			java.lang.reflect.Method[] methods = getClass().getDeclaredMethods();
+			if(methods!=null)
+			{
+				for(int i=0; i<methods.length; i++)
+				{
+					java.lang.annotation.Annotation restmethod = methods[i].getAnnotation(GET.class);
+					if(restmethod==null)
+						restmethod =  methods[i].getAnnotation(POST.class);
+					if(restmethod==null)
+						restmethod =  methods[i].getAnnotation(PUT.class);
+					if(restmethod==null)
+						restmethod =  methods[i].getAnnotation(DELETE.class);
+					if(restmethod==null)
+						restmethod =  methods[i].getAnnotation(HEAD.class);
+					if(restmethod==null)
+						restmethod =  methods[i].getAnnotation(OPTIONS.class);
+					if(restmethod!=null)
+					{
+						java.lang.annotation.Annotation[][] ans = methods[i].getParameterAnnotations();
+						System.out.println("method: "+methods[i].getName());
+						for(int j=0; j<ans.length; j++)
+						{
+							System.out.println(SUtil.arrayToString(ans[j]));
+						}
+						
+						Path path = methods[i].getAnnotation(Path.class);
+						Consumes consumes = methods[i].getAnnotation(Consumes.class);
+						Produces produces = methods[i].getAnnotation(Produces.class);
+						Class[] ptypes = methods[i].getParameterTypes();
+						
+						ret.append("<p>");
+						ret.append("<i>");
+						ret.append(methods[i].getName());
+						ret.append("</i>");
+						if(ptypes!=null && ptypes.length>0)
+						{
+							ret.append("(");
+							for(int j=0; j<ptypes.length; j++)
+							{
+								ret.append(SReflect.getUnqualifiedClassName(ptypes[j]));
+								if(j+1<ptypes.length)
+									ret.append(", ");
+							}
+							ret.append(")");
+						}
+						ret.append("</br>");
+						
+						String resttype = SReflect.getUnqualifiedClassName(restmethod.annotationType());
+						ret.append(resttype).append(" ");
+						if(consumes!=null)
+						{
+							String[] cons = consumes.value();
+							if(cons.length>0)
+							{
+								ret.append("Consumes: ");
+								for(int j=0; j<cons.length; j++)
+								{
+									ret.append(cons[j]);
+									if(j+1<cons.length)
+										ret.append(" ,");
+								}
+								ret.append(" ");
+							}
+						}
+						if(produces!=null)
+						{
+							String[] prods = produces.value();
+							if(prods.length>0)
+							{
+								ret.append("Produces: ");
+								for(int j=0; j<prods.length; j++)
+								{
+									ret.append(prods[j]);
+									if(j+1<prods.length)
+										ret.append(" ,");
+								}
+								ret.append(" ");
+							}
+						}
+						ret.append("</br>");
+
+						UriBuilder ub = ui.getBaseUriBuilder();
+						if(path!=null)
+							ub.path(path.value());
+						String link = ub.build(null).toString();
+						if(ptypes.length>0 || restmethod.annotationType().equals(POST.class))
+						{
+							ret.append("<form action=\"").append(link).append("\" method=\"")
+								.append(resttype.toLowerCase()).append("\" enctype=\"multipart/form-data\" ")
+								.append("onSubmit=\"return extract(this)\">");
+							
+							for(int j=0; j<ptypes.length; j++)
+							{
+								ret.append("arg").append(j).append(": ");
+								ret.append("<input name=\"arg").append(j).append("\" type=\"text\"/>");
+							}
+							
+							ret.append("<input type=\"submit\" value=\"invoke\"/></form>");
+						}
+						else
+						{
+							ret.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
+						}
+						ret.append("</p>");
+					}
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		
+		ret.append("</body></html>");
+
+		return ret.toString();
 	}
 	
 	/**

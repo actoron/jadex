@@ -56,7 +56,7 @@ public class InvokerAgent
 		tc.setTestCount(2);
 		
 		final Future<TestReport> ret = new Future<TestReport>();
-		ret.addResultListener(new IResultListener<TestReport>()
+		ret.addResultListener(agent.createResultListener(new IResultListener<TestReport>()
 		{
 			public void resultAvailable(TestReport result)
 			{
@@ -70,7 +70,7 @@ public class InvokerAgent
 				agent.setResultValue("testresults", tc);
 				agent.killAgent();	
 			}
-		});
+		}));
 			
 //		testLocal().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)
 //		{

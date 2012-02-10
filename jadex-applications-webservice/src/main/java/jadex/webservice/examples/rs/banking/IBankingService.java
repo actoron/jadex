@@ -2,12 +2,21 @@ package jadex.webservice.examples.rs.banking;
 
 import jadex.commons.future.IFuture;
 
+import java.util.Date;
+
 
 /**
  *  The Jadex asynchronous banking service. 
  */
 public interface IBankingService
 {
+	/**
+	 *  Get the account statement.
+	 *  @param request The request.
+	 *  @return The account statement.
+	 */
+	public IFuture<AccountStatement> getAccountStatement(Date begin, Date end);
+
 	/**
 	 *  Get all account statements.
 	 *  @return The account statements.
