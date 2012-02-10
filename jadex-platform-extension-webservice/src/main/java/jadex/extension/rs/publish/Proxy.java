@@ -117,7 +117,12 @@ public class Proxy
 	public Object getServiceInfo(Object[] params)
 	{
 		StringBuffer ret = new StringBuffer();
-		ret.append("<html><body>");
+		ret.append("<html>");
+		ret.append("<head>");
+		ret.append("<script src=\"functions.js\" type=\"text/javascript\"/>");
+		ret.append("<head>");
+		ret.append("</head>");
+		ret.append("<body>");
 		ret.append("<h1>Service Info for: ");
 		ret.append(SReflect.getUnqualifiedClassName(getClass()));
 		ret.append("</h1>");
@@ -207,13 +212,15 @@ public class Proxy
 						if(ptypes.length>0 || restmethod.annotationType().equals(POST.class))
 						{
 							ret.append("<form action=\"").append(link).append("\" method=\"")
-//								.append(resttype.toLowerCase()).append("\" enctype=\"application/json\" >");
-								.append(resttype.toLowerCase()).append("\" enctype=\"multipart/form-data\" >");
+								.append(resttype.toLowerCase()).append("\" enctype=\"multipart/form-data\" ")
+								.append("onSubmit=\"return extract(this)\">");
+							
 							for(int j=0; j<ptypes.length; j++)
 							{
 								ret.append("arg").append(j).append(": ");
 								ret.append("<input name=\"arg").append(j).append("\" type=\"text\"/>");
 							}
+							
 							ret.append("<input type=\"submit\" value=\"invoke\"/></form>");
 						}
 						else

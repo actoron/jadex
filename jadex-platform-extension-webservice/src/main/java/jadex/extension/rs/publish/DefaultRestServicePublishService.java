@@ -18,6 +18,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,8 +37,10 @@ import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
+import javassist.bytecode.ParameterAnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.ArrayMemberValue;
+import javassist.bytecode.annotation.ClassMemberValue;
 import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
@@ -58,6 +62,7 @@ import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.multipart.FormDataParam;
 
 /**
  *  The default web service publish service.
@@ -344,24 +349,64 @@ public class DefaultRestServicePublishService implements IPublishService
 								CtMethod m = CtNewMethod.wrapped(rettype, mtname, 
 									paramtypes, exceptions, invoke, null, proxyclazz);
 								
+								Class resttype = getHttpType(ms[i], (Class)rt, ms[i].getParameterTypes());
+								
+								// path.
 								attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-								annot = new Annotation(constpool, getCtClass(getHttpType(ms[i], (Class)rt, ms[i].getParameterTypes()), pool));
+								annot = new Annotation(constpool, getCtClass(resttype, pool));
 								attr.addAnnotation(annot);
 								annot = new Annotation(constpool, getCtClass(Path.class, pool));
 								annot.addMemberValue("value", new StringMemberValue(path, constpool));
 								attr.addAnnotation(annot);
+								
+								// consumes.
+								List<MemberValue> cons = new ArrayList<MemberValue>();
+								cons.add(new StringMemberValue(formatmap.get(formats[j]), constpool));
+								if(POST.class.equals(resttype))
+									cons.add(new StringMemberValue(MediaType.MULTIPART_FORM_DATA, constpool));
 								annot = new Annotation(constpool, getCtClass(Consumes.class, pool));
 								ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
-								vals.setValue(new MemberValue[]{
-									new StringMemberValue(formatmap.get(formats[j]), constpool),
-									new StringMemberValue(MediaType.MULTIPART_FORM_DATA, constpool)});
+								vals.setValue(cons.toArray(new MemberValue[0]));
 								annot.addMemberValue("value", vals);
 								attr.addAnnotation(annot);
+								
+								// produces.
 								vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
 								vals.setValue(new MemberValue[]{new StringMemberValue(formatmap.get(formats[j]), constpool)});
 								annot = new Annotation(constpool, getCtClass(Produces.class, pool));
 								annot.addMemberValue("value", vals);
 								attr.addAnnotation(annot);
+
+								// add @FormDataParam if post
+								if(POST.class.equals(resttype))
+								{
+									int pcnt = ms[i].getParameterTypes().length;
+									for(int k=0; k<pcnt; k++)
+									{
+										ParameterAnnotationsAttribute pai = (ParameterAnnotationsAttribute)m.getMethodInfo().getAttribute(ParameterAnnotationsAttribute.visibleTag);
+										if(pai==null)
+										{
+											pai = new ParameterAnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+											pai.setAnnotations(new Annotation[pcnt][0]);
+											m.getMethodInfo().addAttribute(pai);
+										}
+	//									ConstPool pcp = pai.getConstPool();
+										annot = new Annotation(constpool, getCtClass(FormDataParam.class, pool));
+	//									ClassMemberValue cmv = new ClassMemberValue(proxyclazz.getName(), pcp);
+	//									annot.addMemberValue("value", cmv);
+										annot.addMemberValue("value", new StringMemberValue("arg"+k, constpool));
+										Annotation[][] par = pai.getAnnotations();
+										Annotation[] an = par[k];
+										Annotation[] newan = null;
+										if(an.length == 0) 
+											newan = new Annotation[1];
+										else 
+											newan = Arrays.copyOf(an, an.length + 1);
+										newan[an.length] = annot;
+										par[k] = newan;
+										pai.setAnnotations(par);
+									}
+								}
 								
 								m.getMethodInfo().addAttribute(attr);
 			//					System.out.println("m: "+m.getName());
@@ -370,7 +415,7 @@ public class DefaultRestServicePublishService implements IPublishService
 							}
 						}
 					}
-					
+
 					if(geninfo)
 					{
 						// Add the service info method
