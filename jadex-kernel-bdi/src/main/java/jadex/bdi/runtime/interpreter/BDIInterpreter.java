@@ -1459,7 +1459,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public void startMonitorConsequences()
 	{
-		if(microplansteps)
+		if(microplansteps && getRuleSystem().isInited())
 		{
 			monitor_consequences++;
 			if(monitor_consequences==1)
@@ -1473,7 +1473,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public void endMonitorConsequences()
 	{
-		if(microplansteps)
+		if(microplansteps && getRuleSystem().isInited())
 		{
 			assert monitor_consequences>0;
 		

@@ -1119,8 +1119,21 @@ public class StarterPanel extends JLayeredPane
 			@XMLClassname("getrid")
 			public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
 			{
-				URL	url	= SUtil.toURL(ridurl);
-				return new Future<IResourceIdentifier>(new ResourceIdentifier(new LocalResourceIdentifier(ia.getComponentIdentifier().getRoot(), url), globalrid));
+				Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
+				
+				// What to do if ridurl is null, use library service?
+				if(ridurl==null && globalrid==null)
+				{
+					ret.setResult(ia.getModel().getResourceIdentifier());
+				}
+				else
+				{
+					URL	url	= SUtil.toURL(ridurl);
+					LocalResourceIdentifier lid = url==null? null: new LocalResourceIdentifier(ia.getComponentIdentifier().getRoot(), url);
+					ret.setResult(new ResourceIdentifier(lid, globalrid));
+				}
+				
+				return ret;
 			}
 		}).addResultListener(new ExceptionSwingDelegationResultListener<IResourceIdentifier, Void>(ret)
 		{

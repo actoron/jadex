@@ -68,6 +68,15 @@ public class RuleSystem
 	}
 	
 	/**
+	 *  Get the inited.
+	 *  @return the inited.
+	 */
+	public boolean isInited()
+	{
+		return inited;
+	}
+
+	/**
 	 *  Get the memory.
 	 *  @return The memory.
 	 */

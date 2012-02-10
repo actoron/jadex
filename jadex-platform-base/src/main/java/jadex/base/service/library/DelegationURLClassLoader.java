@@ -125,6 +125,10 @@ public class DelegationURLClassLoader extends URLClassLoader
 		catch(ClassNotFoundException e)
 		{
 		}
+		catch(NullPointerException e)
+		{
+			e.printStackTrace();
+		}
 		
 		if(ret==null)
 		{

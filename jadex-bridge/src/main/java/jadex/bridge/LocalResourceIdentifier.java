@@ -36,6 +36,11 @@ public class LocalResourceIdentifier implements ILocalResourceIdentifier
 	 */
 	public LocalResourceIdentifier(IComponentIdentifier cid, URL url)
 	{
+		if(cid==null)
+			throw new IllegalArgumentException("Cid must not null.");
+		if(url==null)
+			throw new IllegalArgumentException("Url must not null.");
+		
 		this.cid = cid;
 		this.url = url;
 	}

@@ -1336,17 +1336,22 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			}
 			catch(InvocationTargetException e)
 			{
+				if("setClazz".equals(prefixes[i]+postfix))
+					System.out.println("here");
 				// Ignore -> try other way of setting attribute
 //				context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
 //					"attribute error", context, context.getParser().getLocation());
 			}
 			catch(Exception e)
 			{
+				if("setClazz".equals(prefixes[i]+postfix))
+					System.out.println("here");
 				// Ignore -> try other way of setting attribute
 //				context.getReporter().report("Failure invoking setter method: "+e,
 //					"attribute error", context, context.getParser().getLocation());
 			}
 		}
+		
 		
 		return set;
 	}
