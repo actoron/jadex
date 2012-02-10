@@ -134,7 +134,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 //				debugcallid	= callid;
 			
 			final RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(
-				pr.getRemoteReference(), method, args, callid);
+				pr.getRemoteReference(), method, args, callid, IComponentIdentifier.LOCAL.get());
 			
 			// Set future result immediately, if method is asynchronous.
 			if(method.getReturnType().equals(void.class) && !pi.isSynchronous(method))

@@ -37,7 +37,7 @@ public abstract class TerminationAdapter implements IComponentListener
 	 *  Invoked when a change occurs with the component.
 	 *  The changes depend on the underlying component type.
 	 */
-	public IFuture eventOccured(IComponentChangeEvent cce)
+	public IFuture<Void> eventOccured(IComponentChangeEvent cce)
 	{
 		componentTerminated();
 		return IFuture.DONE;

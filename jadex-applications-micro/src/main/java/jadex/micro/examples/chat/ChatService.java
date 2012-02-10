@@ -1,15 +1,14 @@
 package jadex.micro.examples.chat;
 
-import jadex.bridge.IInternalAccess;
+import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IRemoteChangeListener;
-import jadex.commons.future.IResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.swing.SwingUtilities;
 
 /**
  *  Chat service implementation.
@@ -21,10 +20,7 @@ public class ChatService implements IChatService
 	
 	/** The agent. */
 	@ServiceComponent
-	protected IInternalAccess agent;
-	
-	/** The listeners. */
-	protected List listeners;
+	protected IExternalAccess agent;
 	
 	/** The chat gui. */
 	protected ChatPanel chatpanel;
@@ -35,53 +31,29 @@ public class ChatService implements IChatService
 	 *  Called on startup.
 	 */
 	@ServiceStart
-	public void start()
+	public IFuture<Void> start()
 	{
-		this.listeners = new ArrayList();
-		this.chatpanel = ChatPanel.createGui(agent.getExternalAccess());
-	}
-	
-	/**
-	 *  Hear something.
-	 *  @param name The name.
-	 *  @param text The text.
-	 */
-	public void hear(String name, String text)
-	{
-		for(int i=0; i<listeners.size(); i++)
+		final Future<Void>	ret	= new Future<Void>();
+		SwingUtilities.invokeLater(new Runnable()
 		{
-//			System.out.println("listeners: "+listeners);
-			final IRemoteChangeListener lis = (IRemoteChangeListener)listeners.get(i);
-			lis.changeOccurred(new ChangeEvent(name, null, text))
-				.addResultListener(agent.createResultListener(new IResultListener()
+			public void run()
 			{
-				public void resultAvailable(Object result)
-				{
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-//					exception.printStackTrace();
-					listeners.remove(lis);
-				}
-			}));
-		}
+				chatpanel = ChatPanel.createGui(agent);
+				ret.setResult(null);
+			}
+		});
+		return ret;
 	}
 	
 	/**
-	 *  Add a local listener.
+	 *  Hear a new message.
+	 *  @param name The name of the sender.
+	 *  @param text The text message.
 	 */
-	public void addChangeListener(IRemoteChangeListener listener)
+	public IFuture<Void>	message(String text)
 	{
-		listeners.add(listener);
-	}
-	
-	/**
-	 *  Remove a local listener.
-	 */
-	public void removeChangeListener(IRemoteChangeListener listener)
-	{
-		listeners.remove(listener);
+		chatpanel.addMessage(""+IComponentIdentifier.CALLER.get(), text);
+		return IFuture.DONE;
 	}
 	
 	/**

@@ -4,11 +4,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
-import jadex.bridge.service.IService;
-import jadex.commons.ChangeEvent;
-import jadex.commons.IRemoteChangeListener;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -70,48 +65,12 @@ public class ChatPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				tell(""+agent.getComponentIdentifier(), tf.getText());
+				tell(tf.getText());
 				tf.setText("");
 			}
 		};
 		tf.addActionListener(al);
 		send.addActionListener(al);
-		
-		agent.scheduleStep(new IComponentStep<IService>()
-		{
-			@XMLClassname("addlistener")
-			public IFuture<IService> execute(IInternalAccess ia)
-			{
-				return new Future<IService>(ia.getServiceContainer().getProvidedServices(IChatService.class)[0]);
-//				final Future ret = new Future();
-//				ia.getServiceContainer().getRequiredService("mychatservice").addResultListener(
-//					ia.createResultListener(new DelegationResultListener(ret)));
-//				return ret;
-			}
-		}).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-				IChatService cs = (IChatService)result;
-				cs.addChangeListener(new IRemoteChangeListener()
-				{
-					public IFuture changeOccurred(final ChangeEvent event)
-					{
-						Future ret = new Future();
-						if(!isVisible())
-						{
-							ret.setException(new RuntimeException("Gui closed."));
-						}
-						else
-						{
-							addMessage((String)event.getSource(), (String)event.getValue());
-							ret.setResult(null);
-						}
-						return ret;
-					}
-				});
-			}
-		});
 		
 		this.setLayout(new BorderLayout());
 		this.add(main, BorderLayout.CENTER);
@@ -171,7 +130,7 @@ public class ChatPanel extends JPanel
 	 *  @param name The name.
 	 *  @param text The text.
 	 */
-	public void tell(final String name, final String text)
+	public void tell(final String text)
 	{
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
@@ -185,10 +144,10 @@ public class ChatPanel extends JPanel
 //						System.out.println("bulk");
 						if(result!=null)
 						{
-							for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
+							for(Iterator<IChatService> it=result.iterator(); it.hasNext(); )
 							{
-								IChatService cs = (IChatService)it.next();
-								cs.hear(name, text);
+								IChatService cs = it.next();
+								cs.message(text);
 							}
 						}
 					}
@@ -202,7 +161,7 @@ public class ChatPanel extends JPanel
 					public void intermediateResultAvailable(IChatService result)
 					{
 //						System.out.println("intermediate");
-						result.hear(name, text);
+						result.message(text);
 					}
 					
 					public void finished()

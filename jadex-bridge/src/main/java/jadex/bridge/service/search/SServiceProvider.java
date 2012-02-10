@@ -17,6 +17,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 
@@ -316,6 +317,18 @@ public class SServiceProvider
 	public static <T> IFuture<T> getService(IServiceProvider provider, final IComponentIdentifier cid, final Class<T> type)
 	{
 		final Future<T> ret = new Future<T>();
+		ret.addResultListener(new IResultListener<T>()
+		{
+			@Override
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("exception: "+exception);
+			}
+			public void resultAvailable(T result)
+			{
+				System.out.println("result: "+result);
+			}			
+		});
 		
 		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)

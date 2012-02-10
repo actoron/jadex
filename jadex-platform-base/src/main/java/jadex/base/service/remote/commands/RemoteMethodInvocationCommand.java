@@ -1,5 +1,6 @@
 package jadex.base.service.remote.commands;
 
+import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.service.remote.RemoteReference;
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.base.service.remote.RemoteServiceManagementService;
@@ -61,6 +62,9 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	/** The target object (set by postprocessing). */
 	protected Object	target;
 	
+	/** The caller. */
+	protected IComponentIdentifier caller;
+	
 	//-------- constructors --------
 	
 	/**
@@ -74,7 +78,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  Create a new remote method invocation command. 
 	 */
 	public RemoteMethodInvocationCommand(RemoteReference rr, Method method, 
-		Object[] parametervalues, String callid)
+		Object[] parametervalues, String callid, IComponentIdentifier caller)
 	{
 		this.rr = rr;
 		this.method = method;
@@ -82,6 +86,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		this.parametertypes = method.getParameterTypes();
 		this.parametervalues = parametervalues;
 		this.callid = callid;
+		this.caller	= caller;
 //		System.out.println("rmi on client: "+callid+" "+methodname);
 	}
 	
@@ -198,7 +203,11 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	public IIntermediateFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
 		final IntermediateFuture ret = new IntermediateFuture();
+		
+		// RMS acts as representative of remote caller.
+		IComponentIdentifier.LOCAL.set(caller);
 		invokeMethod(ret);
+		IComponentIdentifier.LOCAL.set(component.getComponentIdentifier());
 		
 //		rsms.getRemoteReferenceModule().getTargetObject(getRemoteReference())
 //			.addResultListener(new IResultListener() // todo: createResultListener?!
@@ -392,6 +401,24 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	{
 //		System.out.println("rmi on server: "+callid);
 		this.callid = callid;
+	}
+
+	/**
+	 *  Get the caller.
+	 *  @return the caller.
+	 */
+	public IComponentIdentifier getCaller()
+	{
+		return caller;
+	}
+
+	/**
+	 *  Set the caller.
+	 *  @param caller The caller to set.
+	 */
+	public void setCaller(IComponentIdentifier caller)
+	{
+		this.caller = caller;
 	}
 
 	/**
