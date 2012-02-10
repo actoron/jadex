@@ -317,18 +317,18 @@ public class SServiceProvider
 	public static <T> IFuture<T> getService(IServiceProvider provider, final IComponentIdentifier cid, final Class<T> type)
 	{
 		final Future<T> ret = new Future<T>();
-		ret.addResultListener(new IResultListener<T>()
-		{
-			@Override
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("exception: "+exception);
-			}
-			public void resultAvailable(T result)
-			{
-				System.out.println("result: "+result);
-			}			
-		});
+//		ret.addResultListener(new IResultListener<T>()
+//		{
+//			@Override
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("exception: "+exception);
+//			}
+//			public void resultAvailable(T result)
+//			{
+//				System.out.println("result: "+result);
+//			}			
+//		});
 		
 		SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)

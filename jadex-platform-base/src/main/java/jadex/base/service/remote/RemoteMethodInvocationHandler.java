@@ -70,7 +70,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
-		final Future future = IIntermediateFuture.class.isAssignableFrom(method.getReturnType())
+		Future future = IIntermediateFuture.class.isAssignableFrom(method.getReturnType())
 			? new IntermediateFuture() : new Future();
 		Object ret = future;
 		
@@ -136,21 +136,16 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			final RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(
 				pr.getRemoteReference(), method, args, callid, IComponentIdentifier.LOCAL.get());
 			
-			// Set future result immediately, if method is asynchronous.
+			// Can be invoked directly, because internally redirects to agent thread.
+			rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
+				content, callid, to, future);
+			
+			// Provide alternative immediate future result, if method is asynchronous.
 			if(method.getReturnType().equals(void.class) && !pi.isSynchronous(method))
 			{
 //				System.out.println("Warning, void method call will be executed asynchronously: "
 //					+method.getDeclaringClass()+" "+method.getName()+" "+Thread.currentThread());
-				// Can be invoked directly, because internally redirects to agent thread.
-				rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-					content, callid, to, new Future<Object>());
-				future.setResult(null);
-			}
-			else
-			{
-				// Can be invoked directly, because internally redirects to agent thread.
-				rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-					content, callid, to, future);				
+				future	= new Future(null);
 			}
 		}
 		

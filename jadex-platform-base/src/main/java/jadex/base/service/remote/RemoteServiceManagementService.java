@@ -507,14 +507,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  (Can safely be called from any thread).
 	 */
 	public void sendMessage(final IComponentIdentifier receiver, final Object content,
-		final String callid, final long to, Future<Object> future)
+		final String callid, final long to, final Future<Object> future)
 	{
 //		System.out.println("RMS sending: "+content);
 		
-		component.scheduleStep(new IComponentStep<Object>()
+		component.scheduleStep(new IComponentStep<Void>()
 		{
 			@XMLClassname("sendMessage")
-			public IFuture<Object> execute(final IInternalAccess ia)
+			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				Future<Void>	pre	= new Future<Void>(); 
 				if(content instanceof AbstractRemoteCommand)
@@ -527,9 +527,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					pre.setResult(null);
 				}
 				
-				final Future<Object>	ret	= new Future<Object>();
-				
-				pre.addResultListener(new ExceptionDelegationResultListener<Void, Object>(ret)
+				pre.addResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
 				{
 					public void customResultAvailable(Void v)
 					{
@@ -537,7 +535,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						
 						putWaitingCall(callid, future);
 						// Remove waiting call when future is done
-						ret.addResultListener(new IResultListener<Object>()
+						future.addResultListener(new IResultListener<Object>()
 						{
 							public void resultAvailable(Object result)
 							{
@@ -558,22 +556,22 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		//				msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
 						
 						ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Object>(ret)
+							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Object>(future)
 						{
 							public void customResultAvailable(final ILibraryService ls)
 							{
 								ia.getServiceContainer().searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(new ExceptionDelegationResultListener<IMessageService, Object>(ret)
+									.addResultListener(new ExceptionDelegationResultListener<IMessageService, Object>(future)
 								{
 									public void customResultAvailable(final IMessageService ms)
 									{
 										// todo: use rid of sender?! (not important as writer does not use classloader, only nuggets)
 										ls.getClassLoader(ia.getModel().getResourceIdentifier())
-											.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Object>(ret)
+											.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Object>(future)
 										{
 											public void customResultAvailable(final ClassLoader cl)
 											{
-												msgservice.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], Object>(ret)
+												msgservice.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], Object>(future)
 												{
 													public void customResultAvailable(String[] addresses)
 													{
@@ -589,7 +587,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				//										}
 														
 														ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), null)
-															.addResultListener(new ExceptionDelegationResultListener<Void, Object>(ret)
+															.addResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
 														{
 															public void customResultAvailable(Void result)
 															{
@@ -635,9 +633,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					}
 				});
 				
-				return ret;
+				return IFuture.DONE;
 			}
-		}).addResultListener(new DelegationResultListener<Object>(future));
+		});
 	}
 
 	/**

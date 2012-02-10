@@ -239,7 +239,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								{
 									public void resultAvailable(Void result)
 									{
-										System.out.println("Command valid: "+com);
+//										System.out.println("Command valid: "+com);
 										com.execute((IMicroExternalAccess)getExternalAccess(), rms)
 											.addResultListener(createResultListener(new IntermediateDelegationResultListener<IRemoteCommand>(reply)));
 									}
