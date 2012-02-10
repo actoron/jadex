@@ -1,20 +1,26 @@
 package jadex.base.service.remote.commands;
 
+import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.TypeResultSelector;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +47,9 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	/** The callid. */
 	protected String callid;
 	
+	/** The security level (set by postprocessing). */
+	protected String	securitylevel;
+
 	//-------- constructors --------
 	
 	/**
@@ -65,6 +74,48 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 
 	//-------- methods --------
 	
+	/**
+	 *  Return security level determined by post-process.
+	 */
+	public String getSecurityLevel()
+	{
+		return securitylevel;
+	}
+	
+	/**
+	 *  Post-process a received command before execution
+	 *  for e.g. setting security level.
+	 */
+	public IFuture<Void>	postprocessCommand(IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
+	{
+		Security	sec	= null;
+		// Try to find security level.
+		// Todo: support other result selectors!?
+		if(selector instanceof TypeResultSelector)
+		{
+			List<Class<?>>	classes	= new ArrayList<Class<?>>();
+			classes.add(((TypeResultSelector)selector).getType());
+			for(int i=0; sec==null && i<classes.size(); i++)
+			{
+				Class<?>	clazz	= classes.get(i);
+				sec	= clazz.getAnnotation(Security.class);
+				if(sec==null)
+				{
+					classes.addAll(Arrays.asList(clazz.getInterfaces()));
+					if(clazz.getSuperclass()!=null)
+					{
+						classes.add(clazz.getSuperclass());
+					}
+				}
+			}
+		}
+		
+		// Default to max security if not found.
+		securitylevel	= sec!=null ? sec.value() : Security.PASSWORD;
+		
+		return IFuture.DONE;
+	}
+
 	/**
 	 *  Execute the command.
 	 *  @param lrms The local remote management service.

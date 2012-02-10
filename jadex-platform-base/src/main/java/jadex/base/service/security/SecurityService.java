@@ -7,6 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -368,7 +369,7 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void>	validateRequest(IAuthorizable request)
 	{
 		String	error	= null;
-		if(usepass!=null && usepass.booleanValue() && password!=null)
+		if(Security.PASSWORD.equals(request.getSecurityLevel()) && usepass!=null && usepass.booleanValue() && password!=null)
 		{
 			if(request.getAuthenticationData()!=null)
 			{

@@ -250,10 +250,16 @@ public class Future<E> implements IFuture<E>
 //        		else
 //        			throw new RuntimeException(exception);
         	}
-        		
-//        	System.out.println(this+" setResult: "+result);
-        	this.exception = exception;
-        	resultavailable = true;			
+        	else
+        	{
+//	        	System.out.println(this+" setResult: "+result);
+        		this.exception = exception;
+        		resultavailable = true;
+            	if(DEBUG)
+            	{
+            		first	= new DebugException("first setExceptionIfUndone()");
+            	}
+        	}
 		}
     	
     	resume();
@@ -314,11 +320,19 @@ public class Future<E> implements IFuture<E>
     	synchronized(this)
 		{
         	if(isDone())
+        	{
         		return false;
-        	
-//        	System.out.println(this+" setResult: "+result);
-        	this.result = result;
-        	resultavailable = true;			
+        	}
+        	else
+        	{
+//	        	System.out.println(this+" setResult: "+result);
+        		this.result = result;
+        		resultavailable = true;	
+            	if(DEBUG)
+            	{
+            		first	= new DebugException("first setResultIfUndone()");
+            	}
+        	}
 		}
     	
     	resume();

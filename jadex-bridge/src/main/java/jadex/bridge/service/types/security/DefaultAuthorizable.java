@@ -1,5 +1,7 @@
 package jadex.bridge.service.types.security;
 
+import jadex.bridge.service.annotation.Security;
+
 public class DefaultAuthorizable implements IAuthorizable
 {
 	//-------- attributes --------
@@ -20,6 +22,15 @@ public class DefaultAuthorizable implements IAuthorizable
 	}
 	
 	//-------- IAuthorizable interface --------
+	
+	/**
+	 *  Get the security level of the request.
+	 */
+	public String	getSecurityLevel()
+	{
+		// As default use maximum security.
+		return Security.PASSWORD;
+	}
 	
 	/**
 	 *  The time stamp of the command.

@@ -653,7 +653,7 @@ public class RemoteReferenceModule
 	 *  @param rr The remote reference.
 	 *  @return The target object.
 	 */
-	public IFuture getTargetObject(RemoteReference rr)
+	public IFuture<Object> getTargetObject(RemoteReference rr)
 	{
 		checkThread();
 		final Future ret = new Future();

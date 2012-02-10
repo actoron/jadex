@@ -4,6 +4,7 @@ import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IIntermediateFuture;
@@ -43,6 +44,16 @@ public class RemoteGetExternalAccessCommand extends AbstractRemoteCommand
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Get the security level of the request.
+	 */
+	public String	getSecurityLevel()
+	{
+		// Todo: customize security levels for external accesses?
+		// Specify security level at component start!?
+		return Security.PASSWORD;
+	}
 	
 	/**
 	 *  Execute the command.

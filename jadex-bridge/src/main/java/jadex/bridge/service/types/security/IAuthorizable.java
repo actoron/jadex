@@ -17,6 +17,11 @@ public interface IAuthorizable
 //	public IComponentIdentifier	getOrigin();
 	
 	/**
+	 *  Get the security level of the request.
+	 */
+	public String	getSecurityLevel();
+	
+	/**
 	 *  The time stamp of the request.
 	 *  Used for digest authentication and preventing replay attacks.
 	 *  Ignored, when no authentication is supplied.

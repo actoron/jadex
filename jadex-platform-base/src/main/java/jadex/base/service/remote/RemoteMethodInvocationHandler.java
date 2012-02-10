@@ -136,17 +136,22 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 			final RemoteMethodInvocationCommand content = new RemoteMethodInvocationCommand(
 				pr.getRemoteReference(), method, args, callid);
 			
-			// Can be invoked directly, because internally redirects to agent thread.
-			rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-				content, callid, to, future);
-			
 			// Set future result immediately, if method is asynchronous.
 			if(method.getReturnType().equals(void.class) && !pi.isSynchronous(method))
 			{
 //				System.out.println("Warning, void method call will be executed asynchronously: "
 //					+method.getDeclaringClass()+" "+method.getName()+" "+Thread.currentThread());
-				future.setResultIfUndone(null);
-			}			
+				// Can be invoked directly, because internally redirects to agent thread.
+				rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
+					content, callid, to, new Future<Object>());
+				future.setResult(null);
+			}
+			else
+			{
+				// Can be invoked directly, because internally redirects to agent thread.
+				rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
+					content, callid, to, future);				
+			}
 		}
 		
 		// Wait for future, if blocking method.

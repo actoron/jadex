@@ -6,6 +6,7 @@ import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.Security;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -134,6 +135,15 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	}
 	
 	//-------- getter/setter methods --------
+	
+	/**
+	 *  Get the security level of the request.
+	 */
+	public String	getSecurityLevel()
+	{
+		// Always pass through results.
+		return Security.UNRESTRICTED;
+	}
 	
 	/**
 	 *  Get the result.

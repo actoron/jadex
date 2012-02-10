@@ -2,8 +2,6 @@ package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
-import jadex.base.service.remote.commands.RemoteDGCAddReferenceCommand;
-import jadex.base.service.remote.commands.RemoteDGCRemoveReferenceCommand;
 import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
@@ -203,36 +201,38 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								
 //								System.out.println("received: "+rms.getServiceIdentifier()+" "+content);
 								
+								// Post-process.
+								final IFuture<Void>	post	= com instanceof AbstractRemoteCommand
+									? ((AbstractRemoteCommand)com).postprocessCommand(RemoteServiceManagementAgent.this, rms.getRemoteReferenceModule(), getComponentIdentifier()) : IFuture.DONE;
+								
 								// Validate command.
 								final Future<Void>	valid	= new Future<Void>();
-								if(com instanceof RemoteResultCommand || com instanceof RemoteDGCAddReferenceCommand || com instanceof RemoteDGCRemoveReferenceCommand)
+								post.addResultListener(new DelegationResultListener<Void>(valid)
 								{
-									// Results and DGC calls are allowed to simplify one-way authentication.
-									valid.setResult(null);
-								}
-								else
-								{
-									getServiceContainer().searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-										.addResultListener(new IResultListener<ISecurityService>()
+									public void customResultAvailable(Void result)
 									{
-										public void resultAvailable(ISecurityService sec)
+										getServiceContainer().searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											.addResultListener(new IResultListener<ISecurityService>()
 										{
-											sec.validateRequest(com).addResultListener(new DelegationResultListener<Void>(valid));
-										}
-										public void exceptionOccurred(Exception e)
-										{
-											if(e instanceof ServiceNotFoundException)
+											public void resultAvailable(ISecurityService sec)
 											{
-												// Valid by default, if no security service installed.
-												valid.setResult(null);
+												sec.validateRequest(com).addResultListener(new DelegationResultListener<Void>(valid));
 											}
-											else
+											public void exceptionOccurred(Exception e)
 											{
-												valid.setException(e);
+												if(e instanceof ServiceNotFoundException)
+												{
+													// Valid by default, if no security service installed.
+													valid.setResult(null);
+												}
+												else
+												{
+													valid.setException(e);
+												}
 											}
-										}
-									});
-								}
+										});										
+									}
+								});
 								
 								// Execute command and fetch reply
 								valid.addResultListener(new IResultListener<Void>()
@@ -320,10 +320,6 @@ public class RemoteServiceManagementAgent extends MicroAgent
 					//											System.out.println("content: "+content);
 //																System.out.println("reply: "+callid);
 																sendMessage(reply, mt);
-															}
-															public void exceptionOccurred(Exception exception)
-															{
-																super.exceptionOccurred(exception);
 															}
 														}));
 													};

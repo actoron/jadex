@@ -58,4 +58,13 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 		});
 		return ret;
 	}
+	
+	/**
+	 *  Post-process a received command before execution
+	 *  for e.g. setting security level.
+	 */
+	public IFuture<Void>	postprocessCommand(IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
+	{
+		return IFuture.DONE;
+	}
 }

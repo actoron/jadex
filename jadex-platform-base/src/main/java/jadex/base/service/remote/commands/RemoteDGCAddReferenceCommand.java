@@ -4,6 +4,7 @@ import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteReference;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
@@ -45,6 +46,15 @@ public class RemoteDGCAddReferenceCommand extends AbstractRemoteCommand
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Get the security level of the request.
+	 */
+	public String	getSecurityLevel()
+	{
+		// No security issues here.
+		return Security.UNRESTRICTED;
+	}
 	
 	/**
 	 *  Execute the command.

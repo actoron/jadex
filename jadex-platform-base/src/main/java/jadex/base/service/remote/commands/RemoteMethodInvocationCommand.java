@@ -6,8 +6,10 @@ import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -19,7 +21,10 @@ import jadex.xml.writer.WriteContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /**
  *  Command for executing a remote method.
@@ -50,6 +55,12 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	/** The call identifier. */
 	protected String callid;
 	
+	/** The security level (set by postprocessing). */
+	protected String	securitylevel;
+	
+	/** The target object (set by postprocessing). */
+	protected Object	target;
+	
 	//-------- constructors --------
 	
 	/**
@@ -75,6 +86,14 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	}
 	
 	//-------- methods --------
+	
+	/**
+	 *  Get the security level of the request.
+	 */
+	public String	getSecurityLevel()
+	{
+		return securitylevel;
+	}
 
 	/**
 	 *  Preprocess command and replace if they are remote references.
@@ -109,6 +128,68 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	}
 	
 	/**
+	 *  Post-process a received command before execution
+	 *  for e.g. setting security level.
+	 */
+	public IFuture<Void>	postprocessCommand(IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		rrm.getTargetObject(getRemoteReference())
+			.addResultListener(component.createResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				try
+				{
+					RemoteMethodInvocationCommand.this.target	= result;
+					method = result.getClass().getMethod(methodname, parametertypes);
+					
+					// Try to find security level.
+					Security	sec	= null;
+					List<Class<?>>	classes	= new ArrayList<Class<?>>();
+					classes.add(result.getClass());
+					for(int i=0; sec==null && i<classes.size(); i++)
+					{
+						Class<?>	clazz	= classes.get(i);
+						try
+						{
+							Method	m	= clazz.getMethod(methodname, parametertypes);
+							sec	= m.getAnnotation(Security.class);
+						}
+						catch(Exception e)
+						{
+						}
+						
+						if(sec==null)
+						{
+							sec	= clazz.getAnnotation(Security.class);
+							if(sec==null)
+							{
+								classes.addAll(Arrays.asList(clazz.getInterfaces()));
+								if(clazz.getSuperclass()!=null)
+								{
+									classes.add(clazz.getSuperclass());
+								}
+							}
+						}
+					}
+					// Default to max security if not found.
+					securitylevel	= sec!=null ? sec.value() : Security.PASSWORD;
+					
+					ret.setResult(null);
+				}
+				catch(Exception e)
+				{
+					super.exceptionOccurred(e);
+				}
+			}
+		}));
+		
+		return ret;
+	}
+
+	/**
 	 *  Execute the command.
 	 *  @param lrms The local remote management service.
 	 *  @return An optional result command that will be 
@@ -117,98 +198,25 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	public IIntermediateFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
 		final IntermediateFuture ret = new IntermediateFuture();
+		invokeMethod(ret);
 		
-		rsms.getRemoteReferenceModule().getTargetObject(getRemoteReference())
-			.addResultListener(new IResultListener() // todo: createResultListener?!
-		{
-			public void resultAvailable(Object result)
-			{
-				invokeMethod(result, ret);//.addResultListener(new DelegationResultListener(ret));
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-//				ret.setResult(new RemoteResultCommand(null, new RuntimeException(
+//		rsms.getRemoteReferenceModule().getTargetObject(getRemoteReference())
+//			.addResultListener(new IResultListener() // todo: createResultListener?!
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//				invokeMethod(result, ret);//.addResultListener(new DelegationResultListener(ret));
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+////				ret.setResult(new RemoteResultCommand(null, new RuntimeException(
+////					"Target object not found: "+getRemoteReference()), callid, false, methodname));
+//				ret.addIntermediateResult(new RemoteResultCommand(null, new RuntimeException(
 //					"Target object not found: "+getRemoteReference()), callid, false, methodname));
-				ret.addIntermediateResult(new RemoteResultCommand(null, new RuntimeException(
-					"Target object not found: "+getRemoteReference()), callid, false, methodname));
-				ret.setFinished();
-			}
-		});
-		
-		
-//		if(getRemoteReference().getTargetIdentifier() instanceof String)
-//		{
-//			Object target = rsms.getRemoteReferenceModule().getTargetObject(getRemoteReference());
-//			if(target!=null)
-//			{
-//				invokeMethod(target, ret);
+//				ret.setFinished();
 //			}
-//			else
-//			{
-//				ret.setResult(new RemoteResultCommand(null, new RuntimeException("Target object not found: "+tid), callid));
-//			}
-//		}
-//		else if(getRemoteReference().getTargetIdentifier() instanceof IServiceIdentifier)
-//		{
-//			IServiceIdentifier sid = (IServiceIdentifier)getRemoteReference().getTargetIdentifier();
-//			
-//			// fetch service via its id
-//			SServiceProvider.getService(component.getServiceProvider(), sid)
-//				.addResultListener(new IResultListener()
-//			{
-//				public void resultAvailable(Object source, Object result)
-//				{
-//					invokeMethod(result, ret);
-//				}
-//				
-//				public void exceptionOccurred(Object source, Exception exception)
-//				{
-//					ret.setResult(new RemoteResultCommand(null, exception, callid));
-//				}
-//			});
-//		}
-//		else if(getRemoteReference().getTargetIdentifier() instanceof IComponentIdentifier)
-//		{
-//			final IComponentIdentifier cid = (IComponentIdentifier)getRemoteReference().getTargetIdentifier();
-//			
-//			// fetch component via target component id
-//			SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-//				.addResultListener(new IResultListener()
-////				.addResultListener(component.createResultListener(new IResultListener()
-//			{
-//				public void resultAvailable(Object source, Object result)
-//				{
-//					IComponentManagementService cms = (IComponentManagementService)result;
-//					
-//					// fetch target component via component identifier.
-//					cms.getExternalAccess(cid).addResultListener(new IResultListener()
-//					{
-//						public void resultAvailable(Object source, Object result)
-//						{
-//							IExternalAccess exta = (IExternalAccess)result;
-//							
-//							// invoke method directly on external access
-//							invokeMethod(exta, ret);
-//						}
-//						
-//						public void exceptionOccurred(Object source, Exception exception)
-//						{
-//							ret.setResult(new RemoteResultCommand(null, exception, callid));
-//						}
-//					});
-//				}
-//				
-//				public void exceptionOccurred(Object source, Exception exception)
-//				{
-//					ret.setResult(new RemoteResultCommand(null, exception, callid));
-//				}
-//			});
-//		}
-//		else
-//		{
-//			System.out.println("remote invocation error, not target could be found: "+getRemoteReference().getTargetIdentifier());
-//		}
+//		});
 		
 		return ret;
 	}
@@ -218,7 +226,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  @param target The target object.
 	 *  @param ret The result future.
 	 */
-	public void invokeMethod(Object target, final IntermediateFuture ret)
+	public void invokeMethod(final IntermediateFuture ret)
 	{
 //		final IntermediateFuture ret = new IntermediateFuture();
 		
@@ -227,16 +235,13 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		
 		try
 		{
-			// fetch method on service and invoke method
-			Method m = target.getClass().getMethod(methodname, parametertypes);
-			
 //			System.out.println("invoke: "+m);
 			
 			// Necessary due to Java inner class bug 4071957
 			if(target.getClass().isAnonymousClass())
-				m.setAccessible(true);
+				method.setAccessible(true);
 			
-			Object res = m.invoke(target, parametervalues);
+			Object res = method.invoke(target, parametervalues);
 			
 			if(res instanceof IIntermediateFuture)
 			{

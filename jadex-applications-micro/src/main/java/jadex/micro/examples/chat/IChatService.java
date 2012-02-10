@@ -1,11 +1,13 @@
 package jadex.micro.examples.chat;
 
+import jadex.bridge.service.annotation.Security;
 import jadex.commons.IRemoteChangeListener;
 
 
 /**
  *  Service can receive chat messages.
  */
+@Security(Security.UNRESTRICTED)
 public interface IChatService
 {
 	/**
@@ -13,6 +15,7 @@ public interface IChatService
 	 *  @param name The name of the sender.
 	 *  @param text The text message.
 	 */
+	@Security(Security.UNRESTRICTED)
 	public void hear(String name, String text);
 		
 	/**
