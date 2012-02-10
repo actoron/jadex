@@ -148,10 +148,10 @@
 		</argument>
 
 		<!-- Flag if web service publishing is enabled. -->
-		<argument name="wspublish" class="boolean">true</argument>
+		<argument name="wspublish" class="boolean">false</argument>
 		
 		<!-- Flag if rest service publishing is enabled. -->
-		<argument name="rspublish" class="boolean">true</argument>
+		<argument name="rspublish" class="boolean">false</argument>
 		
 		<!-- The name(s) of kernel(s) to load (separated by comma).
 		     Currently supports 'component', 'micro', 'bpmn', 'bdi', 'gpmn' and 'application' kernel.
