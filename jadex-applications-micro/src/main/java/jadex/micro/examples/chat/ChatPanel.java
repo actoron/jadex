@@ -13,10 +13,12 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -29,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -37,7 +40,9 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIDefaults;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -67,6 +72,16 @@ public class ChatPanel extends JPanel
 	
 	/** The user state for a no longer available user. */
 	public static final String	STATE_DEAD	= "dead";
+	
+	/** The icons. */
+	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
+	{
+		STATE_UNKNOWN,		SGUI.makeIcon(ChatPanel.class, "images/user_blue.png"),
+		STATE_OPEN,			SGUI.makeIcon(ChatPanel.class, "images/user_yellow.png"),
+		STATE_CONNECTED,	SGUI.makeIcon(ChatPanel.class, "images/user_green.png"),
+		STATE_BROKEN,		SGUI.makeIcon(ChatPanel.class, "images/user_red.png"),
+		STATE_DEAD,			SGUI.makeIcon(ChatPanel.class, "images/user_gray.png")
+	});
 	
 	//-------- attributes --------
 	
@@ -109,12 +124,27 @@ public class ChatPanel extends JPanel
 		
 		table	= new JTable(new UserTableModel());
 		JScrollPane userpan = new JScrollPane(table);
+		table.getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer()
+		{
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
+			{
+				super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+				IComponentIdentifier	cid	= (IComponentIdentifier)value;
+				this.setText(cid.getLocalName());
+				this.setToolTipText(cid.getName());
+				Icon	icon	= icons.getIcon(users.get(cid));
+				this.setIcon(icon);
+				return this;
+			}
+		});
 		
 		JPanel south = new JPanel(new BorderLayout());
 		final JTextField tf = new JTextField();
 		final JButton send = new JButton("Send");
 		south.add(tf, BorderLayout.CENTER);
 		south.add(send, BorderLayout.EAST);
+		tf.setEnabled(false);
+		send.setEnabled(false);
 
 		ActionListener al = new ActionListener()
 		{
@@ -122,13 +152,44 @@ public class ChatPanel extends JPanel
 			{
 				tf.setEnabled(false);
 				send.setEnabled(false);
+
+				// Set user states to unknown before sending.
+				IComponentIdentifier[]	cids	= users.keySet().toArray(new IComponentIdentifier[users.size()]);
+				for(int i=0; i<cids.length; i++)
+				{
+					// Change user states to unknown, except for those who are already determined as dead (will be resurrected if found in search anyways).
+					if(!STATE_DEAD.equals(users.get(cids[i])))
+					{
+						users.put(cids[i], STATE_UNKNOWN);
+					}
+				}
+				((DefaultTableModel)table.getModel()).fireTableDataChanged();
+				table.getParent().invalidate();
+				table.getParent().doLayout();
+				table.repaint();
+				
 				tell(tf.getText()).addResultListener(new SwingDefaultResultListener<Void>()
 				{
 					public void customResultAvailable(Void result)
 					{
+						// Set states of unavailable users to dead
+						IComponentIdentifier[]	cids	= users.keySet().toArray(new IComponentIdentifier[users.size()]);
+						for(int i=0; i<cids.length; i++)
+						{
+							if(STATE_UNKNOWN.equals(users.get(cids[i])))
+							{
+								users.put(cids[i], STATE_DEAD);
+							}
+						}
+						((DefaultTableModel)table.getModel()).fireTableDataChanged();
+						table.getParent().invalidate();
+						table.getParent().doLayout();
+						table.repaint();
+						
 						tf.setEnabled(true);
 						send.setEnabled(true);
 						tf.setText("");
+						tf.requestFocus();
 					}
 					public void customExceptionOccurred(Exception exception)
 					{
@@ -140,11 +201,52 @@ public class ChatPanel extends JPanel
 		};
 		tf.addActionListener(al);
 		send.addActionListener(al);
-		
+
+		JSplitPanel	split	= new JSplitPanel(JSplitPanel.HORIZONTAL_SPLIT, userpan, main);
+		split.setOneTouchExpandable(true);
+		split.setDividerLocation(0.3);
 		this.setLayout(new BorderLayout());
-		this.add(main, BorderLayout.CENTER);
-		this.add(userpan, BorderLayout.WEST);
+		this.add(split, BorderLayout.CENTER);
 		this.add(south, BorderLayout.SOUTH);
+		
+		// Get list of initial users.
+		agent.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				final IIntermediateFuture<IChatService> ifut = ia.getServiceContainer().getRequiredServices("chatservices");
+				ifut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
+				{
+					public void intermediateResultAvailable(final IChatService chat)
+					{
+						// Assume connected at first.
+						setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_CONNECTED);
+					}
+					
+					public void finished()
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								// Ready to chat.
+								tf.setEnabled(true);
+								send.setEnabled(true);
+								tf.setText("");
+								tf.requestFocus();
+							}
+						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						finished();
+					}
+				});
+				
+				return IFuture.DONE;
+			}
+		});
 	}
 	
 	/**
@@ -202,20 +304,6 @@ public class ChatPanel extends JPanel
 	 */
 	public IFuture<Void>	tell(final String text)
 	{
-		IComponentIdentifier[]	cids	= users.keySet().toArray(new IComponentIdentifier[users.size()]);
-		for(int i=0; i<cids.length; i++)
-		{
-			// Change user states to unknown, except for those who are already determined as dead (will be resurrected if found in search anyways).
-			if(!STATE_DEAD.equals(users.get(cids[i])))
-			{
-				users.put(cids[i], STATE_UNKNOWN);
-			}
-		}
-		((DefaultTableModel)table.getModel()).fireTableDataChanged();
-		table.getParent().invalidate();
-		table.getParent().doLayout();
-		table.repaint();
-		
 		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -302,7 +390,7 @@ public class ChatPanel extends JPanel
 	 */
 	public class UserTableModel	extends DefaultTableModel
 	{
-		protected String[]	columns	= new String[]{"User", "State"};
+		protected String[]	columns	= new String[]{"User"};
 		
 		public int getColumnCount()
 		{
@@ -323,7 +411,8 @@ public class ChatPanel extends JPanel
 		public Object getValueAt(int row, int column)
 		{
 			IComponentIdentifier[]	cids	= users.keySet().toArray(new IComponentIdentifier[users.size()]);
-			return column==0 ? cids[row] : users.get(cids[row]);
+//			return column==0 ? cids[row] : users.get(cids[row]);
+			return cids[row];
 		}
 		
 		public boolean isCellEditable(int row, int column)
