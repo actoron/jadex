@@ -47,6 +47,9 @@ public class SendRequest	implements IHttpRequest
 	/** The HTTP response as it becomes available. */
 	protected StringBuffer	response;
 	
+	/** The expected response length. */
+	protected int length;
+	
 	/** The idle flag. */
 	protected boolean	idle;
 	
@@ -234,10 +237,13 @@ public class SendRequest	implements IHttpRequest
 					throw new IOException("Stream closed");
 			}
 			
-			// Complete HTTP response
-			if(response.lastIndexOf("\r\n\r\n")!=-1)
+			// Complete HTTP response header -> message sending completed.
+			if(!fut.isDone() && response.indexOf("\r\n\r\n")!=-1)
 			{
-				boolean	close	= response.indexOf("Connection: close")!=-1;
+				int	cl	= response.indexOf("Content-Length:");
+				boolean	close	= response.indexOf("Connection: close")!=-1
+					|| cl==-1;	// Close connection when no content length supplied, because we don't know how much to read until next request.
+				
 				if(close)
 				{
 //					System.out.println("connection closed");
@@ -246,21 +252,40 @@ public class SendRequest	implements IHttpRequest
 				}
 				else
 				{
-					// No more interest in reading.
-					key.interestOps(0);
+					// Expected response length is content length plus header length.
+					length	= Integer.parseInt(response.substring(cl+15, response.indexOf("\r\n", cl+15)).trim())
+						+ response.indexOf("\r\n\r\n")+4;
+					if(length<=response.length())
+					{
+						// Response completely read -> socket channel now available for next request.
+						key.interestOps(0);
+					}
 				}
 				
 				if("HTTP/1.1 200 OK".equals(response.substring(0, response.indexOf("\r\n"))))
 				{
 					fut.setResult(null);
-					
 				}
 				else
 				{
 					fut.setException(new IOException("HTTP response: "+response));
+//					if(length<=response.length())
+//					{
+//						System.out.println("Complete error response: "+response);
+//					}
+//					else
+//					{
+//						System.out.println("Incomplete error response: "+response);
+//					}
 				}
 					
-//				System.out.println("Received response: "+received);
+			}
+
+			// Received rest of content -> free connection
+			else if(fut.isDone() && length<=response.length())
+			{
+				// Response completely read -> socket channel now available for next request.
+				key.interestOps(0);
 			}
 		}
 		catch(Exception e)

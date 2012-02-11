@@ -34,6 +34,7 @@ import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -59,16 +60,16 @@ public class ChatPanel extends JPanel
 	public static final DateFormat	df	= new SimpleDateFormat("HH:mm:ss");
 	
 	/** The initial state for previously known users when sending a new message. */
-	public static final String	STATE_UNKNOWN	= "unknown";
+	public static final String	STATE_READY	= "ready";
 	
 	/** The user state for found but not yet responding user. */
-	public static final String	STATE_OPEN	= "open";
+	public static final String	STATE_RECEIVING	= "receiving";
 	
 	/** The user state for a responding user. */
-	public static final String	STATE_CONNECTED	= "connected";
+	public static final String	STATE_IDLE	= "idle";
 	
 	/** The user state for a not responding user. */
-	public static final String	STATE_BROKEN	= "broken";
+	public static final String	STATE_BROKEN	= "not responding";
 	
 	/** The user state for a no longer available user. */
 	public static final String	STATE_DEAD	= "dead";
@@ -76,9 +77,9 @@ public class ChatPanel extends JPanel
 	/** The icons. */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		STATE_UNKNOWN,		SGUI.makeIcon(ChatPanel.class, "images/user_blue.png"),
-		STATE_OPEN,			SGUI.makeIcon(ChatPanel.class, "images/user_yellow.png"),
-		STATE_CONNECTED,	SGUI.makeIcon(ChatPanel.class, "images/user_green.png"),
+		STATE_READY,		SGUI.makeIcon(ChatPanel.class, "images/user_blue.png"),
+		STATE_RECEIVING,			SGUI.makeIcon(ChatPanel.class, "images/user_yellow.png"),
+		STATE_IDLE,	SGUI.makeIcon(ChatPanel.class, "images/user_green.png"),
 		STATE_BROKEN,		SGUI.makeIcon(ChatPanel.class, "images/user_red.png"),
 		STATE_DEAD,			SGUI.makeIcon(ChatPanel.class, "images/user_gray.png")
 	});
@@ -94,11 +95,17 @@ public class ChatPanel extends JPanel
 	/** The text area. */
 	protected JTextArea chatarea;
 	
+	/** The status field. */
+	protected JLabel	status;
+	
 	/** The known chat users (cid->user state). */
 	protected Map<IComponentIdentifier, String>	users;
 	
 	/** The user table. */
 	protected JTable	table;
+	
+	/** The request counter for coordinating gui updates. */
+	protected int	reqcnt;
 	
 	//-------- constructors --------
 	
@@ -130,67 +137,38 @@ public class ChatPanel extends JPanel
 			{
 				super.getTableCellRendererComponent(table, value, selected, focus, row, column);
 				IComponentIdentifier	cid	= (IComponentIdentifier)value;
-				this.setText(cid.getLocalName());
-				this.setToolTipText(cid.getName());
+				this.setText(cid.getName());
+				this.setToolTipText("State: "+users.get(cid));
 				Icon	icon	= icons.getIcon(users.get(cid));
 				this.setIcon(icon);
 				return this;
 			}
 		});
-		
+		status	= new JLabel();
+		final JButton	refresh	= new JButton("Refresh");
+		JPanel	listpan	= new JPanel(new BorderLayout());
+		listpan.add(status, BorderLayout.NORTH);
+		listpan.add(userpan, BorderLayout.CENTER);
+		listpan.add(refresh, BorderLayout.SOUTH);
+
 		JPanel south = new JPanel(new BorderLayout());
 		final JTextField tf = new JTextField();
 		final JButton send = new JButton("Send");
 		south.add(tf, BorderLayout.CENTER);
 		south.add(send, BorderLayout.EAST);
-		tf.setEnabled(false);
-		send.setEnabled(false);
 
 		ActionListener al = new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				tf.setEnabled(false);
-				send.setEnabled(false);
-
-				// Set user states to unknown before sending.
-				IComponentIdentifier[]	cids	= users.keySet().toArray(new IComponentIdentifier[users.size()]);
-				for(int i=0; i<cids.length; i++)
-				{
-					// Change user states to unknown, except for those who are already determined as dead (will be resurrected if found in search anyways).
-					if(!STATE_DEAD.equals(users.get(cids[i])))
-					{
-						users.put(cids[i], STATE_UNKNOWN);
-					}
-				}
-				((DefaultTableModel)table.getModel()).fireTableDataChanged();
-				table.getParent().invalidate();
-				table.getParent().doLayout();
-				table.repaint();
-				
-				tell(tf.getText()).addResultListener(new SwingDefaultResultListener<Void>()
+				final int	request	= startRequest("Sending message..."); 
+				tell(tf.getText(), request).addResultListener(new SwingDefaultResultListener<Void>()
 				{
 					public void customResultAvailable(Void result)
 					{
-						// Set states of unavailable users to dead
-						IComponentIdentifier[]	cids	= users.keySet().toArray(new IComponentIdentifier[users.size()]);
-						for(int i=0; i<cids.length; i++)
-						{
-							if(STATE_UNKNOWN.equals(users.get(cids[i])))
-							{
-								users.put(cids[i], STATE_DEAD);
-							}
-						}
-						((DefaultTableModel)table.getModel()).fireTableDataChanged();
-						table.getParent().invalidate();
-						table.getParent().doLayout();
-						table.repaint();
-						
-						tf.setEnabled(true);
-						send.setEnabled(true);
-						tf.setText("");
-						tf.requestFocus();
+						endRequest(request, "Sending completed.");
 					}
+					
 					public void customExceptionOccurred(Exception exception)
 					{
 						super.customExceptionOccurred(exception);
@@ -202,51 +180,58 @@ public class ChatPanel extends JPanel
 		tf.addActionListener(al);
 		send.addActionListener(al);
 
-		JSplitPanel	split	= new JSplitPanel(JSplitPanel.HORIZONTAL_SPLIT, userpan, main);
+		JSplitPanel	split	= new JSplitPanel(JSplitPanel.HORIZONTAL_SPLIT, listpan, main);
 		split.setOneTouchExpandable(true);
 		split.setDividerLocation(0.3);
 		this.setLayout(new BorderLayout());
 		this.add(split, BorderLayout.CENTER);
 		this.add(south, BorderLayout.SOUTH);
 		
-		// Get list of initial users.
-		agent.scheduleStep(new IComponentStep<Void>()
+		ActionListener	refreshlis	= new ActionListener()
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			public void actionPerformed(ActionEvent e)
 			{
-				final IIntermediateFuture<IChatService> ifut = ia.getServiceContainer().getRequiredServices("chatservices");
-				ifut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
+				users.clear();
+				final int	request	= startRequest("Refreshing...");
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
-					public void intermediateResultAvailable(final IChatService chat)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						// Assume connected at first.
-						setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_CONNECTED);
-					}
-					
-					public void finished()
-					{
-						SwingUtilities.invokeLater(new Runnable()
+						final IIntermediateFuture<IChatService> ifut = ia.getServiceContainer().getRequiredServices("chatservices");
+						ifut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
 						{
-							public void run()
+							public void intermediateResultAvailable(final IChatService chat)
 							{
-								// Ready to chat.
-								tf.setEnabled(true);
-								send.setEnabled(true);
-								tf.setText("");
-								tf.requestFocus();
+								// Assume connected at first.
+								setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_IDLE, request);
+							}
+							
+							public void finished()
+							{
+								SwingUtilities.invokeLater(new Runnable()
+								{
+									public void run()
+									{
+										endRequest(request, "Refresh completed.");
+									}
+								});
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								finished();
 							}
 						});
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						finished();
+						
+						return IFuture.DONE;
 					}
 				});
-				
-				return IFuture.DONE;
 			}
-		});
+		};
+		refresh.addActionListener(refreshlis);
+
+		// Get list of initial users.
+		refreshlis.actionPerformed(null);
 	}
 	
 	/**
@@ -299,10 +284,9 @@ public class ChatPanel extends JPanel
 	
 	/**
 	 *  Tell something.
-	 *  @param name The name.
 	 *  @param text The text.
 	 */
-	public IFuture<Void>	tell(final String text)
+	public IFuture<Void>	tell(final String text, final int request)
 	{
 		return agent.scheduleStep(new IComponentStep<Void>()
 		{
@@ -322,18 +306,18 @@ public class ChatPanel extends JPanel
 					{
 						// Send chat message and wait for future.
 						final IFuture<Void>	cfut	= chat.message(text);
-						setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_OPEN);
+						setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_RECEIVING, request);
 						futures.add(cfut);
 						cfut.addResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
-								setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_CONNECTED);
+								setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_IDLE, request);
 								done(cfut);
 							}
 							public void exceptionOccurred(Exception exception)
 							{
-								setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_BROKEN);
+								setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_BROKEN, request);
 								done(cfut);
 							}
 						});
@@ -367,20 +351,80 @@ public class ChatPanel extends JPanel
 	/**
 	 *  Add a user or change its state.
 	 */
-	public void	setUserState(final IComponentIdentifier user, final String state)
+	public void	setUserState(final IComponentIdentifier user, final String state, final int request)
 	{
 		// Called on component thread.
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				users.put(user, state);
-				((DefaultTableModel)table.getModel()).fireTableDataChanged();
-				table.getParent().invalidate();
-				table.getParent().doLayout();
-				table.repaint();
+				if(request==reqcnt)
+				{
+					users.put(user, state);
+					((DefaultTableModel)table.getModel()).fireTableDataChanged();
+					table.getParent().invalidate();
+					table.getParent().doLayout();
+					table.repaint();
+				}
 			}
 		});
+	}
+	
+	/**
+	 *  Start an asynchronous request.
+	 */
+	protected int	startRequest(String message)
+	{
+//		tf.setEnabled(false);
+//		send.setEnabled(false);
+		status.setText(message);
+
+		// Set user states to unknown before sending.
+		IComponentIdentifier[]	cids	= users.keySet().toArray(new IComponentIdentifier[users.size()]);
+		for(int i=0; i<cids.length; i++)
+		{
+			// Change user states to unknown, except for those who are already determined as dead (will be resurrected if found in search anyways).
+			if(!STATE_DEAD.equals(users.get(cids[i])))
+			{
+				users.put(cids[i], STATE_READY);
+			}
+		}
+		((DefaultTableModel)table.getModel()).fireTableDataChanged();
+		table.getParent().invalidate();
+		table.getParent().doLayout();
+		table.repaint();
+		
+		return ++reqcnt;	// Keep track of parallel sendings and update gui only for last.		
+	}
+	
+	/**
+	 *  Called on request end
+	 */
+	protected void	endRequest(int request, String message)
+	{
+		// Set states of unavailable users to dead
+		if(request==reqcnt)
+		{
+			status.setText(message);
+			
+			IComponentIdentifier[]	cids	= users.keySet().toArray(new IComponentIdentifier[users.size()]);
+			for(int i=0; i<cids.length; i++)
+			{
+				if(STATE_READY.equals(users.get(cids[i])))
+				{
+					users.put(cids[i], STATE_DEAD);
+				}
+			}
+			((DefaultTableModel)table.getModel()).fireTableDataChanged();
+			table.getParent().invalidate();
+			table.getParent().doLayout();
+			table.repaint();
+
+//			tf.setEnabled(true);
+//			send.setEnabled(true);
+//			tf.setText("");
+//			tf.requestFocus();
+		}
 	}
 	
 	//-------- helper classes --------

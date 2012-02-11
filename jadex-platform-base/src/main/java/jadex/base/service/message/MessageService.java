@@ -52,6 +52,7 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -1224,6 +1225,7 @@ public class MessageService extends BasicService implements IMessageService
 							}
 							else
 							{
+								final List<Exception>	exceptions	= Collections.synchronizedList(new ArrayList<Exception>());
 								// Let transports work asynchronously if possible.
 								// Make sure that either the result is set or the exception is propagated on last transport return.
 								IResultListener<Void>	crl	= new IResultListener<Void>()
@@ -1238,6 +1240,7 @@ public class MessageService extends BasicService implements IMessageService
 									}
 									public void exceptionOccurred(Exception exception)
 									{
+										exceptions.add(exception);
 										boolean	last;
 										synchronized(this)
 										{
@@ -1249,7 +1252,7 @@ public class MessageService extends BasicService implements IMessageService
 										if(last)
 										{
 											ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
-												"Transports failed to send message: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())));
+												"Transports failed to send message: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())+", "+exceptions+", "+SUtil.arrayToString(task.getTransports())));
 										}
 									}
 								};
