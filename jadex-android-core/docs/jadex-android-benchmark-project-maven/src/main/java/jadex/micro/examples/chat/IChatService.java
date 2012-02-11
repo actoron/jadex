@@ -1,17 +1,18 @@
 package jadex.micro.examples.chat;
 
-
+import jadex.bridge.service.annotation.Security;
+import jadex.commons.future.IFuture;
 
 
 /**
  *  Service can receive chat messages.
  */
+@Security(Security.UNRESTRICTED)
 public interface IChatService
 {
 	/**
 	 *  Hear a new message.
-	 *  @param name The name of the sender.
 	 *  @param text The text message.
 	 */
-	public void hear(String name, String text);
+	public IFuture<Void>	message(String text);
 }

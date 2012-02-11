@@ -44,6 +44,8 @@
 		StatusBar.java,
 		SwingDelegationResultListener.java,
 		SwingDefaultResultListener.java,
+		SwingExceptionDelegationResultListener.java,
+		SwingIntermediateDefaultResultListener.java,
 		AwarenessAgentPanel.java,
 		ComponentIconCache.java,
 		ComponentProperties.java,

@@ -1,6 +1,5 @@
 package jadex.base.service.remote.commands;
 
-import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.service.remote.RemoteReference;
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.base.service.remote.RemoteServiceManagementService;

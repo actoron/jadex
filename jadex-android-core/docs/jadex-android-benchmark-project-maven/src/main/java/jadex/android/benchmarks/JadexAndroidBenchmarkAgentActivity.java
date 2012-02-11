@@ -15,10 +15,12 @@ import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Binding;
@@ -115,7 +117,7 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 							{
 								if(chatcid==null)
 								{
-									cms.createComponent(null, "jadex.android.benchmarks.ChatAgent.class", null, null)
+									cms.createComponent(name.getText().toString(), "jadex.android.benchmarks.ChatAgent.class", null, null)
 										.addResultListener(new DelegationResultListener<IComponentIdentifier>(fut));
 								}
 								else
@@ -180,45 +182,69 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 		{
 			public void onClick(View v)
 			{
+				if(chatcid==null)
+					return;
+				
 				send.setEnabled(false);
 				msg.setEnabled(false);
-				SServiceProvider.getServices(platform.getServiceProvider(), IChatService.class, Binding.SCOPE_GLOBAL)
-					.addResultListener(new IIntermediateResultListener<IChatService>()
+				
+				SServiceProvider.getService(platform.getServiceProvider(), IComponentManagementService.class, Binding.SCOPE_PLATFORM)
+					.addResultListener(new DefaultResultListener<IComponentManagementService>()
 				{
-					public void intermediateResultAvailable(IChatService result)
+					public void resultAvailable(IComponentManagementService cms)
 					{
-						result.hear(name.getText().toString(), msg.getText().toString());
-					}
-					
-					public void finished()
-					{
-						runOnUiThread(new Runnable()
+						cms.getExternalAccess(chatcid).addResultListener(new DefaultResultListener<IExternalAccess>()
 						{
-							public void run()
+							public void resultAvailable(IExternalAccess exta)
 							{
-								msg.setText("");
-								send.setEnabled(true);
-								msg.setEnabled(true);								
+								exta.scheduleStep(new IComponentStep<Void>()
+								{
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										IIntermediateFuture<IChatService>	chats	= ia.getServiceContainer().getRequiredServices("chats");
+										chats.addResultListener(new IIntermediateResultListener<IChatService>()
+										{
+											public void intermediateResultAvailable(IChatService result)
+											{
+												result.message(msg.getText().toString());
+											}
+											
+											public void finished()
+											{
+												runOnUiThread(new Runnable()
+												{
+													public void run()
+													{
+														msg.setText("");
+														send.setEnabled(true);
+														msg.setEnabled(true);								
+													}
+												});
+											}
+											
+											public void exceptionOccurred(Exception exception)
+											{
+												System.out.println("Chat message problem: "+exception);
+												exception.printStackTrace();
+												runOnUiThread(new Runnable()
+												{
+													public void run()
+													{
+														send.setEnabled(true);
+														msg.setEnabled(true);								
+													}
+												});
+											}
+											
+											public void resultAvailable(Collection<IChatService> result)
+											{
+											}
+										});
+										return IFuture.DONE;
+									}
+								});
 							}
 						});
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						System.out.println("Chat message problem: "+exception);
-						exception.printStackTrace();
-						runOnUiThread(new Runnable()
-						{
-							public void run()
-							{
-								send.setEnabled(true);
-								msg.setEnabled(true);								
-							}
-						});
-					}
-					
-					public void resultAvailable(Collection<IChatService> result)
-					{
 					}
 				});
 			}
@@ -254,11 +280,12 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 					"-rspublish", "false",
 					"-kernels", "\"component, micro\"",
 //					"-tcptransport", "false",
-//					"-niotcptransport", "false",
+					"-niotcptransport", "false",
 					"-relaytransport", "true",
-					"-relayaddress", "\""+SRelay.DEFAULT_ADDRESS+"\"",
+//					"-relayaddress", "\""+SRelay.DEFAULT_ADDRESS+"\"",
 //					"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/\"",					
-					"-saveonexit", "false", "-gui", "false",
+					"-saveonexit", "false",
+					"-gui", "false",
 					"-autoshutdown", "false",
 //					"-awamechanisms", "new String[]{\"Relay\"}",
 //					"-awareness", "false",
