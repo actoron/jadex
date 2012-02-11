@@ -869,7 +869,7 @@ public class ComponentTreePanel extends JSplitPane
 				cms	= result;
 				
 				// Hack!!! How to find root node?
-				cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener(ComponentTreePanel.this)
+				cms.getComponentDescriptions().addResultListener(new SwingDefaultResultListener()
 				{
 					public void customResultAvailable(Object result)
 					{

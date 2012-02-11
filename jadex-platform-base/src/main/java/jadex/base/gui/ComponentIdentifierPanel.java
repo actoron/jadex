@@ -88,7 +88,8 @@ public class ComponentIdentifierPanel extends JPanel
 			public void tableChanged(TableModelEvent e)
 			{
 				//System.out.println("event: "+e);
-				SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
+				SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
 				{
 					public void customResultAvailable(Object result)
 					{
@@ -140,7 +141,8 @@ public class ComponentIdentifierPanel extends JPanel
 		add(content, BorderLayout.CENTER);
 		add(help, BorderLayout.SOUTH);
 		
-		SServiceProvider.getService(provider, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new SwingDefaultResultListener(ComponentIdentifierPanel.this)
+		SServiceProvider.getService(provider, IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new SwingDefaultResultListener()
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -150,6 +152,10 @@ public class ComponentIdentifierPanel extends JPanel
 				{
 					schemes.addRow(new Object[]{ss[i]});
 				}
+			}
+			public void customExceptionOccurred(Exception exception)
+			{
+				// ignore
 			}
 		});
 	}

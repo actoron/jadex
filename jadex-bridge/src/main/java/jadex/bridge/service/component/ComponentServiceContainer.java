@@ -196,7 +196,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	{
 		final Future<IServiceProvider> ret = new Future<IServiceProvider>();
 		
-		ret.setResult(adapter.getParent()!=null ? adapter.getParent().getServiceProvider() : null);
+		ret.setResult(adapter!=null && adapter.getParent()!=null ? adapter.getParent().getServiceProvider() : null);
 		
 		return ret;
 	}

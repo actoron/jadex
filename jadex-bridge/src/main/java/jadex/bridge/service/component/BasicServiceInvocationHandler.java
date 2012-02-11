@@ -40,7 +40,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -78,10 +77,10 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	protected Logger logger;
 
 	/** The list of interceptors. */
-	protected List interceptors;
+	protected List<IServiceInvocationInterceptor> interceptors;
 	
 	/** The pojo service map (pojo -> proxy). */
-	protected static Map pojoproxies;
+	protected static Map<Object, IService>	pojoproxies;
 	
 	//-------- constructors --------
 	
@@ -125,7 +124,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 
 		final ServiceInvocationContext sic = new ServiceInvocationContext(proxy, getInterceptors());
 		
-		List myargs = args!=null? SUtil.arrayToList(args): null;
+		List<Object> myargs = args!=null? SUtil.arrayToList(args): null;
 		
 		if(SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType()))
 		{
@@ -252,7 +251,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	public synchronized void addFirstServiceInterceptor(IServiceInvocationInterceptor interceptor)
 	{
 		if(interceptors==null)
-			interceptors = new ArrayList();
+			interceptors = new ArrayList<IServiceInvocationInterceptor>();
 		interceptors.add(0, interceptor);
 	}
 	
@@ -263,7 +262,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	public synchronized void addServiceInterceptor(IServiceInvocationInterceptor interceptor, int pos)
 	{
 		if(interceptors==null)
-			interceptors = new ArrayList();
+			interceptors = new ArrayList<IServiceInvocationInterceptor>();
 		// Hack? -1 for default position one before method invocation interceptor
 		interceptors.add(pos>-1? pos: interceptors.size()-1, interceptor);
 	}
@@ -579,17 +578,14 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public static void addPojoServiceProxy(Object pojo, IService proxy)
 	{
-		if(pojoproxies==null)
+		synchronized(BasicServiceInvocationHandler.class)
 		{
-			synchronized(BasicServiceInvocationHandler.class)
+			if(pojoproxies==null)
 			{
-				if(pojoproxies==null)
-				{
-					pojoproxies = Collections.synchronizedMap(new IdentityHashMap());
-				}
+				pojoproxies = new IdentityHashMap<Object, IService>();
 			}
+			pojoproxies.put(pojo, proxy);
 		}
-		pojoproxies.put(pojo, proxy);
 //		System.out.println("add: "+pojosids.size());
 	}
 	
@@ -599,18 +595,15 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public static void removePojoServiceProxy(IServiceIdentifier sid)
 	{
-		if(pojoproxies!=null)
+		synchronized(BasicServiceInvocationHandler.class)
 		{
-			synchronized(BasicServiceInvocationHandler.class)
+			for(Iterator<IService> it=pojoproxies.values().iterator(); it.hasNext(); )
 			{
-				for(Iterator it=pojoproxies.values().iterator(); it.hasNext(); )
+				IService proxy = it.next();
+				if(sid.equals(proxy.getServiceIdentifier()))
 				{
-					IService proxy = (IService)it.next();
-					if(sid.equals(proxy.getServiceIdentifier()))
-					{
-						it.remove();
-//						System.out.println("rem: "+pojosids.size());	
-					}
+					it.remove();
+//					System.out.println("rem: "+pojosids.size());	
 				}
 			}
 		}
@@ -623,7 +616,10 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 */
 	public static IService getPojoServiceProxy(Object pojo)
 	{
-		return (IService)pojoproxies.get(pojo);
+		synchronized(BasicServiceInvocationHandler.class)
+		{
+			return (IService)pojoproxies.get(pojo);
+		}
 	}
 	
 //	/**

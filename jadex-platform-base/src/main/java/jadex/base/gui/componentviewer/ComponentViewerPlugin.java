@@ -510,7 +510,7 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				{
 					// Unknown -> start search to find out asynchronously
 					SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), sid)
-						.addResultListener(new SwingDefaultResultListener(comptree)
+						.addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object result)
 						{
@@ -520,6 +520,10 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 							viewables.put(sid, vis? Boolean.TRUE: Boolean.FALSE);
 //							System.out.println("isVis first res: "+viewables.get(sid));
 							node.refresh(false);
+						}
+						public void customExceptionOccurred(Exception exception)
+						{
+							// ignore
 						}
 					});
 				}
@@ -547,19 +551,19 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				{
 					// Unknown -> start search to find out asynchronously
 					SServiceProvider.getServiceUpwards(getJCC().getJCCAccess().getServiceProvider(), IComponentManagementService.class)
-						.addResultListener(new SwingDefaultResultListener(comptree)
+						.addResultListener(new SwingDefaultResultListener()
 					{
 						public void customResultAvailable(Object result)
 						{
 							final IComponentManagementService cms = (IComponentManagementService)result;
 							
-							cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener(comptree)
+							cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener()
 							{
 								public void customResultAvailable(Object result)
 								{
 									final IExternalAccess exta = (IExternalAccess)result;
 									getJCC().getClassLoader(exta.getModel().getResourceIdentifier())
-										.addResultListener(new SwingDefaultResultListener<ClassLoader>(comptree)
+										.addResultListener(new SwingDefaultResultListener<ClassLoader>()
 									{
 										public void customResultAvailable(ClassLoader cl)
 										{
@@ -567,7 +571,12 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 											viewables.put(cid, clid==null? Boolean.FALSE: Boolean.TRUE);
 //											System.out.println("isVis first res: "+viewables.get(cid));
 											node.refresh(false);
-										}										
+										}
+										public void customExceptionOccurred(Exception exception)
+										{
+											// ignore
+										}
+
 									});
 								}
 								
@@ -577,6 +586,10 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 //									exception.printStackTrace();
 								}
 							});
+						}
+						public void customExceptionOccurred(Exception exception)
+						{
+							// ignore
 						}
 					});
 				}

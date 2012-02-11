@@ -31,7 +31,7 @@ public class CMSUpdateHandler
 	protected IExternalAccess	access;
 	
 	/** The change listener called from remote. */
-	protected IRemoteChangeListener	rcl;
+	protected IRemoteChangeListener<?>	rcl;
 	
 	/** The local listeners for the remote CMSs (cms cid->listeners). */
 	protected MultiCollection	listeners;
@@ -47,18 +47,18 @@ public class CMSUpdateHandler
 	public CMSUpdateHandler(IExternalAccess access)
 	{
 		this.access	= access;
-		this.rcl	= new IRemoteChangeListener()
+		this.rcl	= new IRemoteChangeListener<IComponentDescription>()
 		{
-			public IFuture changeOccurred(final ChangeEvent event)
+			public IFuture<Void> changeOccurred(final ChangeEvent<IComponentDescription> event)
 			{
-				final Future	ret	= new Future();
+				final Future<Void>	ret	= new Future<Void>();
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run()
 					{
 						if(listeners!=null && listeners.containsKey(event.getSource()))
 						{
-							Collection	clis	= listeners.getCollection(event.getSource());
+							Collection<?>	clis	= listeners.getCollection(event.getSource());
 //							System.out.println("cmshandler: "+CMSUpdateHandler.this+" "+event+" "+clis);
 							informListeners(event, (ICMSComponentListener[])clis.toArray(new ICMSComponentListener[clis.size()]));
 							ret.setResult(null);
@@ -89,7 +89,7 @@ public class CMSUpdateHandler
 		{
 			Future<Void>	fut	= new Future<Void>();
 			CounterResultListener<Void>	crl	= new CounterResultListener<Void>(listeners.keySet().size(), true, new SwingDelegationResultListener<Void>(fut));
-			for(Iterator it=listeners.keySet().iterator(); it.hasNext(); )
+			for(Iterator<?> it=listeners.keySet().iterator(); it.hasNext(); )
 			{
 				IComponentIdentifier	cid	= (IComponentIdentifier)it.next();
 				// Deregister if not registration in progress.
@@ -167,25 +167,22 @@ public class CMSUpdateHandler
 			listeners.put(cid, listener);
 
 			SRemoteGui.installRemoteCMSListener(access, cid, rcl, buildId(cid))
-				.addResultListener(new SwingDefaultResultListener()
+				.addResultListener(new SwingDefaultResultListener<Void>()
 			{
-				public void customResultAvailable(Object result)
+				public void customResultAvailable(Void result)
 				{
 					assert SwingUtilities.isEventDispatchThread();
-//					if(cid==null)
-//						System.out.println("result cid: "+cid);
-					if(futures==null)
-						System.out.println("result futures: "+futures);
-					Collection coll	= futures.getCollection(cid);
-//					if(coll==null)
-//						System.out.println("result coll: "+coll);
-					for(Iterator it=coll.iterator(); it.hasNext(); )
+					if(futures!=null)	// Todo: can be null?
 					{
-						((Future)it.next()).setResult(null);
+						Collection<?> coll	= futures.getCollection(cid);
+						for(Iterator<?> it=coll.iterator(); it.hasNext(); )
+						{
+							((Future<?>)it.next()).setResult(null);
+						}
+						futures.remove(cid);
+						if(futures.isEmpty())
+							futures	= null;
 					}
-					futures.remove(cid);
-					if(futures.isEmpty())
-						futures	= null;
 				}
 				public void customExceptionOccurred(Exception exception)
 				{
@@ -194,17 +191,17 @@ public class CMSUpdateHandler
 					if(listeners!=null)
 						listeners.remove(cid, listener);
 					
-					if(futures==null)
-						System.out.println("results futures: "+futures);
-					
-					Collection coll	= futures.getCollection(cid);
-					for(Iterator it=coll.iterator(); it.hasNext(); )
+					if(futures!=null)	// Todo: why can be null?
 					{
-						((Future)it.next()).setException(exception);
+						Collection<?> coll	= futures.getCollection(cid);
+						for(Iterator<?> it=coll.iterator(); it.hasNext(); )
+						{
+							((Future<?>)it.next()).setException(exception);
+						}
+						futures.remove(cid);
+						if(futures.isEmpty())
+							futures	= null;
 					}
-					futures.remove(cid);
-					if(futures.isEmpty())
-						futures	= null;
 				}
 			});
 		}
@@ -261,7 +258,7 @@ public class CMSUpdateHandler
 	/**
 	 *  Inform listeners about an event.
 	 */
-	protected void informListeners(final ChangeEvent event, ICMSComponentListener[] cls)
+	protected void informListeners(final ChangeEvent<?> event, ICMSComponentListener[] cls)
 	{
 		assert SwingUtilities.isEventDispatchThread();
 		
@@ -326,8 +323,8 @@ public class CMSUpdateHandler
 		}
 		else if(RemoteCMSListener.EVENT_BULK.equals(event.getType()))
 		{
-			Collection<ChangeEvent>	events	= (Collection<ChangeEvent>)event.getValue();
-			for(Iterator<ChangeEvent> it=events.iterator(); it.hasNext(); )
+			Collection<ChangeEvent<?>>	events	= (Collection<ChangeEvent<?>>)event.getValue();
+			for(Iterator<ChangeEvent<?>> it=events.iterator(); it.hasNext(); )
 			{
 				informListeners(it.next(), cls);
 			}
