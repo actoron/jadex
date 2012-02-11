@@ -1,6 +1,6 @@
 package jadex.base.service.awareness.gui;
 
-import jadex.base.gui.ExceptionSwingDelegationResultListener;
+import jadex.base.gui.SwingExceptionDelegationResultListener;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.componentviewer.IComponentViewerPanel;
 import jadex.base.gui.jtable.ComponentIdentifierRenderer;
@@ -603,7 +603,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 				ret.excludes	= agent.getExcludes();
 				return new Future<AwarenessSettings>(ret);
 			}
-		}).addResultListener(new ExceptionSwingDelegationResultListener<AwarenessSettings, Void>(ret)
+		}).addResultListener(new SwingExceptionDelegationResultListener<AwarenessSettings, Void>(ret)
 		{
 			public void customResultAvailable(AwarenessSettings result)
 			{

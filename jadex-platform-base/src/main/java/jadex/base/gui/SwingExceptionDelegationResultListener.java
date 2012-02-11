@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities;
  *  Delegation result listener that calls customResultAvailable and
  *  customExceptionOccurred on swing thread.
  */
-public abstract class ExceptionSwingDelegationResultListener<E, T> implements IResultListener<E>
+public abstract class SwingExceptionDelegationResultListener<E, T> implements IResultListener<E>
 {
 	//-------- attributes --------
 	
@@ -24,7 +24,7 @@ public abstract class ExceptionSwingDelegationResultListener<E, T> implements IR
 	/**
 	 *  Create a new listener.
 	 */
-	public ExceptionSwingDelegationResultListener(Future<T> future)
+	public SwingExceptionDelegationResultListener(Future<T> future)
 	{
 		this.future = future;
 	}

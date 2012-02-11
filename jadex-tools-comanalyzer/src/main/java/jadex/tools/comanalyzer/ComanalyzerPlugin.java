@@ -1,7 +1,7 @@
 package jadex.tools.comanalyzer;
 
 import jadex.base.fipa.CMSComponentDescription;
-import jadex.base.gui.ExceptionSwingDelegationResultListener;
+import jadex.base.gui.SwingExceptionDelegationResultListener;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.INodeHandler;
@@ -239,7 +239,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 			{
 				// Todo: use remote access for clock !?
 				SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new ExceptionSwingDelegationResultListener<IClockService, Void>(ret)
+					.addResultListener(new SwingExceptionDelegationResultListener<IClockService, Void>(ret)
 				{
 					public void customResultAvailable(IClockService result)
 					{

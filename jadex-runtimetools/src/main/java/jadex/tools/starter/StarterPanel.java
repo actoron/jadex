@@ -3,7 +3,7 @@ package jadex.tools.starter;
 import jadex.base.SComponentFactory;
 import jadex.base.Starter;
 import jadex.base.gui.ComponentSelectorDialog;
-import jadex.base.gui.ExceptionSwingDelegationResultListener;
+import jadex.base.gui.SwingExceptionDelegationResultListener;
 import jadex.base.gui.ParserValidator;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
@@ -1059,7 +1059,7 @@ public class StarterPanel extends JLayeredPane
 				}
 				return ret;
 			}
-		}).addResultListener(new ExceptionSwingDelegationResultListener<Tuple2<String, String>, Properties>(ret)
+		}).addResultListener(new SwingExceptionDelegationResultListener<Tuple2<String, String>, Properties>(ret)
 		{
 			public void customResultAvailable(Tuple2<String, String> result)
 			{
@@ -1135,7 +1135,7 @@ public class StarterPanel extends JLayeredPane
 				
 				return ret;
 			}
-		}).addResultListener(new ExceptionSwingDelegationResultListener<IResourceIdentifier, Void>(ret)
+		}).addResultListener(new SwingExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
 		{
 			public void customResultAvailable(IResourceIdentifier rid)
 			{

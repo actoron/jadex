@@ -2,11 +2,15 @@ package jadex.micro.examples.chat;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceStart;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.micro.annotation.Binding;
 
 import javax.swing.SwingUtilities;
 
@@ -20,7 +24,7 @@ public class ChatService implements IChatService
 	
 	/** The agent. */
 	@ServiceComponent
-	protected IExternalAccess agent;
+	protected IInternalAccess agent;
 	
 	/** The chat gui. */
 	protected ChatPanel chatpanel;
@@ -34,12 +38,20 @@ public class ChatService implements IChatService
 	public IFuture<Void> start()
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SwingUtilities.invokeLater(new Runnable()
+		final IExternalAccess	exta	= agent.getExternalAccess();
+		agent.getServiceContainer().searchService(IClockService.class, Binding.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 		{
-			public void run()
+			public void customResultAvailable(final IClockService clock)
 			{
-				chatpanel = ChatPanel.createGui(agent);
-				ret.setResult(null);
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						chatpanel = ChatPanel.createGui(exta, clock);
+						ret.setResult(null);
+					}
+				});
 			}
 		});
 		return ret;

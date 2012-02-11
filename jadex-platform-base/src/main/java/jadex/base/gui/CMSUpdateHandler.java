@@ -339,7 +339,7 @@ public class CMSUpdateHandler
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionSwingDelegationResultListener<IComponentManagementService, Void>(ret)
+			.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
@@ -359,7 +359,7 @@ public class CMSUpdateHandler
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		SServiceProvider.getService(access.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionSwingDelegationResultListener<IComponentManagementService, Void>(ret)
+			.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 		{
 			public void customResultAvailable(IComponentManagementService cms)
 			{
