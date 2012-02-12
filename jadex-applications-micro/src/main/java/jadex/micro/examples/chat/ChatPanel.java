@@ -21,8 +21,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DateFormat;
@@ -200,8 +198,11 @@ public class ChatPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				final int	request	= startRequest("Sending message..."); 
-				tell(tf.getText(), request).addResultListener(new SwingDefaultResultListener<Void>()
+				final int	request	= startRequest("Sending message...");
+				String	msg	= tf.getText();
+				tf.setText("");
+				typing	= false;
+				tell(msg, request).addResultListener(new SwingDefaultResultListener<Void>()
 				{
 					public void customResultAvailable(Void result)
 					{
@@ -476,11 +477,6 @@ public class ChatPanel extends JPanel
 			table.getParent().invalidate();
 			table.getParent().doLayout();
 			table.repaint();
-
-//			tf.setEnabled(true);
-//			send.setEnabled(true);
-//			tf.setText("");
-//			tf.requestFocus();
 		}
 	}
 	
@@ -512,7 +508,6 @@ public class ChatPanel extends JPanel
 		public Object getValueAt(int row, int column)
 		{
 			IComponentIdentifier[]	cids	= users.keySet().toArray(new IComponentIdentifier[users.size()]);
-//			return column==0 ? cids[row] : users.get(cids[row]);
 			return cids[row];
 		}
 		
