@@ -469,7 +469,7 @@ public class ChatPanel extends JPanel
 	 */
 	public class UserTableModel	extends DefaultTableModel
 	{
-		protected String[]	columns	= new String[]{"User"};
+		protected String[]	columns	= new String[]{"Users"};
 		
 		public int getColumnCount()
 		{
