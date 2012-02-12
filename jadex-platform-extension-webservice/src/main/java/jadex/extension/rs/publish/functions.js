@@ -15,7 +15,7 @@
 				names[i] = form.elements[i].name;
 				vals[i] = form.elements[i].value;
 				types[i] = form.elements[i].accept;
-				if(types[i]=="")
+				if(types[i]==null || types[i]=="")
 				{
 					if(form.elements[i].type=="file")
 					{
@@ -26,22 +26,54 @@
 						types[i] = "text/plain";
 					}
 				}
+				if(vals[i]=="")
+				{
+					if(types[i]=="application/json")
+					{
+						vals[i] = "null";
+					}
+					else if(types[i]=="application/xml")
+					{
+						vals[i] = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+							+"<null xmlns=\"typeinfo:\"></null>";
+					}
+				}
 			}
 		}
 		
 		send(form.action, "post", names, vals, types);
 		
-		}
-		catch(e)
-		{
-			var e2 = e;
-		}
 		return false;
 	}
-		
+
+//	function send(url, method, names, vals, types) 
+//	{
+//		var xmlHttpReq;
+//	
+//		var self = this;
+//		// Mozilla/Safari
+//		if(window.XMLHttpRequest) 
+//		{
+//		    self.xmlHttpReq = new XMLHttpRequest();
+//		}
+//		// IE
+//		else if (window.ActiveXObject) 
+//		{
+//		    self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
+//		}
+//	
+//		self.xmlHttpReq.open("POST", url, true);
+//		self.xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+//		self.xmlHttpReq.setRequestHeader("Content-length", 22);
+//		self.xmlHttpReq.send(null);//"?YourQueryString=Value");
+//	}
+	
 	function send(url, method, names, vals, types) 
 	{
-		var http = new XMLHttpRequest();
+		this.xmlHttpReq = new XMLHttpRequest();
+		
+		var http = xmlHttpReq;
+//		var http = new XMLHttpRequest();
 		var multipart = "";
 	
 		http.open(method, url, true);
@@ -61,6 +93,23 @@
 				+ "\r\n";
 		}
 		multipart += "--" + boundary + "--\r\n";
+		
+//		alert(multipart);
+		
+		http.onreadystatechange = function() 
+		{
+			if(http.readyState == 4 && http.status == 200) 
+			{
+//				document.getElementById("content").innerHTML = http.responseText;
+//				document.title = response.pageTitle;
+//				window.history.pushState({"html":response.html,"pageTitle":response.pageTitle},"", urlPath);
+				window.history.pushState("some string", "Test", url);
+//				document.open();
+//				window.location.replace(url);
+				document.write(http.responseText);
+//				document.close();
+			}
+		}
 	
 		http.send(multipart);
 	}

@@ -6,6 +6,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,6 +29,19 @@ public class BankingService implements IBankingService
 		data.add("Statement 2");
 		data.add("Statement 3");
 	}
+	
+	/**
+	 *  Get the account statement.
+	 *  @param request The request.
+	 *  @return The account statement.
+	 */
+	public IFuture<AccountStatement> getAccountStatement(Date begin, Date end)
+	{
+		System.out.println("getAccountStatement(Date begin, Date end)");
+		AccountStatement as = new AccountStatement(data.toArray(new String[data.size()]), new Request(begin, end));
+		return new Future<AccountStatement>(as);
+	}
+
 	
 	/**
 	 *  Get account statement.

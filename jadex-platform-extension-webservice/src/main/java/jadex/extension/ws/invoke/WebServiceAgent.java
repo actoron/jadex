@@ -35,7 +35,7 @@ public class WebServiceAgent
 	 *  Create a wrapper service implementation based on the JAXB generated
 	 *  Java service class and the service mapping information.
 	 */
-	public Object createServiceImplementation(Class type, WebServiceMappingInfo mapping)
+	public Object createServiceImplementation(Class<?> type, WebServiceMappingInfo mapping)
 	{
 		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
 			new WebServiceWrapperInvocationHandler(agent, mapping));

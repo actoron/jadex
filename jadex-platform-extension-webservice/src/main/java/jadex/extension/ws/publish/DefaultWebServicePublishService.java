@@ -7,6 +7,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.extension.SJavassist;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
@@ -170,14 +171,14 @@ public class DefaultWebServicePublishService implements IPublishService
 		{
 			try
 			{
-				CtClass proxyclazz = pool.makeClass(name, getCtClass(jadex.extension.ws.publish.Proxy.class, pool));
-				proxyclazz.addInterface(getCtClass(type, pool));
+				CtClass proxyclazz = pool.makeClass(name, SJavassist.getCtClass(jadex.extension.ws.publish.Proxy.class, pool));
+				proxyclazz.addInterface(SJavassist.getCtClass(type, pool));
 				Method[] ms = type.getMethods();
-				CtMethod invoke = getCtClass(jadex.extension.ws.publish.Proxy.class, pool).getDeclaredMethod("invoke");
+				CtMethod invoke = SJavassist.getCtClass(jadex.extension.ws.publish.Proxy.class, pool).getDeclaredMethod("invoke");
 				for(int i=0; i<ms.length; i++)
 				{
-					CtMethod m = CtNewMethod.wrapped(getCtClass(ms[i].getReturnType(), pool), ms[i].getName(), 
-						getCtClasses(ms[i].getParameterTypes(), pool), getCtClasses(ms[i].getExceptionTypes(), pool),
+					CtMethod m = CtNewMethod.wrapped(SJavassist.getCtClass(ms[i].getReturnType(), pool), ms[i].getName(), 
+						SJavassist.getCtClasses(ms[i].getParameterTypes(), pool), SJavassist.getCtClasses(ms[i].getExceptionTypes(), pool),
 						invoke, null, proxyclazz);
 //					System.out.println("m: "+m.getName()+" "+getCtClasses(ms[i].getParameterTypes(), pool).length);
 					proxyclazz.addMethod(m);
@@ -187,7 +188,7 @@ public class DefaultWebServicePublishService implements IPublishService
 				
 				ConstPool constpool = cf.getConstPool();
 				AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-				Annotation annot = new Annotation(constpool, getCtClass(WebService.class, pool));
+				Annotation annot = new Annotation(constpool, SJavassist.getCtClass(WebService.class, pool));
 				// Must be set due to bug in javassit, package nulls. package is used for namespace.
 				String ns = "http://"+type.getPackage().getName()+"/";
 				annot.addMemberValue("targetNamespace", new StringMemberValue(ns, constpool));
@@ -210,51 +211,51 @@ public class DefaultWebServicePublishService implements IPublishService
 		return ret;
 	}
 	
-	/**
-	 *  Get a ctclass for a Java class from the pool.
-	 *  @param clazz The Java class.
-	 *  @param pool The class pool.
-	 *  @return The ctclass.
-	 */
-	protected static CtClass getCtClass(Class clazz, ClassPool pool)
-	{
-		CtClass ret = null;
-		try
-		{
-			ret = pool.get(clazz.getName());
-		}
-		catch(Exception e)
-		{
-			try
-			{
-				
-				ClassPath cp = new ClassClassPath(clazz);
-				pool.insertClassPath(cp);
-				ret = pool.get(clazz.getName());
-			}
-			catch(Exception e2)
-			{
-				throw new RuntimeException(e2);
-			}
-		}
-		return ret;
-	}
+//	/**
+//	 *  Get a ctclass for a Java class from the pool.
+//	 *  @param clazz The Java class.
+//	 *  @param pool The class pool.
+//	 *  @return The ctclass.
+//	 */
+//	protected static CtClass getCtClass(Class clazz, ClassPool pool)
+//	{
+//		CtClass ret = null;
+//		try
+//		{
+//			ret = pool.get(clazz.getName());
+//		}
+//		catch(Exception e)
+//		{
+//			try
+//			{
+//				
+//				ClassPath cp = new ClassClassPath(clazz);
+//				pool.insertClassPath(cp);
+//				ret = pool.get(clazz.getName());
+//			}
+//			catch(Exception e2)
+//			{
+//				throw new RuntimeException(e2);
+//			}
+//		}
+//		return ret;
+//	}
 	
-	/**
-	 *  Get a ctclass array for a class array.
-	 *  @param classes The classes.
-	 *  @param pool The pool.
-	 *  @return The ctclass array.
-	 */
-	protected static CtClass[] getCtClasses(Class[] classes, ClassPool pool)
-	{
-		CtClass[] ret = new CtClass[classes.length];
-		for(int i=0; i<classes.length; i++)
-		{
-			ret[i] = getCtClass(classes[i], pool);
-		}
-		return ret;	
-	}
+//	/**
+//	 *  Get a ctclass array for a class array.
+//	 *  @param classes The classes.
+//	 *  @param pool The pool.
+//	 *  @return The ctclass array.
+//	 */
+//	protected static CtClass[] getCtClasses(Class[] classes, ClassPool pool)
+//	{
+//		CtClass[] ret = new CtClass[classes.length];
+//		for(int i=0; i<classes.length; i++)
+//		{
+//			ret[i] = getCtClass(classes[i], pool);
+//		}
+//		return ret;	
+//	}
 	
 	/**
 	 *  Main for testing.

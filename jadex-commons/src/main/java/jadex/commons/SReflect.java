@@ -11,9 +11,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.WeakHashMap;
 
@@ -41,6 +43,9 @@ public class SReflect
 
 	/** Mapping from basic class -> object type(class). */
 	protected static final Map wrappedtypes;
+
+	/** String convertable types. */
+	protected static final Set convertabletypes;
 	
 	static
 	{
@@ -63,8 +68,27 @@ public class SReflect
 		wrappedtypes.put(short.class, Short.class);
 		wrappedtypes.put(byte.class, Byte.class);
 		wrappedtypes.put(char.class, Character.class);
+		
+		convertabletypes	= Collections.synchronizedSet(new HashSet());
+		convertabletypes.add(String.class);
+		convertabletypes.add(int.class);
+		convertabletypes.add(Integer.class);
+		convertabletypes.add(long.class);
+		convertabletypes.add(Long.class);
+		convertabletypes.add(float.class);
+		convertabletypes.add(Float.class);
+		convertabletypes.add(double.class);
+		convertabletypes.add(Double.class);
+		convertabletypes.add(boolean.class);
+		convertabletypes.add(Boolean.class);
+		convertabletypes.add(short.class);
+		convertabletypes.add(Short.class);
+		convertabletypes.add(byte.class);
+		convertabletypes.add(Byte.class);
+		convertabletypes.add(char.class);
+		convertabletypes.add(Character.class);
 	}
-
+	
 	//-------- methods --------
 	
 	/**
@@ -84,6 +108,18 @@ public class SReflect
 
 		Class	result	= (Class)wrappedtypes.get(clazz);
 		return result==null ? clazz : result;
+	}
+	
+	/**
+	 *  Test if the class is automatically convertable
+	 *  from/to a string. Is valid for all basic types
+	 *  and their object pendants.
+	 *  @param clazz The class.
+	 *  @return True, if convertable.
+	 */
+	public static boolean isStringConvertableType(Class clazz)
+	{
+		return convertabletypes.contains(clazz);
 	}
 
 	/**

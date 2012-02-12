@@ -1,6 +1,7 @@
 package jadex.xml;
 
 import jadex.xml.annotation.XMLClassname;
+import jadex.xml.bean.JavaWriter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

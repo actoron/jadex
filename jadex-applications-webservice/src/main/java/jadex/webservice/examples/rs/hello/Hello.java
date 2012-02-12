@@ -21,6 +21,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import com.sun.jersey.api.client.Client;
@@ -35,7 +36,7 @@ import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONMarshaller;
 import com.sun.jersey.api.representation.Form;
 
-@Path("/hello")
+@Path("")
 public class Hello
 {
 	@Context 
@@ -210,7 +211,7 @@ public class Hello
 			Client client = Client.create(cc);
 			WebResource service = client.resource("http://localhost:8080/banking1/"); 
 			ObjectMapper mapper = new ObjectMapper();
-//			System.out.println("jackson json: "+mapper.writeValueAsString(a));
+			System.out.println("jackson json: "+mapper.writeValueAsString(null));
 			service.path("addTransactionDataJSON").type(MediaType.TEXT_PLAIN).post(Void.class, "hallo");
 		}
 		catch(Exception e)
@@ -218,5 +219,31 @@ public class Hello
 			e.printStackTrace();
 		}
 	}
+	
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args)
+//	{
+//		try
+//		{
+//			URI uri = new URI("http://localhost:8080/banking");
+//			
+//			Map<String, Object> props = new HashMap<String, Object>();
+//			props.put("com.sun.jersey.config.property.packages", "examples.rs.hello");
+//			PackagesResourceConfig config = new PackagesResourceConfig(props);
+//			HttpServer srv = GrizzlyServerFactory.createHttpServer(uri, config);
+//			
+//			srv.start();
+//			
+//			System.in.read();
+//			srv.stop();
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
+//	}
+	
 }
 

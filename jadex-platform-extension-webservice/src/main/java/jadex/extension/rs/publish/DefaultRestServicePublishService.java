@@ -15,6 +15,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.extension.SJavassist;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -42,6 +43,7 @@ import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
+import javassist.bytecode.MethodInfo;
 import javassist.bytecode.ParameterAnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.ArrayMemberValue;
@@ -59,6 +61,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
@@ -172,6 +175,8 @@ public class DefaultRestServicePublishService implements IPublishService
 			if(pack!=null)
 				strb.append(", ").append(pack);
 			props.put(jerseypack, strb.toString());
+			props.put("com.sun.jersey.config.feature.Redirect", Boolean.TRUE);
+			props.put("com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature", Boolean.TRUE);
 			props.put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
 			props.put(JADEXSERVICE, service);
 			PackagesResourceConfig config = new PackagesResourceConfig(props);
@@ -185,7 +190,11 @@ public class DefaultRestServicePublishService implements IPublishService
 			if(server==null)
 			{
 				System.out.println("Starting new server: "+uri.getPath());
-				server = GrizzlyServerFactory.createHttpServer(uri.toString(), config);
+				String pub = uri.toString();
+//				if(pub.endsWith("/"))
+//					pub.substring(0, pub.length()-1);
+//					pub += "/";
+				server = GrizzlyServerFactory.createHttpServer(pub, config);
 				server.start();
 				handler = server.getHttpHandler();
 				
@@ -293,35 +302,35 @@ public class DefaultRestServicePublishService implements IPublishService
 				ClassPool pool = new ClassPool(null);
 				pool.appendSystemPath();
 				
-				CtClass proxyclazz = pool.makeClass(name, baseclass==null? null: getCtClass(baseclass, pool));
+				CtClass proxyclazz = pool.makeClass(name, baseclass==null? null: SJavassist.getCtClass(baseclass, pool));
 				ClassFile cf = proxyclazz.getClassFile();
 				ConstPool constpool = cf.getConstPool();
 		
 				if(gen)
 				{
 					// Add field with for functionsjs
-					CtField fjs = new CtField(getCtClass(String.class, pool), "__functionsjs", proxyclazz);
+					CtField fjs = new CtField(SJavassist.getCtClass(String.class, pool), "__functionsjs", proxyclazz);
 					proxyclazz.addField(fjs);
 					
 					// Add field with annotation for resource context
-					CtField rc = new CtField(getCtClass(ResourceConfig.class, pool), "__rc", proxyclazz);
+					CtField rc = new CtField(SJavassist.getCtClass(ResourceConfig.class, pool), "__rc", proxyclazz);
 					AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-					Annotation annot = new Annotation(constpool, getCtClass(Context.class, pool));
+					Annotation annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
 					attr.addAnnotation(annot);
 					rc.getFieldInfo().addAttribute(attr);
 					proxyclazz.addField(rc);
 					
 					// Add field with annotation for uriinfo context
-					CtField ui = new CtField(getCtClass(UriInfo.class, pool), "__ui", proxyclazz);
+					CtField ui = new CtField(SJavassist.getCtClass(UriInfo.class, pool), "__ui", proxyclazz);
 					attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-					annot = new Annotation(constpool, getCtClass(Context.class, pool));
+					annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
 					attr.addAnnotation(annot);
 					ui.getFieldInfo().addAttribute(attr);
 					proxyclazz.addField(ui);
 					
 					// Add methods from the service interface
 					Method[] ms = iface.getMethods();
-					CtMethod invoke = getCtClass(getClass(), pool).getDeclaredMethod("invoke");
+					CtMethod invoke = SJavassist.getCtClass(getClass(), pool).getDeclaredMethod("invoke");
 					Set<String> paths = new HashSet<String>();
 			
 					for(int i=0; i<ms.length; i++)
@@ -342,9 +351,9 @@ public class DefaultRestServicePublishService implements IPublishService
 						
 						// Do not generate method if user has implemented it by herself
 						
-						CtClass rettype = getCtClass((Class)rt, pool);
-						CtClass[] paramtypes = getCtClasses(ms[i].getParameterTypes(), pool);
-						CtClass[] exceptions = getCtClasses(ms[i].getExceptionTypes(), pool);
+						CtClass rettype = SJavassist.getCtClass((Class)rt, pool);
+						CtClass[] paramtypes = SJavassist.getCtClasses(ms[i].getParameterTypes(), pool);
+						CtClass[] exceptions = SJavassist.getCtClasses(ms[i].getExceptionTypes(), pool);
 						
 						// todo: what about pure string variants?
 						// todo: what about mixed variants (in json out xml or plain)
@@ -368,18 +377,21 @@ public class DefaultRestServicePublishService implements IPublishService
 								
 								// path.
 								attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-								annot = new Annotation(constpool, getCtClass(resttype, pool));
+								annot = new Annotation(constpool, SJavassist.getCtClass(resttype, pool));
 								attr.addAnnotation(annot);
-								annot = new Annotation(constpool, getCtClass(Path.class, pool));
+								annot = new Annotation(constpool, SJavassist.getCtClass(Path.class, pool));
 								annot.addMemberValue("value", new StringMemberValue(path, constpool));
 								attr.addAnnotation(annot);
 								
 								// consumes.
 								List<MemberValue> cons = new ArrayList<MemberValue>();
-								cons.add(new StringMemberValue(formatmap.get(formats[j]), constpool));
+								if(!GET.class.equals(resttype))
+									cons.add(new StringMemberValue(formatmap.get(formats[j]), constpool));
 								if(POST.class.equals(resttype))
 									cons.add(new StringMemberValue(MediaType.MULTIPART_FORM_DATA, constpool));
-								annot = new Annotation(constpool, getCtClass(Consumes.class, pool));
+								if(GET.class.equals(resttype))
+									cons.add(new StringMemberValue(MediaType.TEXT_PLAIN, constpool));
+								annot = new Annotation(constpool, SJavassist.getCtClass(Consumes.class, pool));
 								ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
 								vals.setValue(cons.toArray(new MemberValue[0]));
 								annot.addMemberValue("value", vals);
@@ -388,48 +400,45 @@ public class DefaultRestServicePublishService implements IPublishService
 								// produces.
 								vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
 								vals.setValue(new MemberValue[]{new StringMemberValue(formatmap.get(formats[j]), constpool)});
-								annot = new Annotation(constpool, getCtClass(Produces.class, pool));
+								annot = new Annotation(constpool, SJavassist.getCtClass(Produces.class, pool));
 								annot.addMemberValue("value", vals);
 								attr.addAnnotation(annot);
 
 								m.getMethodInfo().addAttribute(attr);
 								proxyclazz.addMethod(m);
 								
-								// add @FormDataParam if post
-								if(POST.class.equals(resttype))
+								// add @QueryParam if get
+								if(GET.class.equals(resttype))
 								{
 									int pcnt = ms[i].getParameterTypes().length;
-									ConstPool mcp = m.getMethodInfo().getConstPool();
-									if(pcnt==1)
+									if(pcnt>0)
 									{
-										ParameterAnnotationsAttribute pai = new ParameterAnnotationsAttribute(mcp, AnnotationsAttribute.visibleTag);
-										annot = new Annotation(mcp, getCtClass(Reference.class, pool));
-										annot.addMemberValue("local", new BooleanMemberValue(true, mcp));
-										annot.addMemberValue("remote", new BooleanMemberValue(true, mcp));
-//										annot.addMemberValue("value", new StringMemberValue("arg", constpool));
-										Annotation[][] dest = new Annotation[pcnt][1];
-										dest[0] = new Annotation[0];//{annot};
-										pai.setAnnotations(dest);
-										
-//										for(int k=0; k<pcnt; k++)
-//										{
-//											annot = new Annotation(mcp, getCtClass(FormDataParam.class, pool));
-//		//									ClassMemberValue cmv = new ClassMemberValue(proxyclazz.getName(), pcp);
-//		//									annot.addMemberValue("value", cmv);
-//											annot.addMemberValue("value", new StringMemberValue("arg"+k, mcp));
-//											Annotation[][] par = pai.getAnnotations();
-//											Annotation[] an = par[k];
-//											Annotation[] newan = null;
-//											if(an.length == 0) 
-//												newan = new Annotation[1];
-//											else 
-//												newan = Arrays.copyOf(an, an.length + 1);
-//											newan[an.length] = annot;
-//											par[k] = newan;
-//											pai.setAnnotations(par);
-//										}
-										
-										m.getMethodInfo().addAttribute(pai);
+										Annotation[][] annos = new Annotation[pcnt][];
+										ConstPool cp = m.getMethodInfo().getConstPool();
+										for(int k=0; k<annos.length; k++)
+										{
+											Annotation anno = new Annotation(cp, SJavassist.getCtClass(QueryParam.class, pool));
+											anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
+											annos[k] = new Annotation[]{anno};
+										}
+										SJavassist.addMethodParameterAnnotation(m, annos, pool);
+									}
+								}
+								// add @FormDataParam if post
+								else if(POST.class.equals(resttype))
+								{
+									int pcnt = ms[i].getParameterTypes().length;
+									if(pcnt>0)
+									{
+										Annotation[][] annos = new Annotation[pcnt][];
+										ConstPool cp = m.getMethodInfo().getConstPool();
+										for(int k=0; k<annos.length; k++)
+										{
+											Annotation anno = new Annotation(cp, SJavassist.getCtClass(FormDataParam.class, pool));
+											anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
+											annos[k] = new Annotation[]{anno};
+										}
+										SJavassist.addMethodParameterAnnotation(m, annos, pool);
 									}
 								}
 			//					System.out.println("m: "+m.getName());
@@ -440,11 +449,11 @@ public class DefaultRestServicePublishService implements IPublishService
 					if(geninfo)
 					{
 						// Add the service info method
-						CtMethod getinfo = getCtClass(getClass(), pool).getDeclaredMethod("getServiceInfo");
-						CtMethod m = CtNewMethod.wrapped(getCtClass(String.class, pool), "getServiceInfo", 
+						CtMethod getinfo = SJavassist.getCtClass(getClass(), pool).getDeclaredMethod("getServiceInfo");
+						CtMethod m = CtNewMethod.wrapped(SJavassist.getCtClass(String.class, pool), "getServiceInfo", 
 							new CtClass[0], new CtClass[0], getinfo, null, proxyclazz);
 						attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-						annot = new Annotation(constpool, getCtClass(GET.class, pool));
+						annot = new Annotation(constpool, SJavassist.getCtClass(GET.class, pool));
 						attr.addAnnotation(annot);
 						m.getMethodInfo().addAttribute(attr);
 						proxyclazz.addMethod(m);
@@ -453,8 +462,8 @@ public class DefaultRestServicePublishService implements IPublishService
 				
 				// Add the path annotation 
 				AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-				Annotation annot = new Annotation(constpool, getCtClass(Path.class, pool));
-				annot.addMemberValue("value", new StringMemberValue("/", constpool));
+				Annotation annot = new Annotation(constpool, SJavassist.getCtClass(Path.class, pool));
+				annot.addMemberValue("value", new StringMemberValue("", constpool));
 				attr.addAnnotation(annot);
 				cf.addAttribute(attr);
 								
@@ -476,75 +485,69 @@ public class DefaultRestServicePublishService implements IPublishService
 	 *  @param method The method.
 	 *  @return  The rs annotation of the method type to use 
 	 */
-	public Class getHttpType(Method method, Class rettype, Class[] paramtypes)
+	public Class<?> getHttpType(Method method, Class<?> rettype, Class<?>[] paramtypes)
 	{
 	    // Retrieve = GET (!hasparams && hasret)
 	    // Update = POST (hasparams && hasret)
 	    // Create = PUT  return is pointer to new resource (hasparams? && hasret)
 	    // Delete = DELETE (hasparams? && hasret?)
 
-		Class ret = GET.class;
+		Class<?> ret = GET.class;
 		
 		boolean hasparams = paramtypes.length>0;
 		boolean hasret = !rettype.equals(Void.class) && !rettype.equals(void.class);
 		
-		if(hasparams)// && hasret)
+		// GET or POST if has both
+		if(hasparams && hasret)
 		{
-			ret = POST.class;
+			if(hasStringConvertableParameters(method, rettype, paramtypes))
+			{
+				ret = GET.class;
+			}
+			else
+			{
+				ret = POST.class;
+			}
 		}
 		
-//		System.out.println("http-type: "+ret.getName()+" "+method.getName()+" "+hasparams+" "+hasret);
+		System.out.println("http-type: "+ret.getName()+" "+method.getName()+" "+hasparams+" "+hasret);
 		
 		return ret;
 //		return GET.class;
 	}
-	
+
 	/**
-	 *  Get a ctclass for a Java class from the pool.
-	 *  @param clazz The Java class.
-	 *  @param pool The class pool.
-	 *  @return The ctclass.
+	 * 
 	 */
-	protected static CtClass getCtClass(Class clazz, ClassPool pool)
+	public boolean hasStringConvertableParameters(Method method, Class<?> rettype, Class<?>[] paramtypes)
 	{
-		CtClass ret = null;
-		try
+		boolean ret = true;
+		
+		for(int i=0; i<paramtypes.length && ret; i++)
 		{
-			ret = pool.get(clazz.getName());
-		}
-		catch(Exception e)
-		{
-			try
+			if(!SReflect.isStringConvertableType(paramtypes[i]))
 			{
-				ClassPath cp = new ClassClassPath(clazz);
-				pool.insertClassPath(cp);
-				ret = pool.get(clazz.getName());
-			}
-			catch(Exception e2)
-			{
-				throw new RuntimeException(e2);
+				try
+				{
+					Method m = paramtypes[i].getMethod("fromString", new Class[]{String.class});
+				}
+				catch(Exception e)
+				{
+					try
+					{
+						Method m = paramtypes[i].getMethod("valueOf", new Class[]{String.class});
+					}
+					catch(Exception e2)
+					{
+						ret = false;
+					}
+				}
 			}
 		}
+		
 		return ret;
 	}
 	
-	/**
-	 *  Get a ctclass array for a class array.
-	 *  @param classes The classes.
-	 *  @param pool The pool.
-	 *  @return The ctclass array.
-	 */
-	protected static CtClass[] getCtClasses(Class[] classes, ClassPool pool)
-	{
-		CtClass[] ret = new CtClass[classes.length];
-		for(int i=0; i<classes.length; i++)
-		{
-			ret[i] = getCtClass(classes[i], pool);
-		}
-		return ret;	
-	}
-	
-
 	/**
 	 *  Functionality blueprint for all service methods.
 	 *  @param params The parameters.
@@ -746,16 +749,24 @@ public class DefaultRestServicePublishService implements IPublishService
 						if(path!=null)
 							ub.path(path.value());
 						String link = ub.build(null).toString();
-						if(ptypes.length>0 || restmethod.annotationType().equals(POST.class))
+						
+						// For post set the media type of the arguments.
+						if(ptypes.length>0)
 						{
 							ret.append("<form action=\"").append(link).append("\" method=\"")
-								.append(resttype.toLowerCase()).append("\" enctype=\"multipart/form-data\" ")
-								.append("onSubmit=\"return extract(this)\">");
+								.append(resttype.toLowerCase()).append("\" enctype=\"multipart/form-data\" ");
 							
+							if(restmethod.annotationType().equals(POST.class))
+								ret.append("onSubmit=\"return extract(this)\"");
+							
+							ret.append(">");
+							
+							String[] cons = consumes.value();
 							for(int j=0; j<ptypes.length; j++)
 							{
 								ret.append("arg").append(j).append(": ");
-								ret.append("<input name=\"arg").append(j).append("\" type=\"text\"/>");
+								ret.append("<input name=\"arg").append(j).append("\" type=\"text\"")
+									.append(" accept=\"").append(cons[0]).append("\" />");
 							}
 							
 							ret.append("<input type=\"submit\" value=\"invoke\"/></form>");
