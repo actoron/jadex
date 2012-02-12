@@ -59,9 +59,6 @@ public class ChatPanel extends JPanel
 	/** The time format. */
 	public static final DateFormat	df	= new SimpleDateFormat("HH:mm:ss");
 	
-	/** The initial state for previously known users when sending a new message. */
-	public static final String	STATE_READY	= "ready";
-	
 	/** The user state for found but not yet responding user. */
 	public static final String	STATE_RECEIVING	= "receiving";
 	
@@ -70,6 +67,9 @@ public class ChatPanel extends JPanel
 	
 	/** The user state for a user typing a message. */
 	public static final String	STATE_TYPING	= IChatService.STATE_TYPING;
+	
+	/** The user state for a user typing a message. */
+	public static final String	STATE_RECEIVING_TYPING	= IChatService.STATE_TYPING+", "+STATE_RECEIVING;
 	
 	/** The user state for a not responding user. */
 	public static final String	STATE_BROKEN	= "not responding";
@@ -80,10 +80,10 @@ public class ChatPanel extends JPanel
 	/** The icons. */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
 	{
-		STATE_READY,		SGUI.makeIcon(ChatPanel.class, "images/user_blue.png"),
 		STATE_RECEIVING,			SGUI.makeIcon(ChatPanel.class, "images/user_yellow.png"),
 		STATE_IDLE,	SGUI.makeIcon(ChatPanel.class, "images/user_green.png"),
-		STATE_TYPING,	SGUI.makeIcon(ChatPanel.class, "images/user_typing.png"),
+		STATE_TYPING,	SGUI.makeIcon(ChatPanel.class, "images/user_green_typing.png"),
+		STATE_RECEIVING_TYPING,	SGUI.makeIcon(ChatPanel.class, "images/user_yellow_typing.png"),
 		STATE_BROKEN,		SGUI.makeIcon(ChatPanel.class, "images/user_red.png"),
 		STATE_DEAD,			SGUI.makeIcon(ChatPanel.class, "images/user_gray.png")
 	});
@@ -114,6 +114,8 @@ public class ChatPanel extends JPanel
 	/** The typing state. */
 	protected boolean	typing;
 
+	/** The dead users determined during a request. */
+	protected Set<IComponentIdentifier>	deadusers;
 	
 	//-------- constructors --------
 	
@@ -398,9 +400,15 @@ public class ChatPanel extends JPanel
 		{
 			public void run()
 			{
+				deadusers.remove(user);
 				if(request==reqcnt || request==-1)
 				{
-					users.put(user, state);
+					String	s2	= state;
+					if(STATE_RECEIVING.equals(state) &&	STATE_TYPING.equals(users.get(user)))
+						s2	= STATE_RECEIVING_TYPING;
+					else if(request!=-1 && STATE_IDLE.equals(state) &&	STATE_RECEIVING_TYPING.equals(users.get(user)))
+						s2	= STATE_TYPING;
+					users.put(user, s2);
 					((DefaultTableModel)table.getModel()).fireTableDataChanged();
 					table.getParent().invalidate();
 					table.getParent().doLayout();
@@ -419,20 +427,8 @@ public class ChatPanel extends JPanel
 //		send.setEnabled(false);
 		status.setText(message);
 
-		// Set user states to unknown before sending.
-		IComponentIdentifier[]	cids	= users.keySet().toArray(new IComponentIdentifier[users.size()]);
-		for(int i=0; i<cids.length; i++)
-		{
-			// Change user states to unknown, except for those who are already determined as dead (will be resurrected if found in search anyways).
-			if(!STATE_DEAD.equals(users.get(cids[i])))
-			{
-				users.put(cids[i], STATE_READY);
-			}
-		}
-		((DefaultTableModel)table.getModel()).fireTableDataChanged();
-		table.getParent().invalidate();
-		table.getParent().doLayout();
-		table.repaint();
+		// Remember known users to determine dead ones.
+		deadusers	= new HashSet<IComponentIdentifier>(users.keySet());
 		
 		return ++reqcnt;	// Keep track of parallel sendings and update gui only for last.		
 	}
@@ -447,13 +443,9 @@ public class ChatPanel extends JPanel
 		{
 			status.setText(message);
 			
-			IComponentIdentifier[]	cids	= users.keySet().toArray(new IComponentIdentifier[users.size()]);
-			for(int i=0; i<cids.length; i++)
+			for(IComponentIdentifier cid: deadusers)
 			{
-				if(STATE_READY.equals(users.get(cids[i])))
-				{
-					users.put(cids[i], STATE_DEAD);
-				}
+				users.put(cid, STATE_DEAD);
 			}
 			((DefaultTableModel)table.getModel()).fireTableDataChanged();
 			table.getParent().invalidate();
