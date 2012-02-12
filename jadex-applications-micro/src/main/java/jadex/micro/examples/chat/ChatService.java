@@ -58,14 +58,23 @@ public class ChatService implements IChatService
 	}
 	
 	/**
-	 *  Hear a new message.
-	 *  @param name The name of the sender.
+	 *  Post a message
 	 *  @param text The text message.
 	 */
 	public IFuture<Void>	message(String text)
 	{
-		chatpanel.addMessage(""+IComponentIdentifier.CALLER.get(), text);
+		chatpanel.addMessage(IComponentIdentifier.CALLER.get(), text);
 		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Post a status change.
+	 *  @param status The new status.
+	 */
+	public IFuture<Void>	status(String status)
+	{
+		chatpanel.setUserState(IComponentIdentifier.CALLER.get(), status, -1);
+		return IFuture.DONE;		
 	}
 	
 	/**
