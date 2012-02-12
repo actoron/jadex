@@ -18,6 +18,9 @@ public interface IChatService
 	/** The user typing a message. */
 	public static final String	STATE_TYPING	= "typing";
 	
+	/** The state for a disconnected user. */
+	public static final String	STATE_DEAD	= "dead";
+	
 	//-------- methods --------
 	
 	/**

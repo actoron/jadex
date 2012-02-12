@@ -5,7 +5,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TerminationAdapter;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.Future;
@@ -15,7 +14,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -77,7 +75,7 @@ public class ChatPanel extends JPanel
 	public static final String	STATE_BROKEN	= "not responding";
 	
 	/** The user state for a no longer available user. */
-	public static final String	STATE_DEAD	= "dead";
+	public static final String	STATE_DEAD	= IChatService.STATE_DEAD;
 	
 	/** The icons. */
 	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
@@ -256,22 +254,6 @@ public class ChatPanel extends JPanel
 			public void windowClosing(WindowEvent e)
 			{
 				agent.killComponent();
-			}
-		});
-		
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			@XMLClassname("dispose")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				ia.addComponentListener(new TerminationAdapter()
-				{
-					public void componentTerminated()
-					{
-						f.setVisible(false);
-					}
-				});
-				return IFuture.DONE;
 			}
 		});
 		
@@ -525,5 +507,19 @@ public class ChatPanel extends JPanel
 		public void removeTableModelListener(TableModelListener l)
 		{
 		}
+	}
+
+	/**
+	 *  Close the gui.
+	 */
+	public void dispose()
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				SGUI.getWindowParent(ChatPanel.this).dispose();
+			}
+		});
 	}
 }
