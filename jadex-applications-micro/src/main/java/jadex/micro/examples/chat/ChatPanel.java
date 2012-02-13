@@ -32,14 +32,12 @@ import java.util.Set;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelListener;
@@ -59,38 +57,6 @@ public class ChatPanel extends JPanel
 	/** The time format. */
 	public static final DateFormat	df	= new SimpleDateFormat("HH:mm:ss");
 	
-	/** The user state for found but not yet responding user. */
-	public static final String	STATE_RECEIVING	= "receiving";
-	
-	/** Helper state when a user was discovered during a post status (will be set to idle, if new). */
-	public static final String	STATE_DISCOVERED	= "discovered";
-	
-	/** The user state for a responding user. */
-	public static final String	STATE_IDLE	= IChatService.STATE_IDLE;
-	
-	/** The user state for a user typing a message. */
-	public static final String	STATE_TYPING	= IChatService.STATE_TYPING;
-	
-	/** The user state for a user typing a message. */
-	public static final String	STATE_RECEIVING_TYPING	= IChatService.STATE_TYPING+", "+STATE_RECEIVING;
-	
-	/** The user state for a not responding user. */
-	public static final String	STATE_BROKEN	= "not responding";
-	
-	/** The user state for a no longer available user. */
-	public static final String	STATE_DEAD	= IChatService.STATE_DEAD;
-	
-	/** The icons. */
-	protected static final UIDefaults	icons	= new UIDefaults(new Object[]
-	{
-		STATE_RECEIVING,			SGUI.makeIcon(ChatPanel.class, "images/user_yellow.png"),
-		STATE_IDLE,	SGUI.makeIcon(ChatPanel.class, "images/user_green.png"),
-		STATE_TYPING,	SGUI.makeIcon(ChatPanel.class, "images/user_green_typing.png"),
-		STATE_RECEIVING_TYPING,	SGUI.makeIcon(ChatPanel.class, "images/user_yellow_typing.png"),
-		STATE_BROKEN,		SGUI.makeIcon(ChatPanel.class, "images/user_red.png"),
-		STATE_DEAD,			SGUI.makeIcon(ChatPanel.class, "images/user_gray.png")
-	});
-	
 	//-------- attributes --------
 	
 	/** The agent. */
@@ -102,21 +68,18 @@ public class ChatPanel extends JPanel
 	/** The text area. */
 	protected JTextArea chatarea;
 	
-	/** The status field. */
-	protected JLabel	status;
-	
 	/** The known chat users (cid->user state). */
-	protected Map<IComponentIdentifier, String>	users;
+	protected Map<IComponentIdentifier, ChatUser>	users;
 	
 	/** The user table. */
 	protected JTable	table;
 	
-	/** The request counter for coordinating gui updates. */
-	protected int	reqcnt;
-	
 	/** The typing state. */
 	protected boolean	typing;
 
+	/** The request counter for coordinating gui updates. */
+	protected int	reqcnt;
+	
 	/** The dead users determined during a request. */
 	protected Set<IComponentIdentifier>	deadusers;
 	
@@ -129,7 +92,7 @@ public class ChatPanel extends JPanel
 	{
 		this.agent	= agent;
 		this.clock	= clock;
-		this.users	= new LinkedHashMap<IComponentIdentifier, String>();
+		this.users	= new LinkedHashMap<IComponentIdentifier, ChatUser>();
 		
 		chatarea = new JTextArea(10, 30)
 		{
@@ -152,17 +115,13 @@ public class ChatPanel extends JPanel
 				IComponentIdentifier	cid	= (IComponentIdentifier)value;
 				this.setText(cid.getName());
 				this.setToolTipText("State: "+users.get(cid));
-				Icon	icon	= icons.getIcon(users.get(cid));
+				Icon	icon	= users.get(cid).getIcon();
 				this.setIcon(icon);
 				return this;
 			}
 		});
-		status	= new JLabel();
-//		final JButton	refresh	= new JButton("Refresh");
 		JPanel	listpan	= new JPanel(new BorderLayout());
-		listpan.add(status, BorderLayout.NORTH);
 		listpan.add(userpan, BorderLayout.CENTER);
-//		listpan.add(refresh, BorderLayout.SOUTH);
 
 		JPanel south = new JPanel(new BorderLayout());
 		final JTextField tf = new JTextField();
@@ -192,7 +151,7 @@ public class ChatPanel extends JPanel
 				if(newtyping!=typing)
 				{
 					typing	= newtyping;
-					postStatus(typing ? STATE_TYPING : STATE_IDLE);
+					postStatus(typing ? IChatService.STATE_TYPING : IChatService.STATE_IDLE);
 				}
 			}			
 		});
@@ -204,26 +163,18 @@ public class ChatPanel extends JPanel
 				final String	msg	= tf.getText();
 				tf.setText("");
 				typing	= false;
-				
-				// Decouple sending as send request should happen after post request for better status updates (receiving).
-				SwingUtilities.invokeLater(new Runnable()
+				final int	request	= startRequest();
+				tell(msg, request).addResultListener(new SwingDefaultResultListener<Void>(ChatPanel.this)
 				{
-					public void run()
+					public void customResultAvailable(Void result)
 					{
-						final int	request	= startRequest("Sending message...");
-						tell(msg, request).addResultListener(new SwingDefaultResultListener<Void>()
-						{
-							public void customResultAvailable(Void result)
-							{
-								endRequest(request, "Sending completed.");
-							}
-							
-							public void customExceptionOccurred(Exception exception)
-							{
-								super.customExceptionOccurred(exception);
-								customResultAvailable(null);	// re-enable widgets.
-							}
-						});
+						endRequest(request);
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						super.customExceptionOccurred(exception);
+						endRequest(request);
 					}
 				});
 			}
@@ -238,61 +189,14 @@ public class ChatPanel extends JPanel
 		this.add(split, BorderLayout.CENTER);
 		this.add(south, BorderLayout.SOUTH);
 		
-//		ActionListener	refreshlis	= new ActionListener()
-//		{
-//			public void actionPerformed(ActionEvent e)
-//			{
-//				users.clear();
-//			}
-//		};
-//		refresh.addActionListener(refreshlis);
-
 		// Post availability, also gets list of initial users.
-		postStatus(STATE_IDLE);
+		postStatus(IChatService.STATE_IDLE);
 	}
 	
-	/**
-	 *  Create a gui frame.
-	 */
-	public static ChatPanel createGui(final IExternalAccess agent, IClockService clock)
-	{
-		final JFrame f = new JFrame(agent.getComponentIdentifier().getName());
-		ChatPanel cp = new ChatPanel(agent, clock);
-		f.add(cp);
-		f.pack();
-		f.setLocation(SGUI.calculateMiddlePosition(f));
-		f.setVisible(true);
-		f.addWindowListener(new WindowAdapter()
-		{
-			public void windowClosing(WindowEvent e)
-			{
-				agent.killComponent();
-			}
-		});
-		
-		return cp;
-	}
+	//-------- methods called from gui --------
 	
 	/**
-	 *  Add a message to the text area.
-	 */
-	public void addMessage(final IComponentIdentifier sender, final String text)
-	{
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				setUserState(sender, STATE_IDLE, -1);
-				StringBuffer buf = new StringBuffer();
-				buf.append("[").append(df.format(new Date(clock.getTime()))).append(", ")
-					.append(sender.getName()).append("]: ").append(text).append(lf);
-				chatarea.append(buf.toString());
-			}
-		});
-	}
-	
-	/**
-	 *  Tell something.
+	 *  Send a message.
 	 *  @param text The text.
 	 */
 	public IFuture<Void>	tell(final String text, final int request)
@@ -315,18 +219,18 @@ public class ChatPanel extends JPanel
 					{
 						// Send chat message and wait for future.
 						final IFuture<Void>	cfut	= chat.message(text);
-						setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_RECEIVING, request);
+						setReceiving(chat, request, true);
 						futures.add(cfut);
 						cfut.addResultListener(new IResultListener<Void>()
 						{
 							public void resultAvailable(Void result)
 							{
-								setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_IDLE, request);
+								setReceiving(chat, request, false);
 								done(cfut);
 							}
 							public void exceptionOccurred(Exception exception)
 							{
-								setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_BROKEN, request);
+								setReceiving(chat, -2, true);
 								done(cfut);
 							}
 						});
@@ -362,7 +266,7 @@ public class ChatPanel extends JPanel
 	 */
 	public IFuture<Void>	postStatus(final String status)
 	{
-		final int	request	= startRequest("Refreshing...");
+		final int	request	= startRequest();
 		return agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
@@ -372,8 +276,7 @@ public class ChatPanel extends JPanel
 				{
 					public void intermediateResultAvailable(final IChatService chat)
 					{
-						// Assume connected at first for found users.
-						setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_DISCOVERED, request);
+						setReceiving(chat, -1, false);	// Adds user if not already known.
 						
 						chat.status(status);
 					}
@@ -384,7 +287,7 @@ public class ChatPanel extends JPanel
 						{
 							public void run()
 							{
-								endRequest(request, "Refresh completed.");
+								endRequest(request);
 							}
 						});
 					}
@@ -399,46 +302,137 @@ public class ChatPanel extends JPanel
 			}
 		});
 	}
+	
+	//-------- helper methods --------
 
+	/**
+	 *  Start an asynchronous request.
+	 *  Used to collect dead users.
+	 */
+	protected int	startRequest()
+	{
+		assert SwingUtilities.isEventDispatchThread();
+		// Remember known users to determine dead ones.
+		deadusers	= new HashSet<IComponentIdentifier>(users.keySet());
+		return ++reqcnt;	// Keep track of parallel sendings and update gui only for last.		
+	}
+	
+	/**
+	 *  Called on request end
+	 *  Used to collect dead users.
+	 */
+	protected void	endRequest(int request)
+	{
+		assert SwingUtilities.isEventDispatchThread();
+		// Set states of unavailable users to dead
+		if(request==reqcnt)
+		{
+			for(IComponentIdentifier cid: deadusers)
+			{
+				if(users.containsKey(cid))
+					users.get(cid).setState(IChatService.STATE_DEAD);
+			}
+			((DefaultTableModel)table.getModel()).fireTableDataChanged();
+			table.getParent().invalidate();
+			table.getParent().doLayout();
+			table.repaint();
+		}
+	}
 	
 	/**
 	 *  Add a user or change its state.
 	 */
-	public void	setUserState(final IComponentIdentifier user, final String newstate, final int request)
+	public void	setReceiving(final IChatService chat, final int receiving, final boolean b)
 	{
 		// Called on component thread.
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				deadusers.remove(user);
-				if(request==reqcnt || request==-1)	// -1 for remote status update.
+				IComponentIdentifier	cid	= ((IService)chat).getServiceIdentifier().getProviderId();
+				deadusers.remove(cid);
+				ChatUser	cu	= users.get(cid);
+				if(cu==null)
 				{
-					// Manage dependencies between local (receiving/idle) and remote (typing/idle) states.
-					String	s2	= newstate;
-					if(STATE_TYPING.equals(users.get(user)) && STATE_RECEIVING.equals(newstate)
-						|| STATE_RECEIVING.equals(users.get(user)) && STATE_TYPING.equals(newstate))
+					cu	= new ChatUser(chat);
+					users.put(cid, cu);
+				}
+			
+				cu.setReceiving(receiving, b);
+				((DefaultTableModel)table.getModel()).fireTableDataChanged();
+				table.getParent().invalidate();
+				table.getParent().doLayout();
+				table.repaint();
+			}
+		});
+	}
+
+	//-------- methods called from service --------
+	
+	/**
+	 *  Create a gui frame.
+	 */
+	public static IFuture<ChatPanel>	createGui(final IExternalAccess agent, final IClockService clock)
+	{
+		final Future<ChatPanel>	ret	= new Future<ChatPanel>();
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				final JFrame f = new JFrame(agent.getComponentIdentifier().getName());
+				ChatPanel cp = new ChatPanel(agent, clock);
+				f.add(cp);
+				f.pack();
+				f.setLocation(SGUI.calculateMiddlePosition(f));
+				f.setVisible(true);
+				f.addWindowListener(new WindowAdapter()
+				{
+					public void windowClosing(WindowEvent e)
 					{
-						s2	= STATE_RECEIVING_TYPING;
+						agent.killComponent();
 					}
-					else if(STATE_RECEIVING_TYPING.equals(users.get(user)) && STATE_IDLE.equals(newstate))
-					{
-						s2	= request==-1 ? STATE_RECEIVING : STATE_TYPING;
-					}
-					else if(STATE_RECEIVING.equals(users.get(user)) && STATE_IDLE.equals(newstate))
-					{
-						s2	= request==-1 ? STATE_RECEIVING : STATE_IDLE;
-					}
-					else if(STATE_TYPING.equals(users.get(user)) && STATE_IDLE.equals(newstate))
-					{
-						s2	= request==-1 ? STATE_IDLE : STATE_TYPING;
-					}
-					else if(STATE_DISCOVERED.equals(newstate))
-					{
-						// When discovered user already known, keep previous state.
-						s2	= users.containsKey(user) && !STATE_DEAD.equals(users.get(user)) ? users.get(user) : STATE_IDLE;
-					}
-					users.put(user, s2);
+				});
+				ret.setResult(cp);
+			}
+		});
+		
+		return ret;
+	}
+
+	/**
+	 *  Close the gui.
+	 */
+	public void dispose()
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				SGUI.getWindowParent(ChatPanel.this).dispose();
+			}
+		});
+	}
+	
+	/**
+	 *  Add a message to the text area.
+	 */
+	public void addMessage(final IComponentIdentifier cid, final String text)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				StringBuffer buf = new StringBuffer();
+				buf.append("[").append(df.format(new Date(clock.getTime()))).append(", ")
+					.append(cid.getName()).append("]: ").append(text).append(lf);
+				chatarea.append(buf.toString());
+				
+				deadusers.remove(cid);
+				ChatUser	cu	= users.get(cid);
+				if(cu==null)
+				{
+					cu	= new ChatUser(cid);
+					users.put(cid, cu);
 					((DefaultTableModel)table.getModel()).fireTableDataChanged();
 					table.getParent().invalidate();
 					table.getParent().doLayout();
@@ -449,39 +443,29 @@ public class ChatPanel extends JPanel
 	}
 	
 	/**
-	 *  Start an asynchronous request.
+	 *  Add a user or change its state.
 	 */
-	protected int	startRequest(String message)
+	public void	setUserState(final IComponentIdentifier cid, final String newstate)
 	{
-//		tf.setEnabled(false);
-//		send.setEnabled(false);
-		status.setText(message);
-
-		// Remember known users to determine dead ones.
-		deadusers	= new HashSet<IComponentIdentifier>(users.keySet());
-		
-		return ++reqcnt;	// Keep track of parallel sendings and update gui only for last.		
-	}
-	
-	/**
-	 *  Called on request end
-	 */
-	protected void	endRequest(int request, String message)
-	{
-		// Set states of unavailable users to dead
-		if(request==reqcnt)
+		// Called on component thread.
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			status.setText(message);
-			
-			for(IComponentIdentifier cid: deadusers)
+			public void run()
 			{
-				users.put(cid, STATE_DEAD);
+				deadusers.remove(cid);
+				ChatUser	cu	= users.get(cid);
+				if(cu==null)
+				{
+					cu	= new ChatUser(cid);
+					users.put(cid, cu);
+				}
+				cu.setState(newstate);
+				((DefaultTableModel)table.getModel()).fireTableDataChanged();
+				table.getParent().invalidate();
+				table.getParent().doLayout();
+				table.repaint();
 			}
-			((DefaultTableModel)table.getModel()).fireTableDataChanged();
-			table.getParent().invalidate();
-			table.getParent().doLayout();
-			table.repaint();
-		}
+		});
 	}
 	
 	//-------- helper classes --------
@@ -529,19 +513,5 @@ public class ChatPanel extends JPanel
 		public void removeTableModelListener(TableModelListener l)
 		{
 		}
-	}
-
-	/**
-	 *  Close the gui.
-	 */
-	public void dispose()
-	{
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				SGUI.getWindowParent(ChatPanel.this).dispose();
-			}
-		});
 	}
 }

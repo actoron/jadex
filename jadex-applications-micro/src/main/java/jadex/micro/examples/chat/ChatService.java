@@ -16,7 +16,6 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.micro.annotation.Binding;
 
-import javax.swing.SwingUtilities;
 
 /**
  *  Chat service implementation.
@@ -48,11 +47,12 @@ public class ChatService implements IChatService
 		{
 			public void customResultAvailable(final IClockService clock)
 			{
-				SwingUtilities.invokeLater(new Runnable()
+				ChatPanel.createGui(exta, clock)
+					.addResultListener(new ExceptionDelegationResultListener<ChatPanel, Void>(ret)
 				{
-					public void run()
+					public void customResultAvailable(ChatPanel result)
 					{
-						chatpanel = ChatPanel.createGui(exta, clock);
+						chatpanel = result;
 						ret.setResult(null);
 					}
 				});
@@ -111,16 +111,7 @@ public class ChatService implements IChatService
 	 */
 	public IFuture<Void>	status(String status)
 	{
-		chatpanel.setUserState(IComponentIdentifier.CALLER.get(), status, -1);
+		chatpanel.setUserState(IComponentIdentifier.CALLER.get(), status);
 		return IFuture.DONE;		
-	}
-	
-	/**
-	 *  Get the string representation.
-	 *  @return The string representation.
-	 */
-	public String toString()
-	{
-		return "ChatService, "+agent.getComponentIdentifier();
 	}
 }
