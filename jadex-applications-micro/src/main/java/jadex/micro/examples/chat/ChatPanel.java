@@ -62,6 +62,9 @@ public class ChatPanel extends JPanel
 	/** The user state for found but not yet responding user. */
 	public static final String	STATE_RECEIVING	= "receiving";
 	
+	/** Helper state when a user was discovered during a post status (will be set to idle, if new). */
+	public static final String	STATE_DISCOVERED	= "discovered";
+	
 	/** The user state for a responding user. */
 	public static final String	STATE_IDLE	= IChatService.STATE_IDLE;
 	
@@ -370,7 +373,7 @@ public class ChatPanel extends JPanel
 					public void intermediateResultAvailable(final IChatService chat)
 					{
 						// Assume connected at first for found users.
-						setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_IDLE, request);
+						setUserState(((IService)chat).getServiceIdentifier().getProviderId(), STATE_DISCOVERED, request);
 						
 						chat.status(status);
 					}
@@ -429,6 +432,11 @@ public class ChatPanel extends JPanel
 					else if(STATE_TYPING.equals(users.get(user)) && STATE_IDLE.equals(newstate))
 					{
 						s2	= request==-1 ? STATE_IDLE : STATE_TYPING;
+					}
+					else if(STATE_DISCOVERED.equals(newstate))
+					{
+						// When discovered user already known, keep previous state.
+						s2	= users.containsKey(user) && !STATE_DEAD.equals(users.get(user)) ? users.get(user) : STATE_IDLE;
 					}
 					users.put(user, s2);
 					((DefaultTableModel)table.getModel()).fireTableDataChanged();
