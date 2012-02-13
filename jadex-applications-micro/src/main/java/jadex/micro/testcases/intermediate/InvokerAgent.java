@@ -127,8 +127,8 @@ public class InvokerAgent
 //		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-			"-gui", "false", "-usepass", "false", "-simulation", "false"
-//			"-logging_level", "java.util.logging.Level.INFO"
+			"-gui", "false", "-usepass", "false", "-simulation", "false",
+			"-logging_level", "java.util.logging.Level.INFO"
 		}).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{

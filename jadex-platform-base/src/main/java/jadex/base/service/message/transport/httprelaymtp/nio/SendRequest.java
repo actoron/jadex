@@ -1,11 +1,12 @@
 package jadex.base.service.message.transport.httprelaymtp.nio;
 
-import jadex.base.service.message.ManagerSendTask;
+import jadex.base.service.message.ISendTask;
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
-import jadex.commons.concurrent.Token;
 import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
@@ -23,6 +24,9 @@ public class SendRequest	implements IHttpRequest
 {
 	//-------- attributes --------
 
+	/** The send task. */
+	protected ISendTask	task;
+	
 	/** The data to be sent. */
 	protected List<ByteBuffer>	buffers;
 	
@@ -35,15 +39,6 @@ public class SendRequest	implements IHttpRequest
 	/** The current buffer. */
 	protected int	bufnum;
 	
-	/** The token to acquire for avoiding duplicate sending. */
-	protected Token	token;
-	
-	/** True, if the token has been acquired. */
-	protected boolean	hastoken;
-	
-	/** The future to be informed, when sending is finished. */
-	protected Future<Void>	fut;
-	
 	/** The HTTP response as it becomes available. */
 	protected StringBuffer	response;
 	
@@ -53,17 +48,22 @@ public class SendRequest	implements IHttpRequest
 	/** The idle flag. */
 	protected boolean	idle;
 	
+	/** True, if the transport is allowed to send. */
+	protected boolean	send;
+	
+	/** The result future (if any). */
+	protected Future<Void>	fut;
+	
 	//-------- constructors ---------
 	
 	/**
 	 *  Create a send request.
 	 */
-	public SendRequest(ManagerSendTask task, Token token, Future<Void> fut, Tuple2<String, Integer> address, String path, Logger logger)
+	public SendRequest(ISendTask task, Tuple2<String, Integer> address, String path, Logger logger)
 	{
+		this.task	= task;
 		this.logger	= logger;
 		this.buffers	= new LinkedList<ByteBuffer>();
-		this.fut	= fut;
-		this.token	= token;
 		this.address	= address;
 		
 		// Only called with receivers on same platform, therefore safe to get root id from first receiver.
@@ -137,14 +137,28 @@ public class SendRequest	implements IHttpRequest
 	 *  @return	In case of errors may request to be rescheduled on a new connection:
 	 *    -1 no reschedule, 0 immediate reschedule, >0 reschedule after delay (millis.)
 	 */
-	public int handleWrite(SelectionKey key)
+	public int handleWrite(final SelectionKey key)
 	{
 		int reschedule	= -1;
-		SocketChannel	sc	= (SocketChannel)key.channel();
+		final SocketChannel	sc	= (SocketChannel)key.channel();
 //		System.out.println("Sending "+this+" on: "+sc);
 
-		hastoken	= hastoken || token.acquire();
-		if(hastoken)
+		if(!send)
+		{
+			key.interestOps(SelectionKey.OP_CONNECT);	// Use key that never becomes true for holding connection until we are allowed to send.
+			task.ready(new IResultCommand<IFuture<Void>, Void>()
+			{
+				public IFuture<Void> execute(Void args)
+				{
+					fut	= new Future<Void>();
+					send	= true;
+					key.interestOps(SelectionKey.OP_WRITE);
+					return fut;
+				}
+			});
+		}
+		
+		if(send)
 		{
 //			System.out.println("Sending with relay: "+address);
 			try
@@ -191,12 +205,6 @@ public class SendRequest	implements IHttpRequest
 					fut.setException(e);
 				}
 			}
-		}
-		else
-		{
-//			System.out.println("Not sending with relay: "+address);
-			key.interestOps(0);
-			fut.setException(new RuntimeException("Not sending."));
 		}
 		
 		return reschedule;

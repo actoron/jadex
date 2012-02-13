@@ -1,12 +1,11 @@
 package jadex.base.service.message.transport.httprelaymtp.nio;
 
-import jadex.base.service.message.ManagerSendTask;
+import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.Tuple2;
-import jadex.commons.concurrent.Token;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -81,23 +80,40 @@ public class HttpRelayTransport implements ITransport
 	}
 	
 	/**
+	 *  Test if a transport is applicable for the message.
+	 *  
+	 *  @return True, if the transport is applicable for the message.
+	 */
+	public boolean	isApplicable(ISendTask task)
+	{
+		boolean	ret	= false;
+		for(int i=0; !ret && i<task.getReceivers().length; i++)
+		{
+			String[]	raddrs	= task.getReceivers()[i].getAddresses();
+			for(int j=0; j<raddrs.length; j++)
+			{
+				ret	= raddrs[j].toLowerCase().startsWith(getServiceSchema());
+			}			
+		}
+		return ret;
+	}
+
+	/**
 	 *  Send a message to receivers on the same platform.
 	 *  This method is called concurrently for all transports.
-	 *  Each transport should try to connect to the target platform
-	 *  (or reuse an existing connection) and afterwards acquire the token.
+	 *  Each transport should immediately announce its interest and try to connect to the target platform
+	 *  (or reuse an existing connection) and afterwards acquire the token for the task.
 	 *  
-	 *  The one transport that acquires the token (i.e. the first connected transport) gets to send the message.
-	 *  All other transports ignore the current message and return an exception,
-	 *  but may keep any established connections open for later messages.
+	 *  The first transport that acquires the token (i.e. the first connected transport) tries to send the message.
+	 *  If sending fails, it may release the token to trigger the other transports.
+	 *  
+	 *  All transports may keep any established connections open for later messages.
 	 *  
 	 *  @param task The message to send.
-	 *  @param token The token to be acquired before sending. 
-	 *  @return A future indicating successful sending or exception, when the message was not send by this transport.
+	 *  @return True, if the transport is applicable for the message.
 	 */
-	public IFuture<Void>	sendMessage(final ManagerSendTask task, Token token)
+	public void	sendMessage(final ISendTask task)
 	{
-		final Future<Void>	ret	= new Future<Void>();
-		
 		// Fetch all addresses
 		Set<String>	addresses	= new LinkedHashSet<String>();
 		for(int i=0; i<task.getReceivers().length; i++)
@@ -111,19 +127,10 @@ public class HttpRelayTransport implements ITransport
 		}
 
 		// Iterate over all different addresses and try to send
-		if(!addresses.isEmpty())
+		for(Iterator<String> it=addresses.iterator(); it.hasNext(); )
 		{
-			for(Iterator<String> it=addresses.iterator(); it.hasNext(); )
-			{
-				this.selectorthread.addSendTask(task, token, it.next(), ret);
-			}
+			this.selectorthread.addSendTask(task, it.next());
 		}
-		else
-		{
-			ret.setException(new RuntimeException("Could not deliver message"));
-		}
-		
-		return ret;
 	}
 	
 	/**

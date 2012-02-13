@@ -1,18 +1,18 @@
 package jadex.base.service.message.transport.tcpmtp;
 
 import jadex.base.AbstractComponentAdapter;
-import jadex.base.service.message.ManagerSendTask;
+import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ILRUEntryCleaner;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.SCollection;
-import jadex.commons.concurrent.Token;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -260,66 +260,85 @@ public class TCPTransport implements ITransport
 	//-------- methods --------
 	
 	/**
-	 *  Send a message to receivers on the same platform.
-	 *  This method is called concurrently for all transports.
-	 *  Each transport should try to connect to the target platform
-	 *  (or reuse an existing connection) and afterwards acquire the token.
+	 *  Test if a transport is applicable for the message.
 	 *  
-	 *  The one transport that acquires the token (i.e. the first connected transport) gets to send the message.
-	 *  All other transports ignore the current message and return an exception,
-	 *  but may keep any established connections open for later messages.
-	 *  
-	 *  @param task The message to send.
-	 *  @param token The token to be acquired before sending. 
-	 *  @return A future indicating successful sending or exception, when the message was not send by this transport.
+	 *  @return True, if the transport is applicable for the message.
 	 */
-	public IFuture<Void>	sendMessage(ManagerSendTask task, Token token)
+	public boolean	isApplicable(ISendTask task)
 	{
-		IFuture<Void>	ret	= null;
-		
-		// Fetch all addresses
-		Set<String>	addresses	= new LinkedHashSet<String>();
-		for(int i=0; i<task.getReceivers().length; i++)
+		boolean	ret	= false;
+		for(int i=0; !ret && i<task.getReceivers().length; i++)
 		{
 			String[]	raddrs	= task.getReceivers()[i].getAddresses();
 			for(int j=0; j<raddrs.length; j++)
 			{
-				addresses.add(raddrs[j]);
+				ret	= raddrs[j].toLowerCase().startsWith(getServiceSchema());
 			}			
 		}
-
-		// Iterate over all different addresses and try to send
-		// to missing and appropriate receivers
-		String[] addrs = (String[])addresses.toArray(new String[addresses.size()]);
-		for(int i=0; ret==null && i<addrs.length; i++)
-		{
-			TCPOutputConnection con = getConnection(addrs[i], true);
-			if(con!=null)
-			{
-				if(token.acquire())
-				{
-					if(con.send(task.getProlog(), task.getData()))
-					{
-						ret	= IFuture.DONE;
-					}
-					else
-					{
-						ret	= new Future<Void>(new RuntimeException("Send failed: "+con));
-					}
-				}
-				else
-				{
-					ret	= new Future<Void>(new RuntimeException("Not sending."));
-				}
-			}
-		}
-		
-		if(ret==null)
-		{
-			ret	= new Future<Void>(new RuntimeException("No working connection."));			
-		}
-		
 		return ret;
+	}
+	
+	/**
+	 *  Send a message to receivers on the same platform.
+	 *  This method is called concurrently for all transports.
+	 *  Each transport should immediately announce its interest and try to connect to the target platform
+	 *  (or reuse an existing connection) and afterwards acquire the token for the task.
+	 *  
+	 *  The first transport that acquires the token (i.e. the first connected transport) tries to send the message.
+	 *  If sending fails, it may release the token to trigger the other transports.
+	 *  
+	 *  All transports may keep any established connections open for later messages.
+	 *  
+	 *  @param task The message to send.
+	 *  @return True, if the transport is applicable for the message.
+	 */
+	public void	sendMessage(final ISendTask task)
+	{
+		IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
+		{
+			public IFuture<Void> execute(Void args)
+			{
+				IFuture<Void>	ret	= null;
+				
+				// Fetch all addresses
+				Set<String>	addresses	= new LinkedHashSet<String>();
+				for(int i=0; i<task.getReceivers().length; i++)
+				{
+					String[]	raddrs	= task.getReceivers()[i].getAddresses();
+					for(int j=0; j<raddrs.length; j++)
+					{
+						addresses.add(raddrs[j]);
+					}			
+				}
+
+				// Iterate over all different addresses and try to send
+				// to missing and appropriate receivers
+				String[] addrs = (String[])addresses.toArray(new String[addresses.size()]);
+				for(int i=0; ret==null && i<addrs.length; i++)
+				{
+					TCPOutputConnection con = getConnection(addrs[i], true);
+					if(con!=null)
+					{
+						if(con.send(task.getProlog(), task.getData()))
+						{
+							ret	= IFuture.DONE;
+						}
+						else
+						{
+							ret	= new Future<Void>(new RuntimeException("Send failed: "+con));
+						}
+					}
+				}
+				
+				if(ret==null)
+				{
+					ret	= new Future<Void>(new RuntimeException("No working connection."));			
+				}
+				
+				return ret;
+			}
+		};
+		task.ready(send);
 	}
 	
 	/**

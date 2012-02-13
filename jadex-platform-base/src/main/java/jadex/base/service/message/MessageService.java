@@ -31,12 +31,10 @@ import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IExecutable;
-import jadex.commons.concurrent.Token;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
@@ -52,7 +50,6 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -359,8 +356,8 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		
 		IComponentIdentifier sender = (IComponentIdentifier)msgcopy.get(type.getSenderIdentifier());
-		if(sender.getAddresses()==null || sender.getAddresses().length==0)
-			System.out.println("schrott2");
+//		if(sender.getAddresses()==null || sender.getAddresses().length==0)
+//			System.out.println("schrott2");
 		
 		IFilter[] fils;
 		IMessageListener[] lis;
@@ -1170,7 +1167,7 @@ public class MessageService extends BasicService implements IMessageService
 		//-------- attributes --------
 		
 		/** The list of messages to send. */
-		protected List<Tuple2<ManagerSendTask, Future<Void>>> messages;
+		protected List<ManagerSendTask> messages;
 		
 		//-------- constructors --------
 		
@@ -1179,7 +1176,7 @@ public class MessageService extends BasicService implements IMessageService
 		 */
 		public SendManager()
 		{
-			this.messages = new ArrayList<Tuple2<ManagerSendTask, Future<Void>>>();
+			this.messages = new ArrayList<ManagerSendTask>();
 		}
 		
 		//-------- methods --------
@@ -1189,7 +1186,7 @@ public class MessageService extends BasicService implements IMessageService
 		 */
 		public boolean execute()
 		{
-			Tuple2<ManagerSendTask, Future<Void>> tmp = null;
+			ManagerSendTask	tmp = null;
 			boolean isempty;
 			
 			synchronized(this)
@@ -1198,103 +1195,60 @@ public class MessageService extends BasicService implements IMessageService
 					tmp = messages.remove(0);
 				isempty = messages.isEmpty();
 			}
-			final Tuple2<ManagerSendTask, Future<Void>> ftmp = tmp;
+			final ManagerSendTask	task = tmp;
 			
-			// Todo: move back to send manager thread after isValid()
-			// (hack!!! currently only works because message service is raw)
-			// hack!!! doesn't make much sense to check isValid as send manager executes on different thread.
-			isValid().addResultListener(new IResultListener<Boolean>()
+			if(task!=null)
 			{
-				public void resultAvailable(Boolean result)
+				// Todo: move back to send manager thread after isValid()
+				// (hack!!! currently only works because message service is raw)
+				// hack!!! doesn't make much sense to check isValid as send manager executes on different thread.
+				isValid().addResultListener(new IResultListener<Boolean>()
 				{
-					if(result.booleanValue())
+					public void resultAvailable(Boolean result)
 					{
-//						System.err.println("MessageService SendManager.execute");
-						if(ftmp!=null)
+						if(result.booleanValue())
 						{
-							final ManagerSendTask task = ftmp.getFirstEntity();
-							final Future<Void> ret = ftmp.getSecondEntity();
+//							System.err.println("MessageService SendManager.execute");
 							
 							final IComponentIdentifier[] receivers = task.getReceivers();
 //							System.out.println("recs: "+SUtil.arrayToString(receivers)+" "+task.hashCode());
 							
-							if(task.getTransports().isEmpty())
+							for(int i=0; i<task.getTransports().size(); i++)
 							{
-								ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
-									"No transports available for sending message: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())));								
-							}
-							else
-							{
-								final List<Exception>	exceptions	= Collections.synchronizedList(new ArrayList<Exception>());
-								// Let transports work asynchronously if possible.
-								// Make sure that either the result is set or the exception is propagated on last transport return.
-								IResultListener<Void>	crl	= new IResultListener<Void>()
+								ITransport transport = (ITransport)task.getTransports().get(i);
+								if(transport.isApplicable(task))
 								{
-									int	countdown	= task.getTransports().size();
-									
-									public void resultAvailable(Void result)
-									{
-										// One transport succeeded.
-										// Do not increase counter so exception will never be last.
-										ret.setResult(result);
-									}
-									public void exceptionOccurred(Exception exception)
-									{
-										exceptions.add(exception);
-										boolean	last;
-										synchronized(this)
-										{
-											countdown--;
-											last	= countdown==0;
-										}
-										
-										// All transports failed.
-										if(last)
-										{
-											ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
-												"Transports failed to send message: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())+", "+exceptions+", "+SUtil.arrayToString(task.getTransports())));
-										}
-									}
-								};
-								
-								Token	token	= new Token();
-								for(int i=0; i<task.getTransports().size(); i++)
-								{
-									ITransport transport = (ITransport)task.getTransports().get(i);
-									transport.sendMessage(task, token).addResultListener(crl);
+									task.addInterest();
+									transport.sendMessage(task);
 								}
 							}
+							
+							if(!task.getInterest())
+							{
+								task.getFuture().setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
+									"No transports available for sending message: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())+", "+SUtil.arrayToString(task.getTransports())));								
+							}
+						}
+						
+						// Quit when service was terminated.
+						else
+						{
+	//						System.out.println("send message not executed");
+							task.getFuture().setException(new MessageFailureException(task.getMessage(), task.getMessageType(), null, "Message service terminated."));
+	//						isempty	= true;
+	//						messages.clear();
 						}
 					}
 					
-					// Quit when service was terminated.
-					else
+					public void exceptionOccurred(Exception exception)
 					{
-//						System.out.println("send message not executed");
-						if(ftmp!=null)
-						{
-							ManagerSendTask task = ftmp.getFirstEntity();
-							Future<Void> ret = ftmp.getSecondEntity();
-							ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), null, "Message service terminated."));
-						}
-//						isempty	= true;
-//						messages.clear();
+	//					System.out.println("send message not executed");
+						task.getFuture().setException(new MessageFailureException(task.getMessage(), task.getMessageType(), null, "Message service terminated."));
+	//					isempty	= true;
+	//					messages.clear();
 					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-//					System.out.println("send message not executed");
-					if(ftmp!=null)
-					{
-						ManagerSendTask task = ftmp.getFirstEntity();
-						Future<Void> ret = ftmp.getSecondEntity();
-						ret.setException(new MessageFailureException(task.getMessage(), task.getMessageType(), null, "Message service terminated."));
-					}
-//					isempty	= true;
-//					messages.clear();
-				}
-			});
+				});
+			}
 			
 			return !isempty;
 		}
@@ -1305,9 +1259,7 @@ public class MessageService extends BasicService implements IMessageService
 		 */
 		public IFuture<Void> addMessage(final ManagerSendTask task)
 		{
-			final Future<Void> ret = new Future<Void>();
-			
-			isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
+			isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(task.getFuture())
 			{
 				public void customResultAvailable(Boolean result)
 				{
@@ -1315,11 +1267,11 @@ public class MessageService extends BasicService implements IMessageService
 					{
 						synchronized(SendManager.this)
 						{
-							messages.add(new Tuple2<ManagerSendTask, Future<Void>>(task, ret));
+							messages.add(task);
 						}
 						
 						SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, 
-							RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
+							RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(task.getFuture())
 						{
 							public void customResultAvailable(IExecutionService result)
 							{
@@ -1330,13 +1282,13 @@ public class MessageService extends BasicService implements IMessageService
 					// Fail when service was shut down. 
 					else
 					{
-						System.out.println("message not added");
-						ret.setException(new ServiceTerminatedException(getServiceIdentifier()));
+//						System.out.println("message not added");
+						task.getFuture().setException(new ServiceTerminatedException(getServiceIdentifier()));
 					}
 				}
 			});
 			
-			return ret;
+			return task.getFuture();
 		}
 	}
 	

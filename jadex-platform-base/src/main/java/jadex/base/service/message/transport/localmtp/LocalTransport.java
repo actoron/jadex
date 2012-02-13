@@ -1,13 +1,13 @@
 package jadex.base.service.message.transport.localmtp;
 
-import jadex.base.service.message.ManagerSendTask;
+import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
-import jadex.commons.concurrent.Token;
+import jadex.commons.IResultCommand;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -81,33 +81,40 @@ public class LocalTransport implements ITransport
 	//-------- methods --------
 	
 	/**
+	 *  Test if a transport is applicable for the message.
+	 *  
+	 *  @return True, if the transport is applicable for the message.
+	 */
+	public boolean	isApplicable(ISendTask task)
+	{
+		return task.getReceivers()[0].getPlatformName().equals(((IComponentIdentifier)container.getId()).getPlatformName());
+	}
+	
+	/**
 	 *  Send a message to receivers on the same platform.
 	 *  This method is called concurrently for all transports.
-	 *  Each transport should try to connect to the target platform
-	 *  (or reuse an existing connection) and afterwards acquire the token.
+	 *  Each transport should immediately announce its interest and try to connect to the target platform
+	 *  (or reuse an existing connection) and afterwards acquire the token for the task.
 	 *  
-	 *  The one transport that acquires the token (i.e. the first connected transport) gets to send the message.
-	 *  All other transports ignore the current message and return an exception,
-	 *  but may keep any established connections open for later messages.
+	 *  The first transport that acquires the token (i.e. the first connected transport) tries to send the message.
+	 *  If sending fails, it may release the token to trigger the other transports.
+	 *  
+	 *  All transports may keep any established connections open for later messages.
 	 *  
 	 *  @param task The message to send.
-	 *  @param token The token to be acquired before sending. 
-	 *  @return A future indicating successful sending or exception, when the message was not send by this transport.
+	 *  @return True, if the transport is applicable for the message.
 	 */
-	public IFuture<Void>	sendMessage(ManagerSendTask task, Token token)
+	public void	sendMessage(final ISendTask task)
 	{
-		IFuture<Void>	ret;
-		if(task.getReceivers()[0].getPlatformName().equals(((IComponentIdentifier)container.getId()).getPlatformName())
-			&& token.acquire())
+		IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
 		{
-			msgservice.deliverMessage(task.getMessage(), task.getMessageType().getName(), task.getReceivers());
-			ret	= IFuture.DONE;
-		}
-		else
-		{
-			ret	= new Future<Void>(new RuntimeException("Can only deliver to local agents"));
-		}
-		return ret;
+			public IFuture<Void> execute(Void args)
+			{
+				msgservice.deliverMessage(task.getMessage(), task.getMessageType().getName(), task.getReceivers());
+				return IFuture.DONE;
+			}
+		};
+		task.ready(send);
 	}
 
 	

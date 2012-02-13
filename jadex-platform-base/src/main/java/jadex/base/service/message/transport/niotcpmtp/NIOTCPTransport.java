@@ -1,6 +1,6 @@
 package jadex.base.service.message.transport.niotcpmtp;
 
-import jadex.base.service.message.ManagerSendTask;
+import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceProvider;
@@ -8,12 +8,12 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
+import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
-import jadex.commons.concurrent.Token;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -166,42 +166,66 @@ public class NIOTCPTransport implements ITransport
 	//-------- methods --------
 	
 	/**
+	 *  Test if a transport is applicable for the message.
+	 *  
+	 *  @return True, if the transport is applicable for the message.
+	 */
+	public boolean	isApplicable(ISendTask task)
+	{
+		boolean	ret	= false;
+		for(int i=0; !ret && i<task.getReceivers().length; i++)
+		{
+			String[]	raddrs	= task.getReceivers()[i].getAddresses();
+			for(int j=0; j<raddrs.length; j++)
+			{
+				ret	= raddrs[j].toLowerCase().startsWith(getServiceSchema());
+			}			
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Send a message to receivers on the same platform.
 	 *  This method is called concurrently for all transports.
-	 *  Each transport should try to connect to the target platform
-	 *  (or reuse an existing connection) and afterwards acquire the token.
+	 *  Each transport should immediately announce its interest and try to connect to the target platform
+	 *  (or reuse an existing connection) and afterwards acquire the token for the task.
 	 *  
-	 *  The one transport that acquires the token (i.e. the first connected transport) gets to send the message.
-	 *  All other transports ignore the current message and return an exception,
-	 *  but may keep any established connections open for later messages.
+	 *  The first transport that acquires the token (i.e. the first connected transport) tries to send the message.
+	 *  If sending fails, it may release the token to trigger the other transports.
+	 *  
+	 *  All transports may keep any established connections open for later messages.
 	 *  
 	 *  @param task The message to send.
-	 *  @param token The token to be acquired before sending. 
-	 *  @return A future indicating successful sending or exception, when the message was not send by this transport.
+	 *  @return True, if the transport is applicable for the message.
 	 */
-	public IFuture<Void>	sendMessage(final ManagerSendTask task, final Token token)
+	public void	sendMessage(final ISendTask task)
 	{
-		final Future<Void>	ret	= new Future<Void>();
 		InetSocketAddress[] addresses = fetchAddresses(task.getReceivers());
-		selectorthread.getConnection(addresses).addResultListener(new ExceptionDelegationResultListener<NIOTCPOutputConnection, Void>(ret)
+		selectorthread.getConnection(addresses).addResultListener(new IResultListener<NIOTCPOutputConnection>()
 		{
-			public void customResultAvailable(NIOTCPOutputConnection con)
+			public void resultAvailable(final NIOTCPOutputConnection con)
 			{
-				if(token.acquire())
+				IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
 				{
-//					System.out.println("Sending with niotcp: "+SUtil.arrayToString(task.getReceivers()));
-					selectorthread.sendMessage(con, task.getProlog(), task.getData())
-						.addResultListener(new DelegationResultListener<Void>(ret));
-				}
-				else
+					public IFuture<Void> execute(Void args)
+					{
+						return selectorthread.sendMessage(con, task.getProlog(), task.getData());
+					}
+				};
+				task.ready(send);
+			}
+			public void exceptionOccurred(final Exception exception)
+			{
+				IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
 				{
-//					System.out.println("Not sending with niotcp: "+SUtil.arrayToString(task.getReceivers()));
-					ret.setException(new RuntimeException("Not sending."));
-				}
+					public IFuture<Void> execute(Void args)
+					{
+						return new Future<Void>(exception);
+					}
+				};
+				task.ready(send);
 			}
 		});
-		
-		return ret;
 	}
 
 	/**

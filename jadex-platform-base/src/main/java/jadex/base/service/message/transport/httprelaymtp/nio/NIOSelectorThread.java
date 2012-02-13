@@ -1,13 +1,11 @@
 package jadex.base.service.message.transport.httprelaymtp.nio;
 
-import jadex.base.service.message.ManagerSendTask;
+import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.Tuple2;
-import jadex.commons.concurrent.Token;
-import jadex.commons.future.Future;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -280,10 +278,10 @@ public class NIOSelectorThread
 	/**
 	 *  Add a send task.
 	 */
-	public void addSendTask(ManagerSendTask task, Token token, String address, Future<Void> fut)
+	public void addSendTask(ISendTask task, String address)
 	{
 		Tuple2<Tuple2<String, Integer>, String> tup = HttpRelayTransport.parseAddress(address); 
-		SendRequest	req	= new SendRequest(task, token, fut, tup.getFirstEntity(), tup.getSecondEntity(), logger);
+		SendRequest	req	= new SendRequest(task, tup.getFirstEntity(), tup.getSecondEntity(), logger);
 		
 		synchronized(queue)
 		{

@@ -5,17 +5,26 @@ import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.IResultCommand;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  The manager send task is responsible for coordinating
+ *  the sending of a message to a single destination using
+ *  multiple available transports.
  */
-public class ManagerSendTask
+public class ManagerSendTask	implements ISendTask
 {
+	//-------- attributes --------
+	
 	/** The message. */
 	protected Map<String, Object> message;
 	
@@ -39,6 +48,21 @@ public class ManagerSendTask
 
 	/** The transports to be tried. */
 	protected List<ITransport> transports;
+	
+	/** The future for the sending result. */
+	protected Future<Void>	future;
+	
+	/** Is some transport interested in the task? */
+	protected int	interest;
+	
+	/** True, if the token is acquired. */
+	protected boolean	acquired;
+	
+	/** The list of waiting transports. */
+	protected List<IResultCommand<IFuture<Void>, Void>>	waiting;
+	
+
+	//-------- constructors --------- 
 
 	/**
 	 *  Create a new manager send task.
@@ -63,8 +87,10 @@ public class ManagerSendTask
 		this.transports = new ArrayList<ITransport>(Arrays.asList(transports));
 		this.codecs = codecs;
 		this.codecids = codecids;
+		this.future	= new Future<Void>();
 	}
 	
+	//-------- methods used by message service --------
 	
 	/**
 	 *  Get the message.
@@ -103,21 +129,112 @@ public class ManagerSendTask
 	}
 	
 	/**
-	 *  Get the codecs.
-	 *  @return the codecs.
+	 *  Get the future.
 	 */
-	public ICodec[] getCodecs()
+	public Future<Void>	getFuture()
 	{
-		return codecs;
+		return future;
 	}
 	
 	/**
-	 *  Get the codecids.
-	 *  @return the codecids.
+	 *  Transport availability for sending the message.
+	 *  Transports announce their interest, such that the message service knows when no transport is available for a send task.
 	 */
-	public byte[] getCodecIds()
+	public boolean	getInterest()
 	{
-		return codecids;
+		return this.interest>0;
+	}
+	
+	/**
+	 *  Announce availability of a transport for sending the message.
+	 *  Transports should announce their interest, such that the message service knows when no transport is available for a send task.
+	 */
+	public void	addInterest()
+	{
+		this.interest++;
+	}
+
+
+	//--------- methods used by transports ---------
+	
+	/**
+	 *  Called by the transport when is is ready to send the message,
+	 *  i.e. when a connection is established.
+	 *  @param send	The code to be executed to send the message.
+	 */
+	public void ready(IResultCommand<IFuture<Void>, Void> send)
+	{
+		boolean	dosend;
+		synchronized(this)
+		{
+			dosend	= !acquired && !future.isDone();
+			acquired	= true;
+			if(!dosend && !future.isDone())
+			{
+				if(waiting==null)
+				{
+					waiting	= new LinkedList<IResultCommand<IFuture<Void>, Void>>();
+				}
+				waiting.add(send);
+			}
+		}
+		if(dosend)
+		{
+			try
+			{
+				send.execute(null).addResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						done(null);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						done(exception);
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				done(e);
+			}
+		}
+	}
+	
+	/**
+	 *  The message sending is done. 
+	 *  @param e	The exception (if any). Null denotes successful sending.
+	 */
+	protected void done(Exception e)
+	{
+		if(e!=null)
+		{
+			IResultCommand<IFuture<Void>, Void>	next	= null;
+			boolean	nointerest;
+			synchronized(this)
+			{
+				interest--;
+				nointerest	= interest==0;
+				acquired	= false;
+				if(waiting!=null && !waiting.isEmpty())
+				{
+					next	= waiting.remove(0);
+				}
+			}
+			if(next!=null)
+			{
+				ready(next);
+			}
+			else if(nointerest)
+			{
+				future.setException(e);
+			}
+		}
+		else
+		{
+			future.setResult(null);
+		}
 	}
 
 	/**
