@@ -4,9 +4,19 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView 
-	android:id="@+id/testTextView" 
+
+<TextView  
     android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    />	
+    android:layout_height="wrap_content"
+    android:textSize="24sp"
+    android:text="Answer" 
+    />
+
+<TextView 
+	android:id="@+id/answerTextView" 
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content"
+    android:textSize="18sp" 
+    />
+
 </LinearLayout>
