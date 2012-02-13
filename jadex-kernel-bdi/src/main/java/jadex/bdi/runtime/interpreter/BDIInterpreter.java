@@ -1307,44 +1307,37 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		if(getComponentAdapter().isExternalThread()
 			|| getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
 		{
-			try
+			adapter.invokeLater(new Runnable() 
 			{
-				adapter.invokeLater(new Runnable() 
+				public void run() 
 				{
-					public void run() 
+					// Todo: fix termination such that external entries are properly executed!?
+					if(state.containsObject(ragent))
 					{
-						// Todo: fix termination such that external entries are properly executed!?
-						if(state.containsObject(ragent))
+						if(getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
 						{
-							if(getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
+							// Hack!!! During init phase execute directly as rule engine isn't running.
+							try
 							{
-								// Hack!!! During init phase execute directly as rule engine isn't running.
-								try
-								{
-									((IComponentStep)step).execute(getInternalAccess())
-										.addResultListener(new DelegationResultListener(ret));
-								}
-								catch(Exception e)
-								{
-									ret.setException(e);
-								}
+								((IComponentStep)step).execute(getInternalAccess())
+									.addResultListener(new DelegationResultListener(ret));
 							}
-							else
+							catch(Exception e)
 							{
-								getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
+								ret.setException(e);
 							}
 						}
 						else
 						{
-							ret.setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));
+							getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
 						}
 					}
-				});
-			}
-			catch(Exception e)
-			{
-				ret.setException(e);
-			}
+					else
+					{
+						ret.setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));
+					}
+				}
+			});
 		}
 		else
 		{

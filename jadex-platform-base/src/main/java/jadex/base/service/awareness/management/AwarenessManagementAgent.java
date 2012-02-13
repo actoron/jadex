@@ -792,7 +792,14 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		{
 			public void run()
 			{
-				scheduleStep(step);
+				try
+				{
+					scheduleStep(step);
+				}
+				catch(ComponentTerminatedException e)
+				{
+					// ignore
+				}
 			}
 		}, delay);
 	}

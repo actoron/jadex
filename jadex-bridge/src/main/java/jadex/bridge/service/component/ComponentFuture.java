@@ -44,35 +44,47 @@ public class ComponentFuture<E> extends Future<E>
 		// Hack!!! Notify multiple listeners at once?
 		if(adapter.isExternalThread())
 		{
-			ea.scheduleStep(new IComponentStep<Void>()
+			try
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
+				ea.scheduleStep(new IComponentStep<Void>()
 				{
-					ComponentFuture.super.notifyListener(listener);
-					return IFuture.DONE;
-				}
-			}).addResultListener(new IResultListener<Void>()
-			{
-				public void resultAvailable(Void result)
-				{
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-					// Only component terminated exception can occur
-//					assert exception instanceof ComponentTerminatedException: exception;
-					
-					if(exception instanceof ComponentTerminatedException)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						// Hack!!! Schedule notification on wrong thread. 
-						ComponentFuture.this.exception	= exception;
-						ComponentFuture.super.notifyListener(listener);				
+						ComponentFuture.super.notifyListener(listener);
+						return IFuture.DONE;
 					}
+				});
+			}
+			catch(ComponentTerminatedException e)
+			{
+				// Hack!!! Schedule notification on wrong thread. 
+				ComponentFuture.this.exception	= e;
+				ComponentFuture.super.notifyListener(listener);				
+			}
+				
+//			.addResultListener(new IResultListener<Void>()
+//			{
+//				public void resultAvailable(Void result)
+//				{
+//				}
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					// Only component terminated exception can occur
+////					assert exception instanceof ComponentTerminatedException: exception;
+//					
+//					if(exception instanceof ComponentTerminatedException)
+//					{
+//						// Hack!!! Schedule notification on wrong thread. 
+//						ComponentFuture.this.exception	= exception;
+//						ComponentFuture.super.notifyListener(listener);				
+//					}
 //					else
 //					{
-//						System.out.println("Unexpected exception during schedule step: "+exception);
+//						throw 
+////						System.out.println("Unexpected exception during schedule step: "+exception);
 //					}
-				}
-			});
+//				}
+//			});
 		}
 		else
 		{

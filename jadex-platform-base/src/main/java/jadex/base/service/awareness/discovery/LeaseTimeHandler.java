@@ -1,5 +1,6 @@
 package jadex.base.service.awareness.discovery;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -183,7 +184,14 @@ public class LeaseTimeHandler
 		{
 			public void run()
 			{
-				agent.getMicroAgent().scheduleStep(step);
+				try
+				{
+					agent.getMicroAgent().scheduleStep(step);
+				}
+				catch(ComponentTerminatedException e)
+				{
+					// ignore
+				}
 			}
 		}, delay);
 	}

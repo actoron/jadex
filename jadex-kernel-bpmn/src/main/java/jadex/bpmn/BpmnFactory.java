@@ -19,26 +19,21 @@ import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
 import jadex.commons.Tuple2;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
-/* $if !android $ */
 import jadex.commons.gui.SGUI;
-/* $endif $ */
 
 import java.util.HashMap;
 import java.util.Map;
 
-/* $if !android $ */
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
-/* $endif $ */
 
 /**
- *  Foctory for loading bpmn processes.
+ *  Factory for loading bpmn processes.
  */
 public class BpmnFactory extends BasicService implements IComponentFactory
 {
@@ -125,7 +120,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	{
 		final Future<Void> ret = new Future<Void>();
 		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DelegationResultListener(ret)
+			.addResultListener(new ExceptionDelegationResultListener(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
@@ -153,15 +148,16 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 	 */
 	public synchronized IFuture<Void>	shutdownService()
 	{
-		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		final Future<Void>	ret	= new Future<Void>();
+		libservice.removeLibraryServiceListener(libservicelistener)
+			.addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
-				libservice = (ILibraryService)result;
-				libservice.removeLibraryServiceListener(libservicelistener);
+				BpmnFactory.super.shutdownService().addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
-		return super.shutdownService();
+		return ret;
 	}
 	
 	/**

@@ -1220,39 +1220,32 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	{
 		final Future<T> ret = new Future<T>();
 		
-		try
+		getComponentAdapter().invokeLater(new Runnable()
 		{
-			getComponentAdapter().invokeLater(new Runnable()
+			public void run()
 			{
-				public void run()
-				{
-					// To schedule a step an implicit activity is created.
-					// In order to put the step parameter value it is necessary
-					// to have an edge with a mapping. Otherwise the parameter
-					// value with be deleted in process thread updateParametersBeforeStep().
-					
-					MActivity act = new MActivity();
-					act.setName("External Step Activity: "+(cnt++));
-					act.setClazz(ExecuteStepTask.class);
-					act.addParameter(new MParameter(MParameter.DIRECTION_IN, Object[].class, "step", null));
-					act.setActivityType(MBpmnModel.TASK);
-					MSequenceEdge edge = new MSequenceEdge();
-					edge.setTarget(act);
-					edge.addParameterMapping("step", SJavaParser.parseExpression("step", null, null), null);
-					act.addIncomingSequenceEdge(edge);
-					MPool pl = pool!=null? model.getPool(pool): (MPool)model.getPools().get(0);
-					act.setPool(pl);
-					ProcessThread thread = new ProcessThread(""+idcnt++, act, context, BpmnInterpreter.this);
-					thread.setLastEdge(edge);
-					thread.setParameterValue("step", new Object[]{step, ret});
-					context.addExternalThread(thread);
-				}
-			});
-		}
-		catch(Exception e)
-		{
-			ret.setException(e);
-		}
+				// To schedule a step an implicit activity is created.
+				// In order to put the step parameter value it is necessary
+				// to have an edge with a mapping. Otherwise the parameter
+				// value with be deleted in process thread updateParametersBeforeStep().
+				
+				MActivity act = new MActivity();
+				act.setName("External Step Activity: "+(cnt++));
+				act.setClazz(ExecuteStepTask.class);
+				act.addParameter(new MParameter(MParameter.DIRECTION_IN, Object[].class, "step", null));
+				act.setActivityType(MBpmnModel.TASK);
+				MSequenceEdge edge = new MSequenceEdge();
+				edge.setTarget(act);
+				edge.addParameterMapping("step", SJavaParser.parseExpression("step", null, null), null);
+				act.addIncomingSequenceEdge(edge);
+				MPool pl = pool!=null? model.getPool(pool): (MPool)model.getPools().get(0);
+				act.setPool(pl);
+				ProcessThread thread = new ProcessThread(""+idcnt++, act, context, BpmnInterpreter.this);
+				thread.setLastEdge(edge);
+				thread.setParameterValue("step", new Object[]{step, ret});
+				context.addExternalThread(thread);
+			}
+		});
 		return ret;
 	}
 	

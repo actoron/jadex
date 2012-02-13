@@ -1,6 +1,7 @@
 package jadex.base.service.awareness.discovery;
 
 import jadex.base.service.message.transport.codecs.GZIPCodec;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -411,7 +412,14 @@ public abstract class DiscoveryAgent
 		{
 			public void run()
 			{
-				agent.scheduleStep(step);
+				try
+				{
+					agent.scheduleStep(step);
+				}
+				catch(ComponentTerminatedException e)
+				{
+					// ignore
+				}
 			}
 		}, delay);
 	}

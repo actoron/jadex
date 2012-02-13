@@ -14,7 +14,6 @@ import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;

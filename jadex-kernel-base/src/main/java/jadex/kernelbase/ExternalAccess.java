@@ -276,20 +276,13 @@ public class ExternalAccess implements IExternalAccess
 		
 		if(adapter.isExternalThread())
 		{
-			try
+			adapter.invokeLater(new Runnable() 
 			{
-				adapter.invokeLater(new Runnable() 
+				public void run() 
 				{
-					public void run() 
-					{
-						interpreter.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
-					}
-				});
-			}
-			catch(Exception e)
-			{
-				ret.setException(e);
-			}
+					interpreter.scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
+				}
+			});
 		}
 		else
 		{

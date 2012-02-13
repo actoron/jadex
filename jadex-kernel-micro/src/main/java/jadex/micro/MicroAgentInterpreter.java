@@ -616,31 +616,24 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 	{
 		final Future<T> ret = new Future<T>();
 //		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
-		try
+		if(adapter.isExternalThread())
 		{
-			if(adapter.isExternalThread())
-			{
-				adapter.invokeLater(new Runnable()
-				{			
-					public void run()
-					{
-						addStep(new Object[]{step, ret});
-					}
-					
-					public String toString()
-					{
-						return "invokeLater("+step+")";
-					}
-				});
-			}
-			else
-			{
-				addStep(new Object[]{step, ret});
-			}
+			adapter.invokeLater(new Runnable()
+			{			
+				public void run()
+				{
+					addStep(new Object[]{step, ret});
+				}
+				
+				public String toString()
+				{
+					return "invokeLater("+step+")";
+				}
+			});
 		}
-		catch(Exception e)
+		else
 		{
-			ret.setException(e);
+			addStep(new Object[]{step, ret});
 		}
 		return ret;
 	}

@@ -8,6 +8,7 @@ import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.base.service.message.transport.codecs.JadexXMLCodec;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.annotation.Service;
@@ -177,7 +178,10 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					agent.getLogger().info("Sending awareness info to server...failed: "+exception);
+					if(!(exception instanceof ComponentTerminatedException))
+					{
+						agent.getLogger().info("Sending awareness info to server...failed: "+exception);
+					}
 				}
 			});
 			

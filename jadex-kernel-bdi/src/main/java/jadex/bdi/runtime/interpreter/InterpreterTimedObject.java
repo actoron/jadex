@@ -1,6 +1,7 @@
 package jadex.bdi.runtime.interpreter;
 
 import jadex.bridge.CheckedAction;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.service.types.clock.ITimedObject;
 
 /**
@@ -38,7 +39,14 @@ public class InterpreterTimedObject implements ITimedObject
 	public void timeEventOccurred(long currenttime)
 	{
 //		System.out.println("timeEventOccurred: "+this+", "+System.currentTimeMillis());
-		interpreter.scheduleStep(action, null);
+		try
+		{
+			interpreter.scheduleStep(action, null);
+		}
+		catch(ComponentTerminatedException e)
+		{
+			// ignore
+		}
 	}
 	
 	/**
