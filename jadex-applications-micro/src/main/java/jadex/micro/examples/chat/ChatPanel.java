@@ -393,7 +393,7 @@ public class ChatPanel extends JPanel
 	/**
 	 *  Add a user or change its state.
 	 */
-	public void	setUserState(final IComponentIdentifier user, final String state, final int request)
+	public void	setUserState(final IComponentIdentifier user, final String newstate, final int request)
 	{
 		// Called on component thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -401,13 +401,27 @@ public class ChatPanel extends JPanel
 			public void run()
 			{
 				deadusers.remove(user);
-				if(request==reqcnt || request==-1)
+				if(request==reqcnt || request==-1)	// -1 for remote status update.
 				{
-					String	s2	= state;
-					if(STATE_RECEIVING.equals(state) &&	STATE_TYPING.equals(users.get(user)))
+					// Manage dependencies between local (receiving/idle) and remote (typing/idle) states.
+					String	s2	= newstate;
+					if(STATE_TYPING.equals(users.get(user)) && STATE_RECEIVING.equals(newstate)
+						|| STATE_RECEIVING.equals(users.get(user)) && STATE_TYPING.equals(newstate))
+					{
 						s2	= STATE_RECEIVING_TYPING;
-					else if(request!=-1 && STATE_IDLE.equals(state) &&	STATE_RECEIVING_TYPING.equals(users.get(user)))
-						s2	= STATE_TYPING;
+					}
+					else if(STATE_RECEIVING_TYPING.equals(users.get(user)) && STATE_IDLE.equals(newstate))
+					{
+						s2	= request==-1 ? STATE_RECEIVING : STATE_TYPING;
+					}
+					else if(STATE_RECEIVING.equals(users.get(user)) && STATE_IDLE.equals(newstate))
+					{
+						s2	= request==-1 ? STATE_RECEIVING : STATE_IDLE;
+					}
+					else if(STATE_TYPING.equals(users.get(user)) && STATE_IDLE.equals(newstate))
+					{
+						s2	= request==-1 ? STATE_IDLE : STATE_TYPING;
+					}
 					users.put(user, s2);
 					((DefaultTableModel)table.getModel()).fireTableDataChanged();
 					table.getParent().invalidate();
