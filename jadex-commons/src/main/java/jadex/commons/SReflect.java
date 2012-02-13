@@ -5,6 +5,8 @@ import jadex.commons.collection.SCollection;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -108,6 +110,34 @@ public class SReflect
 
 		Class	result	= (Class)wrappedtypes.get(clazz);
 		return result==null ? clazz : result;
+	}
+	
+	/**
+	 *  Unwrap a generic type.
+	 *  @param type The generic type.
+	 *  @return The unwrapped class.
+	 */
+	public static Class<?> unwrapGenericType(Type type)
+	{
+		Class<?> ret;
+		if(type instanceof ParameterizedType)
+		{
+			ParameterizedType pt = (ParameterizedType)type;
+			Type[] pts = pt.getActualTypeArguments();
+			if(pts.length>1)
+				throw new RuntimeException("Cannot unwrap futurized method due to more than one generic type: "+SUtil.arrayToString(pt.getActualTypeArguments()));
+			ret = (Class<?>)pts[0];
+		}
+		else if(type instanceof Class)
+		{
+			ret = (Class<?>)type;
+		}
+		else
+		{
+			throw new RuntimeException("Cannot unwrap: "+type);
+		}
+		
+		return ret;
 	}
 	
 	/**

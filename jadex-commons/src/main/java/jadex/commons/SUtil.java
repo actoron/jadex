@@ -1482,9 +1482,9 @@ public class SUtil
 	 * @param values The values.
 	 * @return The map.
 	 */
-	public static List<Object> createArrayList(Object[] values)
+	public static <T> List<T> createArrayList(T[] values)
 	{
-		List<Object> ret = new ArrayList<Object>();
+		List<T> ret = new ArrayList<T>();
 		for(int i = 0; i < values.length; i++)
 		{
 			ret.add(values[i]);

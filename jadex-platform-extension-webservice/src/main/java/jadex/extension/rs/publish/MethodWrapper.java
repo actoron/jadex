@@ -1,0 +1,97 @@
+package jadex.extension.rs.publish;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
+/**
+ * 
+ */
+public class MethodWrapper
+{
+	protected String name;
+	
+	protected Method method;
+
+	/**
+	 *  Create a new method wrapper.
+	 */
+	public MethodWrapper(Method method)
+	{
+		this(method.getName(), method);
+	}
+	
+	/**
+	 *  Create a new method wrapper.
+	 */
+	public MethodWrapper(String name, Method method)
+	{
+		this.name = name;
+		this.method = method;
+	}
+
+	/**
+	 *  Get the method.
+	 *  @return the method.
+	 */
+	public Method getMethod()
+	{
+		return method;
+	}
+
+	/**
+	 *  Set the method.
+	 *  @param method The method to set.
+	 */
+	public void setMethod(Method method)
+	{
+		this.method = method;
+	}
+
+	/**
+	 *  Get the name.
+	 *  @return the name.
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 *  Set the name.
+	 *  @param name The name to set.
+	 */
+	public void setName(String name)
+	{
+		this.name = name;
+	}
+
+	/**
+	 *  Get the hash code.
+	 */
+	public int hashCode()
+	{
+		return name.hashCode()*31 + Arrays.hashCode(method.getParameterTypes());
+	}
+
+	/**
+	 *  Equal when name and parameters are equal.
+	 */
+	public boolean equals(Object obj)
+	{
+		boolean ret = false;
+		if(obj instanceof MethodWrapper)
+		{
+//			ret = ((MethodWrapper)obj).getName().equals(getName());
+			Method m2 = ((MethodWrapper)obj).getMethod();
+			ret = method.getName().equals(m2);
+			if(method.getName().equals(m2))
+			{
+				Class[] paramtypes = method.getParameterTypes();
+				Class[] pt2 = m2.getParameterTypes();
+				ret = Arrays.equals(paramtypes, pt2);
+			}
+		}
+		
+		return ret;
+	}
+}

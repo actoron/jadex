@@ -5,6 +5,7 @@
 		var names = [];
 		var vals = [];
 		var types = [];
+		var type;
 		
 		for(i=0; i<form.elements.length; i++)
 		{
@@ -14,29 +15,45 @@
 			{
 				names[i] = form.elements[i].name;
 				vals[i] = form.elements[i].value;
-				types[i] = form.elements[i].accept;
-				if(types[i]==null || types[i]=="")
+//				types[i] = form.elements[i].accept;
+				if(form.elements[i].type=="file")
 				{
-					if(form.elements[i].type=="file")
-					{
-						types[i] = "application/octet-stream";
-					}
-					else
-					{
-						types[i] = "text/plain";
-					}
+					types[i] = "application/octet-stream";
 				}
-				if(vals[i]=="")
+				else
 				{
-					if(types[i]=="application/json")
-					{
-						vals[i] = "null";
-					}
-					else if(types[i]=="application/xml")
-					{
-						vals[i] = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-							+"<null xmlns=\"typeinfo:\"></null>";
-					}
+					types[i] = null;
+				}
+				
+			}
+			else if(form.elements[i].tagName.toUpperCase()=="SELECT")
+			{
+				type = form.elements[i].value;
+			}
+		}
+		
+		if(type==null)
+		{
+			type = "text/plain";
+		}
+		
+		for(i=0; i<types.length; i++)
+		{
+			if(types[i]==null)
+			{
+				types[i] = type;
+			}
+			
+			if(vals[i]=="")
+			{
+				if(types[i]=="application/json")
+				{
+					vals[i] = "null";
+				}
+				else if(types[i]=="application/xml")
+				{
+					vals[i] = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+						+"<null xmlns=\"typeinfo:\"></null>";
 				}
 			}
 		}
@@ -70,16 +87,40 @@
 	
 	function send(url, method, names, vals, types) 
 	{
-		this.xmlHttpReq = new XMLHttpRequest();
+//		this.xmlHttpReq = new XMLHttpRequest();
 		
-		var http = xmlHttpReq;
-//		var http = new XMLHttpRequest();
+//		var http = xmlHttpReq;
+		var http = new XMLHttpRequest();
 		var multipart = "";
 	
 		http.open(method, url, true);
 	
 		var boundary = Math.random().toString().substr(2);
-			
+
+		if(types.length>0)
+		{
+			var accept = "";
+			var had = [];
+			var num = 0;
+			for(i=0; i<types.length; i++)
+			{
+				if(!contains(had, types[i]) && "multipart/form-data"!=types[i])
+				{
+					if(accept!="")
+						accept += ",";
+					accept += types[i];
+					had[num++] = types[i];
+				}
+			}
+			if(num!=0)
+			{
+				accept += ";q=0.9,*/*;q=0.8";
+				http.setRequestHeader("Accept", accept);
+			}
+			// else use default browser accept header
+//			http.setRequestHeader("Accept", "text/html,application/json;q=0.9,*/*;q=0.8");
+		}
+		
 		http.setRequestHeader("content-type",
 			"multipart/form-data; charset=utf-8; boundary=" + boundary);
 			
@@ -94,7 +135,7 @@
 		}
 		multipart += "--" + boundary + "--\r\n";
 		
-//		alert(multipart);
+		alert(multipart);
 		
 		http.onreadystatechange = function() 
 		{
@@ -103,15 +144,29 @@
 //				document.getElementById("content").innerHTML = http.responseText;
 //				document.title = response.pageTitle;
 //				window.history.pushState({"html":response.html,"pageTitle":response.pageTitle},"", urlPath);
-				window.history.pushState("some string", "Test", url);
-//				document.open();
+//				window.history.pushState("some string", "Test", url);
 //				window.location.replace(url);
+				document.open();
 				document.write(http.responseText);
-//				document.close();
+				document.close();
+//				window.history.pushState("some string", "Test", url);
 			}
 		}
 	
 		http.send(multipart);
 	}
+	
+	function contains(a, obj) 
+	{
+	    for(var i = 0; i < a.length; i++) 
+	    {
+	        if(a[i] === obj) 
+	        {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+
 	
 </script>

@@ -5,7 +5,6 @@ import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.PublishInfo;
-import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.publish.IPublishService;
@@ -20,35 +19,26 @@ import jadex.extension.SJavassist;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 
-import javassist.ClassClassPath;
-import javassist.ClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.AttributeInfo;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
-import javassist.bytecode.MethodInfo;
-import javassist.bytecode.ParameterAnnotationsAttribute;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.ArrayMemberValue;
-import javassist.bytecode.annotation.BooleanMemberValue;
-import javassist.bytecode.annotation.ClassMemberValue;
 import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
@@ -97,11 +87,12 @@ public class DefaultRestServicePublishService implements IPublishService
 	public static String GENERATE_INFO = "generateinfo";
 	
 	/** The default media formats. */
-	public static String[] DEFAULT_FORMATS = new String[]{"xml", "json"};
+//	public static String[] DEFAULT_FORMATS = new String[]{"xml", "json"};
+	public static MediaType[] DEFAULT_FORMATS = new MediaType[]{MediaType.APPLICATION_XML_TYPE, MediaType.APPLICATION_JSON_TYPE};
 
-	/** The format -> media type mapping. */
-	public static Map<String, String> formatmap = SUtil.createHashMap(DEFAULT_FORMATS, 
-		new String[]{MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON});
+//	/** The format -> media type mapping. */
+//	public static Map<String, String> formatmap = SUtil.createHashMap(DEFAULT_FORMATS, 
+//		new String[]{MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON});
 	
 	/** The service constant. */
 	public static String JADEXSERVICE = "jadexservice"; 
@@ -117,6 +108,27 @@ public class DefaultRestServicePublishService implements IPublishService
 	
 	/** The servers per uri. */
 	protected Map<URI, HttpServer> uriservers;
+	
+	/** The generator. */
+	protected IRestMethodGenerator generator;
+	
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new publish service.
+	 */
+	public DefaultRestServicePublishService()
+	{
+		this(new DefaultRestMethodGenerator());
+	}
+	
+	/**
+	 *  Create a new publish service.
+	 */
+	public DefaultRestServicePublishService(IRestMethodGenerator generator)
+	{
+		this.generator = generator;
+	}
 	
 	//-------- methods --------
 	
@@ -162,7 +174,12 @@ public class DefaultRestServicePublishService implements IPublishService
 			// If no service type was specified it has to be generated.
 			Class<?> iface = service.getServiceIdentifier().getServiceType().getType(cl);
 			Class<?> baseclazz = pi.getServiceType()!=null? pi.getServiceType().getType(cl): null;
-			Class<?> rsimpl = createProxyClass(service, cl, uri.getPath(), baseclazz, mapprops);
+			
+			List<RestMethodInfo> rmis = generator.generateRestMethodInfos(service, cl, baseclazz, mapprops);
+			System.out.println("Produced methods: ");
+			for(int i=0; i<rmis.size(); i++)
+				System.out.println(rmis.get(i));
+			Class<?> rsimpl = createProxyClass(service, cl, baseclazz, mapprops, rmis);
 			
 			Map<String, Object> props = new HashMap<String, Object>();
 			String jerseypack = "com.sun.jersey.config.property.packages";
@@ -252,6 +269,7 @@ public class DefaultRestServicePublishService implements IPublishService
 			ret.setException(new RuntimeException("Published service could not be stopped: "+sid));
 		return ret;
 	}
+
 	
 	/**
 	 *  Create a service proxy class.
@@ -261,19 +279,18 @@ public class DefaultRestServicePublishService implements IPublishService
 	 *  @return The proxy object.
 	 */
 	protected Class<?> createProxyClass(IService service, ClassLoader classloader, 
-		String apppath, Class<?> baseclass, Map<String, Object> mapprops) throws Exception
+		Class<?> baseclass, Map<String, Object> mapprops, List<RestMethodInfo> geninfos) throws Exception
 	{
 		Class<?> ret = null;
 
 		boolean gen = mapprops.get(GENERATE)!=null? ((Boolean)mapprops.get(GENERATE)).booleanValue(): true;
 		boolean emergencygen = baseclass!=null && !baseclass.isAnnotationPresent(Path.class);
-		boolean geninfo = mapprops.get(GENERATE_INFO)!=null? ((Boolean)mapprops.get(GENERATE_INFO)).booleanValue(): true;
 		
 		// Check if generate is off but the baseclass has no Path annotation
 		// Then a subclass with annotation will be provided
 		if(gen || emergencygen)
 		{
-			String[] formats = mapprops.get(FORMATS)==null? DEFAULT_FORMATS: (String[])mapprops.get(FORMATS);
+//			String[] formats = mapprops.get(FORMATS)==null? DEFAULT_FORMATS: (String[])mapprops.get(FORMATS);
 			Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
 			
 			// The name of the class has to ensure that it represents the different class properties:
@@ -287,8 +304,9 @@ public class DefaultRestServicePublishService implements IPublishService
 				builder.append(nameclazz.getPackage().getName());
 			builder.append(".Proxy");
 			builder.append(nameclazz.getSimpleName());
-			if(mapprops!=null && mapprops.size()>0)
-				builder.append(mapprops.hashCode());
+//			if(mapprops!=null && mapprops.size()>0)
+//				builder.append(mapprops.hashCode());
+			builder.append(geninfos.hashCode());
 			String name = builder.toString();
 	
 			try
@@ -328,135 +346,103 @@ public class DefaultRestServicePublishService implements IPublishService
 					ui.getFieldInfo().addAttribute(attr);
 					proxyclazz.addField(ui);
 					
-					// Add methods from the service interface
-					Method[] ms = iface.getMethods();
-					CtMethod invoke = SJavassist.getCtClass(getClass(), pool).getDeclaredMethod("invoke");
-					Set<String> paths = new HashSet<String>();
-			
-					for(int i=0; i<ms.length; i++)
+					// Add methods 
+					for(Iterator<RestMethodInfo> it=geninfos.iterator(); it.hasNext(); )
 					{
-						Type rt = ms[i].getGenericReturnType();
+						RestMethodInfo rmi = it.next();
 						
-						if(rt instanceof ParameterizedType)
-						{
-							ParameterizedType pt = (ParameterizedType)rt;
-							Type[] pts = pt.getActualTypeArguments();
-							if(pts.length>1)
-								throw new RuntimeException("Cannot unwrap futurized method due to more than one generic type: "+SUtil.arrayToString(pt.getActualTypeArguments()));
-							rt = (Class<?>)pts[0];
-						}
-		//				System.out.println("rt: "+pt.getRawType()+" "+SUtil.arrayToString(pt.getActualTypeArguments()));
-						
-						String methodname = ms[i].getName();
+						CtMethod invoke = SJavassist.getCtClass(rmi.getDelegateClazz(), pool)
+							.getDeclaredMethod(rmi.getDelegateMethodName());
 						
 						// Do not generate method if user has implemented it by herself
+						Class<?> rt = SReflect.unwrapGenericType(rmi.getReturnType());
+						CtClass rettype = SJavassist.getCtClass(rt, pool);
+						CtClass[] paramtypes = SJavassist.getCtClasses(rmi.getParameterTypes(), pool);
+						CtClass[] exceptions = SJavassist.getCtClasses(rmi.getExceptionTypes(), pool);
 						
-						CtClass rettype = SJavassist.getCtClass((Class)rt, pool);
-						CtClass[] paramtypes = SJavassist.getCtClasses(ms[i].getParameterTypes(), pool);
-						CtClass[] exceptions = SJavassist.getCtClasses(ms[i].getExceptionTypes(), pool);
-						
-						// todo: what about pure string variants?
-						// todo: what about mixed variants (in json out xml or plain)
-						for(int j=0; j<formats.length; j++)
-						{
-							String mtname = formats.length>1? methodname+formats[j].toUpperCase(): methodname;
-							
-							if(baseclass==null || SReflect.getMethod(baseclass, mtname, ms[i].getParameterTypes())==null)
-							{
-								String path = mtname;
-								for(int k=1; paths.contains(path); k++)
-								{
-									path = mtname+"_"+k;
-								}
-								paths.add(path);
-									
-								CtMethod m = CtNewMethod.wrapped(rettype, mtname, 
-									paramtypes, exceptions, invoke, null, proxyclazz);
+						CtMethod m = CtNewMethod.wrapped(rettype, rmi.getName(),
+							paramtypes, exceptions, invoke, null, proxyclazz);
 								
-								Class resttype = getHttpType(ms[i], (Class)rt, ms[i].getParameterTypes());
-								
-								// path.
-								attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-								annot = new Annotation(constpool, SJavassist.getCtClass(resttype, pool));
-								attr.addAnnotation(annot);
-								annot = new Annotation(constpool, SJavassist.getCtClass(Path.class, pool));
-								annot.addMemberValue("value", new StringMemberValue(path, constpool));
-								attr.addAnnotation(annot);
-								
-								// consumes.
-								List<MemberValue> cons = new ArrayList<MemberValue>();
-								if(!GET.class.equals(resttype))
-									cons.add(new StringMemberValue(formatmap.get(formats[j]), constpool));
-								if(POST.class.equals(resttype))
-									cons.add(new StringMemberValue(MediaType.MULTIPART_FORM_DATA, constpool));
-								if(GET.class.equals(resttype))
-									cons.add(new StringMemberValue(MediaType.TEXT_PLAIN, constpool));
-								annot = new Annotation(constpool, SJavassist.getCtClass(Consumes.class, pool));
-								ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
-								vals.setValue(cons.toArray(new MemberValue[0]));
-								annot.addMemberValue("value", vals);
-								attr.addAnnotation(annot);
-								
-								// produces.
-								vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
-								vals.setValue(new MemberValue[]{new StringMemberValue(formatmap.get(formats[j]), constpool)});
-								annot = new Annotation(constpool, SJavassist.getCtClass(Produces.class, pool));
-								annot.addMemberValue("value", vals);
-								attr.addAnnotation(annot);
-
-								m.getMethodInfo().addAttribute(attr);
-								proxyclazz.addMethod(m);
-								
-								// add @QueryParam if get
-								if(GET.class.equals(resttype))
-								{
-									int pcnt = ms[i].getParameterTypes().length;
-									if(pcnt>0)
-									{
-										Annotation[][] annos = new Annotation[pcnt][];
-										ConstPool cp = m.getMethodInfo().getConstPool();
-										for(int k=0; k<annos.length; k++)
-										{
-											Annotation anno = new Annotation(cp, SJavassist.getCtClass(QueryParam.class, pool));
-											anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
-											annos[k] = new Annotation[]{anno};
-										}
-										SJavassist.addMethodParameterAnnotation(m, annos, pool);
-									}
-								}
-								// add @FormDataParam if post
-								else if(POST.class.equals(resttype))
-								{
-									int pcnt = ms[i].getParameterTypes().length;
-									if(pcnt>0)
-									{
-										Annotation[][] annos = new Annotation[pcnt][];
-										ConstPool cp = m.getMethodInfo().getConstPool();
-										for(int k=0; k<annos.length; k++)
-										{
-											Annotation anno = new Annotation(cp, SJavassist.getCtClass(FormDataParam.class, pool));
-											anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
-											annos[k] = new Annotation[]{anno};
-										}
-										SJavassist.addMethodParameterAnnotation(m, annos, pool);
-									}
-								}
-			//					System.out.println("m: "+m.getName());
-							}
-						}
-					}
-
-					if(geninfo)
-					{
-						// Add the service info method
-						CtMethod getinfo = SJavassist.getCtClass(getClass(), pool).getDeclaredMethod("getServiceInfo");
-						CtMethod m = CtNewMethod.wrapped(SJavassist.getCtClass(String.class, pool), "getServiceInfo", 
-							new CtClass[0], new CtClass[0], getinfo, null, proxyclazz);
+						// path.
 						attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-						annot = new Annotation(constpool, SJavassist.getCtClass(GET.class, pool));
+						annot = new Annotation(constpool, SJavassist.getCtClass(rmi.getRestType(), pool));
 						attr.addAnnotation(annot);
+						annot = new Annotation(constpool, SJavassist.getCtClass(Path.class, pool));
+						annot.addMemberValue("value", new StringMemberValue(rmi.getPath(), constpool));
+						attr.addAnnotation(annot);
+								
+						// consumes.
+						List<MediaType> consumed = rmi.getConsumed();
+						if(!consumed.isEmpty())
+						{
+							List<MemberValue> cons = new ArrayList<MemberValue>();
+							for(Iterator<MediaType> it2=consumed.iterator(); it2.hasNext(); )
+							{
+								MediaType mt = it2.next();
+								cons.add(new StringMemberValue(mt.toString(), constpool));
+							}
+							annot = new Annotation(constpool, SJavassist.getCtClass(Consumes.class, pool));
+							ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
+							vals.setValue(cons.toArray(new MemberValue[0]));
+							annot.addMemberValue("value", vals);
+							attr.addAnnotation(annot);
+						}
+						
+						// produces.
+						List<MediaType> produced = rmi.getProduced();
+						if(!produced.isEmpty())
+						{
+							List<MemberValue> prods = new ArrayList<MemberValue>();
+							for(Iterator<MediaType> it2=produced.iterator(); it2.hasNext(); )
+							{
+								MediaType mt = it2.next();
+								prods.add(new StringMemberValue(mt.toString(), constpool));
+							}
+							ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
+							vals.setValue(prods.toArray(new MemberValue[0]));
+							annot = new Annotation(constpool, SJavassist.getCtClass(Produces.class, pool));
+							annot.addMemberValue("value", vals);
+							attr.addAnnotation(annot);
+						}
+
 						m.getMethodInfo().addAttribute(attr);
 						proxyclazz.addMethod(m);
+								
+						// add @QueryParam if get
+						if(GET.class.equals(rmi.getRestType()))
+						{
+							int pcnt = rmi.getParameterTypes().length;
+							if(pcnt>0)
+							{
+								Annotation[][] annos = new Annotation[pcnt][];
+								ConstPool cp = m.getMethodInfo().getConstPool();
+								for(int k=0; k<annos.length; k++)
+								{
+									Annotation anno = new Annotation(cp, SJavassist.getCtClass(QueryParam.class, pool));
+									anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
+									annos[k] = new Annotation[]{anno};
+								}
+								SJavassist.addMethodParameterAnnotation(m, annos, pool);
+							}
+						}
+						// add @FormDataParam if post
+						else if(POST.class.equals(rmi.getRestType()))
+						{
+							int pcnt = rmi.getParameterTypes().length;
+							if(pcnt>0)
+							{
+								Annotation[][] annos = new Annotation[pcnt][];
+								ConstPool cp = m.getMethodInfo().getConstPool();
+								for(int k=0; k<annos.length; k++)
+								{
+									Annotation anno = new Annotation(cp, SJavassist.getCtClass(FormDataParam.class, pool));
+									anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
+									annos[k] = new Annotation[]{anno};
+								}
+								SJavassist.addMethodParameterAnnotation(m, annos, pool);
+							}
+						}
+//						System.out.println("m: "+m.getName()+" "+SUtil.arrayToString(m.getParameterTypes()));
 					}
 				}
 				
@@ -466,83 +452,19 @@ public class DefaultRestServicePublishService implements IPublishService
 				annot.addMemberValue("value", new StringMemberValue("", constpool));
 				attr.addAnnotation(annot);
 				cf.addAttribute(attr);
+				
+				// Add method mapping table
+				CtField fjs = new CtField(SJavassist.getCtClass(Map.class, pool), "__methodmap", proxyclazz);
+				proxyclazz.addField(fjs, CtField.Initializer.byExpr("jadex.commons.SUtil.createHashMap(new String[]{\"a\"}, new String[]{\"a\"})"));
 								
 				ret = proxyclazz.toClass(classloader, iface.getProtectionDomain());
 				proxyclazz.freeze();
-				System.out.println("create proxy class: "+ret.getName()+" "+apppath);
+				System.out.println("create proxy class: "+ret.getName());
 			}
 		}
 		else
 		{
 			ret = baseclass;
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Guess the http type (GET, POST, PUT, DELETE, ...) of a method.
-	 *  @param method The method.
-	 *  @return  The rs annotation of the method type to use 
-	 */
-	public Class<?> getHttpType(Method method, Class<?> rettype, Class<?>[] paramtypes)
-	{
-	    // Retrieve = GET (!hasparams && hasret)
-	    // Update = POST (hasparams && hasret)
-	    // Create = PUT  return is pointer to new resource (hasparams? && hasret)
-	    // Delete = DELETE (hasparams? && hasret?)
-
-		Class<?> ret = GET.class;
-		
-		boolean hasparams = paramtypes.length>0;
-		boolean hasret = !rettype.equals(Void.class) && !rettype.equals(void.class);
-		
-		// GET or POST if has both
-		if(hasparams && hasret)
-		{
-			if(hasStringConvertableParameters(method, rettype, paramtypes))
-			{
-				ret = GET.class;
-			}
-			else
-			{
-				ret = POST.class;
-			}
-		}
-		
-		System.out.println("http-type: "+ret.getName()+" "+method.getName()+" "+hasparams+" "+hasret);
-		
-		return ret;
-//		return GET.class;
-	}
-
-	/**
-	 * 
-	 */
-	public boolean hasStringConvertableParameters(Method method, Class<?> rettype, Class<?>[] paramtypes)
-	{
-		boolean ret = true;
-		
-		for(int i=0; i<paramtypes.length && ret; i++)
-		{
-			if(!SReflect.isStringConvertableType(paramtypes[i]))
-			{
-				try
-				{
-					Method m = paramtypes[i].getMethod("fromString", new Class[]{String.class});
-				}
-				catch(Exception e)
-				{
-					try
-					{
-						Method m = paramtypes[i].getMethod("valueOf", new Class[]{String.class});
-					}
-					catch(Exception e2)
-					{
-						ret = false;
-					}
-				}
-			}
 		}
 		
 		return ret;
@@ -586,7 +508,12 @@ public class DefaultRestServicePublishService implements IPublishService
 			{
 				method = methods[0];
 			}
-//			System.out.println("call: "+this+" "+method+" "+args+" "+name);
+			System.out.println("call: "+this+" "+method+" "+SUtil.arrayToString(params)+" "+name);
+			
+//			Field f = getClass().getDeclaredField("__methodmap");
+//			f.setAccessible(true);
+//			Object o = f.get(this);
+//			System.out.println("map: "+o);
 			
 			try
 			{
@@ -600,7 +527,7 @@ public class DefaultRestServicePublishService implements IPublishService
 				if(mname.endsWith("JSON"))
 					mname = mname.substring(0, mname.length()-4);
 
-				System.out.println("call: "+mname+" on "+service);
+				System.out.println("call: "+mname+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service);
 				
 				Method m = service.getClass().getMethod(mname, method.getParameterTypes());
 				ret = m.invoke(service, params);
@@ -665,6 +592,9 @@ public class DefaultRestServicePublishService implements IPublishService
 			UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
 			
 			java.lang.reflect.Method[] methods = getClass().getDeclaredMethods();
+			
+			Arrays.sort(methods, new MethodComparator());
+			
 			if(methods!=null)
 			{
 				for(int i=0; i<methods.length; i++)
@@ -683,11 +613,11 @@ public class DefaultRestServicePublishService implements IPublishService
 					if(restmethod!=null)
 					{
 						java.lang.annotation.Annotation[][] ans = methods[i].getParameterAnnotations();
-						System.out.println("method: "+methods[i].getName());
-						for(int j=0; j<ans.length; j++)
-						{
-							System.out.println(SUtil.arrayToString(ans[j]));
-						}
+						System.out.println("method: "+methods[i].getName()+" "+SUtil.arrayToString(methods));
+//						for(int j=0; j<ans.length; j++)
+//						{
+//							System.out.println(SUtil.arrayToString(ans[j]));
+//						}
 						
 						Path path = methods[i].getAnnotation(Path.class);
 						Consumes consumes = methods[i].getAnnotation(Consumes.class);
@@ -695,9 +625,11 @@ public class DefaultRestServicePublishService implements IPublishService
 						Class[] ptypes = methods[i].getParameterTypes();
 						
 						ret.append("<p>");
-						ret.append("<i>");
+						String resttype = SReflect.getUnqualifiedClassName(restmethod.annotationType());
+						ret.append(resttype).append(" ");
+						ret.append("<i><b>");
 						ret.append(methods[i].getName());
-						ret.append("</i>");
+						ret.append("</i></b>");
 						if(ptypes!=null && ptypes.length>0)
 						{
 							ret.append("(");
@@ -711,14 +643,14 @@ public class DefaultRestServicePublishService implements IPublishService
 						}
 						ret.append("</br>");
 						
-						String resttype = SReflect.getUnqualifiedClassName(restmethod.annotationType());
-						ret.append(resttype).append(" ");
 						if(consumes!=null)
 						{
 							String[] cons = consumes.value();
 							if(cons.length>0)
 							{
+								ret.append("<i>");
 								ret.append("Consumes: ");
+								ret.append("</i>");
 								for(int j=0; j<cons.length; j++)
 								{
 									ret.append(cons[j]);
@@ -733,7 +665,9 @@ public class DefaultRestServicePublishService implements IPublishService
 							String[] prods = produces.value();
 							if(prods.length>0)
 							{
+								ret.append("<i>");
 								ret.append("Produces: ");
+								ret.append("</i>");
 								for(int j=0; j<prods.length; j++)
 								{
 									ret.append(prods[j]);
@@ -750,9 +684,9 @@ public class DefaultRestServicePublishService implements IPublishService
 							ub.path(path.value());
 						String link = ub.build(null).toString();
 						
-						// For post set the media type of the arguments.
 						if(ptypes.length>0)
 						{
+							// For post set the media type of the arguments.
 							ret.append("<form action=\"").append(link).append("\" method=\"")
 								.append(resttype.toLowerCase()).append("\" enctype=\"multipart/form-data\" ");
 							
@@ -765,8 +699,22 @@ public class DefaultRestServicePublishService implements IPublishService
 							for(int j=0; j<ptypes.length; j++)
 							{
 								ret.append("arg").append(j).append(": ");
-								ret.append("<input name=\"arg").append(j).append("\" type=\"text\"")
-									.append(" accept=\"").append(cons[0]).append("\" />");
+								ret.append("<input name=\"arg").append(j).append("\" type=\"text\" />");
+//									.append(" accept=\"").append(cons[0]).append("\" />");
+							}
+							if(cons.length>0)
+							{
+								ret.append("<select name=\"mediatype\">");
+								for(int j=0; j<cons.length; j++)
+								{
+									// todo: hmm? what about others?
+									if(!MediaType.MULTIPART_FORM_DATA.equals(cons[j]) &&
+										!MediaType.APPLICATION_FORM_URLENCODED.equals(cons[j]))
+									{
+										ret.append("<option>").append(cons[j]).append("</option>");
+									}
+								}
+								ret.append("</select>");
 							}
 							
 							ret.append("<input type=\"submit\" value=\"invoke\"/></form>");
@@ -791,69 +739,14 @@ public class DefaultRestServicePublishService implements IPublishService
 		return ret.toString();
 	}
 	
-	/**
-	 *  Main for testing.
-	 */
-	public static void main(String[] args) throws Exception
-	{
-		URI uri = new URI("http://localhost:8080/bank");
-//		URI newuri = new URI(uri.getScheme(), uri.getAuthority(), null);
-		URI newuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
-		System.out.println(newuri);
-	}
+//	/**
+//	 *  Main for testing.
+//	 */
+//	public static void main(String[] args) throws Exception
+//	{
+//		URI uri = new URI("http://localhost:8080/bank");
+////		URI newuri = new URI(uri.getScheme(), uri.getAuthority(), null);
+//		URI newuri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), null, null, null);
+//		System.out.println(newuri);
+//	}
 }
-	
-	// Code that removes an annotation
-//	if(baseclass!=null)
-//	{
-//		CtClass ctbc = getCtClass(baseclass, pool);
-//		List attrs = ctbc.getClassFile().getAttributes();
-//		boolean done = false;
-//		for(int i=0; i<attrs.size() && !done; i++)
-//		{
-//			AttributeInfo attr = (AttributeInfo)attrs.get(i);
-//			if(attr instanceof AnnotationsAttribute)
-//			{
-//				AnnotationsAttribute anattr = (AnnotationsAttribute)attr;
-//				Annotation[] ans = anattr.getAnnotations();
-//				for(int j=0; j<ans.length && !done; j++)
-//				{
-//					if(ans[j].getTypeName().equals(Path.class.getName()))
-//					{
-//						attrs.remove(attr);
-//						done = true;
-//					}
-//				}
-//			}
-//		}
-//		ctbc.setName(ctbc.getName()+"New");
-//		newbaseclass = ctbc.toClass(classloader, iface.getProtectionDomain());
-//	}
-	
-//	boolean pathpresent = false;
-//	Class<?> test = newbaseclass;
-//	while(test!=null && !pathpresent)
-//	{
-//		pathpresent = test.isAnnotationPresent(Path.class);
-//		test = test.getSuperclass();
-//	}
-//	System.out.println("found anno: "+pathpresent);
-
-//	// If no explicit url path extract last name from package
-//	if(apppath==null || apppath.length()==0 || apppath.equals("/"))
-//	{
-//		if(iface.getPackage()!=null)
-//		{
-//			String pck = iface.getPackage().getName();
-//			int idx = pck.lastIndexOf(".");
-//			if(idx>0)
-//			{
-//				apppath = pck.substring(idx+1);
-//			}
-//			else
-//			{
-//				apppath = pck;
-//			}
-//		}
-//	}
-//	annot.addMemberValue("value", new StringMemberValue(apppath, constpool));
