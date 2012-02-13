@@ -198,21 +198,29 @@ public class ChatPanel extends JPanel
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				final int	request	= startRequest("Sending message...");
-				String	msg	= tf.getText();
+				final String	msg	= tf.getText();
 				tf.setText("");
 				typing	= false;
-				tell(msg, request).addResultListener(new SwingDefaultResultListener<Void>()
+				
+				// Decouple sending as send request should happen after post request for better status updates (receiving).
+				SwingUtilities.invokeLater(new Runnable()
 				{
-					public void customResultAvailable(Void result)
+					public void run()
 					{
-						endRequest(request, "Sending completed.");
-					}
-					
-					public void customExceptionOccurred(Exception exception)
-					{
-						super.customExceptionOccurred(exception);
-						customResultAvailable(null);	// re-enable widgets.
+						final int	request	= startRequest("Sending message...");
+						tell(msg, request).addResultListener(new SwingDefaultResultListener<Void>()
+						{
+							public void customResultAvailable(Void result)
+							{
+								endRequest(request, "Sending completed.");
+							}
+							
+							public void customExceptionOccurred(Exception exception)
+							{
+								super.customExceptionOccurred(exception);
+								customResultAvailable(null);	// re-enable widgets.
+							}
+						});
 					}
 				});
 			}
