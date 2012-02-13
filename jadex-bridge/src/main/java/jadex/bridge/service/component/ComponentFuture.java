@@ -44,42 +44,35 @@ public class ComponentFuture<E> extends Future<E>
 		// Hack!!! Notify multiple listeners at once?
 		if(adapter.isExternalThread())
 		{
-			try
+			ea.scheduleStep(new IComponentStep<Void>()
 			{
-				ea.scheduleStep(new IComponentStep<Void>()
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						ComponentFuture.super.notifyListener(listener);
-						return IFuture.DONE;
-					}
-				});
-			}
-			catch(ComponentTerminatedException e)
+					ComponentFuture.super.notifyListener(listener);
+					return IFuture.DONE;
+				}
+			}).addResultListener(new IResultListener<Void>()
 			{
-				// Hack!!! Schedule notification on wrong thread. 
-				ComponentFuture.this.exception	= e;
-				ComponentFuture.super.notifyListener(listener);				
-			}
-//			.addResultListener(new IResultListener<Void>()
-//			{
-//				public void resultAvailable(Void result)
-//				{
-//				}
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					// Only component terminated exception can occur
-////					assert exception instanceof ComponentTerminatedException: exception;
-//					
-//					if(exception instanceof ComponentTerminatedException)
-//					{
-//					}
+				public void resultAvailable(Void result)
+				{
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					// Only component terminated exception can occur
+//					assert exception instanceof ComponentTerminatedException: exception;
+					
+					if(exception instanceof ComponentTerminatedException)
+					{
+						// Hack!!! Schedule notification on wrong thread. 
+						ComponentFuture.this.exception	= exception;
+						ComponentFuture.super.notifyListener(listener);				
+					}
 //					else
 //					{
 //						System.out.println("Unexpected exception during schedule step: "+exception);
 //					}
-//				}
-//			});
+				}
+			});
 		}
 		else
 		{
