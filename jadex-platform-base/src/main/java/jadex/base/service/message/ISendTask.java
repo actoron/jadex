@@ -51,7 +51,13 @@ public interface ISendTask
 	/**
 	 *  Called by the transport when is is ready to send the message,
 	 *  i.e. when a connection is established.
-	 *  @param send	The code to be executed to send the message.
+	 *  
+	 *  The send manager calls the send commands of the transports and makes sure that the message
+	 *  gets sent only once (i.e. call send commands sequentially and stop, when one send command finished successfully).
+	 *  
+	 *  @param send	The command to be executed to send the message with the transport.
+	 *  	The result future of the command should indicate
+	 *  	when/if message sending was successful. 
 	 */
 	public void ready(IResultCommand<IFuture<Void>, Void> send);
 }

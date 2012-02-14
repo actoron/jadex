@@ -29,18 +29,17 @@ public interface ITransport
 	public boolean	isApplicable(ISendTask task);
 	
 	/**
-	 *  Send a message to receivers on the same platform.
-	 *  This method is called concurrently for all transports.
-	 *  Each transport should immediately announce its interest and try to connect to the target platform
-	 *  (or reuse an existing connection) and afterwards acquire the token for the task.
+	 *  Send a message to receivers on a specific target platform.
+	 *  This method is called for all applicable transports.
+	 *  Each transport should asynchronously try to connect to the target platform
+	 *  (or reuse an existing connection) and afterwards call-back the ready() method on the send task.
 	 *  
-	 *  The first transport that acquires the token (i.e. the first connected transport) tries to send the message.
-	 *  If sending fails, it may release the token to trigger the other transports.
+	 *  The send manager calls the send commands of the transports and makes sure that the message
+	 *  gets sent only once (i.e. call send commands sequentially and stop, when a send command finished successfully).
 	 *  
 	 *  All transports may keep any established connections open for later messages.
 	 *  
-	 *  @param task The message to send.
-	 *  @return True, if the transport is applicable for the message.
+	 *  @param task A task representing the message to send.
 	 */
 	public void	sendMessage(ISendTask task);
 	
