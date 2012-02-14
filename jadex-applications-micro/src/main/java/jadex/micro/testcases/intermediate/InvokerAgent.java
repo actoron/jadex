@@ -127,8 +127,8 @@ public class InvokerAgent
 //		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-			"-gui", "false", "-usepass", "false", "-simulation", "false",
-			"-logging_level", "java.util.logging.Level.INFO"
+//			"-logging_level", "java.util.logging.Level.INFO",
+			"-gui", "false", "-usepass", "false", "-simulation", "false"
 		}).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
@@ -206,7 +206,7 @@ public class InvokerAgent
 									public void customResultAvailable(IIntermediateResultService service)
 									{
 										// Invoke service agent
-		//								System.out.println("Invoking");
+//										System.out.println("Invoking");
 										final Long[] start = new Long[1];
 										IIntermediateFuture<String> fut = service.getResults(delay, max);
 										fut.addResultListener(agent.createResultListener(new IIntermediateResultListener<String>()

@@ -270,7 +270,7 @@ public class TCPTransport implements ITransport
 		for(int i=0; !ret && i<task.getReceivers().length; i++)
 		{
 			String[]	raddrs	= task.getReceivers()[i].getAddresses();
-			for(int j=0; j<raddrs.length; j++)
+			for(int j=0; !ret && j<raddrs.length; j++)
 			{
 				ret	= raddrs[j].toLowerCase().startsWith(getServiceSchema());
 			}			
