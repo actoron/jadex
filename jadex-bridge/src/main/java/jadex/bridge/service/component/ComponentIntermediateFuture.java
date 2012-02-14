@@ -48,32 +48,21 @@ public class ComponentIntermediateFuture<E> extends IntermediateFuture<E>
 		// Hack!!! Notify multiple listeners at once?
 		if(adapter.isExternalThread())
 		{
-			ea.scheduleStep(new IComponentStep<Void>()
+			try
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
+				ea.scheduleStep(new IComponentStep<Void>()
 				{
-					ComponentIntermediateFuture.super.notifyListener(listener);
-					return IFuture.DONE;
-				}
-			}).addResultListener(new IResultListener<Void>()
-			{
-				public void resultAvailable(Void result)
-				{
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-					// Component terminated exception can occur
-//					System.out.println("Exe: "+exception);
-					if(exception instanceof ComponentTerminatedException)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ComponentIntermediateFuture.super.notifyListener(listener);
+						return IFuture.DONE;
 					}
-					else
-					{
-						System.out.println("Exception during schedule step: "+exception);
-					}
-				}
-			});
+				});
+			}
+			catch(ComponentTerminatedException e)
+			{
+				ComponentIntermediateFuture.super.notifyListener(listener);
+			}
 		}
 		else
 		{
@@ -89,32 +78,21 @@ public class ComponentIntermediateFuture<E> extends IntermediateFuture<E>
 		// Hack!!! Notify multiple results at once?
 		if(adapter.isExternalThread())
 		{
-			ea.scheduleStep(new IComponentStep<Void>()
+			try
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
+				ea.scheduleStep(new IComponentStep<Void>()
 				{
-					ComponentIntermediateFuture.super.notifyIntermediateResult(listener, result);
-					return IFuture.DONE;
-				}
-			}).addResultListener(new IResultListener<Void>()
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						ComponentIntermediateFuture.super.notifyIntermediateResult(listener, result);
+						return IFuture.DONE;
+					}
+				});
+			}
+			catch(ComponentTerminatedException e)
 			{
-				public void resultAvailable(Void result)
-				{
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-					// Component terminated exception can occur
-//					System.out.println("Exe: "+exception);
-					if(exception instanceof ComponentTerminatedException)
-					{
-						ComponentIntermediateFuture.super.notifyListener(listener);
-					}
-					else
-					{
-						System.out.println("Exception during schedule step: "+exception);
-					}
-				}
-			});
+				ComponentIntermediateFuture.super.notifyListener(listener);
+			}				
 		}
 		else
 		{

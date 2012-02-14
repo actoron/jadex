@@ -1,12 +1,12 @@
 package jadex.android.benchmarks;
 
-import jadex.base.Starter;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -35,7 +35,12 @@ import java.util.Map;
 import java.util.UUID;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -283,44 +288,56 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 		});
 		
 		// Start the platform
-		System.out.println("Starting Jadex Platform...");
-		new Thread(new Runnable()
+		bindService(new Intent(this, JadexPlatformService.class), new ServiceConnection()
 		{
-			public void run()
+			public void onServiceConnected(ComponentName comp, IBinder service)
 			{
-				Starter.createPlatform(new String[]
-				{
-					"-logging_level", "java.util.logging.Level.INFO",
-					"-platformname", "and_" + createRandomPlattformID(),
-					"-extensions", "null",
-					"-wspublish", "false",
-					"-rspublish", "false",
-					"-kernels", "\"component, micro\"",
-//					"-tcptransport", "false",
-//					"-niotcptransport", "false",
-//					"-relaytransport", "true",
-//					"-relayaddress", "\""+SRelay.DEFAULT_ADDRESS+"\"",
-//					"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/\"",					
-					"-saveonexit", "false",
-					"-gui", "false",
-					"-autoshutdown", "false",
-//					"-awamechanisms", "new String[]{\"Relay\"}",
-//					"-awareness", "false",
-//					"-usepass", "false"
-				}).addResultListener(new IResultListener<IExternalAccess>()
+				IJadexPlatformService	jps	= (IJadexPlatformService)service;
+				jps.getPlatform().addResultListener(new IResultListener<IExternalAccess>()
 				{
 					public void resultAvailable(IExternalAccess result)
 					{
 						platform = result;
-						runOnUiThread(new Runnable()
+						platform.scheduleStep(new IComponentStep<Void>()
 						{
-							public void run()
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								startMB1.setEnabled(true);
-								startMB2.setEnabled(true);
-								startMB3.setEnabled(true);
-								chat.setEnabled(true);
-								name.setEnabled(true);
+								ia.getServiceContainer().searchService(IChatService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(new IResultListener<IChatService>()
+								{
+									public void resultAvailable(final IChatService result)
+									{
+										runOnUiThread(new Runnable()
+										{
+											public void run()
+											{
+												chatcid	= ((IService)result).getServiceIdentifier().getProviderId();
+												startMB1.setEnabled(true);
+												startMB2.setEnabled(true);
+												startMB3.setEnabled(true);
+												msg.setEnabled(true);
+												send.setEnabled(true);
+												chat.setText("Exit Chat");
+											}
+										});
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										runOnUiThread(new Runnable()
+										{
+											public void run()
+											{
+												startMB1.setEnabled(true);
+												startMB2.setEnabled(true);
+												startMB3.setEnabled(true);
+												chat.setEnabled(true);
+												name.setEnabled(true);
+											}
+										});
+									}
+								});
+								
+								return IFuture.DONE;
 							}
 						});
 					}
@@ -332,9 +349,13 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 					}
 				});
 			}
-		}).start();
+			
+			public void onServiceDisconnected(ComponentName name)
+			{
+			}
+		}, Context.BIND_AUTO_CREATE);
 	}
-	
+		
 	//-------- helper methods --------
 
 	/**
