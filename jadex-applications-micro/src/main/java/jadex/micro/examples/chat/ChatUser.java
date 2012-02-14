@@ -102,6 +102,11 @@ public class ChatUser
 	 */
 	public void	setReceiving(int id, boolean rec)
 	{
+		if(IChatService.STATE_DEAD.equals(state))
+		{
+			state	= IChatService.STATE_IDLE;
+		}
+		
 		if(rec)
 		{
 			this.receiving	= id;
