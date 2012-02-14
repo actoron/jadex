@@ -55,6 +55,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/** The provider. */
 	protected IServiceProvider provider;
 	
+	/** The external access. */
+	protected IExternalAccess	access;
+	
 	/** The result. */
 	protected Object result;
 	
@@ -63,8 +66,9 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 	/**
 	 *  Create a new required service fetcher.
 	 */
-	public DefaultServiceFetcher(IServiceProvider provider)
+	public DefaultServiceFetcher(IServiceProvider provider, IExternalAccess access)
 	{
+		this.access	= access;
 		this.provider = provider;
 	}
 	
@@ -742,40 +746,21 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 //		if(!service.getServiceIdentifier().getProviderId().equals(ea.getServiceProvider().getId()) || !Proxy.isProxyClass(service.getClass()))
 		
 		SServiceProvider.getService(provider, IComponentManagementService.class, RequiredServiceInfo.SCOPE_GLOBAL)
-			.addResultListener(new DelegationResultListener(ret)
+			.addResultListener(new DelegationResultListener<IComponentManagementService>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(final IComponentManagementService cms)
 			{
 //				System.out.println("createProxy 1:"+service);
-				final IComponentManagementService cms = (IComponentManagementService)result;
-				cms.getExternalAccess((IComponentIdentifier)provider.getId()).addResultListener(new DelegationResultListener(ret)
+				final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
+				IFuture<IService>	fut	= access.scheduleStep(new IComponentStep<IService>()
 				{
-					public void customResultAvailable(Object result) 
+					public IFuture<IService> execute(IInternalAccess ia)
 					{
 //						System.out.println("createProxy 2:"+service);
-						final IExternalAccess ea = (IExternalAccess)result;
-						final IComponentAdapter adapter = cms.getComponentAdapter((IComponentIdentifier)provider.getId());
-						IFuture<IService>	fut	= ea.scheduleStep(new IComponentStep<IService>()
-						{
-							public IFuture<IService> execute(IInternalAccess ia)
-							{
-//								System.out.println("createProxy 3:"+service);
-								return new Future<IService>(BasicServiceInvocationHandler.createRequiredServiceProxy(ia, ea, adapter, service, DefaultServiceFetcher.this, info, binding));
-							}
-						});
-//						fut.addResultListener(new IResultListener()
-//						{
-//							public void exceptionOccurred(Exception exception)
-//							{
-//							}
-//							public void resultAvailable(Object result)
-//							{
-//								System.out.println("createProxy 4 for "+service+": "+result);
-//							}
-//						});
-						fut.addResultListener(new DelegationResultListener(ret));
+						return new Future<IService>(BasicServiceInvocationHandler.createRequiredServiceProxy(ia, access, adapter, service, DefaultServiceFetcher.this, info, binding));
 					}
 				});
+				fut.addResultListener(new DelegationResultListener(ret));
 			}
 		});
 		
@@ -930,6 +915,7 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 				public void exceptionOccurred(Exception exception)
 				{
 //					System.out.println("ex: "+exception);
+//					exception.printStackTrace();
 					StoreIntermediateDelegationResultListener.super.exceptionOccurred(exception);
 					ret.setResult(null);
 				}

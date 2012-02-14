@@ -1,10 +1,8 @@
 package jadex.bridge.service.component;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.BasicService;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IRequiredServiceFetcher;
@@ -282,7 +280,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IRequiredServiceFetcher createServiceFetcher(String name)
 	{
-		return new DefaultServiceFetcher(this);
+		return new DefaultServiceFetcher(this, instance.getExternalAccess());
 	}
 	
 	/**

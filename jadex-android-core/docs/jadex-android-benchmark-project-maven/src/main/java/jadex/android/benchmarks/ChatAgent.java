@@ -2,6 +2,7 @@ package jadex.android.benchmarks;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.ICommand;
 import jadex.commons.future.Future;
@@ -26,7 +27,7 @@ import jadex.micro.examples.chat.IChatService;
 @Arguments(@Argument(name="toastcmd", clazz=ICommand.class))
 @ProvidedServices(@ProvidedService(type=IChatService.class,
 	implementation=@Implementation(expression="$component.getPojoAgent()")))
-@RequiredServices(@RequiredService(name="chats", type=IChatService.class, multiple=true, binding=@Binding(scope=Binding.SCOPE_GLOBAL)))
+@RequiredServices(@RequiredService(name="chats", type=IChatService.class, multiple=true, binding=@Binding(scope=Binding.SCOPE_GLOBAL, dynamic=true)))
 @Service
 public class ChatAgent	implements IChatService
 {
@@ -54,6 +55,7 @@ public class ChatAgent	implements IChatService
 		{
 			public void intermediateResultAvailable(IChatService chat)
 			{
+				toastcmd.execute("User "+((IService)chat).getServiceIdentifier().getProviderId()+" is online.");
 				chat.status(STATE_IDLE);
 			}
 			public void finished()

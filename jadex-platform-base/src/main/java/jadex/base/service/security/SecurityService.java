@@ -393,7 +393,7 @@ public class SecurityService implements ISecurityService
 			}
 		}
 		
-		return error==null ? new Future<Void>((Void)null) : new Future<Void>(new SecurityException(error));
+		return error==null ? new Future<Void>((Void)null) : new Future<Void>(new SecurityException(error+" "+request));
 	}
 	
 	

@@ -58,7 +58,7 @@ public class DelegationInterceptor extends AbstractMultiInterceptor
 		this.ea = ea;
 		this.info = info;
 		this.binding = binding;
-		this.fetcher = fetcher!=null? fetcher: new DefaultServiceFetcher(ea.getServiceProvider());
+		this.fetcher = fetcher!=null? fetcher: new DefaultServiceFetcher(ea.getServiceProvider(), ea);
 	}
 	
 	//-------- methods --------

@@ -79,12 +79,14 @@ public class RemoteServiceContainer extends BasicServiceContainer
 				}
 				else
 				{
+//					System.out.println("remote search: "+componentid);
 					// Hack! Use user search manager.
 					rms.getServiceProxies(componentid, SServiceProvider.sequentialmanager, decider, selector)
 						.addResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object res)
 						{
+//							System.out.println("remote search finished: "+componentid);
 							if(res instanceof Collection)
 							{
 								for(Iterator it=((Collection)res).iterator(); it.hasNext(); )
@@ -108,6 +110,7 @@ public class RemoteServiceContainer extends BasicServiceContainer
 						
 						public void exceptionOccurred(Exception exception)
 						{
+//							System.out.println("remote search failed: "+componentid+", "+exception);
 //							ret.setFinished();
 							// todo: notify exception?
 							ret.setException(exception);

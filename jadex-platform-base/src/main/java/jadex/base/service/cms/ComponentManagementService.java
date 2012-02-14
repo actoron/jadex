@@ -1832,6 +1832,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	 */
 	protected IFuture<IExternalAccess> getExternalAccess(final IComponentIdentifier cid, boolean internal)
 	{
+//		System.out.println("getExternalAccess: "+this+", "+cid);
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		if(cid==null)
@@ -1842,6 +1843,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		
 		if(isRemoteComponent(cid))
 		{
+//			System.out.println("getExternalAccess: remote");
 			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService rcms)
@@ -1852,9 +1854,11 @@ public abstract class ComponentManagementService extends BasicService implements
 		}
 		else
 		{
+//			System.out.println("getExternalAccess: local");
 			IComponentAdapter adapter = null;
 			synchronized(adapters)
 			{
+//				System.out.println("getExternalAccess: adapters");
 				boolean delayed = false;
 				adapter = (IComponentAdapter)adapters.get(cid);
 				
@@ -1866,7 +1870,7 @@ public abstract class ComponentManagementService extends BasicService implements
 					{
 						if(!internal && (ii.getAdapter()==null || ii.getAdapter().isExternalThread()))
 						{
-//							System.out.println("delayed");
+//							System.out.println("getExternalAccess: delayed");
 							delayed = true;
 							IFuture<Void> fut = ii.getInitFuture();
 							fut.addResultListener(new ExceptionDelegationResultListener<Void, IExternalAccess>(ret)
@@ -1886,6 +1890,7 @@ public abstract class ComponentManagementService extends BasicService implements
 						}
 						else
 						{
+//							System.out.println("getExternalAccess: not delayed");
 							adapter = ii.getAdapter();
 						}
 					}
