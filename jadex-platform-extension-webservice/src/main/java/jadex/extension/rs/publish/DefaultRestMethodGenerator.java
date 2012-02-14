@@ -1,7 +1,11 @@
 package jadex.extension.rs.publish;
 
 import jadex.bridge.service.IService;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.extension.rs.publish.annotation.MethodMapper;
+import jadex.extension.rs.publish.annotation.ParameterMapper;
+import jadex.extension.rs.publish.annotation.ResultMapper;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -20,6 +24,7 @@ import javax.ws.rs.HEAD;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -56,6 +61,9 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 		
 		// Determine methods to be generated
 		
+		// Remember path that are taken
+		Set<String> paths = new HashSet<String>();
+		
 		Set<MethodWrapper> methods = new LinkedHashSet<MethodWrapper>();
 		if(gen)
 		{
@@ -73,13 +81,29 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 				// Else check for abstract methods (others are user implemented and will not be touched)
 				else
 				{
-					Method[] bms = baseclass.getMethods();
-					for(int i=0; i<bms.length; i++)
+					Class<?> clazz = baseclass;
+					while(!clazz.equals(Object.class))
 					{
-						if(Modifier.isAbstract(bms[i].getModifiers()))
+						Method[] bms = baseclass.getMethods();
+						for(int i=0; i<bms.length; i++)
 						{
-							addMethodWrapper(new MethodWrapper(bms[i]), methods);
+							if(Modifier.isAbstract(bms[i].getModifiers()))
+							{
+								addMethodWrapper(new MethodWrapper(bms[i]), methods);
+							}
+							else if(bms[i].isAnnotationPresent(Path.class))
+							{
+								String path = "";
+								if(bms[i].isAnnotationPresent(Path.class))
+									path = ((Path)bms[i].getAnnotation(Path.class)).value();
+								addPath(path, paths);
+							}
+							else if(getDeclaredRestType(bms[i])!=null)
+							{
+								addPath("", paths);
+							}
 						}
+						clazz = clazz.getSuperclass();
 					}
 				}
 				
@@ -91,10 +115,10 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 					{
 						// Add method only if not already present
 						baseclass.getMethod(ims[i].getName(), ims[i].getParameterTypes());
-						addMethodWrapper(new MethodWrapper(ims[i]), methods);
 					}
 					catch(Exception e)
 					{
+						addMethodWrapper(new MethodWrapper(ims[i]), methods);
 					}
 				}
 			}
@@ -109,7 +133,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 			}
 		}
 		
-		Set<String> paths = new HashSet<String>();
+		
 		for(Iterator<MethodWrapper> it = methods.iterator(); it.hasNext(); )
 		{
 			MethodWrapper mw = it.next();
@@ -133,6 +157,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 						}
 					}
 				}
+				
 				if(method.isAnnotationPresent(Produces.class))
 				{
 					String[] prods = method.getAnnotation(Produces.class).value();
@@ -145,7 +170,43 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 					}
 				}
 				
-				ret.add(new RestMethodInfo(method, mw.getName(), getPathName(mw.getName(), paths), resttype, consumed, produced, 
+				MethodInfo methodmapper = null;
+				if(method.isAnnotationPresent(MethodMapper.class))
+				{
+					MethodMapper mm = (MethodMapper)method.getAnnotation(MethodMapper.class);
+					methodmapper = new MethodInfo(mm.value(), mm.parameters());
+				}
+				
+				Value parametermapper = null;
+				if(method.isAnnotationPresent(ParameterMapper.class))
+				{
+					ParameterMapper pm = (ParameterMapper)method.getAnnotation(ParameterMapper.class);
+					Class<?> clazz = pm.value().clazz();
+					if(clazz!=null && !Object.class.equals(clazz))
+						parametermapper = new Value(clazz);
+					else
+						parametermapper = new Value(pm.value().value());
+				}
+				
+				Value resultmapper = null;
+				if(method.isAnnotationPresent(ResultMapper.class))
+				{
+					ResultMapper pm = (ResultMapper)method.getAnnotation(ResultMapper.class);
+					Class<?> clazz = pm.value().clazz();
+					if(clazz!=null && !Object.class.equals(clazz))
+						resultmapper = new Value(clazz);
+					else
+						resultmapper = new Value(pm.value().value());
+				}
+				
+				String path = "";
+				if(method.isAnnotationPresent(Path.class))
+					path = ((Path)method.getAnnotation(Path.class)).value();
+				else
+					path = mw.getName();
+				
+				ret.add(new RestMethodInfo(method, mw.getName(), getPathName(path, paths), resttype, consumed, produced, 
+					methodmapper, parametermapper, resultmapper,
 					DefaultRestServicePublishService.class, "invoke"));
 			}
 			// Guess how method should be restified
@@ -175,7 +236,11 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 					produced.add(formats[j]);
 				}
 				
+				// store original method info
+				MethodInfo methodmapper = new MethodInfo(method.getName(), method.getParameterTypes());
+				
 				ret.add(new RestMethodInfo(method, mw.getName(), getPathName(mw.getName(), paths), resttype, consumed, produced,
+					methodmapper, null, null,
 					DefaultRestServicePublishService.class, "invoke"));
 			}
 		}
@@ -185,9 +250,12 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 			List<MediaType> consumed = new ArrayList<MediaType>();
 			List<MediaType> produced = new ArrayList<MediaType>();
 			produced.add(MediaType.TEXT_HTML_TYPE);
-			ret.add(new RestMethodInfo(new Class[0], String.class, new Class[0], "getServiceInfo", "", GET.class, 
-				consumed, produced, DefaultRestServicePublishService.class, "getServiceInfo"));
+			ret.add(new RestMethodInfo(new Class[0], String.class, new Class[0], "getServiceInfo", getPathName("", paths), GET.class, 
+				consumed, produced, null, null, null, 
+				DefaultRestServicePublishService.class, "getServiceInfo"));
 		}
+		
+		System.out.println("paths: "+paths);
 		
 		return ret;
 	}
@@ -233,35 +301,6 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 	
 	/**
 	 * 
-	 */
-	public static Class<?> getDeclaredRestType(Method method)
-	{
-		java.lang.annotation.Annotation ret = method.getAnnotation(GET.class);
-		if(ret==null)
-		{
-			ret =  method.getAnnotation(POST.class);
-			if(ret==null)
-			{
-				ret =  method.getAnnotation(PUT.class);
-				if(ret==null)
-				{
-					ret =  method.getAnnotation(DELETE.class);
-					if(ret==null)
-					{
-						ret =  method.getAnnotation(HEAD.class);
-						if(ret==null)
-						{
-							ret =  method.getAnnotation(OPTIONS.class);
-						}
-					}
-				}
-			}
-		}
-		return ret==null? null: ret.annotationType();
-	}
-	
-	/**
-	 * 
 	 * @param mw
 	 * @param methods
 	 */
@@ -283,18 +322,32 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 	 * @param mw
 	 * @param methods
 	 */
-	protected static String getPathName(String name, Set<String> names)
+	protected static String getPathName(String path, Set<String> paths)
 	{
-		if(names.contains(name))
+		if(paths.contains(path))
 		{
-			String basename = name;
-			for(int i=0; names.contains(name); i++)
+			String basename = path;
+			for(int i=0; paths.contains(path); i++)
 			{
-				name = basename+i;
+				path = basename+i;
 			}
 		}
-		names.add(name);
-		return name;
+		addPath(path, paths);
+		return path;
+	}
+	
+	/**
+	 * 
+	 */
+	protected static void addPath(String path, Set<String> paths)
+	{
+		String p = path;
+		if(path.endsWith("/"))
+			p = path.substring(0, path.length()-1);
+		else
+			p = path + "/";
+		paths.add(path);
+		paths.add(p);
 	}
 	
 	/**
@@ -337,5 +390,34 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 			}
 		}
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public static Class<?> getDeclaredRestType(Method method)
+	{
+		java.lang.annotation.Annotation ret = method.getAnnotation(GET.class);
+		if(ret==null)
+		{
+			ret =  method.getAnnotation(POST.class);
+			if(ret==null)
+			{
+				ret =  method.getAnnotation(PUT.class);
+				if(ret==null)
+				{
+					ret =  method.getAnnotation(DELETE.class);
+					if(ret==null)
+					{
+						ret =  method.getAnnotation(HEAD.class);
+						if(ret==null)
+						{
+							ret =  method.getAnnotation(OPTIONS.class);
+						}
+					}
+				}
+			}
+		}
+		return ret==null? null: ret.annotationType();
 	}
 }

@@ -68,6 +68,8 @@ public class RSBankingService
 	@Produces(MediaType.TEXT_HTML)
 	public String getServiceInfo()
 	{
+		System.out.println("mygetserviceinfo");
+		
 		UriBuilder ub = uriinfo.getBaseUriBuilder();
 		ub.path("getAccountStatement");
 		String req = ub.build(null).toString();

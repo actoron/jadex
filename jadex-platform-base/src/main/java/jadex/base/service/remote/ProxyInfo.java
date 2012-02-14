@@ -1,5 +1,6 @@
 package jadex.base.service.remote;
 
+import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 
 import java.lang.reflect.Method;

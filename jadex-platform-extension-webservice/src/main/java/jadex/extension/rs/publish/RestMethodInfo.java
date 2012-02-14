@@ -1,5 +1,7 @@
 package jadex.extension.rs.publish;
 
+import jadex.commons.MethodInfo;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.List;
@@ -38,12 +40,21 @@ public class RestMethodInfo
 	
 	/** The produced media types. */
 	protected List<MediaType> produced;
+	
+	/** The original service method. */
+	protected MethodInfo methodmapper;
+	
+	/** The parameter mapper info. */
+	protected Value parametermapper;
+	
+	/** The result mapper info. */
+	protected Value resultmapper;
 
 	
 	/** Delegation class. */
 	protected Class<?> dclazz;
 	
-	/** The delegation method. */
+	/** The delegation (prototype) method. */
 	protected String dmname;
 	
 	/**
@@ -51,6 +62,7 @@ public class RestMethodInfo
 	 */
 	public RestMethodInfo(Method method, 
 		String name, String path, Class<?> resttype, List<MediaType> consumed, List<MediaType> produced,
+		MethodInfo methodmapper, Value parametermapper, Value resultmapper, 
 		Class<?> dclazz, String dmname)
 	{
 		if(method==null)
@@ -62,6 +74,9 @@ public class RestMethodInfo
 		this.resttype = resttype;
 		this.consumed = consumed;
 		this.produced = produced;
+		this.methodmapper = methodmapper;
+		this.parametermapper = parametermapper;
+		this.resultmapper = resultmapper;
 		
 		this.dclazz = dclazz;
 		this.dmname = dmname;
@@ -72,6 +87,7 @@ public class RestMethodInfo
 	 */
 	public RestMethodInfo(Class<?>[] parametertypes, Type returntype, Class<?>[] exceptiontypes, 
 		String name, String path, Class<?> resttype, List<MediaType> consumed, List<MediaType> produced,
+		MethodInfo methodmapper, Value parametermapper, Value resultmapper, 
 		Class<?> dclazz, String dmname)
 	{
 		this.name = name;
@@ -83,6 +99,9 @@ public class RestMethodInfo
 		this.resttype = resttype;
 		this.consumed = consumed;
 		this.produced = produced;
+		this.methodmapper = methodmapper;
+		this.parametermapper = parametermapper;
+		this.resultmapper = resultmapper;
 		
 		this.dclazz = dclazz;
 		this.dmname = dmname;
@@ -249,7 +268,61 @@ public class RestMethodInfo
 		this.produced = produced;
 	}
 
+	/**
+	 *  Get the methodmapper.
+	 *  @return the methodmapper.
+	 */
+	public MethodInfo getMethodMapper()
+	{
+		return methodmapper;
+	}
 
+	/**
+	 *  Set the methodmapper.
+	 *  @param methodmapper The methodmapper to set.
+	 */
+	public void setMethodMapper(MethodInfo methodmapper)
+	{
+		this.methodmapper = methodmapper;
+	}
+
+	/**
+	 *  Get the parametermapper.
+	 *  @return the parametermapper.
+	 */
+	public Value getParameterMapper()
+	{
+		return parametermapper;
+	}
+
+	/**
+	 *  Set the parametermapper.
+	 *  @param parametermapper The parametermapper to set.
+	 */
+	public void setParameterMapper(Value parametermapper)
+	{
+		this.parametermapper = parametermapper;
+	}
+
+	/**
+	 *  Get the resultmapper.
+	 *  @return the resultmapper.
+	 */
+	public Value getResultMapper()
+	{
+		return resultmapper;
+	}
+
+	/**
+	 *  Set the resultmapper.
+	 *  @param resultmapper The resultmapper to set.
+	 */
+	public void setResultMapper(Value resultmapper)
+	{
+		this.resultmapper = resultmapper;
+	}
+
+	
 	
 	/**
 	 *  Get the dclazz.
@@ -264,7 +337,7 @@ public class RestMethodInfo
 	 *  Set the dclazz.
 	 *  @param dclazz The dclazz to set.
 	 */
-	public void setDclazz(Class<?> dclazz)
+	public void setDelegateClazz(Class<?> dclazz)
 	{
 		this.dclazz = dclazz;
 	}

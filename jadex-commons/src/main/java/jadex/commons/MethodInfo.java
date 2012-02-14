@@ -1,6 +1,5 @@
-package jadex.base.service.remote;
+package jadex.commons;
 
-import jadex.commons.SUtil;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -16,7 +15,7 @@ public class MethodInfo
 	protected String name;
 	
 	/** The parameter classes. */
-	protected Class[] parametertypes;
+	protected Class<?>[] parametertypes;
 	
 	//-------- constructors --------
 	
@@ -32,8 +31,16 @@ public class MethodInfo
 	 */
 	public MethodInfo(Method m)
 	{
-		this.name = m.getName();
-		this.parametertypes = m.getParameterTypes();
+		this(m.getName(), m.getParameterTypes());
+	}
+	
+	/**
+	 *  Create a new method info.
+	 */
+	public MethodInfo(String name, Class<?>[] parametertypes)
+	{
+		this.name = name;
+		this.parametertypes = parametertypes;
 	}
 
 	//-------- methods --------
@@ -60,7 +67,7 @@ public class MethodInfo
 	 *  Get the parametertypes.
 	 *  @return the parametertypes.
 	 */
-	public Class[] getParameterTypes()
+	public Class<?>[] getParameterTypes()
 	{
 		return parametertypes;
 	}
@@ -69,7 +76,7 @@ public class MethodInfo
 	 *  Set the parametertypes.
 	 *  @param parametertypes The parametertypes to set.
 	 */
-	public void setParameterTypes(Class[] parametertypes)
+	public void setParameterTypes(Class<?>[] parametertypes)
 	{
 		this.parametertypes = parametertypes;
 	}

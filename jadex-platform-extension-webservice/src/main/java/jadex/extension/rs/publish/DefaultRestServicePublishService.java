@@ -8,6 +8,7 @@ import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.types.publish.IPublishService;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -15,6 +16,14 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.SJavassist;
+import jadex.extension.rs.publish.annotation.MethodMapper;
+import jadex.extension.rs.publish.annotation.ParameterMapper;
+import jadex.extension.rs.publish.annotation.ResultMapper;
+import jadex.extension.rs.publish.mapper.DefaultParameterMapper;
+import jadex.extension.rs.publish.mapper.IParameterMapper;
+import jadex.extension.rs.publish.mapper.IValueMapper;
+import jadex.javaparser.SJavaParser;
+import jadex.javaparser.javaccimpl.JavaParserTest;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -22,6 +31,7 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,7 +48,9 @@ import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
+import javassist.bytecode.annotation.AnnotationMemberValue;
 import javassist.bytecode.annotation.ArrayMemberValue;
+import javassist.bytecode.annotation.ClassMemberValue;
 import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
@@ -320,7 +332,8 @@ public class DefaultRestServicePublishService implements IPublishService
 				ClassPool pool = new ClassPool(null);
 				pool.appendSystemPath();
 				
-				CtClass proxyclazz = pool.makeClass(name, baseclass==null? null: SJavassist.getCtClass(baseclass, pool));
+				CtClass proxyclazz = pool.makeClass(name, baseclass==null || baseclass.isInterface()? 
+					null: SJavassist.getCtClass(baseclass, pool));
 				ClassFile cf = proxyclazz.getClassFile();
 				ConstPool constpool = cf.getConstPool();
 		
@@ -404,7 +417,50 @@ public class DefaultRestServicePublishService implements IPublishService
 							annot.addMemberValue("value", vals);
 							attr.addAnnotation(annot);
 						}
-
+						
+						MethodInfo methodmapper = rmi.getMethodMapper();
+						if(methodmapper!=null)
+						{
+							annot = new Annotation(constpool, SJavassist.getCtClass(MethodMapper.class, pool));
+							annot.addMemberValue("value", new StringMemberValue(methodmapper.getName(), constpool));
+							Class<?>[] ptypes = methodmapper.getParameterTypes();
+							ArrayMemberValue vals = new ArrayMemberValue(new ClassMemberValue(constpool), constpool);
+							MemberValue[] mvals = new MemberValue[methodmapper.getParameterTypes().length];
+							for(int i=0; i<mvals.length; i++)
+							{
+								mvals[i] = new ClassMemberValue(ptypes[i].getName(), constpool);
+							}
+							vals.setValue(mvals);
+							annot.addMemberValue("parameters", vals);
+							attr.addAnnotation(annot);
+						}
+						
+						Value parametermapper = rmi.getParameterMapper();
+						if(parametermapper!=null)
+						{
+							annot = new Annotation(constpool, SJavassist.getCtClass(ParameterMapper.class, pool));
+							Annotation value = new Annotation(constpool, SJavassist.getCtClass(jadex.micro.annotation.Value.class, pool));
+							if(parametermapper.getExpression()!=null && parametermapper.getExpression().length()==0)
+								value.addMemberValue("value", new StringMemberValue(parametermapper.getExpression(), constpool));
+							if(parametermapper.getClazz()!=null && !parametermapper.getClazz().equals(Object.class))
+								value.addMemberValue("clazz", new ClassMemberValue(parametermapper.getClazz().getName(), constpool));
+							annot.addMemberValue("value", new AnnotationMemberValue(value, constpool));
+							attr.addAnnotation(annot);
+						}
+						
+						Value resultmapper = rmi.getResultMapper();
+						if(resultmapper!=null)
+						{
+							annot = new Annotation(constpool, SJavassist.getCtClass(ResultMapper.class, pool));
+							Annotation value = new Annotation(constpool, SJavassist.getCtClass(jadex.micro.annotation.Value.class, pool));
+							if(resultmapper.getExpression()!=null && resultmapper.getExpression().length()==0)
+								value.addMemberValue("value", new StringMemberValue(resultmapper.getExpression(), constpool));
+							if(resultmapper.getClazz()!=null && !resultmapper.getClazz().equals(Object.class))
+								value.addMemberValue("clazz", new ClassMemberValue(resultmapper.getClazz().getName(), constpool));
+							annot.addMemberValue("value", new AnnotationMemberValue(value, constpool));
+							attr.addAnnotation(annot);
+						}
+						
 						m.getMethodInfo().addAttribute(attr);
 						proxyclazz.addMethod(m);
 								
@@ -483,8 +539,12 @@ public class DefaultRestServicePublishService implements IPublishService
 		
 		try
 		{
+			// find own method
 			StackTraceElement[] s = Thread.currentThread().getStackTrace();
 			String name = s[2].getMethodName();
+			
+//			System.out.println("name is: "+name);
+
 //			for(int i=0;i<s.length; i++)
 //			{
 //				System.out.println(s[i].getMethodName());
@@ -510,35 +570,74 @@ public class DefaultRestServicePublishService implements IPublishService
 			}
 			System.out.println("call: "+this+" "+method+" "+SUtil.arrayToString(params)+" "+name);
 			
-//			Field f = getClass().getDeclaredField("__methodmap");
-//			f.setAccessible(true);
-//			Object o = f.get(this);
-//			System.out.println("map: "+o);
-			
-			try
+			// check if mappers are there
+			ResourceConfig rc = (ResourceConfig)getClass().getDeclaredField("__rc").get(this);
+//			Object service = rc.getProperty(JADEXSERVICE);
+			Object service = rc.getProperty("jadexservice");
+
+			Method targetmethod = null;
+			if(method.isAnnotationPresent(MethodMapper.class))
 			{
-				ResourceConfig rc = (ResourceConfig)getClass().getDeclaredField("__rc").get(this);
-//				Object service = rc.getProperty(JADEXSERVICE);
-				Object service = rc.getProperty("jadexservice");
-						
+				MethodMapper mm = method.getAnnotation(MethodMapper.class);
+				targetmethod = SReflect.getMethod(service.getClass(), mm.value(), mm.parameters());
+			}
+			else
+			{
 				String mname = method.getName();
 				if(mname.endsWith("XML"))
 					mname = mname.substring(0, mname.length()-3);
 				if(mname.endsWith("JSON"))
 					mname = mname.substring(0, mname.length()-4);
-
-				System.out.println("call: "+mname+" paramtypes: "+SUtil.arrayToString(method.getParameterTypes())+" on "+service);
-				
-				Method m = service.getClass().getMethod(mname, method.getParameterTypes());
-				ret = m.invoke(service, params);
-				if(ret instanceof IFuture)
-				{
-					ret = ((IFuture)ret).get(new ThreadSuspendable());
-				}
+				targetmethod = service.getClass().getMethod(mname, method.getParameterTypes());
 			}
-			catch(Exception e)
+			
+			System.out.println("target: "+targetmethod);
+			
+			Object[] targetparams = params;
+			if(method.isAnnotationPresent(ParameterMapper.class))
 			{
-				throw new RuntimeException(e);
+				ParameterMapper mm = method.getAnnotation(ParameterMapper.class);
+				Class<?> clazz = mm.value().clazz();
+				Object mapper;
+				if(!Object.class.equals(clazz))
+				{
+					mapper = clazz.newInstance();
+				}
+				else
+				{
+					mapper = SJavaParser.evaluateExpression(mm.value().value(), null);
+				}
+				if(mapper instanceof IValueMapper)
+					mapper = new DefaultParameterMapper((IValueMapper)mapper);
+				
+				targetparams = ((IParameterMapper)mapper).convertParameters(params);
+			}
+			
+//			System.out.println("targetparams: "+SUtil.arrayToString(targetparams));
+//			System.out.println("call: "+targetmethod.getName()+" paramtypes: "+SUtil.arrayToString(targetmethod.getParameterTypes())+" on "+service);
+//			
+			ret = targetmethod.invoke(service, targetparams);
+			if(ret instanceof IFuture)
+			{
+				ret = ((IFuture)ret).get(new ThreadSuspendable());
+			}
+			
+			if(method.isAnnotationPresent(ResultMapper.class))
+			{
+				ResultMapper mm = method.getAnnotation(ResultMapper.class);
+				Class<?> clazz = mm.value().clazz();
+				IValueMapper mapper;
+//				System.out.println("res mapper: "+clazz);
+				if(!Object.class.equals(clazz))
+				{
+					mapper = (IValueMapper)clazz.newInstance();
+				}
+				else
+				{
+					mapper = (IValueMapper)SJavaParser.evaluateExpression(mm.value().value(), null);
+				}
+				
+				ret = mapper.convertValue(ret);
 			}
 		}
 		catch(Throwable t)
@@ -591,45 +690,42 @@ public class DefaultRestServicePublishService implements IPublishService
 	
 			UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
 			
-			java.lang.reflect.Method[] methods = getClass().getDeclaredMethods();
+			Class<?> clazz = getClass();
+			List<Method> methods = new ArrayList<Method>();
+			while(!clazz.equals(Object.class))
+			{
+				List<Method> l = SUtil.arrayToList(clazz.getDeclaredMethods());
+				methods.addAll(l);
+				clazz = clazz.getSuperclass();
+			}
 			
-			Arrays.sort(methods, new MethodComparator());
+			Collections.sort(methods, new MethodComparator());
 			
 			if(methods!=null)
 			{
-				for(int i=0; i<methods.length; i++)
+				for(int i=0; i<methods.size(); i++)
 				{
-					java.lang.annotation.Annotation restmethod = methods[i].getAnnotation(GET.class);
-					if(restmethod==null)
-						restmethod =  methods[i].getAnnotation(POST.class);
-					if(restmethod==null)
-						restmethod =  methods[i].getAnnotation(PUT.class);
-					if(restmethod==null)
-						restmethod =  methods[i].getAnnotation(DELETE.class);
-					if(restmethod==null)
-						restmethod =  methods[i].getAnnotation(HEAD.class);
-					if(restmethod==null)
-						restmethod =  methods[i].getAnnotation(OPTIONS.class);
+					Method method = methods.get(i);
+					Class<?> restmethod = DefaultRestMethodGenerator.getDeclaredRestType(method);
 					if(restmethod!=null)
 					{
-						java.lang.annotation.Annotation[][] ans = methods[i].getParameterAnnotations();
-						System.out.println("method: "+methods[i].getName()+" "+SUtil.arrayToString(methods));
+						System.out.println("method: "+method.getName()+" "+SUtil.arrayToString(methods));
+//						java.lang.annotation.Annotation[][] ans = method.getParameterAnnotations();
 //						for(int j=0; j<ans.length; j++)
 //						{
 //							System.out.println(SUtil.arrayToString(ans[j]));
 //						}
-						
-						Path path = methods[i].getAnnotation(Path.class);
-						Consumes consumes = methods[i].getAnnotation(Consumes.class);
-						Produces produces = methods[i].getAnnotation(Produces.class);
-						Class[] ptypes = methods[i].getParameterTypes();
+						Path path = method.getAnnotation(Path.class);
+						Consumes consumes = method.getAnnotation(Consumes.class);
+						Produces produces = method.getAnnotation(Produces.class);
+						Class<?>[] ptypes = method.getParameterTypes();
 						
 						ret.append("<p>");
-						String resttype = SReflect.getUnqualifiedClassName(restmethod.annotationType());
+						String resttype = SReflect.getUnqualifiedClassName(restmethod);
 						ret.append(resttype).append(" ");
 						ret.append("<i><b>");
-						ret.append(methods[i].getName());
-						ret.append("</i></b>");
+						ret.append(method.getName());
+						ret.append("</b></i>");
 						if(ptypes!=null && ptypes.length>0)
 						{
 							ret.append("(");
@@ -660,6 +756,7 @@ public class DefaultRestServicePublishService implements IPublishService
 								ret.append(" ");
 							}
 						}
+						
 						if(produces!=null)
 						{
 							String[] prods = produces.value();
@@ -690,33 +787,36 @@ public class DefaultRestServicePublishService implements IPublishService
 							ret.append("<form action=\"").append(link).append("\" method=\"")
 								.append(resttype.toLowerCase()).append("\" enctype=\"multipart/form-data\" ");
 							
-							if(restmethod.annotationType().equals(POST.class))
+							if(restmethod.equals(POST.class))
 								ret.append("onSubmit=\"return extract(this)\"");
-							
 							ret.append(">");
 							
-							String[] cons = consumes.value();
 							for(int j=0; j<ptypes.length; j++)
 							{
 								ret.append("arg").append(j).append(": ");
 								ret.append("<input name=\"arg").append(j).append("\" type=\"text\" />");
 //									.append(" accept=\"").append(cons[0]).append("\" />");
 							}
-							if(cons.length>0)
-							{
-								ret.append("<select name=\"mediatype\">");
-								for(int j=0; j<cons.length; j++)
-								{
-									// todo: hmm? what about others?
-									if(!MediaType.MULTIPART_FORM_DATA.equals(cons[j]) &&
-										!MediaType.APPLICATION_FORM_URLENCODED.equals(cons[j]))
-									{
-										ret.append("<option>").append(cons[j]).append("</option>");
-									}
-								}
-								ret.append("</select>");
-							}
 							
+							if(consumes!=null)
+							{
+								String[] cons = consumes.value();
+								if(cons!=null && cons.length>0)
+								{
+									ret.append("<select name=\"mediatype\">");
+									for(int j=0; j<cons.length; j++)
+									{
+										// todo: hmm? what about others?
+										if(!MediaType.MULTIPART_FORM_DATA.equals(cons[j]) &&
+											!MediaType.APPLICATION_FORM_URLENCODED.equals(cons[j]))
+										{
+											ret.append("<option>").append(cons[j]).append("</option>");
+										}
+									}
+									ret.append("</select>");
+								}
+							}
+							System.out.println(method.getName()+": x");
 							ret.append("<input type=\"submit\" value=\"invoke\"/></form>");
 						}
 						else
@@ -725,6 +825,7 @@ public class DefaultRestServicePublishService implements IPublishService
 						}
 						ret.append("</p>");
 					}
+					
 				}
 			}
 		}

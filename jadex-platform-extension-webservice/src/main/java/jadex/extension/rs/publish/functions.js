@@ -58,34 +58,12 @@
 			}
 		}
 		
-		send(form.action, "post", names, vals, types);
+		send(form.action, "post", names, vals, types, form);
 		
 		return false;
 	}
 
-//	function send(url, method, names, vals, types) 
-//	{
-//		var xmlHttpReq;
-//	
-//		var self = this;
-//		// Mozilla/Safari
-//		if(window.XMLHttpRequest) 
-//		{
-//		    self.xmlHttpReq = new XMLHttpRequest();
-//		}
-//		// IE
-//		else if (window.ActiveXObject) 
-//		{
-//		    self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
-//		}
-//	
-//		self.xmlHttpReq.open("POST", url, true);
-//		self.xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-//		self.xmlHttpReq.setRequestHeader("Content-length", 22);
-//		self.xmlHttpReq.send(null);//"?YourQueryString=Value");
-//	}
-	
-	function send(url, method, names, vals, types) 
+	function send(url, method, names, vals, types, form) 
 	{
 //		this.xmlHttpReq = new XMLHttpRequest();
 		
@@ -135,7 +113,7 @@
 		}
 		multipart += "--" + boundary + "--\r\n";
 		
-		alert(multipart);
+//		alert(multipart);
 		
 		http.onreadystatechange = function() 
 		{
@@ -146,10 +124,39 @@
 //				window.history.pushState({"html":response.html,"pageTitle":response.pageTitle},"", urlPath);
 //				window.history.pushState("some string", "Test", url);
 //				window.location.replace(url);
+//				window.history.pushState("some string", "Test", url);
+
 				document.open();
 				document.write(http.responseText);
 				document.close();
-//				window.history.pushState("some string", "Test", url);
+			
+//				try
+//				{
+//				var tas = form.getElementsByTagName("textarea");
+//				if(tas==null || tas.length==0)
+//				{
+//					tas = [];
+//					tas[0] = document.createElement("textarea");
+//					form.appendChild(tas[0]);
+//				}
+//				tas[0].value = http.responseText;
+					
+//				alert(tas[0].innerHTML);
+				
+//				var cdata = document.createCDATASection(http.responseText);
+//				tas[0].appendChild(cdata);
+				
+//				tas[0].innerHTML = "\u003c\u0021\u005bCDATA\u005b"+http.responseText+"\u005d\u005d\u003e";
+//					"<![CDATA[ "+http.responseText+" ]]>";
+//				var text = http.responseText.replace(/\</g, "&lt;").replace(/\>/g, "&gt;");
+//				tas[0].innerHTML = text;
+				
+//				form.appendChild(tas[0]);
+//				}
+//				catch(err)
+//				{
+//					alert(err);
+//				}
 			}
 		}
 	
