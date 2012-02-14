@@ -24,13 +24,15 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
-import jadex.commons.gui.SGUI;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/* $if !android $ */
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
+import jadex.commons.gui.SGUI;
+/* $endif $ */
 
 /**
  *  Factory for loading bpmn processes.
