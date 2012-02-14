@@ -13,6 +13,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
+import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
@@ -40,6 +41,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  *  Activity (screen) for the jadex android benchmark app.
@@ -117,7 +119,22 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 							{
 								if(chatcid==null)
 								{
-									cms.createComponent(name.getText().toString(), "jadex.android.benchmarks.ChatAgent.class", null, null)
+									ICommand	toastcmd	= new ICommand()
+									{
+										public void execute(final Object args)
+										{
+											runOnUiThread(new Runnable()
+											{
+												public void run()
+												{
+													Toast.makeText(getApplicationContext(), ""+args, Toast.LENGTH_SHORT).show();
+												}
+											});
+										}
+									};
+									Map<String, Object>	args	= new HashMap<String, Object>();
+									args.put("toastcmd", toastcmd);
+									cms.createComponent(name.getText().toString(), "jadex.android.benchmarks.ChatAgent.class", new CreationInfo(args), null)
 										.addResultListener(new DelegationResultListener<IComponentIdentifier>(fut));
 								}
 								else
@@ -280,8 +297,8 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 					"-rspublish", "false",
 					"-kernels", "\"component, micro\"",
 //					"-tcptransport", "false",
-					"-niotcptransport", "false",
-					"-relaytransport", "true",
+//					"-niotcptransport", "false",
+//					"-relaytransport", "true",
 //					"-relayaddress", "\""+SRelay.DEFAULT_ADDRESS+"\"",
 //					"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/\"",					
 					"-saveonexit", "false",

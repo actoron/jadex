@@ -152,6 +152,7 @@ public class HttpRelayTransport implements ITransport
 							throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
 						
 						delivered	= true;
+//						System.out.println("Sent with IO relay: "+task.getReceivers()[0]);
 					}
 					catch(Exception e)
 					{

@@ -8,6 +8,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -388,6 +389,9 @@ public class SelectorThread implements Runnable
 			// Accept the connection and make it non-blocking
 			SocketChannel sc = ssc.accept();
 			sc.configureBlocking(false);
+			
+			// Write one byte for handshake (always works due to local network buffers).
+			sc.write(ByteBuffer.wrap(new byte[1]));
 	
 			// Register the new SocketChannel with our Selector, indicating
 			// we'd like to be notified when there's data waiting to be read
@@ -409,24 +413,63 @@ public class SelectorThread implements Runnable
 	 */
 	protected void	handleRead(SelectionKey key)
 	{
-		NIOTCPInputConnection	con	= (NIOTCPInputConnection)key.attachment();
-		try
+		if(key.attachment() instanceof NIOTCPInputConnection)
 		{
-			// Read as much messages as available (if any).
-			for(byte[] msg=con.read(); msg!=null; msg=con.read())
+			NIOTCPInputConnection	con	= (NIOTCPInputConnection)key.attachment();
+			try
 			{
-//				System.out.println("Read message from: "+con);
-				msgservice.deliverMessage(msg);
+				// Read as much messages as available (if any).
+				for(byte[] msg=con.read(); msg!=null; msg=con.read())
+				{
+	//				System.out.println("Read message from: "+con);
+					msgservice.deliverMessage(msg);
+				}
+			}
+			catch(Exception e)
+			{ 
+				logger.warning("NIOTCP receiving error while reading data: "+con+", "+e);
+	//			e.printStackTrace();
+				con.close();
+				key.cancel();
 			}
 		}
-		catch(Exception e)
-		{ 
-			logger.warning("NIOTCP receiving error while reading data: "+con+", "+e);
-//			e.printStackTrace();
-			con.close();
-			key.cancel();
+		
+		// Handle output handshake (read one byte to make sure that channel is working before sending).
+		else
+		{
+			SocketChannel	sc	= (SocketChannel)key.channel();
+			Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>	tuple	= (Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>)key.attachment();
+			InetSocketAddress	address	= (InetSocketAddress)tuple.get(0);
+			Future<NIOTCPOutputConnection>	ret	= tuple.getSecondEntity();
+			try
+			{
+				if(sc.read(ByteBuffer.wrap(new byte[1]))!=1)
+					throw new IOException("Error receiving handshake byte.");
+				
+				Cleaner	cleaner	= new Cleaner(address);
+				NIOTCPOutputConnection	con	= new NIOTCPOutputConnection(sc, address, cleaner);
+				cleaner.refresh();
+				synchronized(connections)
+				{
+					connections.put(address, con);
+				}
+				// Keep channel on hold until we are ready to write.
+			    key.interestOps(0);
+				logger.info("NIOTCP connected to: "+address);
+				ret.setResult(con);
+			}
+			catch(Exception e)
+			{ 
+				synchronized(connections)
+				{
+					connections.put(address, new NIOTCPDeadConnection());
+				}
+				ret.setException(e);
+				logger.info("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPDeadConnection.DEADSPAN/1000+" seconds): "+address+", "+e);
+//				e.printStackTrace();
+				key.cancel();
+			}
 		}
-
 	}
 
 	/**
@@ -442,17 +485,10 @@ public class SelectorThread implements Runnable
 		{
 			boolean	finished	= sc.finishConnect();
 			assert finished;
-			Cleaner	cleaner	= new Cleaner(address);
-			NIOTCPOutputConnection	con	= new NIOTCPOutputConnection(sc, address, cleaner);
-			cleaner.refresh();
-			synchronized(connections)
-			{
-				connections.put(address, con);
-			}
-			// Keep channel on hold until we are ready to write.
-		    key.interestOps(0);
-			logger.info("Connected to : "+address);
-			ret.setResult(con);
+			// Before connection can be used, make sure that it works by waiting for handshake byte.
+			key.interestOps(SelectionKey.OP_READ);
+			
+			logger.info("NIOTCP connected to: "+address+", waiting for handshake");
 		}
 		catch(Exception e)
 		{ 
@@ -507,6 +543,7 @@ public class SelectorThread implements Runnable
 						if(buffers.isEmpty())
 						{
 							queue.remove(task);
+//							System.out.println("Sent with NIO TCP: "+con.address);
 							fut.setResult(null);
 						}
 					}

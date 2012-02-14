@@ -272,6 +272,7 @@ public class SendRequest	implements IHttpRequest
 				
 				if("HTTP/1.1 200 OK".equals(response.substring(0, response.indexOf("\r\n"))))
 				{
+//					System.out.println("Sent with NIO relay: "+task.getReceivers()[0]);
 					fut.setResult(null);
 				}
 				else

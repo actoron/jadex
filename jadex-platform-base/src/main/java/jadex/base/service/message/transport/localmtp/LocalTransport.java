@@ -110,6 +110,7 @@ public class LocalTransport implements ITransport
 		{
 			public IFuture<Void> execute(Void args)
 			{
+//				System.out.println("Sent with local transport: "+task.getReceivers()[0]);
 				msgservice.deliverMessage(task.getMessage(), task.getMessageType().getName(), task.getReceivers());
 				return IFuture.DONE;
 			}
