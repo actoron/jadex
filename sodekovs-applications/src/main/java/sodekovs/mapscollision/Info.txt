@@ -1,0 +1,1 @@
+Beispiel Code von Wolf Posdorf für den A*-Algorithmus und das einlesen einer Karte mit Kantenerkennung in Jadex.
