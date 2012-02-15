@@ -295,232 +295,219 @@ public class DefaultRestServicePublishService implements IPublishService
 	{
 		Class<?> ret = null;
 
-		boolean gen = mapprops.get(GENERATE)!=null? ((Boolean)mapprops.get(GENERATE)).booleanValue(): true;
-		boolean emergencygen = baseclass!=null && !baseclass.isAnnotationPresent(Path.class);
+		// The name of the class has to ensure that it represents the different class properties:
+		// - the package+"Proxy"+name of the baseclass or (if not available) interface
+		// - the hashcode of the properties
+		// - only same implclass name + same props => same generated classname
 		
-		// Check if generate is off but the baseclass has no Path annotation
-		// Then a subclass with annotation will be provided
-		if(gen || emergencygen)
-		{
-//			String[] formats = mapprops.get(FORMATS)==null? DEFAULT_FORMATS: (String[])mapprops.get(FORMATS);
-			Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
-			
-			// The name of the class has to ensure that it represents the different class properties:
-			// - the package+"Proxy"+name of the baseclass or (if not available) interface
-			// - the hashcode of the properties
-			// - only same implclass name + same props => same generated classname
-			
-			StringBuilder builder = new StringBuilder();
-			Class<?> nameclazz = baseclass!=null? baseclass: iface;
-			if(nameclazz.getPackage()!=null)
-				builder.append(nameclazz.getPackage().getName());
-			builder.append(".Proxy");
-			builder.append(nameclazz.getSimpleName());
+		StringBuilder builder = new StringBuilder();
+		Class<?> iface = service.getServiceIdentifier().getServiceType().getType(classloader);
+		Class<?> nameclazz = baseclass!=null? baseclass: iface;
+		if(nameclazz.getPackage()!=null)
+			builder.append(nameclazz.getPackage().getName());
+		builder.append(".Proxy");
+		builder.append(nameclazz.getSimpleName());
 //			if(mapprops!=null && mapprops.size()>0)
 //				builder.append(mapprops.hashCode());
-			builder.append(geninfos.hashCode());
-			String name = builder.toString();
+		builder.append(geninfos.hashCode());
+		String name = builder.toString();
+
+		try
+		{
+			ret = classloader.loadClass(name);
+//			ret = SReflect.classForName0(name, classloader); // does not work because SReflect cache saves that not found!
+		}
+		catch(Exception e)
+		{
+			System.out.println("Not found, creating new: "+name);
+			ClassPool pool = new ClassPool(null);
+			pool.appendSystemPath();
+			
+			CtClass proxyclazz = pool.makeClass(name, baseclass==null || baseclass.isInterface()? 
+				null: SJavassist.getCtClass(baseclass, pool));
+			ClassFile cf = proxyclazz.getClassFile();
+			ConstPool constpool = cf.getConstPool();
 	
-			try
+			// Add field for functionsjs
+			CtField fjs = new CtField(SJavassist.getCtClass(String.class, pool), "__functionsjs", proxyclazz);
+			proxyclazz.addField(fjs);
+
+			// Add field for stylecss
+			CtField scss = new CtField(SJavassist.getCtClass(String.class, pool), "__stylecss", proxyclazz);
+			proxyclazz.addField(scss);
+			
+			// Add field with annotation for resource context
+			CtField rc = new CtField(SJavassist.getCtClass(ResourceConfig.class, pool), "__rc", proxyclazz);
+			AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+			Annotation annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
+			attr.addAnnotation(annot);
+			rc.getFieldInfo().addAttribute(attr);
+			proxyclazz.addField(rc);
+			
+			// Add field with annotation for uriinfo context
+			CtField ui = new CtField(SJavassist.getCtClass(UriInfo.class, pool), "__ui", proxyclazz);
+			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+			annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
+			attr.addAnnotation(annot);
+			ui.getFieldInfo().addAttribute(attr);
+			proxyclazz.addField(ui);
+			
+			// Add methods 
+			for(Iterator<RestMethodInfo> it=geninfos.iterator(); it.hasNext(); )
 			{
-				ret = classloader.loadClass(name);
-	//			ret = SReflect.classForName0(name, classloader); // does not work because SReflect cache saves that not found!
-			}
-			catch(Exception e)
-			{
-				System.out.println("Not found, creating new: "+name);
-				ClassPool pool = new ClassPool(null);
-				pool.appendSystemPath();
+				RestMethodInfo rmi = it.next();
 				
-				CtClass proxyclazz = pool.makeClass(name, baseclass==null || baseclass.isInterface()? 
-					null: SJavassist.getCtClass(baseclass, pool));
-				ClassFile cf = proxyclazz.getClassFile();
-				ConstPool constpool = cf.getConstPool();
-		
-				if(gen)
+				CtMethod invoke = SJavassist.getCtClass(rmi.getDelegateClazz(), pool)
+					.getDeclaredMethod(rmi.getDelegateMethodName());
+				
+				// Do not generate method if user has implemented it by herself
+				Class<?> rt = SReflect.unwrapGenericType(rmi.getReturnType());
+				CtClass rettype = SJavassist.getCtClass(rt, pool);
+				CtClass[] paramtypes = SJavassist.getCtClasses(rmi.getParameterTypes(), pool);
+				CtClass[] exceptions = SJavassist.getCtClasses(rmi.getExceptionTypes(), pool);
+				
+				CtMethod m = CtNewMethod.wrapped(rettype, rmi.getName(),
+					paramtypes, exceptions, invoke, null, proxyclazz);
+						
+				// path.
+				attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+				annot = new Annotation(constpool, SJavassist.getCtClass(rmi.getRestType(), pool));
+				attr.addAnnotation(annot);
+				annot = new Annotation(constpool, SJavassist.getCtClass(Path.class, pool));
+				annot.addMemberValue("value", new StringMemberValue(rmi.getPath(), constpool));
+				attr.addAnnotation(annot);
+						
+				// consumes.
+				List<MediaType> consumed = rmi.getConsumed();
+				if(!consumed.isEmpty())
 				{
-					// Add field with for functionsjs
-					CtField fjs = new CtField(SJavassist.getCtClass(String.class, pool), "__functionsjs", proxyclazz);
-					proxyclazz.addField(fjs);
-					
-					// Add field with annotation for resource context
-					CtField rc = new CtField(SJavassist.getCtClass(ResourceConfig.class, pool), "__rc", proxyclazz);
-					AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-					Annotation annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
-					attr.addAnnotation(annot);
-					rc.getFieldInfo().addAttribute(attr);
-					proxyclazz.addField(rc);
-					
-					// Add field with annotation for uriinfo context
-					CtField ui = new CtField(SJavassist.getCtClass(UriInfo.class, pool), "__ui", proxyclazz);
-					attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-					annot = new Annotation(constpool, SJavassist.getCtClass(Context.class, pool));
-					attr.addAnnotation(annot);
-					ui.getFieldInfo().addAttribute(attr);
-					proxyclazz.addField(ui);
-					
-					// Add methods 
-					for(Iterator<RestMethodInfo> it=geninfos.iterator(); it.hasNext(); )
+					List<MemberValue> cons = new ArrayList<MemberValue>();
+					for(Iterator<MediaType> it2=consumed.iterator(); it2.hasNext(); )
 					{
-						RestMethodInfo rmi = it.next();
-						
-						CtMethod invoke = SJavassist.getCtClass(rmi.getDelegateClazz(), pool)
-							.getDeclaredMethod(rmi.getDelegateMethodName());
-						
-						// Do not generate method if user has implemented it by herself
-						Class<?> rt = SReflect.unwrapGenericType(rmi.getReturnType());
-						CtClass rettype = SJavassist.getCtClass(rt, pool);
-						CtClass[] paramtypes = SJavassist.getCtClasses(rmi.getParameterTypes(), pool);
-						CtClass[] exceptions = SJavassist.getCtClasses(rmi.getExceptionTypes(), pool);
-						
-						CtMethod m = CtNewMethod.wrapped(rettype, rmi.getName(),
-							paramtypes, exceptions, invoke, null, proxyclazz);
-								
-						// path.
-						attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-						annot = new Annotation(constpool, SJavassist.getCtClass(rmi.getRestType(), pool));
-						attr.addAnnotation(annot);
-						annot = new Annotation(constpool, SJavassist.getCtClass(Path.class, pool));
-						annot.addMemberValue("value", new StringMemberValue(rmi.getPath(), constpool));
-						attr.addAnnotation(annot);
-								
-						// consumes.
-						List<MediaType> consumed = rmi.getConsumed();
-						if(!consumed.isEmpty())
-						{
-							List<MemberValue> cons = new ArrayList<MemberValue>();
-							for(Iterator<MediaType> it2=consumed.iterator(); it2.hasNext(); )
-							{
-								MediaType mt = it2.next();
-								cons.add(new StringMemberValue(mt.toString(), constpool));
-							}
-							annot = new Annotation(constpool, SJavassist.getCtClass(Consumes.class, pool));
-							ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
-							vals.setValue(cons.toArray(new MemberValue[0]));
-							annot.addMemberValue("value", vals);
-							attr.addAnnotation(annot);
-						}
-						
-						// produces.
-						List<MediaType> produced = rmi.getProduced();
-						if(!produced.isEmpty())
-						{
-							List<MemberValue> prods = new ArrayList<MemberValue>();
-							for(Iterator<MediaType> it2=produced.iterator(); it2.hasNext(); )
-							{
-								MediaType mt = it2.next();
-								prods.add(new StringMemberValue(mt.toString(), constpool));
-							}
-							ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
-							vals.setValue(prods.toArray(new MemberValue[0]));
-							annot = new Annotation(constpool, SJavassist.getCtClass(Produces.class, pool));
-							annot.addMemberValue("value", vals);
-							attr.addAnnotation(annot);
-						}
-						
-						MethodInfo methodmapper = rmi.getMethodMapper();
-						if(methodmapper!=null)
-						{
-							annot = new Annotation(constpool, SJavassist.getCtClass(MethodMapper.class, pool));
-							annot.addMemberValue("value", new StringMemberValue(methodmapper.getName(), constpool));
-							Class<?>[] ptypes = methodmapper.getParameterTypes();
-							ArrayMemberValue vals = new ArrayMemberValue(new ClassMemberValue(constpool), constpool);
-							MemberValue[] mvals = new MemberValue[methodmapper.getParameterTypes().length];
-							for(int i=0; i<mvals.length; i++)
-							{
-								mvals[i] = new ClassMemberValue(ptypes[i].getName(), constpool);
-							}
-							vals.setValue(mvals);
-							annot.addMemberValue("parameters", vals);
-							attr.addAnnotation(annot);
-						}
-						
-						Value parametermapper = rmi.getParameterMapper();
-						if(parametermapper!=null)
-						{
-							annot = new Annotation(constpool, SJavassist.getCtClass(ParameterMapper.class, pool));
-							Annotation value = new Annotation(constpool, SJavassist.getCtClass(jadex.micro.annotation.Value.class, pool));
-							if(parametermapper.getExpression()!=null && parametermapper.getExpression().length()==0)
-								value.addMemberValue("value", new StringMemberValue(parametermapper.getExpression(), constpool));
-							if(parametermapper.getClazz()!=null && !parametermapper.getClazz().equals(Object.class))
-								value.addMemberValue("clazz", new ClassMemberValue(parametermapper.getClazz().getName(), constpool));
-							annot.addMemberValue("value", new AnnotationMemberValue(value, constpool));
-							attr.addAnnotation(annot);
-						}
-						
-						Value resultmapper = rmi.getResultMapper();
-						if(resultmapper!=null)
-						{
-							annot = new Annotation(constpool, SJavassist.getCtClass(ResultMapper.class, pool));
-							Annotation value = new Annotation(constpool, SJavassist.getCtClass(jadex.micro.annotation.Value.class, pool));
-							if(resultmapper.getExpression()!=null && resultmapper.getExpression().length()==0)
-								value.addMemberValue("value", new StringMemberValue(resultmapper.getExpression(), constpool));
-							if(resultmapper.getClazz()!=null && !resultmapper.getClazz().equals(Object.class))
-								value.addMemberValue("clazz", new ClassMemberValue(resultmapper.getClazz().getName(), constpool));
-							annot.addMemberValue("value", new AnnotationMemberValue(value, constpool));
-							attr.addAnnotation(annot);
-						}
-						
-						m.getMethodInfo().addAttribute(attr);
-						proxyclazz.addMethod(m);
-								
-						// add @QueryParam if get
-						if(GET.class.equals(rmi.getRestType()))
-						{
-							int pcnt = rmi.getParameterTypes().length;
-							if(pcnt>0)
-							{
-								Annotation[][] annos = new Annotation[pcnt][];
-								ConstPool cp = m.getMethodInfo().getConstPool();
-								for(int k=0; k<annos.length; k++)
-								{
-									Annotation anno = new Annotation(cp, SJavassist.getCtClass(QueryParam.class, pool));
-									anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
-									annos[k] = new Annotation[]{anno};
-								}
-								SJavassist.addMethodParameterAnnotation(m, annos, pool);
-							}
-						}
-						// add @FormDataParam if post
-						else if(POST.class.equals(rmi.getRestType()))
-						{
-							int pcnt = rmi.getParameterTypes().length;
-							if(pcnt>0)
-							{
-								Annotation[][] annos = new Annotation[pcnt][];
-								ConstPool cp = m.getMethodInfo().getConstPool();
-								for(int k=0; k<annos.length; k++)
-								{
-									Annotation anno = new Annotation(cp, SJavassist.getCtClass(FormDataParam.class, pool));
-									anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
-									annos[k] = new Annotation[]{anno};
-								}
-								SJavassist.addMethodParameterAnnotation(m, annos, pool);
-							}
-						}
-//						System.out.println("m: "+m.getName()+" "+SUtil.arrayToString(m.getParameterTypes()));
+						MediaType mt = it2.next();
+						cons.add(new StringMemberValue(mt.toString(), constpool));
 					}
+					annot = new Annotation(constpool, SJavassist.getCtClass(Consumes.class, pool));
+					ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
+					vals.setValue(cons.toArray(new MemberValue[0]));
+					annot.addMemberValue("value", vals);
+					attr.addAnnotation(annot);
 				}
 				
-				// Add the path annotation 
-				AnnotationsAttribute attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
-				Annotation annot = new Annotation(constpool, SJavassist.getCtClass(Path.class, pool));
-				annot.addMemberValue("value", new StringMemberValue("", constpool));
-				attr.addAnnotation(annot);
-				cf.addAttribute(attr);
+				// produces.
+				List<MediaType> produced = rmi.getProduced();
+				if(!produced.isEmpty())
+				{
+					List<MemberValue> prods = new ArrayList<MemberValue>();
+					for(Iterator<MediaType> it2=produced.iterator(); it2.hasNext(); )
+					{
+						MediaType mt = it2.next();
+						prods.add(new StringMemberValue(mt.toString(), constpool));
+					}
+					ArrayMemberValue vals = new ArrayMemberValue(new StringMemberValue(constpool), constpool);
+					vals.setValue(prods.toArray(new MemberValue[0]));
+					annot = new Annotation(constpool, SJavassist.getCtClass(Produces.class, pool));
+					annot.addMemberValue("value", vals);
+					attr.addAnnotation(annot);
+				}
 				
-				// Add method mapping table
-				CtField fjs = new CtField(SJavassist.getCtClass(Map.class, pool), "__methodmap", proxyclazz);
-				proxyclazz.addField(fjs, CtField.Initializer.byExpr("jadex.commons.SUtil.createHashMap(new String[]{\"a\"}, new String[]{\"a\"})"));
-								
-				ret = proxyclazz.toClass(classloader, iface.getProtectionDomain());
-				proxyclazz.freeze();
-				System.out.println("create proxy class: "+ret.getName());
+				MethodInfo methodmapper = rmi.getMethodMapper();
+				if(methodmapper!=null)
+				{
+					annot = new Annotation(constpool, SJavassist.getCtClass(MethodMapper.class, pool));
+					annot.addMemberValue("value", new StringMemberValue(methodmapper.getName(), constpool));
+					Class<?>[] ptypes = methodmapper.getParameterTypes();
+					ArrayMemberValue vals = new ArrayMemberValue(new ClassMemberValue(constpool), constpool);
+					MemberValue[] mvals = new MemberValue[methodmapper.getParameterTypes().length];
+					for(int i=0; i<mvals.length; i++)
+					{
+						mvals[i] = new ClassMemberValue(ptypes[i].getName(), constpool);
+					}
+					vals.setValue(mvals);
+					annot.addMemberValue("parameters", vals);
+					attr.addAnnotation(annot);
+				}
+				
+				Value parametermapper = rmi.getParameterMapper();
+				if(parametermapper!=null)
+				{
+					annot = new Annotation(constpool, SJavassist.getCtClass(ParameterMapper.class, pool));
+					Annotation value = new Annotation(constpool, SJavassist.getCtClass(jadex.micro.annotation.Value.class, pool));
+					if(parametermapper.getExpression()!=null && parametermapper.getExpression().length()==0)
+						value.addMemberValue("value", new StringMemberValue(parametermapper.getExpression(), constpool));
+					if(parametermapper.getClazz()!=null && !parametermapper.getClazz().equals(Object.class))
+						value.addMemberValue("clazz", new ClassMemberValue(parametermapper.getClazz().getName(), constpool));
+					annot.addMemberValue("value", new AnnotationMemberValue(value, constpool));
+					attr.addAnnotation(annot);
+				}
+				
+				Value resultmapper = rmi.getResultMapper();
+				if(resultmapper!=null)
+				{
+					annot = new Annotation(constpool, SJavassist.getCtClass(ResultMapper.class, pool));
+					Annotation value = new Annotation(constpool, SJavassist.getCtClass(jadex.micro.annotation.Value.class, pool));
+					if(resultmapper.getExpression()!=null && resultmapper.getExpression().length()==0)
+						value.addMemberValue("value", new StringMemberValue(resultmapper.getExpression(), constpool));
+					if(resultmapper.getClazz()!=null && !resultmapper.getClazz().equals(Object.class))
+						value.addMemberValue("clazz", new ClassMemberValue(resultmapper.getClazz().getName(), constpool));
+					annot.addMemberValue("value", new AnnotationMemberValue(value, constpool));
+					attr.addAnnotation(annot);
+				}
+				
+				m.getMethodInfo().addAttribute(attr);
+				proxyclazz.addMethod(m);
+						
+				// add @QueryParam if get
+				if(GET.class.equals(rmi.getRestType()))
+				{
+					int pcnt = rmi.getParameterTypes().length;
+					if(pcnt>0)
+					{
+						Annotation[][] annos = new Annotation[pcnt][];
+						ConstPool cp = m.getMethodInfo().getConstPool();
+						for(int k=0; k<annos.length; k++)
+						{
+							Annotation anno = new Annotation(cp, SJavassist.getCtClass(QueryParam.class, pool));
+							anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
+							annos[k] = new Annotation[]{anno};
+						}
+						SJavassist.addMethodParameterAnnotation(m, annos, pool);
+					}
+				}
+				// add @FormDataParam if post
+				else if(POST.class.equals(rmi.getRestType()))
+				{
+					int pcnt = rmi.getParameterTypes().length;
+					if(pcnt>0)
+					{
+						Annotation[][] annos = new Annotation[pcnt][];
+						ConstPool cp = m.getMethodInfo().getConstPool();
+						for(int k=0; k<annos.length; k++)
+						{
+							Annotation anno = new Annotation(cp, SJavassist.getCtClass(FormDataParam.class, pool));
+							anno.addMemberValue("value", new StringMemberValue("arg"+k, cp));
+							annos[k] = new Annotation[]{anno};
+						}
+						SJavassist.addMethodParameterAnnotation(m, annos, pool);
+					}
+				}
+//						System.out.println("m: "+m.getName()+" "+SUtil.arrayToString(m.getParameterTypes()));
 			}
-		}
-		else
-		{
-			ret = baseclass;
+			
+			// Add the path annotation 
+			attr = new AnnotationsAttribute(constpool, AnnotationsAttribute.visibleTag);
+			annot = new Annotation(constpool, SJavassist.getCtClass(Path.class, pool));
+			annot.addMemberValue("value", new StringMemberValue("", constpool));
+			attr.addAnnotation(annot);
+			cf.addAttribute(attr);
+			
+			// Add method mapping table
+//			CtField fjs = new CtField(SJavassist.getCtClass(Map.class, pool), "__methodmap", proxyclazz);
+//			proxyclazz.addField(fjs, CtField.Initializer.byExpr("jadex.commons.SUtil.createHashMap(new String[]{\"a\"}, new String[]{\"a\"})"));
+							
+			ret = proxyclazz.toClass(classloader, iface.getProtectionDomain());
+			proxyclazz.freeze();
+			System.out.println("create proxy class: "+ret.getName());
 		}
 		
 		return ret;
@@ -658,6 +645,9 @@ public class DefaultRestServicePublishService implements IPublishService
 		
 		try
 		{
+			ResourceConfig rc = (ResourceConfig)getClass().getDeclaredField("__rc").get(this);
+			Object service = rc.getProperty("jadexservice");
+
 			Field fjs = getClass().getDeclaredField("__functionsjs");
 			String functionsjs = (String)fjs.get(this);
 			if(functionsjs==null)
@@ -676,18 +666,44 @@ public class DefaultRestServicePublishService implements IPublishService
 					throw new RuntimeException(e);
 				}
 			}
+			
+			Field scss = getClass().getDeclaredField("__stylecss");
+			String stylecss = (String)scss.get(this);
+			if(stylecss==null)
+			{
+				try
+				{
+					InputStream is = SUtil.getResource0("jadex/extension/rs/publish/style.css", 
+						Thread.currentThread().getContextClassLoader());
+					stylecss = new Scanner(is).useDelimiter("\\A").next();
+					scss.set(this, stylecss);
+//					System.out.println(functionsjs);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+			}
 		
 			ret.append("<html>");
 			ret.append("<head>");
+			ret.append(stylecss);
 			ret.append(functionsjs);
 	//		ret.append("<script src=\"functions.js\" type=\"text/javascript\"/>");
 			ret.append("<head>");
 			ret.append("</head>");
 			ret.append("<body>");
-			ret.append("<h1>Service Info for: ");
-			ret.append(SReflect.getUnqualifiedClassName(getClass()));
+			
+			ret.append("<div class=\"header\">");
+			ret.append("<h1>");//Service Info for: ");
+			String ifacename = ((IService)service).getServiceIdentifier().getServiceType().getTypeName();
+			ret.append(SReflect.getUnqualifiedTypeName(ifacename));
 			ret.append("</h1>");
-	
+			ret.append("</div>");
+
+			ret.append("<div class=\"middle\">");
+			
 			UriInfo ui = (UriInfo)getClass().getDeclaredField("__ui").get(this);
 			
 			Class<?> clazz = getClass();
@@ -720,24 +736,30 @@ public class DefaultRestServicePublishService implements IPublishService
 						Produces produces = method.getAnnotation(Produces.class);
 						Class<?>[] ptypes = method.getParameterTypes();
 						
-						ret.append("<p>");
-						String resttype = SReflect.getUnqualifiedClassName(restmethod);
-						ret.append(resttype).append(" ");
-						ret.append("<i><b>");
+						ret.append("<div class=\"method\">");
+						
+						ret.append("<div class=\"methodname\">");
+//						ret.append("<i><b>");
 						ret.append(method.getName());
-						ret.append("</b></i>");
+//						ret.append("</b></i>");
+						
+						ret.append("(");
 						if(ptypes!=null && ptypes.length>0)
 						{
-							ret.append("(");
 							for(int j=0; j<ptypes.length; j++)
 							{
 								ret.append(SReflect.getUnqualifiedClassName(ptypes[j]));
 								if(j+1<ptypes.length)
 									ret.append(", ");
 							}
-							ret.append(")");
 						}
-						ret.append("</br>");
+						ret.append(")");
+						ret.append("</div>");
+//						ret.append("</br>");
+						
+						ret.append("<div class=\"restproperties\">");
+						String resttype = SReflect.getUnqualifiedClassName(restmethod);
+						ret.append(resttype).append(" ");
 						
 						if(consumes!=null)
 						{
@@ -774,7 +796,8 @@ public class DefaultRestServicePublishService implements IPublishService
 								ret.append(" ");
 							}
 						}
-						ret.append("</br>");
+//						ret.append("</br>");
+						ret.append("</div>");
 
 						UriBuilder ub = ui.getBaseUriBuilder();
 						if(path!=null)
@@ -783,8 +806,12 @@ public class DefaultRestServicePublishService implements IPublishService
 						
 						if(ptypes.length>0)
 						{
+							ret.append("<div class=\"servicelink\">");
+							ret.append(link);
+							ret.append("</div>");
+							
 							// For post set the media type of the arguments.
-							ret.append("<form action=\"").append(link).append("\" method=\"")
+							ret.append("<form class=\"arguments\" action=\"").append(link).append("\" method=\"")
 								.append(resttype.toLowerCase()).append("\" enctype=\"multipart/form-data\" ");
 							
 							if(restmethod.equals(POST.class))
@@ -816,18 +843,20 @@ public class DefaultRestServicePublishService implements IPublishService
 									ret.append("</select>");
 								}
 							}
-							System.out.println(method.getName()+": x");
-							ret.append("<input type=\"submit\" value=\"invoke\"/></form>");
+							ret.append("<input type=\"submit\" value=\"invoke\"/>");
+							ret.append("</form>");
 						}
 						else
 						{
-							ret.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
+							ret.append("<a class=\"servicelink\" href=\"").append(link).append("\">").append(link).append("</a>");
 						}
-						ret.append("</p>");
+						
+						ret.append("</div>");
 					}
-					
 				}
 			}
+			
+			ret.append("</div>");
 		}
 		catch(Exception e)
 		{

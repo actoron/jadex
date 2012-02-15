@@ -39,7 +39,8 @@ import jadex.micro.annotation.Publish;
 
 	// d) Use annotated interface instead of implementation (generation of interface implementation)
 	@ProvidedService(name="banking3", type=IBankingService.class, implementation=@Implementation(BankingService.class),
-		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/banking4", servicetype=IRSBankingService.class))	
+		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/banking4", servicetype=IRSBankingService.class,
+		properties=@NameValue(name="generate", value="true")))
 })
 public class BankingAgent
 {

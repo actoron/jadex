@@ -65,49 +65,50 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 		Set<String> paths = new HashSet<String>();
 		
 		Set<MethodWrapper> methods = new LinkedHashSet<MethodWrapper>();
-		if(gen)
+			
+		if(baseclass!=null)
 		{
-			if(baseclass!=null)
+			// Add all methods if is specific interface
+			if(baseclass.isInterface())
 			{
-				// Add all methods if is specific interface
-				if(baseclass.isInterface())
+				Method[] ims = baseclass.getMethods();
+				for(int i=0; i<ims.length; i++)
 				{
-					Method[] ims = baseclass.getMethods();
-					for(int i=0; i<ims.length; i++)
-					{
-						addMethodWrapper(new MethodWrapper(ims[i]), methods);
-					}
+					addMethodWrapper(new MethodWrapper(ims[i]), methods);
 				}
-				// Else check for abstract methods (others are user implemented and will not be touched)
-				else
+			}
+			// Else check for abstract methods (others are user implemented and will not be touched)
+			else
+			{
+				Class<?> clazz = baseclass;
+				while(!clazz.equals(Object.class))
 				{
-					Class<?> clazz = baseclass;
-					while(!clazz.equals(Object.class))
+					Method[] bms = baseclass.getMethods();
+					for(int i=0; i<bms.length; i++)
 					{
-						Method[] bms = baseclass.getMethods();
-						for(int i=0; i<bms.length; i++)
+						if(Modifier.isAbstract(bms[i].getModifiers()))
 						{
-							if(Modifier.isAbstract(bms[i].getModifiers()))
-							{
-								addMethodWrapper(new MethodWrapper(bms[i]), methods);
-							}
-							else if(bms[i].isAnnotationPresent(Path.class))
-							{
-								String path = "";
-								if(bms[i].isAnnotationPresent(Path.class))
-									path = ((Path)bms[i].getAnnotation(Path.class)).value();
-								addPath(path, paths);
-							}
-							else if(getDeclaredRestType(bms[i])!=null)
-							{
-								addPath("", paths);
-							}
+							addMethodWrapper(new MethodWrapper(bms[i]), methods);
 						}
-						clazz = clazz.getSuperclass();
+						else if(bms[i].isAnnotationPresent(Path.class))
+						{
+							String path = "";
+							if(bms[i].isAnnotationPresent(Path.class))
+								path = ((Path)bms[i].getAnnotation(Path.class)).value();
+							addPath(path, paths);
+						}
+						else if(getDeclaredRestType(bms[i])!=null)
+						{
+							addPath("", paths);
+						}
 					}
+					clazz = clazz.getSuperclass();
 				}
-				
-				// Add additional interface methods of original interface if not already implemented
+			}
+			
+			// Add additional interface methods of original interface if not already implemented
+			if(gen)
+			{
 				Method[] ims = iface.getMethods();
 				for(int i=0; i<ims.length; i++)
 				{
@@ -122,17 +123,16 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 					}
 				}
 			}
-			// Add all interface methods
-			else
+		}
+		// Add all interface methods
+		else
+		{
+			Method[] ims = iface.getMethods();
+			for(int i=0; i<ims.length; i++)
 			{
-				Method[] ims = iface.getMethods();
-				for(int i=0; i<ims.length; i++)
-				{
-					addMethodWrapper(new MethodWrapper(ims[i]), methods);
-				}
+				addMethodWrapper(new MethodWrapper(ims[i]), methods);
 			}
 		}
-		
 		
 		for(Iterator<MethodWrapper> it = methods.iterator(); it.hasNext(); )
 		{
