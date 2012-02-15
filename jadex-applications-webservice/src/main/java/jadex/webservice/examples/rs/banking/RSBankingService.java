@@ -134,7 +134,7 @@ public class RSBankingService
 	@Path("getAccountStatement")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_XML)
-	public String getAccountStatement(@FormDataParam("begin") Date begin, @FormDataParam("end") Date end)
+	public String getAccountStatement(@FormDataParam("arg0") Date begin, @FormDataParam("arg1") Date end)
 	{
 		return "called";
 	}

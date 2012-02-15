@@ -40,19 +40,19 @@ body
     line-height: 1em;
 }
 
-div.header
+.header
 {
 	padding-left: 25px;
 	background: white;	
 }
 
-div.middle
+.middle
 {
 	padding-left: 25px;
 	background: #fff2cc;
 }
 
-div.method
+.method
 {
 	padding-top: 10px;
 	padding-bottom: 10px;
@@ -60,19 +60,19 @@ div.method
 	border-bottom: 1px dashed #000000;
 }
 
-div.methodname
+.methodname
 {
 	padding-top: 5px;
 	font-style: italic;
 	font-size: 120%;
 }
 	
-div.restproperties
+.restproperties
 {
 	padding-top: 5px;
 }
 
-form.arguments
+.arguments
 {
 	padding-top: 5px;
 }

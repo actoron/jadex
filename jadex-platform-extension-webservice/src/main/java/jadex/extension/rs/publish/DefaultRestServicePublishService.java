@@ -23,16 +23,13 @@ import jadex.extension.rs.publish.mapper.DefaultParameterMapper;
 import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
-import jadex.javaparser.javaccimpl.JavaParserTest;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -55,12 +52,8 @@ import javassist.bytecode.annotation.MemberValue;
 import javassist.bytecode.annotation.StringMemberValue;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -825,12 +818,13 @@ public class DefaultRestServicePublishService implements IPublishService
 //									.append(" accept=\"").append(cons[0]).append("\" />");
 							}
 							
+							ret.append("<select name=\"mediatype\">");
 							if(consumes!=null)
 							{
 								String[] cons = consumes.value();
 								if(cons!=null && cons.length>0)
 								{
-									ret.append("<select name=\"mediatype\">");
+//									ret.append("<select name=\"mediatype\">");
 									for(int j=0; j<cons.length; j++)
 									{
 										// todo: hmm? what about others?
@@ -840,15 +834,22 @@ public class DefaultRestServicePublishService implements IPublishService
 											ret.append("<option>").append(cons[j]).append("</option>");
 										}
 									}
-									ret.append("</select>");
 								}
 							}
+							else
+							{
+								ret.append("<option>").append(MediaType.TEXT_PLAIN).append("</option>");
+							}
+							ret.append("</select>");
+							
 							ret.append("<input type=\"submit\" value=\"invoke\"/>");
 							ret.append("</form>");
 						}
 						else
 						{
-							ret.append("<a class=\"servicelink\" href=\"").append(link).append("\">").append(link).append("</a>");
+							ret.append("<div class=\"servicelink\">");
+							ret.append("<a href=\"").append(link).append("\">").append(link).append("</a>");
+							ret.append("</div>");
 						}
 						
 						ret.append("</div>");
