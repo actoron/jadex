@@ -17,7 +17,37 @@ import javax.ws.rs.core.MediaType;
 public interface IRSChartService
 {
 	/**
-	 *  Get a chart.
+	 *  Get a bar chart.
+	 */
+	@GET
+	@Path("chart")
+	@Consumes("text/plain")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	@QueryParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"bhs\")"))
+//	@ParameterMapper(@Value(clazz=ChartParameterMapper.class))
+//	@ResultMapper(@Value(clazz=ChartResultMapper.class))
+	public @ResultMapper(@Value(clazz=ChartResultMapper.class)) IFuture<byte[]> getBarChart(
+		@QueryParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
+		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
+		@QueryParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels);
+
+	/**
+	 *  Get a line chart.
+	 */
+	@GET
+	@Path("chart")
+	@Consumes("text/plain")
+	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+	@QueryParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"lc\")"))
+//	@ParameterMapper(@Value(clazz=ChartParameterMapper.class))
+//	@ResultMapper(@Value(clazz=ChartResultMapper.class))
+	public @ResultMapper(@Value(clazz=ChartResultMapper.class)) IFuture<byte[]> getLineChart(
+		@QueryParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
+		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
+		@QueryParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels);
+	
+	/**
+	 *  Get a pie chart.
 	 */
 	@GET
 	@Path("chart")

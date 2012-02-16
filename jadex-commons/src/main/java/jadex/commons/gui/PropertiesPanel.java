@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -105,6 +106,14 @@ public class PropertiesPanel	extends	JPanel
 	/**
 	 *  Create a text field and add it to the panel.
 	 */
+	public JTextField createTextField(String name, String defvalue, boolean editable)
+	{
+		return createTextField(name, defvalue, editable, 0);
+	}
+	
+	/**
+	 *  Create a text field and add it to the panel.
+	 */
 	public JTextField createTextField(String name, String defvalue, boolean editable, double weighty)
 	{
 		JTextField	tf	= new JTextField(defvalue);
@@ -129,6 +138,25 @@ public class PropertiesPanel	extends	JPanel
 		JCheckBox cb = new JCheckBox(name, selected);
 		cb.setMargin(new Insets(0,0,0,0));
 		cb.setEnabled(enabled);
+		addComponent(name, cb, weighty);
+		return cb;
+	}
+	
+	/**
+	 *  Create a combo box and add it to the panel.
+	 */
+	public JComboBox createComboBox(String name, Object[] values)
+	{
+		return createComboBox(name, values, false, 0);
+	}
+	
+	/**
+	 *  Create a combo box and add it to the panel.
+	 */
+	public JComboBox createComboBox(String name, Object[] values, boolean editable, double weighty)
+	{
+		JComboBox cb = new JComboBox(values);
+		cb.setEditable(editable);
 		addComponent(name, cb, weighty);
 		return cb;
 	}
