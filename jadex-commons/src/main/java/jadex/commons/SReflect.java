@@ -921,7 +921,7 @@ public class SReflect
 	 *  @throws IllegalArgumentException when argument is not
 	 * 		one of (Iterator, Enumeration, Collection, Map, Array).
 	 */
-	public static Iterator<Object>	getIterator(Object collection)
+	public static <T> Iterator<T>	getIterator(Object collection)
 	{
 		if(collection==null)
 		{

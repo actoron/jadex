@@ -8,5 +8,5 @@ public interface IValueMapper
 	/**
 	 * 
 	 */
-	public Object convertValue(Object result) throws Exception;
+	public Object convertValue(Object value) throws Exception;
 }

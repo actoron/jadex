@@ -1,5 +1,8 @@
 package jadex.extension.rs.publish;
 
+import jadex.extension.rs.publish.mapper.IValueMapper;
+import jadex.javaparser.SJavaParser;
+
 /**
  * 
  */
@@ -43,5 +46,45 @@ public class Value
 	public Class<?> getClazz()
 	{
 		return clazz;
+	}
+	
+	/**
+	 * 
+	 */
+	public static Object evaluate(Value value, String[] imports) throws Exception
+	{
+		Object ret = null;
+		
+		Class<?> clazz = value.getClazz();
+		if(clazz!=null && !Object.class.equals(clazz))
+		{
+			ret = clazz.newInstance();
+		}
+		else if(value.getExpression()!=null)
+		{
+			ret = SJavaParser.evaluateExpression(value.getExpression(), imports, null, null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public static Object evaluate(jadex.micro.annotation.Value value, String[] imports) throws Exception
+	{
+		Object ret = null;
+		
+		Class<?> clazz = value.clazz();
+		if(clazz!=null && !Object.class.equals(clazz))
+		{
+			ret = clazz.newInstance();
+		}
+		else if(value.value().length()>0)
+		{
+			ret = SJavaParser.evaluateExpression(value.value(), imports, null, null);
+		}
+		
+		return ret;
 	}
 }
