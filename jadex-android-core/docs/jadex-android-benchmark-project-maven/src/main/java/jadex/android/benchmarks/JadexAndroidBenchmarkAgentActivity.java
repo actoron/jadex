@@ -41,6 +41,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -77,6 +80,63 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 	
 	//-------- methods --------
 
+	/**
+	 *  Called when the menu is shown.
+	 */
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.menu, menu);
+	    return true;
+	}
+	
+	/**
+	 *  Called when a menu item is selected.
+	 */
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		boolean	ret;
+		
+		if(item.getItemId()==R.id.nocodec || item.getItemId()==R.id.codec
+			|| item.getItemId()==R.id.remote || item.getItemId()==R.id.remotecodec)
+		{
+			String	agent	= MessagePerformanceAgent.class.getName().replaceAll("\\.", "/")+".class";
+			Map<String, Object> args	= new HashMap<String, Object>();
+			if(item.getItemId()==R.id.codec || item.getItemId()==R.id.remotecodec)
+			{
+				args.put("codec", Boolean.TRUE);
+			}
+			if(item.getItemId()==R.id.remote || item.getItemId()==R.id.remotecodec)
+			{
+				args.put("echo", new ComponentIdentifier("echo@echo",
+					new String[]{SRelay.DEFAULT_ADDRESS}));
+//					new String[]{SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/"}));
+			}
+			
+			runBenchmark(agent, args).addResultListener(new IResultListener<Collection<Tuple2<String, Object>>>()
+			{
+				public void resultAvailable(final Collection<Tuple2<String, Object>> result)
+				{
+					System.out.println(result);
+				}
+				
+				public void exceptionOccurred(final Exception exception)
+				{
+					exception.printStackTrace();
+					System.out.println("Benchmark failed: "+exception);
+				}
+			});
+			
+			ret	= true;
+	    }
+		else
+		{
+			ret	= super.onOptionsItemSelected(item);
+		}
+		
+		return ret;
+	}
+	
 	/**
 	 *  Called when the activity is first created.
 	 */
