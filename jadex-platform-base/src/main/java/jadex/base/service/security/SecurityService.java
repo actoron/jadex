@@ -287,7 +287,7 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void>	setLocalPassword(String password)
 	{
 		IFuture<Void>	ret;
-		if(password==null && usepass!=null && usepass.booleanValue())
+		if(password==null && (usepass==null || usepass.booleanValue()))
 		{
 			ret	= new Future<Void>(new IllegalStateException("Cannot set password to null, when password protection is enabled."));
 		}
@@ -369,7 +369,7 @@ public class SecurityService implements ISecurityService
 	public IFuture<Void>	validateRequest(IAuthorizable request)
 	{
 		String	error	= null;
-		if(Security.PASSWORD.equals(request.getSecurityLevel()) && usepass!=null && usepass.booleanValue() && password!=null)
+		if(Security.PASSWORD.equals(request.getSecurityLevel()) && (usepass==null || usepass.booleanValue()) && password!=null)
 		{
 			if(request.getAuthenticationData()!=null)
 			{
@@ -466,7 +466,7 @@ public class SecurityService implements ISecurityService
 	public static void	main(String args[]) throws Exception
 	{
 		// Test performance of algorithms
-		// See http://download.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#MessageDigesthttp://download.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#MessageDigest
+		// See http://download.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#MessageDigest
 		String[]	names	= new String[]
 		{
 			"MD2",
