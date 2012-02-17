@@ -98,6 +98,10 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 			
 			results.add(result);
 			
+//			if(listener instanceof IIntermediateResultListener)
+//			{
+//				scheduleNotification(listener, true, result);
+//			}
 			if(listeners!=null)
 			{
 				// Find intermediate listeners to be notified.
@@ -105,7 +109,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 				{
 					if(listeners.get(i) instanceof IIntermediateResultListener)
 					{
-						scheduleNotification((IResultListener)listeners.get(i), true, result);
+						scheduleNotification(listeners.get(i), true, result);
 					}
 				}
 			}
@@ -223,9 +227,16 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 	    	}
 	    	else
 	    	{
-	    		if(listeners==null)
-	    			listeners	= new ArrayList();
-	    		listeners.add(listener);
+//	    		if(this.listener==null)
+//	    		{
+//	    			this.listener	= listener;
+//	    		}
+//	    		else
+	    		{
+		    		if(listeners==null)
+		    			listeners	= new ArrayList<IResultListener<Collection<E>>>();
+		    		listeners.add(listener);
+	    		}
 	    	}
     	}
 

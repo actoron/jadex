@@ -34,7 +34,7 @@ public class Future<E> implements IFuture<E>
 	public static final boolean DEBUG = false;
 	
 	/** The empty future. */
-	public static final IFuture	EMPTY	= new Future(null);
+	public static final IFuture<?>	EMPTY	= new Future<Object>(null);
 	
 	/**
 	 *  Get the empty future of some type.
@@ -52,16 +52,18 @@ public class Future<E> implements IFuture<E>
 	
 	/** The exception (if any). */
 	protected Exception exception;
-//	protected Exception resultex;
 	
 	/** Flag indicating if result is available. */
 	protected boolean resultavailable;
 	
-	/** The blocked callers. */
-	protected Map callers;
+	/** The blocked callers (caller->state). */
+	protected Map<ISuspendable, String> callers;
+	
+//	/** The first listener (for avoiding array creation). */
+//	protected IResultListener<E> listener;
 	
 	/** The listeners. */
-	protected List listeners;
+	protected List<IResultListener<E>> listeners;
 	
 	/** For capturing call stack of future creation. */
 	// Only for debugging;
@@ -142,7 +144,7 @@ public class Future<E> implements IFuture<E>
 	     
 //	    	   	System.out.println(this+" suspend: "+caller);
 	    	   	if(callers==null)
-	    	   		callers	= Collections.synchronizedMap(new HashMap());
+	    	   		callers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
 	    	   	callers.put(caller, CALLER_QUEUED);
 	    	   	suspend = true;
 	    	}
@@ -348,13 +350,13 @@ public class Future<E> implements IFuture<E>
 		{
     	   	if(callers!=null)
     	   	{
-				for(Iterator it=callers.keySet().iterator(); it.hasNext(); )
+				for(Iterator<ISuspendable> it=callers.keySet().iterator(); it.hasNext(); )
 		    	{
-		    		ISuspendable caller = (ISuspendable)it.next();
+		    		ISuspendable caller = it.next();
 		    		Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
 		    		synchronized(mon)
 					{
-		    			Object	state	= callers.get(caller);
+		    			String	state	= callers.get(caller);
 		    			if(CALLER_SUSPENDED.equals(state))
 		    			{
 		    				// Only reactivate thread when previously suspended.
@@ -368,11 +370,15 @@ public class Future<E> implements IFuture<E>
 			}
 		}
 		
+//		if(listener!=null)
+//		{
+//    		notifyListener(listener);			
+//		}
 		if(listeners!=null)
 		{
 	    	for(int i=0; i<listeners.size(); i++)
 	    	{
-	    		notifyListener((IResultListener<E>)listeners.get(i));
+	    		notifyListener(listeners.get(i));
 	    	}
 		}
 	}
@@ -395,9 +401,16 @@ public class Future<E> implements IFuture<E>
 	    	}
 	    	else
 	    	{
-	    		if(listeners==null)
-	    			listeners	= new ArrayList();
-	    		listeners.add(listener);
+//	    		if(this.listener==null)
+//	    		{
+//	    			this.listener	= listener;
+//	    		}
+//	    		else
+	    		{
+	    			if(listeners==null)
+	    				listeners	= new ArrayList<IResultListener<E>>();
+	    			listeners.add(listener);
+	    		}
 	    	}
     	}
     	if(notify)
@@ -410,63 +423,13 @@ public class Future<E> implements IFuture<E>
      */
     protected void notifyListener(IResultListener<E> listener)
     {
-//    	try
-//    	{
-			if(exception!=null)
-			{
-				listener.exceptionOccurred(exception);
-			}
-			else
-			{
-				listener.resultAvailable(result); 
-			}
-//    	}
-//    	catch(Exception e)
-//    	{
-//    		e.printStackTrace();
-//    	}
-    }
-    
-    /**
-     *  Main for testing. 
-     */
-    public static void main(String[] args) throws Exception
-    {
-    	final Future f = new Future();
-    
-    	f.addResultListener(new IResultListener()
+		if(exception!=null)
 		{
-			public void resultAvailable(Object result)
-			{
-				System.out.println(Thread.currentThread().getName()+": listener: "+result);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-			}
-		});
-    	
-    	Thread t = new Thread(new Runnable()
+			listener.exceptionOccurred(exception);
+		}
+		else
 		{
-			public void run()
-			{
-				try
-				{
-					System.out.println(Thread.currentThread().getName()+": waiting for 1 sec");
-					Thread.sleep(1000);
-					System.out.println(Thread.currentThread().getName()+": setting result");
-					f.setResult("my result");
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-		});
-    	t.start();
-    	
-    	System.out.println(Thread.currentThread().getName()+": waiting for result");
-    	Object result = f.get(new ThreadSuspendable(new Object()));
-    	System.out.println(Thread.currentThread().getName()+": result is: "+result);
+			listener.resultAvailable(result); 
+		}
     }
 }

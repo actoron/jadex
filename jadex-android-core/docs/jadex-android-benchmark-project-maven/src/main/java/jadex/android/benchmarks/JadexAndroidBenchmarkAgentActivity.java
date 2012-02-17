@@ -24,9 +24,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.micro.CascadingFutureTest;
 import jadex.micro.annotation.Binding;
 import jadex.micro.benchmarks.MessagePerformanceAgent;
+import jadex.micro.benchmarks.PojoAgentCreationAgent;
 import jadex.micro.examples.chat.IChatService;
 import jadex.xml.annotation.XMLClassname;
 
@@ -89,10 +89,12 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 	{
 		boolean	ret;
 		
-		if(item.getItemId()==R.id.nocodec || item.getItemId()==R.id.codec
+		if(item.getItemId()==R.id.creation || item.getItemId()==R.id.nocodec || item.getItemId()==R.id.codec
 			|| item.getItemId()==R.id.remote || item.getItemId()==R.id.remotecodec)
 		{
-			String	agent	= MessagePerformanceAgent.class.getName().replaceAll("\\.", "/")+".class";
+			String	agent	= item.getItemId()==R.id.creation
+				? PojoAgentCreationAgent.class.getName().replaceAll("\\.", "/")+".class"
+				: MessagePerformanceAgent.class.getName().replaceAll("\\.", "/")+".class";
 			Map<String, Object> args	= new HashMap<String, Object>();
 			if(item.getItemId()==R.id.codec || item.getItemId()==R.id.remotecodec)
 			{

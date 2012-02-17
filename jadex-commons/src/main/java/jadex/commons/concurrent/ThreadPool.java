@@ -42,8 +42,8 @@ public class ThreadPool implements IThreadPool
 	/** The running flag. */
 	protected boolean	running;
 
-	/** The task - thread mapping. */
-	protected Map	threads;
+//	/** The task - thread mapping. */
+//	protected Map	threads;
 
 	//-------- constructors --------
 
@@ -66,7 +66,7 @@ public class ThreadPool implements IThreadPool
 		this.tasks	= new ArrayBlockingQueue();
 //		this.tasks = new java.util.concurrent.LinkedBlockingQueue();
 		this.pool = new ArrayList();
-		this.threads = new Hashtable();
+//		this.threads = new Hashtable();
 		
 		addThreads(strategy.getThreadCount());
 	
@@ -151,13 +151,13 @@ public class ThreadPool implements IThreadPool
 		}
 	}
 
-	/**
-	 *  Get a thread for a task.
-	 */
-	protected synchronized Thread getThread(Runnable task)
-	{
-		return (Thread)threads.get(task);
-	}
+//	/**
+//	 *  Get a thread for a task.
+//	 */
+//	protected synchronized Thread getThread(Runnable task)
+//	{
+//		return (Thread)threads.get(task);
+//	}
 
 	/**
 	 *  The task for a given thread.
@@ -184,8 +184,8 @@ public class ThreadPool implements IThreadPool
 		/** The actual task. */
 		protected Runnable task;
 
-		/** The start time. */
-		protected long start;
+//		/** The start time. */
+//		protected long start;
 
 		//-------- constructors --------
 
@@ -213,10 +213,10 @@ public class ThreadPool implements IThreadPool
 				{
 					this.task = ((Runnable)tasks.dequeue(strategy.getThreadTimeout()));
 //					this.task = ((Runnable)tasks.poll(strategy.getThreadTimeout(), TimeUnit.MILLISECONDS));
-					threads.put(task, this);
-					this.start = System.currentTimeMillis();
-					String	oldname	= this.getName();
-					this.setName(task.toString());
+//					threads.put(task, this);
+//					this.start = System.currentTimeMillis();
+//					String	oldname	= this.getName();
+//					this.setName(task.toString());
 
 					try
 					{
@@ -227,7 +227,7 @@ public class ThreadPool implements IThreadPool
 					{
 						e.printStackTrace();
 					}
-					this.setName(oldname);
+//					this.setName(oldname);
 				}
 				catch(IBlockingQueue.ClosedException e)
 				{
@@ -248,7 +248,7 @@ public class ThreadPool implements IThreadPool
 				
 				if(task!=null)
 				{
-					threads.remove(task);
+//					threads.remove(task);
 					this.task = null;
 					terminate = strategy.taskFinished();
 				}
