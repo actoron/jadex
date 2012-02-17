@@ -12,6 +12,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+/**
+ *  The mapping information for the rest service.
+ *  Describes how the Java service call information is used
+ *  to generate the rest service call.
+ */
 //@BaseURI("https://chart.googleapis.com/chart")
 @Path("https://chart.googleapis.com")
 public interface IRSChartService
@@ -24,8 +29,6 @@ public interface IRSChartService
 	@Consumes("text/plain")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	@QueryParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"bhs\")"))
-//	@ParameterMapper(@Value(clazz=ChartParameterMapper.class))
-//	@ResultMapper(@Value(clazz=ChartResultMapper.class))
 	public @ResultMapper(@Value(clazz=ChartResultMapper.class)) IFuture<byte[]> getBarChart(
 		@QueryParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
 		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
@@ -39,8 +42,6 @@ public interface IRSChartService
 	@Consumes("text/plain")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	@QueryParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"lc\")"))
-//	@ParameterMapper(@Value(clazz=ChartParameterMapper.class))
-//	@ResultMapper(@Value(clazz=ChartResultMapper.class))
 	public @ResultMapper(@Value(clazz=ChartResultMapper.class)) IFuture<byte[]> getLineChart(
 		@QueryParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
 		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
@@ -54,13 +55,12 @@ public interface IRSChartService
 	@Consumes("text/plain")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 	@QueryParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"p3\")"))
-//	@ParameterMapper(@Value(clazz=ChartParameterMapper.class))
-//	@ResultMapper(@Value(clazz=ChartResultMapper.class))
 	public @ResultMapper(@Value(clazz=ChartResultMapper.class)) IFuture<byte[]> getPieChart(
 		@QueryParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
 		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
 		@QueryParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels);
 
+	
 //	/**
 //	 *  Get a chart.
 //	 */

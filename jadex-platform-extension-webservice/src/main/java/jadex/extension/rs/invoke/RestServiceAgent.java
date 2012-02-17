@@ -32,20 +32,11 @@ public class RestServiceAgent
 	//-------- methods --------
 	
 	/**
-	 *  Create a wrapper service implementation based on the JAXB generated
-	 *  Java service class and the service mapping information.
+	 *  Create a wrapper service implementation based on mapping information.
 	 */
 	public Object createServiceImplementation(Class<?> type, Class<?> impl)
 	{
-		try
-		{
 		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
 			new RestServiceWrapperInvocationHandler(agent, impl));
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
 	}
 }

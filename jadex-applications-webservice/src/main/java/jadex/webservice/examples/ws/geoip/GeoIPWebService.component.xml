@@ -1,0 +1,25 @@
+<!--
+	<H3>The geoip provider</H3>
+-->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:env="http://jadex.sourceforge.net/jadex-envspace"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-component-2.0.xsd
+	                    http://jadex.sourceforge.net/jadex-envspace 
+	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
+	name="GeoIPWebService" package="jadex.webservice.examples.ws.geoip">
+	
+	<imports>
+		<import>jadex.extension.ws.invoke.*</import>
+		<import>jadex.webservice.examples.ws.geoip.gen.*</import>
+	</imports>
+	
+	<services>
+		<providedservice class="IGeoIPService">
+			<implementation>SWebService.createServiceImplementation($component, IGeoIPService.class, 
+				new WebServiceMappingInfo(GeoIPService.class, "getGeoIPServiceSoap"))</implementation>
+		</providedservice>
+	</services>
+	
+</componenttype>

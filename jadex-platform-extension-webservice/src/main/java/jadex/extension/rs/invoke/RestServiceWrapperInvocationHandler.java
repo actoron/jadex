@@ -4,7 +4,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
@@ -13,41 +15,30 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.rs.invoke.annotation.QueryParamMapper;
 import jadex.extension.rs.publish.DefaultRestMethodGenerator;
-import jadex.extension.rs.publish.JadexXMLBodyReader;
 import jadex.extension.rs.publish.annotation.ParameterMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
-import jadex.extension.rs.publish.mapper.IParameterMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
-import jadex.javaparser.SJavaParser;
+import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.Value;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-
-import org.codehaus.jackson.map.ObjectMapper;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
@@ -58,7 +49,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
  *  data to determine details about the service call.
  *  The invocation agent returns the result and terminates itself after the call.
  */
-@Service
+@Service // Used here only to pass allow proxy to be used as service (check is delegated to handler)
 class RestServiceWrapperInvocationHandler implements InvocationHandler
 {
 	public static String[] defaultimports = new String[]{"jadex.extension.rs.invoke.*", 
@@ -100,13 +91,15 @@ class RestServiceWrapperInvocationHandler implements InvocationHandler
 	{
 		final Future<Object> ret = new Future<Object>();
 			
-		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
-		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
+//		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
+		IFuture<IComponentManagementService> fut = SServiceProvider.getService(agent.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
+		fut.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 				CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
-				cms.createComponent(null, "invocation", ci, null)
+//				cms.createComponent(null, "invocation", ci, null)
+				cms.createComponent(null, "jadex/extension/rs/invoke/RestServiceInvocationAgent.class", ci, null)
 					.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier cid) 
@@ -249,7 +242,7 @@ class RestServiceWrapperInvocationHandler implements InvocationHandler
 					}
 				}));
 			}
-		});
+		}));
 			
 		return ret;
 	}

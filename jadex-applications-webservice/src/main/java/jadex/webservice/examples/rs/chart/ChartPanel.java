@@ -1,20 +1,19 @@
 package jadex.webservice.examples.rs.chart;
 
 import jadex.base.gui.SwingDefaultResultListener;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -23,7 +22,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 /**
@@ -34,7 +32,7 @@ public class ChartPanel extends JPanel
 	/**
 	 * 
 	 */
-	public ChartPanel(final IChartService chartservice)
+	public ChartPanel(final IExternalAccess agent)
 	{
 		setLayout(new BorderLayout());
 		JPanel iconp = new JPanel(new BorderLayout());
@@ -62,54 +60,64 @@ public class ChartPanel extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				int num = chartdata.getModel().getSize();
-				double[] data = new double[num];
+				final double[] data = new double[num];
 				for(int i=0; i<num; i++)
 				{
 					Object elem = chartdata.getModel().getElementAt(i);
 					data[i] = Double.parseDouble(""+elem);
 				}
-				int w = Integer.parseInt(width.getText());
-				int h = Integer.parseInt(height.getText());
+				final int w = Integer.parseInt(width.getText());
+				final int h = Integer.parseInt(height.getText());
 
-				if("Bar Chart".equals(charttype.getSelectedItem()))
+				final Object chartt = charttype.getSelectedItem();
+				agent.scheduleStep(new IComponentStep<Void>()
 				{
-					chartservice.getBarChart(w, h, data, null).addResultListener(new SwingDefaultResultListener<byte[]>()
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						public void customResultAvailable(byte[] data)
+						IFuture<IChartService> csfut = ia.getServiceContainer().getRequiredService("chartservice");
+						csfut.addResultListener(new SwingDefaultResultListener<IChartService>()
 						{
-							ImageIcon icon = new ImageIcon(data);
-							chartlabel.setIcon(icon);
-//							chartbutton.setIcon(icon);
-//							ChartPanel.this.pack();
-//							ChartPanel.this.invalidate();
-//							ChartPanel.this.doLayout();
-//							chartlabel.repaint();
-						}
-					});
-				}
-				else if("Line Chart".equals(charttype.getSelectedItem()))
-				{
-					chartservice.getLineChart(w, h, data, null).addResultListener(new SwingDefaultResultListener<byte[]>()
-					{
-						public void customResultAvailable(byte[] data)
-						{
-							ImageIcon icon = new ImageIcon(data);
-							chartlabel.setIcon(icon);
-						}
-					});
-					chartservice.getLineChart(w, h, data, null);
-				}
-				else if("Pie Chart".equals(charttype.getSelectedItem()))
-				{
-					chartservice.getPieChart(w, h, data, null).addResultListener(new SwingDefaultResultListener<byte[]>()
-					{
-						public void customResultAvailable(byte[] data)
-						{
-							ImageIcon icon = new ImageIcon(data);
-							chartlabel.setIcon(icon);
-						}
-					});
-				}
+							public void customResultAvailable(IChartService chartservice)
+							{
+								if("Bar Chart".equals(chartt))
+								{
+									chartservice.getBarChart(w, h, data, null).addResultListener(new SwingDefaultResultListener<byte[]>()
+									{
+										public void customResultAvailable(byte[] data)
+										{
+											ImageIcon icon = new ImageIcon(data);
+											chartlabel.setIcon(icon);
+										}
+									});
+								}
+								else if("Line Chart".equals(chartt))
+								{
+									chartservice.getLineChart(w, h, data, null).addResultListener(new SwingDefaultResultListener<byte[]>()
+									{
+										public void customResultAvailable(byte[] data)
+										{
+											ImageIcon icon = new ImageIcon(data);
+											chartlabel.setIcon(icon);
+										}
+									});
+									chartservice.getLineChart(w, h, data, null);
+								}
+								else if("Pie Chart".equals(chartt))
+								{
+									chartservice.getPieChart(w, h, data, null).addResultListener(new SwingDefaultResultListener<byte[]>()
+									{
+										public void customResultAvailable(byte[] data)
+										{
+											ImageIcon icon = new ImageIcon(data);
+											chartlabel.setIcon(icon);
+										}
+									});
+								}
+							}
+						});
+						return IFuture.DONE;
+					}
+				});
 			}
 		});
 	}
@@ -117,10 +125,10 @@ public class ChartPanel extends JPanel
 	/**
 	 * 
 	 */
-	public static JFrame createChartFrame(IChartService chartservice)
+	public static JFrame createChartFrame(IExternalAccess agent)
 	{
 		JFrame f = new JFrame();
-		JPanel p = new ChartPanel(chartservice);
+		JPanel p = new ChartPanel(agent);
 		f.add(p, BorderLayout.CENTER);
 		f.pack();
 		f.setVisible(true);

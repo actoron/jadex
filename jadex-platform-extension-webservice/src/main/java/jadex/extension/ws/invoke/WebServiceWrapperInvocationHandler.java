@@ -4,7 +4,9 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DelegationResultListener;
@@ -63,13 +65,15 @@ class WebServiceWrapperInvocationHandler implements InvocationHandler
 	{
 		final Future<Object> ret = new Future<Object>();
 			
-		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
+//		IFuture<IComponentManagementService> fut = agent.getServiceContainer().getRequiredService("cms");
+		IFuture<IComponentManagementService> fut = SServiceProvider.getService(agent.getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM);
 		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
 				CreationInfo ci = new CreationInfo(agent.getComponentIdentifier());
-				cms.createComponent(null, "invocation", ci, null)
+//				cms.createComponent(null, "invocation", ci, null)
+				cms.createComponent(null, "jadex/extension/ws/invoke/WebServiceInvocationAgent.class", ci, null)
 					.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Object>(ret)
 				{
 					public void customResultAvailable(IComponentIdentifier cid) 
@@ -86,7 +90,7 @@ class WebServiceWrapperInvocationHandler implements InvocationHandler
 										
 										try
 										{
-											Class sclass = mapping.getService();
+											Class<?> sclass = mapping.getService();
 											Object service = sclass.newInstance();
 											Method ptm = sclass.getMethod(mapping.getPortType(), new Class[0]);
 											Object porttype = ptm.invoke(service, new Object[0]);
