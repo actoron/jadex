@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface QueryParamMapper
+public @interface ParamMapper
 {
 	/**
 	 *  The method name.

@@ -200,6 +200,15 @@ public class PropertiesPanel	extends	JPanel
 	}
 	
 	/**
+	 *  Add a component that spans a full line.
+	 *  No label is rendered.
+	 */
+	public void	addComponent(String name, JComponent comp)
+	{
+		addComponent(name, comp, 0);
+	}
+	
+	/**
 	 *  Add a component
 	 */
 	public void	addComponent(String name, JComponent comp, double weighty)

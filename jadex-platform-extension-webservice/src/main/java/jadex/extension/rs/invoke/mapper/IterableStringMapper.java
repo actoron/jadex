@@ -13,6 +13,7 @@ public class IterableStringMapper implements IValueMapper
 	protected String delim;
 	protected String prefix;
 	protected String postfix;
+	protected IValueMapper submapper;
 	
 	/**
 	 * 
@@ -33,6 +34,14 @@ public class IterableStringMapper implements IValueMapper
 	/**
 	 * 
 	 */
+	public IterableStringMapper(String delim, IValueMapper submapper)
+	{
+		this(null, delim, null, submapper);		
+	}
+	
+	/**
+	 * 
+	 */
 	public IterableStringMapper(String prefix, String delim)
 	{
 		this(prefix, delim, null);
@@ -43,9 +52,18 @@ public class IterableStringMapper implements IValueMapper
 	 */
 	public IterableStringMapper(String prefix, String delim, String postfix)
 	{
+		this(prefix, delim, postfix, null);
+	}
+	
+	/**
+	 * 
+	 */
+	public IterableStringMapper(String prefix, String delim, String postfix, IValueMapper submapper)
+	{
 		this.prefix = prefix;
 		this.delim = delim;
 		this.postfix = postfix;
+		this.submapper = submapper;
 	}
 	
 	/**
@@ -58,7 +76,10 @@ public class IterableStringMapper implements IValueMapper
 			ret.append(prefix);
 		for(Iterator<?> it = SReflect.getIterator(value); it.hasNext(); )
 		{
-			ret.append(it.next());
+			Object next = it.next();
+			if(submapper!=null)
+				next = submapper.convertValue(next);
+			ret.append(next);
 			if(delim!=null && it.hasNext())
 				ret.append(delim);
 		}

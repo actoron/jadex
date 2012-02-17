@@ -1,12 +1,12 @@
 package jadex.webservice.examples.rs.chart;
 
 import jadex.commons.future.IFuture;
-import jadex.extension.rs.invoke.annotation.QueryParamMapper;
-import jadex.extension.rs.publish.annotation.ParameterMapper;
+import jadex.extension.rs.invoke.annotation.ParamMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.micro.annotation.Value;
 
-import javax.ws.rs.Consumes;
+import java.awt.Color;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -26,52 +26,68 @@ public interface IRSChartService
 	 */
 	@GET
 	@Path("chart")
-	@Consumes("text/plain")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	@QueryParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"bhs\")"))
+	@ParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"bhs\")"))
 	public @ResultMapper(@Value(clazz=ChartResultMapper.class)) IFuture<byte[]> getBarChart(
-		@QueryParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
-		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
-		@QueryParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels);
+		@ParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
+		@ParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
+		@ParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
+		@ParamMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
 
 	/**
 	 *  Get a line chart.
 	 */
 	@GET
 	@Path("chart")
-	@Consumes("text/plain")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	@QueryParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"lc\")"))
+	@ParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"lc\")"))
 	public @ResultMapper(@Value(clazz=ChartResultMapper.class)) IFuture<byte[]> getLineChart(
-		@QueryParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
-		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
-		@QueryParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels);
+		@ParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
+		@ParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
+//		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
+		@ParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
+		@ParamMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
 	
 	/**
 	 *  Get a pie chart.
 	 */
 	@GET
 	@Path("chart")
-	@Consumes("text/plain")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	@QueryParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"p3\")"))
+	@ParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"pc\")"))
 	public @ResultMapper(@Value(clazz=ChartResultMapper.class)) IFuture<byte[]> getPieChart(
-		@QueryParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
-		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
-		@QueryParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels);
+		@ParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
+		@ParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
+//		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
+		@ParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
+		@ParamMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
 
+	
+	//-------- alternatives --------
 	
 //	/**
 //	 *  Get a chart.
 //	 */
 //	@GET
 //	@Path("chart")
-//	@Consumes("text/plain")
 //	@Produces(MediaType.APPLICATION_OCTET_STREAM)
 //	@ParameterMapper(@Value(clazz=ChartParameterMapper.class))
 //	@ResultMapper(@Value(clazz=ChartResultMapper.class))
 //	public IFuture<byte[]> getPieChart(int width, int height, double[] data, String[] labels);
-
+//
+//	/**
+//	 *  Get a bar chart.
+//	 */
+//	@POST
+//	@Path("chart")
+//	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+//	@Produces(MediaType.APPLICATION_OCTET_STREAM)
+//	@ParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"bhs\")"))
+//	public @ResultMapper(@Value(clazz=ChartResultMapper.class)) IFuture<byte[]> getBarChart(
+//		@ParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
+//		@ParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
+//		@ParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
+//		@ParamMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
 	
 //	https://chart.googleapis.com/chart?
 //	    This is the base URL for all chart requests. (However, see Improving Performance on Pages with Many Charts below for an optional variation for pages with multiple charts.)

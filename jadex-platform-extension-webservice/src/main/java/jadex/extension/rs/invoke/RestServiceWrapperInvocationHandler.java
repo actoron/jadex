@@ -9,12 +9,17 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.extension.rs.invoke.annotation.QueryParamMapper;
+import jadex.extension.rs.invoke.annotation.ParamMapper;
+import jadex.extension.rs.invoke.annotation.ParamMappers;
+import jadex.extension.rs.invoke.annotation.ParametersInURL;
 import jadex.extension.rs.publish.DefaultRestMethodGenerator;
+import jadex.extension.rs.publish.JadexXMLBodyReader;
+import jadex.extension.rs.publish.JadexXMLBodyWriter;
 import jadex.extension.rs.publish.annotation.ParameterMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
@@ -28,26 +33,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.RequestBuilder;
+import com.sun.jersey.api.client.UniformInterface;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
  *  Create a new web service wrapper invocation handler.
  *  
- *  Creates an 'web service invocation agent' for each method invocation.
+ *  Creates an 'rest service invocation agent' for each method invocation.
  *  Lets this invocation agent call the web service by using the mapping
  *  data to determine details about the service call.
  *  The invocation agent returns the result and terminates itself after the call.
+ *  
+ *  todo: 
+ *  - path parameter support
+ *  
  */
 @Service // Used here only to pass allow proxy to be used as service (check is delegated to handler)
 class RestServiceWrapperInvocationHandler implements InvocationHandler
@@ -121,47 +139,60 @@ class RestServiceWrapperInvocationHandler implements InvocationHandler
 											Class<?> resttype = DefaultRestMethodGenerator.getDeclaredRestType(m);
 											String methodname = m.getAnnotation(Path.class).value();
 											
-											String[] consumes = null;
+											String[] consumes = SUtil.EMPTY_STRING_ARRAY;
 											if(m.isAnnotationPresent(Consumes.class))
 												consumes = m.getAnnotation(Consumes.class).value();
 											
-											String[] produces = m.getAnnotation(Produces.class).value();
+											String[] produces = SUtil.EMPTY_STRING_ARRAY;
 											if(m.isAnnotationPresent(Produces.class))
 												produces = m.getAnnotation(Produces.class).value();
 											
+											// Test if general parameter mapper is given
 											Value pmapper = null;
 											if(m.isAnnotationPresent(ParameterMapper.class))
 												pmapper = m.getAnnotation(ParameterMapper.class).value();
-											List pmappers = null;
+											
+											// Otherwise test if parameter specific mappers are given
+											List<Object[]> pmappers = null;
 											if(pmapper==null)
 											{
-												pmappers = new ArrayList();
+												pmappers = new ArrayList<Object[]>();
 												Annotation[][] anoss = m.getParameterAnnotations();
 												for(int i=0; i<anoss.length; i++)
 												{
 													Annotation[] anos = anoss[i]; 
 													for(int j=0; j<anos.length; j++)
 													{
-														if(anos[j] instanceof QueryParamMapper)
+														if(anos[j] instanceof ParamMapper)
 														{
 															pmappers.add(new Object[]{anos[j], new int[]{i}});
 														}
 													}
 												}
-												if(m.isAnnotationPresent(QueryParamMapper.class))
+												if(m.isAnnotationPresent(ParamMapper.class))
 												{
-													QueryParamMapper qpm = m.getAnnotation(QueryParamMapper.class);
+													ParamMapper qpm = m.getAnnotation(ParamMapper.class);
 													pmappers.add(new Object[]{qpm, new int[]{-1}});
+												}
+												if(m.isAnnotationPresent(ParamMappers.class))
+												{
+													ParamMappers qpms = m.getAnnotation(ParamMappers.class);
+													ParamMapper[] mps = qpms.value();
+													for(int i=0; i<mps.length; i++)
+													{
+														pmappers.add(new Object[]{mps[i], new int[]{-1}});
+													}
 												}
 											}
 											
+											// Test if a result mapper is given
 											Value rmapper = null;
 											if(m.isAnnotationPresent(ResultMapper.class))
 												rmapper = m.getAnnotation(ResultMapper.class).value();
 											
 											ClientConfig cc = new DefaultClientConfig();
-//											cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-//											cc.getClasses().add(JadexXMLBodyReader.class);
+											cc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+											cc.getClasses().add(JadexXMLBodyWriter.class);
 											
 											Object targetparams = args;
 											if(pmapper!=null)
@@ -175,7 +206,7 @@ class RestServiceWrapperInvocationHandler implements InvocationHandler
 												for(int i=0; i<pmappers.size(); i++)
 												{
 													Object[] pm = (Object[])pmappers.get(i);
-													QueryParamMapper qpm = (QueryParamMapper)pm[0];
+													ParamMapper qpm = (ParamMapper)pm[0];
 													String name = qpm.value();
 													Value val = qpm.mapper();
 													int[] src = qpm.source().length>0? qpm.source(): (int[])pm[1];
@@ -193,29 +224,55 @@ class RestServiceWrapperInvocationHandler implements InvocationHandler
 											}
 											
 											Client client = Client.create(cc);
-											WebResource service = client.resource(baseuri); 
-											service = service.path(methodname);
-//											for(int i=0; i<consumes.length; i++)
-//												service = service.type(consumes[i]);
-//											for(int i=0; i<produces.length; i++)
-//												service = service.accept(produces[i]);
+											WebResource wr = client.resource(baseuri); 
+											wr = wr.path(methodname);
 											
 											ClientResponse res = null;
 											if(GET.class.equals(resttype))
 											{
-												service = service.queryParams((MultivaluedMap<String, String>)(targetparams));
-//												Map<String, String> vals = (Map<String, String>)targetparams;
-//												for(Iterator<String> it = vals.keySet().iterator(); it.hasNext(); )
-//												{
-//													String key = it.next();
-//													String value = vals.get(key);
-//													service = service.queryParam(key, value);
-//												}
-												res = service.get(ClientResponse.class);
+												wr = wr.queryParams((MultivaluedMap<String, String>)targetparams);
+												
+												RequestBuilder rb = wr;
+												for(int i=0; i<consumes.length; i++)
+												{
+													rb = rb.type(consumes[i]);
+												}
+												for(int i=0; i<produces.length; i++)
+												{
+													rb = rb.accept(produces[i]);
+												}
+
+												res = ((UniformInterface)rb).get(ClientResponse.class);
 											}
-											else if(POST.class.equals(resttype))
+											else 
 											{	
-												res = service.post(ClientResponse.class, targetparams);
+												boolean inurl = false;
+												if(m.isAnnotationPresent(ParametersInURL.class))
+													inurl = m.getAnnotation(ParametersInURL.class).value();
+												
+												if(inurl)
+													wr = wr.queryParams((MultivaluedMap<String, String>)targetparams);
+												
+												RequestBuilder rb = wr;
+												for(int i=0; i<consumes.length; i++)
+												{
+													rb = rb.type(consumes[i]);
+												}
+												for(int i=0; i<produces.length; i++)
+												{
+													rb = rb.accept(produces[i]);
+												}
+												
+												if(POST.class.equals(resttype))
+													res = ((UniformInterface)rb).post(ClientResponse.class, inurl? null: targetparams);
+												else if(PUT.class.equals(resttype))
+													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+												else if(HEAD.class.equals(resttype))
+													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+												else if(OPTIONS.class.equals(resttype))
+													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+												else if(DELETE.class.equals(resttype))
+													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
 											}
 											
 											Object targetret = res;
