@@ -363,6 +363,15 @@ public class Starter
 										// Start normal execution of root component (i.e. platform) unless an error occurred during init.
 										if(!ret.isDone())
 										{
+//											try
+//											{
+//												Thread.sleep(300000);
+//											}
+//											catch(InterruptedException e)
+//											{
+//												// TODO Auto-generated catch block
+//												e.printStackTrace();
+//											}
 											afac.initialWakeup(adapter);
 										}
 									}

@@ -15,24 +15,6 @@
             android:layout_height="fill_parent" />
     </ScrollView>
 
-    <Button
-        android:id="@+id/startAB1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Nocodec Msg Performance" />
-
-    <Button
-        android:id="@+id/startAB2"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Codec Msg Performance" />
-
-    <Button
-        android:id="@+id/startAB3"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Echo Msg Performance" />
-
     <TableLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">

@@ -24,6 +24,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.micro.CascadingFutureTest;
 import jadex.micro.annotation.Binding;
 import jadex.micro.benchmarks.MessagePerformanceAgent;
 import jadex.micro.examples.chat.IChatService;
@@ -61,15 +62,6 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 	
 	/** The jadex platform access. */
 	private IExternalAccess platform;
-	
-	/** Button to start the first message performance test. */
-	private Button startMB1;
-	
-	/** Button to start the second message performance test. */
-	private Button startMB2;
-	
-	/** Button to start the third message performance test. */
-	private Button startMB3;
 	
 	/** The text view for showing results. */
 	private TextView textView;
@@ -144,16 +136,6 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.agntmain);
-
-		startMB1 = (Button)findViewById(R.id.startAB1);
-		startMB2 = (Button)findViewById(R.id.startAB2);
-		startMB3 = (Button)findViewById(R.id.startAB3);
-		startMB1.setOnClickListener(buttonListener);
-		startMB2.setOnClickListener(buttonListener);
-		startMB3.setOnClickListener(buttonListener);
-		startMB1.setEnabled(false);
-		startMB2.setEnabled(false);
-		startMB3.setEnabled(false);
 
 		final Button	chat	= (Button)findViewById(R.id.chat);
 		final Button	send	= (Button)findViewById(R.id.send);
@@ -347,6 +329,8 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 			}
 		});
 		
+//		CascadingFutureTest.main(null);
+		
 		// Start the platform
 		bindService(new Intent(this, JadexPlatformService.class), new ServiceConnection()
 		{
@@ -372,9 +356,6 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 											public void run()
 											{
 												chatcid	= ((IService)result).getServiceIdentifier().getProviderId();
-												startMB1.setEnabled(true);
-												startMB2.setEnabled(true);
-												startMB3.setEnabled(true);
 												msg.setEnabled(true);
 												send.setEnabled(true);
 												chat.setText("Exit Chat");
@@ -387,9 +368,6 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 										{
 											public void run()
 											{
-												startMB1.setEnabled(true);
-												startMB2.setEnabled(true);
-												startMB3.setEnabled(true);
 												chat.setEnabled(true);
 												name.setEnabled(true);
 											}
@@ -417,69 +395,6 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 	}
 		
 	//-------- helper methods --------
-
-	/**
-	 *  The button listener starts a benchmarks and re-enables buttons
-	 *  when the benchmark has finished.
-	 */
-	private OnClickListener buttonListener = new OnClickListener()
-	{
-		public void onClick(View view)
-		{
-			String	agent	= MessagePerformanceAgent.class.getName().replaceAll("\\.", "/")+".class";
-			Map<String, Object> args	= null;
-			if(view == startMB2)
-			{
-				args	= new HashMap<String, Object>();
-				args.put("codec", Boolean.TRUE);
-			}
-			else if(view == startMB3)
-			{
-				args	= new HashMap<String, Object>();
-//				args.put("max", new Integer(2));
-//				args.put("codec", Boolean.TRUE);
-				args.put("echo", new ComponentIdentifier("echo@echo",
-					new String[]{SRelay.DEFAULT_ADDRESS}));
-//					new String[]{SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/"}));
-			}
-			
-			startMB1.setEnabled(false);
-			startMB2.setEnabled(false);
-			startMB3.setEnabled(false);
-			
-			runBenchmark(agent, args).addResultListener(new IResultListener<Collection<Tuple2<String, Object>>>()
-			{
-				public void resultAvailable(final Collection<Tuple2<String, Object>> result)
-				{
-					System.out.println(result);
-					runOnUiThread(new Runnable()
-					{
-						public void run()
-						{
-							startMB1.setEnabled(true);
-							startMB2.setEnabled(true);
-							startMB3.setEnabled(true);
-						}
-					});
-				}
-				
-				public void exceptionOccurred(final Exception exception)
-				{
-					exception.printStackTrace();
-					System.out.println("Benchmark failed: "+exception);
-					runOnUiThread(new Runnable()
-					{
-						public void run()
-						{
-							startMB1.setEnabled(true);
-							startMB2.setEnabled(true);
-							startMB3.setEnabled(true);
-						}
-					});
-				}
-			});
-		}
-	};
 
 	/**
 	 *  Run a benchmark and return the results.

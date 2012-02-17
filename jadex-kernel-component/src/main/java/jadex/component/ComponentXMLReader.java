@@ -32,6 +32,7 @@ import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectStringConverter;
+import jadex.xml.IPostProcessor;
 import jadex.xml.IStringObjectConverter;
 import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
@@ -53,6 +54,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 /* $if !android $ */
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
@@ -83,68 +85,21 @@ public class ComponentXMLReader
 	
 	protected Set[] mappings;
 	
+	//-------- post processors and converters --------
+	
 	public static IStringObjectConverter exconv = new IStringObjectConverter()
 	{
 		public Object convertString(String val, IContext context)
 		{
-			Object	ret	= null;
-			try
-			{
-				ret	= SJavaParser.evaluateExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), null, context.getClassLoader());
-			}
-			catch(RuntimeException e)
-			{
-				Object	se	= new Tuple(((ReadContext)context).getStack());
-				Map	user	= (Map)context.getUserContext();
-				MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
-				report.put(se, e.toString());
-			}
-			return  ret;
+			return SJavaParser.evaluateExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), null, context.getClassLoader());
 		}
 	};
-	
-//	// Convert expression into parsed expression object.
-//	public static IStringObjectConverter pexconv = new IStringObjectConverter()
-//	{
-//		public Object convertString(String val, IContext context)
-//		{
-//			Object	ret	= null;
-//			try
-//			{
-//				ret	= SJavaParser.parseExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader());
-//			}
-//			catch(RuntimeException e)
-//			{
-//				Object	se	= new Tuple(((ReadContext)context).getStack());
-//				Map	user	= (Map)context.getUserContext();
-//				MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
-//				report.put(se, e.toString());
-//			}
-//			return  ret;
-//		}
-//	};
 	
 	public static IStringObjectConverter classconv = new IStringObjectConverter()
 	{
 		public Object convertString(String val, IContext context) throws Exception
 		{
-			Object ret = val;
-			if(val instanceof String)
-			{
-				ret = SReflect.findClass0((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader());
-				if(ret==null)
-				{
-					Object	se	= new Tuple(((ReadContext)context).getStack());
-					Map	user	= (Map)context.getUserContext();
-					MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
-					report.put(se, "Class not found: "+val);
-				}
-				else
-				{
-					ret = new ClassInfo((Class)ret);
-				}
-			}
-			return ret;
+			return new ClassInfo(SReflect.findClass((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), context.getClassLoader()));
 		}
 	};
 	
@@ -156,18 +111,37 @@ public class ComponentXMLReader
 			if(val instanceof ClassInfo)
 			{
 				ret = ((ClassInfo)val).getTypeName();
-//				ret = SReflect.getClassName((ClassInfo)val);
 				if(ret==null)
 				{
-					Object	se	= new Tuple(((ReadContext)context).getStack());
-					Map	user	= (Map)context.getUserContext();
-					MultiCollection	report	= (MultiCollection)user.get(CONTEXT_ENTRIES);
-					report.put(se, "Class not found: "+val);
+					throw new RuntimeException("Class not found: "+val);
 				}
 			}
 			return ret;
 		}
 	};
+	
+	/**
+	 *  Parse expression text.
+	 */
+	public static class ExpressionProcessor	implements IPostProcessor
+	{
+		public Object postProcess(IContext context, Object object)
+		{
+			ModelInfo cm = (ModelInfo)context.getRootObject();
+			UnparsedExpression exp = (UnparsedExpression)object;
+			exp.parseExpression(cm.getAllImports(), context.getClassLoader());
+			return object;
+		}
+		
+		/**
+		 *  Get the pass number.
+		 *  @return The pass number.
+		 */
+		public int getPass()
+		{
+			return 0;
+		}
+	}
 		
 	//-------- constructors --------
 	
@@ -358,11 +332,11 @@ public class ComponentXMLReader
 			
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "import")), new ObjectInfo(String.class), null, null, new BeanObjectReaderHandler()));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "arguments"), new QName(uri, "result")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "configuration"), new QName(uri, "arguments"), new QName(uri, "result")}), new ObjectInfo(UnparsedExpression.class, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
@@ -379,19 +353,19 @@ public class ComponentXMLReader
 				new AttributeInfo(new AccessInfo("number"))
 			}, null)));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "component"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "component"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(UnparsedExpression.class, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "providedservice")}), 
-			new ObjectInfo(ProvidedServiceInfo.class),// new ExpressionProcessor()), 
+			new ObjectInfo(ProvidedServiceInfo.class),
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv)),
 			}, null), null, new BeanObjectReaderHandler()));
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "implementation")), new ObjectInfo(ProvidedServiceImplementation.class),
-			new MappingInfo(null, null, "expression", new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo("class", "implementation"), new AttributeConverter(classconv, reclassconv)),
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "implementation")), new ObjectInfo(ProvidedServiceImplementation.class, new ExpressionProcessor()), 
+			new MappingInfo(null, null, "value", new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv)),
 			}, null)));
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "publish")), new ObjectInfo(PublishInfo.class),
 			new MappingInfo(null, null, null, new AttributeInfo[]{
@@ -399,16 +373,16 @@ public class ComponentXMLReader
 				new AttributeInfo(new AccessInfo("publishtype", "publishType")),
 				new AttributeInfo(new AccessInfo("servicetype", "serviceType"), new AttributeConverter(classconv, reclassconv)),
 			}, null)));
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "publish"), new QName(uri, "property")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "publish"), new QName(uri, "property")}), new ObjectInfo(UnparsedExpression.class, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "interceptor")}), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "interceptor")}), new ObjectInfo(UnparsedExpression.class, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 			}, null)));
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(RequiredServiceInfo.class), // new ExpressionProcessor()), 
-			new MappingInfo(null, null, "value", new AttributeInfo[]{
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "requiredservice")), new ObjectInfo(RequiredServiceInfo.class), 
+			new MappingInfo(null, null, null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("class", "type"), new AttributeConverter(classconv, reclassconv))
 			}, new SubobjectInfo[]{
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "binding")}), new AccessInfo(new QName(uri, "binding"), "defaultBinding")),
@@ -424,17 +398,17 @@ public class ComponentXMLReader
 //				new AttributeInfo(new AccessInfo("class", "className"))
 //			}, null)));
 					
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "initialstep")), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "initialstep")), new ObjectInfo(UnparsedExpression.class, new ExpressionProcessor()), 
 				new MappingInfo(null, null, "value", new AttributeInfo[]{
 					new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 				}, null), null, new BeanObjectReaderHandler()));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "endstep")), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "endstep")), new ObjectInfo(UnparsedExpression.class, new ExpressionProcessor()), 
 				new MappingInfo(null, null, "value", new AttributeInfo[]{
 					new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 				}, null), null, new BeanObjectReaderHandler()));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(UnparsedExpression.class),//, new ExpressionProcessor()), 
+		types.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(UnparsedExpression.class, new ExpressionProcessor()), 
 				new MappingInfo(null, null, "value", new AttributeInfo[]{
 					new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))
 				}, null), null, new BeanObjectReaderHandler()));
@@ -502,82 +476,5 @@ public class ComponentXMLReader
                 return type!=null ? name!=null ? type+" "+name : type : name!=null ? name : "";
             }
         }.buildErrorReport();
-    }
-	
-	//-------- helper classes --------
-	
-//	/**
-//	 *  Parse expression text.
-//	 */
-//	public static class ExpressionProcessor	implements IPostProcessor
-//	{
-//		// Hack!!! Should be configurable.
-//		protected static IExpressionParser	exp_parser	= new JavaCCExpressionParser();
-//		
-//		/**
-//		 *  Parse expression text.
-//		 */
-//		public Object postProcess(IContext context, Object object)
-//		{
-//			Object ret = null;
-//			
-//			ComponentModel cm = (ComponentModel)context.getRootObject();
-//			UnparsedExpression exp = (UnparsedExpression)object;
-//			
-////			String classname = exp.getClassName();
-////			if(classname!=null)
-////			{
-////				try
-////				{
-////					Class clazz = SReflect.findClass(classname, app.getAllImports(), context.getClassLoader());
-////					exp.setClazz(clazz);
-////				}
-////				catch(Exception e)
-////				{
-////					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
-////					MultiCollection	report	= (MultiCollection)context.getUserContext();
-////					report.put(se, e.toString());
-////				}
-////			}
-//			
-//			String lang = exp.getLanguage();
-//			String value = exp.getValue(); 
-//			if(value!=null)
-//			{
-//				if(lang==null || "java".equals(lang))
-//				{
-//					try
-//					{
-//						IParsedExpression pexp = exp_parser.parseExpression(value, cm.getAllImports(), null, context.getClassLoader());
-//						ret = pexp.getValue(null);
-////						exp.setParsedValue(pexp);
-//					}
-//					catch(RuntimeException e)
-//					{
-//						Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
-//						MultiCollection	report	= (MultiCollection)context.getUserContext();
-//						report.put(se, e.toString());
-//					}
-//				}	
-//				else
-//				{
-//					Object	se	= new Tuple(((ReadContext)context).getStack().toArray());
-//					MultiCollection	report	= (MultiCollection)context.getUserContext();
-//					report.put(se, "Unknown expression language: "+lang);
-//				}
-//			}
-//			
-//			return ret;
-//		}
-//		
-//		/**
-//		 *  Get the pass number.
-//		 *  @return The pass number.
-//		 */
-//		public int getPass()
-//		{
-//			return 0;
-//		}
-//	}
-    
+    }	
 }

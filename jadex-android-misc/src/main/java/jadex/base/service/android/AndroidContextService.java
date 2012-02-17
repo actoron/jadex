@@ -5,7 +5,7 @@ import jadex.android.JadexAndroidActivity.AndroidContextChangeListener;
 import jadex.android.JadexAndroidContextNotFoundError;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
-import jadex.base.service.android.IAndroidContextService;
+import jadex.bridge.service.types.android.IAndroidContextService;
 import jadex.commons.future.IFuture;
 
 import java.io.File;

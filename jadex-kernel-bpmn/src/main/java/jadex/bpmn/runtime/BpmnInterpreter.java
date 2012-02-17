@@ -1396,7 +1396,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		ProvidedServiceImplementation	impl	= info.getImplementation();
 		
 		// Service implementation inside BPMN: find start events for service methods.
-		if(impl!=null && impl.getExpression()==null && impl.getImplementation().getType(getClassLoader())==null && info.getName()!=null)
+		if(impl!=null && impl.getValue()==null && impl.getClazz().getType(getClassLoader())==null && info.getName()!=null)
 		{
 			// Build map of potentially matching events: method name -> {list of matching signal event activities}
 			MultiCollection	events	= new MultiCollection();

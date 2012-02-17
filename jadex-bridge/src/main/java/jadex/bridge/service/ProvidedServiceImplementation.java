@@ -3,7 +3,6 @@ package jadex.bridge.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 
 /**
@@ -12,18 +11,10 @@ import jadex.bridge.modelinfo.UnparsedExpression;
  *  - creation expression or
  *  - implementation forward to other component via binding 
  */
-public class ProvidedServiceImplementation
+public class ProvidedServiceImplementation	extends UnparsedExpression
 {
-	// todo: use UnparsedExpression instead of implementation and expression text?
-	
 	//-------- attributes --------
 	
-	/** The implementation class. */
-	protected ClassInfo implementation;
-
-	/** The creation expression. */
-	protected String expression;
-		
 	/** The binding for forwarding service calls. */
 	protected RequiredServiceBinding binding;
 
@@ -46,20 +37,10 @@ public class ProvidedServiceImplementation
 	/**
 	 *  Create a new service implementation.
 	 */
-	public ProvidedServiceImplementation(Class implementation,
+	public ProvidedServiceImplementation(Class<?> implementation,
 		String expression, String proxytype, RequiredServiceBinding binding, UnparsedExpression[] interceptors)
 	{
-		this(implementation!=null? new ClassInfo(implementation): null, expression, proxytype, binding, interceptors);
-	}
-		
-	/**
-	 *  Create a new service implementation.
-	 */
-	public ProvidedServiceImplementation(ClassInfo implementation,
-		String expression, String proxytype, RequiredServiceBinding binding, UnparsedExpression[] interceptors)
-	{
-		setImplementation(implementation);
-		this.expression = expression;
+		super(null, implementation, expression, null);
 		this.proxytype = proxytype;
 		this.binding = binding;
 		if(interceptors!=null)
@@ -76,66 +57,22 @@ public class ProvidedServiceImplementation
 	 */
 	public ProvidedServiceImplementation(ProvidedServiceImplementation prov)
 	{
-		this(prov.implementation, prov.getExpression(), prov.getProxytype(), prov.getBinding()!=null? 
-			new RequiredServiceBinding(prov.getBinding()): null, prov.getInterceptors());
+		setName(prov.getName());
+		setClazz(prov.getClazz());
+		setValue(prov.getValue());
+		setLanguage(prov.getLanguage());
+		
+		setProxytype(prov.getProxytype());
+		setBinding(prov.getBinding());
+		UnparsedExpression[]	ints	= prov.getInterceptors();	
+		for(int i=0; i<ints.length; i++)
+		{
+			addInterceptor(ints[i]);
+		}
 	}
 
 	//-------- methods --------
 	
-//	/**
-//	 *  Get the implementation name.
-//	 *  @return the implementation name.
-//	 */
-//	public String getImplementationName()
-//	{
-//		return implname;
-//	}
-//
-//	/**
-//	 *  Set the implementation name.
-//	 *  @param name The implementation name to set.
-//	 */
-//	public void setImplementationName(String implname)
-//	{
-//		this.implname = implname;
-//	}
-
-	/**
-	 *  Get the implementation.
-	 *  @return The implementation.
-	 */
-	public ClassInfo getImplementation()
-	{
-		return implementation;
-	}
-
-	/**
-	 *  Set the implementation.
-	 *  @param implementation The implementation to set.
-	 */
-	public void setImplementation(ClassInfo implementation)
-	{
-		this.implementation = implementation;
-	}
-
-	/**
-	 *  Get the expression.
-	 *  @return The expression.
-	 */
-	public String getExpression()
-	{
-		return expression;
-	}
-
-	/**
-	 *  Set the expression.
-	 *  @param expression The expression to set.
-	 */
-	public void setExpression(String expression)
-	{
-		this.expression = expression;
-	}
-
 	/**
 	 *  Get the proxy type.
 	 *  @return The proxy type.
@@ -207,8 +144,8 @@ public class ProvidedServiceImplementation
 	 */
 	public String toString()
 	{
-		return implementation!=null? implementation.getTypeName(): 
-			expression!=null? expression: binding!=null? 
+		return getClazz()!=null? getClazz().getTypeName(): 
+			getValue()!=null? getValue(): binding!=null? 
 			binding.getComponentName()!=null? binding.getComponentName(): 
 				binding.getComponentType(): "";
 	}

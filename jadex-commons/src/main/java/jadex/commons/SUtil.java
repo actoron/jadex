@@ -302,7 +302,7 @@ public class SUtil
 	 * @param a The array.
 	 * @return The vector for the array.
 	 */
-	public static Set arrayToSet(Object a)
+	public static <T> Set<T> arrayToSet(Object a)
 	{
 		int l = Array.getLength(a);
 		Set ret = SCollection.createHashSet();

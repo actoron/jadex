@@ -14,7 +14,7 @@ import jadex.bridge.service.types.publish.IPublishService;
 import jadex.bridge.service.types.security.ISecurityService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.bridge.service.types.simulation.ISimulationService;
-import jadex.commons.concurrent.IThreadPool;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -127,7 +127,7 @@ import java.util.logging.Level;
 @ProvidedServices({
 	@ProvidedService(type=IMarshalService.class, implementation=@Implementation(expression="new MarshalService($component.getExternalAccess())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=ISettingsService.class, implementation=@Implementation(expression="new SettingsService($args.platformname, $component, $args.saveonexit)")),
-	@ProvidedService(type=IThreadPool.class, implementation=@Implementation(expression="new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IThreadPoolService.class, implementation=@Implementation(expression="new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IExecutionService.class, implementation=@Implementation(expression="$args.simulation==null || !$args.simulation.booleanValue()? new AsyncExecutionService($component.getServiceProvider()): new SyncExecutionService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IDependencyService.class, implementation=@Implementation(expression="new BasicDependencyService()")),
 	@ProvidedService(type=ILibraryService.class, implementation=@Implementation(expression="$args.libpath==null? new LibraryService(): new LibraryService(new URLClassLoader(SUtil.toURLs($args.libpath), $args.baseclassloader==null ? LibraryService.class.getClassLoader() : $args.baseclassloader))")),

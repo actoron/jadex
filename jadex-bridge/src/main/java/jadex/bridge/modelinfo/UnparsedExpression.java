@@ -2,7 +2,7 @@ package jadex.bridge.modelinfo;
 
 import jadex.bridge.ClassInfo;
 import jadex.commons.IValueFetcher;
-import jadex.commons.SReflect;
+import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SJavaParser;
 
 import java.util.Map;
@@ -26,6 +26,9 @@ public class UnparsedExpression
 	
 	/** The language. */
 	protected String language;
+	
+	/** The parsed expression (cached for speed, but not transmitted). */
+	protected IParsedExpression	parsed;
 	
 	//-------- constructors --------
 
@@ -132,6 +135,20 @@ public class UnparsedExpression
 		this.language = language;
 	}
 	
+	/**
+	 *  Parse the expression.
+	 *  The result is cached for later accesses.
+	 */
+	public IParsedExpression	parseExpression(String[] imports, ClassLoader classloader)
+	{
+		// todo: language
+		if(parsed==null && value!=null)
+		{
+			parsed	= SJavaParser.parseExpression(value, imports, classloader);
+		}
+		return parsed;
+	}
+	
 	//-------- static helpers --------
 	
 	/**
@@ -143,15 +160,7 @@ public class UnparsedExpression
 	 */
 	public static Object	getProperty(Map<String, Object> properties, String name, String[] imports, IValueFetcher fetcher, ClassLoader classloader)
 	{
-		// Todo: caching of parsed values?
-		Object	ret	= properties!=null ? properties.get(name) : null;
-		if(ret instanceof UnparsedExpression)
-		{
-			// todo: language
-			UnparsedExpression	upe	= (UnparsedExpression)ret;
-			ret = SJavaParser.evaluateExpression(upe.getValue(), imports, fetcher, classloader);
-		}
-		return ret;
+		return getParsedValue(properties!=null ? properties.get(name) : null, imports, fetcher, classloader);
 	}
 	
 	/**
@@ -167,8 +176,8 @@ public class UnparsedExpression
 		{
 			// todo: language
 			UnparsedExpression	upe	= (UnparsedExpression)value;
-			value = upe.getValue()==null ? null
-				: SJavaParser.evaluateExpression(upe.getValue(), imports, fetcher, classloader);
+			IParsedExpression	pe	= upe.parseExpression(imports, classloader);
+			value	= pe!=null ? pe.getValue(fetcher) : null;
 		}
 		return value;
 	}

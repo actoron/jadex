@@ -971,8 +971,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					// might depend on each other (e.g. bdi factory must be there for jcc)).
 					
 					final IComponentManagementService ces = (IComponentManagementService)result;
-					createComponent(components, ces, model, 0)
-						.addResultListener(createResultListener(new DelegationResultListener(ret)));
+					createComponent(components, ces, model, 0, ret);
 				}
 			}));
 		}
@@ -1159,12 +1158,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			else
 			{
 				Object	ser	= null;
-				if(impl!=null && impl.getExpression()!=null)
+				if(impl!=null && impl.getValue()!=null)
 				{
 					// todo: other Class imports, how can be found out?
 					try
 					{
-						ser = SJavaParser.evaluateExpression(impl.getExpression(), model.getAllImports(), getFetcher(), getClassLoader());
+						ser = UnparsedExpression.getParsedValue(impl, model.getAllImports(), getFetcher(), getClassLoader());
 //						System.out.println("added: "+ser+" "+model.getName());
 					}
 					catch(RuntimeException e)
@@ -1173,9 +1172,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 						throw new RuntimeException("Service creation error: "+info, e);
 					}
 				}
-				else if(impl!=null && impl.getImplementation().getType(getClassLoader())!=null)
+				else if(impl!=null && impl.getClazz().getType(getClassLoader())!=null)
 				{
-					ser = impl.getImplementation().getType(getClassLoader()).newInstance();
+					ser = impl.getClazz().getType(getClassLoader()).newInstance();
 				}
 				
 				// Implementation may null to disable service in some configurations.
@@ -1367,22 +1366,18 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Create subcomponents.
 	 */
-	public IFuture	createComponent(final ComponentInstanceInfo[] components, final IComponentManagementService cms, final IModelInfo model, final int i)
+	public void	createComponent(final ComponentInstanceInfo[] components, final IComponentManagementService cms, final IModelInfo model, final int i, final Future<Void> fut)
 	{
 		assert !getComponentAdapter().isExternalThread();
 		
-		IFuture	ret;
 		if(i<components.length)
 		{
-			final Future	fut	= new Future();
-			ret	= fut;
 			int num = getNumber(components[i], model);
 			IResultListener crl = new CollectionResultListener(num, false, createResultListener(new DelegationResultListener(fut)
 			{
 				public void customResultAvailable(Object result)
 				{
-					createComponent(components, cms, model, i+1)
-						.addResultListener(createResultListener(new DelegationResultListener(fut)));
+					createComponent(components, cms, model, i+1, fut);
 				}
 			}));
 			for(int j=0; j<num; j++)
@@ -1408,9 +1403,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		}
 		else
 		{
-			ret	= IFuture.DONE;
+			fut.setResult(null);
 		}
-		return ret;
 	}
 	
 	/**

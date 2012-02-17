@@ -5,7 +5,6 @@ import jadex.base.test.Testcase;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.UnparsedExpression;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClockService;
@@ -78,7 +77,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		tr = new TestReport("#2", "Test if all imports are used");
 		String[] imps = agent.getModel().getImports();
 //		System.out.println("imps: "+SUtil.arrayToString(imps));
-		Set impset = SUtil.arrayToSet(imps);
+		Set<String> impset = SUtil.arrayToSet(imps);
 		if(impset.contains("b1") && impset.contains("b2") && impset.contains("eb1") && impset.contains("eb2"))
 		{
 			tr.setSucceeded(true);
@@ -90,7 +89,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		results.add(tr);
 		
 		tr = new TestReport("#3", "Test properties");
-		Map props = agent.getModel().getProperties();
+		Map<String, Object> props = agent.getModel().getProperties();
 //		System.out.println("props: "+props);
 		if(((UnparsedExpression)props.get("a")).getValue().equals("eba") 
 			&& ((UnparsedExpression)props.get("b")).getValue().equals("ebb"))
@@ -119,7 +118,7 @@ public class ExtendedBaseAgent extends BaseAgent
 		tr = new TestReport("#5", "Provided services");
 		ProvidedServiceInfo[] provs = agent.getModel().getProvidedServices();
 //		System.out.println("pro sers: "+SUtil.arrayToString(provs));
-		if(provs[0].getImplementation().getImplementation().getType(agent.getClassLoader()).equals(MyAService.class))
+		if(provs[0].getImplementation().getClazz().getType(agent.getClassLoader()).equals(MyAService.class))
 		{
 			tr.setSucceeded(true);
 		}

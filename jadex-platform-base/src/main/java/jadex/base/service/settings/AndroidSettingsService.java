@@ -1,8 +1,8 @@
 package jadex.base.service.settings;
 
-import jadex.base.service.android.IAndroidContextService;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.android.IAndroidContextService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 

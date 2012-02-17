@@ -8,7 +8,8 @@
 						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
 	name="Platform" package="jadex.standalone">
 	
-	<imports>
+	<!--
+	<imports> 
 		<import>jadex.commons.*</import>
 		<import>jadex.commons.future.*</import>
 		<import>jadex.bridge.*</import>
@@ -22,13 +23,14 @@
 		<import>jadex.component.*</import>
 		<import>jadex.application.*</import>
 		<import>java.util.*</import>
-		<import>java.util.logging.Level</import>
+		<!- - <import>java.util.logging.Level</import> - ->
 		<import>java.lang.reflect.*</import>
 		<import>java.net.*</import>
 		<import>jadex.benchmarking.services.*</import>
 		
-		<import>jadex.bridge.service.types.awareness.*</import>
 		<import>jadex.bridge.service.types.clock.*</import>
+	<!- - 
+		<import>jadex.bridge.service.types.awareness.*</import>
 		<import>jadex.bridge.service.types.cms.*</import>
 		<import>jadex.bridge.service.types.deployment.*</import>
 		<import>jadex.bridge.service.types.df.*</import>
@@ -44,6 +46,7 @@
 		<import>jadex.bridge.service.types.publish.*</import>
 		<import>jadex.bridge.service.types.security.*</import>
 		<import>jadex.bridge.service.*</import>
+	 - ->
 		
 		<import>jadex.base.service.android.*</import>
 		<import>jadex.base.service.awareness.*</import>
@@ -70,10 +73,11 @@
 		<import>jadex.base.service.message.transport.localmtp.*</import>
 		<import>jadex.base.service.message.transport.tcpmtp.*</import>
 		<import>jadex.base.service.message.transport.niotcpmtp.*</import>
-		<import>jadex.base.service.message.transport.httprelaymtp.*</import>
+		<!- - <import>jadex.base.service.message.transport.httprelaymtp.*</import> - ->
 		<import>jadex.base.service.message.transport.httprelaymtp.nio.*</import>
 		<import>jadex.base.service.message.transport.codecs.*</import>
 	</imports>
+	-->
 	
 	<arguments>
 	
@@ -99,7 +103,7 @@
 		<!-- Save platform settings on shutdown? -->
 		<argument name="saveonexit" class="boolean">true</argument>
 		<!-- Logging level for platform. -->
-		<argument name="logging_level" class="Level">Level.SEVERE</argument>
+		<argument name="logging_level" class="java.util.logging.Level">java.util.logging.Level.SEVERE</argument>
 		<!-- Use simulation execution mode? -->
 		<argument name="simulation" class="Boolean"/>
 		<!-- Flag if copying parameters for local service calls is allowed. -->
@@ -139,7 +143,7 @@
 		<!-- Flag if relay transport is enabled. -->
 		<argument name="relaytransport" class="boolean">true</argument>
 		<!-- Address for relay transport. -->
-		<argument name="relayaddress" class="String">SRelay.DEFAULT_ADDRESS</argument>
+		<argument name="relayaddress" class="String">jadex.base.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS</argument>
 		
 		<!-- The file name(s) of extension component(s) to load (separated by comma). -->
 		<argument name="extensions" class="String">
@@ -183,113 +187,111 @@
 	</componenttypes>
 	
 	<services>
-		<providedservice class="IMarshalService">
+		<providedservice class="jadex.bridge.service.types.marshal.IMarshalService">
 			<implementation proxytype="raw">
-				new MarshalService($component.getExternalAccess())
+				new jadex.base.service.marshal.MarshalService($component.getExternalAccess())
 			</implementation>
 		</providedservice>
-		<providedservice class="IAndroidContextService">
+		<providedservice class="jadex.bridge.service.types.android.IAndroidContextService">
 			<implementation>
 				Boolean.TRUE.equals($args.android)
-				? AndroidContextService.class.getConstructor(new Class[]{IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})
+				? jadex.base.service.android.AndroidContextService.class.getConstructor(new Class[]{IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})
 				: null
 			</implementation>
 		</providedservice>
-		<providedservice class="ISettingsService">
+		<providedservice class="jadex.bridge.service.types.settings.ISettingsService">
 			<implementation>
 				Boolean.TRUE.equals($args.android)
-				? AndroidSettingsService.class.getConstructor(new Class[]{String.class, IInternalAccess.class, boolean.class}).newInstance(new Object[]{$args.platformname, $component, $args.saveonexit})
-				: new SettingsService($args.platformname, $component, $args.saveonexit)
+				? jadex.base.service.settings.AndroidSettingsService.class.getConstructor(new Class[]{String.class, IInternalAccess.class, boolean.class}).newInstance(new Object[]{$args.platformname, $component, $args.saveonexit})
+				: new jadex.base.service.settings.SettingsService($args.platformname, $component, $args.saveonexit)
 			</implementation>
 		</providedservice>
-		<providedservice class="IThreadPool">
+		<providedservice class="jadex.bridge.service.types.threadpool.IThreadPoolService">
 			<implementation proxytype="raw">
-				new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
+				new jadex.base.service.threadpool.ThreadPoolService(
+					new jadex.commons.concurrent.ThreadPool(new jadex.commons.concurrent.DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())
 				//new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 500)), $component.getServiceProvider())
 			</implementation>
 		</providedservice>
-		<providedservice class="IExecutionService">
+		<providedservice class="jadex.bridge.service.types.execution.IExecutionService">
 			<implementation proxytype="raw">
 				$args.simulation==null || !$args.simulation.booleanValue()
-				? new AsyncExecutionService($component.getServiceProvider())
-				: new SyncExecutionService($component.getServiceProvider())
+				? new jadex.base.service.execution.AsyncExecutionService($component.getServiceProvider())
+				: new jadex.base.service.execution.SyncExecutionService($component.getServiceProvider())
 			</implementation>
 		</providedservice>
-			<providedservice class="IDependencyService">
-			<implementation>
-				new BasicDependencyService()
-				//new MavenDependencyResolverService()
-			</implementation>
+			<providedservice class="jadex.bridge.service.types.library.IDependencyService">
+			<implementation class="jadex.base.service.library.BasicDependencyService"/>
+			<!-- <implementation class="jadex.base.service.dependency.maven.MavenDependencyResolverService"/> -->
 		</providedservice>
-		<providedservice class="ILibraryService">
+		<providedservice class="jadex.bridge.service.types.library.ILibraryService">
 			<implementation> <!-- proxytype="raw" -->
-				$args.libpath==null ? new LibraryService() :
-					new LibraryService(new URLClassLoader(SUtil.toURLs($args.libpath),
-						$args.baseclassloader==null ? LibraryService.class.getClassLoader() : $args.baseclassloader))
+				$args.libpath==null ? new jadex.base.service.library.LibraryService() :
+					new jadex.base.service.library.LibraryService(new java.net.URLClassLoader(jadex.commons.SUtil.toURLs($args.libpath),
+						$args.baseclassloader==null ? jadex.base.service.library.LibraryService.class.getClassLoader() : $args.baseclassloader))
 			</implementation>
 		</providedservice>
-		<providedservice class="IClockService">
+		<providedservice class="jadex.bridge.service.types.clock.IClockService">
 			<implementation proxytype="raw">
 				$args.simulation==null || !$args.simulation.booleanValue()
-				? new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "system_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(), $args.simulation)
-				: new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(), $args.simulation)
+				? new jadex.base.service.clock.ClockService(new jadex.base.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_SYSTEM, "system_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(), $args.simulation)
+				: new jadex.base.service.clock.ClockService(new jadex.base.service.clock.ClockCreationInfo(jadex.bridge.service.types.clock.IClock.TYPE_EVENT_DRIVEN, "simulation_clock", System.currentTimeMillis(), 100), $component.getServiceProvider(), $args.simulation)
 			</implementation>
 		</providedservice>
-		<providedservice class="IMessageService">
+		<providedservice class="jadex.bridge.service.types.message.IMessageService">
 			<implementation proxytype="raw">
-				new MessageService($component.getExternalAccess(), $component.getLogger(),
-				new ITransport[]
+				new jadex.base.service.message.MessageService($component.getExternalAccess(), $component.getLogger(),
+				new jadex.base.service.message.transport.ITransport[]
 				{
-					//new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, java.util.logging.Logger.getLogger("test"))
-					$args.localtransport? new LocalTransport($component.getServiceProvider()): null,
-					$args.tcptransport? new TCPTransport($component.getServiceProvider(), $args.tcpport): null,
-					$args.niotcptransport? new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null,
-					$args.relaytransport? new HttpRelayTransport($component, $args.relayaddress): null
+					$args.localtransport? new jadex.base.service.message.transport.localmtp.LocalTransport($component.getServiceProvider()): null,
+					$args.tcptransport? new jadex.base.service.message.transport.tcpmtp.TCPTransport($component.getServiceProvider(), $args.tcpport): null,
+					$args.niotcptransport? new jadex.base.service.message.transport.niotcpmtp.NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null,
+					$args.relaytransport? new jadex.base.service.message.transport.httprelaymtp.nio.HttpRelayTransport($component, $args.relayaddress): null
 				},
-				new MessageType[]
+				new jadex.bridge.service.types.message.MessageType[]
 				{
-					new FIPAMessageType()
-				}, null, new CodecFactory()
+					new jadex.base.fipa.FIPAMessageType()
+				}, null, new jadex.base.service.message.transport.codecs.CodecFactory()
 				)
 			</implementation>
 		</providedservice>
-		<providedservice class="IComponentManagementService">
+		<providedservice class="jadex.bridge.service.types.cms.IComponentManagementService">
 			<implementation proxytype="raw">
-				new ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter(), 
+				new jadex.standalone.service.ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter(), 
 					$args.componentfactory, $args.parametercopy)
 			</implementation>
 		</providedservice>
-		<providedservice class="IDF">
+		<providedservice class="jadex.bridge.service.types.df.IDF">
 			<implementation proxytype="raw">
-				new DirectoryFacilitatorService($component.getServiceProvider())
+				new jadex.standalone.service.DirectoryFacilitatorService($component.getServiceProvider())
 			</implementation>
 		</providedservice>
-		<providedservice class="ISimulationService">
+		<providedservice class="jadex.bridge.service.types.simulation.ISimulationService">
 			<implementation>
-				new SimulationService($component)
+				new jadex.base.service.simulation.SimulationService($component)
 			</implementation>
 		</providedservice>
-		<providedservice class="IDeploymentService">
+		<providedservice class="jadex.bridge.service.types.deployment.IDeploymentService">
 			<implementation>
-				new DeploymentService($component.getServiceProvider())
+				new jadex.base.service.deployment.DeploymentService($component.getServiceProvider())
 			</implementation>		
 		</providedservice>
-		<providedservice name="publish_ws" class="IPublishService">
+		<providedservice name="publish_ws" class="jadex.bridge.service.types.publish.IPublishService">
 			<implementation>
-				Boolean.TRUE.equals($args.wspublish &amp;&amp; !$args.android) ? DefaultWebServicePublishService.class.newInstance() : null
+				Boolean.TRUE.equals($args.wspublish &amp;&amp; !$args.android) ? jadex.extension.ws.publish.DefaultWebServicePublishService.class.newInstance() : null
 			</implementation>
 		</providedservice>
-		<providedservice name="publish_rs" class="IPublishService">
+		<providedservice name="publish_rs" class="jadex.bridge.service.types.publish.IPublishService">
 			<implementation>
-				Boolean.TRUE.equals($args.rspublish &amp;&amp; !$args.android) ? DefaultRestServicePublishService.class.newInstance() : null
+				Boolean.TRUE.equals($args.rspublish &amp;&amp; !$args.android) ? jadex.extension.rs.publish.DefaultRestServicePublishService.class.newInstance() : null
 			</implementation>
 		</providedservice>
 		<!-- Todo start before message service because of relay !? -->
-		<providedservice class="ISecurityService">
-			<implementation>new SecurityService($args.usepass, $args.printpass)</implementation>
+		<providedservice class="jadex.bridge.service.types.security.ISecurityService">
+			<implementation>new jadex.base.service.security.SecurityService($args.usepass, $args.printpass)</implementation>
 		</providedservice>
 		
-		<requiredservice name="factoryservices" class="IComponentFactory" multiple="true">
+		<requiredservice name="factoryservices" class="jadex.bridge.service.types.factory.IComponentFactory" multiple="true">
 			<binding scope="platform"/>
 		</requiredservice>
 	</services>
