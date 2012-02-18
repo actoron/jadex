@@ -44,21 +44,26 @@ public class JadexPlatformService	extends Service	implements IJadexPlatformServi
 	/**
 	 *  Cleanup the service.
 	 */
-	public void onDestroy()
+	public boolean onUnbind(Intent intent)
 	{
 		if(platform!=null)
 		{
 			try
 			{
+				System.out.println("Starting platform shutdown");
 				ThreadSuspendable	sus	= new ThreadSuspendable();
-				long timeout	= 30000;
-				platform.get(sus, timeout).killComponent().get(sus, timeout);
+				long start	= System.currentTimeMillis();
+				long timeout	= 4500;	// Android issues hard kill (ANR) after 5 secs!
+				IExternalAccess	ea = platform.get(sus, timeout);
+				ea.killComponent().get(sus, start+timeout-System.currentTimeMillis());
+				System.out.println("Platform shutdown completed");
 			}
 			catch(TimeoutException e)
 			{
 				System.err.println("Timeout when shutting down platform: "+e);
 			}
 		}
+		return false;
 	}
 	
 	//-------- IJadexPlatformService interface --------

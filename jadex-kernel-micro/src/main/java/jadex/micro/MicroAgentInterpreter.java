@@ -559,6 +559,7 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 				StringWriter	sw	= new StringWriter();
 				exception.printStackTrace(new PrintWriter(sw));
 				microagent.getLogger().severe("Exception during cleanup: "+sw);
+				ret.setResult(null);
 			}
 		}));
 		

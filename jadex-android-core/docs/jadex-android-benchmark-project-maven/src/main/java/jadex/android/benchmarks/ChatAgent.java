@@ -2,9 +2,11 @@ package jadex.android.benchmarks;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.ICommand;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -22,6 +24,8 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.examples.chat.IChatService;
+
+import java.util.Collection;
 
 @Agent
 @Arguments(@Argument(name="toastcmd", clazz=ICommand.class))
@@ -84,15 +88,16 @@ public class ChatAgent	implements IChatService
 			{
 				chat.status(STATE_DEAD);
 			}
-			public void finished()
+		});
+		// Respect androids 5 sec responsiveness requirement.
+		chats.addResultListener(new TimeoutResultListener<Collection<IChatService>>(4000, agent.getExternalAccess(),
+			new ExceptionDelegationResultListener<Collection<IChatService>, Void>(ret)
+		{
+			public void customResultAvailable(Collection<IChatService> result)
 			{
 				ret.setResult(null);
 			}
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setException(exception);
-			}
-		});
+		}));
 		return ret;
 	}
 	

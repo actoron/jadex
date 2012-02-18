@@ -8,6 +8,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
@@ -632,8 +633,10 @@ public class RemoteReferenceModule
 		checkThread();
 		timer.cancel();
 		
+		// wait no longer than 5 seconds for unregistering remote references.
 		RemoteReference[] rrs = (RemoteReference[])proxycount.keySet().toArray(new RemoteReference[0]);
-		CounterResultListener crl = new CounterResultListener(rrs.length, true, new DelegationResultListener(ret));
+		CounterResultListener<Void> crl = new CounterResultListener<Void>(rrs.length, true,
+			new TimeoutResultListener<Void>(10000, rsms.getComponent(), new DelegationResultListener<Void>(ret)));
 //		{
 //			public void customResultAvailable(Object result)
 //			{

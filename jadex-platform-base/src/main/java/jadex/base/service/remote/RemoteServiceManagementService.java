@@ -7,6 +7,7 @@ import jadex.base.service.remote.commands.RemoteSearchCommand;
 import jadex.base.service.remote.xml.RMIPostProcessor;
 import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -511,131 +512,138 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	{
 //		System.out.println("RMS sending: "+content);
 		
-		component.scheduleStep(new IComponentStep<Void>()
+		try
 		{
-			@XMLClassname("sendMessage")
-			public IFuture<Void> execute(final IInternalAccess ia)
+			component.scheduleStep(new IComponentStep<Void>()
 			{
-				Future<Void>	pre	= new Future<Void>(); 
-				if(content instanceof AbstractRemoteCommand)
+				@XMLClassname("sendMessage")
+				public IFuture<Void> execute(final IInternalAccess ia)
 				{
-					((AbstractRemoteCommand)content).preprocessCommand(ia, rrm, receiver)
-						.addResultListener(new DelegationResultListener<Void>(pre));
-				}
-				else
-				{
-					pre.setResult(null);
-				}
-				
-				pre.addResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
-				{
-					public void customResultAvailable(Void v)
+					Future<Void>	pre	= new Future<Void>(); 
+					if(content instanceof AbstractRemoteCommand)
 					{
-						final long timeout = to<=0? DEFAULT_TIMEOUT: to;
-						
-						putWaitingCall(callid, future);
-						// Remove waiting call when future is done
-						future.addResultListener(new IResultListener<Object>()
-						{
-							public void resultAvailable(Object result)
-							{
-								removeWaitingCall(callid);
-							}
-							public void exceptionOccurred(Exception exception)
-							{
-								removeWaitingCall(callid);								
-								ia.getLogger().info("Remote exception occurred: "+receiver+", "+exception.toString());
-							}
-						});
-//						System.out.println("Waitingcalls: "+waitingcalls.size());
-						
-						final Map<String, Object> msg = new HashMap<String, Object>();
-						msg.put(SFipa.SENDER, component.getComponentIdentifier());
-						msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
-						msg.put(SFipa.CONVERSATION_ID, callid);
-		//				msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
-						
-						ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Object>(future)
-						{
-							public void customResultAvailable(final ILibraryService ls)
-							{
-								ia.getServiceContainer().searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(new ExceptionDelegationResultListener<IMessageService, Object>(future)
-								{
-									public void customResultAvailable(final IMessageService ms)
-									{
-										// todo: use rid of sender?! (not important as writer does not use classloader, only nuggets)
-										ls.getClassLoader(ia.getModel().getResourceIdentifier())
-											.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Object>(future)
-										{
-											public void customResultAvailable(final ClassLoader cl)
-											{
-												msgservice.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], Object>(future)
-												{
-													public void customResultAvailable(String[] addresses)
-													{
-														// Hack!!! Manual encoding for using custom class loader at receiver side.
-														String cont = Writer.objectToXML(getWriter(), content, cl, new Object[]{receiver, addresses});
-														msg.put(SFipa.CONTENT, cont);
-
-														
-//														System.out.println("RMS sending to2: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
-				//										if(cont.indexOf("getServices")!=-1)
-				//										{
-				//											interestingcalls.put(callid, cont);
-				//										}
-														
-														ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), null)
-															.addResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
-														{
-															public void customResultAvailable(Void result)
-															{
-//																System.out.println("sent: "+callid);
-																// ok message could be sent.
-																timer.schedule(new TimerTask()
-																{
-																	public void run()
-																	{
-																		ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-																		{
-																			public IFuture<Void> execute(IInternalAccess ia)
-																			{
-																				if(!future.isDone())
-																				{
-																					removeWaitingCall(callid);
-																					future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+SUtil.arrayToString(msg.get(SFipa.RECEIVERS))+", "+callid)
-																					{
-																						public void printStackTrace()
-																						{
-																							Thread.dumpStack();
-																							super.printStackTrace();
-																						}
-																					}
-																					);
-																				}
-																				return IFuture.DONE;
-																			}
-																		});
-				//														System.out.println("timeout triggered: "+msg);
-																	}
-																}, timeout);
-															}
-														});
-													}
-												});
-											}
-										});
-									}
-								});
-							}
-						});
+						((AbstractRemoteCommand)content).preprocessCommand(ia, rrm, receiver)
+							.addResultListener(new DelegationResultListener<Void>(pre));
 					}
-				});
-				
-				return IFuture.DONE;
-			}
-		});
+					else
+					{
+						pre.setResult(null);
+					}
+					
+					pre.addResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
+					{
+						public void customResultAvailable(Void v)
+						{
+							final long timeout = to<=0? DEFAULT_TIMEOUT: to;
+							
+							putWaitingCall(callid, future);
+							// Remove waiting call when future is done
+							future.addResultListener(new IResultListener<Object>()
+							{
+								public void resultAvailable(Object result)
+								{
+									removeWaitingCall(callid);
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									removeWaitingCall(callid);								
+									ia.getLogger().info("Remote exception occurred: "+receiver+", "+exception.toString());
+								}
+							});
+	//						System.out.println("Waitingcalls: "+waitingcalls.size());
+							
+							final Map<String, Object> msg = new HashMap<String, Object>();
+							msg.put(SFipa.SENDER, component.getComponentIdentifier());
+							msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
+							msg.put(SFipa.CONVERSATION_ID, callid);
+			//				msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
+							
+							ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+								.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Object>(future)
+							{
+								public void customResultAvailable(final ILibraryService ls)
+								{
+									ia.getServiceContainer().searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+										.addResultListener(new ExceptionDelegationResultListener<IMessageService, Object>(future)
+									{
+										public void customResultAvailable(final IMessageService ms)
+										{
+											// todo: use rid of sender?! (not important as writer does not use classloader, only nuggets)
+											ls.getClassLoader(ia.getModel().getResourceIdentifier())
+												.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Object>(future)
+											{
+												public void customResultAvailable(final ClassLoader cl)
+												{
+													msgservice.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], Object>(future)
+													{
+														public void customResultAvailable(String[] addresses)
+														{
+															// Hack!!! Manual encoding for using custom class loader at receiver side.
+															String cont = Writer.objectToXML(getWriter(), content, cl, new Object[]{receiver, addresses});
+															msg.put(SFipa.CONTENT, cont);
+	
+															
+	//														System.out.println("RMS sending to2: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
+					//										if(cont.indexOf("getServices")!=-1)
+					//										{
+					//											interestingcalls.put(callid, cont);
+					//										}
+															
+															ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), null)
+																.addResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
+															{
+																public void customResultAvailable(Void result)
+																{
+	//																System.out.println("sent: "+callid);
+																	// ok message could be sent.
+																	timer.schedule(new TimerTask()
+																	{
+																		public void run()
+																		{
+																			ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
+																			{
+																				public IFuture<Void> execute(IInternalAccess ia)
+																				{
+																					if(!future.isDone())
+																					{
+																						removeWaitingCall(callid);
+																						future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+SUtil.arrayToString(msg.get(SFipa.RECEIVERS))+", "+callid)
+																						{
+																							public void printStackTrace()
+																							{
+																								Thread.dumpStack();
+																								super.printStackTrace();
+																							}
+																						}
+																						);
+																					}
+																					return IFuture.DONE;
+																				}
+																			});
+					//														System.out.println("timeout triggered: "+msg);
+																		}
+																	}, timeout);
+																}
+															});
+														}
+													});
+												}
+											});
+										}
+									});
+								}
+							});
+						}
+					});
+					
+					return IFuture.DONE;
+				}
+			});
+		}
+		catch(ComponentTerminatedException e)
+		{
+			future.setException(e);
+		}
 	}
 
 	/**
