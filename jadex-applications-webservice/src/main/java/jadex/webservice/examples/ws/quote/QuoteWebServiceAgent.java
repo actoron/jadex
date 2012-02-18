@@ -13,7 +13,7 @@ import jadex.micro.annotation.ProvidedServices;
  *  in the same way as normal Jadex component services.
  */
 @Agent
-@Imports({"jadex.base.service.ws.*", "jadex.webservice.examples.ws.quote.gen.*"})
+@Imports({"jadex.extension.ws.invoke.*", "jadex.webservice.examples.ws.quote.gen.*"})
 @ProvidedServices(@ProvidedService(type=IQuoteService.class, implementation=@Implementation(
 	expression="$pojoagent.createServiceImplementation(IQuoteService.class, new WebServiceMappingInfo(StockQuote.class, \"getStockQuoteSoap\"))")))
 public class QuoteWebServiceAgent extends WebServiceAgent

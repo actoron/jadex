@@ -43,9 +43,6 @@ public class BeanProperty
 	 */
 	public BeanProperty(String name, Class type, Method getter, Method setter, Class settertype)
 	{
-		if(getter==null)
-			System.out.println("hererer");
-		
 		this.name = name;
 		this.type = type;
 		this.getter = getter;

@@ -13,17 +13,17 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
-	name="Banking" package="jadex.micro.examples.ws.banking">
+	name="Banking" package="jadex.webservice.examples.ws.banking">
 	
 	<imports>
-		<import>jadex.base.service.ws.*</import>
-		<import>jadex.micro.examples.ws.offerquote.gen.*</import>
+		<import>jadex.extension.ws.publish.*</import>
+		<import>jadex.webservice.examples.ws.offerquote.gen.*</import>
 	</imports>
 	
 	<services>
 		<providedservice class="IBankingService">
 			<implementation class="BankingService"/>
-			<publish publishtype="ws" publishid="http://localhost:8080/wanking" servicetype="IWSBankingService"/>
+			<publish publishtype="ws" publishid="http://localhost:8080/banking" servicetype="IWSBankingService"/>
 		</providedservice>
 	</services>
 </componenttype>	

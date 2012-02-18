@@ -13,8 +13,8 @@
 	</imports>
 	
 	<componenttypes>
-		<componenttype name="User" filename="jadex/micro/examples/ws/quote/UserAgent.class"/>
-		<componenttype name="WebService" filename="jadex/micro/examples/ws/quote/QuoteWebServiceAgent.class"/>
+		<componenttype name="User" filename="UserAgent.class"/>
+		<componenttype name="WebService" filename="QuoteWebServiceAgent.class"/>
 	</componenttypes>
 	
 	<configurations>
