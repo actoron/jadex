@@ -26,6 +26,7 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
@@ -121,90 +122,111 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable
 	{
 		Object ret = null;
-
-		final ServiceInvocationContext sic = new ServiceInvocationContext(proxy, getInterceptors());
 		
-		List<Object> myargs = args!=null? SUtil.arrayToList(args): null;
-		
-		if(SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType()))
+		if((args==null || args.length==0) && "getServiceIdentifier".equals(method.getName()))
 		{
-			final IntermediateFuture fut = new IntermediateFuture();
-			ret = fut;
-			sic.invoke(service, method, myargs).addResultListener(new IntermediateDelegationResultListener(fut)
-			{
-				public void customResultAvailable(Collection result)
-				{
-					if(sic.getResult() instanceof IIntermediateFuture)
-					{
-						((IIntermediateFuture)sic.getResult()).addResultListener(new IntermediateDelegationResultListener(fut));
-					}
-					else if(sic.getResult() instanceof IFuture)
-					{
-						((IFuture)sic.getResult()).addResultListener(new DelegationResultListener(fut));
-					}
-					else
-					{
-						fut.setResult((Collection)sic.getResult());
-					}
-				}
-			});
+			ret	= getServiceIdentifier();
 		}
-		else if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
+		else if(args!=null && args.length==1 && "equals".equals(method.getName()) && Object.class.equals(method.getParameterTypes()[0]))
 		{
-			final Future fut = new Future();
-			ret = fut;
-			
-			sic.invoke(service, method, myargs).addResultListener(new DelegationResultListener(fut)
-			{
-				public void customResultAvailable(Object result)
-				{
-					if(sic.getResult() instanceof IFuture)
-					{
-						((IFuture)sic.getResult()).addResultListener(new DelegationResultListener(fut));
-					}
-					else
-					{
-						fut.setResult(sic.getResult());
-					}
-				}
-			});
-		}
-		else if(method.getReturnType().equals(void.class))
-		{
-			IFuture	myvoid	= sic.invoke(service, method, myargs);
-			
-			// Check result and propagate exception, if any.
-			// Do not throw exception as user code should not defferentiate between local and remote case.
-//			if(myvoid.isDone())
-//			{
-//				myvoid.get(null);	// throws exception, if any.
-//			}
-//			else
-			{
-				myvoid.addResultListener(new IResultListener()
-				{
-					public void resultAvailable(Object result)
-					{
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						logger.warning("Exception in void method call: "+method+" "+getServiceIdentifier()+" "+exception);
-					}
-				});
-			}
+			ret	= equals(args[0]);
 		}
 		else
 		{
-			IFuture fut = sic.invoke(service, method, myargs);
-			if(fut.isDone())
+			final ServiceInvocationContext sic = new ServiceInvocationContext(proxy, getInterceptors());
+			
+			List<Object> myargs = args!=null? SUtil.arrayToList(args): null;
+			
+			if(SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType()))
 			{
-				ret = sic.getResult();
+				final IntermediateFuture fut = new IntermediateFuture();
+				ret = fut;
+				sic.invoke(service, method, myargs).addResultListener(new IntermediateDelegationResultListener(fut)
+				{
+					public void customResultAvailable(Collection result)
+					{
+						if(sic.getResult() instanceof IIntermediateFuture)
+						{
+							((IIntermediateFuture)sic.getResult()).addResultListener(new IntermediateDelegationResultListener(fut));
+						}
+						else if(sic.getResult() instanceof IFuture)
+						{
+							((IFuture)sic.getResult()).addResultListener(new DelegationResultListener(fut));
+						}
+						else
+						{
+							fut.setResult((Collection)sic.getResult());
+						}
+					}
+				});
+			}
+			else if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
+			{
+				final Future fut = new Future();
+				ret = fut;
+				
+				sic.invoke(service, method, myargs).addResultListener(new DelegationResultListener(fut)
+				{
+					public void customResultAvailable(Object result)
+					{
+						if(sic.getResult() instanceof IFuture)
+						{
+							((IFuture)sic.getResult()).addResultListener(new DelegationResultListener(fut));
+						}
+						else
+						{
+							fut.setResult(sic.getResult());
+						}
+					}
+				});
+			}
+			else if(method.getReturnType().equals(void.class))
+			{
+				IFuture	myvoid	= sic.invoke(service, method, myargs);
+				
+				// Check result and propagate exception, if any.
+				// Do not throw exception as user code should not defferentiate between local and remote case.
+	//			if(myvoid.isDone())
+	//			{
+	//				myvoid.get(null);	// throws exception, if any.
+	//			}
+	//			else
+				{
+					myvoid.addResultListener(new IResultListener()
+					{
+						public void resultAvailable(Object result)
+						{
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							logger.warning("Exception in void method call: "+method+" "+getServiceIdentifier()+" "+exception);
+						}
+					});
+				}
 			}
 			else
 			{
-				logger.warning("Warning, blocking call: "+method.getName()+" "+getServiceIdentifier());
-				ret = fut.get(new ThreadSuspendable());
+				IFuture fut = sic.invoke(service, method, myargs);
+				if(fut.isDone())
+				{
+					ret = sic.getResult();
+				}
+				else
+				{
+					// Try again after triggering delayed notifications.
+					FutureHelper.notifyStackedListeners();
+					if(fut.isDone())
+					{
+//						System.out.println("stacked method: "+method);
+						ret = sic.getResult();
+					}
+					else
+					{
+						logger.warning("Warning, blocking call: "+method.getName()+" "+getServiceIdentifier());
+						ret = fut.get(new ThreadSuspendable());
+					}
+				}
 			}
 		}
 		

@@ -300,15 +300,22 @@ public class ContextPanel extends JPanel
 			{
 				public void resultAvailable(Object result)
 				{
-					boolean	executing	= ((Boolean)result).booleanValue();
-					String	clocktype	= simservice.getClockService().getClockType();
-					boolean	clockok	= simservice.getClockService().getNextTimer()!=null;
-					
-					if(laststate==null || executing!=laststate.executing || clockok!=laststate.clockok
-						|| !clocktype.equals(laststate.clocktype))
+					try
 					{
-						laststate	= new SimulationState(executing, clocktype, clockok);
-						elementChanged("simulation", laststate);
+						boolean	executing	= ((Boolean)result).booleanValue();
+						String	clocktype	= simservice.getClockService().getClockType();
+						boolean	clockok	= simservice.getClockService().getNextTimer()!=null;
+						
+						if(laststate==null || executing!=laststate.executing || clockok!=laststate.clockok
+							|| !clocktype.equals(laststate.clocktype))
+						{
+							laststate	= new SimulationState(executing, clocktype, clockok);
+							elementChanged("simulation", laststate);
+						}
+					}
+					catch(Exception e)
+					{
+						exceptionOccurred(e);
 					}
 				}
 				
@@ -325,9 +332,15 @@ public class ContextPanel extends JPanel
 		protected void dispose()
 		{
 			super.dispose();
-			
-			simservice.removeChangeListener(this);
-			simservice.getClockService().removeChangeListener(this);
+			try
+			{
+				simservice.removeChangeListener(this);
+				simservice.getClockService().removeChangeListener(this);
+			}
+			catch(Exception e)
+			{
+				
+			}
 //			System.out.println("dispose: "+id);
 		}
 	}

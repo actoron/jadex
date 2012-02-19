@@ -121,6 +121,8 @@ public class SequentialSearchManager implements ISearchManager
 	protected void processNode(final IServiceProvider start, final IServiceProvider source, final IServiceProvider provider,
 		final SearchContext context, final IntermediateFuture ret, final boolean up, final int callstack, final boolean ischild)//, final List res)
 	{
+//		System.out.println("processNode: "+context+", "+source+", "+provider);
+
 //		if(provider!=null && provider.getId().toString().startsWith("Lars-PC"))
 //			System.out.println("processing node: "+provider.getId());
 //		if(context.selector instanceof TypeResultSelector && ((TypeResultSelector)context.selector).getType().toString().indexOf("IComponentMana")!=-1)
@@ -145,9 +147,7 @@ public class SequentialSearchManager implements ISearchManager
 //		{
 //			res.add(new Tuple(provider.getId(), found));
 //		}
-		
-		boolean dochildren = false;
-		
+				
 		// If node is to be searched, continue with this node.
 //		if(context.selector instanceof TypeResultSelector && ((TypeResultSelector)context.selector).getType().getName().indexOf("Add")!=-1)
 //		{
@@ -175,7 +175,7 @@ public class SequentialSearchManager implements ISearchManager
 					{
 						public void resultAvailable(Object result)
 						{
-//							System.out.println("found: "+provider.getId()+" "+result);
+//							System.out.println("found: "+context+", "+provider.getId()+" "+result);
 							if(result!=null)
 							{
 								Collection res = (Collection)result;
@@ -212,6 +212,7 @@ public class SequentialSearchManager implements ISearchManager
 					{
 						// what to do with exception?
 					}
+//					System.out.println("found: "+context+", "+provider.getId()+" "+res);
 					if(res!=null && res.size()>0)
 					{
 						for(Iterator it=res.iterator(); it.hasNext(); )
@@ -236,17 +237,13 @@ public class SequentialSearchManager implements ISearchManager
 			}
 			else
 			{
-				dochildren = true;
+				// Continue with child nodes from todo list (if any).
+				processChildNodes(start, provider, context, ret, callstack+1);//, res);
 			}
 		}
 		else
 		{
-			dochildren = true;
-		}
-		
-		// Else continue with child nodes from todo list (if any).
-		if(dochildren)
-		{
+			// Continue with child nodes from todo list (if any).
 			processChildNodes(start, provider, context, ret, callstack+1);//, res);
 		}
 	}
@@ -257,8 +254,6 @@ public class SequentialSearchManager implements ISearchManager
 	protected void processParent(final IServiceProvider start, final IServiceProvider source, final IServiceProvider provider,
 		final SearchContext context, final IntermediateFuture ret, final boolean up, final int callstack)//, final List res)
 	{
-		context.callstack++;
-
 		// When searching upwards, continue with parent.
 		if(!context.selector.isFinished(ret.getIntermediateResults()) && up)
 		{
@@ -305,8 +300,6 @@ public class SequentialSearchManager implements ISearchManager
 		{
 			processChildNodes(start, provider, context, ret, callstack+1);//, res);
 		}
-		
-		context.callstack--;
 	}
 
 	/**
@@ -315,8 +308,6 @@ public class SequentialSearchManager implements ISearchManager
 	protected void processChildNodes(final IServiceProvider start, final IServiceProvider provider,
 		final SearchContext context, final IntermediateFuture ret, final int callstack)//, final List res)
 	{
-		context.callstack++;
-		
 		// Finished, when no more todo nodes.
 		if(context.selector.isFinished(ret.getIntermediateResults()) || context.todo.isEmpty())
 		{
@@ -379,8 +370,6 @@ public class SequentialSearchManager implements ISearchManager
 				}
 			}
 		}
-		
-		context.callstack--;
 	}
 	
 	/**
@@ -389,8 +378,6 @@ public class SequentialSearchManager implements ISearchManager
 	protected void addChildren(IServiceProvider start, IServiceProvider source, IServiceProvider provider,
 		SearchContext context, IntermediateFuture ret, Collection children, int callstack)//, List res)
 	{
-		context.callstack++;
-		
 		if(!context.selector.isFinished(ret.getIntermediateResults()) && children!=null && !children.isEmpty())
 		{
 			List	ccs	= new LinkedList(children);
@@ -401,8 +388,6 @@ public class SequentialSearchManager implements ISearchManager
 			}
 		}
 		processChildNodes(start, provider, context, ret, callstack+1);//, res);
-		
-		context.callstack--;
 	}
 
 
@@ -472,7 +457,6 @@ public class SequentialSearchManager implements ISearchManager
 		public IResultSelector	selector;
 //		public Collection	results;
 		public Map	todo;
-		public int	callstack;
 		
 		public SearchContext(IVisitDecider decider, IResultSelector selector, Map todo)
 		{

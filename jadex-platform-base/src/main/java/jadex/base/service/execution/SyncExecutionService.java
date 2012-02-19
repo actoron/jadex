@@ -272,6 +272,10 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 							}
 						});
 						
+						running = true;
+						// Wake up the main executor for executing tasks
+						executor.execute();
+						
 						ret.setResult(null);
 //						ret.setResult(getServiceIdentifier());
 					}
@@ -284,10 +288,6 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 			}
 		});
 		
-		running = true;
-		// Wake up the main executor for executing tasks
-		executor.execute();
-
 		return ret;
 	}
 

@@ -376,11 +376,11 @@ public class AsyncExecutionService	extends BasicService implements IExecutionSer
 					{
 						ret.setResult(null);
 					}
+					executors = null;
 				}
 			}
 		});
 		
-		executors = null;
 		return ret;
 	}
 

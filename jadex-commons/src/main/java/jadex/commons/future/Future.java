@@ -2,12 +2,14 @@ package jadex.commons.future;
 
 
 import jadex.commons.DebugException;
+import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +21,13 @@ import java.util.Map;
  */
 public class Future<E> implements IFuture<E>
 {
+	static int stackcount, maxstack;
+	static double	avgstack;
+	
 	//-------- constants --------
+	
+	/** Notification stack for unwinding call stack to topmost future. */
+	protected static ThreadLocal<List<Tuple2<Future<?>, IResultListener<?>>>>	STACK	= new ThreadLocal<List<Tuple2<Future<?>,IResultListener<?>>>>();
 	
 	/** A caller is queued for suspension. */
 	protected final String	CALLER_QUEUED	= "queued";
@@ -32,6 +40,9 @@ public class Future<E> implements IFuture<E>
 	
 	/** Debug flag. */
 	public static final boolean DEBUG = false;
+	
+	/** Disable Stack unfolding for easier debugging. */
+	public static final boolean DEBUGSTACK = false;
 	
 	/** The empty future. */
 	public static final IFuture<?>	EMPTY	= new Future<Object>(null);
@@ -423,13 +434,56 @@ public class Future<E> implements IFuture<E>
      */
     protected void notifyListener(IResultListener<E> listener)
     {
-		if(exception!=null)
-		{
-			listener.exceptionOccurred(exception);
-		}
-		else
-		{
-			listener.resultAvailable(result); 
-		}
+//		int stack	= Thread.currentThread().getStackTrace().length;
+//    	synchronized(Future.class)
+//		{
+//			stackcount++;
+//			avgstack	= (avgstack*(stackcount-1)+stack)/stackcount;
+//			if(stack>maxstack)
+//			{
+//				maxstack	= stack;
+//				System.out.println("max: "+maxstack+", avg: "+avgstack);
+////				Thread.dumpStack();
+//			}
+//		}
+    	
+    	if(DEBUGSTACK || STACK.get()==null)
+    	{
+    		List<Tuple2<Future<?>, IResultListener<?>>>	list	= new LinkedList<Tuple2<Future<?>, IResultListener<?>>>();
+    		STACK.set(list);
+    		try
+    		{
+	    		if(exception!=null)
+	    		{
+	    			listener.exceptionOccurred(exception);
+	    		}
+	    		else
+	    		{
+	    			listener.resultAvailable(result); 
+	    		}
+				while(!list.isEmpty())
+				{
+					Tuple2<Future<?>, IResultListener<?>>	tup	= list.remove(0);
+					Future<?> fut	= tup.getFirstEntity();
+					if(fut.exception!=null)
+					{
+						tup.getSecondEntity().exceptionOccurred(fut.exception);
+					}
+					else
+					{
+						((IResultListener)tup.getSecondEntity()).resultAvailable(fut.result); 
+					}
+				}
+    		}
+    		finally
+    		{
+    			// Make sure that stack gets removed also when exception occurs -> else no notifications would happen any more.
+    			STACK.set(null);
+    		}
+    	}
+    	else
+    	{
+    		STACK.get().add(new Tuple2<Future<?>, IResultListener<?>>(this, listener));
+    	}
     }
 }

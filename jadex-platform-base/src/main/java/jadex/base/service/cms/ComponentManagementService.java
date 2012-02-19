@@ -1792,22 +1792,25 @@ public abstract class ComponentManagementService extends BasicService implements
 //			}
 			IntermediateResultListener reslis = resultlisteners.remove(cid);
 //			System.out.println("kill lis: "+cid+" "+reslis+" "+results+" "+ex);
-			if(ex!=null)
+			if(reslis!=null)	// null for platform.
 			{
-				reslis.exceptionOccurred(ex);
-			}
-			else
-			{
-				reslis.finished();
-//					reslis.resultAvailable(results);
-			}
+				if(ex!=null)
+				{
+					reslis.exceptionOccurred(ex);
+				}
+				else
+				{
+					reslis.finished();
+	//					reslis.resultAvailable(results);
+				}
 			
-			if(ex!=null && !reslis.isInitial())
-			{
-				// Unhandled component exception
-				// Todo: delegate printing to parent component (if any).
-				adapter.getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
-				ex.printStackTrace();
+				if(ex!=null && !reslis.isInitial())
+				{
+					// Unhandled component exception
+					// Todo: delegate printing to parent component (if any).
+					adapter.getLogger().severe("Fatal error, component '"+cid+"' will be removed.");
+					ex.printStackTrace();
+				}
 			}
 			
 //			System.out.println("CleanupCommand end.");

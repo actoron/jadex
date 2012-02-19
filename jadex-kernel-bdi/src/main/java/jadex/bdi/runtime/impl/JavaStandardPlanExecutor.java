@@ -6,14 +6,22 @@ import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bdi.runtime.interpreter.OAVBDIRuntimeModel;
 import jadex.bdi.runtime.interpreter.PlanRules;
+import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.SReflect;
 import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IThreadPool;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.rules.state.IOAVState;
 
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
+
+import javax.naming.Binding;
 
 /**
  *  A plan executor for plans that run on their own thread
@@ -837,6 +845,23 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 	 */
 	public static class PlanTerminated	extends	ThreadDeath 
 	{
+	}
+	
+	/**
+	 *  Create the plan executor.
+	 */
+	public static IFuture<IPlanExecutor>	createPlanExecutor(IInternalAccess comp)
+	{
+		final Future<IPlanExecutor>	ret	= new Future<IPlanExecutor>();
+		comp.getServiceContainer().searchService(IThreadPoolService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, IPlanExecutor>(ret)
+		{
+			public void customResultAvailable(IThreadPoolService threadpool)
+			{
+				ret.setResult(new JavaStandardPlanExecutor(threadpool));
+			}
+		});
+		return ret;
 	}
 	
 	// todo remove me

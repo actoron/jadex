@@ -40,6 +40,7 @@ public class MicroCreationTest extends TestCase
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks",
 //			"-kernels", "all",
+//			"-logging_level", "java.util.logging.Level.INFO",
 			"-libpath", "new String[]{\""+new File("../jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
 			"-awareness", "false",	// otherwise influences performance measure
 			"-gui", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "true", "-printpass", "false"}).get(sus, timeout);

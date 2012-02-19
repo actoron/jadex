@@ -6,7 +6,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -22,7 +21,6 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  *  Testing broken components.

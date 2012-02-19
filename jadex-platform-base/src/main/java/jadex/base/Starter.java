@@ -24,6 +24,7 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.SJavaParser;
@@ -353,11 +354,12 @@ public class Starter
 										instancefut.setResult(root.getFirstEntity());
 										IComponentAdapter adapter = root.getSecondEntity();
 										
-										// Execute init steps of root component on main thread (i.e. platform).
+										// Execute init steps of root component on main thread (i.e. platform)
+										// until platform is ready to run by itself.
 										boolean again = true;
 										while(again && !ret.isDone())
 										{
-											again = afac.executeStep(adapter);
+											again = afac.executeStep(adapter) || FutureHelper.notifyStackedListeners();
 										}
 										
 										// Start normal execution of root component (i.e. platform) unless an error occurred during init.
@@ -536,8 +538,6 @@ public class Starter
 		}
 		
 		return ret;
-	}
-	
-	
+	}	
 }
 

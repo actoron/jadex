@@ -7,18 +7,18 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.ISearchConstraints;
-import jadex.bridge.modelinfo.Argument;
-import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 import jadex.bridge.service.types.df.IDFServiceDescription;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
-import jadex.micro.MicroAgentMetaInfo;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
@@ -55,19 +55,21 @@ public class DFTestAgent extends MicroAgent
 	/**
 	 *  Called when agent finishes.
 	 */
-	public IFuture	agentKilled()
+	public IFuture<Void>	agentKilled()
 	{
+		final Future<Void>	ret	= new Future<Void>();
 		// Store test results.
 		setResultValue("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
 
 		// Deregister agent.
-		getServiceContainer().searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new DefaultResultListener()
+		// Todo: use fix component service container
+		getServiceContainer().searchService(IDF.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IDF, Void>(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(IDF df)
 			{
-				IDF df = (IDF)result;
 				IDFComponentDescription ad = df.createDFComponentDescription(getComponentIdentifier(), null);
-				df.deregister(ad);
+				df.deregister(ad).addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
 		return IFuture.DONE;

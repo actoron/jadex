@@ -2,39 +2,32 @@ package jadex.commons.future;
 
 public class CascadingFutureTest
 {
-	protected static ThreadLocal<CascadingFuture<String>>	CFUTURE	= new ThreadLocal<CascadingFuture<String>>();
-	
-	protected static CascadingFuture<String>	sync(String s, int i)
+	protected static IFuture<String>	sync(String s, int i)
 	{
-		final CascadingFuture<String>	ret	= CFUTURE.get()!=null ? CFUTURE.get() : new CascadingFuture<String>();
-		if(CFUTURE.get()==null)
-			CFUTURE.set(ret);
-		
-		ret.setCascadingResult("sync"+s+i);
-		return ret;
+		System.out.println("Sync"+s+i);
+		return new Future<String>(s+i);
 	}
 	
-	protected static CascadingFuture<String>	recurse(final int i)
+	protected static IFuture<String>	recurse(final int i)
 	{
-		final CascadingFuture<String>	ret	= CFUTURE.get()!=null ? CFUTURE.get() : new CascadingFuture<String>();
-		if(CFUTURE.get()==null)
-			CFUTURE.set(ret);
+		System.out.println("rec"+i);
+		final Future<String>	ret	= new Future<String>();
 		
 		if(i>0)
 		{
-			sync("A", i).addCascadingResultListener(new DelegationResultListener<String>(ret)
+			sync("A", i).addResultListener(new DelegationResultListener<String>(ret)
 			{
 				public void customResultAvailable(final String res1)
 				{
-					sync("B", i).addCascadingResultListener(new DelegationResultListener<String>(ret)
+					sync("B", i).addResultListener(new DelegationResultListener<String>(ret)
 					{
 						public void customResultAvailable(final String res2)
 						{
-							recurse(i-1).addCascadingResultListener(new DelegationResultListener<String>(ret)
+							recurse(i-1).addResultListener(new DelegationResultListener<String>(ret)
 							{
 								public void customResultAvailable(String res3)
 								{
-									ret.setCascadingResult("rec"+i+"(syncA="+res1+" "+"syncB="+res2+" "+res3+")");
+									ret.setResult("rec"+i+"(syncA="+res1+" "+"syncB="+res2+" "+res3+")");
 								}
 							});
 						}
@@ -44,22 +37,16 @@ public class CascadingFutureTest
 		}
 		else
 		{
-			long	time	= System.nanoTime();
-			long sum	= 0;
-			for(int j=0; j<1000; j++)
-			{
-				sum	+= Thread.currentThread().getStackTrace().length;
-			}
-			System.out.println("stack: "+sum/1000+", time "+(System.nanoTime()-time)/1000/1000/1000.0+" ms");
-//			Thread.dumpStack();
-			ret.setCascadingResult("rec"+i);
+			Thread.dumpStack();
+			ret.setResult("rec"+i);
 		}
+		System.out.println("rec"+i+ "end");
 		return ret;
 	}
 	
 	public static void main(String[] args)
 	{
-		recurse(3).addCascadingResultListener(new DefaultResultListener<String>()
+		recurse(10).addResultListener(new DefaultResultListener<String>()
 		{
 			public void resultAvailable(String result)
 			{
