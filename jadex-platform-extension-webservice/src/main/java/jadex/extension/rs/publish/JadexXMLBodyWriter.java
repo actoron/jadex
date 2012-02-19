@@ -14,7 +14,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 /**
- *  Body writer for jersey. Allows to use the Jadex XML Codec
+ *  Body writer for Jersey. Allows to use the Jadex XML Codec
  *  for producing XML for parameters. 
  */
 @Provider

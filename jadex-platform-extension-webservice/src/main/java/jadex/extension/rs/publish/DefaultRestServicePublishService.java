@@ -17,7 +17,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.extension.SJavassist;
 import jadex.extension.rs.publish.annotation.MethodMapper;
-import jadex.extension.rs.publish.annotation.ParameterMapper;
+import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.extension.rs.publish.mapper.DefaultParameterMapper;
 import jadex.extension.rs.publish.mapper.IParameterMapper;
@@ -424,7 +424,7 @@ public class DefaultRestServicePublishService implements IPublishService
 				Value parametermapper = rmi.getParameterMapper();
 				if(parametermapper!=null)
 				{
-					annot = new Annotation(constpool, SJavassist.getCtClass(ParameterMapper.class, pool));
+					annot = new Annotation(constpool, SJavassist.getCtClass(ParametersMapper.class, pool));
 					Annotation value = new Annotation(constpool, SJavassist.getCtClass(jadex.micro.annotation.Value.class, pool));
 					if(parametermapper.getExpression()!=null && parametermapper.getExpression().length()==0)
 						value.addMemberValue("value", new StringMemberValue(parametermapper.getExpression(), constpool));
@@ -574,9 +574,9 @@ public class DefaultRestServicePublishService implements IPublishService
 			System.out.println("target: "+targetmethod);
 			
 			Object[] targetparams = params;
-			if(method.isAnnotationPresent(ParameterMapper.class))
+			if(method.isAnnotationPresent(ParametersMapper.class))
 			{
-				ParameterMapper mm = method.getAnnotation(ParameterMapper.class);
+				ParametersMapper mm = method.getAnnotation(ParametersMapper.class);
 				Class<?> clazz = mm.value().clazz();
 				Object mapper;
 				if(!Object.class.equals(clazz))
@@ -629,7 +629,10 @@ public class DefaultRestServicePublishService implements IPublishService
 	}
 	
 	/**
-	 *  Functionality blueprint for get service info.
+	 *  Functionality blueprint for get service info web method.
+	 *  Creates a html page with css for style and javascript for ajax post requests.
+	 *  The service info site contains a section for each published method. 
+	 *  @param params The parameters.
 	 *  @return The result.
 	 */
 	public Object getServiceInfo(Object[] params)

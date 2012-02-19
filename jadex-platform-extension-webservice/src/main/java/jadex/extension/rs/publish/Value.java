@@ -1,21 +1,26 @@
 package jadex.extension.rs.publish;
 
-import jadex.extension.rs.publish.mapper.IValueMapper;
 import jadex.javaparser.SJavaParser;
 
 /**
- * 
+ *  Java class representation for the Value annotation
+ *  as annotations cannot be created at runtime.
  */
 public class Value
 {
+	//-------- attributes --------
+	
 	/** The expression. */
 	protected String expression;
 	
 	/** The class. */
 	protected Class<?> clazz;
 
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new value.
+	 *  @param expression The creation expression.
 	 */
 	public Value(String expression)
 	{
@@ -23,12 +28,15 @@ public class Value
 	}
 
 	/**
-	 * 
+	 *  Create a new value.
+	 *  @param clazz The clazz.
 	 */
-	public Value(Class< ? > clazz)
+	public Value(Class<?> clazz)
 	{
 		this.clazz = clazz;
 	}
+	
+	//-------- methods --------
 
 	/**
 	 *  Get the expression.
@@ -49,7 +57,7 @@ public class Value
 	}
 	
 	/**
-	 * 
+	 *  Evaluate a value.
 	 */
 	public static Object evaluate(Value value, String[] imports) throws Exception
 	{
@@ -69,7 +77,7 @@ public class Value
 	}
 	
 	/**
-	 * 
+	 *  Evaluate a value.
 	 */
 	public static Object evaluate(jadex.micro.annotation.Value value, String[] imports) throws Exception
 	{

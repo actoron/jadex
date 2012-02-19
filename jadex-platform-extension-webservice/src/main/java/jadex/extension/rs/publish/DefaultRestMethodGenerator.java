@@ -4,7 +4,7 @@ import jadex.bridge.service.IService;
 import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.extension.rs.publish.annotation.MethodMapper;
-import jadex.extension.rs.publish.annotation.ParameterMapper;
+import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 
 import java.lang.reflect.Method;
@@ -29,18 +29,21 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- * 
+ *  The default rest method generator. Analyses
+ *  the Jadex service interface and possible the
+ *  baseclass (which can be a concrete or abstract class or
+ *  an interface).
  */
 public class DefaultRestMethodGenerator implements IRestMethodGenerator
 {
 	/**
-	 * 
-	 * @param service
-	 * @param classloader
-	 * @param baseclass
-	 * @param mapprops
-	 * @return
-	 * @throws Exception
+	 *  Generate the rest method infos.
+	 *  @param service The Jadex service. 
+	 *  @param classloader The classloader.
+	 *  @param baseclass The (abstract or concrete) baseclass or interface.
+	 *  @param mapprops Additional mapping properties.
+	 *  @return The method infos.
+	 *  @throws Exception
 	 */
 	public List<RestMethodInfo> generateRestMethodInfos(IService service, ClassLoader classloader, 
 		Class<?> baseclass, Map<String, Object> mapprops) throws Exception
@@ -178,9 +181,9 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 				}
 				
 				Value parametermapper = null;
-				if(method.isAnnotationPresent(ParameterMapper.class))
+				if(method.isAnnotationPresent(ParametersMapper.class))
 				{
-					ParameterMapper pm = (ParameterMapper)method.getAnnotation(ParameterMapper.class);
+					ParametersMapper pm = (ParametersMapper)method.getAnnotation(ParametersMapper.class);
 					Class<?> clazz = pm.value().clazz();
 					if(clazz!=null && !Object.class.equals(clazz))
 						parametermapper = new Value(clazz);
@@ -255,7 +258,7 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 				DefaultRestServicePublishService.class, "getServiceInfo"));
 		}
 		
-		System.out.println("paths: "+paths);
+//		System.out.println("paths: "+paths);
 		
 		return ret;
 	}
@@ -300,9 +303,9 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 	}
 	
 	/**
-	 * 
-	 * @param mw
-	 * @param methods
+	 *  A a method wrapper.
+	 *  @param mw The method mapper.
+	 *  @param methods The set of method wrapper.
 	 */
 	protected static void addMethodWrapper(MethodWrapper mw, Set<MethodWrapper> methods)
 	{
@@ -318,9 +321,10 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 	}
 	
 	/**
-	 * 
-	 * @param mw
-	 * @param methods
+	 *  Get a path name based on a start name.
+	 *  @param path The path name.
+	 *  @param paths The already taken paths.
+	 *  @return The available path.
 	 */
 	protected static String getPathName(String path, Set<String> paths)
 	{
@@ -337,7 +341,10 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 	}
 	
 	/**
-	 * 
+	 *  Add a path to the set of paths.
+	 *  Add the path plus the path with trailing slash.
+	 *  @param path The path.
+	 *  @param paths The paths.
 	 */
 	protected static void addPath(String path, Set<String> paths)
 	{
@@ -351,7 +358,11 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 	}
 	
 	/**
-	 * 
+	 *  Test if a method has parameters that are all convertible from string.
+	 *  @param method The method.
+	 *  @param rettype The return types (possibly unwrapped from future type).
+	 *  @param paramtypes The parameter types.
+	 *  @return True, if is convertible.
 	 */
 	public boolean hasStringConvertableParameters(Method method, Class<?> rettype, Class<?>[] paramtypes)
 	{
@@ -366,7 +377,10 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 	}
 	
 	/**
-	 * 
+	 *  Test if a class is convertible from string.
+	 *  Tests if is simple type (string, boolean, int, double, etc.)
+	 *  or if it contains a static method 'fromString' or 'valueOf'
+	 *  for Jersey.
 	 */
 	public static boolean isStringConvertableType(Class<?> type)
 	{
@@ -393,7 +407,9 @@ public class DefaultRestMethodGenerator implements IRestMethodGenerator
 	}
 	
 	/**
-	 * 
+	 *  Get the declared rest type.
+	 *  @param method The method.
+	 *  @return The rest type.
 	 */
 	public static Class<?> getDeclaredRestType(Method method)
 	{

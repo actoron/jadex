@@ -8,11 +8,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
+ *  Parameter mapper to map the parameters.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ParameterMapper
+public @interface ParametersMapper
 {
 	/**
 	 *  The method name.

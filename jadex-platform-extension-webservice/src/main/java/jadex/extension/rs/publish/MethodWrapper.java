@@ -4,12 +4,15 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /**
- * 
+ *  Helper struct that saves a method and a method name.
+ *  The method name can be different from the original name.
  */
 public class MethodWrapper
 {
+	/** The method name. */
 	protected String name;
 	
+	/** The method. */
 	protected Method method;
 
 	/**

@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
+ *  Method mapper annotation. Can be used to express
+ *  to what exact Jadex service method a call should be routed to.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -18,7 +19,7 @@ public @interface MethodMapper
 	public String value();
 	
 	/**
-	 *  The parameters.
+	 *  The method parameters.
 	 */
 	public Class<?>[] parameters() default {};
 }

@@ -13,7 +13,7 @@ import jadex.micro.annotation.RequiredServices;
 import java.lang.reflect.Proxy;
 
 /**
- *  Agent that wraps a normal web service as Jadex service.
+ *  Convenience agent that wraps a normal rest web service as Jadex service.
  *  In this way the web service can be used by active components
  *  in the same way as normal Jadex component services.
  */

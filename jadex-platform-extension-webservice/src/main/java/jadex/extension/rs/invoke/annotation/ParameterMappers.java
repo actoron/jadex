@@ -5,12 +5,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ *  Container annotation for more than one parameter
+ *  mapper that should be annotated at the method itself.
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ParamMappers
+public @interface ParameterMappers
 {
 	/**
-	 *  The query parameter mappers.
+	 *  The parameter mappers.
 	 */
-	public ParamMapper[] value() default {};
+	public ParameterMapper[] value() default {};
 }

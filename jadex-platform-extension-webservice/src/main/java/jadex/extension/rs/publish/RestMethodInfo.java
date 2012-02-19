@@ -13,6 +13,8 @@ import javax.ws.rs.core.MediaType;
  */
 public class RestMethodInfo
 {
+	//-------- attributes --------
+	
 	/** The original method. */
 	protected Method method;
 		
@@ -56,6 +58,8 @@ public class RestMethodInfo
 	
 	/** The delegation (prototype) method. */
 	protected String dmname;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new rest method info.
@@ -107,6 +111,8 @@ public class RestMethodInfo
 		this.dmname = dmname;
 	}
 
+	//-------- methods --------
+	
 //	/**
 //	 *  Get the method.
 //	 *  @return the method.
@@ -368,6 +374,5 @@ public class RestMethodInfo
 		return "RestMethodInfo(name=" + name + ", resttype=" + resttype
 				+ ", consumed=" + consumed + ", produced=" + produced + ")";
 	}
-	
 	
 }

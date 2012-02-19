@@ -7,22 +7,30 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ *  The parameter mapper can be used to state how a parameter should
+ *  be mapped for a rest service invocation.
+ */
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ParamMapper
+public @interface ParameterMapper
 {
 	/**
-	 *  The method name.
+	 *  The parameter name as used in the rest call.
 	 */
 	public String value() default "";
 	
 	/**
-	 *  The source parameter numbers.
+	 *  The parameter numbers that should be
+	 *  passed to the mapper as input. If not
+	 *  given only the annotated parameter will
+	 *  be given.
+	 *  (from 0: the first till n: the last).
 	 */
 	public int[] source() default {};
 	
 	/**
-	 *  The mapper.
+	 *  The class or creation expression of the mapper.
 	 */
 	public Value mapper() default @Value();
 }

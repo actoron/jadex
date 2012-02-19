@@ -4,7 +4,8 @@ import java.lang.reflect.Method;
 import java.util.Comparator;
 
 /**
- * 
+ *  Simple method comparator that can be used to
+ *  order methods alphabetically.
  */
 public class MethodComparator implements Comparator<Method>
 {

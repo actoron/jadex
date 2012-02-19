@@ -14,7 +14,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
 /**
- *  Body reader for jersey. Allows to use the Jadex XML Codec
+ *  Body reader for Jersey. Allows to use the Jadex XML Codec
  *  for reading XML for parameters. 
  */
 @Provider

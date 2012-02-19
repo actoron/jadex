@@ -1,7 +1,7 @@
 package jadex.webservice.examples.rs.chart;
 
 import jadex.commons.future.IFuture;
-import jadex.extension.rs.invoke.annotation.ParamMapper;
+import jadex.extension.rs.invoke.annotation.ParameterMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.micro.annotation.Value;
 
@@ -27,12 +27,12 @@ public interface IRSChartService
 	@GET
 	@Path("chart")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	@ParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"bhs\")"))
+	@ParameterMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"bhs\")"))
 	public @ResultMapper(@Value(clazz=ChartResultMapper.class)) IFuture<byte[]> getBarChart(
-		@ParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
-		@ParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
-		@ParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
-		@ParamMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
+		@ParameterMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
+		@ParameterMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
+		@ParameterMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
+		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
 
 	/**
 	 *  Get a line chart.
@@ -40,13 +40,13 @@ public interface IRSChartService
 	@GET
 	@Path("chart")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	@ParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"lc\")"))
+	@ParameterMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"lc\")"))
 	public @ResultMapper(@Value(clazz=ChartResultMapper.class)) IFuture<byte[]> getLineChart(
-		@ParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
-		@ParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
+		@ParameterMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
+		@ParameterMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
 //		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
-		@ParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
-		@ParamMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
+		@ParameterMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
+		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
 	
 	/**
 	 *  Get a pie chart.
@@ -54,13 +54,13 @@ public interface IRSChartService
 	@GET
 	@Path("chart")
 	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-	@ParamMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"pc\")"))
+	@ParameterMapper(value="cht", mapper=@Value("new ConstantStringMapper(\"pc\")"))
 	public @ResultMapper(@Value(clazz=ChartResultMapper.class)) IFuture<byte[]> getPieChart(
-		@ParamMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
-		@ParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
+		@ParameterMapper(value="chs", mapper=@Value(clazz=SizeStringMapper.class), source={0,1}) int width, int height, 
+		@ParameterMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\"|\", null, new IterableStringMapper(\",\"))")) double[][] data, 
 //		@QueryParamMapper(value="chd", mapper=@Value("new IterableStringMapper(\"t:\",\",\")")) double[] data, 
-		@ParamMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
-		@ParamMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
+		@ParameterMapper(value="chl", mapper=@Value("new IterableStringMapper(\"|\")")) String[] labels,
+		@ParameterMapper(value="chco", mapper=@Value("new IterableStringMapper(\",\", new ColorStringMapper())")) Color[] colors);
 
 	
 	//-------- alternatives --------

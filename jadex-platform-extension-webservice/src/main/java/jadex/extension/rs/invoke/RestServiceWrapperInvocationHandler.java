@@ -14,16 +14,14 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.extension.rs.invoke.annotation.ParamMapper;
-import jadex.extension.rs.invoke.annotation.ParamMappers;
+import jadex.extension.rs.invoke.annotation.ParameterMapper;
+import jadex.extension.rs.invoke.annotation.ParameterMappers;
 import jadex.extension.rs.invoke.annotation.ParametersInURL;
 import jadex.extension.rs.publish.DefaultRestMethodGenerator;
-import jadex.extension.rs.publish.JadexXMLBodyReader;
 import jadex.extension.rs.publish.JadexXMLBodyWriter;
-import jadex.extension.rs.publish.annotation.ParameterMapper;
+import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.extension.rs.publish.mapper.IValueMapper;
-import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.Value;
 
 import java.lang.annotation.Annotation;
@@ -41,7 +39,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import com.sun.jersey.api.client.Client;
@@ -52,7 +49,6 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 
 /**
@@ -65,6 +61,7 @@ import com.sun.jersey.core.util.MultivaluedMapImpl;
  *  
  *  todo: 
  *  - path parameter support
+ *  - fix import problem: expressions are evaluated in other agent so that imports are missing
  *  
  */
 @Service // Used here only to pass allow proxy to be used as service (check is delegated to handler)
@@ -149,8 +146,8 @@ class RestServiceWrapperInvocationHandler implements InvocationHandler
 											
 											// Test if general parameter mapper is given
 											Value pmapper = null;
-											if(m.isAnnotationPresent(ParameterMapper.class))
-												pmapper = m.getAnnotation(ParameterMapper.class).value();
+											if(m.isAnnotationPresent(ParametersMapper.class))
+												pmapper = m.getAnnotation(ParametersMapper.class).value();
 											
 											// Otherwise test if parameter specific mappers are given
 											List<Object[]> pmappers = null;
@@ -163,21 +160,21 @@ class RestServiceWrapperInvocationHandler implements InvocationHandler
 													Annotation[] anos = anoss[i]; 
 													for(int j=0; j<anos.length; j++)
 													{
-														if(anos[j] instanceof ParamMapper)
+														if(anos[j] instanceof ParameterMapper)
 														{
 															pmappers.add(new Object[]{anos[j], new int[]{i}});
 														}
 													}
 												}
-												if(m.isAnnotationPresent(ParamMapper.class))
+												if(m.isAnnotationPresent(ParameterMapper.class))
 												{
-													ParamMapper qpm = m.getAnnotation(ParamMapper.class);
+													ParameterMapper qpm = m.getAnnotation(ParameterMapper.class);
 													pmappers.add(new Object[]{qpm, new int[]{-1}});
 												}
-												if(m.isAnnotationPresent(ParamMappers.class))
+												if(m.isAnnotationPresent(ParameterMappers.class))
 												{
-													ParamMappers qpms = m.getAnnotation(ParamMappers.class);
-													ParamMapper[] mps = qpms.value();
+													ParameterMappers qpms = m.getAnnotation(ParameterMappers.class);
+													ParameterMapper[] mps = qpms.value();
 													for(int i=0; i<mps.length; i++)
 													{
 														pmappers.add(new Object[]{mps[i], new int[]{-1}});
@@ -206,7 +203,7 @@ class RestServiceWrapperInvocationHandler implements InvocationHandler
 												for(int i=0; i<pmappers.size(); i++)
 												{
 													Object[] pm = (Object[])pmappers.get(i);
-													ParamMapper qpm = (ParamMapper)pm[0];
+													ParameterMapper qpm = (ParameterMapper)pm[0];
 													String name = qpm.value();
 													Value val = qpm.mapper();
 													int[] src = qpm.source().length>0? qpm.source(): (int[])pm[1];
@@ -228,52 +225,36 @@ class RestServiceWrapperInvocationHandler implements InvocationHandler
 											wr = wr.path(methodname);
 											
 											ClientResponse res = null;
-											if(GET.class.equals(resttype))
-											{
-												wr = wr.queryParams((MultivaluedMap<String, String>)targetparams);
-												
-												RequestBuilder rb = wr;
-												for(int i=0; i<consumes.length; i++)
-												{
-													rb = rb.type(consumes[i]);
-												}
-												for(int i=0; i<produces.length; i++)
-												{
-													rb = rb.accept(produces[i]);
-												}
 
+											boolean inurl = GET.class.equals(resttype);
+											if(!inurl && m.isAnnotationPresent(ParametersInURL.class))
+												inurl = m.getAnnotation(ParametersInURL.class).value();
+												
+											if(inurl)
+												wr = wr.queryParams((MultivaluedMap<String, String>)targetparams);
+											
+											RequestBuilder rb = wr;
+											for(int i=0; i<consumes.length; i++)
+											{
+												rb = rb.type(consumes[i]);
+											}
+											for(int i=0; i<produces.length; i++)
+											{
+												rb = rb.accept(produces[i]);
+											}
+											
+											if(GET.class.equals(resttype))
 												res = ((UniformInterface)rb).get(ClientResponse.class);
-											}
-											else 
-											{	
-												boolean inurl = false;
-												if(m.isAnnotationPresent(ParametersInURL.class))
-													inurl = m.getAnnotation(ParametersInURL.class).value();
-												
-												if(inurl)
-													wr = wr.queryParams((MultivaluedMap<String, String>)targetparams);
-												
-												RequestBuilder rb = wr;
-												for(int i=0; i<consumes.length; i++)
-												{
-													rb = rb.type(consumes[i]);
-												}
-												for(int i=0; i<produces.length; i++)
-												{
-													rb = rb.accept(produces[i]);
-												}
-												
-												if(POST.class.equals(resttype))
-													res = ((UniformInterface)rb).post(ClientResponse.class, inurl? null: targetparams);
-												else if(PUT.class.equals(resttype))
-													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
-												else if(HEAD.class.equals(resttype))
-													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
-												else if(OPTIONS.class.equals(resttype))
-													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
-												else if(DELETE.class.equals(resttype))
-													res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
-											}
+											else if(POST.class.equals(resttype))
+												res = ((UniformInterface)rb).post(ClientResponse.class, inurl? null: targetparams);
+											else if(PUT.class.equals(resttype))
+												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+											else if(HEAD.class.equals(resttype))
+												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+											else if(OPTIONS.class.equals(resttype))
+												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
+											else if(DELETE.class.equals(resttype))
+												res = ((UniformInterface)rb).put(ClientResponse.class, inurl? null: targetparams);
 											
 											Object targetret = res;
 											if(rmapper!=null)

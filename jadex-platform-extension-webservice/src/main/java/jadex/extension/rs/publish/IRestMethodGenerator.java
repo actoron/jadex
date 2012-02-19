@@ -6,18 +6,22 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  Rest method generator interface.
+ *  The publish service uses the generator to create detailed
+ *  information about the methods to publish. The generator
+ *  already includes all rest details into the rest method info
+ *  that is returned.
  */
 public interface IRestMethodGenerator
 {
 	/**
-	 * 
-	 * @param service
-	 * @param classloader
-	 * @param baseclass
-	 * @param mapprops
-	 * @return
-	 * @throws Exception
+	 *  Generate the rest method infos.
+	 *  @param service The Jadex service. 
+	 *  @param classloader The classloader.
+	 *  @param baseclass The (abstract or concrete) baseclass or interface.
+	 *  @param mapprops Additional mapping properties.
+	 *  @return The method infos.
+	 *  @throws Exception
 	 */
 	public List<RestMethodInfo> generateRestMethodInfos(IService service, ClassLoader classloader, 
 		Class<?> baseclass, Map<String, Object> mapprops) throws Exception;

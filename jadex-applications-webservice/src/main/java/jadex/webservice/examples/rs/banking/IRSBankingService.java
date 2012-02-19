@@ -1,7 +1,7 @@
 package jadex.webservice.examples.rs.banking;
 
 import jadex.extension.rs.publish.annotation.MethodMapper;
-import jadex.extension.rs.publish.annotation.ParameterMapper;
+import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.micro.annotation.Value;
 
@@ -24,7 +24,7 @@ public interface IRSBankingService
 	@Path("getAS/")
 	@Produces(MediaType.TEXT_HTML)
 	@MethodMapper(value="getAccountStatement", parameters={Request.class})
-	@ParameterMapper(@Value(clazz=RequestMapper.class))
+	@ParametersMapper(@Value(clazz=RequestMapper.class))
 	@ResultMapper(@Value(clazz=BeanToHTMLMapper.class))
 	public String getAcci(String begin, String end);
 	
