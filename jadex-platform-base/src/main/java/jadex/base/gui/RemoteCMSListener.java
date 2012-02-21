@@ -78,6 +78,15 @@ public class RemoteCMSListener	implements ICMSComponentListener
 	 */
 	public RemoteCMSListener(IComponentIdentifier cid, String id, IComponentManagementService cms, IRemoteChangeListener rcl)
 	{
+		if(cid==null)
+			throw new IllegalArgumentException("Cid must not null");
+		if(id==null)
+			throw new IllegalArgumentException("Id must not null");
+		if(cms==null)
+			throw new IllegalArgumentException("Cms must not null");
+		if(rcl==null)
+			throw new IllegalArgumentException("Rcl must not null");
+		
 		this.cid	= cid;
 		this.id	= id;
 		this.cms	= cms;

@@ -55,6 +55,9 @@ public class MessagePerformanceAgent extends MicroAgent
 	/** The current message number sent. */
 	protected int current;
 	
+	/** The future for terminating. */
+	protected Future<Void> future;
+	
 	//-------- methods --------
 	
 	/**
@@ -62,6 +65,8 @@ public class MessagePerformanceAgent extends MicroAgent
 	 */
 	public IFuture<Void> executeBody()
 	{
+		future = new Future<Void>();
+		
 		getTime().addResultListener(new DefaultResultListener<Long>()
 		{
 			public void resultAvailable(Long result)
@@ -79,12 +84,14 @@ public class MessagePerformanceAgent extends MicroAgent
 					public void resultAvailable(Void result)
 					{
 						System.out.println("sending completed");
+						future.setResult(null);
 					}
 
 					public void exceptionOccurred(Exception exception)
 					{
 						System.out.println("sending failed: "+exception);
 						exception.printStackTrace();
+						future.setResult(null);
 					}
 				});
 				
@@ -179,7 +186,20 @@ public class MessagePerformanceAgent extends MicroAgent
 					long dur = result.longValue() - starttime;
 					System.out.println("Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
 					setResultValue("result", "Sending/receiving " + msgcnt + " messages took: " + dur + " milliseconds.");
-					killAgent();
+					
+					future.addResultListener(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+							killAgent();
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							killAgent();
+						}
+					});
+					
 				}
 			});
 		}
