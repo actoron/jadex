@@ -59,8 +59,8 @@ public class StartSimulationProzess extends SimplePropertyObject implements
 	public static String SUBAHN = "subahn";
 	public static String TYP = "typ";
 	
-	public static String fahrgastdaten = "FahrgastDaten.xml";
-	public static String fahrplandaten = "FahrplanDaten.xml";
+	public static String fahrgastdaten = "E:/Workspaces/Jadex/Jadex Test Instanz/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrgastDaten.xml";
+	public static String fahrplandaten = "E:/Workspaces/Jadex/Jadex Test Instanz/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrplanDaten.xml";
 	
 	public static void setzFahrgastDaten( String fahrgastdaten )
 	{

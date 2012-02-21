@@ -7,7 +7,7 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
-	name="Simulation" package="de.uhh.avs.simulation">
+	name="Simulation" package="sodekovs.bikesharing.simulation">
 
 	<imports>
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
@@ -19,14 +19,15 @@
 		<import>jadex.extension.envsupport.math.Vector2Double</import>
 		<import>jadex.application.space.envsupport.dataview.*</import>
 		<import>jadex.application.space.envsupport.observer.perspective.*</import>
-		<import>de.uhh.avs.container.Weg</import>
 		<import>jadex.extension.envsupport.evaluation.CSVFileDataConsumer</import>
 		<import>jadex.extension.envsupport.observer.perspective.*</import>
 		<import>jadex.extension.envsupport.dataview.GeneralDataView2D</import>		
-		<import>de.uhh.avs.fahrrad.FahrradVerleihStation</import>
-		<import>jadex.bridge.service.clock.IClockService</import>
+		<import>sodekovs.bikesharing.fahrrad.FahrradVerleihStation</import>		
+		<import>jadex.bridge.service.types.clock.IClockService</import>
+		<import>jadex.bridge.service.search.*</import>		
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
+		<import>sodekovs.bikesharing.container.Weg</import>
 	</imports>
 
 	<extensiontypes>
@@ -88,7 +89,7 @@
 					<env:property name="abendsende" class="Integer" />
 				</env:objecttype>
 				<env:objecttype name="SimInfo">
-					<env:property name="text" dynamic="false">"Time Info"</env:property>
+					<env:property name="text" dynamic="false">" "</env:property>
 					<env:property name="duration" dynamic="true">$properties.clock.getTime()</env:property>
 					<!-- <env:property name="duration" dynamic="true">$zeitagent.max</env:property>-->
 					<!-- <env:property name="start_time">$args.tmp_start_time</env:property>-->					
@@ -121,15 +122,15 @@
 			<env:perspectives>
 				<env:perspective name="main" class="Perspective2D"	opengl="true" objectplacement="center">
 					<env:drawable objecttype="station" height="1.0" width="1.0">
-						<env:texturedrectangle imagepath="bilder/ubahn.png">
+						<env:texturedrectangle imagepath="sodekovs/bikesharing/bilder/ubahn.png">
 							<env:drawcondition>StartSimulationProzess.UBAHN.equals($object.typ)
 							</env:drawcondition>
 						</env:texturedrectangle>
-						<env:texturedrectangle imagepath="bilder/sbahn.png">
+						<env:texturedrectangle imagepath="sodekovs/bikesharing/bilder/sbahn.png">
 							<env:drawcondition>StartSimulationProzess.SBAHN.equals($object.typ)
 							</env:drawcondition>
 						</env:texturedrectangle>
-						<env:texturedrectangle imagepath="bilder/subahn.png">
+						<env:texturedrectangle imagepath="sodekovs/bikesharing/bilder/subahn.png">
 							<env:drawcondition>StartSimulationProzess.SUBAHN.equals($object.typ)
 							</env:drawcondition>
 						</env:texturedrectangle>
@@ -165,7 +166,7 @@
 					<!-- SimInfo -->
 					<env:drawable objecttype="SimInfo" width="1.0"
 						height="1.0">
-						<env:texturedrectangle layer="2" width="15" height="4" imagepath="bilder/WhiteSpace.png"/>						
+						<env:texturedrectangle layer="2" width="15" height="4" imagepath="sodekovs/bikesharing/bilder/WhiteSpace.png"/>						
 						<env:rectangle layer="1" width="1" height="1" color="#1e1e1e46" />
 						<env:text layer="2" size="8" font="Arial"
 							abssize="true" text="$text$" align="left" color="black" />							
@@ -174,7 +175,7 @@
 					</env:drawable>
 					
 					<env:prelayers>
-						<env:tiledlayer width="1" height="1" imagepath="bilder/map.png" />
+						<env:tiledlayer width="1" height="1" imagepath="sodekovs/bikesharing/bilder/map.png" />
 					</env:prelayers>
 				</env:perspective>
 			</env:perspectives>
@@ -191,27 +192,24 @@
 
 	<componenttypes>
 		<componenttype name="Sbahn"
-			filename="de/uhh/avs/standard/VerkehrsmittelAgent.class" />
+			filename="sodekovs/bikesharing/standard/VerkehrsmittelAgent.class" />
 		<componenttype name="Verkehrsteilnehmer"
-			filename="de/uhh/avs/verkehrsteilnehmer/Verkehrsteilnehmer.agent.xml" />
-		<componenttype name="ZeitAgent" filename="de/uhh/avs/zeit/ZeitAgent.class" />
+			filename="sodekovs/bikesharing/verkehrsteilnehmer/Verkehrsteilnehmer.agent.xml" />
+		<componenttype name="ZeitAgent" filename="sodekovs/bikesharing/zeit/ZeitAgent.class" />
 		<componenttype name="EndstationsAgent"
-			filename="de/uhh/avs/standard/EndstationsAgent.class" />
+			filename="sodekovs/bikesharing/standard/EndstationsAgent.class" />
 		<componenttype name="DispositionEngpassagent"
-			filename="de/uhh/avs/disposition/DispositionEngpassAgent.class" />
+			filename="sodekovs/bikesharing/disposition/DispositionEngpassAgent.class" />
 		<componenttype name="DispositionSchwellwertagent"
-			filename="de/uhh/avs/disposition/DispositionSchwellwertAgent.class" />
+			filename="sodekovs/bikesharing/disposition/DispositionSchwellwertAgent.class" />
 		<componenttype name="DispositionVergangenheitsagent"
-			filename="de/uhh/avs/disposition/DispositionVergangenheitAgent.class" />
+			filename="sodekovs/bikesharing/disposition/DispositionVergangenheitAgent.class" />
 			<componenttype name="TimeAgent"
-			filename="de/uhh/avs/simulation/manager/TimeAgent.class" />
+			filename="sodekovs/bikesharing/simulation/manager/TimeAgent.class" />
 	</componenttypes>
 
 	<properties>
-		<property name="clock" class="IFuture">
-			SServiceProvider.getService($component.getServiceProvider(),
-			IClockService.class,RequiredServiceInfo.SCOPE_PLATFORM)
-		</property>
+		<property name="clock" class="IFuture">SServiceProvider.getService($component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)</property>
 	</properties>
 	
 	<configurations>
@@ -228,7 +226,7 @@
 
 					<env:objects>
 						<env:object type="SimInfo">
-						<env:property name="position">new Vector2Double(4.0, 4.0)</env:property>							
+						<env:property name="position">new Vector2Double(2.0, 4.0)</env:property>							
 						</env:object>						
 					</env:objects>
 					

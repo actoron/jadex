@@ -6,7 +6,7 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
-	name="simulation2" package="de.uhh.avs.datenkonvertierung">
+	name="Simulation2" package="sodekovs.bikesharing.datenkonvertierung">
 
 	<imports>
 		<import>jadex.application.space.envsupport.environment.space2d.*</import>
@@ -17,10 +17,10 @@
 		<import>jadex.application.space.envsupport.math.Vector2Double</import>
 		<import>jadex.application.space.envsupport.dataview.*</import>
 		<import>jadex.application.space.envsupport.observer.perspective.*</import>
-		<import>de.uhh.avs.container.Weg</import>
+		<import>sodekovs.bikesharing.container.Weg</import>
 		<import>java.awt.Color</import>
 		<import>jadex.application.space.envsupport.evaluation.CSVFileDataConsumer</import>
-		<import>de.uhh.avs.fahrrad.FahrradVerleihStation</import>
+		<import>sodekovs.bikesharing.fahrrad.FahrradVerleihStation</import>
 	</imports>
 
 	<spacetypes>

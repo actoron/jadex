@@ -86,8 +86,8 @@ public class StartSimulationProzess extends SimplePropertyObject implements
 	public static String SUBAHN = "subahn";
 	public static String TYP = "typ";
 	
-	public static String fahrgastdaten = "FahrgastDaten.xml";
-	public static String fahrplandaten = "FahrplanDaten.xml";
+	public static String fahrgastdaten = "sodekovs/bikesharing/setting/FahrgastDaten.xml";
+	public static String fahrplandaten = "sodekovs/bikesharing/setting/FahrplanDaten.xml";
 	
 	public static void setzFahrgastDaten( String fahrgastdaten )
 	{

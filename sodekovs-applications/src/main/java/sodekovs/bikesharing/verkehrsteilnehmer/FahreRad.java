@@ -1,17 +1,12 @@
 package sodekovs.bikesharing.verkehrsteilnehmer;
 
+import jadex.bdi.runtime.PlanFailureException;
+import jadex.extension.envsupport.math.IVector2;
 import sodekovs.bikesharing.datenkonvertierung.Datensammler;
 import sodekovs.bikesharing.fahrrad.Fahrrad;
 import sodekovs.bikesharing.fahrrad.FahrradVerleihStation;
 import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
 import sodekovs.bikesharing.zeit.Zeitverwaltung;
-//import jadex.application.space.envsupport.environment.space2d.Grid2D;
-//import jadex.application.space.envsupport.environment.space2d.Space2D;
-//import jadex.application.space.envsupport.math.IVector2;
-import jadex.extension.envsupport.environment.space2d.Grid2D;
-import jadex.extension.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.math.IVector2;
-import jadex.bdi.runtime.PlanFailureException;
 
 /**
  * Eine Klasse für den Plan, mit dem der Verkehrsteilnehmer Fahrrad fährt
@@ -20,7 +15,7 @@ import jadex.bdi.runtime.PlanFailureException;
  */
 public class FahreRad extends SelbstBewegPlan
 {
-	private static String ausgabedatei = "fahrten.csv";
+	private static String ausgabedatei = "E:/Workspaces/Jadex/Jadex Test Instanz/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/fahrten.csv";
 	private Fahrrad f;
 	private FahrradVerleihStation _startFVS, _zielFVS;
 	IVector2 _ziel;

@@ -1,9 +1,8 @@
 package sodekovs.bikesharing.simulation;
 
+import jadex.base.Starter;
 import sodekovs.bikesharing.disposition.DispositionsAgent;
 import sodekovs.bikesharing.verkehrsteilnehmer.FahreRad;
-import jadex.base.Starter;
-import jadex.commons.future.IFuture;
 
 /**
  * Startet die Simulation
@@ -17,13 +16,13 @@ public class SimulationStarter
 	
 	public static void main( String args[] )
 	{
-		String datei = "fahrten.csv";
+		String datei = "E:/Workspaces/Jadex/Jadex Test Instanz/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/fahrten.csv";
 		if ( args.length > 0 )
 		{
 			datei = args[0];
 		}
 		System.out.println("Schreibe in: " + datei);
-		String datei2 = "FahrgastDaten.csv";
+		String datei2 = "E:/Workspaces/Jadex/Jadex Test Instanz/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrgastDaten.csv";
 		if ( args.length > 1 )
 		{
 			datei2 = args[1];

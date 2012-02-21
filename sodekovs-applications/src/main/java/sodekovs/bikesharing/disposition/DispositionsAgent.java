@@ -44,7 +44,7 @@ public abstract class DispositionsAgent extends MicroAgent
 	public static final String SCHWELLWERT = "dispositionSchwellwertagent";
 	public static final String VERGANGENHEIT = "dispositionVergangenheitsagent";
 	
-	public static String ausgabedatei = "DispositionsFahrten.csv";
+	public static String ausgabedatei = "E:/Workspaces/Jadex/Jadex Test Instanz/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/DispositionsFahrten.csv";
 
 	protected Vector2Double _ziel;
 	private Vector2Double _position;

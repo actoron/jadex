@@ -55,7 +55,8 @@ public class TimeAgent extends MicroAgent{
 					@Override
 					public void resultAvailable(Object arg0) {
 						IClockService clock  = (IClockService) arg0;
-						System.out.println("jadex Clock: " + clock.getTime() + " - Local Clock: " +  Zeitverwaltung.gibInstanz().gibZeit());
+						long localTime = Zeitverwaltung.gibInstanz().gibZeit();
+						System.out.println("jadex Clock: " + clock.getTime() + " - Local Clock: " +  localTime + " - " + localTime/60%24 + ':' + localTime%60);
 						// TODO Auto-generated method stub
 						
 					}

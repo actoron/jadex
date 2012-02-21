@@ -3,22 +3,22 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
 	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
-	name="Verkehrsteilnehmer" package="de.uhh.avs.verkehrsteilnehmer">
+	name="Verkehrsteilnehmer" package="sodekovs.bikesharing.verkehrsteilnehmer">
 
 	<imports>
 		<import>jadex.extension.envsupport.math.Vector2Int</import>
 		<import>jadex.extension.envsupport.math.IVector2</import>
-		<import>jadex.extension.envsupport.math.Vector2Double</import>
-		<import>de.uhh.avs.container.*</import>
-		<import>de.uhh.avs.zeit.Zeitverwaltung</import>
+		<import>jadex.extension.envsupport.math.Vector2Double</import>		
 		<import>jadex.extension.envsupport.environment.space2d.Grid2D</import>
 		<import>jadex.extension.envsupport.environment.ISpaceObject</import>
 		<import>jadex.commons.future.IFuture</import>
+		<import>sodekovs.bikesharing.container.*</import>
+		<import>sodekovs.bikesharing.zeit.Zeitverwaltung</import>
 	</imports>
 
 	<beliefs>
 		<belief name="space" class="Grid2D">
-			<fact class="IFuture">$scope.getParent().getExtension("simulationsspace")</fact>		
+			<fact class="IFuture">$scope.getParentAccess().getExtension("simulationsspace")</fact>		
 		</belief>
 		<belief name="avatar" class="ISpaceObject">
 			<fact>$beliefbase.space.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>		

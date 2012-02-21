@@ -13,7 +13,7 @@
 		<import>jadex.commons.future.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.bridge.service.*</import>
-		<import>jadex.bridge.service.clock.*</import>
+		<import>jadex.bridge.service.types.clock.*</import>
 		<import>jadex.bridge.service.execution.*</import>
 		<import>jadex.bridge.service.library.*</import>
 		<import>jadex.bridge.service.threadpool.*</import>

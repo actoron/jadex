@@ -1,32 +1,17 @@
 package sodekovs.bikesharing.simulation;
 
+import jadex.commons.SimplePropertyObject;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.evaluation.DataTable;
+import jadex.extension.envsupport.evaluation.ITableDataConsumer;
+import jadex.extension.envsupport.evaluation.ITableDataProvider;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-
-import sodekovs.bikesharing.fahrrad.FahrradVerleihStation;
-
-
-import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
-import jadex.extension.envsupport.evaluation.CSVFileDataConsumer;
-import jadex.extension.envsupport.evaluation.DataTable;
-import jadex.extension.envsupport.evaluation.ITableDataConsumer;
-import jadex.extension.envsupport.evaluation.ITableDataProvider;
-import jadex.extension.envsupport.evaluation.XYChartDataConsumer;
-import jadex.commons.IPropertiesProvider;
-
-//import jadex.application.space.envsupport.environment.AbstractEnvironmentSpace;
-//import jadex.application.space.envsupport.evaluation.CSVFileDataConsumer;
-//import jadex.application.space.envsupport.evaluation.DataTable;
-//import jadex.application.space.envsupport.evaluation.ITableDataConsumer;
-//import jadex.application.space.envsupport.evaluation.ITableDataProvider;
-//import jadex.application.space.envsupport.evaluation.XYChartDataConsumer;
-//import jadex.base.gui.IPropertiesProvider;
-import jadex.commons.SimplePropertyObject;
 
 public class StationsDatenConsumer extends SimplePropertyObject implements ITableDataConsumer
 {
