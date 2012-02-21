@@ -16,6 +16,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.Collection;
@@ -38,6 +39,7 @@ public class SRemoteGui
 	{
 		return ea.scheduleImmediate(new IComponentStep<Object[]>()
 		{
+			@Classname("getServiceInfos")
 			@XMLClassname("getServiceInfos")
 			public IFuture<Object[]> execute(IInternalAccess ia)
 			{
@@ -92,6 +94,7 @@ public class SRemoteGui
 						final IRemoteChangeListener	rcl	= rcl0;
 						exta.scheduleStep(new IComponentStep<Void>()
 						{
+							@Classname("installListener")
 							@XMLClassname("installListener")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
@@ -134,6 +137,7 @@ public class SRemoteGui
 						final String	id	= id0;
 						exta.scheduleStep(new IComponentStep<Void>()
 						{
+							@Classname("deregisterListener")
 							@XMLClassname("deregisterListener")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{

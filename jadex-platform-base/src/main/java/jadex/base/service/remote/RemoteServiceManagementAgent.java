@@ -24,8 +24,11 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
@@ -41,6 +44,10 @@ import java.util.Map;
  *  remote service management components on other platforms to its service.
  */
 //@Properties(@NameValue(name="logging.level", value="java.util.logging.Level.INFO"))
+@Arguments(
+{
+	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="false", description="Set if the agent should send binary messages as default."),
+})
 public class RemoteServiceManagementAgent extends MicroAgent
 {
 	//-------- attributes --------
@@ -71,7 +78,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						{
 							public void customResultAvailable(final IMessageService msgservice)
 							{
-								rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), libservice, marshalservice, msgservice);
+								boolean binarymode = ((Boolean) getArgument("binarymessages")).booleanValue();
+								rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), libservice, marshalservice, msgservice, binarymode);
 								addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 								ret.setResult(null);
 							}
@@ -144,10 +152,10 @@ public class RemoteServiceManagementAgent extends MicroAgent
 		//						System.out.println("store command: "+callid+" "+getComponentIdentifier());
 		
 		//					// For debugging.
-							final String orig = (String)content;
+							final Object orig = content;
 		
 							// Decode content.
-							if(content instanceof String)
+							if(content instanceof String || content instanceof byte[])
 							{
 								// Catch decode problems.
 								// Should be ignored or be a warning.
@@ -156,7 +164,11 @@ public class RemoteServiceManagementAgent extends MicroAgent
 									List<Object>	errors	= new ArrayList<Object>();
 //									String contentcopy = (String)content;	// for debugging
 									
-									content = Reader.objectFromXML(rms.getReader(), (String)content, cl, errors);
+									String lang = (String) msg.get(SFipa.LANGUAGE);
+									if (RemoteServiceManagementService.RMS_JADEX_BINARY.equals(lang))
+										content = BinarySerializer.objectFromByteArray((byte[]) content, rms.getBinaryPostProcessors(), errors, cl);
+									else
+										content = Reader.objectFromXML(rms.getReader(), (String)content, cl, errors);
 									
 									// For corrupt result (e.g. if class not found) set exception to clean up waiting call.
 									if(!errors.isEmpty())
@@ -315,7 +327,17 @@ public class RemoteServiceManagementAgent extends MicroAgent
 															{
 					//											reply.put(SFipa.CONTENT, JavaWriter.objectToXML(repcontent, ls.getClassLoader()));
 //																ClassLoader cl = ls.getClassLoader(null);//rms.getComponent().getModel().getResourceIdentifier());
-																String content = Writer.objectToXML(rms.getWriter(), result, cl, new Object[]{msg.get(SFipa.SENDER), addresses});
+																String lang = (String) msg.get(SFipa.LANGUAGE);
+																Object content = null;
+																if (RemoteServiceManagementService.RMS_JADEX_BINARY.equals(lang))
+																{
+																	System.out.println("Encoding bin2");
+																	content = BinarySerializer.objectToByteArray(result, rms.getBinaryPreProcessors(), new Object[]{msg.get(SFipa.SENDER), addresses}, cl);
+																}
+																else
+																{
+																	content = Writer.objectToXML(rms.getWriter(), result, cl, new Object[]{msg.get(SFipa.SENDER), addresses});
+																}
 																reply.put(SFipa.CONTENT, content);
 					//											System.out.println("content: "+content);
 //																System.out.println("reply: "+callid);

@@ -388,6 +388,9 @@ public class EventReificator implements IOAVStateListener
 				event.setSourceCategory(ComponentChangeEvent.SOURCE_CATEGORY_PLAN);
 				event.setSourceName(element.toString());
 				event.setSourceType(info.getType());
+				Object reason = state.getAttributeValue(element, OAVBDIRuntimeModel.plan_has_reason);
+				if (reason != null)
+					event.setParent(reason.toString());
 				event.setDetails(info);
 			}
 			else if(OAVBDIRuntimeModel.CHANGEEVENT_GOALADDED.equals(type) ||
@@ -399,13 +402,28 @@ public class EventReificator implements IOAVStateListener
 				event.setSourceName(element.toString());
 				event.setSourceType(info.getType());
 				event.setDetails(info);
+				Object parentplan = state.getAttributeValue(element, OAVBDIRuntimeModel.goal_has_parentplan);
+				if (parentplan != null)
+				{
+					event.setParent(parentplan.toString());
+				}
+				else
+				{
+					GoalFlyweight x = GoalFlyweight.getGoalFlyweight(state, scope, element);
+					
+					System.out.println("This goal has no parent plan: " + x.getType() + " " + type);
+					//event.setParent(bdiint.getAgentAdapter().getComponentIdentifier().getName());
+				}
 				if (OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type))
 				{
 					GoalFlyweight gf = GoalFlyweight.getGoalFlyweight(state, scope, element);
 					if (gf.isSucceeded())
 						event.setReason("Success");
 					else if (gf.getException() != null)
+					{
 						event.setReason(gf.getException().toString());
+						gf.getException().printStackTrace();
+					}
 				}
 			}
 			else if (OAVBDIRuntimeModel.CHANGEEVENT_MESSAGEEVENTRECEIVED.equals(type) ||
@@ -433,8 +451,8 @@ public class EventReificator implements IOAVStateListener
 				if (OAVBDIRuntimeModel.CHANGEEVENT_AGENTTERMINATING.equals(type))
 					event.setDetails("Terminating");
 			}
-		
-			ComponentChangeEvent.dispatchComponentChangeEvent(event, componentlisteners);
+			
+			bdiint.notifyListeners(event);
 		}
 	}
 }

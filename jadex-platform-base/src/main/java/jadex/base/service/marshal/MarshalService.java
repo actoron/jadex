@@ -21,8 +21,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.traverser.ITraverseProcessor;
-import jadex.commons.traverser.Traverser;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 import jadex.xml.TypeInfo;
 
 import java.lang.reflect.Proxy;
@@ -121,7 +121,7 @@ public class MarshalService extends BasicService implements IMarshalService
 			
 			public Object process(Object object, Class<?> clazz,
 				List<ITraverseProcessor> processors, Traverser traverser,
-				Map<Object, Object> traversed, boolean clone)
+				Map<Object, Object> traversed, boolean clone, Object context)
 			{
 				return BasicServiceInvocationHandler.getPojoServiceProxy(object);
 			}

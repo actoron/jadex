@@ -21,8 +21,11 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -37,6 +40,10 @@ import java.util.Map;
  * Control the discovery mechanism of the relay transport.
  */
 @Agent
+@Arguments(
+{
+	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="false", description="Set if the agent should send binary messages as default."),
+})
 @ProvidedServices(@ProvidedService(type=IRelayAwarenessService.class,
 	implementation=@Implementation(expression="$component.getPojoAgent()")))
 @Service
@@ -156,6 +163,9 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 									Map<String, Object> msg = new HashMap<String, Object>();
 									msg.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(), receivers);
 									msg.put(SFipa.CONTENT, awainfo);
+									
+									// TODO: Binary/XML branch
+									//if g
 									msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);	// Todo: remove need for nested codecs!?
 									
 									ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE,

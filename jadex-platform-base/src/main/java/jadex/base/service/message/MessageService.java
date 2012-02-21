@@ -43,8 +43,8 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.traverser.ITraverseProcessor;
-import jadex.commons.traverser.Traverser;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -76,7 +76,8 @@ public class MessageService extends BasicService implements IMessageService
     {
         new jadex.base.contentcodecs.JavaXMLContentCodec(),
         new jadex.base.contentcodecs.JadexXMLContentCodec(),
-        new jadex.base.contentcodecs.NuggetsXMLContentCodec()
+        new jadex.base.contentcodecs.NuggetsXMLContentCodec(),
+        new jadex.base.contentcodecs.JadexBinaryContentCodec(),
     };
 
 	//-------- attributes --------
@@ -320,7 +321,7 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			public Object process(Object object, Class<?> clazz,
 				List<ITraverseProcessor> processors, Traverser traverser,
-				Map<Object, Object> traversed, boolean clone)
+				Map<Object, Object> traversed, boolean clone, Object context)
 			{
 				return internalUpdateComponentIdentifier((IComponentIdentifier)object);
 			}
@@ -335,7 +336,7 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			String	name	= it.next();
 			Object	value	= msgcopy.get(name);
-			value = Traverser.traverseObject(value, procs, false);
+			value = Traverser.traverseObject(value, procs, false, null);
 			msgcopy.put(name, value);
 			
 			IContentCodec codec = type.findContentCodec(compcodecs, msgcopy, name);
@@ -346,7 +347,7 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				msgcopy.put(name, codec.encode(value, cl));
 			}
-			else if(value!=null && !(value instanceof String) 
+			else if(value!=null && !((value instanceof String) || (value instanceof byte[])) 
 				&& !(name.equals(type.getSenderIdentifier()) || name.equals(type.getReceiverIdentifier())
 					|| name.equals(type.getResourceIdIdentifier())))
 			{	

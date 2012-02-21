@@ -21,8 +21,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.traverser.FilterProcessor;
-import jadex.commons.traverser.Traverser;
+import jadex.commons.transformation.traverser.FilterProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -181,7 +181,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						
 						List procs = marshal.getCloneProcessors();
 						procs.add(procs.size()-2, new FilterProcessor(filter));
-						copyargs.add(Traverser.traverseObject(args[i], procs, true));
+						copyargs.add(Traverser.traverseObject(args[i], procs, true, null));
 //						copyargs.add(Traverser.traverseObject(args[i], marshal.getCloneProcessors(), filter));
 					}
 					else
@@ -281,7 +281,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				} : deffilter;
 				List procs = marshal.getCloneProcessors();
 				procs.add(procs.size()-1, new FilterProcessor(filter));
-				res = Traverser.traverseObject(value, procs, true);
+				res = Traverser.traverseObject(value, procs, true, null);
 //				res = Traverser.deepCloneObject(value, marshal.getCloneProcessors(), filter);
 			}
 		}

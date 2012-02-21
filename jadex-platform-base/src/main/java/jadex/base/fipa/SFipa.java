@@ -1,5 +1,6 @@
 package jadex.base.fipa;
 
+import jadex.base.contentcodecs.JadexBinaryContentCodec;
 import jadex.base.contentcodecs.JadexXMLContentCodec;
 import jadex.base.contentcodecs.NuggetsXMLContentCodec;
 import jadex.bridge.ComponentIdentifier;
@@ -193,6 +194,7 @@ public class SFipa
 	public static final String FIPA_SL  = "fipa-sl";
 	public static final String JAVA_XML = "java-xml"; //JavaXMLContentCodec.JAVA_XML; // Hack!!! avoid dependency for 1.3 compliance
 	public static final String JADEX_XML = JadexXMLContentCodec.JADEX_XML;
+	public static final String JADEX_BINARY = JadexBinaryContentCodec.JADEX_BINARY;
 	public static final String NUGGETS_XML = NuggetsXMLContentCodec.NUGGETS_XML;
 	//public static final String XSTREAM_XML = "xstream-xml"; //todo
 

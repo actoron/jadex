@@ -124,6 +124,9 @@
 		<!-- Exclude entries for awareness agent. -->
 		<argument name="awaexcludes" class="String">""</argument>
 		
+		<!-- Use a compact binary message format instead of XML by default. -->
+		<argument name="binarymessages">false</argument>
+		
 		<!-- Flag if the platform should be protected with password.
 		     If a value is provided this value overrides the settings value. -->
 		<argument name="usepass" class="Boolean"/>
@@ -251,7 +254,7 @@
 				new jadex.bridge.service.types.message.MessageType[]
 				{
 					new jadex.base.fipa.FIPAMessageType()
-				}, null, new jadex.base.service.message.transport.codecs.CodecFactory()
+				}, null, $args.binarymessages? new jadex.base.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.base.service.message.transport.codecs.JadexBinaryCodec.class, jadex.base.service.message.transport.codecs.GZIPCodec.class} ): new jadex.base.service.message.transport.codecs.CodecFactory()
 				)
 			</implementation>
 		</providedservice>
@@ -328,7 +331,11 @@
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;gpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<!-- <component name="kernel_bdiv3" type="kernel_bdiv3" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdiv3&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/> -->
-				<component name="rms" type="rms" daemon="true"/>
+				<component name="rms" type="rms" daemon="true">
+					<arguments>
+						<argument name="binarymessages">$args.binarymessages</argument>
+					</arguments>
+				</component>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
 						<argument name="mechanisms">$args.awamechanisms</argument>
@@ -360,7 +367,11 @@
 				<component name="kernel_bdibpmn" type="kernel_bdibpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdi&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;gpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
-				<component name="rms" type="rms" daemon="true"/>
+				<component name="rms" type="rms" daemon="true">
+					<arguments>
+						<argument name="binarymessages">$args.binarymessages</argument>
+					</arguments>
+				</component>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
 						<argument name="mechanisms">$args.awamechanisms</argument>

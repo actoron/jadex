@@ -28,6 +28,7 @@ import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IFilter;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.future.DelegationResultListener;
@@ -35,6 +36,12 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.binaryserializer.BinarySerializer;
+import jadex.commons.transformation.binaryserializer.DecodingContext;
+import jadex.commons.transformation.binaryserializer.EncodingContext;
+import jadex.commons.transformation.binaryserializer.IDecoderHandler;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.Traverser;
 import jadex.micro.IMicroExternalAccess;
 import jadex.xml.IContext;
 import jadex.xml.IPreProcessor;
@@ -52,6 +59,7 @@ import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 import jadex.xml.writer.Writer;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -60,17 +68,10 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/* $if !android $ */
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
-/* $else $
-import javaxx.xml.namespace.QName;
-import javaxx.xml.stream.Location;
-import javaxx.xml.stream.XMLReporter;
-import javaxx.xml.stream.XMLStreamException;
-$endif $ */
 
 
 /**
@@ -80,6 +81,18 @@ $endif $ */
 public class RemoteServiceManagementService extends BasicService implements IRemoteServiceManagementService
 {
 	//-------- constants --------
+	
+	/** Language constant for binary-encoded messages.
+	 *  RMS needs its own language to prevent the message service
+	 *  from decoding RMS messages.
+	 */
+	public static String RMS_JADEX_BINARY = "rms-" + SFipa.JADEX_BINARY;
+	
+	/** Language constant for XML-encoded messages.
+	 *  RMS needs its own language to prevent the message service
+	 *  from decoding RMS messages.
+	 */
+	public static String RMS_JADEX_XML = "rms-" + SFipa.JADEX_XML;
 	
 	/** Excluded remote methods (for all methods)
 	 *	Excluded methods throw UnsupportedOperationException. */
@@ -120,6 +133,15 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** The rmi xml to object reader. */
 	protected Reader reader;
 	
+	/** Preprocessors for binary encoding. */
+	protected List<ITraverseProcessor> binpreprocs;
+	
+	/** Postprocessors for binary decoding. */
+	protected List<IDecoderHandler> binpostprocs;
+	
+	/** Flag whether to use binary encoding. */
+	protected boolean binarymode;
+	
 	/** The timer. */
 	protected Timer	timer;
 	
@@ -135,7 +157,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  Create a new remote service management service.
 	 */
 	public RemoteServiceManagementService(IMicroExternalAccess component, 
-		ILibraryService libservice, final IMarshalService marshal, final IMessageService msgservice)
+		ILibraryService libservice, final IMarshalService marshal, final IMessageService msgservice, boolean binarymode)
 	{
 		super(component.getServiceProvider().getId(), IRemoteServiceManagementService.class, null);
 
@@ -145,7 +167,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		this.timer	= new Timer(true);
 		this.marshal = marshal;
 		this.msgservice = msgservice;
-		
+		this.binarymode = binarymode;
+		System.out.println(binarymode);
 		
 		// Reader that supports conversion of proxyinfo to proxy.
 		
@@ -269,6 +292,101 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //				super.writeObject(wc, object, tag);
 //			};
 //		};
+		
+		
+		// Equivalent pre- and postprocessors for binary mode.
+		
+		binpostprocs = new ArrayList<IDecoderHandler>();
+		IDecoderHandler rmipostproc = new IDecoderHandler()
+		{
+			public boolean isApplicable(Class clazz)
+			{
+				return ProxyReference.class.equals(clazz);
+			}
+			
+			public Object decode(Class clazz, DecodingContext context)
+			{
+				try
+				{
+					return rrm.getProxy((ProxyReference)context.getLastObject(), context.getClassloader());
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+			}
+		};
+		binpostprocs.add(rmipostproc);
+		
+		binpreprocs = new ArrayList<ITraverseProcessor>();
+		ITraverseProcessor bpreproc = new ITraverseProcessor()
+		{
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+			{
+				return ComponentIdentifier.class.equals(clazz);
+			}
+			
+			public Object process(Object object, Class<?> clazz,
+					List<ITraverseProcessor> processors, Traverser traverser,
+					Map<Object, Object> traversed, boolean clone, Object context)
+			{
+				IComponentIdentifier src = (IComponentIdentifier)object;
+				ComponentIdentifier ret = null;
+				if(src.getPlatformName().equals(root.getLocalName()))
+				{
+					//Object[] oa = (Object[])((EncodingContext) context).getUserContext();
+					String[] addresses = (String[])((Object[])((EncodingContext) context).getUserContext())[1];
+					ret = new ComponentIdentifier(src.getName(), addresses);
+				}
+				
+				return ret==null? src: ret;
+			}
+		};
+		binpreprocs.add(bpreproc);
+		
+		bpreproc = new ITraverseProcessor()
+		{
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+			{
+				if (object != null && SReflect.getClassName(object.getClass()).contains("ComponentManagementService"))
+					System.out.println("Called for " + String.valueOf(object));
+				return object != null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class);
+			}
+			
+			public Object process(Object object, Class<?> clazz,
+					List<ITraverseProcessor> processors, Traverser traverser,
+					Map<Object, Object> traversed, boolean clone, Object context)
+			{
+				return BasicServiceInvocationHandler.getPojoServiceProxy(object);
+			}
+		};
+		binpreprocs.add(bpreproc);
+		
+		bpreproc = new ITraverseProcessor()
+		{
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+			{
+				return marshal.isRemoteReference(object);
+			}
+			
+			public Object process(Object object, Class<?> clazz,
+					List<ITraverseProcessor> processors, Traverser traverser,
+					Map<Object, Object> traversed, boolean clone, Object context)
+			{
+				try
+				{
+					Object[] uc = (Object[])((EncodingContext) context).getUserContext();
+					return rrm.getProxyReference(object, (IComponentIdentifier)uc[0], ((EncodingContext) context).getClassLoader());
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+			}
+		};
+		binpreprocs.add(bpreproc);
 	}
 	
 	//-------- methods --------
@@ -451,6 +569,24 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	}
 	
 	/**
+	 *  Get the preprocessors for binary encoding.
+	 *  @return Binary preprocessors.
+	 */
+	public List<ITraverseProcessor> getBinaryPreProcessors()
+	{
+		return binpreprocs;
+	}
+	
+	/**
+	 *  Get the postprocessors for binary decoding.
+	 *  @return Binary postprocessors.
+	 */
+	public List<IDecoderHandler> getBinaryPostProcessors()
+	{
+		return binpostprocs;
+	}
+	
+	/**
 	 *  Get the msg service.
 	 *  @return the msg service.
 	 */
@@ -557,6 +693,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
 							msg.put(SFipa.CONVERSATION_ID, callid);
 			//				msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
+							if (binarymode)
+								msg.put(SFipa.LANGUAGE, RMS_JADEX_BINARY);
+							else
+								msg.put(SFipa.LANGUAGE, RMS_JADEX_XML);
 							
 							ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 								.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Object>(future)
@@ -578,8 +718,18 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 													{
 														public void customResultAvailable(String[] addresses)
 														{
+															Object cont = null;
 															// Hack!!! Manual encoding for using custom class loader at receiver side.
-															String cont = Writer.objectToXML(getWriter(), content, cl, new Object[]{receiver, addresses});
+															if (binarymode)
+															{
+																System.out.println("Encoding binary");
+																cont = BinarySerializer.objectToByteArray(content, binpreprocs, new Object[]{receiver, addresses}, cl);
+															}
+															else
+															{
+																cont = Writer.objectToXML(getWriter(), content, cl, new Object[]{receiver, addresses});
+															}
+															
 															msg.put(SFipa.CONTENT, cont);
 	
 															

@@ -135,6 +135,12 @@ public class ProcessThread	implements ITaskContext
 	{
 		return this.activity;
 	}
+	
+	public String getActivityId()
+	{
+		//TODO FIXME
+		return null;
+	}
 
 	/**
 	 *  Set the next activity. Sets the last edge to null.

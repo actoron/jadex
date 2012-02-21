@@ -13,7 +13,13 @@ public interface ITaskContext
 	 *  @return	The model of the task.
 	 */
 	public MActivity getModelElement();
-
+	
+	/**
+	 *  Get the activity id.
+	 *  @return The activity id.
+	 */
+	public String getActivityId();
+	
 	/**
 	 *  Get the activity.
 	 *  @return The activity.

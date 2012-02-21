@@ -2,7 +2,7 @@ package jadex.bridge.service.types.marshal;
 
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.Reference;
-import jadex.commons.traverser.ITraverseProcessor;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
 
 import java.util.List;
 

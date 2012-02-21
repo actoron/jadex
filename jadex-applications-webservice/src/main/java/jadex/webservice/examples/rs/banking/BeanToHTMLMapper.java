@@ -8,8 +8,8 @@ import java.util.Map;
 
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.traverser.BeanProperty;
-import jadex.commons.traverser.BeanReflectionIntrospector;
+import jadex.commons.transformation.traverser.BeanProperty;
+import jadex.commons.transformation.traverser.BeanReflectionIntrospector;
 import jadex.extension.rs.publish.mapper.IValueMapper;
 
 /**

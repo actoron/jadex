@@ -14,6 +14,7 @@ public interface IComponentChangeEvent
 	public static final String SOURCE_CATEGORY_FACT	   = "Fact";
 	public static final String SOURCE_CATEGORY_MESSAGE   = "Message";
 	public static final String SOURCE_CATEGORY_IEVENT	   = "Internal Event";
+	public static final String SOURCE_CATEGORY_ACTIVITY	   = "Activity";
 	
 	/**
 	 *  Returns the type of the event.
