@@ -1,4 +1,4 @@
-package jadex.commons.traverser;
+package jadex.commons.transformation.traverser;
 
 import jadex.commons.SReflect;
 
@@ -27,7 +27,7 @@ public class ListProcessor implements ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
 	{
 		List ret = (List)getReturnObject(object, clazz, clone);
 		List list = (List)object;
@@ -38,7 +38,7 @@ public class ListProcessor implements ITraverseProcessor
 		{
 			Object val = list.get(i);
 			Class valclazz = val!=null? val.getClass(): null;
-			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone);
+			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone, context);
 			
 			if(clone)
 			{

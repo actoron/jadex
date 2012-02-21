@@ -1,8 +1,7 @@
-package jadex.commons.traverser;
+package jadex.commons.transformation.traverser;
 
 import jadex.commons.SReflect;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,7 @@ public class MapProcessor implements ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
 	{
 		Map ret = (Map)getReturnObject(object, clazz, clone);
 		Map map = (Map)object;
@@ -47,7 +46,7 @@ public class MapProcessor implements ITraverseProcessor
 		{
 			Object val = map.get(keys[i]);
 			Class valclazz = val!=null? val.getClass(): null;
-			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone);
+			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone, context);
 			
 			if(clone || newval!=val)
 				ret.put(keys[i], newval);

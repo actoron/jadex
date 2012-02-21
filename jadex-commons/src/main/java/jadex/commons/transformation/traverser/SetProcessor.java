@@ -1,8 +1,7 @@
-package jadex.commons.traverser;
+package jadex.commons.transformation.traverser;
 
 import jadex.commons.SReflect;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,7 @@ public class SetProcessor implements ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
 	{
 		Set ret = (Set)getReturnObject(object, clazz, clone);
 		Set set = (Set)object;
@@ -40,7 +39,7 @@ public class SetProcessor implements ITraverseProcessor
 		for(int i=0; i<vals.length; i++)
 		{
 			Class valclazz = vals[i]!=null? vals[i].getClass(): null;
-			Object newval = traverser.traverse(vals[i], valclazz, traversed, processors, clone);
+			Object newval = traverser.traverse(vals[i], valclazz, traversed, processors, clone, context);
 			
 			if(clone)
 			{

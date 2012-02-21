@@ -1,4 +1,4 @@
-package jadex.commons.traverser;
+package jadex.commons.transformation.traverser;
 
 import jadex.commons.SReflect;
 
@@ -35,7 +35,7 @@ public class EnumerationProcessor implements ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
 	{
 		Enumeration en = (Enumeration)object;
 		Vector copy = new Vector();
@@ -48,7 +48,7 @@ public class EnumerationProcessor implements ITraverseProcessor
 		{
 			Object val = en.nextElement();
 			Class valclazz = val!=null? val.getClass(): null;
-			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone);
+			Object newval = traverser.traverse(val, valclazz, traversed, processors, clone, context);
 			copy.add(newval);
 		}
 		

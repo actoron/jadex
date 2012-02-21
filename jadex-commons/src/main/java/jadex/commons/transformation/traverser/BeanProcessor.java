@@ -1,7 +1,5 @@
-package jadex.commons.traverser;
+package jadex.commons.transformation.traverser;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -9,9 +7,9 @@ import java.util.Map;
 /**
  *  Processor that traverses Java beans.
  */
-class BeanProcessor implements ITraverseProcessor
+public class BeanProcessor implements ITraverseProcessor
 {
-	BeanReflectionIntrospector intro = new BeanReflectionIntrospector();
+	protected BeanReflectionIntrospector intro = new BeanReflectionIntrospector();
 	
 	/**
 	 *  Test if the processor is appliable.
@@ -29,7 +27,7 @@ class BeanProcessor implements ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
 	{
 //		System.out.println("fp: "+object);
 		Object ret = getReturnObject(object, clazz, clone);
@@ -40,7 +38,7 @@ class BeanProcessor implements ITraverseProcessor
 //			System.out.println("cloned: "+object.getClass());
 //			ret = object.getClass().newInstance();
 			
-			traverseProperties(object, traversed, processors, traverser, clone, ret);
+			traverseProperties(object, traversed, processors, traverser, clone, ret, context);
 		}
 		catch(Exception e)
 		{
@@ -54,7 +52,7 @@ class BeanProcessor implements ITraverseProcessor
 	 *  Clone all properties of an object.
 	 */
 	protected void traverseProperties(Object object, Map<Object, Object> cloned, 
-		List<ITraverseProcessor> processors, Traverser traverser, boolean clone, Object ret)
+			List<ITraverseProcessor> processors, Traverser traverser, boolean clone, Object ret, Object context)
 	{
 		Class clazz = object.getClass();
 			
@@ -73,7 +71,7 @@ class BeanProcessor implements ITraverseProcessor
 					Object val = prop.getGetter().invoke(object, new Object[0]);
 					if(val!=null) 
 					{
-						Object newval = traverser.traverse(val, prop.getType(), cloned, processors, clone);
+						Object newval = traverser.traverse(val, prop.getType(), cloned, processors, clone, context);
 						if(clone || val!=newval)
 							prop.getSetter().invoke(ret, new Object[]{newval});
 					}

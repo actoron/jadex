@@ -1,4 +1,4 @@
-package jadex.commons.traverser;
+package jadex.commons.transformation.traverser;
 
 import java.util.HashSet;
 import java.util.List;
@@ -44,7 +44,7 @@ public class ExcludeProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
 	{
-		return excluded.contains(clazz);
+		return object == null || excluded.contains(clazz);
 	}
 	
 	/**
@@ -53,7 +53,7 @@ public class ExcludeProcessor implements ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
 	{
 		return object;
 	}

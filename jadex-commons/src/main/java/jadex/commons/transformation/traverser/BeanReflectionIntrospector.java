@@ -1,4 +1,4 @@
-package jadex.commons.traverser;
+package jadex.commons.transformation.traverser;
 
 import jadex.commons.collection.LRU;
 

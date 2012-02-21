@@ -1,4 +1,4 @@
-package jadex.commons.traverser;
+package jadex.commons.transformation.traverser;
 
 import java.lang.reflect.Array;
 import java.util.List;
@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  *  An array processor allows for traversing arrays.
  */
-class ArrayProcessor implements ITraverseProcessor
+public class ArrayProcessor implements ITraverseProcessor
 {
 	/**
 	 *  Create a new array processor.
@@ -32,7 +32,7 @@ class ArrayProcessor implements ITraverseProcessor
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
 	{
 		Object ret = getReturnObject(object, clazz, clone);
 		int length = Array.getLength(object);
@@ -43,7 +43,7 @@ class ArrayProcessor implements ITraverseProcessor
 		for(int i=0; i<length; i++) 
 		{
 			Object val = Array.get(object, i);
-			Object newval = traverser.traverse(val, type, traversed, processors, clone);
+			Object newval = traverser.traverse(val, type, traversed, processors, clone, context);
 			if(clone || newval!=val)
 				Array.set(ret, i, newval);
 		}

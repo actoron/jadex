@@ -1,4 +1,4 @@
-package jadex.commons.traverser;
+package jadex.commons.transformation.traverser;
 
 import jadex.commons.SReflect;
 
@@ -77,21 +77,21 @@ public class Traverser
 	/**
 	 *  Traverse an object.
 	 *  @param object The object to traverse.
-	 *  @param processors The processors to apply.
+	 *  @param processors The lists of processors.
 	 *  @return The traversed (or modified) object.
 	 */
-	public static Object traverseObject(Object object, List<ITraverseProcessor> processors, boolean clone)
+	public static Object traverseObject(Object object, List<ITraverseProcessor> processors, boolean clone, Object context)
 	{
 //		if(clone && object!=null && object.getClass().getName().indexOf("Prop")!=-1)
-//			System.out.println("Cloning: "+object);
+//		System.out.println("Cloning: "+object);
 //		if(!clone) 
-//			System.out.println("Traversing: "+object+" "+object.getClass());
-		
+//		System.out.println("Traversing: "+object+" "+object.getClass());
+	
 		Object ret = null;
 		try
 		{
 			// Must be identity hash map because otherwise empty collections will equal
-			ret = getInstance().traverse(object, null, new IdentityHashMap<Object, Object>(), processors, clone);
+			ret = getInstance().traverse(object, null, new IdentityHashMap<Object, Object>(), processors, clone, context);
 		}
 		catch(RuntimeException e)
 		{
@@ -100,7 +100,7 @@ public class Traverser
 		}
 		
 //		if(clone && object!=null && object.getClass().getName().indexOf("Prop")!=-1)
-//			System.out.println("Cloned: "+ret);
+//		System.out.println("Cloned: "+ret);
 		
 		return ret;
 	}
@@ -109,10 +109,10 @@ public class Traverser
 	 *  Traverse an object.
 	 */
 	public Object traverse(Object object, Class<?> clazz, Map<Object, Object> traversed, 
-		List<ITraverseProcessor> processors, boolean clone)
+		List<ITraverseProcessor> processors, boolean clone, Object context)
 	{
 		Object ret = object;
-				
+		
 		if(object!=null)
 		{
 //			if(object.getClass().getName().indexOf("SpaceObject")!=-1)
@@ -124,7 +124,7 @@ public class Traverser
 				ret = traversed.get(object);
 				fin = true;
 			}
-
+			
 			if(!fin && processors!=null)
 			{
 				if(clazz==null || SReflect.isSupertype(clazz, object.getClass()))
@@ -138,7 +138,7 @@ public class Traverser
 					if(proc.isApplicable(processed, clazz, clone))
 					{
 //						System.out.println("traverse: "+object+" "+proc.getClass());
-						processed = proc.process(processed, clazz, processors, this, traversed, clone);
+						processed = proc.process(processed, clazz, processors, this, traversed, clone, context);
 						ret	= processed;
 						fin = true;
 					}
