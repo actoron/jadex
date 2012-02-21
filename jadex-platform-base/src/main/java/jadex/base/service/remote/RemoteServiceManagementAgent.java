@@ -331,7 +331,6 @@ public class RemoteServiceManagementAgent extends MicroAgent
 																Object content = null;
 																if (RemoteServiceManagementService.RMS_JADEX_BINARY.equals(lang))
 																{
-																	System.out.println("Encoding bin2");
 																	content = BinarySerializer.objectToByteArray(result, rms.getBinaryPreProcessors(), new Object[]{msg.get(SFipa.SENDER), addresses}, cl);
 																}
 																else

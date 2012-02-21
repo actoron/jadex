@@ -168,7 +168,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		this.marshal = marshal;
 		this.msgservice = msgservice;
 		this.binarymode = binarymode;
-		System.out.println(binarymode);
 		
 		// Reader that supports conversion of proxyinfo to proxy.
 		
@@ -349,8 +348,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
 			{
-				if (object != null && SReflect.getClassName(object.getClass()).contains("ComponentManagementService"))
-					System.out.println("Called for " + String.valueOf(object));
 				return object != null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class);
 			}
 			
@@ -722,7 +719,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 															// Hack!!! Manual encoding for using custom class loader at receiver side.
 															if (binarymode)
 															{
-																System.out.println("Encoding binary");
 																cont = BinarySerializer.objectToByteArray(content, binpreprocs, new Object[]{receiver, addresses}, cl);
 															}
 															else
