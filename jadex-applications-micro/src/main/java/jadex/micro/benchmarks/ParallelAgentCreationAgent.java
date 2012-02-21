@@ -10,6 +10,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
@@ -36,7 +37,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		Map arguments = getArguments();			
 		final int num	= ((Integer)arguments.get("num")).intValue();
@@ -181,6 +182,8 @@ public class ParallelAgentCreationAgent extends MicroAgent
 				}
 			});
 		}
+		
+		return new Future<Void>(); // never kill?!
 	}
 
 	/**

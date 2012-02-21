@@ -13,4 +13,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Agent
 {
+	/**
+	 *  If the agent body has a void return value
+	 *  or no body at all this flag can be used to 
+	 *  determine if the agent should be kept alive.
+	 */
+	public boolean keepalive() default true; 
 }

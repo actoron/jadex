@@ -3,6 +3,8 @@ package jadex.micro.benchmarks;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
@@ -22,7 +24,7 @@ public class TreeStressTestAgent extends MicroAgent
 	/**
 	 *  Execute the agent.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		getServiceContainer().searchServiceUpwards(IComponentManagementService.class)
 			.addResultListener(new IResultListener()
@@ -54,6 +56,8 @@ public class TreeStressTestAgent extends MicroAgent
 				exception.printStackTrace();
 			}
 		});
+		
+		return new Future<Void>(); // never kill?!
 	}
 	
 //	/**

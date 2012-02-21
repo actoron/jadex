@@ -30,6 +30,7 @@ import jadex.commons.collection.LRU;
 import jadex.commons.collection.WeakValueMap;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -73,26 +74,28 @@ public class RemoteReferenceModule
 	protected RemoteServiceManagementService rsms;
 	
 	/** The cache of proxy infos (class -> proxy info). */
-	protected Map proxyinfos;
+	protected Map<Object, ProxyInfo> proxyinfos;
 	
 	/** The map of target objects (rr  -> target object). */
-	protected Map targetobjects;
+	protected Map<RemoteReference, Object> targetobjects;
 	
 	/** The map of target components and services (rr  -> target comp). */
-	protected Map targetcomps;
+	protected Map<RemoteReference, Object> targetcomps;
 	
 	/** The inverse map of target object to remote references (target objects -> rr). */
-	protected Map remoterefs;
+	protected Map<Object, RemoteReference> remoterefs;
 	
 	/** The id counter. */
 	protected long idcnt;
 
 	/** The proxycount count map. (rr -> number of proxies created for rr). */
-	protected Map proxycount;
-	protected Map proxydates;
+	protected Map<RemoteReference, Integer> proxycount;
+	
+	/** The proxy dates (date -> rr). */
+	protected Map<Long, RemoteReference> proxydates;
 	
 	/** The remote reference holders of a object (rr -> holder (rms cid)). */
-	protected Map holders;
+	protected Map<RemoteReference, Map<RemoteReferenceHolder, RemoteReferenceHolder>> holders;
 	
 	
 	/** The library service. */
@@ -122,14 +125,14 @@ public class RemoteReferenceModule
 		this.marshalservice = marshalservice;
 		this.timer	= new Timer(true);
 		
-		this.proxyinfos = new LRU(200);
-		this.targetobjects = new HashMap();
-		this.targetcomps = new WeakValueMap();
-		this.remoterefs = new WeakHashMap();
+		this.proxyinfos = new LRU<Object, ProxyInfo>(200);
+		this.targetobjects = new HashMap<RemoteReference, Object>();
+		this.targetcomps = new WeakValueMap(); // <RemoteReference, Object>
+		this.remoterefs = new WeakHashMap<Object, RemoteReference> ();
 		
-		this.proxycount = new HashMap();
-		this.proxydates = new TreeMap();
-		this.holders = new HashMap();
+		this.proxycount = new HashMap<RemoteReference, Integer>();
+		this.proxydates = new TreeMap<Long, RemoteReference>();
+		this.holders = new HashMap<RemoteReference, Map<RemoteReferenceHolder, RemoteReferenceHolder>>();
 	}
 	
 	//-------- methods --------
@@ -160,7 +163,7 @@ public class RemoteReferenceModule
 		// via synchronized block and rechecking if proxy was already created.
 		// -> not necessary due to only single threaded access via agent thread
 		
-		Class[] remoteinterfaces = marshalservice.getRemoteInterfaces(target, cl);
+		Class<?>[] remoteinterfaces = marshalservice.getRemoteInterfaces(target, cl);
 		
 		if(remoteinterfaces.length==0)
 			throw new RuntimeException("Proxyable object has no remote interfaces: "+target);
@@ -177,7 +180,7 @@ public class RemoteReferenceModule
 		ProxyReference	ret	= new ProxyReference(pi, rr);
 
 		// Check interface methods and possibly cache constant calls.
-		Class[] allinterfaces = SReflect.getSuperInterfaces(remoteinterfaces);
+		Class<?>[] allinterfaces = SReflect.getSuperInterfaces(remoteinterfaces);
 		for(int i=0; i<allinterfaces.length; i++)
 		{
 			Method[] methods = allinterfaces[i].getMethods();
@@ -199,13 +202,13 @@ public class RemoteReferenceModule
 	/**
 	 *  Create a proxy info for a service. 
 	 */
-	protected ProxyInfo createProxyInfo(Object target, Class[] remoteinterfaces, ClassLoader cl)
+	protected ProxyInfo createProxyInfo(Object target, Class<?>[] remoteinterfaces, ClassLoader cl)
 	{
 		checkThread();
 		// todo: dgc, i.e. remember that target is a remote object (for which a proxyinfo is sent away).
 			
 		ProxyInfo ret = new ProxyInfo(remoteinterfaces);
-		Map properties = null;
+		Map<String, Object> properties = null;
 		
 		// Hack! as long as registry is not there
 		String[]	imports	= null;
@@ -221,7 +224,7 @@ public class RemoteReferenceModule
 			properties = ((IService)target).getPropertyMap();
 		}
 		
-		Class targetclass = target.getClass();
+		Class<?> targetclass = target.getClass();
 		
 		// Check for excluded and synchronous methods.
 		if(properties!=null)
@@ -229,7 +232,7 @@ public class RemoteReferenceModule
 			Object ex = UnparsedExpression.getProperty(properties, RemoteServiceManagementService.REMOTE_EXCLUDED, imports, null, cl);
 			if(ex!=null)
 			{
-				for(Iterator it = SReflect.getIterator(ex); it.hasNext(); )
+				for(Iterator<Object> it = SReflect.getIterator(ex); it.hasNext(); )
 				{
 					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
 					for(int j=0; j<mis.length; j++)
@@ -241,7 +244,7 @@ public class RemoteReferenceModule
 			Object syn = UnparsedExpression.getProperty(properties, RemoteServiceManagementService.REMOTE_SYNCHRONOUS, imports, null, cl);
 			if(syn!=null)
 			{
-				for(Iterator it = SReflect.getIterator(syn); it.hasNext(); )
+				for(Iterator<Object> it = SReflect.getIterator(syn); it.hasNext(); )
 				{
 					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
 					for(int j=0; j<mis.length; j++)
@@ -253,7 +256,7 @@ public class RemoteReferenceModule
 			Object un = UnparsedExpression.getProperty(properties, RemoteServiceManagementService.REMOTE_UNCACHED, imports, null, cl);
 			if(un!=null)
 			{
-				for(Iterator it = SReflect.getIterator(un); it.hasNext(); )
+				for(Iterator<Object> it = SReflect.getIterator(un); it.hasNext(); )
 				{
 					MethodInfo[] mis = getMethodInfo(it.next(), targetclass, false);
 					for(int j=0; j<mis.length; j++)
@@ -265,7 +268,7 @@ public class RemoteReferenceModule
 			Object mr = UnparsedExpression.getProperty(properties, RemoteServiceManagementService.REMOTE_METHODREPLACEMENT, imports, null, cl);
 			if(mr!=null)
 			{
-				for(Iterator it = SReflect.getIterator(mr); it.hasNext(); )
+				for(Iterator<Object> it = SReflect.getIterator(mr); it.hasNext(); )
 				{
 					Object[] tmp = (Object[])it.next();
 					MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
@@ -278,7 +281,7 @@ public class RemoteReferenceModule
 			Object to = UnparsedExpression.getProperty(properties, RemoteServiceManagementService.REMOTE_TIMEOUT, imports, null, cl);
 			if(to!=null)
 			{
-				for(Iterator it = SReflect.getIterator(to); it.hasNext(); )
+				for(Iterator<Object> it = SReflect.getIterator(to); it.hasNext(); )
 				{
 					Object[] tmp = (Object[])it.next();
 					MethodInfo[] mis = getMethodInfo(tmp[0], targetclass, false);
@@ -293,7 +296,7 @@ public class RemoteReferenceModule
 		// Add properties from annotations.
 		// Todo: merge with external properties (which precedence?)
 		
-		Class[] allinterfaces = SReflect.getSuperInterfaces(remoteinterfaces);
+		Class<?>[] allinterfaces = SReflect.getSuperInterfaces(remoteinterfaces);
 		
 		for(int i=0; i<allinterfaces.length; i++)
 		{
@@ -354,7 +357,7 @@ public class RemoteReferenceModule
 				{
 					Replacement	ra	= methods[j].getAnnotation(Replacement.class);
 //					Class	rep	= SReflect.findClass0(ra.value(), null, libservice.getClassLoader());
-					Class	rep	= SReflect.findClass0(ra.value(), null, cl);
+					Class<?>	rep	= SReflect.findClass0(ra.value(), null, cl);
 					if(rep!=null)
 					{
 						try
@@ -424,8 +427,8 @@ public class RemoteReferenceModule
 		// only cache when not excluded, not cached and not replaced
 		if(!pi.isUncached(m) && !pi.isExcluded(m) && !pi.isReplaced(m)) 
 		{
-			Class rt = m.getReturnType();
-			Class[] ar = m.getParameterTypes();
+			Class<?> rt = m.getReturnType();
+			Class<?>[] ar = m.getParameterTypes();
 			
 			if(void.class.equals(rt))
 			{
@@ -459,7 +462,7 @@ public class RemoteReferenceModule
 	/**
 	 *  Get method info.
 	 */
-	public static MethodInfo[] getMethodInfo(Object iden, Class targetclass, boolean noargs)
+	public static MethodInfo[] getMethodInfo(Object iden, Class<?> targetclass, boolean noargs)
 	{
 		MethodInfo[] ret;
 		
@@ -633,22 +636,35 @@ public class RemoteReferenceModule
 		checkThread();
 		timer.cancel();
 		
+		// todo: wait until all remote ref messages have been sent?!
+		
 		// wait no longer than 5 seconds for unregistering remote references.
 		RemoteReference[] rrs = (RemoteReference[])proxycount.keySet().toArray(new RemoteReference[0]);
-		CounterResultListener<Void> crl = new CounterResultListener<Void>(rrs.length, true,
-			new TimeoutResultListener<Void>(10000, rsms.getComponent(), new DelegationResultListener<Void>(ret)));
+//		CounterResultListener<Void> crl = new CounterResultListener<Void>(rrs.length, true,
+//			new TimeoutResultListener<Void>(10000, rsms.getComponent(), true, new DelegationResultListener<Void>(ret)));
+
 //		{
-//			public void customResultAvailable(Object result)
+//			public void customResultAvailable(Void result)
 //			{
-//				System.out.println("shutti");
-//				super.customResultAvailable(result);
+//				System.out.println("shutti (res)");
+//				super.resultAvailable(null);
 //			}
-//		});
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("shutti (ex)");
+//				super.exceptionOccurred(exception);
+//			}
+//		}));
+		
 //		System.out.println("shut: "+SUtil.arrayToString(rrs));
+		
 		for(int i=0; i<rrs.length; i++)
 		{
-			sendRemoveRemoteReference(rrs[i]).addResultListener(crl);
+			// Cannot wait until all send remove refs return (platforms may have vanished)
+			sendRemoveRemoteReference(rrs[i]);//.addResultListener(crl);
 		}
+		ret.setResult(null);
+		
 		return ret;
 	}
 	
@@ -660,7 +676,7 @@ public class RemoteReferenceModule
 	public IFuture<Object> getTargetObject(RemoteReference rr)
 	{
 		checkThread();
-		final Future ret = new Future();
+		final Future<Object> ret = new Future<Object>();
 				
 		if(rr.getTargetIdentifier() instanceof IServiceIdentifier)
 		{
@@ -668,18 +684,7 @@ public class RemoteReferenceModule
 			
 			// fetch service via its id
 			SServiceProvider.getService(rsms.getComponent().getServiceProvider(), sid)
-				.addResultListener(new IResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					ret.setResult(result);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setException(exception);
-				}
-			});
+				.addResultListener(new DelegationResultListener<Object>(ret));
 		}
 		else if(rr.getTargetIdentifier() instanceof IComponentIdentifier)
 		{
@@ -687,31 +692,19 @@ public class RemoteReferenceModule
 			
 			// fetch component via target component id
 			SServiceProvider.getServiceUpwards(rsms.getComponent().getServiceProvider(), IComponentManagementService.class)
-				.addResultListener(new IResultListener()
+				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(ret)
 //					.addResultListener(component.createResultListener(new IResultListener()
 			{
-				public void resultAvailable(Object result)
+				public void customResultAvailable(IComponentManagementService cms)
 				{
-					IComponentManagementService cms = (IComponentManagementService)result;
-					
 					// fetch target component via component identifier.
-					cms.getExternalAccess(cid).addResultListener(new IResultListener()
+					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, Object>(ret)
 					{
-						public void resultAvailable(Object result)
+						public void customResultAvailable(IExternalAccess result)
 						{
 							ret.setResult(result);
 						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							ret.setException(exception);
-						}
 					});
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setException(exception);
 				}
 			});
 		}
@@ -779,8 +772,8 @@ public class RemoteReferenceModule
 		{
 //			System.out.println("interfaces of proxy: "+SUtil.arrayToString(pi.getTargetInterfaces()));
 			
-			Class[] tmp = pr.getProxyInfo().getTargetInterfaces();
-			Class[] interfaces = new Class[tmp.length+1];
+			Class<?>[] tmp = pr.getProxyInfo().getTargetInterfaces();
+			Class<?>[] interfaces = new Class[tmp.length+1];
 			System.arraycopy(tmp, 0, interfaces, 0, tmp.length);
 			interfaces[tmp.length] = IFinalize.class;
 			
@@ -965,9 +958,9 @@ public class RemoteReferenceModule
 						{
 							final RemoteReference rr = (RemoteReference)proxydates.remove(dates[i]);
 //							System.out.println("renewal sent for: "+rr);
-							IResultListener lis = agent.createResultListener(new IResultListener()
+							IResultListener<Void> lis = agent.createResultListener(new IResultListener<Void>()
 							{
-								public void resultAvailable(Object result)
+								public void resultAvailable(Void result)
 								{
 									if(DEBUG)
 										System.out.println("Renewed successfully lease for: "+rr);
@@ -1002,7 +995,7 @@ public class RemoteReferenceModule
 					if(proxycount.size()>0 && diff>0)
 					{
 //						System.out.println("renewal behaviour waiting: "+diff);
-						final IComponentStep	step	= this;
+						final IComponentStep<Void>	step	= this;
 						timer.schedule(new TimerTask()
 						{
 							public void run()
@@ -1044,13 +1037,13 @@ public class RemoteReferenceModule
 //						}
 //					}
 					
-					for(Iterator it=holders.keySet().iterator(); it.hasNext(); )
+					for(Iterator<RemoteReference> it=holders.keySet().iterator(); it.hasNext(); )
 					{
 						RemoteReference rr = (RemoteReference)it.next();
-						Map hds = (Map)holders.get(rr);
-						for(Iterator it2=hds.keySet().iterator(); it2.hasNext(); )
+						Map<RemoteReferenceHolder, RemoteReferenceHolder> hds = (Map<RemoteReferenceHolder, RemoteReferenceHolder>)holders.get(rr);
+						for(Iterator<RemoteReferenceHolder> it2=hds.keySet().iterator(); it2.hasNext(); )
 						{
-							RemoteReferenceHolder rrh = (RemoteReferenceHolder)it2.next();
+							RemoteReferenceHolder rrh = it2.next();
 							if(System.currentTimeMillis() > rrh.getExpiryDate()+DEFAULT_LEASETIME*WAITFACTOR)
 							{
 								if(DEBUG)
@@ -1069,7 +1062,7 @@ public class RemoteReferenceModule
 					
 					if(holders.size()>0)
 					{
-						final IComponentStep	step	= this;
+						final IComponentStep<Void>	step	= this;
 						timer.schedule(new TimerTask()
 						{
 							public void run()
@@ -1088,29 +1081,39 @@ public class RemoteReferenceModule
 	 *  Send addRef to the origin process of the remote reference.
 	 *  @param rr The remote reference.
 	 */
-	protected Future sendAddRemoteReference(final RemoteReference rr)
+	protected Future<Void> sendAddRemoteReference(final RemoteReference rr)
 	{
 		checkThread();
 		// DGC: notify rr origin that a new proxy of target object exists
 		// todo: handle failures!
-		Future future = new Future();
+		final Future<Void> ret = new Future<Void>();
+		
 //		System.out.println("send add: "+rr);
 		final String callid = SUtil.createUniqueId(rsms.getRMSComponentIdentifier().getLocalName());
 		RemoteDGCAddReferenceCommand com = new RemoteDGCAddReferenceCommand(rr, rsms.getRMSComponentIdentifier(), callid);
-		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, -1, future);
-		return future;
+		Future<Object> fut = new Future<Object>();
+		fut.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				ret.setResult(null);
+			}
+		});
+		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, -1, fut);
+		
+		return ret;
 	}
 	
 	/**
 	 *  Send removeRef to the origin process of the remote reference.
 	 *  @param rr The remote reference.
 	 */
-	public Future sendRemoveRemoteReference(final RemoteReference rr)
+	public Future<Void> sendRemoveRemoteReference(final RemoteReference rr)
 	{
 		checkThread();
 		// DGC: notify rr origin that a new proxy of target object exists
 		// todo: handle failures!
-		Future future = new Future();
+		final Future<Void> ret = new Future<Void>();
 //		System.out.println("send rem: "+rr);
 		final String callid = SUtil.createUniqueId(rsms.getRMSComponentIdentifier().getLocalName());
 		RemoteDGCRemoveReferenceCommand com = new RemoteDGCRemoveReferenceCommand(rr, rsms.getRMSComponentIdentifier(), callid);
@@ -1127,8 +1130,17 @@ public class RemoteReferenceModule
 //				System.out.println("send ex: "+rr);
 //			}
 //		});
-		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, -1, future);
-		return future;
+		
+		Future<Object> fut = new Future<Object>();
+		fut.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				ret.setResult(null);
+			}
+		});
+		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, -1, fut);
+		return ret;
 	}
 	
 	/**
@@ -1139,10 +1151,10 @@ public class RemoteReferenceModule
 	protected void addTemporaryRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
 		checkThread();
-		Map hds = (Map)holders.get(rr);
+		Map<RemoteReferenceHolder, RemoteReferenceHolder> hds = (Map<RemoteReferenceHolder, RemoteReferenceHolder>)holders.get(rr);
 		if(hds==null)
 		{
-			hds = new HashMap();
+			hds = new HashMap<RemoteReferenceHolder, RemoteReferenceHolder>();
 			holders.put(rr, hds);
 			startRemovalBehaviour();
 		}
@@ -1171,10 +1183,10 @@ public class RemoteReferenceModule
 	public void addRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
 		checkThread();
-		Map hds = (Map)holders.get(rr);
+		Map<RemoteReferenceHolder, RemoteReferenceHolder> hds = (Map<RemoteReferenceHolder, RemoteReferenceHolder>)holders.get(rr);
 		if(hds==null)
 		{
-			hds = new HashMap();
+			hds = new HashMap<RemoteReferenceHolder, RemoteReferenceHolder>();
 			holders.put(rr, hds);
 			startRemovalBehaviour();
 		}
@@ -1219,7 +1231,7 @@ public class RemoteReferenceModule
 	public void removeRemoteReference(final RemoteReference rr, final IComponentIdentifier holder)
 	{
 		checkThread();
-		Map hds = (Map)holders.get(rr);
+		Map<RemoteReferenceHolder, RemoteReferenceHolder> hds = (Map<RemoteReferenceHolder, RemoteReferenceHolder>)holders.get(rr);
 //		if(hds==null || !hds.contains(holder))
 //			throw new RuntimeException("Holder not contained: "+holder);
 

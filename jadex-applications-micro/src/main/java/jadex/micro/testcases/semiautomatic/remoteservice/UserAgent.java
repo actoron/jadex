@@ -21,18 +21,22 @@ public class UserAgent extends MicroAgent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
+		final Future ret = new Future<Void>();
+		
 		final CounterResultListener lis = new CounterResultListener(2, new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
-				killAgent();
+				ret.setResult(null);
+//				killAgent();
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				killAgent();
+				ret.setResult(null);
+//				killAgent();
 			}
 		});
 		
@@ -97,6 +101,8 @@ public class UserAgent extends MicroAgent
 				lis.resultAvailable(null);
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**

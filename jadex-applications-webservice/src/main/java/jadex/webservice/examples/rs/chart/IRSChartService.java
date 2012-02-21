@@ -74,7 +74,7 @@ public interface IRSChartService
 //	@ParameterMapper(@Value(clazz=ChartParameterMapper.class))
 //	@ResultMapper(@Value(clazz=ChartResultMapper.class))
 //	public IFuture<byte[]> getPieChart(int width, int height, double[] data, String[] labels);
-//
+
 //	/**
 //	 *  Get a bar chart.
 //	 */

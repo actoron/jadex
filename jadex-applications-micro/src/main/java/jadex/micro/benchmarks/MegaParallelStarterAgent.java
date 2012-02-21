@@ -7,6 +7,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
@@ -42,7 +43,7 @@ public class MegaParallelStarterAgent extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		Map arguments = getArguments();	
 		if(arguments==null)
@@ -137,6 +138,8 @@ public class MegaParallelStarterAgent extends MicroAgent
 				});
 			}
 		});
+		
+		return new Future<Void>(); // never kill
 	}
 
 	/**

@@ -46,10 +46,10 @@ public class DFTestAgent extends MicroAgent
 	/**
 	 *  At startup register the agent at the DF.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		this.reports	= new ArrayList();
-		registerDF();
+		return registerDF();
 	}
 	
 	/**
@@ -78,8 +78,10 @@ public class DFTestAgent extends MicroAgent
 	/**
 	 *  Register the agent at the DF.
 	 */
-	protected void registerDF()
+	protected IFuture<Void> registerDF()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		final TestReport tr	= new TestReport("#1", "Test DF registration.");
 		reports.add(tr);
 
@@ -91,32 +93,37 @@ public class DFTestAgent extends MicroAgent
 				IDFServiceDescription sd = df.createDFServiceDescription(null, "testType", null);
 				IDFComponentDescription ad = df.createDFComponentDescription(getComponentIdentifier(), sd);
 
-				IFuture ret = df.register(ad); 
-				ret.addResultListener(createResultListener(new IResultListener()
+				IFuture re = df.register(ad); 
+				re.addResultListener(createResultListener(new IResultListener()
 				{
 					public void resultAvailable(Object result)
 					{
 						// Set test success and continue test.
 						tr.setSucceeded(true);
-						searchDF();
+						searchDF().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
 					}
 					
 					public void exceptionOccurred(Exception e)
 					{
 						// Set test failure and kill agent.
 						tr.setFailed(e.toString());
-						killAgent();
+//						killAgent();
+						ret.setResult(null);
 					}
 				}));
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**
 	 *  Search for the agent at the DF.
 	 */
-	protected  void searchDF()
+	protected  IFuture<Void> searchDF()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		final TestReport	tr	= new TestReport("#2", "Test DF search.");
 		reports.add(tr);
 
@@ -130,8 +137,8 @@ public class DFTestAgent extends MicroAgent
 				IDFComponentDescription ad = df.createDFComponentDescription(null, sd);
 				ISearchConstraints	cons = df.createSearchConstraints(-1, 0);
 				
-				IFuture ret = df.search(ad, cons); 
-				ret.addResultListener(createResultListener(new IResultListener() 
+				IFuture re = df.search(ad, cons); 
+				re.addResultListener(createResultListener(new IResultListener() 
 				{
 					public void resultAvailable(Object result)
 					{
@@ -148,6 +155,7 @@ public class DFTestAgent extends MicroAgent
 							// Set test failure and kill agent.
 							tr.setFailed("No suitable service found.");
 							killAgent();
+							ret.setResult(null);
 						}
 					}
 					
@@ -155,15 +163,20 @@ public class DFTestAgent extends MicroAgent
 					{
 						// Set test failure and kill agent.
 						tr.setFailed(e.toString());
-						killAgent();
+//						killAgent();
+						ret.setResult(null);
 					}
 				}));
 			}
 		});
+		
+		return ret;
 	}
 	
-	private void sendMessageToReceiver(IComponentIdentifier cid)
+	private IFuture<Void> sendMessageToReceiver(IComponentIdentifier cid)
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		final TestReport	tr	= new TestReport("#3", "Test sending message to service (i.e. myself).");
 		reports.add(tr);
 
@@ -181,12 +194,16 @@ public class DFTestAgent extends MicroAgent
 			{
 				// Set test failure and kill agent.
 				tr.setFailed("No message received.");
-				killAgent();
+//				killAgent();
+				ret.setResult(null);
 				return IFuture.DONE;
 			}
 		});
+		
+		return ret;
 	}
 	
+	// todo: set body future?!
 	public void messageArrived(Map msg, MessageType mt)
 	{
 		TestReport	tr	= (TestReport)reports.get(reports.size()-1);

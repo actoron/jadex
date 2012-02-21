@@ -4,6 +4,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.IFilter;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -42,7 +43,7 @@ public class HeatbugAgent extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		getParentAccess().getExtension("mygc2dspace").addResultListener(createResultListener(new DefaultResultListener()
 		{
@@ -144,5 +145,7 @@ public class HeatbugAgent extends MicroAgent
 				waitForTick(com);
 			}
 		}));
+		
+		return new Future<Void>(); // never kill?!
 	}
 }

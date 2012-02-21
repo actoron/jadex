@@ -1,6 +1,8 @@
 package jadex.micro.testcases.semiautomatic.compositeservice;
 
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
@@ -19,7 +21,7 @@ public class UserAgent extends MicroAgent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		getRequiredService("addservice").addResultListener(new DefaultResultListener()
 		{
@@ -40,6 +42,8 @@ public class UserAgent extends MicroAgent
 				});
 			}
 		});
+		
+		return new Future<Void>(); // never kill?!
 	}
 	
 	//-------- static methods --------

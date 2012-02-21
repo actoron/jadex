@@ -77,8 +77,10 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
+		return new Future<Void>();
+//		return IFuture.DONE;
 	}
 
 	/**

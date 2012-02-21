@@ -28,7 +28,7 @@ public class CompositeCalculatorAgent extends MicroAgent
 	/**
 	 *  The body.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		add(1,1).addResultListener(new IResultListener()
 		{
@@ -55,6 +55,8 @@ public class CompositeCalculatorAgent extends MicroAgent
 //				super.exceptionOccurred(exception);
 //			}
 //		});
+		
+		return new Future<Void>(); // never kill?!
 	}
 	
 	/**

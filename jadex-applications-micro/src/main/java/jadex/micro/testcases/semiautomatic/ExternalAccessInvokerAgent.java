@@ -10,6 +10,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.xml.annotation.XMLClassname;
@@ -26,13 +27,14 @@ public class ExternalAccessInvokerAgent extends MicroAgent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()
 			{
-				final ComponentSelectorDialog agentselector	= new ComponentSelectorDialog(null, getExternalAccess(), new CMSUpdateHandler(getExternalAccess()), new ComponentIconCache(getExternalAccess()));
+				final ComponentSelectorDialog agentselector	= new ComponentSelectorDialog(null, getExternalAccess(), 
+					new CMSUpdateHandler(getExternalAccess()), new ComponentIconCache(getExternalAccess()));
 				final IComponentIdentifier cid = agentselector.selectAgent(null);
 				if(cid!=null)
 				{
@@ -61,5 +63,7 @@ public class ExternalAccessInvokerAgent extends MicroAgent
 				}
 			}
 		});
+		
+		return new Future<Void>(); // never kill?!
 	}
 }

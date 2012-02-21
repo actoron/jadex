@@ -6,6 +6,8 @@ import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
@@ -23,14 +25,19 @@ import jadex.micro.annotation.Results;
 	@Configuration(name="b")
 })
 @Results(@Result(name="testresults", clazz=Testcase.class)) 
-public class RequiredServiceConfigurationsAgent extends MicroAgent
+@Agent(keepalive=false)
+public class RequiredServiceConfigurationsAgent //extends MicroAgent
 {
+	@Agent
+	protected MicroAgent agent;
+	
 	/**
 	 *  Agent created.
 	 */
-	public IFuture agentCreated()
+	@AgentCreated
+	public IFuture<Void> agentCreated()
 	{
-		BasicServiceContainer con = (BasicServiceContainer)getServiceContainer();
+		BasicServiceContainer con = (BasicServiceContainer)agent.getServiceContainer();
 		RequiredServiceInfo rsi = con.getRequiredServiceInfo("as");
 //		System.out.println(rsi.getDefaultBinding().getScope());
 		TestReport tr = new TestReport("#1", "Test required service overriding.");
@@ -42,15 +49,15 @@ public class RequiredServiceConfigurationsAgent extends MicroAgent
 		{
 			tr.setFailed("Wrong service implementation: "+rsi.getDefaultBinding().getScope());
 		}
-		setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
+		agent.setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
 		return IFuture.DONE;
 	}
 	
-	/**
-	 *  The body.
-	 */
-	public void executeBody()
-	{
-		killAgent();
-	}
+//	/**
+//	 *  The body.
+//	 */
+//	public void executeBody()
+//	{
+//		killAgent();
+//	}
 }

@@ -2,6 +2,7 @@ package jadex.micro.testcases.semiautomatic;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Breakpoints;
@@ -23,7 +24,7 @@ public class BreakpointAgent extends MicroAgent
 	/**
 	 *  Execute a series of steps.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		step	= "hop";	// first step
 		
@@ -62,6 +63,8 @@ public class BreakpointAgent extends MicroAgent
 				return IFuture.DONE;
 			}
 		});
+		
+		return new Future<Void>(); // never kill?!
 	}
 	
 	/**

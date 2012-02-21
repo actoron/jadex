@@ -17,12 +17,12 @@ public interface IMicroAgent
 	 *  Called once after agent creation.
 	 *  Creation is considered done when the returned future is finished.
 	 */
-	public IFuture<Void>	agentCreated();
+	public IFuture<Void> agentCreated();
 	
 	/**
 	 *  Called once after agent has been started.
 	 */
-	public void executeBody();
+	public IFuture<Void> executeBody();
 	
 	/**
 	 *  Called, whenever a message is received.

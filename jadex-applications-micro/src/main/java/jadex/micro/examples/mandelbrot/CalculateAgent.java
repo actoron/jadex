@@ -4,6 +4,7 @@ import javax.swing.plaf.InternalFrameUI;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
@@ -47,8 +48,10 @@ public class CalculateAgent extends MicroAgent
 	/**
 	 *  Execute the body.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		final long delay = ((Number)getArgument("delay")).longValue();
 		IComponentStep step = new IComponentStep<Void>()
 		{
@@ -57,7 +60,8 @@ public class CalculateAgent extends MicroAgent
 				if(!isHadJob())
 				{
 //					System.out.println("killComponent: "+getComponentIdentifier());
-					killComponent();
+//					killComponent();
+					ret.setResult(null);
 				}
 				setHadJob(false);
 				waitFor(delay, this);
@@ -66,6 +70,8 @@ public class CalculateAgent extends MicroAgent
 		};
 		if(delay>0)
 			waitFor(delay, step);
+		
+		return ret;
 	}
 	
 	/**

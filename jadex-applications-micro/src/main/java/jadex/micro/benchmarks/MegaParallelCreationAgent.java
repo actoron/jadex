@@ -1,5 +1,7 @@
 package jadex.micro.benchmarks;
 
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -20,7 +22,7 @@ public class MegaParallelCreationAgent extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		Map arguments = getArguments();	
 		if(arguments==null)
@@ -30,6 +32,8 @@ public class MegaParallelCreationAgent extends MicroAgent
 		int num = args.get("num")!=null? ((Integer)args.get("num")).intValue(): 1;
 		
 		System.out.println("Created peer: "+num+" "+getComponentIdentifier());
+		
+		return new Future<Void>(); // never kill?!
 	}
 
 }

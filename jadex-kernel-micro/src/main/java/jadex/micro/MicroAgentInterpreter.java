@@ -286,7 +286,25 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				System.out.println("body: "+getComponentAdapter().getComponentIdentifier());
-				microagent.executeBody();
+				microagent.executeBody().addResultListener(createResultListener(new IResultListener<Void>()
+				{
+					public void resultAvailable(Void result)
+					{
+						// result?!
+//						System.out.println("Killing (res): "+getComponentIdentifier().getName());
+						microagent.killComponent();
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						// result?!
+//						System.out.println("Killing (ex): "+getComponentIdentifier().getName());
+						if(exception instanceof RuntimeException)
+							throw (RuntimeException)exception;
+						else
+							throw new RuntimeException(exception);
+//						microagent.killComponent();
+					}
+				}));
 				return IFuture.DONE;
 			}
 			public String toString()

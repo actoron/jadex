@@ -52,14 +52,15 @@ public class PojoBDIAgent extends BDIAgent implements IPojoMicroAgent
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
-		invokeMethod(AgentBody.class, null).addResultListener(new DefaultResultListener()
-		{
-			public void resultAvailable(Object result)
-			{
-			}
-		});
+		return invokeMethod(AgentBody.class, null);
+//		.addResultListener(new DefaultResultListener()
+//		{
+//			public void resultAvailable(Object result)
+//			{
+//			}
+//		});
 	}
 
 	/**

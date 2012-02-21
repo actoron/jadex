@@ -2,6 +2,7 @@ package jadex.micro.testcases.semiautomatic;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Breakpoints;
@@ -25,7 +26,7 @@ public class CountingAgent extends MicroAgent
 	/**
 	 *  Execute a series of steps.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		cnt	= 1;
 
@@ -60,6 +61,8 @@ public class CountingAgent extends MicroAgent
 		};
 		
 		scheduleStep(step);
+		
+		return new Future<Void>(); //never kill?!
 	}
 	
 	/**

@@ -3,6 +3,8 @@ package jadex.micro.testcases;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.service.IService;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;
@@ -18,8 +20,10 @@ import java.util.Collections;
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public class NoServiceAgent extends MicroAgent
 {
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		final TestReport	tr	= new TestReport("#1", "Searching for services.");
 		
 		getServiceContainer().searchServices(INoService.class).addResultListener(new IResultListener()
@@ -35,16 +39,20 @@ public class NoServiceAgent extends MicroAgent
 					tr.setFailed("Expected empty list but was: "+result);
 				}
 				setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
-				killAgent();
+//				killAgent();
+				ret.setResult(null);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 				tr.setFailed("Exception during test: "+exception);
 				setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
-				killAgent();
+//				killAgent();
+				ret.setResult(null);
 			}
 		});
+		
+		return ret;
 	}
 	
 	/** Test service interface. */

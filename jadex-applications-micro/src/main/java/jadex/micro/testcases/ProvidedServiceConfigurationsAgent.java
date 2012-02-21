@@ -59,9 +59,10 @@ public class ProvidedServiceConfigurationsAgent extends MicroAgent implements IA
 	/**
 	 *  The body.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
-		killAgent();
+		return IFuture.DONE;
+//		killAgent();
 	}
 	
 	/**

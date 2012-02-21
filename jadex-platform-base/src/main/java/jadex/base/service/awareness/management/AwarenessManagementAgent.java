@@ -234,10 +234,11 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		root = getComponentIdentifier().getRoot();
 		startRemoveBehaviour();
+		return new Future<Void>(); // never kill by return
 	}
 	
 	/**

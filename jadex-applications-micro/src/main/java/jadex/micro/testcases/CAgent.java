@@ -39,8 +39,10 @@ public class CAgent extends MicroAgent implements ICService
 	/**
 	 *  Test if copy parameters work.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		final List<TestReport> testcases = new ArrayList<TestReport>();
 		
 		// Test with required service proxy.
@@ -67,7 +69,8 @@ public class CAgent extends MicroAgent implements ICService
 									{										
 										setResultValue("testresults", new Testcase(testcases.size(),
 											(TestReport[])testcases.toArray(new TestReport[testcases.size()])));
-										killAgent();
+//										killAgent();
+										ret.setResult(null);
 									}
 								});
 							}
@@ -76,6 +79,8 @@ public class CAgent extends MicroAgent implements ICService
 				});
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**

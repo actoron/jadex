@@ -62,6 +62,10 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	public ComponentServiceContainer(IComponentAdapter adapter, String type,IInternalAccess instance)//IComponentInstance instance)
 	{
 		super(adapter.getComponentIdentifier());
+		
+		if(instance==null)
+			throw new IllegalArgumentException("Instance must not null.");
+		
 		this.adapter = adapter;
 		this.type	= type;
 		this.instance = instance;

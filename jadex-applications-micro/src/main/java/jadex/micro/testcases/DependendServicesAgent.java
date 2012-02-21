@@ -108,7 +108,7 @@ public class DependendServicesAgent extends MicroAgent
     /**
      *  The agent body.
      */
-    public void executeBody()
+    public IFuture<Void> executeBody()
     {
         getChildrenAccesses().addResultListener(createResultListener(new DefaultResultListener()
         {
@@ -121,6 +121,8 @@ public class DependendServicesAgent extends MicroAgent
                 }
             }
         }));
+        
+        return new Future<Void>(); // never kill?
     }
 }
 

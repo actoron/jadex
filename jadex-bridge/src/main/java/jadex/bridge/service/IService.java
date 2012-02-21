@@ -35,5 +35,5 @@ public interface IService //extends IRemotable
 	 *  Get the map of properties (considered as constant).
 	 *  @return The service property map (if any).
 	 */
-	public Map getPropertyMap();
+	public Map<String, Object> getPropertyMap();
 }

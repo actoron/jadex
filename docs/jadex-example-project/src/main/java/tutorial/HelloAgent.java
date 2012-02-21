@@ -1,5 +1,6 @@
 package tutorial;
 
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 
 /**
@@ -10,9 +11,9 @@ public class HelloAgent extends MicroAgent
 	/**
 	 *  Called when the agent is started.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		System.out.println("Hello world!");
-		killAgent();
+		return IFuture.DONE;
 	}
 }

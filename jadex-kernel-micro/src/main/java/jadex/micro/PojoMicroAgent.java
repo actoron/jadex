@@ -1,10 +1,12 @@
 package jadex.micro;
 
 import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.SReflect;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
@@ -44,29 +46,59 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	 */
 	public IFuture<Void> agentCreated()
 	{
-		return invokeMethod(AgentCreated.class, null);
+		final Future<Void> ret = new Future<Void>();
+		invokeMethod(AgentCreated.class, null).addResultListener(
+			createResultListener(new ExceptionDelegationResultListener<Method, Void>(ret)
+		{
+			public void customResultAvailable(Method result)
+			{
+				ret.setResult(null);
+			}
+		}));
+		return ret;
 	}
 		
 	/**
 	 *  Execute the functional body of the agent.
 	 *  Is only called once.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
-		invokeMethod(AgentBody.class, null).addResultListener(
-			interpreter.createResultListener(new IResultListener<Void>()
+		final Future<Void> ret = new Future<Void>();
+		
+		invokeMethod(AgentBody.class, null)
+			.addResultListener(interpreter.createResultListener(
+				new ExceptionDelegationResultListener<Method, Void>(ret)
 		{
-			public void resultAvailable(Void result)
+			public void customResultAvailable(Method method)
 			{
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				if(exception instanceof RuntimeException)
-					throw (RuntimeException)exception;
+				// Only end body if future or void and kill is true 
+				Boolean found = null;
+				
+				if(method!=null)
+				{
+					if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
+					{
+						found = Boolean.TRUE;
+					}
+					else if(void.class.equals(method.getReturnType()))
+					{
+						AgentBody ab = method.getAnnotation(AgentBody.class);
+						found = ab.keepalive()? Boolean.FALSE: Boolean.TRUE;
+					}
+				}
 				else
-					throw new RuntimeException(exception);
+				{
+					Agent ag = agent.getClass().getAnnotation(Agent.class);
+					found = ag.keepalive()? Boolean.FALSE: Boolean.TRUE;
+				}
+				
+				if(found.booleanValue())
+					ret.setResult(null);
 			}
 		}));
+		
+		return ret;
 	}
 
 	/**
@@ -77,9 +109,9 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	public void messageArrived(Map msg, MessageType mt)
 	{
 		invokeMethod(AgentMessageArrived.class, new Object[]{msg, mt}).addResultListener(
-			interpreter.createResultListener(new IResultListener<Void>()
+			interpreter.createResultListener(new IResultListener<Method>()
 		{
-			public void resultAvailable(Void result)
+			public void resultAvailable(Method result)
 			{
 			}
 			public void exceptionOccurred(Exception exception)
@@ -98,7 +130,16 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	 */
 	public IFuture<Void> agentKilled()
 	{
-		return invokeMethod(AgentKilled.class, null);
+		final Future<Void> ret = new Future<Void>();
+		invokeMethod(AgentKilled.class, null).addResultListener(
+			createResultListener(new ExceptionDelegationResultListener<Method, Void>(ret)
+		{
+			public void customResultAvailable(Method result)
+			{
+				ret.setResult(null);
+			}
+		}));
+		return ret;
 	}
 	
 	/**
@@ -114,15 +155,16 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 	 *  Invoke double methods.
 	 *  The boolean 'firstorig' determines if basicservice method is called first.
 	 */
-	protected IFuture<Void> invokeMethod(Class<? extends Annotation> annotation, Object[] args)
+	protected IFuture<Method> invokeMethod(Class<? extends Annotation> annotation, Object[] args)
 	{
-		final Future<Void> ret = new Future<Void>();
+		final Future<Method> ret = new Future<Method>();
 		
 		Method[] methods = agent.getClass().getMethods();
 		boolean found = false;
 		
 		for(int i=0; i<methods.length && !found; i++)
 		{
+			final Method method = methods[i];
 			if(methods[i].isAnnotationPresent(annotation))
 			{
 				found = true;
@@ -132,11 +174,18 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 					if(res instanceof IFuture)
 					{
 						((IFuture)res).addResultListener(createResultListener(
-							new DelegationResultListener<Void>(ret)));
+							new ExceptionDelegationResultListener<Void, Method>(ret)
+						{
+							public void customResultAvailable(Void result)
+							{
+								ret.setResult(method);
+							}
+						}
+						));
 					}
 					else
 					{
-						ret.setResult(null);
+						ret.setResult(method);
 					}
 				}
 				catch(Exception e)

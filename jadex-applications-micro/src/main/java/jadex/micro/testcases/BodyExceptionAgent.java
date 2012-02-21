@@ -1,5 +1,6 @@
 package jadex.micro.testcases;
 
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 
 /**
@@ -10,7 +11,7 @@ public class BodyExceptionAgent extends MicroAgent
 	/**
 	 *  The agent body.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 //		System.out.println("execute ExceptionTest ...");
 		throw new RuntimeException("Exception in agent body");

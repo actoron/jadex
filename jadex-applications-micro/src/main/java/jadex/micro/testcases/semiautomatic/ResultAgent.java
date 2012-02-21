@@ -5,6 +5,8 @@ import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentMetaInfo;
@@ -24,12 +26,15 @@ public class ResultAgent extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		if(Math.random()<0.3)
 		{
 			setResultValue("result", "last: "+getAgentName()+": "+Math.random());
-			killAgent();
+//			killAgent();
+			ret.setResult(null);
 		}
 		else
 		{
@@ -47,13 +52,15 @@ public class ResultAgent extends MicroAgent
 						public void resultAvailable(Object result)
 						{
 							System.out.println(getAgentName()+" got result: "+result);
-							killAgent();
+							ret.setResult(null);
+//							killAgent();
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
 							System.out.println("exception occurred: "+exception);
-							killAgent();
+//							killAgent();
+							ret.setResult(null);
 						}
 					})).addResultListener(new IResultListener()
 					{
@@ -64,22 +71,25 @@ public class ResultAgent extends MicroAgent
 						public void exceptionOccurred(Exception exception)
 						{
 							System.out.println("Could not create agent: "+exception);
-							killAgent();
+//							killAgent();
+							ret.setResult(null);
 						}
 					});
 				}
 			});
 		}
+		
+		return ret;
 	}
 	
-	//-------- static methods --------
-	
-	/**
-	 *  Get the meta information about the agent.
-	 */
-	public static Object getMetaInfo()
-	{
-		return new MicroAgentMetaInfo("This agent starts a subagent and fetches its result.", 
-			null, null, new IArgument[]{new Argument("result", "Result value.", "String", new Integer(0))}, null, null);
-	}
+//	//-------- static methods --------
+//	
+//	/**
+//	 *  Get the meta information about the agent.
+//	 */
+//	public static Object getMetaInfo()
+//	{
+//		return new MicroAgentMetaInfo("This agent starts a subagent and fetches its result.", 
+//			null, null, new IArgument[]{new Argument("result", "Result value.", "String", new Integer(0))}, null, null);
+//	}
 }

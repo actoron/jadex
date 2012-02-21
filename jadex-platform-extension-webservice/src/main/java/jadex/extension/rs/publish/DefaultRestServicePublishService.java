@@ -548,7 +548,7 @@ public class DefaultRestServicePublishService implements IPublishService
 			{
 				method = methods[0];
 			}
-			System.out.println("call: "+this+" "+method+" "+SUtil.arrayToString(params)+" "+name);
+//			System.out.println("call: "+this+" "+method+" "+SUtil.arrayToString(params)+" "+name);
 			
 			// check if mappers are there
 			ResourceConfig rc = (ResourceConfig)getClass().getDeclaredField("__rc").get(this);
@@ -571,7 +571,7 @@ public class DefaultRestServicePublishService implements IPublishService
 				targetmethod = service.getClass().getMethod(mname, method.getParameterTypes());
 			}
 			
-			System.out.println("target: "+targetmethod);
+			//System.out.println("target: "+targetmethod);
 			
 			Object[] targetparams = params;
 			if(method.isAnnotationPresent(ParametersMapper.class))
@@ -721,7 +721,7 @@ public class DefaultRestServicePublishService implements IPublishService
 					Class<?> restmethod = DefaultRestMethodGenerator.getDeclaredRestType(method);
 					if(restmethod!=null)
 					{
-						System.out.println("method: "+method.getName()+" "+SUtil.arrayToString(methods));
+//						System.out.println("method: "+method.getName()+" "+SUtil.arrayToString(methods));
 //						java.lang.annotation.Annotation[][] ans = method.getParameterAnnotations();
 //						for(int j=0; j<ans.length; j++)
 //						{

@@ -7,6 +7,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
@@ -46,8 +47,10 @@ public class PingingAgent extends MicroAgent
 	/**
 	 *  Execute the body.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		receiver = (IComponentIdentifier)getArgument("receiver");
 		final int missed_max = ((Number)getArgument("missed_max")).intValue();
 		final long timeout = ((Number)getArgument("timeout")).longValue();
@@ -61,7 +64,8 @@ public class PingingAgent extends MicroAgent
 				if(dif>missed_max)
 				{
 					getLogger().warning("Ping target does not respond: "+receiver);
-					killAgent();
+//					killAgent();
+					ret.setResult(null);
 				}
 				else
 				{
@@ -100,6 +104,8 @@ public class PingingAgent extends MicroAgent
 //		}
 
 		scheduleStep(step);
+		
+		return ret;
 	}
 	
 	/**

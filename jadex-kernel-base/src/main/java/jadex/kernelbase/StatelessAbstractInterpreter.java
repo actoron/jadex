@@ -145,8 +145,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	/**
 	 *  Can be called concurrently (also during executeAction()).
 	 *  
-	 *  -  
-	 *   
 	 *  Request component to kill itself.
 	 *  The component might perform arbitrary cleanup activities during which executeAction()
 	 *  will still be called as usual.

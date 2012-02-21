@@ -42,25 +42,30 @@ public class InterceptorAgent extends MicroAgent implements IAService
 	/**
 	 *  Just finish the test by setting the result and killing the agent.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		final List testresults = new ArrayList();
-		performProvidedServiceTest(testresults).addResultListener(createResultListener(new DefaultResultListener()
+		performProvidedServiceTest(testresults).addResultListener(createResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
-				performRequiredServiceTest(testresults).addResultListener(createResultListener(new DefaultResultListener()
+				performRequiredServiceTest(testresults).addResultListener(createResultListener(new DelegationResultListener(ret)
 				{
-					public void resultAvailable(Object result)
+					public void customResultAvailable(Object result)
 					{
 //						System.out.println("testresults: "+testresults);
 						TestReport[] tr = (TestReport[])testresults.toArray(new TestReport[testresults.size()]);
 						setResultValue("testresults", new Testcase(tr.length, tr));
-						killAgent();
+//						killAgent();
+						ret.setResult(null);
 					}
 				}));
 			}
 		}));
+		
+		return ret;
 	}
 	
 	/**

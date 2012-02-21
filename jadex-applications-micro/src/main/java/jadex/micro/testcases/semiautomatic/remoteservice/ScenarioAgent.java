@@ -4,6 +4,8 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 
 import java.util.List;
@@ -16,7 +18,7 @@ public class ScenarioAgent extends MicroAgent
 	/**
 	 *  Execute the body.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		getServiceContainer().searchService(ILibraryService.class).addResultListener(new DefaultResultListener()
 		{
@@ -50,5 +52,7 @@ public class ScenarioAgent extends MicroAgent
 				}));
 			}
 		});
+		
+		return new Future<Void>(); // never kill?!
 	}
 }

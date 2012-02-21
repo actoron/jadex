@@ -6,7 +6,9 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
@@ -46,11 +48,13 @@ public class LoggerAgent extends MicroAgent
 	/**
 	 *  Just finish the test by setting the result and killing the agent.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
-		getRequiredService("clockservice").addResultListener(new DefaultResultListener()
+		final Future<Void> ret = new Future<Void>();
+		
+		getRequiredService("clockservice").addResultListener(new DelegationResultListener(ret)
 		{
-			public void resultAvailable(Object result)
+			public void customResultAvailable(Object result)
 			{
 				final IClockService clock = (IClockService)result;
 				final long start = clock.getTime();
@@ -107,10 +111,12 @@ public class LoggerAgent extends MicroAgent
 				reports.add(tr2);
 				
 				setResultValue("testresults", new Testcase(reports.size(), (TestReport[])reports.toArray(new TestReport[reports.size()])));
-				killAgent();
-				
+//				killAgent();
+				ret.setResult(null);
 			}
 		});
+		
+		return ret;
 	}
 	
 	/**

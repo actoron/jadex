@@ -31,8 +31,10 @@ public class ComponentResultTestAgent extends MicroAgent
 	/**
 	 *  Perform the tests
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		final TestReport	tr1	= new TestReport("#1", "Default configuration.");
 		testComponentResult(null, "initial1")
 			.addResultListener(createResultListener(new IResultListener()
@@ -70,11 +72,13 @@ public class ComponentResultTestAgent extends MicroAgent
 					protected void next()
 					{
 						setResultValue("testresults", new Testcase(2, new TestReport[]{tr1, tr2}));
-						killAgent();
+//						killAgent();
+						ret.setResult(null);
 					}
 				}));
 			}
 		}));
+		return ret;
 	}
 
 	/**

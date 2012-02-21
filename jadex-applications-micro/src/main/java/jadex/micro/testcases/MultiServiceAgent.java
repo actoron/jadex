@@ -38,9 +38,10 @@ public class MultiServiceAgent	extends MicroAgent	implements IAddService, ISubSe
 	/**
 	 *  Search for the two services and check if they work as expected.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
-		final Future	fut	= new Future();
+		final Future<Void>	ret	= new Future<Void>();
+		final Future fut = new Future();
 		
 		getRequiredService("add").addResultListener(new DelegationResultListener(fut)
 		{
@@ -73,16 +74,20 @@ public class MultiServiceAgent	extends MicroAgent	implements IAddService, ISubSe
 			{
 				tr.setSucceeded(true);
 				setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
-				killAgent();
+//				killAgent();
+				ret.setResult(null);
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
 				tr.setFailed(exception.toString());
 				setResultValue("testresults", new Testcase(1, new TestReport[]{tr}));
-				killAgent();
+//				killAgent();
+				ret.setResult(null);
 			}
 		}));
+		
+		return ret;
 	}
 
 	

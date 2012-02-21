@@ -28,18 +28,23 @@ public class HelloWorldAgent extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
+		final Future<Void> ret = new Future<Void>();
 		System.out.println(getArgument("welcome text"));
+		
 		waitFor(2000, new IComponentStep<Void>()
 		{			
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				System.out.println("Good bye world.");
-				killAgent();
+//				killAgent();
+				ret.setResult(null);
 				return IFuture.DONE;
 			}
 		});
+		
+		return ret;
 	}
 	
 	public IFuture<Void> loop(final Iterator<IComponentManagementService> it)

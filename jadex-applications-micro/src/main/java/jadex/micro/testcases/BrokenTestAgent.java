@@ -38,8 +38,10 @@ public class BrokenTestAgent extends MicroAgent
 	/**
 	 *  Perform the tests
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		final TestReport	tr1	= new TestReport("#1", "Body exception subcomponent.");
 		
 		testBrokenComponent(BodyExceptionAgent.class.getName()+".class")
@@ -96,13 +98,16 @@ public class BrokenTestAgent extends MicroAgent
 							protected void next()
 							{
 								setResultValue("testresults", new Testcase(3, new TestReport[]{tr1, tr2, tr3}));
-								killAgent();
+//								killAgent();
+								ret.setResult(null);
 							}
 						}));
 					}
 				}));
 			}
 		}));
+		
+		return ret;
 	}
 
 	/**

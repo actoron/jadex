@@ -1,6 +1,10 @@
 package jadex.bridge;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.commons.concurrent.TimeoutException;
@@ -32,6 +36,15 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 	 */
 	public TimeoutResultListener(final long timeout, IExternalAccess exta, final IResultListener<E> listener)
 	{
+		this(timeout, exta, false, listener);
+	}
+	
+	/**
+	 *  Create a new listener.
+	 */
+	public TimeoutResultListener(final long timeout, IExternalAccess exta, final boolean realtime,
+		final IResultListener<E> listener)
+	{
 		if(listener==null)
 			throw new IllegalArgumentException("Listener must not null.");
 		if(exta==null)
@@ -50,9 +63,9 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 				{
 					try
 					{
-						clock.createTimer(timeout, new ITimedObject()
+						final Runnable notify = new Runnable()
 						{
-							public void timeEventOccurred(long currenttime)
+							public void run()
 							{
 								boolean notify = false;
 								synchronized(TimeoutResultListener.this)
@@ -66,7 +79,29 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 								if(notify)
 									listener.exceptionOccurred(new TimeoutException());
 							}
-						});
+						};
+						
+						if(realtime && !IClock.TYPE_SYSTEM.equals(clock.getClockType()))
+						{
+							Timer t = new Timer();
+							t.schedule(new TimerTask()
+							{
+								public void run()
+								{
+									notify.run();
+								}
+							}, timeout);
+						}
+						else
+						{
+							clock.createTimer(timeout, new ITimedObject()
+							{
+								public void timeEventOccurred(long currenttime)
+								{
+									notify.run();
+								}
+							});
+						}
 					}
 					catch(Exception e)
 					{
