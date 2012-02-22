@@ -2,6 +2,7 @@ package jadex.webservice.examples.rs.chart;
 
 import jadex.commons.future.IFuture;
 import jadex.extension.rs.invoke.annotation.ParameterMapper;
+import jadex.extension.rs.publish.annotation.ParametersMapper;
 import jadex.extension.rs.publish.annotation.ResultMapper;
 import jadex.micro.annotation.Value;
 
@@ -71,7 +72,7 @@ public interface IRSChartService
 //	@GET
 //	@Path("chart")
 //	@Produces(MediaType.APPLICATION_OCTET_STREAM)
-//	@ParameterMapper(@Value(clazz=ChartParameterMapper.class))
+//	@ParametersMapper(@Value(clazz=ChartParameterMapper.class))
 //	@ResultMapper(@Value(clazz=ChartResultMapper.class))
 //	public IFuture<byte[]> getPieChart(int width, int height, double[] data, String[] labels);
 

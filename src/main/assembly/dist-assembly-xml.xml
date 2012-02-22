@@ -57,10 +57,10 @@
 			<source>pom.xml</source>
 			<outputDirectory>sources</outputDirectory>
 		</file>
-		<file>
+		<!-- <file>
 			<source>/src/main/assembly/dist-assembly-xml.xml</source>
 			<outputDirectory>sources/src/main/assembly</outputDirectory>
-		</file>
+		</file>-->
 		<file>
 			<source>docs/readme.txt</source>
 			<outputDirectory>/</outputDirectory>
