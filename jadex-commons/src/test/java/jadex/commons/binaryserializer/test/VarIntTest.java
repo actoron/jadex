@@ -32,6 +32,9 @@ public class VarIntTest extends TestCase
 		}
 	}
 	
+	/**
+	 *  Test critical corner cases of the variable encoding.
+	 */
 	public void testCornerCases() throws Exception
 	{
 		for (int i = 0; i < CORNER_CASES.length; ++i)
@@ -50,6 +53,9 @@ public class VarIntTest extends TestCase
 		}
 	}
 	
+	/**
+	 * Test correct offset handling of a VarInt embedded in a larger array.
+	 */
 	public void testOffsetHandling() throws Exception
 	{
 		for (int i = 0; i < CORNER_CASES.length; ++i)
