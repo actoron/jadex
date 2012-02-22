@@ -39,7 +39,10 @@
 		</belief>
 		
 		<!-- Known nests. -->
-		<beliefset name="nests" class="ISpaceObject" />			
+		<!-- <beliefset name="nests" class="ISpaceObject" /> -->
+		<beliefsetref name="nests">
+			<concrete ref="move.nests"/>
+		</beliefsetref>  			
 		
 		<!-- Does it carry a piece of food carried at that moment? -->
 		<belief name="has_food" class="Boolean" evaluationmode="push">
@@ -47,17 +50,23 @@
 		</belief>
 		
 		<!-- Known/Detected??? Food sources at the current position. -->
-		<beliefset name="foodSources" class="ISpaceObject" />		
+		<!-- <beliefset name="foodSources" class="ISpaceObject" />-->
+		<beliefsetref name="foodSources">
+			<concrete ref="move.foodSources"/>
+		</beliefsetref>		
 
 		<!-- Smelled pheromones. -->
-		<beliefset name="pheromones" class="ISpaceObject" />	
+		<!-- <beliefset name="pheromones" class="ISpaceObject" />-->
+		<beliefsetref name="pheromones">
+			<concrete ref="move.pheromones"/>
+		</beliefsetref>	
 	</beliefs>
 
 <goals>
 <!-- This goal is used to mine food.-->
 		<achievegoal name="food_mining" exclude="never" retry="false">
 			<unique />
-			<creationcondition language="jcl">
+			<creationcondition language="jcl">				
 				Arrays.asList($beliefbase.foodSources).size() &gt; 0
 			</creationcondition>
 			<!-- <deliberation>

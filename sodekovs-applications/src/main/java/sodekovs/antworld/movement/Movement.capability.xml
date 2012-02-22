@@ -36,6 +36,15 @@
 
 		<!-- The seen targets. -->
 		<beliefset name="my_targets" class="ISpaceObject" exported="true" />
+		
+		<!-- Known/Detected??? Food sources at the current position. -->
+		<beliefset name="foodSources" class="ISpaceObject" />		
+
+		<!-- Smelled pheromones. -->
+		<beliefset name="pheromones" class="ISpaceObject" />	
+		
+		<!-- Known nests. -->
+		<beliefset name="nests" class="ISpaceObject" />		
 	</beliefs>
 
 	<goals>

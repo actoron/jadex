@@ -128,13 +128,13 @@ public class RandomWalkPlan extends Plan {
 	 * @param positionsKeyArray
 	 * @return
 	 */
-	private HashMap copyHashMap(HashMap org, Object[] positionsKeyArray) {
-		HashMap ret = new HashMap();
-
-		for (int i = 0; i < positionsKeyArray.length; i++) {
-			String s = (String) org.get(positionsKeyArray[i]);
-			ret.put(positionsKeyArray[i], s);
-		}
-		return ret;
-	}
+//	private HashMap copyHashMap(HashMap org, Object[] positionsKeyArray) {
+//		HashMap ret = new HashMap();
+//
+//		for (int i = 0; i < positionsKeyArray.length; i++) {
+//			String s = (String) org.get(positionsKeyArray[i]);
+//			ret.put(positionsKeyArray[i], s);
+//		}
+//		return ret;
+//	}
 }

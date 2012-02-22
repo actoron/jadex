@@ -164,8 +164,7 @@
 					class="DefaultBDIVisionProcessor">
 					<env:property name="percepttypes"> new Object[] { new
 						String[]{"food_appeared", "add", "foodSources"}, new
-						String[]{"food_disappeared", "remove", "foodSources"},
-						new
+						String[]{"food_disappeared", "remove", "foodSources"},new
 						String[]{"nest_appeared", "add", "nests"},new
 						String[]{"pheromone_appeared", "add", "pheromones"}, new
 						String[]{"pheromone_disappeared", "remove", "pheromones"} }

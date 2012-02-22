@@ -1,18 +1,24 @@
 package sodekovs.bikesharing.datenkonvertierung;
 
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.commons.SimplePropertyObject;
+import jadex.extension.envsupport.environment.IEnvironmentSpace;
+import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.ISpaceProcess;
+import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.math.IVector1;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector2Double;
+import jadex.extension.envsupport.math.Vector3Double;
+
 import java.awt.Color;
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,44 +34,10 @@ import sodekovs.bikesharing.bahnverwaltung.BahnStation;
 import sodekovs.bikesharing.bahnverwaltung.LinienInformation;
 import sodekovs.bikesharing.bahnverwaltung.LinienInformationen;
 import sodekovs.bikesharing.container.Weg;
-import sodekovs.bikesharing.disposition.DispositionsAgent;
 import sodekovs.bikesharing.fahrrad.FahrradVerleihStation;
 import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
 import sodekovs.bikesharing.simulation.BahnStationen;
-import sodekovs.bikesharing.simulation.Bereich;
-import sodekovs.bikesharing.simulation.Ort;
-import sodekovs.bikesharing.standard.VerkehrsmittelAgent;
-import sodekovs.bikesharing.verkehrsteilnehmer.SucheNeuenWegPlan;
-import sodekovs.bikesharing.verkehrsteilnehmer.ZielWaehlPlan;
 import sodekovs.bikesharing.zeit.Zeitverwaltung;
-
-
-import jadex.extension.envsupport.environment.IEnvironmentSpace;
-import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.ISpaceProcess;
-import jadex.extension.envsupport.environment.space2d.Grid2D;
-import jadex.extension.envsupport.environment.space2d.Space2D;
-//import jadex.application.space.envsupport.environment.IEnvironmentSpace;
-//import jadex.application.space.envsupport.environment.ISpaceObject;
-//import jadex.application.space.envsupport.environment.ISpaceProcess;
-//import jadex.application.space.envsupport.environment.space2d.Grid2D;
-//import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.math.Vector2Double;
-import jadex.extension.envsupport.math.Vector1Double;
-import jadex.extension.envsupport.math.Vector3Double;
-import jadex.extension.envsupport.math.IVector1;
-import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.Vector2Int;
-//import jadex.application.space.envsupport.math.IVector1;
-//import jadex.application.space.envsupport.math.IVector2;
-//import jadex.application.space.envsupport.math.Vector1Double;
-//import jadex.application.space.envsupport.math.Vector2Double;
-//import jadex.application.space.envsupport.math.Vector2Int;
-//import jadex.application.space.envsupport.math.Vector3Double;
-import jadex.commons.SimplePropertyObject;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.clock.IClockService;
 
 //TODO: Startorte Verkehrsteilnehmer, Startzeitenverteilung
 

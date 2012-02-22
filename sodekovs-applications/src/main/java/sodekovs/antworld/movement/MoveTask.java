@@ -3,6 +3,7 @@ package sodekovs.antworld.movement;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
@@ -63,7 +64,18 @@ public class MoveTask extends AbstractTask {
 		IVector2 newloc = ((Space2D) space).getDistance(loc, destination).getAsDouble() <= maxdist ? destination : destination.copy().subtract(loc).normalize().multiply(maxdist).add(loc);
 
 		((Space2D) space).setPosition(obj.getId(), newloc);
-
+		
+		
+//		// Check access to surrounding agent
+//		agent.scheduleStep(new IComponentStep<Void>() {
+//			public IFuture<Void> execute(IInternalAccess ia) {
+//				IBDIInternalAccess bia = (IBDIInternalAccess) ia;		
+//				Object[] foodSources =  bia.getBeliefbase().getBeliefSet("foodSources").getFacts();
+//				System.out.println("#AntAgent# MoveTask: Size of foodSources: " + foodSources.length);
+//				return IFuture.DONE;
+//			}
+//		});
+		
 		// Check, whether agent should walk randomly with or without remembering already visited positions.
 		//Confer WalkingStrategyEnum for Mapping of int values to semantics.
 		int walkingStrategyProperty =(Integer) space.getSpaceObjectsByType("walkingStrategy")[0].getProperty("strategy");
@@ -80,16 +92,13 @@ public class MoveTask extends AbstractTask {
 					synchronized (map) {
 						map.put(decimalFormat.format(newLocation.getXAsDouble()), decimalFormat.format(newLocation.getYAsDouble()));
 						homebases[0].setProperty("visitedPos", map);
-					}
-
+					}					
+					
 					// Hack: Create trace
 					Map props = new HashMap();
 					props.put(Space2D.PROPERTY_POSITION, newLocation);
 					space.createSpaceObject("trace", props, null);
-
-					// System.out.println("#Sentry# MoveTask: " + map.size());
-					// ((Space2D)space).get
-					// }
+					
 					return IFuture.DONE;
 				}
 			});
