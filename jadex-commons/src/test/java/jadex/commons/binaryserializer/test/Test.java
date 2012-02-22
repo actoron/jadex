@@ -32,7 +32,6 @@ import junit.framework.TestCase;
 public class Test extends TestCase
 {
 	//-------- methods --------
-	static long encsize = 0;
 	/**
 	 *  Main for testing single methods.
 	 */
@@ -55,7 +54,6 @@ public class Test extends TestCase
 		
 		try
 		{
-			encsize = 0;
 			int cnt = 1;
 			long start = System.currentTimeMillis();
 			for(int i=0; i<cnt; i++)
@@ -120,7 +118,6 @@ public class Test extends TestCase
 			long dur = System.currentTimeMillis()-start;
 			
 			System.out.println("Needed: "+dur+" for cnt="+cnt);
-			System.out.println("Size: " + encsize);
 		}
 		catch(Exception e)
 		{
@@ -145,12 +142,6 @@ public class Test extends TestCase
 	{
 		//(new RuntimeException()).printStackTrace();
 		byte[] serialized = BinarySerializer.objectToByteArray(wo, null, null, null);
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		GZIPOutputStream gos = new GZIPOutputStream(bos);
-		gos.write(serialized);
-		gos.flush();
-		gos.close();
-		encsize += bos.toByteArray().length;
 		
 //		System.out.println("xml is:"+new String(xml));
 		
