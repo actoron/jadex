@@ -8,6 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
@@ -58,7 +59,7 @@ public class MessagePerformanceAgent extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	public void executeBody()
+	public IFuture<Void>	executeBody()
 	{
 		getTime().addResultListener(new DefaultResultListener<Long>()
 		{
@@ -152,6 +153,8 @@ public class MessagePerformanceAgent extends MicroAgent
 				send.execute(MessagePerformanceAgent.this);
 			}
 		});
+		
+		return new Future<Void>();
 	}
 	
 	/**

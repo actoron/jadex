@@ -488,7 +488,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 
 		public String toString()
 		{
-			return "invokeMethod("+sic.getMethod()+")";
+			return "invokeMethod("+sic.getMethod()+", "+sic.getArguments()+")";
 		}
 	}
 }

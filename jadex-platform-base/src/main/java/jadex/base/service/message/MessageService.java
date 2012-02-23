@@ -587,8 +587,8 @@ public class MessageService extends BasicService implements IMessageService
 		ArrayList schemes = new ArrayList();
 		for(int i = 0; i < trans.length; i++)
 		{
-			String scheme = trans[i].getServiceSchema();
-			schemes.add(scheme);
+			String[] aschemes = trans[i].getServiceSchemas();
+			schemes.addAll(Arrays.asList(aschemes));
 		}
 
 		return (String[])schemes.toArray(new String[schemes.size()]);

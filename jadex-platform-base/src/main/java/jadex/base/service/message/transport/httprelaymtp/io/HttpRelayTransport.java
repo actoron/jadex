@@ -18,8 +18,52 @@ import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 public class HttpRelayTransport implements ITransport
 {
+	// HACK!!! Disable all certificate checking (only until we find a more fine-grained solution)
+	static
+	{
+        try
+        {
+	        TrustManager[] trustAllCerts = new TrustManager[]
+	        {
+                new X509TrustManager()
+                {
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers()
+                    {
+                    	return null;
+                    }
+                    public void checkClientTrusted( java.security.cert.X509Certificate[] certs, String authType ) { }
+                    public void checkServerTrusted( java.security.cert.X509Certificate[] certs, String authType ) { }
+                }
+	        };
+	
+	        // Install the all-trusting trust manager
+            SSLContext sc = SSLContext.getInstance( "TLS" );
+            sc.init( null, trustAllCerts, new java.security.SecureRandom() );
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier()
+            {
+                public boolean verify(String urlHostName, SSLSession session)
+                {
+                	return true;
+                }
+            });
+        }
+        catch(Exception e)
+        {
+            //We can not recover from this exception.
+            e.printStackTrace();
+        }
+	}
+	
 	//-------- attributes --------
 	
 	/** The component. */
@@ -40,8 +84,15 @@ public class HttpRelayTransport implements ITransport
 	{
 		this.component	= component;
 		this.address	= address;
-		if(!address.startsWith(getServiceSchema()))
-			throw new RuntimeException("Address does not match service schema: "+address+", "+getServiceSchema());
+		boolean	found	= false;
+		for(int i=0; !found && i<getServiceSchemas().length; i++)
+		{
+			found	= address.startsWith(getServiceSchemas()[i]);
+		}
+		if(!found)
+		{
+			throw new RuntimeException("Address does not match supported service schemes: "+address+", "+SUtil.arrayToString(getServiceSchemas()));
+		}
 	}
 	
 	//-------- methods --------
@@ -79,7 +130,10 @@ public class HttpRelayTransport implements ITransport
 			String[]	raddrs	= task.getReceivers()[i].getAddresses();
 			for(int j=0; !ret && j<raddrs.length; j++)
 			{
-				ret	= raddrs[j].toLowerCase().startsWith(getServiceSchema());
+				for(int k=0; !ret && k<getServiceSchemas().length; k++)
+				{
+					ret	= raddrs[j].toLowerCase().startsWith(getServiceSchemas()[k]);
+				}
 			}			
 		}
 		return ret;
@@ -112,8 +166,11 @@ public class HttpRelayTransport implements ITransport
 					String[]	raddrs	= task.getReceivers()[i].getAddresses();
 					for(int j=0; j<raddrs.length; j++)
 					{
-						if(raddrs[j].startsWith(getServiceSchema()))
-							addresses.add(raddrs[j].substring(6));	// strip 'relay-' prefix.
+						for(int k=0; k<getServiceSchemas().length; k++)
+						{
+							if(raddrs[j].startsWith(getServiceSchemas()[k]))
+								addresses.add(raddrs[j].substring(6));	// strip 'relay-' prefix.
+						}
 					}			
 				}
 
@@ -132,6 +189,18 @@ public class HttpRelayTransport implements ITransport
 						
 						URL	url	= new URL(addrs[i]);
 						HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
+//						// Hack!!! Do not validate server (todo: enable/disable by platform argument).
+//						if(con instanceof HttpsURLConnection)
+//						{
+//							HttpsURLConnection httpscon = (HttpsURLConnection) con;  
+//					        httpscon.setHostnameVerifier(new HostnameVerifier()  
+//					        {        
+//					            public boolean verify(String hostname, SSLSession session)  
+//					            {  
+//					                return true;  
+//					            }  
+//					        });												
+//						}
 						con.setRequestMethod("POST");
 						con.setDoOutput(true);
 						con.setUseCaches(false);
@@ -170,9 +239,9 @@ public class HttpRelayTransport implements ITransport
 	 *  Returns the prefix of this transport
 	 *  @return Transport prefix.
 	 */
-	public String getServiceSchema()
+	public String[] getServiceSchemas()
 	{
-		return SRelay.ADDRESS_SCHEME;
+		return SRelay.ADDRESS_SCHEMES;
 	}
 	
 	/**

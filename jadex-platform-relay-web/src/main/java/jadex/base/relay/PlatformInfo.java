@@ -31,6 +31,9 @@ public class PlatformInfo
 	/** The platform host. */
 	protected String	host;
 	
+	/** The protocol (e.g. http or https). */
+	protected String	scheme;
+	
 	/** The time when the connection was established. */
 	protected Date	connect_time;
 	
@@ -51,10 +54,11 @@ public class PlatformInfo
 	/**
 	 *  Create a platform info.
 	 */
-	public PlatformInfo(Object id, String host)
+	public PlatformInfo(Object id, String host, String protocol)
 	{
 		this.id	= id;
 		this.host	= host;
+		this.scheme	= protocol;
 		this.connect_time	= new Date();
 	}
 	
@@ -74,6 +78,14 @@ public class PlatformInfo
 	public String	getHost()
 	{
 		return host;
+	}
+	
+	/**
+	 *  Get the host.
+	 */
+	public String	getScheme()
+	{
+		return scheme;
 	}
 	
 	/**

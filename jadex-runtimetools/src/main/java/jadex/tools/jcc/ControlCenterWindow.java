@@ -152,23 +152,23 @@ public class ControlCenterWindow extends JFrame
 	public void displayError(final String errortitle, String errormessage, final Exception exception)
 	{
 		final String	text;
-		String	exmsg	= exception==null ? null : exception.getMessage();
-		if(errormessage==null && exmsg==null)
+//		String	exmsg	= exception==null ? null : exception.getMessage();
+		if(errormessage==null)// && exmsg==null)
 		{
 			text	= errortitle;
 		}
-		else if(errormessage!=null && exmsg==null)
+		else //if(errormessage!=null && exmsg==null)
 		{
 			text	= errormessage;
 		}
-		else if(errormessage==null && exmsg!=null)
-		{
-			text	= exmsg;
-		}
-		else// if(errormessage!=null && exmsg!=null)
-		{
-			text = errormessage + "\n" + exmsg;
-		}
+//		else if(errormessage==null && exmsg!=null)
+//		{
+//			text	= exmsg;
+//		}
+//		else// if(errormessage!=null && exmsg!=null)
+//		{
+//			text = errormessage + "\n" + exmsg;
+//		}
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			public void run()

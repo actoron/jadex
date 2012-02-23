@@ -22,6 +22,15 @@ public class ComponentTerminatedException	extends RuntimeException
 		this.cid = cid;
 	}
 
+	/**
+	 *	Create an component termination exception.  
+	 */
+	public ComponentTerminatedException(IComponentIdentifier cid, String message)
+	{
+		super(cid.getName()+": "+message);
+		this.cid = cid;
+	}
+
 	//-------- methods --------
 	
 	/**

@@ -5,6 +5,7 @@ import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -37,8 +38,15 @@ public class HttpRelayTransport implements ITransport
 	{
 		this.component	= component;
 		this.address	= address;
-		if(!address.startsWith(getServiceSchema()))
-			throw new RuntimeException("Address does not match service schema: "+address+", "+getServiceSchema());
+		boolean	found	= false;
+		for(int i=0; !found && i<getServiceSchemas().length; i++)
+		{
+			found	= address.startsWith(getServiceSchemas()[i]);
+		}
+		if(!found)
+		{
+			throw new RuntimeException("Address does not match supported service schemes: "+address+", "+SUtil.arrayToString(getServiceSchemas()));
+		}
 	}
 	
 	//-------- ITransport  interface --------
@@ -57,7 +65,7 @@ public class HttpRelayTransport implements ITransport
 				try
 				{
 					// Create the selector thread (starts automatically).
-					selectorthread	= new NIOSelectorThread(component.getComponentIdentifier().getRoot(), address, ms, component.getLogger(), component.getExternalAccess());
+					selectorthread	= new NIOSelectorThread(component.getComponentIdentifier().getRoot(), address, parseAddress(address), ms, component.getLogger(), component.getExternalAccess());
 					ret.setResult(null);
 				}
 				catch(Exception e)
@@ -92,7 +100,10 @@ public class HttpRelayTransport implements ITransport
 			String[]	raddrs	= task.getReceivers()[i].getAddresses();
 			for(int j=0; !ret && j<raddrs.length; j++)
 			{
-				ret	= raddrs[j].toLowerCase().startsWith(getServiceSchema());
+				for(int k=0; !ret && k<getServiceSchemas().length; k++)
+				{
+					ret	= raddrs[j].toLowerCase().startsWith(getServiceSchemas()[k]);
+				}
 			}			
 		}
 		return ret;
@@ -121,15 +132,18 @@ public class HttpRelayTransport implements ITransport
 			String[]	raddrs	= task.getReceivers()[i].getAddresses();
 			for(int j=0; j<raddrs.length; j++)
 			{
-				if(raddrs[j].startsWith(getServiceSchema()))
+				for(int k=0; k<getServiceSchemas().length; k++)
+				if(raddrs[j].startsWith(getServiceSchemas()[k]))
+				{
 					addresses.add(raddrs[j]);
+				}
 			}			
 		}
 
 		// Iterate over all different addresses and try to send
 		for(Iterator<String> it=addresses.iterator(); it.hasNext(); )
 		{
-			this.selectorthread.addSendTask(task, it.next());
+			this.selectorthread.addSendTask(task, parseAddress(it.next()));
 		}
 	}
 	
@@ -137,9 +151,10 @@ public class HttpRelayTransport implements ITransport
 	 *  Returns the prefix of this transport
 	 *  @return Transport prefix.
 	 */
-	public String getServiceSchema()
+	public String[] getServiceSchemas()
 	{
-		return SRelay.ADDRESS_SCHEME;
+		// Currently does not support HTTPS.
+		return new String[]{SRelay.ADDRESS_SCHEMES[0]};
 	}
 	
 	/**
@@ -156,23 +171,30 @@ public class HttpRelayTransport implements ITransport
 	 *  Parse the address.
 	 *  @return Host, port and path.
 	 */
-	public static Tuple2<Tuple2<String, Integer>, String> parseAddress(String address)
+	public Tuple2<Tuple2<String, Integer>, String> parseAddress(String address)
 	{
-		String	path	= "";
-		int port	= 80;
-		String host	= address.substring(SRelay.ADDRESS_SCHEME.length());
-		if(host.indexOf('/')!=-1)
+		Tuple2<Tuple2<String, Integer>, String>	tup	= null;
+		for(int i=0; tup==null && i<getServiceSchemas().length; i++)
 		{
-			path	= host.substring(host.indexOf('/'));
-			host	= host.substring(0, host.indexOf('/'));
+			if(address.startsWith(getServiceSchemas()[i]))
+			{
+				String	path	= "";
+				int port	= SRelay.DEFAULT_PORTS[i];
+				String host	= address.substring(getServiceSchemas()[i].length());
+				if(host.indexOf('/')!=-1)
+				{
+					path	= host.substring(host.indexOf('/'));
+					host	= host.substring(0, host.indexOf('/'));
+				}
+				if(host.indexOf(':')!=-1)
+				{
+					port	= Integer.parseInt(host.substring(host.indexOf(':')+1));
+					host	= host.substring(0, host.indexOf(':'));			
+				}
+				Tuple2<String, Integer>	adr	= new Tuple2<String, Integer>(host, new Integer(port));
+				tup	= new Tuple2<Tuple2<String, Integer>, String>(adr, path);
+			}
 		}
-		if(host.indexOf(':')!=-1)
-		{
-			port	= Integer.parseInt(host.substring(host.indexOf(':')+1));
-			host	= host.substring(0, host.indexOf(':'));			
-		}
-		Tuple2<String, Integer>	adr	= new Tuple2<String, Integer>(host, new Integer(port));
-		Tuple2<Tuple2<String, Integer>, String>	tup	= new Tuple2<Tuple2<String, Integer>, String>(adr, path);
 		return tup;
 	}
 }

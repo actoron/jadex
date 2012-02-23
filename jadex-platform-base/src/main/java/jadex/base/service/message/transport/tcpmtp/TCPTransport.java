@@ -48,7 +48,7 @@ public class TCPTransport implements ITransport
 	//-------- constants --------
 	
 	/** The schema name. */
-	public final static String SCHEMA = "tcp-mtp://";
+	public final static String[] SCHEMAS = new String[]{"tcp-mtp://"};
 	
 	/** Constant for asynchronous setting. */
 	public final static String ASYNCHRONOUS = "asynchronous";
@@ -156,7 +156,10 @@ public class TCPTransport implements ITransport
 			this.addresses	= new String[addresses.length];
 			for(int i=0; i<addresses.length; i++)
 			{
-				this.addresses[i]	= getAddress(addresses[i], port);
+				for(int j=0; j<getServiceSchemas().length; j++)
+				{
+					this.addresses[i]	= getAddress(getServiceSchemas()[j], addresses[i], port);
+				}
 			}
 			
 			// Start the receiver thread.
@@ -272,7 +275,10 @@ public class TCPTransport implements ITransport
 			String[]	raddrs	= task.getReceivers()[i].getAddresses();
 			for(int j=0; !ret && j<raddrs.length; j++)
 			{
-				ret	= raddrs[j].toLowerCase().startsWith(getServiceSchema());
+				for(int k=0; !ret && k<getServiceSchemas().length; k++)
+				{
+					ret	= raddrs[j].toLowerCase().startsWith(getServiceSchemas()[k]);
+				}
 			}			
 		}
 		return ret;
@@ -346,9 +352,9 @@ public class TCPTransport implements ITransport
 	 *  Returns the prefix of this transport
 	 *  @return Transport prefix.
 	 */
-	public String getServiceSchema()
+	public String[] getServiceSchemas()
 	{
-		return SCHEMA;
+		return SCHEMAS;
 	}
 	
 	/**
@@ -369,9 +375,9 @@ public class TCPTransport implements ITransport
 	 *  @param port The port.
 	 *  @return <scheme>:<hostname>:<port>
 	 */
-	protected String getAddress(String hostname, int port)
+	protected String getAddress(String schema, String hostname, int port)
 	{
-		return getServiceSchema()+hostname+":"+port;
+		return schema+hostname+":"+port;
 	}
 	
 	/**
@@ -419,37 +425,40 @@ public class TCPTransport implements ITransport
 		TCPOutputConnection ret = null;
 		
 		address = address.toLowerCase();
-		if(address.startsWith(getServiceSchema()))
+		for(int i=0; i<getServiceSchemas().length; i++)
 		{
-			// Parse the address
-			// todo: handle V6 ip adresses (0:0:0:0 ...)
-			try
+			if(address.startsWith(getServiceSchemas()[i]))
 			{
-				int schemalen = getServiceSchema().length();
-				int div = address.indexOf(':', schemalen);
-				String hostname;
-				int iport;
-				if(div>0)
+				// Parse the address
+				// todo: handle V6 ip adresses (0:0:0:0 ...)
+				try
 				{
-					hostname = address.substring(schemalen, div);
-					iport = Integer.parseInt(address.substring(div+1));
+					int schemalen = getServiceSchemas()[i].length();
+					int div = address.indexOf(':', schemalen);
+					String hostname;
+					int iport;
+					if(div>0)
+					{
+						hostname = address.substring(schemalen, div);
+						iport = Integer.parseInt(address.substring(div+1));
+					}
+					else
+					{
+						hostname = address.substring(schemalen);
+						iport = DEFAULT_PORT;
+					}
+	
+					// todo: which resource identifier to use for outgoing connections?
+					ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, new Cleaner(address));
+					connections.put(address, ret);
 				}
-				else
-				{
-					hostname = address.substring(schemalen);
-					iport = DEFAULT_PORT;
+				catch(Exception e)
+				{ 
+					connections.put(address, new TCPDeadConnection());
+					
+	//				logger.warning("Could not create connection: "+e.getMessage());
+					//e.printStackTrace();
 				}
-
-				// todo: which resource identifier to use for outgoing connections?
-				ret = new TCPOutputConnection(InetAddress.getByName(hostname), iport, new Cleaner(address));
-				connections.put(address, ret);
-			}
-			catch(Exception e)
-			{ 
-				connections.put(address, new TCPDeadConnection());
-				
-//				logger.warning("Could not create connection: "+e.getMessage());
-				//e.printStackTrace();
 			}
 		}
 		

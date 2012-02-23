@@ -82,6 +82,9 @@ public class ReceiveRequest	implements IHttpRequest
 	/** The component id. */
 	protected IComponentIdentifier	cid;
 
+	/** The relay server url (full url with protocol+host+path). */
+	protected String	url;
+	
 	/** The relay server address (host/port). */
 	protected Tuple2<String, Integer>	address;
 	
@@ -126,12 +129,13 @@ public class ReceiveRequest	implements IHttpRequest
 	/**
 	 *  Create a send request.
 	 */
-	public ReceiveRequest(IComponentIdentifier cid, Tuple2<String, Integer> address, String path, IMessageService ms, Logger logger, IExternalAccess access)	throws IOException
+	public ReceiveRequest(IComponentIdentifier cid, String url, Tuple2<String, Integer> address, String path, IMessageService ms, Logger logger, IExternalAccess access)	throws IOException
 	{
 		this.ms	= ms;
 		this.logger	= logger;
 		this.access	= access;
 		this.cid	= cid;
+		this.url	= url;
 		this.address	= address;
 		this.path	= path;
 	}
@@ -168,7 +172,7 @@ public class ReceiveRequest	implements IHttpRequest
 			{
 				public void resultAvailable(IRelayAwarenessService ras)
 				{
-					ras.disconnected(SRelay.ADDRESS_SCHEME+address.getFirstEntity()+":"+address.getSecondEntity()+path);
+					ras.disconnected(url);
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -319,7 +323,7 @@ public class ReceiveRequest	implements IHttpRequest
 						{
 							public void resultAvailable(IRelayAwarenessService ras)
 							{
-								ras.connected(SRelay.ADDRESS_SCHEME+address.getFirstEntity()+":"+address.getSecondEntity()+path);
+								ras.connected(url);
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -622,7 +626,7 @@ public class ReceiveRequest	implements IHttpRequest
 				{
 					public void resultAvailable(IRelayAwarenessService ras)
 					{
-						ras.disconnected(SRelay.ADDRESS_SCHEME+address.getFirstEntity()+":"+address.getSecondEntity()+path);
+						ras.disconnected(url);
 					}
 					
 					public void exceptionOccurred(Exception exception)

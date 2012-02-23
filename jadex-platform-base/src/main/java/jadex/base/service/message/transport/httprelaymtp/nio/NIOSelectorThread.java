@@ -63,7 +63,7 @@ public class NIOSelectorThread
 	 *  Create and start a new receiver.
 	 * @throws IOException 
 	 */
-	public NIOSelectorThread(IComponentIdentifier root, String address, IMessageService ms, Logger logger, IExternalAccess access) throws IOException
+	public NIOSelectorThread(IComponentIdentifier root, String url, Tuple2<Tuple2<String, Integer>, String> address, IMessageService ms, Logger logger, IExternalAccess access) throws IOException
 	{
 		this.logger	= logger;
 		this.queue	= new ArrayList<IHttpRequest>();
@@ -83,10 +83,9 @@ public class NIOSelectorThread
 		});
 		
 		// Add request for receiving messages from relay server.
-		Tuple2<Tuple2<String, Integer>, String> tup = HttpRelayTransport.parseAddress(address);
 		synchronized(queue)
 		{
-			queue.add(new ReceiveRequest(root, tup.getFirstEntity(), tup.getSecondEntity(), ms, logger, access));
+			queue.add(new ReceiveRequest(root, url, address.getFirstEntity(), address.getSecondEntity(), ms, logger, access));
 		}
 		
 		// ANDROID: Selector.open() causes an exception in a 2.2
@@ -278,10 +277,9 @@ public class NIOSelectorThread
 	/**
 	 *  Add a send task.
 	 */
-	public void addSendTask(ISendTask task, String address)
+	public void addSendTask(ISendTask task, Tuple2<Tuple2<String, Integer>, String> address)
 	{
-		Tuple2<Tuple2<String, Integer>, String> tup = HttpRelayTransport.parseAddress(address); 
-		SendRequest	req	= new SendRequest(task, tup.getFirstEntity(), tup.getSecondEntity(), logger);
+		SendRequest	req	= new SendRequest(task, address.getFirstEntity(), address.getSecondEntity(), logger);
 		
 		synchronized(queue)
 		{

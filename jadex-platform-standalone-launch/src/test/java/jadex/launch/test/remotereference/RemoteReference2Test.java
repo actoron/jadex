@@ -21,17 +21,19 @@ public class RemoteReference2Test extends TestCase
 {
 	public void	testRemoteReference()
 	{
-		long timeout	= 30000;
+		long timeout	= 3000000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		
 		// Start platform1 used for remote access. (underscore in name assures both platforms use same password)
 		IExternalAccess	platform1	= Starter.createPlatform(new String[]{"-platformname", "testcases_1",
-			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false"
+//			"-relaytransport", "false",
+			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
 			}).get(sus, timeout);
 		
 		// Start platform2 with services. (underscore in name assures both platforms use same password)
 		IExternalAccess	platform2	= Starter.createPlatform(new String[]{"-platformname", "testcases_2",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-gui", "false", "-awareness", "false", "-printpass", "false",
+//			"-relaytransport", "false",
 			"-component", "jadex/launch/test/remotereference/SearchServiceProviderAgent.class",
 			"-component", "jadex/launch/test/remotereference/LocalServiceProviderAgent.class"}).get(sus, timeout);
 		
@@ -61,7 +63,7 @@ public class RemoteReference2Test extends TestCase
 		assertEquals(service1, service2);
 
 		// Kill platforms and end test case.
-		platform1.killComponent().get(sus, timeout);
 		platform2.killComponent().get(sus, timeout);
+		platform1.killComponent().get(sus, timeout);
 	}
 }

@@ -1,14 +1,16 @@
 package jadex.android.benchmarks;
 
-import java.util.UUID;
-
 import jadex.base.Starter;
+import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
+
+import java.util.UUID;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -100,16 +102,18 @@ public class JadexPlatformService	extends Service	implements IJadexPlatformServi
 						"-rspublish", "false",
 						"-kernels", "\"component, micro\"",
 	//					"-tcptransport", "false",
-	//					"-niotcptransport", "false",
+						"-niotcptransport", "false",
 	//					"-relaytransport", "true",
+						"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"grisougarfield.dyndns.org:52339/relay/\"",
 	//					"-relayaddress", "\""+SRelay.DEFAULT_ADDRESS+"\"",
 	//					"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/\"",					
 						"-saveonexit", "false",
 						"-gui", "false",
-						"-autoshutdown", "false",
+						"-autoshutdown", "false"
 	//					"-awamechanisms", "new String[]{\"Relay\"}",
 	//					"-awareness", "false",
-	//					"-usepass", "false"
+	//					"-usepass", "false",
+//						"-binarymessages", "true"
 					}).addResultListener(new DelegationResultListener<IExternalAccess>(platform));
 				}
 			}).start();

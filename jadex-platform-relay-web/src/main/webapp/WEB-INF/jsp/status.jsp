@@ -10,6 +10,7 @@
 	<tr>
 		<th>Platform (Host)</th>
 		<th>Connected Since</th>
+		<th>Scheme</th>
 		<th>Received Messages</th>
 		<th>Avg. Transfer Rate</th>
 	</tr>
@@ -24,6 +25,8 @@
 					<%= infos[i].getId() %> (<%= infos[i].getHost() %>)</td>
 				<td>
 					<%= infos[i].getConnectTime() %></td>
+				<td>
+					<%= infos[i].getScheme() %></td>
 				<td class="number">
 					<%= infos[i].getMessageCount() %> (<%= infos[i].getByteCount() %>)</td>
 				<td class="number">

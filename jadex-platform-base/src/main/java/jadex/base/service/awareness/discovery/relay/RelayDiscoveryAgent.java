@@ -21,7 +21,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
@@ -144,36 +143,46 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 							final List<IComponentIdentifier> receivers = new ArrayList<IComponentIdentifier>();
 							for(int i=0; i<addresses.length; i++)
 							{
-								if(addresses[i].startsWith(SRelay.ADDRESS_SCHEME))
+								for(int j=0; j<SRelay.ADDRESS_SCHEMES.length; j++)
 								{
-									receivers.add(new ComponentIdentifier("__relay"+i,
-										new String[]{addresses[i].endsWith("/") ? addresses[i]+"awareness" : addresses[i]+"/awareness"}));
+									if(addresses[i].startsWith(SRelay.ADDRESS_SCHEMES[j]))
+									{
+										receivers.add(new ComponentIdentifier("__relay"+i,
+											new String[]{addresses[i].endsWith("/") ? addresses[i]+"awareness" : addresses[i]+"/awareness"}));
+									}
 								}
 							}
 							
-							createAwarenessInfo().addResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(fut)
+							if(!receivers.isEmpty())
 							{
-								public void customResultAvailable(final AwarenessInfo awainfo)
+								createAwarenessInfo().addResultListener(new ExceptionDelegationResultListener<AwarenessInfo, Void>(fut)
 								{
-									sending	= false;	// Subsequent updates trigger new send.
-									awainfo.setDelay(-1);	// no delay required
-									if(offline)
-										awainfo.setState(AwarenessInfo.STATE_OFFLINE);
-									
-									Map<String, Object> msg = new HashMap<String, Object>();
-									msg.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(), receivers);
-									msg.put(SFipa.CONTENT, awainfo);
-									
-									// TODO: Binary/XML branch
-									//if g
-									msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);	// Todo: remove need for nested codecs!?
-									
-									ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE,
-										agent.getComponentIdentifier(), agent.getModel().getResourceIdentifier(),
-										new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID}) // Use fixed codecs to avoid complex	codec handling in servlet
-										.addResultListener(new DelegationResultListener<Void>(fut));
-								}
-							});
+									public void customResultAvailable(final AwarenessInfo awainfo)
+									{
+										sending	= false;	// Subsequent updates trigger new send.
+										awainfo.setDelay(-1);	// no delay required
+										if(offline)
+											awainfo.setState(AwarenessInfo.STATE_OFFLINE);
+										
+										Map<String, Object> msg = new HashMap<String, Object>();
+										msg.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(), receivers);
+										msg.put(SFipa.CONTENT, awainfo);
+										
+										// TODO: Binary/XML branch
+										//if g
+										msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);	// Todo: remove need for nested codecs!?
+										
+										ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE,
+											agent.getComponentIdentifier(), agent.getModel().getResourceIdentifier(),
+											new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID}) // Use fixed codecs to avoid complex	codec handling in servlet
+											.addResultListener(new DelegationResultListener<Void>(fut));
+									}
+								});
+							}
+							else
+							{
+								fut.setResult(null);
+							}
 						}
 					});
 				}

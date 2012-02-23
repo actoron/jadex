@@ -118,7 +118,7 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	{
 		if(nosteps)
 		{
-			((Future)step[1]).setException(new ComponentTerminatedException(getComponentAdapter().getComponentIdentifier()));
+			((Future)step[1]).setException(new ComponentTerminatedException(getComponentAdapter().getComponentIdentifier(), ""+step[0]));
 		}
 		else
 		{
@@ -324,19 +324,45 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 		return classloader;
 	}
 	
+//	/**
+//	 *  Overridden to abort remaining steps on cleanup.
+//	 */
+//	public IFuture<Void> terminateExtensions()
+//	{
+//		nosteps	= true;
+//		ComponentTerminatedException ex = new ComponentTerminatedException(getComponentAdapter().getComponentIdentifier());
+//		while(steps!=null && !steps.isEmpty())
+//		{
+//			Object[] step = (Object[])steps.remove(0);
+//			Future<Void> future = (Future<Void>)step[1];
+//			future.setException(ex);
+//		}
+//		return super.terminateExtensions();
+//	}
+
 	/**
 	 *  Overridden to abort remaining steps on cleanup.
 	 */
-	public IFuture<Void> terminateExtensions()
+	public IFuture<Void> terminateServiceContainer()
 	{
-		nosteps	= true;
-		ComponentTerminatedException ex = new ComponentTerminatedException(getComponentAdapter().getComponentIdentifier());
-		while(steps!=null && !steps.isEmpty())
+		final Future<Void>	ret	= new Future<Void>();
+		super.terminateServiceContainer()
+			.addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			Object[] step = (Object[])steps.remove(0);
-			Future<Void> future = (Future<Void>)step[1];
-			future.setException(ex);
-		}
-		return super.terminateExtensions();
+			public void customResultAvailable(Void result)
+			{
+				nosteps	= true;
+				ComponentTerminatedException ex = new ComponentTerminatedException(getComponentAdapter().getComponentIdentifier());
+				while(steps!=null && !steps.isEmpty())
+				{
+					Object[] step = (Object[])steps.remove(0);
+					Future<Void> future = (Future<Void>)step[1];
+					future.setException(ex);
+				}
+				ret.setResult(null);
+			}
+		});
+		
+		return ret;
 	}
 }

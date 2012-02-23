@@ -120,7 +120,7 @@ public class RelayServlet extends HttpServlet
 				PlatformInfo	info	= platforms.get(id);
 				if(info==null)
 				{
-					info	= new PlatformInfo(id, request.getRemoteHost());
+					info	= new PlatformInfo(id, request.getRemoteHost(), request.getScheme());
 					platforms.put(id, info);
 				}
 				else

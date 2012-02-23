@@ -126,6 +126,8 @@
 		"/>
 
 	<property name="exclude-jadex-commons" value="
+		ColorCodec.java,
+		ImageCodec.java,
 		BrowserPane.java,
 		CombiIcon.java,
 		EditableListEvent.java,

@@ -40,7 +40,7 @@ public class NIOTCPTransport implements ITransport
 	//-------- constants --------
 	
 	/** The schema name. */
-	public static final String SCHEMA = "nio-mtp://";
+	public static final String[] SCHEMAS = new String[]{"tcp-mtp://"};
 	
 	/** How long to keep connections alive (5 min). */
 	protected static final int	MAX_KEEPALIVE	= 300000;
@@ -119,7 +119,10 @@ public class NIOTCPTransport implements ITransport
 			this.addresses	= new String[addresses.length];
 			for(int i=0; i<addresses.length; i++)
 			{
-				this.addresses[i]	= getAddress(addresses[i], port);
+				for(int j=0; j<getServiceSchemas().length; j++)
+				{
+					this.addresses[i]	= getAddress(getServiceSchemas()[j], addresses[i], port);
+				}
 			}
 			
 			// Start receiver thread.
@@ -178,7 +181,10 @@ public class NIOTCPTransport implements ITransport
 			String[]	raddrs	= task.getReceivers()[i].getAddresses();
 			for(int j=0; !ret && j<raddrs.length; j++)
 			{
-				ret	= raddrs[j].toLowerCase().startsWith(getServiceSchema());
+				for(int k=0; !ret && k<getServiceSchemas().length; k++)
+				{
+					ret	= raddrs[j].toLowerCase().startsWith(getServiceSchemas()[k]);
+				}
 			}			
 		}
 		return ret;
@@ -257,9 +263,9 @@ public class NIOTCPTransport implements ITransport
 	 *  Returns the prefix of this transport
 	 *  @return Transport prefix.
 	 */
-	public String getServiceSchema()
+	public String[] getServiceSchemas()
 	{
-		return SCHEMA;
+		return SCHEMAS;
 	}
 	
 	/**
@@ -280,9 +286,9 @@ public class NIOTCPTransport implements ITransport
 	 *  @param port The port.
 	 *  @return <scheme>:<hostname>:<port>
 	 */
-	protected String getAddress(String hostname, int port)
+	protected String getAddress(String schema, String hostname, int port)
 	{
-		return getServiceSchema()+hostname+":"+port;
+		return schema+hostname+":"+port;
 	}
 	
 	/**
@@ -290,33 +296,36 @@ public class NIOTCPTransport implements ITransport
 	 *  @param address The address string.
 	 *  @return The parsed address.
 	 */
-	protected static InetSocketAddress	parseAddress(String address)
+	protected InetSocketAddress	parseAddress(String address)
 	{
 		InetSocketAddress	ret	= null;
 		address = address.toLowerCase();
 		
-		if(address.startsWith(SCHEMA))
-		{		
-			try
-			{
-				int schemalen = SCHEMA.length();
-				int div = address.lastIndexOf(':');
-				String hostname;
-				int port;
-				if(div>schemalen)
+		for(int i=0; i<getServiceSchemas().length; i++)
+		{
+			if(address.startsWith(getServiceSchemas()[i]))
+			{		
+				try
 				{
-					hostname = address.substring(schemalen, div);
-					port = Integer.parseInt(address.substring(div+1));
+					int schemalen = getServiceSchemas()[i].length();
+					int div = address.lastIndexOf(':');
+					String hostname;
+					int port;
+					if(div>schemalen)
+					{
+						hostname = address.substring(schemalen, div);
+						port = Integer.parseInt(address.substring(div+1));
+					}
+					else
+					{
+						hostname = address.substring(schemalen);
+						port = DEFAULT_PORT;
+					}
+					ret	= new InetSocketAddress(hostname, port);
 				}
-				else
-				{
-					hostname = address.substring(schemalen);
-					port = DEFAULT_PORT;
+				catch(Exception e)
+				{ 
 				}
-				ret	= new InetSocketAddress(hostname, port);
-			}
-			catch(Exception e)
-			{ 
 			}
 		}
 		

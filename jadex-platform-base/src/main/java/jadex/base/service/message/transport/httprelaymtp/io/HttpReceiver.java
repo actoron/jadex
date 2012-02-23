@@ -25,6 +25,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
 /**
  *  The receiver connects to the relay server
  *  and accepts messages.
@@ -88,6 +92,20 @@ public class HttpReceiver
 //											System.out.println("Connecting to: "+url);
 											con	= (HttpURLConnection)url.openConnection();
 											con.setUseCaches(false);
+											
+//											// Hack!!! Do not validate server (todo: enable/disable by platform argument).
+//											if(con instanceof HttpsURLConnection)
+//											{
+//												HttpsURLConnection httpscon = (HttpsURLConnection) con;  
+//										        httpscon.setHostnameVerifier(new HostnameVerifier()  
+//										        {        
+//										            public boolean verify(String hostname, SSLSession session)  
+//										            {  
+//										                return true;  
+//										            }  
+//										        });												
+//											}
+											
 											InputStream	in	= con.getInputStream();
 											while(true)
 											{

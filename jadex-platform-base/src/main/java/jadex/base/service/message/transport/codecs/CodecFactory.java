@@ -55,11 +55,13 @@ public class CodecFactory
 		codecclasses = SCollection.createHashMap();
 		codeccache = SCollection.createHashMap();
 		if(codecs==null)
+		{
 			/* $if !android $ */
 			codecs = new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class};
 			/* $else $
-		codecs = new Class[]{SerialCodec.class, NuggetsCodec.class, JadexXMLCodec.class, GZIPCodec.class};
+			codecs = new Class[]{SerialCodec.class, NuggetsCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class};
 			$endif $ */
+		}
 		for(int i=0; i<codecs.length; i++)
 		{
 			addCodec(codecs[i]);

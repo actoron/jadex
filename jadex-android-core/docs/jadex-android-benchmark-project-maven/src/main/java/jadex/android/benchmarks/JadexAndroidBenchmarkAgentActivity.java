@@ -103,8 +103,9 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 			if(item.getItemId()==R.id.remote || item.getItemId()==R.id.remotecodec)
 			{
 				args.put("echo", new ComponentIdentifier("echo@echo",
-					new String[]{SRelay.DEFAULT_ADDRESS}));
+//					new String[]{SRelay.DEFAULT_ADDRESS}));
 //					new String[]{SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/"}));
+					new String[]{SRelay.ADDRESS_SCHEME+"grisougarfield.dyndns.org:52339/relay/"}));
 			}
 			
 			runBenchmark(agent, args).addResultListener(new IResultListener<Collection<Tuple2<String, Object>>>()

@@ -27,7 +27,7 @@ public class Future<E> implements IFuture<E>
 	//-------- constants --------
 	
 	/** Notification stack for unwinding call stack to topmost future. */
-	protected static ThreadLocal<List<Tuple2<Future<?>, IResultListener<?>>>>	STACK	= new ThreadLocal<List<Tuple2<Future<?>,IResultListener<?>>>>();
+	public static ThreadLocal<List<Tuple2<Future<?>, IResultListener<?>>>>	STACK	= new ThreadLocal<List<Tuple2<Future<?>,IResultListener<?>>>>();
 	
 	/** A caller is queued for suspension. */
 	protected final String	CALLER_QUEUED	= "queued";

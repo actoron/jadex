@@ -33,9 +33,11 @@ public class BinarySerializer
 		ENCODER_HANDLERS.add(new EnumerationCodec());
 		ENCODER_HANDLERS.add(new MultiCollectionCodec());
 		ENCODER_HANDLERS.add(new MapCodec());
+		/* $if !android $ */
 		ENCODER_HANDLERS.add(new ColorCodec());
-		ENCODER_HANDLERS.add(new URLCodec());
 		ENCODER_HANDLERS.add(new ImageCodec());
+		/* $endif $ */
+		ENCODER_HANDLERS.add(new URLCodec());
 		ENCODER_HANDLERS.add(new TupleCodec());
 		ENCODER_HANDLERS.add(new InetAddressCodec());
 		ENCODER_HANDLERS.add(new LoggingLevelCodec());

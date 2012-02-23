@@ -379,34 +379,40 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	public IFuture<Void> serviceShutdowned(final IInternalService service)
 	{
 		final Future<Void> ret = new Future<Void>();
-		ProvidedServiceInfo info = getProvidedServiceInfo(service.getServiceIdentifier());
-		final PublishInfo pi = info==null? null: info.getPublish();
-//		System.out.println("shutdown ser: "+service.getServiceIdentifier());
-		if(pi!=null)
-		{
-			final IServiceIdentifier sid = service.getServiceIdentifier();
-//			getPublishService(instance, pi.getPublishType(), null).addResultListener(instance.createResultListener(new IResultListener<IPublishService>()
-			getPublishService(instance, pi.getPublishType(), null).addResultListener(new IResultListener<IPublishService>()
-			{
-				public void resultAvailable(IPublishService ps)
+//		adapter.invokeLater(new Runnable()
+//		{
+//			public void run()
+//			{
+				ProvidedServiceInfo info = getProvidedServiceInfo(service.getServiceIdentifier());
+				final PublishInfo pi = info==null? null: info.getPublish();
+//				System.out.println("shutdown ser: "+service.getServiceIdentifier());
+				if(pi!=null)
 				{
-					ps.unpublishService(sid).addResultListener(new DelegationResultListener<Void>(ret));
+					final IServiceIdentifier sid = service.getServiceIdentifier();
+//					getPublishService(instance, pi.getPublishType(), null).addResultListener(instance.createResultListener(new IResultListener<IPublishService>()
+					getPublishService(instance, pi.getPublishType(), null).addResultListener(new IResultListener<IPublishService>()
+					{
+						public void resultAvailable(IPublishService ps)
+						{
+							ps.unpublishService(sid).addResultListener(new DelegationResultListener<Void>(ret));
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+			//				instance.getLogger().severe("Could not unpublish: "+sid+" "+exception.getMessage());
+							
+							// ignore, if no publish info
+							ret.setResult(null);
+							// todo: what if publish info but no publish service?
+						}
+					});
 				}
-				
-				public void exceptionOccurred(Exception exception)
+				else
 				{
-	//				instance.getLogger().severe("Could not unpublish: "+sid+" "+exception.getMessage());
-					
-					// ignore, if no publish info
 					ret.setResult(null);
-					// todo: what if publish info but no publish service?
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(null);
-		}
+				}				
+//			}
+//		});
 		return ret;
 	}
 	

@@ -32,6 +32,7 @@ public class JCCTest extends TestCase
 		long timeout	= 30000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		final IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "testcases",
+//			"-logging_level", "java.util.logging.Level.INFO",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-printpass", "false"}).get(sus, timeout);
 		
 		IComponentManagementService	cms	= (IComponentManagementService)SServiceProvider

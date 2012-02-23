@@ -682,6 +682,10 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		executing	= true;
 		wokenup	= false;	
 		
+//		if(instantiated && Future.STACK.get()!=null)
+//		{
+//			System.out.println("futurestack in adapter!");
+//		}
 		// Note: wakeup() can be called from arbitrary threads (even when the
 		// component itself is currently running. I.e. it cannot be ensured easily
 		// that an execution task is enqueued and the component has terminated

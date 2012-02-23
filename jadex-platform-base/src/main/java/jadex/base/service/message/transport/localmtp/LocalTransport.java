@@ -22,7 +22,7 @@ public class LocalTransport implements ITransport
 	//-------- constants --------
 	
 	/** The schema name. */
-	public final static String SCHEMA = "local-mtp://";
+	public final static String[] SCHEMAS = new String[]{"local-mtp://"};
 	
 	//-------- attributes --------
 	
@@ -123,9 +123,9 @@ public class LocalTransport implements ITransport
 	 *  Returns the prefix of this transport
 	 *  @return Transport prefix.
 	 */
-	public String getServiceSchema()
+	public String[] getServiceSchemas()
 	{
-		return "local:";
+		return SCHEMAS;
 	}
 	
 	/**

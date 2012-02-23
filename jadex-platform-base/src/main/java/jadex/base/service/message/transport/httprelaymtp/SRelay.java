@@ -9,10 +9,13 @@ public class SRelay
 	//-------- constants --------
 	
 	/** Relay address scheme. */
-	public static final String	ADDRESS_SCHEME	= "relay-http://";
+	public static final String[]	ADDRESS_SCHEMES	= new String[]{"relay-http://", "relay-https://"};
+	
+	/** The default ports corresponding to the address schemes (http=80, https=443). */
+	public static final int[]	DEFAULT_PORTS	= new int[]{80, 443};
 	
 	/** Default relay address. */
-	public static final String	DEFAULT_ADDRESS	= ADDRESS_SCHEME+"jadex.informatik.uni-hamburg.de/relay/";
+	public static final String	DEFAULT_ADDRESS	= "relay-http://jadex.informatik.uni-hamburg.de/relay/";
 	
 	/** The default message type (followed by arbitrary message content from some sender). */
 	public static final byte	MSGTYPE_DEFAULT	= 1;

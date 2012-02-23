@@ -44,10 +44,10 @@ public interface ITransport
 	public void	sendMessage(ISendTask task);
 	
 	/**
-	 *  Returns the prefix of this transport
-	 *  @return Transport prefix.
+	 *  Returns the prefixes of this transport
+	 *  @return Transport prefixes.
 	 */
-	public String getServiceSchema();
+	public String[] getServiceSchemas();
 	
 	/**
 	 *  Get the addresses of this transport.
