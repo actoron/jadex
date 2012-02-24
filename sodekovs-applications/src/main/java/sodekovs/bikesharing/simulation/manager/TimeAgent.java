@@ -22,7 +22,7 @@ public class TimeAgent extends MicroAgent{
 	private IComponentStep timeProcess;
 	
 	@Override
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		System.out.println("Here we go my new TimeAgent!");
 		timeProcess = new IComponentStep() {
@@ -73,6 +73,7 @@ public class TimeAgent extends MicroAgent{
 			}
 		};
 		waitForTick(timeProcess);
+		return IFuture.DONE;
 		
 	}
 }

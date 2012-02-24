@@ -11,7 +11,7 @@ public class ZeitAgent extends MicroAgent
 	private IComponentStep r;
 	
 	@Override
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		System.out.println("Starte Zeitagent");
 		r = new IComponentStep() {
@@ -26,6 +26,7 @@ public class ZeitAgent extends MicroAgent
 			}
 		};
 		waitForTick(r);
+		return IFuture.DONE;
 		
 	}
 }

@@ -4,6 +4,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
@@ -39,9 +40,10 @@ import jadex.simulation.analysis.service.highLevel.IAGeneralPlanningService;
 public class GeneralAnalysisAgent extends MicroAgent
 {
 	@Override
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		IAGeneralAnalysisProcessService service = (IAGeneralAnalysisProcessService) SServiceProvider.getService(getServiceProvider(), IAGeneralAnalysisProcessService.class).get(new ThreadSuspendable(this));
 		service.analyse(null);
+		return IFuture.DONE;
 	}
 }

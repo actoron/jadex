@@ -27,7 +27,8 @@ public class ExampleMicroAgent extends MicroAgent {
 	}
 
 	@Override
-	public void executeBody() {
+	public IFuture<Void> executeBody() {
+		return IFuture.DONE;
 	}
 
 	public class ReceiveHelloStep extends CoordinationComponentStep {

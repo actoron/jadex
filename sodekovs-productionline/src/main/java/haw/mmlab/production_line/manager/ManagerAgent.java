@@ -160,11 +160,12 @@ public class ManagerAgent extends MicroAgent {
 	}
 
 	@Override
-	public void executeBody() {
+	public IFuture<Void> executeBody() {
 		getLogger().info("Manager agent is writing the statistics to the database and creating the log files");
 		logManager.beforeSimulation(confFile);
 		getLogger().info("Manager agent is starting the agents");
 		startAgents();
+		return IFuture.DONE;
 	}
 
 	@Override

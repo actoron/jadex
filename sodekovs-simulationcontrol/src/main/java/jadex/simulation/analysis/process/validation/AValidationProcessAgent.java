@@ -2,6 +2,7 @@ package jadex.simulation.analysis.process.validation;
 
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;
@@ -24,9 +25,10 @@ import jadex.simulation.analysis.service.highLevel.IAValidationProcessService;
 public class AValidationProcessAgent extends MicroAgent
 {
 	@Override
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		IAValidationProcessService service = (IAValidationProcessService) SServiceProvider.getService(getServiceProvider(), IAValidationProcessService.class).get(new ThreadSuspendable(this));
 		service.validate(null);
+		return IFuture.DONE;
 	}
 }

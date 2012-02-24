@@ -27,7 +27,8 @@ public class ExampleMicroAgent extends MicroAgent {
 	}
 
 	@Override
-	public void executeBody() {
+	public IFuture<Void> executeBody() {
+		return IFuture.DONE;
 //		System.out.println("ExampleMicroAgent executeBody() called.");
 //		waitFor(2300 , new SayHelloStep("Hello, I'm the example micro agent and it is nice to chat with you!"));
 //		new SayHelloStep("Hello, I'm the example micro agent and it is nice to chat with you!").execute(this);

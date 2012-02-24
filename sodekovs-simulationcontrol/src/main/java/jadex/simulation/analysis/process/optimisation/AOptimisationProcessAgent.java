@@ -2,6 +2,7 @@ package jadex.simulation.analysis.process.optimisation;
 
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;
@@ -24,9 +25,10 @@ import jadex.simulation.analysis.service.highLevel.IAOptimisationProcessService;
 public class AOptimisationProcessAgent extends MicroAgent
 {
 	@Override
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		IAOptimisationProcessService service = (IAOptimisationProcessService) SServiceProvider.getService(getServiceProvider(), IAOptimisationProcessService.class).get(new ThreadSuspendable(this));
 		service.optimize(null);
+		return IFuture.DONE;
 	}
 }

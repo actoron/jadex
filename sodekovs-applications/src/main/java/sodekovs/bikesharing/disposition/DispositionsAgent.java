@@ -60,7 +60,7 @@ public abstract class DispositionsAgent extends MicroAgent
 		_raeder = new LinkedList<Fahrrad>();
 	}
 
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		System.out.println("Starte Dispositionsagent " + this.getClass());
 
@@ -109,6 +109,7 @@ public abstract class DispositionsAgent extends MicroAgent
 						});
 					}
 				}));
+		return IFuture.DONE;
 
 	}
 

@@ -65,7 +65,7 @@ public class VerkehrsmittelAgent extends MicroAgent
 		_schritte = 10000;
 	}
 
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		IExternalAccess	paexta = (IExternalAccess)getParentAccess();
 		paexta.getExtension("simulationsspace")
@@ -91,6 +91,7 @@ public class VerkehrsmittelAgent extends MicroAgent
 				waitForTick(r);
 			}
 		}));
+		return IFuture.DONE;
 	}
 	
 	private synchronized void vorBerechnungen()

@@ -41,7 +41,7 @@ public class EndstationsAgent extends MicroAgent
 	private long _endzeit;
 
 	@Override
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		// System.out.println("Starte Endstationsagent");
 //		IApplicationExternalAccess app = (IApplicationExternalAccess) getParent();
@@ -81,6 +81,7 @@ public class EndstationsAgent extends MicroAgent
 				waitForTick(r);
 			}
 		}));
+		return IFuture.DONE;
 
 	}
 

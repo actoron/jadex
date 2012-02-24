@@ -2,6 +2,7 @@ package jadex.simulation.analysis.application.jadex;
 
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
@@ -26,7 +27,7 @@ import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimen
 public class JadexAgent extends MicroAgent
 {
 	@Override
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		IAExecuteExperimentsService service = (IAExecuteExperimentsService) SServiceProvider.getService(getServiceProvider(), IAExecuteExperimentsService.class).get(new ThreadSuspendable(this));
 		IAExperiment experiment = AExperimentFactory.createTestAExperiment(Modeltype.Jadex);
@@ -52,6 +53,7 @@ public class JadexAgent extends MicroAgent
 				
 			}
 		});
+		return IFuture.DONE;
 		
 	}
 

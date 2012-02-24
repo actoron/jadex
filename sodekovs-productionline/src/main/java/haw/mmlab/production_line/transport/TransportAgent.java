@@ -88,7 +88,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 	}
 
 	@Override
-	public void executeBody() {
+	public IFuture<Void> executeBody() {
 		for (Role role : assignedRoles) {
 			// is producer role
 			if (role.getPrecondition().getTargetAgent() == null) {
@@ -98,6 +98,7 @@ public class TransportAgent extends ProcessWorkpieceAgent {
 				waitForTick(step);
 			}
 		}
+		return IFuture.DONE;
 	}
 
 	/**

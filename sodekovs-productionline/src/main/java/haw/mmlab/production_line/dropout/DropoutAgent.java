@@ -81,7 +81,7 @@ public class DropoutAgent extends MicroAgent {
 	 * @see jadex.micro.MicroAgent#executeBody()
 	 */
 	@Override
-	public void executeBody() {
+	public IFuture<Void> executeBody() {
 		for (Configuration conf : config.getConfigurations()) {
 			if (conf.getRate() == 0) {
 				waitForTick(new QueryStep(conf));
@@ -89,6 +89,7 @@ public class DropoutAgent extends MicroAgent {
 				waitFor(conf.getRate() * 1000, new QueryStep(conf));
 			}
 		}
+		return IFuture.DONE;
 	}
 
 	private class QueryStep implements IComponentStep<Void> {

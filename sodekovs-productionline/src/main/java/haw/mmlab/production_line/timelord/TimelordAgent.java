@@ -34,7 +34,7 @@ public class TimelordAgent extends MicroAgent {
 	}
 
 	@Override
-	public void executeBody() {
+	public IFuture<Void> executeBody() {
 		databaseLogger.setIntervalTime(time);
 		time++;
 
@@ -45,6 +45,7 @@ public class TimelordAgent extends MicroAgent {
 		} else {
 			waitFor(interval, step);
 		}
+		return IFuture.DONE;
 	}
 
 	/**
