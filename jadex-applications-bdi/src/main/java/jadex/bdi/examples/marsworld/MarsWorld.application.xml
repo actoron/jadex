@@ -370,7 +370,7 @@
 					<env:drawable3d objecttype="carry" width="0.075" height="0.075" depth="0.075">
 				 	<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.05f,$object.getProperty("vision").doubleValue()*10)</env:property>
 						<env:sphere  size="visionsize"  x="0" y="0.00" z="0"  color="#FFFF0040" />
-						 <env:object3d modelpath="jadex/bdi/examples/marsworld/Models/gabelstapler/gabel.obj" /> 
+						 <env:object3d modelpath="jadex/bdi/examples/marsworld/models/carrier/carrier.obj" /> 
 
 						<env:box width="0.2" height="0.2" depth="0.2"  x="0.4" y="0.2" z="0.0"  color="#FFA54FFF">
 							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
