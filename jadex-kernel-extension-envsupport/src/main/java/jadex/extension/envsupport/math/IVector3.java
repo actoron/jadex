@@ -303,5 +303,6 @@ public interface IVector3
 	 * @return true if the vectors are equal
 	 */
 	public boolean equals(IVector3 vector);
+
 }
 

@@ -140,6 +140,11 @@ public interface IVector2
 	 *
 	 *  @return vector length
 	 */
+	public double getInnerProductAsDouble(IVector2 vector);
+	/** Returns the length (magnitude) of the vector.
+	 *
+	 *  @return vector length
+	 */
 	public IVector1 getLength();
 	
 	/** Returns the squared length (magnitude) of the vector.
@@ -147,6 +152,25 @@ public interface IVector2
 	 *  @return squared vector length
 	 */
 	public IVector1 getSquaredLength();
+	
+	/** Returns the direction (theta) of the vector.
+	 *
+	 *  @return vector direction
+	 */
+	public IVector1 getDirection(IVector2 vector);
+	
+	/** Returns the direction (theta) of the vector as float.
+	 *
+	 *  @return vector direction as float
+	 */
+	public float getDirectionAsFloat(IVector2 vector);
+	
+	/** Returns the direction (theta) of the vector as double.
+	 *
+	 *  @return vector direction as double
+	 */
+	public double getDirectionAsDouble(IVector2 vector);
+	
 	
 	/** Returns the direction (theta) of the vector.
 	 *

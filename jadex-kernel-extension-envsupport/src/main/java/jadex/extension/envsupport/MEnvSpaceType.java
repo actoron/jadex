@@ -15,15 +15,25 @@ import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
+import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable.Primitive;
 import jadex.extension.envsupport.observer.graphics.drawable.RegularPolygon;
 import jadex.extension.envsupport.observer.graphics.drawable.Text;
 import jadex.extension.envsupport.observer.graphics.drawable.TexturedRectangle;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Object3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Cylinder3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Dome3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Torus3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Sky3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Terrain3d;
 import jadex.extension.envsupport.observer.graphics.layer.GridLayer;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
 import jadex.extension.envsupport.observer.graphics.layer.TiledLayer;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 import jadex.extension.envsupport.observer.perspective.Perspective2D;
+import jadex.extension.envsupport.observer.perspective.Perspective3D;
 import jadex.javaparser.IExpressionParser;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
@@ -96,7 +106,6 @@ public class MEnvSpaceType
 	}
 
 	/**
-	 *  Set the name.
 	 *  @param name The name to set.
 	 */
 	public void setName(String name)
@@ -465,12 +474,43 @@ public class MEnvSpaceType
 						}
 						((Perspective2D) ret).setPostlayers((Layer[]) targetpostlayers.toArray(new Layer[0]));
 					}
-					
+										
+					if(ret instanceof Perspective3D)
+					{
+						Perspective3D pers = (Perspective3D)ret;
+						Boolean invertx = (Boolean)getProperty(args, "invertxaxis");
+						pers.setInvertYAxis(invertx.booleanValue());
+						Boolean inverty = (Boolean)getProperty(args, "invertyaxis");
+						pers.setInvertYAxis(inverty.booleanValue());
+						
+						
+						String	placement	= (String)getProperty(args, "objectplacement");
+						if(OBJECTPLACEMENT_CENTER.equals(placement))
+							pers.setObjectShift(new Vector2Double(0.5));
+						
+						List drawables3d = (List)args.get("drawables3d");
+						if(drawables3d!=null)
+						{
+							for(int k=0; k<drawables3d.size(); k++)
+							{
+								Map sourcedrawable3d = (Map)drawables3d.get(k);
+								Map tmp = new HashMap();
+								tmp.put("fetcher", fetcher);
+								tmp.put("object", sourcedrawable3d);
+								ret.addVisual(getProperty(sourcedrawable3d, "objecttype"), 
+									((IObjectCreator)getProperty(sourcedrawable3d, "creator")).createObject(tmp));
+								
+							}
+						}
+						
+					}
+
 					return ret;
 				}
 			}, new BeanAccessInfo(AccessInfo.THIS)))
 			},
 			new SubobjectInfo[]{
+			new SubobjectInfo(new AccessInfo(new QName(uri, "drawable3d"), "drawables3d", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new SubobjectInfo(new AccessInfo(new QName(uri, "drawable"), "drawables", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "prelayers"), new QName(uri, "gridlayer")}), new AccessInfo(new QName(uri, "gridlayer"), "prelayers", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "prelayers"), new QName(uri, "tiledlayer")}), new AccessInfo(new QName(uri, "tiledlayer"), "prelayers", null, null, new BeanAccessInfo(AccessInfo.THIS))),
@@ -479,6 +519,859 @@ public class MEnvSpaceType
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "postlayers"), new QName(uri, "tiledlayer")}), new AccessInfo(new QName(uri, "tiledlayer"), "postlayers", null, null, new BeanAccessInfo(AccessInfo.THIS))),
 			new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "postlayers"), new QName(uri, "colorlayer")}), new AccessInfo(new QName(uri, "colorlayer"), "postlayers", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "drawable3d")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(ti_po, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("objecttype", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("y", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("z", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("initialrotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("initialrotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("initialrotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("hasSpaceobject", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						IValueFetcher fetcher = (IValueFetcher)args.get("fetcher");
+						args = (Map)args.get("object");
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),
+								(Double)getProperty(args, "z"));
+						}				
+						Object rotation = getProperty(args, "rotation");
+						if(rotation==null)
+						{
+							Double rx = (Double)getProperty(args, "rotatex");
+							Double ry = (Double)getProperty(args, "rotatey");
+							Double rz = (Double)getProperty(args, "rotatez");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						}
+						Object size = getProperty(args, "size");
+						if(size==null)
+						{
+							size = Vector3Double.getVector3((Double)getProperty(args, "width"),
+								(Double)getProperty(args, "height"),
+								(Double)getProperty(args, "depth"));
+						}
+						Boolean hasSpaceobject = (Boolean)getProperty(args, "hasSpaceobject");
+						if(hasSpaceobject==null)
+						{
+							hasSpaceobject = true;
+						}
+						DrawableCombiner3d ret = new DrawableCombiner3d(position, rotation, size, (boolean)hasSpaceobject);
+						
+						List parts = (List)args.get("parts");
+						if(parts!=null)
+						{
+							for(int l=0; l<parts.size(); l++)
+							{
+								Map sourcepart = (Map)parts.get(l);
+								ret.addPrimitive((Primitive3d)((IObjectCreator)getProperty(sourcepart, "creator")).createObject(sourcepart));
+							}
+						}
+						
+						List props = (List)args.get("properties");
+						setProperties(ret, props, fetcher);
+						
+						return ret;
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "sphere"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "box"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "cylinder"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "dome"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "torus"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "object3d"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "arrow"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "text3d"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "sky"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "terrain"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new SubobjectInfo(new AccessInfo(new QName(uri, "rndterrain"), "parts", null, null, new BeanAccessInfo(AccessInfo.THIS))),		
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "box")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("z", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),(Double)getProperty(args, "z"));
+						}		
+						Object rotation = getProperty(args, "rotation");
+						if(rotation==null)
+						{
+							Double rx = (Double)getProperty(args, "rotatex");
+							Double ry = (Double)getProperty(args, "rotatey");
+							Double rz = (Double)getProperty(args, "rotatez");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						}
+						Object size = getProperty(args, "size");
+						if(size==null)
+						{
+							size = Vector3Double.getVector3((Double)getProperty(args, "width"),
+								(Double)getProperty(args, "height"),
+								(Double)getProperty(args, "depth"));
+						}
+						int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+						
+						String texturepath = (String)getProperty(args, "texturepath");
+						if(texturepath==null)
+						{
+							texturepath = "";
+						}
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_BOX, position, rotation, size, absFlags, getProperty(args, "color"), texturepath, exp);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "sphere")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("z", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),(Double)getProperty(args, "z"));
+						}			
+						Object rotation = getProperty(args, "rotation");
+						if(rotation==null)
+						{
+							Double rx = (Double)getProperty(args, "rotatex");
+							Double ry = (Double)getProperty(args, "rotatey");
+							Double rz = (Double)getProperty(args, "rotatez");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						}
+						Object size = getProperty(args, "size");
+						if(size==null)
+						{
+							size = Vector3Double.getVector3((Double)getProperty(args, "width"),
+								(Double)getProperty(args, "height"),
+								(Double)getProperty(args, "depth"));
+						}
+						int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+						String texturepath = (String)getProperty(args, "texturepath");
+						if(texturepath==null)
+						{
+							texturepath = "";
+						}
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_SPHERE, position, rotation, size, absFlags, getProperty(args, "color"), texturepath, exp);
+						//return new Rectangle(position, rotation, size, absFlags, getProperty(args, "color"), exp);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "cylinder")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("z", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("radius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),(Double)getProperty(args, "z"));
+						}
+						Object rotation = getProperty(args, "rotation");
+						if(rotation==null)
+						{
+							Double rx = (Double)getProperty(args, "rotatex");
+							Double ry = (Double)getProperty(args, "rotatey");
+							Double rz = (Double)getProperty(args, "rotatez");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						}
+						Object size = getProperty(args, "size");
+						if(size==null)
+						{
+							size = Vector3Double.getVector3(new Double(1),new Double(1),new Double(1));
+						}
+						int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+						
+						Double radius = (Double)getProperty(args, "radius");
+						Double height = (Double)getProperty(args, "height");
+						String texturepath = (String)getProperty(args, "texturepath");
+						if(texturepath==null)
+						{
+							texturepath = "";
+						}
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+						return new Cylinder3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, radius, height, exp);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "dome")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("z", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("radius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("planes", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("samples", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),(Double)getProperty(args, "z"));
+						}				
+						Object rotation = getProperty(args, "rotation");
+						if(rotation==null)
+						{
+							Double rx = (Double)getProperty(args, "rotatex");
+							Double ry = (Double)getProperty(args, "rotatey");
+							Double rz = (Double)getProperty(args, "rotatez");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						}
+						Object size = getProperty(args, "size");
+						Double width = (Double)getProperty(args, "width");
+						Double height= (Double)getProperty(args, "height");
+						Double depth= (Double)getProperty(args, "height");
+						
+						if(size==null && (width==null || height == null || depth == null) )
+						{
+							
+							size = Vector3Double.getVector3(new Double(1),new Double(1),new Double(1));
+	
+						}
+						else if(size==null)
+						{
+							size = Vector3Double.getVector3((Double)getProperty(args, "width"),
+									(Double)getProperty(args, "height"),
+									(Double)getProperty(args, "depth"));
+						}
+						int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+						
+						Double radius = (Double)getProperty(args, "radius");
+						Integer samples = (Integer)getProperty(args, "samples");
+						if(samples==null)
+						{
+							samples = 4;
+						}
+						Integer planes = (Integer)getProperty(args, "planes");
+						if(planes==null)
+						{
+							planes = 2;
+						}
+						String texturepath = (String)getProperty(args, "texturepath");
+						if(texturepath==null)
+						{
+							texturepath = "";
+						}
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+						return new Dome3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, radius, (int)samples, (int)planes, exp);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "torus")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("z", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("innerRadius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("outerRadius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("circleSamples", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("radialSamples", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),(Double)getProperty(args, "z"));
+						}			
+						Object rotation = getProperty(args, "rotation");
+						if(rotation==null)
+						{
+							Double rx = (Double)getProperty(args, "rotatex");
+							Double ry = (Double)getProperty(args, "rotatey");
+							Double rz = (Double)getProperty(args, "rotatez");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						}
+						Object size = getProperty(args, "size");
+						Double width = (Double)getProperty(args, "width");
+						Double height= (Double)getProperty(args, "height");
+						Double depth= (Double)getProperty(args, "depth");
+						
+						if(size==null && (width==null || height == null || depth == null) )
+						{
+							
+							size = Vector3Double.getVector3(new Double(1),new Double(1),new Double(1));
+	
+						}
+						else if(size==null)
+						{
+							// HACK because of Rotation in TorusJMonkeyRenderer
+							size = Vector3Double.getVector3((Double)getProperty(args, "width"),
+									(Double)getProperty(args, "height"),
+									(Double)getProperty(args, "depth"));
+						}
+						int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+						
+						Double innerRadius = (Double)getProperty(args, "innerRadius");
+						Double outerRadius = (Double)getProperty(args, "outerRadius");
+						
+						Integer circleSamples = (Integer)getProperty(args, "circleSamples");
+						Integer radialSamples = (Integer)getProperty(args, "radialSamples");
+						if(circleSamples==null)
+						{
+							circleSamples = 40;
+						}
+						if(radialSamples==null)
+						{
+							radialSamples = 20;
+						}
+						String texturepath = (String)getProperty(args, "texturepath");
+						if(texturepath==null)
+						{
+							texturepath = "";
+						}
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+						return new Torus3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, innerRadius, outerRadius, (int)circleSamples, (int)radialSamples, exp);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "object3d")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("z", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("modelpath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),(Double)getProperty(args, "z"));
+						}			
+						Object rotation = getProperty(args, "rotation");
+						if(rotation==null)
+						{
+							Double rx = (Double)getProperty(args, "rotatex");
+							Double ry = (Double)getProperty(args, "rotatey");
+							Double rz = (Double)getProperty(args, "rotatez");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						}
+						Object size = getProperty(args, "size");
+						if(size==null)
+						{
+							size = Vector3Double.getVector3((Double)getProperty(args, "width"),
+								(Double)getProperty(args, "height"),
+								(Double)getProperty(args, "depth"));
+						}
+						int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+						
+						String texturepath = (String)getProperty(args, "texturepath");
+						if(texturepath==null)
+						{
+							texturepath = "";
+						}
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+
+						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), texturepath, exp);
+//						//////////////
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "arrow")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("z", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),(Double)getProperty(args, "z"));
+						}		
+						Object rotation = getProperty(args, "rotation");
+						if(rotation==null)
+						{
+							Double rx = (Double)getProperty(args, "rotatex");
+							Double ry = (Double)getProperty(args, "rotatey");
+							Double rz = (Double)getProperty(args, "rotatez");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						}
+						Object size = getProperty(args, "size");
+						if(size==null)
+						{
+							size = Vector3Double.getVector3((Double)getProperty(args, "width"),
+								(Double)getProperty(args, "height"),
+								(Double)getProperty(args, "depth"));
+						}
+						else if(size instanceof Double)
+						{
+							size = new Vector3Double((Double)size);
+						}
+						int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+						String texturepath = (String)getProperty(args, "texturepath");
+						if(texturepath==null)
+						{
+							texturepath = "";
+						}
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+						return new Primitive3d(Primitive3d.PRIMITIVE_TYPE_ARROW, position, rotation, size, absFlags, getProperty(args, "color"), texturepath, exp);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "text3d")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("z", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("abspos", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("abssize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("absrot", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
+				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("text", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),(Double)getProperty(args, "z"));
+						}	
+						Object rotation = getProperty(args, "rotation");
+						if(rotation==null)
+						{
+							Double rx = (Double)getProperty(args, "rotatex");
+							Double ry = (Double)getProperty(args, "rotatey");
+							Double rz = (Double)getProperty(args, "rotatez");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						}
+						Object size = getProperty(args, "size");
+						if(size==null)
+						{
+							size = Vector3Double.getVector3((Double)getProperty(args, "width"),
+								(Double)getProperty(args, "height"),
+								(Double)getProperty(args, "depth"));
+						}
+						int absFlags = Boolean.TRUE.equals(getProperty(args, "abspos"))? Primitive.ABSOLUTE_POSITION : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "abssize"))? Primitive.ABSOLUTE_SIZE : 0;
+						absFlags |= Boolean.TRUE.equals(getProperty(args, "absrot"))? Primitive.ABSOLUTE_ROTATION : 0;
+						String texturepath = (String)getProperty(args, "texturepath");
+						if(texturepath==null)
+						{
+							texturepath = "";
+						}
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+						return new Text3d(position, rotation, size, absFlags, getProperty(args, "color"), texturepath, (String)getProperty(args, "text"), exp);
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "sky")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("skyfile", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("skypath", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("west", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("east", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("north", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("south", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("up", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("down", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("isSphere", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						
+						String skyfile = (String)getProperty(args, "skyfile");
+						String skypath = (String)getProperty(args, "skypath");
+						String west = (String)getProperty(args, "west");
+						String east = (String)getProperty(args, "east");
+						String north = (String)getProperty(args, "north");
+						String south = (String)getProperty(args, "south");
+						String up = (String)getProperty(args, "up");
+						String down = (String)getProperty(args, "down");
+						if(skyfile==null)
+						{
+							skyfile = "Textures/Sky/Bright/BrightSky.dds";
+						}
+						boolean isSphere = (Boolean)getProperty(args, "isSphere");
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+						
+
+						return new Sky3d(skyfile, isSphere, skypath, west, east, north, south, up, down, exp);
+//						//////////////
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "terrain")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("z", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("terrapath", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("alphamap", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("heightmap", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("texture01", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("texture02", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("texture03", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("texture04", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("texture05", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("tex01val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("tex02val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("tex03val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("tex04val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("tex05val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("patchsize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("picsize", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),(Double)getProperty(args, "z"));
+						}	
+						Object rotation = getProperty(args, "rotation");
+						if(rotation==null)
+						{
+							Double rx = (Double)getProperty(args, "rotatex");
+							Double ry = (Double)getProperty(args, "rotatey");
+							Double rz = (Double)getProperty(args, "rotatez");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						}
+						Object size = getProperty(args, "size");
+						if(size==null)
+						{
+							size = Vector3Double.getVector3((Double)getProperty(args, "width"),
+								(Double)getProperty(args, "height"),
+								(Double)getProperty(args, "depth"));
+						}
+						String 			terrapath = (String)getProperty(args, "terrapath");
+						String 			heightmap = (String)getProperty(args, "heightmap");
+						String			alphamap = (String)getProperty(args, "alphamap");
+						String			texture01 = (String)getProperty(args, "texture01");
+						String			texture02 = (String)getProperty(args, "texture02");
+						String			texture03 = (String)getProperty(args, "texture03");
+						String			texture04 = (String)getProperty(args, "texture04");
+						String			texture05 = (String)getProperty(args, "texture05");
+						Integer			tex01val = (Integer)getProperty(args, "tex01val");
+						Integer			tex02val = (Integer)getProperty(args, "tex02val");
+						Integer			tex03val = (Integer)getProperty(args, "tex03val");
+						Integer			tex04val = (Integer)getProperty(args, "tex04val");
+						Integer			tex05val = (Integer)getProperty(args, "tex05val");
+						
+						Integer patchsize = (Integer)getProperty(args, "patchsize");
+						Integer picsize = (Integer)getProperty(args, "picsize");
+						
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+						
+
+						return new Terrain3d(position, rotation, size, terrapath, alphamap, heightmap, texture01, texture02, texture03, texture04, texture05, tex01val, tex02val, tex03val, tex04val, tex05val, patchsize, picsize);
+//						//////////////
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "rndterrain")}), new ObjectInfo(MultiCollection.class),
+				new MappingInfo(null, new AttributeInfo[]{
+						new AttributeInfo(new AccessInfo("x", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+						new AttributeInfo(new AccessInfo("y", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+						new AttributeInfo(new AccessInfo("z", null, null,null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+						new AttributeInfo(new AccessInfo("rotatex", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+						new AttributeInfo(new AccessInfo("rotatey", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+						new AttributeInfo(new AccessInfo("rotatez", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+						new AttributeInfo(new AccessInfo("width", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+						new AttributeInfo(new AccessInfo("height", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+						new AttributeInfo(new AccessInfo("depth", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.DOUBLE_CONVERTER, null)),
+						new AttributeInfo(new AccessInfo("position", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+						new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+						new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("tiles", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("terrapath", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("alphamap", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("iterations", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("minradius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("maxradius", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("seed", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("texture01", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("texture02", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("texture03", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("texture04", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("texture05", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.STRING_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("tex01val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("tex02val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("tex03val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("tex04val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("tex05val", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.INTEGER_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
+				{
+					public Object createObject(Map args) throws Exception
+					{
+						Object position = getProperty(args, "position");
+						if(position==null)
+						{
+							position = Vector3Double.getVector3((Double)getProperty(args, "x"),
+								(Double)getProperty(args, "y"),(Double)getProperty(args, "z"));
+						}	
+						Object rotation = getProperty(args, "rotation");
+						if(rotation==null)
+						{
+							Double rx = (Double)getProperty(args, "rotatex");
+							Double ry = (Double)getProperty(args, "rotatey");
+							Double rz = (Double)getProperty(args, "rotatez");
+							rotation = Vector3Double.getVector3(rx!=null? rx: new Double(0), ry!=null? ry: new Double(0), rz!=null? rz: new Double(0));
+						}
+						Object size = getProperty(args, "size");
+						if(size==null)
+						{
+							size = Vector3Double.getVector3((Double)getProperty(args, "width"),
+								(Double)getProperty(args, "height"),
+								(Double)getProperty(args, "depth"));
+						}
+						String 			terrapath = (String)getProperty(args, "terrapath");
+						String			alphamap = (String)getProperty(args, "alphamap");
+						String			texture01 = (String)getProperty(args, "texture01");
+						String			texture02 = (String)getProperty(args, "texture02");
+						String			texture03 = (String)getProperty(args, "texture03");
+						String			texture04 = (String)getProperty(args, "texture04");
+						String			texture05 = (String)getProperty(args, "texture05");
+						Integer			tex01val = (Integer)getProperty(args, "tex01val");
+						Integer			tex02val = (Integer)getProperty(args, "tex02val");
+						Integer			tex03val = (Integer)getProperty(args, "tex03val");
+						Integer			tex04val = (Integer)getProperty(args, "tex04val");
+						Integer			tex05val = (Integer)getProperty(args, "tex05val");
+						Integer tiles = (Integer)getProperty(args, "tiles");
+						Integer iterations = (Integer)getProperty(args, "iterations");
+						Integer minradius = (Integer)getProperty(args, "minradius");
+						Integer maxradius = (Integer)getProperty(args, "maxradius");
+						Integer seed = (Integer)getProperty(args, "seed");
+
+						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
+						
+
+						return new Terrain3d(position, rotation, size, tiles, iterations, minradius, maxradius, seed, terrapath, alphamap, texture01, texture02, texture03, texture04, texture05, tex01val, tex02val, tex03val, tex04val, tex05val);
+//						//////////////
+					}
+				}, new BeanAccessInfo(AccessInfo.THIS)))
+				},
+				new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
+				})));
 		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "drawable")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(ti_po, new AttributeInfo[]{
@@ -898,6 +1791,8 @@ public class MEnvSpaceType
 			new SubobjectInfo(new AccessInfo(new QName(uri, "drawcondition"), null, null, null, new BeanAccessInfo(AccessInfo.THIS)), suexconv)
 			})));
 		
+		
+		
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "gridlayer")}), new ObjectInfo(MultiCollection.class),
 			new MappingInfo(null, new AttributeInfo[]{
 			new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
@@ -1076,6 +1971,16 @@ public class MEnvSpaceType
 			new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
 			new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
 			})));
+		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "drawable3d"), new QName(uri, "property")}), new ObjectInfo(HashMap.class), 
+				new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),
+				new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("name", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("class", "clazz", null, null, new BeanAccessInfo(AccessInfo.THIS)), attypeconv),
+				new AttributeInfo(new AccessInfo("dynamic", null, null, Boolean.FALSE, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null))
+				})));
+	
+
 
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "spaceexecutor"), new QName(uri, "property")}), new ObjectInfo(HashMap.class),
 			new MappingInfo(null, null, new AttributeInfo(new AccessInfo("value", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), atexconv),

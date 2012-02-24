@@ -4,11 +4,13 @@ import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.gui.plugin.IObserverCenterPlugin;
 import jadex.extension.envsupport.observer.gui.plugin.IntrospectorPlugin;
 import jadex.extension.envsupport.observer.gui.plugin.VisualsPlugin;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 import jadex.extension.envsupport.observer.perspective.Perspective2D;
+import jadex.extension.envsupport.observer.perspective.Perspective3D;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -19,16 +21,19 @@ import jadex.commons.IChangeListener;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -76,7 +81,7 @@ public class ObserverCenter
 	private String selecteddataviewname;
 	
 	/** Perspectives */
-	private Map perspectives;
+	private Map<String, IPerspective> perspectives;
 	
 	/** Selected Perspective */
 	private IPerspective selectedperspective;
@@ -190,6 +195,33 @@ public class ObserverCenter
 				});
 				plugintimer.start();
 								
+				//TODO: find a better solution for closing app´s in the Background
+				mainwindow.addWindowListener(new WindowAdapter() {
+		            
+		            public void windowClosing(WindowEvent e) {
+//						System.out.println("window closing!");
+						IPerspective p = getSelectedPerspective();
+						if (p instanceof Perspective3D)
+						{
+
+							((Perspective3D) p).getViewport().stopApp();
+							perspectives.remove(p);
+						}
+						
+						// Close all the App´s in the Background
+						Set<String> keys = perspectives.keySet();
+						
+						for(String key : keys)
+						{
+							IPerspective pp = perspectives.get(key);
+							if (pp instanceof Perspective3D)
+							{
+								((Perspective3D) pp).getViewport().stopApp();
+							}
+							
+						}
+		            }
+		        });
 				mainwindow.addWindowListener(new ObserverWindowController());
 				
 				mainwindow.addWindowStateListener(new WindowStateListener()
@@ -371,18 +403,42 @@ public class ObserverCenter
 	 * 
 	 *  @param name name of the perspective
 	 */
+	//TODO: Clean up here!
 	public void setSelectedPerspective(final String name)
 	{
 		if(SwingUtilities.isEventDispatchThread())
 		{
 			synchronized(perspectives)
 			{
+
+				IPerspective selp = getSelectedPerspective();
+
+				if(selp!=null)
+				
+				if (selp instanceof Perspective3D)
+				{
+					if(!selp.getName().equals(name))
+					{
+						
+						((Perspective3D) selp).getViewport().pauseApp();
+				        try {
+				            Thread.sleep(1000);
+				        } catch (InterruptedException ex) {
+				        }
+				        
+					}
+
+				}
+			
 				IPerspective perspective = (IPerspective)perspectives.get(name);
 				perspective.setObserverCenter(this);
 				selectedperspective = perspective;
 				mainwindow.setPerspectiveView(perspective.getView());
 				perspective.setSelectedObject(null);
+				
+			
 			}
+			
 		}
 		else
 		{
@@ -392,6 +448,7 @@ public class ObserverCenter
 				{
 					synchronized(perspectives)
 					{
+						System.out.println("------------------------RUNNABLE C_HANGE---------------------");
 						IPerspective perspective = (IPerspective)perspectives.get(name);
 						perspective.setObserverCenter(ObserverCenter.this);
 						selectedperspective = perspective;
@@ -716,6 +773,7 @@ public class ObserverCenter
 		
 		public void windowClosed(WindowEvent e)
 		{
+			getSelectedPerspective().shutdown();
 		}
 		
 		public void windowClosing(WindowEvent e)

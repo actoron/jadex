@@ -725,7 +725,7 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 		return viewport;
 	}
 	
-	private class SelectionController implements IViewportListener
+	class SelectionController implements IViewportListener
 	{
 		public void leftClicked(IVector2 position)
 		{
@@ -766,5 +766,12 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 				setSelectedObject(closest.get(selectCycle));
 			}
 		}
+	}
+
+	@Override
+	public void shutdown()
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

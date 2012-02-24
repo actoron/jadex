@@ -47,6 +47,14 @@ public interface IVector1
 	 *  Calculate the modulo.
 	 *  @return The modulo value.
 	 */
+	
+	
+	/**
+	 *  Calculate the cube root.
+	 *  @return The cube root.
+	 */
+	public IVector1 cbrt();
+	
 	public IVector1 mod(IVector1 mod);
 	
 	/** Returns the distance to another vector

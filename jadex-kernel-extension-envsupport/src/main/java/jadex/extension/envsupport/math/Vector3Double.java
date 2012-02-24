@@ -61,7 +61,7 @@ public class Vector3Double implements IVector3, Cloneable
 	{
 		x_ = vector.getXAsDouble();
 		y_ = vector.getYAsDouble();
-		y_ = vector.getZAsDouble();
+		z_ = vector.getZAsDouble();
 		return this;
 	}
 	
@@ -109,7 +109,7 @@ public class Vector3Double implements IVector3, Cloneable
 	{
 		x_ -= vector.getXAsDouble();
 		y_ -= vector.getYAsDouble();
-		y_ -= vector.getZAsDouble();
+		z_ -= vector.getZAsDouble();
 		return this;
 	}
 	
@@ -186,6 +186,7 @@ public class Vector3Double implements IVector3, Cloneable
 		z_ = -z_;
 		return this;
 	}
+	
 
 	public IVector3 negate()
 	{

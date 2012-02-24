@@ -295,7 +295,7 @@ public class Vector2Int implements IVector2
 	{
 		return new Vector1Double((x_ * x_) + (y_ * y_));
 	}
-	
+		
 	/** Returns the direction (theta) of the vector.
 	 *
 	 *  @return vector direction
@@ -542,4 +542,30 @@ public class Vector2Int implements IVector2
 			ret = a.intValue()==0 && b.intValue()==0? ZERO: new Vector2Int(a.intValue(), b.intValue());
 		return ret;
 	}
+
+	@Override
+	public double getInnerProductAsDouble(IVector2 vector) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public IVector1 getDirection(IVector2 vector) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double getDirectionAsDouble(IVector2 vector) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public float getDirectionAsFloat(IVector2 vector) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
 }

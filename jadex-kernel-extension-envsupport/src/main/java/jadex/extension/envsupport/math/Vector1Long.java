@@ -91,6 +91,16 @@ public class Vector1Long implements IVector1
 	}
 	
 	/**
+	 *  Calculate the cbrt root.
+	 *  @return The cbrt root.
+	 */
+	public IVector1 cbrt()
+	{
+		x_ = (long)Math.cbrt(x_);
+		return this;
+	}
+	
+	/**
 	 *  Calculate the modulo.
 	 *  @return The modulo value.
 	 */

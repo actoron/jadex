@@ -248,4 +248,10 @@ public class Vector1Int implements IVector1
 	{
 		return Integer.toString(x_);
 	}
+
+	@Override
+	public IVector1 cbrt() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -23,6 +23,7 @@ import javax.swing.JToolBar;
  */
 public class ObserverCenterWindow extends JFrame
 {
+	
 	/** The menubar
 	 */
 	private JMenuBar menubar;
@@ -78,6 +79,8 @@ public class ObserverCenterWindow extends JFrame
 				setLocation(SGUI.calculateMiddlePosition(ObserverCenterWindow.this));
 				setVisible(true);
 				mainpane.setDividerLocation(250);
+				
+
 			}
 		};
 		

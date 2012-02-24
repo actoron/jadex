@@ -215,7 +215,7 @@ public class Vector2Double implements IVector2, Cloneable
 	{
 		return new Vector1Double((x_ * x_) + (y_ * y_));
 	}
-
+	
 	public IVector1 getDirection()
 	{
 		return new Vector1Double(Math.atan2(y_, x_));
@@ -366,6 +366,13 @@ public class Vector2Double implements IVector2, Cloneable
 		return (int)x_*31 + (int)y_;
 	}
 	
+	
+	public Vector3Double getVector3DoubleValueNoHight()
+	{
+		return new Vector3Double(x_, 0,  y_);
+		
+	}
+	
 	public String toString()
 	{
 		StringBuffer buffer = new StringBuffer();
@@ -404,6 +411,37 @@ public class Vector2Double implements IVector2, Cloneable
 		else if (a!=null || b !=null)
 			ret = new Vector2Double(a == null? 0.0:a.doubleValue(), b == null? 0.0:b.doubleValue());
 		return ret;
+	}
+
+
+
+	@Override
+	public double getInnerProductAsDouble(IVector2 vector) {
+		
+		double bx = vector.getXAsDouble();
+		double by = vector.getYAsDouble();
+		
+		return (x_*bx)+(y_*by);
+	}
+
+	@Override
+	public IVector1 getDirection(IVector2 vector) {
+		
+		return null;
+	}
+
+	@Override
+	public double getDirectionAsDouble(IVector2 vector) {
+		double qa = Math.sqrt(x_*x_ + y_*y_);
+		double qb = Math.sqrt(vector.getXAsDouble()*vector.getXAsDouble() + vector.getYAsDouble()*vector.getYAsDouble());
+		
+		return Math.cos(getInnerProductAsDouble(vector)/(qa*qb));
+	}
+
+	@Override
+	public float getDirectionAsFloat(IVector2 vector) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }
 
