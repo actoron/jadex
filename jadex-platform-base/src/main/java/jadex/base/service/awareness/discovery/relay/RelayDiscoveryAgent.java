@@ -41,7 +41,7 @@ import java.util.Map;
 @Agent
 @Arguments(
 {
-	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="false", description="Set if the agent should send binary messages as default."),
+	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="false", description="Set if the agent should send binary messages as default.")
 })
 @ProvidedServices(@ProvidedService(type=IRelayAwarenessService.class,
 	implementation=@Implementation(expression="$component.getPojoAgent()")))

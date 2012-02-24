@@ -83,8 +83,19 @@ public class ParallelAgentCreationAgent extends MicroAgent
 											{
 												String name = createPeerName(i);
 //												IComponentIdentifier cid = cms.createComponentIdentifier(name, true, null);
-												IComponentIdentifier cid = new ComponentIdentifier(name, getComponentIdentifier().getRoot());
-												cms.destroyComponent(cid);	// Kill listener already added on create.
+												final IComponentIdentifier cid = new ComponentIdentifier(name, getComponentIdentifier().getRoot());
+												cms.destroyComponent(cid).addResultListener(new IResultListener<Map<String, Object>>()
+												{
+													public void resultAvailable(Map<String, Object> result)
+													{
+														System.out.println("Successfully destroyed peer: "+cid);
+													}
+													
+													public void exceptionOccurred(Exception exception)
+													{
+														// Ignore: Kill listener already added on create.	
+													};
+												});
 											}		
 											return IFuture.DONE;
 										}
@@ -160,14 +171,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 										}
 									});
 								}
-							})
-							{
-								public void intermediateResultAvailable(Object result)
-								{
-									// todo: result?! = cid
-									System.out.println("Successfully destroyed peer: "+result);
-								}
-							};
+							});
 							
 							Map	args	= new HashMap();
 							args.put("num", new Integer(0));

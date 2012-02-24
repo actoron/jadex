@@ -46,7 +46,7 @@ import java.util.Map;
 //@Properties(@NameValue(name="logging.level", value="java.util.logging.Level.INFO"))
 @Arguments(
 {
-	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="false", description="Set if the agent should send binary messages as default."),
+	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="false", description="Set if the agent should send binary messages as default.")
 })
 public class RemoteServiceManagementAgent extends MicroAgent
 {
