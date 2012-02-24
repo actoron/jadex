@@ -33,7 +33,7 @@ public class BicyclistAgent extends MicroAgent {
 	 * @see jadex.micro.MicroAgent#executeBody()
 	 */
 	@Override
-	public void executeBody() {
+	public IFuture<Void> executeBody() {
 		this.getRequiredService("mapservice").addResultListener(new IResultListener() {
 
 			@Override
@@ -57,6 +57,7 @@ public class BicyclistAgent extends MicroAgent {
 				exception.printStackTrace();
 			}
 		});
+		return IFuture.DONE;
 	}
 
 	/*

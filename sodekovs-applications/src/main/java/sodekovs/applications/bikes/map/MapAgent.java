@@ -38,9 +38,10 @@ public class MapAgent extends MicroAgent {
 	 * @see jadex.micro.MicroAgent#executeBody()
 	 */
 	@Override
-	public void executeBody() {
+	public IFuture<Void> executeBody() {
 		// TODO Auto-generated method stub
 		super.executeBody();
+		return IFuture.DONE;
 	}
 
 	/* (non-Javadoc)

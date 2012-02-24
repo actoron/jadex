@@ -36,7 +36,7 @@ import java.util.UUID;
 public class OptJTestAgent extends MicroAgent
 {
 	@Override
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		IAOptimisationService service = (IAOptimisationService) SServiceProvider.getService(getServiceProvider(), IAOptimisationService.class).get(new ThreadSuspendable(this));
 		AParameterEnsemble ensConf = new AParameterEnsemble("config");
@@ -91,6 +91,7 @@ public class OptJTestAgent extends MicroAgent
 			batch = (AExperimentBatch) service.nextSolutions(session, batch).get(new ThreadSuspendable(this));
 			System.out.println(batch);
 		}
+		return IFuture.DONE;
 		
 	}
 
