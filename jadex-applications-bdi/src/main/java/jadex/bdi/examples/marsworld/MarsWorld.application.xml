@@ -59,11 +59,21 @@
 		<env:envspacetype name="2dspace" class="ContinuousSpace2D" width="1" height="1">
 			<env:objecttypes>
 				<env:objecttype name="target">
+					<env:property name="tick360" class="double" dynamic="true">$properties.clock.getTick()%360
+					</env:property>	
+					<env:property name="abbau" class="boolean" dynamic="true">								
+						$object.getProperty("state").equals("analyzed")
+						&amp;&amp; ($object.getProperty("ore")!=0 &amp;&amp; $object.getProperty("capacity")!=0)
+					</env:property>
 					<env:property name="ore" class="int">0</env:property>
 					<env:property name="capacity" class="int">0</env:property>
 					<env:property name="state" class="String">"unknown"</env:property>
 				</env:objecttype>
 				<env:objecttype name="sentry">
+				<env:property name="tick360" class="double" dynamic="true">$properties.clock.getTick()%360
+					</env:property>	
+					<env:property name="radarsize" class="Vector3Double" dynamic="true">new Vector3Double(0.1*(($properties.clock.getTick())%10),0.01,0.1*(($properties.clock.getTick())%10))
+					</env:property>	
 					<env:property name="vision" class="double">0.1</env:property>
 					<env:property name="speed" class="double">0.05</env:property>
 					<env:property name="position" class="IVector2" dynamic="true">$space.getSpaceObjectsByType("homebase")[0].getProperty("position")</env:property>
@@ -106,6 +116,8 @@
 				<env:avatarmapping componenttype="Producer" objecttype="producer"/>
 				<env:avatarmapping componenttype="Carry" objecttype="carry"/>
 			</env:avatarmappings>
+			
+			
 			
 			<env:perspectives>
 				<env:perspective name="icons" class="Perspective2D" opengl="true">
@@ -177,7 +189,407 @@
 						<env:tiledlayer width="0.6" height="0.6" imagepath="jadex/bdi/examples/marsworld/images/mars.png" />
 					</env:prelayers>
 				</env:perspective>
+				
+			<!-- 3d Perspective	- SIMPLE
+			
+
+			
+			
+			-->
+			
+			
+			<env:perspective name="Primitives3D" class="Perspective3D" opengl="true" >
+
+				<!-- Statisch -->
+				<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
+				<env:property name="rotate90" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+					 <env:cylinder height="0.01" radius="0.75" rotation="rotate90" x="0" y="-0.005" z="0" color="#EEE5DEFF" />
+				</env:drawable3d>
+				
+	
+				<env:drawable3d objecttype="test" width="1" height="1" depth="1">
+				<env:property name="rotate" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+				<env:torus width="1" height="1" depth="6" innerRadius="0.02" rotation="rotate" outerRadius="0.99" x="-1" y="0.12" z="1" color="#D02090FF"></env:torus>
+				
+				</env:drawable3d>
+				
+				<!-- H O M E B A S E -->
+				<env:drawable3d objecttype="homebase" width="0.1" height="0.1" depth="0.1">
+					<env:property name="oresize" dynamic="true">new Vector3Double(0.72f,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/1000.0),0.72f)</env:property>
+					<env:property name="textda" dynamic="true">$object.getProperty("text")</env:property>
+					<env:property name="rotate" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+				
+					<env:torus width="1" height="1" depth="6" innerRadius="0.02" rotation="rotate" outerRadius="0.99" x="-1" y="0.12" z="1" color="#D02090FF"   ></env:torus>
+					
+					<!--Box für Erz -->
+					<env:box  width="1" height="0.01" depth="1" x="-1" y="0.01" z="1" color="#D2B48CFF" />
+
+					<env:box  width="0.001" height="0.15" depth="1.0" x="-2" y="0.15" z="1" color="#FF7F24FF" />
+					<env:box  width="1.0" height="0.15" depth="0.01" x="-1" y="0.15" z="2" color="#FF7F24FF" />
+
+					<env:sphere size="oresize" x="-1" y="0" z="1"  color="#FFA54FFF">
+							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+					</env:sphere>
+					<env:sphere  width="0.1" height="0.1" depth="0.1"  x="0" y="0.6" z="2" color="#FF4040FF" />
+					<env:sphere  width="0.1" height="0.1" depth="0.1"  x="-2" y="0.6" z="2" color="#FF4040FF" />
+					<env:sphere  width="0.1" height="0.1" depth="0.1"  x="-2" y="0.6" z="0" color="#FF4040FF" />	
+					<env:dome  radius="0.1" x="0" y="0.8" z="2" color="#FFB5C5FF" />
+					<env:dome  radius="0.1" x="-2" y="0.8" z="2" color="#FFB5C5FF" />
+					<env:dome  radius="0.1" x="-2" y="0.8" z="0" color="#FFB5C5FF" />
+	
+					<env:arrow  width="0.0" height="0.9" depth="0.0"  x="0" y="0.0" z="2" color="#97FFFFFF" />
+					<env:arrow  width="0.0" height="0.9" depth="0.0"  x="-2" y="0.0" z="2" color="#97FFFFFF" />
+					<env:arrow  width="0.0" height="0.9" depth="0.0"  x="-2" y="0.0" z="0" color="#97FFFFFF" />				
+				
+					<!--Erzabladepunkt -->
+					<env:sphere  width="0.2" height="0.05" depth="0.2" color="#B22222FF" />
+					<env:sphere  width="0.5" height="0.01" depth="0.5" color="#FFD700FF" />
+					<env:box  width="0.75" height="0.005" depth="0.75" color="#DCDCDCFF" />
+				
+
+				</env:drawable3d>
+				
+				<!--ERZVORKOMMEN  -->
+				<env:drawable3d objecttype="target" width="0.05" height="0.05" depth="0.05">
+				  	<env:property name="oresize" dynamic="true">new Vector3Double(0.5,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/2000.0),0.5)</env:property>
+				  	<env:property name="capa" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/400.0))</env:property>
+					<env:property name="rotate90" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+					<env:property name="rotated" dynamic="true">new Vector3Double((Math.PI/180)*$object.getProperty("tick360")*8, 0, 0)</env:property>
+					<env:property name="rotate45d" dynamic="true">new Vector3Double((Math.PI/180)*$object.getProperty("tick360")*8-45, 0, 0)</env:property>
+					<env:property name="rotate90d" dynamic="true">new Vector3Double((Math.PI/180)*$object.getProperty("tick360")*8-90, 0, 0)</env:property>
+					<env:property name="rotate135d" dynamic="true">new Vector3Double((Math.PI/180)*$object.getProperty("tick360")*8-135,0, 0)</env:property>
+
+						<!--Erzvorkommen  -->
+						<env:sphere size="oresize" color="#FFA54FFF" x="1" y="-0.5" z="-1" >
+							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+						</env:sphere>
+						
+						<!-- Nullpunkt  -->
+						<env:sphere width="0.02" height="0.02" depth="0.02" x="0" y="0" z="0" color="#FFB90FFF" />
+						
+						<!--Abgebautes erz  -->
+						<env:sphere size="capa"  x="-1" y="0" z="1" color="#FFB90FFF">
+							<env:drawcondition>((Number)$object.getProperty("capacity")).intValue()>0</env:drawcondition>
+						</env:sphere>
+						
+						<!-- Markierung  -->
+						<env:cylinder height="1" radius="0.05" rotation="rotate90" x="1" y="0.5" z="1" color="#FFFF00FF" >
+							<env:drawcondition>
+								$object.getProperty("state").equals("analyzed")
+								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
+							</env:drawcondition>
+						</env:cylinder>
+						<env:dome radius="0.1" samples="30" x="1" y="1.0" z="1" color="#FF4500FF" >
+							<env:drawcondition>
+								$object.getProperty("state").equals("analyzed")
+								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
+							</env:drawcondition>
+						</env:dome>
+						
+						<!-- Schaufeleffekt  -->
+						<env:box  width="0.04" height="0.55" depth="0.04" x="0" y="0.4" z="0" rotation="rotated" color="#836FFFFF">						
+							<env:drawcondition>$object.getProperty("abbau")</env:drawcondition>
+						</env:box>
+						<env:box  width="0.04" height="0.45" depth="0.04"  x="0" y="0.4" z="0"  rotation="rotate45d"  color="#836FFFFF">
+							<env:drawcondition>$object.getProperty("abbau")</env:drawcondition>
+						</env:box>
+						<env:box  width="0.04" height="0.55" depth="0.04"  x="0" y="0.4" z="0"   rotation="rotate90d" color="#836FFFFF">
+							<env:drawcondition>$object.getProperty("abbau")</env:drawcondition>
+						</env:box>
+						<env:box  width="0.04" height="0.45" depth="0.04"  x="0" y="0.4" z="0"  rotation="rotate135d" color="#836FFFFF">
+							<env:drawcondition>$object.getProperty("abbau")</env:drawcondition>
+						</env:box>
+
+
+						<!-- Noch nicht Analysiert -->
+						<env:sphere width="0.05" height="0.05" depth="0.05" x="0" y="0" z="0.0" color="#00FF00FF">
+							<env:drawcondition>
+							$object.getProperty("state").equals("unknown")
+							</env:drawcondition>
+				   		</env:sphere>
+						
+						<!-- Endzustand, Analysiert  -->
+						<env:sphere width="0.06" height="0.06" depth="0.06" x="0" y="0" z="0.0" color="#BEBEBEFF">
+				   			<env:drawcondition>
+				   			((Number)$object.getProperty("capacity")).intValue()==0
+				   			&amp;&amp; 
+				   			$object.getProperty("state").equals("analyzed")
+				   			</env:drawcondition>
+				   		</env:sphere>
+				   	
+			</env:drawable3d>
+				
+
+				<env:drawable3d objecttype="sentry" width="0.09" height="0.09" depth="0.09">
+				<env:property name="radarsize2" dynamic="true">$object.getProperty("radarsize")</env:property>
+				<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.001f,$object.getProperty("vision").doubleValue()*10)</env:property>
+				<env:property name="rotate" dynamic="true">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+				<env:property name="roll90" dynamic="false">new Vector3Double(0, (Math.PI/180)*90, 0)</env:property>
+				<env:property name="rotatespoiler" dynamic="false">new Vector3Double(0, 0, (Math.PI/180)*-25)</env:property>
+				<env:property name="rotatedyn" dynamic="true">new Vector3Double(0, (Math.PI/180)*$object.getProperty("tick360")*10, 0)</env:property>
+				
+						<!--  Radarkreisel -->
+						<env:torus rotation="rotatedyn" innerRadius="0.035" outerRadius="0.3" radialSamples="20" circleSamples="40" x="0.05" y="0.7" z="0.0" />
+						<env:box  width="0.45" height="0.01" depth="0.01" rotation="rotatedyn"  x="0.05" y="0.7" z="0.0" />
+						<env:box  width="0.01" height="0.01" depth="0.25" rotation="rotatedyn"  x="0.05" y="0.7" z="0.0"  color="#FF0000FF"/>
+						<env:cylinder rotation="rotate" height="0.5" radius="0.03"  x="0.05" y="0.6" z="0.0" color="#FFFFFFFF"/>
+						
+						<!--Aufbau spoiler -->
+						<env:box  rotation="rotatespoiler" width="0.1" height="0.01" depth="0.3"  x="-0.45" y="0.4" z="0.0" />
+
+						<!--Aufbau auspuffe-->
+						<env:cylinder rotation="roll90" height="0.2" radius="0.05" x="-0.5" y="0.25" z="0.1" />
+						<env:cylinder rotation="roll90" height="0.2" radius="0.05" x="-0.5" y="0.25" z="-0.1"  />
+						
+						<!--Aufbau -->
+						<env:box  width="0.07" height="0.07" depth="0.07" x="0.05" y="0.27" z="0.0" color="#FF6A6AFF" />
+						<env:box  width="0.5" height="0.1" depth="0.2" x="0.0" y="0.2" z="0.0" color="#DCDCDCFF" />
+						
+						
+						<!--Achsen -->
+						<env:box  width="0.01" height="0.01" depth="0.25" x="0.25" y="0.1" z="0.0" color="#000000FF" />
+						<env:box  width="0.01" height="0.01" depth="0.25" x="-0.25" y="0.1" z="0.0" color="#000000FF" />
+						
+						<!--Räder innen -->
+						<env:sphere  width="0.13" height="0.13" depth="0.01" x="0.25" y="0.15" z="0.25" color="#FF4040FF" />
+						<env:sphere  width="0.13" height="0.13" depth="0.01" x="-0.25" y="0.15" z="-0.25" color="#FF4040FF" />
+						<env:sphere  width="0.13" height="0.13" depth="0.01" x="0.25" y="0.15" z="-0.25" color="#FF4040FF" />
+						<env:sphere  width="0.13" height="0.13" depth="0.01" x="-0.25" y="0.15" z="0.25" color="#FF4040FF" />
+						<!--Räder reifen -->
+						<env:torus  innerRadius="0.04" outerRadius="0.11" radialSamples="20" circleSamples="20"  x="0.25" y="0.15" z="0.25"  />
+						<env:torus  innerRadius="0.04" outerRadius="0.11" radialSamples="20" circleSamples="20"  x="-0.25" y="0.15" z="-0.25" />
+						<env:torus  innerRadius="0.04" outerRadius="0.11" radialSamples="20" circleSamples="20"  x="0.25" y="0.15" z="-0.25"  />
+						<env:torus  innerRadius="0.04" outerRadius="0.11" radialSamples="20" circleSamples="20"  x="-0.25" y="0.15" z="0.25"  />
+						<!--Räder mitte -->
+						<env:sphere  width="0.02" height="0.02" depth="0.02" x="0.25" y="0.15" z="0.25" color="#404040FF" />
+						<env:sphere  width="0.02" height="0.02" depth="0.02" x="-0.25" y="0.15" z="-0.25" color="#404040FF" />
+						<env:sphere  width="0.02" height="0.02" depth="0.02" x="0.25" y="0.15" z="-0.25" color="#404040FF" />
+						<env:sphere  width="0.02" height="0.02" depth="0.02" x="-0.25" y="0.15" z="0.25" color="#404040FF" />
+
+						<!--  Sonstiges -->
+						<env:sphere  size="radarsize2" x="0.0" y="0.0" z="0.0" color="#ADFF2F50" />
+						<env:sphere  size="visionsize" x="0.0" y="0.0" z="0.0" color="#FFFF0040" />
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="carry" width="0.075" height="0.075" depth="0.075">
+				 	<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.05f,$object.getProperty("vision").doubleValue()*10)</env:property>
+						<env:sphere  size="visionsize"  x="0" y="0.00" z="0"  color="#FFFF0040" />
+						<env:box  width="0.2" height="0.15" depth="0.15" x="0.0" y="0.15" z="0.0" color="#232323FF" />
+						<env:box width="0.2" height="0.2" depth="0.2"  x="0.4" y="0.2" z="0.0"  color="#FFA54FFF">
+							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+						</env:box>
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="producer" width="0.075" height="0.075" depth="0.075">
+					<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.05f,$object.getProperty("vision").doubleValue()*10)</env:property>
+						<env:box  width="0.2" height="0.15" depth="0.15" x="0.0" y="0.15" z="0.0" color="#002323FF" />
+						<env:box  width="0.1" height="0.10" depth="0.10" x="0.2" y="0.25" z="0.0" color="#FF4040FF" />
+						<env:sphere  size="visionsize" x="0" y="0.00" z="0" color="#FFFF0040" />
+					</env:drawable3d>
+					
+				</env:perspective>
 			</env:perspectives>
+				
+				
+				
+				
+			<env:perspective name="Complex3D" class="Perspective3D" opengl="true" >
+
+				<!-- Statisch -->
+				<env:drawable3d objecttype="static" hasSpaceobject="false" width="1" height="1" depth="1">
+				<env:property name="rotate90" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+
+					<env:sky skypath="jadex/bdi/examples/marsworld/Textures/Sky/space/" west="west.jpg" east="east.jpg" north="north.jpg" south="south.jpg" up="up.jpg" down="down.jpg" isSphere="false" />  
+					 
+							
+					<env:rndterrain width="1" height="0.2" depth="1"  
+		 		tiles="256" iterations="2000" minradius="25" maxradius="100" seed="4"
+					terrapath="jadex/bdi/examples/marsworld/Textures/Terrain/" alphamap="alphamapseed.png" 
+					texture01="grass.jpg" tex01val="64" texture02="dirt.jpg" tex02val="32"/>
+
+				</env:drawable3d>
+				
+				<!-- H O M E B A S E -->
+				<env:drawable3d objecttype="homebase" width="0.1" height="0.1" depth="0.1">
+					<env:property name="oresize" dynamic="true">new Vector3Double(0.72f,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/1000.0),0.72f)</env:property>
+					<env:property name="textda" dynamic="true">$object.getProperty("text")</env:property>
+					<env:property name="rotate" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+				
+					<env:torus width="1" height="1" depth="6" innerRadius="0.02" rotation="rotate" outerRadius="0.99" x="-1" y="0.12" z="1" color="#D02090FF"   ></env:torus>
+					
+					<!--Box für Erz -->
+					<env:box  width="1" height="0.01" depth="1" x="-1" y="0.01" z="1" color="#D2B48CFF" />
+
+					<env:box  width="0.001" height="0.15" depth="1.0" x="-2" y="0.15" z="1" color="#FF7F24FF" />
+					<env:box  width="1.0" height="0.15" depth="0.01" x="-1" y="0.15" z="2" color="#FF7F24FF" />
+
+					<env:sphere size="oresize" x="-1" y="0" z="1"  color="#FFA54FFF">
+							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+					</env:sphere>
+					<env:sphere  width="0.1" height="0.1" depth="0.1"  x="0" y="0.6" z="2" color="#FF4040FF" />
+					<env:sphere  width="0.1" height="0.1" depth="0.1"  x="-2" y="0.6" z="2" color="#FF4040FF" />
+					<env:sphere  width="0.1" height="0.1" depth="0.1"  x="-2" y="0.6" z="0" color="#FF4040FF" />	
+					<env:dome  radius="0.1" x="0" y="0.8" z="2" color="#FFB5C5FF" />
+					<env:dome  radius="0.1" x="-2" y="0.8" z="2" color="#FFB5C5FF" />
+					<env:dome  radius="0.1" x="-2" y="0.8" z="0" color="#FFB5C5FF" />
+	
+					<env:arrow  width="0.0" height="0.9" depth="0.0"  x="0" y="0.0" z="2" color="#97FFFFFF" />
+					<env:arrow  width="0.0" height="0.9" depth="0.0"  x="-2" y="0.0" z="2" color="#97FFFFFF" />
+					<env:arrow  width="0.0" height="0.9" depth="0.0"  x="-2" y="0.0" z="0" color="#97FFFFFF" />				
+				
+					<!--Erzabladepunkt -->
+					<env:sphere  width="0.2" height="0.05" depth="0.2" color="#B22222FF" />
+					<env:sphere  width="0.5" height="0.01" depth="0.5" color="#FFD700FF" />
+					<env:box  width="0.75" height="0.005" depth="0.75" color="#DCDCDCFF" />
+				
+
+				</env:drawable3d>
+				
+				<!--ERZVORKOMMEN  -->
+				<env:drawable3d objecttype="target" width="0.05" height="0.05" depth="0.05">
+				  	<env:property name="oresize" dynamic="true">new Vector3Double(0.5,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/2000.0),0.5)</env:property>
+				  	<env:property name="capa" dynamic="true">new Vector3Double(Math.sqrt(((Number)$object.getProperty("capacity")).intValue()/400.0))</env:property>
+					<env:property name="rotate90" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+					<env:property name="rotated" dynamic="true">new Vector3Double((Math.PI/180)*$object.getProperty("tick360")*8, 0, 0)</env:property>
+					<env:property name="rotate45d" dynamic="true">new Vector3Double((Math.PI/180)*$object.getProperty("tick360")*8-45, 0, 0)</env:property>
+					<env:property name="rotate90d" dynamic="true">new Vector3Double((Math.PI/180)*$object.getProperty("tick360")*8-90, 0, 0)</env:property>
+					<env:property name="rotate135d" dynamic="true">new Vector3Double((Math.PI/180)*$object.getProperty("tick360")*8-135,0, 0)</env:property>
+
+						<!--Erzvorkommen  -->
+						<env:sphere size="oresize" color="#FFA54FFF" x="1" y="-0.5" z="-1" >
+							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+						</env:sphere>
+						
+						<!-- Nullpunkt  -->
+						<env:sphere width="0.02" height="0.02" depth="0.02" x="0" y="0" z="0" color="#FFB90FFF" />
+						
+						<!--Abgebautes erz  -->
+						<env:sphere size="capa"  x="-1" y="0" z="1" color="#FFB90FFF">
+							<env:drawcondition>((Number)$object.getProperty("capacity")).intValue()>0</env:drawcondition>
+						</env:sphere>
+						
+						<!-- Markierung  -->
+						<env:cylinder height="1" radius="0.05" rotation="rotate90" x="1" y="0.5" z="1" color="#FFFF00FF" >
+							<env:drawcondition>
+								$object.getProperty("state").equals("analyzed")
+								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
+							</env:drawcondition>
+						</env:cylinder>
+						<env:dome radius="0.1" samples="30" x="1" y="1.0" z="1" color="#FF4500FF" >
+							<env:drawcondition>
+								$object.getProperty("state").equals("analyzed")
+								&amp;&amp; ($object.getProperty("ore")!=0 || $object.getProperty("capacity")!=0)
+							</env:drawcondition>
+						</env:dome>
+						
+						<!-- Schaufeleffekt  -->
+						<env:box  width="0.04" height="0.55" depth="0.04" x="0" y="0.4" z="0" rotation="rotated" color="#836FFFFF">						
+							<env:drawcondition>$object.getProperty("abbau")</env:drawcondition>
+						</env:box>
+						<env:box  width="0.04" height="0.45" depth="0.04"  x="0" y="0.4" z="0"  rotation="rotate45d"  color="#836FFFFF">
+							<env:drawcondition>$object.getProperty("abbau")</env:drawcondition>
+						</env:box>
+						<env:box  width="0.04" height="0.55" depth="0.04"  x="0" y="0.4" z="0"   rotation="rotate90d" color="#836FFFFF">
+							<env:drawcondition>$object.getProperty("abbau")</env:drawcondition>
+						</env:box>
+						<env:box  width="0.04" height="0.45" depth="0.04"  x="0" y="0.4" z="0"  rotation="rotate135d" color="#836FFFFF">
+							<env:drawcondition>$object.getProperty("abbau")</env:drawcondition>
+						</env:box>
+
+
+						<!-- Noch nicht Analysiert -->
+						<env:sphere width="0.05" height="0.05" depth="0.05" x="0" y="0" z="0.0" color="#00FF00FF">
+							<env:drawcondition>
+							$object.getProperty("state").equals("unknown")
+							</env:drawcondition>
+				   		</env:sphere>
+						
+						<!-- Endzustand, Analysiert  -->
+						<env:sphere width="0.06" height="0.06" depth="0.06" x="0" y="0" z="0.0" color="#BEBEBEFF">
+				   			<env:drawcondition>
+				   			((Number)$object.getProperty("capacity")).intValue()==0
+				   			&amp;&amp; 
+				   			$object.getProperty("state").equals("analyzed")
+				   			</env:drawcondition>
+				   		</env:sphere>
+				   	
+			</env:drawable3d>
+				
+
+				<env:drawable3d objecttype="sentry" width="0.09" height="0.09" depth="0.09">
+				<env:property name="radarsize2" dynamic="true">$object.getProperty("radarsize")</env:property>
+				<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.001f,$object.getProperty("vision").doubleValue()*10)</env:property>
+				<env:property name="rotate" dynamic="true">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
+				<env:property name="roll90" dynamic="false">new Vector3Double(0, (Math.PI/180)*90, 0)</env:property>
+				<env:property name="rotatespoiler" dynamic="false">new Vector3Double(0, 0, (Math.PI/180)*-25)</env:property>
+				<env:property name="rotatedyn" dynamic="true">new Vector3Double(0, (Math.PI/180)*$object.getProperty("tick360")*10, 0)</env:property>
+				
+						<!--  Radarkreisel -->
+						<env:torus rotation="rotatedyn" innerRadius="0.035" outerRadius="0.3" radialSamples="20" circleSamples="40" x="0.05" y="0.7" z="0.0" />
+						<env:box  width="0.45" height="0.01" depth="0.01" rotation="rotatedyn"  x="0.05" y="0.7" z="0.0" />
+						<env:box  width="0.01" height="0.01" depth="0.25" rotation="rotatedyn"  x="0.05" y="0.7" z="0.0"  color="#FF0000FF"/>
+						<env:cylinder rotation="rotate" height="0.5" radius="0.03"  x="0.05" y="0.6" z="0.0" color="#FFFFFFFF"/>
+						
+						<!--Aufbau spoiler -->
+						<env:box  rotation="rotatespoiler" width="0.1" height="0.01" depth="0.3"  x="-0.45" y="0.4" z="0.0" />
+
+						<!--Aufbau auspuffe-->
+						<env:cylinder rotation="roll90" height="0.2" radius="0.05" x="-0.5" y="0.25" z="0.1" />
+						<env:cylinder rotation="roll90" height="0.2" radius="0.05" x="-0.5" y="0.25" z="-0.1"  />
+						
+						<!--Aufbau -->
+						<env:box  width="0.07" height="0.07" depth="0.07" x="0.05" y="0.27" z="0.0" color="#FF6A6AFF" />
+						<env:box  width="0.5" height="0.1" depth="0.2" x="0.0" y="0.2" z="0.0" color="#DCDCDCFF" />
+						
+						
+						<!--Achsen -->
+						<env:box  width="0.01" height="0.01" depth="0.25" x="0.25" y="0.1" z="0.0" color="#000000FF" />
+						<env:box  width="0.01" height="0.01" depth="0.25" x="-0.25" y="0.1" z="0.0" color="#000000FF" />
+						
+						<!--Räder innen -->
+						<env:sphere  width="0.13" height="0.13" depth="0.01" x="0.25" y="0.15" z="0.25" color="#FF4040FF" />
+						<env:sphere  width="0.13" height="0.13" depth="0.01" x="-0.25" y="0.15" z="-0.25" color="#FF4040FF" />
+						<env:sphere  width="0.13" height="0.13" depth="0.01" x="0.25" y="0.15" z="-0.25" color="#FF4040FF" />
+						<env:sphere  width="0.13" height="0.13" depth="0.01" x="-0.25" y="0.15" z="0.25" color="#FF4040FF" />
+						<!--Räder reifen -->
+						<env:torus  innerRadius="0.04" outerRadius="0.11" radialSamples="20" circleSamples="20"  x="0.25" y="0.15" z="0.25"  />
+						<env:torus  innerRadius="0.04" outerRadius="0.11" radialSamples="20" circleSamples="20"  x="-0.25" y="0.15" z="-0.25" />
+						<env:torus  innerRadius="0.04" outerRadius="0.11" radialSamples="20" circleSamples="20"  x="0.25" y="0.15" z="-0.25"  />
+						<env:torus  innerRadius="0.04" outerRadius="0.11" radialSamples="20" circleSamples="20"  x="-0.25" y="0.15" z="0.25"  />
+						<!--Räder mitte -->
+						<env:sphere  width="0.02" height="0.02" depth="0.02" x="0.25" y="0.15" z="0.25" color="#404040FF" />
+						<env:sphere  width="0.02" height="0.02" depth="0.02" x="-0.25" y="0.15" z="-0.25" color="#404040FF" />
+						<env:sphere  width="0.02" height="0.02" depth="0.02" x="0.25" y="0.15" z="-0.25" color="#404040FF" />
+						<env:sphere  width="0.02" height="0.02" depth="0.02" x="-0.25" y="0.15" z="0.25" color="#404040FF" />
+
+						<!--  Sonstiges -->
+						<env:sphere  size="radarsize2" x="0.0" y="0.0" z="0.0" color="#ADFF2F50" />
+						<env:sphere  size="visionsize" x="0.0" y="0.0" z="0.0" color="#FFFF0040" />
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="carry" width="0.075" height="0.075" depth="0.075">
+				 	<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.05f,$object.getProperty("vision").doubleValue()*10)</env:property>
+						<env:sphere  size="visionsize"  x="0" y="0.00" z="0"  color="#FFFF0040" />
+						 <env:object3d modelpath="jadex/bdi/examples/marsworld/Models/gabelstapler/gabel.obj" /> 
+
+						<env:box width="0.2" height="0.2" depth="0.2"  x="0.4" y="0.2" z="0.0"  color="#FFA54FFF">
+							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
+						</env:box>
+					</env:drawable3d>
+					
+					<env:drawable3d objecttype="producer" width="0.075" height="0.075" depth="0.075">
+					<env:property name="visionsize" dynamic="true">new Vector3Double($object.getProperty("vision").doubleValue()*10,0.05f,$object.getProperty("vision").doubleValue()*10)</env:property>
+						<!-- Assertion from Jmonkey -->
+ 						<env:object3d width="0.45" height="0.45" depth="0.45"  modelpath="Models/Teapot/Teapot.obj"/> 
+						<env:sphere  size="visionsize" x="0" y="0.00" z="0" color="#FFFF0040" />
+					</env:drawable3d>
+					
+				</env:perspective>	
+				
+				
+				
+				
+				
 
 			<!-- executor -->
 			<env:spaceexecutor class="DeltaTimeExecutor">
