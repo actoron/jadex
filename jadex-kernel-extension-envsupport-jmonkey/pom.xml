@@ -73,17 +73,13 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	<!--
-		<parent> <groupId>net.sourceforge.jadex</groupId>
-		<artifactId>jadex-settings</artifactId>
-		<version>${jadexVersion}</version>
-		<relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
-		</parent>
-	-->
+	<!-- <parent> <groupId>net.sourceforge.jadex</groupId> <artifactId>jadex-settings</artifactId> 
+		<version>${jadexVersion}</version> <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath> 
+		</parent> -->
 
 	<properties>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-  	</properties>
+	</properties>
 
 	<build>
 		<resources>
@@ -100,7 +96,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-        		<version>2.3.2</version>
+				<version>2.3.2</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
@@ -110,7 +106,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-        		<version>2.1.2</version>
+				<version>2.1.2</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -121,11 +117,11 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-        		<artifactId>maven-javadoc-plugin</artifactId>
-        		<version>2.8</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.8</version>
 				<executions>
 					<execution>
 						<id>attach-javadoc</id>
@@ -135,7 +131,7 @@
 						</goals>
 					</execution>
 				</executions>
-        	</plugin>
+			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -154,13 +150,83 @@
 		</plugins>
 	</build>
 
+	<repositories>
+		<repository>
+			<id>sonatype-public</id>
+			<name>sonatype public</name>
+			<url>https://oss.sonatype.org/content/groups/public/</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-commons</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
+
+
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>jmonkeyengine3</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
+
+		</dependency>
+
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>jME3-core</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
+		</dependency>
+			
+		<dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jME3-terrain</artifactId>
+            <version>3.0.0-SNAPSHOT</version>
+        </dependency> 
+
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>jME3-lwjgl</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>jME3-lwjgl-natives</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.jme3</groupId>
+			<artifactId>lwjgl</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
+		</dependency>
 		
+        <dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jME3-blender</artifactId>
+            <version>3.0.0-SNAPSHOT</version>
+        </dependency>    
+               
+        <dependency>
+           	<groupId>com.jme3</groupId>
+           	<artifactId>jME3-desktop</artifactId>
+            <version>3.0.0-SNAPSHOT</version>
+        </dependency>  
+                 
+        <dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jME3-plugins</artifactId>
+            <version>3.0.0-SNAPSHOT</version>
+        </dependency>   
+        
+       <dependency>
+            <groupId>com.jme3</groupId>
+            <artifactId>jME3-testdata</artifactId>
+            <version>3.0.0-SNAPSHOT</version>
+       </dependency>
+
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-javaparser</artifactId>
@@ -172,5 +238,6 @@
 			<artifactId>jadex-kernel-extension-envsupport</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
+		
 	</dependencies>
 </project>

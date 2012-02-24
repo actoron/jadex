@@ -165,7 +165,8 @@ public class MonkeyApp extends SimpleApplication {
 	    // Add the names to the action listener.
 	    ActionListener actionListener = new ActionListener() {
 		    public void onAction(String name, boolean keyPressed, float tpf) {
-		      if (name.equals("Random")) {
+		    
+		      if (keyPressed && name.equals("Random")) {
 		        setHeight();
 		      }
 		    }
