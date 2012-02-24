@@ -25,7 +25,7 @@ import jadex.micro.annotation.Publish;
 	//a) Generate everything (no own implementation)
 	@ProvidedService(name="banking1", type=IBankingService.class, implementation=@Implementation(BankingService.class),
 		publish=@Publish(publishtype=IPublishService.PUBLISH_RS, publishid="http://localhost:8080/banking1",
-		properties=@NameValue(name="formats", value="new javax.ws.rs.core.MediaType[]{javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE, javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE}"))),
+		properties=@NameValue(name="formats", value="new javax.ws.rs.core.MediaType[]{javax.ws.rs.core.MediaType.APPLICATION_XML_TYPE, javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE}")))
 	
 //	// b) Use custom service class (no generation) Note: the publish id here is taken from the implementation class directly
 //	@ProvidedService(name="banking2", type=IBankingService.class, implementation=@Implementation(BankingService.class),
