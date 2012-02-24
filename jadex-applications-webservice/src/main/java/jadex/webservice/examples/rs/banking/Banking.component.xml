@@ -29,7 +29,7 @@
 		</providedservice>
 		<!--  <providedservice name="banking1" class="IBankingService">
 			<implementation class="BankingService"/>
-			<publish publishtype="rs" publishid="http://localhost:8080/" servicetype="RSBankingService.class"/>
+			<publish publishtype="rs" publishid="http://localhost:8080/" mapping="RSBankingService.class"/>
 		</providedservice>-->
 	</services>
 </componenttype>	

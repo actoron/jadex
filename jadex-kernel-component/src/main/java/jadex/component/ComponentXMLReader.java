@@ -371,7 +371,7 @@ public class ComponentXMLReader
 			new MappingInfo(null, null, null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("publishid", "publishId")),
 				new AttributeInfo(new AccessInfo("publishtype", "publishType")),
-				new AttributeInfo(new AccessInfo("servicetype", "serviceType"), new AttributeConverter(classconv, reclassconv)),
+				new AttributeInfo(new AccessInfo("mapping", "mapping"), new AttributeConverter(classconv, reclassconv)),
 			}, null)));
 		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "publish"), new QName(uri, "property")}), new ObjectInfo(UnparsedExpression.class, new ExpressionProcessor()), 
 			new MappingInfo(null, null, "value", new AttributeInfo[]{

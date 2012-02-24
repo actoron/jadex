@@ -178,7 +178,7 @@ public class DefaultRestServicePublishService implements IPublishService
 			
 			// If no service type was specified it has to be generated.
 			Class<?> iface = service.getServiceIdentifier().getServiceType().getType(cl);
-			Class<?> baseclazz = pi.getServiceType()!=null? pi.getServiceType().getType(cl): null;
+			Class<?> baseclazz = pi.getMapping()!=null? pi.getMapping().getType(cl): null;
 			
 			List<RestMethodInfo> rmis = generator.generateRestMethodInfos(service, cl, baseclazz, mapprops);
 			System.out.println("Produced methods: ");
@@ -536,7 +536,7 @@ public class DefaultRestServicePublishService implements IPublishService
 			{
 			    for(int i=0; i<methods.length && method==null; i++)
 			    {
-			    	Class[] types = methods[i].getParameterTypes();
+			    	Class<?>[] types = methods[i].getParameterTypes();
 			    	if(types.length==params.length)
 			    	{
 			    		// check param types
@@ -599,7 +599,7 @@ public class DefaultRestServicePublishService implements IPublishService
 			ret = targetmethod.invoke(service, targetparams);
 			if(ret instanceof IFuture)
 			{
-				ret = ((IFuture)ret).get(new ThreadSuspendable());
+				ret = ((IFuture<?>)ret).get(new ThreadSuspendable());
 			}
 			
 			if(method.isAnnotationPresent(ResultMapper.class))
@@ -798,7 +798,7 @@ public class DefaultRestServicePublishService implements IPublishService
 						UriBuilder ub = ui.getBaseUriBuilder();
 						if(path!=null)
 							ub.path(path.value());
-						String link = ub.build(null).toString();
+						String link = ub.build((Object[])null).toString();
 						
 						if(ptypes.length>0)
 						{

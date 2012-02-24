@@ -23,7 +23,7 @@
 	<services>
 		<providedservice class="IBankingService">
 			<implementation class="BankingService"/>
-			<publish publishtype="ws" publishid="http://localhost:8080/banking" servicetype="IWSBankingService"/>
+			<publish publishtype="ws" publishid="http://localhost:8080/banking" mapping="IWSBankingService"/>
 		</providedservice>
 	</services>
 </componenttype>	

@@ -412,7 +412,7 @@ public class MicroClassReader
 					NameValue[] props = p.properties();
 					UnparsedExpression[] exps = createUnparsedExpressions(props);
 					
-					PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), Object.class.equals(p.servicetype())? null: p.servicetype(), exps);
+					PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), Object.class.equals(p.mapping())? null: p.mapping(), exps);
 					ProvidedServiceInfo psis = new ProvidedServiceInfo(vals[i].name().length()>0? 
 						vals[i].name(): null, vals[i].type(), impl, pi);
 				
@@ -569,7 +569,7 @@ public class MicroClassReader
 								im.expression().length()>0? im.expression(): null, im.proxytype(), bind, interceptors);
 							Publish p = provs[j].publish();
 							PublishInfo pi = p.publishid().length()==0? null: new PublishInfo(p.publishid(), p.publishtype(), 
-								p.servicetype(), createUnparsedExpressions(p.properties()));
+								p.mapping(), createUnparsedExpressions(p.properties()));
 							psis[j] = new ProvidedServiceInfo(provs[j].name().length()>0? provs[j].name(): null, provs[j].type(), impl, pi);
 							configinfo.setProvidedServices(psis);
 						}

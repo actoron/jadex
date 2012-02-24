@@ -497,6 +497,6 @@ In this section, specifications for extensions as required
 		</xs:sequence>
 		<xs:attribute name="publishtype" type="xs:string" use="optional" default='"ws"'/>
 		<xs:attribute name="publishid" type="xs:string" use="required"/>
-		<xs:attribute name="servicetype" type="xs:string" use="optional"/>
+		<xs:attribute name="mapping" type="xs:string" use="optional"/>
 	</xs:complexType>
 </xs:schema>

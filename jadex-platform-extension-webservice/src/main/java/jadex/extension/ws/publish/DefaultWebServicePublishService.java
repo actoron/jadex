@@ -9,17 +9,12 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.SJavassist;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import javassist.CannotCompileException;
-import javassist.ClassClassPath;
-import javassist.ClassPath;
 import javassist.ClassPool;
-import javassist.CodeConverter;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
@@ -28,9 +23,6 @@ import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.StringMemberValue;
-import javassist.expr.ExprEditor;
-import javassist.expr.FieldAccess;
-import javassist.expr.MethodCall;
 
 import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
@@ -72,7 +64,7 @@ public class DefaultWebServicePublishService implements IPublishService
 //		Object pr = Proxy.newProxyInstance(cl, new Class[]{service.getServiceIdentifier().getServiceType()}, 
 //			new WebServiceToJadexWrapperInvocationHandler(service));
 		
-		Object pr = createProxy(service, cl, pi.getServiceType().getType(cl));
+		Object pr = createProxy(service, cl, pi.getMapping().getType(cl));
 		
 		// Jaxb seems to use the context classloader so it needs to be set :-(
 		ClassLoader ccl = Thread.currentThread().getContextClassLoader();
@@ -125,13 +117,13 @@ public class DefaultWebServicePublishService implements IPublishService
 	 *  @param type The web service interface type.
 	 *  @return The proxy object.
 	 */
-	protected Object createProxy(IService service, ClassLoader classloader, Class type)
+	protected Object createProxy(IService service, ClassLoader classloader, Class<?> type)
 	{
 //		System.out.println("createProxy: "+service.getServiceIdentifier());
 		Object ret = null;
 		try
 		{
-			Class clazz = getProxyClass(type, classloader);
+			Class<?> clazz = getProxyClass(type, classloader);
 //			System.out.println("proxy class: "+clazz.getPackage()+" "+clazz.getClassLoader()+" "+classloader);
 			ret = clazz.newInstance();
 			Method shm = clazz.getMethod("setHandler", new Class[]{InvocationHandler.class});
@@ -153,9 +145,9 @@ public class DefaultWebServicePublishService implements IPublishService
 	 *  @param classloader The class loader.
 	 *  @return The (possibly newly generated) proxy class.
 	 */
-	protected Class getProxyClass(Class type, ClassLoader classloader)
+	protected Class<?> getProxyClass(Class<?> type, ClassLoader classloader)
 	{
-		Class ret = null;
+		Class<?> ret = null;
 
 		ClassPool pool = ClassPool.getDefault();
 //		String pck = type.getPackage().getName();

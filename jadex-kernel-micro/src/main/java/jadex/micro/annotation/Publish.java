@@ -23,12 +23,12 @@ public @interface Publish
 	public String publishtype();
 	
 	/**
-	 * The service type. 
+	 * The mapping information (e.g. annotated interface). 
 	 */
-	public Class<?> servicetype() default Object.class;
+	public Class<?> mapping() default Object.class;
 	
 	/**
-	 *  The mapping properties. 
+	 *  Additional mapping properties. 
 	 */
 	public NameValue[] properties() default {};
 }

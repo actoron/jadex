@@ -20,8 +20,8 @@ public class PublishInfo
 	/** The publish type. */
 	protected String publishtype;
 	
-	/** The service type. */
-	protected ClassInfo servicetype;
+	/** The mapping information (e.g. annotated interface). */
+	protected ClassInfo mapping;
 	
 	/** The mapping properties. */
 	protected List<UnparsedExpression> properties;
@@ -41,11 +41,11 @@ public class PublishInfo
 	 *  @param publishtype The publish type.
 	 */
 	public PublishInfo(String pid, String publishtype, 
-		Class<?> servicetype, UnparsedExpression[] properties)
+		Class<?> mapping, UnparsedExpression[] properties)
 	{
 		this.pid = pid;
 		this.publishtype = publishtype;
-		this.servicetype = servicetype==null? null: new ClassInfo(servicetype);
+		this.mapping = mapping==null? null: new ClassInfo(mapping);
 		this.properties = SUtil.arrayToList(properties);
 	}
 	
@@ -88,21 +88,21 @@ public class PublishInfo
 	}
 
 	/**
-	 *  Get the servicetype.
-	 *  @return The servicetype.
+	 *  Get the mapping information (e.g. annotated interface). 
+	 *  @return The mapping.
 	 */
-	public ClassInfo getServiceType()
+	public ClassInfo getMapping()
 	{
-		return servicetype;
+		return mapping;
 	}
 
 	/**
-	 *  Set the servicetype.
-	 *  @param servicetype The servicetype to set.
+	 *  Set the mapping information (e.g. annotated interface). 
+	 *  @param mapping The mapping to set.
 	 */
-	public void setServiceType(ClassInfo servicetype)
+	public void setMapping(ClassInfo mapping)
 	{
-		this.servicetype = servicetype;
+		this.mapping = mapping;
 	}
 
 	/**
