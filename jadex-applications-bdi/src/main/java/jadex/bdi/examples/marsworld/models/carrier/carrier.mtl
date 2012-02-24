@@ -1,0 +1,7 @@
+newmtl 01_-_Default
+Ns 10
+Ka 0 0 0
+Kd 0.8 0.8 0.8
+Ks 0.6 0.6 0.6
+map_Kd forklift01_diffuse.tga
+d 1
