@@ -414,21 +414,33 @@ public class ObserverCenter
 				IPerspective selp = getSelectedPerspective();
 
 				if(selp!=null)
-				
-				if (selp instanceof Perspective3D)
-				{
-					if(!selp.getName().equals(name))
 					{
-						
-						((Perspective3D) selp).getViewport().pauseApp();
-				        try {
-				            Thread.sleep(1000);
-				        } catch (InterruptedException ex) {
-				        }
-				        
+					
+						if(selp instanceof Perspective3D)
+						{
+							((Perspective3D) selp).getViewport().pauseApp();
+					        try {
+					            Thread.sleep(1000);
+					        } catch (InterruptedException ex) {
+					        }
+						}
 					}
-
-				}
+					
+				
+//				if (selp instanceof Perspective3D)
+//				{
+//					if(!selp.getName().equals(name))
+//					{
+//						
+//						((Perspective3D) selp).getViewport().pauseApp();
+//				        try {
+//				            Thread.sleep(1000);
+//				        } catch (InterruptedException ex) {
+//				        }
+//				        
+//					}
+//
+//				}
 			
 				IPerspective perspective = (IPerspective)perspectives.get(name);
 				perspective.setObserverCenter(this);
