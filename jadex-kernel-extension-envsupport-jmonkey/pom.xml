@@ -226,6 +226,24 @@
             <artifactId>jME3-testdata</artifactId>
             <version>3.0.0-SNAPSHOT</version>
        </dependency>
+       
+       <dependency>
+             <groupId>com.jme3</groupId>
+             <artifactId>jME3-jogg</artifactId>
+             <version>3.0.0-SNAPSHOT</version>
+       </dependency>      
+            
+       <dependency>
+             <groupId>com.jme3</groupId>
+             <artifactId>j-ogg-oggd</artifactId>
+             <version>3.0.0-SNAPSHOT</version>
+       </dependency>  
+                
+       <dependency>
+             <groupId>com.jme3</groupId>
+             <artifactId>j-ogg-vorbisd</artifactId>
+             <version>3.0.0-SNAPSHOT</version>
+      </dependency>  
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
