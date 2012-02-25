@@ -324,7 +324,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		assert started && !shutdowned;
 		
 		started	= false;
-		shutdowned = true;
 		
 //		Thread.dumpStack();
 //		System.out.println("shutdown called: "+getName());
@@ -345,10 +344,12 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 				{
 					reqservicefetchers	= null;
 					requiredserviceinfos	= null;
+					shutdowned = true;
 					ret.setResult(null);
 				}
 				public void exceptionOccurred(Exception exception)
 				{
+					shutdowned = true;
 					exception.printStackTrace();
 					super.exceptionOccurred(exception);
 				}
@@ -383,6 +384,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		}
 		else
 		{
+			shutdowned = true;	
 			ret.setResult(null);
 		}
 		
