@@ -1,5 +1,6 @@
 package jadex.bridge.service;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
@@ -50,6 +51,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	/** True, if the container is started. */
 	protected boolean started;
 	
+	/** True, if the container is shutdowned. */
+	protected boolean shutdowned;
+	
 	//-------- constructors --------
 
 	/**
@@ -69,7 +73,10 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public IIntermediateFuture<IService>	getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector)
 	{
-		return manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
+		if(shutdowned)
+			return new IntermediateFuture<IService>(new ComponentTerminatedException(id));
+		else
+			return manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
 	}
 	
 	/**
@@ -111,6 +118,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public IFuture<Void>	addService(final IInternalService service, final ProvidedServiceInfo info)
 	{
+		if(shutdowned)
+			return new Future<Void>(new ComponentTerminatedException(id));
 		final Future<Void> ret = new Future<Void>();
 		
 		getServiceType(service.getServiceIdentifier()).addResultListener(new ExceptionDelegationResultListener<Class<?>, Void>(ret)
@@ -158,8 +167,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			}
 		});
 		
-//		
-		
 		return ret;
 	}
 
@@ -170,6 +177,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public IFuture<Void> removeService(final IServiceIdentifier sid)
 	{
+		if(shutdowned)
+			return new Future<Void>(new ComponentTerminatedException(id));
+		
 		final Future<Void> ret = new Future<Void>();
 		
 		if(sid==null)
@@ -269,6 +279,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	protected IFuture<Void> initServices(final Iterator<IInternalService> services)
 	{
+		if(shutdowned)
+			return new Future<Void>(new ComponentTerminatedException(id));
+			
 		final Future<Void> ret = new Future<Void>();
 		if(services.hasNext())
 		{
@@ -308,9 +321,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public IFuture<Void> shutdown()
 	{
-		assert started;
+		assert started && !shutdowned;
 		
 		started	= false;
+		shutdowned = true;
+		
 //		Thread.dumpStack();
 //		System.out.println("shutdown called: "+getName());
 		final Future<Void> ret = new Future<Void>();
@@ -373,33 +388,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		
 		return ret;
 	}
-	
-	/**
-	 *  Do shutdown the services.
-	 */
-//	protected IFuture<Void> doShutdown(final Iterator<IInternalService> services)
-//	{
-//		final Future<Void> ret = new Future<Void>();
-//		if(services.hasNext())
-//		{
-//			final IInternalService ser = services.next();
-//			final IServiceIdentifier sid = ser.getServiceIdentifier();
-//
-//			// Shutdown services in reverse order as later services might depend on earlier ones.
-//			doShutdown(services).addResultListener(new DelegationResultListener<Void>(ret)
-//			{
-//				public void customResultAvailable(Void result)
-//				{
-//					removeService(sid).addResultListener(new DelegationResultListener<Void>(ret));
-//				}
-//			});
-//		}
-//		else
-//		{
-//			ret.setResult(null);
-//		}
-//		return ret;
-//	}
 	
 	/**
 	 *  Do shutdown the services.
@@ -487,6 +475,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public <T> IFuture<T> getService(final Class<T> type, final IComponentIdentifier cid)
 	{
+		if(shutdowned)
+			return new Future<T>(new ComponentTerminatedException(id));
+
 		final Future<T> ret = new Future<T>();
 		SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
 			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
@@ -513,6 +504,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public IService getProvidedService(String name)
 	{
+		if(shutdowned)
+			throw new ComponentTerminatedException(id);
+
 		IService ret = null;
 		for(Iterator<Class<?>> it=services.keySet().iterator(); it.hasNext() && ret==null; )
 		{
@@ -537,6 +531,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public IService[] getProvidedServices(Class<?> clazz)
 	{
+		if(shutdowned)
+			throw new ComponentTerminatedException(id);
+		
 		Collection<IInternalService> coll = services.get(clazz);
 		return coll==null ? new IService[0] : coll.toArray(new IService[coll.size()]);
 	}
@@ -547,6 +544,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public RequiredServiceInfo[] getRequiredServiceInfos()
 	{
+		if(shutdowned)
+			throw new ComponentTerminatedException(id);
+
 		return requiredserviceinfos==null? new RequiredServiceInfo[0]: 
 			(RequiredServiceInfo[])requiredserviceinfos.values().toArray(new RequiredServiceInfo[requiredserviceinfos.size()]);
 	}
@@ -557,6 +557,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public void setRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
 	{
+		if(shutdowned)
+			throw new ComponentTerminatedException(id);
+
 		this.requiredserviceinfos = null;
 		addRequiredServiceInfos(requiredservices);
 	}
@@ -568,6 +571,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public void addRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
 	{
+		if(shutdowned)
+			throw new ComponentTerminatedException(id);
+
 		if(requiredservices!=null && requiredservices.length>0)
 		{
 			if(this.requiredserviceinfos==null)
@@ -585,34 +591,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public RequiredServiceInfo getRequiredServiceInfo(String name)
 	{
+		if(shutdowned)
+			throw new ComponentTerminatedException(id);
+
 		return requiredserviceinfos==null? null: (RequiredServiceInfo)requiredserviceinfos.get(name);
 	}
-	
-//	/**
-//	 *  Set the required service bindings.
-//	 *  @param bindings The bindings.
-//	 */
-//	public void setRequiredServiceBindings(RequiredServiceBinding[] bindings)
-//	{
-//		if(bindings!=null && bindings.length>0)
-//		{
-//			this.bindings = new HashMap();
-//			for(int i=0; i<bindings.length; i++)
-//			{
-//				this.bindings.put(bindings[i].getName(), bindings[i]);
-//			}
-//		}
-//	}
-	
-//	/**
-//	 *  Get the binding info of a service.
-//	 *  @param name The required service name.
-//	 *  @return The binding info of a service.
-//	 */
-//	public RequiredServiceBinding getRequiredServiceBinding(String name)
-//	{
-//		return bindings!=null? (RequiredServiceBinding)bindings.get(name): null;
-//	}
 	
 	/**
 	 *  Get a required service.
@@ -620,6 +603,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public IFuture<IService> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
+		if(shutdowned)
+			return new Future<IService>(new ComponentTerminatedException(id));
 		return getRequiredService(info, binding, false);
 	}
 	
@@ -629,6 +614,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public IIntermediateFuture<IService> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding)
 	{
+		if(shutdowned)
+			return new IntermediateFuture<IService>(new ComponentTerminatedException(id));
 		return getRequiredServices(info, binding, false);
 	}
 	
@@ -639,6 +626,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public <T> IFuture<T> getRequiredService(String name)
 	{
+		if(shutdowned)
+			return new Future<T>(new ComponentTerminatedException(id));
 		return getRequiredService(name, false);
 	}
 	
@@ -649,6 +638,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public <T> IIntermediateFuture<T> getRequiredServices(String name)
 	{
+		if(shutdowned)
+			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
 		return getRequiredServices(name, false);
 	}
 	
@@ -658,6 +649,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public <T> IFuture<T> getRequiredService(String name, boolean rebind)
 	{
+		if(shutdowned)
+			return new Future<T>(new ComponentTerminatedException(id));
 		RequiredServiceInfo info = getRequiredServiceInfo(name);
 		if(info==null)
 		{
@@ -678,6 +671,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public <T> IIntermediateFuture<T> getRequiredServices(String name, boolean rebind)
 	{
+		if(shutdowned)
+			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
+
 		RequiredServiceInfo info = getRequiredServiceInfo(name);
 		if(info==null)
 		{
@@ -704,6 +700,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			ret.setException(new IllegalArgumentException("Info must not null."));
 			return ret;
 		}
+		if(shutdowned)
+			return new Future<T>(new ComponentTerminatedException(id));
 		
 		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(info.getName());
 		return fetcher.getService(info, binding, rebind);
@@ -721,6 +719,8 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			ret.setException(new IllegalArgumentException("Info must not null."));
 			return ret;
 		}
+		if(shutdowned)
+			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
 		
 		IRequiredServiceFetcher fetcher = getRequiredServiceFetcher(info.getName());
 		return fetcher.getServices(info, binding, rebind);
@@ -733,6 +733,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	protected IRequiredServiceFetcher getRequiredServiceFetcher(String name)
 	{
+		if(shutdowned)
+			throw new ComponentTerminatedException(id);
+
 		IRequiredServiceFetcher ret = reqservicefetchers!=null ? reqservicefetchers.get(name) : null;
 		if(ret==null)
 		{
@@ -757,6 +760,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public void addInterceptor(IServiceInvocationInterceptor interceptor, Object service, int pos)
 	{
+		if(shutdowned)
+			throw new ComponentTerminatedException(id);
+
 		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
 		handler.addServiceInterceptor(interceptor, pos);
 	}
@@ -768,6 +774,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public void removeInterceptor(IServiceInvocationInterceptor interceptor, Object service)
 	{
+		if(shutdowned)
+			throw new ComponentTerminatedException(id);
+
 		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
 		handler.removeServiceInterceptor(interceptor);
 	}
@@ -779,6 +788,9 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public IServiceInvocationInterceptor[] getInterceptors(Object service)
 	{
+		if(shutdowned)
+			throw new ComponentTerminatedException(id);
+
 		BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(service);
 		return handler.getInterceptors();
 	}
@@ -788,85 +800,6 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	 */
 	public abstract IFuture<Class<?>> getServiceType(final IServiceIdentifier sid);
 	
-//	/**
-//	 *  Add a provided service interceptor (at first position in the chain).
-//	 *  @param clazz The interface of the provided service.
-//	 *  @param pos The position in the chain (0=first).
-//	 *  @param interceptor The interceptor.
-//	 *  @return Null using future when done.
-//	 */
-//	public IFuture addProvidedServiceInterceptor(Class clazz, final IServiceInvocationInterceptor interceptor, int pos)
-//	{
-//		final Future ret = new Future();
-//		SServiceProvider.getService(this, clazz, RequiredServiceInfo.SCOPE_LOCAL)
-//			.addResultListener(new DelegationResultListener(ret)
-//		{
-//			public void customResultAvailable(Object result)
-//			{
-//				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(result);
-//				handler.addServiceInterceptor(interceptor, 0);
-//				ret.setResult(null);
-//			}	
-//		});
-//		
-//		return ret;
-//	}
-//	
-//	/**
-//	 *  Remove a provided service interceptor.
-//	 *  @param clazz The interface of the provided service.
-//	 *  @param interceptor The interceptor.
-//	 *  @return Null using future when done.
-//	 */
-//	public IFuture removeProvidedServiceInterceptor(Class clazz, final IServiceInvocationInterceptor interceptor)
-//	{
-//		final Future ret = new Future();
-//		SServiceProvider.getService(this, clazz, RequiredServiceInfo.SCOPE_LOCAL)
-//			.addResultListener(new DelegationResultListener(ret)
-//		{
-//			public void customResultAvailable(Object result)
-//			{
-//				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(result);
-//				handler.removeServiceInterceptor(interceptor);
-//				ret.setResult(null);
-//			}	
-//		});
-//		
-//		return ret;
-//	}
-//
-//	/**
-//	 *  Add a required service interceptor (at first position in the chain).
-//	 *  @param name The name of the required service.
-//	 *  @param pos The position in the chain (0=first).
-//	 *  @param interceptor The interceptor.
-//	 *  @return Null using future when done.
-//	 */
-//	public IFuture addRequiredServiceInterceptor(String name, IServiceInvocationInterceptor interceptor, int pos)
-//	{
-//		final Future ret = new Future();
-//		SServiceProvider.getService(this, clazz, RequiredServiceInfo.SCOPE_LOCAL)
-//			.addResultListener(new DelegationResultListener(ret)
-//		{
-//			public void customResultAvailable(Object result)
-//			{
-//				BasicServiceInvocationHandler handler = (BasicServiceInvocationHandler)Proxy.getInvocationHandler(result);
-//				handler.addServiceInterceptor(interceptor, 0);
-//				ret.setResult(null);
-//			}	
-//		});
-//		
-//		return ret;
-//	}
-//	
-//	/**
-//	 *  Remove a required service interceptor.
-//	 *  @param clazz The interface of the provided service.
-//	 *  @param interceptor The interceptor.
-//	 *  @return Null using future when done.
-//	 */
-//	public IFuture removeRequiredServiceInterceptor(String name, IServiceInvocationInterceptor interceptor);
-
 	/**
 	 *  Get the logger.
 	 *  To be overridden by subclasses.

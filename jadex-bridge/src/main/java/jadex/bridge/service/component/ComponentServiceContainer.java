@@ -1,5 +1,6 @@
 package jadex.bridge.service.component;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -79,6 +80,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public <T> IFuture<T> getRequiredService(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
+		if(shutdowned)
+			return new Future<T>(new ComponentTerminatedException(id));
+
 		IFuture<T>	fut	= super.getRequiredService(info, binding, rebind);
 		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut);
 	}
@@ -89,6 +93,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public <T> IIntermediateFuture<T> getRequiredServices(RequiredServiceInfo info, RequiredServiceBinding binding, boolean rebind)
 	{
+		if(shutdowned)
+			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
+
 		IIntermediateFuture<T>	fut	= super.getRequiredServices(info, binding, rebind);
 		return new ComponentIntermediateFuture<T>(instance.getExternalAccess(), adapter, fut);
 	}
@@ -100,6 +107,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public <T> IFuture<T> searchService(final Class<T> type)
 	{
+		if(shutdowned)
+			return new Future<T>(new ComponentTerminatedException(id));
+
 		final Future<T>	fut	= new Future<T>();
 		SServiceProvider.getService(this, type).addResultListener(new DelegationResultListener(fut)
 		{
@@ -119,6 +129,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public <T> IFuture<T> searchService(final Class<T> type, String scope)
 	{
+		if(shutdowned)
+			return new Future<T>(new ComponentTerminatedException(id));
+
 		final Future<T>	fut	= new Future<T>();
 		SServiceProvider.getService(this, type, scope).addResultListener(new DelegationResultListener(fut)
 		{
@@ -140,6 +153,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public <T> IFuture<T> searchServiceUpwards(final Class<T> type)
 	{
+		if(shutdowned)
+			return new Future<T>(new ComponentTerminatedException(id));
+
 		final Future<T>	fut	= new Future<T>();
 		SServiceProvider.getServiceUpwards(this, type).addResultListener(new DelegationResultListener(fut)
 		{
@@ -159,6 +175,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public <T> IIntermediateFuture<T> searchServices(final Class<T> type)
 	{
+		if(shutdowned)
+			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
+
 		final IntermediateFuture<T>	fut	= new IntermediateFuture<T>();
 		SServiceProvider.getServices(this, type).addResultListener(new IntermediateDelegationResultListener(fut)
 		{
@@ -178,6 +197,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public <T> IIntermediateFuture<T> searchServices(final Class<T> type, String scope)
 	{
+		if(shutdowned)
+			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
+
 		final IntermediateFuture<T>	fut	= new IntermediateFuture<T>();
 		SServiceProvider.getServices(this, type, scope).addResultListener(new IntermediateDelegationResultListener(fut)
 		{
@@ -196,6 +218,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IFuture<IServiceProvider>	getParent()
 	{
+		if(shutdowned)
+			return new Future<IServiceProvider>(new ComponentTerminatedException(id));
+
 		final Future<IServiceProvider> ret = new Future<IServiceProvider>();
 		
 		ret.setResult(adapter!=null && adapter.getParent()!=null ? adapter.getParent().getServiceProvider() : null);
@@ -209,6 +234,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IFuture<Collection<IServiceProvider>> getChildren()
 	{
+		if(shutdowned)
+			return new Future<Collection<IServiceProvider>>(new ComponentTerminatedException(id));
+
 		final Future<Collection<IServiceProvider>> ret = new Future<Collection<IServiceProvider>>();
 //		ComponentFuture ret = new ComponentFuture(ea, adapter, oldret);
 		
@@ -253,37 +281,14 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		return ret;
 	}
 	
-//	/**
-//	 *  Get the external access.
-//	 */
-//	public IFuture getExternalAccess()
-//	{
-//		final Future ret = new Future();
-//		if(exta==null)
-//		{
-//			cms.getExternalAccess(adapter.getComponentIdentifier())
-//				.addResultListener(new DelegationResultListener(ret)
-//			{
-//				public void customResultAvailable(Object result)
-//				{
-//	//				System.out.println("exta: "+result);
-//					exta = (IExternalAccess)result;
-//					ret.setResult(exta);
-//				}
-//			});
-//		}
-//		else
-//		{
-//			ret.setResult(exta);
-//		}
-//		return ret;
-//	}
-	
 	/**
 	 *  Create a service fetcher.
 	 */
 	public IRequiredServiceFetcher createServiceFetcher(String name)
 	{
+		if(shutdowned)
+			throw new ComponentTerminatedException(id);
+			
 		return new DefaultServiceFetcher(this, instance.getExternalAccess());
 	}
 	
@@ -472,6 +477,9 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	 */
 	public IFuture<Class<?>> getServiceType(final IServiceIdentifier sid)
 	{
+		if(shutdowned)
+			return new Future<Class<?>>(new ComponentTerminatedException(id));
+
 		final Future<Class<?>> ret = new Future<Class<?>>();
 		if(sid.getServiceType().getType()!=null)
 		{

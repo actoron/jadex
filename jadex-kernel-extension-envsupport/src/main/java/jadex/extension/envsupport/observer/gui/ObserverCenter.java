@@ -17,6 +17,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IChangeListener;
+import jadex.commons.future.DefaultResultListener;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -102,6 +103,8 @@ public class ObserverCenter
 	/** Kill the application on exit. */
 	protected boolean	killonexit;
 	
+	protected IClockService clock;
+	
 	/** Creates an observer center.
 	 *  
 	 *  @param title title of the observer window
@@ -122,6 +125,15 @@ public class ObserverCenter
 		if(!spaceviews.isEmpty())
 			selecteddataviewname = (String)spaceviews.keySet().iterator().next();
 		activeplugin = null;
+		
+		SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(new DefaultResultListener<IClockService>()
+		{
+			public void resultAvailable(IClockService result)
+			{
+				clock = result;
+			}
+		});
 		
 		Runnable init = new Runnable()
 		{
@@ -839,15 +851,16 @@ public class ObserverCenter
 		
 		if(clocklistener != null)
 		{
-			SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDefaultResultListener(mainwindow)
-			{
-				public void customResultAvailable(Object result)
-				{
-					IClockService	clock	= (IClockService)result;
-					clock.removeChangeListener(clocklistener);
-				}
-			});
+			clock.removeChangeListener(clocklistener);
+//			SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//				.addResultListener(new SwingDefaultResultListener(mainwindow)
+//			{
+//				public void customResultAvailable(Object result)
+//				{
+//					IClockService	clock	= (IClockService)result;
+//					clock.removeChangeListener(clocklistener);
+//				}
+//			});
 		}
 		
 		if (vptimer != null)
