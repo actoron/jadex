@@ -991,6 +991,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("color", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), attcolconv),
 				new AttributeInfo(new AccessInfo("texturepath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("modelpath", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
+				new AttributeInfo(new AccessInfo("hasLightMaterials", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()		
 				{
 					public Object createObject(Map args) throws Exception
@@ -1025,9 +1026,15 @@ public class MEnvSpaceType
 						{
 							texturepath = "";
 						}
+						
+						Boolean hasLightMaterials = (Boolean)getProperty(args, "hasLightMaterials");
+						if(hasLightMaterials==null)
+						{
+							hasLightMaterials = true;
+						}
 						IParsedExpression exp = (IParsedExpression)getProperty(args, "drawcondition");
 
-						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), texturepath, exp);
+						return new Object3d(position, rotation, size, absFlags, getProperty(args, "color"), (String)getProperty(args, "modelpath"), texturepath, hasLightMaterials, exp);
 //						//////////////
 					}
 				}, new BeanAccessInfo(AccessInfo.THIS)))
