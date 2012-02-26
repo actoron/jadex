@@ -14,9 +14,9 @@ public class monkeyApp_Grid
 {
 	private Node _gridNode;
 	private AssetManager _assetManager;
-	private int _areaSize;
+	private float _areaSize;
 
-	public monkeyApp_Grid(final int areaSize, final AssetManager assetManager)
+	public monkeyApp_Grid(final float areaSize, final AssetManager assetManager)
 	{
 		_assetManager = assetManager;
 		_areaSize = areaSize;
@@ -31,7 +31,7 @@ public class monkeyApp_Grid
 	  
 	
 	
-	private void createGrid(int _areaSize)
+	private void createGrid(float _areaSize)
 	{
 		// the three basic Directions
 	    putArrow(Vector3f.ZERO, new Vector3f(_areaSize, 0, 0), ColorRGBA.Red);
@@ -40,11 +40,11 @@ public class monkeyApp_Grid
 	    
 	    // the inner grid
 	    
-	    int abstand = _areaSize/10;
+	    float abstand = _areaSize/10;
 	    
 	    for(int i = 0; i <= 10; i ++ )
 	    {
-	    	int punkt = abstand*i;
+	    	float punkt = abstand*i;
     		//the two sides
     		putLine(new Vector3f(punkt, 0, 0), new Vector3f(punkt, _areaSize, 0), ColorRGBA.Gray );
     		putLine(new Vector3f(0, 0, punkt), new Vector3f(0, _areaSize, punkt), ColorRGBA.Gray );
@@ -53,7 +53,7 @@ public class monkeyApp_Grid
 	    	for(int j = 0; j <= 10; j ++ )
 	    	{
 
-	    			int punktj = abstand*j;
+	    			float punktj = abstand*j;
 		    		//x-line and y-line. The Basement
 		    		putLine(new Vector3f(punkt, 0, 0), new Vector3f(punkt, 0, _areaSize), ColorRGBA.Gray );
 		    		putLine(new Vector3f(0, 0, punktj), new Vector3f(_areaSize, 0, punktj), ColorRGBA.Gray );

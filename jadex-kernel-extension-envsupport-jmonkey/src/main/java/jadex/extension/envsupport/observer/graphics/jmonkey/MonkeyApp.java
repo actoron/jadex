@@ -1,10 +1,11 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
+import java.util.Collection;
+
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
@@ -24,16 +25,17 @@ import com.jme3.terrain.heightmap.HillHeightMap;
  */
 public class MonkeyApp extends SimpleApplication {
 	
- private int _areaSize;
+ private float _areaSize;
  private Node	_geometryNode;
  private Node _gridNode;
  private Node _staticNode;
+
  
  private TerrainQuad terrain;
  
  // Helper Classes
  private monkeyApp_Grid _gridHandler;
-  public MonkeyApp(int areaSize)
+  public MonkeyApp(float areaSize)
 {
 	  _areaSize = areaSize;
 	  _geometryNode = new Node("geometryNode");
@@ -44,8 +46,10 @@ public class MonkeyApp extends SimpleApplication {
 @Override
   public void simpleInitApp() {
 	
+
+	
     /** Configure cam to look at scene */
-    cam.setLocation(new Vector3f(_areaSize*1.1f, _areaSize*0.7f, _areaSize*1.2f));
+    cam.setLocation(new Vector3f(_areaSize*1.1f, _areaSize, _areaSize*1.2f));
     cam.lookAt(new Vector3f(1, 2, 1), Vector3f.UNIT_Y);
     flyCam.setEnabled(true);
     flyCam.setMoveSpeed(100);
@@ -70,6 +74,11 @@ public class MonkeyApp extends SimpleApplication {
     
     
   }
+
+public Collection<com.jme3.renderer.Caps> getCaps()
+{
+	return renderer.getCaps();
+}
  
 
 
@@ -175,6 +184,11 @@ public class MonkeyApp extends SimpleApplication {
 
 	 
 	  }
+
+	public void setScale(float scale) {
+		_areaSize = scale;
+		
+	}
 
        
 }

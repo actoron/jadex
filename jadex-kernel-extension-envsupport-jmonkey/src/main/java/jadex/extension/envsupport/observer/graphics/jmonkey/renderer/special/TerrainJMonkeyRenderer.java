@@ -51,7 +51,7 @@ public class TerrainJMonkeyRenderer extends AbstractJMonkeyRenderer
 	    {
 	    	if(!tex.getTexture().equals(""))
 	    	{
-	    		System.out.println("tex " + terrapath.concat(tex.getTexture()) + "name " + tex.getName());
+//	    		System.out.println("tex " + terrapath.concat(tex.getTexture()) + "name " + tex.getName());
 	    		Texture text = assetManager.loadTexture(terrapath.concat(tex.getTexture()));
 	    		text.setWrap(WrapMode.Repeat);
 	    	    mat_terrain.setTexture(tex.getName(), text);

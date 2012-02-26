@@ -36,57 +36,67 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Caps;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeCanvasContext;
 
 
-
-public class ViewportJMonkey extends AbstractViewport3d 
+/**
+ * @author Flipflop
+ */
+public class ViewportJMonkey extends AbstractViewport3d
 {
-	MonkeyApp					_app;
+	MonkeyApp								_app;
 
-	private JmeCanvasContext	_context;
+	private JmeCanvasContext				_context;
 
-	int							_selectedId;
+	int										_selectedId;
 
-	DrawableCombiner3d			_marker;
-	
-	private ClassLoader	_classloader;
-	
-	//
-	// Drawstuff
-	//
-	
+	DrawableCombiner3d						_marker;
 
-	private SpaceObject selectedObj;
-	private Set<Object> _drawObjects;
-	//Objects called in this refresh
-	private Set<Object> _drawObjectsRefresh;
-	//Objects has been createt during the last refresh
-	private Set<Object> _drawObjectsLast;
-	private Node _geometryNode = new Node("Geometry");
-	private Node _staticNode = new Node("Static Geometry");
-	
-	private boolean _firstrun = true;
-	
+	private ClassLoader						_classloader;
+
+
+	// the graphic card capabilities
+	Collection<Caps>						_capabilities;
+
+
+	private SpaceObject						_selectedObj;
+
+	private Set<Object>						_drawObjects;
+
+	// Objects called in this refresh
+	private Set<Object>						_drawObjectsRefresh;
+
+	// Objects has been createt during the last refresh
+	private Set<Object>						_drawObjectsLast;
+
+	private Node							_geometryNode	= new Node("Geometry");
+
+	private Node							_staticNode		= new Node("Static Geometry");
+
+	private boolean							_firstrun		= true;
+
 	// The Node to be updated
-	private Node _tmpNode;
-	
-	private Node marker;
-	
-	private int _lastselect = -1;
+	private Node							_tmpNode;
 
-	
-	private Callable<Object>	renderFrameAction_;
+	private Node							marker;
 
-	
+	private int								_lastselect		= -1;
+
+
+	private Callable<Object>				renderFrameAction_;
+
+	private float							_scale			= 1;
+
+
 	/** The overal scale for the Application */
-	private final static int _scaleApp; 
+	private final static int				_scaleApp		= 100;
 
 	/** The 3d renderers. */
-	private static final IJMonkeyRenderer[] RENDERERS = new IJMonkeyRenderer[10];
+	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[10];
 	static
 	{
 		RENDERERS[0] = new SphereJMonkeyRenderer();
@@ -96,22 +106,22 @@ public class ViewportJMonkey extends AbstractViewport3d
 		RENDERERS[4] = new DomeJMonkeyRenderer();
 		RENDERERS[5] = new TorusJMonkeyRenderer();
 		RENDERERS[6] = new Object3dJMonkeyRenderer();
-//		RENDERERS[7] = new Text3dJMonkeyRenderer();
+		// RENDERERS[7] = new Text3dJMonkeyRenderer();
 		RENDERERS[8] = new SkyJMonkeyRenderer();
 		RENDERERS[9] = new TerrainJMonkeyRenderer();
-		
-		// Don´t change this
-		_scaleApp = 100;
 	}
+
 	public ViewportJMonkey(IPerspective perspective, ClassLoader classloader)
 	{
 		super(perspective);
-		
-		//Context ClassLoader for Assets
+
+		// Context ClassLoader for Assets
 		Thread.currentThread().setContextClassLoader(classloader);
-		
+
 		_classloader = classloader;
-		_app = new MonkeyApp(_scaleApp);
+		_scale = _scaleApp / areaSize_.getXAsFloat();
+
+		_app = new MonkeyApp(_scale);
 
 		AppSettings settings = new AppSettings(true);
 
@@ -120,44 +130,46 @@ public class ViewportJMonkey extends AbstractViewport3d
 		_app.createCanvas();
 		_app.startCanvas();
 
-		
+
 		_context = (JmeCanvasContext)_app.getContext();
-		System.out.println("ViewportJMonkey Konstruktur: bis hier");
 		canvas_ = _context.getCanvas();
 		canvas_.setSize(settings.getWidth(), settings.getHeight());
-		
+
 		// Drawstuff
 		_drawObjects = Collections.synchronizedSet(new HashSet<Object>());
 		_drawObjectsRefresh = Collections.synchronizedSet(new HashSet<Object>());
 		_drawObjectsLast = Collections.synchronizedSet(new HashSet<Object>());
-				
+
 		renderFrameAction_ = new Callable<Object>()
 		{
 			public Object call()
 			{
-				
-				rendering = false;
+
+
+				_scale = _scaleApp / areaSize_.getXAsFloat();
+				_app.setScale(_scale);
+
 
 				if(_firstrun)
 				{
-					_staticNode = updateMonkey(_staticvisuals);
-					_staticNode.setLocalScale(_scaleApp / (areaSize_.getXAsFloat()));
+					_capabilities = _app.getCaps();
+					_staticNode = createStatics(_staticvisuals);
+					_staticNode.setLocalScale(_scale);
 					_app.setStaticGeometry(_staticNode);
 					_firstrun = false;
 				}
-				
+
 				_geometryNode = updateMonkey(objectList_);
-				
-				_geometryNode.setLocalScale(_scaleApp / (areaSize_.getXAsFloat()));
-				
+
+				_geometryNode.setLocalScale(_scale);
+
 				_app.setGeometry(_geometryNode);
-				
+				rendering = false;
 				return null;
 			};
 		};
-		 
-	}
 
+	}
 
 
 	public void setSelected(int selected, DrawableCombiner3d marker)
@@ -192,21 +204,21 @@ public class ViewportJMonkey extends AbstractViewport3d
 	}
 
 
-	public Spatial createPrimitive3d(DrawableCombiner3d drawableCombiner3d,
-			Primitive3d p, Object obj)
+	public Spatial createPrimitive3d(DrawableCombiner3d drawableCombiner3d, Primitive3d p, Object obj)
 	{
 		return RENDERERS[p.getType()].prepareAndExecuteDraw(drawableCombiner3d, p, obj, this);
 	}
 
 
-	public void updatePrimitive3d(DrawableCombiner3d drawableCombiner3d,
-			Primitive3d p, Object obj, Spatial sp)
+	public void updatePrimitive3d(DrawableCombiner3d drawableCombiner3d, Primitive3d p, Object obj, Spatial sp)
 	{
 		RENDERERS[p.getType()].prepareAndExecuteUpdate(drawableCombiner3d, p, obj, this, sp);
 
 	}
 
-
+	/**
+	 * This start´s the jMonkey Application
+	 */
 	public void startApp()
 	{
 		_app.startCanvas();
@@ -225,311 +237,318 @@ public class ViewportJMonkey extends AbstractViewport3d
 	}
 
 
-	
-	protected Node updateMonkey(ArrayList<DrawableCombiner3d> staticvisuals)
+	/*
+	 * the Static visuals are created here
+	 */
+	private Node createStatics(ArrayList<DrawableCombiner3d> staticvisuals)
 	{
-		for(DrawableCombiner3d combiner : _staticvisuals)
+		for(DrawableCombiner3d combiner3d : _staticvisuals)
 		{
 			Node objectNode = new Node("one static");
-			Vector3Double sizeDrawableD = (Vector3Double) combiner.getSize();
-				
-			Vector3f sizeDrawable =   new Vector3f(sizeDrawableD.getXAsFloat(), sizeDrawableD.getYAsFloat(), sizeDrawableD.getZAsFloat());	
-			
-			objectNode.setLocalScale(sizeDrawable);
-//			Vector3f vector = new Vector3f(areaSize_.getXAsFloat(), 0 , areaSize_.getYAsFloat());
-//			objectNode.setLocalTranslation(vector.divide(2));
-			
-//			TODO: ACHTUNG?
-			List<Primitive3d> drawList = combiner.getPrimitives3d();
-			if(drawList == null)
-				return objectNode;
+			Vector3Double sizeDrawableD = (Vector3Double)combiner3d.getSize();
 
-			for(Iterator<Primitive3d> it = drawList.iterator(); it.hasNext();)
-			{
-				Primitive3d p = (Primitive3d)it.next();
-				Spatial spatial = createPrimitive3d(combiner, p, null);
-				if(spatial!=null)
-				{
-					objectNode.attachChild(spatial);
-				}
-			}
+			Vector3f sizeDrawable = new Vector3f(sizeDrawableD.getXAsFloat(), sizeDrawableD.getYAsFloat(), sizeDrawableD.getZAsFloat());
+
+			objectNode.setLocalScale(sizeDrawable);
+
+			// TODO: ACHTUNG? sobj ist NULL
+			createObjects(objectNode, combiner3d, null);
 
 			_staticNode.attachChild(objectNode);
 		}
 		return _staticNode;
 	}
-	
-	public Node updateMonkey(List<Object> objectList) {
+
+	/*
+	 * the Dynamic Visuals are created and updated here, this includes the
+	 * marker
+	 */
+	private Node updateMonkey(List<Object> objectList)
+	{
 		synchronized(objectList)
 		{
+			_selectedObj = null;
+			
+			int selected = getSelected();
+			
+			createAndUpdateVisuals(objectList, selected);
 			// Clear the Refresh "listener"
 			_drawObjectsRefresh = new HashSet<Object>();
-			
 
-			selectedObj = null;
-				for (Iterator<Object> it = objectList.iterator(); it.hasNext(); )
+			// Update Selection (The Visualisation) // Big HACK would like
+			// to have an easier solution
+			// int selected = getSelected();
+
+			if(selected != -1)
+			{
+				if(_lastselect != -1 && _lastselect != selected)
 				{
-					Object[] o = (Object[]) it.next();
-					DrawableCombiner3d d = (DrawableCombiner3d) o[1];
-					SpaceObject sobj = (SpaceObject) o[0];
-					
-					Object identifier = SObjectInspector.getId(sobj);
-					
-					_drawObjectsRefresh.add(identifier);
-					
-					
-					// Handle Selection
-					int selected = getSelected();
-					int iteration =  ((Long) sobj.getId()).intValue();
-					if(iteration == selected)
-					{
-						selectedObj = sobj;
-					}
-					
-
-					
-					if (!_drawObjects.contains(identifier))
-					{
-						_drawObjects.add(identifier);
-						Node objectNode = new Node(identifier.toString());
-
-						Vector2Double pos2d = ((Vector2Double) SObjectInspector.getProperty(sobj, "position"));
-						Vector2f pos2df = new Vector2f(pos2d.getXAsFloat(),pos2d.getYAsFloat());
-						
-						Vector3f position = new Vector3f(pos2df.x,_app.getHeightAt(pos2df),pos2df.y);
-						// OLD POS
-//						Vector3f position = ((Vector2Double) SObjectInspector.getProperty(sobj, "position")).getVector3DoubleValueNoHight().createAsFloat();
-						Vector3Double sizeDrawableD = (Vector3Double) d.getSize();
-						
-						Vector3f sizeDrawable =   new Vector3f(sizeDrawableD.getXAsFloat(), sizeDrawableD.getYAsFloat(), sizeDrawableD.getZAsFloat());	
-						
-						
-		
-
-						
-						// Calculate the Direction
-						Vector3f degreecalc = (position.subtract(objectNode.getLocalTranslation())).normalizeLocal();
-						if(!degreecalc.equals(Vector3f.ZERO))
-								{
-								float grad = degreecalc.clone().angleBetween(Vector3f.UNIT_X.normalizeLocal());
-								Quaternion quat = new Quaternion();
-								if(degreecalc.getX() <= 0.0f && degreecalc.getZ() >= 0.0f )
-								{
-								quat.fromAngleAxis((360*FastMath.DEG_TO_RAD)-grad,Vector3f.UNIT_Y);
-								}
-								else if(degreecalc.getX() >= 0.0f && degreecalc.getZ() >= 0.0f )
-								{
-								quat.fromAngleAxis((360*FastMath.DEG_TO_RAD)-grad,Vector3f.UNIT_Y);
-								}
-								else
-								{
-									quat.fromAngleAxis(grad,Vector3f.UNIT_Y);	
-								}
-								objectNode.setLocalRotation(quat);
-								}
-						
-						
-						
-						objectNode.setLocalScale(sizeDrawable);
-						objectNode.setLocalTranslation(position);
-						
-						
-//						NEW NEW NEW
-//						TODO: ACHTUNG?
-						List<Primitive3d> drawList = d.getPrimitives3d();
-						if(drawList == null)
-							return objectNode;
-
-						for(Iterator<Primitive3d> itp = drawList.iterator(); itp.hasNext();)
-						{
-							Primitive3d p = (Primitive3d)itp.next();
-							Spatial spatial = createPrimitive3d(d, p, sobj);
-							if(spatial!=null)
-							{
-								objectNode.attachChild(spatial);
-							}
-						}
-
-
-						_geometryNode.attachChild(objectNode);
-
-					}
-					else
-					{
-						Vector2Double pos2d = ((Vector2Double) SObjectInspector.getProperty(sobj, "position"));
-						Vector2f pos2df = new Vector2f(pos2d.getXAsFloat(),pos2d.getYAsFloat());
-						
-						Vector3f position = new Vector3f(pos2df.x,_app.getHeightAt(pos2df),pos2df.y);
-						// OLD POS
-//						Vector3f position = ((Vector2Double) SObjectInspector.getProperty(sobj, "position")).getVector3DoubleValueNoHight().createAsFloat();
-						Vector3Double sizeDrawableD = (Vector3Double) d.getSize();
-
-						Vector3f sizeDrawable =   new Vector3f(sizeDrawableD.getXAsFloat(), sizeDrawableD.getYAsFloat(), sizeDrawableD.getZAsFloat());	
-						
-						Spatial node = _geometryNode.getChild(identifier.toString());
-						_tmpNode = (Node) node;
-						
-
-						
-						
-						// Calculate the Direction
-						try
-						{
-						Vector3f degreecalc = (position.clone().subtract(_tmpNode.getLocalTranslation().clone())).normalizeLocal();
-	
-						if(!degreecalc.equals(Vector3f.ZERO))
-								{
-								float grad = degreecalc.clone().angleBetween(Vector3f.UNIT_X.normalizeLocal());
-								Quaternion quat = new Quaternion();
-								if(degreecalc.getX() <= 0.0f && degreecalc.getZ() >= 0.0f )
-								{
-								quat.fromAngleAxis((360*FastMath.DEG_TO_RAD)-grad,Vector3f.UNIT_Y);
-								}
-								else if(degreecalc.getX() >= 0.0f && degreecalc.getZ() >= 0.0f )
-								{
-								quat.fromAngleAxis((360*FastMath.DEG_TO_RAD)-grad,Vector3f.UNIT_Y);
-								}
-								else
-								{
-									quat.fromAngleAxis(grad,Vector3f.UNIT_Y);	
-								}
-								_tmpNode.setLocalRotation(quat);
-								}
-						
-						_tmpNode.setLocalScale(sizeDrawable);
-						
-						_tmpNode.setLocalTranslation(position);
-						
-						
-								List<Primitive3d> drawList = d.getPrimitives3d();
-								if(drawList == null)
-								{
-									System.out.println("Viewport Monkey Zeile 407ca: null?!");
-								}
-								else
-								{
-									for(Iterator<Primitive3d> itx = drawList.iterator(); itx.hasNext();)
-									{
-										Primitive3d p = (Primitive3d)itx.next();
-										
-										identifier = "Type: "+ p.getType()+ " HCode " +p.hashCode();
-								
-										Spatial sp = _tmpNode.getChild((String)identifier);
-										
-										if(!(sp == null))
-										{
-											updatePrimitive3d(d, p, sobj, sp);
-											
-										}
-										else
-											{
-												
-												Spatial spatial = createPrimitive3d(d, p, sobj);
-												if(spatial!=null)
-												{
-													_tmpNode.attachChild(spatial);
-												}
-											}
-								}
-									
-					
-
-									
-								}
-
-						
-
-						
-						
-						} catch(NullPointerException e)
-						{
-							
-						}
-					}
-
-
-				}
-				
-				// Update Selection (The Visualisation) // Big HACK would like to have an easier solution
-				int selected = getSelected();
-
-				if(selected != -1)
-				{
-					if(_lastselect!=-1 && _lastselect!=selected)
-					{
-						Node node = (Node) _geometryNode.getChild(_lastselect);
-						marker = new Node("Marker");
-//						marker = getMarker().modify(selectedObj, this, marker);
-						if(node.getChild("Marker")!=null)
-						{		
-							node.getChild("Marker").removeFromParent();
-						}
-					}
-					_lastselect = selected;
-					Node node = (Node) _geometryNode.getChild(selected);
+					Node node = (Node)_geometryNode.getChild(_lastselect);
 					marker = new Node("Marker");
-//					marker = getMarker().modify(selectedObj, this, marker);
-					if(node.getChild("Marker")==null)
-					{		
-						node.attachChild(marker);
-					}
-				}
-				else if (selected == -1 && _lastselect != -1)
-				{
-					Node node = (Node) _geometryNode.getChild(_lastselect);
-					marker = new Node("Marker");
-//					marker = getMarker().modify(selectedObj, this, marker);
-					if(node.getChild("Marker")!=null)
-					{		
+					// marker = getMarker().modify(selectedObj, this,
+					// marker);
+					if(node.getChild("Marker") != null)
+					{
 						node.getChild("Marker").removeFromParent();
 					}
 				}
-				
-				// End of Selection Updates
-		
-				
-				// Delete all deleted Objects by removing them from the Geometry Node
-				for (Iterator<Object> it = _drawObjectsLast.iterator(); it.hasNext(); )
+				_lastselect = selected;
+				Node node = (Node)_geometryNode.getChild(selected);
+				marker = new Node("Marker");
+				// marker = getMarker().modify(selectedObj, this, marker);
+				if(node.getChild("Marker") == null)
 				{
-					Object identifier = it.next();
-					if(!_drawObjectsRefresh.contains(identifier))
-					{
-						_geometryNode.getChild(identifier.toString()).removeFromParent();
-						System.out.println("delete!");
-					}
-				
+					node.attachChild(marker);
 				}
-				_drawObjectsLast = new HashSet<Object>(_drawObjectsRefresh);
+			}
+			else if(selected == -1 && _lastselect != -1)
+			{
+				Node node = (Node)_geometryNode.getChild(_lastselect);
+				marker = new Node("Marker");
+				// marker = getMarker().modify(selectedObj, this, marker);
+				if(node.getChild("Marker") != null)
+				{
+					node.getChild("Marker").removeFromParent();
+				}
+			}
+
+			// End of Selection Updates
+
+
+			// Delete all deleted Objects by removing them from the Geometry
+			// Node
+			for(Iterator<Object> itr = _drawObjectsLast.iterator(); itr.hasNext();)
+			{
+				Object id = itr.next();
+				if(!_drawObjectsRefresh.contains(id))
+				{
+					_geometryNode.getChild(id.toString()).removeFromParent();
+					// System.out.println("delete!");
+				}
+
+			}
+			_drawObjectsLast = new HashSet<Object>(_drawObjectsRefresh);
+
 		}
 		return _geometryNode;
+
+	}
+
+	private void createAndUpdateVisuals(List<Object> objectList, int selected)
+	{
+		for(Iterator<Object> it = objectList.iterator(); it.hasNext();)
+		{
+			
+			Object[] o = (Object[])it.next();
+			DrawableCombiner3d combiner3d = (DrawableCombiner3d)o[1];
+			SpaceObject sobj = (SpaceObject)o[0];
+			Object identifier = SObjectInspector.getId(sobj);
+
+			_drawObjectsRefresh.add(identifier);
+
+			// Handle Selection
+			// int iteration = ((Long) sobj.getId()).intValue();
+			// if(iteration == selected)
+			// {
+			// selectedObj = sobj;
+			// }
+			if(!_drawObjects.contains(identifier))
+			{
+				_drawObjects.add(identifier);
+				Node objectNode = new Node(identifier.toString());
+				Vector2Double pos2d = ((Vector2Double)SObjectInspector.getProperty(sobj, "position"));
+				Vector3Double sizeDrawableD = (Vector3Double)combiner3d.getSize();
+
+				/*
+				 * The same values in Float
+				 */
+				Vector2f pos2df = new Vector2f(pos2d.getXAsFloat(), pos2d.getYAsFloat());
+				// TODO: y-position (Height) only based on Heightmap or
+				// Ground
+				Vector3f position = new Vector3f(pos2df.x, _app.getHeightAt(pos2df), pos2df.y);
+				Vector3f sizeDrawable = new Vector3f(sizeDrawableD.getXAsFloat(), sizeDrawableD.getYAsFloat(), sizeDrawableD.getZAsFloat());
+
+
+				// Use this distance Vector to calculate the Rotation of the
+				// Object
+				Quaternion quat = calculateRotation(position, objectNode.getLocalTranslation(), true);
+
+
+				if(quat != null)
+					objectNode.setLocalRotation(quat);
+
+				objectNode.setLocalScale(sizeDrawable);
+				objectNode.setLocalTranslation(position);
+
+				// The visuals for each DrawableCombiner3d (stored in a the
+				// objectNode, influenced by it´s holder the SpaceObject
+				// (sobj)...
+				createObjects(objectNode, combiner3d, sobj);
+
+				// ...and attached to the gemetryNode, holder of all dyn.
+				// visuals in the Scene
+				_geometryNode.attachChild(objectNode);
+
+			}
+			else
+			{
+				Vector2Double pos2d = ((Vector2Double)SObjectInspector.getProperty(sobj, "position"));
+				Vector2f pos2df = new Vector2f(pos2d.getXAsFloat(), pos2d.getYAsFloat());
+
+				Vector3f position = new Vector3f(pos2df.x, _app.getHeightAt(pos2df), pos2df.y);
+				// OLD POS
+				// Vector3f position = ((Vector2Double)
+				// SObjectInspector.getProperty(sobj,
+				// "position")).getVector3DoubleValueNoHight().createAsFloat();
+				Vector3Double sizeDrawableD = (Vector3Double)combiner3d.getSize();
+
+				Vector3f sizeDrawable = new Vector3f(sizeDrawableD.getXAsFloat(), sizeDrawableD.getYAsFloat(), sizeDrawableD.getZAsFloat());
+
+				Spatial node = _geometryNode.getChild(identifier.toString());
+				_tmpNode = (Node)node;
+
+
+				Vector3f direction = position.subtract(_tmpNode.getLocalTranslation());
+				if(!direction.equals(Vector3f.ZERO))
+				{
+					// Calculate the Direction
+					Quaternion quat = calculateRotation(position, _tmpNode.getLocalTranslation(), true);
+
+					if(quat != null)
+						_tmpNode.setLocalRotation(quat);
+
+					_tmpNode.setLocalScale(sizeDrawable);
+
+					_tmpNode.setLocalTranslation(position);
+
+
+					List<Primitive3d> drawList = combiner3d.getPrimitives3d();
+					if(drawList == null)
+					{
+						// System.out.println("Viewport Monkey Zeile 407ca: null?!");
+					}
+					else
+					{
+						for(Iterator<Primitive3d> itx = drawList.iterator(); itx.hasNext();)
+						{
+							Primitive3d p = (Primitive3d)itx.next();
+
+							identifier = "Type: " + p.getType() + " HCode " + p.hashCode();
+
+							Spatial sp = _tmpNode.getChild((String)identifier);
+
+							if(!(sp == null))
+							{
+								updatePrimitive3d(combiner3d, p, sobj, sp);
+
+							}
+							else
+							{
+
+								Spatial spatial = createPrimitive3d(combiner3d, p, sobj);
+								if(spatial != null)
+								{
+									_tmpNode.attachChild(spatial);
+								}
+							}
+						}
+					}
+
+				}
+			}
+
+
+		}
 		
 	}
-	
+
+
+	/*
+	 * Calculate the current Rotation of the Object in Up/Down and Left/Right
+	 */
+	private Quaternion calculateRotation(Vector3f newpos, Vector3f oldpos, boolean b)
+	{
+
+		Vector3f direction = newpos.subtract(oldpos);
+		if(!direction.equals(Vector3f.ZERO))
+		{
+			Quaternion quat = new Quaternion();
+			quat.lookAt(direction, Vector3f.UNIT_Y);
+			return quat;
+		}
+		else
+		{
+			System.out.println("No Positionchange!");
+		}
+
+		return null;
+
+	}
+
+
+	private void createObjects(Node objectNode, DrawableCombiner3d combiner3d, SpaceObject sobj)
+	{
+		List<Primitive3d> drawList = combiner3d.getPrimitives3d();
+		if(drawList == null)
+			return;
+
+		for(Iterator<Primitive3d> itp = drawList.iterator(); itp.hasNext();)
+		{
+			Primitive3d p = (Primitive3d)itp.next();
+			Spatial spatial = createPrimitive3d(combiner3d, p, sobj);
+			if(spatial != null)
+			{
+				objectNode.attachChild(spatial);
+			}
+		}
+
+
+		_geometryNode.attachChild(objectNode);
+
+	}
+
+
 	public ClassLoader getClassloader()
 	{
 		return _classloader;
 	}
 
-	
+
 	// HACK TODO: good?
 	public void stopApp()
 	{
 
-		
 
 		_app.stop();
 
-			System.out.println("ViewportJmonkey: STOP STOP STOP");
+		// System.out.println("ViewportJmonkey: STOP STOP STOP");
 
 	}
 
 	// TODO Auto-generated method stub
 	public void pauseApp()
 	{
-		
+
 		_app.loseFocus();
 	}
 
+
+	/**
+	 * @return return the graphic card capabilities
+	 */
+	public Collection<Caps> getCapabilities()
+	{
+		return _capabilities;
+	}
+
+
+	/**
+	 * @param capabilities the graphic card capabilities
+	 */
+	public void setCapabilities(Collection<Caps> capabilities)
+	{
+		this._capabilities = capabilities;
+	}
 
 
 }
