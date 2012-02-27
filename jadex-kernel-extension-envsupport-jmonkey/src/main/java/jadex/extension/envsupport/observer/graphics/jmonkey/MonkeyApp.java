@@ -227,13 +227,16 @@ public class MonkeyApp extends SimpleApplication
 
 	}
 
+	/*
+	 * Use only for Camera
+	 */
 	public float getHeightAt(float x, float z)
 	{
 		if(_terrain != null)
 		{
 			Vector2f vec = new Vector2f(x, z);
 			float height = _terrain.getHeight(vec);
-			return height+1;
+			return height+3;
 		}
 
 		return 0;
