@@ -17,8 +17,6 @@ public class Primitive3d extends AbstractVisual3d
 	public static final int PRIMITIVE_TYPE_DOME		 		= 4;
 	public static final int PRIMITIVE_TYPE_TORUS			 = 5;
 	
-
-	
 	public static final int PRIMITIVE_TYPE_OBJECT3D	 		= 6;
 	
 	public static final int PRIMITIVE_TYPE_TEXT3D			 = 7;
