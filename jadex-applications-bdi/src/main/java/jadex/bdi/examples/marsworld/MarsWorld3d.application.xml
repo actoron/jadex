@@ -136,7 +136,7 @@
 				</env:drawable3d>
 				
 				<!-- H O M E B A S E -->
-				<env:drawable3d objecttype="homebase" width="0.1" height="0.1" depth="0.1">
+				<env:drawable3d objecttype="homebase" width="0.1" height="0.1" depth="0.1" rotation3d="false">
 					<env:property name="oresize" dynamic="true">new Vector3Double(0.72f,Math.sqrt(((Number)$object.getProperty("ore")).intValue()/1000.0),0.72f)</env:property>
 					<env:property name="textda" dynamic="true">$object.getProperty("text")</env:property>
 					<env:property name="rotate" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
@@ -231,7 +231,7 @@
 						
 						 <env:object3d width="1.5" height="1.5" depth="1.5" rotation="-turn90" modelpath="jadex3d/models/vehicles/forklift/forklift.j3o" hasLightMaterials="false"/> 
 					
-						<env:box width="0.2" height="0.2" depth="0.2"  x="0.4" y="0.2" z="0.0"  color="#FFA54FFF">
+						<env:box width="0.2" height="0.2" depth="0.2"  x="0.0" y="0.22" z="0.4"  color="#FFFFFFFF" texturepath="jadex3d/textures/solid/wood.jpg">
 							<env:drawcondition>((Number)$object.getProperty("ore")).intValue()>0</env:drawcondition>
 						</env:box>
 					</env:drawable3d>
