@@ -86,7 +86,8 @@ public abstract class ProcessWorkpieceAgent extends MicroAgent {
 			fut = new Future<IProcessWorkpieceService>(processWPServices.get(role));
 		} else {
 			ComponentIdentifier ci = new ComponentIdentifier(role.getPostcondition().getTargetAgent(), getParentAccess().getComponentIdentifier());
-			IServiceIdentifier sid = new ServiceIdentifier(ci, IProcessWorkpieceService.class, role.getPostcondition().getTargetAgent());
+			// TODO check if a null IResourceIdentifer is ok
+			IServiceIdentifier sid = new ServiceIdentifier(ci, IProcessWorkpieceService.class, role.getPostcondition().getTargetAgent(), null);
 			fut = SServiceProvider.getService(getServiceProvider(), sid);
 			fut.addResultListener(new DefaultResultListener<IProcessWorkpieceService>() {
 

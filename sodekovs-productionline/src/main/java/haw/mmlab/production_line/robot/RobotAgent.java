@@ -107,8 +107,9 @@ public class RobotAgent extends ProcessWorkpieceAgent {
 	}
 
 	@Override
-	public void executeBody() {
+	public IFuture<Void> executeBody() {
 		waitForTick(new SendWorkpieceStep());
+		return IFuture.DONE;
 	}
 
 	@Override
