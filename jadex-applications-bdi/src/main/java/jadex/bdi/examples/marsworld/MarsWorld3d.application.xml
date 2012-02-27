@@ -129,7 +129,7 @@
 					<env:sky skypath="jadex/bdi/examples/marsworld/Textures/Sky/space/" west="west.jpg" east="east.jpg" north="north.jpg" south="south.jpg" up="up.jpg" down="down.jpg" isSphere="false" />  
 						
 					<env:rndterrain width="1" height="0.2" depth="1"  
-		 		tiles="256" iterations="1000" minradius="25" maxradius="100" seed="4"
+		 		tiles="512" iterations="1000" minradius="25" maxradius="100" seed="4"
 					terrapath="jadex/bdi/examples/marsworld/Textures/Terrain/" alphamap="alphamap.png" 
 					texture01="grass.jpg" tex01val="64" texture02="dirt.jpg" tex02val="32" texture03="road.jpg" tex03val="128" />
 
