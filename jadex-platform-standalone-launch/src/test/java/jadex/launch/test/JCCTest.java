@@ -109,7 +109,26 @@ public class JCCTest extends TestCase
 	 */
 	public static void main(String[] args)
 	{
-		JCCTest test = new JCCTest();
-		test.testJCC();
+		for(int i=0; i<5; i++)
+		{
+			final int	num	= i;
+			new Thread(new Runnable()
+			{				
+				public void run()
+				{
+					try
+					{
+						System.out.println("starting: "+num);
+						JCCTest test = new JCCTest();
+						test.testJCC();
+						System.out.println("finished: "+num);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+			}).start();
+		}
 	}
 }

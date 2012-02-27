@@ -141,7 +141,7 @@
 					<env:property name="textda" dynamic="true">$object.getProperty("text")</env:property>
 					<env:property name="rotate" dynamic="false">new Vector3Double((Math.PI/180)*90, 0, 0)</env:property>
 				
-					<!--Box für Erz -->
+					<!--Box for Ore -->
 					<env:box  width="1" height="0.01" depth="1" x="-1" y="0.01" z="1" color="#D2B48CFF" />
 
 					<env:box  width="0.001" height="0.15" depth="1.0" x="-2" y="0.15" z="1" color="#FF7F24FF" />

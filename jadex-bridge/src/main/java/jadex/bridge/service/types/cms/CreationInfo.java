@@ -160,7 +160,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, boolean suspend)
 	{
-		this(config, args, parent, null, (String[])null);
+		this(config, args, parent, suspend, (String[])null);
 	}
 	
 	/**
@@ -174,7 +174,7 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend, String[] imports)
 	{
-		this(config, args, parent, null, null, null, null, imports, null, null);
+		this(config, args, parent, suspend, null, null, null, imports, null, null);
 	}
 	
 	/**
