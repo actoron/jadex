@@ -539,6 +539,7 @@ public class MEnvSpaceType
 				new AttributeInfo(new AccessInfo("rotation", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("size", null, null, null, new BeanAccessInfo(AccessInfo.THIS))),
 				new AttributeInfo(new AccessInfo("hasSpaceobject", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
+				new AttributeInfo(new AccessInfo("rotation3d", null, null, null, new BeanAccessInfo(AccessInfo.THIS)), new AttributeConverter(BasicTypeConverter.BOOLEAN_CONVERTER, null)),
 				new AttributeInfo(new AccessInfo("creator", null, null, new IObjectCreator()
 				{
 					public Object createObject(Map args) throws Exception
@@ -572,7 +573,12 @@ public class MEnvSpaceType
 						{
 							hasSpaceobject = true;
 						}
-						DrawableCombiner3d ret = new DrawableCombiner3d(position, rotation, size, (boolean)hasSpaceobject);
+						Boolean rotation3d = (Boolean)getProperty(args, "rotation3d");
+						if(rotation3d==null)
+						{
+							rotation3d = true;
+						}
+						DrawableCombiner3d ret = new DrawableCombiner3d(position, rotation, size, (boolean)hasSpaceobject, rotation3d);
 						
 						List parts = (List)args.get("parts");
 						if(parts!=null)

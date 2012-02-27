@@ -30,10 +30,13 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	/** The properties */
 	public Map<String, Object> properties;
 	
-	/** Is an Avator for SpaceObject?*/
+	/** Has a SpaceObject?*/
 
 	//TODO : better Name
 	public boolean _hasSpaceobject;
+	
+	/** Uses 3d Rotation? */
+	public boolean _rotation3d;
 	
 	//-------- constructors --------
 	
@@ -42,7 +45,7 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	 */
 	public DrawableCombiner3d()
 	{
-		this(null, null, null, true);
+		this(null, null, null, true, false);
 	}
 
 	//-------- methods --------
@@ -50,11 +53,13 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	/**
 	 * Creates a new DrawableCombiner3d
 	 */
-	public DrawableCombiner3d(Object position, Object rotation, Object size, boolean hasSpaceobject)
+	public DrawableCombiner3d(Object position, Object rotation, Object size, boolean hasSpaceobject, boolean rotation3d)
 	{
 		super(position==null? "position": position, rotation, size);
 		_hasSpaceobject = hasSpaceobject;
+		_rotation3d = rotation3d;
 		primitives3d = new ArrayList<Primitive3d>();
+		
 	}
 
 	/**
@@ -183,6 +188,22 @@ public class DrawableCombiner3d extends AbstractVisual3d implements IPropertyObj
 	public void setPrimitives3d(List<Primitive3d> primitives3d)
 	{
 		this.primitives3d = primitives3d;
+	}
+
+	/**
+	 * @return the _rotation3d
+	 */
+	public boolean isRotation3d()
+	{
+		return _rotation3d;
+	}
+
+	/**
+	 * @param _rotation3d the _rotation3d to set
+	 */
+	public void setRotation3d(boolean _rotation3d)
+	{
+		this._rotation3d = _rotation3d;
 	}
 
 }
