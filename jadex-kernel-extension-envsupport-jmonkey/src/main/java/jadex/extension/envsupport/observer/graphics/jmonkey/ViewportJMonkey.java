@@ -343,6 +343,8 @@ public class ViewportJMonkey extends AbstractViewport3d
 			DrawableCombiner3d combiner3d = (DrawableCombiner3d)o[1];
 			SpaceObject sobj = (SpaceObject)o[0];
 			Object identifier = SObjectInspector.getId(sobj);
+			
+			boolean rotation3d = combiner3d.isRotation3d();
 
 			_drawObjectsRefresh.add(identifier);
 
@@ -359,6 +361,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 				Vector2Double pos2d = ((Vector2Double)SObjectInspector.getProperty(sobj, "position"));
 				Vector3Double sizeDrawableD = (Vector3Double)combiner3d.getSize();
 
+				
 				/*
 				 * The same values in Float
 				 */
@@ -371,7 +374,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 				// Use this distance Vector to calculate the Rotation of the
 				// Object
-				Quaternion quat = calculateRotation(position, objectNode.getLocalTranslation(), true);
+				Quaternion quat = calculateRotation(position, objectNode.getLocalTranslation(), rotation3d);
 
 
 				if(quat != null)
@@ -409,10 +412,9 @@ public class ViewportJMonkey extends AbstractViewport3d
 
 
 				Vector3f direction = position.subtract(_tmpNode.getLocalTranslation());
-				if(!direction.equals(Vector3f.ZERO))
-				{
+
 					// Calculate the Direction
-					Quaternion quat = calculateRotation(position, _tmpNode.getLocalTranslation(), true);
+					Quaternion quat = calculateRotation(position, _tmpNode.getLocalTranslation(), rotation3d);
 
 					if(quat != null)
 						_tmpNode.setLocalRotation(quat);
@@ -454,7 +456,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 						}
 					}
 
-				}
+				
 			}
 
 
@@ -466,19 +468,28 @@ public class ViewportJMonkey extends AbstractViewport3d
 	/*
 	 * Calculate the current Rotation of the Object in Up/Down and Left/Right
 	 */
-	private Quaternion calculateRotation(Vector3f newpos, Vector3f oldpos, boolean b)
+	private Quaternion calculateRotation(Vector3f newp, Vector3f oldp, boolean rotation3d)
 	{
 
+		Vector3f newpos;
+		Vector3f oldpos;
+		if(rotation3d)
+		{
+			newpos = newp;
+			oldpos = oldp;
+		}
+		else
+		{
+			newpos = newp.clone().setY(0);
+			oldpos = oldp.clone().setY(0);
+		}
+		
 		Vector3f direction = newpos.subtract(oldpos);
 		if(!direction.equals(Vector3f.ZERO))
 		{
 			Quaternion quat = new Quaternion();
 			quat.lookAt(direction, Vector3f.UNIT_Y);
 			return quat;
-		}
-		else
-		{
-			System.out.println("No Positionchange!");
 		}
 
 		return null;
