@@ -31,7 +31,8 @@ import com.jme3.terrain.heightmap.HillHeightMap;
 public class MonkeyApp extends SimpleApplication
 {
 
-	private boolean _walkCam;
+	private boolean			_walkCam;
+
 	private float			_areaSize;
 
 	private Node			_geometryNode;
@@ -67,7 +68,7 @@ public class MonkeyApp extends SimpleApplication
 
 
 		this.rootNode.attachChild(_geometryNode);
-		this.rootNode.attachChild(_gridNode);
+//		this.rootNode.attachChild(_gridNode);
 		this.rootNode.attachChild(_staticNode);
 
 
@@ -88,6 +89,7 @@ public class MonkeyApp extends SimpleApplication
 		inputManager.addMapping("Random", new KeyTrigger(KeyInput.KEY_SPACE));
 
 		inputManager.addMapping("ChangeCam", new KeyTrigger(KeyInput.KEY_F6));
+		inputManager.addMapping("Grid", new KeyTrigger(KeyInput.KEY_F8));
 		inputManager.addMapping("ZoomIn", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
 		inputManager.addMapping("ZoomOut", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
 		inputManager.addMapping("Rotatey", new MouseButtonTrigger(0));
@@ -102,6 +104,21 @@ public class MonkeyApp extends SimpleApplication
 				if(keyPressed && name.equals("Random"))
 				{
 					setHeight();
+
+				}
+				if(keyPressed && name.equals("Grid"))
+				{
+
+					if(rootNode.getChild("gridNode") != null)
+					{
+						rootNode.detachChild(_gridNode);
+
+					}
+					else
+					{
+						rootNode.attachChild(_gridNode);
+					}
+
 				}
 				else if(name.equals("ZoomIn"))
 				{
@@ -116,16 +133,13 @@ public class MonkeyApp extends SimpleApplication
 					_walkCam = !_walkCam;
 
 				}
-				else
-				{
-					System.out.println("jo");
-				}
 			}
 
 		};
 
 
 		inputManager.addListener(actionListener, new String[]{"Random"});
+		inputManager.addListener(actionListener, new String[]{"Grid"});
 		inputManager.addListener(actionListener, new String[]{"ChangeCam"});
 		inputManager.addListener(actionListener, new String[]{"ZoomIn"});
 		inputManager.addListener(actionListener, new String[]{"ZoomOut"});
@@ -178,12 +192,12 @@ public class MonkeyApp extends SimpleApplication
 
 	public void simpleUpdate(float tpf)
 	{
-		 if(_walkCam)
-		 {
-		 Vector3f loc = cam.getLocation();
-		 loc.setY(getHeightAt(loc.x, loc.z));
-		 cam.setLocation(loc);
-		 }
+		if(_walkCam)
+		{
+			Vector3f loc = cam.getLocation();
+			loc.setY(getHeightAt(loc.x, loc.z));
+			cam.setLocation(loc);
+		}
 
 	}
 
@@ -236,7 +250,7 @@ public class MonkeyApp extends SimpleApplication
 		{
 			Vector2f vec = new Vector2f(x, z);
 			float height = _terrain.getHeight(vec);
-			return height+3;
+			return height + 3;
 		}
 
 		return 0;
