@@ -158,7 +158,7 @@ public class CreationInfo
 	 *  @param master	The master flag.
 	 *  @param imports	The imports.
 	 */
-	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, boolean suspend)
+	public CreationInfo(String config, Map<String, Object> args, IComponentIdentifier parent, Boolean suspend)
 	{
 		this(config, args, parent, suspend, (String[])null);
 	}
