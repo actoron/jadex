@@ -4,18 +4,22 @@ import java.util.Collection;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
+import com.jme3.collision.CollisionResults;
 import com.jme3.input.FlyByCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.light.DirectionalLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.Ray;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.terrain.geomipmap.TerrainLodControl;
@@ -85,6 +89,8 @@ public class MonkeyApp extends SimpleApplication
 	/** Custom Keybinding: Map named actions to inputs. */
 	private void initKeys()
 	{
+		
+		inputManager.addMapping("Select", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 		// You can map one or several inputs to one named action
 		inputManager.addMapping("Random", new KeyTrigger(KeyInput.KEY_SPACE));
 
@@ -92,7 +98,6 @@ public class MonkeyApp extends SimpleApplication
 		inputManager.addMapping("Grid", new KeyTrigger(KeyInput.KEY_F8));
 		inputManager.addMapping("ZoomIn", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, false));
 		inputManager.addMapping("ZoomOut", new MouseAxisTrigger(MouseInput.AXIS_WHEEL, true));
-		inputManager.addMapping("Rotatey", new MouseButtonTrigger(0));
 		// Add the names to the action listener.
 
 
@@ -143,6 +148,7 @@ public class MonkeyApp extends SimpleApplication
 		inputManager.addListener(actionListener, new String[]{"ChangeCam"});
 		inputManager.addListener(actionListener, new String[]{"ZoomIn"});
 		inputManager.addListener(actionListener, new String[]{"ZoomOut"});
+		inputManager.addListener(analogListener, new String[]{"Select"});
 
 
 	}
@@ -300,6 +306,41 @@ public class MonkeyApp extends SimpleApplication
 		_areaSize = scale;
 
 	}
+	
+	/*
+	 * Use later for Selectioncontroll
+	 */
+	private AnalogListener analogListener = new AnalogListener() {
+	    public void onAnalog(String name, float intensity, float tpf) {
+	      if (name.equals("Select")) {
+	        // Reset results list.
+	        CollisionResults results = new CollisionResults();
+	        // Convert screen click to 3d position
+	        Vector2f click2d = inputManager.getCursorPosition();
+	        Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
+	        Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalize();
+	        // Aim the ray from the clicked spot forwards.
+	        Ray ray = new Ray(click3d, dir);
+	        // Collect intersections between ray and all nodes in results list.
+	        rootNode.collideWith(ray, results);
+	        // (Print the results so we see what is going on:)
+	        for (int i = 0; i < results.size(); i++) {
+	          // (For each "hit", we know distance, impact point, geometry.)
+	          float dist = results.getCollision(i).getDistance();
+	          Vector3f pt = results.getCollision(i).getContactPoint();
+	          String target = results.getCollision(i).getGeometry().getName();
+	          System.out.println("Selection #" + i + ": " + target + " at " + pt + ", " + dist + " WU away.");
+	        }
+	        // Use the results -- we rotate the selected geometry.
+	        if (results.size() > 0) {
+	          Geometry target = results.getClosestCollision().getGeometry();
+	          // Here comes the action:
+	          System.out.println("target: " + target.getName());
+	          
+	        }
+	      } // else if ...
+	    }
+	  };
 
 
 }
