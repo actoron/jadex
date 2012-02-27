@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import org.lwjgl.Sys;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
