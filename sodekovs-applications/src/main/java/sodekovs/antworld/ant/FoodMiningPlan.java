@@ -85,46 +85,18 @@ public class FoodMiningPlan extends Plan
 		
 		//Take a piece of food.		
 		props = new HashMap();
-		props.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
+		props.put(PickupFoodTask.ACTOR_ID, myself.getId());
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));		
 		taskid = space.createObjectTask(PickupFoodTask.PROPERTY_TYPENAME, props, myself.getId());
 		res = new SyncResultListener();
 		space.addTaskListener(taskid, myself.getId(), res);
 		res.waitForResult();
 		
-		//Take a piece of food.				
-//		Map params = new HashMap();
-//		params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
-//		SyncResultListener srl	= new SyncResultListener();
-//		env.performSpaceAction("pickup", params, srl);
-//		System.out.println("#FoodMiningPlan# trying ot pick up food.");
-//		srl.waitForResult();
-		//TODO: Model failed situation!
-//		if(!((Boolean)srl.waitForResult()).booleanValue()) 
-//			fail();
-//		System.out.println("#FoodMiningPlan# successfully picked up food.");
+
 		
 		//Move to the nest.
-		ISpaceObject[] nests = (ISpaceObject[]) getBeliefbase().getBeliefSet("nests").getFacts();
-//		if(nests.length == 0){
-//			do{
-//				//walk randomly on grid.
-////				System.out.println("#FoodMiningPlan# walking randomly on the grid since no nest is known.");
-////				IGoal checkGoal = createGoal("check");
-////			    dispatchSubgoalAndWait(checkGoal);
-//			    IGoal walkRandomly = createGoal("go");
-//			    walkRandomly.getParameter("pos").setValue(computeNextPositionRandomly());
-//				dispatchSubgoalAndWait(walkRandomly);
-//			    nests = (ISpaceObject[]) getBeliefbase().getBeliefSet("nests").getFacts();
-//			}while(nests.length == 0);
-//		}		
-		IVector2 nestPos = (IVector2)nests[0].getProperty(Space2D.PROPERTY_POSITION);
-//		System.out.println("#FoodMiningPlan# walking to nest: " + nestPos.toString());
-//		IGoal goToNest = createGoal("go");
-//		goToNest.getParameter("pos").setValue(nestPos);
-//		dispatchSubgoalAndWait(goToNest);
-//		System.out.println("#FoodMiningPlan# Reached nest. Drop food and walk randomly on grid.");
-		
+		ISpaceObject[] nests = (ISpaceObject[]) getBeliefbase().getBeliefSet("nests").getFacts();		
+		IVector2 nestPos = (IVector2)nests[0].getProperty(Space2D.PROPERTY_POSITION);		
 		props = new HashMap();
 		props.put(MoveTask.PROPERTY_DESTINATION, nestPos);
 		props.put(MoveTask.PROPERTY_SCOPE, getScope().getExternalAccess());
@@ -136,20 +108,9 @@ public class FoodMiningPlan extends Plan
 		res.waitForResult();
 		
 		
-		//TODO:
-//		getBeliefbase().getBeliefSet("carriedFood").removeFacts();
-		//Drop the piece of food in the nest.				
-//		params = new HashMap();
-//		params.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
-//		srl	= new SyncResultListener();
-//		env.performSpaceAction("drop", params, srl);		
-//		srl.waitForResult();
-		//TODO: Model failed situation!
-//		if(!((Boolean)srl.waitForResult()).booleanValue()) 
-//			fail();
-		
+		//Drop the carried piece of food at the nest.
 		props = new HashMap();
-		props.put(ISpaceAction.ACTOR_ID, getComponentIdentifier());
+		props.put(DropFoodTask.ACTOR_ID, myself.getId());
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));		
 		taskid = space.createObjectTask(DropFoodTask.PROPERTY_TYPENAME, props, myself.getId());
 		res = new SyncResultListener();

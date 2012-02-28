@@ -1,6 +1,5 @@
 package sodekovs.bikesharing.simulation.manager;
 
-import sodekovs.bikesharing.zeit.Zeitverwaltung;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -10,6 +9,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Description;
+import sodekovs.bikesharing.zeit.Zeitverwaltung;
 
 @Description("Agent offering a time service.")
 public class TimeAgent extends MicroAgent{

@@ -1,79 +1,78 @@
 package sodekovs.antworld.ant;
 
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.commons.SimplePropertyObject;
+import jadex.bridge.service.types.clock.IClockService;
+import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
-import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
-import jadex.extension.envsupport.environment.space2d.Grid2D;
-import jadex.extension.envsupport.math.IVector2;
-
-import java.util.Collection;
-import java.util.Map;
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 
 /**
- * Action for picking up food.
+ * Task for picking up food.
  */
-public class PickupFoodTask extends SimplePropertyObject implements ISpaceAction {
-	
+public class PickupFoodTask extends AbstractTask {
+	// -------- constants --------
+
 	/** The destination property. */
 	public static final String PROPERTY_TYPENAME = "pickup";
-	
+
+	/** The IComponentIdentifier of the calling BDI Agent. */
+	public static final String ACTOR_ID = "actor_id";
+
+	// -------- IObjectTask methods --------
+
 	/**
-	 * Performs the action.
+	 * Executes the task. Handles exceptions. Subclasses should implement
+	 * doExecute() instead.
 	 * 
-	 * @param parameters
-	 *            parameters for the action
 	 * @param space
-	 *            the environment space
-	 * @return action return value
+	 *            The environment in which the task is executing.
+	 * @param obj
+	 *            The object that is executing the task.
+	 * @param progress
+	 *            The time that has passed according to the environment
+	 *            executor.
 	 */
-	public Object perform(Map parameters, IEnvironmentSpace space) {
+	public void execute(final IEnvironmentSpace space, ISpaceObject obj,
+			long progress, IClockService clock) {
 		boolean ret = false;
 
-		Grid2D grid = (Grid2D) space;
+		ContinuousSpace2D contSpace = (ContinuousSpace2D) space;
+		long avatarId = (Long) getProperty(ACTOR_ID);
+		ISpaceObject so = contSpace.getSpaceObject(avatarId);
 
-		IComponentDescription owner = (IComponentDescription) parameters.get(ISpaceAction.ACTOR_ID);
-		ISpaceObject so = grid.getAvatar(owner);
-
-		assert so.getProperty("food") == null : so;
+		assert (Boolean) so.getProperty("has_food") == false : so;
 
 		// TODO: atomic action?
-		Collection food = grid.getSpaceObjectsByGridPosition((IVector2) so.getProperty(Grid2D.PROPERTY_POSITION), "food");
-		ISpaceObject pickedFood = (ISpaceObject) (food != null ? food.iterator().next() : null);
+		ISpaceObject[] allFoodSources = contSpace.getSpaceObjectsByType("food");
 
-		// System.out.println("#"+ so.getId() + "#pickup food action: "+so+" "+so.getProperty(Grid2D.PROPERTY_POSITION)+" "+pickedFood);
-		if (food != null) {
-			// if(Math.random()>0.88)
-			// {
-			Collection foodSources = grid.getSpaceObjectsByGridPosition((IVector2) so.getProperty(Grid2D.PROPERTY_POSITION), "foodSource");
-			ISpaceObject foodSource = (ISpaceObject) foodSources.iterator().next();
-			int stock = ((Integer) foodSource.getProperty("stock")).intValue();
-			foodSource.setProperty("stock", new Integer(stock - 1));
+		// Get the "right" food source
+		for (ISpaceObject foodSource : allFoodSources) {
+			if (foodSource
+					.getProperty(ContinuousSpace2D.PROPERTY_POSITION)
+					.equals(so.getProperty(ContinuousSpace2D.PROPERTY_POSITION))) {
+				System.out
+						.println("Food Source Pos: "
+								+ foodSource
+										.getProperty(ContinuousSpace2D.PROPERTY_POSITION)
+								+ " ant Pos: "
+								+ so.getProperty(ContinuousSpace2D.PROPERTY_POSITION));
+				int foodPieces = (Integer) foodSource
+						.getProperty("food_pieces");
+				if (foodPieces > 0) {
+					foodSource.setProperty("food_pieces", foodPieces - 1);
+					so.setProperty("has_food", true);
 
-			food.remove(pickedFood);
-			// System.out.println("pickup: "+waste);
-			so.setProperty("food", pickedFood);
+					// Support evaluation
+					// int carriedFood = ((Integer)
+					// so.getProperty("eval:carriedFood")).intValue();
+					// so.setProperty("eval:carriedFood", new
+					// Integer(carriedFood + 1));
 
-			// Support evaluation
-			int carriedFood = ((Integer) so.getProperty("eval:carriedFood")).intValue();
-			so.setProperty("eval:carriedFood", new Integer(carriedFood + 1));
-
-			grid.setPosition(pickedFood.getId(), null);
-			ret = true;
-			// pcs.firePropertyChange("worldObjects", garb, null);
-			// System.out.println("Agent picked up: "+owner+" "+so.getProperty(Space2D.POSITION));
-			// }
-			// else
-			// {
-			// System.out.println("#PickUpFoodAction#Agent Pick UP failed randomly.");
-			// }
-		} else {
-			System.out.println("#" + so.getId() + " - PickupFoodAction#Agent picked up failed.");
+				}
+				break;
+			}
 		}
+		setFinished(space, obj, true);
 
-		// System.out.println("pickup food action "+parameters + "completed.");
-
-		return ret ? Boolean.TRUE : Boolean.FALSE;
 	}
 }

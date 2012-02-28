@@ -1,12 +1,7 @@
 package sodekovs.bikesharing.disposition;
 
-import sodekovs.bikesharing.fahrrad.Fahrrad;
-import sodekovs.bikesharing.fahrrad.FahrradVerleihStation;
-import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
-import jadex.bridge.IInternalAccess;
 import jadex.extension.envsupport.math.Vector2Double;
-import jadex.micro.IMicroAgent;
-import jadex.micro.MicroAgent;
+import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
 
 public class DispositionEngpassAgent extends DispositionsAgent
 {

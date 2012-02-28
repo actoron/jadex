@@ -1,39 +1,25 @@
 package sodekovs.bikesharing.verkehrsteilnehmer;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import sodekovs.bikesharing.bahnverwaltung.BahnStation;
-import sodekovs.bikesharing.bahnverwaltung.LinienInformation;
-import sodekovs.bikesharing.bahnverwaltung.LinienInformationen;
-import sodekovs.bikesharing.container.VerkehrsteilnehmerWeg;
-import sodekovs.bikesharing.container.Weg;
-import sodekovs.bikesharing.fahrrad.FahrradVerleihStation;
-import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
-import sodekovs.bikesharing.simulation.BahnStationen;
-import sodekovs.bikesharing.simulation.StartSimulationProzess;
-import sodekovs.bikesharing.zeit.Zeitverwaltung;
-
-//import jadex.application.runtime.IApplicationExternalAccess;
-//import jadex.application.space.envsupport.environment.ISpaceObject;
-//import jadex.application.space.envsupport.environment.space2d.Grid2D;
-//import jadex.application.space.envsupport.environment.space2d.Space2D;
-//import jadex.application.space.envsupport.math.IVector2;
-//import jadex.application.space.envsupport.math.Vector2Double;
-//import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.bdi.runtime.PlanFailureException;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import sodekovs.bikesharing.bahnverwaltung.BahnStation;
+import sodekovs.bikesharing.container.VerkehrsteilnehmerWeg;
+import sodekovs.bikesharing.container.Weg;
+import sodekovs.bikesharing.fahrrad.FahrradVerleihStation;
+import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
+import sodekovs.bikesharing.simulation.BahnStationen;
 
 /**
  * Ein Plan, mittels dem der Verkehrsteilnehmer einen neuen Weg suchen soll

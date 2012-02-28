@@ -3,11 +3,7 @@ package sodekovs.bikesharing.datenkonvertierung;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,7 +20,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import sodekovs.bikesharing.datenkonvertierung.DatenZuStadtrad.Station;
 import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
 import sodekovs.bikesharing.simulation.StartSimulationProzess;
 import sodekovs.bikesharing.verkehrsteilnehmer.FahreRad;

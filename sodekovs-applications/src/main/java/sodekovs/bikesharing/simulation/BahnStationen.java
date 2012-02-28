@@ -1,22 +1,15 @@
 package sodekovs.bikesharing.simulation;
 
-import jadex.extension.envsupport.math.Vector2Int;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
-//import jadex.application.space.envsupport.math.IVector1;
-//import jadex.application.space.envsupport.math.IVector2;
-//import jadex.application.space.envsupport.math.Vector2Int;
-import jadex.commons.Tuple;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import sodekovs.bikesharing.bahnverwaltung.BahnStation;
-import sodekovs.bikesharing.bahnverwaltung.LinienInformation;
 import sodekovs.bikesharing.bahnverwaltung.WegZustand;
 import sodekovs.bikesharing.container.Weg;
 

@@ -3,7 +3,6 @@ package sodekovs.antworld.movement;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
@@ -12,13 +11,10 @@ import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.Vector1Double;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Move an object towards a destination.
@@ -107,28 +103,28 @@ public class MoveTask extends AbstractTask {
 		
 
 		// Process vision at new location.
-		double vision = ((Number) obj.getProperty(PROPERTY_VISION)).doubleValue();
-		final Set objects = ((Space2D) space).getNearObjects((IVector2) obj.getProperty(Space2D.PROPERTY_POSITION), new Vector1Double(vision));
-		if (objects != null) {
-			agent.scheduleStep(new IComponentStep<Void>() {
-				public IFuture<Void> execute(IInternalAccess ia) {
-					IBDIInternalAccess bia = (IBDIInternalAccess) ia;
-					for (Iterator it = objects.iterator(); it.hasNext();) {
-						final ISpaceObject so = (ISpaceObject) it.next();
-						if (so.getType().equals("target")) {
-							if (!bia.getBeliefbase().getBeliefSet("my_targets").containsFact(so)) {
-								bia.getBeliefbase().getBeliefSet("my_targets").addFact(so);
-							}
-							// System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
-
-						}
-					}
-					return IFuture.DONE;
-				}
-			});
-			// System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
-
-		}
+//		double vision = ((Number) obj.getProperty(PROPERTY_VISION)).doubleValue();
+//		final Set objects = ((Space2D) space).getNearObjects((IVector2) obj.getProperty(Space2D.PROPERTY_POSITION), new Vector1Double(vision));
+//		if (objects != null) {
+//			agent.scheduleStep(new IComponentStep<Void>() {
+//				public IFuture<Void> execute(IInternalAccess ia) {
+//					IBDIInternalAccess bia = (IBDIInternalAccess) ia;
+//					for (Iterator it = objects.iterator(); it.hasNext();) {
+//						final ISpaceObject so = (ISpaceObject) it.next();
+//						if (so.getType().equals("target")) {
+//							if (!bia.getBeliefbase().getBeliefSet("my_targets").containsFact(so)) {
+//								bia.getBeliefbase().getBeliefSet("my_targets").addFact(so);
+//							}
+//							// System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
+//
+//						}
+//					}
+//					return IFuture.DONE;
+//				}
+//			});
+//			// System.out.println("New target seen: "+scope.getAgentName()+", "+objects[i]);
+//
+//		}
 
 		if (newloc == destination)
 			setFinished(space, obj, true);

@@ -1,10 +1,10 @@
 package sodekovs.bikesharing.verkehrsteilnehmer;
 
+import jadex.bdi.runtime.IGoal;
+import jadex.bdi.runtime.Plan;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
-import jadex.bdi.runtime.IGoal;
-import jadex.bdi.runtime.Plan;
 
 /**
  * Der Plan, mit dem der Agent startet, und der ihn initialisiert,

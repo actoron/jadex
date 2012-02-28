@@ -1,14 +1,12 @@
 package sodekovs.bikesharing.bahnverwaltung;
 
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector2Double;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.Vector2Int;
-import jadex.extension.envsupport.math.Vector2Double;
-import jadex.commons.Tuple;
 
 /**
  * Klasse, um eine Bahnstation mit ihren Daten zu speichern

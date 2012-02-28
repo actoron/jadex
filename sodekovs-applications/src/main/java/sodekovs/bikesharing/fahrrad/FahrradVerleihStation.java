@@ -6,9 +6,6 @@ import jadex.extension.envsupport.math.Vector2Double;
 import java.util.LinkedList;
 import java.util.List;
 
-import sodekovs.bikesharing.datenkonvertierung.Datensammler;
-import sodekovs.bikesharing.zeit.Zeitverwaltung;
-
 
 /**
  * Eine Klasse, um eine Fahrradverleihstation mit den an der Station

@@ -1,15 +1,5 @@
 package sodekovs.bikesharing.verkehrsteilnehmer;
 
-import sodekovs.bikesharing.container.VerkehrsteilnehmerWeg;
-import sodekovs.bikesharing.simulation.StartSimulationProzess;
-import sodekovs.bikesharing.zeit.Zeitverwaltung;
-//import jadex.application.runtime.IApplicationExternalAccess;
-//import jadex.application.space.envsupport.environment.ISpaceObject;
-//import jadex.application.space.envsupport.environment.space2d.Grid2D;
-//import jadex.application.space.envsupport.environment.space2d.Space2D;
-//import jadex.application.space.envsupport.math.IVector2;
-//import jadex.application.space.envsupport.math.Vector2Double;
-//import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
@@ -18,6 +8,7 @@ import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector2Double;
+import sodekovs.bikesharing.container.VerkehrsteilnehmerWeg;
 
 /**
  * Ein Plan, bei dem der Verkehrsteilnehmer einen alten Weg

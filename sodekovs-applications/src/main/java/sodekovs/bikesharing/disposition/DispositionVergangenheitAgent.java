@@ -6,8 +6,6 @@ import jadex.extension.envsupport.math.Vector2Double;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.omg.CORBA._PolicyStub;
-
 import sodekovs.bikesharing.fahrrad.FahrradVerleihStation;
 import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
 import sodekovs.bikesharing.zeit.Zeitverwaltung;

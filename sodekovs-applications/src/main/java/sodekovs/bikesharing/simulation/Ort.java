@@ -1,7 +1,6 @@
 package sodekovs.bikesharing.simulation;
 
 import jadex.extension.envsupport.math.Vector2Double;
-//import jadex.application.space.envsupport.math.Vector2Double;
 
 /**
  * Klasse, um einen Ort einer Verteilung zu speichern

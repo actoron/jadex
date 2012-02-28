@@ -10,10 +10,12 @@
 	package="sodekovs.antworld.movement">
 
 	<imports>		
+		<import>java.util.*</import>
 		<import>jadex.extension.envsupport.environment.*</import>
 		<import>jadex.extension.envsupport.environment.space2d.*</import>
 		<import>jadex.extension.envsupport.math.*</import>
 		<import>jadex.commons.future.*</import>
+		<import>sodekovs.antworld.ant.*</import>
 	</imports>
 
 	<beliefs>
@@ -55,10 +57,21 @@
 
 		<!-- Walk around without target when nothing else to do. -->
 		<performgoal name="walk_around" retry="true" exclude="never" exported="true">
-			<!-- <dropcondition language="jcl">
-				$beliefbase.missionend
-			</dropcondition> -->
+			<dropcondition language="jcl">
+				Arrays.asList($beliefbase.foodSources).size() &gt; 0
+			</dropcondition>
   		</performgoal>
+  		
+  		<!-- This goal is used to mine food.-->
+		<achievegoal name="food_mining" exclude="never" retry="false">
+			<unique />
+			<creationcondition language="jcl">				
+				Arrays.asList($beliefbase.foodSources).size() &gt; 0
+			</creationcondition>
+			<!-- <deliberation>
+				<inhibits ref="pheromone_follow" />
+			</deliberation> -->
+		</achievegoal>
 
 		<!-- Move home when missionend. -->
 		<!-- <achievegoal name="missionend">
@@ -94,5 +107,14 @@
 				<goal ref="walk_around"/>
 			</trigger>
 		</plan>
+		
+		<!-- Mine food. -->
+		<plan name="foodMining">
+			<body class="FoodMiningPlan" />
+			<trigger>
+				<goal ref="food_mining" />
+			</trigger>
+		</plan>
+		
 	</plans>
 </capability>

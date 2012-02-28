@@ -2,11 +2,11 @@ package sodekovs.bikesharing.standard;
 
 import jadex.base.fipa.FIPAMessageType;
 import jadex.base.fipa.SFipa;
-import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;

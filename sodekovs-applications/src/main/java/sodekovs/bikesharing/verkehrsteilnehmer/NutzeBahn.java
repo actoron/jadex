@@ -1,36 +1,22 @@
 package sodekovs.bikesharing.verkehrsteilnehmer;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.swing.text.html.HTMLDocument.Iterator;
-
-import sodekovs.bikesharing.bahnverwaltung.BahnStation;
-import sodekovs.bikesharing.container.Weg;
-import sodekovs.bikesharing.simulation.BahnStationen;
-import sodekovs.bikesharing.simulation.StartSimulationProzess;
-import sodekovs.bikesharing.standard.EndstationsAgent;
-import sodekovs.bikesharing.standard.VerkehrsmittelAgent;
-
-//import jadex.application.runtime.IApplicationExternalAccess;
-//import jadex.application.space.envsupport.environment.ISpaceObject;
-//import jadex.application.space.envsupport.environment.space2d.Grid2D;
-//import jadex.application.space.envsupport.environment.space2d.Space2D;
-
-import jadex.base.fipa.FIPAMessageType;
 import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bdi.runtime.PlanFailureException;
-import jadex.bridge.IComponentIdentifier;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
 import jadex.extension.envsupport.math.Vector2Double;
+
+import java.util.List;
+import java.util.Set;
+
+import sodekovs.bikesharing.bahnverwaltung.BahnStation;
+import sodekovs.bikesharing.container.Weg;
+import sodekovs.bikesharing.simulation.BahnStationen;
+import sodekovs.bikesharing.standard.VerkehrsmittelAgent;
 
 /**
  * Plan, bei dem der Agent zu einem Ziel mit der Bahn kommen will Bedingung:

@@ -1,15 +1,10 @@
 package sodekovs.bikesharing.verkehrsteilnehmer;
 
-import sodekovs.bikesharing.zeit.Zeitverwaltung;
-//import jadex.application.runtime.IApplicationExternalAccess;
-//import jadex.application.space.envsupport.environment.ISpaceObject;
-//import jadex.application.space.envsupport.environment.space2d.Grid2D;
-//import jadex.application.space.envsupport.math.Vector2Double;
-//import jadex.application.space.envsupport.math.Vector2Int;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.Vector2Double;
+import sodekovs.bikesharing.zeit.Zeitverwaltung;
 
 /**
  * Plan, bei dem der Agent auswaehlt, was er als naechstes tun moechte Derzeitig

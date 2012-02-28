@@ -1,9 +1,7 @@
 package sodekovs.bikesharing.disposition;
 
-import sodekovs.bikesharing.fahrrad.Fahrrad;
-import sodekovs.bikesharing.fahrrad.FahrradVerleihStation;
-import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
 import jadex.extension.envsupport.math.Vector2Double;
+import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
 
 public class DispositionSchwellwertAgent extends DispositionsAgent
 {

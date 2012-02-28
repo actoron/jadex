@@ -4,11 +4,7 @@ package sodekovs.bikesharing.verkehrsteilnehmer;
 //import jadex.application.space.envsupport.environment.ISpaceObject;
 //import jadex.application.space.envsupport.environment.space2d.Grid2D;
 //import jadex.application.space.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.math.Vector2Double;
-import jadex.extension.envsupport.math.Vector2Int;
 import jadex.extension.envsupport.math.IVector2;
-import jadex.bdi.runtime.IParameter;
-import jadex.bdi.runtime.Plan;
 
 /**
  * Plan, bei dem der Agent das als Parameter �bergebene Ziel zu Fuss erreichen

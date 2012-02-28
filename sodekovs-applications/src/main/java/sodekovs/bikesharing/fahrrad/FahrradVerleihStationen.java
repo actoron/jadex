@@ -1,7 +1,6 @@
 package sodekovs.bikesharing.fahrrad;
 
 import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.Vector2Double;
 
 import java.util.LinkedList;
 import java.util.List;

@@ -1,7 +1,6 @@
 package sodekovs.bikesharing.container;
 
 import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.Vector2Int;
 
 import java.util.ArrayList;
 import java.util.List;

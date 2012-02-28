@@ -1,6 +1,5 @@
 package sodekovs.bikesharing.bahnverwaltung;
 
-import jadex.extension.envsupport.math.IVector2;
 
 /**
  * Speichert Informationen über den Zustand eines Weges zwischen 2 BahnStationen,

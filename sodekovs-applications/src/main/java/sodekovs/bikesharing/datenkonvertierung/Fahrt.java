@@ -1,7 +1,7 @@
 package sodekovs.bikesharing.datenkonvertierung;
 
-import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
 import jadex.extension.envsupport.math.IVector2;
+import sodekovs.bikesharing.fahrrad.FahrradVerleihStationen;
 
 /**
  * Klasse, um Fahrten zu speichern und zu vergleichen

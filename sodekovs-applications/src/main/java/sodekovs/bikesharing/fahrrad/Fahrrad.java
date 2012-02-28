@@ -3,8 +3,8 @@ package sodekovs.bikesharing.fahrrad;
 //import jadex.application.space.envsupport.environment.ISpaceObject;
 //import jadex.application.space.envsupport.math.Vector2Double;
 
-import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.math.Vector2Double;
 
 /**
  * Eine Klasse, um die Fahrräder der Simulation zu modellieren

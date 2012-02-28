@@ -24,6 +24,7 @@
 		<import>java.util.Date</import>		
 		<import>sodekovs.antworld.movement.*</import>
 		<import>sodekovs.antworld.ant.*</import>
+		<import>sodekovs.antworld.env.*</import>
 		<import>jadex.bridge.service.types.clock.IClockService</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
@@ -102,8 +103,9 @@
 				<env:objecttype name="walkingStrategy">					
 					<env:property name="strategy">0</env:property>
 				</env:objecttype>
-
 			</env:objecttypes>
+			
+
 
 			<env:avatarmappings>
 				<env:avatarmapping componenttype="Ant"
@@ -114,12 +116,20 @@
 				<env:tasktype name="move" class="MoveTask" />
 				<env:tasktype name="pickup" class="PickupFoodTask" />
 				<env:tasktype name="drop" class="DropFoodTask" />				
-			</env:tasktypes>
+			</env:tasktypes>			
+			
+			<env:processtypes>
+				<!-- <env:processtype name="managePheromones" class="ManagePheromonesProcess">
+					<env:property name="rate">2</env:property>
+				</env:processtype> -->
+				<env:processtype name="manageFoodSources" class="ManageFoodSourcesProcess">
+					<env:property name="rate">1</env:property>
+				</env:processtype>
+			</env:processtypes>
+						
 			
 			<!-- The percepttypes, generators and processors. -->
 			<env:percepttypes>
-
-
 				<!--
 					Percepttypes that the environment produces and agents can consume.
 				-->
@@ -256,15 +266,15 @@
 						</env:object>
 						<env:object type="food">
 							<env:property name="position">new Vector2Double(0.1, 0.2)</env:property>
-							<env:property name="food_pieces">20</env:property>
+							<env:property name="food_pieces">2</env:property>
 						</env:object>
 						<env:object type="food">
 							<env:property name="position">new Vector2Double(0.6, 0.2)</env:property>
-							<env:property name="food_pieces">20</env:property>
+							<env:property name="food_pieces">2</env:property>
 						</env:object>
 						<env:object type="food">
 							<env:property name="position">new Vector2Double(0.1, 0.6)</env:property>
-							<env:property name="food_pieces">20</env:property>
+							<env:property name="food_pieces">2</env:property>
 						</env:object>
 						
 						<env:object type="walkingStrategy">					
@@ -280,8 +290,17 @@
 				</env:envspace>
 			</extensions>
 			<components>
-				<component type="Ant" number="3" />
+				<component type="Ant" number="1" />
 			</components>
+			<env:processes>
+			<!--<env:process type="managePheromones">
+					<env:property name="rate">4</env:property>
+				</env:process> -->
+				<env:process type="manageFoodSources">
+					<env:property name="rate">1</env:property>
+			</env:process>
+			</env:processes>
+								
 		</configuration>
 
 	</configurations>

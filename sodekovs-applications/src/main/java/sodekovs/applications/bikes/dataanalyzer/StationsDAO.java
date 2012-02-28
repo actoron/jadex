@@ -1,9 +1,6 @@
 package sodekovs.applications.bikes.dataanalyzer;
 
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +9,6 @@ import java.util.ArrayList;
 
 import sodekovs.applications.bikes.datafetcher.database.DatabaseConnection;
 import sodekovs.applications.bikes.model.SystemSnapshot;
-import sodekovs.util.misc.FileHandler;
 import sodekovs.util.misc.GlobalConstants;
 
 public class StationsDAO {
