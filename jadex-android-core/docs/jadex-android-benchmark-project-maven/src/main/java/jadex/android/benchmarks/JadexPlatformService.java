@@ -1,7 +1,6 @@
 package jadex.android.benchmarks;
 
 import jadex.base.Starter;
-import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
@@ -104,13 +103,13 @@ public class JadexPlatformService	extends Service	implements IJadexPlatformServi
 	//					"-tcptransport", "false",
 						"-niotcptransport", "false",
 	//					"-relaytransport", "true",
-						"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"grisougarfield.dyndns.org:52339/relay/\"",
+//						"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"grisougarfield.dyndns.org:52339/relay/\"",
 	//					"-relayaddress", "\""+SRelay.DEFAULT_ADDRESS+"\"",
 	//					"-relayaddress", "\""+SRelay.ADDRESS_SCHEME+"134.100.11.200:8080/jadex-platform-relay-web/\"",					
 						"-saveonexit", "false",
 						"-gui", "false",
 						"-autoshutdown", "false"
-						"-binarymessages", "true",
+//						"-binarymessages", "true"
 	//					"-awamechanisms", "new String[]{\"Relay\"}",
 	//					"-awareness", "false",
 	//					"-usepass", "false",

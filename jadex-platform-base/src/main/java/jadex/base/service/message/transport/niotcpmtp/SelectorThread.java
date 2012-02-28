@@ -170,149 +170,66 @@ public class SelectorThread implements Runnable
 	 *  Tries all addresses in parallel and returns the first
 	 *  available connection.
 	 *  
-	 *  @param addresses	The addresses to connect to.
+	 *  @param addresses	The address to connect to.
 	 *  @return A future containing a connection to the first responsive address.
 	 */
-	public IFuture<NIOTCPOutputConnection>	getConnection(final InetSocketAddress[] addresses)
+	public IFuture<NIOTCPOutputConnection>	getConnection(final InetSocketAddress address)
 	{
-		final Future<NIOTCPOutputConnection>	ret	= new Future<NIOTCPOutputConnection>();
+		Future<NIOTCPOutputConnection>	ret	= null;	// Java compiler doesn't detect that ret is always assigned. grrr
 		
-		NIOTCPOutputConnection	con	= null;
-		List<Runnable>	todo	= null;
-		List<IFuture<NIOTCPOutputConnection>>	futures	= null;
 		synchronized(connections)
 		{
 			// Try to find existing connection.
-			for(int i=0; con==null && i<addresses.length; i++)
+			Object	val	= connections.get(address); 
+			if(val instanceof NIOTCPOutputConnection)
 			{
-				Object	val	= connections.get(addresses[i]); 
-				if(val instanceof NIOTCPOutputConnection)
-				{
-					con	= (NIOTCPOutputConnection)val;
-				}
+				ret	= new Future<NIOTCPOutputConnection>((NIOTCPOutputConnection)val);
 			}
 			
 			// Not found: get futures for connecting to addresses
-			if(con==null)
-			{
-				for(int i=0; con==null && i<addresses.length; i++)
-				{
-					Object	val	= connections.get(addresses[i]);
-					
-					// Reset connection if connection should be retried.
-					if(val instanceof NIOTCPDeadConnection && ((NIOTCPDeadConnection)val).shouldRetry())
-					{
-						val	= null;
-					}
-					
-					if(val==null)
-					{
-						final Future<NIOTCPOutputConnection>	fut	= new Future<NIOTCPOutputConnection>();
-						connections.put(addresses[i], fut);
-						final InetSocketAddress	address	= addresses[i];
-						Runnable	task	= new Runnable()
-						{
-							public void run()
-							{
-								try
-								{
-									SocketChannel	sc	= SocketChannel.open();
-									sc.configureBlocking(false);
-									sc.connect(address);
-									sc.register(selector, SelectionKey.OP_CONNECT, new Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>(address, fut));
-									logger.info("Attempting connection to: "+address);
-//									System.out.println(new Date()+": Attempting connection to: "+address+", "+ret.hashCode());
-								}
-								catch(Exception e)
-								{
-//									System.out.println(new Date()+": Failed connection to: "+address+", "+ret.hashCode());
-									fut.setException(e);
-								}
-							}			
-						};
-						if(todo==null)
-						{
-							todo	= new ArrayList<Runnable>();
-						}
-						todo.add(task);
-						if(futures==null)
-						{
-							futures	= new ArrayList<IFuture<NIOTCPOutputConnection>>();
-						}
-						futures.add(fut);
-					}
-					else if(val instanceof Future)
-					{
-						if(futures==null)
-						{
-							futures	= new ArrayList<IFuture<NIOTCPOutputConnection>>();
-						}
-						futures.add((IFuture<NIOTCPOutputConnection>)val);						
-					}
-				}
-			}
-		}
-		
-		// Connection available.
-		if(con!=null)
-		{
-			ret.setResult(con);
-		}
-		
-		// Connection not available: wait for futures.
-		else
-		{
-			// Enqueue connection tasks if any.
-			if(todo!=null)
-			{
-				synchronized(tasks)
-				{
-					for(int i=0; i<todo.size(); i++)
-					{
-						tasks.add(todo.get(i));
-					}
-				}
-				selector.wakeup();
-			}
-			
-			if(futures!=null)
-			{
-				// Listener called on NIO thread only
-				final int	num	= futures.size();
-				IResultListener<NIOTCPOutputConnection>	lis	= new IResultListener<NIOTCPOutputConnection>()
-				{
-					protected int	cnt;
-					
-					public void resultAvailable(NIOTCPOutputConnection result)
-					{
-						cnt++;
-//						System.out.println(new Date()+": Got connection "+cnt+" of "+num+", "+ret.hashCode());
-						if(!ret.isDone())
-						{
-							ret.setResult(result);
-						}
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						cnt++;
-//						System.out.println(new Date()+": No connection "+cnt+" of "+num+", "+ret.hashCode());
-						if(cnt==num && !ret.isDone())
-						{
-							ret.setExceptionIfUndone(new RuntimeException("Cannot open connection: no working addresses. "+SUtil.arrayToString(addresses)));
-						}
-					}
-				};
-				
-				for(int i=0; i<futures.size(); i++)
-				{
-					futures.get(i).addResultListener(lis);
-				}
-			}
 			else
-			{				
-				// Happens if only dead connections are found.
-				ret.setException(new RuntimeException("Cannot open connection: no working addresses. "+SUtil.arrayToString(addresses)));
+			{
+				// Reset connection if connection should be retried.
+				if(val instanceof NIOTCPDeadConnection && ((NIOTCPDeadConnection)val).shouldRetry())
+				{
+					val	= null;
+				}
+				
+				if(val==null)
+				{
+					final Future<NIOTCPOutputConnection>	fut	= new Future<NIOTCPOutputConnection>();
+					ret	= fut;
+					connections.put(address, fut);
+					Runnable	task	= new Runnable()
+					{
+						public void run()
+						{
+							try
+							{
+								SocketChannel	sc	= SocketChannel.open();
+								sc.configureBlocking(false);
+								sc.connect(address);
+								sc.register(selector, SelectionKey.OP_CONNECT, new Tuple2<InetSocketAddress, Future<NIOTCPOutputConnection>>(address, fut));
+								logger.info("Attempting connection to: "+address);
+//									System.out.println(new Date()+": Attempting connection to: "+address+", "+ret.hashCode());
+							}
+							catch(Exception e)
+							{
+//									System.out.println(new Date()+": Failed connection to: "+address+", "+ret.hashCode());
+								fut.setException(e);
+							}
+						}			
+					};
+					synchronized(tasks)
+					{
+						tasks.add(task);
+					}
+					selector.wakeup();
+				}
+				else if(val instanceof Future)
+				{
+					ret	= (Future<NIOTCPOutputConnection>)val;
+				}
 			}
 		}
 		

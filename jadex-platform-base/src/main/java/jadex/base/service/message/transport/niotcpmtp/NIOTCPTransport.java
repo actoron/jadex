@@ -176,17 +176,10 @@ public class NIOTCPTransport implements ITransport
 	public boolean	isApplicable(String address)	
 	{
 		boolean	ret	= false;
-//		for(int i=0; !ret && i<task.getReceivers().length; i++)
-//		{
-//			String[]	raddrs	= task.getReceivers()[i].getAddresses();
-//			for(int j=0; !ret && j<raddrs.length; j++)
-//			{
-//				for(int k=0; !ret && k<getServiceSchemas().length; k++)
-//				{
-//					ret	= raddrs[j].toLowerCase().startsWith(getServiceSchemas()[k]);
-//				}
-//			}			
-//		}
+		for(int i=0; !ret && i<getServiceSchemas().length; i++)
+		{
+			ret	= address.startsWith(getServiceSchemas()[i]);
+		}
 		return ret;
 	}
 	
@@ -206,8 +199,7 @@ public class NIOTCPTransport implements ITransport
 	 */
 	public void	sendMessage(String address, final ISendTask task)
 	{
-		InetSocketAddress[] addresses = fetchAddresses(task.getReceivers());
-		selectorthread.getConnection(addresses).addResultListener(new IResultListener<NIOTCPOutputConnection>()
+		selectorthread.getConnection(parseAddress(address)).addResultListener(new IResultListener<NIOTCPOutputConnection>()
 		{
 			public void resultAvailable(final NIOTCPOutputConnection con)
 			{
@@ -234,31 +226,6 @@ public class NIOTCPTransport implements ITransport
 		});
 	}
 
-	/**
-	 *  Fetch addresses correponding to receivers of a send task.
-	 */
-	protected InetSocketAddress[] fetchAddresses(IComponentIdentifier[] receivers)
-	{
-		// Fetch all addresses
-		Set<InetSocketAddress>	addrs	= new LinkedHashSet<InetSocketAddress>();
-		for(int i=0; i<receivers.length; i++)
-		{
-			String[]	raddrs	= receivers[i].getAddresses();
-			if(raddrs==null || raddrs.length==0)
-				throw new RuntimeException("Adresses must not null: "+receivers[i]);
-			for(int j=0; j<raddrs.length; j++)
-			{
-				InetSocketAddress	address	= parseAddress(raddrs[j]);
-				if(address!=null)
-				{
-					addrs.add(address);
-				}
-			}
-		}
-		InetSocketAddress[]	addresses	= (InetSocketAddress[])addrs.toArray(new InetSocketAddress[addrs.size()]);
-		return addresses;
-	}
-	
 	/**
 	 *  Returns the prefix of this transport
 	 *  @return Transport prefix.

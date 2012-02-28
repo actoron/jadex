@@ -42,7 +42,7 @@ public class Future<E> implements IFuture<E>
 	public static final boolean DEBUG = false;
 	
 	/** Disable Stack unfolding for easier debugging. */
-	public static final boolean NO_STACK_COMPACTION = true;
+	public static final boolean NO_STACK_COMPACTION = false;
 	
 	/** The empty future. */
 	public static final IFuture<?>	EMPTY	= new Future<Object>(null);
