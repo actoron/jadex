@@ -78,7 +78,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						{
 							public void customResultAvailable(final IMessageService msgservice)
 							{
-								boolean binarymode = ((Boolean) getArgument("binarymessages")).booleanValue();
+								boolean binarymode = ((Boolean)getArgument("binarymessages")).booleanValue();
 								rms = new RemoteServiceManagementService((IMicroExternalAccess)getExternalAccess(), libservice, marshalservice, msgservice, binarymode);
 								addService("rms", IRemoteServiceManagementService.class, rms, BasicServiceInvocationHandler.PROXYTYPE_DIRECT);
 								ret.setResult(null);
@@ -161,11 +161,11 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								// Should be ignored or be a warning.
 								try
 								{	
-									List<Object>	errors	= new ArrayList<Object>();
+									List<Object> errors	= new ArrayList<Object>();
 //									String contentcopy = (String)content;	// for debugging
 									
-									String lang = (String) msg.get(SFipa.LANGUAGE);
-									if (RemoteServiceManagementService.RMS_JADEX_BINARY.equals(lang))
+									String lang = (String)msg.get(SFipa.LANGUAGE);
+									if(RemoteServiceManagementService.RMS_JADEX_BINARY.equals(lang))
 										content = BinarySerializer.objectFromByteArray((byte[]) content, rms.getBinaryPostProcessors(), errors, cl);
 									else
 										content = Reader.objectFromXML(rms.getReader(), (String)content, cl, errors);

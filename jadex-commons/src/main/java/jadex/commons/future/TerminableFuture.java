@@ -14,7 +14,6 @@ public class TerminableFuture<E> extends Future<E> implements ITerminableFuture<
 	 */
 	public TerminableFuture()
 	{
-		super();
 	}
 	
 	/**
@@ -23,7 +22,6 @@ public class TerminableFuture<E> extends Future<E> implements ITerminableFuture<
 	 */
 	public TerminableFuture(Runnable terminate)
 	{
-		super();
 		this.terminate = terminate;
 	}
 	
@@ -32,7 +30,11 @@ public class TerminableFuture<E> extends Future<E> implements ITerminableFuture<
 	 */
 	public void terminate()
 	{
-		setException(new TerminatedException());
+		if(setExceptionIfUndone(new FutureTerminatedException()))
+		{
+			if(terminate!=null)
+				terminate.run();
+		}
 	}
 	
 	/**
@@ -41,9 +43,7 @@ public class TerminableFuture<E> extends Future<E> implements ITerminableFuture<
 	 */
 	public boolean isTerminated()
 	{
-		if(terminate!=null)
-			terminate.run();
-		return isDone() && exception instanceof TerminatedException;
+		return isDone() && exception instanceof FutureTerminatedException;
 	}
 	
 	/**
@@ -69,9 +69,13 @@ public class TerminableFuture<E> extends Future<E> implements ITerminableFuture<
 //		ITerminableFuture<String> fut1 = called.getName();
 //		fut1.addResultListener(pl);
 		
-		ITerminableFuture<String> fut2 = called.getName();
-		fut2.addResultListener(pl);
-		fut2.terminate();
+//		ITerminableFuture<String> fut2 = called.getName();
+//		fut2.addResultListener(pl);
+//		fut2.terminate();
+		
+		ITerminableFuture<String> fut3 = called.getName2();
+		fut3.addResultListener(pl);
+		fut3.terminate();
 	}
 }
 
@@ -103,6 +107,20 @@ class Called
 			}
 		});
 		t.start();
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public ITerminableFuture<String> getName2()
+	{
+		final TerminableDelegationFuture<String> ret = new TerminableDelegationFuture<String>();
+		
+//		getName().addResultListener(new DelegationResultListener<String>(ret));
+		ITerminableFuture<String> src = getName();
+		src.addResultListener(new TerminableDelegationResultListener<String>(ret, src));
 		
 		return ret;
 	}

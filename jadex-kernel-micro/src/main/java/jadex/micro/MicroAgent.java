@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
@@ -351,7 +352,13 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 				{
 					public void timeEventOccurred(final long currenttime)
 					{
-						interpreter.scheduleStep(new ExecuteWaitForStep(ts[0], run));
+						try
+						{
+							interpreter.scheduleStep(new ExecuteWaitForStep(ts[0], run));
+						}
+						catch(ComponentTerminatedException e)
+						{
+						}
 					}
 				});
 				if(timers==null)

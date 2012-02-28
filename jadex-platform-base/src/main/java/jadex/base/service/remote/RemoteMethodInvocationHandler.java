@@ -1,5 +1,6 @@
 package jadex.base.service.remote;
 
+import jadex.base.service.remote.commands.RemoteFutureTerminationCommand;
 import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.IComponentIdentifier;
@@ -12,7 +13,11 @@ import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TerminableDelegationFuture;
+import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.writer.WriteContext;
@@ -70,11 +75,53 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
 	{
-		Future future = IIntermediateFuture.class.isAssignableFrom(method.getReturnType())
-			? new IntermediateFuture() : new Future();
-		Object ret = future;
+		final IComponentIdentifier compid = rsms.getRMSComponentIdentifier();
+		final String callid = SUtil.createUniqueId(compid.getLocalName());
 		
 		ProxyInfo pi = pr.getProxyInfo();
+		// Get method timeout
+		final long to = pi.getMethodTimeout(method);
+		
+		Future future;
+		Class type = method.getReturnType();
+		if(SReflect.isSupertype(IIntermediateFuture.class, type))
+		{
+			future = new IntermediateFuture();
+		}
+		else if(SReflect.isSupertype(ITerminableFuture.class, type))
+		{
+			future = new TerminableDelegationFuture()
+			{
+				public void terminate() 
+				{
+					Future res = new Future();
+//					res.addResultListener(new IResultListener()
+//					{
+//						public void resultAvailable(Object result)
+//						{
+//							System.out.println("received result: "+result);
+//						}
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							System.out.println("received exception: "+exception);
+//						}
+//					});
+					final String mycallid = SUtil.createUniqueId(compid.getLocalName());
+					RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid);
+					// Can be invoked directly, because internally redirects to agent thread.
+//					System.out.println("sending terminate");
+					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
+						content, mycallid, to, res);
+					
+				};
+			};
+		}
+		else
+		{
+			future = new Future();
+		}
+		Object ret = future;
+		
 //		if(method.getName().indexOf("store")!=-1)
 //			System.out.println("remote method invoc: "+method.getName());
 		
@@ -122,13 +169,9 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 				return null;
 			}
 			
-			// Get method timeout
-			long	to	= pi.getMethodTimeout(method);
 //			System.out.println("timeout: "+to);
 			
 			// Call remote method using invocation command.	
-			final IComponentIdentifier compid = rsms.getRMSComponentIdentifier();
-			final String callid = SUtil.createUniqueId(compid.getLocalName());
 //			System.out.println("call: "+callid+" "+method);
 //			if("getServices".equals(method.getName()))
 //				debugcallid	= callid;
@@ -137,6 +180,8 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 				pr.getRemoteReference(), method, args, callid, IComponentIdentifier.LOCAL.get());
 			
 			// Can be invoked directly, because internally redirects to agent thread.
+//			if(method.getName().equals("getResult"))
+//				System.out.println("sending invoke");
 			rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
 				content, callid, to, future);
 			
@@ -199,5 +244,6 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	{
 		return 31 + pr.getRemoteReference().hashCode();
 	}
+	
 }
 

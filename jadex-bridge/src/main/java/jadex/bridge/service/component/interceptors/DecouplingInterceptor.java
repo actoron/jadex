@@ -14,13 +14,17 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.commons.IFilter;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TerminableDelegationFuture;
+import jadex.commons.future.TerminableDelegationResultListener;
 import jadex.commons.transformation.traverser.FilterProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
@@ -220,8 +224,11 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		
 		// Perform decoupling
 		
-		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
+		boolean scheduleable = SReflect.isSupertype(IFuture.class, sic.getMethod().getReturnType())
 			|| sic.getMethod().getReturnType().equals(void.class);
+		
+//		boolean scheduleable = sic.getMethod().getReturnType().equals(IFuture.class) 
+//			|| sic.getMethod().getReturnType().equals(void.class);
 		
 		if(!adapter.isExternalThread() || !scheduleable || NO_DECOUPLING.contains(sic.getMethod()))
 		{
@@ -405,6 +412,9 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		{
 			Object	res	= sic.getResult();
 			
+//			if(sic.getMethod().getName().equals("getResult"))
+//				System.out.println("heererrere");
+			
 			if(res instanceof IFuture)
 			{
 				Method method = sic.getMethod();
@@ -417,7 +427,20 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						return marshal.isLocalReference(object);
 					}
 				};
-				if(res instanceof IIntermediateFuture)
+				if(res instanceof ITerminableFuture)
+				{
+					TerminableDelegationFuture<Object> fut = new TerminableDelegationFuture<Object>((ITerminableFuture)res)
+					{
+						public void	setResult(Object result)
+						{
+					    	Object res = doCopy(copy, deffilter, result);
+							super.setResult(res);
+					    }	
+					};
+//					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
+					res	= fut;
+				}
+				else if(res instanceof IIntermediateFuture)
 				{
 					IntermediateFuture<Object>	fut	= new IntermediateFuture<Object>()
 					{

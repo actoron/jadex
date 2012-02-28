@@ -11,6 +11,7 @@ public class ExceptionInfo
 	//-------- attributes --------
 	
 	/** The exception type. */
+	// todo: make class info
 	protected Class type;
 	
 	/** The message. */

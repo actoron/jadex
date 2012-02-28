@@ -42,7 +42,7 @@ public class Future<E> implements IFuture<E>
 	public static final boolean DEBUG = false;
 	
 	/** Disable Stack unfolding for easier debugging. */
-	public static final boolean DEBUGSTACK = false;
+	public static final boolean NO_STACK_COMPACTION = true;
 	
 	/** The empty future. */
 	public static final IFuture<?>	EMPTY	= new Future<Object>(null);
@@ -447,7 +447,7 @@ public class Future<E> implements IFuture<E>
 //			}
 //		}
     	
-    	if(DEBUGSTACK || STACK.get()==null)
+    	if(NO_STACK_COMPACTION || STACK.get()==null)
     	{
     		List<Tuple2<Future<?>, IResultListener<?>>>	list	= new LinkedList<Tuple2<Future<?>, IResultListener<?>>>();
     		STACK.set(list);

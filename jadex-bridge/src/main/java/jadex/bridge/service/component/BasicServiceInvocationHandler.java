@@ -30,8 +30,12 @@ import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.TerminableDelegationFuture;
+import jadex.commons.future.TerminableDelegationResultListener;
+import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.javaparser.SJavaParser;
 
@@ -137,7 +141,26 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			
 			List<Object> myargs = args!=null? SUtil.arrayToList(args): null;
 			
-			if(SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType()))
+			if(SReflect.isSupertype(ITerminableFuture.class, method.getReturnType()))
+			{
+				final TerminableDelegationFuture fut = new TerminableDelegationFuture();
+				ret = fut;
+				sic.invoke(service, method, myargs).addResultListener(new DelegationResultListener(fut)
+				{
+					public void customResultAvailable(Object result)
+					{
+//						System.out.println("result rec: "+sic.getResult());
+						ITerminableFuture<?> src = (ITerminableFuture)sic.getResult();
+						src.addResultListener(new TerminableDelegationResultListener(fut, src));
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("ex rec: "+exception);
+						super.exceptionOccurred(exception);
+					}
+				});
+			}
+			else if(SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType()))
 			{
 				final IntermediateFuture fut = new IntermediateFuture();
 				ret = fut;

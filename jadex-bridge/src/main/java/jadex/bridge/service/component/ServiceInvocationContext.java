@@ -166,15 +166,15 @@ public class ServiceInvocationContext
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		if(method.getName().equals("add"))
+//		if(method.getName().equals("getResult"))
 //			System.out.println("invoke: "+Thread.currentThread());
 		
 		push(object, method, args, null);
 		
 		final IServiceInvocationInterceptor interceptor = getNextInterceptor();
 
-//		if(method.getName().equals("add"))
-//			System.out.println("add: "+used.get(used.size()-1)+" "+interceptor+" "+Thread.currentThread());
+//		if(method.getName().equals("getResult"))
+//			System.out.println("getResult: "+used.get(used.size()-1)+" "+interceptor+" "+Thread.currentThread());
 		
 		if(interceptor!=null)
 		{
@@ -184,7 +184,7 @@ public class ServiceInvocationContext
 			{
 				public void resultAvailable(Void result)
 				{
-//					if(method.getName().equals("isValid"))
+//					if(method.getName().equals("getResult"))
 //						System.out.println("interceptor2: "+interceptor);
 
 					pop();

@@ -30,11 +30,14 @@ import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
+import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.TerminableFuture;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.binaryserializer.DecodingContext;
 import jadex.commons.transformation.binaryserializer.EncodingContext;
@@ -129,6 +132,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	
 	/** The map of waiting calls (callid -> future). */
 	protected Map<String, Future<Object>> waitingcalls;
+	
+	/** The map of processing calls (callid -> terniable future). */
+	protected Map<String, ITerminableFuture<Object>> processingcalls;
+	
+	/** The map of termination commands without futures (callid -> command). 
+	    This can happen whenever a remote invocation command is executed after the terminate arrives. */
+	protected LRU<String, Runnable> terminationcommands;
 
 	/** The remote reference module. */
 	protected RemoteReferenceModule rrm;
@@ -170,6 +180,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		this.component = component;
 		this.rrm = new RemoteReferenceModule(this, libservice, marshal);
 		this.waitingcalls = new HashMap<String, Future<Object>>();
+		this.processingcalls = new HashMap<String, ITerminableFuture<Object>>();
+		this.terminationcommands = new LRU<String, Runnable>(100);
 		this.timer	= new Timer(true);
 		this.marshal = marshal;
 		this.msgservice = msgservice;
@@ -629,6 +641,55 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	{
 		getRemoteReferenceModule().checkThread();
 		return waitingcalls.remove(callid);
+	}
+	
+	/**
+	 *  Add a new processing call.
+	 *  @param callid The callid.
+	 *  @param future The future.
+	 */
+	public void putProcessingCall(String callid, ITerminableFuture<Object> future)
+	{
+		getRemoteReferenceModule().checkThread();
+		processingcalls.put(callid, future);
+	}
+	
+	/**
+	 *  Get a processing call future.
+	 *  @param callid The callid.
+	 *  @return The future.
+	 */
+	public ITerminableFuture<Object> getProcessingCall(String callid)
+	{
+		getRemoteReferenceModule().checkThread();
+		return processingcalls.get(callid);
+	}
+	
+	/**
+	 *  Remove a processing call.
+	 *  @param callid The callid.
+	 *  @return The future.
+	 */
+	public ITerminableFuture<Object> removeProcessingCall(String callid)
+	{
+		getRemoteReferenceModule().checkThread();
+		return processingcalls.remove(callid);
+	}
+	
+	/**
+	 *  Add a termination command.
+	 */
+	public void addTerminationCommand(String callid, Runnable command)
+	{
+		terminationcommands.put(callid, command);
+	}
+	
+	/**
+	 *  Remove a termination command.
+	 */
+	public Runnable removeTerminationCommand(String callid)
+	{
+		return terminationcommands.remove(callid);
 	}
 	
 	/**

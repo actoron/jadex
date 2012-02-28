@@ -1,6 +1,7 @@
 package jadex.base.service.remote.commands;
 
 import jadex.base.service.remote.ExceptionInfo;
+import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.base.service.remote.xml.RMIPreProcessor;
@@ -59,6 +60,9 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 */
 	public RemoteResultCommand(Object result, Exception exception, String callid, boolean isref, String methodname)
 	{
+//		if(methodname!=null && methodname.equals("getResult"))
+//			System.out.println("callid of getResult result: "+callid);
+		
 		this.result = result;
 		this.exceptioninfo = exception!=null? new ExceptionInfo(exception): null;
 		this.callid = callid;
@@ -106,6 +110,9 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 //		System.out.println("result command: "+result+" "+exceptioninfo+" "+callid);
 //		if(callid.equals(RemoteMethodInvocationHandler.debugcallid))
 //			System.out.println("debuggcallid");
+		
+//		if(methodname!=null && methodname.equals("getResult"))
+//			System.out.println("callid of getResult result: "+callid);
 		
 		Future future = (Future)rsms.getWaitingCall(callid);
 		

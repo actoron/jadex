@@ -1,5 +1,6 @@
 package jadex.base.service.remote.commands;
 
+import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteReference;
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.base.service.remote.RemoteServiceManagementService;
@@ -8,6 +9,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -15,6 +17,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
 import jadex.xml.writer.WriteContext;
@@ -79,6 +82,9 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	public RemoteMethodInvocationCommand(RemoteReference rr, Method method, 
 		Object[] parametervalues, String callid, IComponentIdentifier caller)
 	{
+//		if(method.getName().equals("getResult"))
+//			System.out.println("callid of getResult: "+callid);
+		
 		this.rr = rr;
 		this.method = method;
 		this.methodname = method.getName();
@@ -199,13 +205,13 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  @return An optional result command that will be 
 	 *  sent back to the command origin. 
 	 */
-	public IIntermediateFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
+	public IIntermediateFuture<IRemoteCommand> execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
-		final IntermediateFuture ret = new IntermediateFuture();
+		final IntermediateFuture<IRemoteCommand> ret = new IntermediateFuture<IRemoteCommand>();
 		
 		// RMS acts as representative of remote caller.
 		IComponentIdentifier.LOCAL.set(caller);
-		invokeMethod(ret);
+		invokeMethod(ret, rsms);
 		IComponentIdentifier.LOCAL.set(component.getComponentIdentifier());
 		
 //		rsms.getRemoteReferenceModule().getTargetObject(getRemoteReference())
@@ -234,7 +240,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 *  @param target The target object.
 	 *  @param ret The result future.
 	 */
-	public void invokeMethod(final IntermediateFuture ret)
+	public void invokeMethod(final IntermediateFuture<IRemoteCommand> ret, final RemoteServiceManagementService rsms)
 	{
 //		final IntermediateFuture ret = new IntermediateFuture();
 		
@@ -243,6 +249,8 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		
 		try
 		{
+			final boolean terminable = SReflect.isSupertype(ITerminableFuture.class, method.getReturnType());
+			
 //			System.out.println("invoke: "+m);
 			
 			// Necessary due to Java inner class bug 4071957
@@ -250,6 +258,15 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				method.setAccessible(true);
 			
 			Object res = method.invoke(target, parametervalues);
+			
+			// Remember invocation for termination invocation
+			if(terminable)
+			{
+				rsms.putProcessingCall(callid, (ITerminableFuture)res);
+				Runnable cmd = rsms.removeTerminationCommand(callid);
+				if(cmd!=null)
+					cmd.run();
+			}
 			
 			if(res instanceof IIntermediateFuture)
 			{
@@ -266,6 +283,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 //						System.out.println("fin");
 						ret.addIntermediateResult(new RemoteIntermediateResultCommand(null, callid, returnisref, methodname, true));
 						ret.setFinished();
+						rsms.removeProcessingCall(callid);
 					}
 					
 					public void resultAvailable(Object result)
@@ -273,6 +291,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 //						System.out.println("ra");
 						ret.addIntermediateResult(new RemoteResultCommand(result, null, callid, returnisref, methodname));
 						ret.setFinished();
+						rsms.removeProcessingCall(callid);
 					}
 					
 					public void resultAvailable(Collection result)
@@ -280,6 +299,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 //						System.out.println("ra");
 						ret.addIntermediateResult(new RemoteResultCommand(result, null, callid, returnisref, methodname));
 						ret.setFinished();
+						rsms.removeProcessingCall(callid);
 					}
 					
 					public void exceptionOccurred(Exception exception)
@@ -287,6 +307,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 //						System.out.println("ex: "+exception);
 						ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false, methodname));
 						ret.setFinished();
+						rsms.removeProcessingCall(callid);
 					}
 				});
 			}
@@ -298,12 +319,14 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 					{
 						ret.addIntermediateResult(new RemoteResultCommand(result, null, callid, returnisref, methodname));
 						ret.setFinished();
+						rsms.removeProcessingCall(callid);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
 						ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false, methodname));
 						ret.setFinished();
+						rsms.removeProcessingCall(callid);
 					}
 				});
 			}
@@ -311,6 +334,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			{
 				ret.addIntermediateResult(new RemoteResultCommand(res, null, callid, returnisref, methodname));
 				ret.setFinished();
+				rsms.removeProcessingCall(callid);
 			}
 		}
 		catch(Exception exception)
@@ -322,6 +346,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			}
 			ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false, methodname));
 			ret.setFinished();
+			rsms.removeProcessingCall(callid);
 		}
 		
 //		return ret;

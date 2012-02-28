@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.awareness;
 
+import jadex.commons.IChangeListener;
 import jadex.commons.future.IFuture;
 
 /**
@@ -20,4 +21,17 @@ public interface IManagementService
 //	 *  @return The awareness infos.
 //	 */
 //	public IFuture getAwarenessInfos();
+	
+//	/**
+//	 *  Add a change listener.
+//	 *  @param listener The change listener.
+//	 */
+//	public IFuture<Void> addChangeListener(IChangeListener<AwarenessInfo> listener);
+//	
+//	/**
+//	 *  Remove a change listener.
+//	 *  @param listener The change listener.
+//	 */
+//	public IFuture<Void> removeChangeListener(IChangeListener<AwarenessInfo> listener);
+	
 }
