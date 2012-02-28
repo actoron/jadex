@@ -1,22 +1,29 @@
 package jadex.base.service.message.transport.httprelaymtp.io;
 
+import jadex.base.service.awareness.discovery.relay.IRelayAwarenessService;
 import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.xml.bean.JavaWriter;
+import jadex.commons.future.IResultListener;
+import jadex.micro.annotation.Binding;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -27,6 +34,11 @@ import javax.net.ssl.X509TrustManager;
 
 public class HttpRelayTransport implements ITransport
 {
+	//-------- constants --------
+	
+	/** The alive time for assuming a connection is working. */
+	protected static final long	ALIVETIME	= 30000;
+	
 	// HACK!!! Disable all certificate checking (only until we find a more fine-grained solution)
 	static
 	{
@@ -69,11 +81,20 @@ public class HttpRelayTransport implements ITransport
 	/** The component. */
 	protected IInternalAccess component;
 	
+	/** The thread pool. */
+	protected IThreadPoolService	threadpool;
+	
 	/** The relay server address. */
 	protected String	address;
 	
 	/** The receiver process. */
 	protected HttpReceiver	receiver;
+	
+	/** The known addresses (address -> last used date (0 for pinging, negative for dead connections)). */
+	protected Map<String, Long>	addresses;
+	
+	/** The ready queue per address (tasks to reschedule after ping). */
+	protected Map<String, Collection<ISendTask>>	readyqueue;
 	
 	//-------- constructors --------
 	
@@ -84,6 +105,9 @@ public class HttpRelayTransport implements ITransport
 	{
 		this.component	= component;
 		this.address	= address;
+		this.addresses	= Collections.synchronizedMap(new HashMap<String, Long>());	// Todo: cleanup unused addresses!?
+		this.readyqueue	= new HashMap<String, Collection<ISendTask>>();
+		
 		boolean	found	= false;
 		for(int i=0; !found && i<getServiceSchemas().length; i++)
 		{
@@ -102,9 +126,19 @@ public class HttpRelayTransport implements ITransport
 	 */
 	public IFuture<Void> start()
 	{
-		// Create the receiver (starts automatically).
-		receiver	= new HttpReceiver(component.getExternalAccess(), address.substring(6));	// strip 'relay-' prefix.
-		return IFuture.DONE;
+		final Future<Void>	ret	= new Future<Void>();
+		component.getServiceContainer().searchService(IThreadPoolService.class, Binding.SCOPE_PLATFORM)
+			.addResultListener(new ExceptionDelegationResultListener<IThreadPoolService, Void>(ret)
+		{
+			public void customResultAvailable(IThreadPoolService tps)
+			{
+				threadpool	= tps;
+				// Create the receiver (starts automatically).
+				receiver	= new HttpReceiver(HttpRelayTransport.this, component.getExternalAccess(), address.substring(6));	// strip 'relay-' prefix.
+				ret.setResult(null);
+			}
+		});
+		return ret;
 	}
 
 	/**
@@ -118,121 +152,133 @@ public class HttpRelayTransport implements ITransport
 	}
 	
 	/**
-	 *  Test if a transport is applicable for the message.
-	 *  
-	 *  @return True, if the transport is applicable for the message.
+	 *  Called from receiver thread, when it connects to a address.
 	 */
-	public boolean	isApplicable(ISendTask task)
+	protected void	connected(final String address, final boolean dead)
 	{
-		boolean	ret	= false;
-		for(int i=0; !ret && i<task.getReceivers().length; i++)
+		Long	oldtime	= addresses.get(address);
+		// Remove all old entries with start address (e.g. also awareness urls).
+		if(!dead)
 		{
-			String[]	raddrs	= task.getReceivers()[i].getAddresses();
-			for(int j=0; !ret && j<raddrs.length; j++)
+			String[]	aadrs	= addresses.keySet().toArray(new String[0]);
+			for(int i=0; i<aadrs.length; i++)
 			{
-				for(int k=0; !ret && k<getServiceSchemas().length; k++)
+				if(aadrs[i].startsWith(address))
 				{
-					ret	= raddrs[j].toLowerCase().startsWith(getServiceSchemas()[k]);
+					addresses.remove(aadrs[i]);
 				}
-			}			
+			}
 		}
-		return ret;
+		addresses.put(address, new Long(dead ? -System.currentTimeMillis() : System.currentTimeMillis()));
+		
+		ISendTask[]	readytasks	= null;
+		synchronized(readyqueue)
+		{
+			Collection<ISendTask>	queue	= readyqueue.get(address);
+			if(queue!=null)
+			{
+				readytasks	= queue.toArray(new ISendTask[queue.size()]);
+				readyqueue.remove(address);
+			}
+		}
+		for(int i=0; readytasks!=null && i<readytasks.length; i++)
+		{
+			internalSendMessage(address, readytasks[i]);
+		}
+		
+		// inform awa when olddead
+		boolean	olddead	= oldtime==null || oldtime.longValue()<=0;
+		if(dead != olddead)
+		{
+			// Inform awareness manager (if any).
+			component.getServiceContainer().searchService(IRelayAwarenessService.class, Binding.SCOPE_PLATFORM)
+				.addResultListener(new IResultListener<IRelayAwarenessService>()
+			{
+				public void resultAvailable(IRelayAwarenessService ras)
+				{
+					if(dead)
+						ras.disconnected("relay-"+address);
+					else
+						ras.connected("relay-"+address);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					// No awa service -> ignore awa infos.
+				}
+			});
+		}
 	}
 	
 	/**
-	 *  Send a message to receivers on the same platform.
-	 *  This method is called concurrently for all transports.
-	 *  Each transport should immediately announce its interest and try to connect to the target platform
-	 *  (or reuse an existing connection) and afterwards acquire the token for the task.
+	 *  Test if a transport is applicable for the target address.
 	 *  
-	 *  The first transport that acquires the token (i.e. the first connected transport) tries to send the message.
-	 *  If sending fails, it may release the token to trigger the other transports.
+	 *  @return True, if the transport is applicable for the address.
+	 */
+	public boolean	isApplicable(String address)
+	{
+		boolean	applicable	= false;
+		for(int i=0; !applicable && i<getServiceSchemas().length; i++)
+		{
+			applicable	= address.startsWith(getServiceSchemas()[i]);
+		}
+		return applicable;		
+	}
+	
+	/**
+	 *  Send a message to the given address.
+	 *  This method is called multiple times for the same message, i.e. once for each applicable transport / address pair.
+	 *  The transport should asynchronously try to connect to the target address
+	 *  (or reuse an existing connection) and afterwards call-back the ready() method on the send task.
+	 *  
+	 *  The send manager calls the obtained send commands of the transports and makes sure that the message
+	 *  gets sent only once (i.e. call send commands sequentially and stop, when a send command finished successfully).
 	 *  
 	 *  All transports may keep any established connections open for later messages.
 	 *  
-	 *  @param task The message to send.
-	 *  @return True, if the transport is applicable for the message.
+	 *  @param address The address to send to.
+	 *  @param task A task representing the message to send.
 	 */
-	public void	sendMessage(final ISendTask task)
+	public void	sendMessage(String address, ISendTask task)
 	{
-		IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
+		internalSendMessage(address.substring(6), task);	// strip 'relay-' prefix.
+	}
+	
+	/**
+	 * 	Schedule message sending.
+	 */
+	public void	internalSendMessage(final String address, final ISendTask task)
+	{
+		final Long	time	= addresses.get(address);
+		// Connection available or dead.
+		if(time!=null && time.longValue()!=0 && Math.abs(time.longValue())+ALIVETIME>System.currentTimeMillis())
 		{
-			public IFuture<Void> execute(Void args)
+			IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
 			{
-				// Fetch all addresses
-				Set<String>	addresses	= new LinkedHashSet<String>();
-				for(int i=0; i<task.getReceivers().length; i++)
+				public IFuture<Void> execute(Void args)
 				{
-					String[]	raddrs	= task.getReceivers()[i].getAddresses();
-					for(int j=0; j<raddrs.length; j++)
+					IFuture<Void>	ret;
+					if(time.longValue()>0)
 					{
-						for(int k=0; k<getServiceSchemas().length; k++)
-						{
-							if(raddrs[j].startsWith(getServiceSchemas()[k]))
-								addresses.add(raddrs[j].substring(6));	// strip 'relay-' prefix.
-						}
-					}			
-				}
-
-				boolean	delivered	= false;
-				Exception	ex	= null;
-				// Iterate over all different addresses and try to send
-				String[] addrs = (String[])addresses.toArray(new String[addresses.size()]);
-				for(int i=0; !delivered && i<addrs.length; i++)
-				{
-					try
-					{
-						// Message service only calls transport.sendMessage() with receivers on same destination
-						// so just use first to fetch platform id.
-						IComponentIdentifier	targetid	= task.getReceivers()[0].getRoot();
-						byte[]	iddata	= JavaWriter.objectToByteArray(targetid, HttpRelayTransport.class.getClassLoader());
-						
-						URL	url	= new URL(addrs[i]);
-						HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
-//						// Hack!!! Do not validate server (todo: enable/disable by platform argument).
-//						if(con instanceof HttpsURLConnection)
-//						{
-//							HttpsURLConnection httpscon = (HttpsURLConnection) con;  
-//					        httpscon.setHostnameVerifier(new HostnameVerifier()  
-//					        {        
-//					            public boolean verify(String hostname, SSLSession session)  
-//					            {  
-//					                return true;  
-//					            }  
-//					        });												
-//						}
-						con.setRequestMethod("POST");
-						con.setDoOutput(true);
-						con.setUseCaches(false);
-						con.setRequestProperty("Content-Type", "application/octet-stream");
-						con.setRequestProperty("Content-Length", ""+(4+iddata.length+4+task.getProlog().length+task.getData().length));
-						con.connect();
-						
-						OutputStream	out	= con.getOutputStream();
-						out.write(SUtil.intToBytes(iddata.length));
-						out.write(iddata);
-						out.write(SUtil.intToBytes(task.getProlog().length+task.getData().length));
-						out.write(task.getProlog());
-						out.write(task.getData());
-						out.flush();
-						
-						int	code	= con.getResponseCode();
-						if(code!=HttpURLConnection.HTTP_OK)
-							throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
-						
-						delivered	= true;
-//						System.out.println("Sent with IO relay: "+task.getReceivers()[0]);
+						// Connection alive.
+						ret	= queueDoSendTask(address, task);
 					}
-					catch(Exception e)
+					else
 					{
-						ex	= e;
+						// Connection dead.
+						ret	= new Future<Void>(new RuntimeException("No connection to "+address));
 					}
+					return ret;
 				}
-				
-				return delivered ? IFuture.DONE : ex!=null ? new Future<Void>(ex) : new Future<Void>(new RuntimeException("Could not deliver message"));
-			}
-		};
-		task.ready(send);
+			};
+			task.ready(send);
+		}
+		
+		// Ping required or already running.
+		else
+		{
+			queueReadySendTask(address, task, time==null || time.longValue()!=0);
+		}
 	}
 	
 	/**
@@ -252,5 +298,116 @@ public class HttpRelayTransport implements ITransport
 	public String[] getAddresses()
 	{
 		return new String[]{address};
+	}
+	
+	/**
+	 *  Queue a ready send task for execution after a ping.
+	 */
+	protected void	queueReadySendTask(final String address, ISendTask task, boolean ping)
+	{
+		synchronized(readyqueue)
+		{
+			Collection<ISendTask>	queue	= readyqueue.get(address);
+			if(queue==null)
+			{
+				queue	= new ArrayList<ISendTask>();
+				readyqueue.put(address, queue);
+			}
+			queue.add(task);
+		}
+		
+		if(ping)
+		{
+			addresses.put(address, new Long(0));
+			
+			threadpool.execute(new Runnable()
+			{
+				public void run()
+				{
+					// Start new server ping.
+					try
+					{
+						URL	url	= new URL(address + (address.endsWith("/") ? "ping" : "/ping"));
+						HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
+						con.connect();
+						int	code	= con.getResponseCode();
+						if(code!=HttpURLConnection.HTTP_OK)
+							throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
+						addresses.put(address, new Long(System.currentTimeMillis()));
+					}
+					catch(Exception e)
+					{
+						component.getLogger().info("HTTP relay: No connection to "+address+", "+e);
+						addresses.put(address, new Long(-System.currentTimeMillis()));
+					}
+					
+					ISendTask[]	readytasks	= null;
+					synchronized(readyqueue)
+					{
+						Collection<ISendTask>	queue	= readyqueue.get(address);
+						if(queue!=null)
+						{
+							readytasks	= queue.toArray(new ISendTask[queue.size()]);
+							readyqueue.remove(address);
+						}
+					}
+					for(int i=0; readytasks!=null && i<readytasks.length; i++)
+					{
+						internalSendMessage(address, readytasks[i]);
+					}
+				}
+			});
+		}
+	}
+
+	/**
+	 *  Queue a send task for execution on a worker thread.
+	 */
+	protected IFuture<Void>	queueDoSendTask(final String address, final ISendTask task)
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		threadpool.execute(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					// Message service only calls transport.sendMessage() with receivers on same destination
+					// so just use first to fetch platform id.
+					IComponentIdentifier	targetid	= task.getReceivers()[0].getRoot();
+					byte[]	iddata	= targetid.getName().getBytes("UTF-8");
+					
+					URL	url	= new URL(address);
+					HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
+
+					con.setRequestMethod("POST");
+					con.setDoOutput(true);
+					con.setUseCaches(false);
+					con.setRequestProperty("Content-Type", "application/octet-stream");
+					con.setRequestProperty("Content-Length", ""+(4+iddata.length+4+task.getProlog().length+task.getData().length));
+					con.connect();
+					
+					OutputStream	out	= con.getOutputStream();
+					out.write(SUtil.intToBytes(iddata.length));
+					out.write(iddata);
+					out.write(SUtil.intToBytes(task.getProlog().length+task.getData().length));
+					out.write(task.getProlog());
+					out.write(task.getData());
+					out.flush();
+					
+					int	code	= con.getResponseCode();
+					if(code!=HttpURLConnection.HTTP_OK)
+						throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
+					addresses.put(address, new Long(System.currentTimeMillis()));
+					
+					ret.setResult(null);
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
+		});
+		return ret;
 	}
 }

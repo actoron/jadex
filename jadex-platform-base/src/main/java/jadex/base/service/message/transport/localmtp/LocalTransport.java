@@ -2,7 +2,6 @@ package jadex.base.service.message.transport.localmtp;
 
 import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -32,9 +31,6 @@ public class LocalTransport implements ITransport
 	/** The addresses. */
 	protected String[] addresses;
 	
-	/** The platform name. */
-//	protected String platformname;
-	
 	/** The platform. */
 	protected IServiceProvider container;
 	
@@ -48,8 +44,7 @@ public class LocalTransport implements ITransport
 	public LocalTransport(IServiceProvider container)
 	{
 		this.container = container;
-		this.addresses = new String[0];
-//		this.platformname = platform.getName();
+		this.addresses = new String[]{SCHEMAS[0]+container.getId().getPlatformName()};
 	}
 
 	/**
@@ -81,30 +76,36 @@ public class LocalTransport implements ITransport
 	//-------- methods --------
 	
 	/**
-	 *  Test if a transport is applicable for the message.
+	 *  Test if a transport is applicable for the target address.
 	 *  
-	 *  @return True, if the transport is applicable for the message.
+	 *  @return True, if the transport is applicable for the address.
 	 */
-	public boolean	isApplicable(ISendTask task)
+	public boolean	isApplicable(String address)
 	{
-		return task.getReceivers()[0].getPlatformName().equals(((IComponentIdentifier)container.getId()).getPlatformName());
+		boolean	applicable	= false;
+		for(int i=0; !applicable && i<getServiceSchemas().length; i++)
+		{
+			applicable	= address.startsWith(getServiceSchemas()[i])
+				&& address.substring(getServiceSchemas()[i].length()).equals(container.getId().getPlatformName());
+		}
+		return applicable;
 	}
 	
 	/**
-	 *  Send a message to receivers on the same platform.
-	 *  This method is called concurrently for all transports.
-	 *  Each transport should immediately announce its interest and try to connect to the target platform
-	 *  (or reuse an existing connection) and afterwards acquire the token for the task.
+	 *  Send a message to the given address.
+	 *  This method is called multiple times for the same message, i.e. once for each applicable transport / address pair.
+	 *  The transport should asynchronously try to connect to the target address
+	 *  (or reuse an existing connection) and afterwards call-back the ready() method on the send task.
 	 *  
-	 *  The first transport that acquires the token (i.e. the first connected transport) tries to send the message.
-	 *  If sending fails, it may release the token to trigger the other transports.
+	 *  The send manager calls the obtained send commands of the transports and makes sure that the message
+	 *  gets sent only once (i.e. call send commands sequentially and stop, when a send command finished successfully).
 	 *  
 	 *  All transports may keep any established connections open for later messages.
 	 *  
-	 *  @param task The message to send.
-	 *  @return True, if the transport is applicable for the message.
+	 *  @param address The address to send to.
+	 *  @param task A task representing the message to send.
 	 */
-	public void	sendMessage(final ISendTask task)
+	public void	sendMessage(String address, final ISendTask task)
 	{
 		IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
 		{
@@ -129,7 +130,7 @@ public class LocalTransport implements ITransport
 	}
 	
 	/**
-	 *  Get the adresses of this transport.
+	 *  Get the addresses of this transport.
 	 *  @return An array of strings representing the addresses 
 	 *  of this message transport mechanism.
 	 */

@@ -4,17 +4,22 @@ import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.MessageFailureException;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IResultCommand;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *  The manager send task is responsible for coordinating
@@ -135,26 +140,51 @@ public class ManagerSendTask	implements ISendTask
 	{
 		return future;
 	}
-	
+		
 	/**
-	 *  Transport availability for sending the message.
-	 *  Transports announce their interest, such that the message service knows when no transport is available for a send task.
+	 *  Use transports to send the message.
 	 */
-	public boolean	getInterest()
+	public void doSendMessage()
 	{
-		return this.interest>0;
+		// Fetch all addresses
+		Set<String>	addresses	= new LinkedHashSet<String>();
+		for(int i=0; i<receivers.length; i++)
+		{
+			String[]	raddrs	= receivers[i].getAddresses();
+			for(int j=0; j<raddrs.length; j++)
+			{
+				addresses.add(raddrs[j]);
+			}			
+		}
+		// Determine applicable transport/address pairs.
+		List<Tuple2<ITransport, String>>	sendpairs	= new ArrayList<Tuple2<ITransport, String>>();
+		for(int i=0; i<getTransports().size(); i++)
+		{
+			ITransport transport = (ITransport)getTransports().get(i);
+			for(String address: addresses)
+			{
+				if(transport.isApplicable(address))
+				{
+					interest++;
+					sendpairs.add(new Tuple2<ITransport, String>(transport, address));
+				}
+			}
+		}
+		
+		if(sendpairs.isEmpty())
+		{
+			getFuture().setException(new MessageFailureException(getMessage(), getMessageType(), receivers, 
+				"No transports available for sending message: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())+", "+SUtil.arrayToString(getTransports())));								
+		}
+		else
+		{
+			for(Tuple2<ITransport, String> sendpair: sendpairs)
+			{
+				sendpair.getFirstEntity().sendMessage(sendpair.getSecondEntity(), this);
+			}
+		}
 	}
 	
-	/**
-	 *  Announce availability of a transport for sending the message.
-	 *  Transports should announce their interest, such that the message service knows when no transport is available for a send task.
-	 */
-	public void	addInterest()
-	{
-		this.interest++;
-	}
-
-
 	//--------- methods used by transports ---------
 	
 	/**

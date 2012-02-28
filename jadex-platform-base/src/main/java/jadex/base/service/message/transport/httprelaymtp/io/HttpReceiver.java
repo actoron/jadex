@@ -17,7 +17,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Binding;
 import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,9 +24,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
 
 /**
  *  The receiver connects to the relay server
@@ -54,7 +50,7 @@ public class HttpReceiver
 	/**
 	 *  Create and start a new receiver.
 	 */
-	public HttpReceiver(IExternalAccess access_, String address_)
+	public HttpReceiver(final HttpRelayTransport transport, IExternalAccess access_, String address_)
 	{
 		this.access	= access_;
 		this.address	= address_;
@@ -78,16 +74,16 @@ public class HttpReceiver
 								{
 									try
 									{
-										// When last connection attempt was less than a second ago, wait some time.
-										if(lasttry!=0 && System.currentTimeMillis()-lasttry<1000)
+										// When last connection attempt was less than 30 seconds ago, wait some time.
+										if(lasttry!=0 && System.currentTimeMillis()-lasttry<HttpRelayTransport.ALIVETIME)
 										{
-											Thread.sleep(30000);
+											Thread.sleep(lasttry+HttpRelayTransport.ALIVETIME-System.currentTimeMillis());
 										}
 										
 										if(!finished)
 										{
 											lasttry	= System.currentTimeMillis();
-											String	xmlid	= JavaWriter.objectToXML(cid, getClass().getClassLoader());
+											String	xmlid	= cid.getName();
 											URL	url	= new URL(address+"?id="+URLEncoder.encode(xmlid, "UTF-8"));
 //											System.out.println("Connecting to: "+url);
 											con	= (HttpURLConnection)url.openConnection();
@@ -107,6 +103,7 @@ public class HttpReceiver
 //											}
 											
 											InputStream	in	= con.getInputStream();
+											transport.connected(address, false);
 											while(true)
 											{
 												// Read message type.
@@ -163,6 +160,7 @@ public class HttpReceiver
 									}
 									catch(final Exception e)
 									{
+										transport.connected(address, true);
 										if(!finished)
 										{
 											access.scheduleStep(new IComponentStep<Void>()

@@ -26,7 +26,7 @@ public class PlatformInfo
 	//-------- attributes --------
 	
 	/** The platform id. */
-	protected Object	id;
+	protected String	id;
 	
 	/** The platform host. */
 	protected String	host;
@@ -54,7 +54,7 @@ public class PlatformInfo
 	/**
 	 *  Create a platform info.
 	 */
-	public PlatformInfo(Object id, String host, String protocol)
+	public PlatformInfo(String id, String host, String protocol)
 	{
 		this.id	= id;
 		this.host	= host;
@@ -67,7 +67,7 @@ public class PlatformInfo
 	/**
 	 *  Get the id.
 	 */
-	public Object	getId()
+	public String	getId()
 	{
 		return id;
 	}

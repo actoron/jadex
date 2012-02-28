@@ -7,9 +7,9 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -68,23 +68,31 @@ public class SendRequest	implements IHttpRequest
 		
 		// Only called with receivers on same platform, therefore safe to get root id from first receiver.
 		IComponentIdentifier	recid	= task.getReceivers()[0].getRoot();
-		byte[]	id	= JavaWriter.objectToByteArray(recid, getClass().getClassLoader());
-		byte[]	prolog	= task.getProlog();
-		byte[]	data	= task.getData();
-		byte[]	header	= 
-			( "POST "+path+" HTTP/1.1\r\n"
-			+ "Content-Type: application/octet-stream\r\n"
-			+ "Host: "+address.getFirstEntity()+":"+address.getSecondEntity()+"\r\n"
-			+ "Content-Length: "+(4+id.length+4+prolog.length+data.length)+"\r\n"
-			+ "\r\n"
-			).getBytes();
-
-		buffers.add(ByteBuffer.wrap(header));
-		buffers.add(ByteBuffer.wrap(SUtil.intToBytes(id.length)));
-		buffers.add(ByteBuffer.wrap(id));
-		buffers.add(ByteBuffer.wrap(SUtil.intToBytes(prolog.length+data.length)));
-		buffers.add(ByteBuffer.wrap(prolog));
-		buffers.add(ByteBuffer.wrap(data));
+		try
+		{
+			byte[]	id	= recid.getName().getBytes("UTF-8");
+			byte[]	prolog	= task.getProlog();
+			byte[]	data	= task.getData();
+			byte[]	header	= 
+				( "POST "+path+" HTTP/1.1\r\n"
+				+ "Content-Type: application/octet-stream\r\n"
+				+ "Host: "+address.getFirstEntity()+":"+address.getSecondEntity()+"\r\n"
+				+ "Content-Length: "+(4+id.length+4+prolog.length+data.length)+"\r\n"
+				+ "\r\n"
+				).getBytes();
+	
+			buffers.add(ByteBuffer.wrap(header));
+			buffers.add(ByteBuffer.wrap(SUtil.intToBytes(id.length)));
+			buffers.add(ByteBuffer.wrap(id));
+			buffers.add(ByteBuffer.wrap(SUtil.intToBytes(prolog.length+data.length)));
+			buffers.add(ByteBuffer.wrap(prolog));
+			buffers.add(ByteBuffer.wrap(data));
+		}
+		catch(UnsupportedEncodingException e)
+		{
+			// Shouldn't happen?
+			throw new RuntimeException(e);
+		}
 		
 //		System.out.println("Try sending with relay: "+SUtil.arrayToString(task.getReceivers()));
 

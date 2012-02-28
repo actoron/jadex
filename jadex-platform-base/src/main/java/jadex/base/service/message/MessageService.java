@@ -1209,34 +1209,7 @@ public class MessageService extends BasicService implements IMessageService
 					{
 						if(result.booleanValue())
 						{
-//							System.err.println("MessageService SendManager.execute");
-							
-							final IComponentIdentifier[] receivers = task.getReceivers();
-//							System.out.println("recs: "+SUtil.arrayToString(receivers)+" "+task.hashCode());
-
-							List<ITransport>	transports	= new ArrayList<ITransport>();
-							for(int i=0; i<task.getTransports().size(); i++)
-							{
-								ITransport transport = (ITransport)task.getTransports().get(i);
-								if(transport.isApplicable(task))
-								{
-									task.addInterest();
-									transports.add(transport);
-								}
-							}
-							
-							if(transports.isEmpty())
-							{
-								task.getFuture().setException(new MessageFailureException(task.getMessage(), task.getMessageType(), receivers, 
-									"No transports available for sending message: "+ SUtil.arrayToString(receivers)+", "+SUtil.arrayToString(receivers[0].getAddresses())+", "+SUtil.arrayToString(task.getTransports())));								
-							}
-							else
-							{
-								for(ITransport transport: transports)
-								{
-									transport.sendMessage(task);
-								}
-							}
+							task.doSendMessage();
 						}
 						
 						// Quit when service was terminated.

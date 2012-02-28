@@ -263,42 +263,43 @@ public class TCPTransport implements ITransport
 	//-------- methods --------
 	
 	/**
-	 *  Test if a transport is applicable for the message.
+	 *  Test if a transport is applicable for the target address.
 	 *  
-	 *  @return True, if the transport is applicable for the message.
+	 *  @return True, if the transport is applicable for the address.
 	 */
-	public boolean	isApplicable(ISendTask task)
+	public boolean	isApplicable(String address)
 	{
 		boolean	ret	= false;
-		for(int i=0; !ret && i<task.getReceivers().length; i++)
-		{
-			String[]	raddrs	= task.getReceivers()[i].getAddresses();
-			for(int j=0; !ret && j<raddrs.length; j++)
-			{
-				for(int k=0; !ret && k<getServiceSchemas().length; k++)
-				{
-					ret	= raddrs[j].toLowerCase().startsWith(getServiceSchemas()[k]);
-				}
-			}			
-		}
+//		for(int i=0; !ret && i<task.getReceivers().length; i++)
+//		{
+//			String[]	raddrs	= task.getReceivers()[i].getAddresses();
+//			for(int j=0; !ret && j<raddrs.length; j++)
+//			{
+//				for(int k=0; !ret && k<getServiceSchemas().length; k++)
+//				{
+//					ret	= raddrs[j].toLowerCase().startsWith(getServiceSchemas()[k]);
+//				}
+//			}			
+//		}
 		return ret;
 	}
 	
+	
 	/**
-	 *  Send a message to receivers on the same platform.
-	 *  This method is called concurrently for all transports.
-	 *  Each transport should immediately announce its interest and try to connect to the target platform
-	 *  (or reuse an existing connection) and afterwards acquire the token for the task.
+	 *  Send a message to the given address.
+	 *  This method is called multiple times for the same message, i.e. once for each applicable transport / address pair.
+	 *  The transport should asynchronously try to connect to the target address
+	 *  (or reuse an existing connection) and afterwards call-back the ready() method on the send task.
 	 *  
-	 *  The first transport that acquires the token (i.e. the first connected transport) tries to send the message.
-	 *  If sending fails, it may release the token to trigger the other transports.
+	 *  The send manager calls the obtained send commands of the transports and makes sure that the message
+	 *  gets sent only once (i.e. call send commands sequentially and stop, when a send command finished successfully).
 	 *  
 	 *  All transports may keep any established connections open for later messages.
 	 *  
-	 *  @param task The message to send.
-	 *  @return True, if the transport is applicable for the message.
+	 *  @param address The address to send to.
+	 *  @param task A task representing the message to send.
 	 */
-	public void	sendMessage(final ISendTask task)
+	public void	sendMessage(String address, final ISendTask task)
 	{
 		IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
 		{

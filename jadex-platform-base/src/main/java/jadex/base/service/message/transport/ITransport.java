@@ -22,26 +22,27 @@ public interface ITransport
 	public IFuture<Void> shutdown();
 	
 	/**
-	 *  Test if a transport is applicable for the message.
+	 *  Test if a transport is applicable for the target address.
 	 *  
-	 *  @return True, if the transport is applicable for the message.
+	 *  @return True, if the transport is applicable for the address.
 	 */
-	public boolean	isApplicable(ISendTask task);
+	public boolean	isApplicable(String address);
 	
 	/**
-	 *  Send a message to receivers on a specific target platform.
-	 *  This method is called for all applicable transports.
-	 *  Each transport should asynchronously try to connect to the target platform
+	 *  Send a message to the given address.
+	 *  This method is called multiple times for the same message, i.e. once for each applicable transport / address pair.
+	 *  The transport should asynchronously try to connect to the target address
 	 *  (or reuse an existing connection) and afterwards call-back the ready() method on the send task.
 	 *  
-	 *  The send manager calls the send commands of the transports and makes sure that the message
+	 *  The send manager calls the obtained send commands of the transports and makes sure that the message
 	 *  gets sent only once (i.e. call send commands sequentially and stop, when a send command finished successfully).
 	 *  
 	 *  All transports may keep any established connections open for later messages.
 	 *  
+	 *  @param address The address to send to.
 	 *  @param task A task representing the message to send.
 	 */
-	public void	sendMessage(ISendTask task);
+	public void	sendMessage(String address, ISendTask task);
 	
 	/**
 	 *  Returns the prefixes of this transport

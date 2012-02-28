@@ -4,7 +4,6 @@ import jadex.base.fipa.SFipa;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ArrayBlockingQueue;
@@ -41,7 +40,7 @@ public class RelayServlet extends HttpServlet
 	//-------- attributes --------
 	
 	/** The relay map (id -> queue for pending requests). */
-	protected Map<Object, IBlockingQueue<Message>>	map;
+	protected Map<String, IBlockingQueue<Message>>	map;
 	
 	/** Info about connected platforms.*/
 	protected Map<Object, PlatformInfo>	platforms;
@@ -62,7 +61,7 @@ public class RelayServlet extends HttpServlet
 	 */
 	public void init() throws ServletException
 	{
-		map	= Collections.synchronizedMap(new HashMap<Object, IBlockingQueue<Message>>());
+		map	= Collections.synchronizedMap(new HashMap<String, IBlockingQueue<Message>>());
 		platforms	= Collections.synchronizedMap(new LinkedHashMap<Object, PlatformInfo>());
 	}
 	
@@ -93,30 +92,33 @@ public class RelayServlet extends HttpServlet
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
-		String	idstring	= request.getParameter("id");
-		
-		// Render status page.
-		if(idstring==null)
+		if("/ping".equals(request.getServletPath()))
 		{
-			request.setAttribute("platforms", platforms);
-			String	view	= "/WEB-INF/jsp/status.jsp";
-			RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);
-			rd.forward(request, response);
 		}
-		
-		// Handle platform connection.
 		else
 		{
-			synchronized(this)
+	
+			String	id	= request.getParameter("id");
+			
+			// Render status page.
+			if(id==null)
 			{
-				opencnt1++;
+				request.setAttribute("platforms", platforms);
+				String	view	= "/WEB-INF/jsp/status.jsp";
+				RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);
+				rd.forward(request, response);
 			}
-			System.out.println("Entering GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
 			
-			Object	id	= JavaReader.objectFromXML(idstring, getClass().getClassLoader());
-			
-			if(!"benchmark".equals(id))
+			// Handle platform connection.
+			else
 			{
+				synchronized(this)
+				{
+					opencnt1++;
+				}
+				System.out.println("Entering GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
+				
+				
 				PlatformInfo	info	= platforms.get(id);
 				if(info==null)
 				{
@@ -221,42 +223,13 @@ public class RelayServlet extends HttpServlet
 						items.get(i).getFuture().setException(new RuntimeException("Target disconnected."));
 					}
 				}
-			}
-			else
-			{
-				int	size	= Integer.parseInt(request.getParameter("size"));
-				Random	rnd	= new Random();
-					
-				// Ping to let client know that it is connected.
-				response.getOutputStream().write(SRelay.MSGTYPE_PING);  
-				response.flushBuffer();
-					
-				try
+				
+				synchronized(this)
 				{
-					while(true)
-					{
-						// Send message header.
-						response.getOutputStream().write(SRelay.MSGTYPE_DEFAULT);
-						
-						// Send message to output stream.
-						byte[]	msg	= new byte[size];
-						rnd.nextBytes(msg);
-						response.getOutputStream().write(SUtil.intToBytes(size));
-						response.getOutputStream().write(msg);
-						response.getOutputStream().flush();
-					}
+					opencnt1--;
 				}
-				catch(Exception e)
-				{
-					// exception on output stream, when client disconnects
-				}				
+				System.out.println("Leaving GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
 			}
-			
-			synchronized(this)
-			{
-				opencnt1--;
-			}
-			System.out.println("Leaving GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
 		}
 	}
 
@@ -280,7 +253,7 @@ public class RelayServlet extends HttpServlet
 		{
 			ServletInputStream	in	= request.getInputStream();
 			// Read target id.
-			readObject(in);
+			readString(in);
 			
 			// Read total message length.
 			byte[]	len	= readData(in, 4);
@@ -299,50 +272,34 @@ public class RelayServlet extends HttpServlet
 		else
 		{
 			ServletInputStream	in	= request.getInputStream();
-			Object	targetid	= readObject(in);
+			String	targetid	= readString(in);
 			boolean	sent	= false;
-			if(!"benchmark".equals(targetid))
-			{
-				IBlockingQueue<Message>	queue	= map.get(targetid);
-				if(queue!=null)
-				{
-					try
-					{
-						Message	msg	= new Message(SRelay.MSGTYPE_DEFAULT, in);
-						queue.enqueue(msg);
-	//					synchronized(this)
-	//					{
-	//						queued++;
-	//					}
-	//					System.out.println("queued: "+queued);
-						msg.getFuture().get(new ThreadSuspendable(), 30000);	// todo: how to set a useful timeout value!?
-						sent	= true;
-					}
-					catch(Exception e)
-					{
-						// timeout or platform just disconnected
-					}
-				}
-			}
-			else
+			IBlockingQueue<Message>	queue	= map.get(targetid);
+			if(queue!=null)
 			{
 				try
 				{
-					byte[]	buf	= new byte[8192];  
-					while(in.read(buf)!=-1)
-					{
-					}
+					Message	msg	= new Message(SRelay.MSGTYPE_DEFAULT, in);
+					queue.enqueue(msg);
+//					synchronized(this)
+//					{
+//						queued++;
+//					}
+//					System.out.println("queued: "+queued);
+					msg.getFuture().get(new ThreadSuspendable(), 30000);	// todo: how to set a useful timeout value!?
 					sent	= true;
 				}
 				catch(Exception e)
-				{			
+				{
+					// timeout or platform just disconnected
 				}
 			}
 			
 			if(!sent)
 			{
-				// Todo: other error msg?
-				response.sendError(404);
+				// Set content length to avoid error page being sent.
+				response.setStatus(404);
+				response.setContentLength(0);
 			}
 		}
 		synchronized(this)
@@ -360,8 +317,8 @@ public class RelayServlet extends HttpServlet
 	protected void	sendAwarenessInfos(AwarenessInfo awainfo)
 	{
 		// Update platform awareness info.
-		IComponentIdentifier	cid	= awainfo.getSender();
-		PlatformInfo	platform	= platforms.get(cid);
+		String	id	= awainfo.getSender().getPlatformName();
+		PlatformInfo	platform	= platforms.get(id);
 		boolean	initial	= platform!=null && platform.getAwarenessInfo()==null && AwarenessInfo.STATE_ONLINE.equals(awainfo.getState());
 		if(platform!=null)
 		{
@@ -375,13 +332,13 @@ public class RelayServlet extends HttpServlet
 			System.arraycopy(SUtil.intToBytes(data.length), 0, info, 0, 4);
 			System.arraycopy(data, 0, info, 4, data.length);
 			
-			Map.Entry<Object, IBlockingQueue<Message>>[]	entries	= map.entrySet().toArray(new Map.Entry[0]);
+			Map.Entry<String, IBlockingQueue<Message>>[]	entries	= map.entrySet().toArray(new Map.Entry[0]);
 			for(int i=0; i<entries.length; i++)
 			{
 				// Send awareness to other platforms with awareness on.
 				PlatformInfo	p2	= platforms.get(entries[i].getKey());
 				AwarenessInfo	awainfo2	= p2!=null ? p2.getAwarenessInfo() : null;
-				if(awainfo2!=null && !cid.equals(entries[i].getKey()))
+				if(awainfo2!=null && !id.equals(entries[i].getKey()))
 				{
 					try
 					{
@@ -402,7 +359,7 @@ public class RelayServlet extends HttpServlet
 						
 						try
 						{
-							map.get(cid).enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info2)));
+							map.get(id).enqueue(new Message(SRelay.MSGTYPE_AWAINFO, new ByteArrayInputStream(info2)));
 						}
 						catch(Exception e)
 						{
@@ -414,6 +371,20 @@ public class RelayServlet extends HttpServlet
 		}
 	}
 
+	/**
+	 * 	Read a string from the given stream.
+	 *  @param in	The input stream.
+	 *  @return The string.
+	 *  @throws	IOException when the stream is closed.
+	 */
+	public static String	readString(InputStream in) throws IOException
+	{
+		byte[]	len	= readData(in, 4);
+		int	length	= SUtil.bytesToInt(len);
+		byte[] buffer = readData(in, length);
+		return new String(buffer, "UTF-8");
+	}
+	
 	/**
 	 * 	Read an object from the given stream.
 	 *  @param in	The input stream.

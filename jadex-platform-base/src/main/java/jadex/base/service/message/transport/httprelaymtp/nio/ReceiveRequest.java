@@ -14,7 +14,6 @@ import jadex.commons.Tuple2;
 import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Binding;
 import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -194,7 +193,7 @@ public class ReceiveRequest	implements IHttpRequest
 	{
 		try
 		{
-			String	xmlid	= JavaWriter.objectToXML(cid, getClass().getClassLoader());
+			String	xmlid	= cid.getName();
 			byte[]	header	= getBytes(
 				"GET "+path+"?id="+URLEncoder.encode(xmlid, "UTF-8")+" HTTP/1.1\r\n"
 				+ "Host: "+address.getFirstEntity()+":"+address.getSecondEntity()+"\r\n"
