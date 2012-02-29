@@ -21,9 +21,7 @@ import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -90,6 +88,8 @@ public class SUtil
 
 	/** An empty class array. */
 	public static final Class[]	EMPTY_CLASS_ARRAY		= new Class[0];
+	
+	protected static final IResultCommand<ResourceInfo, URLConnection>[]	RESOURCEINFO_MAPPERS;
 
 	static
 	{
@@ -153,6 +153,100 @@ public class SUtil
 		Iterator<String> it = htmlwraps.keySet().iterator();
 		while(it.hasNext())
 			seps += it.next();
+		
+		List<IResultCommand<ResourceInfo, URLConnection>>	mappers	= new ArrayList();
+		String	custommappers	= System.getProperty("jadex.resourcemappers");
+		if(custommappers!=null)
+		{
+			StringTokenizer	stok	= new StringTokenizer(custommappers, ",");
+			while(stok.hasMoreTokens())
+			{
+				String	mapper	= stok.nextToken().trim();
+				try
+				{
+					Class	clazz	= SReflect.findClass(mapper, null, SUtil.class.getClassLoader());
+					mappers.add((IResultCommand<ResourceInfo, URLConnection>)clazz.newInstance());
+				}
+				catch(Exception e)
+				{
+					System.err.println("Error loading custom resource mapper: "+mapper);
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		
+		// ResourceInfo mapper for Jar URL connection
+		mappers.add(new IResultCommand<ResourceInfo, URLConnection>()
+		{
+			public ResourceInfo execute(URLConnection con)
+			{
+				ResourceInfo	ret	= null;
+				if(con instanceof JarURLConnection)
+				{
+					try
+					{
+						long	modified	= 0;
+						String	filename	= con.getURL().getFile();
+						JarURLConnection juc = (JarURLConnection)con;
+						// System.out.println("Jar file:     "+juc.getJarFile());
+						// System.out.println("Jar file url: "+juc.getJarFileURL());
+						// System.out.println("Jar entry:    "+juc.getJarEntry());
+						// System.out.println("Entry name:   "+juc.getEntryName());
+	
+						// Add jar protocol to file (hack???).
+						if(!filename.startsWith("jar:"))
+							filename = "jar:" + filename;
+	
+						// Set modified date to time of entry (if
+						// specified).
+						if(juc.getJarEntry().getTime() != -1)
+							modified = juc.getJarEntry().getTime();
+	
+						try
+						{
+							ret = new ResourceInfo(filename,
+									con.getInputStream(), modified);
+						}
+						catch(NullPointerException e)
+						{
+							// Workaround for Java bug #5093378 !?
+							// Maybe this is only a race condition???
+							String jarfilename = juc.getJarFile().getName();
+							ret = new ResourceInfo(filename, new JarFile(
+									jarfilename).getInputStream(juc
+									.getJarEntry()), modified);
+							// System.err.println("loaded with workaround: "+url);
+						}
+	
+						// todo: what about jar directories?!
+					}
+					catch(IOException e)
+					{
+						
+					}
+				}
+				return ret;
+			}
+		});
+		// Fallback resource info.
+		mappers.add(new IResultCommand<ResourceInfo, URLConnection>()
+		{
+			public ResourceInfo execute(URLConnection con)
+			{
+				ResourceInfo	ret	= null;
+				try
+				{
+					long modified = con.getLastModified();
+					String	filename	= con.getURL().getFile();
+					ret	= new ResourceInfo(filename, con.getInputStream(), modified);
+				}
+				catch(IOException e)
+				{
+				}
+				return ret;
+			}
+		});
+		RESOURCEINFO_MAPPERS	= mappers.toArray(new IResultCommand[mappers.size()]);
 	}
 
 	/**
@@ -1111,49 +1205,10 @@ public class SUtil
 						url = classloader.getResource(name.startsWith("/")
 								? name.substring(1) : name);
 						URLConnection con = url.openConnection();
-						con.setDefaultUseCaches(false); // See Java Bug ID
-														// 4386865
-						long modified = con.getLastModified();
-						String filename = url.getFile();
-						if(con instanceof JarURLConnection)
+						con.setDefaultUseCaches(false); // See Java Bug ID 4386865
+						for(int i=0; ret==null && i<RESOURCEINFO_MAPPERS.length; i++)
 						{
-							JarURLConnection juc = (JarURLConnection)con;
-							// System.out.println("Jar file:     "+juc.getJarFile());
-							// System.out.println("Jar file url: "+juc.getJarFileURL());
-							// System.out.println("Jar entry:    "+juc.getJarEntry());
-							// System.out.println("Entry name:   "+juc.getEntryName());
-
-							// Add jar protocol to file (hack???).
-							if(!filename.startsWith("jar:"))
-								filename = "jar:" + filename;
-
-							// Set modified date to time of entry (if
-							// specified).
-							if(juc.getJarEntry().getTime() != -1)
-								modified = juc.getJarEntry().getTime();
-
-							try
-							{
-								ret = new ResourceInfo(filename,
-										con.getInputStream(), modified);
-							}
-							catch(NullPointerException e)
-							{
-								// Workaround for Java bug #5093378 !?
-								// Maybe this is only a race condition???
-								String jarfilename = juc.getJarFile().getName();
-								ret = new ResourceInfo(filename, new JarFile(
-										jarfilename).getInputStream(juc
-										.getJarEntry()), modified);
-								// System.err.println("loaded with workaround: "+url);
-							}
-
-							// todo: what about jar directories?!
-						}
-						else
-						{
-							ret = new ResourceInfo(filename,
-									con.getInputStream(), modified);
+							ret	= RESOURCEINFO_MAPPERS[i].execute(con);
 						}
 					}
 					catch(IOException e)

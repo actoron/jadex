@@ -9,6 +9,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -23,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
@@ -38,6 +41,9 @@ public class HttpRelayTransport implements ITransport
 	
 	/** The alive time for assuming a connection is working. */
 	protected static final long	ALIVETIME	= 30000;
+	
+	/** The maximum number of workers for an address. */
+	protected static final int	MAX_WORKERS	= 16;
 	
 	// HACK!!! Disable all certificate checking (only until we find a more fine-grained solution)
 	static
@@ -93,8 +99,14 @@ public class HttpRelayTransport implements ITransport
 	/** The known addresses (address -> last used date (0 for pinging, negative for dead connections)). */
 	protected Map<String, Long>	addresses;
 	
+	/** The worker count (address -> count). */
+	protected Map<String, Integer>	workers;
+	
 	/** The ready queue per address (tasks to reschedule after ping). */
 	protected Map<String, Collection<ISendTask>>	readyqueue;
+	
+	/** The send queue per address (tasks to send on worker thread). */
+	protected Map<String, List<Tuple2<ISendTask, Future<Void>>>>	sendqueue;
 	
 	//-------- constructors --------
 	
@@ -106,7 +118,9 @@ public class HttpRelayTransport implements ITransport
 		this.component	= component;
 		this.address	= address;
 		this.addresses	= Collections.synchronizedMap(new HashMap<String, Long>());	// Todo: cleanup unused addresses!?
+		this.workers	= new HashMap<String, Integer>();
 		this.readyqueue	= new HashMap<String, Collection<ISendTask>>();
+		this.sendqueue	= new HashMap<String, List<Tuple2<ISendTask, Future<Void>>>>();
 		
 		boolean	found	= false;
 		for(int i=0; !found && i<getServiceSchemas().length; i++)
@@ -363,51 +377,118 @@ public class HttpRelayTransport implements ITransport
 	/**
 	 *  Queue a send task for execution on a worker thread.
 	 */
-	protected IFuture<Void>	queueDoSendTask(final String address, final ISendTask task)
+	protected IFuture<Void>	queueDoSendTask(final String address, ISendTask task)
 	{
-		final Future<Void>	ret	= new Future<Void>();
-		threadpool.execute(new Runnable()
+		Future<Void>	ret	= new Future<Void>();
+		boolean	startworker	= false;
+		synchronized(workers)
 		{
-			public void run()
+			List<Tuple2<ISendTask, Future<Void>>>	queue	= sendqueue.get(address);
+			if(queue==null)
 			{
-				try
-				{
-					// Message service only calls transport.sendMessage() with receivers on same destination
-					// so just use first to fetch platform id.
-					IComponentIdentifier	targetid	= task.getReceivers()[0].getRoot();
-					byte[]	iddata	= targetid.getName().getBytes("UTF-8");
-					
-					URL	url	= new URL(address);
-					HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
-
-					con.setRequestMethod("POST");
-					con.setDoOutput(true);
-					con.setUseCaches(false);
-					con.setRequestProperty("Content-Type", "application/octet-stream");
-					con.setRequestProperty("Content-Length", ""+(4+iddata.length+4+task.getProlog().length+task.getData().length));
-					con.connect();
-					
-					OutputStream	out	= con.getOutputStream();
-					out.write(SUtil.intToBytes(iddata.length));
-					out.write(iddata);
-					out.write(SUtil.intToBytes(task.getProlog().length+task.getData().length));
-					out.write(task.getProlog());
-					out.write(task.getData());
-					out.flush();
-					
-					int	code	= con.getResponseCode();
-					if(code!=HttpURLConnection.HTTP_OK)
-						throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
-					addresses.put(address, new Long(System.currentTimeMillis()));
-					
-					ret.setResult(null);
-				}
-				catch(Exception e)
-				{
-					ret.setException(e);
-				}
+				queue	= new LinkedList<Tuple2<ISendTask,Future<Void>>>();
+				sendqueue.put(address, queue);
 			}
-		});
+			queue.add(new Tuple2<ISendTask, Future<Void>>(task, ret));
+			
+			Integer	cnt	= workers.get(address);
+			if(cnt==null)
+			{
+				cnt	= new Integer(0);
+				workers.put(address, cnt);
+			}
+			if(cnt.intValue()<MAX_WORKERS)
+			{
+				workers.put(address, new Integer(cnt.intValue()+1));
+				startworker	= true;
+//				System.out.println("starting worker: "+workers.get(address));
+			}
+		}
+		
+		if(startworker)
+		{
+			threadpool.execute(new Runnable()
+			{
+				public void run()
+				{
+					boolean	again	= true;
+					
+					while(again)
+					{
+						ISendTask	task	= null;
+						Future<Void>	ret	= null;
+						synchronized(workers)
+						{
+							List<Tuple2<ISendTask, Future<Void>>>	queue	= sendqueue.get(address);
+							if(queue!=null)
+							{
+								Tuple2<ISendTask, Future<Void>>	tup	= queue.remove(0);
+								task	= tup.getFirstEntity();
+								ret	= tup.getSecondEntity();
+								if(queue.isEmpty())
+								{
+									sendqueue.remove(address);
+								}
+							}
+							else
+							{
+								again	= false;
+								Integer	cnt	= workers.get(address);
+								if(cnt.intValue()>1)
+								{
+									workers.put(address, new Integer(cnt.intValue()-1));
+								}
+								else
+								{
+									workers.remove(address);
+								}
+							}
+						}
+						
+						if(task!=null)
+						{
+//							System.out.println("using worker");
+							try
+							{
+								// Message service only calls transport.sendMessage() with receivers on same destination
+								// so just use first to fetch platform id.
+								IComponentIdentifier	targetid	= task.getReceivers()[0].getRoot();
+								byte[]	iddata	= targetid.getName().getBytes("UTF-8");
+								
+								URL	url	= new URL(address);
+								HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
+			
+								con.setRequestMethod("POST");
+								con.setDoOutput(true);
+								con.setUseCaches(false);
+								con.setRequestProperty("Content-Type", "application/octet-stream");
+								con.setRequestProperty("Content-Length", ""+(4+iddata.length+4+task.getProlog().length+task.getData().length));
+								con.connect();
+								
+								OutputStream	out	= con.getOutputStream();
+								out.write(SUtil.intToBytes(iddata.length));
+								out.write(iddata);
+								out.write(SUtil.intToBytes(task.getProlog().length+task.getData().length));
+								out.write(task.getProlog());
+								out.write(task.getData());
+								out.flush();
+								
+								int	code	= con.getResponseCode();
+								if(code!=HttpURLConnection.HTTP_OK)
+									throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
+								addresses.put(address, new Long(System.currentTimeMillis()));
+								
+								ret.setResult(null);
+							}
+							catch(Exception e)
+							{
+								ret.setException(e);
+							}
+						}
+					}
+				}
+			});
+		}
 		return ret;
 	}
 }
