@@ -36,7 +36,7 @@ public class DropFoodTask extends AbstractTask {
 		long avatarId = (Long) getProperty(ACTOR_ID);
 		ISpaceObject so = contSpace.getSpaceObject(avatarId);
 
-		assert (Boolean) so.getProperty("has_food") == true : so;
+//		assert (Boolean) so.getProperty("has_food") == true : so;
 
 		// TODO: atomic action?
 		ISpaceObject[] allNests = contSpace.getSpaceObjectsByType("nest");

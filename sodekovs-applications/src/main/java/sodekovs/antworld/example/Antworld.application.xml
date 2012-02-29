@@ -123,7 +123,7 @@
 					<env:property name="rate">2</env:property>
 				</env:processtype> -->
 				<env:processtype name="manageFoodSources" class="ManageFoodSourcesProcess">
-					<env:property name="rate">1</env:property>
+					 <env:property name="rate">1</env:property>
 				</env:processtype>
 			</env:processtypes>
 						
@@ -282,6 +282,15 @@
 						</env:object>
 					</env:objects>
 					
+					<env:processes>
+						<!--<env:process type="managePheromones">
+						<env:property name="rate">4</env:property>
+						</env:process> -->				
+				 		<env:process type="manageFoodSources">
+							<env:property name="rate">1</env:property> 
+						</env:process>
+					</env:processes>
+			
 					<env:observers>
 						<env:observer name="AntWorld" dataview="view_all"
 							perspective="icons">
@@ -290,17 +299,8 @@
 				</env:envspace>
 			</extensions>
 			<components>
-				<component type="Ant" number="1" />
-			</components>
-			<env:processes>
-			<!--<env:process type="managePheromones">
-					<env:property name="rate">4</env:property>
-				</env:process> -->
-				<env:process type="manageFoodSources">
-					<env:property name="rate">1</env:property>
-			</env:process>
-			</env:processes>
-								
+				<component type="Ant" number="3" />
+			</components>							
 		</configuration>
 
 	</configurations>

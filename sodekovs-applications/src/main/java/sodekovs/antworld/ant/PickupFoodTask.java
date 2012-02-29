@@ -21,20 +21,17 @@ public class PickupFoodTask extends AbstractTask {
 	// -------- IObjectTask methods --------
 
 	/**
-	 * Executes the task. Handles exceptions. Subclasses should implement
-	 * doExecute() instead.
+	 * Executes the task. Handles exceptions. Subclasses should implement doExecute() instead.
 	 * 
 	 * @param space
 	 *            The environment in which the task is executing.
 	 * @param obj
 	 *            The object that is executing the task.
 	 * @param progress
-	 *            The time that has passed according to the environment
-	 *            executor.
+	 *            The time that has passed according to the environment executor.
 	 */
-	public void execute(final IEnvironmentSpace space, ISpaceObject obj,
-			long progress, IClockService clock) {
-		boolean ret = false;
+	public void execute(final IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock) {
+//		boolean ret = false;
 
 		ContinuousSpace2D contSpace = (ContinuousSpace2D) space;
 		long avatarId = (Long) getProperty(ACTOR_ID);
@@ -47,17 +44,9 @@ public class PickupFoodTask extends AbstractTask {
 
 		// Get the "right" food source
 		for (ISpaceObject foodSource : allFoodSources) {
-			if (foodSource
-					.getProperty(ContinuousSpace2D.PROPERTY_POSITION)
-					.equals(so.getProperty(ContinuousSpace2D.PROPERTY_POSITION))) {
-				System.out
-						.println("Food Source Pos: "
-								+ foodSource
-										.getProperty(ContinuousSpace2D.PROPERTY_POSITION)
-								+ " ant Pos: "
-								+ so.getProperty(ContinuousSpace2D.PROPERTY_POSITION));
-				int foodPieces = (Integer) foodSource
-						.getProperty("food_pieces");
+			if (foodSource.getProperty(ContinuousSpace2D.PROPERTY_POSITION).equals(so.getProperty(ContinuousSpace2D.PROPERTY_POSITION))) {
+				System.out.println("Food Source Pos: " + foodSource.getProperty(ContinuousSpace2D.PROPERTY_POSITION) + " ant Pos: " + so.getProperty(ContinuousSpace2D.PROPERTY_POSITION));
+				int foodPieces = (Integer) foodSource.getProperty("food_pieces");
 				if (foodPieces > 0) {
 					foodSource.setProperty("food_pieces", foodPieces - 1);
 					so.setProperty("has_food", true);
@@ -68,6 +57,8 @@ public class PickupFoodTask extends AbstractTask {
 					// so.setProperty("eval:carriedFood", new
 					// Integer(carriedFood + 1));
 
+				}else{
+					System.out.println("did not pick up food since it was already empty...");
 				}
 				break;
 			}
