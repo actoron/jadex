@@ -175,7 +175,7 @@ public class SelectorThread implements Runnable
 	 */
 	public IFuture<NIOTCPOutputConnection>	getConnection(final InetSocketAddress address)
 	{
-		Future<NIOTCPOutputConnection>	ret	= null;	// Java compiler doesn't detect that ret is always assigned. grrr
+		Future<NIOTCPOutputConnection>	ret;
 		
 		synchronized(connections)
 		{
@@ -229,6 +229,10 @@ public class SelectorThread implements Runnable
 				else if(val instanceof Future)
 				{
 					ret	= (Future<NIOTCPOutputConnection>)val;
+				}
+				else
+				{
+					ret	= new Future<NIOTCPOutputConnection>(new RuntimeException("Dead connection: "+address));
 				}
 			}
 		}

@@ -49,8 +49,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -736,7 +738,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 */
 	protected static String[]	extractNames(IComponentIdentifier cid)
 	{
-		List<String>	ret	= new ArrayList<String>();
+		Set<String>	ret	= new LinkedHashSet<String>();
 		ret.add(cid.getName());
 		String[]	addrs	= cid.getAddresses();
 		for(int i=0; i<addrs.length; i++)
@@ -744,21 +746,29 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			int	prot	= addrs[i].indexOf("://");
 			if(prot!=-1)
 			{
-				int	port	= addrs[i].indexOf(':', prot+3);
-				if(port!=-1)
+				int	slash	= addrs[i].indexOf('/', prot+3);
+				if(slash!=-1)
 				{
-					ret.add(addrs[i].substring(0, port));
-				}
-				else
-				{
-					int	slash	= addrs[i].indexOf('/', prot+3);
-					if(slash!=-1)
+					int	port	= addrs[i].lastIndexOf(':', slash);
+					if(port!=-1 && port>prot+3)
 					{
-						ret.add(addrs[i].substring(0, slash));
+						ret.add(addrs[i].substring(prot+3, port));
 					}
 					else
 					{
-						System.out.println("Warning: Unknown address scheme "+addrs[i]);
+						ret.add(addrs[i].substring(prot+3, slash));
+					}
+				}
+				else
+				{
+					int	port	= addrs[i].lastIndexOf(':');
+					if(port!=-1 && port>prot+3)
+					{
+						ret.add(addrs[i].substring(prot+3, port));
+					}
+					else
+					{
+						ret.add(addrs[i].substring(prot+3));
 					}
 				}
 			}
@@ -767,6 +777,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				System.out.println("Warning: Unknown address scheme "+addrs[i]);
 			}
 		}
+//		System.out.println("cidnames: "+ret);
 		return (String[])ret.toArray(new String[ret.size()]);
 	}
 	

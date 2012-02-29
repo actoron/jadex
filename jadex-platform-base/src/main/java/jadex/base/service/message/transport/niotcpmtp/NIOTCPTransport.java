@@ -199,7 +199,7 @@ public class NIOTCPTransport implements ITransport
 	 */
 	public void	sendMessage(String address, final ISendTask task)
 	{
-		selectorthread.getConnection(parseAddress(address)).addResultListener(new IResultListener<NIOTCPOutputConnection>()
+		IResultListener<NIOTCPOutputConnection>	lis	= new IResultListener<NIOTCPOutputConnection>()
 		{
 			public void resultAvailable(final NIOTCPOutputConnection con)
 			{
@@ -223,7 +223,35 @@ public class NIOTCPTransport implements ITransport
 				};
 				task.ready(send);
 			}
-		});
+		};
+		IFuture<NIOTCPOutputConnection>	con	= selectorthread.getConnection(parseAddress(address));
+		
+		// Inform listener immediately if future is done (avoids that niotcp drops behind other transports due to stack unwindind).
+		if(con.isDone())
+		{
+			NIOTCPOutputConnection	res	= null;
+			Exception	ex	= null;
+			try
+			{
+				res	= con.get(null);
+			}
+			catch(Exception e)
+			{
+				ex	= e;
+			}
+			if(ex!=null)
+			{
+				lis.exceptionOccurred(ex);
+			}
+			else
+			{
+				lis.resultAvailable(res);
+			}
+		}
+		else
+		{
+			con.addResultListener(lis);
+		}
 	}
 
 	/**
