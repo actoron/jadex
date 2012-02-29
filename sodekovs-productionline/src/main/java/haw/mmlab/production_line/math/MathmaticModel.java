@@ -11,7 +11,7 @@ import java.math.BigInteger;
  */
 public class MathmaticModel {
 
-	private static final long R = 70;
+	private static final long R = 1000000;
 
 	private static final long C = R;
 
@@ -32,6 +32,7 @@ public class MathmaticModel {
 		//
 		// distributionFunction(300, redRate, workload, KAPPA, C, k, t);
 
+		System.out.println(R);
 		System.out.println("redRate\tworkload\texpectationValue\tdistributionFunction\tvariance\tstandardDeviation\ttwoSigma\tlower\tupper");
 
 		for (int r = 1; r <= 10; r++) {
@@ -41,9 +42,13 @@ public class MathmaticModel {
 
 			for (int w = 1; w <= 10; w++) {
 				double workload = w / 10.0;
-				double expValue = expectationValue(N, redRate, workload, kappa(workload), C, k, t);
-				double df = distributionFunction(N, redRate, workload, kappa(workload), C, k, t);
-				double variance = variance(N, redRate, workload, kappa(workload), C, k, t);
+				// double expValue = expectationValue(N, redRate, workload, kappa(workload), C, k, t);
+				// double df = distributionFunction(N, redRate, workload, kappa(workload), C, k, t);
+				// double variance = variance(N, redRate, workload, kappa(workload), C, k, t);
+				double[] result = calc(N, redRate, workload, kappa(workload), C, k, t);
+				double expValue = result[0];
+				double variance = result[1];
+				double df = result[2];
 				double sd = standardDeviation(variance);
 				double twoSig = twoSigma(sd);
 				double lower = expValue - twoSig;
@@ -69,6 +74,25 @@ public class MathmaticModel {
 
 	public static double kappa(double workload) {
 		return workload * 10;
+	}
+
+	private static double[] calc(long n, double redRate, double workload, double kappa, long c, long k, long t) {
+		double[] result = new double[3];
+		double expValue = 0.0;
+		double variance = 0.0;
+		double df = 0.0;
+
+		for (int i = 1; i <= n; i++) {
+			expValue += i * p(i, redRate, workload, kappa, c, k, t);
+			variance += Math.pow(i - expValue, 2) * p(i, redRate, workload, kappa, c, k, t);
+			df += p(i, redRate, workload, kappa, c, k, t);
+		}
+
+		result[0] = expValue;
+		result[1] = variance;
+		result[2] = df;
+
+		return result;
 	}
 
 	private static double variance(long n, double redRate, double workload, double kappa, long c, long k, long t) {
