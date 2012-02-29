@@ -172,6 +172,7 @@ public class SettingsService extends BasicService implements ISettingsService
 //			System.out.println("Removed provider: "+id+", "+provider);
 			if(saveonexit)
 			{
+//				provider.getProperties().addResultListener(new DelegationResultListener(ret)
 				provider.getProperties().addResultListener(access.createResultListener(new DelegationResultListener(ret)
 				{
 					public void customResultAvailable(Object result)

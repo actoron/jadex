@@ -2106,9 +2106,29 @@ public class SUtil
 		{
 			int idx = ret.lastIndexOf(sep);
 			if(idx>0)
+			{
 				ret = ret.substring(0, idx);
+			}
 			else
-				throw new RuntimeException("Corrupt filename: "+filename);
+			{
+				// Try other variant before fail
+				if('/'!=File.separatorChar)
+				{
+					if('/'==sep)
+						sep = File.separatorChar;
+					else
+						sep = '/';
+					idx = ret.lastIndexOf(sep);
+					if(idx>0)
+						ret = ret.substring(0, idx);
+					else
+						throw new RuntimeException("Corrupt filename: "+filename);
+				}
+				else
+				{
+					throw new RuntimeException("Corrupt filename: "+filename);
+				}
+			}
 		}
 		
 		if(ret.startsWith("jar:file:") && ret.endsWith("!"))

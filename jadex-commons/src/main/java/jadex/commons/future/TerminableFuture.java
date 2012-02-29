@@ -5,6 +5,9 @@ package jadex.commons.future;
  *  Future that can be terminated from caller side. 
  *  A termination request leads to setException() being 
  *  called with a FutureTerminatedException.
+ *  
+ *  The future can be supplied with a command that
+ *  gets executed if terminate is called.
  */
 public class TerminableFuture<E> extends Future<E> implements ITerminableFuture<E>
 {

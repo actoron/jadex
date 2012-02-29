@@ -108,6 +108,8 @@
 		<argument name="simulation" class="Boolean"/>
 		<!-- Flag if copying parameters for local service calls is allowed. -->
 		<argument name="parametercopy" class="boolean">true</argument>
+		<!-- Flag if decoupled service cms should be used. -->
+		<argument name="decoupledcms" class="boolean">true</argument>
 
 		<!-- Additional library paths (classpath entries) for loading agent models and classes. -->
 		<argument name="libpath" class="String"></argument>
@@ -258,10 +260,20 @@
 				)
 			</implementation>
 		</providedservice>
-		<providedservice class="jadex.bridge.service.types.cms.IComponentManagementService">
-			<implementation proxytype="raw">
-				new jadex.standalone.service.ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter(), 
+		<providedservice name="cms" class="jadex.bridge.service.types.cms.IComponentManagementService">
+			 <implementation proxytype="raw">
+				!$args.decoupledcms
+				? new jadex.standalone.service.ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter(), 
 					$args.componentfactory, $args.parametercopy)
+				: null
+			</implementation>
+		</providedservice>
+		<providedservice name="cms_decoupled" class="jadex.bridge.service.types.cms.IComponentManagementService">
+			<implementation>
+				$args.decoupledcms
+				? new jadex.standalone.service.DecoupledComponentManagementService($component.getComponentAdapter(), 
+					$args.componentfactory, $args.parametercopy)
+				: null
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.df.IDF">

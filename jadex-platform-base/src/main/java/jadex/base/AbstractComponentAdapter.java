@@ -574,34 +574,45 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 								{
 									// Do final cleanup step as (last) ext_entry
 									// for allowing previously added entries still be executed.
-									Runnable	laststep	= new Runnable()
-									{								
-										public void run()
-										{
-											clock	= null;
-											cms	= null;
-//											component	= null;	// Required by getResults()
-											model	= null;
-//											desc	= null;	// Required by toString()
-											parent	= null;
-											killfuture.setResult(null);
-											
-//											System.out.println("Checking ext entries after cleanup: "+cid);
-											assert ext_entries==null || ext_entries.isEmpty() : "Ext entries after cleanup: "+desc.getName()+", "+ext_entries;
-										}
-									};
+									Runnable laststep = new LastStep();
+//									Runnable	laststep	= new Runnable()
+//									{								
+//										public void run()
+//										{
+//											clock	= null;
+//											cms	= null;
+////											component	= null;	// Required by getResults()
+//											model	= null;
+////											desc	= null;	// Required by toString()
+//											parent	= null;
+//											killfuture.setResult(null);
+//											
+////											System.out.println("Checking ext entries after cleanup: "+cid);
+//											assert ext_entries==null || ext_entries.isEmpty() : "Ext entries after cleanup: "+desc.getName()+", "+ext_entries;
+//										}
+//									};
+									// In case of platform invokerLater cannot be called.
 									if(getComponentIdentifier().getParent()!=null)
 									{
 										invokeLater(laststep);
+//										if(ext_entries==null)
+//											ext_entries	= new ArrayList();
+//										ext_entries.add(laststep);
 										// No more ext entries after cleanup step allowed.
 										ext_forbidden	= true;
+//										wakeup();
 									}
 									else
 									{
 										// Execute last step of platform directly
 										// No more ext entries after cleanup step allowed.
 										ext_forbidden	= true;
-										laststep.run();
+										if(ext_entries==null)
+											ext_entries	= new ArrayList();
+										ext_entries.add(laststep);
+										executeExternalEntries();
+										ext_forbidden	= true;
+//										laststep.run();
 									}
 								}
 							}
@@ -720,60 +731,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			
 			// Copy actions from external threads into the state.
 			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
-			boolean	extexecuted	= false;
-			Runnable[]	entries	= null;
-			synchronized(this)
-			{
-				if(ext_entries!=null && !(ext_entries.isEmpty()))
-				{
-					entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
-					ext_entries.clear();
-					
-					extexecuted	= true;
-				}
-			}
-			for(int i=0; entries!=null && i<entries.length; i++)
-			{
-				if(entries[i] instanceof CheckedAction)
-				{
-					if(((CheckedAction)entries[i]).isValid())
-					{
-						try
-						{
-							entries[i].run();
-						}
-						catch(Exception e)
-						{
-							fatalError(e);
-						}
-					}
-					try
-					{
-						((CheckedAction)entries[i]).cleanup();
-					}
-					catch(Exception e)
-					{
-						fatalError(e);
-					}
-				}
-				else //if(entries[i] instanceof Runnable)
-				{
-					try
-					{
-//						if(entries[i].toString().indexOf("calc")!=-1)
-//						{
-//							System.out.println("scheduleStep: "+getComponentIdentifier());
-//						}
-						entries[i].run();
-					}
-					catch(Exception e)
-					{
-	//					e.printStackTrace();
-						fatalError(e);
-					}
-				}
-			}
-	
+			boolean	extexecuted	= executeExternalEntries();
+				
 			// Suspend when breakpoint is triggered.
 			// Necessary because component wakeup could be called anytime even if is at breakpoint..
 			boolean	breakpoint_triggered	= false;
@@ -880,6 +839,71 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		return ret;
 	}
 
+	/**
+	 *  Execute external entries.
+	 */
+	protected boolean executeExternalEntries()
+	{
+		// Copy actions from external threads into the state.
+		// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
+		boolean	extexecuted	= false;
+		
+		Runnable[]	entries	= null;
+		synchronized(this)
+		{
+			if(ext_entries!=null && !(ext_entries.isEmpty()))
+			{
+				entries	= (Runnable[])ext_entries.toArray(new Runnable[ext_entries.size()]);
+				ext_entries.clear();
+				
+				extexecuted	= true;
+			}
+		}
+		for(int i=0; entries!=null && i<entries.length; i++)
+		{
+			if(entries[i] instanceof CheckedAction)
+			{
+				if(((CheckedAction)entries[i]).isValid())
+				{
+					try
+					{
+						entries[i].run();
+					}
+					catch(Exception e)
+					{
+						fatalError(e);
+					}
+				}
+				try
+				{
+					((CheckedAction)entries[i]).cleanup();
+				}
+				catch(Exception e)
+				{
+					fatalError(e);
+				}
+			}
+			else //if(entries[i] instanceof Runnable)
+			{
+				try
+				{
+//					if(entries[i].toString().indexOf("calc")!=-1)
+//					{
+//						System.out.println("scheduleStep: "+getComponentIdentifier());
+//					}
+					entries[i].run();
+				}
+				catch(Exception e)
+				{
+//					e.printStackTrace();
+					fatalError(e);
+				}
+			}
+		}
+		
+		return extexecuted;
+	}
+	
 	/**
 	 * 	Called when an error occurs during component execution.
 	 *  @param e	The error.
@@ -1008,6 +1032,24 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		wakeup();
 		
 		return ret;
+	}
+	
+	class LastStep implements Runnable
+	{
+		public void run()
+		{
+			clock	= null;
+			cms	= null;
+//			component	= null;	// Required by getResults()
+			model	= null;
+//			desc	= null;	// Required by toString()
+			parent	= null;
+			killfuture.setResult(null);
+			
+//			System.out.println("Checking ext entries after cleanup: "+cid);
+			assert ext_entries==null || ext_entries.isEmpty() : "Ext entries after cleanup: "+desc.getName()+", "+ext_entries;
+
+		}
 	}
 	
 	/**
