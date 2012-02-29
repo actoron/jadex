@@ -14,7 +14,6 @@ import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.message.IMessageService;
-import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -78,15 +77,8 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 		{
 			public void exceptionOccurred(Exception exception)
 			{
-				if(exception instanceof TimeoutException)
-				{
-					// Ignore timeout exception.
-					super.resultAvailable(null);
-				}
-				else
-				{
-					super.exceptionOccurred(exception);
-				}
+				// Ignore exception.
+				super.resultAvailable(null);
 			}
 		}));
 		return ret;
