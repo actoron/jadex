@@ -125,7 +125,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	
 	/** The locked components. */
 	protected Map<IComponentIdentifier, LockEntry> lockentries;
-
+	
     //-------- constructors --------
 
 	/**
@@ -2612,6 +2612,9 @@ public abstract class ComponentManagementService extends BasicService implements
 		this.localtypes	= null;
 		this.marshalservice	= null;
 		this.msgservice	= null;
+		
+		shutdowned = true;
+		
 		return super.shutdownService();
 
 		/*final Future ret = new Future();
@@ -3096,8 +3099,6 @@ public abstract class ComponentManagementService extends BasicService implements
 	{
 		return (InitInfo)initinfos.remove(cid);
 	}
-	
-	
 	
 	/**
 	 *  Struct that stores information about initing components.

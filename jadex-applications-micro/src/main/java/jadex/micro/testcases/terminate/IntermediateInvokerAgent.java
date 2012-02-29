@@ -1,11 +1,15 @@
 package jadex.micro.testcases.terminate;
 
+import java.util.Collection;
+
 import jadex.base.Starter;
 import jadex.base.service.remote.RemoteException;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
@@ -18,8 +22,9 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -28,14 +33,14 @@ import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
 /**
- *  The invoker agent tests if futures can be terminated
+ *  The intermediate invoker agent tests if intermediate futures can be terminated
  *  in local and remote cases.
  */
 @Agent
 @Results(@Result(name="testresults", clazz=Testcase.class))
-@Description("The invoker agent tests if futures can be terminated " +
+@Description("The intermediate invoker agent tests if intermediate futures can be terminated " +
 	"in local and remote cases.")
-public class InvokerAgent
+public class IntermediateInvokerAgent
 {
 	//-------- attributes --------
 	
@@ -51,7 +56,7 @@ public class InvokerAgent
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		tc.setTestCount(1);
+		tc.setTestCount(2);
 		
 		final Future<TestReport> ret = new Future<TestReport>();
 		ret.addResultListener(agent.createResultListener(new IResultListener<TestReport>()
@@ -70,55 +75,56 @@ public class InvokerAgent
 			}
 		}));
 			
-//		testLocal().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)
-//		{
-//			public void customResultAvailable(Void result)
-//			{
-//				System.out.println("tests finished");
-//			}
-//		}));
-		
-		testRemote(1, 1000).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-		{
-			public void customResultAvailable(TestReport result)
-			{
-				tc.addReport(result);
-				ret.setResult(null);
-			}
-		}));
-		
-//		testLocal(1, 100).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+//		testLocal(1, 1000, 3).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 //		{
 //			public void customResultAvailable(TestReport result)
 //			{
 //				tc.addReport(result);
-////				ret.setResult(null);
-//				testRemote(2, 100).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-//				{
-//					public void customResultAvailable(TestReport result)
-//					{
-//						tc.addReport(result);
-//						ret.setResult(null);
-//					}
-//				}));
+//				ret.setResult(null);
 //			}
 //		}));
+		
+//		testRemote(1, 1000, 3).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+//		{
+//			public void customResultAvailable(TestReport result)
+//			{
+//				tc.addReport(result);
+//				ret.setResult(null);
+//			}
+//		}));
+		
+		testLocal(1, 100, 3).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+		{
+			public void customResultAvailable(TestReport result)
+			{
+				tc.addReport(result);
+//				ret.setResult(null);
+				testRemote(2, 100, 3).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+				{
+					public void customResultAvailable(TestReport result)
+					{
+						tc.addReport(result);
+						ret.setResult(null);
+					}
+				}));
+			}
+		}));
 	}
 	
 	/**
 	 *  Test if local intermediate results are correctly delivered
 	 *  (not as bunch when finished has been called). 
 	 */
-	protected IFuture<TestReport> testLocal(int testno, long delay)
+	protected IFuture<TestReport> testLocal(int testno, long delay, int max)
 	{
-		return performTest(agent.getServiceProvider(), agent.getComponentIdentifier().getRoot(), testno, delay);
+		return performTest(agent.getServiceProvider(), agent.getComponentIdentifier().getRoot(), testno, delay, max);
 	}
 	
 	/**
 	 *  Test if remote intermediate results are correctly delivered
 	 *  (not as bunch when finished has been called). 
 	 */
-	protected IFuture<TestReport> testRemote(final int testno, final long delay)
+	protected IFuture<TestReport> testRemote(final int testno, final long delay, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 		
@@ -134,7 +140,7 @@ public class InvokerAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getServiceProvider(), platform.getComponentIdentifier(), testno, delay)
+				performTest(platform.getServiceProvider(), platform.getComponentIdentifier(), testno, delay, max)
 					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
 					public void customResultAvailable(final TestReport result)
@@ -162,13 +168,13 @@ public class InvokerAgent
 	 *  - invoke the service
 	 *  - wait with intermediate listener for results 
 	 */
-	protected IFuture<TestReport> performTest(final IServiceProvider provider, final IComponentIdentifier root, final int testno, final long delay)
+	protected IFuture<TestReport> performTest(final IServiceProvider provider, final IComponentIdentifier root, final int testno, final long delay, final int max)
 	{
 		final Future<TestReport> ret = new Future<TestReport>();
 
 		final Future<TestReport> res = new Future<TestReport>();
 		
-		final TestReport tr = new TestReport("#"+testno, "Tests if ternimating future works");
+		final TestReport tr = new TestReport("#"+testno, "Tests if terminating future works");
 		
 		ret.addResultListener(new DelegationResultListener<TestReport>(res)
 		{
@@ -203,14 +209,24 @@ public class InvokerAgent
 							{
 								// Invoke service agent
 //								System.out.println("Invoking");
-								ITerminableFuture<String> fut = service.getResult(delay);
-								fut.addResultListener(agent.createResultListener(new IResultListener<String>()
+								final ITerminableIntermediateFuture<String> fut = service.getResults(delay, max);
+								fut.addResultListener(agent.createResultListener(new IIntermediateResultListener<String>()
 								{
-									public void resultAvailable(String result)
+									public void resultAvailable(Collection<String> result)
 									{
 //										System.out.println("resultAvailable: "+result);
 										cms.destroyComponent(cid);
 										tr.setReason("Termination did not occur: "+result);
+										ret.setResult(tr);
+									}
+									public void intermediateResultAvailable(String result)
+									{
+										System.out.println("intermediate result: "+result);
+									}
+									public void finished()
+									{
+										cms.destroyComponent(cid);
+										tr.setReason("Termination did not occur.");
 										ret.setResult(tr);
 									}
 									public void exceptionOccurred(Exception exception)
@@ -229,7 +245,16 @@ public class InvokerAgent
 										ret.setResult(tr);
 									}
 								}));
-								fut.terminate();
+								
+								agent.waitFor(delay*(max-1)+delay/2, new IComponentStep<Void>()
+								{
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										fut.terminate();
+										return IFuture.DONE;
+									}
+								});
+								
 //								System.out.println("Added listener");
 							}		
 						}));

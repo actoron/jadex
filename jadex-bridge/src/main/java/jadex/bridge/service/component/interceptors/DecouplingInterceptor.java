@@ -21,10 +21,12 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableDelegationResultListener;
+import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.transformation.traverser.FilterProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
@@ -436,6 +438,19 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					    	Object res = doCopy(copy, deffilter, result);
 							super.setResult(res);
 					    }	
+					};
+//					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
+					res	= fut;
+				}
+				else if(res instanceof ITerminableIntermediateFuture)
+				{
+					TerminableIntermediateDelegationFuture<Object> fut = new TerminableIntermediateDelegationFuture<Object>((ITerminableIntermediateFuture)res)
+					{
+						public void addIntermediateResult(Object result)
+						{
+					    	Object res = doCopy(copy, deffilter, result);
+							super.addIntermediateResult(res);
+						}	
 					};
 //					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
 					res	= fut;

@@ -49,7 +49,7 @@ public class IntermediateResultProviderAgent implements IIntermediateResultServi
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("setting intermediate result: "+cnt);//+" - "+System.currentTimeMillis());
+				System.out.println("setting intermediate result: "+cnt[0]);//+" - "+System.currentTimeMillis());
 				ret.addIntermediateResult("step("+(cnt[0]++)+"/"+max+")");
 				if(cnt[0]==max)
 				{

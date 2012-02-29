@@ -15,9 +15,11 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableFuture;
+import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.writer.WriteContext;
@@ -84,9 +86,33 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		
 		Future future;
 		Class type = method.getReturnType();
-		if(SReflect.isSupertype(IIntermediateFuture.class, type))
+
+		if(SReflect.isSupertype(ITerminableIntermediateFuture.class, type))
 		{
-			future = new IntermediateFuture();
+			future = new TerminableIntermediateDelegationFuture()
+			{
+				public void terminate() 
+				{
+					Future res = new Future();
+//					res.addResultListener(new IResultListener()
+//					{
+//						public void resultAvailable(Object result)
+//						{
+//							System.out.println("received result: "+result);
+//						}
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							System.out.println("received exception: "+exception);
+//						}
+//					});
+					final String mycallid = SUtil.createUniqueId(compid.getLocalName());
+					RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid);
+					// Can be invoked directly, because internally redirects to agent thread.
+//					System.out.println("sending terminate");
+					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
+						content, mycallid, to, res);
+				};
+			};
 		}
 		else if(SReflect.isSupertype(ITerminableFuture.class, type))
 		{
@@ -115,6 +141,10 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 					
 				};
 			};
+		}
+		else if(SReflect.isSupertype(IIntermediateFuture.class, type))
+		{
+			future = new IntermediateFuture();
 		}
 		else
 		{

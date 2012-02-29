@@ -1,6 +1,8 @@
 package jadex.commons.future;
 
 
+import jadex.commons.DebugException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -117,6 +119,47 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 
 		startScheduledNotifications();
 	}
+	
+	  /**
+     *  Set the result. 
+     *  Listener notifications occur on calling thread of this method.
+     *  @param result The result.
+     *  @return True if result was set.
+     */
+    public boolean	addIntermediateResultIfUndone(E result)
+    {
+    	synchronized(this)
+		{
+        	if(isDone())
+        	{
+        		return false;
+        	}
+        	else
+        	{
+        		intermediate = true;
+        		
+    			if(results==null)
+    				results	= new ArrayList<E>();
+    			
+    			results.add(result);
+    			
+    			if(listeners!=null)
+    			{
+    				// Find intermediate listeners to be notified.
+    				for(int i=0; i<listeners.size(); i++)
+    				{
+    					if(listeners.get(i) instanceof IIntermediateResultListener)
+    					{
+    						scheduleNotification(listeners.get(i), true, result);
+    					}
+    				}
+    			}
+    		}
+ 		}
+
+    	startScheduledNotifications();
+    	return true;
+    }
 	
 	/**
      *  Set the result. 

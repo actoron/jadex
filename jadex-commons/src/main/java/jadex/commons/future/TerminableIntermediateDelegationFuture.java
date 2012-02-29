@@ -1,19 +1,20 @@
 package jadex.commons.future;
 
 /**
- *  A terminable delegation future can be used when a termination future 
+ *  A terminable intermediate delegation future can be used when a termination intermediate future 
  *  should be delegated. This kind of future needs to be connected to the
  *  termination source (another delegation or a real future). Termination
  *  calls are forwarded to the termination source. The future remembers
  *  when terminate() was called in unconnected state and forwards the request
  *  as soon as the connection is established.
  */
-public class TerminableDelegationFuture<E> extends Future<E> implements ITerminableFuture<E>
+public class TerminableIntermediateDelegationFuture<E> extends IntermediateFuture<E>
+	implements ITerminableIntermediateFuture<E>
 {
 	//-------- attributes --------
 	
 	/** The termination source. */
-	protected ITerminableFuture<?> src;
+	protected ITerminableIntermediateFuture<?> src;
 	
 	/** Flag if source has to be notified. */
 	protected boolean notify;
@@ -26,17 +27,16 @@ public class TerminableDelegationFuture<E> extends Future<E> implements ITermina
 	/**
 	 *  Create a new future.
 	 */
-	public TerminableDelegationFuture()
+	public TerminableIntermediateDelegationFuture()
 	{
-//		System.out.println("tfut: "+hashCode());
 	}
 	
 	/**
 	 *  Create a new future.
 	 */
-	public TerminableDelegationFuture(ITerminableFuture<?> src)
+	public TerminableIntermediateDelegationFuture(ITerminableIntermediateFuture<?> src)
 	{
-		src.addResultListener(new TerminableDelegationResultListener(this, src));
+		src.addResultListener(new TerminableIntermediateDelegationResultListener(this, src));
 	}
 	
 	//-------- methods --------
@@ -44,7 +44,7 @@ public class TerminableDelegationFuture<E> extends Future<E> implements ITermina
 	/**
 	 *  Set the termination source.
 	 */
-	public void setTerminationSource(ITerminableFuture<?> src)
+	public void setTerminationSource(ITerminableIntermediateFuture<?> src)
 	{
 		assert this.src==null;
 		

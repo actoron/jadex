@@ -134,7 +134,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	protected Map<String, Future<Object>> waitingcalls;
 	
 	/** The map of processing calls (callid -> terniable future). */
-	protected Map<String, ITerminableFuture<Object>> processingcalls;
+	protected Map<String, Object> processingcalls;
 	
 	/** The map of termination commands without futures (callid -> command). 
 	    This can happen whenever a remote invocation command is executed after the terminate arrives. */
@@ -180,7 +180,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		this.component = component;
 		this.rrm = new RemoteReferenceModule(this, libservice, marshal);
 		this.waitingcalls = new HashMap<String, Future<Object>>();
-		this.processingcalls = new HashMap<String, ITerminableFuture<Object>>();
+		this.processingcalls = new HashMap<String, Object>();
 		this.terminationcommands = new LRU<String, Runnable>(100);
 		this.timer	= new Timer(true);
 		this.marshal = marshal;
@@ -648,7 +648,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param callid The callid.
 	 *  @param future The future.
 	 */
-	public void putProcessingCall(String callid, ITerminableFuture<Object> future)
+	public void putProcessingCall(String callid, Object future)
 	{
 		getRemoteReferenceModule().checkThread();
 		processingcalls.put(callid, future);
@@ -659,7 +659,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param callid The callid.
 	 *  @return The future.
 	 */
-	public ITerminableFuture<Object> getProcessingCall(String callid)
+	public Object getProcessingCall(String callid)
 	{
 		getRemoteReferenceModule().checkThread();
 		return processingcalls.get(callid);
@@ -670,7 +670,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param callid The callid.
 	 *  @return The future.
 	 */
-	public ITerminableFuture<Object> removeProcessingCall(String callid)
+	public Object removeProcessingCall(String callid)
 	{
 		getRemoteReferenceModule().checkThread();
 		return processingcalls.remove(callid);

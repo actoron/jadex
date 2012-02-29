@@ -18,6 +18,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
 import jadex.xml.writer.WriteContext;
@@ -249,7 +250,8 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		
 		try
 		{
-			final boolean terminable = SReflect.isSupertype(ITerminableFuture.class, method.getReturnType());
+			final boolean terminable = SReflect.isSupertype(ITerminableFuture.class, method.getReturnType())
+				|| SReflect.isSupertype(ITerminableIntermediateFuture.class, method.getReturnType());
 			
 //			System.out.println("invoke: "+m);
 			
@@ -262,7 +264,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			// Remember invocation for termination invocation
 			if(terminable)
 			{
-				rsms.putProcessingCall(callid, (ITerminableFuture)res);
+				rsms.putProcessingCall(callid, res);
 				Runnable cmd = rsms.removeTerminationCommand(callid);
 				if(cmd!=null)
 					cmd.run();

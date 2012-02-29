@@ -5,6 +5,7 @@ import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
 
@@ -64,11 +65,14 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 		// RMS acts as representative of remote caller.
 //		System.out.println("callid: "+callid);
 //		System.out.println("terminatecallid: "+terminatecallid);
-		ITerminableFuture<?> tfut = rsms.getProcessingCall(terminatecallid);
+		Object tfut = rsms.getProcessingCall(terminatecallid);
 		if(tfut!=null)
 		{
-//			System.out.println("terminating remote future: "+tfut.hashCode());
-			tfut.terminate();
+			System.out.println("terminating remote future: "+tfut.hashCode());
+			if(tfut instanceof ITerminableFuture)
+				((ITerminableFuture)tfut).terminate();
+			else
+				((ITerminableIntermediateFuture)tfut).terminate();
 		}
 		else
 		{
@@ -77,11 +81,14 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 			{
 				public void run()
 				{
-					ITerminableFuture<?> tfut = rsms.getProcessingCall(terminatecallid);
+					Object tfut = rsms.getProcessingCall(terminatecallid);
 					if(tfut!=null)
 					{
 //						System.out.println("terminated future afterwards");
-						tfut.terminate();
+						if(tfut instanceof ITerminableFuture)
+							((ITerminableFuture)tfut).terminate();
+						else
+							((ITerminableIntermediateFuture)tfut).terminate();
 					}
 				}
 			});
