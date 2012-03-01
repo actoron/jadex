@@ -105,7 +105,7 @@ public class RandomWalkPlan extends Plan {
 		// double check res:
 		Space2D space = ((Space2D) getBeliefbase().getBelief("environment").getFact());
 		IVector2 vec = new Vector2Double(xPos, yPos);
-		IVector1 one = space.getDistance(vec, destination);
+//		IVector1 one = space.getDistance(vec, destination);
 
 		// System.out.println("#checkIfVisited# Res: " + Math.sqrt(squareSum) + "<=" + vision + "; res by distance: " + one + ";--- vision: " + new Vector1Double(vision));
 		return Math.sqrt(squareSum) <= vision;

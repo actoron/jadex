@@ -75,14 +75,13 @@
 				
 				<!-- The size of the objects decreases as time goes by.-->
 				<env:objecttype name="pheromone">
+					<env:property name="strength">10</env:property>
 					<env:property name="size" dynamic="true">
 						$object.getProperty("strength") == null ? new
-						Vector2Double(3.0,3.0) :
-						new Vector2Double( Math.max(0.1,
-						((5 +
-						$object.getProperty("strength"))/30.0)), Math.max(0.1, (
-						(5 +
-						$object.getProperty("strength"))/30.0) )) <!--
+						Vector2Double(0.01,0.01) :
+						new Vector2Double( Math.max(0.01,
+						(($object.getProperty("strength"))/300.0)), Math.max(0.01, (
+						($object.getProperty("strength"))/300.0) )) <!--
 							new Vector2Double(0.5,0.5)
 						-->
 					</env:property>
@@ -119,9 +118,9 @@
 			</env:tasktypes>			
 			
 			<env:processtypes>
-				<!-- <env:processtype name="managePheromones" class="ManagePheromonesProcess">
-					<env:property name="rate">2</env:property>
-				</env:processtype> -->
+				<env:processtype name="managePheromones" class="ManagePheromonesProcess">
+					<env:property name="rate">1</env:property>
+				</env:processtype>
 				<env:processtype name="manageFoodSources" class="ManageFoodSourcesProcess">
 					 <env:property name="rate">1</env:property>
 				</env:processtype>
@@ -280,12 +279,34 @@
 						<env:object type="walkingStrategy">					
 							<env:property name="strategy">0</env:property>
 						</env:object>
+						
+						
+						<!--  Test pheromones for distance eval function. -->
+						<env:object type="pheromone">
+							<env:property name="position">new Vector2Double(0.6, 0.8)</env:property>
+							<env:property name="strenght">15</env:property>
+						</env:object>
+						
+						<env:object type="pheromone">
+							<env:property name="position">new Vector2Double(0.6, 0.7)</env:property>
+							<env:property name="strenght">15</env:property>
+						</env:object>
+						
+						<env:object type="pheromone">
+							<env:property name="position">new Vector2Double(0.5, 0.8)</env:property>
+							<env:property name="strenght">15</env:property>
+						</env:object>
+						
+						<env:object type="pheromone">
+							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
+							<env:property name="strenght">15</env:property>
+						</env:object>
 					</env:objects>
 					
 					<env:processes>
-						<!--<env:process type="managePheromones">
-						<env:property name="rate">4</env:property>
-						</env:process> -->				
+						<env:process type="managePheromones">
+						<env:property name="rate">8</env:property>
+						</env:process>			
 				 		<env:process type="manageFoodSources">
 							<env:property name="rate">1</env:property> 
 						</env:process>

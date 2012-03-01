@@ -54,7 +54,6 @@
 		</beliefsetref>		
 
 		<!-- Smelled pheromones. -->
-		<!-- <beliefset name="pheromones" class="ISpaceObject" />-->
 		<beliefsetref name="pheromones">
 			<concrete ref="move.pheromones"/>
 		</beliefsetref>	

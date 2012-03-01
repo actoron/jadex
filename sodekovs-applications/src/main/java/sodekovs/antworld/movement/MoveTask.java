@@ -9,12 +9,15 @@ import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
+import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
+
+import sodekovs.bikesharing.standard.VerkehrsmittelAgent;
 
 /**
  * Move an object towards a destination.
@@ -36,6 +39,9 @@ public class MoveTask extends AbstractTask {
 
 	/** The vision property of the moving object (radius in units). */
 	public static final String PROPERTY_VISION = "vision";
+	
+	/** The objectId of the calling avatar. */
+	public static final String ACTOR_ID = "actor_id";
 
 	// -------- IObjectTask methods --------
 
@@ -91,7 +97,7 @@ public class MoveTask extends AbstractTask {
 					}					
 					
 					// Hack: Create trace
-					Map props = new HashMap();
+					Map<String,Object> props = new HashMap<String,Object>();
 					props.put(Space2D.PROPERTY_POSITION, newLocation);
 					space.createSpaceObject("trace", props, null);
 					
@@ -101,6 +107,15 @@ public class MoveTask extends AbstractTask {
 			// *******************************
 		}
 		
+		//Produce a pheromone if the ant is carrying a piece of food from a source to a nest. 
+		long avatarId = (Long) getProperty(ACTOR_ID);
+		ISpaceObject so = space.getSpaceObject(avatarId);
+		if ((Boolean) so.getProperty("has_food")){
+			Map<String, Object> properties = new HashMap<String, Object>();
+			properties.put(Space2D.PROPERTY_POSITION, newloc);
+			properties.put("strength", 10);			
+			space.createSpaceObject("pheromone", properties, null);
+		}
 
 		// Process vision at new location.
 //		double vision = ((Number) obj.getProperty(PROPERTY_VISION)).doubleValue();

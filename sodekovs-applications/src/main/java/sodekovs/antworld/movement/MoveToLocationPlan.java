@@ -22,9 +22,10 @@ public class MoveToLocationPlan extends Plan {
 		IVector2 dest = (IVector2) getParameter("destination").getValue();
 
 
-		Map props = new HashMap();
+		Map<String,Object> props = new HashMap<String,Object>();
 		props.put(MoveTask.PROPERTY_DESTINATION, dest);
 		props.put(MoveTask.PROPERTY_SCOPE, getScope().getExternalAccess());
+		props.put(MoveTask.ACTOR_ID, myself.getId());
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 		IEnvironmentSpace space = (IEnvironmentSpace) getBeliefbase().getBelief("environment").getFact();
 		Object taskid = space.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());

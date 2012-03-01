@@ -5,7 +5,6 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
-import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
@@ -92,8 +91,9 @@ public class FoodMiningPlan extends Plan {
 	 * @param myself
 	 */
 	private void moveToDestination(IVector2 dest, IEnvironmentSpace env, ISpaceObject myself) {
-		Map props = new HashMap();
+		Map<String,Object> props = new HashMap<String,Object>();
 		props.put(MoveTask.PROPERTY_DESTINATION, dest);
+		props.put(MoveTask.ACTOR_ID, myself.getId());
 		props.put(MoveTask.PROPERTY_SCOPE, getScope().getExternalAccess());
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 		Object taskid = env.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
@@ -109,7 +109,7 @@ public class FoodMiningPlan extends Plan {
 	 * @param myself
 	 */
 	private void takePieceOfFood(IEnvironmentSpace env, ISpaceObject myself) {
-		Map props = new HashMap();
+		Map<String,Object> props = new HashMap<String,Object>();
 		props.put(PickupFoodTask.ACTOR_ID, myself.getId());
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 		Object taskid = env.createObjectTask(PickupFoodTask.PROPERTY_TYPENAME, props, myself.getId());
@@ -125,7 +125,7 @@ public class FoodMiningPlan extends Plan {
 	 * @param myself
 	 */
 	private void dropPieceOfFood(IEnvironmentSpace env, ISpaceObject myself) {
-		Map props = new HashMap();
+		Map<String,Object> props = new HashMap<String,Object>();
 		props.put(DropFoodTask.ACTOR_ID, myself.getId());
 		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
 		Object taskid = env.createObjectTask(DropFoodTask.PROPERTY_TYPENAME, props, myself.getId());
