@@ -610,7 +610,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 										if(ext_entries==null)
 											ext_entries	= new ArrayList();
 										ext_entries.add(laststep);
-										executeExternalEntries();
+										executeExternalEntries(true);
 										ext_forbidden	= true;
 //										laststep.run();
 									}
@@ -731,7 +731,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			
 			// Copy actions from external threads into the state.
 			// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
-			boolean	extexecuted	= executeExternalEntries();
+			boolean	extexecuted	= executeExternalEntries(false);
 				
 			// Suspend when breakpoint is triggered.
 			// Necessary because component wakeup could be called anytime even if is at breakpoint..
@@ -842,7 +842,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	/**
 	 *  Execute external entries.
 	 */
-	protected boolean executeExternalEntries()
+	protected boolean executeExternalEntries(boolean platform)
 	{
 		// Copy actions from external threads into the state.
 		// Is done in before tool check such that tools can see external actions appearing immediately (e.g. in debugger).
@@ -871,7 +871,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 					}
 					catch(Exception e)
 					{
-						fatalError(e);
+//						if(!platform)
+							fatalError(e);
 					}
 				}
 				try
@@ -891,12 +892,15 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 //					{
 //						System.out.println("scheduleStep: "+getComponentIdentifier());
 //					}
+//					if(platform)
+//						System.out.println(entries[i]+" "+entries[i].getClass());
 					entries[i].run();
 				}
 				catch(Exception e)
 				{
 //					e.printStackTrace();
-					fatalError(e);
+//					if(!platform)
+						fatalError(e);
 				}
 			}
 		}

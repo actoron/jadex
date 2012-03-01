@@ -1278,6 +1278,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public IFuture<Map<String, Object>> killComponent()
 	{
+//		if(getComponentIdentifier().getParent()==null)
+//		{
+//			System.out.println("inter: "+getComponentIdentifier().getName());
+//			Thread.dumpStack();
+//		}
+		
 		final Future<Map<String, Object>> ret = new Future<Map<String, Object>>();
 		
 		IFuture<IComponentManagementService> fut = SServiceProvider.getService(getServiceContainer(), 
