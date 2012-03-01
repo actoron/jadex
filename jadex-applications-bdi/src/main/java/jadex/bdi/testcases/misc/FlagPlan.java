@@ -71,7 +71,7 @@ public class FlagPlan extends Plan
 		
 		tr = new TestReport("#4", "Start agent as autoshutdown.");
 		ci =  new CreationInfo("donothing", null, getComponentIdentifier());
-		ci.setAutoshutdown(Boolean.TRUE);
+		ci.setAutoShutdown(Boolean.TRUE);
 		cid = (IComponentIdentifier)cms.createComponent(null, "jadex/bdi/testcases/misc/Flag.agent.xml", ci , null).get(this);
 		desc = (IComponentDescription)cms.getComponentDescription(cid).get(this);
 		

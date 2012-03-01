@@ -379,7 +379,8 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		try
 		{
 			CMSComponentDescription ret = (CMSComponentDescription)super.clone();
-			ret.setName((ComponentIdentifier)((ComponentIdentifier)name).clone());
+			if(name!=null)
+				ret.setName((ComponentIdentifier)((ComponentIdentifier)name).clone());
 			if(children!=null)
 			{
 				ret.children = new LinkedHashSet(); 

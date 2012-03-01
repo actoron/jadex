@@ -383,7 +383,7 @@ public class CreationInfo
 	 *  Set the autoshutdown.
 	 *  @param autoshutdown The autoshutdown to set.
 	 */
-	public void setAutoshutdown(Boolean autoshutdown)
+	public void setAutoShutdown(Boolean autoshutdown)
 	{
 		this.autoshutdown = autoshutdown;
 	}
