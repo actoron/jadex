@@ -193,27 +193,43 @@ public class HttpReceiver
 	{
 		finished	= true;
 		
-		try
+		if(con!=null)
 		{
-			// Use sun.net.www.http.HttpClient.closeServer() if available.
-			Field	f	= con.getClass().getDeclaredField("http");
-			f.setAccessible(true);
-			Object	client	= f.get(con);
-			client.getClass().getMethod("closeServer", new Class[0]).invoke(client, new Object[0]);
-		}
-		catch(Exception e)
-		{
-			// Hack!!! InputStream doesn't wake up.
-			// See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4514257
-			
-			// deprecated method calls not allowed in Android
-//			thread.stop();
-			
-			thread.interrupt();
-			if(con!=null)
+			// Use sun.net.www.http.HttpClient.closeServer()
+			// as con.disconnect() just blocks for sun default implementation :-(
+			if(con.getClass().getName().equals("sun.net.www.protocol.http.HttpURLConnection"))
 			{
-				con.disconnect();	// Hangs until next ping :-(
+				try
+				{
+					Field	f	= con.getClass().getDeclaredField("http");
+					f.setAccessible(true);
+					Object	client	= f.get(con);
+					client.getClass().getMethod("closeServer", new Class[0]).invoke(client, new Object[0]);
+					
+				}
+				catch(Exception e)
+				{
+					con.disconnect();	// Hangs until next ping :-(
+				}
 			}
+			// Special treatment for android impl not needed, because disconnect() works fine. 
+//			else if()
+//			{
+//				// org.apache.harmony.luni.internal.net.www.protocol.http.HttpURLConnectionImpl	con;
+//				// org.apache.harmony.luni.internal.net.www.protocol.http.HttpConnection	connection = con.connection;
+//				// Socket socket	= connection.socket;
+//				Field	f	= con.getClass().getDeclaredField("connection");
+//				f.setAccessible(true);
+//				Object	connection	= f.get(con);
+//				f	= connection.getClass().getDeclaredField("socket");
+//				f.setAccessible(true);
+//				Socket	socket	= (Socket)f.get(connection);
+//				socket.close();				
+//			}
+			else
+			{
+				con.disconnect();
+			}			
 		}
 		
 		access	= null;
