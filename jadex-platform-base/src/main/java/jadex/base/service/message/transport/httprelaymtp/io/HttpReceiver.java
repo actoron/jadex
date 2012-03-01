@@ -20,6 +20,7 @@ import jadex.xml.bean.JavaReader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -190,30 +191,31 @@ public class HttpReceiver
 	 */
 	public void	stop()
 	{
-		// Hack!!! InputStream doesn't wake up. 
-		// using NIO, one could use thread.interrupt()
-		// See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4514257
-		/* $if !android $ */
-		// deprecated method calls not allowed in Android
-		thread.stop();
-		/* $else $
-		thread.interrupt();
-		if(con!=null)
-		{
-			System.out.println("Closing connection.");
-			con.disconnect();
-			System.out.println("Closed connection.");
-		}
-		$endif $ */
-		
 		finished	= true;
-//		thread.interrupt();
-//		if(con!=null)
-//		{
-//			System.out.println("Closing connection.");
-//			con.disconnect();
-//			System.out.println("Closed connection.");
-//		}
+		
+		try
+		{
+			// Use sun.net.www.http.HttpClient.closeServer() if available.
+			Field	f	= con.getClass().getDeclaredField("http");
+			f.setAccessible(true);
+			Object	client	= f.get(con);
+			client.getClass().getMethod("closeServer", new Class[0]).invoke(client, new Object[0]);
+		}
+		catch(Exception e)
+		{
+			// Hack!!! InputStream doesn't wake up.
+			// See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4514257
+			
+			// deprecated method calls not allowed in Android
+//			thread.stop();
+			
+			thread.interrupt();
+			if(con!=null)
+			{
+				con.disconnect();	// Hangs until next ping :-(
+			}
+		}
+		
 		access	= null;
 		address	= null;
 		thread	= null;
@@ -224,7 +226,7 @@ public class HttpReceiver
 	/**
 	 *  Read a complete message from the stream.
 	 */
-	protected byte[]	readMessage(InputStream in) throws IOException
+	protected static byte[]	readMessage(InputStream in) throws IOException
 	{
 		byte[] rawmsg	= null;
 		
