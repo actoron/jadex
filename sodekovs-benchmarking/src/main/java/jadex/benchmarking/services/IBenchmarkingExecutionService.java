@@ -26,7 +26,7 @@ public interface IBenchmarkingExecutionService	extends IService
 	 *  @param clientArgs can be defined if service is called by ClientSimulator; null if only benchmark has to be executed without parameter sweeping etc.
 	 *  @param benchmarkingDefinitionFile reference to the file with the benchmarking definition
 	 */
-	public IFuture<Void> executeBenchmark(Map applicationArgs, HashMap<String,Object> clientArgs, String benchmarkingDefinitionFile);
+	public IFuture<Object> executeBenchmark(Map applicationArgs, HashMap<String,Object> clientArgs, String benchmarkingDefinitionFile);
 	
 	
 	/**

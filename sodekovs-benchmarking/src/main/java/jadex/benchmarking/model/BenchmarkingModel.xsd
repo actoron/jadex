@@ -58,13 +58,19 @@
 							<xs:simpleType>
 								<xs:restriction base="xs:NMTOKEN">
 									<xs:enumeration value="list"/>
-									<xs:enumeration value="space"/>
+									<xs:enumeration value="space"/> 
+									<xs:enumeration value="stochasticDistribution"/>
 								</xs:restriction>
 							</xs:simpleType>
 						</xs:attribute>									
 						<xs:attribute name="end" type="xs:string"/>
 						<xs:attribute name="step" type="xs:string"/>
 						<xs:attribute name="values" type="xs:string"/>
+						<!-- Required for Poisson distribution--> 
+						<xs:attribute name="lambda" type="xs:string"/>
+						<!-- Required for standard normal distribution--> 
+						<xs:attribute name="alpha" type="xs:string"/>
+						<xs:attribute name="sigma" type="xs:string"/>
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="Actions">

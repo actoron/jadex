@@ -6,7 +6,6 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.benchmarking.helper.Constants;
 import jadex.benchmarking.model.Schedule;
-import jadex.benchmarking.model.SuTinfo;
 import jadex.bridge.service.BasicService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -96,7 +95,7 @@ public class BenchmarkingExecutionService extends BasicService implements IBench
 	 * @param benchmarkingDefinitionFile
 	 *            reference to the file with the benchmarking definition
 	 */
-	public IFuture executeBenchmark(Map applicationArgs, HashMap<String, Object> clientArgs, String benchmarkingDefinitionFile) {
+	public IFuture<Object> executeBenchmark(Map applicationArgs, HashMap<String, Object> clientArgs, String benchmarkingDefinitionFile) {
 		System.out.println("#BenchmarkingExecutionService# ****************************************************");
 		System.out.println("#BenchmarkingExecutionService# Called Service:  executeBenchmark()");
 		// serves as id for this benchmark -> required for parallel execution of benchmarks

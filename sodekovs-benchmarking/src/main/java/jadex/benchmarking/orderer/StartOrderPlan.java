@@ -20,12 +20,12 @@ public class StartOrderPlan extends Plan {
 		
 		IBenchmarkingExecutionService benchServ = (IBenchmarkingExecutionService) getScope().getServiceContainer().getRequiredService("benchmarkingExecutionService").get(this);
 		
-		for(int i=0; i <10; i++){
-		benchServ.executeBenchmark(null, null, benchConf).addResultListener(new IResultListener<Void>() {
+		for(int i=0; i <1; i++){
+		benchServ.executeBenchmark(null, null, benchConf).addResultListener(new IResultListener<Object>() {
 			
 			@Override
-			public void resultAvailable(Void result) {
-			System.out.println("#StartOrderPlan# Received result for benchmark from coresponding service: \n" + result);
+			public void resultAvailable(Object result) {
+			System.out.println("#StartOrderPlan# Received result for benchmark from coresponding service: \n" + result.toString());
 				
 			}
 			
