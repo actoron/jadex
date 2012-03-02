@@ -89,19 +89,26 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 //		System.out.println("ss: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 		if(adapter.isExternalThread())
 		{
-			adapter.invokeLater(new Runnable()
-			{			
-				public void run()
-				{
-//						System.out.println("as1: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
-					addStep(new Object[]{step, ret});
-				}
-				
-				public String toString()
-				{
-					return "invokeLater("+step+")";
-				}
-			});
+			try
+			{
+				adapter.invokeLater(new Runnable()
+				{			
+					public void run()
+					{
+	//						System.out.println("as1: "+getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
+						addStep(new Object[]{step, ret});
+					}
+					
+					public String toString()
+					{
+						return "invokeLater("+step+")";
+					}
+				});
+			}
+			catch(ComponentTerminatedException e)
+			{
+				ret.setException(e);
+			}
 		}
 		else
 		{
