@@ -203,7 +203,7 @@ public class InitBenchmarkingPlan extends Plan {
 	 * Start scheduler in suspended mode.
 	 */
 	private void startScheduler() {
-		HashMap args = new HashMap();
+		HashMap<String,Object> args = new HashMap<String,Object>();
 		args.put(Constants.SUT_INFO, new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));
 		args.put(Constants.SCHEDULE_LOGGER, scheduleLogger);
 

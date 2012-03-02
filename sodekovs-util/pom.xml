@@ -131,5 +131,10 @@
 			<version>10.8.1.2</version>
 			<scope>compile</scope>
 			</dependency>
+		<dependency>
+  			<groupId>colt</groupId>
+  			<artifactId>colt</artifactId>
+  			<version>1.2.0</version>
+		</dependency>		
 	</dependencies>	
 </project>

@@ -21,6 +21,10 @@ public class Constants {
 	public static final String DELETE = "delete";
 	public static final String SPACE = "space";
 	public static final String LIST = "list";
+	public static final String STOCHASTIC_DISTRIBUTION = "stochasticDistribution";
+	//Denotes the type "normal stochastic distribution"
+	public static final String NORMAL = "normal";
+	public static final String POISSON = "poisson";
 	public static final String PATH_OF_SCHEDULER = "../sodekovs-benchmarking/src/main/java/jadex/benchmarking/scheduler/Scheduler.agent.xml";
 	public static final String SUT_INFO = "SuTinfo";
 	public static final String TERMINATED = "terminated";
@@ -30,3 +34,4 @@ public class Constants {
 	public static final String PREPARE_GNUPLOT_PREFIX = "prepare_gnuplot_prefix";
 	public static final String PREPARE_GNUPLOT_SUFFIX = "prepare_gnuplot_suffix";
 }
+

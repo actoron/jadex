@@ -66,6 +66,8 @@
 						<xs:attribute name="end" type="xs:string"/>
 						<xs:attribute name="step" type="xs:string"/>
 						<xs:attribute name="values" type="xs:string"/>
+						<!-- Denotes the type of stochastic distribution to be applied.--> 
+						<xs:attribute name="typeOfStochasticDistribution" type="xs:string"/>
 						<!-- Required for Poisson distribution--> 
 						<xs:attribute name="lambda" type="xs:string"/>
 						<!-- Required for standard normal distribution--> 

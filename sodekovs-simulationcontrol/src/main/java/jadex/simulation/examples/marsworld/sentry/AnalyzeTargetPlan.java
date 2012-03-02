@@ -86,7 +86,7 @@ public class AnalyzeTargetPlan extends Plan {
 			}
 
 			mevent.getParameter(SFipa.CONTENT).setValue(rp);
-			System.out.println("#Sentr.AnaTargPlan#");
+//			System.out.println("#Sentr.AnaTargPlan#");
 			sendMessage(mevent);
 			// System.out.println("Sentry Agent: sent location to: "+producers[sel].getName());
 		}

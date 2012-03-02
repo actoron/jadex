@@ -5,10 +5,8 @@ import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IChangeEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
-import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.extension.agr.AGRSpace;
-import jadex.extension.agr.Group;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.math.IVector2;
@@ -29,7 +27,7 @@ public class NewInformNewTargetPlan extends Plan
 		ISpaceObject	target	= (ISpaceObject)reason.getValue();
 				
 		AGRSpace agrs = (AGRSpace)((IExternalAccess)getScope().getParentAccess()).getExtension("myagrspace").get(this);
-		Group group = agrs.getGroup("mymarsteam");
+//		Group group = agrs.getGroup("mymarsteam");
 //		IComponentIdentifier[]	sentries	= group.getAgentsForRole("sentry");
 		
 		//send only to one sentry
@@ -55,7 +53,7 @@ public class NewInformNewTargetPlan extends Plan
 			mevent.getParameterSet(SFipa.RECEIVERS).addValue(space.getOwner(nearestSentry.getId()).getName());
 //			mevent.getParameterSet(SFipa.RECEIVERS).addValue(new ArrayList<IComponentIdentifier>().add(space.getOwner(nearestSentry.getId()).getName()));
 			mevent.getParameter(SFipa.CONTENT).setValue(target);
-			System.out.println("#Carry.NewInfTarget#");
+//			System.out.println("#Carry.NewInfTarget#");
 			sendMessage(mevent);
 		}
 

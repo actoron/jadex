@@ -12,7 +12,7 @@
 	</Imports>
 	
 	<TerminateCondition>
-		 <TerminationTime value="20000" />
+		 <TerminationTime value="30000" />
 		<!-- <SemanticCondition condition="$object.getProperty(&quot;ore&quot;) >= 55">
 			<ObjectSource type="ISpaceObject" name="homebase" />
 		</SemanticCondition> -->
@@ -30,8 +30,19 @@
 		</Properties>
 	</SytemUnderTest>
 	<Sequences>
+	<Sequence starttime="2500" actiontype="create">
+			<!--<RepeatConfiguration type="stochasticDistribution" typeOfStochasticDistribution="normal" alpha="5000" sigma="2500" />-->
+			<RepeatConfiguration type="stochasticDistribution" typeOfStochasticDistribution="poisson" lambda="6000"/>
+			<Actions>
+				<Action componentname="SentryW1" componenttype="BDIAgent"
+					componentmodel="../sodekovs-simulationcontrol/src/main/java/jadex/simulation/examples/marsworld/sentry/Sentry.agent.xml" numberOfComponents="1"> 
+					<Properties>
+						<Property name="sspeed" value="22"></Property>
+					</Properties>
+				</Action>
+			</Actions>
+		</Sequence>
 	<Sequence starttime="2000" actiontype="create">
-			<!-- <RepeatConfiguration type="list" values="3500;5000;7000;23000;" /> -->
 			<RepeatConfiguration type="list" values="9000;12000;24000;35000" />
 			<Actions>
 				<Action componentname="SentryW1" componenttype="BDIAgent"
@@ -43,7 +54,6 @@
 			</Actions>
 		</Sequence>
 		<Sequence starttime="12000" actiontype="delete">
-			<!-- <RepeatConfiguration type="list" values="3500;5000;7000;23000;" /> -->
 			<RepeatConfiguration type="space" step="3000" end="20000" />
 			<Actions>
 				<Action componentname="SentryW1" componenttype="BDIAgent"

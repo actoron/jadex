@@ -28,6 +28,10 @@ import sodekovs.util.misc.GlobalConstants;
  * Abstract plan that contains common used methods for the scheduler.
  */
 public abstract class AbstractSchedulerPlan extends Plan {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6975083111569362187L;
 	// -------- constants --------
 	protected IComponentManagementService cms = null;
 	protected IClockService clockservice = null;
@@ -63,13 +67,8 @@ public abstract class AbstractSchedulerPlan extends Plan {
 							}
 						});
 			}
-			// IComponentIdentifier cid = (IComponentIdentifier) fut.get(this);
-			// IBDIExternalAccess ie = (IBDIExternalAccess) cms.getExternalAccess(cid).get(this);
 		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.ISPACE_OBJECT)) {
 			// Schedule step??
-			// Map props = new HashMap();
-			// Vector2Double pos = new Vector2Double(0.8, 0.8);
-			// props.put("position", pos);
 			for (int i = 0; i < action.getNumberOfComponents(); i++) {
 				sutSpace.createSpaceObject(action.getComponentmodel(), componentProperties, null);
 				System.out.println("Created Component : " + action.getComponentmodel() + " -> " + getTimestamp());
@@ -114,14 +113,8 @@ public abstract class AbstractSchedulerPlan extends Plan {
 					}
 				}
 			});
-			// }
-			// IComponentIdentifier cid = (IComponentIdentifier) fut.get(this);
-			// IBDIExternalAccess ie = (IBDIExternalAccess) cms.getExternalAccess(cid).get(this);
 		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.ISPACE_OBJECT)) {
 			// Schedule step??
-			// Map props = new HashMap();
-			// Vector2Double pos = new Vector2Double(0.8, 0.8);
-			// props.put("position", pos);
 			ISpaceObject[] objects = sutSpace.getSpaceObjectsByType(action.getComponentmodel());
 			int destroyConunter = 0;
 
@@ -172,7 +165,6 @@ public abstract class AbstractSchedulerPlan extends Plan {
 	 */
 	protected void init(SuTinfo sut) {
 		cms = (IComponentManagementService) SServiceProvider.getService(getScope().getServiceContainer(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
-//		clockservice = (IClockService) SServiceProvider.getService(getScope().getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(this);
 		clockservice = (IClockService) getScope().getServiceContainer().getRequiredService("clockservice").get(this);
 		sortedSequenceList = sut.getSortedSequenceList();
 		sutCID = sut.getSutCID();
