@@ -11,9 +11,9 @@ package jadex.benchmarking.model;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
 
 
 /**
@@ -25,8 +25,10 @@ import javax.xml.bind.annotation.XmlValue;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="filter" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;sequence>
+ *         &lt;element ref="{}ObjectSource"/>
+ *       &lt;/sequence>
+ *       &lt;attribute name="condition" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -36,88 +38,62 @@ import javax.xml.bind.annotation.XmlValue;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "content"
+    "objectSource"
 })
-@XmlRootElement(name = "MixedProperty")
-public class MixedProperty {
+@XmlRootElement(name = "AdaptationEvent")
+public class AdaptationEvent {
 
-    @XmlValue
-    protected String content;
-    @XmlAttribute(name = "name")
-    protected String name;
-    @XmlAttribute(name = "filter")
-    protected String filter;
+    @XmlElement(name = "ObjectSource", required = true)
+    protected ObjectSource objectSource;
+    @XmlAttribute(name = "condition", required = true)
+    protected String condition;
 
     /**
-     * Gets the value of the content property.
+     * Gets the value of the objectSource property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link ObjectSource }
+     *     
+     */
+    public ObjectSource getObjectSource() {
+        return objectSource;
+    }
+
+    /**
+     * Sets the value of the objectSource property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link ObjectSource }
+     *     
+     */
+    public void setObjectSource(ObjectSource value) {
+        this.objectSource = value;
+    }
+
+    /**
+     * Gets the value of the condition property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getContent() {
-        return content;
+    public String getCondition() {
+        return condition;
     }
 
     /**
-     * Sets the value of the content property.
+     * Sets the value of the condition property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setContent(String value) {
-        this.content = value;
-    }
-
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
-
-    /**
-     * Gets the value of the filter property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getFilter() {
-        return filter;
-    }
-
-    /**
-     * Sets the value of the filter property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setFilter(String value) {
-        this.filter = value;
+    public void setCondition(String value) {
+        this.condition = value;
     }
 
 }

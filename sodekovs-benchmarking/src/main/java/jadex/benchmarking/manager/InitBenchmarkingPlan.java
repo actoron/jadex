@@ -171,7 +171,9 @@ public class InitBenchmarkingPlan extends Plan {
 		}
 
 		// Resume scheduler & adaptationAnalyzer
+		cms.resumeComponent(schedulerCID).get(this);
 		cms.resumeComponent(adaptationAnalyzerCID).get(this);
+		
 		
 		benchmarkStatusMap = (HashMap<Integer, String>) getBeliefbase().getBelief("benchmarkStatus").getFact();
 		benchmarkStatusMap.put(localBenchmarkingCounter, Constants.RUNNING);

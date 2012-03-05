@@ -49,15 +49,14 @@
 		<!-- Responsible for managing the start and execution of the monitoring process. It an "IncidentEvent" is observed is starts a separate goal (MonitorSingleAdaptationGoal) to handle this single adaptation. -->
 		<achievegoal name="MonitorSystemGoal" retry="false" exclude="never">
 			<!-- Contains references of the SuT. -->
-			<parameter name="args" class="SuTinfo" />
+			<!-- <parameter name="args" class="SuTinfo" /> -->
 		</achievegoal>
 
 		<!-- Contains a sequence of the schedule that has to be executed many times 
 			/ repeatedly. -->
-		<achievegoal name="MonitorSingleAdaptationGoal" retry="false"
-			exclude="never">
+		<achievegoal name="MonitorSingleAdaptationGoal" retry="false" exclude="never">
 			<!-- Contains references of the SuT. -->
-			<parameter name="args" class="SuTinfo" />			
+			<!-- <parameter name="args" class="SuTinfo" />			-->
 			<!-- Sequence to be executed repeatedly. -->						
 			<parameter name="target" class="TargetDefinition" />
 			<!-- <parameter name="scheduleLogger" class="ScheduleLogger" /> -->
@@ -67,10 +66,7 @@
 	<plans>		
 		<!-- Start Monitoring of SuT. -->
 		<plan name="start_monitor_system">
-			<body class="MonitorSystemPlan" />
-			<parameter name="args" class="SuTinfo">
-				<goalmapping ref="MonitorSystemGoal.args" />
-			</parameter>
+			<body class="MonitorSystemPlan" />			
 			<trigger>
 				<goal ref="MonitorSystemGoal" />
 			</trigger>
@@ -80,9 +76,9 @@
 			/ repeatedly. -->
 		<plan name="start_monitor_single_adaptation">
 			<body class="MonitorSingleAdaptationPlan" />
-			<parameter name="args" class="SuTinfo">
+			<!-- <parameter name="args" class="SuTinfo">
 				<goalmapping ref="MonitorSingleAdaptationGoal.args" />
-			</parameter>
+			</parameter>-->
 			<parameter name="target" class="TargetDefinition">
 				<goalmapping ref="MonitorSingleAdaptationGoal.target" />
 			</parameter>

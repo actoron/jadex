@@ -392,12 +392,12 @@
 						</env:object>
 						<env:object type="target">
 							<env:property name="position">new Vector2Double(0.7, 0.4)</env:property>
-							<env:property name="ore">10</env:property>
+							<env:property name="ore">30</env:property>
 							<!-- <env:property name="ore">$args.al</env:property> -->
 						</env:object>
 						<env:object type="target">
 							<env:property name="position">new Vector2Double(0.8, 0.8)</env:property>
-							<env:property name="ore">25</env:property>
+							<env:property name="ore">45</env:property>
 						</env:object>
 
 						<!-- TMP-HACK! -->

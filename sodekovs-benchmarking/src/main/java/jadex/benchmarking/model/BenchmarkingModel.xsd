@@ -234,10 +234,31 @@
 				<xs:element ref="AdaptationEvent" minOccurs="0" maxOccurs="1"/>
 				<xs:element ref="SystemReadyEvent" minOccurs="0" maxOccurs="1"/>
 			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
 		</xs:complexType>
 	</xs:element>
-		
-	<xs:element name="IncidentEvent" type="xs:string"/>
-	<xs:element name="AdaptationEvent" type="xs:string"/>
-	<xs:element name="SystemReadyEvent" type="xs:string"/>
+	<xs:element name="IncidentEvent">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ObjectSource" minOccurs="1" maxOccurs="1"/>
+			</xs:sequence>
+			<xs:attribute name="condition" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="AdaptationEvent">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ObjectSource" minOccurs="1" maxOccurs="1"/>
+			</xs:sequence>
+			<xs:attribute name="condition" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SystemReadyEvent">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ObjectSource" minOccurs="1" maxOccurs="1"/>
+			</xs:sequence>
+			<xs:attribute name="condition" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>

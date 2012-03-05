@@ -12,7 +12,7 @@
 	</Imports>
 	
 	<TerminateCondition>
-		 <TerminationTime value="30000" />
+		 <TerminationTime value="80000000" />
 		<!-- <SemanticCondition condition="$object.getProperty(&quot;ore&quot;) >= 55">
 			<ObjectSource type="ISpaceObject" name="homebase" />
 		</SemanticCondition> -->
@@ -53,7 +53,7 @@
 				</Action>
 			</Actions>
 		</Sequence>
-		<Sequence starttime="12000" actiontype="delete">
+		<!-- <Sequence starttime="12000" actiontype="delete">
 			<RepeatConfiguration type="space" step="3000" end="20000" />
 			<Actions>
 				<Action componentname="SentryW1" componenttype="BDIAgent"
@@ -74,7 +74,7 @@
 					</Properties>
 				</Action>
 			</Actions>
-		</Sequence>
+		</Sequence>-->
 	</Sequences>
 	<Evaluation>
 	<Dataproviders>
@@ -116,10 +116,21 @@
 	2.) "AdaptionEvent": the system starts to reconfigure
 	3.) "SystemReadyEvent": the system has accomplished the adaption. -->
 	<AdaptationAnalysis>
-		<TargetDefinition>
-			<IncidentEvent>ola</IncidentEvent>							
-			<AdaptationEvent>wie</AdaptationEvent>
-			<SystemReadyEvent>gehts und stehts</SystemReadyEvent>
+		<TargetDefinition name="Adapt1">
+			<IncidentEvent condition="$object.getProperty(&quot;ore&quot;) >=
+					10"><ObjectSource type="ISpaceObject" name="homebase" /></IncidentEvent>							
+			<AdaptationEvent condition="$object.getProperty(&quot;ore&quot;) >=
+					45"><ObjectSource type="ISpaceObject" name="homebase" /></AdaptationEvent>
+			<SystemReadyEvent condition="$object.getProperty(&quot;ore&quot;) >=
+					85"><ObjectSource type="ISpaceObject" name="homebase" /></SystemReadyEvent>
+		</TargetDefinition>
+		<TargetDefinition name="Adapt2">
+			<IncidentEvent condition="$object.getProperty(&quot;ore&quot;) >=
+					50"><ObjectSource type="ISpaceObject" name="homebase" /></IncidentEvent>							
+			<AdaptationEvent condition="$object.getProperty(&quot;ore&quot;) >=
+					75"><ObjectSource type="ISpaceObject" name="homebase" /></AdaptationEvent>
+			<SystemReadyEvent condition="$object.getProperty(&quot;ore&quot;) >=
+					95"><ObjectSource type="ISpaceObject" name="homebase" /></SystemReadyEvent>
 		</TargetDefinition>
 	</AdaptationAnalysis>
 </Schedule>
