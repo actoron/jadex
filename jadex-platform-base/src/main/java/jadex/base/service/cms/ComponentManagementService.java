@@ -1056,8 +1056,12 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			contains = cfs.containsKey(cid);
 			tmp = contains? (Future<Map<String, Object>>)cfs.get(cid): new Future<Map<String, Object>>();
-//			System.out.println("destroy0: "+cid+" "+cfs.containsKey(cid));
-//			Thread.currentThread().dumpStack();
+			
+//			if(cid.getParent()==null)
+//			{
+//				System.err.println("destroy0: "+cid+" "+cfs.containsKey(cid));
+//				Thread.dumpStack();
+//			}
 			
 			// If destroyComponent has not called before
 			if(!contains)

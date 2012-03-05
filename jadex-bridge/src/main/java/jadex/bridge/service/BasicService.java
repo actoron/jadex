@@ -146,7 +146,7 @@ public class BasicService implements IInternalService
 	 *  Get a service property.
 	 *  @return The service property (if any).
 	 */
-	public Map getPropertyMap()
+	public Map<String, Object> getPropertyMap()
 	{
 		return properties!=null? properties: Collections.EMPTY_MAP; 
 	}

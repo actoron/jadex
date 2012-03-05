@@ -409,9 +409,9 @@ public class EventReificator implements IOAVStateListener
 				}
 				else
 				{
-					GoalFlyweight x = GoalFlyweight.getGoalFlyweight(state, scope, element);
+//					GoalFlyweight x = GoalFlyweight.getGoalFlyweight(state, scope, element);
 					
-					System.out.println("This goal has no parent plan: " + x.getType() + " " + type);
+//					System.out.println("This goal has no parent plan: " + x.getType() + " " + type);
 					//event.setParent(bdiint.getAgentAdapter().getComponentIdentifier().getName());
 				}
 				if (OAVBDIRuntimeModel.CHANGEEVENT_GOALDROPPED.equals(type))

@@ -140,11 +140,11 @@ public class ExternalAccess implements IExternalAccess
 		{
 			try
 			{
-				if(adapter.getComponentIdentifier().getParent()==null)
-				{
-					System.out.println("platform e: "+adapter.getComponentIdentifier().getName());
-					Thread.dumpStack();
-				}
+//				if(adapter.getComponentIdentifier().getParent()==null)
+//				{
+//					System.err.println("platform e: "+adapter.getComponentIdentifier().getName());
+//					Thread.dumpStack();
+//				}
 				adapter.invokeLater(new Runnable() 
 				{
 					public void run() 
@@ -160,11 +160,11 @@ public class ExternalAccess implements IExternalAccess
 		}
 		else
 		{
-			if(adapter.getComponentIdentifier().getParent()==null)
-			{
-				System.out.println("platform i: "+adapter.getComponentIdentifier().getName());
-				Thread.dumpStack();
-			}
+//			if(adapter.getComponentIdentifier().getParent()==null)
+//			{
+//				System.err.println("platform i: "+adapter.getComponentIdentifier().getName());
+//				Thread.dumpStack();
+//			}
 			interpreter.killComponent().addResultListener(new DelegationResultListener<Map<String, Object>>(ret));
 		}
 		

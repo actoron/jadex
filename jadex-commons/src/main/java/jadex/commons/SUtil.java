@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -222,7 +223,28 @@ public class SUtil
 					}
 					catch(IOException e)
 					{
-						
+					}
+				}
+				return ret;
+			}
+		});
+		// Eclipse OSGI resource bundle.
+		mappers.add(new IResultCommand<ResourceInfo, URLConnection>()
+		{
+			public ResourceInfo execute(URLConnection con)
+			{
+				ResourceInfo ret = null;
+				long modified = con.getLastModified();
+				if(con.getClass().getName().equals("org.eclipse.osgi.framework.internal.core.BundleURLConnection"))
+				{
+					try
+					{
+						Method	m	= con.getClass().getMethod("getLocalURL", new Class<?>[0]);
+						ret = new ResourceInfo(m.invoke(con, new Object[0]).toString(), con.getInputStream(), modified);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
 					}
 				}
 				return ret;

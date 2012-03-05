@@ -1280,7 +1280,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	{
 //		if(getComponentIdentifier().getParent()==null)
 //		{
-//			System.out.println("inter: "+getComponentIdentifier().getName());
+//			System.err.println("inter: "+getComponentIdentifier().getName());
 //			Thread.dumpStack();
 //		}
 		

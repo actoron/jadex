@@ -75,8 +75,11 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	{
 		if(shutdowned)
 		{
-			if(id.getParent()==null)
-				System.out.println("getS: "+id);
+//			if(id.getParent()==null)
+//			{
+//				System.err.println("getS: "+id);
+//				Thread.dumpStack();
+//			}
 			return new IntermediateFuture<IService>(new ComponentTerminatedException(id));
 		}
 		return manager.searchServices(this, decider, selector, services!=null ? services : Collections.EMPTY_MAP);
