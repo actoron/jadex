@@ -26,7 +26,9 @@ public class Constants {
 	public static final String NORMAL = "normal";
 	public static final String POISSON = "poisson";
 	public static final String PATH_OF_SCHEDULER = "../sodekovs-benchmarking/src/main/java/jadex/benchmarking/scheduler/Scheduler.agent.xml";
+	public static final String PATH_OF_ADAPTATION_ANALYZER = "../sodekovs-benchmarking/src/main/java/jadex/benchmarking/adaptationAnalyzer/AdaptationAnalyzer.agent.xml";
 	public static final String SUT_INFO = "SuTinfo";
+	public static final String ADAPTATION_ANALYSIS = "AdaptationAnalysis";
 	public static final String TERMINATED = "terminated";
 	public static final String RUNNING = "running";
 	public static final String PREPARING_START = "preparing_start";

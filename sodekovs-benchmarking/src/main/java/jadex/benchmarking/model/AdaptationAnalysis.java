@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{}Dataconsumer" maxOccurs="unbounded"/>
+ *         &lt;element ref="{}TargetDefinition" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -38,41 +38,41 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "dataconsumer"
+    "targetDefinition"
 })
-@XmlRootElement(name = "Dataconsumers")
-public class Dataconsumers {
+@XmlRootElement(name = "AdaptationAnalysis")
+public class AdaptationAnalysis {
 
-    @XmlElement(name = "Dataconsumer", required = true)
-    protected List<Dataconsumer> dataconsumer;
+    @XmlElement(name = "TargetDefinition")
+    protected List<TargetDefinition> targetDefinition;
 
     /**
-     * Gets the value of the dataconsumer property.
+     * Gets the value of the targetDefinition property.
      * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the dataconsumer property.
+     * This is why there is not a <CODE>set</CODE> method for the targetDefinition property.
      * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getDataconsumer().add(newItem);
+     *    getTargetDefinition().add(newItem);
      * </pre>
      * 
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link Dataconsumer }
+     * {@link TargetDefinition }
      * 
      * 
      */
-    public List<Dataconsumer> getDataconsumer() {
-        if (dataconsumer == null) {
-            dataconsumer = new ArrayList<Dataconsumer>();
+    public List<TargetDefinition> getTargetDefinition() {
+        if (targetDefinition == null) {
+            targetDefinition = new ArrayList<TargetDefinition>();
         }
-        return this.dataconsumer;
+        return this.targetDefinition;
     }
 
 }

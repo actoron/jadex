@@ -110,4 +110,16 @@
 		<!-- </Dataconsumer> -->		 		
 	</Dataconsumers>
 	</Evaluation>
+	
+	<!-- The following elements are used for a time analysis of the ability of the system to detect "incidents", i.e. any type of event that requires an system adaption (reconfiguration). It consists iof three parts:
+	1.) "IncidentEvent": defines the exact type of incident
+	2.) "AdaptionEvent": the system starts to reconfigure
+	3.) "SystemReadyEvent": the system has accomplished the adaption. -->
+	<AdaptationAnalysis>
+		<TargetDefinition>
+			<IncidentEvent>ola</IncidentEvent>							
+			<AdaptationEvent>wie</AdaptationEvent>
+			<SystemReadyEvent>gehts und stehts</SystemReadyEvent>
+		</TargetDefinition>
+	</AdaptationAnalysis>
 </Schedule>

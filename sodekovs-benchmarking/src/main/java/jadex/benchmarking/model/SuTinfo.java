@@ -22,6 +22,8 @@ public class SuTinfo {
 	private IExternalAccess sutExta = null;
 	// Space of System Under Test
 	private AbstractEnvironmentSpace sutSpace = null;
+	//AdaptationAnalysis
+	private AdaptationAnalysis adaptationAnalysis = null;
 	
 	/**
 	 * 	
@@ -30,12 +32,13 @@ public class SuTinfo {
 	 * @param sutExta
 	 * @param sutSpace
 	 */
-	public SuTinfo(ArrayList<Sequence> sortedSequenceList, IComponentIdentifier sutCID, IExternalAccess sutExta, AbstractEnvironmentSpace sutSpace) {
+	public SuTinfo(ArrayList<Sequence> sortedSequenceList, AdaptationAnalysis adaptationAnalysis, IComponentIdentifier sutCID, IExternalAccess sutExta, AbstractEnvironmentSpace sutSpace) {
 		super();
 		this.sortedSequenceList = sortedSequenceList;
 		this.sutCID = sutCID;
 		this.sutExta = sutExta;
 		this.sutSpace = sutSpace;
+		this.adaptationAnalysis = adaptationAnalysis;
 	}
 	
 	public ArrayList<Sequence> getSortedSequenceList() {
@@ -61,7 +64,15 @@ public class SuTinfo {
 	}
 	public void setSutSpace(AbstractEnvironmentSpace sutSpace) {
 		this.sutSpace = sutSpace;
+	}	
+	public AdaptationAnalysis getAdaptationAnalysis() {
+		return adaptationAnalysis;
 	}
+
+	public void setAdaptationAnalysis(AdaptationAnalysis adaptationAnalysis) {
+		this.adaptationAnalysis = adaptationAnalysis;
+	}
+
 	public String toString(){
 		return "SuTinfo:  " + sutCID + " - " + sutExta + " - " + sutSpace; 
 	}

@@ -26,7 +26,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.MEnvSpaceType;
@@ -70,6 +69,8 @@ public class InitBenchmarkingPlan extends Plan {
 	private AbstractEnvironmentSpace sutSpace = null;
 	// Component Identifier of scheduler
 	private IComponentIdentifier schedulerCID = null;
+	// Component Identifier of adaptationAnalyzer
+	private IComponentIdentifier adaptationAnalyzerCID = null;
 	// private Log events
 	private ScheduleLogger scheduleLogger = null;
 	// private OnlineVisualisation vis = null;
@@ -141,6 +142,10 @@ public class InitBenchmarkingPlan extends Plan {
 		// Start scheduler, that handles the execution of the sequences of the conducted benchmark.
 		// Scheduler is started in suspend mode.
 		startScheduler();
+		
+		// Start AdaptationAnalysis, that monitors the ability of the system to adapt to changes 
+		// AdaptationAnalyzer is started in suspend mode.
+		startAdaptationAnalyzer(benchConf);
 
 		// Check if there are DataConsumer and DataProvider to be added to space
 		if (checkDataConcumerAndProvider(benchConf)) {
@@ -165,8 +170,8 @@ public class InitBenchmarkingPlan extends Plan {
 			// myLogger.log("Warm-up finished");
 		}
 
-		// Resume scheduler
-		cms.resumeComponent(schedulerCID).get(this);
+		// Resume scheduler & adaptationAnalyzer
+		cms.resumeComponent(adaptationAnalyzerCID).get(this);
 		
 		benchmarkStatusMap = (HashMap<Integer, String>) getBeliefbase().getBelief("benchmarkStatus").getFact();
 		benchmarkStatusMap.put(localBenchmarkingCounter, Constants.RUNNING);
@@ -204,11 +209,23 @@ public class InitBenchmarkingPlan extends Plan {
 	 */
 	private void startScheduler() {
 		HashMap<String,Object> args = new HashMap<String,Object>();
-		args.put(Constants.SUT_INFO, new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));
+		args.put(Constants.SUT_INFO, new SuTinfo(sortedSequenceList, null, sutCID, sutExta, sutSpace));
 		args.put(Constants.SCHEDULE_LOGGER, scheduleLogger);
 
 		IFuture fut = cms.createComponent("Scheduler" + GetRandom.getRandom(100000), Constants.PATH_OF_SCHEDULER, new CreationInfo(null, args, null, true, false), null);
 		schedulerCID = (IComponentIdentifier) fut.get(this);
+	}
+	
+	/*
+	 * Start adaptationAnalyzer in suspended mode.
+	 */
+	private void startAdaptationAnalyzer(Schedule benchConf) {
+		HashMap<String,Object> args = new HashMap<String,Object>();
+		args.put(Constants.SUT_INFO, new SuTinfo(null, benchConf.getAdaptationAnalysis(), sutCID, sutExta, sutSpace));
+//		args.put(Constants.SCHEDULE_LOGGER, scheduleLogger);
+
+		IFuture fut = cms.createComponent("AdaptationAnalyzer" + GetRandom.getRandom(100000), Constants.PATH_OF_ADAPTATION_ANALYZER, new CreationInfo(null, args, null, true, false), null);
+		adaptationAnalyzerCID = (IComponentIdentifier) fut.get(this);
 	}
 
 	/*
@@ -276,10 +293,10 @@ public class InitBenchmarkingPlan extends Plan {
 	 * 
 	 * @return
 	 */
-	private long getTimestamp() {
-		long starttime = ((Long) sutSpace.getProperty("REAL_START_TIME_OF_SIMULATION")).longValue();
-		return clockservice.getTime() - starttime;
-	}
+//	private long getTimestamp() {
+//		long starttime = ((Long) sutSpace.getProperty("REAL_START_TIME_OF_SIMULATION")).longValue();
+//		return clockservice.getTime() - starttime;
+//	}
 
 	private void persistLogs(String fileName, Schedule benchConf) {
 		// ConnectionManager conMgr = new ConnectionManager();

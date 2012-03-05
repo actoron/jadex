@@ -39,7 +39,7 @@ public class ScheduleSequencesPlan extends AbstractSchedulerPlan {
 			if (nextSequence.getRepeatConfiguration() != null) {
 				// Dispatch separate goal to handle sequence 
 				IGoal eval = (IGoal) getGoalbase().createGoal("SequenceRepeaterGoal");
-				eval.getParameter("args").setValue(new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));		
+				eval.getParameter("args").setValue(new SuTinfo(sortedSequenceList, null, sutCID, sutExta, sutSpace));		
 				eval.getParameter("sequence").setValue(nextSequence);				
 				eval.getParameter("scheduleLogger").setValue(scheduleLogger);
 				getGoalbase().dispatchTopLevelGoal(eval);		

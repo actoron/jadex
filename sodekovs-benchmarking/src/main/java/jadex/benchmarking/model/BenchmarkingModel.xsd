@@ -35,6 +35,7 @@
 					</xs:complexType>
 				</xs:element>
 			<xs:element ref="Imports"/>				
+			<xs:element ref="AdaptationAnalysis"/>
 			</xs:sequence>
 			<xs:attribute name="type" use="required">
 				<xs:simpleType>
@@ -214,4 +215,29 @@
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+	
+	<!-- The following elements are used for a time analysis of the ability of the system to detect "incidents", i.e. any type of event that requires an system adaption (reconfiguration). It consists of three parts:
+	1.) "IncidentEvent": defines the exact type of incident
+	2.) "AdaptionEvent": the system starts to reconfigure
+	3.) "SystemReadyEvent": the system has accomplished the adaption. -->
+	<xs:element name="AdaptationAnalysis">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="TargetDefinition" minOccurs="0" maxOccurs="unbounded"/>											
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TargetDefinition">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="IncidentEvent" minOccurs="0" maxOccurs="1"/>							
+				<xs:element ref="AdaptationEvent" minOccurs="0" maxOccurs="1"/>
+				<xs:element ref="SystemReadyEvent" minOccurs="0" maxOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+		
+	<xs:element name="IncidentEvent" type="xs:string"/>
+	<xs:element name="AdaptationEvent" type="xs:string"/>
+	<xs:element name="SystemReadyEvent" type="xs:string"/>
 </xs:schema>

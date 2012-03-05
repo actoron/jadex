@@ -10,10 +10,9 @@ package jadex.benchmarking.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
 
 
 /**
@@ -25,8 +24,11 @@ import javax.xml.bind.annotation.XmlValue;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="filter" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;sequence>
+ *         &lt;element ref="{}IncidentEvent" minOccurs="0"/>
+ *         &lt;element ref="{}AdaptationEvent" minOccurs="0"/>
+ *         &lt;element ref="{}SystemReadyEvent" minOccurs="0"/>
+ *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -36,88 +38,90 @@ import javax.xml.bind.annotation.XmlValue;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "content"
+    "incidentEvent",
+    "adaptationEvent",
+    "systemReadyEvent"
 })
-@XmlRootElement(name = "MixedProperty")
-public class MixedProperty {
+@XmlRootElement(name = "TargetDefinition")
+public class TargetDefinition {
 
-    @XmlValue
-    protected String content;
-    @XmlAttribute(name = "name")
-    protected String name;
-    @XmlAttribute(name = "filter")
-    protected String filter;
+    @XmlElement(name = "IncidentEvent")
+    protected String incidentEvent;
+    @XmlElement(name = "AdaptationEvent")
+    protected String adaptationEvent;
+    @XmlElement(name = "SystemReadyEvent")
+    protected String systemReadyEvent;
 
     /**
-     * Gets the value of the content property.
+     * Gets the value of the incidentEvent property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getContent() {
-        return content;
+    public String getIncidentEvent() {
+        return incidentEvent;
     }
 
     /**
-     * Sets the value of the content property.
+     * Sets the value of the incidentEvent property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setContent(String value) {
-        this.content = value;
+    public void setIncidentEvent(String value) {
+        this.incidentEvent = value;
     }
 
     /**
-     * Gets the value of the name property.
+     * Gets the value of the adaptationEvent property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getName() {
-        return name;
+    public String getAdaptationEvent() {
+        return adaptationEvent;
     }
 
     /**
-     * Sets the value of the name property.
+     * Sets the value of the adaptationEvent property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setName(String value) {
-        this.name = value;
+    public void setAdaptationEvent(String value) {
+        this.adaptationEvent = value;
     }
 
     /**
-     * Gets the value of the filter property.
+     * Gets the value of the systemReadyEvent property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getFilter() {
-        return filter;
+    public String getSystemReadyEvent() {
+        return systemReadyEvent;
     }
 
     /**
-     * Sets the value of the filter property.
+     * Sets the value of the systemReadyEvent property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setFilter(String value) {
-        this.filter = value;
+    public void setSystemReadyEvent(String value) {
+        this.systemReadyEvent = value;
     }
 
 }
