@@ -74,7 +74,8 @@ public class InitBenchmarkingPlan extends Plan {
 	// private Log events
 	private ScheduleLogger scheduleLogger = null;
 	// private OnlineVisualisation vis = null;
-
+	// The java representation of the benchmark to be conducted
+	Schedule benchConf = null;
 	// required for parallel execution of benchmarks
 	private int localBenchmarkingCounter = -1;
 
@@ -117,7 +118,7 @@ public class InitBenchmarkingPlan extends Plan {
 //		String benchmarkDescription = (String) getBeliefbase().getBelief("scheduleDescriptionFile").getFact();
 		String benchmarkDescription = (String) getParameter("benchmarkingDefinitionFile").getValue();
 		System.out.println("#InitBench# Init Benchmark Agent with configuration file: " + benchmarkDescription + " and local BenchID: " + localBenchmarkingCounter);
-		Schedule benchConf = (Schedule) XMLHandler.parseXMLFromString(benchmarkDescription, Schedule.class);
+		benchConf = (Schedule) XMLHandler.parseXMLFromString(benchmarkDescription, Schedule.class);
  
 		HashMap<Integer,Schedule> allBenchmarks = (HashMap<Integer, Schedule>) getBeliefbase().getBelief("allBenchmarks").getFact();
 		allBenchmarks.put(localBenchmarkingCounter, benchConf);
@@ -130,7 +131,7 @@ public class InitBenchmarkingPlan extends Plan {
 		// Start System under Test (SuT) if required, i.e. has not been started by another component yet.
 		// SUT is started in suspend mode.
 		if (benchConf.getSytemUnderTest() != null) {
-			startSuT(benchConf);
+			startSuT();
 		}
 
 //		getBeliefbase().getBelief("suTinfo").setFact(new SuTinfo(sortedSequenceList, sutCID, sutExta, sutSpace));
@@ -145,14 +146,14 @@ public class InitBenchmarkingPlan extends Plan {
 		
 		// Start AdaptationAnalysis, that monitors the ability of the system to adapt to changes 
 		// AdaptationAnalyzer is started in suspend mode.
-		startAdaptationAnalyzer(benchConf);
+		startAdaptationAnalyzer();
 
 		// Check if there are DataConsumer and DataProvider to be added to space
-		if (checkDataConcumerAndProvider(benchConf)) {
-			addDataConsumerAndProvider(benchConf);
+		if (checkDataConcumerAndProvider()) {
+			addDataConsumerAndProvider();
 
 			// start Online Visualization
-			startOnlineVisualization(benchConf);
+			startOnlineVisualization();
 		} else {
 			System.out.println("#InitBenchmarkingPlan# No DataConsumer and DataProvider to add to space.");
 		}
@@ -181,24 +182,24 @@ public class InitBenchmarkingPlan extends Plan {
 		// myLogger.log("Resumed Scheduler");
 
 		// Handle termination of benchmark
-		terminateBenchmark(benchConf);
+		terminateBenchmark();
 		benchmarkStatusMap = (HashMap<Integer, String>) getBeliefbase().getBelief("benchmarkStatus").getFact();
 		benchmarkStatusMap.put(localBenchmarkingCounter, Constants.TERMINATED);
 		getBeliefbase().getBelief("benchmarkStatus").setFact(benchmarkStatusMap);
 		scheduleLogger.log(Constants.PREPARE_GNUPLOT_SUFFIX);
-		persistLogs(scheduleLogger.getFileName(), benchConf);
+		persistLogs(scheduleLogger.getFileName());
 		// ConnectionManager.getInstance().executeStatement("Over and out");
 	}
 
 	/*
 	 * Start System under Test. Required if system has not been started yet.
 	 */
-	private void startSuT(Schedule schedule) {
+	private void startSuT() {
 
-		HashMap<String, String> sutProperties = Methods.propertyListToHashMapforString(schedule.getSytemUnderTest().getProperties().getProperty());
+		HashMap<String, String> sutProperties = Methods.propertyListToHashMapforString(benchConf.getSytemUnderTest().getProperties().getProperty());
 
 		// create SuT in suspended modus
-		IFuture fut = cms.createComponent(schedule.getName() + GetRandom.getRandom(100000), sutProperties.get(Constants.APPLICATION_FILE_PATH),
+		IFuture fut = cms.createComponent(benchConf.getName() + GetRandom.getRandom(100000), sutProperties.get(Constants.APPLICATION_FILE_PATH),
 				new CreationInfo(sutProperties.get(Constants.APPLICATION_COONFIGURATION), new HashMap(), null, true, false), null);
 		sutCID = (IComponentIdentifier) fut.get(this);
 		sutExta = (IExternalAccess) cms.getExternalAccess(sutCID).get(this);
@@ -213,6 +214,7 @@ public class InitBenchmarkingPlan extends Plan {
 		HashMap<String,Object> args = new HashMap<String,Object>();
 		args.put(Constants.SUT_INFO, new SuTinfo(sortedSequenceList, null, sutCID, sutExta, sutSpace));
 		args.put(Constants.SCHEDULE_LOGGER, scheduleLogger);
+		args.put(Constants.SCALE_FACTOR, benchConf.getSequences().getScaleFactor());
 
 		IFuture fut = cms.createComponent("Scheduler" + GetRandom.getRandom(100000), Constants.PATH_OF_SCHEDULER, new CreationInfo(null, args, null, true, false), null);
 		schedulerCID = (IComponentIdentifier) fut.get(this);
@@ -221,7 +223,7 @@ public class InitBenchmarkingPlan extends Plan {
 	/*
 	 * Start adaptationAnalyzer in suspended mode.
 	 */
-	private void startAdaptationAnalyzer(Schedule benchConf) {
+	private void startAdaptationAnalyzer() {
 		HashMap<String,Object> args = new HashMap<String,Object>();
 		args.put(Constants.SUT_INFO, new SuTinfo(null, benchConf.getAdaptationAnalysis(), sutCID, sutExta, sutSpace));
 //		args.put(Constants.SCHEDULE_LOGGER, scheduleLogger);
@@ -235,7 +237,7 @@ public class InitBenchmarkingPlan extends Plan {
 	 * 
 	 * @param benchConf
 	 */
-	private void terminateBenchmark(Schedule benchConf) {
+	private void terminateBenchmark() {
 		if (benchConf.getTerminateCondition() != null) {
 			if (benchConf.getTerminateCondition().getTerminationTime() != null) {
 				waitFor(benchConf.getTerminateCondition().getTerminationTime().getValue());
@@ -300,7 +302,7 @@ public class InitBenchmarkingPlan extends Plan {
 //		return clockservice.getTime() - starttime;
 //	}
 
-	private void persistLogs(String fileName, Schedule benchConf) {
+	private void persistLogs(String fileName) {
 		// ConnectionManager conMgr = new ConnectionManager();
 		// conMgr.storeGnuPlotLogs(fileName,benchConf.getType(),benchConf.getName(), scheduleLogger.getTimestamp());
 		LogDAO.getInstance().insertNewGnuPlotLog(fileName, benchConf.getType(), benchConf.getName(), scheduleLogger.getTimestamp());
@@ -318,12 +320,8 @@ public class InitBenchmarkingPlan extends Plan {
 		});
 	}
 
-	private void addDataConsumerAndProvider(Schedule benchConf) {
+	private void addDataConsumerAndProvider() {
 
-		// IFuture fut = (sutExta).getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));
-		// AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
-
-		// AbstractEnvironmentSpace space = ((AbstractEnvironmentSpace) (exta).getExtension(simConf.getNameOfSpace()));
 		IExpressionParser parser = new JavaCCExpressionParser();
 
 		List<Dataprovider> providers = benchConf.getEvaluation().getDataproviders().getDataprovider();
@@ -427,10 +425,7 @@ public class InitBenchmarkingPlan extends Plan {
 		// System.out.println("nnnnnnnnnnneded iterations: " + counterTmp);
 	}
 
-	private void startOnlineVisualization(Schedule benchConf) {
-
-		// IFuture fut = sutExta.getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));
-		// AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
+	private void startOnlineVisualization() {
 
 		// init online visualization
 		ArrayList<AbstractChartDataConsumer> chartDataConsumer = new ArrayList<AbstractChartDataConsumer>();
@@ -475,7 +470,7 @@ public class InitBenchmarkingPlan extends Plan {
 	 * @param benchConf
 	 * @return
 	 */
-	private boolean checkDataConcumerAndProvider(Schedule benchConf) {
+	private boolean checkDataConcumerAndProvider() {
 		IFuture fut = (sutExta).getExtension(getProperty(benchConf.getSytemUnderTest().getProperties().getProperty(), "spaceName"));
 		AbstractEnvironmentSpace space = (AbstractEnvironmentSpace) fut.get(this);
 

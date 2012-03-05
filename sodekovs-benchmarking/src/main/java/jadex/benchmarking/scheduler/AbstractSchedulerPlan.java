@@ -1,6 +1,7 @@
 package jadex.benchmarking.scheduler;
 
 import jadex.bdi.runtime.Plan;
+import jadex.benchmarking.helper.Constants;
 import jadex.benchmarking.helper.Methods;
 import jadex.benchmarking.logger.ScheduleLogger;
 import jadex.benchmarking.model.Action;
@@ -45,6 +46,8 @@ public abstract class AbstractSchedulerPlan extends Plan {
 	protected ArrayList<Sequence> sortedSequenceList = null;
 	// Logs events of the schedule
 	protected ScheduleLogger scheduleLogger = null;
+	// Is used to scale the CRUD-operations for the components: multiplies the defined numbers with this factor. -->
+	protected double scaleFactor = 1.0;
 
 	// -------- methods --------
 
@@ -57,7 +60,7 @@ public abstract class AbstractSchedulerPlan extends Plan {
 		if (action.getComponenttype() == null) {
 			System.out.println("Error: ComponentType not set!");
 		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.BDI_AGENT)) {
-			for (int i = 0; i < action.getNumberOfComponents(); i++) {
+			for (int i = 0; i < Math.round(action.getNumberOfComponents()*scaleFactor); i++) {
 				// Get random required in order to avoid creating components with the same name/id.
 				cms.createComponent(action.getComponentname() + "-" + GetRandom.getRandom(100000), action.getComponentmodel(), new CreationInfo(null, componentProperties, sutCID, false, false), null)
 						.addResultListener(new DefaultResultListener() {
@@ -69,7 +72,7 @@ public abstract class AbstractSchedulerPlan extends Plan {
 			}
 		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.ISPACE_OBJECT)) {
 			// Schedule step??
-			for (int i = 0; i < action.getNumberOfComponents(); i++) {
+			for (int i = 0; i < Math.round(action.getNumberOfComponents()*scaleFactor); i++) {
 				sutSpace.createSpaceObject(action.getComponentmodel(), componentProperties, null);
 				System.out.println("Created Component : " + action.getComponentmodel() + " -> " + getTimestamp());
 				scheduleLogger.log("C: " + action.getComponentname());
@@ -93,7 +96,7 @@ public abstract class AbstractSchedulerPlan extends Plan {
 				public void resultAvailable(Object result) {
 					IComponentDescription[] descriptions = (IComponentDescription[]) result;
 					if (descriptions.length > 0) {
-						int destroyConunter = 0;
+						int destroyCounter = 0;
 
 						for (int i = 0; i < descriptions.length; i++) {
 							if (descriptions[i].getModelName().equalsIgnoreCase(action.getComponentmodel())) {
@@ -103,9 +106,9 @@ public abstract class AbstractSchedulerPlan extends Plan {
 										scheduleLogger.log("D: " + action.getComponentname());
 									}
 								});
-								destroyConunter++;
+								destroyCounter++;
 								// check whether all components have been destroyed
-								if (destroyConunter == action.getNumberOfComponents()) {
+								if (destroyCounter == Math.round(action.getNumberOfComponents()*scaleFactor)) {
 									break;
 								}
 							}
@@ -116,7 +119,7 @@ public abstract class AbstractSchedulerPlan extends Plan {
 		} else if (action.getComponenttype().equalsIgnoreCase(GlobalConstants.ISPACE_OBJECT)) {
 			// Schedule step??
 			ISpaceObject[] objects = sutSpace.getSpaceObjectsByType(action.getComponentmodel());
-			int destroyConunter = 0;
+			int destroyCounter = 0;
 
 			for (int i = 0; i < objects.length; i++) {
 				if (objects[i].getType().equalsIgnoreCase(action.getComponentmodel())) {
@@ -124,9 +127,9 @@ public abstract class AbstractSchedulerPlan extends Plan {
 					System.out.println("Destroyed Component : " + action.getComponentmodel() + " -> " + getTimestamp());
 					scheduleLogger.log("D: " + action.getComponentname());
 
-					destroyConunter++;
+					destroyCounter++;
 					// check whether all components have been destroyed
-					if (destroyConunter == action.getNumberOfComponents()) {
+					if (destroyCounter == Math.round(action.getNumberOfComponents()*scaleFactor)) {
 						break;
 					}
 				}
@@ -170,5 +173,6 @@ public abstract class AbstractSchedulerPlan extends Plan {
 		sutCID = sut.getSutCID();
 		sutExta = sut.getSutExta();
 		sutSpace = sut.getSutSpace();
+		scaleFactor = (Double) getBeliefbase().getBelief(Constants.SCALE_FACTOR).getFact();
 	}
 }

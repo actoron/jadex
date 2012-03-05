@@ -20,6 +20,8 @@ public class ScheduleSequencesPlan extends AbstractSchedulerPlan {
 		scheduleLogger.init();
 		scheduleLogger.log(Constants.PREPARE_GNUPLOT_PREFIX);
 		
+		//Test
+		System.out.println("Scale Factor:" + scaleFactor);
 		
 		// responsible to start the components
 		startScheduler();

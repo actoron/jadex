@@ -8,6 +8,7 @@ package jadex.benchmarking.helper;
 public class Constants {
 
 	public static final String BENCHMARKING_NAME = "name";
+	public static final String SCALE_FACTOR = "scaleFactor";
 	public static final String WARM_UP_TIME = "warmUpTime";
 	public static final String APPLICATION_FILE_PATH = "appFilePath";
 	public static final String APPLICATION_COONFIGURATION = "appConfiguration";

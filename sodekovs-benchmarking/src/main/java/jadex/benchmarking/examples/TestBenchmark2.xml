@@ -29,7 +29,8 @@
 			<Property name="spaceName" value="my2dspace"></Property>
 		</Properties>
 	</SytemUnderTest>
-	<Sequences>
+	<!-- ScaleFactor: Is used to scale the CRUD-operations for the components: multiplies the defined numbers with this factor. -->
+	<Sequences scaleFactor="3.0">
 	<Sequence starttime="2500" actiontype="create">
 			<!--<RepeatConfiguration type="stochasticDistribution" typeOfStochasticDistribution="normal" alpha="5000" sigma="2500" />-->
 			<RepeatConfiguration type="stochasticDistribution" typeOfStochasticDistribution="poisson" lambda="6000"/>
@@ -53,7 +54,7 @@
 				</Action>
 			</Actions>
 		</Sequence>
-		<!-- <Sequence starttime="12000" actiontype="delete">
+		<Sequence starttime="12000" actiontype="delete">
 			<RepeatConfiguration type="space" step="3000" end="20000" />
 			<Actions>
 				<Action componentname="SentryW1" componenttype="BDIAgent"
@@ -74,7 +75,7 @@
 					</Properties>
 				</Action>
 			</Actions>
-		</Sequence>-->
+		</Sequence>
 	</Sequences>
 	<Evaluation>
 	<Dataproviders>

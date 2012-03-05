@@ -24,6 +24,8 @@
 						<xs:sequence>
 							<xs:element ref="Sequence" maxOccurs="unbounded"/>							
 						</xs:sequence>
+						<!--Is used to scale the CRUD-operations for the components: multiplies the defined numbers with this factor. -->
+						<xs:attribute name="scaleFactor" type="xs:double" default="1.0"/>
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="Evaluation">

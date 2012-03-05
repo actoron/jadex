@@ -43,6 +43,9 @@
 		
 		<!-- Contains the schedule logger.-->
 		<belief name="schedule_logger" class="ScheduleLogger"/>
+		
+		<!--Is used to scale the CRUD-operations for the components: multiplies the defined numbers with this factor. -->
+		<belief name="scaleFactor" class="Double"/>
 
 	</beliefs>
 
