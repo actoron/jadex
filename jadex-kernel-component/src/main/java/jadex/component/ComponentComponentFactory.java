@@ -145,7 +145,6 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	 */
 	public IFuture<Void> startService()
 	{
-		System.out.println("Starting CCFactory");
 		final Future<Void> ret = new Future<Void>();
 		super.startService().addResultListener(new DelegationResultListener<Void>(ret)
 		{
