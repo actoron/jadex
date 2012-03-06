@@ -220,7 +220,13 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 			public void customResultAvailable(ILibraryService libservice)
 			{
 				libservice.removeLibraryServiceListener(libservicelistener)
-					.addResultListener(new DelegationResultListener<Void>(fut));
+					.addResultListener(new DelegationResultListener<Void>(fut)
+				{
+					public void customResultAvailable(Void result)
+					{
+						BDIAgentFactory.super.shutdownService().addResultListener(new DelegationResultListener<Void>(fut));
+					}
+				});
 			}
 		});
 		return fut;
