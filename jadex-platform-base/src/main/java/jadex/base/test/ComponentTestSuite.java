@@ -52,7 +52,9 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes, long timeout) throws Exception
 	{
-		this(new String[]{"-platformname", SUtil.createUniqueId("testcases", 3),
+		this(new String[]
+		{
+			"-platformname", SUtil.createUniqueId("testcases", 3),
 			"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
 			"-simulation", "true",
 			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
@@ -62,9 +64,8 @@ public class ComponentTestSuite extends TestSuite
 			"-saveonexit", "false",
 			"-welcome", "false",
 			"-autoshutdown", "false",
-			"-printpass", "false",
-			"-logging_level", "java.util.logging.Level.INFO"},
-			path, excludes, timeout);
+			"-printpass", "false"
+		}, path, excludes, timeout);
 	}
 	
 	/**

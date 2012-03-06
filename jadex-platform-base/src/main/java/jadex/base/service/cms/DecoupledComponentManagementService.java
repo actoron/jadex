@@ -792,7 +792,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 							for(Iterator it=factories.iterator(); it.hasNext(); )
 							{
 								Object o = it.next();
-								System.out.println("is: "+o+" "+(o instanceof IComponentFactory));
+//								System.out.println("is: "+o+" "+(o instanceof IComponentFactory));
 							}
 							selectComponentFactory((IComponentFactory[])factories.toArray(new IComponentFactory[factories.size()]), model, cinfo, rid, 0)
 								.addResultListener(new DelegationResultListener<IComponentFactory>(ret));

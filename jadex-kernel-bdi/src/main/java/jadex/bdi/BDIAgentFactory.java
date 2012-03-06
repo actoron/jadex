@@ -85,9 +85,6 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 
 	//-------- attributes --------
 	
-//	/** The factory properties. */
-	protected Map props;
-	
 	/** The model loader. */
 	protected OAVBDIModelLoader loader;
 	
@@ -128,7 +125,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 			}
 		));
 		this.root	= new ComponentIdentifier(dummy);
-		loader	= new OAVBDIModelLoader(props, root);
+		loader	= new OAVBDIModelLoader(getPropertyMap(), root);
 	}
 	
 	/**
@@ -138,7 +135,6 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	public BDIAgentFactory(Map props, IInternalAccess component)
 	{
 		super(component.getServiceContainer().getId(), IComponentFactory.class, props);
-//		this(props);
 		this.component	= component;
 	}
 	
@@ -168,42 +164,50 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 //	@ServiceStart
 	public IFuture<Void>	startService()
 	{
-		final Future	fut	= new Future();
-		this.root	= component!=null ? component.getComponentIdentifier().getRoot() : root;
-		super.startService().addResultListener(new DelegationResultListener<Void>(fut)
+		if(!started)
 		{
-			public void customResultAvailable(Void result)
+			final Future	fut	= new Future();
+			this.root	= component!=null ? component.getComponentIdentifier().getRoot() : root;
+			super.startService().addResultListener(new DelegationResultListener<Void>(fut)
 			{
-				SServiceProvider.getService(component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(component.createResultListener(new DelegationResultListener(fut)
+				public void customResultAvailable(Void result)
 				{
-					public void customResultAvailable(Object result)
+					SServiceProvider.getService(component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(component.createResultListener(new DelegationResultListener(fut)
 					{
-						libservice = (ILibraryService) result;
-						loader	= new OAVBDIModelLoader(props, root);
-						mtypes	= Collections.synchronizedMap(new WeakHashMap());
-						libservicelistener = new ILibraryServiceListener()
+						public void customResultAvailable(Object result)
 						{
-							public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
+							libservice = (ILibraryService) result;
+							loader	= new OAVBDIModelLoader(getPropertyMap(), root);
+							mtypes	= Collections.synchronizedMap(new WeakHashMap());
+							libservicelistener = new ILibraryServiceListener()
 							{
-								loader.clearModelCache();
-								return IFuture.DONE;
-							}
-							
-							public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
-							{
-								loader.clearModelCache();
-								return IFuture.DONE;
-							}
-						};
-						libservice.addLibraryServiceListener(libservicelistener);
-						super.customResultAvailable(null);
-					}
-				}));
-			}
-		});
-		
-		return fut;
+								public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
+								{
+									loader.clearModelCache();
+									return IFuture.DONE;
+								}
+								
+								public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
+								{
+									loader.clearModelCache();
+									return IFuture.DONE;
+								}
+							};
+							libservice.addLibraryServiceListener(libservicelistener);
+							super.customResultAvailable(null);
+						}
+					}));
+				}
+			});
+			return fut;
+		}
+		else
+		{
+			// Hack!!! Service is deployed twice as IComponentFactory and IDynamicBDIFactory
+			// -> skip start for second deploymemt.
+			return IFuture.DONE;
+		}
 	}
 	
 	/**
@@ -270,7 +274,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 						IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 						state.addSubstate(amodel.getState());
 						
-						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, copy, resultlistener, init);
+						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, resultlistener, init);
 						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
 					}
 					catch(Exception e)
@@ -299,7 +303,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 				IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 				state.addSubstate(amodel.getState());
 				
-				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, copy, resultlistener, init);
+				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, resultlistener, init);
 				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
 			}
 			catch(Exception e)
@@ -332,7 +336,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 		state.addSubstate(amodel.getState());
 		
-		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, props, copy, resultlistener, ret);
+		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, resultlistener, ret);
 		return new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter());
 	}
 	
@@ -488,7 +492,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	public Map	getProperties(String type)
 	{
 		return FILETYPE_BDIAGENT.equals(type) || FILETYPE_BDICAPABILITY.equals(type)
-			? props : null;
+			? getPropertyMap() : null;
 	}
 
 	/**
