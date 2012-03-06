@@ -165,42 +165,44 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	/**
 	 *  Start the service.
 	 */
-	@ServiceStart
-	public synchronized IFuture	startService()
+//	@ServiceStart
+	public IFuture<Void>	startService()
 	{
-		Future	fut	= new Future();
-//		super.startService().addResultListener(new DelegationResultListener<Void>(fut))
-//		{
-//			
-//		});
+		final Future	fut	= new Future();
 		this.root	= component!=null ? component.getComponentIdentifier().getRoot() : root;
-		
-		SServiceProvider.getService(component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(component.createResultListener(new DelegationResultListener(fut)
+		super.startService().addResultListener(new DelegationResultListener<Void>(fut)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Void result)
 			{
-				libservice = (ILibraryService) result;
-				loader	= new OAVBDIModelLoader(props, root);
-				mtypes	= Collections.synchronizedMap(new WeakHashMap());
-				libservicelistener = new ILibraryServiceListener()
+				SServiceProvider.getService(component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(component.createResultListener(new DelegationResultListener(fut)
 				{
-					public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
+					public void customResultAvailable(Object result)
 					{
-						loader.clearModelCache();
-						return IFuture.DONE;
+						libservice = (ILibraryService) result;
+						loader	= new OAVBDIModelLoader(props, root);
+						mtypes	= Collections.synchronizedMap(new WeakHashMap());
+						libservicelistener = new ILibraryServiceListener()
+						{
+							public IFuture<Void> resourceIdentifierRemoved(IResourceIdentifier rid)
+							{
+								loader.clearModelCache();
+								return IFuture.DONE;
+							}
+							
+							public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
+							{
+								loader.clearModelCache();
+								return IFuture.DONE;
+							}
+						};
+						libservice.addLibraryServiceListener(libservicelistener);
+						super.customResultAvailable(null);
 					}
-					
-					public IFuture<Void> resourceIdentifierAdded(IResourceIdentifier rid)
-					{
-						loader.clearModelCache();
-						return IFuture.DONE;
-					}
-				};
-				libservice.addLibraryServiceListener(libservicelistener);
-				super.customResultAvailable(null);
+				}));
 			}
-		}));
+		});
+		
 		return fut;
 	}
 	
@@ -208,8 +210,8 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	 *  Shutdown the service.
 	 *  @param listener The listener.
 	 */
-	@ServiceShutdown
-	public synchronized IFuture<Void>	shutdownService()
+//	@ServiceShutdown
+	public IFuture<Void>	shutdownService()
 	{
 		final Future<Void>	fut	= new Future<Void>();
 		component.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
