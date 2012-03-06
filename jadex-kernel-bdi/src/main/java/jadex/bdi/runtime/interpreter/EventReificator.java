@@ -418,11 +418,13 @@ public class EventReificator implements IOAVStateListener
 				{
 					GoalFlyweight gf = GoalFlyweight.getGoalFlyweight(state, scope, element);
 					if (gf.isSucceeded())
+					{
 						event.setReason("Success");
+					}
 					else if (gf.getException() != null)
 					{
 						event.setReason(gf.getException().toString());
-						gf.getException().printStackTrace();
+//						gf.getException().printStackTrace();
 					}
 				}
 			}

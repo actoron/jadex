@@ -4,13 +4,13 @@
 	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-platform-extension-webservice</artifactId>
 	<packaging>jar</packaging>
-	<name>jadex-platform-base</name>
+	<name>jadex-platform-extension-webservice</name>
 	<version>2.1-SNAPSHOT</version>
 	<url>http://jadex.sourceforge.net</url>
 
 	<description>
-		The Jadex platform base package contains
-		functionality for web services and rest services.
+		The Jadex webservice platform extension package contains
+		functionality for WSDL web services and REST web services.
 	</description>
 
 	<licenses>
