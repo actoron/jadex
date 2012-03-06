@@ -28,6 +28,10 @@
 		<beliefsetref name="catalog"> <!-- todo argument="true" -->
 			<concrete ref="shopcap.catalog"/>
 		</beliefsetref>
+		
+		<beliefsetref name="inventory">
+			<concrete ref="customercap.inventory"/>
+		</beliefsetref>
 	</beliefs>
 	
 	<properties>
