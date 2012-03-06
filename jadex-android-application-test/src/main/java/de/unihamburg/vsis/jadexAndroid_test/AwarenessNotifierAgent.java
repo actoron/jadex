@@ -81,8 +81,8 @@ public class AwarenessNotifierAgent extends
 	}
 
 	@Override
-	public void executeBody() {
-		super.executeBody();
+	public IFuture<Void> executeBody() {
+		return super.executeBody();
 	}
 
 	@Override

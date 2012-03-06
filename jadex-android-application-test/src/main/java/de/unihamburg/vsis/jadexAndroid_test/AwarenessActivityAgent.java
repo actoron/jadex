@@ -26,8 +26,9 @@ public class AwarenessActivityAgent extends MicroAgent {
 	public static AwarenessActivityAgent instance;
 
 	@Override
-	public void executeBody() {
+	public IFuture<Void> executeBody() {
 		instance = this;
+		return new Future<Void>();
 	}
 
 	public IFuture getRemoteComponents(final IComponentIdentifier id) {

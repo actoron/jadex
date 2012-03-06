@@ -4,6 +4,7 @@ import java.util.Map;
 
 import jadex.base.fipa.SFipa;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
 import android.os.Bundle;
@@ -20,9 +21,10 @@ public class AndroidAgent extends MicroAgent
 	/**
 	 *  Called when the agent is started.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 		showAndroidMessage("This is Agent <<" + this.getAgentName() + ">> saying hello!");
+		return new Future<Void>();
 	}
 
 	/**

@@ -9,6 +9,7 @@ import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
@@ -47,7 +48,7 @@ public class AgentCreationAgent extends MicroAgent
 	/**
 	 *  Execute an agent step.
 	 */
-	public void executeBody()
+	public IFuture<Void> executeBody()
 	{
 //		System.out.println("body");
 		
@@ -90,6 +91,8 @@ public class AgentCreationAgent extends MicroAgent
 		{
 			step1(args);
 		}
+		
+		return new Future<Void>(); // never kill?!
 	}
 
 	/**

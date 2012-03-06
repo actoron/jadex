@@ -17,8 +17,7 @@ public class AndroidAgent extends MicroAgent {
 	}
 
 	@Override
-	public void executeBody() {
-		super.executeBody();
+	public IFuture<Void> executeBody() {
 		System.out.println(this.getAgentName() + ": execute Body");
 		Context context = (Context) getArgument("context");
 		Message message = new Message();
@@ -26,5 +25,6 @@ public class AndroidAgent extends MicroAgent {
 		bundle.putString("text", "Agent " + getAgentName() + ": execute Body");
 		message.setData(bundle);
 		AgentActivity.getHandler().sendMessage(message);
+		return super.executeBody();
 	}
 }

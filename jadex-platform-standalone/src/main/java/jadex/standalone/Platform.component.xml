@@ -200,14 +200,14 @@
 		<providedservice class="jadex.bridge.service.types.android.IAndroidContextService">
 			<implementation>
 				Boolean.TRUE.equals($args.android)
-				? jadex.base.service.android.AndroidContextService.class.getConstructor(new Class[]{IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})
+				? jadex.base.service.android.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()})
 				: null
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.settings.ISettingsService">
 			<implementation>
 				Boolean.TRUE.equals($args.android)
-				? jadex.base.service.settings.AndroidSettingsService.class.getConstructor(new Class[]{String.class, IInternalAccess.class, boolean.class}).newInstance(new Object[]{$args.platformname, $component, $args.saveonexit})
+				? jadex.base.service.settings.AndroidSettingsService.class.getConstructor(new Class[]{String.class, jadex.bridge.IInternalAccess.class, boolean.class}).newInstance(new Object[]{$args.platformname, $component, $args.saveonexit})
 				: new jadex.base.service.settings.SettingsService($args.platformname, $component, $args.saveonexit)
 			</implementation>
 		</providedservice>
