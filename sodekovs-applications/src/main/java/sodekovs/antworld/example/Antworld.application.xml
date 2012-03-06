@@ -87,6 +87,11 @@
 					</env:property>
 				</env:objecttype>
 				
+				<!-- Ants cannot pass by these obstacles. -->
+				<env:objecttype name="obstacle">					
+					<env:property name="size">new Vector2Double(0.01,0.01)</env:property>
+				</env:objecttype>
+				
 				
 				<!-- Trace object. Depicts the way an agent has walked on. -->
 				<env:objecttype name="trace">					
@@ -122,6 +127,10 @@
 					<env:property name="rate">1</env:property>
 				</env:processtype>
 				<env:processtype name="manageFoodSources" class="ManageFoodSourcesProcess">
+					 <env:property name="rate">1</env:property>
+				</env:processtype>
+				<!-- Create obstacles on application start. Then to nothing. -->
+				<env:processtype name="createObstacles" class="CreateObstaclesProcess">
 					 <env:property name="rate">1</env:property>
 				</env:processtype>
 			</env:processtypes>
@@ -223,6 +232,12 @@
 							imagepath="sodekovs/antworld/images/pheromone.png" />
 					</env:drawable>
 					
+					<env:drawable objecttype="obstacle" width="1.0"
+						height="1.0">
+						<env:texturedrectangle layer="0" size="size"
+							imagepath="sodekovs/antworld/images/obstacle.png" />
+					</env:drawable>
+					
 					<env:prelayers>
 						<env:tiledlayer width="0.6" height="0.6"
 							imagepath="sodekovs/antworld/images/meadow.jpg" />
@@ -264,17 +279,17 @@
 							<env:property name="position">new Vector2Double(0.3, 0.3)</env:property>													
 						</env:object>
 						<env:object type="food">
-							<env:property name="position">new Vector2Double(0.1, 0.2)</env:property>
+							<env:property name="position">new Vector2Double(0.8, 0.5)</env:property>
 							<env:property name="food_pieces">2</env:property>
 						</env:object>
-						<env:object type="food">
+						<!-- <env:object type="food">
 							<env:property name="position">new Vector2Double(0.6, 0.2)</env:property>
 							<env:property name="food_pieces">2</env:property>
 						</env:object>
 						<env:object type="food">
 							<env:property name="position">new Vector2Double(0.1, 0.6)</env:property>
 							<env:property name="food_pieces">2</env:property>
-						</env:object>
+						</env:object>-->
 						
 						<env:object type="walkingStrategy">					
 							<env:property name="strategy">0</env:property>
@@ -282,7 +297,7 @@
 						
 						
 						<!--  Test pheromones for distance eval function. -->
-						<env:object type="pheromone">
+						<!-- <env:object type="pheromone">
 							<env:property name="position">new Vector2Double(0.6, 0.8)</env:property>
 							<env:property name="strenght">15</env:property>
 						</env:object>
@@ -296,11 +311,35 @@
 							<env:property name="position">new Vector2Double(0.5, 0.8)</env:property>
 							<env:property name="strenght">15</env:property>
 						</env:object>
-						
+						 
 						<env:object type="pheromone">
 							<env:property name="position">new Vector2Double(0.7, 0.7)</env:property>
 							<env:property name="strenght">15</env:property>
+						</env:object>-->
+						
+						<!-- obstacles -->
+						<!--<env:object type="obstacle">
+							<env:property name="position">new Vector2Double(0.6, 0.2)</env:property>
 						</env:object>
+						<env:object type="obstacle">
+							<env:property name="position">new Vector2Double(0.6, 0.3)</env:property>
+						</env:object>
+						<env:object type="obstacle">
+							<env:property name="position">new Vector2Double(0.6, 0.4)</env:property>
+						</env:object>
+						<env:object type="obstacle">
+							<env:property name="position">new Vector2Double(0.6, 0.5)</env:property>
+						</env:object>
+						<env:object type="obstacle">
+							<env:property name="position">new Vector2Double(0.6, 0.6)</env:property>
+						</env:object>
+						<env:object type="obstacle">
+							<env:property name="position">new Vector2Double(0.6, 0.7)</env:property>
+						</env:object>
+						<env:object type="obstacle">
+							<env:property name="position">new Vector2Double(0.6, 0.8)</env:property>
+						</env:object>-->
+						
 					</env:objects>
 					
 					<env:processes>
@@ -308,6 +347,9 @@
 						<env:property name="rate">8</env:property>
 						</env:process>			
 				 		<env:process type="manageFoodSources">
+							<env:property name="rate">1</env:property> 
+						</env:process>
+						<env:process type="createObstacles">
 							<env:property name="rate">1</env:property> 
 						</env:process>
 					</env:processes>
@@ -320,7 +362,7 @@
 				</env:envspace>
 			</extensions>
 			<components>
-				<component type="Ant" number="3" />
+				<component type="Ant" number="1" />
 			</components>							
 		</configuration>
 

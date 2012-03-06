@@ -12,6 +12,8 @@ import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.Vector1Double;
+import jadex.extension.envsupport.math.Vector2Double;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -64,7 +66,14 @@ public class MoveTask extends AbstractTask {
 		IVector2 loc = (IVector2) obj.getProperty(Space2D.PROPERTY_POSITION);
 		// Todo: how to handle border conditions!?
 		IVector2 newloc = ((Space2D) space).getDistance(loc, destination).getAsDouble() <= maxdist ? destination : destination.copy().subtract(loc).normalize().multiply(maxdist).add(loc);
+		
+		//Is there an obstacle that cannot be passed by?
+		if(positionHasObstacle(space, newloc)){
+			newloc = new Vector2Double(loc.getXAsDouble(), loc.getYAsDouble()-0.005);
+			System.out.println("Detected obstacle.Moving 0.005 up");
+		}
 
+		System.out.println("#moveTask locations: " + loc.toString() + " - " + newloc.toString() + " ;diff: " + loc.subtract(newloc));
 		((Space2D) space).setPosition(obj.getId(), newloc);
 		
 		
@@ -143,5 +152,10 @@ public class MoveTask extends AbstractTask {
 
 		if (newloc == destination)
 			setFinished(space, obj, true);
+	}
+	
+	private boolean positionHasObstacle(IEnvironmentSpace space, IVector2 location){
+		return ((ContinuousSpace2D)space).getNearestObject(location, new Vector1Double(0.005), "obstacle") == null ? false : true;
+		
 	}
 }
