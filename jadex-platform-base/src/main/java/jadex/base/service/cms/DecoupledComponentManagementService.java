@@ -13,9 +13,11 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.ISearchConstraints;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.SubcomponentTypeInfo;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ComponentFactorySelector;
@@ -48,6 +50,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.kernelbase.IBootstrapFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,6 +78,9 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	/** The agent. */
 	@ServiceComponent
 	protected IInternalAccess agent;
+	
+	@ServiceIdentifier
+	protected IServiceIdentifier sid;
 	
 	/** The logger. */
 	protected Logger logger;
@@ -2273,47 +2279,52 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		final Future<Void>	ret	= new Future<Void>();
 		
 		logger = agent.getLogger();
-		
-		SServiceProvider.getService(agent.getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
+		((IBootstrapFactory)componentfactory).startService(agent.getServiceContainer(), sid.getResourceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret)
 		{
-			public void customResultAvailable(IExecutionService result)
+			public void customResultAvailable(Void result)
 			{
-				exeservice	= result;
-				
-				SServiceProvider.getService(agent.getServiceContainer(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
+				SServiceProvider.getService(agent.getServiceContainer(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(createResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
 				{
-					public void customResultAvailable(IMarshalService result)
+					public void customResultAvailable(IExecutionService result)
 					{
-						marshalservice	= result;
-				
-						SServiceProvider.getService(agent.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+						exeservice	= result;
+						
+						SServiceProvider.getService(agent.getServiceContainer(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
 						{
-							public void customResultAvailable(IMessageService result)
+							public void customResultAvailable(IMarshalService result)
 							{
-								msgservice	= result;
-								
-								// add root adapter and register root component
-								if(root!=null)
+								marshalservice	= result;
+						
+								SServiceProvider.getService(agent.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 								{
-									msgservice.getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
+									public void customResultAvailable(IMessageService result)
 									{
-										public void customResultAvailable(String[] addresses)
+										msgservice	= result;
+										
+										// add root adapter and register root component
+										if(root!=null)
 										{
-											((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(addresses);
-											adapters.put(root.getComponentIdentifier(), root);
-											ret.setResult(null);
+											msgservice.getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
+											{
+												public void customResultAvailable(String[] addresses)
+												{
+													((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(addresses);
+													adapters.put(root.getComponentIdentifier(), root);
+													ret.setResult(null);
+												}
+											}));
 										}
-									}));
-								}
+									}
+								}));
 							}
 						}));
 					}
 				}));
 			}
-		}));
+		});
 		
 		return ret;
 	}

@@ -25,6 +25,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.kernelbase.CacheableKernelModel;
+import jadex.kernelbase.IBootstrapFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ import javax.swing.UIDefaults;
  *  Factory for default contexts.
  *  No special properties supported, yet.
  */
-public class ComponentComponentFactory extends BasicService implements IComponentFactory
+public class ComponentComponentFactory extends BasicService implements IComponentFactory, IBootstrapFactory
 {
 	//-------- constants --------
 	
@@ -131,8 +132,20 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	/**
 	 *  Start the service.
 	 */
+	public IFuture<Void> startService(IServiceProvider provider, IResourceIdentifier rid)
+	{
+		this.provider = provider;
+		this.providerid = provider.getId();
+		createServiceIdentifier("Bootstrap Factory", IComponentFactory.class, rid);
+		return startService();
+	}
+	
+	/**
+	 *  Start the service.
+	 */
 	public IFuture<Void> startService()
 	{
+		System.out.println("Starting CCFactory");
 		final Future<Void> ret = new Future<Void>();
 		super.startService().addResultListener(new DelegationResultListener<Void>(ret)
 		{
@@ -144,6 +157,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 					public void customResultAvailable(ILibraryService result)
 					{
 						libservice = result;
+						System.out.println("Got Libservice " + libservice);
 						
 						SServiceProvider.getServices(provider, IComponentFactoryExtensionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactoryExtensionService>, Void>(ret)

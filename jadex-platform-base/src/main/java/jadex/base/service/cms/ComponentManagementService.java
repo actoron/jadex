@@ -46,6 +46,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.kernelbase.IBootstrapFactory;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.ArrayList;
@@ -2534,61 +2535,65 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			public void customResultAvailable(Void result)
 			{
-//				final boolean[]	services = new boolean[2];
-				SServiceProvider.getService(exta.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
+				((IBootstrapFactory)componentfactory).startService(exta.getServiceProvider(), sid.getResourceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret)
 				{
-					public void customResultAvailable(IExecutionService result)
+					public void customResultAvailable(Void result)
 					{
-						exeservice	= result;
-						
-						SServiceProvider.getService(exta.getServiceProvider(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
+//						final boolean[]	services = new boolean[2];
+						SServiceProvider.getService(exta.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+							.addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
 						{
-							public void customResultAvailable(IMarshalService result)
+							public void customResultAvailable(IExecutionService result)
 							{
-								marshalservice	= result;
-						
-								SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+								exeservice	= result;
+								
+								SServiceProvider.getService(exta.getServiceProvider(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
 								{
-									public void customResultAvailable(IMessageService result)
+									public void customResultAvailable(IMarshalService result)
 									{
-										msgservice	= result;
-										
-										// add root adapter and register root component
-										if(root!=null)
+										marshalservice	= result;
+								
+										SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
 										{
-											msgservice.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
+											public void customResultAvailable(IMessageService result)
 											{
-												public void customResultAvailable(String[] addresses)
+												msgservice	= result;
+												
+												// add root adapter and register root component
+												if(root!=null)
 												{
-													((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(addresses);
-													synchronized(adapters)
+													msgservice.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
 													{
-														adapters.put(root.getComponentIdentifier(), root);
-													}
-													ret.setResult(null);
+														public void customResultAvailable(String[] addresses)
+														{
+															((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(addresses);
+															synchronized(adapters)
+															{
+																adapters.put(root.getComponentIdentifier(), root);
+															}
+															ret.setResult(null);
+														}
+													});
 												}
-											});
-										}
+											}
+										});
 									}
 								});
+//								boolean	setresult;
+//								synchronized(services)
+//								{
+//									services[0]	= true;
+//									setresult	= services[0] && services[1];
+//								}
+//								if(setresult)
+//									ret.setResult(null);
+//									ret.setResult(getServiceIdentifier());
 							}
 						});
-//						boolean	setresult;
-//						synchronized(services)
-//						{
-//							services[0]	= true;
-//							setresult	= services[0] && services[1];
-//						}
-//						if(setresult)
-//							ret.setResult(null);
-//							ret.setResult(getServiceIdentifier());
-					}
+					};
 				});
-				
-			
 			}
 		});
 		
