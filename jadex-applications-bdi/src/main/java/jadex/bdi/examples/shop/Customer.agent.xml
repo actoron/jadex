@@ -18,6 +18,9 @@
 			<assignto ref="customercap.money"/>
 			<fact>100</fact>
 		</belief>
+		<beliefsetref name="inventory">
+			<concrete ref="customercap.inventory"/>
+		</beliefsetref>
 	</beliefs>
 	
 	<properties>

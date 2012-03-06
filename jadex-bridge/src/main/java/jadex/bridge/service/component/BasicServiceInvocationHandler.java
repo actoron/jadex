@@ -396,7 +396,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		
 		if(service instanceof IInternalService)
 		{
-			((IInternalService)service).createServiceIdentifier(name, service.getClass(), rid);
+			((IInternalService)service).createServiceIdentifier(name, service.getClass(), rid, type);
 		}
 		
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
@@ -475,7 +475,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			}
 			
 			BasicService mgmntservice = new BasicService(ia.getExternalAccess().getServiceProvider().getId(), type, null);
-			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier());
+			mgmntservice.createServiceIdentifier(name, service.getClass(), ia.getModel().getResourceIdentifier(), type);
 						
 			boolean found = false;
 			Class serclass = service.getClass();

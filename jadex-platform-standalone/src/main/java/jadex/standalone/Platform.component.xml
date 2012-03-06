@@ -263,7 +263,7 @@
 		<providedservice name="cms" class="jadex.bridge.service.types.cms.IComponentManagementService">
 			 <implementation proxytype="raw">
 				!$args.decoupledcms
-				? new jadex.standalone.service.ComponentManagementService($component.getExternalAccess(), $component.getComponentAdapter(), 
+				? new jadex.standalone.service.ComponentManagementService($component, $component.getComponentAdapter(), 
 					$args.componentfactory, $args.parametercopy)
 				: null
 			</implementation>

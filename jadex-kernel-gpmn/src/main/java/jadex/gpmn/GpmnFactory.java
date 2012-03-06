@@ -13,6 +13,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -33,6 +34,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.gpmn.model.MGpmnModel;
+import jadex.kernelbase.IBootstrapFactory;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -108,6 +110,9 @@ public class GpmnFactory extends BasicService implements IComponentFactory
 		this.converter = new GpmnBDIConverter(access.getComponentIdentifier().getRoot());
 	}
 	
+	/**
+	 *  Start the service.
+	 */
 	public IFuture<Void> startService()
 	{
 //		final IFuture<Void> sfuture = super.startService();

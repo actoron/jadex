@@ -15,6 +15,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -35,6 +37,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.kernelbase.IBootstrapFactory;
 import jadex.rules.state.IOAVState;
 import jadex.rules.state.IOAVStateListener;
 import jadex.rules.state.OAVAttributeType;
@@ -58,8 +61,8 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating Jadex V2 BDI agents.
  */
-@Service
-public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
+//@Service
+public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory, IComponentFactory, IBootstrapFactory
 {
 	//-------- constants --------
 	
@@ -82,14 +85,14 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 
 	//-------- attributes --------
 	
-	/** The factory properties. */
+//	/** The factory properties. */
 	protected Map props;
 	
 	/** The model loader. */
 	protected OAVBDIModelLoader loader;
 	
 	/** The provider. */
-	@ServiceComponent
+//	@ServiceComponent
 	protected IInternalAccess component;
 		
 	/** The root id. */
@@ -112,18 +115,18 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	// Constructor used by ADF Checker. (hack?)
 	public BDIAgentFactory(String dummy)
 	{
-		this(SUtil.createHashMap(
-				new String[]
-				{
-					"planexecutor_standard",
-					"planexecutor_bpmn"
-				},
-				new Object[]
-				{
-					"dummy",
-					"dummy"
-				}
-			));
+		super(new ComponentIdentifier(dummy), IComponentFactory.class, SUtil.createHashMap(
+			new String[]
+			{
+				"planexecutor_standard",
+				"planexecutor_bpmn"
+			},
+			new Object[]
+			{
+				"dummy",
+				"dummy"
+			}
+		));
 		this.root	= new ComponentIdentifier(dummy);
 		loader	= new OAVBDIModelLoader(props, root);
 	}
@@ -134,16 +137,29 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	// Constructor used by GPMN factory.
 	public BDIAgentFactory(Map props, IInternalAccess component)
 	{
-		this(props);
+		super(component.getServiceContainer().getId(), IComponentFactory.class, props);
+//		this(props);
 		this.component	= component;
 	}
 	
+//	/**
+//	 *  Create a new agent factory.
+//	 */
+//	public BDIAgentFactory(IInternalAccess component, Map props)
+//	{
+//		super(component.getServiceContainer().getId(), IComponentFactory.class, props);
+//		this.props = props;
+//	}
+	
 	/**
-	 *  Create a new agent factory.
+	 *  Start the service.
 	 */
-	public BDIAgentFactory(Map props)
+	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
-		this.props = props;
+		this.component = component;
+		this.providerid = component.getServiceContainer().getId();
+		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class);
+		return startService();
 	}
 	
 	/**
@@ -152,8 +168,13 @@ public class BDIAgentFactory	implements IDynamicBDIFactory, IComponentFactory
 	@ServiceStart
 	public synchronized IFuture	startService()
 	{
-		this.root	= component!=null ? component.getComponentIdentifier().getRoot() : root;
 		Future	fut	= new Future();
+//		super.startService().addResultListener(new DelegationResultListener<Void>(fut))
+//		{
+//			
+//		});
+		this.root	= component!=null ? component.getComponentIdentifier().getRoot() : root;
+		
 		SServiceProvider.getService(component.getServiceContainer(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(component.createResultListener(new DelegationResultListener(fut)
 		{

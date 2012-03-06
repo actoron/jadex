@@ -3,6 +3,7 @@ package jadex.component;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -132,11 +133,11 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	/**
 	 *  Start the service.
 	 */
-	public IFuture<Void> startService(IServiceProvider provider, IResourceIdentifier rid)
+	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
 	{
-		this.provider = provider;
+		this.provider = component.getServiceContainer();
 		this.providerid = provider.getId();
-		createServiceIdentifier("Bootstrap Factory", IComponentFactory.class, rid);
+		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class);
 		return startService();
 	}
 	
@@ -156,7 +157,7 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 					public void customResultAvailable(ILibraryService result)
 					{
 						libservice = result;
-						System.out.println("Got Libservice " + libservice);
+//						System.out.println("Got Libservice " + libservice);
 						
 						SServiceProvider.getServices(provider, IComponentFactoryExtensionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 							.addResultListener(new ExceptionDelegationResultListener<Collection<IComponentFactoryExtensionService>, Void>(ret)

@@ -62,7 +62,8 @@ public class ComponentTestSuite extends TestSuite
 			"-saveonexit", "false",
 			"-welcome", "false",
 			"-autoshutdown", "false",
-			"-printpass", "false"},
+			"-printpass", "false",
+			"-logging_level", "java.util.logging.Level.INFO"},
 			path, excludes, timeout);
 	}
 	

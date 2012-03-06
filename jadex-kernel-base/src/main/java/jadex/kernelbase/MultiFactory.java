@@ -750,7 +750,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 				})));
 				for (Iterator it = factories.iterator(); it.hasNext(); )
 				{
-					final IComponentFactory factory = (IComponentFactory) it.next();
+					final IComponentFactory factory = (IComponentFactory)it.next();
 					factory.isLoadable(model, imports, rid).addResultListener(ia.createResultListener(new IResultListener()
 					{
 						public void resultAvailable(Object result)

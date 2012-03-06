@@ -74,6 +74,7 @@ public abstract class ComponentManagementService extends BasicService implements
 
 	/** The service provider. */
 	protected IExternalAccess exta;
+	protected IInternalAccess inta; // only for bootstrap usage
 
 	/** The components (id->component adapter). */
 	protected Map<IComponentIdentifier, IComponentAdapter> adapters;
@@ -119,7 +120,7 @@ public abstract class ComponentManagementService extends BasicService implements
 	protected Collection<IComponentFactory> factories;
 	
 	/** The bootstrap component factory. */
-	protected IComponentFactory componentfactory;
+	protected IBootstrapFactory componentfactory;
 	
 	/** The default copy parameters flag for service calls. */
 	protected boolean copy;
@@ -136,7 +137,7 @@ public abstract class ComponentManagementService extends BasicService implements
      *  Create a new component execution service.
      *  @param provider	The service provider.
      */
-    public ComponentManagementService(IExternalAccess provider)
+    public ComponentManagementService(IInternalAccess provider)
 	{
     	this(provider, null);
 	}
@@ -145,7 +146,7 @@ public abstract class ComponentManagementService extends BasicService implements
      *  Create a new component execution service.
      *  @param exta	The service provider.
      */
-    public ComponentManagementService(IExternalAccess exta, IComponentAdapter root)
+    public ComponentManagementService(IInternalAccess exta, IComponentAdapter root)
 	{
     	this(exta, root, null, true);
     }
@@ -154,12 +155,13 @@ public abstract class ComponentManagementService extends BasicService implements
      *  Create a new component execution service.
      *  @param exta	The service provider.
      */
-    public ComponentManagementService(IExternalAccess exta, IComponentAdapter root, 
-    	IComponentFactory componentfactory, boolean copy)
+    public ComponentManagementService(IInternalAccess exta, IComponentAdapter root, 
+    	IBootstrapFactory componentfactory, boolean copy)
 	{
-		super(exta.getServiceProvider().getId(), IComponentManagementService.class, null);
+		super(exta.getServiceContainer().getId(), IComponentManagementService.class, null);
 
-		this.exta = exta;
+		this.inta = exta;
+		this.exta = exta.getExternalAccess();
 		this.root = root;
 		this.componentfactory = componentfactory;
 		this.copy = copy;
@@ -2535,7 +2537,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			public void customResultAvailable(Void result)
 			{
-				((IBootstrapFactory)componentfactory).startService(exta.getServiceProvider(), sid.getResourceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret)
+				componentfactory.startService(inta, sid.getResourceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{

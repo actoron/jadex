@@ -142,7 +142,7 @@ public class ExternalAccess implements IExternalAccess
 			{
 //				if(adapter.getComponentIdentifier().getParent()==null)
 //				{
-//					System.err.println("platform e: "+adapter.getComponentIdentifier().getName());
+//					System.out.println("platform e: "+adapter.getComponentIdentifier().getName());
 //					Thread.dumpStack();
 //				}
 				adapter.invokeLater(new Runnable() 

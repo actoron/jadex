@@ -3,6 +3,7 @@ package jadex.application;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -26,6 +27,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.component.ComponentInterpreter;
 import jadex.kernelbase.CacheableKernelModel;
+import jadex.kernelbase.IBootstrapFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -48,7 +50,7 @@ import javax.swing.UIDefaults;
  *  Factory for default contexts.
  *  No special properties supported, yet.
  */
-public class ApplicationComponentFactory extends BasicService implements IComponentFactory
+public class ApplicationComponentFactory extends BasicService implements IComponentFactory, IBootstrapFactory
 {
 	//-------- constants --------
 	
@@ -129,6 +131,17 @@ public class ApplicationComponentFactory extends BasicService implements ICompon
 	{
 		super(provider.getId(), IComponentFactory.class, null);
 		this.provider = provider;
+	}
+	
+	/**
+	 *  Start the service.
+	 */
+	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
+	{
+		this.provider = component.getServiceContainer();
+		this.providerid = provider.getId();
+		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class);
+		return startService();
 	}
 	
 	/**

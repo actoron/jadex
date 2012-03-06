@@ -7,14 +7,17 @@ import java.util.Date;
 import jadex.extension.rs.publish.mapper.IParameterMapper;
 
 /**
- * 
+ *  Example mapper that shows how a request can be transformed.
  */
 public class RequestMapper implements IParameterMapper
 {
+	/** The date formatetr. */
 	protected SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 
 	/**
-	 * 
+	 *  Convert the parameters.
+	 *  @param parameters The parameters.
+	 *  @return The converted parameters.
 	 */
 	public Object[] convertParameters(Object[] parameters) throws Exception
 	{
@@ -22,7 +25,9 @@ public class RequestMapper implements IParameterMapper
 	}
 	
 	/**
-	 * 
+	 *  Parse a date.
+	 *  @param val The value.
+	 *  @return The date.
 	 */
 	protected Date parseDate(Object val) throws ParseException
 	{

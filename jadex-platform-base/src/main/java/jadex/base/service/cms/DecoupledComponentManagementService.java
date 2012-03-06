@@ -126,7 +126,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	protected Collection<IComponentFactory> factories;
 	
 	/** The bootstrap component factory. */
-	protected IComponentFactory componentfactory;
+	protected IBootstrapFactory componentfactory;
 	
 	/** The default copy parameters flag for service calls. */
 	protected boolean copy;
@@ -150,7 +150,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
      *  @param exta	The service provider.
      */
     public DecoupledComponentManagementService(IComponentAdapter root, 
-    	IComponentFactory componentfactory, boolean copy)
+    	IBootstrapFactory componentfactory, boolean copy)
 	{
 		this.root = root;
 		this.componentfactory = componentfactory;
@@ -789,6 +789,11 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 						public void customResultAvailable(Collection<IComponentFactory> facts)
 						{	
 							factories = facts;
+							for(Iterator it=factories.iterator(); it.hasNext(); )
+							{
+								Object o = it.next();
+								System.out.println("is: "+o+" "+(o instanceof IComponentFactory));
+							}
 							selectComponentFactory((IComponentFactory[])factories.toArray(new IComponentFactory[factories.size()]), model, cinfo, rid, 0)
 								.addResultListener(new DelegationResultListener<IComponentFactory>(ret));
 						}
@@ -926,6 +931,12 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	 */
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
+//		if(cid.getParent()==null)
+//		{
+//			System.out.println("Platform kill called:_"+cid.getName());
+//			Thread.dumpStack();
+//		}
+		
 		boolean contains = false;
 		boolean locked = false;
 		Future<Map<String, Object>> tmp;
@@ -2279,7 +2290,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		final Future<Void>	ret	= new Future<Void>();
 		
 		logger = agent.getLogger();
-		((IBootstrapFactory)componentfactory).startService(agent.getServiceContainer(), sid.getResourceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret)
+		componentfactory.startService(agent, sid.getResourceIdentifier()).addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{

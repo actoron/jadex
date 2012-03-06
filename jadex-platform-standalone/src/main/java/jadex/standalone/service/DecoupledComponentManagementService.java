@@ -1,14 +1,13 @@
 package jadex.standalone.service;
 
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
-import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.kernelbase.IBootstrapFactory;
 import jadex.standalone.ComponentAdapterFactory;
 import jadex.standalone.StandaloneComponentAdapter;
 
@@ -38,7 +37,7 @@ public class DecoupledComponentManagementService extends jadex.base.service.cms.
 	 *  Create a new component execution service.
 	 *  @param exta	The service provider.
 	 */
-	public DecoupledComponentManagementService(IComponentAdapter root, IComponentFactory factory, boolean copy)
+	public DecoupledComponentManagementService(IComponentAdapter root, IBootstrapFactory factory, boolean copy)
 	{
 		super(root, factory, copy);
 	}

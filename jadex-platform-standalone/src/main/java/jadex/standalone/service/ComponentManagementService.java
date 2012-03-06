@@ -1,13 +1,13 @@
 package jadex.standalone.service;
 
 import jadex.bridge.IComponentInstance;
-import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
-import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.kernelbase.IBootstrapFactory;
 import jadex.standalone.ComponentAdapterFactory;
 import jadex.standalone.StandaloneComponentAdapter;
 
@@ -27,7 +27,7 @@ public class ComponentManagementService extends jadex.base.service.cms.Component
 	 *  Create a new component execution service.
 	 *  @param exta	The service provider.
 	 */
-	public ComponentManagementService(IExternalAccess exta)
+	public ComponentManagementService(IInternalAccess exta)
 	{
 		super(exta);
 	}
@@ -36,7 +36,7 @@ public class ComponentManagementService extends jadex.base.service.cms.Component
 	 *  Create a new component execution service.
 	 *  @param exta	The service provider.
 	 */
-	public ComponentManagementService(IExternalAccess exta, IComponentAdapter root)
+	public ComponentManagementService(IInternalAccess exta, IComponentAdapter root)
 	{
 		super(exta, root);
 	}
@@ -45,7 +45,7 @@ public class ComponentManagementService extends jadex.base.service.cms.Component
 	 *  Create a new component execution service.
 	 *  @param exta	The service provider.
 	 */
-	public ComponentManagementService(IExternalAccess exta, IComponentAdapter root, IComponentFactory factory, boolean copy)
+	public ComponentManagementService(IInternalAccess exta, IComponentAdapter root, IBootstrapFactory factory, boolean copy)
 	{
 		super(exta, root, factory, copy);
 	}

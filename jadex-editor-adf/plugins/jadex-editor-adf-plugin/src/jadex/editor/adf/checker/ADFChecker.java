@@ -59,7 +59,7 @@ public class ADFChecker extends IncrementalProjectBuilder
 	/**
 	 *  Called by eclipse, when a project needs building.
 	 */
-	protected IProject[] build(int kind, Map<String, String> args, final IProgressMonitor monitor) throws CoreException
+	protected IProject[] build(int kind, Map args, final IProgressMonitor monitor) throws CoreException
 	{
 //		final int[]	cnt	= new int[2];
 //		long	start	= System.nanoTime();

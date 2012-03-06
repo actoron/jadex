@@ -1,15 +1,22 @@
 package jadex.kernelbase;
 
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.future.IFuture;
 
-public interface IBootstrapFactory
+/**
+ *  Interface for bootstrap component factories, i.e.
+ *  factories that are used at startup time of the platform.
+ */
+public interface IBootstrapFactory extends IComponentFactory
 {
 	/**
-	 * 
-	 * @param provider
-	 * @return
+	 *  Start the service. Is called via the component
+	 *  management service startup. Allows to initialize the
+	 *  service with a valid service provider.
+	 *  @param component The component.
+	 *  @param rid The resource identifier.
 	 */
-	public IFuture<Void> startService(IServiceProvider provider, IResourceIdentifier rid);
+	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid);
 }

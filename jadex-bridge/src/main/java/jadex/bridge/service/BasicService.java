@@ -5,18 +5,13 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.publish.IPublishService;
 import jadex.commons.SReflect;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -42,26 +37,27 @@ public class BasicService implements IInternalService
 	/** The service properties. */
 	protected Map properties;
 	
-	/** The publish info. */
+//	/** The publish info. */
 //	protected PublishInfo publishinfo;
 	
 	/** The provider id. */
 	protected IComponentIdentifier providerid;
 	
-	/** The type. */
-	protected Class type;
+//	/** The type. */
+//	protected Class type;
 	
 	//-------- constructors --------
 
 	/**
 	 *  Create a new service.
 	 */
+	// todo: remove type!!!
 	public BasicService(IComponentIdentifier providerid, Class type, Map properties)
 	{
 //		if(!SReflect.isSupertype(type, getClass()))
 //			throw new RuntimeException("Service must implement provided interface: "+getClass().getName()+", "+type.getName());
 		this.providerid = providerid;
-		this.type = type;
+//		this.type = type;
 //		this.implclazz = implclazz;
 		this.properties	= properties;
 		
@@ -107,7 +103,7 @@ public class BasicService implements IInternalService
 	/**
 	 *  Set the service identifier.
 	 */
-	public void createServiceIdentifier(String name, Class implclazz, IResourceIdentifier rid)
+	public void createServiceIdentifier(String name, Class implclazz, IResourceIdentifier rid, Class<?> type)
 	{
 		this.sid = createServiceIdentifier(providerid, name, type, implclazz, rid);
 	}

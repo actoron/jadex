@@ -48,7 +48,7 @@
 						new BpmnPlanExecutor(),
 						"jadex.tools.debugger.bdi.BDIViewerDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentInspectorDebuggerPanel, jadex.tools.debugger.bdi.BDIAgentRuleEngineDebuggerPanel"
 					}
-				))
+				), $component)
 			</implementation>
 		</providedservice>
 		<providedservice class="IDynamicBDIFactory">

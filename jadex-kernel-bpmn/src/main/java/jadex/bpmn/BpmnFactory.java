@@ -5,6 +5,7 @@ import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -32,12 +33,13 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
 import jadex.commons.gui.SGUI;
+import jadex.kernelbase.IBootstrapFactory;
 /* $endif $ */
 
 /**
  *  Factory for loading bpmn processes.
  */
-public class BpmnFactory extends BasicService implements IComponentFactory
+public class BpmnFactory extends BasicService implements IComponentFactory, IBootstrapFactory
 {
 	//-------- constants --------
 	
@@ -113,6 +115,17 @@ public class BpmnFactory extends BasicService implements IComponentFactory
 				return IFuture.DONE;
 			}
 		};
+	}
+	
+	/**
+	 *  Start the service.
+	 */
+	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
+	{
+		this.provider = component.getServiceContainer();
+		this.providerid = provider.getId();
+		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class);
+		return startService();
 	}
 	
 	/**

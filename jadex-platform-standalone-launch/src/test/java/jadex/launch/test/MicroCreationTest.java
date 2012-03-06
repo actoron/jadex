@@ -43,7 +43,8 @@ public class MicroCreationTest extends TestCase
 //			"-logging_level", "java.util.logging.Level.INFO",
 			"-libpath", "new String[]{\""+new File("../jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",
 			"-awareness", "false",	// otherwise influences performance measure
-			"-gui", "false", "-saveonexit", "false", "-welcome", "false", "-autoshutdown", "true", "-printpass", "false"}).get(sus, timeout);
+			"-gui", "false", "-saveonexit", "false", "-welcome", "false", //"-autoshutdown", "true", 
+			"-printpass", "false"}).get(sus, timeout);
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(platform.getServiceProvider(), IComponentManagementService.class).get(sus, timeout);
 		
 		final Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();

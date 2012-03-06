@@ -151,7 +151,7 @@ public interface IServiceContainer extends IServiceProvider
 	 */
 	public <T> IFuture<T> searchService(Class<T> type, String scope);
 	
-	// todo: remove
+	// todo: remove! is just convenience for search(type, upwards)
 	/**
 	 *  Get one service of a type and only search upwards (parents).
 	 *  @param type The class.

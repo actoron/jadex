@@ -3,6 +3,7 @@ package jadex.bdiv3;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -25,6 +26,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 /* $if !android $ */
 import jadex.commons.gui.SGUI;
+import jadex.kernelbase.IBootstrapFactory;
 /* $endif $ */
 
 import java.util.ArrayList;
@@ -40,7 +42,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating micro agents.
  */
-public class BDIAgentFactory extends BasicService implements IComponentFactory
+public class BDIAgentFactory extends BasicService implements IComponentFactory, IBootstrapFactory
 {
 	//-------- constants --------
 	
@@ -110,6 +112,17 @@ public class BDIAgentFactory extends BasicService implements IComponentFactory
 	{
 		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new BDIModelLoader();
+	}
+	
+	/**
+	 *  Start the service.
+	 */
+	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
+	{
+		this.provider = component.getServiceContainer();
+		this.providerid = provider.getId();
+		createServiceIdentifier("Bootstrap Factory", IComponentFactory.class, rid, IComponentFactory.class);
+		return startService();
 	}
 	
 	/**

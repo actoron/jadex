@@ -3,6 +3,7 @@ package jadex.micro;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
@@ -31,6 +32,8 @@ import java.util.Map;
 
 /* $if !android $ */
 import jadex.commons.gui.SGUI;
+import jadex.kernelbase.IBootstrapFactory;
+
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
 /* $endif $ */
@@ -38,7 +41,7 @@ import javax.swing.UIDefaults;
 /**
  *  Factory for creating micro agents.
  */
-public class MicroAgentFactory extends BasicService implements IComponentFactory
+public class MicroAgentFactory extends BasicService implements IComponentFactory, IBootstrapFactory
 {
 	//-------- constants --------
 	
@@ -108,6 +111,17 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		super(new ComponentIdentifier(providerid), IComponentFactory.class, null);
 		this.loader = new MicroModelLoader();
+	}
+	
+	/**
+	 *  Start the service.
+	 */
+	public IFuture<Void> startService(IInternalAccess component, IResourceIdentifier rid)
+	{
+		this.provider = component.getServiceContainer();
+		this.providerid = provider.getId();
+		createServiceIdentifier("BootstrapFactory", IComponentFactory.class, rid, IComponentFactory.class);
+		return startService();
 	}
 	
 	/**
