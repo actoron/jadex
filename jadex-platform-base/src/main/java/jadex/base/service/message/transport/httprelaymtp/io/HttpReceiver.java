@@ -9,7 +9,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.bridge.service.types.awareness.IManagementService;
+import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
@@ -280,10 +280,10 @@ public class HttpReceiver
 	 */
 	protected void	postAwarenessInfo(final byte[] data, final int type)
 	{
-		SServiceProvider.getService(access.getServiceProvider(), IManagementService.class, Binding.SCOPE_PLATFORM)
-			.addResultListener(new IResultListener<IManagementService>()
+		SServiceProvider.getService(access.getServiceProvider(), IAwarenessManagementService.class, Binding.SCOPE_PLATFORM)
+			.addResultListener(new IResultListener<IAwarenessManagementService>()
 		{
-			public void resultAvailable(IManagementService awa)
+			public void resultAvailable(IAwarenessManagementService awa)
 			{
 				try
 				{

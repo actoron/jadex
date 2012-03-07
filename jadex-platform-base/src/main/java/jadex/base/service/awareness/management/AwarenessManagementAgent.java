@@ -7,8 +7,9 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.bridge.service.types.awareness.DiscoveryInfo;
+import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
-import jadex.bridge.service.types.awareness.IManagementService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -24,7 +25,9 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -114,7 +117,7 @@ import java.util.TimerTask;
 })
 @Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.base.service.awareness.gui.AwarenessAgentPanel\""))
 @ProvidedServices(
-	@ProvidedService(type=IManagementService.class, implementation=@Implementation(expression="$component"))
+	@ProvidedService(type=IAwarenessManagementService.class, implementation=@Implementation(expression="$component"))
 )
 @RequiredServices(
 {
@@ -122,8 +125,8 @@ import java.util.TimerTask;
 	@RequiredService(name="settings", type=ISettingsService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
 	@RequiredService(name="discoveries", type=IDiscoveryService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT))
 })
-@Service(IManagementService.class)
-public class AwarenessManagementAgent extends MicroAgent implements IPropertiesProvider, IManagementService
+@Service(IAwarenessManagementService.class)
+public class AwarenessManagementAgent extends MicroAgent implements IPropertiesProvider, IAwarenessManagementService
 {
 	//-------- attributes --------
 	
@@ -141,6 +144,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 
 	/** The discovered components. */
 	protected Map<IComponentIdentifier, DiscoveryInfo> discovered;
+	
+	/** The discovery listeners. */
+	protected Set<TerminableIntermediateFuture<DiscoveryInfo>>	listeners;
 	
 	/** The timer. */
 	protected Timer	timer;
@@ -298,6 +304,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			{
 				dif = new DiscoveryInfo(sender, null, getClockTime(), info.getDelay(), remoteexcluded);
 				discovered.put(sender, dif);
+				informListeners(dif);
 				ret	= true;
 			}
 			else
@@ -346,14 +353,73 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		return new Future<Boolean>(ret? Boolean.TRUE: Boolean.FALSE);
 	}
 	
-//	/**
-//	 *  Get the current awareness infos.
-//	 *  @return The awareness infos.
-//	 */
-//	public IFuture getAwarenessInfos()
-//	{
-//		
-//	}
+	/**
+	 *  Get the discovery info for a platform, if any.
+	 *  @param cid	The platform id.
+	 *  @return The discovery info.
+	 */
+	public IFuture<DiscoveryInfo> getPlatformInfo(IComponentIdentifier cid)
+	{
+		return new Future<DiscoveryInfo>(discovered.get(cid));
+	}
+	
+	/**
+	 *  Get the currently known platforms.
+	 *  @return The discovery infos of known platforms.
+	 */
+	public IFuture<Collection<DiscoveryInfo>> getKnownPlatforms()
+	{
+		return new Future<Collection<DiscoveryInfo>>(discovered.values());
+	}
+	
+	/**
+	 *  Retrieve information about platforms as they appear or vanish.
+	 *  @param include_initial	If true, information about initially known platforms will be immediately posted to the caller.
+	 *  	Otherwise only changes that happen after the subscription will be posted. 
+	 *  @return An intermediate future that is notified about any changes.
+	 */
+	public ITerminableIntermediateFuture<DiscoveryInfo> subscribeToPlatformList(boolean include_initial)
+	{
+		if(listeners==null)
+		{
+			listeners	= new LinkedHashSet<TerminableIntermediateFuture<DiscoveryInfo>>();
+		}
+		TerminableIntermediateFuture<DiscoveryInfo>	ret	= new TerminableIntermediateFuture<DiscoveryInfo>();
+		listeners.add(ret);
+		
+		if(include_initial)
+		{
+			for(DiscoveryInfo dif: discovered.values())
+			{
+				ret.addIntermediateResult(dif);
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Inform listeners about a changed discovery info.
+	 */
+	protected void	informListeners(DiscoveryInfo dif)
+	{
+		if(listeners!=null)
+		{
+			for(Iterator<TerminableIntermediateFuture<DiscoveryInfo>> it=listeners.iterator(); it.hasNext() ; )
+			{
+				TerminableIntermediateFuture<DiscoveryInfo>	fut	= it.next();
+				try
+				{
+					fut.addIntermediateResult(dif);
+				}
+				catch(Exception e)
+				{
+					// Future terminated, i.e., subscription cancelled.
+					it.remove();
+				}
+			}
+		}
+	}
 	
 	/**
 	 *  Get the delay.
@@ -546,6 +612,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 							{
 	//							System.out.println("Removing: "+dif);
 								it.remove();
+								informListeners(dif);
 								if(autodelete)
 								{
 									todel.add(dif);
@@ -596,6 +663,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 						public void exceptionOccurred(Exception exception)
 						{
 							dif.setProxy(null);
+							informListeners(dif);
 						}
 					});
 				}
@@ -646,7 +714,10 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 //							System.out.println("Proxy killed: "+source);
 							DiscoveryInfo dif = getDiscoveryInfo(cid);
 							if(dif!=null)
+							{
 								dif.setProxy(null);
+								informListeners(dif);
+							}
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -690,7 +761,10 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 					{
 						DiscoveryInfo	dif	= discovered.get(cid);
 						if(dif!=null)
+						{
 							dif.setProxy(null);
+							informListeners(dif);
+						}
 						ret.setResult(null);
 					}
 				});

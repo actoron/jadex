@@ -7,7 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.bridge.service.types.awareness.IManagementService;
+import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
@@ -531,10 +531,10 @@ public class ReceiveRequest	implements IHttpRequest
 						else if(msgtype==SRelay.MSGTYPE_AWAINFO)
 						{
 							final byte[]	awamsg	= msg;
-							SServiceProvider.getService(access.getServiceProvider(), IManagementService.class, Binding.SCOPE_PLATFORM)
-								.addResultListener(new IResultListener<IManagementService>()
+							SServiceProvider.getService(access.getServiceProvider(), IAwarenessManagementService.class, Binding.SCOPE_PLATFORM)
+								.addResultListener(new IResultListener<IAwarenessManagementService>()
 							{
-								public void resultAvailable(IManagementService awa)
+								public void resultAvailable(IAwarenessManagementService awa)
 								{
 									try
 									{

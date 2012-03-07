@@ -1,10 +1,10 @@
-package jadex.base.service.awareness.management;
+package jadex.bridge.service.types.awareness;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
 
 /**
- *  Info about a discovered component.
+ *  Local information about discovered platforms.
  */
 public class DiscoveryInfo
 {

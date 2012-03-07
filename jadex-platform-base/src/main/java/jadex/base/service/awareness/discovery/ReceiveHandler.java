@@ -4,7 +4,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
-import jadex.bridge.service.types.awareness.IManagementService;
+import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -189,10 +189,10 @@ public abstract class ReceiveHandler
 			
 //			System.out.println(System.currentTimeMillis()+" "+getComponentIdentifier()+" received: "+info.getSender());
 			
-			IFuture<IManagementService>	msfut	= agent.getMicroAgent().getRequiredService("management");
-			msfut.addResultListener(new DefaultResultListener<IManagementService>(agent.getMicroAgent().getLogger())
+			IFuture<IAwarenessManagementService>	msfut	= agent.getMicroAgent().getRequiredService("management");
+			msfut.addResultListener(new DefaultResultListener<IAwarenessManagementService>(agent.getMicroAgent().getLogger())
 			{
-				public void resultAvailable(IManagementService ms)
+				public void resultAvailable(IAwarenessManagementService ms)
 				{
 					ms.addAwarenessInfo(info).addResultListener(new DefaultResultListener<Boolean>(agent.getMicroAgent().getLogger())
 					{

@@ -2,15 +2,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
-	<artifactId>jadex-platform-standalone-launch</artifactId>
+	<artifactId>jadex-javadocs</artifactId>
 	<packaging>jar</packaging>
-	<name>jadex-platform-standalone-launch</name>
+	<name>jadex-javadocs</name>
 	<version>2.1-SNAPSHOT</version>
 	<url>http://jadex.sourceforge.net</url>
 
 	<description>
-		The Jadex launch package facilitates
-		executing the Jadex standalone platform.
+		This project is used for generating the complete Jadex javadoc documentation
 	</description>
 
 	<licenses>
@@ -137,10 +136,34 @@
 				<executions>
 					<execution>
 						<id>attach-javadoc</id>
-						<phase>install</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>jar</goal>
 						</goals>
+						<configuration>
+							<doctitle>Jadex Active Component Platform ${project.version} API.</doctitle>
+							<windowtitle>Jadex Active Component Platform ${project.version} API.</windowtitle>
+							<!-- <groups>
+								<group>
+									<title>Core Packages</title>
+									<!- - To includes java.lang, java.lang.ref, java.lang.reflect and only java.util 
+										(i.e. not java.util.jar) - ->
+									<packages>java.lang*:java.util</packages>
+								</group>
+								<group>
+									<title>Extension Packages</title>
+									<!- - To include javax.accessibility, javax.crypto, ... (among others) - ->
+									<packages>javax.*</packages>
+								</group>
+							</groups>						
+							<excludePackageNames>a.*, b.c.*</excludePackageNames> -->
+							<show>public</show>
+							<detectLinks>true</detectLinks>
+							<includeDependencySources>true</includeDependencySources>
+							<dependencySourceIncludes>
+								<dependencySourceInclude>net.sourceforge.jadex:*</dependencySourceInclude>
+							</dependencySourceIncludes>
+						</configuration>
 					</execution>
 				</executions>
         	</plugin>
@@ -255,11 +278,11 @@
 			<artifactId>jadex-kernel-bpmn</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-application</artifactId>
 			<version>2.1-SNAPSHOT</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-gpmn</artifactId>
