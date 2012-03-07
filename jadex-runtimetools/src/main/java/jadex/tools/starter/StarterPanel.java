@@ -3,6 +3,7 @@ package jadex.tools.starter;
 import jadex.base.SComponentFactory;
 import jadex.base.Starter;
 import jadex.base.gui.ComponentSelectorDialog;
+import jadex.base.gui.SRemoteGui;
 import jadex.base.gui.SwingExceptionDelegationResultListener;
 import jadex.base.gui.ParserValidator;
 import jadex.base.gui.SwingDefaultResultListener;
@@ -1028,38 +1029,8 @@ public class StarterPanel extends JLayeredPane
 	{
 		final Future<Properties>	ret	= new Future<Properties>();
 		
-		final String	name	= filename.getText();
-		final IResourceIdentifier rid = lastrid;
-		jcc.getPlatformAccess().scheduleStep(new IComponentStep<Tuple2<String, String>>()
-		{
-			@XMLClassname("convertPath")
-			public IFuture<Tuple2<String, String>> execute(IInternalAccess ia)
-			{
-				final Future<Tuple2<String, String>>	ret	= new Future<Tuple2<String, String>>();
-				// lastrid ok?
-				if(name.length()>0)
-				{
-					SComponentFactory.loadModel(ia.getExternalAccess(), name, rid)
-						.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, String>>(ret)
-					{
-						public void customResultAvailable(IModelInfo result)
-						{
-							// Todo: support global rid, if any?
-							ret.setResult(new Tuple2<String, String>(SUtil.convertPathToRelative(name), SUtil.convertPathToRelative(SUtil.convertURLToString(rid.getLocalIdentifier().getUrl()))));
-						}
-						public void exceptionOccurred(Exception exception)
-						{
-							ret.setResult(null);
-						}
-					}));
-				}
-				else
-				{
-					ret.setResult(null);
-				}
-				return ret;
-			}
-		}).addResultListener(new SwingExceptionDelegationResultListener<Tuple2<String, String>, Properties>(ret)
+		SRemoteGui.localizeModel(jcc.getPlatformAccess(), filename.getText(), lastrid)
+			.addResultListener(new SwingExceptionDelegationResultListener<Tuple2<String, String>, Properties>(ret)
 		{
 			public void customResultAvailable(Tuple2<String, String> result)
 			{
@@ -1109,33 +1080,10 @@ public class StarterPanel extends JLayeredPane
 		
 //		System.out.println("setP: "+Thread.currentThread().getName());
 		
-		// Todo: read global rid (if any).
-//		String rid = props.getStringProperty("rid");
-//		lastrid =  JavaReader.objectFromXML(rid, null);
-		final String ridurl = props.getStringProperty("ridurl");
-		final String globalrid = props.getStringProperty("globalrid");
-		jcc.getPlatformAccess().scheduleStep(new IComponentStep<IResourceIdentifier>()
-		{
-			@XMLClassname("getrid")
-			public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
-			{
-				Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-				
-				// What to do if ridurl is null, use library service?
-				if(ridurl==null && globalrid==null)
-				{
-					ret.setResult(ia.getModel().getResourceIdentifier());
-				}
-				else
-				{
-					URL	url	= SUtil.toURL(ridurl);
-					LocalResourceIdentifier lid = url==null? null: new LocalResourceIdentifier(ia.getComponentIdentifier().getRoot(), url);
-					ret.setResult(new ResourceIdentifier(lid, globalrid));
-				}
-				
-				return ret;
-			}
-		}).addResultListener(new SwingExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
+		String ridurl = props.getStringProperty("ridurl");
+		String globalrid = props.getStringProperty("globalrid");
+		SRemoteGui.createResourceIdentifier(jcc.getPlatformAccess(), ridurl, globalrid)
+			.addResultListener(new SwingExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
 		{
 			public void customResultAvailable(IResourceIdentifier rid)
 			{

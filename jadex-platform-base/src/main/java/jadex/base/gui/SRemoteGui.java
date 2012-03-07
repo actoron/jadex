@@ -1,9 +1,14 @@
 package jadex.base.gui;
 
+import jadex.base.SComponentFactory;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
+import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -11,6 +16,8 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IRemoteChangeListener;
+import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -19,6 +26,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.xml.annotation.XMLClassname;
 
+import java.net.URL;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -167,5 +175,69 @@ public class SRemoteGui
 			}
 		});
 		return ret;
+	}
+	
+	/**
+	 *  Localize a model name.
+	 *  The result can be e.g. used to save settings.
+	 *  @return A tuple with the relative local model name and the relative local RID URL.
+	 */
+	public static IFuture<Tuple2<String, String>>	localizeModel(IExternalAccess platformaccess, final String name, final IResourceIdentifier rid)
+	{
+		return platformaccess.scheduleStep(new IComponentStep<Tuple2<String, String>>()
+		{
+			@XMLClassname("localizeModel")
+			public IFuture<Tuple2<String, String>> execute(IInternalAccess ia)
+			{
+				final Future<Tuple2<String, String>>	ret	= new Future<Tuple2<String, String>>();
+				SComponentFactory.loadModel(ia.getExternalAccess(), name, rid)
+					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, String>>(ret)
+				{
+					public void customResultAvailable(IModelInfo result)
+					{
+						ret.setResult(new Tuple2<String, String>(
+							SUtil.convertPathToRelative(name),
+							SUtil.convertPathToRelative(SUtil.convertURLToString(rid.getLocalIdentifier().getUrl()))));
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						ret.setResult(null);
+					}
+				}));
+				return ret;
+			}
+		});
+	}
+	
+	/**
+	 *  Create a resource identifier.
+	 *  @param ridurl	The (possibly relative) local RID URL.
+	 *  @param globalrid	The global RID, if any.
+	 *  @return A valid RID for the platform.
+	 */
+	public static IFuture<IResourceIdentifier>	createResourceIdentifier(IExternalAccess platformaccess, final String ridurl, final String globalrid)
+	{
+		return platformaccess.scheduleStep(new IComponentStep<IResourceIdentifier>()
+		{
+			@XMLClassname("createResourceIdentifier")
+			public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
+			{
+				Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
+				
+				// What to do if ridurl is null, use library service?
+				if(ridurl==null && globalrid==null)
+				{
+					ret.setResult(ia.getModel().getResourceIdentifier());
+				}
+				else
+				{
+					URL	url	= SUtil.toURL(ridurl);
+					LocalResourceIdentifier lid = url==null? null: new LocalResourceIdentifier(ia.getComponentIdentifier().getRoot(), url);
+					ret.setResult(new ResourceIdentifier(lid, globalrid));
+				}
+				
+				return ret;
+			}
+		});
 	}
 }

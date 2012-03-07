@@ -217,23 +217,32 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 //	@ServiceShutdown
 	public IFuture<Void>	shutdownService()
 	{
-		final Future<Void>	fut	= new Future<Void>();
-		component.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(fut)
+		if(!shutdowned)
 		{
-			public void customResultAvailable(ILibraryService libservice)
+			final Future<Void>	fut	= new Future<Void>();
+			component.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(fut)
 			{
-				libservice.removeLibraryServiceListener(libservicelistener)
-					.addResultListener(new DelegationResultListener<Void>(fut)
+				public void customResultAvailable(ILibraryService libservice)
 				{
-					public void customResultAvailable(Void result)
+					libservice.removeLibraryServiceListener(libservicelistener)
+						.addResultListener(new DelegationResultListener<Void>(fut)
 					{
-						BDIAgentFactory.super.shutdownService().addResultListener(new DelegationResultListener<Void>(fut));
-					}
-				});
-			}
-		});
-		return fut;
+						public void customResultAvailable(Void result)
+						{
+							BDIAgentFactory.super.shutdownService().addResultListener(new DelegationResultListener<Void>(fut));
+						}
+					});
+				}
+			});
+			return fut;
+		}
+		else
+		{
+			// Hack!!! Service is deployed twice as IComponentFactory and IDynamicBDIFactory
+			// -> skip shutdown for second deploymemt.
+			return IFuture.DONE;
+		}
 	}
 	
 	//-------- IAgentFactory interface --------

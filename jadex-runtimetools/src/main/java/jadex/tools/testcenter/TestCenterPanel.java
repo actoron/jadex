@@ -1,12 +1,12 @@
 package jadex.tools.testcenter;
 
+import jadex.base.gui.SRemoteGui;
 import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.SwingDelegationResultListener;
+import jadex.base.gui.SwingExceptionDelegationResultListener;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -16,17 +16,19 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
+import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IRemoteResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.EditableList;
-import jadex.commons.gui.EditableListEvent;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ScrollablePanel;
+import jadex.xml.PropertiesXMLHelper;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
@@ -45,6 +47,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -322,27 +325,31 @@ public class TestCenterPanel extends JSplitPanel
 					{
 						public void customResultAvailable(final ClassLoader cl)
 						{
-							try
+							File file = loadsavechooser.getSelectedFile();
+							if(file!=null)
 							{
-								File file = loadsavechooser.getSelectedFile();
-								if(file!=null)
+								if(!file.getName().endsWith(FILEEXTENSION_TESTS))
 								{
-									if(!file.getName().endsWith(FILEEXTENSION_TESTS))
-									{
-										file = new File(file.getParentFile(), file.getName()+FILEEXTENSION_TESTS);
-										loadsavechooser.setSelectedFile(file);
-									}
-									FileWriter fos = new FileWriter(file);
-//									fos.write(JavaWriter.objectToXML(teststable.getEntries(), ((ILibraryService)result).getClassLoader()));
-//									fos.write(JavaWriter.objectToXML(teststable.getEntries(), plugin.getJCC().getJCCAccess().getModel().getClassLoader()));
-//									fos.write(JavaWriter.objectToXML(teststable.getEntries(), cl));//plugin.getJCC().getClassLoader(null)));
-									fos.write(JavaWriter.objectToXML(tests, cl));//plugin.getJCC().getClassLoader(null)));
-									fos.close();
+									file = new File(file.getParentFile(), file.getName()+FILEEXTENSION_TESTS);
+									loadsavechooser.setSelectedFile(file);
 								}
-							}
-							catch(Exception e)
-							{
-								e.printStackTrace();
+								final File	f	= file;
+								getProperties().addResultListener(new SwingDefaultResultListener<Properties>()
+								{
+									public void customResultAvailable(Properties result)
+									{
+										try
+										{
+											FileWriter fos = new FileWriter(f);
+											fos.write(JavaWriter.objectToXML(PropertiesXMLHelper.getPropertyWriter(), result, getClass().getClassLoader()));
+											fos.close();
+										}
+										catch(Exception e)
+										{
+											customExceptionOccurred(e);
+										}
+									}
+								});
 							}
 						}
 					});
@@ -369,21 +376,11 @@ public class TestCenterPanel extends JSplitPanel
 							File file = loadsavechooser.getSelectedFile();
 							if(file!=null)
 							{
-								FileReader fis = null;
+								FileInputStream fis = null;
 								try
 								{
-									fis = new FileReader(file);
-									StringBuffer out = new StringBuffer();
-									char[] b = new char[4096];
-									for(int n; (n = fis.read(b)) != -1;) 
-									{
-										out.append(new String(b, 0, n));
-									}
-//									String[] names = (String[])JavaReader.objectFromXML(out.toString(), ((ILibraryService)result).getClassLoader());
-//									String[] names = (String[])JavaReader.objectFromXML(out.toString(), plugin.getJCC().getJCCAccess().getModel().getClassLoader());
-//									String[] names = (String[])JavaReader.objectFromXML(out.toString(), cl);//plugin.getJCC().getClassLoader(null));
-									List tests = (List)JavaReader.objectFromXML(out.toString(), cl);//plugin.getJCC().getClassLoader(null));
-									setTests(tests);
+									fis = new FileInputStream(file);
+									setProperties((Properties)PropertiesXMLHelper.getPropertyReader().read(fis, getClass().getClassLoader(), null));
 								}
 								catch(Exception e)
 								{
@@ -498,25 +495,15 @@ public class TestCenterPanel extends JSplitPanel
 	/**
 	 * Load the properties.
 	 */
-	public IFuture	setProperties(Properties props)
+	public IFuture<Void>	setProperties(Properties props)
 	{
+		final Future<Void>	ret	= new Future<Void>();
 		// Load settings into fresh state.
 		reset();
 		
 		teststable.setAllowDuplicates(props.getBooleanProperty("allowduplicates"));
 		allowduplicates.setSelected(props.getBooleanProperty("allowduplicates"));
-		
-		String entries = props.getStringProperty("entries");
-		if(entries!=null)
-			setTests((List)JavaReader.objectFromXML(entries, null));
-		
-//		Property[]	entries	= props.getProperties("entry");
-//		for(int i=0; i<entries.length; i++)
-//		{
-//			Tuple2<String, IResourceIdentifier> tup = JavaReader.objectFromXML(entries[i].getValue(), null);
-//			addTest(tup.getFirstEntity(), tup.getSecondEntity());
-//		}
-		
+
 		String timeout;
 		if(props.getProperty("timeout")!=null)
 		{
@@ -537,8 +524,37 @@ public class TestCenterPanel extends JSplitPanel
 			else
 				tfpar.getModel().setSelectedItem(""+concurrency);
 		}
+
+		Properties[]	entries	= props.getSubproperties("entry");
+		final CollectionResultListener<Tuple2<String, IResourceIdentifier>>	crl	=
+			new CollectionResultListener<Tuple2<String, IResourceIdentifier>>(entries.length, false,
+			new SwingExceptionDelegationResultListener<Collection<Tuple2<String,IResourceIdentifier>>, Void>(ret)
+		{
+			public void customResultAvailable(Collection<Tuple2<String, IResourceIdentifier>> result)
+			{
+				for(Tuple2<String, IResourceIdentifier> tup: result)
+				{
+					addTest(tup.getFirstEntity(), tup.getSecondEntity());
+				}
+				ret.setResult(null);
+			}
+		});
+		for(int i=0; i<entries.length; i++)
+		{
+			final String	name	= entries[i].getStringProperty("model");
+			String	ridurl	= entries[i].getStringProperty("ridurl");
+			String	globalrid	= entries[i].getStringProperty("globalrid");
+			SRemoteGui.createResourceIdentifier(plugin.getJCC().getPlatformAccess(), ridurl, globalrid)
+				.addResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Void>(ret)
+			{
+				public void customResultAvailable(IResourceIdentifier result)
+				{
+					crl.resultAvailable(new Tuple2<String, IResourceIdentifier>(name, result));
+				}
+			});
+		}
 		
-		return IFuture.DONE;
+		return ret;
 	}
 
 	/**
@@ -557,42 +573,37 @@ public class TestCenterPanel extends JSplitPanel
 	/**
 	 * Save the properties.
 	 */
-	public IFuture	getProperties()
+	public IFuture<Properties>	getProperties()
 	{
-		final Future ret	= new Future();
-		
-//		final String[]	entries	= teststable.getEntries();
-		final String[]	entries	= getTestNames();
-		
-		plugin.getJCC().getPlatformAccess().scheduleStep(new IComponentStep<String[]>()
+		final Future<Properties> ret	= new Future<Properties>();
+
+		CollectionResultListener<Tuple2<String, String>>	crl	= new CollectionResultListener<Tuple2<String,String>>(tests.size(), false,
+			new SwingExceptionDelegationResultListener<Collection<Tuple2<String, String>>, Properties>(ret)
 		{
-			@XMLClassname("convertPathToRelative")
-			public IFuture<String[]> execute(IInternalAccess ia)
-			{
-				for(int i=0; i<entries.length; i++)
-				{
-					entries[i]	= SUtil.convertPathToRelative(entries[i]);
-				}
-				return new Future<String[]>(entries);
-			}
-		}).addResultListener(new SwingDelegationResultListener<String[]>(ret)
-		{
-			public void customResultAvailable(String[] entries)
+			public void customResultAvailable(Collection<Tuple2<String, String>> result)
 			{
 				Properties	props	= new Properties();
-				List mytests = new ArrayList();
-				for(int i=0; i<entries.length; i++)
+				Iterator<Tuple2<String, String>>	it	= result.iterator();
+				for(int i=0; i<tests.size(); i++)
 				{
-					Tuple2<String, IResourceIdentifier> tup = new Tuple2<String, IResourceIdentifier>(entries[i], tests.get(i).getSecondEntity());
-					mytests.add(tup);
+					Tuple2<String, String>	local	= it.next();
+					Properties	entry	= new Properties();
+					entry.addProperty(new Property("model", local.getFirstEntity()));
+					entry.addProperty(new Property("ridurl", local.getSecondEntity()));
+					entry.addProperty(new Property("globalrid", tests.get(i).getSecondEntity().getGlobalIdentifier()));
+					props.addSubproperties("entry", entry);
 				}
-				props.addProperty(new Property("entries", JavaWriter.objectToXML(mytests, null)));
 				props.addProperty(new Property("timeout", tfto.getText()));
 				props.addProperty(new Property("concurrency", ""+concurrency));
 				props.addProperty(new Property("allowduplicates", ""+allowduplicates.isSelected()));
 				ret.setResult(props);
 			}
 		});
+		for(int i=0; i<tests.size(); i++)
+		{
+			SRemoteGui.localizeModel(plugin.getJCC().getPlatformAccess(), tests.get(i).getFirstEntity(), tests.get(i).getSecondEntity())
+				.addResultListener(crl);
+		}
 		
 		return ret;
 	}
@@ -746,16 +757,16 @@ public class TestCenterPanel extends JSplitPanel
 			if(testcases[i]!=null && testcases[i].isPerformed())
 			{
 				text.append("<td><a href=\"#");
-				text.append(names[i]);
+				text.append(names[i].getFirstEntity());
 				text.append(i);
 				text.append("\">");
-				text.append(names[i]);
+				text.append(names[i].getFirstEntity());
 				text.append("</a></td>\n");
 			}
 			else
 			{
 				text.append("<td>");
-				text.append(names[i]);
+				text.append(names[i].getFirstEntity());
 				text.append("</td>\n");
 			}
 			
@@ -816,7 +827,7 @@ public class TestCenterPanel extends JSplitPanel
 			if(testcases[i]!=null && testcases[i].isPerformed())
 			{
 				text.append("<p>\n<a name=\"");
-				text.append(names[i]);
+				text.append(names[i].getFirstEntity());
 				text.append(i);
 				text.append("\"></a>\n");
 				text.append(testcases[i].getHTMLFragment(i+1, names[i].getFirstEntity()));
@@ -887,10 +898,17 @@ public class TestCenterPanel extends JSplitPanel
 	/**
 	 *  Add a test.
 	 */
-	public void addTest(String model, IResourceIdentifier rid)
+	public void addTest(String model, final IResourceIdentifier rid)
 	{
-		tests.add(new Tuple2<String, IResourceIdentifier>(model, rid));
-		teststable.addEntry(model);
+		SRemoteGui.localizeModel(plugin.getJCC().getPlatformAccess(), model, rid)
+			.addResultListener(new SwingDefaultResultListener<Tuple2<String,String>>()
+		{
+			public void customResultAvailable(Tuple2<String, String> result)
+			{				
+				tests.add(new Tuple2<String, IResourceIdentifier>(result.getFirstEntity(), rid));
+				teststable.addEntry(result.getFirstEntity());
+			}
+		});
 	}
 	
 	/**
@@ -899,7 +917,7 @@ public class TestCenterPanel extends JSplitPanel
 	public void removeTest(String model, IResourceIdentifier rid)
 	{
 		tests.remove(new Tuple2<String, IResourceIdentifier>(model, rid));
-		teststable.addEntry(model);
+		teststable.removeEntry(model);
 	}
 	
 	/**
