@@ -57,10 +57,10 @@ public class MoveTask extends AbstractTask {
 	 * @param progress
 	 *            The time that has passed according to the environment executor.
 	 */
-	public void execute(final IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock) {
+	public void execute(final IEnvironmentSpace space, ISpaceObject obj, long progress, IClockService clock) {		
 		IVector2 destination = (IVector2) getProperty(PROPERTY_DESTINATION);
 		final IBDIExternalAccess agent = (IBDIExternalAccess) getProperty(PROPERTY_SCOPE);
-
+		System.out.println("#mmmoveTask# " + destination);
 		double speed = ((Number) obj.getProperty(PROPERTY_SPEED)).doubleValue();
 		double maxdist = progress * speed * 0.001;
 		IVector2 loc = (IVector2) obj.getProperty(Space2D.PROPERTY_POSITION);

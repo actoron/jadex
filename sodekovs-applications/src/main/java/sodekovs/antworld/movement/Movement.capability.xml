@@ -68,9 +68,21 @@
 			<creationcondition language="jcl">				
 				Arrays.asList($beliefbase.foodSources).size() &gt; 0
 			</creationcondition>
-			<!-- <deliberation>
+			<deliberation>
 				<inhibits ref="pheromone_follow" />
-			</deliberation> -->
+			</deliberation>
+		</achievegoal>
+		
+		<!-- This goal is used to follow pheromones in order to find a food source.	-->
+		<achievegoal name="pheromone_follow" exclude="never"
+			retry="false">
+			<unique />
+			<creationcondition language="jcl">
+				Arrays.asList($beliefbase.pheromones).size() &gt; 0
+			</creationcondition>
+			<deliberation>
+				<inhibits ref="walk_around"/> 
+			</deliberation>			
 		</achievegoal>
 
 		<!-- Move home when missionend. -->
@@ -113,6 +125,14 @@
 			<body class="FoodMiningPlan" />
 			<trigger>
 				<goal ref="food_mining" />
+			</trigger>
+		</plan>
+		
+		<!-- Plan for moving to a food source with the help of pheromones. This plan is executed if the ant is under the influence / feels pheromones.-->
+		<plan name="pheromoneWalk">
+			<body class="PheromoneWalkPlan" />
+			<trigger>
+				<goal ref="pheromone_follow" />
 			</trigger>
 		</plan>
 		

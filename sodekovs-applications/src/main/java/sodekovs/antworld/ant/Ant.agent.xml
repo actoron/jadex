@@ -75,6 +75,11 @@
 		<achievegoalref name="food_mining">
 			<concrete ref="move.food_mining"/>
 		</achievegoalref>
+		
+		<!-- This goal is used to follow smelled pheromones.-->
+		<achievegoalref name="pheromone_follow">
+			<concrete ref="move.pheromone_follow"/>
+		</achievegoalref>				
 </goals>
   		
 </agent>

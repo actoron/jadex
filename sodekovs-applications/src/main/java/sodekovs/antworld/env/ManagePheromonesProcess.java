@@ -102,7 +102,7 @@ public class ManagePheromonesProcess extends SimplePropertyObject implements ISp
 	 */
 	private void manageEvaporation(ISpaceObject[] objects, IEnvironmentSpace space) {
 		for (int i = 0; i < objects.length; i++) {
-			System.out.println(objects[i].getId());
+//			System.out.println(objects[i].getId());
 			Integer strength = (Integer) objects[i].getProperty("strength");
 			// int roundInt = round.intValue()-1;
 			double reductionRate = 0.90;

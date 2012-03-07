@@ -92,6 +92,11 @@
 					<env:property name="size">new Vector2Double(0.01,0.01)</env:property>
 				</env:objecttype>
 				
+				<!-- Sign, that denotes the goal destination of the ant. -->
+				<env:objecttype name="destination">					
+					<env:property name="size">new Vector2Double(0.05,0.05)</env:property>
+				</env:objecttype>
+				
 				
 				<!-- Trace object. Depicts the way an agent has walked on. -->
 				<env:objecttype name="trace">					
@@ -238,6 +243,12 @@
 							imagepath="sodekovs/antworld/images/obstacle.png" />
 					</env:drawable>
 					
+					<env:drawable objecttype="destination" width="1.0"
+						height="1.0">
+						<env:texturedrectangle layer="0" size="size"
+							imagepath="sodekovs/antworld/images/destination.png" />
+					</env:drawable>
+					
 					<env:prelayers>
 						<env:tiledlayer width="0.6" height="0.6"
 							imagepath="sodekovs/antworld/images/meadow.jpg" />
@@ -280,7 +291,7 @@
 						</env:object>
 						<env:object type="food">
 							<env:property name="position">new Vector2Double(0.8, 0.5)</env:property>
-							<env:property name="food_pieces">2</env:property>
+							<env:property name="food_pieces">1</env:property>
 						</env:object>
 						<!-- <env:object type="food">
 							<env:property name="position">new Vector2Double(0.6, 0.2)</env:property>
