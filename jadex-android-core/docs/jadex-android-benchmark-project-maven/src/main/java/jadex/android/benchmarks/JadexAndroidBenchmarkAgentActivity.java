@@ -1,7 +1,6 @@
 package jadex.android.benchmarks;
 
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
-import jadex.base.service.message.transport.httprelaymtp.io.HttpTest;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;

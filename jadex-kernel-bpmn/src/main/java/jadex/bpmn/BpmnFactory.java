@@ -19,6 +19,7 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.kernelbase.IBootstrapFactory;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -26,14 +27,12 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /* $if !android $ */
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
 import jadex.commons.gui.SGUI;
-import jadex.kernelbase.IBootstrapFactory;
 /* $endif $ */
 
 /**
@@ -61,9 +60,6 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	/** The provider. */
 	protected IServiceProvider provider;
 	
-	/** Running process instances */
-	protected Map processes;
-	
 	/** The model loader */
 	protected BpmnModelLoader loader;
 	
@@ -74,7 +70,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	protected ILibraryServiceListener libservicelistener;
 	
 	/** The properties. */
-	protected Map properties;
+	protected Map<String, Object> properties;
 	
 	//-------- constructors --------
 	
@@ -92,12 +88,11 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	/**
 	 *  Create a new BpmnProcessService.
 	 */
-	public BpmnFactory(IServiceProvider provider, Map properties)
+	public BpmnFactory(IServiceProvider provider, Map<String, Object> properties)
 	{
 		super(provider.getId(), IComponentFactory.class, null);
 
 		this.provider = provider;
-		this.processes = new HashMap();
 		this.loader = new BpmnModelLoader();
 		this.properties	= properties;
 		
@@ -135,13 +130,13 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	{
 		final Future<Void> ret = new Future<Void>();
 		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener(ret)
+			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(ILibraryService result)
 			{
-				libservice = (ILibraryService)result;
+				libservice = result;
 				libservice.addLibraryServiceListener(libservicelistener);
-				BpmnFactory.super.startService().addResultListener(new DelegationResultListener(ret));
+				BpmnFactory.super.startService().addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
 		return ret;
@@ -346,7 +341,7 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 	 *  @param type	The component type. 
 	 *  @return The properties or null, if the component type is not supported by this factory.
 	 */
-	public Map	getProperties(String type)
+	public Map<String, Object>	getProperties(String type)
 	{
 		return FILETYPE_BPMNPROCESS.equals(type)
 		? properties : null;

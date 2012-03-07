@@ -17,6 +17,7 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.library.ILibraryServiceListener;
+import jadex.kernelbase.IBootstrapFactory;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
@@ -25,14 +26,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /* $if !android $ */
 import jadex.commons.gui.SGUI;
-import jadex.kernelbase.IBootstrapFactory;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
@@ -65,7 +62,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	protected IServiceProvider provider;
 	
 	/** The properties. */
-	protected Map properties;
+	protected Map<String, Object> properties;
 	
 	/** The library service. */
 	protected ILibraryService libservice;
@@ -78,7 +75,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Create a new agent factory.
 	 */
-	public MicroAgentFactory(IServiceProvider provider, Map properties)
+	public MicroAgentFactory(IServiceProvider provider, Map<String, Object> properties)
 	{
 		super(provider.getId(), IComponentFactory.class, null);
 
@@ -131,13 +128,14 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	{
 		final Future<Void> ret = new Future<Void>();
 		SServiceProvider.getService(provider, ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new DelegationResultListener(ret)
+			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(ILibraryService result)
 			{
-				libservice = (ILibraryService)result;
+				libservice = result;
 				libservice.addLibraryServiceListener(libservicelistener);
-				MicroAgentFactory.super.startService().addResultListener(new DelegationResultListener(ret));
+				MicroAgentFactory.super.startService()
+					.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
 		return ret;
@@ -397,7 +395,7 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param type	The component type. 
 	 *  @return The properties or null, if the component type is not supported by this factory.
 	 */
-	public Map	getProperties(String type)
+	public Map<String, Object>	getProperties(String type)
 	{
 		return FILETYPE_MICROAGENT.equals(type)
 		? properties: null;
@@ -424,9 +422,9 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  Get the mirco agent class.
 	 */
 	// todo: make use of cache
-	protected Class getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
+	protected Class<?> getMicroAgentClass(String clname, String[] imports, ClassLoader classloader)
 	{
-		Class ret = SReflect.findClass0(clname, imports, classloader);
+		Class<?> ret = SReflect.findClass0(clname, imports, classloader);
 //		System.out.println(clname+" "+cma+" "+ret);
 		int idx;
 		while(ret==null && (idx=clname.indexOf('.'))!=-1)
@@ -438,29 +436,5 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 		if(ret==null)// || !cma.isAssignableFrom(IMicroAgent.class))
 			throw new RuntimeException("No micro agent file: "+clname);
 		return ret;
-	}
-	
-	/**
-	 *  Add excluded methods.
-	 */
-	public static void addExcludedMethods(Map props, String[] excludes)
-	{
-		Object ex = props.get("remote_excluded");
-		if(ex!=null)
-		{
-			List newex = new ArrayList();
-			for(Iterator it=SReflect.getIterator(ex); it.hasNext(); )
-			{
-				newex.add(it.next());
-			}
-			for(int i=0; i<excludes.length; i++)
-			{
-				newex.add(excludes[i]);
-			}
-		}
-		else
-		{
-			props.put("remote_excluded", excludes);
-		}
 	}
 }
