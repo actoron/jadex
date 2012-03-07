@@ -9,11 +9,9 @@ import jadex.android.bluetooth.service.ConnectionService;
 import jadex.android.bluetooth.service.IBTP2PMessageCallback;
 import jadex.android.bluetooth.service.IConnectionServiceConnection;
 import jadex.android.bluetooth.util.Helper;
+import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.ManagerSendTask;
 import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.MessageEnvelope;
-import jadex.base.service.message.transport.codecs.CodecFactory;
-import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -21,17 +19,16 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
-import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.IResultCommand;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -51,8 +48,8 @@ import android.util.Log;
 public class BTTransport implements ITransport, AndroidContextChangeListener {
 	// -------- constants --------
 
-	/** The schema name. */
-	public final static String SCHEMA = "bt-mtp://";
+	/** The schema names. */
+	public final static String[] SCHEMAS = new String[]{"bt-mtp://"};
 
 	/** Constant for asynchronous setting. */
 	public final static String ASYNCHRONOUS = "asynchronous";
@@ -62,7 +59,10 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 
 	/** The prolog size. */
 	protected final static int PROLOG_SIZE = 4;
-
+	
+	/** The length of a valid address, without schema name */
+	protected final static int ADDRESS_LENGTH = 17; 
+	
 	// -------- attributes --------
 
 	/** The platform. */
@@ -172,62 +172,71 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	/**
 	 * Send a message.
 	 * 
-	 * @param message
-	 *            The message to send. (todo: On which thread this should be
-	 *            done?)
+	 * 	@param address The address to send to.
+	 *  @param task A task representing the message to send.
+	 *  
 	 */
-//	public IFuture<Void> sendMessage(Map msg, String type,
-//			IComponentIdentifier[] receivers, byte[] codecids) {
-	public IFuture<Void> sendMessage(ManagerSendTask task) {
-		IComponentIdentifier[] receivers = task.getReceivers();
+	public void sendMessage(String address, final ISendTask task) {
 
-		// Fetch all addresses
-		Set<String> addresses = new LinkedHashSet<String>();
-		for (int i = 0; i < receivers.length; i++) {
-			String[] raddrs = receivers[i].getAddresses();
-			for (int j = 0; j < raddrs.length; j++) {
-				String parseAddress = parseAddress(raddrs[j]);
-				if (parseAddress != null) {
-					addresses.add(parseAddress);
+		IResultCommand<IFuture<Void>, Void> send = new IResultCommand<IFuture<Void>, Void>() {
+
+			@Override
+			public IFuture<Void> execute(Void args) {
+				IFuture<Void>	ret	= null;
+				
+				IComponentIdentifier[] receivers = task.getReceivers();
+
+				// Fetch all addresses
+				Set<String> addresses = new LinkedHashSet<String>();
+				for (int i = 0; i < receivers.length; i++) {
+					String[] raddrs = receivers[i].getAddresses();
+					for (int j = 0; j < raddrs.length; j++) {
+						if (isApplicable(raddrs[j])) {
+							addresses.add(raddrs[j]);
+						}
+					}
 				}
+
+				// Iterate over all different addresses and try to send
+				// to missing and appropriate receivers
+				String[] addrs = addresses.toArray(new String[addresses.size()]);
+
+				boolean delivered = false;
+				BluetoothMessage bluetoothMessage;
+				ByteArrayOutputStream stream = new ByteArrayOutputStream(task.getProlog().length
+						+ task.getData().length);
+
+				try {
+					stream.write(task.getProlog());
+					stream.write(task.getData());
+				} catch (IOException e1) {
+					Log.e(Helper.LOG_TAG, "Could not encode Message: " + e1.toString());
+				}
+				byte[] msgData = stream.toByteArray();
+				for (int i = 0; !delivered && i < addrs.length; i++) {
+
+					bluetoothMessage = new BluetoothMessage(addrs[i], msgData, DataPacket.TYPE_DATA);
+
+					try {
+						binder.sendMessage(bluetoothMessage);
+						ret	= IFuture.DONE;
+					} catch (RemoteException e) {
+						ret	= new Future<Void>(new RuntimeException("Send failed: "+bluetoothMessage));
+						e.printStackTrace();
+					}
+				}
+				
+				if(ret==null)
+				{
+					ret	= new Future<Void>(new RuntimeException("No working connection."));			
+				}
+				
+				return ret;
 			}
-		}
-
-		// Iterate over all different addresses and try to send
-		// to missing and appropriate receivers
-		String[] addrs = addresses.toArray(new String[addresses
-				.size()]);
-
-		boolean delivered = false;
-		BluetoothMessage bluetoothMessage;
-		ByteArrayOutputStream stream = new ByteArrayOutputStream(task.getProlog().length + task.getData().length);
+		};
 		
-		try {
-			stream.write(task.getProlog());
-			stream.write(task.getData());
-		} catch (IOException e1) {
-			Log.e(Helper.LOG_TAG, "Could not encode Message: " + e1.toString());
-		}
-		byte[] msgData = stream.toByteArray();
-		
-		for (int i = 0; !delivered && i < addrs.length; i++) {
-//			bluetoothMessage = new BluetoothMessage(addrs[i], BTTransport.this.encodeMessage(
-//					new MessageEnvelope(msg, Arrays.asList(receivers), type.getName()),
-//					codecids), DataPacket.TYPE_DATA);
-			
-			bluetoothMessage = new BluetoothMessage(addrs[i], msgData, DataPacket.TYPE_DATA);
-			
-			try {
-				binder.sendMessage(bluetoothMessage);
-				delivered = true;
-			} catch (RemoteException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		task.ready(send);
 
-		return delivered ? IFuture.DONE : new Future<Void>(new RuntimeException(
-		"Could not deliver message"));
 	}
 	
 	protected void receiveMessage(final byte[] data) {
@@ -253,8 +262,9 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	 * 
 	 * @return Transport prefix.
 	 */
-	public String getServiceSchema() {
-		return SCHEMA;
+	@Override
+	public String[] getServiceSchemas() {
+		return SCHEMAS;
 	}
 
 	/**
@@ -274,10 +284,10 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 	 * 
 	 * @param hostname
 	 *            The hostname.
-	 * @return <scheme>:<hostname>
+	 * @return <scheme><hostname>
 	 */
-	protected String getAddress(String hostname) {
-		return getServiceSchema() + hostname;
+	public String getAddress(String hostname) {
+		return getServiceSchemas() + hostname;
 	}
 
 //	protected MessageEnvelope decodeMessage(byte[] data) {
@@ -348,34 +358,33 @@ public class BTTransport implements ITransport, AndroidContextChangeListener {
 		return ret;
 	}
 	
-	/**
-	 *  Get the address of this transport.
-	 *  @param hostname The hostname.
-	 *  @param port The port.
-	 *  @return <scheme>:<hostname>:<port>
-	 */
-	protected String getAddress(String hostname, int port)
-	{
-		return getServiceSchema()+hostname+":"+port;
-	}
+//	/**
+//	 *  Get the address of this transport.
+//	 *  @param hostname The hostname.
+//	 *  @param port The port.
+//	 *  @return <scheme>:<hostname>:<port>
+//	 */
+//	protected String getAddress(String hostname, int port)
+//	{
+//		return getServiceSchema()+hostname+":"+port;
+//	}
 	
 	/**
-	 *  Parse an address.
-	 *  @param address The address string.
-	 *  @return The parsed address.
+	 *  Test if a transport is applicable for the target address.
+	 *  
+	 *  @return True, if the transport is applicable for the address.
 	 */
-	protected static String parseAddress(String address)
-	{
-		String ret = null;
-		
-		if(address.startsWith(SCHEMA))
-		{		
-				int schemalen = SCHEMA.length();
-				if (address.length() == schemalen + 17) {
-					ret = address;
+	@Override
+	public boolean isApplicable(String address) {
+		boolean ret = false;
+		for (String schema : SCHEMAS) {
+			if (address.startsWith(schema)) {
+				int schemalen = address.length();
+				if (address.length() == schemalen + ADDRESS_LENGTH) {
+					ret = true;
 				}
+			}
 		}
-		
 		return ret;
 	}
 
