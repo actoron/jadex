@@ -1,7 +1,14 @@
 package jadex.base.service.message;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageFailureException;
@@ -13,34 +20,17 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
- *  The manager send task is responsible for coordinating
- *  the sending of a message to a single destination using
- *  multiple available transports.
+ * 
  */
-public class ManagerSendTask	implements ISendTask
+public abstract class AbstractSendTask implements ISendTask
 {
-	//-------- attributes --------
-	
-	/** The message. */
-	protected Map<String, Object> message;
-	
 	/** The encoded message envelope. */
 	protected byte[] data;
 
 	/** The message prolog. */
 	protected byte[] prolog;
-	
-	/** The message type. */
-	protected MessageType messagetype;
+
 	
 	/** The codecids. */
 	protected byte[] codecids;
@@ -54,6 +44,7 @@ public class ManagerSendTask	implements ISendTask
 	/** The transports to be tried. */
 	protected List<ITransport> transports;
 	
+
 	/** The future for the sending result. */
 	protected Future<Void>	future;
 	
@@ -65,56 +56,39 @@ public class ManagerSendTask	implements ISendTask
 	
 	/** The list of waiting transports. */
 	protected List<IResultCommand<IFuture<Void>, Void>>	waiting;
+
 	
-
-	//-------- constructors --------- 
-
 	/**
-	 *  Create a new manager send task.
+	 *  Create a new task.
 	 */
-	public ManagerSendTask(Map<String, Object> message, MessageType messagetype, IComponentIdentifier[] receivers, 
-		ITransport[] transports, byte[] codecids, ICodec[] codecs)//, SendManager manager)
+	public AbstractSendTask(IComponentIdentifier[] receivers, 
+		ITransport[] transports, byte[] codecids, ICodec[] codecs)
 	{
-		if(codecids==null || codecids.length==0)
-			throw new IllegalArgumentException("Codec ids must not null.");
-		if(codecs==null || codecs.length==0)
-			throw new IllegalArgumentException("Codecs must not null.");
-		
 		for(int i=0; i<receivers.length; i++)
 		{
 			if(receivers[i].getAddresses()==null)
 				throw new IllegalArgumentException("Addresses must not null");
 		}
 		
-		this.message = message;
-		this.messagetype = messagetype;
 		this.receivers = receivers;
 		this.transports = new ArrayList<ITransport>(Arrays.asList(transports));
-		this.codecs = codecs;
-		this.codecids = codecids;
+		this.codecs = codecs==null? new ICodec[0]: codecs;
+		this.codecids = codecids==null? new byte[0]: codecids;
 		this.future	= new Future<Void>();
 	}
 	
-	//-------- methods used by message service --------
+	/**
+	 *  Get the messagetype.
+	 *  @return the messagetype.
+	 */
+	public abstract MessageType getMessageType();
 	
 	/**
 	 *  Get the message.
 	 *  @return the message.
 	 */
-	public Map<String, Object> getMessage()
-	{
-		return message;
-	}
-
-	/**
-	 *  Get the messagetype.
-	 *  @return the messagetype.
-	 */
-	public MessageType getMessageType()
-	{
-		return messagetype;
-	}
-
+	public abstract Object getMessage();
+	
 	/**
 	 *  Get the receivers.
 	 *  @return the receivers.
@@ -221,6 +195,7 @@ public class ManagerSendTask	implements ISendTask
 					
 					public void exceptionOccurred(Exception exception)
 					{
+						exception.printStackTrace();
 						done(exception);
 					}
 				});
@@ -266,53 +241,17 @@ public class ManagerSendTask	implements ISendTask
 			future.setResult(null);
 		}
 	}
-
-	/**
-	 *  Get the encoded message.
-	 *  Saves the message to avoid multiple encoding with different transports.
-	 */
-	public byte[] getData()
-	{
-		if(data==null)
-		{
-			synchronized(this)
-			{
-				if(data==null)
-				{
-					MessageEnvelope	envelope = new MessageEnvelope(message, Arrays.asList(receivers),  messagetype.getName());
-					
-					Object enc_msg = envelope;
-					for(int i=0; i<codecs.length; i++)
-					{
-						enc_msg	= codecs[i].encode(enc_msg, getClass().getClassLoader());
-					}
-					data = (byte[])enc_msg;
-				}
-			}
-		}
-		return data;
-	}
 	
 	/**
-	 *  Get the prolog bytes.
-	 *  Separated from data to avoid array copies.
-	 *  Message service expects messages to be delivered in the form {prolog}{data}. 
-	 *  @return The prolog bytes.
+	 * 
 	 */
-	public byte[] getProlog()
+	protected byte[] encode(Object obj)
 	{
-		if(prolog==null)
+		Object enc_msg = obj;
+		for(int i=0; i<codecs.length; i++)
 		{
-			synchronized(this)
-			{
-				if(prolog==null)
-				{
-					prolog = new byte[1+codecids.length];
-					prolog[0] = (byte)codecids.length;
-					System.arraycopy(codecids, 0, prolog, 1, codecids.length);
-				}
-			}
+			enc_msg	= codecs[i].encode(enc_msg, getClass().getClassLoader());
 		}
-		return prolog;
+		return (byte[])enc_msg;
 	}
 }

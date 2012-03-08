@@ -14,23 +14,20 @@ import java.util.Map;
 public interface ISendTask
 {
 	/**
-	 * Get the message.
-	 * 
-	 * @return the message.
+	 *  Get the message.
+	 *  @return the message.
 	 */
-	public Map<String, Object> getMessage();
+	public Object getMessage();
+
+//	/**
+//	 *  Get the message type.
+//	 *  @return the message type.
+//	 */
+//	public MessageType getMessageType();
 
 	/**
-	 * Get the messagetype.
-	 * 
-	 * @return the messagetype.
-	 */
-	public MessageType getMessageType();
-
-	/**
-	 * Get the receivers.
-	 * 
-	 * @return the receivers.
+	 *  Get the receivers.
+	 *  @return the receivers.
 	 */
 	public IComponentIdentifier[] getReceivers();
 	

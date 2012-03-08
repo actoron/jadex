@@ -2,8 +2,6 @@ package jadex.bridge;
 
 import jadex.bridge.service.types.message.MessageType;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.Map;
 
 /**
@@ -14,7 +12,7 @@ public class MessageFailureException	extends RuntimeException
 	//-------- attributes --------
 	
 	/** The message. */
-	protected Map message;
+	protected Object message;
 
 	/** The message type. */
 	protected MessageType messagetype;
@@ -27,7 +25,7 @@ public class MessageFailureException	extends RuntimeException
 	/**
 	 *  Create a new MessageFailureException.
 	 */
-	public MessageFailureException(Map message, MessageType type, IComponentIdentifier[] unknown, Throwable cause)
+	public MessageFailureException(Object message, MessageType type, IComponentIdentifier[] unknown, Throwable cause)
 	{
 		super(null, cause);
 		this.message = message;
@@ -38,7 +36,7 @@ public class MessageFailureException	extends RuntimeException
 	/**
 	 *  Create a new MessageFailureException.
 	 */
-	public MessageFailureException(Map message, MessageType type, IComponentIdentifier[] unknown, String text)
+	public MessageFailureException(Object message, MessageType type, IComponentIdentifier[] unknown, String text)
 	{
 		super(text, null);
 		this.message = message;
@@ -52,7 +50,7 @@ public class MessageFailureException	extends RuntimeException
 	 *  Get the message.
 	 *  @return the message.
 	 */
-	public Map getMessageEvent()
+	public Object getMessageEvent()
 	{
 		return message;
 	}

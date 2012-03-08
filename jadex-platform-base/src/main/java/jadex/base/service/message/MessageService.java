@@ -1,6 +1,7 @@
 package jadex.base.service.message;
 
 import jadex.base.AbstractComponentAdapter;
+import jadex.base.fipa.SFipa;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
@@ -11,8 +12,10 @@ import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.ServiceTerminatedException;
@@ -28,6 +31,7 @@ import jadex.bridge.service.types.message.IContentCodec;
 import jadex.bridge.service.types.message.IMessageListener;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
@@ -55,6 +59,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 
@@ -124,6 +129,16 @@ public class MessageService extends BasicService implements IMessageService
 	/** The codec factory for messages. */
 	protected CodecFactory codecfactory;
 	
+	/** The delivery handler map. */
+	protected Map<Byte, ICommand> deliveryhandlers;
+	
+	
+	/** The binary input connections. */
+	protected Map<Integer, InputConnection> bicons;
+
+	/** The binary output connections. */
+	protected Map<Integer, OutputConnection> bocons;
+	
 	//-------- constructors --------
 
 	/**
@@ -168,9 +183,37 @@ public class MessageService extends BasicService implements IMessageService
 			}
 		}
 		this.codecfactory = codecfactory!=null? codecfactory: new CodecFactory();
+		
+		this.deliveryhandlers = new HashMap<Byte, ICommand>();
+		deliveryhandlers.put(MapSendTask.MESSAGE_TYPE_MAP, new MapDeliveryHandler());
+		deliveryhandlers.put(StreamSendTask.MESSAGE_TYPE_STREAM, new StreamDeliveryHandler());
+		
+		this.bicons = new HashMap<Integer, InputConnection>();
+		this.bocons = new HashMap<Integer, OutputConnection>();
 	}
 	
 	//-------- interface methods --------
+
+	/**
+	 *  Create a virtual output connection.
+	 */
+	public IFuture<IOutputConnection> createOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
+	{
+		UUID uuconid = UUID.randomUUID();
+		int conid = uuconid.hashCode();
+		byte[] cids	= codecfactory.getDefaultCodecIds();
+		OutputConnection con = new OutputConnection(this, sender, receiver, conid, getTransports(), cids, getMessageCodecs(cids));
+		return new Future<IOutputConnection>(con);
+	}
+
+	/**
+	 *  Create a virtual input connection.
+	 */
+	public IFuture<IInputConnection> createInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
+	{
+		// todo:
+		return new Future(new UnsupportedOperationException());
+	}
 
 	/**
 	 *  Send a message.
@@ -425,11 +468,12 @@ public class MessageService extends BasicService implements IMessageService
 		byte[] cids	= codecids;
 		if(cids==null || cids.length==0)
 			cids = codecfactory.getDefaultCodecIds();
-		ICodec[] codecs = new ICodec[cids.length];
-		for(int i=0; i<codecs.length; i++)
-		{
-			codecs[i] = codecfactory.getCodec(cids[i]);
-		}
+		ICodec[] codecs = getMessageCodecs(cids);
+//		ICodec[] codecs = new ICodec[cids.length];
+//		for(int i=0; i<codecs.length; i++)
+//		{
+//			codecs[i] = codecfactory.getCodec(cids[i]);
+//		}
 		
 		CounterResultListener<Void> crl = new CounterResultListener<Void>(managers.size(), false, new DelegationResultListener<Void>(ret));
 		for(Iterator<?> it=managers.keySet().iterator(); it.hasNext();)
@@ -437,12 +481,25 @@ public class MessageService extends BasicService implements IMessageService
 			SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm).toArray(new IComponentIdentifier[0]);
 			
-			ManagerSendTask task = new ManagerSendTask(msgcopy, type, recs, getTransports(), cids, codecs);
+			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), cids, codecs);
 			tm.addMessage(task).addResultListener(crl);
 //			task.getSendManager().addMessage(task).addResultListener(crl);
 		}
 		
 //		sendmsg.addMessage(msgcopy, type, receivers, ret);
+	}
+	
+	/**
+	 *  Get array of message codecs for codec ids.
+	 */
+	public ICodec[] getMessageCodecs(byte[] codecids)
+	{
+		ICodec[] codecs = new ICodec[codecids.length];
+		for(int i=0; i<codecs.length; i++)
+		{
+			codecs[i] = codecfactory.getCodec(codecids[i]);
+		}
+		return codecs;
 	}
 	
 	/**
@@ -480,20 +537,20 @@ public class MessageService extends BasicService implements IMessageService
 		return ret!=null? (IContentCodec[])ret.toArray(new IContentCodec[ret.size()]): null;
 	}
 
-	/**
-	 *  Deliver a message to some components.
-	 */
-	public void deliverMessage(Map<String, Object> msg, String type, IComponentIdentifier[] receivers)
-	{
-		delivermsg.addMessage(new MessageEnvelope(msg, Arrays.asList(receivers), type));
-	}
+//	/**
+//	 *  Deliver a message to some components.
+//	 */
+//	public void deliverMessage(Map<String, Object> msg, String type, IComponentIdentifier[] receivers)
+//	{
+//		delivermsg.addMessage(new MessageEnvelope(msg, Arrays.asList(receivers), type));
+//	}
 	
 	/**
 	 *  Deliver a message to the intended components. Called from transports.
 	 *  @param message The native message. 
 	 *  (Synchronized because can be called from concurrently executing transports)
 	 */
-	public void deliverMessage(byte[] msg)
+	public void deliverMessage(Object msg)
 	{
 		delivermsg.addMessage(msg);
 	}
@@ -949,6 +1006,346 @@ public class MessageService extends BasicService implements IMessageService
 		MessageEnvelope	me	= null;
 		try
 		{
+			ICommand handler;
+			if(obj instanceof MessageEnvelope)
+			{
+				me	= (MessageEnvelope)obj;
+				handler = deliveryhandlers.get(MapSendTask.MESSAGE_TYPE_MAP);
+			}
+			else
+			{
+				byte[]	rawmsg	= (byte[])obj;
+				int	idx	= 0;
+				byte rmt = rawmsg[idx++];
+				handler = deliveryhandlers.get(rmt);
+			}
+			if(handler==null)
+				throw new RuntimeException("Corrupt message, unknown delivery handler code.");
+			handler.execute(obj);
+		}
+		catch(Exception e)
+		{
+			logger.warning("Message could not be delivered to receivers: "+(me!=null ? me.getReceivers() : "unknown") +", "+e);
+		}
+	}
+	
+	/**
+	 *  Get the classloader for a resource identifier.
+	 */
+	protected IFuture<ClassLoader> getRIDClassLoader(Map msg, MessageType mt)
+	{
+		final Future<ClassLoader> ret = new Future<ClassLoader>();
+		
+//		MessageType mt = getMessageType(type);
+		String ridid = mt.getResourceIdIdentifier();
+		final IResourceIdentifier rid = (IResourceIdentifier)msg.get(ridid);
+		if(rid!=null)
+		{
+			IFuture<ILibraryService> fut = SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class);
+			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
+			{
+				public void customResultAvailable(ILibraryService ls)
+				{
+					ls.getClassLoader(rid).addResultListener(new DelegationResultListener<ClassLoader>(ret));
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					super.resultAvailable(null);
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Send message(s) executable.
+	 */
+	protected class SendManager implements IExecutable
+	{
+		//-------- attributes --------
+		
+		/** The list of messages to send. */
+		protected List<AbstractSendTask> messages;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Send manager.
+		 */
+		public SendManager()
+		{
+			this.messages = new ArrayList<AbstractSendTask>();
+		}
+		
+		//-------- methods --------
+	
+		/**
+		 *  Send a message.
+		 */
+		public boolean execute()
+		{
+			AbstractSendTask	tmp = null;
+			boolean isempty;
+			
+			synchronized(this)
+			{
+				if(!messages.isEmpty())
+					tmp = messages.remove(0);
+				isempty = messages.isEmpty();
+			}
+			final AbstractSendTask	task = tmp;
+			
+			if(task!=null)
+			{
+				// Todo: move back to send manager thread after isValid()
+				// (hack!!! currently only works because message service is raw)
+				// hack!!! doesn't make much sense to check isValid as send manager executes on different thread.
+				isValid().addResultListener(new IResultListener<Boolean>()
+				{
+					public void resultAvailable(Boolean result)
+					{
+						if(result.booleanValue())
+						{
+							task.doSendMessage();
+						}
+						
+						// Quit when service was terminated.
+						else
+						{
+	//						System.out.println("send message not executed");
+							task.getFuture().setException(new MessageFailureException(task.getMessage(), task.getMessageType(), null, "Message service terminated."));
+	//						isempty	= true;
+	//						messages.clear();
+						}
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+	//					System.out.println("send message not executed");
+						task.getFuture().setException(new MessageFailureException(task.getMessage(), task.getMessageType(), null, "Message service terminated."));
+	//					isempty	= true;
+	//					messages.clear();
+					}
+				});
+			}
+			
+			return !isempty;
+		}
+		
+		/**
+		 *  Add a message to be sent.
+		 *  @param message The message.
+		 */
+		public IFuture<Void> addMessage(final AbstractSendTask task)
+		{
+			isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(task.getFuture())
+			{
+				public void customResultAvailable(Boolean result)
+				{
+					if(result.booleanValue())
+					{
+						synchronized(SendManager.this)
+						{
+							messages.add(task);
+						}
+						
+						SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, 
+							RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(task.getFuture())
+						{
+							public void customResultAvailable(IExecutionService result)
+							{
+								result.execute(SendManager.this);
+							}
+						});
+					}
+					// Fail when service was shut down. 
+					else
+					{
+//						System.out.println("message not added");
+						task.getFuture().setException(new ServiceTerminatedException(getServiceIdentifier()));
+					}
+				}
+			});
+			
+			return task.getFuture();
+		}
+	}
+	
+	/**
+	 *  Deliver message(s) executable.
+	 */
+	protected class DeliverMessage implements IExecutable
+	{
+		//-------- attributes --------
+		
+		/** The list of messages to send. */
+		protected List<Object> messages;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a new deliver message executable.
+		 */
+		public DeliverMessage()
+		{
+			this.messages = new ArrayList<Object>();
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  Deliver the message.
+		 */
+		public boolean execute()
+		{
+			Object tmp = null;
+			boolean isempty;
+			
+			synchronized(this)
+			{
+				if(!messages.isEmpty())
+					tmp = messages.remove(0);
+				isempty = messages.isEmpty();
+			}
+			
+			if(tmp!=null)
+			{
+				internalDeliverMessage(tmp);
+			}
+			
+			return !isempty;
+		}
+		
+		/**
+		 *  Add a message to be delivered.
+		 */
+		public void addMessage(Object msg)
+		{
+			synchronized(this)
+			{
+				messages.add(msg);
+			}
+			
+			SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new DefaultResultListener()
+			{
+				public void resultAvailable(Object result)
+				{
+					try
+					{
+						((IExecutionService)result).execute(DeliverMessage.this);
+					}
+					catch(RuntimeException e)
+					{
+						// ignore if execution service is shutting down.
+					}
+				}
+			});
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	class StreamDeliveryHandler implements ICommand
+	{
+		/**
+		 * 
+		 */
+		public void execute(Object obj)
+		{
+			byte[] rawmsg = (byte[])obj;
+			System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
+			int idx = 1;
+			byte type = rawmsg[idx++];
+			byte[] codec_ids = new byte[rawmsg[idx++]];
+			byte[] bconid = new byte[4];
+			for(int i=0; i<codec_ids.length; i++)
+			{
+				codec_ids[i] = rawmsg[idx++];
+			}
+			for(int i=0; i<4; i++)
+			{
+				bconid[i] = rawmsg[idx++];
+			}
+			int conid = SUtil.bytesToInt(bconid);
+			
+			final Object data;
+//			byte[] data;
+			if(codec_ids.length==0)
+			{
+				data = new byte[rawmsg.length-idx];
+				System.arraycopy(rawmsg, idx, data, 0, rawmsg.length-idx);
+			}
+			else
+			{
+				Object tmp = new ByteArrayInputStream(rawmsg, idx, rawmsg.length-idx);
+				for(int i=codec_ids.length-1; i>-1; i--)
+				{
+					ICodec dec = codecfactory.getCodec(codec_ids[i]);
+					tmp = dec.decode(tmp, classloader);
+				}
+				data = tmp;
+			}
+			
+			// todo: how to decide if in or output con?
+			final InputConnection con;
+			if(bicons.containsKey(new Integer(conid)))
+			{
+				con = bicons.get(new Integer(conid));
+			}
+			else
+			{
+				con = new InputConnection(conid);
+				bicons.put(new Integer(conid), con);
+			}
+			
+			Future<Void> ret = new Future<Void>();
+			if(type==StreamSendTask.INIT_INPUT)
+			{
+				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+				{
+					public void customResultAvailable(IComponentManagementService cms)
+					{
+						AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter((IComponentIdentifier)data);
+						if(component != null)
+						{
+							Map<String, Object> msg = new HashMap<String, Object>();
+							msg.put(SFipa.CONTENT, con);
+							component.receiveMessage(msg, getMessageType(SFipa.MESSAGE_TYPE_NAME_FIPA));
+						}
+					}
+				});
+			}
+			else if(type==StreamSendTask.DATA_INPUT)
+			{
+				con.addData((byte[])data);
+			}
+			else if(type==StreamSendTask.CLOSE_INPUT)
+			{
+				con.setClosed();
+				bicons.remove(conid);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	class MapDeliveryHandler implements ICommand
+	{
+		/**
+		 * 
+		 */
+		public void execute(Object obj)
+		{
+			MessageEnvelope me;
 			if(obj instanceof MessageEnvelope)
 			{
 				me	= (MessageEnvelope)obj;
@@ -957,6 +1354,7 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				byte[]	rawmsg	= (byte[])obj;
 				int	idx	= 0;
+				byte rmt = rawmsg[idx++];
 				byte[] codec_ids = new byte[rawmsg[idx++]];
 				for(int i=0; i<codec_ids.length; i++)
 				{
@@ -1118,230 +1516,6 @@ public class MessageService extends BasicService implements IMessageService
 							}
 						}	
 					});
-				}
-			});
-		}
-		catch(Exception e)
-		{
-			logger.warning("Message could not be delivered to receivers: "+(me!=null ? me.getReceivers() : "unknown") +", "+e);
-		}
-	}
-	
-	/**
-	 *  Get the classloader for a resource identifier.
-	 */
-	protected IFuture<ClassLoader> getRIDClassLoader(Map msg, MessageType mt)
-	{
-		final Future<ClassLoader> ret = new Future<ClassLoader>();
-		
-//		MessageType mt = getMessageType(type);
-		String ridid = mt.getResourceIdIdentifier();
-		final IResourceIdentifier rid = (IResourceIdentifier)msg.get(ridid);
-		if(rid!=null)
-		{
-			IFuture<ILibraryService> fut = SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class);
-			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
-			{
-				public void customResultAvailable(ILibraryService ls)
-				{
-					ls.getClassLoader(rid).addResultListener(new DelegationResultListener<ClassLoader>(ret));
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-					super.resultAvailable(null);
-				}
-			});
-		}
-		else
-		{
-			ret.setResult(null);
-		}
-		
-		return ret;
-	}
-	
-	/**
-	 *  Send message(s) executable.
-	 */
-	protected class SendManager implements IExecutable
-	{
-		//-------- attributes --------
-		
-		/** The list of messages to send. */
-		protected List<ManagerSendTask> messages;
-		
-		//-------- constructors --------
-		
-		/**
-		 *  Send manager.
-		 */
-		public SendManager()
-		{
-			this.messages = new ArrayList<ManagerSendTask>();
-		}
-		
-		//-------- methods --------
-	
-		/**
-		 *  Send a message.
-		 */
-		public boolean execute()
-		{
-			ManagerSendTask	tmp = null;
-			boolean isempty;
-			
-			synchronized(this)
-			{
-				if(!messages.isEmpty())
-					tmp = messages.remove(0);
-				isempty = messages.isEmpty();
-			}
-			final ManagerSendTask	task = tmp;
-			
-			if(task!=null)
-			{
-				// Todo: move back to send manager thread after isValid()
-				// (hack!!! currently only works because message service is raw)
-				// hack!!! doesn't make much sense to check isValid as send manager executes on different thread.
-				isValid().addResultListener(new IResultListener<Boolean>()
-				{
-					public void resultAvailable(Boolean result)
-					{
-						if(result.booleanValue())
-						{
-							task.doSendMessage();
-						}
-						
-						// Quit when service was terminated.
-						else
-						{
-	//						System.out.println("send message not executed");
-							task.getFuture().setException(new MessageFailureException(task.getMessage(), task.getMessageType(), null, "Message service terminated."));
-	//						isempty	= true;
-	//						messages.clear();
-						}
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-	//					System.out.println("send message not executed");
-						task.getFuture().setException(new MessageFailureException(task.getMessage(), task.getMessageType(), null, "Message service terminated."));
-	//					isempty	= true;
-	//					messages.clear();
-					}
-				});
-			}
-			
-			return !isempty;
-		}
-		
-		/**
-		 *  Add a message to be sent.
-		 *  @param message The message.
-		 */
-		public IFuture<Void> addMessage(final ManagerSendTask task)
-		{
-			isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(task.getFuture())
-			{
-				public void customResultAvailable(Boolean result)
-				{
-					if(result.booleanValue())
-					{
-						synchronized(SendManager.this)
-						{
-							messages.add(task);
-						}
-						
-						SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, 
-							RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(task.getFuture())
-						{
-							public void customResultAvailable(IExecutionService result)
-							{
-								result.execute(SendManager.this);
-							}
-						});
-					}
-					// Fail when service was shut down. 
-					else
-					{
-//						System.out.println("message not added");
-						task.getFuture().setException(new ServiceTerminatedException(getServiceIdentifier()));
-					}
-				}
-			});
-			
-			return task.getFuture();
-		}
-	}
-	
-	/**
-	 *  Deliver message(s) executable.
-	 */
-	protected class DeliverMessage implements IExecutable
-	{
-		//-------- attributes --------
-		
-		/** The list of messages to send. */
-		protected List<Object> messages;
-		
-		//-------- constructors --------
-		
-		/**
-		 *  Create a new deliver message executable.
-		 */
-		public DeliverMessage()
-		{
-			this.messages = new ArrayList<Object>();
-		}
-		
-		//-------- methods --------
-		
-		/**
-		 *  Deliver the message.
-		 */
-		public boolean execute()
-		{
-			Object tmp = null;
-			boolean isempty;
-			
-			synchronized(this)
-			{
-				if(!messages.isEmpty())
-					tmp = messages.remove(0);
-				isempty = messages.isEmpty();
-			}
-			
-			if(tmp!=null)
-			{
-				internalDeliverMessage(tmp);
-			}
-			
-			return !isempty;
-		}
-		
-		/**
-		 *  Add a message to be delivered.
-		 */
-		public void addMessage(Object msg)
-		{
-			synchronized(this)
-			{
-				messages.add(msg);
-			}
-			
-			SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					try
-					{
-						((IExecutionService)result).execute(DeliverMessage.this);
-					}
-					catch(RuntimeException e)
-					{
-						// ignore if execution service is shutting down.
-					}
 				}
 			});
 		}

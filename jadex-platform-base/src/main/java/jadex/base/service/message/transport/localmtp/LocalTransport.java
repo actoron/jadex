@@ -1,7 +1,10 @@
 package jadex.base.service.message.transport.localmtp;
 
+import java.util.Arrays;
+
 import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
+import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -112,7 +115,9 @@ public class LocalTransport implements ITransport
 			public IFuture<Void> execute(Void args)
 			{
 //				System.out.println("Sent with local transport: "+task.getReceivers()[0]);
-				msgservice.deliverMessage(task.getMessage(), task.getMessageType().getName(), task.getReceivers());
+				
+//				msgservice.deliverMessage(task.getMessage(), task.getMessageType().getName(), task.getReceivers());
+				msgservice.deliverMessage(task.getMessage());
 				return IFuture.DONE;
 			}
 		};
