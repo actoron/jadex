@@ -40,8 +40,6 @@ public class FactoryFilter implements IRemoteFilter
 	 */
 	public FactoryFilter(String model, String[] imports, IResourceIdentifier rid)
 	{
-		if(model.length()==0)
-			System.out.println("zzzzz");
 		this.model	= model;
 		this.imports	= imports;
 		this.rid = rid;

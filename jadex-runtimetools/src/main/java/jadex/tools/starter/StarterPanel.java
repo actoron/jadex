@@ -1028,9 +1028,17 @@ public class StarterPanel extends JLayeredPane
 	public IFuture<Properties>	getProperties()
 	{
 		final Future<Properties>	ret	= new Future<Properties>();
-		
-		SRemoteGui.localizeModel(jcc.getPlatformAccess(), filename.getText(), lastrid)
-			.addResultListener(new SwingExceptionDelegationResultListener<Tuple2<String, String>, Properties>(ret)
+		Future<Tuple2<String, String>>	mfut	= new Future<Tuple2<String, String>>();
+		if(filename.getText().length()>0)
+		{
+			SRemoteGui.localizeModel(jcc.getPlatformAccess(), filename.getText(), lastrid)
+				.addResultListener(new DelegationResultListener<Tuple2<String,String>>(mfut));
+		}
+		else
+		{
+			mfut.setResult(null);
+		}
+		mfut.addResultListener(new SwingExceptionDelegationResultListener<Tuple2<String, String>, Properties>(ret)
 		{
 			public void customResultAvailable(Tuple2<String, String> result)
 			{

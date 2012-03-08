@@ -43,6 +43,8 @@ public class SComponentFactory
 	{
 		if(model==null)
 			throw new NullPointerException();
+		if(model.length()==0)
+			throw new IllegalArgumentException();
 		return exta.scheduleStep(new IComponentStep<IModelInfo>()
 		{
 			@XMLClassname("loadModel")
