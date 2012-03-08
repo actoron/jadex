@@ -1,6 +1,5 @@
 package jadex.bridge;
 
-import jadex.commons.future.IFuture;
 
 /**
  * 
@@ -8,12 +7,22 @@ import jadex.commons.future.IFuture;
 public interface IInputConnection
 {
 	/**
-	 * 
+	 *  Non-blocking read. Tries to read the next byte.
+	 *  @return The next byte or -1 if the end of the stream has been reached.
 	 */
-	public IFuture<Void> read(byte[] buffer);
+	public int read();
 	
 	/**
-	 * 
+	 *  Non-blocking read. Tries to fill the 
+	 *  buffer from the stream.
+	 *  @param buffer The buffer to read in.
+	 *  @return The number of bytes that could be read
+	 *  into the buffer.
 	 */
-	public IFuture<Void> close();
+	public int read(byte[] buffer);
+	
+	/**
+	 *  Close the stream.
+	 */
+	public void close();
 }

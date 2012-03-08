@@ -1,6 +1,5 @@
 package jadex.base.service.message;
 
-import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class InputConnection implements IInputConnection
 	protected int position;
 	
 	/**
-	 * 
+	 *  Create a new input connection.
 	 */
 	public InputConnection(int id)
 	{
@@ -34,9 +33,13 @@ public class InputConnection implements IInputConnection
 	}
 	
 	/**
-	 * 
+	 *  Non-blocking read. Tries to fill the 
+	 *  buffer from the stream.
+	 *  @param buffer The buffer to read in.
+	 *  @return The number of bytes that could be read
+	 *  into the buffer.
 	 */
-	public IFuture<Void> read(byte[] buffer)
+	public synchronized int read(byte[] buffer)
 	{
 		int startpos = 0;
 		int rowcnt = 0;
@@ -48,26 +51,23 @@ public class InputConnection implements IInputConnection
 			startpos += row.length;
 		}
 		
+		int buffercnt = 0;
 		if(rowcnt<data.size())
 		{
 			byte[] row = data.get(rowcnt);
 			int inrowstart = position-startpos;
-			int buffercnt = 0;
+			
 			for(; buffercnt<buffer.length;)
 			{
 				buffer[buffercnt++] = row[inrowstart];
 				inrowstart++;
-				if(inrowstart>row.length)
+				if(inrowstart>=row.length)
 				{
 					inrowstart = 0;
 					if(++rowcnt<data.size())
 					{
 						row = data.get(rowcnt);
 					}
-				}
-				else
-				{
-					break;
 				}
 			}
 			position += buffercnt;
@@ -76,36 +76,67 @@ public class InputConnection implements IInputConnection
 		{
 			throw new RuntimeException("End of stream reached.");
 		}
-		// todo: support blocking version?
 		
-//		if(buffercnt==0 && closed)
-//			return new Future(new RuntimeException());
-		return IFuture.DONE;
+		return buffercnt;
+	}
+	
+	/**
+	 *  Non-blocking read. Tries to read the next byte.
+	 *  @return The next byte or -1 if none is currently available.
+	 *  @throws exception if end of stream has been reached.
+	 */
+	public synchronized int read()
+	{
+		int startpos = 0;
+		int rowcnt = 0;
+		for(; rowcnt<data.size(); rowcnt++)
+		{
+			byte[] row = data.get(rowcnt);
+			if(position<startpos+row.length)
+				break;
+			startpos += row.length;
+		}
+		
+		int ret = -1;
+		if(rowcnt<data.size())
+		{
+			byte[] row = data.get(rowcnt);
+			int inrowstart = position-startpos;
+			
+			ret = row[inrowstart];
+			position++;
+		}
+		else if(closed)
+		{
+			throw new RuntimeException("End of stream reached.");
+		}
+		
+		return ret;
 	}
 	
 	/**
 	 * 
 	 */
-	public IFuture<Void> close()
+	public synchronized void close()
 	{
 		// todo:
-		return IFuture.DONE;
 	}
 	
 	//-------- methods called from message service --------
 	
 	/**
-	 * 
+	 *  Add data to the internal data buffer.
+	 *  @param data The data to add.
 	 */
-	public void addData(byte[] data)
+	public synchronized void addData(byte[] data)
 	{
 		this.data.add(data);
 	}
 	
 	/**
-	 * 
+	 *  Set the stream to be closed.
 	 */
-	public void setClosed()
+	public synchronized void setClosed()
 	{
 		this.closed = true;
 	}

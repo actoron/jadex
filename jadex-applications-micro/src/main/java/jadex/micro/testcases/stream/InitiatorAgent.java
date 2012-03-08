@@ -82,12 +82,15 @@ public class InitiatorAgent
 									{
 										final IComponentStep<Void> step = new IComponentStep<Void>()
 										{
-											final int[] cnt = new int[1];
+											final int[] cnt = new int[]{1};
 											final int max = 3;
 											final IComponentStep<Void> self = this;
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
-												ocon.send(new byte[]{(byte)cnt[0]})
+												byte[] tosend = new byte[cnt[0]];
+												for(int i=0; i<cnt[0]; i++)
+													tosend[i] = (byte)cnt[0];
+												ocon.send(tosend)
 													.addResultListener(new DelegationResultListener<Void>(ret)
 												{
 													public void customResultAvailable(Void result)

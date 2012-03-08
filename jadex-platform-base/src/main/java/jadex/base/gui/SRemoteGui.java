@@ -184,6 +184,9 @@ public class SRemoteGui
 	 */
 	public static IFuture<Tuple2<String, String>>	localizeModel(IExternalAccess platformaccess, final String name, final IResourceIdentifier rid)
 	{
+		if(name==null || name.length()==0)
+			throw new IllegalArgumentException("Model must not null or be empty.");
+		
 		return platformaccess.scheduleStep(new IComponentStep<Tuple2<String, String>>()
 		{
 			@XMLClassname("localizeModel")

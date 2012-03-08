@@ -34,13 +34,16 @@ public class ReceiverAgent
 			{
 				try
 				{
-					byte[] buffer = new byte[1];
-					con.read(buffer);
-					System.out.println("buffer: "+SUtil.arrayToString(buffer));
+//					byte[] buffer = new byte[2];
+//					con.read(buffer);
+//					System.out.println("buffer: "+SUtil.arrayToString(buffer));
+					int res = con.read();
+					System.out.println("read: "+res);
 				}
 				catch(Exception e)
 				{
-					e.printStackTrace();
+					agent.killAgent();
+//					e.printStackTrace();
 				}
 				agent.waitFor(1000, this);
 				return null;
