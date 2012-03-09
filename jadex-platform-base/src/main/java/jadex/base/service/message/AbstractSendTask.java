@@ -195,7 +195,7 @@ public abstract class AbstractSendTask implements ISendTask
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						exception.printStackTrace();
+//						exception.printStackTrace();
 						done(exception);
 					}
 				});

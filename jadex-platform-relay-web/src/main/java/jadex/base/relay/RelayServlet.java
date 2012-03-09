@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -260,10 +259,10 @@ public class RelayServlet extends HttpServlet
 			int	length	= SUtil.bytesToInt(len);
 
 			// Read prolog (1 byte codec length + 1 byte xml codec id + 1 byte gzip codec id)
-			readData(in, 3);
+			readData(in, 4);
 			
 			// Read message and extract awareness info content.
-			byte[] buffer = readData(in, length-3);
+			byte[] buffer = readData(in, length-4);
 			buffer	= GZIPCodec.decodeBytes(buffer, getClass().getClassLoader());
 			MessageEnvelope	msg	= (MessageEnvelope)JavaReader.objectFromByteArray(buffer, getClass().getClassLoader());
 			AwarenessInfo	info	= (AwarenessInfo)JavaReader.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), getClass().getClassLoader());

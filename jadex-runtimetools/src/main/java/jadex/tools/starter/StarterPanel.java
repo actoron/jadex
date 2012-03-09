@@ -1029,11 +1029,18 @@ public class StarterPanel extends JLayeredPane
 	{
 		final Future<Properties>	ret	= new Future<Properties>();
 		
+		Future<Tuple2<String, String>>	mfut	= new Future<Tuple2<String,String>>();
 		if(filename.getText().length()==0)
-			return new Future<Properties>((Properties)null);
+		{
+			mfut.setResult(null);
+		}
+		else
+		{
+			SRemoteGui.localizeModel(jcc.getPlatformAccess(), filename.getText(), lastrid)
+				.addResultListener(new DelegationResultListener<Tuple2<String,String>>(mfut));
+		}
 		
-		SRemoteGui.localizeModel(jcc.getPlatformAccess(), filename.getText(), lastrid)
-			.addResultListener(new SwingExceptionDelegationResultListener<Tuple2<String, String>, Properties>(ret)
+		mfut.addResultListener(new SwingExceptionDelegationResultListener<Tuple2<String, String>, Properties>(ret)
 		{
 			public void customResultAvailable(Tuple2<String, String> result)
 			{
@@ -1046,9 +1053,6 @@ public class StarterPanel extends JLayeredPane
 					props.addProperty(new Property("globalrid", lastrid!=null ? lastrid.getGlobalIdentifier() : null));
 				}
 
-				// Todo: save global rid, if any.
-//				props.addProperty(new Property("rid", JavaWriter.objectToXML(rid, null)));
-				
 				String c = (String)config.getSelectedItem();
 				if(c!=null) props.addProperty(new Property("config", c));
 
