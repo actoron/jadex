@@ -9,7 +9,7 @@ import java.lang.ref.ReferenceQueue;
  *  as a runnable to be executed.
  *  @see ActionReferenceQueue
  */
-public class WeakEntry extends WeakObject
+public class WeakEntry<T> extends WeakObject<T>
 {
 	//-------- attributes --------
 	
@@ -23,7 +23,7 @@ public class WeakEntry extends WeakObject
 	 *  @param object Object to reference.
 	 *  @param arg The argument.
 	 */
-	public WeakEntry(Object object, Object arg)
+	public WeakEntry(T object, Object arg)
 	{
 		super(object);
 		this.arg = arg;
@@ -36,7 +36,7 @@ public class WeakEntry extends WeakObject
 	 *  @param arg The argument.
 	 *  @param queue Reference queue.
 	 */
-	public WeakEntry(Object object, Object arg, ReferenceQueue queue)
+	public WeakEntry(T object, Object arg, ReferenceQueue<? super T> queue)
 	{
 		super(object, queue);
 		this.arg = arg;

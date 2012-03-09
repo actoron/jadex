@@ -7,10 +7,12 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentMessageArrived;
 
+import java.util.Collection;
 import java.util.Map;
 
 @Agent
@@ -28,27 +30,47 @@ public class ReceiverAgent
 		System.out.println("received: "+msg);
 		final IInputConnection con = (IInputConnection)msg.get(SFipa.CONTENT);
 		
-		IComponentStep<Void> step = new IComponentStep<Void>()
+		con.aread().addResultListener(new IIntermediateResultListener<Byte>()
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			public void resultAvailable(Collection<Byte> result)
 			{
-				try
-				{
-//					byte[] buffer = new byte[2];
-//					con.read(buffer);
-//					System.out.println("buffer: "+SUtil.arrayToString(buffer));
-					int res = con.read();
-					System.out.println("read: "+res);
-				}
-				catch(Exception e)
-				{
-					agent.killAgent();
-//					e.printStackTrace();
-				}
-				agent.waitFor(1000, this);
-				return null;
+				System.out.println("Result: "+result);
 			}
-		};
-		agent.waitFor(1000, step);
+			public void intermediateResultAvailable(Byte result)
+			{
+				System.out.println("Intermediate result: "+result);
+			}
+			public void finished()
+			{
+				System.out.println("finished");
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println(exception);
+			}
+		});
+		
+//		IComponentStep<Void> step = new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				try
+//				{
+////					byte[] buffer = new byte[2];
+////					con.read(buffer);
+////					System.out.println("buffer: "+SUtil.arrayToString(buffer));
+//					int res = con.read();
+//					System.out.println("read: "+res);
+//				}
+//				catch(Exception e)
+//				{
+//					agent.killAgent();
+////					e.printStackTrace();
+//				}
+//				agent.waitFor(1000, this);
+//				return null;
+//			}
+//		};
+//		agent.waitFor(1000, step);
 	}
 }

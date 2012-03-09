@@ -16,12 +16,23 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 {
 	public static final byte MESSAGE_TYPE_STREAM = 99;
 
-	public static final byte INIT_INPUT = 0;
-	public static final byte DATA_INPUT = 1;
-	public static final byte CLOSE_INPUT = 2;
-	public static final byte INIT_OUTPUT = 3;
-	public static final byte DATA_OUTPUT = 4;
-	public static final byte CLOSE_OUTPUT = 5;
+	/** Create input connection - from initiator. */
+	public static final byte INIT_INPUT_INITIATOR = 0; 
+	/** Send data - from initiator. */
+	public static final byte DATA_INPUT_INITIATOR = 1;
+	/** Close connection - from initiator. */
+	public static final byte CLOSE_INPUT_INITIATOR = 2;
+	/** Close connection - from participant. */
+	public static final byte CLOSE_INPUT_PARTICIPANT = 3;
+	
+	/** Create output connection - from initiator. */ 
+	public static final byte INIT_OUTPUT_INITIATOR = 4;
+	/** Send data - from participant. */
+	public static final byte DATA_OUTPUT_PARTICIPANT = 5;
+	/** Close connection - from initiator. */
+	public static final byte CLOSE_OUTPUT_INITIATOR = 6;
+	/** Close connection - from participant. */
+	public static final byte CLOSE_OUTPUT_PARTICIPANT = 7;
 	
 	//-------- attributes --------
 

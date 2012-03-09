@@ -2,6 +2,7 @@ package jadex.commons.collection;
 
 import java.lang.ref.ReferenceQueue;
 import java.util.AbstractCollection;
+import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
@@ -12,15 +13,15 @@ import java.util.Set;
 /**
  *  A map with weak values.
  */
-public class WeakValueMap	implements Map
+public class WeakValueMap<K, V>	implements Map<K, V>
 {
 	//-------- attributes --------
 	
 	/** The contents. */
-	protected Map	contents;
+	protected Map<K, WeakEntry<V>>	contents;
 	
 	/** The reference queue. */
-	protected ReferenceQueue	queue;
+	protected ReferenceQueue<V>	queue;
 	
 	//-------- constructors --------
 	
@@ -29,8 +30,8 @@ public class WeakValueMap	implements Map
 	 */
 	public WeakValueMap()
 	{
-		this.contents	= new LinkedHashMap();
-		this.queue	= new ReferenceQueue();
+		this.contents	= new LinkedHashMap<K, WeakEntry<V>>();
+		this.queue	= new ReferenceQueue<V>();
 	}
 	
 	//-------- Map methods --------
@@ -74,33 +75,40 @@ public class WeakValueMap	implements Map
 	/**
 	 *  Get value for key.
 	 */
-	public Object get(Object key)
+	public V get(Object key)
 	{
 		expungeStaleEntries();
-		WeakObject	ret	= (WeakObject)contents.get(key);
+		WeakObject<V>	ret	= (WeakObject<V>)contents.get(key);
 		return ret!=null ? ret.get() : null;
 	}
 
 	/**
 	 *  Add value for key.
 	 */
-	public Object put(final Object key, Object value)
+	public V put(final K key, V value)
 	{
 		expungeStaleEntries();
+		WeakEntry<V> ret;
 		if(value!=null)
 		{
-			value	= new WeakEntry(value, key, queue);
+			WeakEntry<V> we	= new WeakEntry<V>(value, key, queue);
+			ret = contents.put(key, we);
 		}
-		return contents.put(key, value);
+		else
+		{
+			ret = contents.put(key, null);
+		}
+		return ret!=null ? ret.get() : null;
 	}
 
 	/**
 	 *  Remove value for key.
 	 */
-	public Object remove(Object key)
+	public V remove(Object key)
 	{
 		expungeStaleEntries();
-		return contents.remove(key);
+		WeakEntry<V> ret = contents.remove(key);
+		return ret!=null ? ret.get() : null;
 	}
 
 	/**
@@ -115,11 +123,11 @@ public class WeakValueMap	implements Map
 	/**
 	 *  Add all mappings.
 	 */
-	public void putAll(Map m)
+	public void putAll(Map<? extends K, ? extends V> m)
 	{
-		for(Iterator it=m.keySet().iterator(); it.hasNext(); )
+		for(Iterator<? extends K> it=m.keySet().iterator(); it.hasNext(); )
 		{
-			Object	key	= it.next();
+			K	key	= it.next();
 			put(key, m.get(key));
 		}
 	}
@@ -127,11 +135,11 @@ public class WeakValueMap	implements Map
 	/**
 	 *  Get the key set.
 	 */
-	public Set keySet()
+	public Set<K> keySet()
 	{
-		return new AbstractSet()
+		return new AbstractSet<K>()
 		{
-			public Iterator iterator()
+			public Iterator<K> iterator()
 			{
 				expungeStaleEntries();
 				return contents.keySet().iterator();
@@ -147,25 +155,25 @@ public class WeakValueMap	implements Map
 	/**
 	 *  Get the values.
 	 */
-	public Collection values()
+	public Collection<V> values()
 	{
-		return new AbstractCollection()
+		return new AbstractCollection<V>()
 		{
-			public Iterator iterator()
+			public Iterator<V> iterator()
 			{
 				expungeStaleEntries();
-				return new Iterator()
+				return new Iterator<V>()
 				{
-					protected Iterator	it	= contents.values().iterator();
+					protected Iterator<WeakEntry<V>>	it	= contents.values().iterator();
 					
 					public boolean hasNext()
 					{
 						return it.hasNext();
 					}
 
-					public Object next()
+					public V next()
 					{
-						WeakObject	ret	= (WeakObject)it.next();
+						WeakObject<V>	ret	= (WeakObject<V>)it.next();
 						return ret!=null ? ret.get() : null;
 					}
 
@@ -186,14 +194,32 @@ public class WeakValueMap	implements Map
 	/**
 	 *  Get the entries.
 	 */
-	public Set entrySet()
+	public Set<Entry<K, V>> entrySet()
 	{
-		return new AbstractSet()
+		return new AbstractSet<Entry<K, V>>()
 		{
-			public Iterator iterator()
+			public Iterator<Entry<K, V>> iterator()
 			{
 				expungeStaleEntries();
-				return contents.entrySet().iterator();
+				final Iterator<Entry<K, WeakEntry<V>>> oit = contents.entrySet().iterator();
+				Iterator<Entry<K, V>> it = new Iterator<Entry<K, V>>()
+				{
+					public boolean hasNext()
+					{
+						return oit.hasNext();
+					}
+					public java.util.Map.Entry<K, V> next()
+					{
+						Entry<K, WeakEntry<V>> ret = oit.next();
+						WeakEntry<V> we = ret.getValue();
+						return new AbstractMap.SimpleEntry<K, V>(ret.getKey(), we!=null ? we.get() : null);
+					}
+					public void remove()
+					{
+						oit.remove();
+					}
+				};
+				return it;
 			}
 
 			public int size()
@@ -210,8 +236,8 @@ public class WeakValueMap	implements Map
 	 */
 	protected final void expungeStaleEntries()
 	{
-		WeakEntry entry;
-		while((entry=(WeakEntry)queue.poll())!=null)
+		WeakEntry<V> entry;
+		while((entry=(WeakEntry<V>)queue.poll())!=null)
 		{
 			contents.remove(entry.getArgument());
 		}

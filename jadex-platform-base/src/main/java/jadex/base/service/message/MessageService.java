@@ -38,6 +38,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
+import jadex.commons.collection.WeakValueMap;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
@@ -60,6 +61,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
 
@@ -133,12 +135,12 @@ public class MessageService extends BasicService implements IMessageService
 	protected Map<Byte, ICommand> deliveryhandlers;
 	
 	
-	/** The binary input connections. */
-	protected Map<Integer, InputConnection> bicons;
+	/** The initiator connections. */
+	protected Map<Integer, Object> icons;
 
-	/** The binary output connections. */
-	protected Map<Integer, OutputConnection> bocons;
-	
+	/** The participant connections. */
+	protected Map<Integer, Object> pcons;
+
 	//-------- constructors --------
 
 	/**
@@ -188,8 +190,8 @@ public class MessageService extends BasicService implements IMessageService
 		deliveryhandlers.put(MapSendTask.MESSAGE_TYPE_MAP, new MapDeliveryHandler());
 		deliveryhandlers.put(StreamSendTask.MESSAGE_TYPE_STREAM, new StreamDeliveryHandler());
 		
-		this.bicons = new HashMap<Integer, InputConnection>();
-		this.bocons = new HashMap<Integer, OutputConnection>();
+		this.icons = new WeakValueMap<Integer, Object>();
+		this.pcons = new WeakValueMap<Integer, Object>();
 	}
 	
 	//-------- interface methods --------
@@ -203,6 +205,7 @@ public class MessageService extends BasicService implements IMessageService
 		int conid = uuconid.hashCode();
 		byte[] cids	= codecfactory.getDefaultCodecIds();
 		OutputConnection con = new OutputConnection(this, sender, receiver, conid, getTransports(), cids, getMessageCodecs(cids));
+		icons.put(conid, con);
 		return new Future<IOutputConnection>(con);
 	}
 
@@ -1276,7 +1279,6 @@ public class MessageService extends BasicService implements IMessageService
 			int conid = SUtil.bytesToInt(bconid);
 			
 			final Object data;
-//			byte[] data;
 			if(codec_ids.length==0)
 			{
 				data = new byte[rawmsg.length-idx];
@@ -1292,45 +1294,63 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				data = tmp;
 			}
-			
-			// todo: how to decide if in or output con?
-			final InputConnection con;
-			if(bicons.containsKey(new Integer(conid)))
+
+			// Handle input connection participant side
+			if(type==StreamSendTask.INIT_INPUT_INITIATOR
+				|| type==StreamSendTask.DATA_INPUT_INITIATOR
+				|| type==StreamSendTask.CLOSE_INPUT_INITIATOR)
 			{
-				con = bicons.get(new Integer(conid));
-			}
-			else
-			{
-				con = new InputConnection(conid);
-				bicons.put(new Integer(conid), con);
-			}
-			
-			Future<Void> ret = new Future<Void>();
-			if(type==StreamSendTask.INIT_INPUT)
-			{
-				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+				final InputConnection con;
+				if(pcons.containsKey(new Integer(conid)))
 				{
-					public void customResultAvailable(IComponentManagementService cms)
+					con = (InputConnection)pcons.get(new Integer(conid));
+				}
+				else
+				{
+					IComponentIdentifier[] recs = (IComponentIdentifier[])data;
+					con = new InputConnection(MessageService.this, recs[0], recs[1], conid, getTransports(), pcons);
+//					pcons.put(new Integer(conid), con);
+				}
+				
+				Future<Void> ret = new Future<Void>();
+				if(type==StreamSendTask.INIT_INPUT_INITIATOR)
+				{
+					SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 					{
-						AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter((IComponentIdentifier)data);
-						if(component != null)
+						public void customResultAvailable(IComponentManagementService cms)
 						{
-							Map<String, Object> msg = new HashMap<String, Object>();
-							msg.put(SFipa.CONTENT, con);
-							component.receiveMessage(msg, getMessageType(SFipa.MESSAGE_TYPE_NAME_FIPA));
+							AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(((IComponentIdentifier[])data)[1]);
+							if(component != null)
+							{
+								Map<String, Object> msg = new HashMap<String, Object>();
+								msg.put(SFipa.CONTENT, con);
+								component.receiveMessage(msg, getMessageType(SFipa.MESSAGE_TYPE_NAME_FIPA));
+							}
 						}
-					}
-				});
+					});
+				}
+				else if(type==StreamSendTask.DATA_INPUT_INITIATOR)
+				{
+					con.addData((byte[])data);
+				}
+				else if(type==StreamSendTask.CLOSE_INPUT_INITIATOR)
+				{
+					con.setClosed();
+//					pcons.remove(conid);
+				}
 			}
-			else if(type==StreamSendTask.DATA_INPUT)
+			
+			// Handle input connection initiator side
+			if(type==StreamSendTask.CLOSE_INPUT_PARTICIPANT)
 			{
-				con.addData((byte[])data);
-			}
-			else if(type==StreamSendTask.CLOSE_INPUT)
-			{
-				con.setClosed();
-				bicons.remove(conid);
+				final OutputConnection con;
+				if(icons.containsKey(new Integer(conid)))
+				{
+					con = (OutputConnection)icons.get(new Integer(conid));
+					con.setClosed();
+					icons.remove(conid);
+				}
 			}
 		}
 	}

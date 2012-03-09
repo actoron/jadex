@@ -1,5 +1,7 @@
 package jadex.bridge;
 
+import jadex.commons.future.IIntermediateFuture;
+
 
 /**
  * 
@@ -20,6 +22,13 @@ public interface IInputConnection
 	 *  into the buffer.
 	 */
 	public int read(byte[] buffer);
+	
+	/**
+	 *  Asynchronous read. 
+	 *  @return Bytes one by one till end of stream or closed.
+	 */
+	public IIntermediateFuture<Byte> aread();
+
 	
 	/**
 	 *  Close the stream.

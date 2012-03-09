@@ -5,7 +5,6 @@ import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IOutputConnection;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
@@ -13,6 +12,9 @@ import jadex.commons.future.IFuture;
  */
 public class OutputConnection implements IOutputConnection
 {
+	/** Boolean flag if connection is closed. */
+	protected boolean closed;
+
 	/** The message service. */
 	protected MessageService ms;
 	
@@ -50,7 +52,8 @@ public class OutputConnection implements IOutputConnection
 		this.codecs = codecs;
 		
 		// Send init message
-		StreamSendTask task = new StreamSendTask(StreamSendTask.INIT_INPUT, receiver, id, 
+		StreamSendTask task = new StreamSendTask(StreamSendTask.INIT_INPUT_INITIATOR, 
+			new IComponentIdentifier[]{sender, receiver}, id, 
 			new IComponentIdentifier[]{receiver}, transports, codecids, codecs);
 		ms.getSendManager(receiver).addMessage(task);
 	}
@@ -58,11 +61,14 @@ public class OutputConnection implements IOutputConnection
 	/**
 	 * 
 	 */
-	public IFuture<Void> send(byte[] data)
+	public synchronized IFuture<Void> send(byte[] data)
 	{
+		if(closed)
+			throw new RuntimeException("Connection closed.");
+		
 		// Send data message
 		SendManager sm = ms.getSendManager(receiver);
-		StreamSendTask task = new StreamSendTask(StreamSendTask.DATA_INPUT, data, id, 
+		StreamSendTask task = new StreamSendTask(StreamSendTask.DATA_INPUT_INITIATOR, data, id, 
 			new IComponentIdentifier[]{receiver}, transports, null, null);
 		return sm.addMessage(task);
 	}
@@ -70,12 +76,24 @@ public class OutputConnection implements IOutputConnection
 	/**
 	 * 
 	 */
-	public IFuture<Void> close()
+	public synchronized IFuture<Void> close()
 	{
+		if(closed)
+			throw new RuntimeException("Connection closed.");
+
 		// Send data message
+		setClosed();
 		SendManager sm = ms.getSendManager(receiver);
-		StreamSendTask task = new StreamSendTask(StreamSendTask.CLOSE_INPUT, new byte[1], id, 
+		StreamSendTask task = new StreamSendTask(StreamSendTask.CLOSE_INPUT_INITIATOR, new byte[1], id, 
 			new IComponentIdentifier[]{receiver}, transports, null, null);
 		return sm.addMessage(task);
+	}
+	
+	/**
+	 *  Set the stream to be closed.
+	 */
+	public synchronized void setClosed()
+	{
+		this.closed = true;
 	}
 }
