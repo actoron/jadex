@@ -1,38 +1,25 @@
 package jadex.micro.testcases.stream;
 
+import java.util.Collection;
+
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.IOutputConnection;
+import jadex.bridge.IInputConnection;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.micro.annotation.Result;
-import jadex.micro.annotation.Results;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.List;
 
 /**
  *  Agent that provides a service with a stream.
@@ -46,12 +33,14 @@ import java.util.List;
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
 @ComponentTypes(
-	@ComponentType(name="receiver", filename="jadex/micro/testcases/stream/ReceiverAgent.class")
+	@ComponentType(name="receiver", filename="jadex/micro/testcases/stream/Receiver2Agent.class")
 )
-public class InitiatorAgent
+public class Initiator2Agent
 {
 	@Agent
 	protected MicroAgent agent;
+	
+	protected IInputConnection icon;
 	
 	/**
 	 * 
@@ -75,41 +64,31 @@ public class InitiatorAgent
 						{
 							public void customResultAvailable(IMessageService ms)
 							{
-								ms.createOutputConnection(agent.getComponentIdentifier(), cid)
-									.addResultListener(new ExceptionDelegationResultListener<IOutputConnection, Void>(ret)
+								ms.createInputConnection(agent.getComponentIdentifier(), cid)
+									.addResultListener(new ExceptionDelegationResultListener<IInputConnection, Void>(ret)
 								{
-									public void customResultAvailable(final IOutputConnection ocon) 
+									public void customResultAvailable(final IInputConnection icon) 
 									{
-										final IComponentStep<Void> step = new IComponentStep<Void>()
+										Initiator2Agent.this.icon = icon;
+										icon.aread().addResultListener(new IIntermediateResultListener<Byte>()
 										{
-											final int[] cnt = new int[]{1};
-											final int max = 100;
-											final IComponentStep<Void> self = this;
-											public IFuture<Void> execute(IInternalAccess ia)
+											public void resultAvailable(Collection<Byte> result)
 											{
-												byte[] tosend = new byte[cnt[0]];
-												for(int i=0; i<cnt[0]; i++)
-													tosend[i] = (byte)cnt[0];
-												ocon.write(tosend)
-													.addResultListener(new DelegationResultListener<Void>(ret)
-												{
-													public void customResultAvailable(Void result)
-													{
-														if(cnt[0]++<max)
-														{
-															agent.waitFor(200, self);
-														}
-														else
-														{
-															ocon.close();
-//															ret.setResult(null);
-														}
-													}
-												});
-												return IFuture.DONE;
+												System.out.println("Result: "+result);
 											}
-										};
-										agent.waitFor(200, step);
+											public void intermediateResultAvailable(Byte result)
+											{
+												System.out.println("Intermediate result: "+result);
+											}
+											public void finished()
+											{
+												System.out.println("finished");
+											}
+											public void exceptionOccurred(Exception exception)
+											{
+												System.out.println("ex:"+exception);
+											}
+										});
 									}
 								});
 							}
@@ -121,5 +100,5 @@ public class InitiatorAgent
 		
 		return ret;
 	}
-	
 }
+

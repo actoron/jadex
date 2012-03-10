@@ -239,7 +239,33 @@ public class WeakValueMap<K, V>	implements Map<K, V>
 		WeakEntry<V> entry;
 		while((entry=(WeakEntry<V>)queue.poll())!=null)
 		{
+			System.out.println("removing: "+entry);
 			contents.remove(entry.getArgument());
 		}
 	}
+	
+//	/**
+//	 * 
+//	 */
+//	public static void main(String[] args)
+//	{
+//		Object o = new Object();
+//		WeakValueMap<String, Object> map = new WeakValueMap<String, Object>();
+//		map.put("hallo", o);
+//		boolean b = true;
+//		while(b)
+//		{
+//			try
+//			{
+//				Thread.currentThread().sleep(1000);
+//				System.out.print(".");
+//				map.get("hallo");
+//			}
+//			catch(Exception e)
+//			{
+//				e.printStackTrace();
+//			}
+//		}
+//		System.out.println(o);
+//	}
 }

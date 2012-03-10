@@ -21,14 +21,18 @@ public class ReceiverAgent
 	@Agent
 	protected MicroAgent agent;
 	
+	protected IInputConnection con;
+	
 	/**
 	 * 
 	 */
 	@AgentMessageArrived
 	public void messageArrvied(Map<String, Object> msg, MessageType mt)
 	{
-		System.out.println("received: "+msg);
-		final IInputConnection con = (IInputConnection)msg.get(SFipa.CONTENT);
+		// todo: how to avoid garbage collection of connection?
+//		final IInputConnection con = (IInputConnection)msg.get(SFipa.CONTENT);
+		con = (IInputConnection)msg.get(SFipa.CONTENT);
+		System.out.println("received: "+msg+" "+con.hashCode());
 		
 		con.aread().addResultListener(new IIntermediateResultListener<Byte>()
 		{
@@ -46,7 +50,7 @@ public class ReceiverAgent
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println(exception);
+				System.out.println("ex:"+exception);
 			}
 		});
 		
@@ -56,16 +60,16 @@ public class ReceiverAgent
 //			{
 //				try
 //				{
-////					byte[] buffer = new byte[2];
-////					con.read(buffer);
-////					System.out.println("buffer: "+SUtil.arrayToString(buffer));
-//					int res = con.read();
-//					System.out.println("read: "+res);
+//					byte[] buffer = new byte[2];
+//					con.read(buffer);
+//					System.out.println("buffer: "+SUtil.arrayToString(buffer));
+////					int res = con.read();
+////					System.out.println("read: "+res);
 //				}
 //				catch(Exception e)
 //				{
 //					agent.killAgent();
-////					e.printStackTrace();
+//					e.printStackTrace();
 //				}
 //				agent.waitFor(1000, this);
 //				return null;

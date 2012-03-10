@@ -1,7 +1,6 @@
 package jadex.micro.testcases.stream;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import jadex.commons.future.IFuture;
 

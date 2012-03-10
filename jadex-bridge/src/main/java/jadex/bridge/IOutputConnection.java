@@ -3,17 +3,18 @@ package jadex.bridge;
 import jadex.commons.future.IFuture;
 
 /**
- * 
+ *  Interface for output connection.
  */
 public interface IOutputConnection
 {
 	/**
-	 * 
+	 *  Write the content to the stream.
+	 *  @param data The data.
 	 */
-	public IFuture<Void> send(byte[] data);
+	public IFuture<Void> write(byte[] data);
 	
 	/**
-	 * 
+	 *  Close the connection.
 	 */
-	public IFuture<Void> close();
+	public void close();
 }

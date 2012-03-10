@@ -4,7 +4,7 @@ import jadex.commons.future.IIntermediateFuture;
 
 
 /**
- * 
+ *  Interface for input connection stream.
  */
 public interface IInputConnection
 {

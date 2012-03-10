@@ -204,7 +204,7 @@ public class MessageService extends BasicService implements IMessageService
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
 		byte[] cids	= codecfactory.getDefaultCodecIds();
-		OutputConnection con = new OutputConnection(this, sender, receiver, conid, getTransports(), cids, getMessageCodecs(cids));
+		InitiatorOutputConnection con = new InitiatorOutputConnection(this, sender, receiver, conid, getTransports(), cids, getMessageCodecs(cids));
 		icons.put(conid, con);
 		return new Future<IOutputConnection>(con);
 	}
@@ -214,8 +214,12 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public IFuture<IInputConnection> createInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
 	{
-		// todo:
-		return new Future(new UnsupportedOperationException());
+		UUID uuconid = UUID.randomUUID();
+		int conid = uuconid.hashCode();
+		byte[] cids	= codecfactory.getDefaultCodecIds();
+		InitiatorInputConnection con = new InitiatorInputConnection(this, sender, receiver, conid, getTransports(), cids, getMessageCodecs(cids));
+		icons.put(conid, con);
+		return new Future<IInputConnection>(con);	
 	}
 
 	/**
@@ -1253,17 +1257,17 @@ public class MessageService extends BasicService implements IMessageService
 	}
 	
 	/**
-	 * 
+	 *  Handle stream messages.
 	 */
 	class StreamDeliveryHandler implements ICommand
 	{
 		/**
-		 * 
+		 *  Execute the command.
 		 */
 		public void execute(Object obj)
 		{
 			byte[] rawmsg = (byte[])obj;
-			System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
+//			System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
 			int idx = 1;
 			byte type = rawmsg[idx++];
 			byte[] codec_ids = new byte[rawmsg[idx++]];
@@ -1276,7 +1280,7 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				bconid[i] = rawmsg[idx++];
 			}
-			int conid = SUtil.bytesToInt(bconid);
+			final int conid = SUtil.bytesToInt(bconid);
 			
 			final Object data;
 			if(codec_ids.length==0)
@@ -1296,72 +1300,140 @@ public class MessageService extends BasicService implements IMessageService
 			}
 
 			// Handle input connection participant side
-			if(type==StreamSendTask.INIT_INPUT_INITIATOR
-				|| type==StreamSendTask.DATA_INPUT_INITIATOR
-				|| type==StreamSendTask.CLOSE_INPUT_INITIATOR)
+			if(type==StreamSendTask.INIT_INPUT_INITIATOR)
 			{
-				final InputConnection con;
-				if(pcons.containsKey(new Integer(conid)))
-				{
-					con = (InputConnection)pcons.get(new Integer(conid));
-				}
-				else
-				{
-					IComponentIdentifier[] recs = (IComponentIdentifier[])data;
-					con = new InputConnection(MessageService.this, recs[0], recs[1], conid, getTransports(), pcons);
-//					pcons.put(new Integer(conid), con);
-				}
+				IComponentIdentifier[] recs = (IComponentIdentifier[])data;
+				final ParticipantInputConnection con = new ParticipantInputConnection(MessageService.this, recs[0], recs[1], conid, getTransports());
+				pcons.put(new Integer(conid), con);
+//				System.out.println("created: "+con.hashCode());
 				
-				Future<Void> ret = new Future<Void>();
-				if(type==StreamSendTask.INIT_INPUT_INITIATOR)
+				final Future<Void> ret = new Future<Void>();
+				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 				{
-					SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+					public void customResultAvailable(IComponentManagementService cms)
 					{
-						public void customResultAvailable(IComponentManagementService cms)
+						AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(((IComponentIdentifier[])data)[1]);
+						if(component != null)
 						{
-							AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(((IComponentIdentifier[])data)[1]);
-							if(component != null)
-							{
-								Map<String, Object> msg = new HashMap<String, Object>();
-								msg.put(SFipa.CONTENT, con);
-								component.receiveMessage(msg, getMessageType(SFipa.MESSAGE_TYPE_NAME_FIPA));
-							}
+							Map<String, Object> msg = new HashMap<String, Object>();
+							msg.put(SFipa.CONTENT, con);
+							component.receiveMessage(msg, getMessageType(SFipa.MESSAGE_TYPE_NAME_FIPA));
+//							pcons.put(new Integer(conid), con);
 						}
-					});
-				}
-				else if(type==StreamSendTask.DATA_INPUT_INITIATOR)
+					}
+				});
+			}
+			else if(type==StreamSendTask.DATA_INPUT_INITIATOR)
+			{
+				ParticipantInputConnection con = (ParticipantInputConnection)pcons.get(new Integer(conid));
+				if(con!=null)
 				{
 					con.addData((byte[])data);
 				}
-				else if(type==StreamSendTask.CLOSE_INPUT_INITIATOR)
+				else
+				{
+					System.out.println("InputStream not found: "+conid);
+				}
+			}
+			else if(type==StreamSendTask.CLOSE_INPUT_INITIATOR)
+			{
+				ParticipantInputConnection con = (ParticipantInputConnection)pcons.get(new Integer(conid));
+				if(con!=null)
 				{
 					con.setClosed();
-//					pcons.remove(conid);
+				}
+				else
+				{
+					System.out.println("InputStream not found: "+conid);
+				}
+			}
+			else if(type==StreamSendTask.CLOSE_INPUT_PARTICIPANT)
+			{
+				// Handle input connection initiator side
+				InitiatorOutputConnection con = (InitiatorOutputConnection)icons.get(new Integer(conid));
+				if(con!=null)
+				{
+					con.setClosed();
+				}
+				else
+				{
+					System.out.println("OutputStream not found: "+conid);
 				}
 			}
 			
-			// Handle input connection initiator side
-			if(type==StreamSendTask.CLOSE_INPUT_PARTICIPANT)
+			else if(type==StreamSendTask.INIT_OUTPUT_INITIATOR)
 			{
-				final OutputConnection con;
-				if(icons.containsKey(new Integer(conid)))
+				IComponentIdentifier[] recs = (IComponentIdentifier[])data;
+				byte[] cids	= codecfactory.getDefaultCodecIds();
+				final ParticipantOutputConnection con = new ParticipantOutputConnection(MessageService.this, recs[0], 
+					recs[1], conid, getTransports(), cids, getMessageCodecs(cids));
+				pcons.put(new Integer(conid), con);
+//				System.out.println("created: "+con.hashCode());
+				
+				final Future<Void> ret = new Future<Void>();
+				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 				{
-					con = (OutputConnection)icons.get(new Integer(conid));
+					public void customResultAvailable(IComponentManagementService cms)
+					{
+						AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(((IComponentIdentifier[])data)[1]);
+						if(component != null)
+						{
+							Map<String, Object> msg = new HashMap<String, Object>();
+							msg.put(SFipa.CONTENT, con);
+							component.receiveMessage(msg, getMessageType(SFipa.MESSAGE_TYPE_NAME_FIPA));
+//							pcons.put(new Integer(conid), con);
+						}
+					}
+				});
+			}
+			else if(type==StreamSendTask.DATA_OUTPUT_PARTICIPANT)
+			{
+				InitiatorInputConnection con = (InitiatorInputConnection)icons.get(new Integer(conid));
+				if(con!=null)
+				{
+					con.addData((byte[])data);
+				}
+				else
+				{
+					System.out.println("InputStream not found: "+conid);
+				}
+			}
+			else if(type==StreamSendTask.CLOSE_OUTPUT_INITIATOR)
+			{
+				ParticipantOutputConnection con = (ParticipantOutputConnection)pcons.get(new Integer(conid));
+				if(con!=null)
+				{
 					con.setClosed();
-					icons.remove(conid);
+				}
+				else
+				{
+					System.out.println("InputStream not found: "+conid);
+				}
+			}
+			else if(type==StreamSendTask.CLOSE_OUTPUT_PARTICIPANT)
+			{
+				InitiatorInputConnection con = (InitiatorInputConnection)icons.get(new Integer(conid));
+				if(con!=null)
+				{
+					con.setClosed();
+				}
+				else
+				{
+					System.out.println("OutputStream not found: "+conid);
 				}
 			}
 		}
 	}
 	
 	/**
-	 * 
+	 *  Handle map messages, i.e. normal text messages.
 	 */
 	class MapDeliveryHandler implements ICommand
 	{
 		/**
-		 * 
+		 *  Execute the command.
 		 */
 		public void execute(Object obj)
 		{

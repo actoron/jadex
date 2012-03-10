@@ -1,6 +1,5 @@
 package jadex.base.service.message;
 
-import jadex.base.service.message.MessageService.SendManager;
 import jadex.base.service.message.transport.ITransport;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
@@ -9,39 +8,23 @@ import jadex.commons.future.IntermediateFuture;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  *  Participant implementation for an input connection.
  */
-public class InputConnection implements IInputConnection
+public class ParticipantInputConnection extends AbstractConnection implements IInputConnection
 {
-	/** Boolean flag if connection is closed. */
-	protected boolean closed;
-	
-	/** The connection id. */
-	protected int id;
-	
 	/** The data. */
 	protected List<byte[]> data;
+	
+	/** The offset (startvalue of current first row). */
+	protected int offset;
 	
 	/** The position. */
 	protected int position;
 	
-	/** The message service. */
-	protected MessageService ms;
-	
-	/** The sender. */
-	protected IComponentIdentifier sender;
-
-	/** The receiver. */
-	protected IComponentIdentifier receiver;
-	
-	/** The transports. */
-	protected ITransport[] transports;
-	
-	/** The connection map. */
-	protected Map<Integer, Object> cons;
+	/** The size. */
+	protected int size;
 	
 	/** The read future. */
 	protected IntermediateFuture<Byte> future;
@@ -49,18 +32,11 @@ public class InputConnection implements IInputConnection
 	/**
 	 *  Create a new input connection.
 	 */
-	public InputConnection(MessageService ms, IComponentIdentifier sender, 
-		IComponentIdentifier receiver, int id, ITransport[] transports,
-		Map<Integer, Object> cons)
+	public ParticipantInputConnection(MessageService ms, IComponentIdentifier sender, 
+		IComponentIdentifier receiver, int id, ITransport[] transports)
 	{
-		this.ms = ms;
-		this.sender = sender;
-		this.receiver = receiver;
-		this.id = id;
-		this.transports = transports;
+		super(ms, sender, receiver, id, transports, null, null);
 		this.data = new ArrayList<byte[]>();
-		this.cons = cons;
-		cons.put(id, this);
 	}
 	
 	/**
@@ -75,20 +51,20 @@ public class InputConnection implements IInputConnection
 		if(future!=null)
 			throw new RuntimeException("Stream has asynchronous reader");
 
-		int startpos = 0;
-		int rowcnt = 0;
-		for(; rowcnt<data.size(); rowcnt++)
-		{
-			byte[] row = data.get(rowcnt);
-			if(position<startpos+row.length)
-				break;
-			startpos += row.length;
-		}
+		int startpos = offset;
+
+//		for(; rowcnt<data.size(); rowcnt++)
+//		{
+//			byte[] row = data.get(rowcnt);
+//			if(position<startpos+row.length)
+//				break;
+//			startpos += row.length;
+//		}
 		
 		int buffercnt = 0;
-		if(rowcnt<data.size())
+		if(data.size()>0)
 		{
-			byte[] row = data.get(rowcnt);
+			byte[] row = data.get(0);
 			int inrowstart = position-startpos;
 			
 			for(; buffercnt<buffer.length;)
@@ -98,9 +74,15 @@ public class InputConnection implements IInputConnection
 				if(inrowstart>=row.length)
 				{
 					inrowstart = 0;
-					if(++rowcnt<data.size())
+					offset += row.length;
+					data.remove(0);
+					if(data.size()>0)
 					{
-						row = data.get(rowcnt);
+						row = data.get(0);
+					}
+					else
+					{
+						break;
 					}
 				}
 			}
@@ -121,27 +103,41 @@ public class InputConnection implements IInputConnection
 	 */
 	public synchronized int read()
 	{
-//		if(future!=null)
-//			throw new RuntimeException("Stream has asynchronous reader");
-
-		int startpos = 0;
-		int rowcnt = 0;
-		for(; rowcnt<data.size(); rowcnt++)
-		{
-			byte[] row = data.get(rowcnt);
-			if(position<startpos+row.length)
-				break;
-			startpos += row.length;
-		}
+		if(future!=null)
+			throw new RuntimeException("Stream has asynchronous reader");
+		return internalRead();
+	}
+	
+	/**
+	 *  Non-blocking read. Tries to read the next byte.
+	 *  @return The next byte or -1 if none is currently available.
+	 *  @throws exception if end of stream has been reached.
+	 */
+	protected synchronized int internalRead()
+	{
+		int startpos = offset;
+		
+//		for(; rowcnt<data.size(); rowcnt++)
+//		{
+//			byte[] row = data.get(rowcnt);
+//			if(position<startpos+row.length)
+//				break;
+//			startpos += row.length;
+//		}
 		
 		int ret = -1;
-		if(rowcnt<data.size())
+		if(data.size()>0)
 		{
-			byte[] row = data.get(rowcnt);
+			byte[] row = data.get(0);
 			int inrowstart = position-startpos;
 			
 			ret = row[inrowstart];
 			position++;
+			if(inrowstart+1==row.length)
+			{
+				offset += row.length;
+				data.remove(0);
+			}
 		}
 		else if(closed)
 		{
@@ -168,14 +164,21 @@ public class InputConnection implements IInputConnection
 			
 		try
 		{
-			for(int val=read(); val!=-1; )
+			try
 			{
-				future.addIntermediateResult(new Byte((byte)val));
+				for(int val=internalRead(); val!=-1; )
+				{
+					future.addIntermediateResult(new Byte((byte)val));
+				}
 			}
-			// end of current stream reached
-			if(cl)
+			catch(Exception e)
 			{
-				future.setException(new RuntimeException("Stream closed"));
+				// catch stream closed exception
+			}
+			if(cl && position==size)
+			{
+				future.setFinished();
+//				future.setException(new RuntimeException("Stream closed"));
 			}
 		}
 		catch(Exception e)
@@ -188,16 +191,16 @@ public class InputConnection implements IInputConnection
 
 	
 	/**
-	 * 
+	 *  Close the stream.
+	 *  Notifies the initiator that the stream has been closed.
 	 */
 	public void close()
 	{
-		// Send data message
+		// Send closed message
 		setClosed();
-		SendManager sm = ms.getSendManager(sender);
 		StreamSendTask task = new StreamSendTask(StreamSendTask.CLOSE_INPUT_PARTICIPANT, new byte[1], id, 
 			new IComponentIdentifier[]{sender}, transports, null, null);
-		sm.addMessage(task); 
+		sendTask(task);
 	}
 	
 	//-------- methods called from message service --------
@@ -208,26 +211,43 @@ public class InputConnection implements IInputConnection
 	 */
 	public void addData(byte[] data)
 	{
+		try
+		{
 		IntermediateFuture<Byte> ret;
 		boolean cl;
 		synchronized(this)
 		{
-			this.data.add(data);
+			if(future!=null)
+			{
+				this.data.add(data);
+			}
+			else
+			{
+				offset += data.length;
+			}
+			this.size += data.length;
 			ret = future;
 			cl = closed;
 		}
 		
 		if(ret!=null)
 		{
-			
+			position += data.length;
 			for(int i=0; i<data.length; i++)
 			{
 				ret.addIntermediateResult(data[i]);
 			}
-			if(cl)
+			
+			if(cl && position==size)
 			{
-				ret.setException(new RuntimeException("Stream closed"));
+				ret.setFinished();
+//				ret.setException(new RuntimeException("Stream closed"));
 			}
+		}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 	}
 	
@@ -237,13 +257,20 @@ public class InputConnection implements IInputConnection
 	public void setClosed()
 	{
 		IntermediateFuture<Byte> ret;
+		boolean cl;
 		synchronized(this)
 		{
-			this.closed = true;
-			cons.remove(id);	
+			super.setClosed();
 			ret = future;
+			cl = position == size;
 		}
-		if(ret!=null)
-			ret.setException(new RuntimeException("Stream closed"));
+		// notify async listener if last byte has been read and stream is closed.
+		if(ret!=null && cl)
+		{
+			ret.setFinished();
+//			ret.setException(new RuntimeException("Stream closed"));
+		}
 	}
+	
+	
 }
