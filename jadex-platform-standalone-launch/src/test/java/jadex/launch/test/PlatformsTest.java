@@ -26,7 +26,7 @@ public class PlatformsTest extends TestCase
 	{
 		"jadex.component.ComponentComponentFactory", "jadex.standalone.Platform.component.xml",
 		"jadex.micro.MicroAgentFactory", "jadex.standalone.PlatformAgent",
-//		"jadex.bpmn.BpmnFactory", "jadex.standalone.Platform.bpmn"
+		"jadex.bpmn.BpmnFactory", "jadex.standalone.Platform.bpmn"
 	};
 	// Base arguments used for every platform.
 	String[]	BASEARGS	= new String[]
