@@ -190,23 +190,41 @@ public class MessageService extends BasicService implements IMessageService
 		deliveryhandlers.put(MapSendTask.MESSAGE_TYPE_MAP, new MapDeliveryHandler());
 		deliveryhandlers.put(StreamSendTask.MESSAGE_TYPE_STREAM, new StreamDeliveryHandler());
 		
-		this.icons = new WeakValueMap<Integer, Object>();
-		this.pcons = new WeakValueMap<Integer, Object>();
+//		this.icons = new WeakValueMap<Integer, Object>();
+//		this.pcons = new WeakValueMap<Integer, Object>();
+		this.icons = new HashMap<Integer, Object>();
+		this.pcons = new HashMap<Integer, Object>();
 	}
 	
 	//-------- interface methods --------
 
 	/**
+	 * 
+	 */
+	public IInputConnection getParticipantInputConnection(int conid)
+	{
+		return (IInputConnection)pcons.get(conid);
+	}
+	
+	/**
 	 *  Create a virtual output connection.
 	 */
-	public IFuture<IOutputConnection> createOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
+	public IOutputConnection internalCreateOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
 	{
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
 		byte[] cids	= codecfactory.getDefaultCodecIds();
 		InitiatorOutputConnection con = new InitiatorOutputConnection(this, sender, receiver, conid, getTransports(), cids, getMessageCodecs(cids));
 		icons.put(conid, con);
-		return new Future<IOutputConnection>(con);
+		return con;
+	}
+	
+	/**
+	 *  Create a virtual output connection.
+	 */
+	public IFuture<IOutputConnection> createOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
+	{
+		return new Future<IOutputConnection>(internalCreateOutputConnection(sender, receiver));
 	}
 
 	/**

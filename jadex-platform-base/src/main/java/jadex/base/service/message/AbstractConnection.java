@@ -8,7 +8,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 /**
- * 
+ *  Abstract base class for connections.
  */
 public abstract class AbstractConnection
 {
@@ -53,7 +53,8 @@ public abstract class AbstractConnection
 	}
 	
 	/**
-	 *  Send a task.
+	 *  Send a task. Automatically closes the stream if
+	 *  the other side could not be reached.
 	 */
 	protected IFuture<Void> sendTask(AbstractSendTask task)
 	{

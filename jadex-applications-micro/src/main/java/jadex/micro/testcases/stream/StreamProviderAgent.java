@@ -1,6 +1,8 @@
 package jadex.micro.testcases.stream;
 
+import jadex.base.service.message.ServiceOutputConnection;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
@@ -22,7 +24,7 @@ import java.util.List;
 /**
  *  Agent that provides a service with a stream.
  */
-@ProvidedServices(@ProvidedService(type=IStreamService.class, implementation=@Implementation(expression="$component")))
+@ProvidedServices(@ProvidedService(type=IStreamService.class, implementation=@Implementation(expression="$pojoagent")))
 @Results(@Result(name="testcases", clazz=List.class))
 @Service(IStreamService.class)
 @Agent
@@ -35,19 +37,18 @@ public class StreamProviderAgent implements IStreamService
 	 *  Pass an Input stream to the user.
 	 *  @return The Input stream.
 	 */
-	public IFuture<InputStream> getInputStream()
+	public IFuture<IInputConnection> getInputStream()
 	{
-		Future<InputStream> ret = new Future<InputStream>();
+		Future<IInputConnection> ret = new Future<IInputConnection>();
 		
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		final PrintWriter pw = new PrintWriter(bos);
+		final ServiceOutputConnection oc = new ServiceOutputConnection();
 
 		final int[] cnt = new int[]{0};
 		IComponentStep<Void> step = new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				pw.write("step ");
+				oc.write(new byte[]{(byte)cnt[0]});
 				if(cnt[0]++<5)
 					agent.waitFor(1000, this);
 				return IFuture.DONE;
@@ -56,10 +57,40 @@ public class StreamProviderAgent implements IStreamService
 		
 		agent.waitFor(1000, step);
 		
-		ret.setResult(null);//;new MagicInputStream(bos));
+		ret.setResult(oc.getInputConnection());
 		
 		return ret;
 	}
 	
+//	/**
+//	 *  Pass an Input stream to the user.
+//	 *  @return The Input stream.
+//	 */
+//	public IFuture<InputStream> getInputStream()
+//	{
+//		Future<InputStream> ret = new Future<InputStream>();
+//		
+//		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//		final PrintWriter pw = new PrintWriter(bos);
+//
+//		final int[] cnt = new int[]{0};
+//		IComponentStep<Void> step = new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				pw.write("step ");
+//				if(cnt[0]++<5)
+//					agent.waitFor(1000, this);
+//				return IFuture.DONE;
+//			}
+//		};
+//		
+//		agent.waitFor(1000, step);
+//		
+//		ret.setResult(null);//;new MagicInputStream(bos));
+//		
+//		return ret;
+//	}
+//	
 	
 }

@@ -1,6 +1,8 @@
 package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
+import jadex.base.service.message.MessageService;
+import jadex.base.service.message.ServiceOutputConnection;
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.base.service.remote.commands.RemoteGetExternalAccessCommand;
 import jadex.base.service.remote.commands.RemoteSearchCommand;
@@ -10,6 +12,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -46,6 +49,7 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.micro.IMicroExternalAccess;
 import jadex.xml.IContext;
+import jadex.xml.IPostProcessor;
 import jadex.xml.IPreProcessor;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
@@ -167,6 +171,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** The message service. */
 	protected IMessageService msgservice;
 	
+//	protected Map<Integer, IInputConnection> icons;
+	
 	//-------- constructors --------
 	
 	/**
@@ -186,16 +192,35 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		this.marshal = marshal;
 		this.msgservice = msgservice;
 		this.binarymode = binarymode;
+//		this.icons = new HashMap<Integer, IInputConnection>();
 		
 		// Reader that supports conversion of proxyinfo to proxy.
+		Set<TypeInfo> typeinfosread = JavaReader.getTypeInfos();
 		
 		QName[] pr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyReference")};
-		
-		Set<TypeInfo> typeinfosread = JavaReader.getTypeInfos();
 		TypeInfo ti_rr = new TypeInfo(new XMLInfo(pr), 
 			new ObjectInfo(ProxyReference.class, new RMIPostProcessor(rrm)));
 		typeinfosread.add(ti_rr);
-				
+
+		QName[] icp = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "InputConnectionProxy")};
+		TypeInfo ti_icp = new TypeInfo(new XMLInfo(icp), 
+			new ObjectInfo(InputConnectionProxy.class, new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				InputConnectionProxy icp = (InputConnectionProxy)object;
+				int conid = icp.getConnectionId();
+				IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(conid);
+				return icon;
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		}));
+		typeinfosread.add(ti_icp);
+		
 		this.reader = new Reader(new TypeInfoPathManager(typeinfosread), false, false, false, new XMLReporter()
 		{
 			public void report(String message, String error, Object info, Location location)
@@ -267,6 +292,26 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				return marshal.isRemoteReference(obj);
 			}
 		}, preproc);
+		
+		// Streams
+		wh.addPreProcessor(new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+				return obj instanceof ServiceOutputConnection.ServiceInputConnection;
+			}
+		}, new IPreProcessor()
+		{
+			public Object preProcess(IContext context, Object object)
+			{
+				IComponentIdentifier receiver = (IComponentIdentifier)((Object[])context.getUserContext())[0];
+				ServiceOutputConnection.ServiceInputConnection con = (ServiceOutputConnection.ServiceInputConnection)object;
+				// hack todo:
+				((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+				con.setOutputConnection(RemoteServiceManagementService.this.component, receiver);
+				return new InputConnectionProxy();
+			}
+		});
 		
 		this.writer = new Writer(wh);
 //		{
@@ -405,6 +450,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	}
 	
 	//-------- methods --------
+	
+//	protected void addInputConnection(IInputConnection icon)
+//	{
+//		icons.put(icon.get, value);
+//	}
 	
 	/**
 	 *  Get service proxies from a remote platform.

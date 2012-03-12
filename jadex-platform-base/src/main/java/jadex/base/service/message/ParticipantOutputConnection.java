@@ -8,7 +8,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
- * 
+ *  Output connection on participant side.
  */
 public class ParticipantOutputConnection extends AbstractConnection implements IOutputConnection
 {

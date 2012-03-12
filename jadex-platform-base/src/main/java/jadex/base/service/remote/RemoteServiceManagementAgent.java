@@ -5,6 +5,7 @@ import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IInputConnection;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
@@ -144,6 +145,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						public void resultAvailable(final ClassLoader cl) 
 						{
 							Object content = msg.get(SFipa.CONTENT);
+							
 							final String callid = (String)msg.get(SFipa.CONVERSATION_ID);
 							final IntermediateFuture<IRemoteCommand>	reply	= new IntermediateFuture<IRemoteCommand>();
 		//					System.out.println("received: "+rms.getServiceIdentifier()+" "+callid);
