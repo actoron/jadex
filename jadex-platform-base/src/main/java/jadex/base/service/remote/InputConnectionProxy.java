@@ -8,6 +8,21 @@ public class InputConnectionProxy
 	protected int connectionid;
 
 	/**
+	 * 
+	 */
+	public InputConnectionProxy()
+	{
+	}
+	
+	/**
+	 * 
+	 */
+	public InputConnectionProxy(int connectionid)
+	{
+		this.connectionid = connectionid;
+	}
+
+	/**
 	 *  Get the connectionid.
 	 *  @return The connectionid.
 	 */

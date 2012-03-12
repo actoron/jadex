@@ -11,6 +11,7 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemotable;
@@ -181,6 +182,7 @@ public class MarshalService extends BasicService implements IMarshalService
 	public boolean isRemoteObject(Object target)
 	{
 		boolean ret = false;
+		
 		if(Proxy.isProxyClass(target.getClass()))
 		{
 			Object handler = Proxy.getInvocationHandler(target);

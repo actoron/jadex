@@ -1,6 +1,7 @@
 package jadex.base.service.remote;
 
 import jadex.base.fipa.SFipa;
+import jadex.base.service.message.InitiatorOutputConnection;
 import jadex.base.service.message.MessageService;
 import jadex.base.service.message.ServiceOutputConnection;
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
@@ -307,9 +308,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				IComponentIdentifier receiver = (IComponentIdentifier)((Object[])context.getUserContext())[0];
 				ServiceOutputConnection.ServiceInputConnection con = (ServiceOutputConnection.ServiceInputConnection)object;
 				// hack todo:
-				((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
-				con.setOutputConnection(RemoteServiceManagementService.this.component, receiver);
-				return new InputConnectionProxy();
+				InitiatorOutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+				con.setOutputConnection(RemoteServiceManagementService.this.component, receiver, ocon);
+				return new InputConnectionProxy(ocon.getConnectionId());
 			}
 		});
 		

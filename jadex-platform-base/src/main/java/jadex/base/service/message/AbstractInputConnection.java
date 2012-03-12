@@ -201,6 +201,7 @@ public abstract class AbstractInputConnection extends AbstractConnection impleme
 	 */
 	public boolean addData(byte[] data)
 	{
+//		System.out.println("added: "+data.length);
 		IntermediateFuture<Byte> ret;
 		boolean cl;
 		synchronized(this)

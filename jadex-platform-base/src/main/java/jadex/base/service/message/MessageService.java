@@ -209,7 +209,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Create a virtual output connection.
 	 */
-	public IOutputConnection internalCreateOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
+	public InitiatorOutputConnection internalCreateOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
 	{
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();

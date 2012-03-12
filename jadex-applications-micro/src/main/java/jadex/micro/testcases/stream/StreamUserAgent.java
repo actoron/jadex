@@ -1,21 +1,25 @@
 package jadex.micro.testcases.stream;
 
 import jadex.bridge.IInputConnection;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 
-import java.io.InputStream;
 import java.util.Collection;
 
 /**
  *  Agent that provides a service with a stream.
  */
-@RequiredServices(@RequiredService(name="ss", type=IStreamService.class))
+@RequiredServices(@RequiredService(name="ss", type=IStreamService.class, 
+	binding=@Binding(scope=RequiredServiceInfo.SCOPE_GLOBAL)))
 @Agent
 public class StreamUserAgent 
 {
@@ -27,6 +31,7 @@ public class StreamUserAgent
 	/**
 	 *  The agent body.
 	 */
+	@AgentBody
 	public void body()
 	{
 		IFuture<IStreamService> fut = agent.getServiceContainer().getRequiredService("ss");
@@ -34,10 +39,11 @@ public class StreamUserAgent
 		{
 			public void resultAvailable(IStreamService ss)
 			{
-				ss.getInputStream().addResultListener(new DefaultResultListener<IInputConnection>()
+				ss.getInputStream().addResultListener(new IResultListener<IInputConnection>()
 				{
 					public void resultAvailable(IInputConnection is)
 					{
+						System.out.println("received icon: "+is);
 						StreamUserAgent.this.icon = is;
 						is.aread().addResultListener(new IIntermediateResultListener<Byte>()
 						{
@@ -58,6 +64,11 @@ public class StreamUserAgent
 								System.out.println("ex:"+exception);
 							}
 						});
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("ex: "+exception);
 					}
 				});
 			}

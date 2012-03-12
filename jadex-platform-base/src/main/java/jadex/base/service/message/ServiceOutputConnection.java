@@ -93,7 +93,7 @@ public class ServiceOutputConnection implements IOutputConnection
 		
 		while(buffer.size()>0)
 		{
-			byte[] data = buffer.get(0);
+			byte[] data = buffer.remove(0);
 			ocon.write(data);
 		}
 		
@@ -108,22 +108,23 @@ public class ServiceOutputConnection implements IOutputConnection
 	 */
 	public class ServiceInputConnection implements IInputConnection
 	{
-		public void setOutputConnection(IExternalAccess component, IComponentIdentifier receiver)
+		public void setOutputConnection(IExternalAccess component, IComponentIdentifier receiver, IOutputConnection ocon)
 		{
-			createOutputConnection(component, receiver)
-				.addResultListener(new IResultListener<IOutputConnection>()
-			{
-				public void resultAvailable(IOutputConnection ocon)
-				{
-					System.out.println("has output");
-					ServiceOutputConnection.this.setOutputConnection(ocon);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					System.out.println("excepetion: "+exception);
-				}
-			});
+			ServiceOutputConnection.this.setOutputConnection(ocon);
+//			createOutputConnection(component, receiver)
+//				.addResultListener(new IResultListener<IOutputConnection>()
+//			{
+//				public void resultAvailable(IOutputConnection ocon)
+//				{
+//					System.out.println("has output");
+//					ServiceOutputConnection.this.setOutputConnection(ocon);
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					System.out.println("excepetion: "+exception);
+//				}
+//			});
 		}
 		
 //		public ServiceOutputConnection getOutputConnection()
@@ -152,34 +153,34 @@ public class ServiceOutputConnection implements IOutputConnection
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	public IFuture<IOutputConnection> createOutputConnection(final IExternalAccess component, final IComponentIdentifier receiver)
-	{
-		final Future<IOutputConnection> ret = new Future<IOutputConnection>();
-		
-		component.scheduleStep(new IComponentStep<IOutputConnection>()
-		{
-			public IFuture<IOutputConnection> execute(final IInternalAccess ia)
-			{
-				final Future<IOutputConnection> fut = new Future<IOutputConnection>();
-				
-				SServiceProvider.getService(ia.getServiceContainer(), 
-					IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IMessageService, IOutputConnection>(ret)
-				{
-					public void customResultAvailable(IMessageService ms)
-					{
-						ms.createOutputConnection(component.getComponentIdentifier(), receiver)
-							.addResultListener(ia.createResultListener(new DelegationResultListener<IOutputConnection>(fut)));
-					}
-				}));
-				
-				return fut; 
-			}
-		}).addResultListener(new DelegationResultListener<IOutputConnection>(ret));
-		
-		return ret;
-	}
+//	/**
+//	 * 
+//	 */
+//	public IFuture<IOutputConnection> createOutputConnection(final IExternalAccess component, final IComponentIdentifier receiver)
+//	{
+//		final Future<IOutputConnection> ret = new Future<IOutputConnection>();
+//		
+//		component.scheduleStep(new IComponentStep<IOutputConnection>()
+//		{
+//			public IFuture<IOutputConnection> execute(final IInternalAccess ia)
+//			{
+//				final Future<IOutputConnection> fut = new Future<IOutputConnection>();
+//				
+//				SServiceProvider.getService(ia.getServiceContainer(), 
+//					IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IMessageService, IOutputConnection>(ret)
+//				{
+//					public void customResultAvailable(IMessageService ms)
+//					{
+//						ms.createOutputConnection(component.getComponentIdentifier(), receiver)
+//							.addResultListener(ia.createResultListener(new DelegationResultListener<IOutputConnection>(fut)));
+//					}
+//				}));
+//				
+//				return fut; 
+//			}
+//		}).addResultListener(new DelegationResultListener<IOutputConnection>(ret));
+//		
+//		return ret;
+//	}
 }

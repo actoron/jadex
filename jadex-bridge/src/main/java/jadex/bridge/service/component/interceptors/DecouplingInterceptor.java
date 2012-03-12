@@ -156,7 +156,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		// Perform argument copy
 		
 		// In case of remote call parameters are copied as part of marshalling.
-		if(copy && !marshal.isRemoteObject(sic.getObject()))
+		if(copy && !marshal.isRemoteObject(sic.getProxy()))
 		{
 			Method method = sic.getMethod();
 			boolean[] refs = SServiceProvider.getLocalReferenceInfo(method, !copy);
@@ -414,14 +414,14 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		{
 			Object	res	= sic.getResult();
 			
-//			if(sic.getMethod().getName().equals("getResult"))
+//			if(sic.getMethod().getName().equals("getInputStream"))
 //				System.out.println("heererrere");
 			
 			if(res instanceof IFuture)
 			{
 				Method method = sic.getMethod();
 				Reference ref = method.getAnnotation(Reference.class);
-				final boolean copy = DecouplingInterceptor.this.copy && !marshal.isRemoteObject(sic.getObject()) && (ref!=null? !ref.local(): true);
+				final boolean copy = DecouplingInterceptor.this.copy && !marshal.isRemoteObject(sic.getProxy()) && (ref!=null? !ref.local(): true);
 				final IFilter	deffilter = new IFilter()
 				{
 					public boolean filter(Object object)

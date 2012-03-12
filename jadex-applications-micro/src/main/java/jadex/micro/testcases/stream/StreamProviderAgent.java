@@ -4,6 +4,7 @@ import jadex.base.service.message.ServiceOutputConnection;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -15,10 +16,6 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.List;
 
 /**
@@ -56,7 +53,6 @@ public class StreamProviderAgent implements IStreamService
 		};
 		
 		agent.waitFor(1000, step);
-		
 		ret.setResult(oc.getInputConnection());
 		
 		return ret;

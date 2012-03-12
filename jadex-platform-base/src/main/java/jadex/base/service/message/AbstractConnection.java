@@ -58,6 +58,7 @@ public abstract class AbstractConnection
 	 */
 	protected IFuture<Void> sendTask(AbstractSendTask task)
 	{
+//		System.out.println("sendTask: "+task);
 		IComponentIdentifier[] recs = task.getReceivers();
 		if(recs.length!=1)
 			throw new RuntimeException("Must have exactly one receiver.");
@@ -86,5 +87,14 @@ public abstract class AbstractConnection
 	public synchronized void setClosed()
 	{
 		this.closed = true;
+	}
+
+	/**
+	 *  Get the id.
+	 *  @return the id.
+	 */
+	public int getConnectionId()
+	{
+		return id;
 	}
 }
