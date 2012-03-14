@@ -1,6 +1,9 @@
 package jadex.base.test;
 
 import jadex.base.Starter;
+import jadex.base.test.impl.BrokenComponentTest;
+import jadex.base.test.impl.Cleanup;
+import jadex.base.test.impl.ComponentTest;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IArgument;

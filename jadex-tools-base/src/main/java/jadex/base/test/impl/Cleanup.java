@@ -1,4 +1,4 @@
-package jadex.base.test;
+package jadex.base.test.impl;
 
 
 import jadex.bridge.IExternalAccess;

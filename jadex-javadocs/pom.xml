@@ -143,20 +143,42 @@
 						<configuration>
 							<doctitle>Jadex Active Component Platform ${project.version} API.</doctitle>
 							<windowtitle>Jadex Active Component Platform ${project.version} API.</windowtitle>
-							<!-- <groups>
+							<groups>
 								<group>
 									<title>Core Packages</title>
-									<!- - To includes java.lang, java.lang.ref, java.lang.reflect and only java.util 
-										(i.e. not java.util.jar) - ->
-									<packages>java.lang*:java.util</packages>
+									<packages>jadex.commons*:jadex.bridge*</packages>
 								</group>
 								<group>
-									<title>Extension Packages</title>
-									<!- - To include javax.accessibility, javax.crypto, ... (among others) - ->
-									<packages>javax.*</packages>
+									<title>Micro Agent Packages</title>
+									<packages>jadex.micro*</packages>
+								</group>
+								<group>
+									<title>BPMN Process Packages</title>
+									<packages>jadex.bpmn*</packages>
+								</group>
+								<group>
+									<title>BDI Agent Packages</title>
+									<packages>jadex.bdi*</packages>
+								</group>
+								<group>
+									<title>Web Service Extension Packages</title>
+									<packages>jadex.extension.ws*:jadex.extension.rs*</packages>
+								</group>
+								<group>
+									<title>2D/3D Environment Extension Packages</title>
+									<packages>jadex.extension.envsupport*</packages>
+								</group>
+								<group>
+									<title>Agent-Group-Role (AGR) Extension Packages</title>
+									<packages>jadex.extension.agr*</packages>
 								</group>
 							</groups>						
-							<excludePackageNames>a.*, b.c.*</excludePackageNames> -->
+							<excludePackageNames>
+								*impl*,
+								jadex.base.gui.*tree*,
+								jadex.base.gui.filechooser*,
+								jadex.base.gui.jtable*
+							</excludePackageNames>
 							<show>public</show>
 							<detectLinks>true</detectLinks>
 							<includeDependencySources>true</includeDependencySources>

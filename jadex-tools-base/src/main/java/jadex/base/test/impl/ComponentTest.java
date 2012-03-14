@@ -1,6 +1,8 @@
-package jadex.base.test;
+package jadex.base.test.impl;
 
 
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
