@@ -176,8 +176,8 @@
 							<excludePackageNames>
 								*impl*,
 								jadex.base.gui.*tree*,
-								jadex.base.gui.*filechooser*, <!-- doesn't work without * ? -->
-								jadex.base.gui.*jtable* <!-- doesn't work without * ? -->
+								jadex.base.gui.*filechooser*, <!-- doesn't work without '*'? -->
+								jadex.base.gui.*jtable* <!-- doesn't work without '*'? -->
 							</excludePackageNames>
 							<show>public</show>
 							<detectLinks>true</detectLinks>
