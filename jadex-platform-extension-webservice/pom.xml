@@ -186,12 +186,12 @@
 			<version>2.1-SNAPSHOT</version>
 		</dependency> -->
 		
-		<!-- hack -> remove (because of remote micro agent) -->
+		<!-- hack -> remove (because of remote micro agent) - ->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-base</artifactId>
 			<version>2.1-SNAPSHOT</version>
-		</dependency>
+		</dependency>-->
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
@@ -210,30 +210,41 @@
 			<artifactId>jersey-grizzly2</artifactId>
 			<version>1.11</version>
 		</dependency> 
+		<dependency>
+			<groupId>org.glassfish.grizzly</groupId>
+			<artifactId>grizzly-http-server</artifactId>
+			<version>2.1.2</version>
+		</dependency> 
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>jsr311-api</artifactId>
+			<version>1.1.1</version>
+		</dependency> 
 		
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-bundle</artifactId>
 			<version>1.11</version>
 		</dependency>
-		
+		<!-- 
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>1.11</version>
+		</dependency>
+		-->
+		<!-- 
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-json</artifactId>
 			<version>1.11</version>
 		</dependency>
-		
+-->		
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
 			<artifactId>jersey-multipart</artifactId>
 			<version>1.11</version>
 		</dependency>
             
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
 </project>

@@ -253,21 +253,23 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-nuggets</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-xml</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
-
-		<!-- Kernels -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-base</artifactId>
+			<artifactId>jadex-tools-base</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
+		<!-- 
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-nuggets</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+		 -->
+
+		<!-- Kernels -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-micro</artifactId>
@@ -278,21 +280,28 @@
 			<artifactId>jadex-kernel-bpmn</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
-		<!-- <dependency>
+		<!-- 
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-base</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-application</artifactId>
 			<version>2.1-SNAPSHOT</version>
-		</dependency> -->
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-kernel-gpmn</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-kernel-component</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-kernel-gpmn</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>		
+		 -->
 		
 		<!-- BDI kernel -->
 		<dependency>
@@ -321,7 +330,7 @@
 			<version>2.1-SNAPSHOT</version>
 		</dependency> -->
 
-		<!-- Platforms -->
+		<!-- Platforms - ->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-platform-base</artifactId>
@@ -332,8 +341,9 @@
 			<artifactId>jadex-platform-standalone</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
+		-->
 
-		<!-- Tools -->
+		<!-- Tools - ->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-runtimetools</artifactId>
@@ -359,6 +369,7 @@
 			<artifactId>jadex-rules-tools</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
+		-->
 
 		<!-- Extensions -->
 		<dependency>

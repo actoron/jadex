@@ -173,7 +173,7 @@
 			<groupId>com.jme3</groupId>
 			<artifactId>jmonkeyengine3</artifactId>
 			<version>3.0.0-SNAPSHOT</version>
-
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
@@ -192,24 +192,28 @@
 			<groupId>com.jme3</groupId>
 			<artifactId>jME3-lwjgl</artifactId>
 			<version>3.0.0-SNAPSHOT</version>
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.jme3</groupId>
 			<artifactId>jME3-lwjgl-natives</artifactId>
 			<version>3.0.0-SNAPSHOT</version>
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.jme3</groupId>
 			<artifactId>lwjgl</artifactId>
 			<version>3.0.0-SNAPSHOT</version>
+			<scope>runtime</scope>
 		</dependency>
 		
         <dependency>
             <groupId>com.jme3</groupId>
             <artifactId>jME3-blender</artifactId>
             <version>3.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
         </dependency>    
                
         <dependency>
@@ -222,30 +226,36 @@
             <groupId>com.jme3</groupId>
             <artifactId>jME3-plugins</artifactId>
             <version>3.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
         </dependency>   
         
+        <!-- todo: remove!? -->
        <dependency>
             <groupId>com.jme3</groupId>
             <artifactId>jME3-testdata</artifactId>
             <version>3.0.0-SNAPSHOT</version>
+            <scope>runtime</scope>
        </dependency>
        
        <dependency>
              <groupId>com.jme3</groupId>
              <artifactId>jME3-jogg</artifactId>
              <version>3.0.0-SNAPSHOT</version>
+             <scope>runtime</scope>
        </dependency>      
             
        <dependency>
              <groupId>com.jme3</groupId>
              <artifactId>j-ogg-oggd</artifactId>
              <version>3.0.0-SNAPSHOT</version>
+             <scope>runtime</scope>
        </dependency>  
                 
        <dependency>
              <groupId>com.jme3</groupId>
              <artifactId>j-ogg-vorbisd</artifactId>
              <version>3.0.0-SNAPSHOT</version>
+             <scope>runtime</scope>
       </dependency>  
 
 		<dependency>

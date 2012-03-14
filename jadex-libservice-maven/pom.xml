@@ -159,6 +159,11 @@
 			<artifactId>jadex-bridge</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-commons</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
 	
 		<dependency>
 			<groupId>org.apache.maven</groupId>
@@ -168,6 +173,11 @@
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-model-builder</artifactId>
+			<version>3.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-settings</artifactId>
 			<version>3.0.3</version>
 		</dependency>
 		<dependency>
@@ -199,36 +209,37 @@
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-impl</artifactId>
       <version>1.13</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-connector-file</artifactId>
       <version>1.13</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-connector-asynchttpclient</artifactId>
       <version>1.13</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-connector-wagon</artifactId>
       <version>1.13</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-aether-provider</artifactId>
-      <version>3.0.3</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
       <version>2.0</version>
+      <scope>runtime</scope>
     </dependency>
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-jdk14</artifactId>
     <version>1.6.2</version>
+    <scope>runtime</scope>
 </dependency>
 	</dependencies>
 </project>

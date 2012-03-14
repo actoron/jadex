@@ -170,12 +170,6 @@
 
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-javaparser</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-bridge</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
