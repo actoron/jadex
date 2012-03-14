@@ -1,7 +1,5 @@
 package jadex.tools.debugger;
 
-import jadex.base.SComponentFactory;
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IExternalAccess;
@@ -10,10 +8,12 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.tools.debugger.common.ObjectInspectorDebuggerPanel;
 
 import java.awt.Dimension;

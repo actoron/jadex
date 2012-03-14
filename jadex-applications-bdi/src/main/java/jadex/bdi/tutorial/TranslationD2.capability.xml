@@ -11,7 +11,7 @@
 	package="jadex.bdi.tutorial">
 
 	<imports>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.commons.*</import>
 	</imports>
 

@@ -1,6 +1,5 @@
 package jadex.tools.ruleprofiler;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
@@ -15,6 +14,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

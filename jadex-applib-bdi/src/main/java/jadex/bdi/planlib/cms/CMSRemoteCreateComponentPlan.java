@@ -1,11 +1,11 @@
 package jadex.bdi.planlib.cms;
 
-import jadex.base.fipa.CMSCreateComponent;
-import jadex.base.fipa.Done;
-import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.fipa.CMSCreateComponent;
+import jadex.bridge.fipa.Done;
+import jadex.bridge.fipa.SFipa;
 
 import java.util.Map;
 

@@ -1,6 +1,5 @@
 package jadex.bdi.examples.marsworld_classic.carrier;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld_classic.AgentInfo;
 import jadex.bdi.examples.marsworld_classic.Environment;
 import jadex.bdi.examples.marsworld_classic.Location;
@@ -9,6 +8,7 @@ import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.SFipa;
 
 /**
  *  This is the main plan for the different Carry Agents.

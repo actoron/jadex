@@ -1,7 +1,5 @@
 package jadex.tools.generic;
 
-import jadex.base.gui.SwingDefaultResultListener;
-import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
@@ -11,6 +9,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingDelegationResultListener;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;

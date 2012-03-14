@@ -1,10 +1,10 @@
 package jadex.micro.benchmarks;
 
-import jadex.base.fipa.SFipa;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;

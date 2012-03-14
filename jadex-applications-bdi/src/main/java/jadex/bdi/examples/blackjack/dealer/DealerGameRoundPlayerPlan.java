@@ -1,7 +1,5 @@
 package jadex.bdi.examples.blackjack.dealer;
 
-import jadex.base.fipa.Done;
-import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.blackjack.Card;
 import jadex.bdi.examples.blackjack.CardSet;
 import jadex.bdi.examples.blackjack.Dealer;
@@ -12,6 +10,8 @@ import jadex.bdi.examples.blackjack.RequestDraw;
 import jadex.bdi.examples.blackjack.RequestFinished;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.Done;
+import jadex.bridge.fipa.SFipa;
 
 /**
  *  Play a game round with the given player.

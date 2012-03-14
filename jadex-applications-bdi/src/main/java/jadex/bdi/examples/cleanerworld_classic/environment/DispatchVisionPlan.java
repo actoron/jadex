@@ -1,11 +1,11 @@
 package jadex.bdi.examples.cleanerworld_classic.environment;
 
-import jadex.base.fipa.Done;
 import jadex.bdi.examples.cleanerworld_classic.Cleaner;
 import jadex.bdi.examples.cleanerworld_classic.Environment;
 import jadex.bdi.examples.cleanerworld_classic.RequestVision;
 import jadex.bdi.examples.cleanerworld_classic.Vision;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.Done;
 
 /**
  *  The dispatch vision plan calculates the vision for a

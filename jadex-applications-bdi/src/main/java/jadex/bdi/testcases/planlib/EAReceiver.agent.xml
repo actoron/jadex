@@ -13,7 +13,7 @@
 		<import>jadex.bdi.planlib.protocols.*</import>
 		<import>jadex.bdi.testcases.*</import>
 		<import>jadex.bridge.IComponentIdentifier</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.commons.IFilter</import>
 	</imports>
 

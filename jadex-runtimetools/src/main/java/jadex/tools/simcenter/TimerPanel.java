@@ -1,6 +1,5 @@
 package jadex.tools.simcenter;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -13,6 +12,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.IRemoteChangeListener;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.jtable.ObjectTableModel;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.annotation.XMLIncludeFields;

@@ -1,6 +1,5 @@
 package jadex.micro.examples.chat;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -14,6 +13,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;

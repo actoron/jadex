@@ -1,9 +1,8 @@
 package jadex.tools.dfbrowser;
 
-import jadex.base.fipa.DFComponentDescription;
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
+import jadex.bridge.fipa.DFComponentDescription;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;
@@ -13,6 +12,7 @@ import jadex.commons.Property;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;

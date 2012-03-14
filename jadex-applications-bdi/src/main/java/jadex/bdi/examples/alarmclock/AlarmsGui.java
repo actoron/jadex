@@ -1,12 +1,12 @@
 package jadex.bdi.examples.alarmclock;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.jtable.ObjectTableModel;
 import jadex.xml.annotation.XMLClassname;
 

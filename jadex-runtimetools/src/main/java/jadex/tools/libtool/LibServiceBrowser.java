@@ -1,6 +1,5 @@
 package jadex.tools.libtool;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IResourceIdentifier;
@@ -13,6 +12,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.EditableListEvent;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

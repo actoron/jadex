@@ -13,7 +13,7 @@
 
 	<imports>
 		<import>jadex.bridge.service.types.df.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>java.util.logging.*</import>
 	</imports>
 

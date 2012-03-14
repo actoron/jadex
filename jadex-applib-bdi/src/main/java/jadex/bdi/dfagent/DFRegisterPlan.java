@@ -1,9 +1,9 @@
 package jadex.bdi.dfagent;
 
-import jadex.base.fipa.DFRegister;
-import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.DFRegister;
+import jadex.bridge.fipa.Done;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 
 /**

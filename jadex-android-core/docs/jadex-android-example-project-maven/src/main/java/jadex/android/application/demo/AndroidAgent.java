@@ -1,12 +1,13 @@
 package jadex.android.application.demo;
 
-import java.util.Map;
-
-import jadex.base.fipa.SFipa;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
+
+import java.util.Map;
+
 import android.os.Bundle;
 import android.os.Message;
 

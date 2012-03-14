@@ -1935,6 +1935,74 @@ public class SUtil
 	}
 	
 	/**
+	 *  Test if a file name is contained.
+	 */
+	public static int indexOfFilename(String url, List<String> urlstrings)
+	{
+		int ret = -1;
+		try
+		{
+			File file = urlToFile(url);
+			if(file==null)
+				file	= new File(url);
+			for(int i=0; file!=null && i<urlstrings.size() && ret==-1; i++)
+			{
+				String	totest	= (String)urlstrings.get(i);
+				File test = urlToFile(totest);
+				if(test==null)
+					test	= new File(totest);
+				if(test!=null && file.getCanonicalPath().equals(test.getCanonicalPath()))
+					ret = i;
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return ret;
+	}
+
+	/**
+	 *  Convert an URL to a file.
+	 *  @return null, if the URL is neither 'file:' nor 'jar:file:' URL and no path point to an existing file.
+	 */
+	public static File urlToFile(String url)
+	{
+		File	file	= null;
+		if(url.startsWith("file:"))
+		{
+			try
+			{
+				url	= URLDecoder.decode(url, "UTF-8");
+			}
+			catch(UnsupportedEncodingException uee)
+			{
+			}
+			file	= new File(url.substring(5));
+		}
+		else if(url.startsWith("jar:file:"))
+		{
+			try
+			{
+				url	= URLDecoder.decode(url, "UTF-8");
+			}
+			catch(UnsupportedEncodingException uee)
+			{
+			}
+			file	= new File(url.substring(9));
+		}
+		else
+		{
+			file	= new File(url);
+			if(!file.exists())
+			{
+				file	= null;
+			}
+		}
+		return file;
+	}	
+
+	/**
 	 *  Add a listener to System.out.
 	 */
 	public static synchronized void	addSystemOutListener(IChangeListener listener)

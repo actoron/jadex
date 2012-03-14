@@ -1,6 +1,5 @@
 package jadex.bdi.examples.cleanerworld.cleaner;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IGoal;
@@ -11,6 +10,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;

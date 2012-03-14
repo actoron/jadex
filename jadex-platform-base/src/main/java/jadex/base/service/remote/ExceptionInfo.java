@@ -1,5 +1,7 @@
 package jadex.base.service.remote;
 
+import jadex.bridge.service.types.remote.RemoteException;
+
 import java.util.ArrayList;
 import java.util.List;
 

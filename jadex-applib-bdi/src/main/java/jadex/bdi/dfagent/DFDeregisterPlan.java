@@ -1,9 +1,9 @@
 package jadex.bdi.dfagent;
 
-import jadex.base.fipa.DFDeregister;
-import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.DFDeregister;
+import jadex.bridge.fipa.Done;
 
 /**
  *  The df deregister plan has the task to receive a message 

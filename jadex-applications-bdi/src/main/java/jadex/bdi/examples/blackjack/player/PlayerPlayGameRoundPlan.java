@@ -1,7 +1,5 @@
 package jadex.bdi.examples.blackjack.player;
 
-import jadex.base.fipa.Done;
-import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.blackjack.Card;
 import jadex.bdi.examples.blackjack.CardSet;
 import jadex.bdi.examples.blackjack.GameResult;
@@ -15,6 +13,8 @@ import jadex.bdi.planlib.GuiCreator;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
+import jadex.bridge.fipa.Done;
+import jadex.bridge.fipa.SFipa;
 
 /**
  *  This plan is executed for every game round.

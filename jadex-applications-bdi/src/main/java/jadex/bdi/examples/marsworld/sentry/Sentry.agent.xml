@@ -16,7 +16,7 @@
 	<imports>
 		<import>java.util.*</import>
 		<import>java.util.logging.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.extension.envsupport.environment.*</import>
 		<import>jadex.extension.envsupport.math.*</import>
 		<import>jadex.bdi.examples.marsworld.movement.*</import>

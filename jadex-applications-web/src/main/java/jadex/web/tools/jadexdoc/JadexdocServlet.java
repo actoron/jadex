@@ -1,12 +1,12 @@
 package jadex.web.tools.jadexdoc;
 
-import jadex.base.SComponentFactory;
 import jadex.base.Starter;
 import jadex.base.gui.filetree.JarAsDirectory;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;

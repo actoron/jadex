@@ -1,11 +1,11 @@
 package jadex.bdi.examples.marsworld_classic.producer;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
 import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;

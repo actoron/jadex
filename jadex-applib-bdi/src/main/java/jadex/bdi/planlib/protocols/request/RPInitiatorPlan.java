@@ -1,9 +1,9 @@
 package jadex.bdi.planlib.protocols.request;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.planlib.protocols.AbstractInitiatorPlan;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.TimeoutException;
+import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
 
 

@@ -1,8 +1,8 @@
 package jadex.bdi.cmsagent;
 
-import jadex.base.fipa.CMSShutdownPlatform;
-import jadex.base.fipa.Done;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.CMSShutdownPlatform;
+import jadex.bridge.fipa.Done;
 
 /**
  *  Isuue a platform shutdown.

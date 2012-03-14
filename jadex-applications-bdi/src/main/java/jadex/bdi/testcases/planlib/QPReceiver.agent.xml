@@ -11,7 +11,7 @@
 
 	<imports>
 		<import>jadex.bdi.runtime.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>java.util.logging.*</import>
 		<import>jadex.bdi.testcases.*</import>
 		<import>jadex.bdi.planlib.protocols.*</import>

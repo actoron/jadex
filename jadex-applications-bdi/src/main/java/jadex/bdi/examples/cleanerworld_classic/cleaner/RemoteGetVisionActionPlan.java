@@ -1,12 +1,12 @@
 package jadex.bdi.examples.cleanerworld_classic.cleaner;
 
-import jadex.base.fipa.Done;
 import jadex.bdi.examples.cleanerworld_classic.Cleaner;
 import jadex.bdi.examples.cleanerworld_classic.Location;
 import jadex.bdi.examples.cleanerworld_classic.RequestVision;
 import jadex.bdi.examples.cleanerworld_classic.Vision;
 import jadex.bdi.examples.cleanerworld_classic.Waste;
 import jadex.bdi.runtime.IGoal;
+import jadex.bridge.fipa.Done;
 
 
 /**

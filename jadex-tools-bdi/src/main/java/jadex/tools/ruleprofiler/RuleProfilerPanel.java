@@ -1,6 +1,5 @@
 package jadex.tools.ruleprofiler;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bdi.runtime.impl.flyweights.ElementFlyweight;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
 import jadex.bridge.IComponentIdentifier;
@@ -9,6 +8,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtreetable.AbstractTreeTableModel;
 import jadex.commons.gui.jtreetable.DefaultTreeTableModel;

@@ -11,7 +11,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6DyUwRPEeCnwcpWvxOwkg" key="0:0" value="jadex.commons.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6DyVARPEeCnwcpWvxOwkg" key="1:0" value="jadex.bridge.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6DyVQRPEeCnwcpWvxOwkg" key="2:0" value="jadex.bpmn.runtime.task.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6DyVgRPEeCnwcpWvxOwkg" key="3:0" value="jadex.base.fipa.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_c6DyVgRPEeCnwcpWvxOwkg" key="3:0" value="jadex.bridge.fipa.*"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_c6M8QARPEeCnwcpWvxOwkg" source="jadex_arguments_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_ugMYgOE7EeCaWpd5N4uTqA" key="dimension" value="1:6"/>

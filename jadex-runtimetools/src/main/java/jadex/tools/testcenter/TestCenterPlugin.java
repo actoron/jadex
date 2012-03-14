@@ -1,7 +1,5 @@
 package jadex.tools.testcenter;
 
-import jadex.base.gui.SwingDefaultResultListener;
-import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.IFileNode;
@@ -26,6 +24,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingDelegationResultListener;
 
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;

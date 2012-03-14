@@ -68,7 +68,7 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 		Object tfut = rsms.getProcessingCall(terminatecallid);
 		if(tfut!=null)
 		{
-			System.out.println("terminating remote future: "+tfut.hashCode());
+//			System.out.println("terminating remote future: "+tfut.hashCode());
 			if(tfut instanceof ITerminableFuture)
 				((ITerminableFuture)tfut).terminate();
 			else

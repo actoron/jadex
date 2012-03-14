@@ -2,8 +2,6 @@ package jadex.tools.jcc;
 
 import jadex.base.Starter;
 import jadex.base.gui.CMSUpdateHandler;
-import jadex.base.gui.SwingExceptionDelegationResultListener;
-import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.base.gui.plugin.IControlCenterPlugin;
@@ -20,6 +18,8 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -115,7 +115,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
+		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
 		// Close all plugins, which have a panel associated.
 		CounterResultListener<Void> lis = new CounterResultListener<Void>(plugins.size(), true,
@@ -234,7 +234,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	public IControlCenterPlugin[]	getPlugins()
 	{
-		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
+		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 
 		
 		return (IControlCenterPlugin[])plugins.keySet().toArray(new IControlCenterPlugin[plugins.size()]);
@@ -247,7 +247,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	public IControlCenterPlugin getPluginForName(String name)
 	{
-		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
+		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
 		for(Iterator it=plugins.keySet().iterator(); it.hasNext();)
 		{
@@ -266,7 +266,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	{
 //		System.out.println("activate plugin: "+plugin);
 		
-		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
+		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
 		final Future<Void>	ret	= new Future<Void>();
 //		ret.addResultListener(new DefaultResultListener<Void>()
@@ -330,7 +330,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	public IFuture<Void> setProperties(final Properties props)
 	{
-		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
+		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
 		final Future<Void>	ret	= new Future<Void>();
 		
@@ -377,7 +377,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	{
 		if(!SwingUtilities.isEventDispatchThread())
 			System.out.println("dreck");
-		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
+		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
 		final Future<Properties> ret	= new Future<Properties>();
 		

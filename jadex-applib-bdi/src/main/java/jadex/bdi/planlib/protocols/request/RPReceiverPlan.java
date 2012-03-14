@@ -1,11 +1,11 @@
 package jadex.bdi.planlib.protocols.request;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.planlib.protocols.AbstractReceiverPlan;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.fipa.SFipa;
 
 /**
  *  Receive a request and answer it.

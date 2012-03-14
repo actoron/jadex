@@ -1,14 +1,11 @@
 package jadex.tools.deployer;
 
-import jadex.base.gui.SwingDefaultResultListener;
-import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.filetree.FileNode;
 import jadex.base.gui.filetree.JarAsDirectory;
 import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.base.service.deployment.DeploymentService;
 import jadex.bridge.service.types.deployment.FileContent;
 import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.commons.IPropertiesProvider;
@@ -17,6 +14,8 @@ import jadex.commons.Property;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingDelegationResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -169,7 +168,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 					{
 						final File source = new File(sel_1);
 						
-						final int fragmentsize = DeploymentService.FRAGMENT_SIZE;
+						final int fragmentsize = IDeploymentService.FRAGMENT_SIZE;
 						final int len = (int)source.length();
 						int num = (int)(len/fragmentsize);
 						final int last = (int)(len%fragmentsize);

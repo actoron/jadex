@@ -1,11 +1,11 @@
 package jadex.bdi.examples.cleanerworld_classic.environment;
 
-import jadex.base.fipa.Done;
 import jadex.bdi.examples.cleanerworld_classic.Environment;
 import jadex.bdi.examples.cleanerworld_classic.RequestDropWaste;
 import jadex.bdi.examples.cleanerworld_classic.Waste;
 import jadex.bdi.examples.cleanerworld_classic.Wastebin;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.Done;
 
 /**
  *  A cleaner requests to drop waste into a waste-bin.

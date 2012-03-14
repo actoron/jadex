@@ -1,9 +1,6 @@
 package jadex.tools.testcenter;
 
 import jadex.base.gui.SRemoteGui;
-import jadex.base.gui.SwingDefaultResultListener;
-import jadex.base.gui.SwingDelegationResultListener;
-import jadex.base.gui.SwingExceptionDelegationResultListener;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
@@ -28,6 +25,9 @@ import jadex.commons.gui.EditableList;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ScrollablePanel;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.xml.PropertiesXMLHelper;
 import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;

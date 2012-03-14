@@ -12,7 +12,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oOvyowRPEeCnwcpWvxOwkg" key="0:0" value="jadex.bpmn.runtime.task.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oOvypARPEeCnwcpWvxOwkg" key="1:0" value="jadex.base.test.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oOvypQRPEeCnwcpWvxOwkg" key="2:0" value="jadex.commons.IFilter"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oOvypgRPEeCnwcpWvxOwkg" key="3:0" value="jadex.base.fipa.SFipa"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oOvypgRPEeCnwcpWvxOwkg" key="3:0" value="jadex.bridge.fipa.SFipa"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_oOvypwRPEeCnwcpWvxOwkg" key="4:0" value="jadex.bridge.*"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_oOvyqARPEeCnwcpWvxOwkg" source="jadex_arguments_table">

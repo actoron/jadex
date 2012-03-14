@@ -2,16 +2,16 @@ public classes:
 
 base.Starter
 base.SComponentFactory
-base.contentcodecs
-base.fipa
-base.gui.SwingXYZListener
+base.contentcodecs?
 base.gui.ComponentSelectorDialog
 base.gui.componentviewer
 base.gui.plugin
 base.test
 
-bdi.IDynamicBDIFactory
-bdi.model
-bdi.model.editable
-bdi.planlib.*
-bdi.runtime (!impl, !interpreter)
+
+private classes:
+
+bdi.impl
+bdi.interpreter)
+
+bdibpmn.handler

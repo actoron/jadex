@@ -12,7 +12,7 @@
 	package="jadex.bdi.testcases.misc">
 	
 	<imports>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.base.test.*</import>
 		<import>jadex.bdi.testcases.ResultPlan</import>
 	</imports>

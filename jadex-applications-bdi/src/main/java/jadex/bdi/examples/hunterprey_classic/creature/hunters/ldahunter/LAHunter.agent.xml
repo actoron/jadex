@@ -16,7 +16,7 @@
 		<import>jadex.bdi.examples.hunterprey_classic.*</import>
 		<import>jadex.bdi.examples.hunterprey_classic.creature.hunters.ldahunter.potentialfield.*</import>
 		<import>jadex.runtime.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 	</imports>
 
 	<capabilities>

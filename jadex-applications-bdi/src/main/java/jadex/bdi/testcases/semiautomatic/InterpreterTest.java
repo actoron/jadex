@@ -1,8 +1,5 @@
 package jadex.bdi.testcases.semiautomatic;
 
-import jadex.base.service.clock.ClockCreationInfo;
-import jadex.base.service.clock.ClockService;
-import jadex.base.service.threadpool.ThreadPoolService;
 import jadex.bdi.OAVBDIModelLoader;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.runtime.interpreter.BDIInterpreter;
@@ -13,13 +10,12 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.component.ComponentServiceContainer;
-import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.concurrent.Executor;
 import jadex.commons.concurrent.IExecutable;
-import jadex.commons.concurrent.ThreadPoolFactory;
+import jadex.commons.concurrent.ThreadPool;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -54,7 +50,7 @@ public class InterpreterTest
 			
 			// Load agent model.
 			Map config = new HashMap();
-			config.put("messagetype_fipa", new jadex.base.fipa.FIPAMessageType());
+			config.put("messagetype_fipa", new jadex.bridge.fipa.FIPAMessageType());
 			config.put("planexecutor_standard", new jadex.bdi.runtime.impl.JavaStandardPlanExecutor(
 				jadex.commons.concurrent.ThreadPoolFactory.createThreadPool()));
 			
@@ -121,12 +117,15 @@ class ComponentAdapter implements IComponentAdapter
 	public ComponentAdapter(final IComponentInstance interpreter)
 	{
 		container = new ComponentServiceContainer(this, "platform", null);
-		ThreadPoolService tps = new ThreadPoolService(ThreadPoolFactory.createThreadPool(), container);
-		container.addService(tps, null);
-		ClockService clock = new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "system"), container, null);
-		container.addService(clock, null);
+		// Todo: move test to somewhere more useful? (jadex-launch?)
+		// Todo: actually test something useful...
+//		ThreadPoolService tps = new ThreadPoolService(ThreadPoolFactory.createThreadPool(), container);
+//		container.addService(tps, null);
+//		ClockService clock = new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, "system"), container, null);
+//		container.addService(clock, null);
 		
-		exe = new Executor(tps);
+//		exe = new Executor(tps);
+		exe	= new Executor(new ThreadPool());
 		exe.setExecutable(new IExecutable()
 		{
 			public boolean execute()

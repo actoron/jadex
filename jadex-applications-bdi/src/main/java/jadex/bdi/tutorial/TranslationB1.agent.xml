@@ -29,7 +29,7 @@
 			messages with performative request. -->
 		<messageevent name="request_translation" direction="receive" type="fipa">
 			<parameter name="performative" class="String" direction="fixed">
-				<value>jadex.base.fipa.SFipa.REQUEST</value>
+				<value>jadex.bridge.fipa.SFipa.REQUEST</value>
 			</parameter>
 		</messageevent>
 	</events>

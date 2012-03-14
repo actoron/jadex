@@ -1,11 +1,11 @@
 package jadex.bdi.testcases.plans;
 
-import jadex.base.fipa.SFipa;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.IEvent;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
+import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
 
 

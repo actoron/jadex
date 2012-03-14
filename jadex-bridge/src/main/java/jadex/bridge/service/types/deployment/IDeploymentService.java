@@ -8,6 +8,9 @@ import jadex.commons.future.IFuture;
  */
 public interface IDeploymentService extends IService
 {
+	/** Default fragment size 10kB. */
+	public static final int FRAGMENT_SIZE = 1024*10;
+	
 //	/**
 //	 *  Get a file.
 //	 *  @return The file data.

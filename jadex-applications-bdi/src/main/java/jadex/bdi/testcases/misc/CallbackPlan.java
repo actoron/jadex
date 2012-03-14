@@ -1,6 +1,5 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.base.fipa.SFipa;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.GoalFailureException;
@@ -15,6 +14,7 @@ import jadex.bdi.runtime.IMessageEventListener;
 import jadex.bdi.runtime.IPlanListener;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.TerminationAdapter;
+import jadex.bridge.fipa.SFipa;
 
 import java.util.logging.Logger;
 

@@ -21,7 +21,7 @@
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.bridge.service.search.*</import>
 		<import>jadex.bridge.service.types.df.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>java.util.logging.*</import>
 		<import>java.util.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>

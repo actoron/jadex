@@ -87,6 +87,7 @@
 				<module>jadex-rules</module>
 				<module>jadex-rules-tools</module>
 
+				<module>jadex-tools-base</module>
 				<module>jadex-runtimetools</module>
 				<module>jadex-tools-bdi</module>
 				<module>jadex-tools-bpmn</module>
@@ -441,6 +442,7 @@
 				<module>jadex-rules-applications</module>
 				<module>jadex-rules-tools</module>
 
+				<module>jadex-tools-base</module>
 				<module>jadex-runtimetools</module>
 				<module>jadex-tools-bdi</module>
 				<module>jadex-tools-bpmn</module>
@@ -502,6 +504,7 @@
 				<module>jadex-rules-applications</module>
 				<module>jadex-rules-tools</module>
 
+				<module>jadex-tools-base</module>
 				<module>jadex-runtimetools</module>
 				<module>jadex-tools-bdi</module>
 				<module>jadex-tools-bpmn</module>
@@ -575,6 +578,7 @@
 				<module>jadex-kernel-micro</module>
 				<module>jadex-xml</module>
 				<module>jadex-applications-web</module>
+				<module>jadex-tools-base</module>
 			</modules>
 		</profile>
 		
@@ -629,6 +633,7 @@
 				<module>jadex-xml</module>
 				<module>jadex-applications-wfms</module>
 				<module>jadex-platform-wfms</module>
+				<module>jadex-tools-base</module>
 			</modules>
 		</profile>
 		
@@ -680,6 +685,7 @@
 				<module>jadex-rules-applications</module>
 				<module>jadex-rules-tools</module>
 
+				<module>jadex-tools-base</module>
 				<module>jadex-runtimetools</module>
 				<module>jadex-tools-bdi</module>
 				<module>jadex-tools-bpmn</module>

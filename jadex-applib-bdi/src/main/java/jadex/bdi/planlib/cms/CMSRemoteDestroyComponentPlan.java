@@ -1,10 +1,10 @@
 package jadex.bdi.planlib.cms;
 
-import jadex.base.fipa.CMSDestroyComponent;
-import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.fipa.CMSDestroyComponent;
+import jadex.bridge.fipa.SFipa;
 
 /**
  *  Destroy an component on a remote cms.

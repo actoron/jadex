@@ -16,7 +16,7 @@
 
 	<imports>
 		<import>java.util.logging.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.bridge.service.types.cms.*</import>
 		<import>jadex.commons.IFilter</import>

@@ -1,12 +1,12 @@
 package jadex.bdi.examples.hunterprey_classic.environment;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.MessageFailureException;
+import jadex.bridge.fipa.SFipa;
 
 
 /**

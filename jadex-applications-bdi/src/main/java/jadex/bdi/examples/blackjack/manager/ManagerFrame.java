@@ -2,7 +2,6 @@ package jadex.bdi.examples.blackjack.manager;
 
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ComponentSelectorDialog;
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
@@ -21,6 +20,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;

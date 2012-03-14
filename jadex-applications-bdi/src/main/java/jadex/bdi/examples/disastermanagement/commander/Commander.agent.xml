@@ -17,7 +17,7 @@
 		<import>java.util.logging.*</import>
 		<import>jadex.bridge.*</import>
 		<import>jadex.bridge.service.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.extension.envsupport.environment.*</import>
 		<import>jadex.extension.envsupport.environment.space2d.*</import>
 		<import>jadex.bdi.runtime.*</import>

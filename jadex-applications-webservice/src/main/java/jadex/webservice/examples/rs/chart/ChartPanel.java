@@ -1,6 +1,5 @@
 package jadex.webservice.examples.rs.chart;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -8,6 +7,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.gui.EditableList;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

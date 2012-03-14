@@ -1,7 +1,6 @@
 package jadex.launch.test;
 
 import jadex.base.Starter;
-import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -14,6 +13,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
+import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.tools.jcc.ControlCenter;
 import jadex.tools.jcc.JCCAgent;
 import jadex.tools.jcc.PlatformControlCenter;

@@ -1,6 +1,6 @@
 package jadex.micro.examples.ping;
 
-import jadex.base.fipa.SFipa;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DefaultResultListener;
 import jadex.micro.MicroAgent;

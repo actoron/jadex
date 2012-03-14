@@ -6,7 +6,6 @@ import java.util.Date;
 
 import javax.swing.SwingUtilities;
 
-import jadex.base.gui.SwingDelegationResultListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
@@ -16,6 +15,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDelegationResultListener;
 
 /**
  *  The chat service.

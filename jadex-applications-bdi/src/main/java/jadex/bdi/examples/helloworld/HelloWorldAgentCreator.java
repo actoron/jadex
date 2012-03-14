@@ -1,6 +1,5 @@
 package jadex.bdi.examples.helloworld;
 
-import jadex.base.SComponentFactory;
 import jadex.base.Starter;
 import jadex.bdi.IDynamicBDIFactory;
 import jadex.bdi.model.editable.IMEBelief;
@@ -11,11 +10,11 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  *  Example that shows how an agent model can be created via the editable model api.

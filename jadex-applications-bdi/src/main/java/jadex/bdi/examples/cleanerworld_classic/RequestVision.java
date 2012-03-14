@@ -1,6 +1,6 @@
 package jadex.bdi.examples.cleanerworld_classic;
 
-import jadex.base.fipa.IComponentAction;
+import jadex.bridge.fipa.IComponentAction;
 
 /**
  *  Java class for concept RequestVision of cleaner_beans ontology.

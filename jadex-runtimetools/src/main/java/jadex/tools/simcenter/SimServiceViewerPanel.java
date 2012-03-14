@@ -1,6 +1,5 @@
 package jadex.tools.simcenter;
 
-import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.componentviewer.AbstractServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.service.IService;
@@ -8,6 +7,7 @@ import jadex.bridge.service.types.simulation.ISimulationService;
 import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDelegationResultListener;
 
 import javax.swing.JComponent;
 

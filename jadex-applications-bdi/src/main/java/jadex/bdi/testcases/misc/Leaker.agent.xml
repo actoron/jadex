@@ -15,7 +15,7 @@
 	package="jadex.bdi.testcases.misc">
 
 	<imports>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.bridge.IComponentIdentifier</import>
 	</imports>
 

@@ -1,9 +1,9 @@
 package jadex.bdi.planlib.protocols;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.SFipa;
 
 /**
  *  This plan serves as a base class for receiver plans.

@@ -1,9 +1,9 @@
 package jadex.bdi.examples.hunterprey_classic.environment;
 
-import jadex.base.fipa.Done;
 import jadex.bdi.examples.hunterprey_classic.RequestMove;
 import jadex.bdi.examples.hunterprey_classic.TaskInfo;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.Done;
 
 /**
  *  Handle move requests by the environment.

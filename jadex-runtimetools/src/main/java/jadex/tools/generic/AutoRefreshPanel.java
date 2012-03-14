@@ -1,10 +1,10 @@
 package jadex.tools.generic;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;

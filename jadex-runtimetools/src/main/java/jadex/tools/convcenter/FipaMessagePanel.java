@@ -1,11 +1,11 @@
 package jadex.tools.convcenter;
 
-import jadex.base.fipa.SFipa;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.ComponentSelectorDialog;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
 import jadex.commons.gui.SGUI;
 

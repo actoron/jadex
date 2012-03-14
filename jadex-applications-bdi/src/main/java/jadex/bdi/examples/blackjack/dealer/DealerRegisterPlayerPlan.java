@@ -1,12 +1,12 @@
 package jadex.bdi.examples.blackjack.dealer;
 
-import jadex.base.fipa.Done;
-import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.blackjack.Player;
 import jadex.bdi.examples.blackjack.RequestJoin;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.fipa.Done;
+import jadex.bridge.fipa.SFipa;
 
 /**
  *  Plan to handle join request of a player.

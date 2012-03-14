@@ -1,7 +1,6 @@
 package jadex.tools.jcc;
 
 import jadex.base.gui.JadexLogoButton;
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
@@ -10,6 +9,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.JSplitPanel;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 

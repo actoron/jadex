@@ -1,6 +1,5 @@
 package jadex.bdi.examples.hunterprey_classic.creature.actsense;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.CurrentVision;
 import jadex.bdi.examples.hunterprey_classic.Food;
@@ -11,6 +10,7 @@ import jadex.bdi.examples.hunterprey_classic.WorldObject;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
 
 import java.util.List;

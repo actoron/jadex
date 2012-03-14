@@ -16,7 +16,7 @@
 
 	<imports>
 		<import>java.util.logging.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>
 	</imports>

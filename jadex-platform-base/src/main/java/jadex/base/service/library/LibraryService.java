@@ -24,10 +24,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -1429,75 +1427,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 //		return new Future<Properties>(props);		
 		return new Future<Properties>(new Properties());
 	}
-
-
-	/**
-	 *  Test if a file name is contained.
-	 */
-	public static int indexOfFilename(String url, List<String> urlstrings)
-	{
-		int ret = -1;
-		try
-		{
-			File file = urlToFile(url);
-			if(file==null)
-				file	= new File(url);
-			for(int i=0; file!=null && i<urlstrings.size() && ret==-1; i++)
-			{
-				String	totest	= (String)urlstrings.get(i);
-				File test = urlToFile(totest);
-				if(test==null)
-					test	= new File(totest);
-				if(test!=null && file.getCanonicalPath().equals(test.getCanonicalPath()))
-					ret = i;
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		return ret;
-	}
-
-	/**
-	 *  Convert an URL to a file.
-	 *  @return null, if the URL is neither 'file:' nor 'jar:file:' URL and no path point to an existing file.
-	 */
-	public static File urlToFile(String url)
-	{
-		File	file	= null;
-		if(url.startsWith("file:"))
-		{
-			try
-			{
-				url	= URLDecoder.decode(url, "UTF-8");
-			}
-			catch(UnsupportedEncodingException uee)
-			{
-			}
-			file	= new File(url.substring(5));
-		}
-		else if(url.startsWith("jar:file:"))
-		{
-			try
-			{
-				url	= URLDecoder.decode(url, "UTF-8");
-			}
-			catch(UnsupportedEncodingException uee)
-			{
-			}
-			file	= new File(url.substring(9));
-		}
-		else
-		{
-			file	= new File(url);
-			if(!file.exists())
-			{
-				file	= null;
-			}
-		}
-		return file;
-	}	
 	
 //	/**
 //	 *  Update the global class loader.
@@ -1568,7 +1497,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	protected void	collectManifestURLs(URL url, Set<URL> set)
 	{
-		File	file	= urlToFile(url.toString());
+		File	file	= SUtil.urlToFile(url.toString());
 		if(file!=null && file.exists() && !file.isDirectory())	// Todo: load manifest also from directories!?
 		{
 	        try 
@@ -1598,7 +1527,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	            			// Try as url
 	            			if(!urlfile.exists())
 	            			{
-	            				urlfile	= urlToFile(path);
+	            				urlfile	= SUtil.urlToFile(path);
 	            			}
 	
 	            			if(urlfile!=null && urlfile.exists())

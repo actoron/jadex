@@ -9,7 +9,7 @@
 	package="jadex.bdi.planlib.messaging" name="Messaging">
 	
 	<imports>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 	</imports>
 	
 	<beliefs>

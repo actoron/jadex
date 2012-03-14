@@ -1,6 +1,5 @@
 package jadex.bdi.examples.cleanerworld_classic.environment;
 
-import jadex.base.fipa.Done;
 import jadex.bdi.examples.cleanerworld_classic.Chargingstation;
 import jadex.bdi.examples.cleanerworld_classic.Cleaner;
 import jadex.bdi.examples.cleanerworld_classic.Environment;
@@ -11,6 +10,7 @@ import jadex.bdi.examples.cleanerworld_classic.Wastebin;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.Done;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.df.IDF;
 import jadex.bridge.service.types.df.IDFComponentDescription;

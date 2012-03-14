@@ -16,7 +16,7 @@
 	<imports>
 		<import>jadex.bdi.examples.marsworld_classic.*</import>
 		<import>jadex.bdi.examples.marsworld_classic.movement.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 	</imports>
 
 	<capabilities>

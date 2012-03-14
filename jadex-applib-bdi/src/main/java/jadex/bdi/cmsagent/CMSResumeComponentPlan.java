@@ -1,9 +1,9 @@
 package jadex.bdi.cmsagent;
 
-import jadex.base.fipa.CMSResumeComponent;
-import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.CMSResumeComponent;
+import jadex.bridge.fipa.Done;
 
 /**
  *  Resume an component.

@@ -1,6 +1,5 @@
 package jadex.bdi.planlib.protocols.contractnet;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.planlib.protocols.AbstractInitiatorPlan;
 import jadex.bdi.planlib.protocols.NegotiationRecord;
 import jadex.bdi.planlib.protocols.ParticipantProposal;
@@ -9,6 +8,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.fipa.SFipa;
 import jadex.commons.SUtil;
 
 import java.util.HashMap;

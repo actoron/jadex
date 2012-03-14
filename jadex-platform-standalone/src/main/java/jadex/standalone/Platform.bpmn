@@ -25,7 +25,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x7LKHmxCEeGo_ajSyHK2Iw" key="11:0" value="jadex.base.service.message.transport.localmtp.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x7LKH2xCEeGo_ajSyHK2Iw" key="12:0" value="jadex.base.service.message.transport.niotcpmtp.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x7LKIGxCEeGo_ajSyHK2Iw" key="13:0" value="jadex.bridge.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x7LKIWxCEeGo_ajSyHK2Iw" key="14:0" value="jadex.base.fipa.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x7LKIWxCEeGo_ajSyHK2Iw" key="14:0" value="jadex.bridge.fipa.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x7LKImxCEeGo_ajSyHK2Iw" key="15:0" value="jadex.base.service.message.transport.codecs.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x7LKI2xCEeGo_ajSyHK2Iw" key="16:0" value="jadex.standalone.service.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_x7LKJGxCEeGo_ajSyHK2Iw" key="17:0" value="jadex.base.service.simulation.*"/>

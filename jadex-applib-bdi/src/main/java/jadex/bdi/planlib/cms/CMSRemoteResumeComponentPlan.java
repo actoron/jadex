@@ -1,10 +1,10 @@
 package jadex.bdi.planlib.cms;
 
-import jadex.base.fipa.CMSResumeComponent;
-import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.fipa.CMSResumeComponent;
+import jadex.bridge.fipa.SFipa;
 
 /**
  *  Suspend an component on a remote cms.

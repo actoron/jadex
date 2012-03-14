@@ -15,7 +15,7 @@
 		<import>jadex.bridge.*</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.concurrent.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.base.*</import>
 		<import>jadex.base.service.simulation.*</import>
 		<import>jadex.base.service.remote.*</import>
@@ -255,7 +255,7 @@
 				},
 				new jadex.bridge.service.types.message.MessageType[]
 				{
-					new jadex.base.fipa.FIPAMessageType()
+					new jadex.bridge.fipa.FIPAMessageType()
 				}, null, $args.binarymessages? new jadex.base.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.base.service.message.transport.codecs.JadexBinaryCodec.class, jadex.base.service.message.transport.codecs.GZIPCodec.class} ): new jadex.base.service.message.transport.codecs.CodecFactory()
 				)
 			</implementation>

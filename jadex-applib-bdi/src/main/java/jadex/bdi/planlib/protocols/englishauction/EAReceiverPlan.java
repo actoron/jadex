@@ -1,6 +1,5 @@
 package jadex.bdi.planlib.protocols.englishauction;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.planlib.protocols.AbstractReceiverPlan;
 import jadex.bdi.planlib.protocols.AuctionDescription;
 import jadex.bdi.runtime.GoalFailureException;
@@ -8,6 +7,7 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.TimeoutException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.fipa.SFipa;
 import jadex.commons.collection.SCollection;
 
 import java.util.List;

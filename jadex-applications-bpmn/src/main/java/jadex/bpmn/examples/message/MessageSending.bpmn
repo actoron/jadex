@@ -10,7 +10,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mEik4gRPEeCnwcpWvxOwkg" key="uniqueColumnIndex" value="0"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mEik4wRPEeCnwcpWvxOwkg" key="0:0" value="jadex.commons.*"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mEik5ARPEeCnwcpWvxOwkg" key="1:0" value="jadex.bridge.*"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mEik5QRPEeCnwcpWvxOwkg" key="2:0" value="jadex.base.fipa.*"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mEik5QRPEeCnwcpWvxOwkg" key="2:0" value="jadex.bridge.fipa.*"/>
   </eAnnotations>
   <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_mEik5gRPEeCnwcpWvxOwkg" source="jadex_arguments_table">
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_mEik5wRPEeCnwcpWvxOwkg" key="dimension" value="2:6"/>

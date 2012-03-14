@@ -16,7 +16,7 @@
 
 	<imports>
 		<import>jadex.bdi.examples.booktrading.common.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>java.util.*</import>
 		<import>jadex.bridge.service.types.df.*</import>
 		<import>jadex.rules.rulesystem.rules.functions.*</import>

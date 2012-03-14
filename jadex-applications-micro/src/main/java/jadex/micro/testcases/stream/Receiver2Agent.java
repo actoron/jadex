@@ -1,9 +1,9 @@
 package jadex.micro.testcases.stream;
 
-import jadex.base.fipa.SFipa;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;

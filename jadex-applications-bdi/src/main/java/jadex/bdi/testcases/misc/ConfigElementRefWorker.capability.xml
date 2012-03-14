@@ -12,7 +12,7 @@
 	
 	<imports>
 		<import>jadex.bridge.IComponentIdentifier</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 	</imports>
 	
 	<goals>

@@ -1,10 +1,10 @@
 package jadex.bdi.cmsagent;
 
-import jadex.base.fipa.CMSCreateComponent;
-import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.fipa.CMSCreateComponent;
+import jadex.bridge.fipa.Done;
 
 /**
  *  Create an component.

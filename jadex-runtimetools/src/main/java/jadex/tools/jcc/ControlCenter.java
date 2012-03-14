@@ -2,8 +2,6 @@ package jadex.tools.jcc;
 
 import jadex.base.Starter;
 import jadex.base.gui.CMSUpdateHandler;
-import jadex.base.gui.SwingDefaultResultListener;
-import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.plugin.SJCC;
 import jadex.bridge.IExternalAccess;
@@ -13,6 +11,8 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.xml.PropertiesXMLHelper;
 
 import java.awt.Dimension;
@@ -303,7 +303,7 @@ public class ControlCenter
 	 */
 	public void	exit()
 	{
-		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
+		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
 		if(!killed)
 		{
@@ -390,7 +390,7 @@ public class ControlCenter
 									public void customResultAvailable(Void result)
 									{
 //										System.out.println("CMS handlers disposed.");
-										if(!Starter.isShutdown())
+//										if(!Starter.isShutdown())
 										{
 											window.setVisible(false);
 											window.dispose();
@@ -411,11 +411,11 @@ public class ControlCenter
 		
 		// Hack!!! When triggered from shutdown hook, swing might be terminated
 		// and invokeLater has no effect (grrr).
-		if(Starter.isShutdown())
-		{
-			runnable.run();
-		}
-		else
+//		if(Starter.isShutdown())
+//		{
+//			runnable.run();
+//		}
+//		else
 		{
 			SwingUtilities.invokeLater(runnable);
 		}
@@ -447,7 +447,7 @@ public class ControlCenter
 	 */
 	public CMSUpdateHandler getCMSHandler()
 	{
-		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
+		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
 		if(cmshandler==null)
 		{
@@ -461,7 +461,7 @@ public class ControlCenter
 	 */
 	public ComponentIconCache getIconCache()
 	{
-		assert SwingUtilities.isEventDispatchThread() ||  Starter.isShutdown();
+		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
 		if(iconcache==null)
 		{

@@ -1,11 +1,11 @@
 package jadex.bdi.testcases.misc;
 
-import jadex.base.fipa.SFipa;
 import jadex.base.test.TestReport;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bdi.runtime.TimeoutException;
+import jadex.bridge.fipa.SFipa;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,6 @@
 package jadex.bdi.examples.blackjack;
 
-import jadex.base.fipa.IComponentAction;
+import jadex.bridge.fipa.IComponentAction;
 
 import java.util.ArrayList;
 import java.util.List;

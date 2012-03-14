@@ -24,9 +24,6 @@ import java.util.Map.Entry;
  */
 public class DeploymentService extends BasicService implements IDeploymentService
 {
-	/** Default fragment size 10kB. */
-	public static final int FRAGMENT_SIZE = 1024*10;
-	
 	/** File id counter. */
 	protected int fileidcnt;
 	

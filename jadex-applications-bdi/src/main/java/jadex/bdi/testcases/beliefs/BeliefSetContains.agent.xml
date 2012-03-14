@@ -17,7 +17,7 @@
 
 	<imports>
 		<import>jadex.bridge.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 	</imports>
 
 	<capabilities>

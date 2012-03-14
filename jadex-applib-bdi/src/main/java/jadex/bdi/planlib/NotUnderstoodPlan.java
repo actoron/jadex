@@ -1,9 +1,9 @@
 package jadex.bdi.planlib;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.IParameterElement;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.SFipa;
 
 /**
  *  Send a not-understood message when

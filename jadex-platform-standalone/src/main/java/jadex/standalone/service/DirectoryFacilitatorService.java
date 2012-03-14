@@ -1,11 +1,11 @@
 package jadex.standalone.service;
 
-import jadex.base.fipa.DFComponentDescription;
-import jadex.base.fipa.DFServiceDescription;
-import jadex.base.fipa.SFipa;
-import jadex.base.fipa.SearchConstraints;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.ISearchConstraints;
+import jadex.bridge.fipa.DFComponentDescription;
+import jadex.bridge.fipa.DFServiceDescription;
+import jadex.bridge.fipa.SFipa;
+import jadex.bridge.fipa.SearchConstraints;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;

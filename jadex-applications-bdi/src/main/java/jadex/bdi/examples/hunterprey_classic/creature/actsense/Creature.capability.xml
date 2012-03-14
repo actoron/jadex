@@ -12,7 +12,7 @@
 
 	<imports>
 		<import>jadex.bdi.examples.hunterprey_classic.*</import>
-		<import>jadex.base.fipa.SFipa</import>
+		<import>jadex.bridge.fipa.SFipa</import>
 		<import>jadex.commons.SUtil</import>
 	</imports>
 

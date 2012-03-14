@@ -1,6 +1,5 @@
 package jadex.tools.debugger;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -12,6 +11,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.jtable.TableSorter;
 
 import java.awt.BorderLayout;

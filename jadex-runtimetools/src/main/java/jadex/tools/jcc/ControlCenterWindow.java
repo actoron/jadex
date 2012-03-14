@@ -126,7 +126,7 @@ public class ControlCenterWindow extends JFrame
 		{
 			public void windowClosing(WindowEvent e)
 			{
-				if(!Starter.isShutdown())
+//				if(!Starter.isShutdown())
 					controlcenter.exit();
 			}
 		});

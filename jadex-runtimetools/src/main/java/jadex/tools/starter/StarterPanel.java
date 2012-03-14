@@ -1,13 +1,9 @@
 package jadex.tools.starter;
 
-import jadex.base.SComponentFactory;
 import jadex.base.Starter;
 import jadex.base.gui.ComponentSelectorDialog;
 import jadex.base.gui.SRemoteGui;
-import jadex.base.gui.SwingExceptionDelegationResultListener;
 import jadex.base.gui.ParserValidator;
-import jadex.base.gui.SwingDefaultResultListener;
-import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -25,6 +21,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.commons.FixedJComboBox;
 import jadex.commons.Properties;
@@ -43,6 +40,9 @@ import jadex.commons.gui.BrowserPane;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.JValidatorTextField;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
 import jadex.xml.annotation.XMLClassname;
 
@@ -1063,7 +1063,7 @@ public class StarterPanel extends JLayeredPane
 				
 				props.addProperty(new Property("name", componentname.getText()));
 				// Cannot get components during shutdown as awt blocks tree lock.
-				for(int i=0; argelems!=null && i<argelems.size() && !Starter.isShutdown(); i++)
+				for(int i=0; argelems!=null && i<argelems.size() /*&& !Starter.isShutdown()*/; i++)
 				{
 					JTextField valt = (JTextField)arguments.getComponent(i*4+3);
 					props.addProperty(new Property("argument", valt.getText()));

@@ -1,9 +1,9 @@
 package jadex.bdi.benchmarks;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.fipa.SFipa;
 
 /**
  *  Send a specified amount of messages.

@@ -13,7 +13,7 @@
 	package="jadex.bdi.testcases.semiautomatic">
 
 	<imports>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.bridge.*</import>
 	</imports>
 

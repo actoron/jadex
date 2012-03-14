@@ -1,9 +1,9 @@
 package jadex.bdi.cmsagent;
 
-import jadex.base.fipa.CMSDestroyComponent;
-import jadex.base.fipa.Done;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.CMSDestroyComponent;
+import jadex.bridge.fipa.Done;
 
 /**
  *  Destroy a component.

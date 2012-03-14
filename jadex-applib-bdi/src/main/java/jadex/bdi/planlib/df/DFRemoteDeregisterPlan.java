@@ -1,10 +1,10 @@
 package jadex.bdi.planlib.df;
 
-import jadex.base.fipa.DFComponentDescription;
-import jadex.base.fipa.DFDeregister;
-import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.DFComponentDescription;
+import jadex.bridge.fipa.DFDeregister;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.df.IDFComponentDescription;
 
 /**

@@ -1,9 +1,9 @@
 package jadex.bdi.examples.hunterprey_classic.environment;
 
-import jadex.base.fipa.Done;
 import jadex.bdi.examples.hunterprey_classic.RequestVision;
 import jadex.bdi.examples.hunterprey_classic.Vision;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.Done;
 
 /**
  *  The dispatch vision plan calculates the vision for a

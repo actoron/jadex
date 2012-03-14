@@ -22,7 +22,7 @@
 	<imports>
 		<import>jadex.bdi.testcases.*</import>
 		<import>java.util.logging.Level</import>		
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 	</imports>
 
 	<capabilities>

@@ -1,12 +1,12 @@
 package jadex.bdi.examples.blackjack.manager;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.bridge.fipa.SFipa;
 import jadex.commons.future.IFuture;
 import jadex.xml.annotation.XMLClassname;
 

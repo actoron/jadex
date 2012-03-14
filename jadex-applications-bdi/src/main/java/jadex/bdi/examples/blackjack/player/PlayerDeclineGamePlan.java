@@ -1,8 +1,8 @@
 package jadex.bdi.examples.blackjack.player;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.SFipa;
 
 /**
  *  This plan is executed when the agent wants to decline a game.

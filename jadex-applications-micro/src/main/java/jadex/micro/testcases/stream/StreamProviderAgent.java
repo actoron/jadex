@@ -1,11 +1,10 @@
 package jadex.micro.testcases.stream;
 
-import jadex.base.service.message.ServiceOutputConnection;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;

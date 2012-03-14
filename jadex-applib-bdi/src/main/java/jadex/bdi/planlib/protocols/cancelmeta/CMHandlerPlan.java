@@ -1,11 +1,11 @@
 package jadex.bdi.planlib.protocols.cancelmeta;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.planlib.protocols.InteractionState;
 import jadex.bdi.runtime.GoalFailureException;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.SFipa;
 
 /**
  *  Receiver plan for FIPA-Cancel-Meta-Protocol.

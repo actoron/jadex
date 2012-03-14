@@ -9,7 +9,7 @@
 	package="jadex.bdi.testcases.plans">
 	
 	<imports>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.bridge.IComponentIdentifier</import>
 		<import>jadex.base.test.TestReport</import>
 		<import>jadex.bdi.testcases.ResultPlan</import>
@@ -62,10 +62,10 @@
 		</internalevent>
 		<messageevent name="property_changed_inform" type="fipa" direction="send_receive">
 			<parameter name="performative" class="String" direction="fixed">
-				<value>jadex.base.fipa.SFipa.INFORM</value>
+				<value>jadex.bridge.fipa.SFipa.INFORM</value>
 			</parameter>
 			<parameter name="language" class="String" direction="fixed">
-				<value>jadex.base.fipa.SFipa.JADEX_XML</value>
+				<value>jadex.bridge.fipa.SFipa.JADEX_XML</value>
 			</parameter>
 		</messageevent>
 	</events> 

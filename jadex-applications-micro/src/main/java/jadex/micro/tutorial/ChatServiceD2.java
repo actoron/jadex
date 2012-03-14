@@ -1,6 +1,5 @@
 package jadex.micro.tutorial;
 
-import jadex.base.gui.SwingDelegationResultListener;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
@@ -10,6 +9,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDelegationResultListener;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

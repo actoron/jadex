@@ -15,7 +15,7 @@
 		<import>jadex.runtime.*</import>
 		<import>jadex.commons.*</import>
 		<import>jadex.*</import>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 	</imports>
 
 	<capabilities>

@@ -13,7 +13,7 @@
 	package="jadex.bdi.cmsagent">
 
 	<imports>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.commons.IFilter</import>
 	</imports>
 

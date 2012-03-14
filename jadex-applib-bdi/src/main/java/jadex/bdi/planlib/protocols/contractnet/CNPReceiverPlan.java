@@ -1,10 +1,10 @@
 package jadex.bdi.planlib.protocols.contractnet;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.planlib.protocols.AbstractReceiverPlan;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.fipa.SFipa;
 import jadex.commons.collection.SCollection;
 
 import java.util.List;

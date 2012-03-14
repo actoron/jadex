@@ -1,9 +1,9 @@
 package jadex.bdi.tutorial;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IExpression;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.SFipa;
 import jadex.commons.Tuple;
 
 import java.util.StringTokenizer;

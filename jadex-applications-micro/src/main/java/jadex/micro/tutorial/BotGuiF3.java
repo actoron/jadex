@@ -1,11 +1,11 @@
 package jadex.micro.tutorial;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.componentviewer.AbstractComponentViewerPanel;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.micro.IPojoMicroAgent;
 
 import java.awt.GridBagConstraints;

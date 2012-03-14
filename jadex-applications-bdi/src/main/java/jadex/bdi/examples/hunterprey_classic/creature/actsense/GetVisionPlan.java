@@ -1,9 +1,9 @@
 package jadex.bdi.examples.hunterprey_classic.creature.actsense;
 
-import jadex.base.fipa.Done;
 import jadex.bdi.examples.hunterprey_classic.Creature;
 import jadex.bdi.examples.hunterprey_classic.RequestVision;
 import jadex.bdi.runtime.IGoal;
+import jadex.bridge.fipa.Done;
 
 /**
  *  Handles an get_vision goal.

@@ -1,8 +1,8 @@
 package jadex.bdi.examples.hunterprey_classic.environment;
 
-import jadex.base.fipa.Done;
 import jadex.bdi.examples.hunterprey_classic.RequestWorldSize;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.Done;
 
 /**
  *  The dispatch world size plan sends back the size of the world.

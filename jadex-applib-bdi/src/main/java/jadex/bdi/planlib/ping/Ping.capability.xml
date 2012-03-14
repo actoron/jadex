@@ -9,7 +9,7 @@
 	name="Ping">
 
 	<imports>
-		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.bdi.planlib.ping.*</import>
 		<import>jadex.bdi.runtime.*</import>
 		<import>jadex.commons.IFilter</import>

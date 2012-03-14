@@ -1,8 +1,5 @@
 package jadex.tools.starter;
 
-import jadex.base.SComponentFactory;
-import jadex.base.gui.SwingDefaultResultListener;
-import jadex.base.gui.SwingDelegationResultListener;
 import jadex.base.gui.asynctree.INodeListener;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.base.gui.componenttree.ComponentTreePanel;
@@ -11,26 +8,23 @@ import jadex.base.gui.filetree.IFileNode;
 import jadex.base.gui.modeltree.ModelTreePanel;
 import jadex.base.gui.plugin.AbstractJCCPlugin.ShowRemoteControlCenterHandler;
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.base.service.library.LibraryService;
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SUtil;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
@@ -41,7 +35,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -126,8 +119,8 @@ public class StarterPluginPanel extends JPanel
 						public IFuture<Boolean> execute(IInternalAccess ia)
 						{
 							boolean	match	= false;
-							File	pathfile	= LibraryService.urlToFile(path);
-							File	modelfile	= LibraryService.urlToFile(model);
+							File	pathfile	= SUtil.urlToFile(path);
+							File	modelfile	= SUtil.urlToFile(model);
 							try
 							{
 								match	= pathfile!=null && modelfile!=null && modelfile.getCanonicalPath().startsWith(pathfile.getCanonicalPath());

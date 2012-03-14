@@ -11,6 +11,7 @@
 	<property name="jadex-kernel-micro" location="../jadex-kernel-micro/src/main/java" />
 	<property name="jadex-platform-base" location="../jadex-platform-base/src/main/java" />
 	<property name="jadex-platform-standalone" location="../jadex-platform-standalone/src/main/java" />
+	<property name="jadex-tools-base" location="../jadex-tools-base/src/main/java" />
 	<property name="jadex-xml" location="../jadex-xml/src/main/java" />
 	
 	<property name="jadex-kernel-extension-agr" location="../jadex-kernel-extension-agr/src/main/java" />
@@ -29,7 +30,7 @@
 
 	<property name="exclude" value=".svn"/>
 
-	<property name="exclude-jadex-platform-base" value="
+	<property name="exclude-jadex-tools-base" value="
 		AboutDialog.java,
 		CMSUpdateHandler.java,
 		ComponentIdentifierDialog.java,
@@ -116,7 +117,6 @@
 		ProvidedServiceInfoNode.java,
 		ProvidedServiceInfoProperties.java,
 		ProvidedServiceData.java,
-		publish,
 		test,
 		PlatformApplet.java
 		" />
@@ -144,7 +144,8 @@
 		TreeCombo.java,
 		TreeExpansionHandler.java,
 		jtable,
-		jtreetable, 
+		jtreetable,
+		gui,
 		FixedJComboBox.java,
 		BrowserLauncher2.java" />
 
@@ -214,13 +215,19 @@
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess>
 		<echo level="info">preprocessing ${jadex-platform-base}</echo>
-		<preprocess indir="${jadex-platform-base}" outdir="${src_android}" out="merge" except="${exclude}, ${exclude-jadex-platform-base}">
+		<preprocess indir="${jadex-platform-base}" outdir="${src_android}" out="merge" except="${exclude}">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess>
 		<echo level="info">preprocessing ${jadex-platform-standalone}</echo>
 		<preprocess indir="${jadex-platform-standalone}" outdir="${src_android}" out="merge" except="${exclude}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
+		<echo level="info">preprocessing ${jadex-tools-base}</echo>
+		<preprocess indir="${jadex-tools-base}" outdir="${src_android}" out="merge" except="${exclude}, ${exclude-jadex-tools-base}">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />

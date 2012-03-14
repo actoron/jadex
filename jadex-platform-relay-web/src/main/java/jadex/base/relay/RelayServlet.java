@@ -1,9 +1,9 @@
 package jadex.base.relay;
 
-import jadex.base.fipa.SFipa;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ArrayBlockingQueue;

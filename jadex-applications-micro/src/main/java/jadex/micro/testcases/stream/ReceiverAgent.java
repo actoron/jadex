@@ -1,12 +1,8 @@
 package jadex.micro.testcases.stream;
 
-import jadex.base.fipa.SFipa;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
-import jadex.bridge.IInternalAccess;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.SUtil;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;

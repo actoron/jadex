@@ -1,6 +1,5 @@
 package jadex.tools.deployer;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
 import jadex.bridge.IComponentIdentifier;
@@ -12,6 +11,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.deployment.IDeploymentService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.tools.generic.AbstractServiceSelectorPanel;
 
 import javax.swing.tree.TreePath;
