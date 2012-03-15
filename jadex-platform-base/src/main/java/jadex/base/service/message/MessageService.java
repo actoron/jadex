@@ -1381,7 +1381,7 @@ public class MessageService extends BasicService implements IMessageService
 		public void execute(Object obj)
 		{
 			byte[] rawmsg = (byte[])obj;
-			System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
+//			System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
 			int idx = 1;
 			byte type = rawmsg[idx++];
 			byte[] codec_ids = new byte[rawmsg[idx++]];

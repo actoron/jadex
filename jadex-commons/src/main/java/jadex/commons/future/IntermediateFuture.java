@@ -2,10 +2,12 @@ package jadex.commons.future;
 
 
 import jadex.commons.DebugException;
+import jadex.commons.concurrent.TimeoutException;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -285,6 +287,86 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 
     	startScheduledNotifications();
     }
+    
+//    /**
+//     *  Get the result - blocking call.
+//     *  @return The future result.
+//     */
+//    public E getIntermediate(ISuspendable caller)
+//    {
+//    	return getIntermediate(caller, -1);
+//    }
+//
+//    /**
+//     *  Get the result - blocking call.
+//     *  @param timeout The timeout in millis.
+//     *  @return The future result.
+//     */
+//    public E getIntermediate(ISuspendable caller, long timeout)
+//    {
+//    	boolean suspend = false;
+//    	synchronized(this)
+//    	{
+//	    	if(!isDone())
+//	    	{
+//	    	   	if(caller==null)
+//	    	   		throw new RuntimeException("No suspendable element.");
+//	//        		caller = new ThreadSuspendable(this);
+//	     
+////	    	   	System.out.println(this+" suspend: "+caller);
+//	    	   	if(callers==null)
+//	    	   		callers	= Collections.synchronizedMap(new HashMap<ISuspendable, String>());
+//	    	   	callers.put(caller, CALLER_QUEUED);
+//	    	   	suspend = true;
+//	    	}
+//    	}
+//    	
+//    	if(suspend)
+//		{
+//	    	Object mon = caller.getMonitor()!=null? caller.getMonitor(): caller;
+//	    	synchronized(mon)
+//	    	{
+//    			Object	state	= callers.get(caller);
+//    			if(CALLER_QUEUED.equals(state))
+//    			{
+//    	    	   	callers.put(caller, CALLER_SUSPENDED);
+////    	    	   	if(caller.toString().indexOf("ExtinguishFirePlan")!=-1)
+////    	    	   		System.out.println("caller suspending: "+caller+", "+this);
+//    				caller.suspend(this, timeout);
+////    	    	   	if(caller.toString().indexOf("ExtinguishFirePlan")!=-1)
+////    	    	   		System.out.println("caller resumed: "+caller+", "+this);
+//    		    	if(exception!=null)
+//    		    	{
+//    		    		// Nest exception to have both calling and manually set exception stack trace.
+////     		    		exception	= new RuntimeException("Exception when evaluating future", exception);
+//     		    		exception	= new RuntimeException(exception.getMessage(), exception);
+//     		    	}
+////    				System.out.println(this+" caller awoke: "+caller+" "+mon);
+//    			}
+//    			// else already resumed.
+//    		}
+//    	}
+//    	
+////    	if(result==null)
+////    		System.out.println(this+" here: "+caller);
+//    	
+//    	synchronized(this)
+//    	{
+//	    	if(exception!=null)
+//	    	{
+//	    		throw exception instanceof RuntimeException? (RuntimeException)exception 
+//	    			:new RuntimeException(exception);
+//	    	}
+//	    	else if(isDone())
+//	    	{
+//	    	   	return result;
+//	    	}
+//	    	else
+//	    	{
+//	    		throw new TimeoutException("Timeout while waiting for future.");
+//	    	}
+//    	}
+//    }
     
     /**
      *  Notify a result listener.

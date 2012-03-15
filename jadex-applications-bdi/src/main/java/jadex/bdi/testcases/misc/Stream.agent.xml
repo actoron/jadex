@@ -31,7 +31,7 @@
 	
 	<plans>
 		<plan name="create_plan">
-			<body class="CreateStreamPlan"/>
+			<body class="SendStreamPlan"/>
 		</plan>
 		<plan name="receive_plan">
 			<body class="ReceiveStreamPlan"/>

@@ -4,6 +4,8 @@ import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 
@@ -27,8 +29,9 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	/** The size. */
 	protected int size;
 	
-	/** The read future. */
-	protected IntermediateFuture<Byte> future;
+	/** The read futures. */
+	protected IntermediateFuture<Byte> ifuture;
+	protected Future<Byte> ofuture;
 	
 	/**
 	 *  Create a new input connection.
@@ -47,7 +50,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 */
 	public int read()
 	{
-		if(future!=null)
+		if(ifuture!=null || ofuture!=null)
 			throw new RuntimeException("Stream has asynchronous reader");
 		return internalRead();
 	}
@@ -61,7 +64,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 */
 	public int read(byte[] buffer)
 	{
-		if(future!=null)
+		if(ifuture!=null || ofuture!=null)
 			throw new RuntimeException("Stream has asynchronous reader");
 
 		int startpos = offset;
@@ -158,9 +161,9 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		boolean cl;
 		synchronized(this)
 		{
-			if(future!=null)
+			if(ifuture!=null || ofuture!=null)
 				return new IntermediateFuture<Byte>(new RuntimeException("Stream has reader"));
-			future = new IntermediateFuture<Byte>();
+			ifuture = new IntermediateFuture<Byte>();
 			cl = closed;
 		}
 			
@@ -170,7 +173,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 			{
 				for(int val=internalRead(); val!=-1; )
 				{
-					future.addIntermediateResult(new Byte((byte)val));
+					ifuture.addIntermediateResult(new Byte((byte)val));
 				}
 			}
 			catch(Exception e)
@@ -179,55 +182,90 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 			}
 			if(cl && position==size)
 			{
-				future.setFinished();
+				ifuture.setFinished();
 //				future.setException(new RuntimeException("Stream closed"));
 			}
 		}
 		catch(Exception e)
 		{
-			future.setException(e);
+			ifuture.setException(e);
 		}
 		
-		return future;
+		return ifuture;
 	}
 	
 	/**
-	 *  Blocking read. Read the next byte.
-	 *  @return The next byte or -1 if the end of the stream has been reached.
+	 *  Asynchronous read. 
+	 *  @return Bytes one by one till end of stream or closed.
 	 */
-	public int bread()
+	public IFuture<Byte> areadNext()
 	{
-		int ret = -1;
+		Future<Byte> ofut;
+		synchronized(this)
+		{
+			if(ifuture!=null || ofuture!=null)
+				return new Future<Byte>(new RuntimeException("Stream has reader"));
+			ofut = new Future<Byte>();
+		}
 		
 		try
 		{
-			ret = read();
-			if(ret == -1)
-			{
-				try
-				{
-					Thread.currentThread().wait();
-				}
-				catch(Exception e)
-				{
-				}
-				try
-				{
-					ret = read();
-					if(ret == -1)
-						throw new RuntimeException("Stream read error.");
-				}
-				catch(Exception e)
-				{
-				}
-			}
+			int val=internalRead();
+			if(val!=-1)
+				ofut.setResult(new Byte((byte)val));
 		}
 		catch(Exception e)
 		{
+			// catch stream closed exception
+			ofut.setException(new RuntimeException("Stream closed"));
 		}
 		
-		return ret;
+		synchronized(this)
+		{
+			if(!ofut.isDone())
+				ofuture = ofut;
+		}
+			
+		return ofut;
 	}
+	
+//	/**
+//	 *  Blocking read. Read the next byte.
+//	 *  @return The next byte or -1 if the end of the stream has been reached.
+//	 */
+//	public int bread()
+//	{
+//		int ret = -1;
+//		
+//		try
+//		{
+//			ret = read();
+//			if(ret == -1)
+//			{
+//				try
+//				{
+//					Thread.currentThread().wait();
+//				}
+//				catch(Exception e)
+//				{
+//				}
+//				try
+//				{
+//					ret = read();
+//					if(ret == -1)
+//						throw new RuntimeException("Stream read error.");
+//				}
+//				catch(Exception e)
+//				{
+//				}
+//			}
+//		}
+//		catch(Exception e)
+//		{
+//		}
+//		
+//		return ret;
+//	}
 
 	//-------- methods called from message service --------
 	
@@ -240,14 +278,15 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	public boolean addData(byte[] data)
 	{
 //		System.out.println("added: "+data.length);
-		IntermediateFuture<Byte> ret;
+		IntermediateFuture<Byte> iret;
+		Future<Byte> oret = null;
 		boolean cl;
 		synchronized(this)
 		{
 			if(closed)
 				return false;
 			
-			if(future!=null)
+			if(ifuture==null)
 			{
 				this.data.add(data);
 			}
@@ -255,24 +294,34 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 			{
 				offset += data.length;
 			}
+			
 			this.size += data.length;
-			ret = future;
+			iret = ifuture;
+			if(ofuture!=null)
+			{
+				oret = ofuture;
+				ofuture = null;
+			}
 			cl = closed;
 		}
 		
-		if(ret!=null)
+		if(iret!=null)
 		{
 			position += data.length;
 			for(int i=0; i<data.length; i++)
 			{
-				ret.addIntermediateResult(data[i]);
+				iret.addIntermediateResult(data[i]);
 			}
 			
 			if(cl && position==size)
 			{
-				ret.setFinished();
+				iret.setFinished();
 //				ret.setException(new RuntimeException("Stream closed"));
 			}
+		}
+		else if(oret!=null)
+		{
+			oret.setResult(new Byte((byte)internalRead()));
 		}
 		
 		return true;
@@ -283,19 +332,25 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 */
 	public void setClosed()
 	{
-		IntermediateFuture<Byte> ret;
+		IntermediateFuture<Byte> iret;
+		Future<Byte> oret;
 		boolean cl;
 		synchronized(this)
 		{
 			super.setClosed();
-			ret = future;
+			iret = ifuture;
+			oret = ofuture;
 			cl = position == size;
 		}
 		// notify async listener if last byte has been read and stream is closed.
-		if(ret!=null && cl)
+		if(iret!=null && cl)
 		{
-			ret.setFinished();
+			iret.setFinished();
 //			ret.setException(new RuntimeException("Stream closed"));
+		}
+		else if(oret!=null && cl)
+		{
+			oret.setException(new RuntimeException("Stream closed"));
 		}
 	}
 }

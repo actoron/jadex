@@ -3,6 +3,7 @@ package jadex.bridge.service.types.remote;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 
 /**
@@ -106,10 +107,15 @@ public class ServiceInputConnectionProxy implements IInputConnection
 		throw new UnsupportedOperationException();
 	}
 	
-	/**
-	 * 
-	 */
-	public int bread()
+//	/**
+//	 * 
+//	 */
+//	public int bread()
+//	{
+//		throw new UnsupportedOperationException();
+//	}
+	
+	public IFuture<Byte> areadNext()
 	{
 		throw new UnsupportedOperationException();
 	}

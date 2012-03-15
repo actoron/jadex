@@ -178,7 +178,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 										if(content instanceof RemoteResultCommand)
 										{
 											System.out.println("corrupt content: "+content);
-		//									System.out.println("errors: "+errors);
+											System.out.println("errors: "+errors);
 											((RemoteResultCommand)content).setExceptionInfo(new ExceptionInfo(new RuntimeException("Errors during XML decoding: "+errors)));
 										}
 										else

@@ -196,7 +196,7 @@ public abstract class AbstractConnection
 	 */
 	public void setAliveTime(long alivetime)
 	{
-		System.out.println("new lease: "+alivetime);
+//		System.out.println("new lease: "+alivetime);
 		this.alivetime = alivetime;
 	}
 	
@@ -206,7 +206,7 @@ public abstract class AbstractConnection
 	public boolean isConnectionAlive(long lease)
 	{
 		boolean isalive = System.currentTimeMillis()<alivetime+lease*1.3;
-		System.out.println("alive: "+isalive+" "+alivetime+" "+System.currentTimeMillis());
+//		System.out.println("alive: "+isalive+" "+alivetime+" "+System.currentTimeMillis());
 		return isalive;
 	}
 
