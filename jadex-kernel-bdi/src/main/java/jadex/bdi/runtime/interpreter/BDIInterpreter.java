@@ -81,7 +81,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import antlr.debug.MessageAdapter;
 
 /**
  *  Main entry point for the reasoning engine
