@@ -1,8 +1,6 @@
 package jadex.base.service.message;
 
 import jadex.base.AbstractComponentAdapter;
-import jadex.base.service.awareness.discovery.DiscoveryEntry;
-import jadex.base.service.awareness.discovery.LeaseTimeHandler;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
@@ -20,12 +18,10 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.ServiceTerminatedException;
-import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;

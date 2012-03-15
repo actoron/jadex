@@ -30,6 +30,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
+import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
@@ -39,8 +40,6 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ITerminableFuture;
-import jadex.commons.future.TerminableFuture;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.binaryserializer.DecodingContext;
 import jadex.commons.transformation.binaryserializer.EncodingContext;
@@ -74,17 +73,10 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/* $if !android $ */
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
-/* $else $
-import javaxx.xml.namespace.QName;
-import javaxx.xml.stream.Location;
-import javaxx.xml.stream.XMLReporter;
-import javaxx.xml.stream.XMLStreamException;
-$endif $ */
 
 
 /**

@@ -1,20 +1,11 @@
 package jadex.bridge.service.types.remote;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,12 +64,36 @@ public class ServiceOutputConnection implements IOutputConnection
 		}
 	}
 	
+	public int getConnectionId()
+	{
+		if(ocon!=null)
+			return ocon.getConnectionId();
+		else
+			throw new RuntimeException("Uninitialized connection.");
+	}
+
+	public IComponentIdentifier getInitiator()
+	{
+		if(ocon!=null)
+			return ocon.getInitiator();
+		else
+			throw new RuntimeException("Uninitialized connection.");
+	}
+
+	public IComponentIdentifier getParticipant()
+	{
+		if(ocon!=null)
+			return ocon.getParticipant();
+		else
+			throw new RuntimeException("Uninitialized connection.");
+	}
+
 	/**
 	 * 
 	 */
 	public IInputConnection getInputConnection()
 	{
-		return new ServiceInputConnection();
+		return new ServiceInputConnectionProxy(this);
 	}
 	
 	/**
@@ -102,85 +117,4 @@ public class ServiceOutputConnection implements IOutputConnection
 			ocon.close();
 		}
 	}
-	
-	/**
-	 * 
-	 */
-	public class ServiceInputConnection implements IInputConnection
-	{
-		public void setOutputConnection(IExternalAccess component, IComponentIdentifier receiver, IOutputConnection ocon)
-		{
-			ServiceOutputConnection.this.setOutputConnection(ocon);
-//			createOutputConnection(component, receiver)
-//				.addResultListener(new IResultListener<IOutputConnection>()
-//			{
-//				public void resultAvailable(IOutputConnection ocon)
-//				{
-//					System.out.println("has output");
-//					ServiceOutputConnection.this.setOutputConnection(ocon);
-//				}
-//				
-//				public void exceptionOccurred(Exception exception)
-//				{
-//					System.out.println("excepetion: "+exception);
-//				}
-//			});
-		}
-		
-//		public ServiceOutputConnection getOutputConnection()
-//		{
-//			return ServiceOutputConnection.this;
-//		}
-		
-		public int read(byte[] buffer)
-		{
-			throw new UnsupportedOperationException();
-		}
-		
-		public int read()
-		{
-			throw new UnsupportedOperationException();
-		}
-		
-		public void close()
-		{
-			throw new UnsupportedOperationException();
-		}
-		
-		public IIntermediateFuture<Byte> aread()
-		{
-			throw new UnsupportedOperationException();
-		}
-	}
-	
-//	/**
-//	 * 
-//	 */
-//	public IFuture<IOutputConnection> createOutputConnection(final IExternalAccess component, final IComponentIdentifier receiver)
-//	{
-//		final Future<IOutputConnection> ret = new Future<IOutputConnection>();
-//		
-//		component.scheduleStep(new IComponentStep<IOutputConnection>()
-//		{
-//			public IFuture<IOutputConnection> execute(final IInternalAccess ia)
-//			{
-//				final Future<IOutputConnection> fut = new Future<IOutputConnection>();
-//				
-//				SServiceProvider.getService(ia.getServiceContainer(), 
-//					IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-//					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IMessageService, IOutputConnection>(ret)
-//				{
-//					public void customResultAvailable(IMessageService ms)
-//					{
-//						ms.createOutputConnection(component.getComponentIdentifier(), receiver)
-//							.addResultListener(ia.createResultListener(new DelegationResultListener<IOutputConnection>(fut)));
-//					}
-//				}));
-//				
-//				return fut; 
-//			}
-//		}).addResultListener(new DelegationResultListener<IOutputConnection>(ret));
-//		
-//		return ret;
-//	}
 }
