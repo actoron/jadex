@@ -190,6 +190,44 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		
 		return future;
 	}
+	
+	/**
+	 *  Blocking read. Read the next byte.
+	 *  @return The next byte or -1 if the end of the stream has been reached.
+	 */
+	public int bread()
+	{
+		int ret = -1;
+		
+		try
+		{
+			ret = read();
+			if(ret == -1)
+			{
+				try
+				{
+					Thread.currentThread().wait();
+				}
+				catch(Exception e)
+				{
+				}
+				try
+				{
+					ret = read();
+					if(ret == -1)
+						throw new RuntimeException("Stream read error.");
+				}
+				catch(Exception e)
+				{
+				}
+			}
+		}
+		catch(Exception e)
+		{
+		}
+		
+		return ret;
+	}
 
 	//-------- methods called from message service --------
 	

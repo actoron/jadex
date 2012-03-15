@@ -17,11 +17,15 @@ import jadex.bdi.runtime.IPropertybase;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.DefaultMessageAdapter;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
@@ -76,6 +80,8 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+
+import antlr.debug.MessageAdapter;
 
 /**
  *  Main entry point for the reasoning engine
@@ -654,6 +660,20 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 				}
 			});
 //		}
+	}
+	
+	/**
+	 *  Inform the agent that a message has arrived.
+	 *  @param message The message that arrived.
+	 */
+	public void streamArrived(final IConnection con)
+	{
+//		System.out.println("messageArrived: "+getAgentAdapter().getComponentIdentifier().getLocalName()+", "+message);
+		Map<String, Object> msg = new HashMap<String, Object>();
+		msg.put(SFipa.CONTENT, con);
+		msg.put(SFipa.SENDER, con.getInitiator());
+		msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{con.getParticipant()});
+		messageArrived(new DefaultMessageAdapter(msg, SFipa.FIPA_MESSAGE_TYPE));
 	}
 
 	/**

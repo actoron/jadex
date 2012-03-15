@@ -28,7 +28,12 @@ public interface IInputConnection extends IConnection
 	 *  @return Bytes one by one till end of stream or closed.
 	 */
 	public IIntermediateFuture<Byte> aread();
-
+	
+	/**
+	 *  Blocking read. Read the next byte.
+	 *  @return The next byte or -1 if the end of the stream has been reached.
+	 */
+	public int bread();
 	
 	/**
 	 *  Close the stream.

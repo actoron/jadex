@@ -13,7 +13,12 @@
 		<import>jadex.base.test.*</import>
 		<import>jadex.bdi.testcases.ResultPlan</import>
 		<import>jadex.base.fipa.*</import>
+		<import>jadex.bridge.*</import>
 	</imports>
+	
+	<capabilities>
+		<capability name="testcap" file="jadex.bdi.planlib.test.Test"/>
+	</capabilities>
 	
 	<beliefs>
 		<beliefref name="timeout"  exported="true">
@@ -25,23 +30,32 @@
 	</beliefs>
 	
 	<plans>
-		<plan name="test_plan">
+		<plan name="create_plan">
 			<body class="CreateStreamPlan"/>
 		</plan>
 		<plan name="receive_plan">
 			<body class="ReceiveStreamPlan"/>
+			<trigger>
+				<messageevent ref="str_receive"></messageevent>
+			</trigger>
 		</plan>
 	</plans>
+	
+	<events>
+		<messageevent name="str_receive" type="fipa" direction="receive">
+			<match>$content instanceof IConnection</match>
+		</messageevent>
+	</events>
 
 	<configurations>
 		<configuration name="default">
 			<beliefs>
 				<initialbelief cref="testcap.testcase_cnt">
-					<fact>2</fact>
+					<fact>1</fact>
 				</initialbelief>
 			</beliefs>
 			<plans>
-				<initialplan ref="test_plan"/>
+				<initialplan ref="create_plan"/>
 			</plans>
 		</configuration>
 	</configurations>
