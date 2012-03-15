@@ -4,6 +4,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -13,6 +14,7 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -93,6 +95,14 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	{
 	}
 
+	/**
+	 *  Called, whenever a stream is received.
+	 *  @param con The stream.
+	 */
+	public void streamArrived(IConnection con)
+	{
+	}
+	
 	/**
 	 *  Called just before the agent is removed from the platform.
 	 *  @return The result of the component.
@@ -651,6 +661,14 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	public IFuture<Void>	removeService(IServiceIdentifier sid)
 	{
 		return ((IServiceContainer)interpreter.getServiceProvider()).removeService(sid);
+	}
+	
+	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public <T> IFuture<T> waitForDelay(final long delay, final IComponentStep<T> step)
+	{
+		return interpreter.waitForDelay(delay, step);
 	}
 	
 	/**

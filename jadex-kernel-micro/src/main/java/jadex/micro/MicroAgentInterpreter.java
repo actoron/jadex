@@ -4,6 +4,7 @@ import jadex.bridge.ComponentChangeEvent;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
@@ -467,6 +468,25 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //		System.out.println("msgrec: "+getAgentAdapter().getComponentIdentifier()+" "+message);
 //		IFuture ret = scheduleStep(new ICommand()
 		scheduleStep(new HandleMessageStep(message));
+	}
+	
+	/**
+	 *  Can be called concurrently (also during executeAction()).
+	 *  
+	 *  Inform the component that a stream has arrived.
+	 *  Can be called concurrently (also during executeAction()).
+	 *  @param con The stream that arrived.
+	 */
+	public void streamArrived(final IConnection con)
+	{
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				microagent.streamArrived(con);
+				return IFuture.DONE;
+			}
+		});
 	}
 
 //	/**

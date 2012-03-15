@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+	<H3>Test if</H3>
+ -->
+<agent xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+						http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="Stream"
+	package="jadex.bdi.testcases.misc">
+	
+	<imports>
+		<import>jadex.base.test.*</import>
+		<import>jadex.bdi.testcases.ResultPlan</import>
+		<import>jadex.base.fipa.*</import>
+	</imports>
+	
+	<beliefs>
+		<beliefref name="timeout"  exported="true">
+			<concrete ref="testcap.timeout"/>
+		</beliefref>
+		<beliefref name="testresults"  result="true">
+			<concrete ref="testcap.testresults"/>
+		</beliefref>
+	</beliefs>
+	
+	<plans>
+		<plan name="test_plan">
+			<body class="CreateStreamPlan"/>
+		</plan>
+		<plan name="receive_plan">
+			<body class="ReceiveStreamPlan"/>
+		</plan>
+	</plans>
+
+	<configurations>
+		<configuration name="default">
+			<beliefs>
+				<initialbelief cref="testcap.testcase_cnt">
+					<fact>2</fact>
+				</initialbelief>
+			</beliefs>
+			<plans>
+				<initialplan ref="test_plan"/>
+			</plans>
+		</configuration>
+	</configurations>
+	
+</agent>

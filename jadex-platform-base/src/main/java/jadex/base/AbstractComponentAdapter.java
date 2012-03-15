@@ -5,6 +5,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
+import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -658,6 +659,19 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 		
 		IMessageAdapter msg = new DefaultMessageAdapter(message, type);
 		component.messageArrived(msg);
+	}
+	
+	/**
+	 *  Called when a stream was sent to the component.
+	 *  (Called from message transport).
+	 *  (Is it ok to call on external thread?).
+	 */
+	public void	receiveStream(IConnection con)
+	{
+		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()) || exception!=null)
+			throw new ComponentTerminatedException(desc.getName());
+
+		component.streamArrived(con);
 	}
 	
 	//-------- IExecutable interface --------

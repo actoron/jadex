@@ -1,7 +1,7 @@
 package jadex.base.service.remote;
 
-import jadex.base.service.message.InitiatorOutputConnection;
 import jadex.base.service.message.MessageService;
+import jadex.base.service.message.OutputConnection;
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.base.service.remote.commands.RemoteGetExternalAccessCommand;
 import jadex.base.service.remote.commands.RemoteSearchCommand;
@@ -30,7 +30,6 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
-import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
@@ -203,13 +202,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			new ObjectInfo(ProxyReference.class, new RMIPostProcessor(rrm)));
 		typeinfosread.add(ti_rr);
 
-		QName[] icp = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "InputConnectionProxy")};
+		QName[] icp = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ServiceInputConnectionProxy")};
 		TypeInfo ti_icp = new TypeInfo(new XMLInfo(icp), 
-			new ObjectInfo(InputConnectionProxy.class, new IPostProcessor()
+			new ObjectInfo(ServiceInputConnectionProxy.class, new IPostProcessor()
 		{
 			public Object postProcess(IContext context, Object object)
 			{
-				InputConnectionProxy icp = (InputConnectionProxy)object;
+				ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)object;
 				int conid = icp.getConnectionId();
 				IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(conid);
 				return icon;
@@ -299,18 +298,18 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			public boolean filter(Object obj)
 			{
-				return obj instanceof ServiceOutputConnection.ServiceInputConnection;
+				return obj instanceof ServiceInputConnectionProxy;
 			}
 		}, new IPreProcessor()
 		{
 			public Object preProcess(IContext context, Object object)
 			{
 				IComponentIdentifier receiver = (IComponentIdentifier)((Object[])context.getUserContext())[0];
-				ServiceOutputConnection.ServiceInputConnection con = (ServiceOutputConnection.ServiceInputConnection)object;
+				ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
 				// hack todo:
-				InitiatorOutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
-				con.setOutputConnection(RemoteServiceManagementService.this.component, receiver, ocon);
-				return new InputConnectionProxy(ocon.getConnectionId());
+				OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+				con.setOutputConnection(ocon);
+				return null;
 			}
 		});
 		

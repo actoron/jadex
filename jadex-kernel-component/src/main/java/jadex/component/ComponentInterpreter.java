@@ -1,7 +1,6 @@
 package jadex.component;
 
 import jadex.bridge.ComponentTerminatedException;
-import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
@@ -13,10 +12,10 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -212,18 +211,6 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 			return false; 
 		}
 	}
-
-	/**
-	 *  Can be called concurrently (also during executeAction()).
-	 *  
-	 *  Inform the component that a message has arrived.
-	 *  Can be called concurrently (also during executeAction()).
-	 *  @param message The message that arrived.
-	 */
-	public void messageArrived(IMessageAdapter message)
-	{
-		throw new UnsupportedOperationException();
-	}
 	
 	/**
 	 *  Test if the component's execution is currently at one of the
@@ -283,34 +270,6 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 //		}
 //		return container;
 //	}
-	
-	/**
-	 *  Wait for some time and execute a component step afterwards.
-	 */
-	public <T> IFuture<T> waitFor(final long delay, final IComponentStep<T> step)
-	{
-		// todo: remember and cleanup timers in case of component removal.
-		
-		final Future ret = new Future();
-		
-		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				IClockService cs = (IClockService)result;
-				cs.createTimer(delay, new ITimedObject()
-				{
-					public void timeEventOccurred(long currenttime)
-					{
-						scheduleStep(step).addResultListener(new DelegationResultListener(ret));
-					}
-				});
-			}
-		}));
-		
-		return ret;
-	}
 	
 	//-------- abstract interpreter methods --------
 	

@@ -4,7 +4,6 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.micro.MicroAgent;
@@ -45,7 +44,7 @@ public class StreamProviderAgent implements IStreamService
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				oc.write(new byte[]{(byte)cnt[0]});
-				if(cnt[0]++<5)
+				if(cnt[0]++<50)
 					agent.waitFor(1000, this);
 				return IFuture.DONE;
 			}

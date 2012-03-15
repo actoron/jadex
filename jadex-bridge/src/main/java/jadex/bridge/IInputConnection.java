@@ -6,7 +6,7 @@ import jadex.commons.future.IIntermediateFuture;
 /**
  *  Interface for input connection stream.
  */
-public interface IInputConnection
+public interface IInputConnection extends IConnection
 {
 	/**
 	 *  Non-blocking read. Tries to read the next byte.

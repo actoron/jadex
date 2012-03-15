@@ -41,6 +41,15 @@ public interface IComponentInstance
 	public void messageArrived(IMessageAdapter message);
 
 	/**
+	 *  Can be called concurrently (also during executeAction()).
+	 *  
+	 *  Inform the component that a stream has arrived.
+	 *  Can be called concurrently (also during executeAction()).
+	 *  @param con The stream that arrived.
+	 */
+	public void streamArrived(IConnection con);
+
+	/**
 	 *  Called when a component has been created as a subcomponent of this component.
 	 *  This event may be ignored, if no special reaction  to new or destroyed components is required.
 	 *  The current subcomponents can be accessed by IComponentAdapter.getSubcomponents().

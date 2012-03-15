@@ -7,6 +7,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
@@ -35,6 +36,7 @@ import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -78,15 +80,6 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	
 	//-------- interface methods --------
 	
-	/**
-	 *  Can be called concurrently (also during executeAction()).
-	 *  
-	 *  Inform the agent that a message has arrived.
-	 *  Can be called concurrently (also during executeAction()).
-	 *  @param message The message that arrived.
-	 */
-	public abstract void messageArrived(final IMessageAdapter message);
-
 	/**
 	 *  Create the service container.
 	 *  @return The service container.
@@ -142,6 +135,34 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public abstract boolean executeStep();
 
+	/**
+	 *  Can be called concurrently (also during executeAction()).
+	 *  
+	 *  Inform the agent that a message has arrived.
+	 *  Can be called concurrently (also during executeAction()).
+	 *  @param message The message that arrived.
+	 */
+	public void messageArrived(IMessageAdapter message)
+	{
+		// Do nothing.
+		getLogger().warning("Unhandled message: "+message);
+//		System.out.println("rec: "+message);
+//		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Can be called concurrently (also during executeAction()).
+	 *  
+	 *  Inform the component that a stream has arrived.
+	 *  Can be called concurrently (also during executeAction()).
+	 *  @param con The stream that arrived.
+	 */
+	public void streamArrived(IConnection con)
+	{
+		// Do nothing.
+		getLogger().warning("Unhandled stream: "+con);
+	}
+	
 	/**
 	 *  Can be called concurrently (also during executeAction()).
 	 *  
@@ -1723,6 +1744,33 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		// Per default just returns false and lets the adapter decide.
 		// Can be overridden to ensure that the interpreter has the last word.
 		return true;
+	}
+	
+	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public <T> IFuture<T> waitForDelay(final long delay, final IComponentStep<T> step)
+	{
+		// todo: remember and cleanup timers in case of component removal.
+		
+		final Future<T> ret = new Future<T>();
+		
+		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IClockService, T>(ret)
+		{
+			public void customResultAvailable(IClockService cs)
+			{
+				cs.createTimer(delay, new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						scheduleStep(step).addResultListener(new DelegationResultListener<T>(ret));
+					}
+				});
+			}
+		}));
+		
+		return ret;
 	}
 	
 }

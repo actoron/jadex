@@ -139,10 +139,10 @@ public interface IInternalAccess
 //	public IFuture getFileName(String ctype);
 	
 	// todo: generic interface does not match MicroAgent implementation (returns IFuture<TimerWrapper>).
-//	/**
-//	 *  Wait for some time and execute a component step afterwards.
-//	 */
-//	public <T>	IFuture<T> waitFor(long delay, IComponentStep<T> step);
+	/**
+	 *  Wait for some time and execute a component step afterwards.
+	 */
+	public <T>	IFuture<T> waitForDelay(long delay, IComponentStep<T> step);
 	
 	// todo:?
 //	/**

@@ -5,34 +5,72 @@ import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
+ *  Task to send data via streams.
  */
 public class StreamSendTask extends AbstractSendTask implements ISendTask
 {
 	public static final byte MESSAGE_TYPE_STREAM = 99;
 
-	/** Create input connection - from initiator. */
-	public static final byte INIT_INPUT_INITIATOR = 0; 
-	/** Send data - from initiator. */
-	public static final byte DATA_INPUT_INITIATOR = 1;
-	/** Close connection - from initiator. */
-	public static final byte CLOSE_INPUT_INITIATOR = 2;
-	/** Close connection - from participant. */
-	public static final byte CLOSE_INPUT_PARTICIPANT = 3;
+	public static final long LEASETIME = 5000;
 	
-	/** Create output connection - from initiator. */ 
-	public static final byte INIT_OUTPUT_INITIATOR = 4;
-	/** Send data - from participant. */
-	public static final byte DATA_OUTPUT_PARTICIPANT = 5;
+	public static final String INIT = "INIT";
+	public static final String DATA = "DATA";
+	public static final String CLOSE = "CLOSE";
+	public static final String ALIVE = "ALIVE";
+	
+	/** Create virtual output connection - from initiator. */
+	public static final byte INIT_OUTPUT_INITIATOR = 0; 
+	/** Send data - from initiator. */
+	public static final byte DATA_OUTPUT_INITIATOR = 1;
 	/** Close connection - from initiator. */
-	public static final byte CLOSE_OUTPUT_INITIATOR = 6;
+	public static final byte CLOSE_OUTPUT_INITIATOR = 2;
 	/** Close connection - from participant. */
-	public static final byte CLOSE_OUTPUT_PARTICIPANT = 7;
+	public static final byte CLOSE_OUTPUT_PARTICIPANT = 3;
+	
+	/** Create virtual input connection - from initiator. */ 
+	public static final byte INIT_INPUT_INITIATOR = 4;
+	/** Send data - from participant. */
+	public static final byte DATA_INPUT_PARTICIPANT = 5;
+	/** Close connection - from initiator. */
+	public static final byte CLOSE_INPUT_INITIATOR = 6;
+	/** Close connection - from participant. */
+	public static final byte CLOSE_INPUT_PARTICIPANT = 7;
+	
+	/** Alive message - from initiator. */ 
+	public static final byte ALIVE_INITIATOR = 8;
+	/** Alive message - from participant. */ 
+	public static final byte ALIVE_PARTICIPANT = 9;
+
+	/** String type, boolean input, boolean initiator. */
+	public static final Map<Tuple, Byte> MESSAGETYPES;
+	
+	public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
+	
+	static
+	{
+		MESSAGETYPES = new HashMap<Tuple, Byte>();
+		
+		MESSAGETYPES.put(new Tuple(INIT, false, true), new Byte(INIT_OUTPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(DATA, false, true), new Byte(DATA_OUTPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(CLOSE, false, true), new Byte(CLOSE_OUTPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(CLOSE, false, false), new Byte(CLOSE_OUTPUT_PARTICIPANT));
+
+		MESSAGETYPES.put(new Tuple(INIT, true, true), new Byte(INIT_INPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(DATA, true, false), new Byte(DATA_INPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(CLOSE, true, true), new Byte(CLOSE_INPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(CLOSE, true, false), new Byte(CLOSE_INPUT_PARTICIPANT));
+
+		MESSAGETYPES.put(new Tuple(ALIVE, true, true), new Byte(ALIVE_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ALIVE, false, true), new Byte(ALIVE_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ALIVE, true, false), new Byte(ALIVE_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(ALIVE, false, false), new Byte(ALIVE_PARTICIPANT));
+	}
 	
 	//-------- attributes --------
 
@@ -144,5 +182,13 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 			}
 		}
 		return prolog;
+	}
+	
+	/**
+	 * 
+	 */
+	public static byte getMessageType(String type, boolean input, boolean initiator)
+	{
+		return MESSAGETYPES.get(new Tuple(type, input, initiator));
 	}
 }

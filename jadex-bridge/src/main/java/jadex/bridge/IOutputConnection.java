@@ -5,7 +5,7 @@ import jadex.commons.future.IFuture;
 /**
  *  Interface for output connection.
  */
-public interface IOutputConnection
+public interface IOutputConnection extends IConnection
 {
 	/**
 	 *  Write the content to the stream.

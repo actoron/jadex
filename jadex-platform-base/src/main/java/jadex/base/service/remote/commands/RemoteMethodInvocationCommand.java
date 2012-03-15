@@ -111,12 +111,14 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 */
 	public IFuture<Void>	preprocessCommand(IInternalAccess component, final RemoteReferenceModule rrm, final IComponentIdentifier target)
 	{
+		
 		Future<Void>	ret	= new Future<Void>();
 		super.preprocessCommand(component, rrm, target)
 			.addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
+				// Do we still need this code? Is done via post processor during marshalling.
 				if(parametertypes.length>0)
 				{
 					RMIPreProcessor preproc = new RMIPreProcessor(rrm);
@@ -130,8 +132,9 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 							parametervalues[i] = preproc.preProcess(context, parametervalues[i]);
 						}
 					}
-					returnisref = SServiceProvider.isReturnValueRemoteReference(method, false);
 				}
+				
+				returnisref = SServiceProvider.isReturnValueRemoteReference(method, false);
 				super.customResultAvailable(result);
 			}
 		});

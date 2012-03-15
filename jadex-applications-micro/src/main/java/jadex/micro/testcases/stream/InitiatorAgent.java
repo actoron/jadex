@@ -14,6 +14,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -90,10 +91,9 @@ public class InitiatorAgent
 												byte[] tosend = new byte[cnt[0]];
 												for(int i=0; i<cnt[0]; i++)
 													tosend[i] = (byte)cnt[0];
-												ocon.write(tosend)
-													.addResultListener(new DelegationResultListener<Void>(ret)
+												ocon.write(tosend).addResultListener(new IResultListener<Void>()
 												{
-													public void customResultAvailable(Void result)
+													public void resultAvailable(Void result)
 													{
 														if(cnt[0]++<max)
 														{
@@ -104,6 +104,10 @@ public class InitiatorAgent
 															ocon.close();
 //															ret.setResult(null);
 														}
+													}
+													public void exceptionOccurred(Exception exception)
+													{
+														System.out.println("Write failed: "+exception);
 													}
 												});
 												return IFuture.DONE;

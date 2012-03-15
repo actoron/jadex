@@ -17,7 +17,7 @@ public class EndStepTestStep implements IComponentStep<Void>
 	 */
 	public IFuture<Void> execute(final IInternalAccess ia)
 	{
-		return ((ComponentInterpreter)ia).waitFor(2000, new IComponentStep<Void>()
+		return ia.waitForDelay(2000, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{

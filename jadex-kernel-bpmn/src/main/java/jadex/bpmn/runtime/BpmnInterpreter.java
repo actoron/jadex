@@ -28,6 +28,7 @@ import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IComponentListener;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IConnection;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
@@ -82,7 +83,7 @@ import java.util.Set;
  *  Arguments are treated in BPMN as parameters, i.e. the argument
  *  values will be fed into corresponding parameters.
  */
-public class BpmnInterpreter extends AbstractInterpreter implements IComponentInstance, IInternalAccess
+public class BpmnInterpreter extends AbstractInterpreter implements IInternalAccess
 {	
 	//-------- static part --------
 	
@@ -186,7 +187,10 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 	
 	/** The messages waitqueue. */
 	protected List messages;
-	
+
+	/** The streams waitqueue. */
+	protected List streams;
+
 	/** The inited future. */
 	protected Future<Void> inited;
 	
@@ -328,6 +332,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		this.stephandlers = stephandlers!=null? stephandlers: DEFAULT_STEP_HANDLERS;
 		this.context = new ThreadContext(model);
 		this.messages = new ArrayList();
+		this.streams = new ArrayList();
 		this.variables	= getArguments()!=null ? new HashMap(getArguments()) : new HashMap();
 	}
 	
@@ -577,6 +582,46 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 				if(!processed)
 				{
 					messages.add(message);
+//					System.out.println("Dispatched to waitqueue: "+message);
+				}
+			}
+		});
+	}
+	
+	/**
+	 *  Can be called concurrently (also during executeAction()).
+	 *  
+	 *  Inform the agent that a message has arrived.
+	 *  Can be called concurrently (also during executeAction()).
+	 *  @param message The message that arrived.
+	 */
+	public void streamArrived(final IConnection con)
+	{
+		getComponentAdapter().invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				// Iterate through process threads and dispatch message to first
+				// waiting and fitting one (filter check).
+				boolean processed = false;
+				for(Iterator it=context.getAllThreads().iterator(); it.hasNext() && !processed; )
+				{
+					ProcessThread pt = (ProcessThread)it.next();
+					if(pt.isWaiting())
+					{
+						IFilter filter = pt.getWaitFilter();
+						if(filter!=null && filter.filter(con))
+						{
+							BpmnInterpreter.this.notify(pt.getActivity(), pt, con);
+//							((DefaultActivityHandler)getActivityHandler(pt.getActivity())).notify(pt.getActivity(), BpmnInterpreter.this, pt, message);
+							processed = true;
+						}
+					}
+				}
+				
+				if(!processed)
+				{
+					streams.add(con);
 //					System.out.println("Dispatched to waitqueue: "+message);
 				}
 			}
@@ -923,6 +968,22 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 					}
 				}
 			}
+			if(thread.isWaiting() && streams.size()>0) 
+			{
+				boolean processed = false;
+				for(int i=0; i<streams.size() && !processed; i++)
+				{
+					Object stream = streams.get(i);
+					IFilter filter = thread.getWaitFilter();
+					if(filter!=null && filter.filter(stream))
+					{
+						notify(thread.getActivity(), thread, stream);
+						processed = true;
+						streams.remove(i);
+//						System.out.println("Dispatched from stream: "+messages.size()+" "+message);
+					}
+				}
+			}
 			
 			if(thread.getThreadContext()!=null)
 				notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
@@ -1256,33 +1317,33 @@ public class BpmnInterpreter extends AbstractInterpreter implements IComponentIn
 		return ret;
 	}
 	
-	/**
-	 *  Wait for some time and execute a component step afterwards.
-	 */
-	public IFuture waitFor(final long delay, final IComponentStep step)
-	{
-		// todo: remember and cleanup timers in case of component removal.
-		
-		final Future ret = new Future();
-		
-		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(createResultListener(new DelegationResultListener(ret)
-		{
-			public void customResultAvailable(Object result)
-			{
-				IClockService cs = (IClockService)result;
-				cs.createTimer(delay, new ITimedObject()
-				{
-					public void timeEventOccurred(long currenttime)
-					{
-						scheduleStep(step).addResultListener(new DelegationResultListener(ret));
-					}
-				});
-			}
-		}));
-		
-		return ret;
-	}
+//	/**
+//	 *  Wait for some time and execute a component step afterwards.
+//	 */
+//	public IFuture waitFor(final long delay, final IComponentStep step)
+//	{
+//		// todo: remember and cleanup timers in case of component removal.
+//		
+//		final Future ret = new Future();
+//		
+//		SServiceProvider.getService(getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//			.addResultListener(createResultListener(new DelegationResultListener(ret)
+//		{
+//			public void customResultAvailable(Object result)
+//			{
+//				IClockService cs = (IClockService)result;
+//				cs.createTimer(delay, new ITimedObject()
+//				{
+//					public void timeEventOccurred(long currenttime)
+//					{
+//						scheduleStep(step).addResultListener(new DelegationResultListener(ret));
+//					}
+//				});
+//			}
+//		}));
+//		
+//		return ret;
+//	}
 	
 //	/**
 //	 *  Adds an activity listener. The listener will be called

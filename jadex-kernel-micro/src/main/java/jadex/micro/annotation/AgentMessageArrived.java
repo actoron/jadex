@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Marker for agent created method.
+ *  Marker for agent message arrived.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

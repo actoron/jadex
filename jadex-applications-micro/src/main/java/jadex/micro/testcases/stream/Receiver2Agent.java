@@ -1,6 +1,7 @@
 package jadex.micro.testcases.stream;
 
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.fipa.SFipa;
@@ -8,9 +9,12 @@ import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentMessageArrived;
+import jadex.micro.annotation.AgentStreamArrived;
 
 import java.util.Map;
 
@@ -20,17 +24,17 @@ public class Receiver2Agent
 	@Agent
 	protected MicroAgent agent;
 	
-	protected IOutputConnection icon;
+	protected IOutputConnection con;
 	
 	/**
 	 * 
 	 */
-	@AgentMessageArrived
-	public void messageArrvied(Map<String, Object> msg, MessageType mt)
+	@AgentStreamArrived
+	public void streamArrvied(final IOutputConnection con)
 	{
 		// todo: how to avoid garbage collection of connection?
-		icon = (IOutputConnection)msg.get(SFipa.CONTENT);
-		System.out.println("received: "+msg+" "+icon.hashCode());
+		this.con = (IOutputConnection)con;
+		System.out.println("received: "+con+" "+con.hashCode());
 		
 		final Future<Void> ret = new Future<Void>();
 		final IComponentStep<Void> step = new IComponentStep<Void>()
@@ -43,10 +47,9 @@ public class Receiver2Agent
 				byte[] tosend = new byte[cnt[0]];
 				for(int i=0; i<cnt[0]; i++)
 					tosend[i] = (byte)cnt[0];
-				icon.write(tosend)
-					.addResultListener(new DelegationResultListener<Void>(ret)
+				con.write(tosend).addResultListener(new IResultListener<Void>()
 				{
-					public void customResultAvailable(Void result)
+					public void resultAvailable(Void result)
 					{
 						if(cnt[0]++<max)
 						{
@@ -54,14 +57,25 @@ public class Receiver2Agent
 						}
 						else
 						{
-							icon.close();
+							con.close();
 //							ret.setResult(null);
 						}
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("Write failed: "+exception);
 					}
 				});
 				return IFuture.DONE;
 			}
 		};
 		agent.waitFor(200, step);
+	}
+	
+	@AgentKilled
+	public void killed()
+	{
+		if(con!=null)
+			con.close();
 	}
 }

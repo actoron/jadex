@@ -1,5 +1,6 @@
 package jadex.micro;
 
+import jadex.bridge.IConnection;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.SReflect;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -11,6 +12,7 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentMessageArrived;
+import jadex.micro.annotation.AgentStreamArrived;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -123,6 +125,30 @@ public class PojoMicroAgent extends MicroAgent implements IPojoMicroAgent
 			}
 		}));
 	}
+	
+	/**
+	 *  Called, whenever a message is received.
+	 *  @param msg The message.
+	 *  @param mt The message type.
+	 */
+	public void streamArrived(IConnection con)
+	{
+		invokeMethod(AgentStreamArrived.class, new Object[]{con}).addResultListener(
+			interpreter.createResultListener(new IResultListener<Method>()
+		{
+			public void resultAvailable(Method result)
+			{
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				if(exception instanceof RuntimeException)
+					throw (RuntimeException)exception;
+				else
+					throw new RuntimeException(exception);
+			}
+		}));
+	}
+
 
 	/**
 	 *  Called just before the agent is removed from the platform.

@@ -1,15 +1,14 @@
 package jadex.micro.testcases.stream;
 
+import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
-import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentMessageArrived;
+import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.AgentStreamArrived;
 
 import java.util.Collection;
-import java.util.Map;
 
 @Agent
 public class ReceiverAgent
@@ -22,15 +21,14 @@ public class ReceiverAgent
 	/**
 	 * 
 	 */
-	@AgentMessageArrived
-	public void messageArrvied(Map<String, Object> msg, MessageType mt)
+	@AgentStreamArrived
+	public void streamArrvied(IConnection con)
 	{
 		// todo: how to avoid garbage collection of connection?
 //		final IInputConnection con = (IInputConnection)msg.get(SFipa.CONTENT);
-		con = (IInputConnection)msg.get(SFipa.CONTENT);
-		System.out.println("received: "+msg+" "+con.hashCode());
+		System.out.println("received: "+con+" "+con.hashCode());
 		
-		con.aread().addResultListener(new IIntermediateResultListener<Byte>()
+		((IInputConnection)con).aread().addResultListener(new IIntermediateResultListener<Byte>()
 		{
 			public void resultAvailable(Collection<Byte> result)
 			{
@@ -72,5 +70,12 @@ public class ReceiverAgent
 //			}
 //		};
 //		agent.waitFor(1000, step);
+	}
+	
+	@AgentKilled
+	public void killed()
+	{
+		if(con!=null)
+			con.close();
 	}
 }
