@@ -37,7 +37,7 @@
 
 	<build>
 		<sourceDirectory>src/gen/java</sourceDirectory>
-	
+
 		<resources>
 			<resource>
 				<directory>src/gen/java</directory>
@@ -52,6 +52,16 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
