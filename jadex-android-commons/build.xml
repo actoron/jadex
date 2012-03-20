@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<project name="jadex-android-commons" default="generateSources" basedir=".">
+	<!-- Sets variables which can later be used. -->
+	<!-- The value of a property is accessed via ${} -->
+	<property name="jadex-commons" location="../jadex-commons/src/main/java" />
+	
+	<!-- target source directory -->
+	<property name="src_android" location="src/gen/java" />
+
+	<!-- 8 = android 2.2 -->
+	<property name="androidVersion" value="8" />
+
+	<property name="exclude" value=".svn"/>
+
+
+	<property name="exclude-jadex-commons" value="
+		ColorCodec.java,
+		ImageCodec.java,
+		BrowserPane.java,
+		CombiIcon.java,
+		EditableListEvent.java,
+		EditableList.java,
+		IMenuItemConstructor.java,
+		JSplitPanel.java,
+		JValidatorTextField.java,
+		ObjectCardLayout.java,
+		PopupBuilder.java,
+		PropertiesPanel.java,
+		ScrollablePanel.java,
+		SGUI.java,
+		ToolTipAction.java,
+		TreeCombo.java,
+		TreeExpansionHandler.java,
+		jtable,
+		jtreetable, 
+		FixedJComboBox.java,
+		BrowserLauncher2.java,
+		gui" />
+
+	
+	<taskdef name="preprocess" classname="com.objfac.prebop.ant.PreprocessorTask">
+		<classpath>
+			<pathelement location="../jadex-android-misc/libs/preprocessor.jar" />
+		</classpath>
+	</taskdef>
+
+	<target name="clean">
+		<delete dir="${src_android}" />
+	</target>
+
+	<!-- Creates the source directory-->
+	<target name="makedir">
+		<mkdir dir="${src_android}" />
+	</target>
+
+	<!-- Preprocesses .java files -->
+	<target name="generateSources" depends="clean">
+		<property name="android" value="true" />
+		<echo level="info">preprocessing ${jadex-commons}</echo>
+		<preprocess indir="${jadex-commons}" outdir="${src_android}" out="merge" except="${exclude}, ${exclude-jadex-commons}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+		</preprocess>
+	</target>
+
+	<!-- This target preprocesses and applies changes IN-PLACE. 
+	The original files are altered. -->
+	<target name="inplace">
+		<property name="android" value="false" />
+		<property name="androidVersion" value="8" />
+		<preprocess indir="${jadex-commons}" outdir="${jadex-commons}" out="merge" except="${exclude}, ${exclude-jadex-commons}">
+			<var name="android" value="${android}" />
+			<var name="androidVersion" value="${androidVersion}" />
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
+		</preprocess>
+	</target>
+</project>

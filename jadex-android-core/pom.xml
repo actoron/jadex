@@ -19,9 +19,15 @@
 	</description>
 
 	<dependencies>
+		<!-- <dependency> -->
+		<!-- <groupId>net.sourceforge.jadex</groupId> -->
+		<!-- <artifactId>jadex-android-woodstox</artifactId> -->
+		<!-- <version>${project.version}</version> -->
+		<!-- </dependency> -->
+
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-woodstox</artifactId>
+			<artifactId>jadex-android-xml</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -39,9 +45,10 @@
 	</dependencies>
 
 	<build>
+		<sourceDirectory>src/gen/java</sourceDirectory>
 		<resources>
 			<resource>
-				<directory>src/main/java</directory>
+				<directory>src/gen/java</directory>
 				<excludes>
 					<exclude>**/*.java</exclude>
 					<exclude>**/.svn/*</exclude>

@@ -1,6 +1,6 @@
 /*
  * This file is auto-generated.  DO NOT MODIFY.
- * Original file: /scratch/8kalinow/workspace/jadex/jadex-android-application-test/src/main/java/com/michaelrnovak/util/logger/service/ILogProcessor.aidl
+ * Original file: /home/julakali/workspace_bac/jadex/jadex-android-application-test/src/main/java/com/michaelrnovak/util/logger/service/ILogProcessor.aidl
  */
 package com.michaelrnovak.util.logger.service;
 public interface ILogProcessor extends android.os.IInterface

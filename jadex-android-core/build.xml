@@ -3,7 +3,6 @@
 	<!-- Sets variables which can later be used. -->
 	<!-- The value of a property is accessed via ${} -->
 	<property name="jadex-bridge" location="../jadex-bridge/src/main/java" />
-	<property name="jadex-commons" location="../jadex-commons/src/main/java" />
 	<property name="jadex-javaparser" location="../jadex-javaparser/src/main/java" />
 	<property name="jadex-kernel-application" location="../jadex-kernel-application/src/main/java" />
 	<property name="jadex-kernel-base" location="../jadex-kernel-base/src/main/java" />
@@ -12,7 +11,6 @@
 	<property name="jadex-platform-base" location="../jadex-platform-base/src/main/java" />
 	<property name="jadex-platform-standalone" location="../jadex-platform-standalone/src/main/java" />
 	<property name="jadex-tools-base" location="../jadex-tools-base/src/main/java" />
-	<property name="jadex-xml" location="../jadex-xml/src/main/java" />
 	
 	<property name="jadex-kernel-extension-agr" location="../jadex-kernel-extension-agr/src/main/java" />
 	
@@ -23,7 +21,7 @@
 	
 	
 	<!-- target source directory -->
-	<property name="src_android" location="src/main/java" />
+	<property name="src_android" location="src/gen/java" />
 
 	<!-- 8 = android 2.2 -->
 	<property name="androidVersion" value="8" />
@@ -125,32 +123,6 @@
 		BeanInfoIntrospector.java
 		"/>
 
-	<property name="exclude-jadex-commons" value="
-		ColorCodec.java,
-		ImageCodec.java,
-		BrowserPane.java,
-		CombiIcon.java,
-		EditableListEvent.java,
-		EditableList.java,
-		IMenuItemConstructor.java,
-		JSplitPanel.java,
-		JValidatorTextField.java,
-		ObjectCardLayout.java,
-		PopupBuilder.java,
-		PropertiesPanel.java,
-		ScrollablePanel.java,
-		SGUI.java,
-		ToolTipAction.java,
-		TreeCombo.java,
-		TreeExpansionHandler.java,
-		jtable,
-		jtreetable,
-		gui,
-		FixedJComboBox.java,
-		BrowserLauncher2.java" />
-
-	
-	
 	<property name="exclude-jadex-kernel-extension-agr" value="
 	"/>
 	
@@ -174,12 +146,6 @@
 		<property name="android" value="true" />
 		<echo level="info">preprocessing ${jadex-bridge}</echo>
 		<preprocess indir="${jadex-bridge}" outdir="${src_android}" out="merge" except="${exclude}">
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
-			<var name="android" value="${android}" />
-			<var name="androidVersion" value="${androidVersion}" />
-		</preprocess>
-		<echo level="info">preprocessing ${jadex-commons}</echo>
-		<preprocess indir="${jadex-commons}" outdir="${src_android}" out="merge" except="${exclude}, ${exclude-jadex-commons}">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
@@ -232,12 +198,6 @@
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess>
-		<echo level="info">preprocessing ${jadex-xml}</echo>
-		<preprocess indir="${jadex-xml}" outdir="${src_android}" out="merge" except="${exclude}, ${exclude-jadex-xml}">
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
-			<var name="android" value="${android}" />
-			<var name="androidVersion" value="${androidVersion}" />
-		</preprocess>
 		
 		<echo level="info">preprocessing ${jadex-kernel-extension-agr}</echo>
 		<preprocess indir="${jadex-kernel-extension-agr}" outdir="${src_android}" out="merge" except="${exclude}, ${exclude-jadex-kernel-extension-agr}">
@@ -253,11 +213,6 @@
 		<property name="android" value="false" />
 		<property name="androidVersion" value="8" />
 		<preprocess indir="${jadex-bridge}" outdir="${jadex-bridge}" out="merge" except="${exclude}">
-			<var name="android" value="${android}" />
-			<var name="androidVersion" value="${androidVersion}" />
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
-		</preprocess>
-		<preprocess indir="${jadex-commons}" outdir="${jadex-commons}" out="merge" except="${exclude}, ${exclude-jadex-commons}">
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
@@ -292,12 +247,12 @@
 			<var name="androidVersion" value="${androidVersion}" />
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 		</preprocess>
-		<preprocess indir="${jadex-platform-standalone}" outdir="${jadex-platform-standalone}" out="merge" except="${exclude}">
+		<preprocess indir="${jadex-tools-base}" outdir="${jadex-tools-base}" out="merge" except="${exclude}, ${exclude-jadex-tools-base}">
+			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
-			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 		</preprocess>
-		<preprocess indir="${jadex-xml}" outdir="${jadex-xml}" out="merge" except="${exclude}">
+		<preprocess indir="${jadex-platform-standalone}" outdir="${jadex-platform-standalone}" out="merge" except="${exclude}">
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />

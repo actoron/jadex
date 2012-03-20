@@ -9,28 +9,38 @@
 		<version>2.1-SNAPSHOT</version>
 		<relativePath>../jadex-android-parent/pom.xml</relativePath>
 	</parent>
-
-	<artifactId>jadex-android-woodstox</artifactId>
+	<artifactId>jadex-android-xml</artifactId>
 	<packaging>jar</packaging>
-	<name>jadex-android-woodstox</name>
+	<name>jadex-android-xml</name>
 
 	<description>
-	This Project brings the Woodstox XML Parser (http://wiki.fasterxml.com/WoodstoxDownload) to the
-	Android Platform.
+	This Project includes the Jadex XML-specific classes
 	</description>
 
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-stax-api</artifactId>
+			<artifactId>jadex-android-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-beans</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-woodstox</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 
 	<build>
+		<sourceDirectory>src/gen/java</sourceDirectory>
+	
 		<resources>
 			<resource>
-				<directory>src/main/java</directory>
+				<directory>src/gen/java</directory>
 				<excludes>
 					<exclude>**/*.java</exclude>
 					<exclude>**/.svn/*</exclude>
@@ -45,6 +55,7 @@
 			</plugin>
 		</plugins>
 	</build>
+
 	<reporting>
 		<plugins>
 			<plugin>

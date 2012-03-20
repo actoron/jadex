@@ -10,22 +10,13 @@
 		<relativePath>../jadex-android-parent/pom.xml</relativePath>
 	</parent>
 
-	<artifactId>jadex-android-woodstox</artifactId>
+	<artifactId>jadex-android-stax-api</artifactId>
 	<packaging>jar</packaging>
-	<name>jadex-android-woodstox</name>
+	<name>jadex-android-stax-api</name>
 
 	<description>
-	This Project brings the Woodstox XML Parser (http://wiki.fasterxml.com/WoodstoxDownload) to the
-	Android Platform.
+	This Project brings the StaX API to Android.
 	</description>
-
-	<dependencies>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-stax-api</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies>
 
 	<build>
 		<resources>

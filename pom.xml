@@ -727,8 +727,11 @@
 			</build>
 			<modules>
 				<module>jadex-android-parent</module>
+				<module>jadex-android-commons</module>
+				<module>jadex-android-xml</module>
 				<module>jadex-android-misc</module>
 				<module>jadex-android-antlr</module>
+				<module>jadex-android-stax-api</module>
 				<module>jadex-android-woodstox</module>
 				<module>jadex-android-core</module>
 				<module>jadex-android-beans</module>
@@ -799,8 +802,11 @@
 			</build>
 			<modules>
 				<module>jadex-android-parent</module>
+				<module>jadex-android-commons</module>
+				<module>jadex-android-xml</module>
 				<module>jadex-android-misc</module>
 				<module>jadex-android-antlr</module>
+				<module>jadex-android-stax-api</module>
 				<module>jadex-android-woodstox</module>
 				<module>jadex-android-core</module>
 				<module>jadex-android-beans</module>
