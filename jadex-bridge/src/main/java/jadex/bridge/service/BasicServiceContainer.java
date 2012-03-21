@@ -558,7 +558,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 		return requiredserviceinfos==null? new RequiredServiceInfo[0]: 
 			(RequiredServiceInfo[])requiredserviceinfos.values().toArray(new RequiredServiceInfo[requiredserviceinfos.size()]);
 	}
-
+	
 	/**
 	 *  Set the required services.
 	 *  @param required services The required services to set.

@@ -242,6 +242,14 @@ public class ServiceContainerProxy implements IServiceContainer
 	{
 		return interpreter.getServiceContainer().getRequiredServiceInfos();
 	}
+	
+	/**
+	 *  Get the required service infos.
+	 */
+	public RequiredServiceInfo getRequiredServiceInfo(String name)
+	{
+		return interpreter.getServiceContainer().getRequiredServiceInfo(name);
+	}
 
 	/**
 	 *  Set the required services.

@@ -69,6 +69,13 @@ public interface IServiceContainer extends IServiceProvider
 	public RequiredServiceInfo[] getRequiredServiceInfos();
 	
 	/**
+	 *  Get the required service info.
+	 *  @param name The name.
+	 *  @return The required service info.
+	 */
+	public RequiredServiceInfo getRequiredServiceInfo(String name);
+	
+	/**
 	 *  Set the required services.
 	 *  @param required services The required services to set.
 	 */

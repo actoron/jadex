@@ -412,6 +412,11 @@ public class CacheServiceContainer	implements IServiceContainer
 		throw new UnsupportedOperationException();
 	}
 	
+	public RequiredServiceInfo getRequiredServiceInfo(String name)
+	{
+		throw new UnsupportedOperationException();
+	}
+	
 	public void setRequiredServiceInfos(RequiredServiceInfo[] requiredservices)
 	{
 		throw new UnsupportedOperationException();
