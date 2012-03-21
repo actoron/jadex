@@ -102,6 +102,8 @@
 		<argument name="gui" class="boolean">true</argument>
 		<!-- Save platform settings on shutdown? -->
 		<argument name="saveonexit" class="boolean">true</argument>
+		<!-- Enable verbose logging (shortcut for setting logging_level to info). -->
+		<argument name="logging" class="boolean">false</argument>
 		<!-- Logging level for platform. -->
 		<argument name="logging_level" class="java.util.logging.Level">java.util.logging.Level.SEVERE</argument>
 		<!-- Use simulation execution mode? -->
@@ -321,7 +323,7 @@
 		<!-- <property name="viewerpanel.componentviewerclass">""</property> -->
 		<!-- <property name="logging.level">java.util.logging.Level.INFO</property> -->
 		<!-- <property name="logging.level">java.util.logging.Level.WARNING</property> -->
-		<property name="logging.level">$args.logging_level</property>
+		<property name="logging.level">$args.logging ? java.util.logging.Level.INFO : $args.logging_level</property>
 	</properties>
 	
 	<configurations>

@@ -220,6 +220,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 */
 	public IFuture<Map<IResourceIdentifier, List<IResourceIdentifier>>>	loadDependencies(IResourceIdentifier rid)
 	{
+		logger.info("Loading dependencies for: "+rid);
 		IFuture<Map<IResourceIdentifier, List<IResourceIdentifier>>>	ret;
 		try
 		{
@@ -252,6 +253,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 			gid = getCoordinates(model.getGroupId(), model.getArtifactId(), model.getVersion());
 		}
 		ResourceIdentifier rid = new ResourceIdentifier(lid, gid);
+		logger.info("Resource identifier for "+url+" is: "+rid);
 		return new Future<IResourceIdentifier>(rid);
 	}
 
@@ -344,6 +346,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 */
 	protected void	processAetherDependencies(IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> rids, DependencyNode node)	throws Exception
 	{
+		logger.info("Loading dependencies with aether: "+rid);
 		List<DependencyNode> children = node.getChildren();
 		List<IResourceIdentifier>	deps	= new ArrayList<IResourceIdentifier>();
 		for(int i=0; i<children.size(); i++)
