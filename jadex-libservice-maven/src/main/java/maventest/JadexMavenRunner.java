@@ -23,12 +23,18 @@ public class JadexMavenRunner
 		Set<URL>	urls	= new HashSet<URL>();
 		String[]	gids	= new String[]
 		{
-			"net.sourceforge.jadex:jadex-tools-base:2.1-SNAPSHOT",
-			"net.sourceforge.jadex:jadex-platform-standalone:2.1-SNAPSHOT",
-			"net.sourceforge.jadex:jadex-kernel-component:2.1-SNAPSHOT",
-			"net.sourceforge.jadex:jadex-kernel-micro:2.1-SNAPSHOT",
-			"net.sourceforge.jadex:jadex-runtimetools:2.1-SNAPSHOT"
+//			"net.sourceforge.jadex:jadex-tools-base:2.1-SNAPSHOT",
+//			"net.sourceforge.jadex:jadex-platform-standalone:2.1-SNAPSHOT",
+//			"net.sourceforge.jadex:jadex-kernel-component:2.1-SNAPSHOT",
+//			"net.sourceforge.jadex:jadex-kernel-micro:2.1-SNAPSHOT",
+//			"net.sourceforge.jadex:jadex-runtimetools:2.1-SNAPSHOT"
 			
+			"net.sourceforge.jadex:jadex-tools-base:[2.0-SNAPSHOT,)",
+			"net.sourceforge.jadex:jadex-platform-standalone:[2.0-SNAPSHOT,)",
+			"net.sourceforge.jadex:jadex-kernel-component:[2.0-SNAPSHOT,)",
+			"net.sourceforge.jadex:jadex-kernel-micro:[2.0-SNAPSHOT,)",
+			"net.sourceforge.jadex:jadex-runtimetools:[2.0-SNAPSHOT,)"
+
 //			"net.sourceforge.jadex:jadex-platform-standalone:2.0",
 //			"net.sourceforge.jadex:jadex-kernel-component:2.0",
 //			"net.sourceforge.jadex:jadex-kernel-micro:2.0",
