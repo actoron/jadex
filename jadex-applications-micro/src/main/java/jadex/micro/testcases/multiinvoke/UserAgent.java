@@ -1,13 +1,6 @@
 package jadex.micro.testcases.multiinvoke;
 
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
@@ -17,9 +10,6 @@ import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.Configuration;
 import jadex.micro.annotation.Configurations;
-import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
@@ -30,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 
+ *  Agent that uses a multi service.
  */
 @RequiredServices(@RequiredService(name="ms", type=IExampleService.class, multiple=true, binding=@Binding(dynamic=true)))
 @Results(@Result(name="testcases", clazz=List.class))
@@ -43,7 +33,7 @@ public class UserAgent
 	protected MicroAgent agent;
 	
 	/**
-	 * 
+	 *  The agent body.
 	 */
 	@AgentBody
 	public void body()
@@ -68,20 +58,54 @@ public class UserAgent
 //				System.out.println("ex: "+exception);
 //			}
 //		});
-		ser.getItems().addResultListener(new IIntermediateResultListener<String>()
+		
+//		ser.getItems().addResultListener(new IIntermediateResultListener<String>()
+//		{
+//			public void intermediateResultAvailable(String result)
+//			{
+//				System.out.println("ires: "+result);
+//			}
+//			public void finished()
+//			{
+//				System.out.println("fin");
+//			}
+//			public void resultAvailable(Collection<String> result)
+//			{
+//				System.out.println("res: "+result);
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ex: "+exception);
+//			}
+//		});
+		
+//		ser.getItem().addResultListener(new IIntermediateResultListener<String>()
+//		{
+//			public void intermediateResultAvailable(String result)
+//			{
+//				System.out.println("ires: "+result);
+//			}
+//			public void finished()
+//			{
+//				System.out.println("fin");
+//			}
+//			public void resultAvailable(Collection<String> result)
+//			{
+//				System.out.println("res: "+result);
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ex: "+exception);
+//			}
+//		});
+		
+		ser.getItem().addResultListener(new IResultListener<Collection<String>>()
 		{
-			public void intermediateResultAvailable(String result)
-			{
-				System.out.println("ires: "+result);
-			}
-			public void finished()
-			{
-				System.out.println("fin");
-			}
 			public void resultAvailable(Collection<String> result)
 			{
 				System.out.println("res: "+result);
 			}
+			
 			public void exceptionOccurred(Exception exception)
 			{
 				System.out.println("ex: "+exception);
@@ -89,10 +113,10 @@ public class UserAgent
 		});
 	}
 
-	
-	
 	/**
-	 * 
+	 *  Get a multi service.
+	 *  @param reqname The required service name.
+	 *  @param multitype The interface of the multi service.
 	 */
 	public <T> T getMultiService(String reqname, Class<T> multitype)
 	{

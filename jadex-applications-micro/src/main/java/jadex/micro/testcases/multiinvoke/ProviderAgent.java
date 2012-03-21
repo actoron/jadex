@@ -22,7 +22,7 @@ import java.util.List;
  */
 @ProvidedServices(@ProvidedService(type=IExampleService.class, 
 	implementation=@Implementation(expression="$pojoagent")))
-@Results(@Result(name="testcases", clazz=List.class))
+//@Results(@Result(name="testcases", clazz=List.class))
 @Service(IExampleService.class)
 @Agent
 public class ProviderAgent implements IExampleService
@@ -31,15 +31,15 @@ public class ProviderAgent implements IExampleService
 	protected IInternalAccess agent;
 	
 	/**
-	 * 
+	 *  Get an item.
 	 */
 	public IFuture<String> getItem()
 	{
-		return new Future<String>("item");
+		return new Future<String>("item: "+agent.getComponentIdentifier().getName());
 	}
 	
 	/**
-	 * 
+	 *  Get the items.
 	 */
 	public IIntermediateFuture<String> getItems()
 	{
@@ -51,7 +51,7 @@ public class ProviderAgent implements IExampleService
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ret.addIntermediateResult("item: "+cnt[0]);
+				ret.addIntermediateResult("item: "+agent.getComponentIdentifier().getName()+" "+cnt[0]);
 				if(cnt[0]++<5)
 				{
 					agent.waitForDelay(delay, this);	

@@ -126,7 +126,12 @@ public class SReflect
 			Type[] pts = pt.getActualTypeArguments();
 			if(pts.length>1)
 				throw new RuntimeException("Cannot unwrap futurized method due to more than one generic type: "+SUtil.arrayToString(pt.getActualTypeArguments()));
-			ret = (Class<?>)pts[0];
+			if(pts[0] instanceof Class)
+				ret = (Class<?>)pts[0];
+			else if(pts[0] instanceof ParameterizedType)
+				ret = (Class<?>)((ParameterizedType)pts[0]).getRawType();
+			else
+				throw new RuntimeException();
 		}
 		else if(type instanceof Class)
 		{

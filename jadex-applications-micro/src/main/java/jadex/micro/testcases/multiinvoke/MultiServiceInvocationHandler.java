@@ -4,7 +4,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -20,10 +19,12 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * 
+ *  Invocation handler for multiplexing service calls.
  */
 public class MultiServiceInvocationHandler implements InvocationHandler
 {
+	//-------- attributes --------
+	
 	/** The agent. */
 	protected IInternalAccess agent;
 	
@@ -33,8 +34,10 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 	/** The service type. */
 	protected Class<?> servicetype;
 	
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new invocation handler.
 	 */
 	public MultiServiceInvocationHandler(IInternalAccess agent, String reqname)
 	{
@@ -46,8 +49,10 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		this.servicetype = reqs.getType().getType(agent.getClassLoader());
 	}
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  Called when a method is invoked.
 	 */
 	public Object invoke(Object proxy, Method method, final Object[] args) throws Throwable
 	{
@@ -58,56 +63,22 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		final Method sermethod = servicetype.getMethod(method.getName(), method.getParameterTypes());
 		
 		IIntermediateFuture<Object> fut = agent.getServiceContainer().getRequiredServices(reqname);
+
+		Class<?> puretype = SReflect.unwrapGenericType(method.getGenericReturnType());
+		final boolean flatten = !SReflect.isSupertype(IFuture.class, puretype);
 		
 		// Normal case, return type should be intermediate future
 		if(SReflect.isSupertype(IIntermediateFuture.class, rettype))
 		{
 			final IntermediateFuture<Object> ret = new IntermediateFuture<Object>();
 			gret = ret;
-			
-			Class<?> puretype = SReflect.unwrapGenericType(method.getGenericReturnType());
-			final boolean flatten = !SReflect.isSupertype(IFuture.class, puretype);
-			
 			fut.addResultListener(new IntermediateMethodResultListener<Object>(ret, sermethod, args, flatten));
 		}
 		else if(SReflect.isSupertype(IFuture.class, rettype))
 		{
 			final Future<Object> ret = new Future<Object>();
 			gret = ret;
-			final List<Object> res = new ArrayList<Object>();
-			
-			fut.addResultListener(new IIntermediateResultListener<Object>()
-			{
-				public void intermediateResultAvailable(Object result)
-				{
-					// Found service -> invoke method
-					try
-					{
-						Object serres = sermethod.invoke(result, args);
-						res.add(serres);
-					}
-					catch(Exception e)
-					{
-						// What to do with invocation error? use flag if propagate?
-					}
-				}
-				public void finished()
-				{
-					ret.setResult(res);
-				}
-				public void resultAvailable(Collection<Object> result)
-				{
-					for(Iterator<Object> it=result.iterator(); it.hasNext(); )
-					{
-						intermediateResultAvailable(it.next());
-					}
-					finished();
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setException(exception);
-				}
-			});
+			fut.addResultListener(new IntermediateMethodResultListener<Object>(ret, sermethod, args, flatten));
 		}
 		else
 		{
@@ -117,10 +88,18 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		return gret;
 	}
 	
+	/**
+	 *  Listener that invokes service methods and delegates the results.
+	 */
 	public class IntermediateMethodResultListener<T> implements IIntermediateResultListener<T>
 	{
+		//-------- attributes --------
+		
 		/** The future. */
-		protected IntermediateFuture<Object> ret;
+		protected Future<Object> fut;
+		
+		/** The future. */
+		protected IntermediateFuture<Object> ifut;
 		
 		/** The service method. */
 		protected Method method;
@@ -131,23 +110,92 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		/** Flag if flatten. */
 		protected boolean flatten;
 		
-		/** The list of unfinished calls. */
-		protected List<Future<?>> opencalls;
+		/** The list of calls. */
+		protected List<Future<Void>> calls;
+		
+		/** The list of results (if ret is not intermediate future). */
+		protected List<Object> callresults;
+		
+		//-------- constructors --------
 		
 		/**
-		 * 
+		 *  Create a new listener.
 		 */
-		public IntermediateMethodResultListener(IntermediateFuture<Object> ret, Method method, Object[] args, boolean flatten)
+		public IntermediateMethodResultListener(Future<Object> fut, Method method, Object[] args, boolean flatten)
 		{
-			this.ret = ret;
+			this.fut = fut;
 			this.method = method;
 			this.args = args;
 			this.flatten = flatten;
-			this.opencalls = new ArrayList<Future<?>>();
+			this.calls = new ArrayList<Future<Void>>();
 		}
 		
 		/**
-		 * 
+		 *  Create a new listener.
+		 */
+		public IntermediateMethodResultListener(IntermediateFuture<Object> ifut, Method method, Object[] args, boolean flatten)
+		{
+			this.ifut = ifut;
+			this.method = method;
+			this.args = args;
+			this.flatten = flatten;
+			this.calls = new ArrayList<Future<Void>>();
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  Add a result.
+		 *  @param result The result.
+		 */
+		protected void addResult(Object result)
+		{
+			if(ifut!=null)
+			{
+				ifut.addIntermediateResult(result);
+			}
+			else
+			{
+				if(callresults==null)
+					callresults = new ArrayList<Object>();
+				callresults.add(result);
+			}
+		}
+		
+		/**
+		 *  Set finished.
+		 */
+		protected void setFinished()
+		{
+			if(ifut!=null)
+			{
+				ifut.setFinished();
+			}
+			else
+			{
+				fut.setResult(callresults);
+			}
+		}
+		
+		/**
+		 *  Set an exception.
+		 *  @param exception The exception.
+		 */
+		protected void setException(Exception exception)
+		{
+			if(ifut!=null)
+			{
+				ifut.setException(exception);
+			}
+			else
+			{
+				fut.setException(exception);
+			}
+		}
+		
+		/**
+		 *  Called when a service has been found.
+		 *  @param result The result.
 		 */
 		public void intermediateResultAvailable(T result)
 		{
@@ -159,60 +207,66 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 				{
 					if(serres instanceof IIntermediateFuture)
 					{
-						final Future<Object> call = new Future<Object>();
+						final Future<Void> call = new Future<Void>();
 						IIntermediateResultListener<Object> lis = new IIntermediateResultListener<Object>()
 						{
 							public void intermediateResultAvailable(Object result)
 							{
-								ret.addIntermediateResult(result);
+								addResult(result);
 							}
 							public void finished()
 							{
-								opencalls.remove(call);
+								call.setResult(null);
+//								opencalls.remove(call);
 							}
 							public void resultAvailable(Collection<Object> result)
 							{
 								for(Iterator<Object> it=result.iterator(); it.hasNext(); )
 								{
-									ret.addIntermediateResult(it.next());
+									addResult(result);
 								}
-								opencalls.remove(call);
+								call.setResult(null);
+//								opencalls.remove(call);
 							}
 							public void exceptionOccurred(Exception exception)
 							{
 								System.out.println("ex: "+exception);
-								opencalls.remove(call);
+								call.setResult(null);
+//								opencalls.remove(call);
 							}
 						};
-						opencalls.add(call);
+						calls.add(call);
 						((IIntermediateFuture<Object>)serres).addResultListener(lis);
 					}
 					else if(serres instanceof IFuture)
 					{
+						final Future<Void> call = new Future<Void>();
 						IResultListener<Object> lis = new IResultListener<Object>()
 						{
 							public void resultAvailable(Object result)
 							{
-								ret.addIntermediateResult(result);
-								opencalls.remove(this);
+								addResult(result);
+								call.setResult(null);
+//								opencalls.remove(this);
 							}
 							public void exceptionOccurred(Exception exception)
 							{
 								System.out.println("ex: "+exception);
-								opencalls.remove(this);
+								call.setResult(null);
+//								opencalls.remove(this);
 							}
 						};
-//						opencalls.add(lis);
+						calls.add(call);
 						((IFuture<Object>)serres).addResultListener(lis);
 					}
 					else
 					{
-						ret.addIntermediateResult(result);
+						addResult(result);
 					}
 				}
 				else
 				{
-					ret.addIntermediateResult(serres);
+					addResult(result);
 				}
 			}
 			catch(Exception e)
@@ -221,36 +275,40 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 			}
 		}
 		
+		/**
+		 *  Called when all services have been found.
+		 */
 		public void finished()
 		{
-			if(opencalls.size()>0)
+			if(calls.size()>0)
 			{
-				CounterResultListener<Void> lis = new CounterResultListener<Void>(opencalls.size(), true, new IResultListener<Void>()
+				CounterResultListener<Void> lis = new CounterResultListener<Void>(calls.size(), true, new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
-						ret.setFinished();
+						setFinished();
 					}
 
 					public void exceptionOccurred(Exception exception)
 					{
 					}
 				});
-				for(int i=0; i<opencalls.size(); i++)
+				for(int i=0; i<calls.size(); i++)
 				{
-//					Future fut = new Future();
-//					fut.addResultListener(new DelegationResultListener<E>(future))
-//					IResultListener<?> calllis = opencalls.get(i);
-//					calllis.
-//					fut.addResultListener(new DelegationResultListener<E>(future))
+					Future<Void> fut = calls.get(i);
+					fut.addResultListener(lis);
 				}
 			}
 			else
 			{
-				ret.setFinished();
+				setFinished();
 			}
 		}
 		
+		/**
+		 *  Called when services have been found.
+		 *  @param result The result.
+		 */
 		public void resultAvailable(Collection<T> result)
 		{
 			for(Iterator<T> it=result.iterator(); it.hasNext(); )
@@ -260,9 +318,14 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 			finished();
 		}
 		
+		/**
+		 *  Called when an exception has occurred.
+		 *  @param exception The exception.
+		 */
 		public void exceptionOccurred(Exception exception)
 		{
-			ret.setException(exception);
+			setException(exception);
 		}
 	}
+	
 }
