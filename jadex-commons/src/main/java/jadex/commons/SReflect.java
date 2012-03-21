@@ -224,7 +224,7 @@ public class SReflect
 		if(name==null)
 			throw new IllegalArgumentException("Class name must not be null.");
 		
-//		if(name.indexOf("diplomarbeit.env.MTransportSpaceType")!=-1)
+//		if(name.indexOf("Maven")!=-1)
 //			System.out.println("+++fC: "+name+" "+classloader);
 		
 		Object ret = basictypes.get(name);

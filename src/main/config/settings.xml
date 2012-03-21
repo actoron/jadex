@@ -10,6 +10,11 @@
 			<username>Lars</username>
 			<password>lax</password>
 		</server>
+		<server>
+			<id>private-snapshots</id>
+			<username>admin</username>
+			<password>admin123</password>
+		</server>
 	</servers>
 
 	<!-- <profiles>

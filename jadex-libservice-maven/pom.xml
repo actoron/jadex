@@ -65,9 +65,12 @@
 			</url>
 		</repository>
 		<snapshotRepository>
-			<id>sonatype-nexus-snapshots</id>
+<!-- 			<id>sonatype-nexus-snapshots</id>
 			<name>Nexus Snapshot Repository</name>
-			<url>http://oss.sonatype.org/content/repositories/snapshots/</url>
+			<url>http://oss.sonatype.org/content/repositories/snapshots/</url> -->
+			<id>private-snapshots</id>
+			<name>Jadex Snapshot Repository</name>
+			<url>http://localhost:8080/nexus/service/local/repositories/snapshots/content/</url>
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 	</distributionManagement>
