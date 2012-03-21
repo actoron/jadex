@@ -220,6 +220,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 */
 	public IFuture<Map<IResourceIdentifier, List<IResourceIdentifier>>>	loadDependencies(IResourceIdentifier rid)
 	{
+		System.out.println("hier11");
 		logger.info("Loading dependencies for: "+rid);
 		IFuture<Map<IResourceIdentifier, List<IResourceIdentifier>>>	ret;
 		try
@@ -232,7 +233,8 @@ public class MavenDependencyResolverService	implements IDependencyService
 		{
 			ret	= new Future<Map<IResourceIdentifier,List<IResourceIdentifier>>>(e);			
 		}
-		
+		System.out.println("_hier11");
+
 		return ret;
 	}
 	
@@ -243,6 +245,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 */
 	public IFuture<IResourceIdentifier> getResourceIdentifier(URL url)
 	{
+		System.out.println("hier10");
 		// todo: get stored rid for url?!
 		ILocalResourceIdentifier lid = new LocalResourceIdentifier(cid, url);
 		String gid	= null;
@@ -254,6 +257,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 		}
 		ResourceIdentifier rid = new ResourceIdentifier(lid, gid);
 		logger.info("Resource identifier for "+url+" is: "+rid);
+		System.out.println("_hier10");
 		return new Future<IResourceIdentifier>(rid);
 	}
 
@@ -267,6 +271,8 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 */
 	protected void	loadDependencies(IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> rids) throws Exception
 	{
+		System.out.println("hier9");
+		logger.info("Loading dependencies: "+rid);
 		// Resolve from local URL.
 		if(!rids.containsKey(rid) && rid.getLocalIdentifier()!=null && cid.equals(rid.getLocalIdentifier().getComponentIdentifier()))
 		{
@@ -317,6 +323,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 			List<IResourceIdentifier>	empty	= Collections.emptyList();
 			rids.put(rid, empty);
 		}
+		System.out.println("_hier9");
 	}
 	
 	/**
@@ -327,6 +334,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 */
 	protected IResourceIdentifier	loadDependenciesWithAether(IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> rids)	throws Exception
 	{
+		System.out.println("hier8");
 		Artifact	art	= new DefaultArtifact(rid.getGlobalIdentifier());
 		// Todo: use remote repositories from settings.
 		CollectRequest	crequest	= new CollectRequest(new Dependency(art, null), repositories);
@@ -335,6 +343,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 		File	file	= result.getRoot().getDependency().getArtifact().getFile();
 		rid	= new ResourceIdentifier(new LocalResourceIdentifier(cid, getUrl(file)), rid.getGlobalIdentifier());
 		processAetherDependencies(rid, rids, result.getRoot());
+		System.out.println("_hier8");
 		return rid;
 	}
 	
@@ -346,6 +355,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 */
 	protected void	processAetherDependencies(IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> rids, DependencyNode node)	throws Exception
 	{
+		System.out.println("hier7");
 		logger.info("Loading dependencies with aether: "+rid);
 		List<DependencyNode> children = node.getChildren();
 		List<IResourceIdentifier>	deps	= new ArrayList<IResourceIdentifier>();
@@ -359,6 +369,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 			deps.add(deprid);
 		}
 		rids.put(rid, deps);
+		System.out.println("_hier7");
 	}
 	
 	/**
@@ -368,6 +379,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 */
 	protected Model loadPom(ModelSource pom)
 	{
+		System.out.println("hier6");
 		Model model;
 		
 		try
@@ -391,6 +403,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 		{
 			throw new RuntimeException(e);
 		}
+		System.out.println("_hier6");
 
 		return model;
 	}
@@ -401,6 +414,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 */
 	protected static ModelSource	findModelSource(final URL url)
 	{
+		System.out.println("hier5");
 		ModelSource	pom = null;
 		
 		// Jar file.
@@ -457,7 +471,8 @@ public class MavenDependencyResolverService	implements IDependencyService
 				}
 			}
 		}
-		
+		System.out.println("_hier5");
+
 		return pom;
 	}
 
@@ -467,7 +482,8 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 * @return
 	 */
 	protected static File findBasedir(File dir)
-	{		
+	{
+		System.out.println("hier4");
 		// Try to find pom.xml upwards in directory structure.
 		File	ret	= null;
 		while(ret==null && dir!=null && dir.exists())
@@ -482,6 +498,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 				dir	= dir.getParentFile();
 			}
 		}
+		System.out.println("_hier4");
 		return ret;
 	}
 
@@ -492,6 +509,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 */
 	public static URL getUrl(File file)
 	{
+		System.out.println("hier3");
 		URL	ret;
 		try
 		{
@@ -506,6 +524,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 			// Shouldn't happen for existing files!?
 			throw new RuntimeException(e);
 		}
+		System.out.println("_hier3");
 		return ret;
 	}
 	
@@ -516,6 +535,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 */
 	protected static File	getFile(URL url)
 	{
+		System.out.println("hier2");
 		assert url.getProtocol().equals("file");
 		
 		File	file;
@@ -529,6 +549,7 @@ public class MavenDependencyResolverService	implements IDependencyService
 			// Shouldn't happen for existing files!?
 			throw new RuntimeException(e);			
 		}
+		System.out.println("_hier2");
 		return file;
 	}
 	
@@ -541,12 +562,14 @@ public class MavenDependencyResolverService	implements IDependencyService
 	 */
 	protected static String getCoordinates(String groupid, String id, String version)
 	{
+		System.out.println("hier1");
 		String gid;
 		StringBuffer	gidbuf	= new StringBuffer();
 		gidbuf.append(groupid).append(':');
 		gidbuf.append(id).append(':');
 		gidbuf.append(version);
 		gid	= gidbuf.toString();
+		System.out.println("_hier1");
 		return gid;
 	}
 }
