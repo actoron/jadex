@@ -12,8 +12,8 @@
 		</server>
 		<server>
 			<id>private-snapshots</id>
-			<username>admin</username>
-			<password>admin123</password>
+			<username>deployment</username>
+			<password>lax</password>
 		</server>
 	</servers>
 

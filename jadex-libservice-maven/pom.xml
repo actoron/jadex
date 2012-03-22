@@ -70,7 +70,7 @@
 			<url>http://oss.sonatype.org/content/repositories/snapshots/</url> -->
 			<id>private-snapshots</id>
 			<name>Jadex Snapshot Repository</name>
-			<url>http://localhost:8080/nexus/service/local/repositories/snapshots/content/</url>
+			<url>http://jadex.informatik.uni-hamburg.de/nexus/content/repositories/snapshots/</url>
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 	</distributionManagement>

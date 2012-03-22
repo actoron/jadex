@@ -144,8 +144,8 @@ public class ADFChecker extends IncrementalProjectBuilder
 	{
 		boolean	checked	= false;
 		
-		if(resource.toString().indexOf(".bpmn")!=-1 && resource.toString().indexOf("src")!=-1)
-			System.out.println("sdfklj hsfopdgh : "+resource);
+//		if(resource.toString().indexOf(".bpmn")!=-1 && resource.toString().indexOf("src")!=-1)
+//			System.out.println("sdfklj hsfopdgh : "+resource);
 		
 		// Only check resources in source folders.
 		if(resource instanceof IFile)
