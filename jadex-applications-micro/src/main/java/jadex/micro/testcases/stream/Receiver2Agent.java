@@ -1,22 +1,15 @@
 package jadex.micro.testcases.stream;
 
 import jadex.bridge.IComponentStep;
-import jadex.bridge.IConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.fipa.SFipa;
-import jadex.bridge.service.types.message.MessageType;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.AgentMessageArrived;
 import jadex.micro.annotation.AgentStreamArrived;
-
-import java.util.Map;
 
 @Agent
 public class Receiver2Agent

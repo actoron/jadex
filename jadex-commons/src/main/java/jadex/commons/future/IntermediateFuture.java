@@ -484,16 +484,23 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
             	}
         	}
         	
-        	if(next!=null)
+        	try
         	{
-        		if(next instanceof IResultListener)
-        		{
-        			doNotifyListener((IResultListener<Collection<E>>)next);
-        		}
-        		else
-        		{
-        			notifyIntermediateResult((IIntermediateResultListener<E>)((Object[])next)[0], (E)((Object[])next)[1]);
-        		}
+	        	if(next!=null)
+	        	{
+	        		if(next instanceof IResultListener)
+	        		{
+	        			doNotifyListener((IResultListener<Collection<E>>)next);
+	        		}
+	        		else
+	        		{
+	        			notifyIntermediateResult((IIntermediateResultListener<E>)((Object[])next)[0], (E)((Object[])next)[1]);
+	        		}
+	        	}
+        	}
+        	catch(Exception e)
+        	{
+        		e.printStackTrace();
         	}
     	}
     }

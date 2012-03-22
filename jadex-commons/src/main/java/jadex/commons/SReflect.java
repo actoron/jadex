@@ -1,6 +1,7 @@
 package jadex.commons;
 
 import jadex.commons.collection.SCollection;
+import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -119,28 +120,41 @@ public class SReflect
 	 */
 	public static Class<?> unwrapGenericType(Type type)
 	{
-		Class<?> ret;
+		return getClass(getInnerGenericType(type));
+	}
+	
+	/**
+	 *  Unwrap a generic type.
+	 *  @param type The generic type.
+	 *  @return The unwrapped class.
+	 */
+	public static Type getInnerGenericType(Type type)
+	{
+		Type ret = null;
 		if(type instanceof ParameterizedType)
 		{
 			ParameterizedType pt = (ParameterizedType)type;
 			Type[] pts = pt.getActualTypeArguments();
 			if(pts.length>1)
 				throw new RuntimeException("Cannot unwrap futurized method due to more than one generic type: "+SUtil.arrayToString(pt.getActualTypeArguments()));
-			if(pts[0] instanceof Class)
-				ret = (Class<?>)pts[0];
-			else if(pts[0] instanceof ParameterizedType)
-				ret = (Class<?>)((ParameterizedType)pts[0]).getRawType();
-			else
-				throw new RuntimeException();
+			ret = pts[0];
 		}
-		else if(type instanceof Class)
-		{
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the class for a type.
+	 */
+	public static Class<?> getClass(Type type)
+	{
+		Class<?> ret = null;
+		if(type instanceof Class)
 			ret = (Class<?>)type;
-		}
-		else
-		{
+		else if(type instanceof ParameterizedType)
+			ret = (Class<?>)((ParameterizedType)type).getRawType();
+		else if(type!=null)
 			throw new RuntimeException("Cannot unwrap: "+type);
-		}
 		
 		return ret;
 	}

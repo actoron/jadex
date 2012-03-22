@@ -16,6 +16,6 @@ public interface IExampleService
 	/**
 	 *  Get all items.
 	 */
-	public IIntermediateFuture<String> getItems();
-
+	public IIntermediateFuture<String> getItems(int num);
+	
 }

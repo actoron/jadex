@@ -41,7 +41,7 @@ public class ProviderAgent implements IExampleService
 	/**
 	 *  Get the items.
 	 */
-	public IIntermediateFuture<String> getItems()
+	public IIntermediateFuture<String> getItems(final int num)
 	{
 		final IntermediateFuture<String> ret = new IntermediateFuture<String>();
 
@@ -51,9 +51,9 @@ public class ProviderAgent implements IExampleService
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				ret.addIntermediateResult("item: "+agent.getComponentIdentifier().getName()+" "+cnt[0]);
-				if(cnt[0]++<5)
+				if(cnt[0]++<num)
 				{
+					ret.addIntermediateResult("item: "+agent.getComponentIdentifier().getName()+" "+cnt[0]);
 					agent.waitForDelay(delay, this);	
 				}
 				else

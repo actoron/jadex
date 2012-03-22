@@ -2,6 +2,7 @@ package jadex.micro.testcases.multiinvoke;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.TargetMethod;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
@@ -13,6 +14,8 @@ import jadex.commons.future.IntermediateFuture;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -34,12 +37,15 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 	/** The service type. */
 	protected Class<?> servicetype;
 	
+	/** The multiplex service type. */
+	protected Class<?> muxservicetype;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new invocation handler.
 	 */
-	public MultiServiceInvocationHandler(IInternalAccess agent, String reqname)
+	public MultiServiceInvocationHandler(IInternalAccess agent, String reqname, Class<?> muxservicetype)
 	{
 		this.agent = agent;
 		this.reqname = reqname;
@@ -47,6 +53,7 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		if(reqs==null)
 			throw new RuntimeException("Required service not found: "+reqname);
 		this.servicetype = reqs.getType().getType(agent.getClassLoader());
+		this.muxservicetype = muxservicetype;
 	}
 	
 	//-------- methods --------
@@ -60,12 +67,35 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		Class<?> rettype = method.getReturnType();
 		
 		// Get the method on original interface
-		final Method sermethod = servicetype.getMethod(method.getName(), method.getParameterTypes());
+		
+		String methodname = method.getName();
+		Method muxsermethod = muxservicetype.getMethod(methodname, method.getParameterTypes());
+		if(muxsermethod.isAnnotationPresent(TargetMethod.class))
+			methodname = muxsermethod.getAnnotation(TargetMethod.class).value();
+		final Method sermethod = servicetype.getMethod(methodname, method.getParameterTypes());
 		
 		IIntermediateFuture<Object> fut = agent.getServiceContainer().getRequiredServices(reqname);
 
-		Class<?> puretype = SReflect.unwrapGenericType(method.getGenericReturnType());
-		final boolean flatten = !SReflect.isSupertype(IFuture.class, puretype);
+		boolean flatten = true;
+		
+		Type motype = method.getGenericReturnType();
+			
+		if(SReflect.isSupertype(IIntermediateFuture.class, SReflect.getClass(motype)))
+		{
+			Type mitype = SReflect.getInnerGenericType(motype);
+			flatten = !SReflect.isSupertype(IFuture.class, SReflect.getClass(mitype));
+		}
+		else if(SReflect.isSupertype(IFuture.class, SReflect.getClass(motype)))
+		{
+			Type mitype = SReflect.getInnerGenericType(motype);
+			if(SReflect.isSupertype(Collection.class, SReflect.getClass(mitype)))
+			{
+				Type miitype = SReflect.getInnerGenericType(mitype);
+				flatten = !SReflect.isSupertype(IFuture.class, SReflect.getClass(miitype));
+			}
+		}
+		
+		//!SReflect.isSupertype(IFuture.class, puretype);
 		
 		// Normal case, return type should be intermediate future
 		if(SReflect.isSupertype(IIntermediateFuture.class, rettype))
@@ -261,12 +291,12 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 					}
 					else
 					{
-						addResult(result);
+						addResult(serres);
 					}
 				}
 				else
 				{
-					addResult(result);
+					addResult(serres);
 				}
 			}
 			catch(Exception e)
