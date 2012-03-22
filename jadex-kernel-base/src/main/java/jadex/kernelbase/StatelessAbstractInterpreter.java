@@ -751,7 +751,8 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 					Map<String, RequiredServiceInfo>	sermap = new LinkedHashMap<String, RequiredServiceInfo>();
 					for(int i=0; i<ms.length; i++)
 					{
-						ms[i]	= new RequiredServiceInfo(getServicePrefix()+ms[i].getName(), ms[i].getType().getType(getClassLoader()), ms[i].isMultiple(), ms[i].getDefaultBinding());
+						ms[i]	= new RequiredServiceInfo(getServicePrefix()+ms[i].getName(), ms[i].getType().getType(getClassLoader()), ms[i].isMultiple(), 
+							ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader()), ms[i].getDefaultBinding());
 						sermap.put(ms[i].getName(), ms[i]);
 					}
 
@@ -763,7 +764,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 						{
 							RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getServicePrefix()+cs[i].getName());
 							RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
-								new RequiredServiceBinding(cs[i].getDefaultBinding()));
+								ms[i].getMultiplexType()==null? null: ms[i].getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(cs[i].getDefaultBinding()));
 							sermap.put(rsi.getName(), newrsi);
 						}
 					}
@@ -773,7 +774,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 						{
 							RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getBindings()[i].getName());
 							RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
-								new RequiredServiceBinding(getBindings()[i]));
+								rsi.getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(getBindings()[i]));
 							sermap.put(rsi.getName(), newrsi);
 						}
 					}

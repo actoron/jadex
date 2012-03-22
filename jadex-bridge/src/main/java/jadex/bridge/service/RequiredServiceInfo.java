@@ -46,6 +46,9 @@ public class RequiredServiceInfo
 	
 	/** Flag if multiple services should be returned. */
 	protected boolean multiple;
+	
+	/** The multiplex type. */
+	protected ClassInfo multiplextype;
 
 	// binding specification
 	
@@ -73,33 +76,36 @@ public class RequiredServiceInfo
 	 */
 	public RequiredServiceInfo(String name, Class type)
 	{
-		this(name, type, RequiredServiceInfo.SCOPE_APPLICATION);
+		this(name, type, RequiredServiceInfo.SCOPE_APPLICATION, null);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(Class type)
+	public RequiredServiceInfo(Class<?> type)
 	{
-		this(null, type, RequiredServiceInfo.SCOPE_APPLICATION);
+		this(null, type, RequiredServiceInfo.SCOPE_APPLICATION, null);
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class type, String scope)
+	public RequiredServiceInfo(String name, Class<?> type, String scope, Class<?> multiplextype)
 	{
-		this(name, type, false, new RequiredServiceBinding(name, scope));
+		this(name, type, false, multiplextype, new RequiredServiceBinding(name, scope));
 	}
 	
 	/**
 	 *  Create a new service info.
 	 */
-	public RequiredServiceInfo(String name, Class type, boolean multiple, RequiredServiceBinding binding)
+	public RequiredServiceInfo(String name, Class<?> type, boolean multiple, 
+		Class<?> multiplextype, RequiredServiceBinding binding)
 	{
 		this.name = name;
 		if(type!=null)
 			setType(new ClassInfo(type));
+		if(multiplextype!=null)
+			setMultiplexType(new ClassInfo(multiplextype));
 		this.multiple = multiple;
 		this.binding = binding;
 	}
@@ -140,6 +146,24 @@ public class RequiredServiceInfo
 	public void setType(ClassInfo type)
 	{
 		this.type = type;
+	}
+	
+	/**
+	 *  Get the multiplextype.
+	 *  @return The multiplextype.
+	 */
+	public ClassInfo getMultiplexType()
+	{
+		return multiplextype;
+	}
+
+	/**
+	 *  Set the multiplextype.
+	 *  @param multiplextype The multiplextype to set.
+	 */
+	public void setMultiplexType(ClassInfo multiplextype)
+	{
+		this.multiplextype = multiplextype;
 	}
 
 	/**

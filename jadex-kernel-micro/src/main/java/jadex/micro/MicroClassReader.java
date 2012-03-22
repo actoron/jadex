@@ -366,7 +366,7 @@ public class MicroClassReader
 				{
 					RequiredServiceBinding binding = createBinding(vals[i].binding());
 					RequiredServiceInfo rsis = new RequiredServiceInfo(vals[i].name(), vals[i].type(), 
-						vals[i].multiple(), binding);
+						vals[i].multiple(), Object.class.equals(vals[i].multiplextype())? null: vals[i].multiplextype(), binding);
 					if(rsers.containsKey(vals[i].name()))
 					{
 						RequiredServiceInfo old = (RequiredServiceInfo)rsers.get(vals[i].name());
@@ -579,8 +579,8 @@ public class MicroClassReader
 						for(int j=0; j<reqs.length; j++)
 						{
 							RequiredServiceBinding binding = createBinding(reqs[j].binding());
-							rsis[j] = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), 
-								reqs[j].multiple(), binding);
+							rsis[j] = new RequiredServiceInfo(reqs[j].name(), reqs[j].type(), reqs[j].multiple(), 
+								Object.class.equals(reqs[j].multiplextype())? null: reqs[j].multiplextype(), binding);
 							configinfo.setRequiredServices(rsis);
 						}
 						

@@ -19,7 +19,7 @@
         <styles xmi:type="notation:FillStyle" xmi:id="_Wjisk26dEeG2TcA6gns3eQ"/>
         <styles xmi:type="notation:LineStyle" xmi:id="_WjislG6dEeG2TcA6gns3eQ" lineColor="0"/>
         <element xmi:type="bpmn:Activity" href="StreamTest.bpmn#_WjhecW6dEeG2TcA6gns3eQ"/>
-        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_WjislW6dEeG2TcA6gns3eQ" x="190" y="86"/>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_WjislW6dEeG2TcA6gns3eQ" x="210" y="84"/>
       </children>
       <styles xmi:type="notation:DrawerStyle" xmi:id="_i5RIkW6cEeG2TcA6gns3eQ"/>
       <styles xmi:type="notation:SortingStyle" xmi:id="_i5RIkm6cEeG2TcA6gns3eQ"/>
@@ -72,7 +72,7 @@
     <children xmi:type="notation:Node" xmi:id="_WjtEoG6dEeG2TcA6gns3eQ" type="4012">
       <styles xmi:type="notation:FillStyle" xmi:id="_WjtEoW6dEeG2TcA6gns3eQ" fillColor="16776959"/>
       <styles xmi:type="notation:LineStyle" xmi:id="_WjtEom6dEeG2TcA6gns3eQ" lineColor="16776959"/>
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_WjtEo26dEeG2TcA6gns3eQ" y="40"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_WjtEo26dEeG2TcA6gns3eQ" y="-10"/>
     </children>
     <styles xmi:type="notation:RoutingStyle" xmi:id="_WjsdkW6dEeG2TcA6gns3eQ" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
     <styles xmi:type="notation:FontStyle" xmi:id="_Wjsdkm6dEeG2TcA6gns3eQ" fontName="Arial"/>
@@ -96,7 +96,7 @@
     <children xmi:type="notation:Node" xmi:id="_aIKC0G6dEeG2TcA6gns3eQ" type="4013">
       <styles xmi:type="notation:FillStyle" xmi:id="_aIKC0W6dEeG2TcA6gns3eQ" fillColor="16776959"/>
       <styles xmi:type="notation:LineStyle" xmi:id="_aIKC0m6dEeG2TcA6gns3eQ" lineColor="16776959"/>
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_aIKC026dEeG2TcA6gns3eQ" y="40"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_aIKC026dEeG2TcA6gns3eQ" y="-10"/>
     </children>
     <styles xmi:type="notation:RoutingStyle" xmi:id="_aII0sW6dEeG2TcA6gns3eQ" routing="Rectilinear" smoothness="Normal" closestDistance="true"/>
     <styles xmi:type="notation:FontStyle" xmi:id="_aII0sm6dEeG2TcA6gns3eQ" fontName="Arial"/>

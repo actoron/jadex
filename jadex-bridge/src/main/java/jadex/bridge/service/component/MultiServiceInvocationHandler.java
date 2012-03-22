@@ -1,4 +1,4 @@
-package jadex.micro.testcases.multiinvoke;
+package jadex.bridge.service.component;
 
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;

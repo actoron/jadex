@@ -20,7 +20,7 @@ public @interface RequiredService
 	/** 
 	 *  The service interface type. 
 	 */
-	public Class type();
+	public Class<?> type();
 
 	/** 
 	 *  Flag if multiple services should be returned. 
@@ -31,4 +31,10 @@ public @interface RequiredService
 	 *  The binding.
 	 */
 	public Binding binding() default @Binding();
+	
+	/**
+	 *  The multiplex type.
+	 */
+	public Class<?> multiplextype() default Object.class;
+
 }

@@ -30,6 +30,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 
+import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -82,9 +83,25 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	{
 		if(shutdowned)
 			return new Future<T>(new ComponentTerminatedException(id));
-
+		if(info.getMultiplexType()!=null)
+		{
+			T ms = getMultiService(info.getName(), (Class<T>)info.getMultiplexType().getType(instance.getClassLoader()));
+			return new Future<T>(ms);
+		}
+		
 		IFuture<T>	fut	= super.getRequiredService(info, binding, rebind);
 		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut);
+	}
+	
+	/**
+	 *  Get a multi service.
+	 *  @param reqname The required service name.
+	 *  @param multitype The interface of the multi service.
+	 */
+	public <T> T getMultiService(String reqname, Class<T> multitype)
+	{
+		return (T)Proxy.newProxyInstance(instance.getClassLoader(), new Class[]{multitype}, 
+			new MultiServiceInvocationHandler(instance, reqname, multitype));
 	}
 	
 	/**

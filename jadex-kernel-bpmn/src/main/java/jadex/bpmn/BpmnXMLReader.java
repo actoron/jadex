@@ -1633,9 +1633,12 @@ public class BpmnXMLReader
 							String typename = table.getCellValue(row, 1);
 							String multi = table.getCellValue(row, 2);
 							String bindingname = table.getCellValue(row, 3);
+							// todo:
+							String mtypename = null;//table.getCellValue(row, 4);
 							if("".equals(bindingname))
 								bindingname	= null;
-							Class type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
+							Class<?> type = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
+							Class<?> mtype = mtypename==null? null: SReflect.findClass0(mtypename, mi.getAllImports(), context.getClassLoader());
 							boolean multiple = new Boolean(multi).booleanValue();
 							
 							RequiredServiceInfo rsi;
@@ -1644,7 +1647,7 @@ public class BpmnXMLReader
 								RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 								if(binding==null)
 									throw new RuntimeException("Unknown binding: "+bindingname);
-								rsi = new RequiredServiceInfo(name, type, multiple, binding);
+								rsi = new RequiredServiceInfo(name, type, multiple, mtype, binding);
 							}
 							else
 							{
@@ -1671,7 +1674,7 @@ public class BpmnXMLReader
 											RequiredServiceBinding binding = (RequiredServiceBinding)bindings.get(bindingname);
 											if(binding==null)
 												throw new RuntimeException("Unknown binding: "+bindingname);
-											rsi = new RequiredServiceInfo(name, type, multiple, binding);
+											rsi = new RequiredServiceInfo(name, type, multiple, mtype, binding);
 										}
 										else
 										{
