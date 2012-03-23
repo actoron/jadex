@@ -88,6 +88,14 @@ public class PropertiesPanel	extends	JPanel
 	}
 	
 	/**
+	 *  Get a combo box.
+	 */
+	public JComboBox	getComboBox(String name)
+	{
+		return (JComboBox)components.get(name);
+	}
+	
+	/**
 	 *  Create a text field and add it to the panel.
 	 */
 	public JTextField createTextField(String name)
@@ -135,7 +143,8 @@ public class PropertiesPanel	extends	JPanel
 	 */
 	public JCheckBox createCheckBox(String name, boolean selected, boolean enabled, double weighty)
 	{
-		JCheckBox cb = new JCheckBox(name, selected);
+		// Todo: checkbox name vs. checkbox label!?
+		JCheckBox cb = new JCheckBox("", selected);
 		cb.setMargin(new Insets(0,0,0,0));
 		cb.setEnabled(enabled);
 		addComponent(name, cb, weighty);

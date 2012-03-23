@@ -1,14 +1,12 @@
 package jadex.commons.gui.future;
 
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.gui.SGUI;
 
 import java.awt.Component;
 import java.util.logging.Logger;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 /**
@@ -115,11 +113,9 @@ public abstract class SwingDefaultResultListener<E> extends DefaultResultListene
 	{
 		if(parent!=null)
 		{
-			exception.printStackTrace();
-			String text = SUtil.wrapText("A problem occurred while performing the requested action: "
-				+SReflect.getInnerClassName(exception.getClass())+" "+exception.getMessage());
-			JOptionPane.showMessageDialog(SGUI.getWindowParent(parent), text,
-				"Problem Occurred", JOptionPane.INFORMATION_MESSAGE);
+			SGUI.showError(parent, "Problem Occurred", "A problem occurred while performing the requested action: "
+					+SReflect.getInnerClassName(exception.getClass())+" "+exception.getMessage(), exception);
+//			exception.printStackTrace();
 		}
 		else
 		{

@@ -89,7 +89,7 @@ import java.util.logging.Level;
 	@Argument(name="libpath", clazz=String.class),
 	@Argument(name="baseclassloader", clazz=ClassLoader.class),
 
-	@Argument(name="awareness", clazz=ClassLoader.class, defaultvalue="true"),
+	@Argument(name="awareness", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="awamechanisms", clazz=String[].class, defaultvalue="new String[]{\"Broadcast\", \"Multicast\"}"),
 	@Argument(name="awaincludes", clazz=String.class, defaultvalue="\"\""),
 	@Argument(name="awaexcludes", clazz=String.class, defaultvalue="\"\""),

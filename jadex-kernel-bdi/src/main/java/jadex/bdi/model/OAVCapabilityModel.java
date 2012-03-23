@@ -715,11 +715,11 @@ public class OAVCapabilityModel implements ICacheableModel//, IModelInfo
 			: findBeliefDefaultValue(state, capa, handle, null, name);
 		if(isarg)
 		{
-			modelinfo.addArgument(new Argument(name, description, typename, new UnparsedExpression(name, (String)null, ""+val, null)));
+			modelinfo.addArgument(new Argument(name, description, typename, ""+val));
 		}
 		else
 		{
-			modelinfo.addResult(new Argument(name, description, typename, new UnparsedExpression(name, (String)null, ""+val, null)));					
+			modelinfo.addResult(new Argument(name, description, typename, ""+val));					
 		}
 	}
 	

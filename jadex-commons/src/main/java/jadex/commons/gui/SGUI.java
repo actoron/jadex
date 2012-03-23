@@ -1,10 +1,15 @@
 package jadex.commons.gui;
 
 
+import jadex.commons.SUtil;
+
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
@@ -16,6 +21,8 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -25,6 +32,8 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.EventObject;
@@ -47,10 +56,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.border.LineBorder;
 import javax.swing.event.CellEditorListener;
@@ -279,6 +292,104 @@ public class SGUI
 			}
 		});
 	}
+	
+	/**
+	 *  Display an error dialog.
+	 * 
+	 *  @param errortitle The title to use for an error dialog (required).
+	 *  @param errormessage An optional error message displayed before the exception.
+	 *  @param exception The exception (if any).
+	 */
+	public static void showError(Component parent, String errortitle, String errormessage, final Exception exception)
+	{
+		final String	text;
+//		String	exmsg	= exception==null ? null : exception.getMessage();
+		if(errormessage==null)// && exmsg==null)
+		{
+			text	= errortitle;
+		}
+		else //if(errormessage!=null && exmsg==null)
+		{
+			text	= errormessage;
+		}
+//		else if(errormessage==null && exmsg!=null)
+//		{
+//			text	= exmsg;
+//		}
+//		else// if(errormessage!=null && exmsg!=null)
+//		{
+//			text = errormessage + "\n" + exmsg;
+//		}
+		Object	message	= SUtil.wrapText(text);
+		if(exception!=null)
+		{
+			final JPanel	panel	= new JPanel(new BorderLayout());
+			final JButton	details	= new JButton("Show Details")
+			{
+				public Insets getInsets()
+				{
+					return new Insets(1, 1, 1, 1);
+				}
+			};
+			details.addActionListener(new ActionListener()
+			{
+				JComponent	area	= null;
+				boolean shown	= false;
+				public void actionPerformed(ActionEvent e)
+				{
+					if(shown)
+					{
+						panel.remove(area);
+						details.setText("Show Details");
+					}
+					else
+					{
+						if(area==null)
+						{
+							StringWriter	sw	= new StringWriter();
+							exception.printStackTrace(new PrintWriter(sw));
+							area	= new JScrollPane(new JTextArea(sw.toString(), 10, 40));
+						}
+						panel.add(area, BorderLayout.CENTER);
+						details.setText("Hide Details");
+					}
+					SGUI.getWindowParent(panel).pack();
+					shown	= !shown;
+				}
+			});
+			JPanel	but	= new JPanel(new FlowLayout(FlowLayout.RIGHT));
+			but.add(details);
+			JTextArea	msg	= new JTextArea(message.toString());
+			msg.setEditable(false);  
+			msg.setCursor(null);  
+			msg.setOpaque(false);  
+//					msg.setFocusable(false);
+			panel.add(msg, BorderLayout.NORTH);
+			panel.add(but, BorderLayout.SOUTH);
+			message	= panel;
+			
+			// Make dialogs resizable
+			panel.addHierarchyListener(new HierarchyListener()
+			{
+				public void hierarchyChanged(HierarchyEvent e)
+				{
+					Window window = SwingUtilities.getWindowAncestor(panel);
+					if(window instanceof Dialog)
+	                {
+	                    Dialog dialog = (Dialog)window;
+	                    if(!dialog.isResizable()) 
+	                    {
+	                        dialog.setResizable(true);
+	                    }
+	                }
+					
+				}
+			});
+		}
+		
+		JOptionPane.showMessageDialog(parent, message, errortitle, JOptionPane.ERROR_MESSAGE);
+	}
+
 
 	/**
 	 *  Adjust components to equal sizes according to their

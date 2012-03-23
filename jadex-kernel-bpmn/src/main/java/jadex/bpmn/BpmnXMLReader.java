@@ -1504,11 +1504,11 @@ public class BpmnXMLReader
 							
 							if(argi)
 							{
-								model.addArgument(new Argument(name, desc, typename, new UnparsedExpression(name, typename, val, null)));
+								model.addArgument(new Argument(name, desc, typename, val));
 							}
 							if(resu)
 							{
-								model.addResult(new Argument(name, desc, typename, new UnparsedExpression(name, typename, val, null)));
+								model.addResult(new Argument(name, desc, typename, val));
 							}
 							if(!argi && !resu)
 							{
@@ -1808,25 +1808,7 @@ public class BpmnXMLReader
 //	//										System.out.println("Context variable: "+name);
 //										}
 										
-										IArgument arg	= null;
-										Object	argval	= null;
-										Class clazz = SReflect.findClass0(typename, mi.getAllImports(), context.getClassLoader());
-										try
-										{
-											if(clazz!=null)
-											{
-												if(val!=null && val.length()>0)
-												{
-													exp = parser.parseExpression(val, mi.getAllImports(), null, context.getClassLoader());
-													argval	= exp!=null ? exp.getValue(null) : null;
-												}
-											}
-										}
-										catch(RuntimeException e)
-										{
-											// Hack!!! initial value for context variable might not be accessible statically.
-										}
-										arg = new Argument(name, desc, typename, argval);
+										IArgument arg	= new Argument(name, desc, typename, val);
 										
 										boolean argi = isarg!=null && Boolean.parseBoolean(isarg);
 										boolean resu = isres!=null && Boolean.parseBoolean(isres);
@@ -1840,7 +1822,7 @@ public class BpmnXMLReader
 										}
 										if(!argi && !resu)
 										{
-											model.addContextVariable(name, clazz, exp, null);
+											model.addContextVariable(name, arg.getClazz().getType(getClass().getClassLoader(), model.getModelInfo().getAllImports()), exp, null);
 										}
 	//									System.out.println("Argument: "+arg);
 									}

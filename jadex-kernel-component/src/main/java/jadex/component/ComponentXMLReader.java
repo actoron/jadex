@@ -25,7 +25,6 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
 import jadex.commons.collection.MultiCollection;
-import jadex.javaparser.SJavaParser;
 import jadex.kernelbase.CacheableKernelModel;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
@@ -87,13 +86,13 @@ public class ComponentXMLReader
 	
 	//-------- post processors and converters --------
 	
-	public static IStringObjectConverter exconv = new IStringObjectConverter()
-	{
-		public Object convertString(String val, IContext context)
-		{
-			return SJavaParser.evaluateExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), null, context.getClassLoader());
-		}
-	};
+//	public static IStringObjectConverter exconv = new IStringObjectConverter()
+//	{
+//		public Object convertString(String val, IContext context)
+//		{
+//			return SJavaParser.evaluateExpression((String)val, ((IModelInfo)context.getRootObject()).getAllImports(), null, context.getClassLoader());
+//		}
+//	};
 	
 	public static IStringObjectConverter classconv = new IStringObjectConverter()
 	{
@@ -322,12 +321,12 @@ public class ComponentXMLReader
 				new SubobjectInfo(new XMLInfo(new QName[]{new QName(uri, "steps"), new QName(uri, "endstep")}), new AccessInfo(new QName(uri, "endstep"), "endStep")),
 			}), null, new BeanObjectReaderHandler()));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
-			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class, new ExpressionProcessor()), 
+			new MappingInfo(null, "description", "value",
 			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))}, null), null, new BeanObjectReaderHandler()));
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "result")}), new ObjectInfo(Argument.class), 
-			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "componenttype"), new QName(uri, "arguments"), new QName(uri, "result")}), new ObjectInfo(Argument.class, new ExpressionProcessor()), 
+			new MappingInfo(null, "description", "value",
 			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))}, null), null, new BeanObjectReaderHandler()));
 			
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "import")), new ObjectInfo(String.class), null, null, new BeanObjectReaderHandler()));

@@ -129,7 +129,7 @@
 		<argument name="awaexcludes" class="String">""</argument>
 		
 		<!-- Use a compact binary message format instead of XML by default. -->
-		<argument name="binarymessages">false</argument>
+		<argument name="binarymessages" class="boolean">false</argument>
 		
 		<!-- Flag if the platform should be protected with password.
 		     If a value is provided this value overrides the settings value. -->

@@ -68,10 +68,14 @@ public class ApplicationXMLReader extends ComponentXMLReader
 		apptype.setReaderHandler(new BeanObjectReaderHandler());
 		types.add(apptype);
 		
-		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "applicationtype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class), 
-			new MappingInfo(null, "description", new AttributeInfo(new AccessInfo((String)null, "defaultValue"), new AttributeConverter(exconv, null)),
-			new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))}, null)));
-		
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "applicationtype"), new QName(uri, "arguments"), new QName(uri, "argument")}), new ObjectInfo(Argument.class, new ExpressionProcessor()), 
+				new MappingInfo(null, "description", "value",
+				new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))}, null)));
+			
+		types.add(new TypeInfo(new XMLInfo(new QName[]{new QName(uri, "applicationtype"), new QName(uri, "arguments"), new QName(uri, "result")}), new ObjectInfo(Argument.class, new ExpressionProcessor()), 
+				new MappingInfo(null, "description", "value",
+				new AttributeInfo[]{new AttributeInfo(new AccessInfo("class", "clazz"), new AttributeConverter(classconv, reclassconv))}, null)));
+			
 		types.add(new TypeInfo(new XMLInfo(new QName(uri, "application")),  new ObjectInfo(ConfigurationInfo.class),
 			new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("type", "typeName")),

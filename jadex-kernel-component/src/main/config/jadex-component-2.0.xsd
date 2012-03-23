@@ -375,7 +375,7 @@ In this section, specifications for extensions as required
 			<xs:documentation>Argument specification for a component.</xs:documentation>
 		</xs:annotation>
 		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="class" type="xs:string" use="optional"/>
+		<xs:attribute name="class" type="xs:string" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="propertytype" mixed="true">
 		<xs:annotation>

@@ -444,7 +444,7 @@ public class MicroClassReader
 	//				Object arg = SJavaParser.evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
 					IArgument tmparg = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
 						vals[i].description(), SReflect.getClassName(vals[i].clazz()),
-						"".equals(vals[i].defaultvalue()) ? null : new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].defaultvalue(), null));
+						"".equals(vals[i].defaultvalue()) ? null : vals[i].defaultvalue());
 					
 					if(!args.containsKey(vals[i].name()))
 					{
@@ -479,7 +479,7 @@ public class MicroClassReader
 	//				Object res = evaluateExpression(vals[i].defaultvalue(), imports, null, classloader);
 					IArgument tmpresult = new jadex.bridge.modelinfo.Argument(vals[i].name(), 
 						vals[i].description(), SReflect.getClassName(vals[i].clazz()),
-						"".equals(vals[i].defaultvalue()) ? null : new UnparsedExpression(vals[i].name(), vals[i].clazz(), vals[i].defaultvalue(), null));
+						"".equals(vals[i].defaultvalue()) ? null : vals[i].defaultvalue());
 					
 					if(!res.containsKey(vals[i].name()))
 					{
