@@ -79,8 +79,6 @@ public class ObserverCenterWindow extends JFrame
 				setLocation(SGUI.calculateMiddlePosition(ObserverCenterWindow.this));
 				setVisible(true);
 				mainpane.setDividerLocation(250);
-				
-
 			}
 		};
 		

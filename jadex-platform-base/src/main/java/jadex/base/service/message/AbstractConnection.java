@@ -12,6 +12,8 @@ import jadex.commons.future.IResultListener;
  */
 public abstract class AbstractConnection
 {
+	//-------- attributes --------
+	
 	/** Boolean flag if connection is closed. */
 	protected boolean closed;
 	
@@ -45,6 +47,8 @@ public abstract class AbstractConnection
 	/** The latest alive time. */
 	protected long alivetime;
 	
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new input connection.
 	 */
@@ -66,8 +70,10 @@ public abstract class AbstractConnection
 		// Send init message if initiator side.
 		if(isInitiatorSide())
 			sendTask(createTask(getMessageType(StreamSendTask.INIT), 
-				new IComponentIdentifier[]{sender, receiver}, true));
+				new IComponentIdentifier[]{sender, receiver}, true, null));
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Send a task. Automatically closes the stream if
@@ -101,19 +107,19 @@ public abstract class AbstractConnection
 	/**
 	 * 
 	 */
-	public AbstractSendTask createTask(byte type, Object content)
+	public AbstractSendTask createTask(byte type, Object content, Integer seqnumber)
 	{
-		return createTask(type, content, false);
+		return createTask(type, content, false, seqnumber);
 	}
 	
 	/**
 	 * 
 	 */
-	public AbstractSendTask createTask(byte type, Object content, boolean usecodecs)
+	public AbstractSendTask createTask(byte type, Object content, boolean usecodecs, Integer seqnumber)
 	{
 		return new StreamSendTask(type, content==null? StreamSendTask.EMPTY_BYTE_ARRAY: content,
 			id, isInitiatorSide()? new IComponentIdentifier[]{participant}: new IComponentIdentifier[]{initiator}, 
-			transports, usecodecs? codecids: null, usecodecs? codecs: null);
+			transports, usecodecs? codecids: null, usecodecs? codecs: null, seqnumber);
 	}
 	
 	/**
@@ -122,7 +128,7 @@ public abstract class AbstractConnection
 	public IFuture<Void> sendAlive()
 	{
 		byte type = isInitiatorSide()? StreamSendTask.ALIVE_INITIATOR: StreamSendTask.ALIVE_PARTICIPANT;
-		return sendTask(createTask(type, null));
+		return sendTask(createTask(type, null, null));
 	}
 	
 	/**
@@ -153,7 +159,7 @@ public abstract class AbstractConnection
 
 		// Send data message
 		setClosed();
-		sendTask(createTask(getMessageType(StreamSendTask.CLOSE), null));
+		sendTask(createTask(getMessageType(StreamSendTask.CLOSE), null, null));
 	}
 	
 	/**

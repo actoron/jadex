@@ -275,7 +275,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 *  
 	 *  If stream is closed adding data is not allowed.
 	 */
-	public boolean addData(byte[] data)
+	public void addData(byte[] data)
 	{
 //		System.out.println("added: "+data.length);
 		IntermediateFuture<Byte> iret;
@@ -283,9 +283,6 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		boolean cl;
 		synchronized(this)
 		{
-			if(closed)
-				return false;
-			
 			if(ifuture==null)
 			{
 				this.data.add(data);
@@ -323,8 +320,6 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		{
 			oret.setResult(new Byte((byte)internalRead()));
 		}
-		
-		return true;
 	}
 	
 	/**

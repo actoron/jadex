@@ -211,7 +211,7 @@ public class MessageService extends BasicService implements IMessageService
 		int conid = uuconid.hashCode();
 		byte[] cids	= codecfactory.getDefaultCodecIds();
 		OutputConnection con = new OutputConnection(this, sender, receiver, conid, 
-			getTransports(), cids, getMessageCodecs(cids), true);
+			getTransports(), cids, getMessageCodecs(cids), true, null);
 		icons.put(conid, con);
 		return con;
 	}
@@ -1191,7 +1191,7 @@ public class MessageService extends BasicService implements IMessageService
 		//-------- attributes --------
 		
 		/** The list of messages to send. */
-		protected List<AbstractSendTask> messages;
+		protected List<AbstractSendTask> tasks;
 		
 		//-------- constructors --------
 		
@@ -1200,7 +1200,7 @@ public class MessageService extends BasicService implements IMessageService
 		 */
 		public SendManager()
 		{
-			this.messages = new ArrayList<AbstractSendTask>();
+			this.tasks = new ArrayList<AbstractSendTask>();
 		}
 		
 		//-------- methods --------
@@ -1215,9 +1215,9 @@ public class MessageService extends BasicService implements IMessageService
 			
 			synchronized(this)
 			{
-				if(!messages.isEmpty())
-					tmp = messages.remove(0);
-				isempty = messages.isEmpty();
+				if(!tasks.isEmpty())
+					tmp = tasks.remove(0);
+				isempty = tasks.isEmpty();
 			}
 			final AbstractSendTask	task = tmp;
 			
@@ -1272,7 +1272,7 @@ public class MessageService extends BasicService implements IMessageService
 					{
 						synchronized(SendManager.this)
 						{
-							messages.add(task);
+							tasks.add(task);
 						}
 						
 						SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, 
@@ -1480,7 +1480,7 @@ public class MessageService extends BasicService implements IMessageService
 				IComponentIdentifier[] recs = (IComponentIdentifier[])data;
 				byte[] cids	= codecfactory.getDefaultCodecIds();
 				final OutputConnection con = new OutputConnection(MessageService.this, recs[0], 
-					recs[1], conid, getTransports(), cids, getMessageCodecs(cids), false);
+					recs[1], conid, getTransports(), cids, getMessageCodecs(cids), false, null);
 				pcons.put(new Integer(conid), con);
 //				System.out.println("created: "+con.hashCode());
 				

@@ -23,6 +23,7 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	public static final String DATA = "DATA";
 	public static final String CLOSE = "CLOSE";
 	public static final String ALIVE = "ALIVE";
+	public static final String RESEND = "RESEND"; // request a resend
 	
 	/** Create virtual output connection - from initiator. */
 	public static final byte INIT_OUTPUT_INITIATOR = 0; 
@@ -32,6 +33,9 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	public static final byte CLOSE_OUTPUT_INITIATOR = 2;
 	/** Close connection - from participant. */
 	public static final byte CLOSE_OUTPUT_PARTICIPANT = 3;
+	/** Close connection - from . */
+	public static final byte RESEND_OUTPUT_PARTICIPANT = 3;
+
 	
 	/** Create virtual input connection - from initiator. */ 
 	public static final byte INIT_INPUT_INITIATOR = 4;
@@ -85,14 +89,18 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	
 	/** The type of message (init, data, close). */
 	protected byte type;
+	
+	/** The sequence number. */
+	protected Integer seqnumber;
 		
 	//-------- constructors --------- 
 
+	
 	/**
 	 *  Create a new manager send task.
 	 */
 	public StreamSendTask(byte type, Object message, int streamid, IComponentIdentifier[] receivers, 
-		ITransport[] transports, byte[] codecids, ICodec[] codecs)//, SendManager manager)
+		ITransport[] transports, byte[] codecids, ICodec[] codecs, int seqnumber)
 	{
 		super(receivers, transports, codecids, codecs);
 		
@@ -105,6 +113,7 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 		this.type = type;
 		this.message = message;
 		this.streamid = streamid;
+		this.seqnumber = seqnumber;
 	}
 	
 	//-------- methods used by message service --------
@@ -130,6 +139,15 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	public MessageType getMessageType()
 	{
 		return null;
+	}
+	
+	/**
+	 *  Get the sequence number.
+	 *  @return the sequence number.
+	 */
+	public Integer getSequenceNumber()
+	{
+		return seqnumber;
 	}
 
 	/**
@@ -170,7 +188,7 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 			{
 				if(prolog==null)
 				{
-					prolog = new byte[7+codecids.length];
+					prolog = new byte[7+codecids.length+(seqnumber==null? 0: 4)];
 					prolog[0] = MESSAGE_TYPE_STREAM;
 					prolog[1] = type;
 					prolog[2] = (byte)codecids.length;
@@ -178,6 +196,12 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 					byte[] strid = SUtil.intToBytes(streamid);
 					for(int i=0; i<4; i++)
 						prolog[i+3+codecids.length] = strid[i];
+					if(seqnumber!=null)
+					{
+						byte[] seqnum = SUtil.intToBytes(seqnumber.intValue());
+						for(int i=0; i<4; i++)
+							prolog[i+7+codecids.length] = seqnum[i];
+					}
 				}
 			}
 		}
