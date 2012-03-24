@@ -450,7 +450,7 @@ public abstract class DiscoveryAgent
 	
 	/**
 	 *  Decode a datagram packet.
-	 *  @param data The byte array.
+	 *  @param sent The byte array.
 	 *  @return The object.
 	 */
 	public static Object decodePacket(DatagramPacket pack, ClassLoader classloader)

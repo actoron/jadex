@@ -43,10 +43,7 @@ public abstract class AbstractConnection
 	
 	/** The initiator flag. */
 	protected boolean ini;
-	
-	/** The latest alive time. */
-	protected long alivetime;
-	
+		
 	//-------- constructors --------
 	
 	/**
@@ -65,7 +62,6 @@ public abstract class AbstractConnection
 		this.codecs = codecs; 
 		this.input = input;
 		this.ini = initiator;
-		this.alivetime = System.currentTimeMillis();
 		
 		// Send init message if initiator side.
 		if(isInitiatorSide())
@@ -122,14 +118,7 @@ public abstract class AbstractConnection
 			transports, usecodecs? codecids: null, usecodecs? codecs: null, seqnumber);
 	}
 	
-	/**
-	 * 
-	 */
-	public IFuture<Void> sendAlive()
-	{
-		byte type = isInitiatorSide()? StreamSendTask.ALIVE_INITIATOR: StreamSendTask.ALIVE_PARTICIPANT;
-		return sendTask(createTask(type, null, null));
-	}
+	
 	
 	/**
 	 *  Set the connection to closed.
@@ -197,25 +186,6 @@ public abstract class AbstractConnection
 		return input;
 	}
 	
-	/**
-	 *  Set the alive time of the other connection side.
-	 */
-	public void setAliveTime(long alivetime)
-	{
-//		System.out.println("new lease: "+alivetime);
-		this.alivetime = alivetime;
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean isConnectionAlive(long lease)
-	{
-		boolean isalive = System.currentTimeMillis()<alivetime+lease*1.3;
-//		System.out.println("alive: "+isalive+" "+alivetime+" "+System.currentTimeMillis());
-		return isalive;
-	}
-
 	/**
 	 *  Get the initiator.
 	 *  @return The initiator.

@@ -24,32 +24,38 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	public static final String CLOSE = "CLOSE";
 	public static final String ALIVE = "ALIVE";
 	public static final String RESEND = "RESEND"; // request a resend
+	public static final String ACK = "ACK"; 
 	
 	/** Create virtual output connection - from initiator. */
-	public static final byte INIT_OUTPUT_INITIATOR = 0; 
+	public static final byte INIT_OUTPUT_INITIATOR = 1; 
 	/** Send data - from initiator. */
-	public static final byte DATA_OUTPUT_INITIATOR = 1;
+	public static final byte DATA_OUTPUT_INITIATOR = 2;
 	/** Close connection - from initiator. */
-	public static final byte CLOSE_OUTPUT_INITIATOR = 2;
+	public static final byte CLOSE_OUTPUT_INITIATOR = 3;
 	/** Close connection - from participant. */
-	public static final byte CLOSE_OUTPUT_PARTICIPANT = 3;
-	/** Close connection - from . */
-	public static final byte RESEND_OUTPUT_PARTICIPANT = 3;
+	public static final byte CLOSE_OUTPUT_PARTICIPANT = 4;
+	/** Resend data - from participant. */
+	public static final byte RESEND_OUTPUT_PARTICIPANT = 5;
+	/** Ack data - from participant .*/
+	public static final byte ACK_OUTPUT_PARTICIPANT = 6;
 
-	
 	/** Create virtual input connection - from initiator. */ 
-	public static final byte INIT_INPUT_INITIATOR = 4;
+	public static final byte INIT_INPUT_INITIATOR = 10;
 	/** Send data - from participant. */
-	public static final byte DATA_INPUT_PARTICIPANT = 5;
+	public static final byte DATA_INPUT_PARTICIPANT = 11;
 	/** Close connection - from initiator. */
-	public static final byte CLOSE_INPUT_INITIATOR = 6;
+	public static final byte CLOSE_INPUT_INITIATOR = 12;
 	/** Close connection - from participant. */
-	public static final byte CLOSE_INPUT_PARTICIPANT = 7;
+	public static final byte CLOSE_INPUT_PARTICIPANT = 13;
+	/** Resend data - from initiator. */
+	public static final byte RESEND_INPUT_INITIATOR = 14;
+	/** Ack data - from participant .*/
+	public static final byte ACK_INPUT_INITIATOR = 15;
 	
 	/** Alive message - from initiator. */ 
-	public static final byte ALIVE_INITIATOR = 8;
+	public static final byte ALIVE_INITIATOR = 20;
 	/** Alive message - from participant. */ 
-	public static final byte ALIVE_PARTICIPANT = 9;
+	public static final byte ALIVE_PARTICIPANT = 21;
 
 	/** String type, boolean input, boolean initiator. */
 	public static final Map<Tuple, Byte> MESSAGETYPES;
@@ -64,11 +70,15 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 		MESSAGETYPES.put(new Tuple(DATA, false, true), new Byte(DATA_OUTPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(CLOSE, false, true), new Byte(CLOSE_OUTPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(CLOSE, false, false), new Byte(CLOSE_OUTPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(RESEND, false, false), new Byte(RESEND_OUTPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(ACK, false, false), new Byte(ACK_OUTPUT_PARTICIPANT));
 
 		MESSAGETYPES.put(new Tuple(INIT, true, true), new Byte(INIT_INPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(DATA, true, false), new Byte(DATA_INPUT_PARTICIPANT));
 		MESSAGETYPES.put(new Tuple(CLOSE, true, true), new Byte(CLOSE_INPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(CLOSE, true, false), new Byte(CLOSE_INPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(RESEND, true, true), new Byte(RESEND_INPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ACK, true, true), new Byte(ACK_INPUT_INITIATOR));
 
 		MESSAGETYPES.put(new Tuple(ALIVE, true, true), new Byte(ALIVE_INITIATOR));
 		MESSAGETYPES.put(new Tuple(ALIVE, false, true), new Byte(ALIVE_INITIATOR));
@@ -95,7 +105,6 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 		
 	//-------- constructors --------- 
 
-	
 	/**
 	 *  Create a new manager send task.
 	 */

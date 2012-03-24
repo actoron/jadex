@@ -26,6 +26,8 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 		byte[] codecids, ICodec[] codecs, boolean initiator, OutputConnectionHandler ch)
 	{
 		super(ms, sender, receiver, id, transports, codecids, codecs, false, initiator);
+		if(ch==null)
+			throw new IllegalArgumentException("Connection hanlder must not null.");
 		this.ch = ch;
 	}
 	
@@ -39,7 +41,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 			return new Future<Void>(new RuntimeException("Connection closed."));
 		StreamSendTask task = (StreamSendTask)createTask(getMessageType(StreamSendTask.DATA), data, new Integer(seqnumber++));
 		// Send data message
-		return sendTask(task);
-//		return ch.send(task);
+//		return sendTask(task);
+		return ch.send(task);
 	}
 }
