@@ -64,6 +64,8 @@
 		IAbstractViewerPanel.java,
 		IComponentViewerPanel.java,
 		IServiceViewerPanel.java,
+		ArgumentTableModel.java,
+		PlatformConfigPanel.java,
 		RemoteFileSystemView.java,
 		DefaultFileFilter.java,
 		DefaultFileFilterMenuItemConstructor.java,
