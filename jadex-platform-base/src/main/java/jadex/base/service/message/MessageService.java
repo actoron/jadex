@@ -1413,6 +1413,17 @@ public class MessageService extends BasicService implements IMessageService
 				data = tmp;
 			}
 
+			int seqnr = -1;
+			if(type==StreamSendTask.DATA_OUTPUT_INITIATOR || type==StreamSendTask.DATA_INPUT_PARTICIPANT)
+			{
+				for(int i=0; i<4; i++)
+				{
+					bconid[i] = rawmsg[idx++];
+				}
+				seqnr = SUtil.bytesToInt(bconid);
+				System.out.println("seqnr: "+seqnr);
+			}
+
 			// Handle output connection participant side
 			if(type==StreamSendTask.INIT_OUTPUT_INITIATOR)
 			{

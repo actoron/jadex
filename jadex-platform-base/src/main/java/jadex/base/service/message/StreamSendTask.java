@@ -100,7 +100,7 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	 *  Create a new manager send task.
 	 */
 	public StreamSendTask(byte type, Object message, int streamid, IComponentIdentifier[] receivers, 
-		ITransport[] transports, byte[] codecids, ICodec[] codecs, int seqnumber)
+		ITransport[] transports, byte[] codecids, ICodec[] codecs, Integer seqnumber)
 	{
 		super(receivers, transports, codecids, codecs);
 		
