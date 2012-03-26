@@ -1,11 +1,6 @@
 package jadex.base.service.message;
 
-import jadex.base.service.message.MessageService.SendManager;
-import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 /**
  *  Abstract base class for connections.

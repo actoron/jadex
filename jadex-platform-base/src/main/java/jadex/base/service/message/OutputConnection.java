@@ -12,20 +12,13 @@ import jadex.commons.future.IFuture;
  */
 public class OutputConnection extends AbstractConnection implements IOutputConnection
 {		
-	/** The connection handler. */
-	protected OutputConnectionHandler ch;
-	
 	/**
 	 *  Create a new connection.
 	 */
-	public OutputConnection(MessageService ms, IComponentIdentifier sender, 
-		IComponentIdentifier receiver, int id, ITransport[] transports, 
-		byte[] codecids, ICodec[] codecs, boolean initiator, OutputConnectionHandler ch)
+	public OutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, 
+		int id, boolean initiator, OutputConnectionHandler ch)
 	{
 		super(sender, receiver, id, false, initiator, ch);
-		if(ch==null)
-			throw new IllegalArgumentException("Connection hanlder must not null.");
-		this.ch = ch;
 	}
 	
 	/**
@@ -36,8 +29,6 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	{
 		if(closed)
 			return new Future<Void>(new RuntimeException("Connection closed."));
-		// Send data message
-//		return sendTask(task);
-		return ch.send(data);
+		return ((OutputConnectionHandler)ch).send(data);
 	}
 }

@@ -209,10 +209,8 @@ public class MessageService extends BasicService implements IMessageService
 	{
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
-		byte[] cids	= codecfactory.getDefaultCodecIds();
-		OutputConnectionHandler och = new OutputConnectionHandler();
-		OutputConnection con = new OutputConnection(this, sender, receiver, conid, 
-			getTransports(), cids, getMessageCodecs(cids), true, och);
+		OutputConnectionHandler och = new OutputConnectionHandler(this);
+		OutputConnection con = new OutputConnection(sender, receiver, conid, true, och);
 		och.setConnection(con);
 		icons.put(conid, och);
 		return con;
@@ -234,9 +232,10 @@ public class MessageService extends BasicService implements IMessageService
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
 		byte[] cids	= codecfactory.getDefaultCodecIds();
-		InputConnection con = new InputConnection(this, sender, receiver, conid, 
-			getTransports(), cids, getMessageCodecs(cids), true);
-		icons.put(conid, new InputConnectionHandler(con));
+		InputConnectionHandler ich = new InputConnectionHandler(this);
+		InputConnection con = new InputConnection(sender, receiver, conid, true, ich);
+		ich.setConnection(con);
+		icons.put(conid, ich);
 		return new Future<IInputConnection>(con);	
 	}
 
@@ -562,6 +561,15 @@ public class MessageService extends BasicService implements IMessageService
 		return ret!=null? (IContentCodec[])ret.toArray(new IContentCodec[ret.size()]): null;
 	}
 
+	/**
+	 *  Get the codec factory.
+	 *  @return The codec factory.
+	 */
+	public CodecFactory getCodecFactory()
+	{
+		return codecfactory;
+	}
+	
 //	/**
 //	 *  Deliver a message to some components.
 //	 */
@@ -1430,10 +1438,10 @@ public class MessageService extends BasicService implements IMessageService
 			if(type==StreamSendTask.INIT_OUTPUT_INITIATOR)
 			{
 				IComponentIdentifier[] recs = (IComponentIdentifier[])data;
-				byte[] cids	= codecfactory.getDefaultCodecIds();
-				final InputConnection con = new InputConnection(MessageService.this, recs[0], recs[1], 
-					conid, getTransports(), cids, getMessageCodecs(cids), false);
-				pcons.put(new Integer(conid), new InputConnectionHandler(con));
+				InputConnectionHandler ich = new InputConnectionHandler(MessageService.this);
+				final InputConnection con = new InputConnection(recs[0], recs[1], conid, false, ich);
+				ich.setConnection(con);
+				pcons.put(new Integer(conid), ich);
 //				System.out.println("created: "+con.hashCode());
 				
 				final Future<Void> ret = new Future<Void>();
@@ -1504,10 +1512,8 @@ public class MessageService extends BasicService implements IMessageService
 			else if(type==StreamSendTask.INIT_INPUT_INITIATOR)
 			{
 				IComponentIdentifier[] recs = (IComponentIdentifier[])data;
-				byte[] cids	= codecfactory.getDefaultCodecIds();
-				OutputConnectionHandler och = new OutputConnectionHandler();
-				final OutputConnection con = new OutputConnection(MessageService.this, recs[0], 
-					recs[1], conid, getTransports(), cids, getMessageCodecs(cids), false, och);
+				OutputConnectionHandler och = new OutputConnectionHandler(MessageService.this);
+				final OutputConnection con = new OutputConnection(recs[0], recs[1], conid, false, och);
 				och.setConnection(con);
 				pcons.put(new Integer(conid), och);
 //				System.out.println("created: "+con.hashCode());

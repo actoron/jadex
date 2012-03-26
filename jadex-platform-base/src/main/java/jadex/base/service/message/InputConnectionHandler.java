@@ -31,10 +31,9 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	/**
 	 * 
 	 */
-	public InputConnectionHandler(AbstractConnection con, ITransport[] transports,
-			byte[] codecids, ICodec[] codecs, MessageService ms)
+	public InputConnectionHandler(MessageService ms)
 	{
-		super(con, transports, codecids, codecs, ms);
+		super(ms);
 		this.seqnumber = -1;
 		this.misscnt = 10;
 		this.ackcnt = 10;
@@ -133,28 +132,10 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
-	 *  Set the connection closed.
-	 */
-	public void setClosed()
-	{
-		con.setClosed();
-	}
-	
-	/**
 	 * 
 	 */
 	public InputConnection getInputConnection()
 	{
 		return (InputConnection)getConnection();
 	}
-	
-	
-//	/**
-//	 *  Get the connection.
-//	 *  @return the connection.
-//	 */
-//	public AbstractConnection getConnection()
-//	{
-//		return con;
-//	}
 }

@@ -38,10 +38,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	/**
 	 * 
 	 */
-	public OutputConnectionHandler(AbstractConnection con, ITransport[] transports,
-		byte[] codecids, ICodec[] codecs, MessageService ms)
+	public OutputConnectionHandler(MessageService ms)
 	{
-		super(con, transports, codecids, codecs, ms);
+		super(ms);
 		this.seqnumber = 0;
 		this.lastack = -1;
 		this.maxsend = 30;
@@ -132,13 +131,12 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		con.setClosed();
 	}
 	
-//	/**
-//	 *  Get the connection.
-//	 *  @return the connection.
-//	 */
-//	public AbstractConnection getConnection()
-//	{
-//		return con;
-//	}
+	/**
+	 * 
+	 */
+	public OutputConnection getOutputConnection()
+	{
+		return (OutputConnection)getConnection();
+	}
 	
 }

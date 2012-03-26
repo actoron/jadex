@@ -15,14 +15,14 @@ public class AbstractConnectionHandler
 	/** The message service. */
 	protected MessageService ms;
 	
-	/** The transports. */
-	protected ITransport[] transports;
-	
-	/** The codecids. */
-	protected byte[] codecids;
-	
-	/** The codecs. */
-	protected ICodec[] codecs;
+//	/** The transports. */
+//	protected ITransport[] transports;
+//	
+//	/** The codecids. */
+//	protected byte[] codecids;
+//	
+//	/** The codecs. */
+//	protected ICodec[] codecs;
 	
 	/** The connection. */
 	protected AbstractConnection con;
@@ -33,14 +33,14 @@ public class AbstractConnectionHandler
 	/**
 	 * 
 	 */
-	public AbstractConnectionHandler(AbstractConnection con, ITransport[] transports,
-		byte[] codecids, ICodec[] codecs, MessageService ms)
+//	public AbstractConnectionHandler(ITransport[] transports,
+//		byte[] codecids, ICodec[] codecs, MessageService ms)
+	public AbstractConnectionHandler(MessageService ms)
 	{
 		this.ms = ms;
-		this.con = con;
-		this.transports = transports;
-		this.codecids = codecids;
-		this.codecs = codecs; 
+//		this.transports = transports;
+//		this.codecids = codecids;
+//		this.codecs = codecs; 
 		this.alivetime = System.currentTimeMillis();
 	}
 	
@@ -86,7 +86,7 @@ public class AbstractConnectionHandler
 	public IFuture<Void> sendInit()
 	{
 		return sendTask(createTask(StreamSendTask.INIT, 
-			new IComponentIdentifier[]{sender, receiver}, true, null));
+			new IComponentIdentifier[]{getConnection().getInitiator(), getConnection().getParticipant()}, true, null));
 	}
 	
 	/**
@@ -96,8 +96,6 @@ public class AbstractConnectionHandler
 	{
 		return sendTask(createTask(StreamSendTask.CLOSE, null, null));
 	}
-	
-	
 	
 	/**
 	 * 
@@ -114,6 +112,14 @@ public class AbstractConnectionHandler
 	public void close()
 	{
 		con.close();
+	}
+	
+	/**
+	 *  Set the connection closed.
+	 */
+	public void setClosed()
+	{
+		con.setClosed();
 	}
 	
 	/**
@@ -152,14 +158,6 @@ public class AbstractConnectionHandler
 		return createTask(type, content, false, seqnumber);
 	}
 	
-//	/**
-//	 * 
-//	 */
-//	public AbstractSendTask createTask(byte type, Object content, Integer seqnumber)
-//	{
-//		return createTask(type, content, false, seqnumber);
-//	}
-	
 	/**
 	 * 
 	 */
@@ -167,7 +165,7 @@ public class AbstractConnectionHandler
 	{
 		return new StreamSendTask(getMessageType(type), content==null? StreamSendTask.EMPTY_BYTE_ARRAY: content,
 			getConnectionId(), getConnection().isInitiatorSide()? new IComponentIdentifier[]{getConnection().getParticipant()}: new IComponentIdentifier[]{getConnection().getInitiator()}, 
-			transports, usecodecs? codecids: null, usecodecs? codecs: null, seqnumber);
+			getTransports(), usecodecs? getCodecIds(): null, usecodecs? getCodecs(): null, seqnumber);
 	}
 	
 	/**
@@ -197,5 +195,29 @@ public class AbstractConnectionHandler
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected ICodec[] getCodecs()
+	{
+		return ms.getMessageCodecs(ms.getCodecFactory().getDefaultCodecIds());
+	}
+	
+	/**
+	 * 
+	 */
+	protected byte[] getCodecIds()
+	{
+		return ms.getCodecFactory().getDefaultCodecIds();
+	}
+	
+	/**
+	 * 
+	 */
+	protected ITransport[] getTransports()
+	{
+		return ms.getTransports();
 	}
 }
