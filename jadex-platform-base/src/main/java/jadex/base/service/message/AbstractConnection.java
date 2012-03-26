@@ -20,105 +20,47 @@ public abstract class AbstractConnection
 	/** The connection id. */
 	protected int id;
 	
-	/** The message service. */
-	protected MessageService ms;
-	
 	/** The connection initiator. */
 	protected IComponentIdentifier initiator;
 
 	/** The participant. */
 	protected IComponentIdentifier participant;
-	
-	/** The transports. */
-	protected ITransport[] transports;
-	
-	/** The codecids. */
-	protected byte[] codecids;
-	
-	/** The codecs. */
-	protected ICodec[] codecs;
-	
+
 	/** The input flag. */
 	protected boolean input;
 	
 	/** The initiator flag. */
 	protected boolean ini;
+	
+	/** The abstract connection handler. */
+	protected AbstractConnectionHandler ch;
 		
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new input connection.
 	 */
-	public AbstractConnection(MessageService ms, IComponentIdentifier sender, 
-		IComponentIdentifier receiver, int id, ITransport[] transports,
-		byte[] codecids, ICodec[] codecs, boolean input, boolean initiator)
+	public AbstractConnection(IComponentIdentifier sender, 
+		IComponentIdentifier receiver, int id, boolean input, boolean initiator, AbstractConnectionHandler ch)
 	{
-		this.ms = ms;
 		this.initiator = sender;
 		this.participant = receiver;
 		this.id = id;
-		this.transports = transports;
-		this.codecids = codecids;
-		this.codecs = codecs; 
 		this.input = input;
 		this.ini = initiator;
+		this.ch = ch;
+		
+		if(ch==null)
+			throw new IllegalArgumentException("Connection hanlder must not null.");
 		
 		// Send init message if initiator side.
 		if(isInitiatorSide())
-			sendTask(createTask(getMessageType(StreamSendTask.INIT), 
-				new IComponentIdentifier[]{sender, receiver}, true, null));
+			ch.sendInit();
+//			sendTask(createTask(getMessageType(StreamSendTask.INIT), 
+//				new IComponentIdentifier[]{sender, receiver}, true, null));
 	}
 	
-	//-------- methods --------
-	
-	/**
-	 *  Send a task. Automatically closes the stream if
-	 *  the other side could not be reached.
-	 */
-	public IFuture<Void> sendTask(AbstractSendTask task)
-	{
-//		System.out.println("sendTask: "+task);
-		IComponentIdentifier[] recs = task.getReceivers();
-		if(recs.length!=1)
-			throw new RuntimeException("Must have exactly one receiver.");
-		SendManager sm = ms.getSendManager(recs[0]);
-		
-		IFuture<Void> ret = sm.addMessage(task);
-		ret.addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-				// nop if could be sent
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				// close connection in case of send error.
-				setClosed();
-			}
-		});
-		
-		return ret;
-	}
-	
-	/**
-	 * 
-	 */
-	public AbstractSendTask createTask(byte type, Object content, Integer seqnumber)
-	{
-		return createTask(type, content, false, seqnumber);
-	}
-	
-	/**
-	 * 
-	 */
-	public AbstractSendTask createTask(byte type, Object content, boolean usecodecs, Integer seqnumber)
-	{
-		return new StreamSendTask(type, content==null? StreamSendTask.EMPTY_BYTE_ARRAY: content,
-			id, isInitiatorSide()? new IComponentIdentifier[]{participant}: new IComponentIdentifier[]{initiator}, 
-			transports, usecodecs? codecids: null, usecodecs? codecs: null, seqnumber);
-	}
-	
-	
+	//-------- methods --------	
 	
 	/**
 	 *  Set the connection to closed.
@@ -148,17 +90,8 @@ public abstract class AbstractConnection
 
 		// Send data message
 		setClosed();
-		sendTask(createTask(getMessageType(StreamSendTask.CLOSE), null, null));
-	}
-	
-	/**
-	 * 
-	 */
-	public byte getMessageType(String type)
-	{
-		// Connection type is determined by initiator and is constant per connection
-		boolean contype = isInitiatorSide()? isInputConnection(): !isInputConnection();
-		return StreamSendTask.getMessageType(type, contype, isInitiatorSide());
+		ch.sendClose();
+//		sendTask(createTask(getMessageType(StreamSendTask.CLOSE), null, null));
 	}
 	
 	/**

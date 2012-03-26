@@ -1,9 +1,14 @@
 package jadex.base.service.message;
 
+import jadex.base.service.message.MessageService.SendManager;
+import jadex.base.service.message.transport.ITransport;
+import jadex.base.service.message.transport.codecs.ICodec;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,24 +20,29 @@ import java.util.Map;
  */
 public class OutputConnectionHandler extends AbstractConnectionHandler
 {
-	/** The data sent. */
+	/** The data sent (not acknowledged). */
 	protected Map<Integer, StreamSendTask> sent;
 
 	/** The data to send. */
 	protected List<Tuple2<StreamSendTask, Future<Void>>> tosend;
 
+	/** The current sequence number. */
+	protected int seqnumber;
+	
 	/** The last acknowledged packet number. */
 	protected int lastack;
 	
 	/** The max number of packets that can be sent without an ack is received. */
 	protected int maxsend;
-	
+
 	/**
 	 * 
 	 */
-	public OutputConnectionHandler()
+	public OutputConnectionHandler(AbstractConnection con, ITransport[] transports,
+		byte[] codecids, ICodec[] codecs, MessageService ms)
 	{
-		super(null);
+		super(con, transports, codecids, codecs, ms);
+		this.seqnumber = 0;
 		this.lastack = -1;
 		this.maxsend = 30;
 		this.tosend = new ArrayList<Tuple2<StreamSendTask, Future<Void>>>();
@@ -42,13 +52,11 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	/**
 	 *  Called from connection.
 	 */
-	public IFuture<Void> send(StreamSendTask task)
+	public IFuture<Void> send(byte[] dat)
 	{
 		IFuture<Void> ret = new Future<Void>();
-		
-		Integer sq = task.getSequenceNumber();
-		if(sq==null)
-			throw new RuntimeException("Data send task has no sequence number.");
+
+		StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, dat, seqnumber);
 		
 		boolean wassent = false;
 		int allowed = maxsend-sent.size();
@@ -60,16 +68,16 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 			if(tosend.size()>0)
 			{
 				Tuple2<StreamSendTask, Future<Void>> tup = tosend.remove(0);
-				getConnection().sendTask(tup.getFirstEntity()).addResultListener(new DelegationResultListener<Void>(tup.getSecondEntity()));
+				sendTask(tup.getFirstEntity()).addResultListener(new DelegationResultListener<Void>(tup.getSecondEntity()));
 				int seqno = tup.getFirstEntity().getSequenceNumber();
 				System.out.println("send: "+seqno);
 				sent.put(seqno, tup.getFirstEntity());
 			}
 			else
 			{
-				System.out.println("send: "+task.getSequenceNumber());
-				ret = getConnection().sendTask(task);
-				sent.put(sq, task);
+				System.out.println("send: "+seqnumber);
+				ret = sendTask(task);
+				sent.put(new Integer(seqnumber), task);
 				wassent = true;
 				break;
 			}
@@ -84,12 +92,21 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	/**
 	 *  Called from message service.
 	 */
+	public IFuture<Void> send(int seqnumber, byte[] data)
+	{
+		StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, data, new Integer(seqnumber++));
+		return sendTask(task);
+	}
+	
+	/**
+	 *  Called from message service.
+	 */
 	public IFuture<Void> resend(int seqnumber)
 	{
 		StreamSendTask task = sent.get(new Integer(seqnumber));
 		if(task==null)
 			throw new RuntimeException("Resend not possible, data not found.");
-		return getConnection().sendTask(task);
+		return sendTask(task);
 	}
 	
 	/**

@@ -1,5 +1,8 @@
 package jadex.base.service.message;
 
+import jadex.base.service.message.transport.ITransport;
+import jadex.base.service.message.transport.codecs.ICodec;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,9 +31,10 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	/**
 	 * 
 	 */
-	public InputConnectionHandler(InputConnection con)
+	public InputConnectionHandler(AbstractConnection con, ITransport[] transports,
+			byte[] codecids, ICodec[] codecs, MessageService ms)
 	{
-		super(con);
+		super(con, transports, codecids, codecs, ms);
 		this.seqnumber = -1;
 		this.misscnt = 10;
 		this.ackcnt = 10;
@@ -95,7 +99,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	protected void sendAck()
 	{
 		System.out.println("send ack: "+seqnumber);
-		con.sendTask(con.createTask(con.getMessageType(StreamSendTask.ACK), seqnumber, true, null));
+		sendTask(createTask(StreamSendTask.ACK, seqnumber, true, null));
 	}
 	
 	/**
@@ -103,7 +107,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 */
 	protected void requestResend(int newest)
 	{
-		con.sendTask(con.createTask(con.getMessageType(StreamSendTask.RESEND), getMissingPackets(newest), true, null));
+		sendTask(createTask(StreamSendTask.RESEND, getMissingPackets(newest), true, null));
 	}
 	
 	/**

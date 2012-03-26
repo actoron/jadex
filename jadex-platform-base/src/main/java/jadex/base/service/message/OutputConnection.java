@@ -11,10 +11,7 @@ import jadex.commons.future.IFuture;
  *  Output connection for writing data.
  */
 public class OutputConnection extends AbstractConnection implements IOutputConnection
-{
-	/** The current sequence number. */
-	protected int seqnumber;
-		
+{		
 	/** The connection handler. */
 	protected OutputConnectionHandler ch;
 	
@@ -25,7 +22,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 		IComponentIdentifier receiver, int id, ITransport[] transports, 
 		byte[] codecids, ICodec[] codecs, boolean initiator, OutputConnectionHandler ch)
 	{
-		super(ms, sender, receiver, id, transports, codecids, codecs, false, initiator);
+		super(sender, receiver, id, false, initiator, ch);
 		if(ch==null)
 			throw new IllegalArgumentException("Connection hanlder must not null.");
 		this.ch = ch;
@@ -39,9 +36,8 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	{
 		if(closed)
 			return new Future<Void>(new RuntimeException("Connection closed."));
-		StreamSendTask task = (StreamSendTask)createTask(getMessageType(StreamSendTask.DATA), data, new Integer(seqnumber++));
 		// Send data message
 //		return sendTask(task);
-		return ch.send(task);
+		return ch.send(data);
 	}
 }
