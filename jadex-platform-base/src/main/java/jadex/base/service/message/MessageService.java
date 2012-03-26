@@ -211,7 +211,6 @@ public class MessageService extends BasicService implements IMessageService
 		int conid = uuconid.hashCode();
 		OutputConnectionHandler och = new OutputConnectionHandler(this);
 		OutputConnection con = new OutputConnection(sender, receiver, conid, true, och);
-		och.setConnection(con);
 		icons.put(conid, och);
 		return con;
 	}
@@ -234,7 +233,6 @@ public class MessageService extends BasicService implements IMessageService
 		byte[] cids	= codecfactory.getDefaultCodecIds();
 		InputConnectionHandler ich = new InputConnectionHandler(this);
 		InputConnection con = new InputConnection(sender, receiver, conid, true, ich);
-		ich.setConnection(con);
 		icons.put(conid, ich);
 		return new Future<IInputConnection>(con);	
 	}
@@ -568,6 +566,15 @@ public class MessageService extends BasicService implements IMessageService
 	public CodecFactory getCodecFactory()
 	{
 		return codecfactory;
+	}
+	
+	/**
+	 *  Get the clock service.
+	 *  @return The clock service.
+	 */
+	public IClockService getClockService()
+	{
+		return clockservice;
 	}
 	
 //	/**
@@ -1406,6 +1413,17 @@ public class MessageService extends BasicService implements IMessageService
 			}
 			final int conid = SUtil.bytesToInt(bconid);
 			
+			int seqnumber = -1;
+			if(type==StreamSendTask.DATA_OUTPUT_INITIATOR || type==StreamSendTask.DATA_INPUT_PARTICIPANT)
+			{
+				for(int i=0; i<4; i++)
+				{
+					bconid[i] = rawmsg[idx++];
+				}
+				seqnumber = SUtil.bytesToInt(bconid);
+//				System.out.println("seqnr: "+seqnumber);
+			}
+			
 			final Object data;
 			if(codec_ids.length==0)
 			{
@@ -1423,24 +1441,12 @@ public class MessageService extends BasicService implements IMessageService
 				data = tmp;
 			}
 
-			int seqnumber = -1;
-			if(type==StreamSendTask.DATA_OUTPUT_INITIATOR || type==StreamSendTask.DATA_INPUT_PARTICIPANT)
-			{
-				for(int i=0; i<4; i++)
-				{
-					bconid[i] = rawmsg[idx++];
-				}
-				seqnumber = SUtil.bytesToInt(bconid);
-				System.out.println("seqnr: "+seqnumber);
-			}
-
 			// Handle output connection participant side
 			if(type==StreamSendTask.INIT_OUTPUT_INITIATOR)
 			{
 				IComponentIdentifier[] recs = (IComponentIdentifier[])data;
 				InputConnectionHandler ich = new InputConnectionHandler(MessageService.this);
 				final InputConnection con = new InputConnection(recs[0], recs[1], conid, false, ich);
-				ich.setConnection(con);
 				pcons.put(new Integer(conid), ich);
 //				System.out.println("created: "+con.hashCode());
 				
@@ -1514,7 +1520,6 @@ public class MessageService extends BasicService implements IMessageService
 				IComponentIdentifier[] recs = (IComponentIdentifier[])data;
 				OutputConnectionHandler och = new OutputConnectionHandler(MessageService.this);
 				final OutputConnection con = new OutputConnection(recs[0], recs[1], conid, false, och);
-				och.setConnection(con);
 				pcons.put(new Integer(conid), och);
 //				System.out.println("created: "+con.hashCode());
 				
@@ -1563,6 +1568,19 @@ public class MessageService extends BasicService implements IMessageService
 				if(ich!=null)
 				{
 					ich.setClosed();
+				}
+				else
+				{
+					System.out.println("OutputStream not found: "+conid);
+				}
+			}
+			else if(type==StreamSendTask.ACK_INPUT_INITIATOR)
+			{
+				// Handle input connection initiator side
+				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
+				if(och!=null)
+				{
+					och.ack(((Integer)data).intValue());
 				}
 				else
 				{

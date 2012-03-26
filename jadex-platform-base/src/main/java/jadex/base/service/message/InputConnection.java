@@ -4,6 +4,7 @@ import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
+import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -32,7 +33,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	/** The read futures. */
 	protected IntermediateFuture<Byte> ifuture;
 	protected Future<Byte> ofuture;
-	
+		
 	/**
 	 *  Create a new input connection.
 	 */

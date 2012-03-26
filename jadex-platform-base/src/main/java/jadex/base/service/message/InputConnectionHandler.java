@@ -2,6 +2,9 @@ package jadex.base.service.message;
 
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.codecs.ICodec;
+import jadex.bridge.service.types.clock.ITimedObject;
+import jadex.bridge.service.types.clock.ITimer;
+import jadex.commons.SUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,17 +19,25 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	/** The last received sequence number. */
 	protected int seqnumber;
 	
-	/** The buffer size after which new resends are sent. */
-	protected int misscnt;
-
-	/** The number of received elements after which an ack is sent. */
-	protected int ackcnt;
-	
 	/** The maximum buffer size. */
 	protected int maxbuf;
 	
 	/** The data. */
 	protected Map<Integer, byte[]> data;
+	
+	
+	/** The last sequence number acknowledged. */
+	protected int lastack;
+	
+	/** The max delay before an acknowledgement is received. */
+	protected long acktimeout;
+	
+	/** The number of received elements after which an ack is sent. */
+	protected int ackcnt;
+	
+	/** The current timer. */
+	protected ITimer timer;
+
 	
 	/**
 	 * 
@@ -35,11 +46,14 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	{
 		super(ms);
 		this.seqnumber = -1;
-		this.misscnt = 10;
-		this.ackcnt = 10;
 		this.maxbuf = 1000;
 		this.data = new HashMap<Integer, byte[]>();
+	
+		this.ackcnt = 10;
+		this.acktimeout = 10000;
+		this.lastack = -1;
 	}
+	
 
 	/**
 	 *  Called from message service.
@@ -72,10 +86,10 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 				con.close();
 				this.data.clear();
 			}
-			else if(this.data.size()%misscnt==0)
-			{
-				requestResend(seqnumber);
-			}
+//			else if(this.data.size()%misscnt==0)
+//			{
+//				requestResend(seqnumber);
+//			}
 		}
 		
 		return true;
@@ -86,10 +100,27 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 */
 	protected void forwardData(byte[] data)
 	{
+		System.out.println("forward dara: "+SUtil.arrayToString(data));
+		
 		seqnumber++;
 		getInputConnection().addData(data);
+		
+		// Directly acknowledge when ackcnt packets have been received
+		// or start time to acknowledge less packages in an interval.
 		if(seqnumber%ackcnt==0)
+		{
 			sendAck();
+		}
+		else if(timer==null)
+		{
+			timer = ms.getClockService().createTimer(acktimeout, new ITimedObject()
+			{
+				public void timeEventOccurred(long currenttime)
+				{
+					sendAck();
+				}
+			});
+		}
 	}
 	
 	/**
@@ -97,17 +128,21 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 */
 	protected void sendAck()
 	{
-		System.out.println("send ack: "+seqnumber);
-		sendTask(createTask(StreamSendTask.ACK, seqnumber, true, null));
+		if(seqnumber>lastack)
+		{
+			System.out.println("send ack: "+seqnumber);
+			sendTask(createTask(StreamSendTask.ACK, seqnumber, true, null));
+			lastack = seqnumber;
+		}
 	}
 	
-	/**
-	 *  Called by itself.
-	 */
-	protected void requestResend(int newest)
-	{
-		sendTask(createTask(StreamSendTask.RESEND, getMissingPackets(newest), true, null));
-	}
+//	/**
+//	 *  Called by itself.
+//	 */
+//	protected void requestResend(int newest)
+//	{
+//		sendTask(createTask(StreamSendTask.RESEND, getMissingPackets(newest), true, null));
+//	}
 	
 	/**
 	 * 

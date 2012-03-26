@@ -35,7 +35,7 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	/** Close connection - from participant. */
 	public static final byte CLOSE_OUTPUT_PARTICIPANT = 4;
 	/** Resend data - from participant. */
-	public static final byte RESEND_OUTPUT_PARTICIPANT = 5;
+//	public static final byte RESEND_OUTPUT_PARTICIPANT = 5;
 	/** Ack data - from participant .*/
 	public static final byte ACK_OUTPUT_PARTICIPANT = 6;
 
@@ -48,7 +48,7 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	/** Close connection - from participant. */
 	public static final byte CLOSE_INPUT_PARTICIPANT = 13;
 	/** Resend data - from initiator. */
-	public static final byte RESEND_INPUT_INITIATOR = 14;
+//	public static final byte RESEND_INPUT_INITIATOR = 14;
 	/** Ack data - from participant .*/
 	public static final byte ACK_INPUT_INITIATOR = 15;
 	
@@ -70,14 +70,14 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 		MESSAGETYPES.put(new Tuple(DATA, false, true), new Byte(DATA_OUTPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(CLOSE, false, true), new Byte(CLOSE_OUTPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(CLOSE, false, false), new Byte(CLOSE_OUTPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(RESEND, false, false), new Byte(RESEND_OUTPUT_PARTICIPANT));
+//		MESSAGETYPES.put(new Tuple(RESEND, false, false), new Byte(RESEND_OUTPUT_PARTICIPANT));
 		MESSAGETYPES.put(new Tuple(ACK, false, false), new Byte(ACK_OUTPUT_PARTICIPANT));
 
 		MESSAGETYPES.put(new Tuple(INIT, true, true), new Byte(INIT_INPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(DATA, true, false), new Byte(DATA_INPUT_PARTICIPANT));
 		MESSAGETYPES.put(new Tuple(CLOSE, true, true), new Byte(CLOSE_INPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(CLOSE, true, false), new Byte(CLOSE_INPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(RESEND, true, true), new Byte(RESEND_INPUT_INITIATOR));
+//		MESSAGETYPES.put(new Tuple(RESEND, true, true), new Byte(RESEND_INPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(ACK, true, true), new Byte(ACK_INPUT_INITIATOR));
 
 		MESSAGETYPES.put(new Tuple(ALIVE, true, true), new Byte(ALIVE_INITIATOR));

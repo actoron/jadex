@@ -1,14 +1,11 @@
 package jadex.base.service.message;
 
-import jadex.base.service.message.MessageService.SendManager;
-import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.codecs.ICodec;
-import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.clock.ITimedObject;
+import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +19,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 {
 	/** The data sent (not acknowledged). */
 	protected Map<Integer, StreamSendTask> sent;
-
+	
 	/** The data to send. */
 	protected List<Tuple2<StreamSendTask, Future<Void>>> tosend;
 
@@ -35,6 +32,17 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	/** The max number of packets that can be sent without an ack is received. */
 	protected int maxsend;
 
+	
+	/** The max delay before an acknowledgement is received. */
+	protected long acktimeout;
+	
+	/** The number of received elements after which an ack is sent. */
+	protected int ackcnt;
+	
+	/** The current timer. */
+	protected ITimer timer;
+
+	
 	/**
 	 * 
 	 */
@@ -46,6 +54,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		this.maxsend = 30;
 		this.tosend = new ArrayList<Tuple2<StreamSendTask, Future<Void>>>();
 		this.sent = new HashMap<Integer, StreamSendTask>();
+		
+		this.ackcnt = 10;
+		this.acktimeout = 15000;
 	}
 	
 	/**
@@ -55,7 +66,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	{
 		IFuture<Void> ret = new Future<Void>();
 
-		StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, dat, seqnumber);
+		StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, dat, seqnumber++);
 		
 		boolean wassent = false;
 		int allowed = maxsend-sent.size();
@@ -68,16 +79,19 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 			{
 				Tuple2<StreamSendTask, Future<Void>> tup = tosend.remove(0);
 				sendTask(tup.getFirstEntity()).addResultListener(new DelegationResultListener<Void>(tup.getSecondEntity()));
-				int seqno = tup.getFirstEntity().getSequenceNumber();
+				final Integer seqno = new Integer(tup.getFirstEntity().getSequenceNumber());
 				System.out.println("send: "+seqno);
 				sent.put(seqno, tup.getFirstEntity());
+				initTimer(seqno);
 			}
 			else
 			{
 				System.out.println("send: "+seqnumber);
 				ret = sendTask(task);
-				sent.put(new Integer(seqnumber), task);
+				Integer seqno = new Integer(seqnumber);
+				sent.put(seqno, task);
 				wassent = true;
+				initTimer(seqno);
 				break;
 			}
 		}
@@ -88,13 +102,40 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		return ret;
 	}
 	
+//	/**
+//	 *  Called from message service.
+//	 */
+//	public IFuture<Void> send(int seqnumber, byte[] data)
+//	{
+//		StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, data, new Integer(seqnumber));
+//		return sendTask(task);
+//	}
+	
 	/**
-	 *  Called from message service.
+	 * 
 	 */
-	public IFuture<Void> send(int seqnumber, byte[] data)
+	// Synchronized with timer on this
+	public synchronized void initTimer(final Integer seqno)
 	{
-		StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, data, new Integer(seqnumber++));
-		return sendTask(task);
+		// todo: selective acknowledgement
+		if(timer==null)
+		{
+			timer = ms.getClockService().createTimer(acktimeout, new ITimedObject()
+			{
+				public void timeEventOccurred(long currenttime)
+				{
+					// Send all packets of the segment again.
+					for(int i=0; i<ackcnt; i++)
+					{
+						resend(i+seqno);
+						synchronized(OutputConnectionHandler.this)
+						{
+							timer = null;
+						}
+					}
+				}
+			});
+		}
 	}
 	
 	/**
@@ -102,10 +143,16 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	 */
 	public IFuture<Void> resend(int seqnumber)
 	{
+		IFuture<Void> ret = IFuture.DONE;
+		
 		StreamSendTask task = sent.get(new Integer(seqnumber));
-		if(task==null)
-			throw new RuntimeException("Resend not possible, data not found.");
-		return sendTask(task);
+		if(task!=null)
+		{
+			System.out.println("resend: "+seqnumber);
+			ret = sendTask(task);
+		}
+		
+		return ret;
 	}
 	
 	/**

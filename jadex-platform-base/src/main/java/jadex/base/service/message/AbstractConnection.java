@@ -49,10 +49,9 @@ public abstract class AbstractConnection
 			throw new IllegalArgumentException("Connection hanlder must not null.");
 		
 		// Send init message if initiator side.
+		ch.setConnection(this);
 		if(isInitiatorSide())
 			ch.sendInit();
-//			sendTask(createTask(getMessageType(StreamSendTask.INIT), 
-//				new IComponentIdentifier[]{sender, receiver}, true, null));
 	}
 	
 	//-------- methods --------	

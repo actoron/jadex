@@ -74,15 +74,6 @@ public class AbstractConnectionHandler
 	/**
 	 * 
 	 */
-	public IFuture<Void> sendAlive()
-	{
-//		byte type = con.isInitiatorSide()? StreamSendTask.ALIVE_INITIATOR: StreamSendTask.ALIVE_PARTICIPANT;
-		return sendTask(createTask(StreamSendTask.ALIVE, null, null));
-	}
-	
-	/**
-	 * 
-	 */
 	public IFuture<Void> sendInit()
 	{
 		return sendTask(createTask(StreamSendTask.INIT, 
@@ -95,6 +86,15 @@ public class AbstractConnectionHandler
 	public IFuture<Void> sendClose()
 	{
 		return sendTask(createTask(StreamSendTask.CLOSE, null, null));
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture<Void> sendAlive()
+	{
+//		byte type = con.isInitiatorSide()? StreamSendTask.ALIVE_INITIATOR: StreamSendTask.ALIVE_PARTICIPANT;
+		return sendTask(createTask(StreamSendTask.ALIVE, null, null));
 	}
 	
 	/**
