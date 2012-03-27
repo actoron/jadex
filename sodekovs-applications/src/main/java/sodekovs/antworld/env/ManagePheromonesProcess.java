@@ -184,12 +184,12 @@ public class ManagePheromonesProcess extends SimplePropertyObject implements ISp
 				tmp[1] = new Integer(newPheromoneStrength);
 				pheromonesToUpdate.add(tmp);
 
-				System.out.println("\n#TEstList# Begin");
-				for (int j = 0; j < pheromonesToUpdate.size(); j++) {
-					Object[] tmp1 = (Object[]) pheromonesToUpdate.get(j);
-					System.out.println(j + " : " + (IVector2) tmp1[0] + " - " + tmp1[1].toString());
-				}
-				System.out.println("\n#TEstList# End");
+//				System.out.println("\n#TEstList# Begin");
+//				for (int j = 0; j < pheromonesToUpdate.size(); j++) {
+//					Object[] tmp1 = (Object[]) pheromonesToUpdate.get(j);
+//					System.out.println(j + " : " + (IVector2) tmp1[0] + " - " + tmp1[1].toString());
+//				}
+//				System.out.println("\n#TEstList# End");
 			}
 		}
 		createPheromonesInSpace(pheromonesToUpdate, space);

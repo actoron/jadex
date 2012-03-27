@@ -45,7 +45,7 @@ public class PickupFoodTask extends AbstractTask {
 		// Get the "right" food source
 		for (ISpaceObject foodSource : allFoodSources) {
 			if (foodSource.getProperty(ContinuousSpace2D.PROPERTY_POSITION).equals(so.getProperty(ContinuousSpace2D.PROPERTY_POSITION))) {
-				System.out.println("Food Source Pos: " + foodSource.getProperty(ContinuousSpace2D.PROPERTY_POSITION) + " ant Pos: " + so.getProperty(ContinuousSpace2D.PROPERTY_POSITION));
+//				System.out.println("Food Source Pos: " + foodSource.getProperty(ContinuousSpace2D.PROPERTY_POSITION) + " ant Pos: " + so.getProperty(ContinuousSpace2D.PROPERTY_POSITION));
 				int foodPieces = (Integer) foodSource.getProperty("food_pieces");
 				if (foodPieces > 0) {
 					foodSource.setProperty("food_pieces", foodPieces - 1);

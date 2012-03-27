@@ -44,7 +44,7 @@ public class DropFoodTask extends AbstractTask {
 		// Get the "right" nest.
 		for (ISpaceObject nest : allNests) {
 			if (nest.getProperty(ContinuousSpace2D.PROPERTY_POSITION).equals(so.getProperty(ContinuousSpace2D.PROPERTY_POSITION))) {
-				System.out.println("Nest Pos: " + nest.getProperty(ContinuousSpace2D.PROPERTY_POSITION) + " ant Pos: " + so.getProperty(ContinuousSpace2D.PROPERTY_POSITION));
+//				System.out.println("Nest Pos: " + nest.getProperty(ContinuousSpace2D.PROPERTY_POSITION) + " ant Pos: " + so.getProperty(ContinuousSpace2D.PROPERTY_POSITION));
 				int stock = (Integer) nest.getProperty("stock");
 				nest.setProperty("stock", stock + 1);
 				so.setProperty("has_food", false);

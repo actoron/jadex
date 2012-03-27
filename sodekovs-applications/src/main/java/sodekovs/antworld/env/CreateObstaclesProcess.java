@@ -40,7 +40,7 @@ public class CreateObstaclesProcess extends SimplePropertyObject implements ISpa
 	public void start(IClockService clock, IEnvironmentSpace space) {
 //		this.lasttick = clock.getTick();
 		ContinuousSpace2D mySpace = (ContinuousSpace2D) space;
-		double stepSize = 0.005;
+		double stepSize = 0.001;
 		IVector2 pos = new Vector2Double(0.5, 0.3);
 		Map<String, Object> props = new HashMap<String, Object>();
 		

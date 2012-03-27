@@ -31,6 +31,11 @@ public class RandomWalkPlan extends Plan {
 	 */
 	public void body() {
 		IVector2 dest = ((Space2D) getBeliefbase().getBelief("environment").getFact()).getRandomPosition(Vector2Int.ZERO);
+		
+		//Test
+		ISpaceObject[] foodSources = (ISpaceObject[]) getBeliefbase().getBeliefSet("foodSources").getFacts();
+		ISpaceObject myself = (ISpaceObject) getBeliefbase().getBelief("myself").getFact();
+//		System.out.println("#RandWalkPlan# Destination of next point: " + dest.toString() + " - " + myself.getId());
 
 		//Check, whether agent should walk randomly with or without remembering already visited positions.
 		//Confer WalkingStrategyEnum for Mapping of int values to semantics.

@@ -29,7 +29,7 @@ public class PheromoneWalkPlan extends Plan {
 	 * Called when the ant is walking according to recognized pheromones. Walk is stochastically computed.
 	 */
 	public void body() {
-		System.out.println("Called Pheromone Walk Plan!!!!!!!!!");
+//		System.out.println("Called Pheromone Walk Plan!!!!!!!!!");
 
 		ISpaceObject myself = (ISpaceObject) getBeliefbase().getBelief("myself").getFact();
 		ISpaceObject[] pheromones = (ISpaceObject[]) getBeliefbase().getBeliefSet("pheromones").getFacts();
@@ -38,9 +38,9 @@ public class PheromoneWalkPlan extends Plan {
 		// Walking strategy consists of two steps in order to avoid ozilliation, i.e. ant walks always between two points
 		// 1.) Go to the furthest pheromone
 		// 2.) go to the strongest pheromone
-		while (pheromones.length > 0) {
+//		while (pheromones.length > 0) {
 			List<ISpaceObject> pheromoneList = (List<ISpaceObject>) Arrays.asList(pheromones);
-			System.out.println("#PheromoneWalkPlan# Size of PheromoneList: " + pheromoneList.size());
+//			System.out.println("#PheromoneWalkPlan# Size of PheromoneList: " + pheromoneList.size());
 
 			// 1.) Furthest pheromone
 			Vector2Double myPos = (Vector2Double) myself.getProperty("position");
@@ -48,24 +48,25 @@ public class PheromoneWalkPlan extends Plan {
 				pheromone.setProperty("distance", myPos.getDistance((IVector2) pheromone.getProperty("position")));
 			}
 			Collections.sort(pheromoneList, new PheromoneDistanceComparator());
-			 System.out.println("#PheromoneWalkPlan# Pheromones sorted by distance. Size: " + pheromoneList.size() + " - myPos: " + myPos);
-			 for(ISpaceObject pheromone : pheromoneList){
-			 System.out.println("Pheromone: " + pheromone.getProperty("position") + " - " + pheromone.getProperty("distance"));
-			 }
-			System.out.println("Furthest Pheromone: " + (IVector2) pheromoneList.get(pheromoneList.size()-1).getProperty("position") + " - " + (IVector1) pheromoneList.get(pheromoneList.size()-1).getProperty("distance"));
-			createDestinationSign((IVector2) pheromoneList.get(pheromoneList.size()-1).getProperty("position"),env);
-			moveToDestination((IVector2) pheromoneList.get(pheromoneList.size()-1).getProperty("position"), env, myself);
-			
+//			System.out.println("#PheromoneWalkPlan# Pheromones sorted by distance. Size: " + pheromoneList.size() + " - myPos: " + myPos);
+//			for (ISpaceObject pheromone : pheromoneList) {
+//				System.out.println("Pheromone: " + pheromone.getProperty("position") + " - " + pheromone.getProperty("distance"));
+//			}
+//			System.out.println("Furthest Pheromone: " + (IVector2) pheromoneList.get(pheromoneList.size() - 1).getProperty("position") + " - "
+//					+ (IVector1) pheromoneList.get(pheromoneList.size() - 1).getProperty("distance"));
+//			createDestinationSign((IVector2) pheromoneList.get(pheromoneList.size() - 1).getProperty("position"), env);
+			moveToDestination((IVector2) pheromoneList.get(pheromoneList.size() - 1).getProperty("position"), env, myself);
+
 			// 2.) Strongest pheromone
-			Collections.sort(pheromoneList, new PheromoneStrengthComparator());
-			System.out.println("#PheromoneWalkPlan# Pheromones sorted by strength. Size: " + pheromoneList.size());
-			for (ISpaceObject pheromone : pheromoneList) {
-				System.out.println("Pheromone: " + pheromone.getProperty("position") + " - " + pheromone.getProperty("strength"));
-			}
-			moveToDestination((IVector2) pheromoneList.get(0).getProperty("position"), env, myself);
-			
-			pheromones = (ISpaceObject[]) getBeliefbase().getBeliefSet("pheromones").getFacts();
-		}
+//			Collections.sort(pheromoneList, new PheromoneStrengthComparator());
+////			System.out.println("#PheromoneWalkPlan# Pheromones sorted by strength. Size: " + pheromoneList.size());
+////			for (ISpaceObject pheromone : pheromoneList) {
+////				System.out.println("Pheromone: " + pheromone.getProperty("position") + " - " + pheromone.getProperty("strength"));
+////			}
+//			moveToDestination((IVector2) pheromoneList.get(0).getProperty("position"), env, myself);
+//
+//			pheromones = (ISpaceObject[]) getBeliefbase().getBeliefSet("pheromones").getFacts();
+//		}
 
 		// Smelled pheromones
 
@@ -74,23 +75,23 @@ public class PheromoneWalkPlan extends Plan {
 		// }
 
 		// ascending ordered.
-//		Collections.sort(pheromoneList, new PheromoneStrengthComparator());
-//		System.out.println("#PheromoneWalkPlan# Pheromones sorted by strength. Size: " + pheromoneList.size());
-//		for (ISpaceObject pheromone : pheromoneList) {
-//			System.out.println("Pheromone: " + pheromone.getProperty("position") + " - " + pheromone.getProperty("strength"));
-//		}
-//
-//		// Collections.sort(pheromones, new PheromoneDistanceComparator());
-//		Vector2Double myPos = (Vector2Double) myself.getProperty("position");
-//		for (ISpaceObject pheromone : pheromoneList) {
-//			pheromone.setProperty("distance", myPos.getDistance((IVector2) pheromone.getProperty("position")));
-//			// System.out.println("Pheromone: " + pheromone.getProperty("position") + " - " + pheromone.getProperty("strength"));
-//		}
-//		Collections.sort(pheromoneList, new PheromoneDistanceComparator());
-//		System.out.println("#PheromoneWalkPlan# Pheromones sorted by distance. Size: " + pheromoneList.size() + " - myPos: " + myPos);
-//		for (ISpaceObject pheromone : pheromoneList) {
-//			System.out.println("Pheromone: " + pheromone.getProperty("position") + " - " + pheromone.getProperty("distance"));
-//		}
+		// Collections.sort(pheromoneList, new PheromoneStrengthComparator());
+		// System.out.println("#PheromoneWalkPlan# Pheromones sorted by strength. Size: " + pheromoneList.size());
+		// for (ISpaceObject pheromone : pheromoneList) {
+		// System.out.println("Pheromone: " + pheromone.getProperty("position") + " - " + pheromone.getProperty("strength"));
+		// }
+		//
+		// // Collections.sort(pheromones, new PheromoneDistanceComparator());
+		// Vector2Double myPos = (Vector2Double) myself.getProperty("position");
+		// for (ISpaceObject pheromone : pheromoneList) {
+		// pheromone.setProperty("distance", myPos.getDistance((IVector2) pheromone.getProperty("position")));
+		// // System.out.println("Pheromone: " + pheromone.getProperty("position") + " - " + pheromone.getProperty("strength"));
+		// }
+		// Collections.sort(pheromoneList, new PheromoneDistanceComparator());
+		// System.out.println("#PheromoneWalkPlan# Pheromones sorted by distance. Size: " + pheromoneList.size() + " - myPos: " + myPos);
+		// for (ISpaceObject pheromone : pheromoneList) {
+		// System.out.println("Pheromone: " + pheromone.getProperty("position") + " - " + pheromone.getProperty("distance"));
+		// }
 
 		//
 		// // drop other goals
@@ -429,14 +430,15 @@ public class PheromoneWalkPlan extends Plan {
 		props.put(MoveTask.PROPERTY_DESTINATION, dest);
 		props.put(MoveTask.ACTOR_ID, myself.getId());
 		props.put(MoveTask.PROPERTY_SCOPE, getScope().getExternalAccess());
-		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));
+		props.put(MoveTask.PHEROMONE_GRADIENT_WALK, true);
+		props.put(AbstractTask.PROPERTY_CONDITION, new PlanFinishedTaskCondition(getPlanElement()));		
 		Object taskid = env.createObjectTask(MoveTask.PROPERTY_TYPENAME, props, myself.getId());
 		SyncResultListener res = new SyncResultListener();
 		env.addTaskListener(taskid, myself.getId(), res);
 		res.waitForResult();
 	}
-	
-	private void createDestinationSign(IVector2 pos, IEnvironmentSpace space){
+
+	private void createDestinationSign(IVector2 pos, IEnvironmentSpace space) {
 		Map<String, Object> props = new HashMap<String, Object>();
 		props.put(Space2D.PROPERTY_POSITION, pos);
 		space.createSpaceObject("destination", props, null);

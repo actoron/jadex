@@ -59,8 +59,8 @@
 						</env:property>					
 				</env:objecttype>
 				<env:objecttype name="ant">
-					<env:property name="vision">0.07</env:property>
-					<env:property name="vision_range">5</env:property>
+					<env:property name="vision">0.15</env:property>
+					<env:property name="vision_range">0.3</env:property>
 					<env:property name="speed">0.05</env:property>
 					<env:property name="position" dynamic="true">$space.getSpaceObjectsByType("nest")[0].getProperty("position")</env:property>
 					<env:property name="has_food">false</env:property>
@@ -147,36 +147,20 @@
 					Percepttypes that the environment produces and agents can consume.
 				-->
 				<!-- TODO: disappear, etc..-->
-				<env:percepttype name="food_appeared"
-					objecttype="food" componenttype="Ant" />
-				<env:percepttype name="food_disappeared"
-					objecttype="food" componenttype="Ant" />
-				<env:percepttype name="nest_appeared" objecttype="nest"
-					componenttype="Ant" />
-				<env:percepttype name="pheromone_appeared"
-					objecttype="pheromone" componenttype="Ant" />
-				<env:percepttype name="pheromone_disappeared"
-					objecttype="pheromone" componenttype="Ant" />
+				<env:percepttype name="nest_appeared" objecttype="nest" componenttype="Ant" />
 
 
 				<!-- Percept generators define which percepts should be created -->
-				<env:perceptgenerator name="visiongen"
-					class="DefaultVisionGenerator">
-					<!--  <env:property name="maxrange">10</env:property>-->
+				<env:perceptgenerator name="visiongen" class="DefaultVisionGenerator">
 					<env:property name="range">10</env:property>
-					<env:property name="range_property">
-						"vision_range"</env:property>
+					<env:property name="range_property">"vision_range"</env:property>
 
 					<!--
 						percept types are declared with associated action types:
 						percepttype, actiontype1, actiontype2, ...
 					-->
-					<env:property name="percepttypes"> new Object[] { new
-						String[]{"food_appeared", "appeared", "created"}, new
-						String[]{"food_disappeared", "disappeared", "destroyed"},new
-						String[]{"nest_appeared", "appeared", "created"},new
-						String[]{"pheromone_appeared", "appeared", "created"}, new
-						String[]{"pheromone_disappeared", "disappeared", "destroyed"} }
+					<env:property name="percepttypes"> new Object[] { 
+						new String[]{"nest_appeared", "appeared", "created"} }
 					</env:property>
 				</env:perceptgenerator>
 
@@ -185,12 +169,8 @@
 				-->
 				<env:perceptprocessor componenttype="Ant"
 					class="DefaultBDIVisionProcessor">
-					<env:property name="percepttypes"> new Object[] { new
-						String[]{"food_appeared", "add", "foodSources"}, new
-						String[]{"food_disappeared", "remove", "foodSources"},new
-						String[]{"nest_appeared", "add", "nests"},new
-						String[]{"pheromone_appeared", "add", "pheromones"}, new
-						String[]{"pheromone_disappeared", "remove", "pheromones"} }
+					<env:property name="percepttypes"> new Object[] { 
+						new String[]{"nest_appeared", "add", "nests"} }
 					</env:property>
 				</env:perceptprocessor>
 
@@ -280,7 +260,7 @@
 	</properties>
 
 	<configurations>
-		<configuration name="FirstScenario">
+		<configuration name="WithObstacles">
 			<extensions>			
 
 				<env:envspace name="my2dspace" type="2dspace" width="1"
@@ -291,16 +271,16 @@
 						</env:object>
 						<env:object type="food">
 							<env:property name="position">new Vector2Double(0.8, 0.5)</env:property>
-							<env:property name="food_pieces">1</env:property>
+							<env:property name="food_pieces">10</env:property>
 						</env:object>
 						<!-- <env:object type="food">
 							<env:property name="position">new Vector2Double(0.6, 0.2)</env:property>
 							<env:property name="food_pieces">2</env:property>
-						</env:object>
+						</env:object>-->
 						<env:object type="food">
 							<env:property name="position">new Vector2Double(0.1, 0.6)</env:property>
-							<env:property name="food_pieces">2</env:property>
-						</env:object>-->
+							<env:property name="food_pieces">20</env:property>
+						</env:object>
 						
 						<env:object type="walkingStrategy">					
 							<env:property name="strategy">0</env:property>
@@ -360,9 +340,9 @@
 				 		<env:process type="manageFoodSources">
 							<env:property name="rate">1</env:property> 
 						</env:process>
-						<env:process type="createObstacles">
+						<!--  --><env:process type="createObstacles">
 							<env:property name="rate">1</env:property> 
-						</env:process>
+						</env:process> 
 					</env:processes>
 			
 					<env:observers>
@@ -373,7 +353,7 @@
 				</env:envspace>
 			</extensions>
 			<components>
-				<component type="Ant" number="1" />
+				<component type="Ant" number="10" />
 			</components>							
 		</configuration>
 

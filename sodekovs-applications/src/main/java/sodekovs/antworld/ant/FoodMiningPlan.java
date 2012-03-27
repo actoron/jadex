@@ -24,12 +24,12 @@ public class FoodMiningPlan extends Plan {
 	 * The plan body.
 	 */
 	public void body() {
-		System.out.println("Called Food Mining Plan!!!!!!!!!");
+//		System.out.println("Called Food Mining Plan!!!!!!!!!");
 		IEnvironmentSpace env = (IEnvironmentSpace) getBeliefbase().getBelief("environment").getFact();
 		ISpaceObject[] foodSources = (ISpaceObject[]) getBeliefbase().getBeliefSet("foodSources").getFacts();
 		IVector2 dest = (IVector2) foodSources[0].getProperty(Space2D.PROPERTY_POSITION);
 		ISpaceObject myself = (ISpaceObject) getBeliefbase().getBelief("myself").getFact();
-		System.out.println("#FoodMiningPlan# Destination of next point (foodSource): " + dest.toString());
+//		System.out.println("#FoodMiningPlan# Destination of next point (foodSource): " + dest.toString() + " - No. of detected food sources: " + foodSources.length);
 
 		IGoal[] goals = getGoalbase().getGoals();
 		// System.out.println("#GoalBase before drop...");
@@ -132,7 +132,7 @@ public class FoodMiningPlan extends Plan {
 		SyncResultListener res = new SyncResultListener();
 		env.addTaskListener(taskid, myself.getId(), res);
 		res.waitForResult();
-		System.out.println("#FoodMiningPlan# successfully dropped food.");
+//		System.out.println("#FoodMiningPlan# successfully dropped food.");
 	}
 
 	/**

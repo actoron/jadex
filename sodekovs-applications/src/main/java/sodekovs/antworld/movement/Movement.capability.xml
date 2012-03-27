@@ -137,4 +137,12 @@
 		</plan>
 		
 	</plans>
+	
+	<configurations>
+		<configuration name="default">		
+			<goals>
+				<initialgoal ref="walk_around"/>
+			</goals>
+		</configuration>
+	</configurations>
 </capability>

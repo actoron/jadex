@@ -56,12 +56,15 @@ public class StartSimulationExperimentsPlan extends Plan {
 		if (simConf.getOptimization().getParameterSweeping() != null) {
 			if (simConf.getOptimization().getParameterSweeping().getStrategy().equals("linear")) {
 				sweepParameters(simConf, applicationArgs);
-			} else {
+			} else if (simConf.getOptimization().getParameterSweeping().getStrategy().equals("recursively")){
 				recusivelySweepParameter(simConf, applicationArgs);
+			} else if (simConf.getOptimization().getParameterSweeping().getStrategy().equals("no sweeping to be performed.")){
+				//Do nothing
 			}
 		} else {
 			simConf.getOptimization().setParameterSweeping(new ParameterSweeping());
 			simConf.getOptimization().getParameterSweeping().setCurrentConfiguration("Simulation without Parameter Sweeping");
+			simConf.getOptimization().getParameterSweeping().setStrategy("no sweeping to be performed.");
 		}
 
 		// store simConf since it contains the current configuration of the parameters that are swept through
