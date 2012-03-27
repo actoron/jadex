@@ -28,19 +28,22 @@ public class ReceiverAgent
 //		final IInputConnection con = (IInputConnection)msg.get(SFipa.CONTENT);
 		System.out.println("received: "+con+" "+con.hashCode());
 		
+		final int[] cnt = new int[1];
 		((IInputConnection)con).aread().addResultListener(new IIntermediateResultListener<Byte>()
 		{
 			public void resultAvailable(Collection<Byte> result)
 			{
 				System.out.println("Result: "+result);
+				cnt[0] += result.size();
 			}
 			public void intermediateResultAvailable(Byte result)
 			{
 				System.out.println("Intermediate result: "+result);
+				cnt[0] += 1;
 			}
 			public void finished()
 			{
-				System.out.println("finished");
+				System.out.println("finished: "+cnt[0]);
 			}
 			public void exceptionOccurred(Exception exception)
 			{

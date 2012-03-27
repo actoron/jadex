@@ -1,13 +1,17 @@
 package jadex.base.service.message;
 
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.Tuple2;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,103 +47,224 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	protected ITimer timer;
 
 	
+	/** Flag if multipackets should be used. */
+	protected boolean multipackets;
+	
+	/** The packet size to collect (in bytes). */
+	protected int mpmaxsize;
+	
+	/** The collected data for a packet. */
+	protected List<byte[]> multipacket;
+	
+	/** The current multipacket size. */
+	protected int mpsize;
+	
+	
+//	/** The close command. */
+//	protected 
+	
 	/**
 	 * 
 	 */
 	public OutputConnectionHandler(MessageService ms)
 	{
 		super(ms);
+		this.tosend = Collections.synchronizedList(new ArrayList<Tuple2<StreamSendTask, Future<Void>>>());
+		this.sent = Collections.synchronizedMap(new HashMap<Integer, StreamSendTask>());
+
 		this.seqnumber = 0;
 		this.lastack = -1;
 		this.maxsend = 30;
-		this.tosend = new ArrayList<Tuple2<StreamSendTask, Future<Void>>>();
-		this.sent = new HashMap<Integer, StreamSendTask>();
 		
 		this.ackcnt = 10;
 		this.acktimeout = 15000;
+		
+		this.multipackets = true;
+		this.mpmaxsize = 20;
+		this.multipacket = new ArrayList<byte[]>();
+		this.mpsize = 0;
+		
 	}
 	
 	/**
 	 *  Called from connection.
+	 *  
+	 *  Uses: sent, tosend
 	 */
 	public IFuture<Void> send(byte[] dat)
 	{
 		IFuture<Void> ret = new Future<Void>();
 
-		StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, dat, seqnumber++);
-		
-		boolean wassent = false;
-		int allowed = maxsend-sent.size();
-		
 		System.out.println("called send: "+sent.size());
 		
-		for(int i=0; i<allowed; i++)
+		sendStored();
+
+		if(multipackets)
 		{
-			if(tosend.size()>0)
+			ret = addMultipacket(dat);
+		}
+		else
+		{
+			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, dat, seqnumber++);
+			if(maxsend-sent.size()>0)
 			{
-				Tuple2<StreamSendTask, Future<Void>> tup = tosend.remove(0);
-				sendTask(tup.getFirstEntity()).addResultListener(new DelegationResultListener<Void>(tup.getSecondEntity()));
-				final Integer seqno = new Integer(tup.getFirstEntity().getSequenceNumber());
-				System.out.println("send: "+seqno);
-				sent.put(seqno, tup.getFirstEntity());
-				initTimer(seqno);
+				System.out.println("send: "+task.getSequenceNumber());
+				ret = sendTask(task, null);
 			}
 			else
 			{
-				System.out.println("send: "+seqnumber);
-				ret = sendTask(task);
-				Integer seqno = new Integer(seqnumber);
-				sent.put(seqno, task);
-				wassent = true;
-				initTimer(seqno);
-				break;
+				ret = new Future<Void>();
+				tosend.add(new Tuple2<StreamSendTask, Future<Void>>(task, (Future<Void>)ret));
 			}
 		}
-	
-		if(!wassent)
-			tosend.add(new Tuple2<StreamSendTask, Future<Void>>(task, (Future<Void>)ret));
 		
 		return ret;
 	}
 	
-//	/**
-//	 *  Called from message service.
-//	 */
-//	public IFuture<Void> send(int seqnumber, byte[] data)
-//	{
-//		StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, data, new Integer(seqnumber));
-//		return sendTask(task);
-//	}
-	
 	/**
+	 *  Called from connection, 
 	 * 
+	 *  Uses: sent, tosend
 	 */
-	// Synchronized with timer on this
-	public synchronized void initTimer(final Integer seqno)
+	// synchronized to avoid being called twice at the same time
+	protected synchronized void sendStored()
 	{
-		// todo: selective acknowledgement
-		if(timer==null)
+		int allowed = maxsend-sent.size();
+		for(int i=0; i<allowed && tosend.size()>0; i++)
 		{
-			timer = ms.getClockService().createTimer(acktimeout, new ITimedObject()
-			{
-				public void timeEventOccurred(long currenttime)
-				{
-					// Send all packets of the segment again.
-					for(int i=0; i<ackcnt; i++)
-					{
-						resend(i+seqno);
-						synchronized(OutputConnectionHandler.this)
-						{
-							timer = null;
-						}
-					}
-				}
-			});
+			Tuple2<StreamSendTask, Future<Void>> tup = tosend.remove(0);
+			System.out.println("send: "+tup.getFirstEntity().getSequenceNumber());
+			sendTask(tup.getFirstEntity(), tup.getSecondEntity());
 		}
 	}
 	
 	/**
+	 * 
+	 */
+	protected IFuture<Void> addMultipacket(byte[] data)
+	{
+		IFuture<Void> ret = new Future<Void>();
+		
+		int start = 0;
+		int len = Math.min(mpmaxsize-mpsize, data.length);
+		
+		List<IFuture<Void>> futs = new ArrayList<IFuture<Void>>();
+		while(len>0)
+		{
+			byte[] part = new byte[len];
+			System.arraycopy(data, start, part, 0, len);
+			futs.add(internalAddMultiPacket(part));
+			start += len;
+			len = Math.min(mpmaxsize-mpsize, data.length-start);
+		}
+		
+		if(futs.size()>0)
+		{
+			CounterResultListener<Void> lis = new CounterResultListener<Void>(futs.size(), 
+				new DelegationResultListener<Void>((Future<Void>)ret));
+			for(int i=0; i<futs.size(); i++)
+			{
+				futs.get(i).addResultListener(lis);
+			}
+		}
+		else
+		{
+			ret = IFuture.DONE;
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> internalAddMultiPacket(byte[] data)
+	{
+		IFuture<Void> ret = IFuture.DONE;
+		
+		multipacket.add(data);
+		mpsize += data.length;
+		
+		if(mpsize==mpmaxsize)
+			ret = sendMultiPacket();
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> sendMultiPacket()
+	{
+		IFuture<Void> ret = IFuture.DONE;
+		
+		if(multipacket.size()>0)
+		{
+			byte[] target = new byte[mpsize];
+			int start = 0;
+			for(int i=0; i<multipacket.size(); i++)
+			{
+				byte[] tmp = multipacket.get(i);
+				System.arraycopy(tmp, 0, target, start, tmp.length);
+				start += tmp.length;
+			}
+			
+			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, target, seqnumber++);
+			if(maxsend-sent.size()>0)
+			{
+				ret = sendTask(task, null);
+			}
+			else
+			{
+				ret = new Future<Void>();
+				tosend.add(new Tuple2<StreamSendTask, Future<Void>>(task, (Future<Void>)ret));
+			}
+			
+			multipacket.clear();
+			mpsize = 0;
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Flush the data.
+	 */
+	public void flush()
+	{
+		if(multipackets)
+			sendMultiPacket();
+	}
+	
+	/**
 	 *  Called from message service.
+	 */
+	public IFuture<Void> sendTask(StreamSendTask task, Future<Void> fut)
+	{
+		IFuture<Void> ret = fut;
+		
+		if(ret==null)
+		{
+			ret = sendTask(task);
+		}
+		else
+		{
+			sendTask(task).addResultListener(new DelegationResultListener<Void>(fut));
+		}
+		
+		// add task to unacknowledged sent list 
+		sent.put(task.getSequenceNumber(), task);
+		
+		// create timer if none is active
+		createTimer(task.getSequenceNumber());
+		
+		return ret;
+	}
+	
+	/**
+	 *  Called from timer.
+	 *  
+	 *  Uses: sent
 	 */
 	public IFuture<Void> resend(int seqnumber)
 	{
@@ -157,6 +282,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	
 	/**
 	 *  Called from message service.
+	 *  
+	 *  Uses: sent, lastack
 	 */
 	public void ack(int seqnumber)
 	{
@@ -167,7 +294,13 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 			if(task==null)
 				throw new RuntimeException("Ack not possible, data not found.");
 		}
+		
 		this.lastack = seqnumber;
+
+		// Try to send stored messages after some others have been acknowledged
+		sendStored();
+		
+		// Try to close if 
 	}
 
 	/**
@@ -186,4 +319,83 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		return (OutputConnection)getConnection();
 	}
 	
+	/**
+	 *  Get the seqnumber.
+	 *  @return the seqnumber.
+	 */
+	public int getSequenceNumber()
+	{
+		return seqnumber;
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture<Void> sendClose()
+	{
+		return sendTask(createTask(StreamSendTask.CLOSE, null, null));
+		
+//		Future<Void> ret = new Future<Void>();
+//		
+//		IComponentStep<Void> closecom = new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				return sendTask(createTask(StreamSendTask.CLOSE, null, null));
+//			}
+//		};
+//		
+//		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	// Synchronized with timer on this
+	public synchronized void createTimer(int seqno)
+	{
+		// Test if packets have been sent till last timer was inited
+		if(timer==null)
+		{
+			if(getSequenceNumber()>seqno)
+			{
+				timer = ms.getClockService().createTimer(System.currentTimeMillis()+acktimeout, new TimedObject(seqno+ackcnt));
+			}
+			else
+			{
+				timer = null;
+			}
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public class TimedObject implements ITimedObject
+	{
+		/** The sequence number. */
+		protected int seqno;
+		
+		/**
+		 * 
+		 */
+		public TimedObject(int seqno)
+		{
+			this.seqno = seqno;
+		}
+		
+		/**
+		 * 
+		 */
+		public void timeEventOccurred(long currenttime)
+		{
+			// Send all packets of the segment again.
+			for(int i=0; i<ackcnt; i++)
+			{
+				resend(i+seqno);
+			}
+			timer = null;
+			createTimer(seqno+ackcnt);
+		}
+	}
 }

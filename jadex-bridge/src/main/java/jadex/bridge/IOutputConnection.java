@@ -14,6 +14,11 @@ public interface IOutputConnection extends IConnection
 	public IFuture<Void> write(byte[] data);
 	
 	/**
+	 *  Flush the data.
+	 */
+	public void flush();
+	
+	/**
 	 *  Close the connection.
 	 */
 	public void close();

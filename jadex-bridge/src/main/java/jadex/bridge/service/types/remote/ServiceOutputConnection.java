@@ -21,6 +21,9 @@ public class ServiceOutputConnection implements IOutputConnection
 	/** The closed flag. */
 	protected boolean closed;
 	
+	/** Flushed flag. */
+	protected boolean flushed;
+	
 	/** The buffer. */
 	protected List<byte[]> buffer;
 	
@@ -52,6 +55,21 @@ public class ServiceOutputConnection implements IOutputConnection
 	}
 	
 	/**
+	 *  Flush the data.
+	 */
+	public void flush()
+	{
+		if(ocon!=null)
+		{
+			ocon.flush();
+		}
+		else
+		{
+			flushed = true;
+		}
+	}
+	
+	/**
 	 *  Close the connection.
 	 */
 	public void close()
@@ -64,6 +82,9 @@ public class ServiceOutputConnection implements IOutputConnection
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public int getConnectionId()
 	{
 		if(ocon!=null)
@@ -72,6 +93,9 @@ public class ServiceOutputConnection implements IOutputConnection
 			throw new RuntimeException("Uninitialized connection.");
 	}
 
+	/**
+	 * 
+	 */
 	public IComponentIdentifier getInitiator()
 	{
 		if(ocon!=null)
@@ -80,6 +104,9 @@ public class ServiceOutputConnection implements IOutputConnection
 			throw new RuntimeException("Uninitialized connection.");
 	}
 
+	/**
+	 * 
+	 */
 	public IComponentIdentifier getParticipant()
 	{
 		if(ocon!=null)
@@ -110,6 +137,11 @@ public class ServiceOutputConnection implements IOutputConnection
 		{
 			byte[] data = buffer.remove(0);
 			ocon.write(data);
+		}
+		
+		if(flushed)
+		{
+			ocon.flush();
 		}
 		
 		if(closed)

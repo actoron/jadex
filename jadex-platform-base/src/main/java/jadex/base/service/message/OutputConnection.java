@@ -1,7 +1,5 @@
 package jadex.base.service.message;
 
-import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IOutputConnection;
 import jadex.commons.future.Future;
@@ -30,5 +28,23 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 		if(closed)
 			return new Future<Void>(new RuntimeException("Connection closed."));
 		return ((OutputConnectionHandler)ch).send(data);
+	}
+	
+	/**
+	 *  Flush the data.
+	 */
+	public void flush()
+	{
+		((OutputConnectionHandler)ch).flush();
+	}
+	
+	/**
+	 *  Close the connection.
+	 *  Notifies the other side that the connection has been closed.
+	 */
+	public void close()
+	{
+		flush();
+		super.close();
 	}
 }

@@ -44,12 +44,31 @@ public class AbstractConnectionHandler
 		this.alivetime = System.currentTimeMillis();
 	}
 	
+	//-------- methods called from message service --------
+	
 	/**
 	 * 
 	 */
 	public void setConnection(AbstractConnection con)
 	{
 		this.con = con;
+	}
+	
+	/**
+	 *  Close the connection.
+	 *  Notifies the other side that the connection has been closed.
+	 */
+	public void close()
+	{
+		con.close();
+	}
+	
+	/**
+	 *  Set the connection closed.
+	 */
+	public void setClosed()
+	{
+		con.setClosed();
 	}
 	
 	/**
@@ -70,6 +89,26 @@ public class AbstractConnectionHandler
 //		System.out.println("alive: "+isalive+" "+alivetime+" "+System.currentTimeMillis());
 		return isalive;
 	}
+	
+	/**
+	 *  Get the closed.
+	 *  @return The closed.
+	 */
+	public boolean isClosed()
+	{
+		return getConnection().isClosed();
+	}
+	
+	/**
+	 *  Get the id.
+	 *  @return the id.
+	 */
+	public int getConnectionId()
+	{
+		return getConnection().getConnectionId();
+	}
+	
+	//-------- methods called from connection --------
 	
 	/**
 	 * 
@@ -97,47 +136,14 @@ public class AbstractConnectionHandler
 		return sendTask(createTask(StreamSendTask.ALIVE, null, null));
 	}
 	
+	//-------- internal methods --------
+	
 	/**
 	 * 
 	 */
 	public  AbstractConnection getConnection()
 	{
 		return con;
-	}
-	
-	/**
-	 *  Close the connection.
-	 *  Notifies the other side that the connection has been closed.
-	 */
-	public void close()
-	{
-		con.close();
-	}
-	
-	/**
-	 *  Set the connection closed.
-	 */
-	public void setClosed()
-	{
-		con.setClosed();
-	}
-	
-	/**
-	 *  Get the closed.
-	 *  @return The closed.
-	 */
-	public boolean isClosed()
-	{
-		return getConnection().isClosed();
-	}
-	
-	/**
-	 *  Get the id.
-	 *  @return the id.
-	 */
-	public int getConnectionId()
-	{
-		return getConnection().getConnectionId();
 	}
 	
 	/**

@@ -113,7 +113,16 @@ public abstract class AbstractSendTask implements ISendTask
 	{
 		return future;
 	}
-		
+	
+	/**
+	 *  Set the data.
+	 *  @param data The data to set.
+	 */
+	public void setData(byte[] data)
+	{
+		this.data = data;
+	}
+
 	/**
 	 *  Use transports to send the message.
 	 */
