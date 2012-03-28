@@ -1,5 +1,6 @@
 package jadex.tools.generic;
 
+import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.service.IService;
 import jadex.commons.SReflect;
 import jadex.commons.future.IFuture;
@@ -9,7 +10,7 @@ import javax.swing.Icon;
 /**
  *  Abstract plugin for wrapping service views to plugin view.
  */
-public abstract class AbstractServicePlugin extends AbstractGenericPlugin
+public abstract class AbstractServicePlugin extends AbstractGenericPlugin<IService>
 {
 	//-------- methods --------
 	
@@ -17,12 +18,12 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 	 *  Get the service type.
 	 *  @return The service type.
 	 */
-	public abstract Class getServiceType();
+	public abstract Class<?> getServiceType();
 	
 	/**
 	 *  Create the component/service panel.
 	 */
-	public abstract IFuture createServicePanel(IService service);
+	public abstract IFuture<IAbstractViewerPanel> createServicePanel(IService service);
 	
 	/**
 	 *  Get the tool icon.
@@ -32,11 +33,11 @@ public abstract class AbstractServicePlugin extends AbstractGenericPlugin
 	/**
 	 *  Create the selector panel.
 	 */
-	public AbstractSelectorPanel createSelectorPanel()
+	public AbstractSelectorPanel<IService> createSelectorPanel()
 	{
 		return new AbstractServiceSelectorPanel(getJCC().getPlatformAccess(), getServiceType())
 		{
-			public IFuture createServicePanel(IService service)
+			public IFuture<IAbstractViewerPanel> createPanel(IService service)
 			{
 				return AbstractServicePlugin.this.createServicePanel(service);
 			}

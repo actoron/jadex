@@ -28,6 +28,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.ListCellRenderer;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -38,7 +39,7 @@ import javax.swing.plaf.basic.BasicComboBoxRenderer;
  *  Panel that allows user choosing among different viewable objects (e.g. services or components).
  *  Uses a combobox for 
  */
-public abstract class AbstractSelectorPanel extends JSplitPanel implements IPropertiesProvider
+public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IPropertiesProvider
 {
 	//-------- constants --------
 
@@ -54,7 +55,7 @@ public abstract class AbstractSelectorPanel extends JSplitPanel implements IProp
 	//-------- attributes --------
 	
 	/** The component selection box. */
-	protected JComboBox selcb;
+	protected JComboBox<E> selcb;
 	
 	/** The remote checkbox. */
 	protected JCheckBox remotecb;
@@ -65,8 +66,8 @@ public abstract class AbstractSelectorPanel extends JSplitPanel implements IProp
 	/** The object card layout. */
 	protected ObjectCardLayout ocl;
 	
-	/** The map of component viewer panels (cid->panel). */
-	protected Map panels;
+	/** The map of component viewer panels (element->panel). */
+	protected Map<E, IAbstractViewerPanel> panels;
 	
 	/** The set properties. */
 	protected Properties props;
@@ -83,7 +84,7 @@ public abstract class AbstractSelectorPanel extends JSplitPanel implements IProp
 		this.setDividerLocation(0);
 		this.setDividerLocation(0.0);
 
-		panels = new HashMap();
+		panels = new HashMap<E, IAbstractViewerPanel>();
 		ocl = new ObjectCardLayout();
 		centerp = new JPanel(ocl);
 		
@@ -96,14 +97,14 @@ public abstract class AbstractSelectorPanel extends JSplitPanel implements IProp
 	
 		centerp.add(ObjectCardLayout.DEFAULT_COMPONENT, emptylabel);
 		
-		selcb = new JComboBox(); 
-		selcb.setRenderer(new BasicComboBoxRenderer()
+		selcb = new JComboBox<E>(); 
+		selcb.setRenderer(new ListCellRenderer<E>()
 		{
-		    public Component getListCellRendererComponent(JList list, 
-		    	Object value, int index, boolean isSelected, boolean cellHasFocus) 
+			BasicComboBoxRenderer	bcbr	= new BasicComboBoxRenderer();
+		    public Component getListCellRendererComponent(JList<? extends E> list, E value, int index, boolean isSelected, boolean cellHasFocus) 
 		    {
-		    	value	= value!=null? convertToString(value): null;
-		    	return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+		    	String	val	= value!=null? convertToString(value): null;
+		    	return bcbr.getListCellRendererComponent(list, val, index, isSelected, cellHasFocus);
 		    }
 		});
 		
@@ -139,20 +140,19 @@ public abstract class AbstractSelectorPanel extends JSplitPanel implements IProp
 			{
 	//			System.out.println("Selected : "+selcb.getSelectedItem());
 				
-				final Object sel = selcb.getSelectedItem()!=null? selcb.getSelectedItem(): ObjectCardLayout.DEFAULT_COMPONENT;
+				final E sel = selcb.getSelectedIndex()!=-1 ? selcb.getModel().getElementAt(selcb.getSelectedIndex()) : null;
 				
-				if(ocl.isAvailable(sel))
+				if(sel==null || ocl.isAvailable(sel))
 				{
-					ocl.show(sel);
+					ocl.show(sel!=null ? sel : ObjectCardLayout.DEFAULT_COMPONENT);
 				}
 				else
 				{
-					createPanel(sel).addResultListener(new SwingDefaultResultListener()
+					createPanel(sel).addResultListener(new SwingDefaultResultListener<IAbstractViewerPanel>()
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(final IAbstractViewerPanel panel)
 						{
-							final IAbstractViewerPanel panel = (IAbstractViewerPanel)result;
-							IFuture	propsdone;
+							IFuture<Void>	propsdone;
 							if(props!=null && props.getSubproperty(PANELPROPERTIES)!=null)
 							{
 								propsdone	= panel.setProperties(props.getSubproperty(PANELPROPERTIES));
@@ -162,9 +162,9 @@ public abstract class AbstractSelectorPanel extends JSplitPanel implements IProp
 								propsdone	= IFuture.DONE;
 							}
 							
-							propsdone.addResultListener(new SwingDefaultResultListener()
+							propsdone.addResultListener(new SwingDefaultResultListener<Void>()
 							{
-								public void customResultAvailable(Object result)
+								public void customResultAvailable(Void result)
 								{
 									panels.put(sel, panel);
 									centerp.add(panel.getComponent(), sel);
@@ -202,12 +202,12 @@ public abstract class AbstractSelectorPanel extends JSplitPanel implements IProp
 	/**
 	 *  Create a panel for a component identifier.
 	 */
-	public abstract IFuture createPanel(Object element);
+	public abstract IFuture<IAbstractViewerPanel> createPanel(E element);
 
 	/**
 	 *  Convert object to string for property saving.
 	 */
-	public abstract String convertToString(Object element);
+	public abstract String convertToString(E element);
 	
 	
 	
@@ -215,7 +215,7 @@ public abstract class AbstractSelectorPanel extends JSplitPanel implements IProp
 	 *  Get the selcb.
 	 *  @return the selcb.
 	 */
-	public JComboBox getSelectionComboBox()
+	public JComboBox<E> getSelectionComboBox()
 	{
 		return selcb;
 	}
@@ -310,10 +310,10 @@ public abstract class AbstractSelectorPanel extends JSplitPanel implements IProp
 	 */
 	public void shutdown()
 	{
-		for(Iterator it=panels.values().iterator(); it.hasNext(); )
+		for(Iterator<IAbstractViewerPanel> it=panels.values().iterator(); it.hasNext(); )
 		{
 			// Todo: should wait for shutdown!!!
-			((IAbstractViewerPanel)it.next()).shutdown();
+			it.next().shutdown();
 		}
 	}
 }

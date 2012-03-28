@@ -1,12 +1,14 @@
 package jadex.tools.generic;
 
+import jadex.base.gui.componentviewer.IAbstractViewerPanel;
+import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.IFuture;
 
 /**
  *  Plugin that allows to look at viewable components.
  */
-public abstract class AbstractComponentPlugin extends AbstractGenericPlugin
+public abstract class AbstractComponentPlugin extends AbstractGenericPlugin<IComponentIdentifier>
 {	
 	//-------- methods --------
 	
@@ -19,16 +21,16 @@ public abstract class AbstractComponentPlugin extends AbstractGenericPlugin
 	/**
 	 *  Create the component panel.
 	 */
-	public abstract IFuture createComponentPanel(IExternalAccess component);
+	public abstract IFuture<IAbstractViewerPanel> createComponentPanel(IExternalAccess component);
 	
 	/**
 	 *  Create the selector panel.
 	 */
-	public AbstractSelectorPanel createSelectorPanel()
+	public AbstractSelectorPanel<IComponentIdentifier> createSelectorPanel()
 	{
 		return new AbstractComponentSelectorPanel(getJCC().getJCCAccess(), getJCC().getPlatformAccess(), getModelName())
 		{
-			public IFuture createComponentPanel(IExternalAccess component)
+			public IFuture<IAbstractViewerPanel> createComponentPanel(IExternalAccess component)
 			{
 				return AbstractComponentPlugin.this.createComponentPanel(component);
 			}

@@ -1,6 +1,6 @@
 package jadex.tools.generic;
 
-import jadex.base.gui.componentviewer.IComponentViewerPanel;
+import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -12,6 +12,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +22,7 @@ import javax.swing.JComboBox;
 /**
  *  Abstract base class for selector panels.
  */
-public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPanel
+public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPanel<IComponentIdentifier>
 {
 	//-------- attributes --------
 	
@@ -64,29 +65,27 @@ public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPan
 	{
 		// Search starting from remote CMS.
 		SServiceProvider.getService(platformaccess.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDefaultResultListener(AbstractComponentSelectorPanel.this) 
+			.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(AbstractComponentSelectorPanel.this) 
 		{
-			public void customResultAvailable(Object result) 
+			public void customResultAvailable(IComponentManagementService cms) 
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
 				IComponentDescription adesc = new CMSComponentDescription(null, null, null, null, null, getModelName(), null, null);
-				cms.searchComponents(adesc, null, isRemote()).addResultListener(new SwingDefaultResultListener(AbstractComponentSelectorPanel.this)
+				cms.searchComponents(adesc, null, isRemote()).addResultListener(new SwingDefaultResultListener<IComponentDescription[]>(AbstractComponentSelectorPanel.this)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(IComponentDescription[] descs)
 					{
-						IComponentDescription[] descs = (IComponentDescription[])result;
 //						System.out.println("descs: "+SUtil.arrayToString(descs)+" "+remotecb.isSelected());
-						Set newcids = new HashSet();
+						Set<IComponentIdentifier> newcids = new HashSet<IComponentIdentifier>();
 						for(int i=0; i<descs.length; i++)
 						{
 							newcids.add(descs[i].getName());
 						}
 						
 						// Find items to remove
-						JComboBox selcb = getSelectionComboBox();
+						JComboBox<IComponentIdentifier> selcb = getSelectionComboBox();
 						for(int i=0; i<selcb.getItemCount(); i++)
 						{
-							IComponentIdentifier oldcid = (IComponentIdentifier)selcb.getItemAt(i);
+							IComponentIdentifier oldcid = selcb.getItemAt(i);
 							if(!newcids.contains(oldcid))
 							{
 								// remove old cid
@@ -108,33 +107,22 @@ public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPan
 	/**
 	 *  Create a panel for a component identifier.
 	 */
-	public IFuture createPanel(final Object element)
+	public IFuture<IAbstractViewerPanel> createPanel(final IComponentIdentifier cid)
 	{
-		final Future ret = new Future();
-		final IComponentIdentifier cid = (IComponentIdentifier)element;
+		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
 		
 		// Get external access using local CMS (speedup in case remote component found by remote platform is actually local).
 		SServiceProvider.getService(jccaccess.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new SwingDelegationResultListener(ret)
+			.addResultListener(new SwingExceptionDelegationResultListener<IComponentManagementService, IAbstractViewerPanel>(ret)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(IComponentManagementService cms)
 			{
-				IComponentManagementService cms = (IComponentManagementService)result;
 				cms.getExternalAccess((IComponentIdentifier)cid)
-					.addResultListener(new SwingDelegationResultListener(ret)
+					.addResultListener(new SwingExceptionDelegationResultListener<IExternalAccess, IAbstractViewerPanel>(ret)
 				{
-					public void customResultAvailable(Object result)
+					public void customResultAvailable(IExternalAccess exta)
 					{
-						IExternalAccess exta = (IExternalAccess)result;
-						createComponentPanel(exta).addResultListener(new SwingDelegationResultListener(ret)
-						{
-							public void customResultAvailable(Object result)
-							{
-//								System.out.println("add: "+result+" "+sel);
-								IComponentViewerPanel panel = (IComponentViewerPanel)result;
-								ret.setResult(panel);
-							}
-						});
+						createComponentPanel(exta).addResultListener(new SwingDelegationResultListener<IAbstractViewerPanel>(ret));
 					}
 				});
 			}
@@ -146,14 +134,13 @@ public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPan
 	/**
 	 *  Convert object to string for property saving.
 	 */
-	public String convertToString(Object element)
+	public String convertToString(IComponentIdentifier element)
 	{
-		return ((IComponentIdentifier)element).getName();
+		return element.getName();
 	}
 	
 	/**
 	 *  Create the component panel.
 	 */
-	public abstract IFuture createComponentPanel(IExternalAccess component);
-
+	public abstract IFuture<IAbstractViewerPanel> createComponentPanel(IExternalAccess component);
 }

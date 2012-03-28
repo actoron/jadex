@@ -6,11 +6,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.xml.annotation.XMLClassname;
 
 import java.util.Collection;
@@ -21,7 +18,7 @@ import javax.swing.JComboBox;
 /**
  *  The abstract base class for service selector panels.
  */
-public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
+public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel<IService>
 {
 	//-------- attributes --------
 	
@@ -29,14 +26,14 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 	protected IExternalAccess platform;
 	
 	/** The service. */
-	protected Class servicetype;
+	protected Class<?> servicetype;
 	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new selector panel.
 	 */
-	public AbstractServiceSelectorPanel(IExternalAccess platform, Class servicetype)
+	public AbstractServiceSelectorPanel(IExternalAccess platform, Class<?> servicetype)
 	{
 		this.platform = platform;
 		this.servicetype = servicetype;
@@ -50,26 +47,21 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 	public void refreshCombo()
 	{
 		// Hack!!! Search locally at (potentially remote) platform, as scope global is set to platform when transferring search request.
-		final Class	type	= servicetype;
+		final Class<IService>	type	= (Class<IService>)servicetype;
 		final String	scope	= isRemote() ? RequiredServiceInfo.SCOPE_GLOBAL: RequiredServiceInfo.SCOPE_PLATFORM;
-		platform.scheduleStep(new IComponentStep<Collection>()
+		platform.scheduleStep(new IComponentStep<Collection<IService>>()
 		{
 			@XMLClassname("search-services")
-			public IFuture<Collection> execute(IInternalAccess ia)
+			public IFuture<Collection<IService>> execute(IInternalAccess ia)
 			{
-				final Future	ret	= new Future();
-				SServiceProvider.getServices(ia.getServiceContainer(), type, scope)
-					.addResultListener(new DelegationResultListener(ret));
-				return ret;
+				return SServiceProvider.getServices(ia.getServiceContainer(), type, scope);
 			}
-		}).addResultListener(new SwingDefaultResultListener(this)
+		}).addResultListener(new SwingDefaultResultListener<Collection<IService>>(this)
 		{
-			public void customResultAvailable(Object result)
+			public void customResultAvailable(Collection<IService> newservices)
 			{
-				Collection newservices = (Collection)result;
-				
 				// Find items to remove
-				JComboBox selcb = getSelectionComboBox();
+				JComboBox<IService> selcb = getSelectionComboBox();
 				for(int i=0; i<selcb.getItemCount(); i++)
 				{
 					Object oldservice = selcb.getItemAt(i);
@@ -81,38 +73,19 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 				}
 				
 				selcb.removeAllItems();
-				for(Iterator it=newservices.iterator(); it.hasNext(); )
+				for(Iterator<IService> it=newservices.iterator(); it.hasNext(); )
 				{
 					selcb.addItem(it.next());
 				}
 			}
 		});
 	}
-	
-	/**
-	 *  Create a panel for a component identifier.
-	 */
-	public IFuture createPanel(final Object element)
-	{
-		final Future ret = new Future();
-		final IService service = (IService)element;
 		
-		createServicePanel(service).addResultListener(new SwingDelegationResultListener(ret));
-		
-		return ret;
-	}
-	
 	/**
 	 *  Convert object to string for property saving.
 	 */
-	public String convertToString(Object element)
+	public String convertToString(IService element)
 	{
-		return ((IService)element).getServiceIdentifier().toString();
+		return element.getServiceIdentifier().toString();
 	}
-	
-	/**
-	 *  Create the component panel.
-	 */
-	public abstract IFuture createServicePanel(IService service);
-
 }

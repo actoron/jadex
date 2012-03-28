@@ -2,6 +2,7 @@ package jadex.tools.deployer;
 
 import jadex.base.gui.asynctree.INodeHandler;
 import jadex.base.gui.asynctree.ITreeNode;
+import jadex.base.gui.componentviewer.IAbstractViewerPanel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
@@ -50,9 +51,9 @@ public class DeployerServiceSelectorPanel extends AbstractServiceSelectorPanel
 	/**
 	 *  Create the service panel.
 	 */
-	public IFuture createServicePanel(final IService service)
+	public IFuture<IAbstractViewerPanel> createPanel(final IService service)
 	{
-		final Future ret = new Future();
+		final Future<IAbstractViewerPanel> ret = new Future<IAbstractViewerPanel>();
 		
 		SServiceProvider.getService(jccaccess.getServiceProvider(), IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new SwingDefaultResultListener()

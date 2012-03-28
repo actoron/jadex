@@ -11,7 +11,7 @@ import javax.swing.UIDefaults;
 /**
  *  Abstract base plugin that allows to look at viewable components or service.
  */
-public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
+public abstract class AbstractGenericPlugin<E> extends AbstractJCCPlugin
 {	
 	//-------- constants --------
 
@@ -21,7 +21,7 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 	});
 	
 	/** The selector panel. */
-	protected AbstractSelectorPanel selectorpanel;
+	protected AbstractSelectorPanel<E> selectorpanel;
 	
 	//-------- methods --------
 	
@@ -54,12 +54,12 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 	/**
 	 *  Create the selector panel.
 	 */
-	public abstract AbstractSelectorPanel createSelectorPanel();
+	public abstract AbstractSelectorPanel<E> createSelectorPanel();
 	
 	/**
 	 *  Set properties loaded from project.
 	 */
-	public IFuture setProperties(final Properties props)
+	public IFuture<Void> setProperties(final Properties props)
 	{
 		return selectorpanel.setProperties(props);
 	}
@@ -67,7 +67,7 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 	/**
 	 *  Return properties to be saved in project.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
 		return selectorpanel.getProperties();
 	}
@@ -75,7 +75,7 @@ public abstract class AbstractGenericPlugin extends AbstractJCCPlugin
 	/**
 	 *  Get the selector panel.
 	 */
-	public AbstractSelectorPanel getSelectorPanel()
+	public AbstractSelectorPanel<E> getSelectorPanel()
 	{
 		return selectorpanel;
 	}
