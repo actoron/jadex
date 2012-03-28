@@ -34,7 +34,7 @@ public class ClassCodec implements ITraverseProcessor, IDecoderHandler
 		Class ret = null;
 		try
 		{
-			ret = SReflect.findClass(context.readString(), null, context.getClassloader());
+			ret = SReflect.classForName(context.readString(), context.getClassloader());
 		}
 		catch (ClassNotFoundException e)
 		{

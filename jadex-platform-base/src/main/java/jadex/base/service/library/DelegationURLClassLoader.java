@@ -17,11 +17,19 @@ import java.util.Set;
  */
 public class DelegationURLClassLoader extends URLClassLoader
 {
+	//-------- attributes --------
+	
 	/** The resource identifier. */
 	protected IResourceIdentifier rid;
 	
 	/** The delegation classloader. */
 	protected DelegationURLClassLoader[] delegates;
+	
+	/** The flattened transitive dependencies without duplicates
+	 *  (created lazy from delegates list). */
+	protected Set<DelegationURLClassLoader>	dependencies;
+	
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new classloader.
@@ -42,7 +50,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 //		System.out.println("d1 : "+url+" "+SUtil.arrayToString(delegates));
 	}
 
-	
+	//-------- methods --------
 	
 	/**
 	 *  Get the delegates.
@@ -51,6 +59,29 @@ public class DelegationURLClassLoader extends URLClassLoader
 	public DelegationURLClassLoader[] getDelegateClassLoaders()
 	{
 		return delegates;
+	}
+	
+	/**
+	 *  Get transitive dependencies as flattened set (without duplicates).
+	 */
+	public Set<DelegationURLClassLoader>	getFlattenedDependencies()
+	{
+		if(dependencies==null)
+		{
+			synchronized(this)
+			{
+				if(dependencies==null)
+				{
+					dependencies	= new LinkedHashSet<DelegationURLClassLoader>();
+					for(int i=0; i<delegates.length; i++)
+					{
+						dependencies.add(delegates[i]);
+						dependencies.addAll(delegates[i].getFlattenedDependencies());
+					}
+				}
+			}
+		}
+		return dependencies;
 	}
 	
 	/**
@@ -110,40 +141,38 @@ public class DelegationURLClassLoader extends URLClassLoader
 	}
 	
 	/**
-	 *  Find a class.
-	 *  @param name The class name.
-	 *  @return The class.
+	 *  Load a class directly, without delegation to dependencies.
+	 *  Overridden to delegate to dependencies, if not found.
 	 */
-	protected Class<?> findClass(String name) throws ClassNotFoundException
+	protected Class<?>	loadDirectClass(String name, boolean resolve)	throws ClassNotFoundException
+	{
+		return super.loadClass(name, resolve);
+	}
+	
+	/**
+	 *  Load class.
+	 *  Overridden to delegate to dependencies, if not found.
+	 */
+	protected Class<?>	loadClass(String name, boolean resolve)	throws ClassNotFoundException
 	{
 		Class<?> ret = null;
-		
 		try
 		{
-			ret = super.findClass(name);
+			ret	= super.loadClass(name, resolve);
 		}
 		catch(ClassNotFoundException e)
 		{
-		}
-		catch(NullPointerException e)
-		{
-			e.printStackTrace();
-		}
-		
-		if(ret==null)
-		{
-			if(delegates!=null)
+			for(DelegationURLClassLoader dep: getFlattenedDependencies())
 			{
-				for(int i=0; ret==null && i<delegates.length; i++)
+//				System.out.println("findClass: "+name+", "+dep);
+				try
 				{
-					try
-					{
-						ret = delegates[i].loadClass(name);
-					}
-					catch (ClassNotFoundException e)
-					{
-					}
+					ret = dep.loadDirectClass(name, resolve);
+					break;
 				}
+				catch (ClassNotFoundException ex)
+				{
+				}				
 			}
 		}
 		
@@ -152,6 +181,99 @@ public class DelegationURLClassLoader extends URLClassLoader
 		
 		return ret;
 	}
+
+//	protected static ThreadLocal<Boolean>	RECURSE	= new ThreadLocal<Boolean>();
+//	
+//	/**
+//	 *  Find a class using super implementation or delegates.
+//	 */
+//	protected Class<?>	findClass(String name) throws ClassNotFoundException
+//	{
+//		Class<?> ret = null;
+//		if(RECURSE.get()==null || RECURSE.get().booleanValue())
+//		{
+//			try
+//			{
+//				RECURSE.set(Boolean.FALSE);
+//				try
+//				{
+//					ret	= super.findClass(name);
+//				}
+//				catch(ClassNotFoundException e)
+//				{
+//					for(DelegationURLClassLoader dep: getFlattenedDependencies())
+//					{
+//	//					System.out.println("findClass: "+name+", "+dep);
+//						try
+//						{
+//							ret = dep.loadClass(name);
+//							break;
+//						}
+//						catch (ClassNotFoundException ex)
+//						{
+//						}				
+//					}
+//				}
+//				
+//				if(ret==null)
+//					throw new ClassNotFoundException(name);
+//			}
+//			finally
+//			{
+//				RECURSE.set(null);
+//			}
+//		}
+//		else
+//		{
+//			return super.findClass(name);
+//		}
+//		return ret;
+//	}
+	
+//	/**
+//	 *  Find a class.
+//	 *  @param name The class name.
+//	 *  @return The class.
+//	 */
+//	protected Class<?> findClass(String name) throws ClassNotFoundException
+//	{
+//		Class<?> ret = null;
+//		
+//		try
+//		{
+//			ret = super.findClass(name);
+//		}
+//		catch(ClassNotFoundException e)
+//		{
+//		}
+//		catch(NullPointerException e)
+//		{
+//			e.printStackTrace();
+//		}
+//		
+//		if(ret==null)
+//		{
+//			if(delegates!=null)
+//			{
+//				for(int i=0; ret==null && i<delegates.length; i++)
+//				{
+//					try
+//					{
+//						ret = delegates[i].loadClass(name);
+//					}
+//					catch (ClassNotFoundException e)
+//					{
+//					}
+//				}
+//			}
+//		}
+//		
+//		if(ret==null)
+//			throw new ClassNotFoundException(name);
+//		
+//		return ret;
+//	}
+
 	
 	/**
 	 *  Find the resource.

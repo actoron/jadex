@@ -34,7 +34,7 @@ public class MultiCollectionCodec implements ITraverseProcessor, IDecoderHandler
 		try
 		{
 			Map map = (Map) BinarySerializer.decodeObject(context);
-			Class type = SReflect.findClass(context.readString(), null, context.getClassloader());
+			Class type = SReflect.classForName(context.readString(), context.getClassloader());
 			Constructor c = clazz.getConstructor(new Class[] { Map.class, Class.class } );
 			ret = (MultiCollection) c.newInstance(new Object[] { map, type });
 		}

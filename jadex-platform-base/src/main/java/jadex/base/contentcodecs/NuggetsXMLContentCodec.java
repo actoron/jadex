@@ -32,7 +32,7 @@ public class NuggetsXMLContentCodec implements IContentCodec, Serializable
 	{
 		try
 		{
-			Class nug = SReflect.findClass("nuggets.Nuggets", null, classloader);
+			Class nug = SReflect.classForName("nuggets.Nuggets", classloader);
 			otx = nug.getMethod("objectToXML", new Class[]{Object.class, ClassLoader.class});
 			ofx = nug.getMethod("objectFromXML", new Class[]{String.class, ClassLoader.class});
 		}

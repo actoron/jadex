@@ -83,7 +83,7 @@ public class ClassInfo
 	{
 		if(type==null && typename!=null)
 		{
-			type = SReflect.findClass0(typename, null, cl);
+			type = SReflect.classForName0(typename, cl);
 		}
 		return type;
 	}

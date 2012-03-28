@@ -165,7 +165,7 @@ public class SUtil
 				String	mapper	= stok.nextToken().trim();
 				try
 				{
-					Class	clazz	= SReflect.findClass(mapper, null, SUtil.class.getClassLoader());
+					Class	clazz	= SReflect.classForName(mapper, SUtil.class.getClassLoader());
 					mappers.add((IResultCommand<ResourceInfo, URLConnection>)clazz.newInstance());
 				}
 				catch(Exception e)

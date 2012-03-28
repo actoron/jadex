@@ -77,7 +77,7 @@ public class SBootstrapLoader
 		Future<IModelInfo> ret = new Future<IModelInfo>();
 		try
 		{
-			Class<IComponentFactory> cfclass = SReflect.findClass(factory, null, cl);
+			Class<IComponentFactory> cfclass = SReflect.classForName(factory, cl);
 			// The providerid for this service is not important as it will be thrown away 
 			// after loading the first component model.
 			final IComponentFactory cfac = cfclass.getConstructor(new Class[]{String.class})

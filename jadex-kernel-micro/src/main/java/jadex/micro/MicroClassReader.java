@@ -264,7 +264,6 @@ public class MicroClassReader
 				imports = new LinkedHashSet();
 				toset.put("imports", imports);
 			}
-			imports.add(cma.getPackage()+".*");
 			
 			// Take all, upper replace lower
 			if(!propdone && cma.isAnnotationPresent(Properties.class))

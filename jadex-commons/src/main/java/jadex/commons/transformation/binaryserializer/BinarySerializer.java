@@ -139,7 +139,7 @@ public class BinarySerializer
 		try
 		{
 			if (!classname.equals("NULL"))
-				clazz = SReflect.findClass(classname, null, context.getClassloader());
+				clazz = SReflect.classForName(classname, context.getClassloader());
 			else
 				clazz = Void.class;
 		}

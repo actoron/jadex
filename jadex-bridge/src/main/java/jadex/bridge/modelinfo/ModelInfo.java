@@ -399,6 +399,8 @@ public class ModelInfo extends Startable implements IModelInfo
 	 */
 	public void setPackage(String packagename)
 	{
+		if(packagename!=null && packagename.startsWith("package "))
+			System.out.println("dskvby?");
 		this.packagename = packagename;
 	}
 

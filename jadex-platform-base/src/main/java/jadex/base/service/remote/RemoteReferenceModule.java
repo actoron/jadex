@@ -357,7 +357,7 @@ public class RemoteReferenceModule
 				{
 					Replacement	ra	= methods[j].getAnnotation(Replacement.class);
 //					Class	rep	= SReflect.findClass0(ra.value(), null, libservice.getClassLoader());
-					Class<?>	rep	= SReflect.findClass0(ra.value(), null, cl);
+					Class<?>	rep	= SReflect.classForName0(ra.value(), cl);
 					if(rep!=null)
 					{
 						try

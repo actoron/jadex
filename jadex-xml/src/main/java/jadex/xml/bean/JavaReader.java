@@ -250,7 +250,7 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						return SReflect.findClass((String)rawattributes.get("classname"), null, context.getClassLoader());
+						return SReflect.classForName((String)rawattributes.get("classname"), context.getClassLoader());
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("classname", null, AccessInfo.IGNORE_READWRITE))}
@@ -508,7 +508,7 @@ public class JavaReader
 						int idx = tmp.indexOf("=");
 						String classname = tmp.substring(0, idx);
 						String name = tmp.substring(idx+1);
-						Class clazz = SReflect.findClass(classname, null, context.getClassLoader());
+						Class clazz = SReflect.classForName(classname, context.getClassLoader());
 						return Enum.valueOf(clazz, name);
 					}
 				}),

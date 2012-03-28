@@ -227,7 +227,7 @@ public class Starter
 				(String)cmdargs.get(CONFIGURATION_FILE): FALLBACK_PLATFORM_CONFIGURATION;
 			String cfclname = (String)cmdargs.get(COMPONENT_FACTORY)!=null? 
 				(String)cmdargs.get(COMPONENT_FACTORY): FALLBACK_COMPONENT_FACTORY;
-			Class<IComponentFactory> cfclass = SReflect.findClass(cfclname, null, cl);
+			Class<IComponentFactory> cfclass = SReflect.classForName(cfclname, cl);
 			// The providerid for this service is not important as it will be thrown away 
 			// after loading the first component model.
 			final IComponentFactory cfac = cfclass.getConstructor(new Class[]{String.class})
@@ -305,7 +305,7 @@ public class Starter
 								{
 									ret.setException(new RuntimeException("No adapterfactory found."));
 								}
-								Class<?> afclass = af instanceof Class ? (Class<?>)af : SReflect.findClass(af.toString(), null, cl);
+								Class<?> afclass = af instanceof Class ? (Class<?>)af : SReflect.classForName(af.toString(), cl);
 								final IComponentAdapterFactory afac = (IComponentAdapterFactory)afclass.newInstance();
 								
 								final Future<IComponentInstance>	instancefut	= new Future<IComponentInstance>();
