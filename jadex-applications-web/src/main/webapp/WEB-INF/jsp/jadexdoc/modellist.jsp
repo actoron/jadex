@@ -1,3 +1,4 @@
+<%@page import="java.net.URLEncoder"%>
 <%@page import="java.util.Comparator"%>
 <%@page import="java.util.Arrays"%>
 <%@page import="java.util.Iterator"%>
@@ -37,8 +38,8 @@
 			for(int j=0; j<lmodels.length; j++) { 
 		%>
 				<tr name="namepackage_<%= lmodels[j].getPackage() %>" class="model">
-					<td><img src="icon?type=<%= lmodels[j].getType() %>"/></td>
-					<td><a href=\"view?model="<%= lmodels[j].getFilename() %>">
+					<td><img src="icon?type=<%= URLEncoder.encode(lmodels[j].getType(), "UTF-8") %>"/></td>
+					<td><a href="view?model=<%= URLEncoder.encode(lmodels[j].getFilename(), "UTF-8") %>">
 							<%= lmodels[j].getName() %>
 						</a></td>
 				</tr>

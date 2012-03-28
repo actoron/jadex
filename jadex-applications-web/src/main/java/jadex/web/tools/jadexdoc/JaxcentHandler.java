@@ -377,7 +377,7 @@ public class JaxcentHandler extends JaxcentPage
 					}
 					else
 					{
-						args.get(i).setInnerText(SUtil.arrayToString(margs[i].getDefaultValue()));
+						args.get(i).setInnerText(margs[i].getDefaultValue().getValue());
 						args.get(i).setCssClass("");
 					}
 				}
@@ -391,7 +391,7 @@ public class JaxcentHandler extends JaxcentPage
 			{
 				for(int i=0; i<margs.length; i++)
 				{
-					args.get(i).setInnerText(SUtil.arrayToString(margs[i].getDefaultValue()));
+					args.get(i).setInnerText(margs[i].getDefaultValue().getValue());
 					args.get(i).setCssClass("");
 				}					
 				if(checkElementExists(SearchType.searchById, id, 0))

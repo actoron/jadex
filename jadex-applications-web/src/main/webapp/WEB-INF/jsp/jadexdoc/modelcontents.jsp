@@ -83,7 +83,7 @@
 	<tr class="<%= i%2==0 ? "even" : "odd"%>">
 		<td class="name"><%= args[i].getName() %></td>
 		<td class="type"><%= args[i].getClazz()!=null ? args[i].getClazz().getTypeName() : "undefined" %></td>
-		<td class="value"><div id="<%= "arg"+i %>"><%= SUtil.arrayToString(args[i].getDefaultValue()) %></div></td>
+		<td class="value"><div id="<%= "arg"+i %>"><%= args[i].getDefaultValue().getValue() %></div></td>
 	</tr>
 <%	} %>
 </table>
@@ -109,7 +109,7 @@
 	<tr class="<%= i%2==0 ? "even" : "odd"%>">
 		<td class="name"><%= args[i].getName() %></td>
 		<td class="type"><%= args[i].getClazz()!=null ? args[i].getClazz().getTypeName() : "undefined" %></td>
-		<td class="value"><div id="<%= "arg"+i %>"><%= SUtil.arrayToString(args[i].getDefaultValue()) %></div></td>
+		<td class="value"><div id="<%= "arg"+i %>"><%= args[i].getDefaultValue().getValue() %></div></td>
 	</tr>
 <%	} %>
 </table>

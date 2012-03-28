@@ -42,7 +42,7 @@ public interface IArgument
 	 *  Get the default value.
 	 *  @return The default value.
 	 */
-	public Object getDefaultValue();
+	public UnparsedExpression	getDefaultValue();
 	
 	/**
 	 *  Check the validity of an input.

@@ -54,7 +54,7 @@ public class Argument	extends UnparsedExpression	implements IArgument
 	 *  Get the default value.
 	 *  @return The default value.
 	 */
-	public Object getDefaultValue()
+	public UnparsedExpression	getDefaultValue()
 	{
 		return this;
 	}
