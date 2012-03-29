@@ -1,5 +1,7 @@
 package jadex.base.service.message;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
+
 import jadex.base.service.message.MessageService.SendManager;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.codecs.ICodec;
@@ -30,6 +32,9 @@ public class AbstractConnectionHandler
 	/** The latest alive time. */
 	protected long alivetime;
 	
+	/** The current sequence number. */
+	protected int seqnumber;
+		
 	/**
 	 * 
 	 */
@@ -42,6 +47,7 @@ public class AbstractConnectionHandler
 //		this.codecids = codecids;
 //		this.codecs = codecs; 
 		this.alivetime = System.currentTimeMillis();
+		this.seqnumber = -1;
 	}
 	
 	//-------- methods called from message service --------
@@ -64,13 +70,13 @@ public class AbstractConnectionHandler
 	}
 	
 	/**
-	 *  Set the connection closed.
+	 * 
 	 */
-	public void setClosed()
+	public boolean isDataFinished()
 	{
-		con.setClosed();
+		return true;
 	}
-	
+
 	/**
 	 *  Set the alive time of the other connection side.
 	 */
@@ -85,7 +91,7 @@ public class AbstractConnectionHandler
 	 */
 	public boolean isConnectionAlive(long lease)
 	{
-		boolean isalive = System.currentTimeMillis()<alivetime+lease*1.3;
+		boolean isalive = System.currentTimeMillis()<alivetime+lease*1.5;
 //		System.out.println("alive: "+isalive+" "+alivetime+" "+System.currentTimeMillis());
 		return isalive;
 	}
@@ -97,6 +103,15 @@ public class AbstractConnectionHandler
 	public boolean isClosed()
 	{
 		return getConnection().isClosed();
+	}
+	
+	/**
+	 *  Get the closed.
+	 *  @return The closed.
+	 */
+	public boolean isClosing()
+	{
+		return getConnection().isClosing();
 	}
 	
 	/**
@@ -113,18 +128,18 @@ public class AbstractConnectionHandler
 	/**
 	 * 
 	 */
-	public IFuture<Void> sendInit()
+	public IFuture<Void> doClose()
 	{
-		return sendTask(createTask(StreamSendTask.INIT, 
-			new IComponentIdentifier[]{getConnection().getInitiator(), getConnection().getParticipant()}, true, null));
+		return IFuture.DONE;
 	}
 	
 	/**
 	 * 
 	 */
-	public IFuture<Void> sendClose()
+	public IFuture<Void> sendInit()
 	{
-		return sendTask(createTask(StreamSendTask.CLOSE, null, null));
+		return sendTask(createTask(StreamSendTask.INIT, 
+			new IComponentIdentifier[]{getConnection().getInitiator(), getConnection().getParticipant()}, true, null));
 	}
 	
 	/**
@@ -137,6 +152,24 @@ public class AbstractConnectionHandler
 	}
 	
 	//-------- internal methods --------
+	
+	/**
+	 *  Get the seqnumber.
+	 *  @return the seqnumber.
+	 */
+	public int getReceivedSequenceNumber()
+	{
+		return seqnumber;
+	}
+	
+	/**
+	 *  Get The next seqnumber.
+	 *  @return The next seqnumber.
+	 */
+	public synchronized int getNextSequenceNumber()
+	{
+		return ++seqnumber;
+	}
 	
 	/**
 	 * 
@@ -226,4 +259,5 @@ public class AbstractConnectionHandler
 	{
 		return ms.getTransports();
 	}
+
 }

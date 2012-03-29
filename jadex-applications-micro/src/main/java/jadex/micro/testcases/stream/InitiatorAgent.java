@@ -101,7 +101,7 @@ public class InitiatorAgent
 														}
 														else
 														{
-															ocon.close();
+//															ocon.close();
 //															ret.setResult(null);
 														}
 													}

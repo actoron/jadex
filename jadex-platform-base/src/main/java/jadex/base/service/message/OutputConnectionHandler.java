@@ -27,8 +27,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	/** The data to send. */
 	protected List<Tuple2<StreamSendTask, Future<Void>>> tosend;
 
-	/** The current sequence number. */
-	protected int seqnumber;
+//	/** The current sequence number. */
+//	protected int seqnumber;
 	
 	/** The last acknowledged packet number. */
 	protected int lastack;
@@ -60,8 +60,12 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	protected int mpsize;
 	
 	
-//	/** The close command. */
-//	protected 
+	/** Close request flag (when a closereq message was received). */
+	protected boolean closereqflag;
+
+	/** The close (for resend). */
+	protected StreamSendTask closetask;
+
 	
 	/**
 	 * 
@@ -72,7 +76,6 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		this.tosend = Collections.synchronizedList(new ArrayList<Tuple2<StreamSendTask, Future<Void>>>());
 		this.sent = Collections.synchronizedMap(new HashMap<Integer, StreamSendTask>());
 
-		this.seqnumber = 0;
 		this.lastack = -1;
 		this.maxsend = 30;
 		
@@ -83,8 +86,46 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		this.mpmaxsize = 20;
 		this.multipacket = new ArrayList<byte[]>();
 		this.mpsize = 0;
-		
 	}
+	
+	/**
+	 *  Received a request to close the connection.
+	 */
+	public void closeRequestReceived()
+	{
+		if(isDataFinished())
+			con.close();
+		else
+			closereqflag = true;
+		
+		// todo: additional timer?
+	}
+	
+	/**
+	 *  Response to close message. 
+	 *  
+	 *  The participant has acked the close -> close this site also.
+	 */
+	public void ackCloseReceived()
+	{
+		System.out.println("received ack close");
+		// Set connection as closed.
+		con.setClosed();
+		closetask = null;
+	}
+	
+	/**
+	 *  Send close message on close init.
+	 */
+	public IFuture<Void> doClose()
+	{
+		if(closetask!=null)
+			throw new RuntimeException("Must be only called once");
+
+		closetask = (StreamSendTask)createTask(StreamSendTask.CLOSE, null, null);
+		return sendTask(closetask);
+	}
+	
 	
 	/**
 	 *  Called from connection.
@@ -105,7 +146,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		}
 		else
 		{
-			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, dat, seqnumber++);
+			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, dat, getNextSequenceNumber());
 			if(maxsend-sent.size()>0)
 			{
 				System.out.println("send: "+task.getSequenceNumber());
@@ -209,7 +250,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 				start += tmp.length;
 			}
 			
-			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, target, seqnumber++);
+			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, target, getNextSequenceNumber());
 			if(maxsend-sent.size()>0)
 			{
 				ret = sendTask(task, null);
@@ -300,9 +341,29 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		// Try to send stored messages after some others have been acknowledged
 		sendStored();
 		
-		// Try to close if 
+		// Try to close if close is requested.
+		if(isCloseRequested() && isDataFinished())
+			close();
+	}
+	
+	/**
+	 *  Get the closereq.
+	 *  @return The closereq.
+	 */
+	public boolean isCloseRequested()
+	{
+		return closereqflag;
 	}
 
+	/**
+	 * 
+	 */
+	public boolean isDataFinished()
+	{
+		// All acks received.
+		return sent.isEmpty();
+	}
+	
 	/**
 	 *  Set the connection closed.
 	 */
@@ -319,14 +380,14 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		return (OutputConnection)getConnection();
 	}
 	
-	/**
-	 *  Get the seqnumber.
-	 *  @return the seqnumber.
-	 */
-	public int getSequenceNumber()
-	{
-		return seqnumber;
-	}
+//	/**
+//	 *  Get the seqnumber.
+//	 *  @return the seqnumber.
+//	 */
+//	public int getSequenceNumber()
+//	{
+//		return seqnumber;
+//	}
 	
 	/**
 	 * 
@@ -357,7 +418,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		// Test if packets have been sent till last timer was inited
 		if(timer==null)
 		{
-			if(getSequenceNumber()>seqno)
+			if(getReceivedSequenceNumber()>seqno)
 			{
 				timer = ms.getClockService().createTimer(System.currentTimeMillis()+acktimeout, new TimedObject(seqno+ackcnt));
 			}

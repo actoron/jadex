@@ -11,6 +11,7 @@ public abstract class AbstractConnection
 	
 	/** Boolean flag if connection is closed. */
 	protected boolean closed;
+	protected boolean closing;
 	
 	/** The connection id. */
 	protected int id;
@@ -59,11 +60,28 @@ public abstract class AbstractConnection
 	/**
 	 *  Set the connection to closed.
 	 */
+	public synchronized void setClosing()
+	{
+		this.closing = true;
+	}
+	
+	/**
+	 *  Set the connection to closed.
+	 */
 	public synchronized void setClosed()
 	{
 		this.closed = true;
 	}
 
+	/**
+	 *  Get the closed.
+	 *  @return The closed.
+	 */
+	public boolean isClosing()
+	{
+		return closing;
+	}
+	
 	/**
 	 *  Get the closed.
 	 *  @return The closed.
@@ -79,12 +97,12 @@ public abstract class AbstractConnection
 	 */
 	public synchronized void close()
 	{
-		if(closed)
+		if(closing || closed)
 			return;
+		
+		setClosing();
 
-		// Send data message
-		setClosed();
-		ch.sendClose();
+		ch.doClose();
 //		sendTask(createTask(getMessageType(StreamSendTask.CLOSE), null, null));
 	}
 	

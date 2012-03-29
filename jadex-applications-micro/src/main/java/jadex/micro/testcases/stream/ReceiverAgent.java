@@ -22,7 +22,7 @@ public class ReceiverAgent
 	 * 
 	 */
 	@AgentStreamArrived
-	public void streamArrvied(IConnection con)
+	public void streamArrvied(final IConnection con)
 	{
 		// todo: how to avoid garbage collection of connection?
 //		final IInputConnection con = (IInputConnection)msg.get(SFipa.CONTENT);
@@ -38,8 +38,10 @@ public class ReceiverAgent
 			}
 			public void intermediateResultAvailable(Byte result)
 			{
-				System.out.println("Intermediate result: "+result);
+				System.out.println("Intermediate result: "+result+" :"+cnt[0]);
 				cnt[0] += 1;
+				if(cnt[0]==5050)
+					((IInputConnection)con).close();
 			}
 			public void finished()
 			{

@@ -25,7 +25,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	 */
 	public synchronized IFuture<Void> write(byte[] data)
 	{
-		if(closed)
+		if(closing || closed)
 			return new Future<Void>(new RuntimeException("Connection closed."));
 		return ((OutputConnectionHandler)ch).send(data);
 	}
@@ -35,6 +35,9 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	 */
 	public void flush()
 	{
+		if(closing || closed)
+			throw new RuntimeException("Stream already closed.");
+		
 		((OutputConnectionHandler)ch).flush();
 	}
 	
@@ -42,9 +45,13 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	 *  Close the connection.
 	 *  Notifies the other side that the connection has been closed.
 	 */
-	public void close()
+	public synchronized void close()
 	{
+		if(closing || closed)
+			return;
+
 		flush();
+		
 		super.close();
 	}
 }

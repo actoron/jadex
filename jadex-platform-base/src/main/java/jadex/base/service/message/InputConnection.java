@@ -327,6 +327,8 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 */
 	public void setClosed()
 	{
+		super.setClosed();
+		
 		IntermediateFuture<Byte> iret;
 		Future<Byte> oret;
 		boolean cl;

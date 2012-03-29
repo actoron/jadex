@@ -1112,7 +1112,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(!mypcons[i].isConnectionAlive(StreamSendTask.LEASETIME))
 					{
-//						System.out.println("removed con: "+mypcons[i]);
+						System.out.println("removed con: "+mypcons[i]);
 						mypcons[i].close();
 						pcons.remove(mypcons[i].getConnectionId());
 					}
@@ -1122,7 +1122,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(!myicons[i].isConnectionAlive(StreamSendTask.LEASETIME))
 					{
-//						System.out.println("removed con: "+mypcons[i]);
+						System.out.println("removed con: "+mypcons[i]);
 						myicons[i].close();
 						icons.remove(mypcons[i].getConnectionId());
 					}
@@ -1401,6 +1401,7 @@ public class MessageService extends BasicService implements IMessageService
 //			System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
 			int idx = 1;
 			byte type = rawmsg[idx++];
+			
 			byte[] codec_ids = new byte[rawmsg[idx++]];
 			byte[] bconid = new byte[4];
 			for(int i=0; i<codec_ids.length; i++)
@@ -1478,30 +1479,57 @@ public class MessageService extends BasicService implements IMessageService
 			}
 			else if(type==StreamSendTask.CLOSE_OUTPUT_INITIATOR)
 			{
+				System.out.println("CCC: close");
 				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(new Integer(conid));
 				if(ich!=null)
 				{
-					ich.setClosed();
+					ich.closeReceived();
 				}
 				else
 				{
 					System.out.println("InputStream not found: "+conid);
 				}
 			}
-			else if(type==StreamSendTask.CLOSE_OUTPUT_PARTICIPANT)
+			else if(type==StreamSendTask.ACKCLOSE_OUTPUT_PARTICIPANT)
 			{
-				// Handle input connection initiator side
+				System.out.println("CCC: ackclose");
 				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
 				if(och!=null)
 				{
-					och.setClosed();
+					och.ackCloseReceived();
 				}
 				else
 				{
 					System.out.println("OutputStream not found: "+conid);
 				}
 			}
-			else if(type==StreamSendTask.ACK_OUTPUT_PARTICIPANT)
+			else if(type==StreamSendTask.CLOSEREQ_OUTPUT_PARTICIPANT)
+			{
+				System.out.println("CCC: closereq");
+				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
+				if(och!=null)
+				{
+					och.closeRequestReceived();
+				}
+				else
+				{
+					System.out.println("OutputStream not found: "+conid);
+				}
+			}
+			else if(type==StreamSendTask.ACKCLOSEREQ_OUTPUT_INITIATOR)
+			{
+				System.out.println("CCC: ackclosereq");
+				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(new Integer(conid));
+				if(ich!=null)
+				{
+					ich.ackCloseRequestReceived();
+				}
+				else
+				{
+					System.out.println("OutputStream not found: "+conid);
+				}
+			}
+			else if(type==StreamSendTask.ACKDATA_OUTPUT_PARTICIPANT)
 			{
 				// Handle input connection initiator side
 				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
@@ -1550,12 +1578,24 @@ public class MessageService extends BasicService implements IMessageService
 					System.out.println("InputStream not found: "+conid);
 				}
 			}
-			else if(type==StreamSendTask.CLOSE_INPUT_INITIATOR)
+			else if(type==StreamSendTask.CLOSEREQ_INPUT_INITIATOR)
 			{
 				OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(new Integer(conid));
 				if(och!=null)
 				{
-					och.setClosed();
+					och.closeRequestReceived();
+				}
+				else
+				{
+					System.out.println("InputStream not found: "+conid);
+				}
+			}
+			else if(type==StreamSendTask.ACKCLOSEREQ_INPUT_PARTICIPANT)
+			{
+				InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
+				if(ich!=null)
+				{
+					ich.ackCloseRequestReceived();
 				}
 				else
 				{
@@ -1567,14 +1607,26 @@ public class MessageService extends BasicService implements IMessageService
 				InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
 				if(ich!=null)
 				{
-					ich.setClosed();
+					ich.closeReceived();
 				}
 				else
 				{
 					System.out.println("OutputStream not found: "+conid);
 				}
 			}
-			else if(type==StreamSendTask.ACK_INPUT_INITIATOR)
+			else if(type==StreamSendTask.ACKCLOSE_INPUT_INITIATOR)
+			{
+				OutputConnectionHandler ich = (OutputConnectionHandler)pcons.get(new Integer(conid));
+				if(ich!=null)
+				{
+					ich.ackCloseReceived();
+				}
+				else
+				{
+					System.out.println("InputStream not found: "+conid);
+				}
+			}
+			else if(type==StreamSendTask.ACKDATA_INPUT_INITIATOR)
 			{
 				// Handle input connection initiator side
 				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
@@ -1591,7 +1643,7 @@ public class MessageService extends BasicService implements IMessageService
 			// Handle lease time update
 			else if(type==StreamSendTask.ALIVE_INITIATOR)
 			{
-//				System.out.println("alive initiator");
+				System.out.println("alive initiator");
 				AbstractConnectionHandler con = (AbstractConnectionHandler)pcons.get(new Integer(conid));
 				if(con!=null)
 				{
@@ -1604,7 +1656,7 @@ public class MessageService extends BasicService implements IMessageService
 			}
 			else if(type==StreamSendTask.ALIVE_PARTICIPANT)
 			{
-//				System.out.println("alive particpant");
+				System.out.println("alive particpant");
 				AbstractConnectionHandler con = (AbstractConnectionHandler)icons.get(new Integer(conid));
 				if(con!=null)
 				{

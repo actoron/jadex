@@ -22,35 +22,43 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	public static final String INIT = "INIT";
 	public static final String DATA = "DATA";
 	public static final String CLOSE = "CLOSE";
+	public static final String CLOSEREQ = "CLOSEREQ";
 	public static final String ALIVE = "ALIVE";
-	public static final String RESEND = "RESEND"; // request a resend
-	public static final String ACK = "ACK"; 
+	public static final String ACKDATA = "ACKDATA"; 
+	public static final String ACKCLOSEREQ = "ACKCLOSEREQ"; 
+	public static final String ACKCLOSE = "ACKCLOSE"; 
 	
 	/** Create virtual output connection - from initiator. */
 	public static final byte INIT_OUTPUT_INITIATOR = 1; 
 	/** Send data - from initiator. */
 	public static final byte DATA_OUTPUT_INITIATOR = 2;
+	/** Ack data/close - from participant .*/
+	public static final byte ACKDATA_OUTPUT_PARTICIPANT = 3;
+	/** Request close connection - from participant. */
+	public static final byte CLOSEREQ_OUTPUT_PARTICIPANT = 4;
+	/** Ack for close request - from initiator .*/
+	public static final byte ACKCLOSEREQ_OUTPUT_INITIATOR = 5;
 	/** Close connection - from initiator. */
-	public static final byte CLOSE_OUTPUT_INITIATOR = 3;
-	/** Close connection - from participant. */
-	public static final byte CLOSE_OUTPUT_PARTICIPANT = 4;
-	/** Resend data - from participant. */
-//	public static final byte RESEND_OUTPUT_PARTICIPANT = 5;
-	/** Ack data - from participant .*/
-	public static final byte ACK_OUTPUT_PARTICIPANT = 6;
+	public static final byte CLOSE_OUTPUT_INITIATOR = 6;
+	/** Ack data/close - from participant .*/
+	public static final byte ACKCLOSE_OUTPUT_PARTICIPANT = 7;
 
+	
 	/** Create virtual input connection - from initiator. */ 
-	public static final byte INIT_INPUT_INITIATOR = 10;
+	public static final byte INIT_INPUT_INITIATOR = 11;
 	/** Send data - from participant. */
-	public static final byte DATA_INPUT_PARTICIPANT = 11;
-	/** Close connection - from initiator. */
-	public static final byte CLOSE_INPUT_INITIATOR = 12;
-	/** Close connection - from participant. */
-	public static final byte CLOSE_INPUT_PARTICIPANT = 13;
-	/** Resend data - from initiator. */
-//	public static final byte RESEND_INPUT_INITIATOR = 14;
+	public static final byte DATA_INPUT_PARTICIPANT = 12;
 	/** Ack data - from participant .*/
-	public static final byte ACK_INPUT_INITIATOR = 15;
+	public static final byte ACKDATA_INPUT_INITIATOR = 13;
+	/** Close request connection - from initiator. */
+	public static final byte CLOSEREQ_INPUT_INITIATOR = 14;
+	/** Ack for close request - from initiator .*/
+	public static final byte ACKCLOSEREQ_INPUT_PARTICIPANT = 15;
+	/** Close connection - from participant. */
+	public static final byte CLOSE_INPUT_PARTICIPANT = 16;
+	/** Ack for close - from initiator .*/
+	public static final byte ACKCLOSE_INPUT_INITIATOR = 17;
+
 	
 	/** Alive message - from initiator. */ 
 	public static final byte ALIVE_INITIATOR = 20;
@@ -68,17 +76,19 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 		
 		MESSAGETYPES.put(new Tuple(INIT, false, true), new Byte(INIT_OUTPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(DATA, false, true), new Byte(DATA_OUTPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ACKDATA, false, false), new Byte(ACKDATA_OUTPUT_PARTICIPANT));
 		MESSAGETYPES.put(new Tuple(CLOSE, false, true), new Byte(CLOSE_OUTPUT_INITIATOR));
-		MESSAGETYPES.put(new Tuple(CLOSE, false, false), new Byte(CLOSE_OUTPUT_PARTICIPANT));
-//		MESSAGETYPES.put(new Tuple(RESEND, false, false), new Byte(RESEND_OUTPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(ACK, false, false), new Byte(ACK_OUTPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(ACKCLOSE, false, false), new Byte(ACKCLOSE_OUTPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(CLOSEREQ, false, false), new Byte(CLOSEREQ_OUTPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(ACKCLOSEREQ, false, false), new Byte(ACKDATA_OUTPUT_PARTICIPANT));
 
 		MESSAGETYPES.put(new Tuple(INIT, true, true), new Byte(INIT_INPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(DATA, true, false), new Byte(DATA_INPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(CLOSE, true, true), new Byte(CLOSE_INPUT_INITIATOR));
-		MESSAGETYPES.put(new Tuple(CLOSE, true, false), new Byte(CLOSE_INPUT_PARTICIPANT));
-//		MESSAGETYPES.put(new Tuple(RESEND, true, true), new Byte(RESEND_INPUT_INITIATOR));
-		MESSAGETYPES.put(new Tuple(ACK, true, true), new Byte(ACK_INPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ACKDATA, true, true), new Byte(DATA_INPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(CLOSEREQ, true, true), new Byte(CLOSEREQ_INPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ACKCLOSEREQ, true, true), new Byte(ACKCLOSEREQ_INPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(CLOSE, true, true), new Byte(CLOSE_INPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(ACKCLOSE, true, false), new Byte(ACKCLOSE_INPUT_INITIATOR));
 
 		MESSAGETYPES.put(new Tuple(ALIVE, true, true), new Byte(ALIVE_INITIATOR));
 		MESSAGETYPES.put(new Tuple(ALIVE, false, true), new Byte(ALIVE_INITIATOR));
