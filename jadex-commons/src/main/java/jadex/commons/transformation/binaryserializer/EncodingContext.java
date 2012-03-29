@@ -83,24 +83,14 @@ public class EncodingContext
 	}
 	
 	/**
-	 *  Runs the preprocessors.
+	 *  Returns the preprocessors.
+	 *  @return The preprocessors
 	 */
-	public Object runPreProcessors(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-			Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+	public List<ITraverseProcessor> getPreprocessors()
 	{
-		if (preprocessors != null)
-		{
-			for (ITraverseProcessor preproc : preprocessors)
-			{
-				if (preproc.isApplicable(object, clazz, clone))
-				{
-					object = preproc.process(object, clazz, processors, traverser, traversed, clone, context);
-				}
-			}
-		}
-		return object;
+		return preprocessors;
 	}
-
+	
 	/**
 	 * Gets the classloader.
 	 * @return The classloader.

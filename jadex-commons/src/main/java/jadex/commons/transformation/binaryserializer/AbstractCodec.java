@@ -21,14 +21,35 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 		if (canReference(object, clazz, ec))
 			traversed.put(object, traversed.size());
 		
-		object = ec.runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
-		if (clazz == null)
+		object = runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
+		if (clazz == null || !clazz.equals(object.getClass()))
 			clazz = object == null? null : object.getClass();
 		
 		ec.writeClass(clazz);
 		
 		object = encode(object, clazz, processors, traverser, traversed, clone, ec);
 		
+		return object;
+	}
+	
+	/**
+	 *  Runs the preprocessors.
+	 */
+	protected Object runPreProcessors(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+	{
+		List<ITraverseProcessor> preprocessors = ((EncodingContext) context).getPreprocessors();
+		//System.out.println(preprocessors);
+		if (preprocessors != null)
+		{
+			for (ITraverseProcessor preproc : preprocessors)
+			{
+				if (preproc.isApplicable(object, clazz, clone))
+				{
+					object = preproc.process(object, clazz, processors, traverser, traversed, clone, context);
+				}
+			}
+		}
 		return object;
 	}
 	
