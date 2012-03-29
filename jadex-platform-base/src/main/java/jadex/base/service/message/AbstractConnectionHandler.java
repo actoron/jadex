@@ -157,7 +157,7 @@ public class AbstractConnectionHandler
 	 *  Get the seqnumber.
 	 *  @return the seqnumber.
 	 */
-	public int getReceivedSequenceNumber()
+	public int getSequenceNumber()
 	{
 		return seqnumber;
 	}

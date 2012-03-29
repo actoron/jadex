@@ -43,8 +43,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	/** The number of received elements after which an ack is sent. */
 	protected int ackcnt;
 	
-	/** The current timer. */
-	protected ITimer timer;
+	/** The acknowledgement timer. */
+	protected ITimer acktimer;
 
 	
 	/** Flag if multipackets should be used. */
@@ -58,6 +58,12 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	
 	/** The current multipacket size. */
 	protected int mpsize;
+	
+	/** The max delay before a multipacket is sent (even if not full). */
+	protected long mpsendtimeout;
+
+	/** The multipacket send timer. */
+	protected ITimer mpsendtimer;
 	
 	
 	/** Close request flag (when a closereq message was received). */
@@ -86,6 +92,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		this.mpmaxsize = 20;
 		this.multipacket = new ArrayList<byte[]>();
 		this.mpsize = 0;
+		this.mpsendtimeout = 3000;
 	}
 	
 	/**
@@ -223,6 +230,10 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	{
 		IFuture<Void> ret = IFuture.DONE;
 		
+		// Install send timer on first packet
+		if(mpsize==0)
+			createSendTimer(getSequenceNumber());
+		
 		multipacket.add(data);
 		mpsize += data.length;
 		
@@ -297,7 +308,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		sent.put(task.getSequenceNumber(), task);
 		
 		// create timer if none is active
-		createTimer(task.getSequenceNumber());
+		createAckTimer(task.getSequenceNumber());
 		
 		return ret;
 	}
@@ -392,71 +403,67 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	/**
 	 * 
 	 */
-	public IFuture<Void> sendClose()
+	// Synchronized with timer on this
+	public synchronized void createSendTimer(final int seqno)
 	{
-		return sendTask(createTask(StreamSendTask.CLOSE, null, null));
-		
-//		Future<Void> ret = new Future<Void>();
-//		
-//		IComponentStep<Void> closecom = new IComponentStep<Void>()
-//		{
-//			public IFuture<Void> execute(IInternalAccess ia)
-//			{
-//				return sendTask(createTask(StreamSendTask.CLOSE, null, null));
-//			}
-//		};
-//		
-//		return ret;
+		if(mpsendtimer!=null)
+			mpsendtimer.cancel();
+		mpsendtimer = ms.getClockService().createTimer(System.currentTimeMillis()+mpsendtimeout, new ITimedObject()
+		{
+			public void timeEventOccurred(long currenttime)
+			{
+				ms.getComponent().scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						// Send the packet if it is still the correct one
+						if(seqno==getSequenceNumber())
+							sendMultiPacket();
+						return IFuture.DONE;
+					}
+				});
+			}
+		});
 	}
 	
 	/**
 	 * 
 	 */
 	// Synchronized with timer on this
-	public synchronized void createTimer(int seqno)
+	public synchronized void createAckTimer(final int seqno)
 	{
 		// Test if packets have been sent till last timer was inited
-		if(timer==null)
+		if(acktimer==null)
 		{
-			if(getReceivedSequenceNumber()>seqno)
+			// If more packets have been sent 
+			if(getSequenceNumber()>seqno)
 			{
-				timer = ms.getClockService().createTimer(System.currentTimeMillis()+acktimeout, new TimedObject(seqno+ackcnt));
+//				final int sq = seqno + ackcnt;
+				acktimer = ms.getClockService().createTimer(System.currentTimeMillis()+acktimeout, new ITimedObject()
+				{
+					public void timeEventOccurred(long currenttime)
+					{
+						ms.getComponent().scheduleStep(new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								// Send all packets of the segment again.
+								for(int i=0; i<ackcnt; i++)
+								{
+									resend(i+seqno);
+								}
+								acktimer = null;
+								createAckTimer(seqno + ackcnt);
+								return IFuture.DONE;
+							}
+						});
+					}
+				});
 			}
 			else
 			{
-				timer = null;
+				acktimer = null;
 			}
-		}
-	}
-
-	/**
-	 * 
-	 */
-	public class TimedObject implements ITimedObject
-	{
-		/** The sequence number. */
-		protected int seqno;
-		
-		/**
-		 * 
-		 */
-		public TimedObject(int seqno)
-		{
-			this.seqno = seqno;
-		}
-		
-		/**
-		 * 
-		 */
-		public void timeEventOccurred(long currenttime)
-		{
-			// Send all packets of the segment again.
-			for(int i=0; i<ackcnt; i++)
-			{
-				resend(i+seqno);
-			}
-			timer = null;
-			createTimer(seqno+ackcnt);
 		}
 	}
 }

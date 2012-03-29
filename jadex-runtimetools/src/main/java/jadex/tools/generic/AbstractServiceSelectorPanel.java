@@ -61,7 +61,7 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 			public void customResultAvailable(Collection<IService> newservices)
 			{
 				// Find items to remove
-				JComboBox<IService> selcb = getSelectionComboBox();
+				JComboBox selcb = getSelectionComboBox();
 				for(int i=0; i<selcb.getItemCount(); i++)
 				{
 					Object oldservice = selcb.getItemAt(i);

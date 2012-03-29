@@ -55,7 +55,7 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 	//-------- attributes --------
 	
 	/** The component selection box. */
-	protected JComboBox<E> selcb;
+	protected JComboBox selcb;
 	
 	/** The remote checkbox. */
 	protected JCheckBox remotecb;
@@ -97,7 +97,7 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 	
 		centerp.add(ObjectCardLayout.DEFAULT_COMPONENT, emptylabel);
 		
-		selcb = new JComboBox<E>(); 
+		selcb = new JComboBox(); 
 		selcb.setRenderer(new ListCellRenderer<E>()
 		{
 			BasicComboBoxRenderer	bcbr	= new BasicComboBoxRenderer();
@@ -140,7 +140,7 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 			{
 	//			System.out.println("Selected : "+selcb.getSelectedItem());
 				
-				final E sel = selcb.getSelectedIndex()!=-1 ? selcb.getModel().getElementAt(selcb.getSelectedIndex()) : null;
+				final Object sel = selcb.getSelectedIndex()!=-1 ? selcb.getModel().getElementAt(selcb.getSelectedIndex()) : null;
 				
 				if(sel==null || ocl.isAvailable(sel))
 				{
@@ -148,7 +148,7 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 				}
 				else
 				{
-					createPanel(sel).addResultListener(new SwingDefaultResultListener<IAbstractViewerPanel>()
+					createPanel((E)sel).addResultListener(new SwingDefaultResultListener<IAbstractViewerPanel>()
 					{
 						public void customResultAvailable(final IAbstractViewerPanel panel)
 						{
@@ -166,7 +166,7 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 							{
 								public void customResultAvailable(Void result)
 								{
-									panels.put(sel, panel);
+									panels.put((E)sel, panel);
 									centerp.add(panel.getComponent(), sel);
 									ocl.show(sel);
 								}
@@ -215,7 +215,7 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 	 *  Get the selcb.
 	 *  @return the selcb.
 	 */
-	public JComboBox<E> getSelectionComboBox()
+	public JComboBox getSelectionComboBox()
 	{
 		return selcb;
 	}

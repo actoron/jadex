@@ -82,10 +82,10 @@ public abstract class AbstractComponentSelectorPanel extends AbstractSelectorPan
 						}
 						
 						// Find items to remove
-						JComboBox<IComponentIdentifier> selcb = getSelectionComboBox();
+						JComboBox selcb = getSelectionComboBox();
 						for(int i=0; i<selcb.getItemCount(); i++)
 						{
-							IComponentIdentifier oldcid = selcb.getItemAt(i);
+							IComponentIdentifier oldcid = (IComponentIdentifier)selcb.getItemAt(i);
 							if(!newcids.contains(oldcid))
 							{
 								// remove old cid

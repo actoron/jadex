@@ -119,16 +119,16 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		
 		// If packet is the next one deliver to stream
 		// else store in map till the next one arrives
-		if(seqnumber==getReceivedSequenceNumber()+1)
+		if(seqnumber==getSequenceNumber()+1)
 		{
 			forwardData(data);
 			
 			// Forward possibly stored data
-			byte[] nextdata = this.data.get(new Integer(getReceivedSequenceNumber()));
+			byte[] nextdata = this.data.get(new Integer(getSequenceNumber()));
 			for(; nextdata!=null ;)
 			{
 				forwardData(nextdata);
-				nextdata = this.data.get(new Integer(getReceivedSequenceNumber()));
+				nextdata = this.data.get(new Integer(getSequenceNumber()));
 			}
 		}
 		else
@@ -173,7 +173,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	protected void sendAck()
 	{
 		// Only send acks if new packets have arrived.
-		if(getReceivedSequenceNumber()>lastack)
+		if(getSequenceNumber()>lastack)
 		{
 			System.out.println("send ack: "+rseqno);
 			sendTask(createTask(StreamSendTask.ACKCLOSEREQ, rseqno, true, null));
@@ -185,7 +185,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 *  Get the last received sequence number.
 	 *  @return the sequence number.
 	 */
-	public int getReceivedSequenceNumber()
+	public int getSequenceNumber()
 	{
 		return rseqno;
 	}
