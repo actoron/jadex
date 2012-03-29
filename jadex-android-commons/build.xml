@@ -35,6 +35,8 @@
 		jtreetable, 
 		FixedJComboBox.java,
 		BrowserLauncher2.java,
+		BeanDelegateReflectionIntrospector.java,
+		binaryserializer,
 		gui" />
 
 	

@@ -59,7 +59,7 @@ public class CodecFactory
 			/* $if !android $ */
 			codecs = new Class[]{SerialCodec.class, NuggetsCodec.class, XMLCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class};
 			/* $else $
-			codecs = new Class[]{SerialCodec.class, NuggetsCodec.class, JadexXMLCodec.class, GZIPCodec.class, JadexBinaryCodec.class};
+			codecs = new Class[]{SerialCodec.class, NuggetsCodec.class, JadexXMLCodec.class, GZIPCodec.class};
 			$endif $ */
 		}
 		for(int i=0; i<codecs.length; i++)

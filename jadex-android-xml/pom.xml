@@ -28,15 +28,21 @@
 			<artifactId>jadex-android-beans</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-android-woodstox</artifactId> -->
-<!-- 			<version>${project.version}</version> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>net.sourceforge.jadex</groupId> -->
+		<!-- <artifactId>jadex-android-woodstox</artifactId> -->
+		<!-- <version>${project.version}</version> -->
+		<!-- </dependency> -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-xmlpull</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>xpp3</groupId>
+			<artifactId>xpp3</artifactId>
+			<version>1.1.4c</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

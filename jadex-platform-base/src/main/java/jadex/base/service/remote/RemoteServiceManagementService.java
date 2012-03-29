@@ -40,10 +40,12 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+/* $if !android $ */
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.binaryserializer.DecodingContext;
 import jadex.commons.transformation.binaryserializer.EncodingContext;
 import jadex.commons.transformation.binaryserializer.IDecoderHandler;
+/* $endif $ */
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.micro.IMicroExternalAccess;
@@ -156,7 +158,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	protected List<ITraverseProcessor> binpreprocs;
 	
 	/** Postprocessors for binary decoding. */
+	/* $if !android $ */
 	protected List<IDecoderHandler> binpostprocs;
+	/* $endif $ */
 	
 	/** Flag whether to use binary encoding. */
 	protected boolean binarymode;
@@ -356,6 +360,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		
 		// Equivalent pre- and postprocessors for binary mode.
+		/* $if !android $ */
 		
 		binpostprocs = new ArrayList<IDecoderHandler>();
 		IDecoderHandler rmipostproc = new IDecoderHandler()
@@ -396,7 +401,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				ComponentIdentifier ret = null;
 				if(src.getPlatformName().equals(root.getLocalName()))
 				{
-					//Object[] oa = (Object[])((EncodingContext) context).getUserContext();
 					String[] addresses = (String[])((Object[])((EncodingContext) context).getUserContext())[1];
 					ret = new ComponentIdentifier(src.getName(), addresses);
 				}
@@ -446,6 +450,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			}
 		};
 		binpreprocs.add(bpreproc);
+		/* $endif $ */
 	}
 	
 	//-------- methods --------
@@ -636,19 +641,23 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  Get the preprocessors for binary encoding.
 	 *  @return Binary preprocessors.
 	 */
+	/* $if !android $ */
 	public List<ITraverseProcessor> getBinaryPreProcessors()
 	{
 		return binpreprocs;
 	}
+	/* $endif $ */
 	
 	/**
 	 *  Get the postprocessors for binary decoding.
 	 *  @return Binary postprocessors.
 	 */
+	/* $if !android $ */
 	public List<IDecoderHandler> getBinaryPostProcessors()
 	{
 		return binpostprocs;
 	}
+	/* $endif $ */
 	
 	/**
 	 *  Get the msg service.
@@ -835,7 +844,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 															// Hack!!! Manual encoding for using custom class loader at receiver side.
 															if (binarymode)
 															{
+																/* $if !android $ */
 																cont = BinarySerializer.objectToByteArray(content, binpreprocs, new Object[]{receiver, addresses}, cl);
+																/* $endif $ */
 															}
 															else
 															{

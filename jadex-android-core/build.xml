@@ -120,10 +120,11 @@
 		PlatformApplet.java
 		" />
 
-	<property name="exclude-jadex-xml" value="
-		BeanInfoIntrospector.java
+	<property name="exclude-jadex-platform-base" value="
+		JadexBinaryCodec.java,
+		JadexBinaryContentCodec.java
 		"/>
-
+			
 	<property name="exclude-jadex-kernel-extension-agr" value="
 	"/>
 	
@@ -182,7 +183,7 @@
 			<var name="androidVersion" value="${androidVersion}" />
 		</preprocess>
 		<echo level="info">preprocessing ${jadex-platform-base}</echo>
-		<preprocess indir="${jadex-platform-base}" outdir="${src_android}" out="merge" except="${exclude}">
+		<preprocess indir="${jadex-platform-base}" outdir="${src_android}" out="merge" except="${exclude}, ${exclude-jadex-platform-base}">
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
@@ -243,7 +244,7 @@
 			<var name="androidVersion" value="${androidVersion}" />
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
 		</preprocess>
-		<preprocess indir="${jadex-platform-base}" outdir="${jadex-platform-base}" out="merge" except="${exclude}">
+		<preprocess indir="${jadex-platform-base}" outdir="${jadex-platform-base}" out="merge" except="${exclude}, ${exclude-jadex-platform-base}">
 			<var name="android" value="${android}" />
 			<var name="androidVersion" value="${androidVersion}" />
 			<filetype commentend="*/" commentbegin="/*" extensions="java" />
