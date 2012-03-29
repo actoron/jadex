@@ -42,6 +42,10 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 {
 	//-------- constants --------
 	
+	/** The supported component types (file extensions).
+	 *  Convention used by platform config panel. */
+	public static final String[]	FILETYPES	= new String[]{"Agent.class"};
+	
 	/** The micro agent file type. */
 	public static final String	FILETYPE_MICROAGENT	= "Micro Agent";
 	

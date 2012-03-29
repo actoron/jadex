@@ -42,6 +42,10 @@ public class BpmnFactory extends BasicService implements IComponentFactory, IBoo
 {
 	//-------- constants --------
 	
+	/** The supported component types (file extensions).
+	 *  Convention used by platform config panel. */
+	public static final String[]	FILETYPES	= new String[]{".bpmn"};
+	
 	/** The micro agent file type. */
 	public static final String	FILETYPE_BPMNPROCESS = "BPMN Process";
 	

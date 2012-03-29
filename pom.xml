@@ -45,38 +45,24 @@
 <!--   	</properties> -->
 	
 	<profiles>
+	
+		<profile>
+			<id>jadex-android-commons</id>
+			<modules>
+				<module>jadex-commons</module>
+			</modules>
+		</profile>
+	
 
 		<!-- Javadocs -->
 		<profile>
 			<id>jadex-javadocs-artifacts</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-deploy-plugin</artifactId>
-						<version>2.5</version>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
 			<modules>
 				<module>jadex-javadocs</module>
 				<module>jadex-commons</module>
 				<module>jadex-xml</module>
 				<module>jadex-javaparser</module>
 				<module>jadex-bridge</module>
-				<!-- 
-				<module>jadex-platform-base</module>
-				<module>jadex-nuggets</module> 
-				-->
-
-				<!--
-				<module>jadex-kernel-base</module>
-				<module>jadex-kernel-application</module>
-				<module>jadex-kernel-component</module>
-				<module>jadex-kernel-gpmn</module>
-				-->
 				<module>jadex-kernel-bdi</module>
 				<module>jadex-kernel-micro</module>
 				<module>jadex-kernel-bpmn</module>
@@ -85,18 +71,8 @@
 				<module>jadex-kernel-extension-envsupport-opengl</module>
 				<module>jadex-kernel-extension-envsupport-jmonkey</module>
 				<module>jadex-kernel-extension-agr</module>
-
 				<module>jadex-applib-bdi</module>
-
-				<!-- <module>jadex-rules</module>
-				<module>jadex-rules-tools</module>  -->
-
 				<module>jadex-tools-base</module>
-				<!-- <module>jadex-runtimetools</module>
-				<module>jadex-tools-bdi</module>
-				<module>jadex-tools-bpmn</module>
-				<module>jadex-tools-comanalyzer</module>
-				<module>jadex-platform-standalone</module> -->
 				<module>jadex-platform-extension-webservice</module>
 			</modules>
 		</profile>

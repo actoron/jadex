@@ -4,8 +4,6 @@ import jadex.bdi.BDIAgentFactory;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.runtime.impl.JavaStandardPlanExecutor;
 import jadex.bdibpmn.BpmnPlanExecutor;
-import jadex.bpmn.model.MBpmnModel;
-import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
@@ -13,7 +11,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -23,8 +20,6 @@ import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
-import jadex.commons.ResourceInfo;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -34,10 +29,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.gpmn.model.MGpmnModel;
-import jadex.kernelbase.IBootstrapFactory;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,6 +42,10 @@ import javax.swing.UIDefaults;
 public class GpmnFactory extends BasicService implements IComponentFactory
 {
 	//-------- constants --------
+	
+	/** The supported component types (file extensions).
+	 *  Convention used by platform config panel. */
+	public static final String[]	FILETYPES	= new String[]{".gpmn"};
 	
 	/** The gpmn process file type. */
 	public static final String	FILETYPE_GPMNPROCESS = "GPMN Process";

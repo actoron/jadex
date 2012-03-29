@@ -159,6 +159,33 @@
         	
 		</plugins>
 	</build>
+	
+	<profiles>
+		<profile>
+			<id>jadex-android-commons</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>munge-maven-plugin</artifactId>
+						<version>1.0</version>
+						<executions>
+							<execution>
+								<id>munge</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>munge</goal>
+								</goals>
+								<configuration>
+									<symbols>android</symbols>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		

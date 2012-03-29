@@ -1,11 +1,11 @@
 package jadex.base.gui.config;
 
 import jadex.base.Starter;
-import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.types.factory.SBootstrapLoader;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -24,10 +24,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -36,6 +34,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -48,29 +47,29 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class PlatformConfigPanel	extends JPanel
 {
-	/** The default factories for given extensions. */
-	public static Map<String, String>	FACTORIES;
-	
-	/** The default platform models. */
-	public static Set<String>	MODELS;
-	
-	static
-	{
-		// Todo: externalize/dynamically check available factories!?
-		FACTORIES	= new LinkedHashMap<String, String>();
-		FACTORIES.put(".component.xml", "jadex.component.ComponentComponentFactory");
-		FACTORIES.put("Agent.class", "jadex.micro.MicroAgentFactory");
-		FACTORIES.put(".agent.xml", "jadex.bdi.BDIAgentFactory");
-		FACTORIES.put(".bpmn", "jadex.bpmn.BpmnFactory");
-		FACTORIES.put(".application.xml", "jadex.application.ApplicationComponentFactory");
-		FACTORIES.put(".gpmn", "jadex.gpmn.GpmnFactory");
-
-		// Todo: externalize/dynamically check available platform models!?
-		MODELS	= new LinkedHashSet<String>();
-		MODELS.add("jadex.standalone.Platform.component.xml");
-		MODELS.add("jadex.standalone.PlatformAgent.class");
-		MODELS.add("jadex.standalone.Platform.bpmn");
-	}
+//	/** The default factories for given extensions. */
+//	public static Map<String, String>	FACTORIES;
+//	
+//	/** The default platform models. */
+//	public static Set<String>	MODELS;
+//	
+//	static
+//	{
+//		// Todo: externalize/dynamically check available factories!?
+//		FACTORIES	= new LinkedHashMap<String, String>();
+//		FACTORIES.put(".component.xml", "jadex.component.ComponentComponentFactory");
+//		FACTORIES.put("Agent.class", "jadex.micro.MicroAgentFactory");
+//		FACTORIES.put(".agent.xml", "jadex.bdi.BDIAgentFactory");
+//		FACTORIES.put(".bpmn", "jadex.bpmn.BpmnFactory");
+//		FACTORIES.put(".application.xml", "jadex.application.ApplicationComponentFactory");
+//		FACTORIES.put(".gpmn", "jadex.gpmn.GpmnFactory");
+//
+//		// Todo: externalize/dynamically check available platform models!?
+//		MODELS	= new LinkedHashSet<String>();
+//		MODELS.add("jadex.standalone.Platform.component.xml");
+//		MODELS.add("jadex.standalone.PlatformAgent.class");
+//		MODELS.add("jadex.standalone.Platform.bpmn");
+//	}
 	
 	//-------- attributes --------
 	
@@ -80,23 +79,37 @@ public class PlatformConfigPanel	extends JPanel
 	/** The argument table model (stored for changing the configuration). */
 	protected ArgumentTableModel	argmodel;
 	
+	/** The argument table model (stored for changing the configuration). */
+	protected ClasspathPanel	classpath;
+	
+	/** The found factories (component file suffix -> factory class name). */
+	protected Map<String, String>	factories;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a platform config panel.
 	 */
-	public PlatformConfigPanel()
+	public PlatformConfigPanel(final ClasspathPanel classpath)
 	{
 		super(new BorderLayout());
+		this.classpath	= classpath;
+		this.factories	= new LinkedHashMap<String, String>();
 		
 		final PropertiesPanel	modelpanel	= new PropertiesPanel("Platform Model");
-		final JComboBox	model	= modelpanel.createComboBox("Model", MODELS.toArray(new String[MODELS.size()]), true, 0);
-		final JComboBox	factory	= modelpanel.createComboBox("Factory", FACTORIES.values().toArray(new String[FACTORIES.size()]), true, 0);
+//		final JComboBox	model	= modelpanel.createComboBox("Model", MODELS.toArray(new String[MODELS.size()]), true, 0);
+//		final JComboBox	factory	= modelpanel.createComboBox("Factory", FACTORIES.values().toArray(new String[FACTORIES.size()]), true, 0);
+		final JComboBox	model	= modelpanel.createComboBox("Model", SUtil.EMPTY_STRING_ARRAY, true, 0);
+		final JComboBox	factory	= modelpanel.createComboBox("Factory", SUtil.EMPTY_STRING_ARRAY, true, 0);
 		final JComboBox	config	= modelpanel.createComboBox("Configuration", SUtil.EMPTY_STRING_ARRAY, false, 0);
 		config.setEnabled(false);
 		JButton[] buts	= modelpanel.createButtons("buts", new String[]
 		{
-			"Load Model", "Load Settings...", "Save Settings...", "Start Platform"
+			"Load Model", "Scan for Factories",  "Scan for Models"
+		}, 0);
+		JButton[] buts1	= modelpanel.createButtons("buts", new String[]
+		{
+			"Load Settings...", "Save Settings...", "Start Platform"
 		}, 0);
 		
 		model.addActionListener(new ActionListener()
@@ -104,11 +117,11 @@ public class PlatformConfigPanel	extends JPanel
 			public void actionPerformed(ActionEvent e)
 			{
 				// When platform model is selected, choose appropriate factory, if any.
-				for(String suffix: FACTORIES.keySet())
+				for(String suffix: factories.keySet())
 				{
 					if(((String)model.getSelectedItem()).endsWith(suffix))
 					{
-						factory.setSelectedItem(FACTORIES.get(suffix));
+						factory.setSelectedItem(factories.get(suffix));
 						break;
 					}
 				}
@@ -140,6 +153,48 @@ public class PlatformConfigPanel	extends JPanel
 			}
 		});
 		
+		buts[1].addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				Class<?>[]	facts	= classpath.scanForFactories();
+				factories.clear();
+				factory.removeAllItems();
+				for(int i=0; i<facts.length; i++)
+				{
+					try
+					{
+						String[]	ctypes	= (String[])facts[i].getField("FILETYPES").get(null);
+						for(int j=0; j<ctypes.length; j++)
+						{
+							factories.put(ctypes[j], facts[i].getName());
+						}
+						factory.addItem(facts[i].getName());
+					}
+					catch(Exception ex)
+					{
+						System.err.println("Error loading "+facts[i].getName()+" :"+ex);
+//						ex.printStackTrace();
+					}
+				}
+				
+				System.out.println(factories);
+			}
+		});
+		
+		buts[2].addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				String[]	models	= classpath.scanForFiles(factories.keySet().toArray(new String[factories.size()]));
+				model.removeAllItems();
+				for(int i=0; i<models.length; i++)
+				{
+					model.addItem(models[i]);
+				}
+			}
+		});
+		
 		final JFileChooser	fc	= new JFileChooser();
 		fc.setFileFilter(new FileFilter()
 		{
@@ -154,7 +209,7 @@ public class PlatformConfigPanel	extends JPanel
 			}
 		});
 		
-		buts[1].addActionListener(new ActionListener()
+		buts1[0].addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -219,7 +274,7 @@ public class PlatformConfigPanel	extends JPanel
 			}
 		});
 		
-		buts[2].addActionListener(new ActionListener()
+		buts1[1].addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -261,7 +316,7 @@ public class PlatformConfigPanel	extends JPanel
 			}
 		});
 
-		buts[3].addActionListener(new ActionListener()
+		buts1[2].addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
@@ -289,13 +344,22 @@ public class PlatformConfigPanel	extends JPanel
 					}
 				}
 				
-				Starter.createPlatform(args.toArray(new String[args.size()]))
-					.addResultListener(new SwingDefaultResultListener<IExternalAccess>(PlatformConfigPanel.this)
+				try
 				{
-					public void customResultAvailable(IExternalAccess result)
-					{
-					}
-				});
+					Class<?> starterclass = SReflect.classForName(Starter.class.getName(), classpath.getClassLoader());
+					Object	fut	= starterclass.getMethod("createPlatform", new Class<?>[]{Object[].class}).
+						invoke(null, new Object[]{args.toArray(new String[args.size()])});
+				}
+				catch(Exception ex)
+				{
+					// TODO: handle exception
+				}
+//					.addResultListener(new SwingDefaultResultListener<IExternalAccess>(PlatformConfigPanel.this)
+//				{
+//					public void customResultAvailable(IExternalAccess result)
+//					{
+//					}
+//				});
 			}
 		});
 
@@ -308,7 +372,7 @@ public class PlatformConfigPanel	extends JPanel
 	public IFuture<Void>	loadModel(JComboBox model, JComboBox factory, final JComboBox config)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		SBootstrapLoader.loadModel(getClass().getClassLoader(), (String)model.getSelectedItem(), (String)factory.getSelectedItem())
+		SBootstrapLoader.loadModel(classpath.getClassLoader(), (String)model.getSelectedItem(), (String)factory.getSelectedItem())
 			.addResultListener(new SwingExceptionDelegationResultListener<IModelInfo, Void>(ret)
 		{
 			public void customResultAvailable(final IModelInfo mi)
@@ -368,8 +432,13 @@ public class PlatformConfigPanel	extends JPanel
 		{
 			public void run()
 			{
+				ClasspathPanel	classpath	= new ClasspathPanel();
+				JTabbedPane	tabs	= new JTabbedPane();
+				tabs.addTab("Platform Config", new PlatformConfigPanel(classpath));
+				tabs.addTab("Classpath", classpath);
+				
 				JFrame	f	= new JFrame("Jadex Platform Configuration");
-				f.getContentPane().add(new PlatformConfigPanel(), BorderLayout.CENTER);
+				f.getContentPane().add(tabs, BorderLayout.CENTER);
 				f.pack();
 				f.setLocation(SGUI.calculateMiddlePosition(f));
 				f.setVisible(true);

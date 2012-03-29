@@ -16,13 +16,8 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.BasicService;
-import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceShutdown;
-import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
@@ -65,6 +60,10 @@ import javax.swing.UIDefaults;
 public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory, IComponentFactory, IBootstrapFactory
 {
 	//-------- constants --------
+	
+	/** The supported component types (file extensions).
+	 *  Convention used by platform config panel. */
+	public static final String[]	FILETYPES	= new String[]{".agent.xml", ".capability.xml"};
 	
 	/** The BDI agent file type. */
 	public static final String	FILETYPE_BDIAGENT	= "BDI Agent";

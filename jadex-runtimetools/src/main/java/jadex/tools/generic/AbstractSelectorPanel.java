@@ -102,7 +102,7 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 		    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) 
 		    {
 		    	String	val	= value!=null? convertToString((E)value): null;
-		    	return getListCellRendererComponent(list, val, index, isSelected, cellHasFocus);
+		    	return super.getListCellRendererComponent(list, val, index, isSelected, cellHasFocus);
 		    }
 		});
 		

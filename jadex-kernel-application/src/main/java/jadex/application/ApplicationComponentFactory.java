@@ -26,6 +26,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.component.ComponentInterpreter;
+import jadex.component.ComponentModelLoader;
 import jadex.kernelbase.CacheableKernelModel;
 import jadex.kernelbase.IBootstrapFactory;
 
@@ -53,6 +54,10 @@ import javax.swing.UIDefaults;
 public class ApplicationComponentFactory extends BasicService implements IComponentFactory, IBootstrapFactory
 {
 	//-------- constants --------
+	
+	/** The supported component types (file extensions).
+	 *  Convention used by platform config panel. */
+	public static final String[]	FILETYPES	= new String[]{ApplicationModelLoader.FILE_EXTENSION_APPLICATION};
 	
 	/** The application component file type. */
 	public static final String	FILETYPE_APPLICATION = "Application";

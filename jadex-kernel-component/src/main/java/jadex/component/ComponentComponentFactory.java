@@ -50,6 +50,10 @@ import javax.swing.UIDefaults;
 public class ComponentComponentFactory extends BasicService implements IComponentFactory, IBootstrapFactory
 {
 	//-------- constants --------
+
+	/** The supported component types (file extensions).
+	 *  Convention used by platform config panel. */
+	public static final String[]	FILETYPES	= new String[]{ComponentModelLoader.FILE_EXTENSION_COMPONENT};
 	
 	/** The component component file type. */
 	public static final String	FILETYPE_COMPONENT = "Component";

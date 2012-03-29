@@ -1,103 +1,109 @@
 package jadex.bridge.service.types.factory;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.commons.SReflect;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Helper methods for loading component models without a running platform.
+ *  Also separates the class loader from the custom platform class loader to support
+ *  loading different versions.
  */
 public class SBootstrapLoader
 {
-//	//-------- constants --------
-//
-//	/** The fallback platform configuration. */
-//	public static final String FALLBACK_PLATFORM_CONFIGURATION = "jadex/standalone/Platform.component.xml";
-//
-//	/** The component factory to be used for platform component. */
-//	public static final String FALLBACK_COMPONENT_FACTORY = "jadex.component.ComponentComponentFactory";
-//
-//	/** The configuration file. */
-//	public static final String CONFIGURATION_FILE = "conf";
-//	
-//	/** The configuration name. */
-//	public static final String CONFIGURATION_NAME = "configname";
-//	
-//	/** The platform name. */
-//	public static final String PLATFORM_NAME = "platformname";
-//
-//	/** The component factory classname. */
-//	public static final String COMPONENT_FACTORY = "componentfactory";
-//	
-//	/** The adapter factory classname. */
-//	public static final String ADAPTER_FACTORY = "adapterfactory";
-//	
-//	/** The autoshutdown flag. */
-//	public static final String AUTOSHUTDOWN = "autoshutdown";
-//
-//	/** The welcome flag. */
-//	public static final String WELCOME = "welcome";
-//
-//	/** The component flag (for starting an additional component). */
-//	public static final String COMPONENT = "component";
-//	
-//	/** The parameter copy flag. */
-//	public static final String PARAMETERCOPY = "parametercopy";
-//
-//	
-//	/** The reserved platform parameters. */
-//	public static final Set<String> RESERVED;
-//	
-//	static
-//	{
-//		RESERVED = new HashSet<String>();
-//		RESERVED.add(CONFIGURATION_FILE);
-//		RESERVED.add(CONFIGURATION_NAME);
-//		RESERVED.add(PLATFORM_NAME);
-//		RESERVED.add(COMPONENT_FACTORY);
-//		RESERVED.add(ADAPTER_FACTORY);
-//		RESERVED.add(AUTOSHUTDOWN);
-//		RESERVED.add(WELCOME);
-//		RESERVED.add(COMPONENT);
-//		RESERVED.add(PARAMETERCOPY);
-//	}
-	
 	//-------- static methods --------
 	
 	/**
 	 *  Load a component model.
 	 */
-	public static IFuture<IModelInfo>	loadModel(ClassLoader cl, String model, String factory)
+	public static IFuture<IModelInfo>	loadModel(final ClassLoader cl, String model, String factory)
 	{
-		Future<IModelInfo> ret = new Future<IModelInfo>();
+		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		try
 		{
-			Class<IComponentFactory> cfclass = SReflect.classForName(factory, cl);
-			// The providerid for this service is not important as it will be thrown away 
-			// after loading the first component model.
-			final IComponentFactory cfac = cfclass.getConstructor(new Class[]{String.class})
-				.newInstance(new Object[]{"rootid"});
+			Class<?> cfclass = SReflect.classForName(factory, cl);
+			Class<?> rlclass = SReflect.classForName(IResultListener.class.getName(), cl);
+			Object cfac = cfclass.getConstructor(new Class[]{String.class}).newInstance(new Object[]{"dummy"});
 			
-			cfac.loadModel(model, null, null)//rid)
-				.addResultListener(new DelegationResultListener<IModelInfo>(ret)
+			// cfac.loadModel(model, null, null)//rid)
+			Object	fut	= SReflect.getMethods(cfclass, "loadModel")[0].invoke(cfac, new Object[]{model, null, null});
+			// .addResultListener(new DelegationResultListener<IModelInfo>(ret)
+			fut.getClass().getMethod("addResultListener", new Class<?>[]{rlclass}).invoke(fut, new Object[]{
+				Proxy.newProxyInstance(cl, new Class<?>[]{rlclass}, new InvocationHandler()
 			{
-				public void customResultAvailable(IModelInfo model) 
+				public Object invoke(Object proxy, Method method, Object[] args)	throws Throwable
 				{
-					if(model.getReport()!=null)
+					if(method.getName().equals("resultAvailable"))
 					{
-						throw new RuntimeException("Error loading model:\n"+model.getReport().getErrorText());
+						final Object	model	= args[0];
+						// if(model.getReport()!=null)
+						Object	report	= model.getClass().getMethod("getReport").invoke(model);
+						if(report!=null)
+						{
+							// throw new RuntimeException("Error loading model:\n"+model.getReport().getErrorText());
+							ret.setException(new RuntimeException("Error loading model:\n"+report.getClass().getMethod("getErrorText").invoke(report)));
+						}
+						else
+						{
+							// Wrapper for model info from different class loaders.
+							ret.setResult((IModelInfo)Proxy.newProxyInstance(SBootstrapLoader.class.getClassLoader(),
+								new Class<?>[]{IModelInfo.class}, new InvocationHandler()
+							{
+								public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+								{
+									Object	ret	= model.getClass().getMethod(method.getName(), method.getParameterTypes())
+										.invoke(model, args);
+									
+									// Wrap arguments also...
+									if(method.getName().equals("getArguments"))
+									{
+										IArgument[]	iargs	= new IArgument[Array.getLength(ret)];
+										for(int i=0; i<iargs.length; i++)
+										{
+											final Object	arg	= Array.get(ret, i);
+											iargs[i]	= (IArgument)Proxy.newProxyInstance(SBootstrapLoader.class.getClassLoader(),
+												new Class<?>[]{IArgument.class}, new InvocationHandler()
+											{
+												public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+												{
+													Object	ret	= arg.getClass().getMethod(method.getName(), method.getParameterTypes())
+														.invoke(arg, args);
+													
+													// Wrap ClassInfos...
+													if(method.getName().equals("getClazz"))
+													{
+														ret	= new ClassInfo((String)ret.getClass().getMethod("getTypeName").invoke(ret));
+													}
+													
+													return ret;
+												}
+											});
+										}
+										ret	= iargs;
+									}
+									return ret;
+								}
+							}));
+						}
 					}
-					else
+					else // if(method.getName().equals("exceptionOccurred"))
 					{
-						super.customResultAvailable(model);
+						ret.setException((Exception)args[0]);
 					}
+					return null;
 				}
-			});
+			})});
 		}
 		catch(Exception e)
 		{
