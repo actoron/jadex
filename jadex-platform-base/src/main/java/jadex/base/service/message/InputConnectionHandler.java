@@ -3,16 +3,23 @@ package jadex.base.service.message;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.SUtil;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
+ *  Handler that sits between connection and message service.
+ *  Is used by connection to forward user requests.
+ *  Is used by the message service to signal arrived messages.
  */
 public class InputConnectionHandler extends AbstractConnectionHandler
 {
+	//-------- attributes -------- 
+	
 	/** The last received sequence number. */
 	protected int rseqno;
 	
@@ -26,27 +33,16 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	/** The last sequence number acknowledged. */
 	protected int lastack;
 	
-	/** The max delay before an acknowledgement is received. */
-	protected long acktimeout;
-	
 	/** The number of received elements after which an ack is sent. */
 	protected int ackcnt;
 	
 	/** The current timer. */
 	protected ITimer datatimer;
 	
-
-	/** Close flag (when a close message was received). */
-	protected boolean closeflag;
-		
-	/** The close request (for resend). */
-	protected StreamSendTask closereqtask;
-
-	/** The close timer. */
-	protected ITimer closereqtimer;
-
+	//-------- constructors --------
+	
 	/**
-	 * 
+	 *  Create a new input connection handler.
 	 */
 	public InputConnectionHandler(MessageService ms)
 	{
@@ -56,10 +52,11 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		this.data = new HashMap<Integer, byte[]>();
 	
 		this.ackcnt = 10;
-		this.acktimeout = 10000;
 		this.lastack = -1;
 	}
 
+	//-------- methods --------
+	
 	/**
 	 *  From initiator.
 	 * 
@@ -70,38 +67,38 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	{
 		// Remember that close message was received, close the connection and send an ack.
 //		System.out.println("close received");
-		closeflag = true;
-		con.setClosed();
+		if(!con.isClosed())
+			con.setClosed();
 		sendTask(createTask(StreamSendTask.ACKCLOSE, null, null));
 	}
 	
-	/**
-	 *  From initiator.
-	 *  
-	 *  Called to signal that the close request was received.
-	 */
-	public void ackCloseRequestReceived()
-	{
-		System.out.println("received ack close req");
-		closereqtask = null;
-	}
+//	/**
+//	 *  From initiator.
+//	 *  
+//	 *  Called to signal that the close request was received.
+//	 */
+//	public void ackCloseRequestReceived()
+//	{
+//		System.out.println("received ack close req");
+//		closereqtask = null;
+//	}
 	
 	/**
-	 * 
+	 *  Called from connection.
+	 *  Initiates closing procedure (is different for initiator and participant).
 	 */
 	public IFuture<Void> doClose()
 	{
 		// Send a close request
-		if(closeflag)
-			return IFuture.DONE;
+		System.out.println("do close input side");
+
+		final Future<Void> ret = new Future<Void>();
+
+		// Needs nothing to do with ack response.
+		sendAcknowledgedMessage(createTask(StreamSendTask.CLOSEREQ, null, null), StreamSendTask.CLOSEREQ)
+			.addResultListener(new DelegationResultListener<Void>(ret));
 		
-		if(closereqtask!=null)
-			throw new RuntimeException("Must be only called once");
-		
-		closeflag = true;
-		closereqtask = (StreamSendTask)createTask(StreamSendTask.CLOSEREQ, null, null);
-		
-		return sendTask(closereqtask);
+		return ret;
 	}
 	
 	/**
@@ -146,7 +143,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
-	 * 
+	 *  Forward the data to the input connection.
 	 */
 	protected void forwardData(byte[] data)
 	{
@@ -159,24 +156,24 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		// or start time to acknowledge less packages in an interval.
 		if(seqno%ackcnt==0)
 		{
-			sendAck();
+			sendDataAck();
 		}
 		else 
 		{
-			createTimer();
+			createDataTimer();
 		}
 	}
 	
 	/**
 	 *  Called by by itself.
 	 */
-	protected void sendAck()
+	protected void sendDataAck()
 	{
 		// Only send acks if new packets have arrived.
 		if(getSequenceNumber()>lastack)
 		{
 			System.out.println("send ack: "+rseqno);
-			sendTask(createTask(StreamSendTask.ACKCLOSEREQ, rseqno, true, null));
+			sendTask(createTask(StreamSendTask.ACKDATA, rseqno, true, null));
 			lastack = rseqno;
 		}
 	}
@@ -200,10 +197,11 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	}
 
 	/**
-	 * 
+	 *  Create a new data ack timer.
+	 *  Sends an ack automatically after some timeout.
 	 */
 	// Synchronized with timer on this
-	public synchronized void createTimer()
+	public synchronized void createDataTimer()
 	{
 		// Test if packets have been received till creation
 		if(datatimer==null && rseqno>lastack)
@@ -212,15 +210,16 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 			public void timeEventOccurred(long currenttime)
 			{
 				System.out.println("timer ack");
-				sendAck();
+				sendDataAck();
 				datatimer = null;
-				createTimer();				
+				createDataTimer();				
 			}
 		});
 	}
 	
 	/**
-	 * 
+	 *  Get the input connection.
+	 *  @return The input connection.
 	 */
 	public InputConnection getInputConnection()
 	{

@@ -16,6 +16,9 @@ import java.util.Map;
  */
 public class MapSendTask extends AbstractSendTask implements ISendTask
 {
+	//-------- constants --------
+	
+	/** Constant for string based map message. */
 	public static final byte MESSAGE_TYPE_MAP = 1;
 	
 	//-------- attributes --------

@@ -1,10 +1,7 @@
 package jadex.base.service.message;
 
-import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
-import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -14,10 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  Input connection implementation for byte streams.
  */
 public class InputConnection extends AbstractConnection implements IInputConnection
 {
+	//-------- attributes --------
+	
 	/** The data. */
 	protected List<byte[]> data;
 	
@@ -34,6 +33,8 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	protected IntermediateFuture<Byte> ifuture;
 	protected Future<Byte> ofuture;
 		
+	//-------- constructors --------
+
 	/**
 	 *  Create a new input connection.
 	 */
@@ -44,6 +45,8 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		this.data = new ArrayList<byte[]>();
 	}
 	
+	//-------- methods --------
+
 	/**
 	 *  Non-blocking read. Tries to read the next byte.
 	 *  @return The next byte or -1 if the end of the stream has been reached.

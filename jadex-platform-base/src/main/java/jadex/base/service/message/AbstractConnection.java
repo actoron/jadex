@@ -1,6 +1,7 @@
 package jadex.base.service.message;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.future.IResultListener;
 
 /**
  *  Abstract base class for connections.
@@ -9,7 +10,8 @@ public abstract class AbstractConnection
 {
 	//-------- attributes --------
 	
-	/** Boolean flag if connection is closed. */
+	/** Boolean flag if connection is inited, closing, closed. */
+	protected boolean inited;
 	protected boolean closed;
 	protected boolean closing;
 	
@@ -47,15 +49,45 @@ public abstract class AbstractConnection
 		this.ch = ch;
 		
 		if(ch==null)
-			throw new IllegalArgumentException("Connection hanlder must not null.");
+			throw new IllegalArgumentException("Connection handler must not null.");
 		
 		// Send init message if initiator side.
 		ch.setConnection(this);
+		
 		if(isInitiatorSide())
-			ch.sendInit();
+			ch.sendInit().addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				setInited();
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				close();
+			}
+		});
 	}
 	
 	//-------- methods --------	
+	
+	/**
+	 *  Get the inited.
+	 *  @return the inited.
+	 */
+	public boolean isInited()
+	{
+		return inited;
+	}
+
+	/**
+	 *  Set the inited.
+	 *  @param inited The inited to set.
+	 */
+	public void setInited()
+	{
+		this.inited = true;
+	}
 	
 	/**
 	 *  Set the connection to closed.
@@ -72,7 +104,7 @@ public abstract class AbstractConnection
 	{
 		this.closed = true;
 	}
-
+	
 	/**
 	 *  Get the closed.
 	 *  @return The closed.
@@ -103,7 +135,6 @@ public abstract class AbstractConnection
 		setClosing();
 
 		ch.doClose();
-//		sendTask(createTask(getMessageType(StreamSendTask.CLOSE), null, null));
 	}
 	
 	/**
@@ -116,7 +147,8 @@ public abstract class AbstractConnection
 	}
 	
 	/**
-	 * 
+	 *  Test if this connection is the initiator side.
+	 *  @return True if is initiator.
 	 */
 	public boolean isInitiatorSide()
 	{
@@ -124,7 +156,8 @@ public abstract class AbstractConnection
 	}
 
 	/**
-	 * 
+	 *  Test if this connection is an input connection.
+	 *  @return True if is initiator.
 	 */
 	public boolean isInputConnection()
 	{

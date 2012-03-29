@@ -15,49 +15,69 @@ import java.util.Map;
  */
 public class StreamSendTask extends AbstractSendTask implements ISendTask
 {
+	//-------- constants ----------
+	
+	/** The message type for streams. */
 	public static final byte MESSAGE_TYPE_STREAM = 99;
 
-	public static final long LEASETIME = 5000;
+	/** The minimal lease time. */
+	public static final long MIN_LEASETIME = 5000;
 	
+	/** Constants for message types. */
+	
+	/** Init a connection. */
 	public static final String INIT = "INIT";
+	/** Acknowledge init. */
+	public static final String ACKINIT = "ACKINIT";
+	/** Send data message. */
 	public static final String DATA = "DATA";
-	public static final String CLOSE = "CLOSE";
-	public static final String CLOSEREQ = "CLOSEREQ";
-	public static final String ALIVE = "ALIVE";
+	/** Acknowledge data message. */
 	public static final String ACKDATA = "ACKDATA"; 
-	public static final String ACKCLOSEREQ = "ACKCLOSEREQ"; 
+	/** Close the connection. */
+	public static final String CLOSE = "CLOSE";
+	/** Acknowledge the close message. */
 	public static final String ACKCLOSE = "ACKCLOSE"; 
+	/** Close request (from participant which cannot close itself). */
+	public static final String CLOSEREQ = "CLOSEREQ";
+	/** Acknowledge the close request. */ 
+	public static final String ACKCLOSEREQ = "ACKCLOSEREQ"; 
+	/** The alive message. */
+	public static final String ALIVE = "ALIVE";
 	
 	/** Create virtual output connection - from initiator. */
 	public static final byte INIT_OUTPUT_INITIATOR = 1; 
+	/** Ack the init - from initiator. */
+	public static final byte ACKINIT_OUTPUT_PARTICIPANT = 2; 
 	/** Send data - from initiator. */
-	public static final byte DATA_OUTPUT_INITIATOR = 2;
+	public static final byte DATA_OUTPUT_INITIATOR = 3;
 	/** Ack data/close - from participant .*/
-	public static final byte ACKDATA_OUTPUT_PARTICIPANT = 3;
+	public static final byte ACKDATA_OUTPUT_PARTICIPANT = 4;
 	/** Request close connection - from participant. */
-	public static final byte CLOSEREQ_OUTPUT_PARTICIPANT = 4;
+	public static final byte CLOSEREQ_OUTPUT_PARTICIPANT = 5;
 	/** Ack for close request - from initiator .*/
-	public static final byte ACKCLOSEREQ_OUTPUT_INITIATOR = 5;
+	public static final byte ACKCLOSEREQ_OUTPUT_INITIATOR = 6;
 	/** Close connection - from initiator. */
-	public static final byte CLOSE_OUTPUT_INITIATOR = 6;
+	public static final byte CLOSE_OUTPUT_INITIATOR = 7;
 	/** Ack data/close - from participant .*/
-	public static final byte ACKCLOSE_OUTPUT_PARTICIPANT = 7;
+	public static final byte ACKCLOSE_OUTPUT_PARTICIPANT = 8;
 
 	
 	/** Create virtual input connection - from initiator. */ 
 	public static final byte INIT_INPUT_INITIATOR = 11;
+	/** Ack the init - from participant. */
+	public static final byte ACKINIT_INPUT_PARTICIPANT = 12; 
 	/** Send data - from participant. */
-	public static final byte DATA_INPUT_PARTICIPANT = 12;
+	public static final byte DATA_INPUT_PARTICIPANT = 13;
 	/** Ack data - from participant .*/
-	public static final byte ACKDATA_INPUT_INITIATOR = 13;
+	public static final byte ACKDATA_INPUT_INITIATOR = 14;
 	/** Close request connection - from initiator. */
-	public static final byte CLOSEREQ_INPUT_INITIATOR = 14;
+	public static final byte CLOSEREQ_INPUT_INITIATOR = 15;
 	/** Ack for close request - from initiator .*/
-	public static final byte ACKCLOSEREQ_INPUT_PARTICIPANT = 15;
+	public static final byte ACKCLOSEREQ_INPUT_PARTICIPANT = 16;
 	/** Close connection - from participant. */
-	public static final byte CLOSE_INPUT_PARTICIPANT = 16;
+	public static final byte CLOSE_INPUT_PARTICIPANT = 17;
 	/** Ack for close - from initiator .*/
-	public static final byte ACKCLOSE_INPUT_INITIATOR = 17;
+	public static final byte ACKCLOSE_INPUT_INITIATOR = 18;
 
 	
 	/** Alive message - from initiator. */ 
@@ -75,20 +95,22 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 		MESSAGETYPES = new HashMap<Tuple, Byte>();
 		
 		MESSAGETYPES.put(new Tuple(INIT, false, true), new Byte(INIT_OUTPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ACKINIT, false, false), new Byte(ACKINIT_OUTPUT_PARTICIPANT));
 		MESSAGETYPES.put(new Tuple(DATA, false, true), new Byte(DATA_OUTPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(ACKDATA, false, false), new Byte(ACKDATA_OUTPUT_PARTICIPANT));
 		MESSAGETYPES.put(new Tuple(CLOSE, false, true), new Byte(CLOSE_OUTPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(ACKCLOSE, false, false), new Byte(ACKCLOSE_OUTPUT_PARTICIPANT));
 		MESSAGETYPES.put(new Tuple(CLOSEREQ, false, false), new Byte(CLOSEREQ_OUTPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(ACKCLOSEREQ, false, false), new Byte(ACKDATA_OUTPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(ACKCLOSEREQ, false, true), new Byte(ACKCLOSEREQ_OUTPUT_INITIATOR));
 
 		MESSAGETYPES.put(new Tuple(INIT, true, true), new Byte(INIT_INPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ACKINIT, true, false), new Byte(ACKINIT_INPUT_PARTICIPANT));
 		MESSAGETYPES.put(new Tuple(DATA, true, false), new Byte(DATA_INPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(ACKDATA, true, true), new Byte(DATA_INPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(ACKDATA, true, true), new Byte(ACKDATA_INPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(CLOSE, true, false), new Byte(CLOSE_INPUT_PARTICIPANT));
+		MESSAGETYPES.put(new Tuple(ACKCLOSE, true, true), new Byte(ACKCLOSE_INPUT_INITIATOR));
 		MESSAGETYPES.put(new Tuple(CLOSEREQ, true, true), new Byte(CLOSEREQ_INPUT_INITIATOR));
-		MESSAGETYPES.put(new Tuple(ACKCLOSEREQ, true, true), new Byte(ACKCLOSEREQ_INPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(CLOSE, true, true), new Byte(CLOSE_INPUT_PARTICIPANT));
-		MESSAGETYPES.put(new Tuple(ACKCLOSE, true, false), new Byte(ACKCLOSE_INPUT_INITIATOR));
+		MESSAGETYPES.put(new Tuple(ACKCLOSEREQ, true, false), new Byte(ACKCLOSEREQ_INPUT_PARTICIPANT));
 
 		MESSAGETYPES.put(new Tuple(ALIVE, true, true), new Byte(ALIVE_INITIATOR));
 		MESSAGETYPES.put(new Tuple(ALIVE, false, true), new Byte(ALIVE_INITIATOR));
@@ -101,9 +123,6 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	/** The binary message part. */
 	protected Object message;
 		
-//	/** The message type. */
-//	protected MessageType messagetype;
-	
 	/** The stream id. */
 	protected int streamid;
 	
@@ -228,10 +247,21 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 	}
 	
 	/**
-	 * 
+	 *  Get the message type.
+	 *  @param type The type.
+	 *  @param input Flag if in input connection.
+	 *  @param initiator Flag if is initiator side.
 	 */
 	public static byte getMessageType(String type, boolean input, boolean initiator)
 	{
-		return MESSAGETYPES.get(new Tuple(type, input, initiator));
+		try
+		{
+			return MESSAGETYPES.get(new Tuple(type, input, initiator));
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 }

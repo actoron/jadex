@@ -20,10 +20,12 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 /**
- * 
+ *  Abstract base class for sending a message with the message service.
  */
 public abstract class AbstractSendTask implements ISendTask
 {
+	//-------- attributes --------
+	
 	/** The encoded message envelope. */
 	protected byte[] data;
 
@@ -56,6 +58,7 @@ public abstract class AbstractSendTask implements ISendTask
 	/** The list of waiting transports. */
 	protected List<IResultCommand<IFuture<Void>, Void>>	waiting;
 
+	//-------- constructors --------
 	
 	/**
 	 *  Create a new task.
@@ -75,6 +78,8 @@ public abstract class AbstractSendTask implements ISendTask
 		this.codecids = codecids==null? new byte[0]: codecids;
 		this.future	= new Future<Void>();
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Get the messagetype.
@@ -251,7 +256,7 @@ public abstract class AbstractSendTask implements ISendTask
 	}
 	
 	/**
-	 * 
+	 *  Encode the object with the codecs.
 	 */
 	protected byte[] encode(Object obj)
 	{

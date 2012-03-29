@@ -10,6 +10,8 @@ import jadex.commons.future.IFuture;
  */
 public class OutputConnection extends AbstractConnection implements IOutputConnection
 {		
+	//-------- constructors --------
+	
 	/**
 	 *  Create a new connection.
 	 */
@@ -19,6 +21,8 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 		super(sender, receiver, id, false, initiator, ch);
 	}
 	
+	//-------- methods --------
+
 	/**
 	 *  Write the content to the stream.
 	 *  @param data The data.

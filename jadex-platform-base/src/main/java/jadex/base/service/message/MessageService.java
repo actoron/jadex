@@ -1077,7 +1077,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 				}
 				
-				ia.waitForDelay(StreamSendTask.LEASETIME, this).addResultListener(new IResultListener<Void>()
+				ia.waitForDelay(StreamSendTask.MIN_LEASETIME, this).addResultListener(new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
@@ -1110,7 +1110,7 @@ public class MessageService extends BasicService implements IMessageService
 				AbstractConnectionHandler[] mypcons = (AbstractConnectionHandler[])pcons.values().toArray(new AbstractConnectionHandler[0]);
 				for(int i=0; i<mypcons.length; i++)
 				{
-					if(!mypcons[i].isConnectionAlive(StreamSendTask.LEASETIME))
+					if(!mypcons[i].isConnectionAlive())
 					{
 						System.out.println("removed con: "+mypcons[i]);
 						mypcons[i].close();
@@ -1120,7 +1120,7 @@ public class MessageService extends BasicService implements IMessageService
 				AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
 				for(int i=0; i<myicons.length; i++)
 				{
-					if(!myicons[i].isConnectionAlive(StreamSendTask.LEASETIME))
+					if(!myicons[i].isConnectionAlive())
 					{
 						System.out.println("removed con: "+mypcons[i]);
 						myicons[i].close();
@@ -1128,7 +1128,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 				}
 				
-				ia.waitForDelay(StreamSendTask.LEASETIME, this);
+				ia.waitForDelay(StreamSendTask.MIN_LEASETIME, this);
 				
 				return IFuture.DONE;
 			}
@@ -1451,6 +1451,8 @@ public class MessageService extends BasicService implements IMessageService
 				pcons.put(new Integer(conid), ich);
 //				System.out.println("created: "+con.hashCode());
 				
+				ich.initReceived();
+				
 				final Future<Void> ret = new Future<Void>();
 				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
@@ -1464,6 +1466,20 @@ public class MessageService extends BasicService implements IMessageService
 						}
 					}
 				});
+			}
+			else if(type==StreamSendTask.ACKINIT_OUTPUT_PARTICIPANT)
+			{
+				System.out.println("CCC: ack init");
+				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
+				if(och!=null)
+				{
+					och.ackReceived(StreamSendTask.INIT);
+//					och.ackCloseReceived();
+				}
+				else
+				{
+					System.out.println("OutputStream not found: "+conid);
+				}
 			}
 			else if(type==StreamSendTask.DATA_OUTPUT_INITIATOR)
 			{
@@ -1496,7 +1512,8 @@ public class MessageService extends BasicService implements IMessageService
 				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
 				if(och!=null)
 				{
-					och.ackCloseReceived();
+					och.ackReceived(StreamSendTask.CLOSE);
+//					och.ackCloseReceived();
 				}
 				else
 				{
@@ -1522,7 +1539,8 @@ public class MessageService extends BasicService implements IMessageService
 				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(new Integer(conid));
 				if(ich!=null)
 				{
-					ich.ackCloseRequestReceived();
+					ich.ackReceived(StreamSendTask.CLOSEREQ);
+//					ich.ackCloseRequestReceived();
 				}
 				else
 				{
@@ -1535,7 +1553,7 @@ public class MessageService extends BasicService implements IMessageService
 				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
 				if(och!=null)
 				{
-					och.ack(((Integer)data).intValue());
+					och.ackData(((Integer)data).intValue());
 				}
 				else
 				{
@@ -1551,6 +1569,8 @@ public class MessageService extends BasicService implements IMessageService
 				pcons.put(new Integer(conid), och);
 //				System.out.println("created: "+con.hashCode());
 				
+				och.initReceived();
+				
 				final Future<Void> ret = new Future<Void>();
 				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
@@ -1565,6 +1585,18 @@ public class MessageService extends BasicService implements IMessageService
 						}
 					}
 				});
+			}
+			else if(type==StreamSendTask.ACKINIT_INPUT_PARTICIPANT)
+			{
+				InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
+				if(ich!=null)
+				{
+					ich.ackReceived(StreamSendTask.INIT);
+				}
+				else
+				{
+					System.out.println("InputStream not found: "+conid);
+				}
 			}
 			else if(type==StreamSendTask.DATA_INPUT_PARTICIPANT)
 			{
@@ -1595,7 +1627,8 @@ public class MessageService extends BasicService implements IMessageService
 				InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
 				if(ich!=null)
 				{
-					ich.ackCloseRequestReceived();
+					ich.ackReceived(StreamSendTask.CLOSEREQ);
+//					ich.ackCloseRequestReceived();
 				}
 				else
 				{
@@ -1619,7 +1652,8 @@ public class MessageService extends BasicService implements IMessageService
 				OutputConnectionHandler ich = (OutputConnectionHandler)pcons.get(new Integer(conid));
 				if(ich!=null)
 				{
-					ich.ackCloseReceived();
+					ich.ackReceived(StreamSendTask.CLOSE);
+//					ich.ackCloseReceived();
 				}
 				else
 				{
@@ -1632,7 +1666,7 @@ public class MessageService extends BasicService implements IMessageService
 				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
 				if(och!=null)
 				{
-					och.ack(((Integer)data).intValue());
+					och.ackData(((Integer)data).intValue());
 				}
 				else
 				{

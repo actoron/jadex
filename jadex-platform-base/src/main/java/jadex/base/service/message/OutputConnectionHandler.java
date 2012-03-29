@@ -9,6 +9,7 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,18 +18,20 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  The output connection handler. 
  */
 public class OutputConnectionHandler extends AbstractConnectionHandler
 {
+	//-------- attributes --------
+	
 	/** The data sent (not acknowledged). */
-	protected Map<Integer, StreamSendTask> sent;
+	protected Map<Integer, Tuple2<StreamSendTask, Integer>> sent;
 	
 	/** The data to send. */
 	protected List<Tuple2<StreamSendTask, Future<Void>>> tosend;
 
-//	/** The current sequence number. */
-//	protected int seqnumber;
+	/** The current sequence number. */
+	protected int seqnumber;
 	
 	/** The last acknowledged packet number. */
 	protected int lastack;
@@ -36,16 +39,13 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	/** The max number of packets that can be sent without an ack is received. */
 	protected int maxsend;
 
-	
-	/** The max delay before an acknowledgement is received. */
-	protected long acktimeout;
-	
+
 	/** The number of received elements after which an ack is sent. */
 	protected int ackcnt;
 	
 	/** The acknowledgement timer. */
 	protected ITimer acktimer;
-
+	
 	
 	/** Flag if multipackets should be used. */
 	protected boolean multipackets;
@@ -69,24 +69,34 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	/** Close request flag (when a closereq message was received). */
 	protected boolean closereqflag;
 
-	/** The close (for resend). */
-	protected StreamSendTask closetask;
-
+	//-------- constructors --------
 	
+//	/**
+//	 *  Creat a new handler.
+//	 */
+//	public OutputConnectionHandler(MessageService ms)
+//	{
+//		this();
+//	}
+	
+//	/**
+//	 *  Creat a new handler.
+//	 */
+//	public OutputConnectionHandler(MessageService ms, int maxresends, long acktimeout, 
+//		long leasetime)
 	/**
-	 * 
+	 *  Creat a new handler.
 	 */
 	public OutputConnectionHandler(MessageService ms)
 	{
-		super(ms);
+		super(ms);//, maxresends, acktimeout, leasetime);
 		this.tosend = Collections.synchronizedList(new ArrayList<Tuple2<StreamSendTask, Future<Void>>>());
-		this.sent = Collections.synchronizedMap(new HashMap<Integer, StreamSendTask>());
-
+		this.sent = Collections.synchronizedMap(new HashMap<Integer, Tuple2<StreamSendTask, Integer>>());
+		this.seqnumber = -1;
 		this.lastack = -1;
-		this.maxsend = 30;
 		
+		this.maxsend = 30;
 		this.ackcnt = 10;
-		this.acktimeout = 15000;
 		
 		this.multipackets = true;
 		this.mpmaxsize = 20;
@@ -94,6 +104,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		this.mpsize = 0;
 		this.mpsendtimeout = 3000;
 	}
+	
+	//-------- methods --------
 	
 	/**
 	 *  Received a request to close the connection.
@@ -104,35 +116,50 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 			con.close();
 		else
 			closereqflag = true;
-		
-		// todo: additional timer?
+	
+		sendTask(createTask(StreamSendTask.ACKCLOSEREQ, null, null));
 	}
 	
-	/**
-	 *  Response to close message. 
-	 *  
-	 *  The participant has acked the close -> close this site also.
-	 */
-	public void ackCloseReceived()
-	{
-		System.out.println("received ack close");
-		// Set connection as closed.
-		con.setClosed();
-		closetask = null;
-	}
+//	/**
+//	 *  Response to close message. 
+//	 *  
+//	 *  The participant has acked the close -> close this site also.
+//	 */
+//	public void ackCloseReceived()
+//	{
+//		System.out.println("received ack close");
+//		ackReceived(StreamSendTask.CLOSE);
+//	}
 	
 	/**
-	 *  Send close message on close init.
+	 *  Called from connection.
+	 *  Initiates closing procedure (is different for initiator and participant).
 	 */
 	public IFuture<Void> doClose()
 	{
-		if(closetask!=null)
-			throw new RuntimeException("Must be only called once");
+		System.out.println("do close output side");
 
-		closetask = (StreamSendTask)createTask(StreamSendTask.CLOSE, null, null);
-		return sendTask(closetask);
+		final Future<Void> ret = new Future<Void>();
+
+		sendAcknowledgedMessage(createTask(StreamSendTask.CLOSE, null, null), StreamSendTask.CLOSE)
+			.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				// Set connection as closed.
+				con.setClosed();
+				ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				con.setClosed();
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
-	
 	
 	/**
 	 *  Called from connection.
@@ -187,7 +214,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
-	 * 
+	 *  Add data to a multi packet.
+	 *  @parm data The data.
 	 */
 	protected IFuture<Void> addMultipacket(byte[] data)
 	{
@@ -201,7 +229,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		{
 			byte[] part = new byte[len];
 			System.arraycopy(data, start, part, 0, len);
-			futs.add(internalAddMultiPacket(part));
+			futs.add(addMultiPacketChunk(part));
 			start += len;
 			len = Math.min(mpmaxsize-mpsize, data.length-start);
 		}
@@ -224,15 +252,16 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
-	 * 
+	 *  Add data chunk.
+	 *  @param data The data.
 	 */
-	protected IFuture<Void> internalAddMultiPacket(byte[] data)
+	protected IFuture<Void> addMultiPacketChunk(byte[] data)
 	{
 		IFuture<Void> ret = IFuture.DONE;
 		
 		// Install send timer on first packet
 		if(mpsize==0)
-			createSendTimer(getSequenceNumber());
+			createMultipacketSendTimer(getSequenceNumber());
 		
 		multipacket.add(data);
 		mpsize += data.length;
@@ -244,7 +273,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
-	 * 
+	 *  Send a multi packet.
 	 */
 	protected IFuture<Void> sendMultiPacket()
 	{
@@ -305,7 +334,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		}
 		
 		// add task to unacknowledged sent list 
-		sent.put(task.getSequenceNumber(), task);
+		sent.put(task.getSequenceNumber(), new Tuple2<StreamSendTask, Integer>(task, new Integer(1)));
 		
 		// create timer if none is active
 		createAckTimer(task.getSequenceNumber());
@@ -322,11 +351,20 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	{
 		IFuture<Void> ret = IFuture.DONE;
 		
-		StreamSendTask task = sent.get(new Integer(seqnumber));
-		if(task!=null)
+		Tuple2<StreamSendTask, Integer> tup = sent.get(new Integer(seqnumber));
+		if(tup!=null)
 		{
-			System.out.println("resend: "+seqnumber);
-			ret = sendTask(task);
+			if(tup.getSecondEntity().intValue()==maxresends)
+			{
+				con.close();
+			}
+			else
+			{
+				System.out.println("resend: "+seqnumber);
+				StreamSendTask task = tup.getFirstEntity();
+				ret = sendTask(tup.getFirstEntity());
+				sent.put(task.getSequenceNumber(), new Tuple2<StreamSendTask, Integer>(task, new Integer(tup.getSecondEntity().intValue()+1)));
+			}
 		}
 		
 		return ret;
@@ -337,13 +375,13 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	 *  
 	 *  Uses: sent, lastack
 	 */
-	public void ack(int seqnumber)
+	public void ackData(int seqnumber)
 	{
 		System.out.println("ack: "+seqnumber);
 		for(int i=seqnumber; i>lastack; i--)
 		{
-			StreamSendTask task = sent.remove(new Integer(i));
-			if(task==null)
+			Tuple2<StreamSendTask, Integer> tup = sent.remove(new Integer(i));
+			if(tup==null)
 				throw new RuntimeException("Ack not possible, data not found.");
 		}
 		
@@ -367,12 +405,12 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	}
 
 	/**
-	 * 
+	 *  Tests if the data processing of the connection is finished. 
 	 */
 	public boolean isDataFinished()
 	{
-		// All acks received.
-		return sent.isEmpty();
+		// All acks received and no unfinished multi packet.
+		return sent.isEmpty() && (!multipackets || mpsize==0);
 	}
 	
 	/**
@@ -384,31 +422,41 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
-	 * 
+	 *  Get the output connection.
+	 *  @return The connection.
 	 */
 	public OutputConnection getOutputConnection()
 	{
 		return (OutputConnection)getConnection();
 	}
 	
-//	/**
-//	 *  Get the seqnumber.
-//	 *  @return the seqnumber.
-//	 */
-//	public int getSequenceNumber()
-//	{
-//		return seqnumber;
-//	}
+	/**
+	 *  Get the seqnumber.
+	 *  @return the seqnumber.
+	 */
+	public int getSequenceNumber()
+	{
+		return seqnumber;
+	}
 	
 	/**
-	 * 
+	 *  Get The next seqnumber.
+	 *  @return The next seqnumber.
+	 */
+	public synchronized int getNextSequenceNumber()
+	{
+		return ++seqnumber;
+	}
+	
+	/**
+	 *  This timer automatically sends non-full multipackets after mpsendtimeout has occurred.
 	 */
 	// Synchronized with timer on this
-	public synchronized void createSendTimer(final int seqno)
+	public synchronized void createMultipacketSendTimer(final int seqno)
 	{
 		if(mpsendtimer!=null)
 			mpsendtimer.cancel();
-		mpsendtimer = ms.getClockService().createTimer(System.currentTimeMillis()+mpsendtimeout, new ITimedObject()
+		mpsendtimer = ms.getClockService().createTimer(mpsendtimeout, new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
@@ -427,7 +475,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
-	 * 
+	 *  Triggers resends of packets if no ack has been received in acktimeout.
 	 */
 	// Synchronized with timer on this
 	public synchronized void createAckTimer(final int seqno)
@@ -439,7 +487,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 			if(getSequenceNumber()>seqno)
 			{
 //				final int sq = seqno + ackcnt;
-				acktimer = ms.getClockService().createTimer(System.currentTimeMillis()+acktimeout, new ITimedObject()
+				acktimer = ms.getClockService().createTimer(acktimeout, new ITimedObject()
 				{
 					public void timeEventOccurred(long currenttime)
 					{

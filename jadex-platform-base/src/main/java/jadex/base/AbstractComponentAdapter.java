@@ -277,6 +277,9 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	 */
 	protected void initLogger(Logger logger)
 	{
+		if(logger==null)
+			System.out.println("gshdfghsdf");
+		
 		// get logging properties (from ADF)
 		// the level of the logger
 		// can be Integer or Level
