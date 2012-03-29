@@ -28,7 +28,6 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
 import javax.swing.UIDefaults;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -98,13 +97,12 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 		centerp.add(ObjectCardLayout.DEFAULT_COMPONENT, emptylabel);
 		
 		selcb = new JComboBox(); 
-		selcb.setRenderer(new ListCellRenderer<E>()
+		selcb.setRenderer(new BasicComboBoxRenderer()
 		{
-			BasicComboBoxRenderer	bcbr	= new BasicComboBoxRenderer();
-		    public Component getListCellRendererComponent(JList<? extends E> list, E value, int index, boolean isSelected, boolean cellHasFocus) 
+		    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) 
 		    {
-		    	String	val	= value!=null? convertToString(value): null;
-		    	return bcbr.getListCellRendererComponent(list, val, index, isSelected, cellHasFocus);
+		    	String	val	= value!=null? convertToString((E)value): null;
+		    	return getListCellRendererComponent(list, val, index, isSelected, cellHasFocus);
 		    }
 		});
 		
