@@ -14,7 +14,7 @@ import java.util.Map;
  *  Codec for encoding and decoding collections.
  *
  */
-public class CollectionCodec implements IDecoderHandler, ITraverseProcessor
+public class CollectionCodec extends AbstractCodec
 {
 	/**
 	 *  Tests if the decoder can decode the class.
@@ -27,12 +27,13 @@ public class CollectionCodec implements IDecoderHandler, ITraverseProcessor
 	}
 	
 	/**
-	 *  Decodes an object.
+	 *  Creates the object during decoding.
+	 *  
 	 *  @param clazz The class of the object.
 	 *  @param context The decoding context.
-	 *  @return The decoded object.
+	 *  @return The created object.
 	 */
-	public Object decode(Class clazz, DecodingContext context)
+	public Object createObject(Class clazz, DecodingContext context)
 	{
 		Collection coll = null;
 		try
@@ -48,12 +49,24 @@ public class CollectionCodec implements IDecoderHandler, ITraverseProcessor
 		{
 			throw new RuntimeException(e);
 		}
+		
+		return coll;
+	}
+	
+	/**
+	 *  Decodes and adds sub-objects during decoding.
+	 *  
+	 *  @param object The instantiated object.
+	 *  @param clazz The class of the object.
+	 *  @param context The decoding context.
+	 *  @return The finished object.
+	 */
+	public Object decodeSubObjects(Object object, Class clazz, DecodingContext context)
+	{
+		Collection coll = (Collection) object;
 		int length = (int) context.readVarInt();
-		while (coll.size() < length)
+		for (int i = 0; i < length; ++i)
 		{
-			int index = (int) context.readVarInt();
-			while (coll.size() < index)
-				coll.add(null);
 			Object element = BinarySerializer.decodeObject(context);
 			coll.add(element);
 		}
@@ -71,25 +84,16 @@ public class CollectionCodec implements IDecoderHandler, ITraverseProcessor
 	}
 	
 	/**
-	 *  Process an object.
-	 *  @param object The object.
-	 *  @return The processed object.
+	 *  Encode the object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		EncodingContext ec = (EncodingContext) context;
-		
-		object = ec.runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
-		clazz = object == null? null : object.getClass();
-		
-		ec.writeClass(clazz);
-		ec.write(VarInt.encode(((Collection) object).size()));
+		ec.writeVarInt(((Collection) object).size());
 		
 		Collection col = (Collection)object;
 
 		traversed.put(object, object);
-		int count = 0;
 		try
 		{
 			for(Iterator<Object> it=col.iterator(); it.hasNext(); )
@@ -97,11 +101,13 @@ public class CollectionCodec implements IDecoderHandler, ITraverseProcessor
 				Object val = it.next();
 				if (val != null)
 				{
-					ec.write(VarInt.encode(count));
 					Class valclazz = val.getClass();
-					traverser.traverse(val, valclazz, traversed, processors, clone, context);
+					traverser.traverse(val, valclazz, traversed, processors, clone, ec);
 				}
-				++count;
+				else
+				{
+					ec.writeString(BinarySerializer.NULL_MARKER);
+				}
 			}
 		}
 		catch(Exception e)

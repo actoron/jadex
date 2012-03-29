@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MapCodec implements ITraverseProcessor, IDecoderHandler
+public class MapCodec extends AbstractCodec
 {
 	/**
 	 *  Tests if the decoder can decode the class.
@@ -23,12 +23,13 @@ public class MapCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Decodes an object.
+	 *  Creates the object during decoding.
+	 *  
 	 *  @param clazz The class of the object.
 	 *  @param context The decoding context.
-	 *  @return The decoded object.
+	 *  @return The created object.
 	 */
-	public Object decode(Class clazz, DecodingContext context)
+	public Object createObject(Class clazz, DecodingContext context)
 	{
 		Map ret = null;
 		try
@@ -42,6 +43,21 @@ public class MapCodec implements ITraverseProcessor, IDecoderHandler
 		{
 			throw new RuntimeException(e);
 		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Decodes and adds sub-objects during decoding.
+	 *  
+	 *  @param object The instantiated object.
+	 *  @param clazz The class of the object.
+	 *  @param context The decoding context.
+	 *  @return The finished object.
+	 */
+	public Object decodeSubObjects(Object object, Class clazz, DecodingContext context)
+	{
+		Map ret = (Map) object;
 		
 		int size = (int) context.readVarInt();
 		for (int i = 0; i < size; ++i)
@@ -65,38 +81,38 @@ public class MapCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Process an object.
-	 *  @param object The object.
-	 *  @return The processed object.
+	 *  Encode the object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		EncodingContext ec = (EncodingContext) context;
-		
-		object = ec.runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
-		clazz = object == null? null : object.getClass();
-		
-		ec.writeClass(clazz);
-		ec.write(VarInt.encode(((Map) object).size()));
+		ec.writeVarInt(((Map) object).size());
 		
 		Set entries = ((Map) object).entrySet();
 		for (Iterator<Map.Entry> it = entries.iterator(); it.hasNext(); )
 		{
 			Map.Entry entry = it.next();
 			Object ev = entry.getKey();
-			Class evclass = ev!=null? ev.getClass(): null;
 			if (ev == null)
-				BinarySerializer.NULL_HANDLER.process(null, null, processors, traverser, traversed, clone, context);
+			{
+				ec.writeString(BinarySerializer.NULL_MARKER);
+				//BinarySerializer.NULL_HANDLER.process(null, null, processors, traverser, traversed, clone, ec);
+			}
 			else
-				traverser.traverse(ev, evclass, traversed, processors, clone, context);
+			{
+				traverser.traverse(ev, ev.getClass(), traversed, processors, clone, ec);
+			}
 			
 			ev = entry.getValue();
-			evclass = ev!=null? ev.getClass(): null;
 			if (ev == null)
-				BinarySerializer.NULL_HANDLER.process(null, null, processors, traverser, traversed, clone, context);
+			{
+				ec.writeString(BinarySerializer.NULL_MARKER);
+				//BinarySerializer.NULL_HANDLER.process(null, null, processors, traverser, traversed, clone, ec);
+			}
 			else
-				traverser.traverse(ev, evclass, traversed, processors, clone, context);
+			{
+				traverser.traverse(ev, ev.getClass(), traversed, processors, clone, ec);
+			}
 		}
 		
 		return object;

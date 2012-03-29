@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-public class MultiCollectionCodec implements ITraverseProcessor, IDecoderHandler
+public class MultiCollectionCodec extends AbstractCodec
 {
 	/**
 	 *  Tests if the decoder can decode the class.
@@ -23,16 +23,18 @@ public class MultiCollectionCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Decodes an object.
+	 *  Creates the object during decoding.
+	 *  
 	 *  @param clazz The class of the object.
 	 *  @param context The decoding context.
-	 *  @return The decoded object.
+	 *  @return The created object.
 	 */
-	public Object decode(Class clazz, DecodingContext context)
+	public Object createObject(Class clazz, DecodingContext context)
 	{
 		MultiCollection ret = null;
 		try
 		{
+			//FIXME: Separation of sub-object decoding not possible with current MultiMap interface?
 			Map map = (Map) BinarySerializer.decodeObject(context);
 			Class type = SReflect.classForName(context.readString(), context.getClassloader());
 			Constructor c = clazz.getConstructor(new Class[] { Map.class, Class.class } );
@@ -57,27 +59,18 @@ public class MultiCollectionCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Process an object.
-	 *  @param object The object.
-	 *  @return The processed object.
+	 *  Encode the object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		EncodingContext ec = (EncodingContext) context;
-		
-		object = ec.runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
-		clazz = object == null? null : object.getClass();
-		
-		ec.writeClass(clazz);
-		
 		MultiCollection mc = (MultiCollection) object;
 		try
 		{
 			Field mapfield = MultiCollection.class.getDeclaredField("map");
 			mapfield.setAccessible(true);
 			Map map = (Map) mapfield.get(mc);
-			traverser.traverse(map, map.getClass(), traversed, processors, clone, context);
+			traverser.traverse(map, map.getClass(), traversed, processors, clone, ec);
 			
 			Field typefield = MultiCollection.class.getDeclaredField("type");
 			typefield.setAccessible(true);

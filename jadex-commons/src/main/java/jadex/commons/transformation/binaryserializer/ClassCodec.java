@@ -11,7 +11,7 @@ import java.util.Map;
  *  Codec for encoding and decoding Class objects.
  *
  */
-public class ClassCodec implements ITraverseProcessor, IDecoderHandler
+public class ClassCodec extends AbstractCodec
 {
 	/**
 	 *  Tests if the decoder can decode the class.
@@ -24,12 +24,13 @@ public class ClassCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Decodes an object.
+	 *  Creates the object during decoding.
+	 *  
 	 *  @param clazz The class of the object.
 	 *  @param context The decoding context.
-	 *  @return The decoded object.
+	 *  @return The created object.
 	 */
-	public Object decode(Class clazz, DecodingContext context)
+	public Object createObject(Class clazz, DecodingContext context)
 	{
 		Class ret = null;
 		try
@@ -58,15 +59,12 @@ public class ClassCodec implements ITraverseProcessor, IDecoderHandler
 	 *  @param object The object.
 	 *  @return The processed object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+	/**
+	 *  Encode the object.
+	 */
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		EncodingContext ec = (EncodingContext) context;
-		
-		object = ec.runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
-		clazz = object == null? null : object.getClass();
-		
-		ec.writeClass(clazz);
 		ec.writeString(SReflect.getClassName((Class) object));
 		
 		return object;

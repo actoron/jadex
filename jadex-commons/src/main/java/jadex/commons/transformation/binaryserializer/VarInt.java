@@ -15,8 +15,14 @@ public class VarInt
 	 */
 	private static final byte[] REMAINDER_TABLE;
 	
+	/** Lookup table for constants to separate VarInts with different extensions.
+	 */
+	private static final long[] ADDITIVE_CONSTANTS_TABLE;
 	static
 	{
+		ADDITIVE_CONSTANTS_TABLE = new long[] { 0L, 128L, 16512L, 2113664L, 270549120L, 34630287488L,
+												4432676798592L, 567382630219904L, 72624976668147840L };
+		
 		EXTENSION_COUNT_TABLE = new byte[256];
 		REMAINDER_TABLE = new byte[256];
 		byte num = 9;
@@ -83,6 +89,7 @@ public class VarInt
 			ret <<= 8;
 			ret |= (varint[offset + i + 1] & 0xFF);
 		}
+		ret += ADDITIVE_CONSTANTS_TABLE[extsize];
 		return ret;
 	}
 	
@@ -93,25 +100,11 @@ public class VarInt
 	 */
 	public static final byte[] encode(long val)
 	{
-		int size = 0;
-		if ((val & 0x7FL) == val)
-			size = 1;
-		else if ((val & 0x3FFFL) == val)
-			size = 2;
-		else if ((val & 0x1FFFFFL) == val)
-			size = 3;
-		else if ((val & 0x0FFFFFFFL) == val)
-			size = 4;
-		else if ((val & 0x07FFFFFFFFL) == val)
-			size = 5;
-		else if ((val & 0x03FFFFFFFFFFL) == val)
-			size = 6;
-		else if ((val & 0x01FFFFFFFFFFFFL) == val)
-			size = 7;
-		else if ((val & 0x00FFFFFFFFFFFFFFL) == val)
-			size = 8;
-		else
-			throw new RuntimeException("Argument too large " + val);
+		/*int size = 0;
+		while (ADDITIVE_CONSTANTS_TABLE[size] <= val)
+			++size;
+		
+		val -= ADDITIVE_CONSTANTS_TABLE[size - 1];
 		
 		byte[] ret = new byte[size];
 		for (int i = size - 1; i >= 0; --i)
@@ -121,6 +114,46 @@ public class VarInt
 		}
 		ret[0] |= 1 << (8 - size);
 		
+		return ret;*/
+		
+		int size = getEncodedSize(val);
+		byte[] ret = new byte[size];
+		encode(val, ret, 0, size);
 		return ret;
+	}
+	
+	/**
+	 *  Determines the encoded size of a value.
+	 *  
+	 *  @param val The value.
+	 *  @return The size of the encoded value.
+	 */
+	public static final int getEncodedSize(long val)
+	{
+		int ret = 0;
+		while (ADDITIVE_CONSTANTS_TABLE[ret] <= val)
+			++ret;
+		return ret;
+	}
+	
+	/**
+	 *  Encodes a VarInt and saves it in a buffer at the given offset.
+	 *  @param val The value being encoded.
+	 *  @param buffer The target buffer.
+	 *  @param offset The buffer offset.
+	 *  @param size Size of the encoded VarInt.
+	 */
+	public static final void encode(long val, byte[] buffer, int offset, int size)
+	{
+		val -= ADDITIVE_CONSTANTS_TABLE[size - 1];
+		
+		//for (int i = size - 1; i >= 0; --i)
+		for (int i = offset + size - 1; i >= offset; --i)
+		{
+			buffer[i] = (byte)(val & 0xFF);
+			val >>>= 8;
+		}
+		
+		buffer[offset] |= (1 << (8 - size));
 	}
 }

@@ -7,7 +7,10 @@ import jadex.commons.transformation.traverser.Traverser;
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  Object serializer for encoding to and decoding from a compact binary format.
@@ -16,12 +19,43 @@ import java.util.List;
 public class BinarySerializer
 {
 	/** Null handler */
-	public static final NullCodec NULL_HANDLER = new NullCodec();
+	//public static final NullCodec NULL_HANDLER = new NullCodec();
+	
+	/** Marker for null values */
+	protected static final String NULL_MARKER = "N";
+	
+	/** Marker for references */
+	protected static final String REFERENCE_MARKER = "R";
+	
+	/** Common known default Strings */
+	public static final List<String> DEFAULT_STRINGS = Collections.synchronizedList(new ArrayList<String>());
+	static
+	{
+		DEFAULT_STRINGS.add(NULL_MARKER);
+		DEFAULT_STRINGS.add(REFERENCE_MARKER);
+		DEFAULT_STRINGS.add(SReflect.getClassName(String.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(int.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(Integer.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(long.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(Long.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(float.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(Float.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(double.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(Double.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(boolean.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(Boolean.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(short.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(Short.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(byte.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(Byte.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(char.class));
+		DEFAULT_STRINGS.add(SReflect.getClassName(Character.class));
+	}
 	
 	/** 
 	 *  Handlers for encoding.
 	 */
-	protected static final List<ITraverseProcessor> ENCODER_HANDLERS;
+	public static final List<ITraverseProcessor> ENCODER_HANDLERS;
 	static
 	{
 		ENCODER_HANDLERS = new ArrayList<ITraverseProcessor>();
@@ -56,7 +90,7 @@ public class BinarySerializer
 	static
 	{
 		DECODER_HANDLERS = new ArrayList<IDecoderHandler>();
-		DECODER_HANDLERS.add(NULL_HANDLER);
+		//DECODER_HANDLERS.add(NULL_HANDLER);
 		for (int i = 0; i < ENCODER_HANDLERS.size(); ++i)
 			DECODER_HANDLERS.add((IDecoderHandler) ENCODER_HANDLERS.get(i));
 	}
@@ -74,8 +108,21 @@ public class BinarySerializer
 	{
 		EncodingContext context = new EncodingContext(usercontext, preprocessors, classloader);
 		
-		Traverser.traverseObject(val, ENCODER_HANDLERS, false, context);
-		
+		Traverser traverser = new Traverser()
+		{
+			public void handleDuplicate(Object object, Class<?> clazz,
+					Object match,
+					List<ITraverseProcessor> processors, boolean clone,
+					Object context)
+			{
+				EncodingContext ec = (EncodingContext) context;
+				int ref = ((Integer)match).intValue();
+				ec.writeString(REFERENCE_MARKER);
+				ec.writeVarInt(ref);
+			}
+		};
+		//Traverser.traverseObject(val, ENCODER_HANDLERS, false, context);
+		traverser.traverse(val, null, new IdentityHashMap<Object, Object>(), ENCODER_HANDLERS, false, context);
 		
 		return context.getBytes();
 	}
@@ -141,10 +188,12 @@ public class BinarySerializer
 		Class clazz = null;
 		try
 		{
-			if (!classname.equals("NULL"))
-				clazz = SReflect.classForName(classname, context.getClassloader());
+			if (classname.equals(NULL_MARKER))
+				return null;
+			else if (classname.equals(REFERENCE_MARKER))
+				return context.getKnownObjects().get(new Integer((int) context.readVarInt()));
 			else
-				clazz = Void.class;
+				clazz = SReflect.findClass(classname, null, context.getClassloader());
 		}
 		catch (ClassNotFoundException e)
 		{
@@ -163,7 +212,6 @@ public class BinarySerializer
 	 */
 	protected static Object decodeRawObject(Class clazz, DecodingContext context)
 	{
-		// TODO: Special treatment of the actual decoders, need interface change?
 		Object dobject = null;
 		for (int i = 0; i < DECODER_HANDLERS.size(); ++i)
 		{

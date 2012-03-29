@@ -1,6 +1,10 @@
 package jadex.commons.transformation.binaryserializer;
 
+import jadex.commons.SReflect;
+
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,13 +34,17 @@ public class DecodingContext
 	protected int offset;
 	
 	/** The String pool. */
-	protected Map<Integer, String> stringpool;
+	//protected Map<Integer, String> stringpool;
+	protected List<String> stringpool;
 	
 	/** The current bitfield (used for boolean values). */
 	protected byte bitfield;
 	
 	/** The current bit position within the bitfield */
 	protected byte bitpos;
+	
+	/** Already known objects */
+	protected Map<Integer, Object> knownobjects;
 	
 	/**
 	 * Creates a new DecodingContext.
@@ -60,9 +68,9 @@ public class DecodingContext
 		this.classloader = classloader;
 		this.usercontext = usercontext;
 		this.offset = offset;
-		this.stringpool = new HashMap<Integer, String>();
-		//this.stringpool.put(0, "java.lang.String");
-		//this.stringpool.put(1, "byte[]");
+		this.stringpool = new ArrayList<String>();
+		this.stringpool.addAll(BinarySerializer.DEFAULT_STRINGS);
+		this.knownobjects = new HashMap<Integer, Object>();
 		this.bitfield = 0;
 		this.bitpos = 8;
 	}
@@ -76,7 +84,14 @@ public class DecodingContext
 		return postprocessors;
 	}
 	
-	
+	/**
+	 *  Returns the known objects.
+	 *  @return Known objects.
+	 */
+	public Map<Integer, Object> getKnownObjects()
+	{
+		return knownobjects;
+	}
 	
 	/**
 	 *  Returns the last object decoded.
@@ -145,10 +160,10 @@ public class DecodingContext
 	 * Gets the String pool.
 	 * @return The string pool.
 	 */
-	public Map<Integer, String> getStringPool()
+	/*public Map<Integer, String> getStringPool()
 	{
 		return stringpool;
-	}
+	}*/
 	
 	/**
 	 *  Reads a number of bytes from the buffer.
@@ -170,7 +185,7 @@ public class DecodingContext
 	 *  Reads a boolean value from the buffer.
 	 *  @return Boolean value.
 	 */
-	public Boolean readBool()
+	public boolean readBoolean()
 	{
 		if (bitpos > 7)
 		{
@@ -179,9 +194,22 @@ public class DecodingContext
 			bitpos = 0;
 		}
 		
-		Boolean ret = ((bitfield >>> bitpos) & 1) == 1? Boolean.TRUE: Boolean.FALSE;
+		boolean ret = ((bitfield >>> bitpos) & 1) == 1? true: false;
 		++bitpos;
 		
+		return ret;
+	}
+	
+	/**
+	 *  Gets a ByteBuffer window of the content.
+	 *  
+	 *  @param length The length in bytes.
+	 *  @return The ByteBuffer.
+	 */
+	public ByteBuffer getByteBuffer(int length)
+	{
+		ByteBuffer ret = ByteBuffer.wrap(content, offset, length);
+		offset += length;
 		return ret;
 	}
 	
@@ -192,8 +220,12 @@ public class DecodingContext
 	public String readString()
 	{
 		int sid = (int) readVarInt();
-		String ret = stringpool.get(sid);
-		if (ret == null)
+		String ret = null;
+		if (sid < stringpool.size())
+		{
+			ret = stringpool.get(sid);
+		}
+		else
 		{
 			int length = (int) readVarInt();
 			try
@@ -205,7 +237,7 @@ public class DecodingContext
 				throw new RuntimeException(e);
 			}
 			offset += length;
-			stringpool.put(sid, ret);
+			stringpool.add(ret);
 		}
 		return ret;
 	}
@@ -228,7 +260,7 @@ public class DecodingContext
 	 */
 	public long readSignedVarInt()
 	{
-		boolean neg = readBool();
+		boolean neg = readBoolean();
 		byte ext = VarInt.getExtensionSize(content, offset);
 		long ret = VarInt.decodeWithKnownSize(content, offset, ext);
 		offset += (ext + 1);

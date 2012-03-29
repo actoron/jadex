@@ -5,7 +5,9 @@ import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +17,9 @@ import java.util.Map;
  */
 public class EncodingContext
 {	
+	/** Cache for class names. */
+	protected Map<Class, String> classnamecache = new HashMap<Class, String>();
+	
 	/** The binary output */
 	protected GrowableByteBuffer buffer;
 		
@@ -29,9 +34,6 @@ public class EncodingContext
 	
 	/** The classloader */
 	protected ClassLoader classloader;
-	
-	/** The current bitfield */
-	protected byte bitfield;
 	
 	/** The current bit position within the bitfield */
 	protected byte bitpos;
@@ -56,11 +58,10 @@ public class EncodingContext
 		this.writeclass = true;
 		buffer = new GrowableByteBuffer();
 		stringPool = new HashMap<String, Integer>();
-		//stringPool.put("java.lang.String", 0);
-		//stringPool.put("byte[]", 1);
-		bitfield = 0;
-		bitpos = 8;
-		bitfieldpos = 0;
+		for (int i = 0; i < BinarySerializer.DEFAULT_STRINGS.size(); ++i)
+			stringPool.put(BinarySerializer.DEFAULT_STRINGS.get(i), i);
+		bitpos = 0;
+		bitfieldpos = -1;
 	}
 	
 	/**
@@ -122,31 +123,50 @@ public class EncodingContext
 	 *  Writes a byte array, appending it to the buffer.
 	 *  @param b The byte array.
 	 */
-	public void write (byte[] b)
+	public void write(byte[] b)
 	{
 		buffer.write(b);
 	}
 	
-	public void writeBoolean(Boolean bool)
+	/**
+	 *  Reserves a byte buffer on the stream.
+	 *  
+	 */
+	public ByteBuffer getByteBuffer(int length)
 	{
-		byte val = (byte) ((Boolean.TRUE.equals(bool))? 1 : 0);
+		return buffer.getByteBuffer(length);
+	}
+	
+	public void writeBoolean(boolean bool)
+	{
+		//byte val = (byte) ((Boolean.TRUE.equals(bool))? 1 : 0);
+		byte val = (byte) (bool? 1 : 0);
+		if (bitfieldpos < 0)
+		{
+			bitfieldpos = buffer.getPosition();
+			buffer.reserveSpace(1);
+		}
 		if (bitpos > 7)
 		{
-			bitfield = 0;
+			//buffer.writeTo(bitfieldpos, bitfield);
 			bitpos = 0;
 			bitfieldpos = buffer.getPosition();
-			buffer.write(new byte[] { bitfield });
+			buffer.reserveSpace(1);
 		}
-		bitfield |= (byte) (val << bitpos);
+		buffer.getBufferAccess()[bitfieldpos] |= (byte) (val << bitpos);
 		++bitpos;
-		buffer.writeTo(bitfieldpos, bitfield);
 	}
 	
 	public void writeClass(Class clazz)
 	{
 		if (writeclass)
 		{
-			String classname = SReflect.getClassName(clazz);
+			String classname = classnamecache.get(clazz);
+			if (classname == null)
+			{
+				classname = SReflect.getClassName(clazz);
+				classnamecache.put(clazz, classname);
+			}
 			writeString(classname);
 		}
 		else
@@ -162,12 +182,12 @@ public class EncodingContext
 		{
 			sid = stringPool.size();
 			stringPool.put(string, sid);
-			buffer.write(VarInt.encode(sid));
+			writeVarInt(sid);
 			try
 			{
 				byte[] encodedString = string.getBytes("UTF-8");
 				
-				buffer.write(VarInt.encode(encodedString.length));
+				writeVarInt(encodedString.length);
 				buffer.write(encodedString);
 			}
 			catch (UnsupportedEncodingException e)
@@ -176,13 +196,21 @@ public class EncodingContext
 			}
 		}
 		else
-			buffer.write(VarInt.encode(sid));
+			writeVarInt(sid);
+	}
+	
+	public void writeVarInt(long value)
+	{
+		int size = VarInt.getEncodedSize(value);
+		int pos = buffer.getPosition();
+		buffer.reserveSpace(size);
+		VarInt.encode(value, buffer.getBufferAccess(), pos, size);
 	}
 	
 	public void writeSignedVarInt(long value)
 	{
 		boolean neg = value < 0;
 		writeBoolean(neg);
-		write(VarInt.encode(Math.abs(value)));
+		writeVarInt(Math.abs(value));
 	}
 }

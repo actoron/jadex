@@ -12,7 +12,7 @@ import java.util.Vector;
 /**
  *  An enumeration processor allows for traversing enumerations.
  */
-public class EnumerationCodec implements ITraverseProcessor, IDecoderHandler
+public class EnumerationCodec extends AbstractCodec
 {
 	/**
 	 *  Tests if the decoder can decode the class.
@@ -25,16 +25,20 @@ public class EnumerationCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Decodes an object.
+	 *  Creates the object during decoding.
+	 *  
 	 *  @param clazz The class of the object.
 	 *  @param context The decoding context.
-	 *  @return The decoded object.
+	 *  @return The created object.
 	 */
-	public Object decode(Class clazz, DecodingContext context)
+	public Object createObject(Class clazz, DecodingContext context)
 	{
 		Vector vec = new Vector();
 		int length = (int) context.readVarInt();
 		int count = 0;
+		
+		//FIXME: Filling in subobjects now since adding them later is not possible.
+		// May not result in correct behavior but fix would require special support.
 		while (count < length)
 		{
 			int index = (int) context.readVarInt();
@@ -57,21 +61,12 @@ public class EnumerationCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Process an object.
-	 *  @param object The object.
-	 *  @return The processed object.
+	 *  Encode the object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		EncodingContext ec = (EncodingContext) context;
-		
-		object = ec.runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
-		clazz = object == null? null : object.getClass();
-		
 		Enumeration en = (Enumeration)object;
-		
-		ec.writeClass(clazz);
 		
 		int count = 0;
 		Vector copy = new Vector();
@@ -82,23 +77,21 @@ public class EnumerationCodec implements ITraverseProcessor, IDecoderHandler
 			copy.add(val);
 		}
 		
-		ec.write(VarInt.encode(count));
+		ec.writeVarInt(count);
 		
 		count = 0;
 		for (Object val : copy)
 		{
 			if (val != null)
 			{
-				ec.write(VarInt.encode(count));
+				ec.writeVarInt(count);
 				Class valclazz = val!=null? val.getClass(): null;
-				traverser.traverse(val, valclazz, traversed, processors, clone, context);
+				traverser.traverse(val, valclazz, traversed, processors, clone, ec);
 			}
 			++count;
 		}
 		
 		Enumeration ret = copy.elements();
-		
-		traversed.put(object, ret);
 		
 		return ret;
 	}

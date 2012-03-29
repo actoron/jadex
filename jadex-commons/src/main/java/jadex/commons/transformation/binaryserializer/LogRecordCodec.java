@@ -13,7 +13,7 @@ import java.util.logging.LogRecord;
  *  Codec for encoding and decoding LogRecord objects.
  *
  */
-public class LogRecordCodec implements ITraverseProcessor, IDecoderHandler
+public class LogRecordCodec extends AbstractCodec
 {
 	/**
 	 *  Tests if the decoder can decode the class.
@@ -26,12 +26,13 @@ public class LogRecordCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Decodes an object.
+	 *  Creates the object during decoding.
+	 *  
 	 *  @param clazz The class of the object.
 	 *  @param context The decoding context.
-	 *  @return The decoded object.
+	 *  @return The created object.
 	 */
-	public Object decode(Class clazz, DecodingContext context)
+	public Object createObject(Class clazz, DecodingContext context)
 	{
 		Level level = (Level) BinarySerializer.decodeObject(context);
 		String msg = context.readString();
@@ -54,23 +55,14 @@ public class LogRecordCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Process an object.
-	 *  @param object The object.
-	 *  @return The processed object.
+	 *  Encode the object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		EncodingContext ec = (EncodingContext) context;
-		
-		object = ec.runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
-		clazz = object == null? null : object.getClass();
-		
-		ec.writeClass(clazz);
-		
 		LogRecord rec = (LogRecord) object;
 		Level level = rec.getLevel();
-		traverser.traverse(level, level.getClass(), traversed, processors, clone, context);
+		traverser.traverse(level, level.getClass(), traversed, processors, clone, ec);
 		ec.writeString(rec.getMessage());
 		ec.writeSignedVarInt(rec.getMillis());
 		

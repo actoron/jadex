@@ -86,7 +86,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 					String property_java_name = Character.toLowerCase(property_name.charAt(0))
 						+ property_name.substring(1);
 					ret.put(property_java_name, new BeanProperty(property_java_name, 
-						getter.getReturnType(), getter, setter, setter_param_type[0]));
+						getter.getReturnType(), getter, setter, setter_param_type[0], null));
 				}
 			}
 

@@ -3,6 +3,7 @@ package jadex.commons.transformation.traverser;
 import jadex.commons.SReflect;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,8 @@ public class Traverser
 		processors.add(new BeanProcessor());
 //		processors.add(new FieldProcessor());
 	}
+	
+	protected Map<Class, ITraverseProcessor> processorcache = new HashMap<Class, ITraverseProcessor>();
 	
 	/**
 	 *  Get the default traversal processors.
@@ -119,34 +122,42 @@ public class Traverser
 //				System.out.println("oooo");
 			
 			boolean fin = false;
-			if(traversed.containsKey(object))
+			Object match = traversed.get(object);
+			if(match != null)
 			{
 				ret = traversed.get(object);
 				fin = true;
+				handleDuplicate(object, clazz, match, processors, clone, context);
 			}
-			
-			if(!fin && processors!=null)
-			{
-				if(clazz==null || SReflect.isSupertype(clazz, object.getClass()))
-					clazz = object.getClass();
+			if(clazz==null || SReflect.isSupertype(clazz, object.getClass()))
+				clazz = object.getClass();
 				
-				// Todo: apply all or only first matching processor!?
-				Object	processed	= object;
-				for(int i=0; i<processors.size() && !fin; i++)
+			// Todo: apply all or only first matching processor!?
+			Object	processed	= object;
+			
+			for(int i=0; i<processors.size() && !fin; i++)
+			{
+				ITraverseProcessor proc = processors.get(i);
+				if(proc.isApplicable(processed, clazz, clone))
 				{
-					ITraverseProcessor proc = processors.get(i);
-					if(proc.isApplicable(processed, clazz, clone))
-					{
 //						System.out.println("traverse: "+object+" "+proc.getClass());
-						processed = proc.process(processed, clazz, processors, this, traversed, clone, context);
-						ret	= processed;
-						fin = true;
-					}
+					processed = proc.process(processed, clazz, processors, this, traversed, clone, context);
+					ret	= processed;
+					fin = true;
+					//processorcache.put(clazz, proc);
 				}
 			}
 		}
 			
 		return ret;
+	}
+	
+	/**
+	 * Special handling for duplicate objects.
+	 */
+	public void handleDuplicate(Object object, Class<?> clazz, Object match, 
+			List<ITraverseProcessor> processors, boolean clone, Object context)
+	{
 	}
 }
 

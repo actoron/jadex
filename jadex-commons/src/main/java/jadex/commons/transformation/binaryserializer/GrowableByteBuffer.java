@@ -1,5 +1,7 @@
 package jadex.commons.transformation.binaryserializer;
 
+import java.nio.ByteBuffer;
+
 
 /**
  *  A growable byte buffer similar to ByteArrayOutputStream but allowing
@@ -10,6 +12,15 @@ package jadex.commons.transformation.binaryserializer;
  */
 public class GrowableByteBuffer
 {
+	/** Initial buffer size. */
+	protected final int INITIAL_SIZE = 4096;
+	
+	/** Buffer growth aggressiveness. */
+	protected final int GROWTH_EXPONENT = 2;
+	
+	/** Constant for a single zero byte. */
+	public static final byte[] ZERO_BYTE = new byte[] {0};
+	
 	/** The buffer */
 	protected byte[] buffer;
 	
@@ -21,7 +32,7 @@ public class GrowableByteBuffer
 	 */
 	public GrowableByteBuffer()
 	{
-		buffer = new byte[512];
+		buffer = new byte[INITIAL_SIZE];
 		pos = 0;
 	}
 	
@@ -31,18 +42,23 @@ public class GrowableByteBuffer
 	 */
 	public void write (byte[] b)
 	{
-		if (b.length > (buffer.length - pos))
-		{
-			int newlength = buffer.length << 1;
-			while (b.length > (newlength - pos))
-				newlength <<= 1;
-			byte[] newbuffer = new byte[newlength];
-			System.arraycopy(buffer, 0, newbuffer, 0, pos);
-			buffer = newbuffer;
-		}
+		allocateSpace(b.length);
 		
 		System.arraycopy(b, 0, buffer, pos, b.length);
 		pos += b.length;
+	}
+	
+	/**
+	 *  Reserves a byte buffer.
+	 */
+	public ByteBuffer getByteBuffer(int length)
+	{
+		allocateSpace(length);
+		
+		ByteBuffer ret = ByteBuffer.wrap(buffer, pos, length);
+		pos += length;
+		
+		return ret;
 	}
 	
 	/**
@@ -64,10 +80,46 @@ public class GrowableByteBuffer
 		return pos;
 	}
 	
+	/**
+	 *  Direct buffer access, handle with care.
+	 *  @return The internal buffer.
+	 */
+	public byte[] getBufferAccess()
+	{
+		return buffer;
+	}
+	
+	/**
+	 *  Reserves a minimum amount of free space in the buffer and shifts the position past it.
+	 *  
+	 */
+	protected void reserveSpace(int length)
+	{
+		allocateSpace(length);
+		pos += length;
+	}
+	
 	public byte[] toByteArray()
 	{
 		byte[] ret = new byte[pos];
 		System.arraycopy(buffer, 0, ret, 0, pos);
 		return ret;
+	}
+	
+	/**
+	 *  Allocates a minimum amount of free space in the buffer.
+	 *  
+	 */
+	protected void allocateSpace(int length)
+	{
+		if (length > (buffer.length - pos))
+		{
+			int newlength = buffer.length << GROWTH_EXPONENT;
+			while (length > (newlength - pos))
+				newlength <<= GROWTH_EXPONENT;
+			byte[] newbuffer = new byte[newlength];
+			System.arraycopy(buffer, 0, newbuffer, 0, pos);
+			buffer = newbuffer;
+		}
 	}
 }

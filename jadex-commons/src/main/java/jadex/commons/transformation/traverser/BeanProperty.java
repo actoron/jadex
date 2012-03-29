@@ -27,6 +27,9 @@ public class BeanProperty
 
 	/** The field. */
 	protected Field field;
+	
+	/** Accessor delegate provider. */
+	protected IBeanDelegateProvider delegateprovider;
 
 	
 	//-------- constructors --------
@@ -41,13 +44,14 @@ public class BeanProperty
 	/**
 	 *  Create a new bean property.
 	 */
-	public BeanProperty(String name, Class type, Method getter, Method setter, Class settertype)
+	public BeanProperty(String name, Class type, Method getter, Method setter, Class settertype, IBeanDelegateProvider delegateprovider)
 	{
 		this.name = name;
 		this.type = type;
 		this.getter = getter;
 		this.setter = setter;
 		this.settertype = settertype;
+		this.delegateprovider = delegateprovider;
 	}
 	
 	/**
@@ -170,5 +174,90 @@ public class BeanProperty
 	{
 		this.field = field;
 	}
-
+	
+	/**
+	 *  Retrieves the bean property value for the given object.
+	 *  
+	 *  @param object The object containing the bean property.
+	 *  @param property The name of the property.
+	 *  
+	 *  @return The value of the bean property.
+	 */
+	public Object getPropertyValue(Object object, String property)
+	{
+		Object ret = null;
+		if (delegateprovider != null)
+		{
+			IBeanAccessorDelegate accdel = delegateprovider.getDelegate(object.getClass());
+			ret = accdel.getPropertyValue(object, property);
+		}
+		else if (getGetter() != null)
+		{
+			try
+			{
+				ret = getGetter().invoke(object, new Object[0]);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			try
+			{
+				Field field = getField();
+				if (!field.isAccessible())
+					field.setAccessible(true);
+				ret = field.get(object);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Sets the bean property value for the given object.
+	 *  
+	 *  @param object The object containing the bean property.
+	 *  @param property The name of the property.
+	 *  @param value The new value.
+	 */
+	public void setPropertyValue(Object object, String property, Object value)
+	{
+		if (delegateprovider != null)
+		{
+			IBeanAccessorDelegate accdel = delegateprovider.getDelegate(object.getClass());
+			accdel.setPropertyValue(object, property, value);
+		}
+		else if (getGetter() != null)
+		{
+			try
+			{
+				getSetter().invoke(object, new Object[] { value });
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			try
+			{
+				Field field = getField();
+				if (!field.isAccessible())
+					field.setAccessible(true);
+				field.set(object, value);
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
 }

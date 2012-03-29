@@ -13,7 +13,7 @@ import java.util.Map;
  *  Codec for encoding and decoding URL objects.
  *
  */
-public class TupleCodec implements ITraverseProcessor, IDecoderHandler
+public class TupleCodec extends AbstractCodec
 {
 	/**
 	 *  Tests if the decoder can decode the class.
@@ -26,13 +26,15 @@ public class TupleCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Decodes an object.
+	 *  Creates the object during decoding.
+	 *  
 	 *  @param clazz The class of the object.
 	 *  @param context The decoding context.
-	 *  @return The decoded object.
+	 *  @return The created object.
 	 */
-	public Object decode(Class clazz, DecodingContext context)
+	public Object createObject(Class clazz, DecodingContext context)
 	{
+		// FIXME: Incorrect behavior in case of self-referencing tuples, similar to the MultiMap problem.
 		Object[] entities = (Object[]) BinarySerializer.decodeObject(context);
 		Tuple ret = null;
 		if (clazz.equals(Tuple2.class))
@@ -53,21 +55,13 @@ public class TupleCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Process an object.
-	 *  @param object The object.
-	 *  @return The processed object.
+	 *  Encode the object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		EncodingContext ec = (EncodingContext) context;
-		
-		object = ec.runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
-		clazz = object == null? null : object.getClass();
-		
-		ec.writeClass(clazz);
 		Object[] entities = ((Tuple) object).getEntities();
-		traverser.traverse(entities, entities.getClass(), traversed, processors, clone, context);
+		traverser.traverse(entities, entities.getClass(), traversed, processors, clone, ec);
 		
 		return object;
 	}

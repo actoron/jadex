@@ -11,7 +11,7 @@ import java.util.Map;
  *  Codec for encoding and decoding Color objects.
  *
  */
-public class ColorCodec implements ITraverseProcessor, IDecoderHandler
+public class ColorCodec extends AbstractCodec
 {
 	/**
 	 *  Tests if the decoder can decode the class.
@@ -24,12 +24,13 @@ public class ColorCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Decodes an object.
+	 *  Creates the object during decoding.
+	 *  
 	 *  @param clazz The class of the object.
 	 *  @param context The decoding context.
-	 *  @return The decoded object.
+	 *  @return The created object.
 	 */
-	public Object decode(Class clazz, DecodingContext context)
+	public Object createObject(Class clazz, DecodingContext context)
 	{
 		byte[] ccomps = context.read(4);
 		Color ret = new Color(ccomps[0] & 0xFF, ccomps[1] & 0xFF, ccomps[2] & 0xFF, ccomps[3] & 0xFF);
@@ -47,18 +48,11 @@ public class ColorCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Process an object.
-	 *  @param object The object.
-	 *  @return The processed object.
+	 *  Encode the object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		EncodingContext ec = (EncodingContext) context;
-		
-		object = ec.runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
-		clazz = object == null? null : object.getClass();
-		
 		Color c = (Color) object;
 		
 		byte[] ccomps = new byte[4];
@@ -67,7 +61,6 @@ public class ColorCodec implements ITraverseProcessor, IDecoderHandler
 		ccomps[2] = (byte) c.getBlue();
 		ccomps[3] = (byte) c.getAlpha();
 		
-		ec.writeClass(clazz);
 		ec.write(ccomps);
 		
 		return object;

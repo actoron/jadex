@@ -13,7 +13,7 @@ import java.util.logging.Level;
  *  Codec for encoding and decoding Logging Level objects.
  *
  */
-public class LoggingLevelCodec implements ITraverseProcessor, IDecoderHandler
+public class LoggingLevelCodec extends AbstractCodec
 {
 	Level[] DEFAULT_LEVELS = new Level[] {Level.OFF,
 										  Level.SEVERE,
@@ -36,17 +36,18 @@ public class LoggingLevelCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Decodes an object.
+	 *  Creates the object during decoding.
+	 *  
 	 *  @param clazz The class of the object.
 	 *  @param context The decoding context.
-	 *  @return The decoded object.
+	 *  @return The created object.
 	 */
-	public Object decode(Class clazz, DecodingContext context)
+	public Object createObject(Class clazz, DecodingContext context)
 	{
 		Level ret = null;
 		
 		// Check if default level
-		if (context.readBool())
+		if (context.readBoolean())
 			ret = DEFAULT_LEVELS[context.read(1)[0] & 0xFF];
 		else
 		{
@@ -81,20 +82,11 @@ public class LoggingLevelCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Process an object.
-	 *  @param object The object.
-	 *  @return The processed object.
+	 *  Encode the object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		EncodingContext ec = (EncodingContext) context;
-		
-		object = ec.runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
-		clazz = object == null? null : object.getClass();
-		
-		ec.writeClass(clazz);
-		
 		Level level = (Level) object;
 		int id = 0;
 		
@@ -105,7 +97,7 @@ public class LoggingLevelCodec implements ITraverseProcessor, IDecoderHandler
 		if (id < DEFAULT_LEVELS.length)
 		{
 			ec.writeBoolean(true);
-			ec.write(new byte[] { (byte) id });
+			ec.write(new byte[] {(byte) id});
 		}
 		else
 		{

@@ -6,12 +6,15 @@ import junit.framework.TestCase;
 public class VarIntTest extends TestCase
 {
 	/** Corner case values. */
-	protected static final long[] CORNER_CASES = 
-			new long[] {0, 127, 128, 255, 256, 16383, 16384, 2097151, 2097152, 268435455, 268435456,
-						34359738367L, 34359738368L, 4398046511103L, 4398046511104L, 562949953421311L, 562949953421312L};
+	protected static final long[] CORNER_CASES = new long[] { 0L, 127L, 128L, 16511, 16512L, 2113663, 2113664L,
+															  270549119L, 270549120L, 34630287487L, 34630287488L,
+															  4432676798591L, 4432676798592L,
+															  567382630219903L, 567382630219904L };
+			/*new long[] {0, 127, 128, 255, 256, 16383, 16384, 2097151, 2097152, 268435455, 268435456,
+						34359738367L, 34359738368L, 4398046511103L, 4398046511104L, 562949953421311L, 562949953421312L};*/
 	
 	/** Expected encoded length of the corner cases */
-	protected static final byte[] EXPECTED_LENGTHS = new byte[] {1, 1, 2, 2, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8};
+	protected static final byte[] EXPECTED_LENGTHS = new byte[] {1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8};
 	
 	/**
 	 * Self-Test.

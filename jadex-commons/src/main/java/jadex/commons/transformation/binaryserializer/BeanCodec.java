@@ -2,8 +2,8 @@ package jadex.commons.transformation.binaryserializer;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.annotations.Classname;
+import jadex.commons.transformation.traverser.BeanDelegateReflectionIntrospector;
 import jadex.commons.transformation.traverser.BeanProperty;
-import jadex.commons.transformation.traverser.BeanReflectionIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
@@ -11,18 +11,22 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Codec for encoding and decoding Java Beans.
  *
  */
-public class BeanCodec implements ITraverseProcessor, IDecoderHandler
+public class BeanCodec extends AbstractCodec
 {
+	protected static final int INTROSPECTOR_CACHE_SIZE = 5000;
+	
 	/** Bean introspector for inspecting beans. */
-	protected BeanReflectionIntrospector intro = new BeanReflectionIntrospector();
+	protected BeanDelegateReflectionIntrospector intro = new BeanDelegateReflectionIntrospector(INTROSPECTOR_CACHE_SIZE);
 	
 	/**
 	 *  Tests if the decoder can decode the class.
@@ -35,35 +39,23 @@ public class BeanCodec implements ITraverseProcessor, IDecoderHandler
 	}
 	
 	/**
-	 *  Decodes an object.
+	 *  Creates the object during decoding.
+	 *  
 	 *  @param clazz The class of the object.
 	 *  @param context The decoding context.
-	 *  @return The decoded object.
+	 *  @return The created object.
 	 */
-	public Object decode(Class clazz, DecodingContext context)
+	public Object createObject(Class clazz, DecodingContext context)
 	{
 		Object bean = null;
-		boolean isanonclass = context.readBool();
+		boolean isanonclass = context.readBoolean();
 		if (isanonclass)
 		{
-			/*Class[] dclasses = clazz.getClasses();
-			clazz = null;
-			int i = 0;
+			String correctcl = context.readString();
 			
-			try{
-			while (clazz == null)
-			{
-				Classname cn = getAnonClassName(dclasses[i]);
-				if (cn != null)
-					clazz = dclasses[i];
-				++i;
-			}
-			}
-			catch(Exception e)
-			{
-				e.printStackTrace();
-			}*/
-			context.readString();
+			Classname cl = getAnonClassName(clazz);
+			if (cl == null || (!correctcl.equals(cl.value())))
+				clazz = findCorrectInnerClass(0, SReflect.getClassName(clazz), correctcl, context.getClassloader());
 			
 			Constructor	c	= clazz.getDeclaredConstructors()[0];
 			c.setAccessible(true);
@@ -105,18 +97,31 @@ public class BeanCodec implements ITraverseProcessor, IDecoderHandler
 			}
 		}
 		
+		return bean;
+	}
+	
+	/**
+	 *  Decodes and adds sub-objects during decoding.
+	 *  
+	 *  @param object The instantiated object.
+	 *  @param clazz The class of the object.
+	 *  @param context The decoding context.
+	 *  @return The finished object.
+	 */
+	public Object decodeSubObjects(Object object, Class clazz, DecodingContext context)
+	{
+		
 		Map props = intro.getBeanProperties(clazz, false);
 		
 		int size = (int) context.readVarInt();
 		for (int i = 0; i < size; ++i)
 		{
 			String name = context.readString();
-			Method setter = ((BeanProperty) props.get(name)).getSetter();
 			Object val = null;
 			try
 			{
 				val = BinarySerializer.decodeObject(context);
-				setter.invoke(bean, val);
+				((BeanProperty) props.get(name)).setPropertyValue(object, name, val);
 			}
 			catch (Exception e)
 			{
@@ -124,58 +129,7 @@ public class BeanCodec implements ITraverseProcessor, IDecoderHandler
 			}
 		}
 		
-		/*for(Iterator it=props.values().iterator(); it.hasNext(); )
-		{
-			BeanProperty prop = (BeanProperty) it.next();
-			Method setter = prop.getSetter();
-			if (prop.getGetter() != null && setter != null)
-			{
-				Object fieldval = null;
-				try
-				{
-					fieldval = BinarySerializer.decodeObject(context);
-					if (fieldval != null)
-					{
-						try
-						{
-							setter.invoke(bean, fieldval);
-						}
-						catch(NullPointerException e)
-						{
-							e.printStackTrace();
-							throw new RuntimeException(e);
-						}
-						catch(IllegalArgumentException e)
-						{
-							System.out.println(fieldval);
-							System.out.println(prop.getName());
-							e.printStackTrace();
-							throw new RuntimeException(e);
-						}
-					}
-				}
-				catch (Exception e)
-				{
-					throw new RuntimeException(e);
-				}
-			}
-			else
-			{*/
-				/*Field field = prop.getField();
-				if (!field.isAccessible())
-					field.setAccessible(true);
-				try
-				{
-					field.set(bean, BinarySerializer.decodeObject(context));
-				}
-				catch (Exception e)
-				{
-					throw new RuntimeException(e);
-				}*/
-			//}
-		//}
-		
-		return bean;
+		return object;
 	}
 	
 	/**
@@ -188,41 +142,38 @@ public class BeanCodec implements ITraverseProcessor, IDecoderHandler
 		return object != null;
 	}
 	
+	protected Set<Class> nonanonclasscache = new HashSet<Class>();
+	
 	/**
-	 *  Process an object.
-	 *  @param object The object.
-	 *  @return The processed object.
+	 *  Encode the object.
 	 */
-	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
+			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		EncodingContext ec = (EncodingContext) context;
-		
-		object = ec.runPreProcessors(object, clazz, processors, traverser, traversed, clone, context);
-		clazz = object == null? null : object.getClass();
-		
-		if (clazz.isAnonymousClass())
+		if (!nonanonclasscache.contains(clazz))
 		{
-			Class eclazz = clazz;
-			while (eclazz.getEnclosingClass() != null)
-				eclazz = eclazz.getEnclosingClass();
-			ec.writeClass(clazz);
-			
-			// Flag class as enclosing the actual inner class.
-			ec.writeBoolean(true);
-			
-			Classname cn = getAnonClassName(clazz);
-			
-			if (cn == null)
-				throw new RuntimeException("Anonymous Class without Classname identifier not supported: " + String.valueOf(clazz));
-			
-			ec.writeString(cn.value());
-			
-			
+			if (clazz != null && clazz.isAnonymousClass())
+			{
+				// Flag class is inner class.
+				ec.writeBoolean(true);
+				
+				Classname cn = getAnonClassName(clazz);
+				
+				if (cn == null)
+					throw new RuntimeException("Anonymous Class without Classname identifier not supported: " + String.valueOf(clazz));
+				
+				ec.writeString(cn.value());
+				
+				
+			}
+			else
+			{
+				ec.writeBoolean(false);
+				nonanonclasscache.add(clazz);
+			}
 		}
 		else
 		{
-			ec.writeClass(clazz);
 			ec.writeBoolean(false);
 		}
 		
@@ -230,34 +181,25 @@ public class BeanCodec implements ITraverseProcessor, IDecoderHandler
 		
 		List<String> names = new ArrayList<String>();
 		List<Object> values = new ArrayList<Object>();
+		List<Class> clazzes = new ArrayList<Class>();
 		for(Iterator it=props.keySet().iterator(); it.hasNext(); )
 		{
 			BeanProperty prop = (BeanProperty)props.get(it.next());
-			if (prop.getGetter() != null && prop.getSetter() != null)
+			Object val = prop.getPropertyValue(object, prop.getName());
+			if (val != null)
 			{
-				Object val;
-				try
-				{
-					val = prop.getGetter().invoke(object, (Object[]) null);
-				}
-				catch (Exception e)
-				{
-					throw new RuntimeException(e);
-				}
-				if (val != null)
-				{
-					names.add(prop.getName());
-					values.add(val);
-				}
+				names.add(prop.getName());
+				clazzes.add(prop.getType());
+				values.add(val);
 			}
 		}
-		ec.write(VarInt.encode(names.size()));
+		ec.writeVarInt(names.size());
 		
 		for (int i = 0; i < names.size(); ++i)
 		{
 			ec.writeString(names.get(i));
 			Object val = values.get(i);
-			traverser.traverse(val, val.getClass(), traversed, processors, clone, context);
+			traverser.traverse(val, clazzes.get(i), traversed, processors, clone, ec);
 		}
 		
 		/*for(Iterator it=props.keySet().iterator(); it.hasNext(); )
@@ -291,7 +233,80 @@ public class BeanCodec implements ITraverseProcessor, IDecoderHandler
 		return object;
 	}
 	
-	private Classname getAnonClassName(Class clazz)
+	/**
+	 *  Attempts to find the correct inner class (compilers have different ways enumerating anonymous inner classes).
+	 *  
+	 * 	@param level Enclosement level being searched, 0 being the level of the target class.
+	 * 	@param startname The name as originally encoded.
+	 * 	@param annotatedname Annotation marker for the correct class.
+	 * 	@param classloader The classloader.
+	 * 	@return The targeted inner class or null if not found.
+	 */
+	private static final Class findCorrectInnerClass(int level, String startname, String annotatedname, ClassLoader classloader)
+	{
+		int marker = 0;
+		String basename = startname;
+		
+		for (int i = -1; i < level; ++i)
+		{
+			marker = basename.lastIndexOf('$');
+			if (marker == -1)
+				return null;
+			basename = basename.substring(0, marker);
+		}
+		basename += "$";
+		
+		int exclude = Integer.valueOf(startname.substring(marker + 1, startname.indexOf('$', marker + 1)));
+		
+		Class ret = null;
+		
+		int classindex = 0;
+		boolean searching = true;
+		while (searching)
+		{
+			if (classindex != exclude)
+			{
+				String candidatename = basename + classindex;
+				
+				try
+				{
+					Class candclass = SReflect.findClass(candidatename, null, classloader);
+					
+					if (level == 0)
+					{
+						Classname candclassname = getAnonClassName(candclass);
+						if (candclassname != null && annotatedname.equals(candclassname.value()))
+						{
+							ret = candclass;
+							searching = false;
+						}
+					}
+					else
+					{
+						ret = findCorrectInnerClass(level - 1, startname, annotatedname, classloader);
+						if (ret != null)
+							searching = false;
+					}
+				}
+				catch (ClassNotFoundException e)
+				{
+					searching = false;
+				}
+			}
+			++classindex;
+		}
+		
+		ret = findCorrectInnerClass(level + 1, startname, annotatedname, classloader);
+		
+		return ret;
+	}
+	
+	/**
+	 *  Attempts to find the "Classname" annotation for an anonymous inner class.
+	 *  @param clazz The class.
+	 *  @return The identifier or null if none was found.
+	 */
+	private static final Classname getAnonClassName(Class clazz)
 	{
 		Field[] fields = clazz.getFields();
 		Classname cn = null;

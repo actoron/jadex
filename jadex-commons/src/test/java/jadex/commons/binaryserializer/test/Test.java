@@ -1,14 +1,16 @@
 package jadex.commons.binaryserializer.test;
 
+import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.zip.GZIPOutputStream;
 
 import junit.framework.TestCase;
 
@@ -85,6 +86,7 @@ public class Test extends TestCase
 				t.testEmptyMap();
 				t.testSpecialCharacter();
 				t.testBean();
+				t.testSelfReferenceBean();
 				t.testEmptyArray();
 				t.testArrayOrder();
 				t.testMultiArray();
@@ -105,11 +107,10 @@ public class Test extends TestCase
 				t.testLogRecord();
 				t.testInetAddress();
 				
-				// Fix tests with dependency on XML-annotations
-				/*t.testBeanWithPublicFields();
+				t.testBeanWithPublicFields();
 				t.testBeanWithIncludedFields();
 				t.testAnonymousInnerClass();
-				t.testAnonymousInnerClassWithSimpleTypes();*/
+				t.testAnonymousInnerClassWithSimpleTypes();
 				
 				t.testImage();
 				t.testTuple();
@@ -687,6 +688,22 @@ public class Test extends TestCase
 	}
 	
 	/**
+	 *  Test if references work.
+	 */
+	public void testSelfReferenceBean() throws Exception
+	{
+		E e = new E();
+		e.setSelfReference(e);
+		doWriteAndRead(e, new Comparator<E>()
+		{
+			public int compare(E o1, E o2)
+			{
+				return o2 != o2.getSelfReference()? -1 : 0;
+			}
+		});
+	}
+	
+	/**
 	 *  Test list transfer works.
 	 */
 	public void testList() throws Exception
@@ -787,27 +804,25 @@ public class Test extends TestCase
 		doWriteAndRead(adr);
 	}
 	
-	//FIXME: Support this.
 	/**
 	 *  Test if writer writes public bean fields (when XML_INCLUDE_FIELDS is set).
 	 */
-	/*public void testBeanWithPublicFields() throws Exception
+	public void testBeanWithPublicFields() throws Exception
 	{
 		C c = new C("test\n", 23);
 		
 		doWriteAndRead(c);
-	}*/
+	}
 	
-	// FIXME: Include Fields
 	/**
 	 *  Test if writer writes public bean fields (when XMLIncludeFields annotation is present).
 	 */
-	/*public void testBeanWithIncludedFields() throws Exception
+	public void testBeanWithIncludedFields() throws Exception
 	{
 		D d = new D("test\n", 23);
 		
 		doWriteAndRead(d);
-	}*/
+	}
 	
 	/**
 	 *  Test if special characters can be transferred.
@@ -819,18 +834,17 @@ public class Test extends TestCase
 		doWriteAndRead(str);
 	}
 	
-	// FIXME: Test for anon. inner classes
 	/**
 	 *  Test if anonymous inner classes can be transferred.
 	 */
-	/*public void testAnonymousInnerClass() throws Exception
+	public void testAnonymousInnerClass() throws Exception
 	{
 		// Do not use final directly as compiler optimizes field away.
 		String	tmp	= "hugo";
 		final String	name	= tmp;
 		Object	obj	= new Object()
 		{
-			@XMLClassname("test")
+			@Classname("test")
 			public boolean equals(Object obj)
 			{
 				String	othername	= null;
@@ -855,13 +869,12 @@ public class Test extends TestCase
 		};
 		
 		doWriteAndRead(obj);
-	}*/
+	}
 	
-	// FIXME: Inner classes
 	/**
 	 *  Test if anonymous inner classes can be transferred.
 	 */
-	/*public void testAnonymousInnerClassWithSimpleTypes() throws Exception
+	public void testAnonymousInnerClassWithSimpleTypes() throws Exception
 	{
 		// Do not use final directly as compiler optimizes field away.
 		String	tmp	= "hugo";
@@ -870,7 +883,7 @@ public class Test extends TestCase
 		final boolean booli = tmp2;
 		Object	obj	= new Object()
 		{
-			@XMLClassname("test2")
+			@Classname("test2")
 			public boolean equals(Object obj)
 			{
 				String	othername	= null;
@@ -906,7 +919,7 @@ public class Test extends TestCase
 		};
 		
 		doWriteAndRead(obj);
-	}*/
+	}
 	
 	/**
 	 *  Test reading / writing tuple2.
