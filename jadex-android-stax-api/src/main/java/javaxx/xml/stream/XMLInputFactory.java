@@ -1,5 +1,6 @@
 package javaxx.xml.stream;
 
+import android.util.Log;
 import javaxx.xml.transform.Source;
 import javaxx.xml.stream.EventFilter;
 import javaxx.xml.stream.FactoryConfigurationError;
@@ -141,13 +142,20 @@ public abstract class XMLInputFactory {
    *
    * @throws FactoryConfigurationError if an instance of this factory cannot be loaded
    */
-  public static XMLInputFactory newInstance()
-    throws FactoryConfigurationError
-  {
-    return (XMLInputFactory) FactoryFinder.find(
-      "javaxx.xml.stream.XMLInputFactory",
-      "com.ctc.wstx.stax.WstxInputFactory");
-  }
+	public static XMLInputFactory newInstance() throws FactoryConfigurationError {
+		Object find = null;
+		try {
+			find = FactoryFinder.find("javaxx.xml.stream.XMLInputFactory",
+					"jadex.android.xmlpullparser.XMLPullInputFactory");
+		} catch (FactoryConfigurationError e) {
+		}
+
+		if (find == null) {
+			find = FactoryFinder.find("javaxx.xml.stream.XMLInputFactory", "com.ctc.wstx.stax.WstxInputFactory");
+		}
+
+		return (XMLInputFactory) find;
+	}
 
   /**
    * Create a new instance of the factory 

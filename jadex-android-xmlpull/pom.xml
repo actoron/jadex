@@ -9,43 +9,31 @@
 		<version>2.1-SNAPSHOT</version>
 		<relativePath>../jadex-android-parent/pom.xml</relativePath>
 	</parent>
-	<artifactId>jadex-android-xml</artifactId>
+	<artifactId>jadex-android-xmlpull</artifactId>
 	<packaging>jar</packaging>
-	<name>jadex-android-xml</name>
+	<name>jadex-android-xmlpull</name>
 
 	<description>
-	This Project includes the Jadex XML-specific classes
+	This Project includes the a variant of the Jadex XML Parser using the Android XML Pull API.
 	</description>
 
 	<dependencies>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-commons</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-beans</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 <!-- 		<dependency> -->
 <!-- 			<groupId>net.sourceforge.jadex</groupId> -->
-<!-- 			<artifactId>jadex-android-woodstox</artifactId> -->
+<!-- 			<artifactId>jadex-android-commons</artifactId> -->
 <!-- 			<version>${project.version}</version> -->
 <!-- 		</dependency> -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-xmlpull</artifactId>
+			<artifactId>jadex-android-stax-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 
 	<build>
-		<sourceDirectory>src/gen/java</sourceDirectory>
-
 		<resources>
 			<resource>
-				<directory>src/gen/java</directory>
+				<directory>src/main/java</directory>
 				<excludes>
 					<exclude>**/*.java</exclude>
 					<exclude>**/.svn/*</exclude>
@@ -55,18 +43,28 @@
 
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
 				<executions>
 					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
 						<goals>
-							<goal>run</goal>
+							<goal>add-source</goal>
 						</goals>
+						<configuration>
+							<sources>
+								<source>src/gen/java</source>
+							</sources>
+						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

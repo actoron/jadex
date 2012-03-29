@@ -728,7 +728,8 @@
 				<module>jadex-android-misc</module>
 				<module>jadex-android-antlr</module>
 				<module>jadex-android-stax-api</module>
-				<module>jadex-android-woodstox</module>
+<!-- 				<module>jadex-android-woodstox</module> -->
+				<module>jadex-android-xmlpull</module>
 				<module>jadex-android-core</module>
 				<module>jadex-android-beans</module>
 				<module>jadex-android-bdi</module>
@@ -803,7 +804,8 @@
 				<module>jadex-android-misc</module>
 				<module>jadex-android-antlr</module>
 				<module>jadex-android-stax-api</module>
-				<module>jadex-android-woodstox</module>
+<!-- 				<module>jadex-android-woodstox</module> -->
+				<module>jadex-android-xmlpull</module>
 				<module>jadex-android-core</module>
 				<module>jadex-android-beans</module>
 				<module>jadex-android-bdi</module>
