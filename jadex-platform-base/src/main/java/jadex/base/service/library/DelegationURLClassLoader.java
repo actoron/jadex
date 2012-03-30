@@ -84,11 +84,11 @@ public class DelegationURLClassLoader extends URLClassLoader
 						dependencies.addAll(delegates[i].getFlattenedDependencies());
 					}
 					
-					System.out.println("Dependencies: "+rid+", "+dependencies.size());
-					for(DelegationURLClassLoader dep: dependencies)
-					{
-						System.out.println("\t"+dep.getResourceIdentifier());
-					}
+//					System.out.println("Dependencies: "+rid+", "+dependencies.size());
+//					for(DelegationURLClassLoader dep: dependencies)
+//					{
+//						System.out.println("\t"+dep.getResourceIdentifier());
+//					}
 				}
 			}
 		}

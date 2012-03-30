@@ -2,6 +2,8 @@ package jadex.base.relay;
 
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -25,17 +27,26 @@ public class PlatformInfo
 	
 	//-------- attributes --------
 	
+	/** The db id. */
+	protected Integer	dbid;
+	
 	/** The platform id. */
 	protected String	id;
 	
-	/** The platform host. */
-	protected String	host;
+	/** The host ip. */
+	protected String	hostip;
+	
+	/** The host name. */
+	protected String	hostname;
 	
 	/** The protocol (e.g. http or https). */
 	protected String	scheme;
 	
 	/** The time when the connection was established. */
 	protected Date	connect_time;
+	
+	/** The time when the connection was lost. */
+	protected Date	disconnect_time;
 	
 	/** The number of received bytes. */
 	protected double	bytes_received;
@@ -54,12 +65,29 @@ public class PlatformInfo
 	/**
 	 *  Create a platform info.
 	 */
-	public PlatformInfo(String id, String host, String protocol)
+	public PlatformInfo(String id, String hostip, String hostname, String protocol)
 	{
+		this(null, id, hostip, hostname, protocol, new Date(), null, 0, 0, 0);
+		
+		StatsDB.getDB().save(this);
+	}
+	
+	/**
+	 *  Constructor used by db.
+	 */
+	public PlatformInfo(Integer dbid, String id, String hostip, String hostname, String protocol,
+		Date connect_time, Date disconnect_time, int msg_cnt, double bytes_received, double total_transmission_time)
+	{
+		this.dbid	= dbid;
 		this.id	= id;
-		this.host	= host;
+		this.hostip	= hostip;
+		this.hostname	= hostname;
 		this.scheme	= protocol;
-		this.connect_time	= new Date();
+		this.connect_time	= connect_time;
+		this.disconnect_time	= disconnect_time;
+		this.msg_cnt	= msg_cnt;
+		this.bytes_received	= bytes_received;
+		this.total_transmission_time	= total_transmission_time;
 	}
 	
 	//-------- methods --------
@@ -75,9 +103,28 @@ public class PlatformInfo
 	/**
 	 *  Get the host.
 	 */
-	public String	getHost()
+	public String	getHostIP()
 	{
-		return host;
+		return hostip;
+	}
+	
+	/**
+	 *  Get the resolved host name.
+	 */
+	public String	getHostName()
+	{
+		if(hostname.equals(hostip))
+		{
+			try
+			{
+				hostname	= InetAddress.getByName(hostip).getCanonicalHostName();
+			}
+			catch(UnknownHostException e)
+			{
+				hostname	= "unknown";
+			}
+		}
+		return hostname;
 	}
 	
 	/**
@@ -106,6 +153,46 @@ public class PlatformInfo
 	}
 	
 	/**
+	 *  Get the disconnect time.
+	 */
+	public String	getDisconnectTime()
+	{
+		if(disconnect_time!=null)
+		{
+			GregorianCalendar	cal	= new GregorianCalendar();
+			GregorianCalendar	con	= new GregorianCalendar();
+			con.setTime(disconnect_time);
+			
+			DateFormat	df	= (con.get(Calendar.YEAR)!=cal.get(Calendar.YEAR)
+				|| con.get(Calendar.MONTH)!=cal.get(Calendar.MONTH)
+				|| con.get(Calendar.DAY_OF_MONTH)!=cal.get(Calendar.DAY_OF_MONTH))
+				? TIME_FORMAT_LONG : TIME_FORMAT_SHORT;
+			
+			return df.format(disconnect_time);
+		}
+		else
+		{
+			return "";
+		}
+	}
+	
+	/**
+	 *  Get the connect date.
+	 */
+	public Date	getConnectDate()
+	{
+		return connect_time;
+	}
+	
+	/**
+	 *  Get the disconnect date.
+	 */
+	public Date	getDisconnectDate()
+	{
+		return disconnect_time;
+	}
+	
+	/**
 	 *  Get the message count.
 	 */
 	public int	getMessageCount()
@@ -122,6 +209,14 @@ public class PlatformInfo
 	}
 	
 	/**
+	 *  Get the byte count as raw value
+	 */
+	public double	getBytes()
+	{
+		return bytes_received;
+	}
+	
+	/**
 	 *  Get the average transfer rate as beautified string.
 	 */
 	public String	getTransferRate()
@@ -131,11 +226,27 @@ public class PlatformInfo
 	}
 	
 	/**
+	 *  Get the transfer time as raw value (millis).
+	 */
+	public double	getTransferTime()
+	{
+		return total_transmission_time;
+	}
+	
+	/**
 	 *  Get the awareness info.
 	 */
 	public AwarenessInfo	getAwarenessInfo()
 	{
 		return awainfo;
+	}
+	
+	/**
+	 *  Get the db id
+	 */
+	public Integer	getDBId()
+	{
+		return dbid;
 	}
 	
 	//-------- modifier methods --------
@@ -150,16 +261,34 @@ public class PlatformInfo
 		msg_cnt++;
 		bytes_received	+= bytes;
 		total_transmission_time	+= time / 1000000.0;
+		
+//		StatsDB.getDB().save(this);
 	}
 	
 	/**
 	 *  Platform with same id has reconnected.
 	 */
-	public void	reconnect(String host)
+	public void	reconnect(String hostip, String hostname)
 	{
-		// Todo: store history of previous values (with max length?)
-		this.host	= host;
-		this.connect_time	= new Date();
+		if(!hostip.equals(this.hostip))
+		{
+			throw new RuntimeException("Platform already connected from different ip: "+this.hostip);
+		}
+//		this.hostip	= hostip;
+		this.hostname	= hostname;
+//		this.connect_time	= new Date();
+		
+//		StatsDB.getDB().save(this);
+	}
+	
+	/**
+	 *  Platform has disconnected.
+	 */
+	public void	disconnect()
+	{
+		this.disconnect_time	= new Date();
+		
+		StatsDB.getDB().save(this);
 	}
 	
 	/**
@@ -168,6 +297,14 @@ public class PlatformInfo
 	public void	setAwarenessInfo(AwarenessInfo awainfo)
 	{
 		this.awainfo	= awainfo;
+	}
+	
+	/**
+	 *  Set db id
+	 */
+	public void	setDBId(Integer dbid)
+	{
+		this.dbid	= dbid;
 	}
 	
 	//-------- helper methods --------
@@ -196,5 +333,16 @@ public class PlatformInfo
 		}
 		
 		return ret;
+	}
+
+	/**
+	 *  Create a string representation.
+	 */
+	public String toString()
+	{
+		return "PlatformInfo(id="+getDBId()+", platform="+getId()+", host="+getHostName()+"("+getHostIP()+"), scheme="+getScheme()
+			+ ", connected="+getConnectTime()+", disconnected="+getDisconnectTime()
+			+ ", messages="+getMessageCount()+"("+getByteCount()+"), rate="+getTransferRate()
+			+ ")";
 	}
 }

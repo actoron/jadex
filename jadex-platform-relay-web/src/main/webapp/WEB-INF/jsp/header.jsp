@@ -19,7 +19,7 @@
 		<td colspan="2" valign="middle" height="16" class="horbar">&nbsp;</td>
 	</tr>
 	<tr valign="top">
-		<td width="20%" class="menublock_top">
+		<td width="12%" class="menublock_top">
 			<jsp:include page="navigation.jsp" flush="false"/>
 		</td>
 		<td class="textblock">

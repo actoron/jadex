@@ -98,11 +98,21 @@ public class RelayServlet extends HttpServlet
 		{
 	
 			String	id	= request.getParameter("id");
-			
 			// Render status page.
 			if(id==null)
 			{
-				request.setAttribute("platforms", platforms);
+				if("/history".equals(request.getServletPath()))
+				{
+					// Fetch array to avoid concurrency problems
+					request.setAttribute("platforms", StatsDB.getDB().getPlatformInfos());
+					request.setAttribute("title", "Platform Connection History");
+				}
+				else
+				{
+					// Fetch array to avoid concurrency problems
+					request.setAttribute("platforms", platforms.values().toArray(new PlatformInfo[0]));
+					request.setAttribute("title", "Connected Platforms");
+				}
 				String	view	= "/WEB-INF/jsp/status.jsp";
 				RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);
 				rd.forward(request, response);
@@ -121,12 +131,12 @@ public class RelayServlet extends HttpServlet
 				PlatformInfo	info	= platforms.get(id);
 				if(info==null)
 				{
-					info	= new PlatformInfo(id, request.getRemoteHost(), request.getScheme());
+					info	= new PlatformInfo(id, request.getRemoteAddr(), request.getRemoteHost(), request.getScheme());
 					platforms.put(id, info);
 				}
 				else
 				{
-					info.reconnect(request.getRemoteHost());
+					info.reconnect(request.getRemoteAddr(), request.getRemoteHost());
 				}
 				
 				IBlockingQueue<Message>	queue	= map.get(id);
