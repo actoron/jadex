@@ -232,6 +232,9 @@ public class SReflect
 		return classForName0(name, true, classloader);
 	}
 
+//	static long	hit	= 0;
+//	static long	miss	= 0;
+	
 	/**
 	 *  Extension for Class.forName(), because primitive
 	 *  types are not supported.
@@ -263,7 +266,7 @@ public class SReflect
 			
 			if(ret==null)
 			{
-//				System.out.println("cFN0 cachemiss: "+name);
+//					System.out.println("cFN0 cachemiss: "+name);
 				
 				// For arrays get plain name and count occurrences of '['.
 				String	clname	= name;
@@ -670,10 +673,18 @@ public class SReflect
 		// Try to find fully qualified.
 		if(cache.containsKey(tuple))
 		{
+//			hit++;
+//			if(hit%1000==0)
+//				System.out.println("hits: "+hit+", misses: "+miss);
+			
 			clazz	= (Class)cache.get(tuple);
 		}
 		else
 		{
+//			miss++;
+//			if(miss%1000==0)
+//				System.out.println("hits: "+hit+", misses: "+miss);
+			
 			clazz	= classForName0(clname, classloader);
 			cache.put(new Tuple(clname, null), clazz);
 		}
@@ -686,10 +697,18 @@ public class SReflect
 				entities[1]	= imports[i];	
 				if(cache.containsKey(tuple))
 				{
+//					hit++;
+//					if(hit%1000==0)
+//						System.out.println("hits: "+hit+", misses: "+miss);
+					
 					clazz	= (Class)cache.get(tuple);
 				}
 				else
 				{
+//					miss++;
+//					if(miss%1000==0)
+//						System.out.println("hits: "+hit+", misses: "+miss);
+					
 					String	clwoa	=	clname;
 					String	brackets	= "";
 					while(clwoa.endsWith("[]"))
@@ -719,10 +738,18 @@ public class SReflect
 			entities[1]	= "java.lang.*";
 			if(cache.containsKey(tuple))
 			{
+//				hit++;
+//				if(hit%1000==0)
+//					System.out.println("hits: "+hit+", misses: "+miss);
+				
 				clazz	= (Class)cache.get(tuple);
 			}
 			else
 			{
+//				miss++;
+//				if(miss%1000==0)
+//					System.out.println("hits: "+hit+", misses: "+miss);
+				
 				clazz	= classForName0("java.lang." + clname, classloader);
 				cache.put(new Tuple(clname, "java.lang.*"), clazz);
 			}

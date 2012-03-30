@@ -66,6 +66,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/** The init urls. */
 	protected Object[] initurls;
 
+	/** The class loader futures for currently loading class loaders. */
+	protected Map<IResourceIdentifier, Future<DelegationURLClassLoader>> clfuts;
+	
 	/** The map of managed resources (url (for local case) -> delegate loader). */
 	protected Map<IResourceIdentifier, DelegationURLClassLoader> classloaders;
 	
@@ -132,6 +135,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	public LibraryService(Object[] urls, ClassLoader baseloader, Map<String, Object> properties)
 	{
 		this.classloaders = new HashMap<IResourceIdentifier, DelegationURLClassLoader>();
+		this.clfuts = new HashMap<IResourceIdentifier, Future<DelegationURLClassLoader>>();
 		this.listeners	= new LinkedHashSet<ILibraryServiceListener>();
 		this.ridsupport = new LinkedHashMap<IResourceIdentifier, Set<IResourceIdentifier>>();
 		this.managedrids = new LinkedHashMap<IResourceIdentifier, Integer>();
@@ -157,27 +161,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			public void customResultAvailable(DelegationURLClassLoader result)
 			{
 				addManaged(rid);
-				
-				// Do not notify listeners with lock held!
-				
-				ILibraryServiceListener[] lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
-				for(int i=0; i<lis.length; i++)
-				{
-					final ILibraryServiceListener liscopy = lis[i];
-					lis[i].resourceIdentifierAdded(rid).addResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-						}
-						public void exceptionOccurred(Exception exception) 
-						{
-							// todo: how to handle timeouts?! allow manual retry?
-//							exception.printStackTrace();
-							removeLibraryServiceListener(liscopy);
-						};
-					});
-				}
-				
 				ret.setResult(null);
 			}
 		});
@@ -542,33 +525,76 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	protected IFuture<DelegationURLClassLoader> getClassLoader(final IResourceIdentifier rid, 
 		Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support)
 	{
-//		System.out.println("getClassLoader(): "+rid);
-//		final URL url = rid.getLocalIdentifier().getSecondEntity();
-		
-		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
-		DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
-		
-		if(cl!=null)
+		final Future<DelegationURLClassLoader> ret;
+		if(clfuts.containsKey(rid))
 		{
-			addSupport(rid, support);
-			ret.setResult(cl);
+			ret	= clfuts.get(rid);
 		}
 		else
 		{
-			if(alldeps==null)
+	//		final URL url = rid.getLocalIdentifier().getSecondEntity();
+			
+			ret = new Future<DelegationURLClassLoader>();
+			DelegationURLClassLoader cl = (DelegationURLClassLoader)classloaders.get(rid);
+			
+			if(cl!=null)
 			{
-				getDependencies(rid).addResultListener(
-					new ExceptionDelegationResultListener<Map<IResourceIdentifier, List<IResourceIdentifier>>, DelegationURLClassLoader>(ret)
-				{
-					public void customResultAvailable(Map<IResourceIdentifier, List<IResourceIdentifier>> deps)
-					{
-						createClassLoader(rid, deps, support).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret));
-					}
-				});
+				addSupport(rid, support);
+				ret.setResult(cl);
 			}
 			else
 			{
-				createClassLoader(rid, alldeps, support).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret));
+				clfuts.put(rid, ret);
+//				if(rid.getGlobalIdentifier()==null)
+//					System.out.println("getClassLoader(): "+rid);
+				
+				if(alldeps==null)
+				{
+					getDependencies(rid).addResultListener(
+						new ExceptionDelegationResultListener<Map<IResourceIdentifier, List<IResourceIdentifier>>, DelegationURLClassLoader>(ret)
+					{
+						public void customResultAvailable(Map<IResourceIdentifier, List<IResourceIdentifier>> deps)
+						{
+							createClassLoader(rid, deps, support).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret)
+							{
+								public void customResultAvailable(DelegationURLClassLoader result)
+								{
+									clfuts.remove(rid);
+									super.customResultAvailable(result);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									clfuts.remove(rid);
+									super.exceptionOccurred(exception);
+								}
+							});
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							clfuts.remove(rid);
+							super.exceptionOccurred(exception);
+						}
+					});
+				}
+				else
+				{
+					createClassLoader(rid, alldeps, support).addResultListener(new DelegationResultListener<DelegationURLClassLoader>(ret)
+					{
+						public void customResultAvailable(DelegationURLClassLoader result)
+						{
+							clfuts.remove(rid);
+							super.customResultAvailable(result);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							clfuts.remove(rid);
+							super.exceptionOccurred(exception);
+						}
+					});
+				}
 			}
 		}
 		
@@ -592,9 +618,28 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])result.toArray(new DelegationURLClassLoader[result.size()]);
 				DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, baseloader, delegates);
 				classloaders.put(rid, cl);
+//				System.out.println("createClassLoader() put: "+rid);
 				globalcl	= null;
 				addSupport(rid, support);
 				ret.setResult(cl);
+				
+				ILibraryServiceListener[] lis = (ILibraryServiceListener[])listeners.toArray(new ILibraryServiceListener[listeners.size()]);
+				for(int i=0; i<lis.length; i++)
+				{
+					final ILibraryServiceListener liscopy = lis[i];
+					lis[i].resourceIdentifierAdded(rid).addResultListener(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+						}
+						public void exceptionOccurred(Exception exception) 
+						{
+							// todo: how to handle timeouts?! allow manual retry?
+//							exception.printStackTrace();
+							removeLibraryServiceListener(liscopy);
+						};
+					});
+				}
 			}
 		});
 		

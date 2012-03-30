@@ -1,6 +1,7 @@
 package jadex.base.service.library;
 
 import jadex.bridge.IResourceIdentifier;
+import jadex.commons.SReflect;
 
 import java.io.IOException;
 import java.net.URL;
@@ -78,6 +79,12 @@ public class DelegationURLClassLoader extends URLClassLoader
 						dependencies.add(delegates[i]);
 						dependencies.addAll(delegates[i].getFlattenedDependencies());
 					}
+					
+					System.out.println("Dependencies: "+rid+", "+dependencies.size());
+					for(DelegationURLClassLoader dep: dependencies)
+					{
+						System.out.println("\t"+dep.getResourceIdentifier());
+					}
 				}
 			}
 		}
@@ -102,25 +109,6 @@ public class DelegationURLClassLoader extends URLClassLoader
 		return rid;
 	}
 	
-//	/**
-//	 *  Get all managed urls inlcuding all subdependencies.
-//	 *  @return The urls.
-//	 */
-//	public Set<URL> getAllURLs()
-//	{
-//		Set<URL> ret = new HashSet<URL>();
-//		if(delegates!=null)
-//		{
-//			for(int i=0; i<delegates.length; i++)
-//			{
-//				ret.addAll(delegates[i].getAllURLs());
-//			}
-//		}
-//		if(getURL()!=null)
-//			ret.add(getURL());
-//		return ret;
-//	}
-	
 	/**
 	 *  Get all managed resource identifiers inlcuding all subdependencies.
 	 *  @return The resource identifiers.
@@ -141,11 +129,11 @@ public class DelegationURLClassLoader extends URLClassLoader
 	}
 	
 	/**
-	 *  Load a class directly, without delegation to dependencies.
-	 *  Overridden to delegate to dependencies, if not found.
+	 *  Load a class directly, without delegation to dependencies or base class loader
 	 */
 	protected Class<?>	loadDirectClass(String name, boolean resolve)	throws ClassNotFoundException
 	{
+//		System.out.println("loadClass: "+name+", "+rid);
 		return super.loadClass(name, resolve);
 	}
 	
@@ -156,6 +144,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 	protected Class<?>	loadClass(String name, boolean resolve)	throws ClassNotFoundException
 	{
 		Class<?> ret = null;
+		
 		try
 		{
 			ret	= super.loadClass(name, resolve);
@@ -182,98 +171,15 @@ public class DelegationURLClassLoader extends URLClassLoader
 		return ret;
 	}
 
-//	protected static ThreadLocal<Boolean>	RECURSE	= new ThreadLocal<Boolean>();
-//	
-//	/**
-//	 *  Find a class using super implementation or delegates.
-//	 */
-//	protected Class<?>	findClass(String name) throws ClassNotFoundException
-//	{
-//		Class<?> ret = null;
-//		if(RECURSE.get()==null || RECURSE.get().booleanValue())
-//		{
-//			try
-//			{
-//				RECURSE.set(Boolean.FALSE);
-//				try
-//				{
-//					ret	= super.findClass(name);
-//				}
-//				catch(ClassNotFoundException e)
-//				{
-//					for(DelegationURLClassLoader dep: getFlattenedDependencies())
-//					{
-//	//					System.out.println("findClass: "+name+", "+dep);
-//						try
-//						{
-//							ret = dep.loadClass(name);
-//							break;
-//						}
-//						catch (ClassNotFoundException ex)
-//						{
-//						}				
-//					}
-//				}
-//				
-//				if(ret==null)
-//					throw new ClassNotFoundException(name);
-//			}
-//			finally
-//			{
-//				RECURSE.set(null);
-//			}
-//		}
-//		else
-//		{
-//			return super.findClass(name);
-//		}
-//		return ret;
-//	}
-	
-//	/**
-//	 *  Find a class.
-//	 *  @param name The class name.
-//	 *  @return The class.
-//	 */
-//	protected Class<?> findClass(String name) throws ClassNotFoundException
-//	{
-//		Class<?> ret = null;
-//		
-//		try
-//		{
-//			ret = super.findClass(name);
-//		}
-//		catch(ClassNotFoundException e)
-//		{
-//		}
-//		catch(NullPointerException e)
-//		{
-//			e.printStackTrace();
-//		}
-//		
-//		if(ret==null)
-//		{
-//			if(delegates!=null)
-//			{
-//				for(int i=0; ret==null && i<delegates.length; i++)
-//				{
-//					try
-//					{
-//						ret = delegates[i].loadClass(name);
-//					}
-//					catch (ClassNotFoundException e)
-//					{
-//					}
-//				}
-//			}
-//		}
-//		
-//		if(ret==null)
-//			throw new ClassNotFoundException(name);
-//		
-//		return ret;
-//	}
-
+	/**
+	 *  Find the resource.
+	 *  @param name The name.
+	 *  @return The url.
+	 */
+	protected URL findDirectResource(String name)
+	{
+		return super.findResource(name);
+	}
 	
 	/**
 	 *  Find the resource.
@@ -282,34 +188,28 @@ public class DelegationURLClassLoader extends URLClassLoader
 	 */
 	public URL findResource(String name)
 	{
-		URL ret = null;
-		
-		try
-		{
-			ret = super.findResource(name);
-		}
-		catch(Exception e)
-		{
-		}
-		
+		URL ret = super.findResource(name);
 		if(ret==null)
 		{
-			if(delegates!=null)
+			for(DelegationURLClassLoader dep: getFlattenedDependencies())
 			{
-				for(int i=0; ret==null && i<delegates.length; i++)
-				{
-					try
-					{
-						ret = delegates[i].getResource(name);
-					}
-					catch (Exception e)
-					{
-					}
-				}
+				ret = dep.findDirectResource(name);
+				if(ret!=null)
+					break;
 			}
 		}
 		
 		return ret;
+	}
+
+	/**
+	 *  Find the resource.
+	 *  @param name The name.
+	 *  @return The url.
+	 */
+	protected Enumeration<URL> findDirectResources(String name) throws IOException
+	{
+		return super.findResources(name);
 	}
 	
 	/**
@@ -320,33 +220,20 @@ public class DelegationURLClassLoader extends URLClassLoader
 	public Enumeration<URL> findResources(String name) throws IOException
 	{
 		Set<URL> res = new HashSet<URL>();
-		URL ret = null;
-		
-		try
+		res.addAll(Collections.list(super.findResources(name)));
+		for(DelegationURLClassLoader dep: getFlattenedDependencies())
 		{
-			res.addAll(Collections.list(super.findResources(name)));
-		}
-		catch(Exception e)
-		{
-		}
-		
-		if(ret==null)
-		{
-			if(delegates!=null)
-			{
-				for(int i=0; ret==null && i<delegates.length; i++)
-				{
-					try
-					{
-						res.addAll(Collections.list(delegates[i].getResources(name)));
-					}
-					catch (Exception e)
-					{
-					}
-				}
-			}
+			res.addAll(Collections.list(dep.findDirectResources(name)));
 		}
 		
 		return Collections.enumeration(res);
+	}
+
+	/**
+	 *  Get a string representation.
+	 */
+	public String toString()
+	{
+		return SReflect.getInnerClassName(getClass())+"("+rid+")";
 	}
 }

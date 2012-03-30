@@ -84,6 +84,8 @@ public class JadexMavenRunner
 //			delegates[i]	= cls.get(rids[i].getLocalIdentifier().getUrl());
 //		}
 //		ClassLoader	cl	= new DelegationURLClassLoader(null, delegates);
+		
+		Thread.sleep(10000);
 
 		
 		// Load classes using wrong imports (classes will be found in java.lang fallback).
@@ -123,7 +125,7 @@ public class JadexMavenRunner
 		time	= System.nanoTime() - start;
 		System.out.println("4th load took: "+(time/100000)/10.0+" ms");
 		
-		
+		Thread.sleep(20000000);
 //		Class<?>	starter	= Class.forName("jadex.base.Starter", true, cl);
 //		starter.getMethod("main", new Class[]{String[].class}).invoke(null, new Object[]{args});
 	}

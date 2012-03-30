@@ -403,7 +403,7 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	{
 		final Future<IModelInfo> ret = new Future<IModelInfo>();
 		
-		findKernel(model, imports, null, isrecur).addResultListener(ia.createResultListener(ia.createResultListener(new IResultListener()
+		findKernel(model, imports, rid, isrecur).addResultListener(ia.createResultListener(ia.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -429,10 +429,11 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture<Boolean> isLoadable(String model, String[] imports, IResourceIdentifier rid)
 	{
-//		System.out.println("isLoadable: "+model);
+//		if(model.endsWith("agent.xml"))
+//			System.out.println("isLoadable: "+model);
 
 		final Future<Boolean> ret = new Future<Boolean>();
-		findKernel(model, imports, null).addResultListener(ia.createResultListener(new IResultListener()
+		findKernel(model, imports, rid).addResultListener(ia.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -489,10 +490,11 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	public IFuture<String> getComponentType(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
-//		if(model.endsWith("application.xml"))
-//			System.out.println("model:"+model);
+//		if(model.endsWith("agent.xml"))
+//			System.out.println("model: "+model);
+
 		final Future<String> ret = new Future<String>();
-		findKernel(model, imports, null).addResultListener(ia.createResultListener(new IResultListener()
+		findKernel(model, imports, rid).addResultListener(ia.createResultListener(new IResultListener()
 		{
 			public void resultAvailable(Object result)
 			{
@@ -727,6 +729,9 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 	 */
 	protected IFuture findActiveKernel(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
+		if(rid==null)
+			System.out.println("il gbdl ");
+		
 		//SServiceProvider.getService(ia.getServiceContainer(), new ComponentFactorySelector(kernelmodel, null, classloader))
 		final Future ret = new Future();
 		SServiceProvider.getServices(ia.getServiceContainer(), IComponentFactory.class, RequiredServiceInfo.SCOPE_APPLICATION).addResultListener(ia.createResultListener(new DelegationResultListener(ret)

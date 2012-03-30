@@ -36,8 +36,8 @@ public class ResourceIdentifier implements IResourceIdentifier
 	 */
 	public ResourceIdentifier(ILocalResourceIdentifier lid, String gid)
 	{
-		if(lid!=null && lid.getUrl()==null)
-			System.out.println("goog");
+//		if(gid==null)
+//			System.out.println("googsdl");
 		this.lid = lid;
 		this.gid = gid;
 	}
