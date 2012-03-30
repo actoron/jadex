@@ -34,6 +34,7 @@ import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
@@ -1556,7 +1557,8 @@ public class MessageService extends BasicService implements IMessageService
 				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
 				if(och!=null)
 				{
-					och.ackData(((Integer)data).intValue());
+					Tuple2<Integer, Boolean> tup = (Tuple2<Integer, Boolean>)data;
+					och.ackData(tup.getFirstEntity().intValue(), tup.getSecondEntity().booleanValue());
 				}
 				else
 				{
@@ -1618,7 +1620,8 @@ public class MessageService extends BasicService implements IMessageService
 				OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(new Integer(conid));
 				if(och!=null)
 				{
-					och.ackData(((Integer)data).intValue());
+					Tuple2<Integer, Boolean> tup = (Tuple2<Integer, Boolean>)data;
+					och.ackData(tup.getFirstEntity().intValue(), tup.getSecondEntity().booleanValue());
 				}
 				else
 				{

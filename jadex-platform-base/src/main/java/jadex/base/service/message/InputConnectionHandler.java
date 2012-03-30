@@ -3,6 +3,7 @@ package jadex.base.service.message;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.SUtil;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -23,10 +24,14 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	/** The last received sequence number. */
 	protected int rseqno;
 	
-	/** The maximum buffer size. */
+	/** The maximum buffer size for out of order packets. */
 	protected int maxbuf;
 	
-	/** The data. */
+	/** The maximum bytes of data that can be stored in connection (without being consumed). */
+	protected int maxstored;
+	
+	/** The data (stored here only as long as it is out of order or incomplete). 
+	    Ready data will be forwarded to the connection. */
 	protected Map<Integer, byte[]> data;
 	
 	
@@ -49,6 +54,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		super(ms);
 		this.rseqno = -1;
 		this.maxbuf = 1000;
+		this.maxstored = 5000; 
 		this.data = new HashMap<Integer, byte[]>();
 	
 		this.ackcnt = 10;
@@ -114,6 +120,8 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		if(con.isClosed())
 			return false;
 		
+		System.err.println("received: "+seqnumber);
+		
 		// If packet is the next one deliver to stream
 		// else store in map till the next one arrives
 		if(seqnumber==getSequenceNumber()+1)
@@ -173,7 +181,9 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		if(getSequenceNumber()>lastack)
 		{
 //			System.out.println("send ack: "+rseqno);
-			sendTask(createTask(StreamSendTask.ACKDATA, rseqno, true, null));
+			// tuple contains seqno and stop flag
+			sendTask(createTask(StreamSendTask.ACKDATA, new Tuple2<Integer, Boolean>(rseqno, 
+				isStop()? Boolean.TRUE: Boolean.FALSE), true, null));
 			lastack = rseqno;
 		}
 	}
@@ -226,4 +236,11 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		return (InputConnection)getConnection();
 	}
 	
+	/**
+	 * 
+	 */
+	protected boolean isStop()
+	{
+		return getInputConnection().getStoredDataSize()>=maxstored;
+	}
 }

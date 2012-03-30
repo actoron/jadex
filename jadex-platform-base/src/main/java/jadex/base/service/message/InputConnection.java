@@ -5,8 +5,11 @@ import jadex.bridge.IInputConnection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateFuture;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +33,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	protected int size;
 	
 	/** The read futures. */
-	protected IntermediateFuture<Byte> ifuture;
+	protected SubscriptionIntermediateFuture<Byte> ifuture;
 	protected Future<Byte> ofuture;
 		
 	//-------- constructors --------
@@ -123,23 +126,19 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 */
 	protected synchronized int internalRead()
 	{
+		
 		int startpos = offset;
 		
-//		for(; rowcnt<data.size(); rowcnt++)
-//		{
-//			byte[] row = data.get(rowcnt);
-//			if(position<startpos+row.length)
-//				break;
-//			startpos += row.length;
-//		}
-		
 		int ret = -1;
+		boolean hasread = false;
 		if(data.size()>0)
 		{
+			hasread = true;
 			byte[] row = data.get(0);
 			int inrowstart = position-startpos;
 			
 			ret = row[inrowstart];
+			ret = ret & 0xff;
 			position++;
 			if(inrowstart+1==row.length)
 			{
@@ -149,8 +148,11 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		}
 		else if(closed)
 		{
+			System.out.println("iread closss");
 			throw new RuntimeException("End of stream reached.");
 		}
+		
+//		System.out.println("iread: "+ret+" "+position+" "+size+" "+hasread);
 		
 		return ret;
 	}
@@ -159,14 +161,14 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 *  Asynchronous read. 
 	 *  @return Bytes one by one till end of stream or closed.
 	 */
-	public IIntermediateFuture<Byte> aread()
+	public ISubscriptionIntermediateFuture<Byte> aread()
 	{
 		boolean cl;
 		synchronized(this)
 		{
 			if(ifuture!=null || ofuture!=null)
-				return new IntermediateFuture<Byte>(new RuntimeException("Stream has reader"));
-			ifuture = new IntermediateFuture<Byte>();
+				return new SubscriptionIntermediateFuture<Byte>(new RuntimeException("Stream has reader"));
+			ifuture = new SubscriptionIntermediateFuture<Byte>();
 			cl = closed;
 		}
 			
@@ -280,22 +282,16 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 */
 	public void addData(byte[] data)
 	{
-//		System.out.println("added: "+data.length);
+//		System.out.println("added: "+data.length+" "+position+" "+size);
+
 		IntermediateFuture<Byte> iret;
 		Future<Byte> oret = null;
 		boolean cl;
 		synchronized(this)
 		{
-			if(ifuture==null)
-			{
-				this.data.add(data);
-			}
-			else
-			{
-				offset += data.length;
-			}
-			
+			this.data.add(data);
 			this.size += data.length;
+
 			iret = ifuture;
 			if(ofuture!=null)
 			{
@@ -307,16 +303,16 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		
 		if(iret!=null)
 		{
-			position += data.length;
-			for(int i=0; i<data.length; i++)
+			try
 			{
-				iret.addIntermediateResult(data[i]);
+				for(int next=internalRead(); next!=-1; next=internalRead())
+				{
+					iret.addIntermediateResult(new Byte((byte)next));
+				}
 			}
-			
-			if(cl && position==size)
+			catch(Exception e)
 			{
 				iret.setFinished();
-//				ret.setException(new RuntimeException("Stream closed"));
 			}
 		}
 		else if(oret!=null)
@@ -343,7 +339,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 			cl = position == size;
 		}
 		
-		System.out.println("hhh; "+position+" "+size);
+		System.out.println("hhh; "+position+" "+size+" "+cl);
 		
 		// notify async listener if last byte has been read and stream is closed.
 		if(iret!=null && cl)
@@ -355,5 +351,21 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		{
 			oret.setException(new RuntimeException("Stream closed"));
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public int getStoredDataSize()
+	{
+		int ret = 0;
+		synchronized(this)
+		{
+			for(int i=0; i<data.size(); i++)
+			{
+				ret += data.get(i).length;
+			}
+		}
+		return ret;
 	}
 }

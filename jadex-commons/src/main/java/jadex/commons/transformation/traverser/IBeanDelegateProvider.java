@@ -9,5 +9,5 @@ public interface IBeanDelegateProvider
 	/**
 	 *  Returns an accessor delegate.
 	 */
-	public IBeanAccessorDelegate getDelegate(Class clazz);
+	public IBeanAccessorDelegate getDelegate(Class<?> clazz);
 }

@@ -129,8 +129,8 @@ public abstract class AbstractConnection
 	 */
 	public synchronized void close()
 	{
-		if(closing || closed)
-			return;
+//		if(closing || closed)
+//			return;
 		
 		setClosing();
 

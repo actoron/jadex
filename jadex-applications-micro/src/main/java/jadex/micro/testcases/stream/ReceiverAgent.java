@@ -3,6 +3,7 @@ package jadex.micro.testcases.stream;
 import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentKilled;
@@ -43,7 +44,8 @@ public class ReceiverAgent
 			File f = new File("c:\\projects\\copy.jpg");
 			final FileOutputStream fos = new FileOutputStream(f);
 			
-			((IInputConnection)con).aread().addResultListener(new IIntermediateResultListener<Byte>()
+			ISubscriptionIntermediateFuture<Byte> fut = ((IInputConnection)con).aread();
+			fut.addResultListener(new IIntermediateResultListener<Byte>()
 			{
 				public void resultAvailable(Collection<Byte> result)
 				{
@@ -63,7 +65,7 @@ public class ReceiverAgent
 				{
 					cnt[0]++;
 					if(cnt[0]%1000==0)
-						System.out.println("rec: "+cnt[0]);
+						System.out.println("bytes: "+cnt[0]);
 					try
 					{
 						fos.write(result.byteValue());

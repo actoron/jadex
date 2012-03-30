@@ -26,8 +26,17 @@ public class TerminableIntermediateFuture<E> extends IntermediateFuture<E>
 	}
 	
 	/**
-	 *  Create a future that is already done.
-	 *  @param result	The result, if any.
+	 *  Create a future that is already done (failed).
+	 *  @param exception	The exception.
+	 */
+	public TerminableIntermediateFuture(Exception exception)
+	{
+		super(exception);
+	}
+	
+	/**
+	 *  Create a new future.
+	 *  @param terminate The runnable to be executed in case of termination.
 	 */
 	public TerminableIntermediateFuture(Runnable terminate)
 	{

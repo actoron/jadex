@@ -10,6 +10,7 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -143,22 +144,25 @@ public class InitiatorAgent
 	{
 		try
 		{
-			File file = new File("c:\\projects\\seite1.jpg");
-			FileInputStream fis = new FileInputStream(file);
-			byte[] data = new byte[(int)file.length()]; 
-			fis.read(data);
-			con.write(data).addResultListener(new IResultListener<Void>()
+			InputStream is = SUtil.getResource("jadex/micro/testcases/stream/test.jpg", agent.getClassLoader());
+//			FileInputStream fis = new FileInputStream(file);
+//			byte[] data = new byte[(int)file.length()]; 
+//			fis.read(data);
+			for(int next = is.read(); next!=-1; next = is.read())
 			{
-				public void resultAvailable(Void result)
+				con.write(new byte[]{(byte)next}).addResultListener(new IResultListener<Void>()
 				{
-					con.close();
-//					ret.setResult(null);
-				}
-				public void exceptionOccurred(Exception exception)
-				{
-					System.out.println("Write failed: "+exception);
-				}
-			});
+					public void resultAvailable(Void result)
+					{
+						con.close();
+//								ret.setResult(null);
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						System.out.println("Write failed: "+exception);
+					}
+				});
+			}
 		}
 		catch(Exception e)
 		{

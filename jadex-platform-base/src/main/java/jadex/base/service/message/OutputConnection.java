@@ -40,7 +40,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	public void flush()
 	{
 		if(closing || closed)
-			throw new RuntimeException("Stream already closed.");
+			return;
 		
 		((OutputConnectionHandler)ch).flush();
 	}
@@ -51,12 +51,11 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	 */
 	public synchronized void close()
 	{
-		if(closing || closed)
-			return;
+//		if(closing || closed)
+//			return;
 
 		flush();
 		
-		((OutputConnectionHandler)ch).closeRequestReceived();
-//		super.close();
+		super.close();
 	}
 }

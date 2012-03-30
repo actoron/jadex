@@ -1,13 +1,9 @@
 package jadex.commons.future;
 
 
-import jadex.commons.DebugException;
-import jadex.commons.concurrent.TimeoutException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -28,7 +24,7 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 	
 	/** Flag if notifying. */
     protected boolean notifying;
-	
+        
 	//-------- constructors--------
 	
 	/**
@@ -96,11 +92,12 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
         	}
 	   	
         	intermediate = true;
-		
-			if(results==null)
-				results	= new ArrayList<E>();
-			
-			results.add(result);
+
+        	addResult(result);
+        	
+//			if(results==null)
+//				results	= new ArrayList<E>();
+//			results.add(result);
 			
 //			if(listener instanceof IIntermediateResultListener)
 //			{
@@ -122,7 +119,18 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
 		startScheduledNotifications();
 	}
 	
-	  /**
+	/**
+	 *  Add a result.
+	 *  @param result The result.
+	 */
+	protected void addResult(E result)
+	{
+		if(results==null)
+			results	= new ArrayList<E>();
+		results.add(result);
+	}
+	
+	/**
      *  Set the result. 
      *  Listener notifications occur on calling thread of this method.
      *  @param result The result.
@@ -140,10 +148,10 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
         	{
         		intermediate = true;
         		
-    			if(results==null)
-    				results	= new ArrayList<E>();
-    			
-    			results.add(result);
+        		addResult(result);
+//    			if(results==null)
+//    				results	= new ArrayList<E>();
+//    			results.add(result);
     			
     			if(listeners!=null)
     			{
@@ -173,8 +181,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
     	boolean ex = false;
     	synchronized(this)
 		{
-    		if(results!=null)
-    			ex = true;
+    		ex = intermediate;
+//    		if(results!=null)
+//    			ex = true;
 		}
     	if(ex)
     	{
@@ -205,8 +214,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
     	boolean ex = false;
     	synchronized(this)
 		{
-    		if(results!=null)
-    			ex = true;
+    		ex = intermediate;
+//    		if(results!=null)
+//    			ex = true;
 		}
     	if(ex)
     	{

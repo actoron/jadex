@@ -69,6 +69,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	/** Close request flag (when a closereq message was received). */
 	protected boolean closereqflag;
 
+	/** Stop flag (is sent in ack from input side) to signal that the rceiver is flooded with data). */
+	protected Tuple2<Boolean, Integer> stopflag;
+	
 	//-------- constructors --------
 	
 //	/**
@@ -99,10 +102,11 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		this.ackcnt = 10;
 		
 		this.multipackets = true;
-		this.mpmaxsize = 10000;
+		this.mpmaxsize = 1000;
 		this.multipacket = new ArrayList<byte[]>();
 		this.mpsize = 0;
 		this.mpsendtimeout = 3000;
+		this.stopflag = new Tuple2<Boolean, Integer>(Boolean.FALSE, -1);
 	}
 	
 	//-------- methods --------
@@ -113,23 +117,15 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	public void closeRequestReceived()
 	{
 		if(isDataFinished())
+		{
 			con.close();
-		else
+		}
+		else if(!closereqflag)
+		{
 			closereqflag = true;
-	
+		}
 		sendTask(createTask(StreamSendTask.ACKCLOSEREQ, null, null));
 	}
-	
-//	/**
-//	 *  Response to close message. 
-//	 *  
-//	 *  The participant has acked the close -> close this site also.
-//	 */
-//	public void ackCloseReceived()
-//	{
-//		System.out.println("received ack close");
-//		ackReceived(StreamSendTask.CLOSE);
-//	}
 	
 	/**
 	 *  Called from connection.
@@ -141,22 +137,29 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 
 		final Future<Void> ret = new Future<Void>();
 
-		sendAcknowledgedMessage(createTask(StreamSendTask.CLOSE, null, null), StreamSendTask.CLOSE)
-			.addResultListener(new IResultListener<Void>()
+		if(isDataFinished())
 		{
-			public void resultAvailable(Void result)
+			sendAcknowledgedMessage(createTask(StreamSendTask.CLOSE, null, null), StreamSendTask.CLOSE)
+				.addResultListener(new IResultListener<Void>()
 			{
-				// Set connection as closed.
-				con.setClosed();
-				ret.setResult(null);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				con.setClosed();
-				ret.setException(exception);
-			}
-		});
+				public void resultAvailable(Void result)
+				{
+					// Set connection as closed.
+					con.setClosed();
+					ret.setResult(null);
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					con.setClosed();
+					ret.setException(exception);
+				}
+			});
+		}
+		else
+		{
+			closereqflag = true;
+		}
 		
 		return ret;
 	}
@@ -181,16 +184,29 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		else
 		{
 			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, dat, getNextSequenceNumber());
-			if(maxsend-sent.size()>0)
-			{
-//				System.out.println("send: "+task.getSequenceNumber());
-				ret = sendTask(task, null);
-			}
-			else
-			{
-				ret = new Future<Void>();
-				tosend.add(new Tuple2<StreamSendTask, Future<Void>>(task, (Future<Void>)ret));
-			}
+			doSendData(task);
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> doSendData(StreamSendTask task)
+	{
+		IFuture<Void> ret;
+		
+		if(isSendAllowed())
+		{
+			System.out.println("send: "+task.getSequenceNumber());
+			ret = sendTask(task, null);
+		}
+		else
+		{
+			System.out.println("store: "+task.getSequenceNumber());
+			ret = new Future<Void>();
+			tosend.add(new Tuple2<StreamSendTask, Future<Void>>(task, (Future<Void>)ret));
 		}
 		
 		return ret;
@@ -208,8 +224,12 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		for(int i=0; i<allowed && tosend.size()>0; i++)
 		{
 			Tuple2<StreamSendTask, Future<Void>> tup = tosend.remove(0);
-//			System.out.println("send: "+tup.getFirstEntity().getSequenceNumber());
+			System.out.println("send Stored: "+tup.getFirstEntity().getSequenceNumber());
 			sendTask(tup.getFirstEntity(), tup.getSecondEntity());
+		
+			// Send only one test message if in stop mode.
+			if(isStop())
+				break;
 		}
 	}
 	
@@ -291,15 +311,16 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 			}
 			
 			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, target, getNextSequenceNumber());
-			if(maxsend-sent.size()>0)
-			{
-				ret = sendTask(task, null);
-			}
-			else
-			{
-				ret = new Future<Void>();
-				tosend.add(new Tuple2<StreamSendTask, Future<Void>>(task, (Future<Void>)ret));
-			}
+			doSendData(task);
+//			if(isSendAllowed())
+//			{
+//				ret = sendTask(task, null);
+//			}
+//			else
+//			{
+//				ret = new Future<Void>();
+//				tosend.add(new Tuple2<StreamSendTask, Future<Void>>(task, (Future<Void>)ret));
+//			}
 			
 			multipacket.clear();
 			mpsize = 0;
@@ -375,12 +396,18 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	 *  
 	 *  Uses: sent, lastack
 	 */
-	public void ackData(int seqnumber)
+	public void ackData(int seqnumber, boolean stop)
 	{
-//		System.out.println("ack: "+seqnumber);
-		for(int i=seqnumber; i>lastack; i--)
+		System.out.println("ack: "+seqnumber+" "+stop);
+		
+		// Update stop if newer
+		if(stopflag.getSecondEntity().intValue()<seqnumber)
+			stopflag = new Tuple2<Boolean, Integer>(stop? Boolean.TRUE: Boolean.FALSE, new Integer(seqnumber));
+		
+//		for(int i=seqnumber; i>lastack && cnt<ackcnt; i--)
+		for(int i=0; i<ackcnt && seqnumber+i>lastack; i++)
 		{
-			Tuple2<StreamSendTask, Integer> tup = sent.remove(new Integer(i));
+			Tuple2<StreamSendTask, Integer> tup = sent.remove(new Integer(seqnumber-i));
 			if(tup==null)
 				throw new RuntimeException("Ack not possible, data not found.");
 		}
@@ -393,6 +420,22 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		// Try to close if close is requested.
 		if(isCloseRequested() && isDataFinished())
 			close();
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean isSendAllowed()
+	{
+		return maxsend-sent.size()>0 && !isStop();
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean isStop()
+	{
+		return stopflag.getFirstEntity().booleanValue();
 	}
 	
 	/**
@@ -409,7 +452,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	 */
 	public boolean isDataFinished()
 	{
-		// All acks received and no unfinished multi packet.
+		// All acks received and no unfinished multi packet
+		System.out.println("fini: "+sent.size()+" "+mpsize);
 		return sent.isEmpty() && (!multipackets || mpsize==0);
 	}
 	
@@ -513,5 +557,21 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 				acktimer = null;
 			}
 		}
+	}
+	
+	/**
+	 *  Continously
+	 */
+	public void createDataTimer()
+	{
+		ms.getClockService().createTimer(10000, new ITimedObject()
+		{
+			public void timeEventOccurred(long currenttime)
+			{
+				System.out.println("data timer triggered");
+				sendStored();
+				createDataTimer();
+			}
+		});
 	}
 }

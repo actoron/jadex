@@ -2,6 +2,7 @@ package jadex.bridge;
 
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 
 /**
@@ -28,7 +29,8 @@ public interface IInputConnection extends IConnection
 	 *  Asynchronous read. 
 	 *  @return Bytes one by one till end of stream or closed.
 	 */
-	public IIntermediateFuture<Byte> aread();
+//	public IIntermediateFuture<Byte> aread();
+	public ISubscriptionIntermediateFuture<Byte> aread();
 	
 	/**
 	 *  Asynchronous read. 
