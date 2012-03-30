@@ -82,6 +82,14 @@ public class RelayServlet extends HttpServlet
 				}
 			}
 		}
+		if(platforms!=null && !platforms.isEmpty())
+		{
+			for(Iterator<PlatformInfo> it=platforms.values().iterator(); it.hasNext(); )
+			{
+				it.next().disconnect();	// Writes end time in DB.
+			}
+		}
+		StatsDB.getDB().shutdown();
 	}
 	
 	//-------- methods --------
@@ -105,13 +113,12 @@ public class RelayServlet extends HttpServlet
 				{
 					// Fetch array to avoid concurrency problems
 					request.setAttribute("platforms", StatsDB.getDB().getPlatformInfos());
-					request.setAttribute("title", "Platform Connection History");
+					request.setAttribute("history", Boolean.TRUE);
 				}
 				else
 				{
 					// Fetch array to avoid concurrency problems
 					request.setAttribute("platforms", platforms.values().toArray(new PlatformInfo[0]));
-					request.setAttribute("title", "Connected Platforms");
 				}
 				String	view	= "/WEB-INF/jsp/status.jsp";
 				RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);
@@ -220,6 +227,8 @@ public class RelayServlet extends HttpServlet
 					items	= queue.setClosed(true);
 					map.remove(id);
 					PlatformInfo	platform	= platforms.remove(id);
+					if(platform!=null)
+						platform.disconnect();
 					AwarenessInfo	awainfo	= platform!=null ? platform.getAwarenessInfo() : null;
 					if(awainfo!=null)
 					{

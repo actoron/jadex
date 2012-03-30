@@ -4,16 +4,25 @@
     pageEncoding="ISO-8859-1"%>
 <%@ page import="jadex.base.relay.*" %>
 <%@ page import="java.util.*" %>
+<%
+	boolean	history	= request.getAttribute("history")!=null;
+%>
 
-<h2><%= request.getAttribute("title") %></h2>
+<h2><%= history ? "Platform Connection History" : "Connected Platforms" %></h2>
 <table>
 	<tr>
 		<th>Platform</th>
 		<th>Host (IP)</th>
-		<th>Connected Since</th>
 		<th>Scheme</th>
+	<% if(history) { %>
+		<th>Connected</th>
+		<th>Disconnected</th>		
+	<% } else { %>
+		<th>Connected Since</th>
+	<% } %>
 		<th>Received Messages</th>
 		<th>Avg. Transfer Rate</th>
+		
 	</tr>
 	<%
 		PlatformInfo[]	infos	= (PlatformInfo[])request.getAttribute("platforms");
@@ -25,9 +34,16 @@
 				<td>
 					<%= infos[i].getHostName() %> (<%= infos[i].getHostIP() %>)</td>
 				<td>
+					<%= infos[i].getScheme() %></td>
+			<% if(history) { %>
+				<td>
 					<%= infos[i].getConnectTime() %></td>
 				<td>
-					<%= infos[i].getScheme() %></td>
+					<%= infos[i].getDisconnectTime() %></td>
+			<% } else { %>
+				<td>
+					<%= infos[i].getConnectTime() %></td>
+			<% } %>
 				<td class="number">
 					<%= infos[i].getMessageCount() %> (<%= infos[i].getByteCount() %>)</td>
 				<td class="number">

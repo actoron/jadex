@@ -41,7 +41,7 @@ public class ReceiverAgent
 		try
 		{
 			final int[] cnt = new int[1];
-			File f = new File("c:\\projects\\copy.jpg");
+			File f = new File("copy.jpg");
 			final FileOutputStream fos = new FileOutputStream(f);
 			
 			ISubscriptionIntermediateFuture<Byte> fut = ((IInputConnection)con).aread();

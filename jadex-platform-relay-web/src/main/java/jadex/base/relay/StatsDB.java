@@ -6,6 +6,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -50,20 +51,21 @@ public class StatsDB
 			String	systemdir	= new File(System.getProperty("user.home"), ".relaystats").getAbsolutePath();
 			System.out.println("Storing relay stats in: "+systemdir);
 			System.setProperty("derby.system.home", systemdir);		
-			Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+			// New instance required in case derby is reloaded in same VM (e.g. servlet container).
+			Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
 			con	= DriverManager.getConnection("jdbc:derby:mydb;create=true");
 
 			// Create the table, if it doesn't exist.
-//			con.createStatement().execute("drop table relay.platforminfo");	// uncomment to create a fresh table.
+			con.createStatement().execute("drop table relay.platforminfo");	// uncomment to create a fresh table.
 			DatabaseMetaData	meta	= con.getMetaData();
 			ResultSet	rs	= meta.getTables(null, "RELAY", "PLATFORMINFO", null);
 			if(!rs.next())
 			{
 				con.createStatement().execute("CREATE TABLE RELAY.PLATFORMINFO ("
 					+ "ID	INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),"
-					+ "PLATFORM	VARCHAR(30)," 
-					+ "HOSTIP	VARCHAR(30),"
-					+ "HOSTNAME	VARCHAR(30),"
+					+ "PLATFORM	VARCHAR(60)," 
+					+ "HOSTIP	VARCHAR(32),"
+					+ "HOSTNAME	VARCHAR(60),"
 		    		+ "SCHEME	VARCHAR(10),"
 		    		+ "CONTIME	TIMESTAMP,"
 					+ "DISTIME	TIMESTAMP,"
@@ -177,6 +179,21 @@ public class StatsDB
 		return ret.toArray(new PlatformInfo[ret.size()]);
 	}
 	
+	public void shutdown()
+	{
+		try
+		{
+			if(con!=null)
+				con.close();
+			DriverManager.getConnection("jdbc:derby:;shutdown=true;deregister=false");
+		}
+		catch(SQLException e)
+		{
+			// Exception thrown by derby to indicate that shutdown was successful. (what the... !?)
+		}
+	}
+
+	
 	//-------- main for testing --------
 	
 	/**
@@ -207,7 +224,7 @@ public class StatsDB
 			System.out.println(infos[i]);
 		}		
 	}
-	
+
 //	/**
 //	 *  Print out the contents of a result set.
 //	 */
