@@ -120,7 +120,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		if(con.isClosed())
 			return false;
 		
-		System.err.println("received: "+seqnumber);
+		System.out.println("received: "+seqnumber);
 		
 		// If packet is the next one deliver to stream
 		// else store in map till the next one arrives

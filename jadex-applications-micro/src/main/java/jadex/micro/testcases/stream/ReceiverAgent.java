@@ -41,6 +41,8 @@ public class ReceiverAgent
 		try
 		{
 			final int[] cnt = new int[1];
+//			File f = new File("c:\\projects\\copy.jpg");
+//			final FileOutputStream fos = new FileOutputStream(f);
 			File f = new File("copy.jpg");
 			final FileOutputStream fos = new FileOutputStream(f);
 			
@@ -49,38 +51,38 @@ public class ReceiverAgent
 			{
 				public void resultAvailable(Collection<Byte> result)
 				{
-					try
-					{
-						for(Iterator<Byte> it=result.iterator(); it.hasNext(); )
-						{
-							fos.write(it.next().byteValue());
-						}
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
+//					try
+//					{
+//						for(Iterator<Byte> it=result.iterator(); it.hasNext(); )
+//						{
+//							fos.write(it.next().byteValue());
+//						}
+//					}
+//					catch(Exception e)
+//					{
+//						e.printStackTrace();
+//					}
 				}
 				public void intermediateResultAvailable(Byte result)
 				{
 					cnt[0]++;
-					if(cnt[0]%1000==0)
+//					if(cnt[0]%1000==0)
 						System.out.println("bytes: "+cnt[0]);
-					try
-					{
-						fos.write(result.byteValue());
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
+//					try
+//					{
+//						fos.write(result.byteValue());
+//					}
+//					catch(Exception e)
+//					{
+//						e.printStackTrace();
+//					}
 				}
 				public void finished()
 				{
 					try
 					{
 						System.out.println("finished");
-						fos.close();
+//						fos.close();
 					}
 					catch(Exception e)
 					{

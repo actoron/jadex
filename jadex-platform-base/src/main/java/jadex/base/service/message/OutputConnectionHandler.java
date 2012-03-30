@@ -98,7 +98,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		this.seqnumber = -1;
 		this.lastack = -1;
 		
-		this.maxsend = 30;
+		this.maxsend = 20;
 		this.ackcnt = 10;
 		
 		this.multipackets = true;
@@ -134,7 +134,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	public IFuture<Void> doClose()
 	{
 		System.out.println("do close output side");
-
+		
 		final Future<Void> ret = new Future<Void>();
 
 		if(isDataFinished())

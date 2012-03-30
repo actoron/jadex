@@ -307,7 +307,15 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 			{
 				for(int next=internalRead(); next!=-1; next=internalRead())
 				{
-					iret.addIntermediateResult(new Byte((byte)next));
+					System.out.println("read inp: "+next);
+					try
+					{
+						iret.addIntermediateResult(new Byte((byte)next));
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
 				}
 			}
 			catch(Exception e)
@@ -366,6 +374,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 				ret += data.get(i).length;
 			}
 		}
+		System.out.println("vvvvv stored: "+ret+" "+data.size());
 		return ret;
 	}
 }

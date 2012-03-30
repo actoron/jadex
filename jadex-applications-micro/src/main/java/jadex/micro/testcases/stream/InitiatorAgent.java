@@ -150,19 +150,21 @@ public class InitiatorAgent
 //			fis.read(data);
 			for(int next = is.read(); next!=-1; next = is.read())
 			{
-				con.write(new byte[]{(byte)next}).addResultListener(new IResultListener<Void>()
-				{
-					public void resultAvailable(Void result)
-					{
-						con.close();
-//								ret.setResult(null);
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						System.out.println("Write failed: "+exception);
-					}
-				});
+				con.write(new byte[]{(byte)next});
+//				.addResultListener(new IResultListener<Void>()
+//				{
+//					public void resultAvailable(Void result)
+//					{
+//						con.close();
+////								ret.setResult(null);
+//					}
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						System.out.println("Write failed: "+exception);
+//					}
+//				});
 			}
+			con.close();
 		}
 		catch(Exception e)
 		{

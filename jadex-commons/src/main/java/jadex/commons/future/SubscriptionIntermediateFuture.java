@@ -42,7 +42,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
 	{
 		this.terminate = terminate;
 		this.storeforfirst = true;
-		this.intermediate = true;
+//		this.intermediate = true;
 	}
 	
 	//-------- methods --------
