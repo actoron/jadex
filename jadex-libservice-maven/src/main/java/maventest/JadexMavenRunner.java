@@ -144,6 +144,6 @@ public class JadexMavenRunner
 //			depcls[i]	= cls.get(deps.get(i).getLocalIdentifier().getUrl());
 //		}
 //		
-//		return new DelegationURLClassLoader(rid, null, depcls);
+//		return new DelegationURLClassLoader(rid, JadexMavenRunner.class.getClassLoader(), depcls);
 //	}
 }

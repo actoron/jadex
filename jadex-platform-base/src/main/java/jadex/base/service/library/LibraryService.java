@@ -85,6 +85,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	/** The base classloader. */
 	protected ClassLoader baseloader;
 	
+	/** The non-managed urls (cached for speed). */
+	protected Set<URL>	nonmanaged;
+	
 	//-------- constructors --------
 	
 	/** 
@@ -186,10 +189,13 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				boolean removed = removeManaged(rid);
 				if(removed)
 				{
-					for(Iterator<IResourceIdentifier> it=result.getAllResourceIdentifiers().iterator(); it.hasNext(); )
+					if(result!=null)
 					{
-						IResourceIdentifier dep = it.next();
-						removeSupport(dep, rid);
+						for(Iterator<IResourceIdentifier> it=result.getAllResourceIdentifiers().iterator(); it.hasNext(); )
+						{
+							IResourceIdentifier dep = it.next();
+							removeSupport(dep, rid);
+						}
 					}
 					
 					// Do not notify listeners with lock held!
@@ -235,10 +241,14 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			public void customResultAvailable(DelegationURLClassLoader result)
 			{
 				removeManagedCompletely(rid);
-				for(Iterator<IResourceIdentifier> it=result.getAllResourceIdentifiers().iterator(); it.hasNext(); )
+				
+				if(result!=null)
 				{
-					IResourceIdentifier dep = it.next();
-					removeSupport(dep, rid);
+					for(Iterator<IResourceIdentifier> it=result.getAllResourceIdentifiers().iterator(); it.hasNext(); )
+					{
+						IResourceIdentifier dep = it.next();
+						removeSupport(dep, rid);
+					}
 				}
 
 				// Do not notify listeners with lock held!
@@ -399,8 +409,21 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<List<URL>> getNonManagedURLs()
 	{
-		List<URL> nonurls = new ArrayList<URL>(getClasspathURLs(baseloader));
-		return new Future<List<URL>>(nonurls);
+		return new Future<List<URL>>(new ArrayList<URL>(getInternalNonManagedURLs()));
+	}
+	
+	/**
+	 *  Get other contained (but not directly managed) urls from parent classloaders.
+	 *  @return The set of urls.
+	 */
+	protected Set<URL>	getInternalNonManagedURLs()
+	{
+		if(nonmanaged==null)
+		{
+			nonmanaged	= new LinkedHashSet<URL>();
+			collectClasspathURLs(baseloader, nonmanaged);
+		}
+		return nonmanaged;
 	}
 	
 	/**
@@ -419,14 +442,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				{
 					res.add(result.get(i).getLocalIdentifier().getUrl());
 				}
-				getNonManagedURLs().addResultListener(new DelegationResultListener<List<URL>>(ret)
-				{
-					public void customResultAvailable(List<URL> result)
-					{
-						res.addAll(result);
-						ret.setResult(res);
-					}
-				});
+				
+				res.addAll(getInternalNonManagedURLs());
+				ret.setResult(res);
 			}
 		});
 		return ret;
@@ -451,11 +469,14 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 			}
 			ret.setResult(globalcl);
 		}
+		else if(isLocal(rid) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUrl()))
+		{
+			ret.setResult(baseloader);
+		}	
 		else
 		{
 			// Resolve global rid or local rid from same platform.
-			if(rid.getGlobalIdentifier()!=null
-				|| rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getComponentIdentifier().equals(component.getComponentIdentifier().getRoot()))
+			if(rid.getGlobalIdentifier()!=null || isLocal(rid))
 			{
 				getClassLoader(rid, null, null).addResultListener(new ExceptionDelegationResultListener<DelegationURLClassLoader, ClassLoader>(ret)
 				{
@@ -526,7 +547,12 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support)
 	{
 		final Future<DelegationURLClassLoader> ret;
-		if(clfuts.containsKey(rid))
+		
+		if(isLocal(rid) && getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUrl()))
+		{
+			ret	= new Future<DelegationURLClassLoader>((DelegationURLClassLoader)null);
+		}
+		else if(clfuts.containsKey(rid))
 		{
 			ret	= clfuts.get(rid);
 		}
@@ -606,6 +632,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	protected IFuture<DelegationURLClassLoader> createClassLoader(final IResourceIdentifier rid, Map<IResourceIdentifier, List<IResourceIdentifier>> alldeps, final IResourceIdentifier support)
 	{
+		// Class loaders shouldn't be created for local URLs, which are already available in base class loader.
+		assert rid.getLocalIdentifier()==null || !isLocal(rid) || !getInternalNonManagedURLs().contains(rid.getLocalIdentifier().getUrl());
+		
 		final Future<DelegationURLClassLoader> ret = new Future<DelegationURLClassLoader>();
 //		final URL url = rid.getLocalIdentifier().getSecondEntity();
 		final List<IResourceIdentifier> deps = alldeps.get(rid);
@@ -615,6 +644,13 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		{
 			public void customResultAvailable(Collection<DelegationURLClassLoader> result)
 			{
+				// Strip null values of provided dependencies from results.
+				for(Iterator<DelegationURLClassLoader> it=result.iterator(); it.hasNext(); )
+				{
+					if(it.next()==null)
+						it.remove();
+				}
+				
 				DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])result.toArray(new DelegationURLClassLoader[result.size()]);
 				DelegationURLClassLoader cl = new DelegationURLClassLoader(rid, baseloader, delegates);
 				classloaders.put(rid, cl);
@@ -1503,18 +1539,6 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 //	}
 
 	/**
-	 *  Get all URLs belonging to a class loader.
-	 *  @return A sorted set with the urls in order of precedence regarding Java class loading (i.e. parent class loaders first).
-	 */
-	public Set<URL>	getClasspathURLs(ClassLoader classloader)
-	{
-		Set<URL>	ret	= new LinkedHashSet<URL>();
-		collectClasspathURLs(classloader, ret);
-//		System.out.println("Classpath URLs: "+ret);
-		return ret;
-	}
-	
-	/**
 	 *  Collect all URLs belonging to a class loader.
 	 */
 	protected void	collectClasspathURLs(ClassLoader classloader, Set<URL> set)
@@ -1601,6 +1625,14 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 				component.getLogger().warning("Error collecting manifest URLs for "+url+": "+e);
 		    }
 		}
-	}	
+	}
+	
+	/**
+	 *  Test if a rid is local to this platform.
+	 */
+	protected boolean	isLocal(IResourceIdentifier rid)
+	{
+		return rid.getLocalIdentifier()!=null && rid.getLocalIdentifier().getComponentIdentifier().equals(component.getComponentIdentifier().getRoot());		
+	}
 }
 

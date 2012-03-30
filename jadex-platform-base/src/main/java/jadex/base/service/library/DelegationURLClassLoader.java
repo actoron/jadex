@@ -23,6 +23,9 @@ public class DelegationURLClassLoader extends URLClassLoader
 	/** The resource identifier. */
 	protected IResourceIdentifier rid;
 	
+	/** The base class loader. */
+	protected ClassLoader basecl;
+	
 	/** The delegation classloader. */
 	protected DelegationURLClassLoader[] delegates;
 	
@@ -45,8 +48,9 @@ public class DelegationURLClassLoader extends URLClassLoader
 	 */
 	public DelegationURLClassLoader(IResourceIdentifier rid, ClassLoader basecl, DelegationURLClassLoader[] delegates)
 	{
-		super(rid!=null && rid.getLocalIdentifier()!=null? new URL[]{rid.getLocalIdentifier().getUrl()}: new URL[0], basecl);
+		super(rid!=null && rid.getLocalIdentifier()!=null? new URL[]{rid.getLocalIdentifier().getUrl()}: new URL[0], null);
 		this.rid = rid;
+		this.basecl	= basecl;
 		this.delegates = delegates;
 //		System.out.println("d1 : "+url+" "+SUtil.arrayToString(delegates));
 	}
@@ -145,23 +149,42 @@ public class DelegationURLClassLoader extends URLClassLoader
 	{
 		Class<?> ret = null;
 		
-		try
+		if(basecl!=null)
 		{
-			ret	= super.loadClass(name, resolve);
-		}
-		catch(ClassNotFoundException e)
-		{
-			for(DelegationURLClassLoader dep: getFlattenedDependencies())
+			try
 			{
-//				System.out.println("findClass: "+name+", "+dep);
-				try
+				ret	=  basecl.loadClass(name);
+				if(resolve)
 				{
-					ret = dep.loadDirectClass(name, resolve);
-					break;
+					// Todo: should resolve in other class loader?
+					resolveClass(ret);
 				}
-				catch (ClassNotFoundException ex)
+			}
+			catch(Exception e)
+			{
+			}
+		}
+		
+		if(ret==null)
+		{
+			try
+			{
+				ret	= super.loadClass(name, resolve);
+			}
+			catch(ClassNotFoundException e)
+			{
+				for(DelegationURLClassLoader dep: getFlattenedDependencies())
 				{
-				}				
+	//				System.out.println("findClass: "+name+", "+dep);
+					try
+					{
+						ret = dep.loadDirectClass(name, resolve);
+						break;
+					}
+					catch (ClassNotFoundException ex)
+					{
+					}				
+				}
 			}
 		}
 		
@@ -188,7 +211,15 @@ public class DelegationURLClassLoader extends URLClassLoader
 	 */
 	public URL findResource(String name)
 	{
-		URL ret = super.findResource(name);
+		URL ret = null;
+		if(basecl!=null)
+		{
+			ret	= basecl.getResource(name);
+		}
+		if(ret==null)
+		{
+			ret = super.findResource(name);
+		}
 		if(ret==null)
 		{
 			for(DelegationURLClassLoader dep: getFlattenedDependencies())
@@ -220,6 +251,10 @@ public class DelegationURLClassLoader extends URLClassLoader
 	public Enumeration<URL> findResources(String name) throws IOException
 	{
 		Set<URL> res = new HashSet<URL>();
+		if(basecl!=null)
+		{
+			res.addAll(Collections.list(basecl.getResources(name)));
+		}
 		res.addAll(Collections.list(super.findResources(name)));
 		for(DelegationURLClassLoader dep: getFlattenedDependencies())
 		{
