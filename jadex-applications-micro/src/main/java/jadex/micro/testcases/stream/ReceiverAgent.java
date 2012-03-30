@@ -8,15 +8,16 @@ import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentStreamArrived;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Collection;
+import java.util.Iterator;
 
 @Agent
 public class ReceiverAgent
 {
 	@Agent
 	protected MicroAgent agent;
-	
-	protected IInputConnection con;
 	
 	/**
 	 * 
@@ -28,59 +29,132 @@ public class ReceiverAgent
 //		final IInputConnection con = (IInputConnection)msg.get(SFipa.CONTENT);
 		System.out.println("received: "+con+" "+con.hashCode());
 		
-		final int[] cnt = new int[1];
-		((IInputConnection)con).aread().addResultListener(new IIntermediateResultListener<Byte>()
+		receiveBehavior((IInputConnection)con);
+	}
+
+	/**
+	 * 
+	 */
+	public void receiveBehavior(IInputConnection con)
+	{
+		try
 		{
-			public void resultAvailable(Collection<Byte> result)
+			final int[] cnt = new int[1];
+			File f = new File("c:\\projects\\copy.jpg");
+			final FileOutputStream fos = new FileOutputStream(f);
+			
+			((IInputConnection)con).aread().addResultListener(new IIntermediateResultListener<Byte>()
 			{
-				System.out.println("Result: "+result);
-				cnt[0] += result.size();
-			}
-			public void intermediateResultAvailable(Byte result)
-			{
-				System.out.println("Intermediate result: "+result+" :"+cnt[0]);
-				cnt[0] += 1;
-				if(cnt[0]==5050)
-					((IInputConnection)con).close();
-			}
-			public void finished()
-			{
-				System.out.println("finished: "+cnt[0]);
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				System.out.println("ex:"+exception);
-			}
-		});
-		
-//		IComponentStep<Void> step = new IComponentStep<Void>()
-//		{
-//			public IFuture<Void> execute(IInternalAccess ia)
-//			{
-//				try
-//				{
-//					byte[] buffer = new byte[2];
-//					con.read(buffer);
-//					System.out.println("buffer: "+SUtil.arrayToString(buffer));
-////					int res = con.read();
-////					System.out.println("read: "+res);
-//				}
-//				catch(Exception e)
-//				{
-//					agent.killAgent();
-//					e.printStackTrace();
-//				}
-//				agent.waitFor(1000, this);
-//				return null;
-//			}
-//		};
-//		agent.waitFor(1000, step);
+				public void resultAvailable(Collection<Byte> result)
+				{
+					try
+					{
+						for(Iterator<Byte> it=result.iterator(); it.hasNext(); )
+						{
+							fos.write(it.next().byteValue());
+						}
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				public void intermediateResultAvailable(Byte result)
+				{
+					cnt[0]++;
+					if(cnt[0]%1000==0)
+						System.out.println("rec: "+cnt[0]);
+					try
+					{
+						fos.write(result.byteValue());
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				public void finished()
+				{
+					try
+					{
+						System.out.println("finished");
+						fos.close();
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					System.out.println("ex:"+exception);
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
-	@AgentKilled
-	public void killed()
-	{
-		if(con!=null)
-			con.close();
-	}
+//	/**
+//	 * 
+//	 */
+//	public void receiveBehavior()
+//	{
+//		final int[] cnt = new int[1];
+//		((IInputConnection)con).aread().addResultListener(new IIntermediateResultListener<Byte>()
+//		{
+//			public void resultAvailable(Collection<Byte> result)
+//			{
+//				System.out.println("Result: "+result);
+//				cnt[0] += result.size();
+//			}
+//			public void intermediateResultAvailable(Byte result)
+//			{
+//				System.out.println("Intermediate result: "+result+" :"+cnt[0]);
+//				cnt[0] += 1;
+//				if(cnt[0]==5050)
+//					((IInputConnection)con).close();
+//			}
+//			public void finished()
+//			{
+//				System.out.println("finished: "+cnt[0]);
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("ex:"+exception);
+//			}
+//		});
+//		
+////		IComponentStep<Void> step = new IComponentStep<Void>()
+////		{
+////			public IFuture<Void> execute(IInternalAccess ia)
+////			{
+////				try
+////				{
+////					byte[] buffer = new byte[2];
+////					con.read(buffer);
+////					System.out.println("buffer: "+SUtil.arrayToString(buffer));
+//////					int res = con.read();
+//////					System.out.println("read: "+res);
+////				}
+////				catch(Exception e)
+////				{
+////					agent.killAgent();
+////					e.printStackTrace();
+////				}
+////				agent.waitFor(1000, this);
+////				return null;
+////			}
+////		};
+////		agent.waitFor(1000, step);
+//	}
+	
+//	@AgentKilled
+//	public void killed()
+//	{
+//		if(con!=null)
+//			con.close();
+//	}
 }

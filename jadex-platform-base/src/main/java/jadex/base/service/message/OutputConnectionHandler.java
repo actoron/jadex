@@ -99,7 +99,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		this.ackcnt = 10;
 		
 		this.multipackets = true;
-		this.mpmaxsize = 20;
+		this.mpmaxsize = 10000;
 		this.multipacket = new ArrayList<byte[]>();
 		this.mpsize = 0;
 		this.mpsendtimeout = 3000;
@@ -170,7 +170,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	{
 		IFuture<Void> ret = new Future<Void>();
 
-		System.out.println("called send: "+sent.size());
+//		System.out.println("called send: "+sent.size());
 		
 		sendStored();
 
@@ -183,7 +183,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, dat, getNextSequenceNumber());
 			if(maxsend-sent.size()>0)
 			{
-				System.out.println("send: "+task.getSequenceNumber());
+//				System.out.println("send: "+task.getSequenceNumber());
 				ret = sendTask(task, null);
 			}
 			else
@@ -208,7 +208,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		for(int i=0; i<allowed && tosend.size()>0; i++)
 		{
 			Tuple2<StreamSendTask, Future<Void>> tup = tosend.remove(0);
-			System.out.println("send: "+tup.getFirstEntity().getSequenceNumber());
+//			System.out.println("send: "+tup.getFirstEntity().getSequenceNumber());
 			sendTask(tup.getFirstEntity(), tup.getSecondEntity());
 		}
 	}
@@ -360,7 +360,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 			}
 			else
 			{
-				System.out.println("resend: "+seqnumber);
+//				System.out.println("resend: "+seqnumber);
 				StreamSendTask task = tup.getFirstEntity();
 				ret = sendTask(tup.getFirstEntity());
 				sent.put(task.getSequenceNumber(), new Tuple2<StreamSendTask, Integer>(task, new Integer(tup.getSecondEntity().intValue()+1)));
@@ -377,7 +377,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	 */
 	public void ackData(int seqnumber)
 	{
-		System.out.println("ack: "+seqnumber);
+//		System.out.println("ack: "+seqnumber);
 		for(int i=seqnumber; i>lastack; i--)
 		{
 			Tuple2<StreamSendTask, Integer> tup = sent.remove(new Integer(i));

@@ -56,6 +56,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 
 		flush();
 		
-		super.close();
+		((OutputConnectionHandler)ch).closeRequestReceived();
+//		super.close();
 	}
 }

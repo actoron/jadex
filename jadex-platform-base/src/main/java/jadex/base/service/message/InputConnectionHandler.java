@@ -66,7 +66,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	public void closeReceived()
 	{
 		// Remember that close message was received, close the connection and send an ack.
-//		System.out.println("close received");
+		System.out.println("close received");
 		if(!con.isClosed())
 			con.setClosed();
 		sendTask(createTask(StreamSendTask.ACKCLOSE, null, null));
@@ -147,7 +147,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 */
 	protected void forwardData(byte[] data)
 	{
-		System.out.println("forward data: "+SUtil.arrayToString(data));
+//		System.out.println("forward data: "+SUtil.arrayToString(data));
 		
 		int seqno = getNextReceivedSequenceNumber();
 		getInputConnection().addData(data);
@@ -172,7 +172,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		// Only send acks if new packets have arrived.
 		if(getSequenceNumber()>lastack)
 		{
-			System.out.println("send ack: "+rseqno);
+//			System.out.println("send ack: "+rseqno);
 			sendTask(createTask(StreamSendTask.ACKDATA, rseqno, true, null));
 			lastack = rseqno;
 		}
@@ -209,7 +209,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				System.out.println("timer ack");
+//				System.out.println("timer ack");
 				sendDataAck();
 				datatimer = null;
 				createDataTimer();				

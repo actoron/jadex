@@ -1613,6 +1613,18 @@ public class MessageService extends BasicService implements IMessageService
 					System.out.println("InputStream not found: "+conid);
 				}
 			}
+			else if(type==StreamSendTask.ACKDATA_INPUT_INITIATOR)
+			{
+				OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(new Integer(conid));
+				if(och!=null)
+				{
+					och.ackData(((Integer)data).intValue());
+				}
+				else
+				{
+					System.out.println("OutputStream not found: "+conid);
+				}
+			}
 			else if(type==StreamSendTask.CLOSEREQ_INPUT_INITIATOR)
 			{
 				OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(new Integer(conid));
@@ -1661,19 +1673,6 @@ public class MessageService extends BasicService implements IMessageService
 				else
 				{
 					System.out.println("InputStream not found: "+conid);
-				}
-			}
-			else if(type==StreamSendTask.ACKDATA_INPUT_INITIATOR)
-			{
-				// Handle input connection initiator side
-				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
-				if(och!=null)
-				{
-					och.ackData(((Integer)data).intValue());
-				}
-				else
-				{
-					System.out.println("OutputStream not found: "+conid);
 				}
 			}
 			

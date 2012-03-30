@@ -31,6 +31,8 @@ import jadex.micro.annotation.Results;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.List;
@@ -81,39 +83,7 @@ public class InitiatorAgent
 								{
 									public void customResultAvailable(final IOutputConnection ocon) 
 									{
-										final IComponentStep<Void> step = new IComponentStep<Void>()
-										{
-											final int[] cnt = new int[]{1};
-											final int max = 100;
-											final IComponentStep<Void> self = this;
-											public IFuture<Void> execute(IInternalAccess ia)
-											{
-												byte[] tosend = new byte[cnt[0]];
-												for(int i=0; i<cnt[0]; i++)
-													tosend[i] = (byte)cnt[0];
-												ocon.write(tosend).addResultListener(new IResultListener<Void>()
-												{
-													public void resultAvailable(Void result)
-													{
-														if(cnt[0]++<max)
-														{
-															agent.waitFor(200, self);
-														}
-														else
-														{
-//															ocon.close();
-//															ret.setResult(null);
-														}
-													}
-													public void exceptionOccurred(Exception exception)
-													{
-														System.out.println("Write failed: "+exception);
-													}
-												});
-												return IFuture.DONE;
-											}
-										};
-										agent.waitFor(200, step);
+										sendBehavior(ocon);
 									}
 								});
 							}
@@ -126,4 +96,73 @@ public class InitiatorAgent
 		return ret;
 	}
 	
+//	/**
+//	 * 
+//	 */
+//	public void sendBehavior(final IOutputConnection con)
+//	{
+//		final IComponentStep<Void> step = new IComponentStep<Void>()
+//		{
+//			final int[] cnt = new int[]{1};
+//			final int max = 100;
+//			final IComponentStep<Void> self = this;
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+//				byte[] tosend = new byte[cnt[0]];
+//				for(int i=0; i<cnt[0]; i++)
+//					tosend[i] = (byte)cnt[0];
+//				con.write(tosend).addResultListener(new IResultListener<Void>()
+//				{
+//					public void resultAvailable(Void result)
+//					{
+//						if(cnt[0]++<max)
+//						{
+//							agent.waitFor(200, self);
+//						}
+//						else
+//						{
+//	//						ocon.close();
+//	//						ret.setResult(null);
+//						}
+//					}
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						System.out.println("Write failed: "+exception);
+//					}
+//				});
+//				return IFuture.DONE;
+//			}
+//		};
+//		agent.waitFor(200, step);
+//	}
+	
+	/**
+	 * 
+	 */
+	public void sendBehavior(final IOutputConnection con)
+	{
+		try
+		{
+			File file = new File("c:\\projects\\seite1.jpg");
+			FileInputStream fis = new FileInputStream(file);
+			byte[] data = new byte[(int)file.length()]; 
+			fis.read(data);
+			con.write(data).addResultListener(new IResultListener<Void>()
+			{
+				public void resultAvailable(Void result)
+				{
+					con.close();
+//					ret.setResult(null);
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					System.out.println("Write failed: "+exception);
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 }

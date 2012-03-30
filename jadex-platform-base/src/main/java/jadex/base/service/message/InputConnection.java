@@ -342,6 +342,9 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 			oret = ofuture;
 			cl = position == size;
 		}
+		
+		System.out.println("hhh; "+position+" "+size);
+		
 		// notify async listener if last byte has been read and stream is closed.
 		if(iret!=null && cl)
 		{
