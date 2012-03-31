@@ -56,7 +56,7 @@ public class StatsDB
 			con	= DriverManager.getConnection("jdbc:derby:mydb;create=true");
 
 			// Create the table, if it doesn't exist.
-			con.createStatement().execute("drop table relay.platforminfo");	// uncomment to create a fresh table.
+//			con.createStatement().execute("drop table RELAY.PLATFORMINFO");	// uncomment to create a fresh table.
 			DatabaseMetaData	meta	= con.getMetaData();
 			ResultSet	rs	= meta.getTables(null, "RELAY", "PLATFORMINFO", null);
 			if(!rs.next())
@@ -185,7 +185,8 @@ public class StatsDB
 		{
 			if(con!=null)
 				con.close();
-			DriverManager.getConnection("jdbc:derby:;shutdown=true;deregister=false");
+			DriverManager.getConnection("jdbc:derby:;shutdown=true");
+//			DriverManager.getConnection("jdbc:derby:;shutdown=true;deregister=false");
 		}
 		catch(SQLException e)
 		{
