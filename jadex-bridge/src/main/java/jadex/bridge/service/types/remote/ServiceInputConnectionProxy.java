@@ -103,7 +103,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	/**
 	 * 
 	 */
-	public ISubscriptionIntermediateFuture<Byte> aread()
+	public ISubscriptionIntermediateFuture<byte[]> aread()
 	{
 		throw new UnsupportedOperationException();
 	}

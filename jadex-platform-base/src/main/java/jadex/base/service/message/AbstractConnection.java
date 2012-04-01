@@ -5,6 +5,10 @@ import jadex.commons.future.IResultListener;
 
 /**
  *  Abstract base class for connections.
+ *  
+ *  Connection code is called from connection users, i.e. active components,
+ *  on their on thread. Calls from the connection handler occur on another
+ *  thread so that these calls must be synchronized. 
  */
 public abstract class AbstractConnection
 {
@@ -69,13 +73,42 @@ public abstract class AbstractConnection
 		});
 	}
 	
+	//-------- IConnection methods --------
+	
+	/**
+	 *  Get the id.
+	 *  @return the id.
+	 */
+	public int getConnectionId()
+	{
+		return id;
+	}
+	
+	/**
+	 *  Get the initiator.
+	 *  @return The initiator.
+	 */
+	public IComponentIdentifier getInitiator()
+	{
+		return initiator;
+	}
+
+	/**
+	 *  Get the participant.
+	 *  @return The participant.
+	 */
+	public IComponentIdentifier getParticipant()
+	{
+		return participant;
+	}
+	
 	//-------- methods --------	
 	
 	/**
 	 *  Get the inited.
 	 *  @return the inited.
 	 */
-	public boolean isInited()
+	public synchronized boolean isInited()
 	{
 		return inited;
 	}
@@ -84,7 +117,7 @@ public abstract class AbstractConnection
 	 *  Set the inited.
 	 *  @param inited The inited to set.
 	 */
-	public void setInited()
+	public synchronized void setInited()
 	{
 		this.inited = true;
 	}
@@ -109,7 +142,7 @@ public abstract class AbstractConnection
 	 *  Get the closed.
 	 *  @return The closed.
 	 */
-	public boolean isClosing()
+	public synchronized boolean isClosing()
 	{
 		return closing;
 	}
@@ -118,7 +151,7 @@ public abstract class AbstractConnection
 	 *  Get the closed.
 	 *  @return The closed.
 	 */
-	public boolean isClosed()
+	public synchronized boolean isClosed()
 	{
 		return closed;
 	}
@@ -127,23 +160,17 @@ public abstract class AbstractConnection
 	 *  Close the connection.
 	 *  Notifies the other side that the connection has been closed.
 	 */
-	public synchronized void close()
+	public void close()
 	{
-//		if(closing || closed)
-//			return;
-		
-		setClosing();
+		synchronized(this)
+		{
+			if(closing || closed)
+				return;			
+		}
+
+		setClosing();	
 
 		ch.doClose();
-	}
-	
-	/**
-	 *  Get the id.
-	 *  @return the id.
-	 */
-	public int getConnectionId()
-	{
-		return id;
 	}
 	
 	/**
@@ -163,23 +190,4 @@ public abstract class AbstractConnection
 	{
 		return input;
 	}
-	
-	/**
-	 *  Get the initiator.
-	 *  @return The initiator.
-	 */
-	public IComponentIdentifier getInitiator()
-	{
-		return initiator;
-	}
-
-	/**
-	 *  Get the participant.
-	 *  @return The participant.
-	 */
-	public IComponentIdentifier getParticipant()
-	{
-		return participant;
-	}
-	
 }

@@ -43,13 +43,14 @@ public class ReceiverAgent
 			final int[] cnt = new int[1];
 //			File f = new File("c:\\projects\\copy.jpg");
 //			final FileOutputStream fos = new FileOutputStream(f);
-			File f = new File("copy.jpg");
+//			File f = new File("copy.jpg");
+			File f = new File("copy.zip");
 			final FileOutputStream fos = new FileOutputStream(f);
 			
-			ISubscriptionIntermediateFuture<Byte> fut = ((IInputConnection)con).aread();
-			fut.addResultListener(new IIntermediateResultListener<Byte>()
+			ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
+			fut.addResultListener(new IIntermediateResultListener<byte[]>()
 			{
-				public void resultAvailable(Collection<Byte> result)
+				public void resultAvailable(Collection<byte[]> result)
 				{
 //					try
 //					{
@@ -63,26 +64,26 @@ public class ReceiverAgent
 //						e.printStackTrace();
 //					}
 				}
-				public void intermediateResultAvailable(Byte result)
+				public void intermediateResultAvailable(byte[] result)
 				{
-					cnt[0]++;
+					cnt[0] += result.length;
 //					if(cnt[0]%1000==0)
 						System.out.println("bytes: "+cnt[0]);
-//					try
-//					{
-//						fos.write(result.byteValue());
-//					}
-//					catch(Exception e)
-//					{
-//						e.printStackTrace();
-//					}
+					try
+					{
+						fos.write(result);
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
 				}
 				public void finished()
 				{
 					try
 					{
 						System.out.println("finished");
-//						fos.close();
+						fos.close();
 					}
 					catch(Exception e)
 					{

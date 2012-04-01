@@ -3,9 +3,13 @@ package jadex.base.service.message;
 import jadex.base.service.message.MessageService.SendManager;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.codecs.ICodec;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -16,6 +20,11 @@ import java.util.Map;
 
 /**
  *  Abstract base class for connection handlers.
+ *  
+ *  Is called from the message service and the connection.
+ *  
+ *  Ensures that all calls from threads other than the message service component
+ *  are scheduled on this thread to avoid multithreading issues in this class.
  */
 public class AbstractConnectionHandler
 {
@@ -63,18 +72,69 @@ public class AbstractConnectionHandler
 		this.leasetime = leasetime;
 
 		this.alivetime = System.currentTimeMillis();
-		this.unacked = Collections.synchronizedMap(new HashMap<Object, SendInfo>());
+		this.unacked = new HashMap<Object, SendInfo>();
+	}
+	
+	/**
+	 *  Set the connection (needed as connection and handler need each other).
+	 *  The connections uses this method to set itself as connection in their constructor.
+	 */
+	// Cannot be decoupled, otherwise connection may still be null
+	public void setConnection(final AbstractConnection con)
+	{
+//		scheduleStep(new IComponentStep<Void>()
+//		{
+//			public IFuture<Void> execute(IInternalAccess ia)
+//			{
+				AbstractConnectionHandler.this.con = con;
+//				return IFuture.DONE;
+//			}
+//		});
 	}
 	
 	//-------- methods called from message service --------
+	
+	// All calls from the message service may occur on different threads
+	// Hence they are all routed to the same component thread
 		
 	/**
 	 *  Received the init message.
 	 */
 	public void initReceived()
 	{
-		con.setInited();
-		sendTask(createTask(StreamSendTask.ACKINIT, null, null));
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				con.setInited();
+				sendTask(createTask(StreamSendTask.ACKINIT, null, null));
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+
+	/**
+	 *  Called when an ack was received.
+	 *  The id is used to identify the original message task.
+	 *  This will cancel the timer (resending) task
+	 *  and call the future of sendAcknowledgedMessage().
+	 */
+	public void ackReceived(final Object id)
+	{
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				SendInfo si = unacked.remove(id);
+				if(si!=null)
+				{
+					si.getTimer().cancel();
+					si.getResult().setResult(null);
+				}
+				return IFuture.DONE;
+			}
+		});
 	}
 	
 	/**
@@ -83,23 +143,38 @@ public class AbstractConnectionHandler
 	 */
 	public void close()
 	{
-		con.close();
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				con.close();
+				return IFuture.DONE;
+			}
+		});
 	}
 	
 	/**
 	 *  Set the alive time of the other connection side.
 	 *  @param alivetime The alive time.
 	 */
-	public void setAliveTime(long alivetime)
+	public void setAliveTime(final long alivetime)
 	{
-//		System.out.println("new lease: "+alivetime);
-		this.alivetime = alivetime;
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+//				System.out.println("new lease: "+alivetime);
+				AbstractConnectionHandler.this.alivetime = alivetime;
+				return IFuture.DONE;
+			}
+		});
 	}
 	
 	/**
 	 *  Test if the connection is alive.
 	 *  @return True, if is alive.
 	 */
+	// Is already called from correct message service thread
 	public boolean isConnectionAlive()
 	{
 		boolean isalive = System.currentTimeMillis()<alivetime+getLeasetime()*2.5;
@@ -108,36 +183,29 @@ public class AbstractConnectionHandler
 	}
 	
 	/**
-	 *  Get the leasetime.
-	 *  @return the leasetime.
-	 */
-	public long getLeasetime()
-	{
-		return leasetime;
-	}
-
-	/**
 	 *  Get the closed.
 	 *  @return The closed.
 	 */
+	// Is already called from correct message service thread
 	public boolean isClosed()
 	{
 		return getConnection().isClosed();
 	}
 	
-	/**
-	 *  Get the closed.
-	 *  @return The closed.
-	 */
-	public boolean isClosing()
-	{
-		return getConnection().isClosing();
-	}
+//	/**
+//	 *  Get the closed.
+//	 *  @return The closed.
+//	 */
+//	public boolean isClosing()
+//	{
+//		return getConnection().isClosing();
+//	}
 	
 	/**
 	 *  Get the id.
 	 *  @return the id.
 	 */
+	// Can be called savely from any thread, id is immutable
 	public int getConnectionId()
 	{
 		return getConnection().getConnectionId();
@@ -146,18 +214,10 @@ public class AbstractConnectionHandler
 	//-------- methods called from connection --------
 	
 	/**
-	 *  Set the connection (needed as connection and handler need each other).
-	 *  The connections uses this method to set itself as connection in their constructor.
-	 */
-	public void setConnection(AbstractConnection con)
-	{
-		this.con = con;
-	}
-	
-	/**
 	 *  Called from connection.
 	 *  Initiates closing procedure (is different for initiator and participant).
 	 */
+	// Is overridded from input and output connection subclasses
 	public IFuture<Void> doClose()
 	{
 		return IFuture.DONE;
@@ -168,9 +228,18 @@ public class AbstractConnectionHandler
 	 */
 	public IFuture<Void> sendInit()
 	{
-		AbstractSendTask task = createTask(StreamSendTask.INIT, new IComponentIdentifier[]{
-			getConnection().getInitiator(), getConnection().getParticipant()}, true, null);
-		return sendAcknowledgedMessage(task, StreamSendTask.INIT);
+		final Future<Void> ret = new Future<Void>();
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				AbstractSendTask task = createTask(StreamSendTask.INIT, new IComponentIdentifier[]{
+					getConnection().getInitiator(), getConnection().getParticipant()}, true, null);
+				sendAcknowledgedMessage(task, StreamSendTask.INIT).addResultListener(new DelegationResultListener<Void>(ret));
+				return IFuture.DONE;
+			}
+		});
+		return ret;
 	}
 	
 	/**
@@ -178,8 +247,16 @@ public class AbstractConnectionHandler
 	 */
 	public IFuture<Void> sendAlive()
 	{
-//		byte type = con.isInitiatorSide()? StreamSendTask.ALIVE_INITIATOR: StreamSendTask.ALIVE_PARTICIPANT;
-		return sendTask(createTask(StreamSendTask.ALIVE, null, null));
+		final Future<Void> ret = new Future<Void>();
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				sendTask(createTask(StreamSendTask.ALIVE, null, null)).addResultListener(new DelegationResultListener<Void>(ret));
+				return IFuture.DONE;
+			}
+		});
+		return ret;
 	}
 	
 	//-------- internal methods --------
@@ -188,7 +265,7 @@ public class AbstractConnectionHandler
 	 *  Get the connection.
 	 *  @return The connection.
 	 */
-	public  AbstractConnection getConnection()
+	protected AbstractConnection getConnection()
 	{
 		return con;
 	}
@@ -225,7 +302,7 @@ public class AbstractConnectionHandler
 	 *  @param type The message type.
 	 *  @return The message type for message sending.
 	 */
-	public byte getMessageType(String type)
+	protected byte getMessageType(String type)
 	{
 		// Connection type is determined by initiator and is constant per connection
 		boolean contype = getConnection().isInitiatorSide()? getConnection().isInputConnection(): !getConnection().isInputConnection();
@@ -239,7 +316,7 @@ public class AbstractConnectionHandler
 	 *  @param seqnumber The sequence number.
 	 *  @return The task for sending the message.
 	 */
-	public AbstractSendTask createTask(String type, Object content, Integer seqnumber)
+	protected AbstractSendTask createTask(String type, Object content, Integer seqnumber)
 	{
 		return createTask(type, content, false, seqnumber);
 	}
@@ -252,7 +329,7 @@ public class AbstractConnectionHandler
 	 *  @param seqnumber The sequence number.
 	 *  @return The task for sending the message.
 	 */
-	public AbstractSendTask createTask(String type, Object content, boolean usecodecs, Integer seqnumber)
+	protected AbstractSendTask createTask(String type, Object content, boolean usecodecs, Integer seqnumber)
 	{
 		return new StreamSendTask(getMessageType(type), content==null? StreamSendTask.EMPTY_BYTE_ARRAY: content,
 			getConnectionId(), getConnection().isInitiatorSide()? new IComponentIdentifier[]{getConnection().getParticipant()}: new IComponentIdentifier[]{getConnection().getInitiator()}, 
@@ -264,7 +341,7 @@ public class AbstractConnectionHandler
 	 *  the other side could not be reached.
 	 *  @param task The task.
 	 */
-	public IFuture<Void> sendTask(AbstractSendTask task)
+	protected IFuture<Void> sendTask(AbstractSendTask task)
 	{
 //		System.out.println("sendTask: "+task);
 		IComponentIdentifier[] recs = task.getReceivers();
@@ -323,6 +400,23 @@ public class AbstractConnectionHandler
 	}
 	
 	/**
+	 *  Get the leasetime.
+	 *  @return the leasetime.
+	 */
+	protected long getLeasetime()
+	{
+		return leasetime;
+	}
+	
+	/**
+	 *  Schedule a step on the message service component.
+	 */
+	protected <E> IFuture<E> scheduleStep(IComponentStep<E> step)
+	{
+		return ms.getComponent().scheduleStep(step);
+	}
+	
+	/**
 	 *  Triggers resends of packets if no ack has been received in acktimeout.
 	 *  @param id The message id.
 	 *  @return The timer.
@@ -334,44 +428,39 @@ public class AbstractConnectionHandler
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				synchronized(AbstractConnectionHandler.this)
+				try
 				{
-					SendInfo si = unacked.get(id);
-					if(si!=null)
+					scheduleStep(new IComponentStep<Void>()
 					{
-						if(si.getTryCnt()>=maxresends)
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							System.out.println("Message could not be sent.");
-							si.getResult().setException(new RuntimeException("Message could not be sent."));
-							unacked.remove(id);
+							SendInfo si = unacked.get(id);
+							if(si!=null)
+							{
+								if(si.getTryCnt()>=maxresends)
+								{
+									System.out.println("Message could not be sent.");
+									si.getResult().setException(new RuntimeException("Message could not be sent."));
+									unacked.remove(id);
+								}
+								else
+								{
+									sendAcknowledgedMessage(si.getTask(), id);
+									createAckTimer(id);
+								}
+							}
+							return IFuture.DONE;
 						}
-						else
-						{
-							sendAcknowledgedMessage(si.getTask(), id);
-							createAckTimer(id);
-						}
-					}
+					});
+				}
+				catch(ComponentTerminatedException e)
+				{
+					// nop
 				}
 			}
 		});
 		
 		return ret;
-	}
-	
-	/**
-	 *  Called when an ack was received.
-	 *  The id is used to identify the original message task.
-	 *  This will cancel the timer (resending) task
-	 *  and call the future of sendAcknowledgedMessage().
-	 */
-	protected synchronized void ackReceived(Object id)
-	{
-		SendInfo si = unacked.remove(id);
-		if(si!=null)
-		{
-			si.getTimer().cancel();
-			si.getResult().setResult(null);
-		}
 	}
 	
 	/**

@@ -45,13 +45,13 @@ public class StreamUserAgent
 					{
 						System.out.println("received icon: "+is);
 						StreamUserAgent.this.icon = is;
-						is.aread().addResultListener(new IIntermediateResultListener<Byte>()
+						is.aread().addResultListener(new IIntermediateResultListener<byte[]>()
 						{
-							public void resultAvailable(Collection<Byte> result)
+							public void resultAvailable(Collection<byte[]> result)
 							{
 								System.out.println("Result: "+result);
 							}
-							public void intermediateResultAvailable(Byte result)
+							public void intermediateResultAvailable(byte[] result)
 							{
 								System.out.println("Intermediate result: "+result);
 							}

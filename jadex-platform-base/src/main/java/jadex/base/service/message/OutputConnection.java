@@ -7,6 +7,13 @@ import jadex.commons.future.IFuture;
 
 /**
  *  Output connection for writing data.
+ *  
+ *  Must synchronized its internal data because the connection handler
+ *  and the connection user (i.e. a component) are using the connection
+ *  concurrently.
+ *  
+ *  - the user calls interface methods like write and flush
+ *  - the connection handler calls close to signal that the connection should close.
  */
 public class OutputConnection extends AbstractConnection implements IOutputConnection
 {		
@@ -21,16 +28,19 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 		super(sender, receiver, id, false, initiator, ch);
 	}
 	
-	//-------- methods --------
+	//-------- IOutputConnection methods --------
 
 	/**
 	 *  Write the content to the stream.
 	 *  @param data The data.
 	 */
-	public synchronized IFuture<Void> write(byte[] data)
+	public IFuture<Void> write(byte[] data)
 	{
-		if(closing || closed)
-			return new Future<Void>(new RuntimeException("Connection closed."));
+		synchronized(this)
+		{
+			if(closing || closed)
+				return new Future<Void>(new RuntimeException("Connection closed."));
+		}
 		return ((OutputConnectionHandler)ch).send(data);
 	}
 	
@@ -39,8 +49,11 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	 */
 	public void flush()
 	{
-		if(closing || closed)
-			return;
+		synchronized(this)
+		{
+			if(closing || closed)
+				return;
+		}
 		
 		((OutputConnectionHandler)ch).flush();
 	}
@@ -49,11 +62,14 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	 *  Close the connection.
 	 *  Notifies the other side that the connection has been closed.
 	 */
-	public synchronized void close()
+	public void close()
 	{
-//		if(closing || closed)
-//			return;
-
+		synchronized(this)
+		{
+			if(closing || closed)
+				return;
+		}
+		
 		flush();
 		
 		super.close();

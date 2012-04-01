@@ -30,7 +30,7 @@ public interface IInputConnection extends IConnection
 	 *  @return Bytes one by one till end of stream or closed.
 	 */
 //	public IIntermediateFuture<Byte> aread();
-	public ISubscriptionIntermediateFuture<Byte> aread();
+	public ISubscriptionIntermediateFuture<byte[]> aread();
 	
 	/**
 	 *  Asynchronous read. 

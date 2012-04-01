@@ -70,13 +70,13 @@ public class Initiator2Agent
 									public void customResultAvailable(final IInputConnection icon) 
 									{
 										Initiator2Agent.this.icon = icon;
-										icon.aread().addResultListener(new IIntermediateResultListener<Byte>()
+										icon.aread().addResultListener(new IIntermediateResultListener<byte[]>()
 										{
-											public void resultAvailable(Collection<Byte> result)
+											public void resultAvailable(Collection<byte[]> result)
 											{
 												System.out.println("Result: "+result);
 											}
-											public void intermediateResultAvailable(Byte result)
+											public void intermediateResultAvailable(byte[] result)
 											{
 												System.out.println("Intermediate result: "+result);
 											}

@@ -1,13 +1,14 @@
 package jadex.base.service.message;
 
+import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	public InputConnectionHandler(MessageService ms)
 	{
 		super(ms);
-		this.rseqno = -1;
+		this.rseqno = 0;
 		this.maxbuf = 1000;
 		this.maxstored = 5000; 
 		this.data = new HashMap<Integer, byte[]>();
@@ -61,7 +62,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		this.lastack = -1;
 	}
 
-	//-------- methods --------
+	//-------- methods called from message service --------
 	
 	/**
 	 *  From initiator.
@@ -71,23 +72,19 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 */
 	public void closeReceived()
 	{
-		// Remember that close message was received, close the connection and send an ack.
-		System.out.println("close received");
-		if(!con.isClosed())
-			con.setClosed();
-		sendTask(createTask(StreamSendTask.ACKCLOSE, null, null));
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				// Remember that close message was received, close the connection and send an ack.
+				System.out.println("close received");
+				if(!con.isClosed())
+					con.setClosed();
+				sendTask(createTask(StreamSendTask.ACKCLOSE, null, null));
+				return IFuture.DONE;
+			}
+		});
 	}
-	
-//	/**
-//	 *  From initiator.
-//	 *  
-//	 *  Called to signal that the close request was received.
-//	 */
-//	public void ackCloseRequestReceived()
-//	{
-//		System.out.println("received ack close req");
-//		closereqtask = null;
-//	}
 	
 	/**
 	 *  Called from connection.
@@ -95,14 +92,22 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 */
 	public IFuture<Void> doClose()
 	{
-		// Send a close request
-		System.out.println("do close input side");
-
 		final Future<Void> ret = new Future<Void>();
 
-		// Needs nothing to do with ack response.
-		sendAcknowledgedMessage(createTask(StreamSendTask.CLOSEREQ, null, null), StreamSendTask.CLOSEREQ)
-			.addResultListener(new DelegationResultListener<Void>(ret));
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				// Send a close request
+				System.out.println("do close input side");
+				
+				// Needs nothing to do with ack response.
+				sendAcknowledgedMessage(createTask(StreamSendTask.CLOSEREQ, null, null), StreamSendTask.CLOSEREQ)
+					.addResultListener(new DelegationResultListener<Void>(ret));
+				
+				return IFuture.DONE;
+			}
+		});
 		
 		return ret;
 	}
@@ -115,39 +120,45 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 *  @param data The new data.
 	 *  @return
 	 */
-	public boolean addData(int seqnumber, byte[] data)
+	public void addData(final int seqnumber, final byte[] dat)
 	{
-		if(con.isClosed())
-			return false;
-		
-		System.out.println("received: "+seqnumber);
-		
-		// If packet is the next one deliver to stream
-		// else store in map till the next one arrives
-		if(seqnumber==getSequenceNumber()+1)
+		scheduleStep(new IComponentStep<Void>()
 		{
-			forwardData(data);
-			
-			// Forward possibly stored data
-			byte[] nextdata = this.data.get(new Integer(getSequenceNumber()));
-			for(; nextdata!=null ;)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				forwardData(nextdata);
-				nextdata = this.data.get(new Integer(getSequenceNumber()));
-			}
-		}
-		else
-		{
-			this.data.put(new Integer(seqnumber), data);
-			if(this.data.size()>maxbuf)
-			{
-				System.out.println("Closing connection due to package loss: "+seqnumber+" :"+this.data.size());
-				con.close();
-				this.data.clear();
-			}
-		}
+				if(!con.isClosed())
+				{
+//					System.out.println("received: "+seqnumber);
 		
-		return true;
+					// If packet is the next one deliver to stream
+					// else store in map till the next one arrives
+					if(seqnumber==getSequenceNumber()+1)
+					{
+						forwardData(dat);
+						
+						// Forward possibly stored data
+						byte[] nextdata = data.get(new Integer(getSequenceNumber()));
+						for(; nextdata!=null ;)
+						{
+							forwardData(nextdata);
+							nextdata = data.get(new Integer(getSequenceNumber()));
+						}
+					}
+					else
+					{
+						data.put(new Integer(seqnumber), dat);
+						if(data.size()>maxbuf)
+						{
+							System.out.println("Closing connection due to package loss: "+seqnumber+" :"+data.size());
+							con.close();
+							data.clear();
+						}
+					}
+				}
+				
+				return IFuture.DONE;
+			}
+		});
 	}
 	
 	/**
@@ -173,22 +184,6 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
-	 *  Called by by itself.
-	 */
-	protected void sendDataAck()
-	{
-		// Only send acks if new packets have arrived.
-		if(getSequenceNumber()>lastack)
-		{
-//			System.out.println("send ack: "+rseqno);
-			// tuple contains seqno and stop flag
-			sendTask(createTask(StreamSendTask.ACKDATA, new Tuple2<Integer, Boolean>(rseqno, 
-				isStop()? Boolean.TRUE: Boolean.FALSE), true, null));
-			lastack = rseqno;
-		}
-	}
-	
-	/**
 	 *  Get the last received sequence number.
 	 *  @return the sequence number.
 	 */
@@ -210,8 +205,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 *  Create a new data ack timer.
 	 *  Sends an ack automatically after some timeout.
 	 */
-	// Synchronized with timer on this
-	public synchronized void createDataTimer()
+	public void createDataTimer()
 	{
 		// Test if packets have been received till creation
 		if(datatimer==null && rseqno>lastack)
@@ -219,12 +213,42 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-//				System.out.println("timer ack");
-				sendDataAck();
-				datatimer = null;
-				createDataTimer();				
+				try
+				{
+					scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+	//						System.out.println("timer ack");
+							sendDataAck();
+							datatimer = null;
+							createDataTimer();	
+							return IFuture.DONE;
+						}
+					});
+				}
+				catch(ComponentTerminatedException e)
+				{
+					// nop
+				}
 			}
 		});
+	}
+	
+	/**
+	 *  Send ack data.
+	 */
+	protected void sendDataAck()
+	{
+		// Only send acks if new packets have arrived.
+		if(getSequenceNumber()>lastack)
+		{
+//			System.out.println("send ack: "+rseqno);
+			// tuple contains seqno and stop flag
+			sendTask(createTask(StreamSendTask.ACKDATA, new Tuple2<Integer, Boolean>(rseqno, 
+				isStop()? Boolean.TRUE: Boolean.FALSE), true, null));
+			lastack = rseqno;
+		}
 	}
 	
 	/**
@@ -237,7 +261,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
-	 * 
+	 *  Test if stop is activated (too much data arrived).
 	 */
 	protected boolean isStop()
 	{

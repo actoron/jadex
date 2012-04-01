@@ -1,5 +1,6 @@
 package jadex.base.service.message;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -93,39 +94,86 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	public OutputConnectionHandler(MessageService ms)
 	{
 		super(ms);//, maxresends, acktimeout, leasetime);
-		this.tosend = Collections.synchronizedList(new ArrayList<Tuple2<StreamSendTask, Future<Void>>>());
-		this.sent = Collections.synchronizedMap(new HashMap<Integer, Tuple2<StreamSendTask, Integer>>());
-		this.seqnumber = -1;
-		this.lastack = -1;
+		this.tosend = new ArrayList<Tuple2<StreamSendTask, Future<Void>>>();
+		this.sent = new HashMap<Integer, Tuple2<StreamSendTask, Integer>>();
+		this.seqnumber = 0;
+		this.lastack = 0;
 		
 		this.maxsend = 20;
 		this.ackcnt = 10;
 		
 		this.multipackets = true;
-		this.mpmaxsize = 1000;
+		this.mpmaxsize = 50000;
 		this.multipacket = new ArrayList<byte[]>();
 		this.mpsize = 0;
 		this.mpsendtimeout = 3000;
 		this.stopflag = new Tuple2<Boolean, Integer>(Boolean.FALSE, -1);
+		
+		createDataTimer();
 	}
 	
-	//-------- methods --------
+	//-------- methods called from message service --------
 	
 	/**
 	 *  Received a request to close the connection.
 	 */
 	public void closeRequestReceived()
 	{
-		if(isDataFinished())
+		scheduleStep(new IComponentStep<Void>()
 		{
-			con.close();
-		}
-		else if(!closereqflag)
-		{
-			closereqflag = true;
-		}
-		sendTask(createTask(StreamSendTask.ACKCLOSEREQ, null, null));
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				closereqflag = true;
+				checkClose();
+				sendTask(createTask(StreamSendTask.ACKCLOSEREQ, null, null));
+				return IFuture.DONE;
+			}
+		});
 	}
+	
+	/**
+	 *  Called from message service.
+	 *  
+	 *  Uses: sent, lastack
+	 */
+	public void ackData(final int seqnumber, final boolean stop)
+	{
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				// Update stop if newer
+				if(stopflag.getSecondEntity().intValue()<seqnumber)
+					stopflag = new Tuple2<Boolean, Integer>(stop? Boolean.TRUE: Boolean.FALSE, new Integer(seqnumber));
+				
+				int s = sent.size();
+				
+//				for(int i=seqnumber; i>lastack && cnt<ackcnt; i--)
+				for(int i=0; i<ackcnt && seqnumber-i>lastack; i++)
+				{
+					Tuple2<StreamSendTask, Integer> tup = sent.remove(new Integer(seqnumber-i));
+					if(tup==null)
+						System.out.println("Ack error: fix me!!!");
+//						throw new RuntimeException("Ack not possible, data not found.");
+				}
+				
+				lastack = seqnumber;
+
+				System.out.println("ack: "+seqnumber+" "+stop+" "+s+" "+sent.size());
+				System.out.println(sent);
+				
+				// Try to send stored messages after some others have been acknowledged
+				sendStored();
+				
+				// Try to close if close is requested.
+				checkClose();
+			
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	//-------- methods called from connection ---------
 	
 	/**
 	 *  Called from connection.
@@ -133,33 +181,41 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	 */
 	public IFuture<Void> doClose()
 	{
-		System.out.println("do close output side");
-		
 		final Future<Void> ret = new Future<Void>();
 
-		if(isDataFinished())
+		scheduleStep(new IComponentStep<Void>()
 		{
-			sendAcknowledgedMessage(createTask(StreamSendTask.CLOSE, null, null), StreamSendTask.CLOSE)
-				.addResultListener(new IResultListener<Void>()
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				public void resultAvailable(Void result)
+				System.out.println("do close output side");
+				
+				if(isDataFinished())
 				{
-					// Set connection as closed.
-					con.setClosed();
-					ret.setResult(null);
+					sendAcknowledgedMessage(createTask(StreamSendTask.CLOSE, null, null), StreamSendTask.CLOSE)
+						.addResultListener(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+							// Set connection as closed.
+							con.setClosed();
+							ret.setResult(null);
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							con.setClosed();
+							ret.setException(exception);
+						}
+					});
+				}
+				else
+				{
+					closereqflag = true;
 				}
 				
-				public void exceptionOccurred(Exception exception)
-				{
-					con.setClosed();
-					ret.setException(exception);
-				}
-			});
-		}
-		else
-		{
-			closereqflag = true;
-		}
+				return IFuture.DONE;
+			}
+		});
 		
 		return ret;
 	}
@@ -169,25 +225,60 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	 *  
 	 *  Uses: sent, tosend
 	 */
-	public IFuture<Void> send(byte[] dat)
+	public IFuture<Void> send(final byte[] dat)
 	{
-		IFuture<Void> ret = new Future<Void>();
+		final Future<Void> ret = new Future<Void>();
+//		ret.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				System.out.println("send end");
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.out.println("send end ex");
+//			}
+//		});
 
-//		System.out.println("called send: "+sent.size());
-		
-		sendStored();
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+//				System.out.println("called send: "+sent.size());
+				
+				sendStored();
 
-		if(multipackets)
-		{
-			ret = addMultipacket(dat);
-		}
-		else
-		{
-			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, dat, getNextSequenceNumber());
-			doSendData(task);
-		}
-		
+				if(multipackets)
+				{
+					addMultipacket(dat).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				else
+				{
+					StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, dat, getNextSequenceNumber());
+					doSendData(task).addResultListener(new DelegationResultListener<Void>(ret));
+				}
+				
+				return IFuture.DONE;
+			}
+		});
+	
 		return ret;
+	}
+	
+	/**
+	 *  Flush the data.
+	 */
+	public void flush()
+	{
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				if(multipackets)
+					sendMultiPacket();
+				return IFuture.DONE;
+			}
+		});
 	}
 	
 	/**
@@ -204,7 +295,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		}
 		else
 		{
-			System.out.println("store: "+task.getSequenceNumber());
+//			System.out.println("store: "+task.getSequenceNumber());
 			ret = new Future<Void>();
 			tosend.add(new Tuple2<StreamSendTask, Future<Void>>(task, (Future<Void>)ret));
 		}
@@ -213,18 +304,18 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
-	 *  Called from connection, 
+	 *  Called internally. 
 	 * 
 	 *  Uses: sent, tosend
 	 */
-	// synchronized to avoid being called twice at the same time
-	protected synchronized void sendStored()
+	protected void sendStored()
 	{
+//		System.out.println("sendStored: "+sent.size());
 		int allowed = maxsend-sent.size();
 		for(int i=0; i<allowed && tosend.size()>0; i++)
 		{
 			Tuple2<StreamSendTask, Future<Void>> tup = tosend.remove(0);
-			System.out.println("send Stored: "+tup.getFirstEntity().getSequenceNumber());
+//			System.out.println("send Stored: "+tup.getFirstEntity().getSequenceNumber());
 			sendTask(tup.getFirstEntity(), tup.getSecondEntity());
 		
 			// Send only one test message if in stop mode.
@@ -234,6 +325,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
+	 *  Called internally.
+	 * 
 	 *  Add data to a multi packet.
 	 *  @parm data The data.
 	 */
@@ -272,6 +365,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
+	 *  Called internally.
+	 * 
 	 *  Add data chunk.
 	 *  @param data The data.
 	 */
@@ -293,6 +388,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
+	 *  Called internally.
+	 * 
 	 *  Send a multi packet.
 	 */
 	protected IFuture<Void> sendMultiPacket()
@@ -312,15 +409,6 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 			
 			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, target, getNextSequenceNumber());
 			doSendData(task);
-//			if(isSendAllowed())
-//			{
-//				ret = sendTask(task, null);
-//			}
-//			else
-//			{
-//				ret = new Future<Void>();
-//				tosend.add(new Tuple2<StreamSendTask, Future<Void>>(task, (Future<Void>)ret));
-//			}
 			
 			multipacket.clear();
 			mpsize = 0;
@@ -330,16 +418,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
-	 *  Flush the data.
-	 */
-	public void flush()
-	{
-		if(multipackets)
-			sendMultiPacket();
-	}
-	
-	/**
-	 *  Called from message service.
+	 *  Called internally.
 	 */
 	public IFuture<Void> sendTask(StreamSendTask task, Future<Void> fut)
 	{
@@ -392,37 +471,6 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
-	 *  Called from message service.
-	 *  
-	 *  Uses: sent, lastack
-	 */
-	public void ackData(int seqnumber, boolean stop)
-	{
-		System.out.println("ack: "+seqnumber+" "+stop);
-		
-		// Update stop if newer
-		if(stopflag.getSecondEntity().intValue()<seqnumber)
-			stopflag = new Tuple2<Boolean, Integer>(stop? Boolean.TRUE: Boolean.FALSE, new Integer(seqnumber));
-		
-//		for(int i=seqnumber; i>lastack && cnt<ackcnt; i--)
-		for(int i=0; i<ackcnt && seqnumber+i>lastack; i++)
-		{
-			Tuple2<StreamSendTask, Integer> tup = sent.remove(new Integer(seqnumber-i));
-			if(tup==null)
-				throw new RuntimeException("Ack not possible, data not found.");
-		}
-		
-		this.lastack = seqnumber;
-
-		// Try to send stored messages after some others have been acknowledged
-		sendStored();
-		
-		// Try to close if close is requested.
-		if(isCloseRequested() && isDataFinished())
-			close();
-	}
-	
-	/**
 	 * 
 	 */
 	protected boolean isSendAllowed()
@@ -453,7 +501,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	public boolean isDataFinished()
 	{
 		// All acks received and no unfinished multi packet
-		System.out.println("fini: "+sent.size()+" "+mpsize);
+		System.out.println("isDataFinished: "+sent.size()+" "+mpsize);
 		return sent.isEmpty() && (!multipackets || mpsize==0);
 	}
 	
@@ -487,7 +535,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	 *  Get The next seqnumber.
 	 *  @return The next seqnumber.
 	 */
-	public synchronized int getNextSequenceNumber()
+	public int getNextSequenceNumber()
 	{
 		return ++seqnumber;
 	}
@@ -495,8 +543,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	/**
 	 *  This timer automatically sends non-full multipackets after mpsendtimeout has occurred.
 	 */
-	// Synchronized with timer on this
-	public synchronized void createMultipacketSendTimer(final int seqno)
+	protected void createMultipacketSendTimer(final int seqno)
 	{
 		if(mpsendtimer!=null)
 			mpsendtimer.cancel();
@@ -504,16 +551,23 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				ms.getComponent().scheduleStep(new IComponentStep<Void>()
+				try
 				{
-					public IFuture<Void> execute(IInternalAccess ia)
+					scheduleStep(new IComponentStep<Void>()
 					{
-						// Send the packet if it is still the correct one
-						if(seqno==getSequenceNumber())
-							sendMultiPacket();
-						return IFuture.DONE;
-					}
-				});
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							// Send the packet if it is still the correct one
+							if(seqno==getSequenceNumber())
+								sendMultiPacket();
+							return IFuture.DONE;
+						}
+					});
+				}
+				catch(ComponentTerminatedException e)
+				{
+					// nop
+				}
 			}
 		});
 	}
@@ -521,8 +575,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	/**
 	 *  Triggers resends of packets if no ack has been received in acktimeout.
 	 */
-	// Synchronized with timer on this
-	public synchronized void createAckTimer(final int seqno)
+	protected void createAckTimer(final int seqno)
 	{
 		// Test if packets have been sent till last timer was inited
 		if(acktimer==null)
@@ -535,20 +588,34 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 				{
 					public void timeEventOccurred(long currenttime)
 					{
-						ms.getComponent().scheduleStep(new IComponentStep<Void>()
+						try
 						{
-							public IFuture<Void> execute(IInternalAccess ia)
+							scheduleStep(new IComponentStep<Void>()
 							{
-								// Send all packets of the segment again.
-								for(int i=0; i<ackcnt; i++)
+								public IFuture<Void> execute(IInternalAccess ia)
 								{
-									resend(i+seqno);
+									scheduleStep(new IComponentStep<Void>()
+									{
+										public IFuture<Void> execute(IInternalAccess ia)
+										{
+											// Send all packets of the segment again.
+											for(int i=0; i<ackcnt; i++)
+											{
+												resend(i+seqno);
+											}
+											acktimer = null;
+											createAckTimer(seqno + ackcnt);
+											return IFuture.DONE;
+										}
+									});
+									return IFuture.DONE;
 								}
-								acktimer = null;
-								createAckTimer(seqno + ackcnt);
-								return IFuture.DONE;
-							}
-						});
+							});
+						}
+						catch(ComponentTerminatedException e)
+						{
+							// nop
+						}
 					}
 				});
 			}
@@ -560,18 +627,60 @@ public class OutputConnectionHandler extends AbstractConnectionHandler
 	}
 	
 	/**
-	 *  Continously
+	 *  
 	 */
-	public void createDataTimer()
+	protected void createDataTimer()
 	{
 		ms.getClockService().createTimer(10000, new ITimedObject()
 		{
 			public void timeEventOccurred(long currenttime)
 			{
-				System.out.println("data timer triggered");
-				sendStored();
-				createDataTimer();
+				try
+				{
+					scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+	//						System.out.println("data timer triggered");
+							
+							sendStored();
+							
+							checkClose();
+							
+							if(!isClosed())
+								createDataTimer();
+							
+							return IFuture.DONE;
+						}
+					});
+				}
+				catch(ComponentTerminatedException e)
+				{
+					// nop
+				}
 			}
 		});
+	}
+	
+	/**
+	 * 
+	 */
+	protected void checkClose()
+	{
+		// Try to close if close is requested.
+		if(isCloseRequested() && isDataFinished())
+		{
+			if(con.isClosing())
+			{
+				doClose();
+			}
+			else
+			{
+				close();
+			}
+			closereqflag = false;
+		}
+//		else
+//			System.out.println("check close: "+isCloseRequested()+" "+isDataFinished());
 	}
 }

@@ -5,38 +5,23 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.ComponentType;
 import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.Implementation;
-import jadex.micro.annotation.ProvidedService;
-import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.micro.annotation.Result;
-import jadex.micro.annotation.Results;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.List;
 
 /**
  *  Agent that provides a service with a stream.
@@ -144,27 +129,40 @@ public class InitiatorAgent
 	{
 		try
 		{
-			InputStream is = SUtil.getResource("jadex/micro/testcases/stream/test.jpg", agent.getClassLoader());
-//			FileInputStream fis = new FileInputStream(file);
-//			byte[] data = new byte[(int)file.length()]; 
-//			fis.read(data);
-			for(int next = is.read(); next!=-1; next = is.read())
+//			final InputStream is = SUtil.getResource("jadex/micro/testcases/stream/android-sdk_r07-windows.zip", agent.getClassLoader());
+			final InputStream is = SUtil.getResource("jadex/micro/testcases/stream/test.jpg", agent.getClassLoader());
+			
+			IComponentStep<Void> step = new IComponentStep<Void>()
 			{
-				con.write(new byte[]{(byte)next});
-//				.addResultListener(new IResultListener<Void>()
-//				{
-//					public void resultAvailable(Void result)
-//					{
-//						con.close();
-////								ret.setResult(null);
-//					}
-//					public void exceptionOccurred(Exception exception)
-//					{
-//						System.out.println("Write failed: "+exception);
-//					}
-//				});
-			}
-			con.close();
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					try
+					{
+						int size = Math.min(200000, is.available());
+						byte[] buf = new byte[size];
+						int read = 0;
+						while(read!=buf.length)
+						{
+							read += is.read(buf);
+						}
+						con.write(buf);
+						System.out.println("wrote: "+size);
+						if(is.available()>0)
+							agent.scheduleStep(this);
+//							agent.waitFor(10, this);
+						else
+							con.close();
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
+					}
+					
+					return IFuture.DONE;
+				}
+			};
+			agent.scheduleStep(step);
+//			con.close();
 		}
 		catch(Exception e)
 		{

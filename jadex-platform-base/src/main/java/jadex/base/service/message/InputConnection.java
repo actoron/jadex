@@ -4,17 +4,22 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  *  Input connection implementation for byte streams.
+ *  
+ *  Must synchronized its internal data because the connection handler
+ *  and the connection user (i.e. a component) are using the connection
+ *  concurrently.
+ *  
+ *  - the handler uses addData to forward received data to the connection.
+ *  - the connection user calls interface methods to read data.
  */
 public class InputConnection extends AbstractConnection implements IInputConnection
 {
@@ -33,7 +38,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	protected int size;
 	
 	/** The read futures. */
-	protected SubscriptionIntermediateFuture<Byte> ifuture;
+	protected SubscriptionIntermediateFuture<byte[]> ifuture;
 	protected Future<Byte> ofuture;
 		
 	//-------- constructors --------
@@ -48,7 +53,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		this.data = new ArrayList<byte[]>();
 	}
 	
-	//-------- methods --------
+	//-------- IInputConnection methods --------
 
 	/**
 	 *  Non-blocking read. Tries to read the next byte.
@@ -75,14 +80,6 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 
 		int startpos = offset;
 
-//		for(; rowcnt<data.size(); rowcnt++)
-//		{
-//			byte[] row = data.get(rowcnt);
-//			if(position<startpos+row.length)
-//				break;
-//			startpos += row.length;
-//		}
-		
 		int buffercnt = 0;
 		if(data.size()>0)
 		{
@@ -126,14 +123,11 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 */
 	protected synchronized int internalRead()
 	{
-		
 		int startpos = offset;
 		
 		int ret = -1;
-		boolean hasread = false;
 		if(data.size()>0)
 		{
-			hasread = true;
 			byte[] row = data.get(0);
 			int inrowstart = position-startpos;
 			
@@ -158,17 +152,35 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	}
 	
 	/**
+	 *  Get the next data byte array.
+	 */
+	public synchronized byte[] getNextByteArray()
+	{
+		byte[] ret = null;
+		if(data.size()>0)
+		{
+			ret = data.remove(0);
+			if(ret!=null)
+			{
+				position += ret.length;
+				offset += ret.length;
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Asynchronous read. 
 	 *  @return Bytes one by one till end of stream or closed.
 	 */
-	public ISubscriptionIntermediateFuture<Byte> aread()
+	public ISubscriptionIntermediateFuture<byte[]> aread()
 	{
 		boolean cl;
 		synchronized(this)
 		{
 			if(ifuture!=null || ofuture!=null)
-				return new SubscriptionIntermediateFuture<Byte>(new RuntimeException("Stream has reader"));
-			ifuture = new SubscriptionIntermediateFuture<Byte>();
+				return new SubscriptionIntermediateFuture<byte[]>(new RuntimeException("Stream has reader"));
+			ifuture = new SubscriptionIntermediateFuture<byte[]>();
 			cl = closed;
 		}
 			
@@ -176,10 +188,14 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		{
 			try
 			{
-				for(int val=internalRead(); val!=-1; )
+				for(byte[] next=getNextByteArray(); next!=null; next=getNextByteArray())
 				{
-					ifuture.addIntermediateResult(new Byte((byte)val));
+					ifuture.addIntermediateResult(next);
 				}
+//				for(int val=internalRead(); val!=-1; )
+//				{
+//					ifuture.addIntermediateResult(new Byte((byte)val));
+//				}
 			}
 			catch(Exception e)
 			{
@@ -284,7 +300,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	{
 //		System.out.println("added: "+data.length+" "+position+" "+size);
 
-		IntermediateFuture<Byte> iret;
+		IntermediateFuture<byte[]> iret;
 		Future<Byte> oret = null;
 		boolean cl;
 		synchronized(this)
@@ -303,25 +319,12 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		
 		if(iret!=null)
 		{
-			try
+			for(byte[] next=getNextByteArray(); next!=null; next=getNextByteArray())
 			{
-				for(int next=internalRead(); next!=-1; next=internalRead())
-				{
-					System.out.println("read inp: "+next);
-					try
-					{
-						iret.addIntermediateResult(new Byte((byte)next));
-					}
-					catch(Exception e)
-					{
-						e.printStackTrace();
-					}
-				}
+				ifuture.addIntermediateResult(next);
 			}
-			catch(Exception e)
-			{
-				iret.setFinished();
-			}
+			if(cl && position == size)
+				ifuture.setFinished();
 		}
 		else if(oret!=null)
 		{
@@ -336,7 +339,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	{
 		super.setClosed();
 		
-		IntermediateFuture<Byte> iret;
+		IntermediateFuture<byte[]> iret;
 		Future<Byte> oret;
 		boolean cl;
 		synchronized(this)
@@ -347,7 +350,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 			cl = position == size;
 		}
 		
-		System.out.println("hhh; "+position+" "+size+" "+cl);
+		System.out.println("setClosed(InputCon): "+position+" "+size+" "+cl);
 		
 		// notify async listener if last byte has been read and stream is closed.
 		if(iret!=null && cl)
@@ -362,7 +365,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	}
 	
 	/**
-	 * 
+	 *  Get the size of the stored data.
 	 */
 	public int getStoredDataSize()
 	{
@@ -374,7 +377,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 				ret += data.get(i).length;
 			}
 		}
-		System.out.println("vvvvv stored: "+ret+" "+data.size());
+//		System.out.println("vvvvv stored: "+ret+" "+data.size());
 		return ret;
 	}
 }
