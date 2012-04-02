@@ -128,6 +128,12 @@ public class RelayServlet extends HttpServlet
 			// Handle platform connection.
 			else
 			{
+				if(id.startsWith("<?xml"))
+				{
+					// Compatibility to older version.
+					id	= JavaReader.objectFromXML(id, getClass().getClassLoader()).toString();
+				}
+				
 				synchronized(this)
 				{
 					opencnt1++;
