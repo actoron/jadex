@@ -140,4 +140,28 @@ public class GeoIPService
 		
 		return ret;
 	}
+
+	/**
+	 *  Fetch country code for an IP address or null, if not found.
+	 */
+	public String	getCountryCode(String ip)
+	{
+		String	ret	= null;
+		
+		if(ls!=null)
+		{
+			try
+			{
+				Location	loc	= ls.getLocation(ip);
+				ret	= loc.countryCode.toLowerCase();
+			}
+			catch(Exception e)
+			{
+				// Ignore errors and let relay work without stats.
+				System.err.println("Warning: Could not get Geo location: "+ e);
+			}
+		}
+		
+		return ret;
+	}
 }

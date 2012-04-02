@@ -14,8 +14,11 @@ import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLConnection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -101,6 +104,12 @@ public class RelayServlet extends HttpServlet
 	{
 		if("/ping".equals(request.getServletPath()))
 		{
+			// somebody is checking, if the server is available, just return an empty http ok.
+		}
+		else if(request.getServletPath().startsWith("/resources"))
+		{
+			// serve images etc. (hack? url mapping doesn't support excludes and we want the relay servlet to react to the wepapp root url.
+			serveResource(request, response);
 		}
 		else
 		{
@@ -440,5 +449,37 @@ public class RelayServlet extends HttpServlet
 			num	= num + read;
 		}
 		return buffer;
+	}
+	
+	/**
+	 *  Serve a static resource from the file system.
+	 */
+	protected void serveResource(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+	{
+        File	file	= new File(getServletContext().getRealPath(request.getServletPath()));
+        if(!file.canRead())
+        {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
+        }
+        else
+        {
+        	response.setContentLength((int)file.length());
+            response.setDateHeader("Last-Modified", file.lastModified());
+        	String	mimetype	= URLConnection.guessContentTypeFromName(file.getName());
+        	if(mimetype!=null)
+        	{
+        		response.setContentType(mimetype);
+        	}
+        	
+			// Copy file content to output stream.
+        	FileInputStream	in	= new FileInputStream(file);
+			byte[]	buf	= new byte[8192];  
+			int	len;
+			while((len=in.read(buf)) != -1)
+			{
+				response.getOutputStream().write(buf, 0, len);
+			}
+			in.close();
+        }
 	}
 }

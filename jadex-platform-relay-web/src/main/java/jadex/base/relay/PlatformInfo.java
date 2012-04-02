@@ -276,6 +276,15 @@ public class PlatformInfo
 		return GeoIPService.getGeoIPService().getCountry(hostip);
 	}
 	
+	/**
+	 *  Get the country code.
+	 *  Dynamically resolved by GeoIP, if available.
+	 */
+	public String	getCountryCode()
+	{
+		return GeoIPService.getGeoIPService().getCountryCode(hostip);
+	}
+	
 	//-------- modifier methods --------
 	
 	/**

@@ -241,3 +241,7 @@ tr.odd {
 .number {
 	text-align: right;
 }
+
+.flag {
+	float:	left;
+}

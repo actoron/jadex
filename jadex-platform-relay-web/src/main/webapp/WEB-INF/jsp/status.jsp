@@ -35,6 +35,9 @@
 				<td>
 					<%= infos[i].getHostName() %> (<%= infos[i].getHostIP() %>)</td>
 				<td>
+					<% if(infos[i].getCountryCode()!=null) {%>
+						<img class="flag" src="<%= request.getContextPath() %>/resources/flags/flag-<%= infos[i].getCountryCode() %>.png"/>
+					<% } %>
 					<%= infos[i].getCity() %>, <%= infos[i].getRegion() %>, <%= infos[i].getCountry() %></td>
 				<td>
 					<%= infos[i].getScheme() %></td>
