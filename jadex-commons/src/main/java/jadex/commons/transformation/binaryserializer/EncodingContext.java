@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  *  Context for encoding (serializing) an object in a binary format.
@@ -24,7 +25,16 @@ public class EncodingContext
 	protected GrowableByteBuffer buffer;
 		
 	/** The string pool. */
-	protected Map<String, Integer> stringPool;
+	protected Map<String, Integer> stringpool;
+	
+	/** Cache for class IDs. */
+	protected Map<Class, Integer> classidcache;
+	
+	/** The class name pool. */
+	protected Map<String, Integer> classnamepool;
+	
+	/** The package fragment pool. */
+	protected Map<String, Integer> pkgpool;
 	
 	/** A user context. */
 	protected Object usercontext;
@@ -57,9 +67,12 @@ public class EncodingContext
 		this.classloader = classloader;
 		this.writeclass = true;
 		buffer = new GrowableByteBuffer();
-		stringPool = new HashMap<String, Integer>();
-		for (int i = 0; i < BinarySerializer.DEFAULT_STRINGS.size(); ++i)
-			stringPool.put(BinarySerializer.DEFAULT_STRINGS.get(i), i);
+		classidcache = new HashMap<Class, Integer>();
+		stringpool = new HashMap<String, Integer>();
+		//for (int i = 0; i < BinarySerializer.DEFAULT_STRINGS.size(); ++i)
+			//stringpool.put(BinarySerializer.DEFAULT_STRINGS.get(i), i);
+		classnamepool = new HashMap<String, Integer>();
+		pkgpool = new HashMap<String, Integer>();
 		bitpos = 0;
 		bitfieldpos = -1;
 	}
@@ -149,15 +162,19 @@ public class EncodingContext
 	
 	public void writeClass(Class clazz)
 	{
+
 		if (writeclass)
 		{
-			String classname = classnamecache.get(clazz);
-			if (classname == null)
+			Integer classid = classidcache.get(clazz);
+			if (classid == null)
 			{
-				classname = SReflect.getClassName(clazz);
-				classnamecache.put(clazz, classname);
+				classid = writeClassname(SReflect.getClassName(clazz));
+				classidcache.put(clazz, classid);
 			}
-			writeString(classname);
+			else
+			{
+				writeVarInt(classid.intValue());
+			}
 		}
 		else
 		{
@@ -165,13 +182,72 @@ public class EncodingContext
 		}
 	}
 	
+	public int writeClassname(String name)
+	{
+		Integer classid = classnamepool.get(name);
+		if (classid == null)
+		{
+			classid = classnamepool.size();
+			classnamepool.put(name, classid);
+			writeVarInt(classid);
+			
+			int lppos = name.lastIndexOf('.');
+			if (lppos < 0)
+			{
+				writeVarInt(0);
+				writeString(name);
+			}
+			else
+			{
+				String pkgname = name.substring(0, lppos);
+				String classname = name.substring(lppos + 1);
+				
+				StringTokenizer tok = new StringTokenizer(pkgname, ".");
+				writeVarInt(tok.countTokens());
+				while (tok.hasMoreElements())
+				{
+					String frag = tok.nextToken();
+					Integer pkgfragid = pkgpool.get(frag);
+					if (pkgfragid == null)
+					{
+						pkgfragid = pkgpool.size();
+						pkgpool.put(frag, pkgfragid);
+						writeVarInt(pkgfragid);
+						writeString(frag);
+						
+					}
+					else
+					{
+						writeVarInt(pkgfragid);
+					}
+				}
+				writeString(classname);
+			}
+			
+			/*String classname = classnamecache.get(clazz);
+			if (classname == null)
+			{
+				classname = SReflect.getClassName(clazz);
+				classnamecache.put(clazz, classname);
+			}
+			writeString(classname);*/
+		}
+		else
+		{
+			writeVarInt(classid.intValue());
+		}
+		
+		
+		return classid.intValue();
+	}
+	
 	public void writeString(String string)
 	{
-		Integer sid = stringPool.get(string);
+		Integer sid = stringpool.get(string);
 		if (sid == null)
 		{
-			sid = stringPool.size();
-			stringPool.put(string, sid);
+			sid = stringpool.size();
+			stringpool.put(string, sid);
 			writeVarInt(sid);
 			try
 			{

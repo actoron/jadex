@@ -36,7 +36,7 @@ public class MultiCollectionCodec extends AbstractCodec
 		{
 			//FIXME: Separation of sub-object decoding not possible with current MultiMap interface?
 			Map map = (Map) BinarySerializer.decodeObject(context);
-			Class type = SReflect.classForName(context.readString(), context.getClassloader());
+			Class type = SReflect.classForName(context.readClassname(), context.getClassloader());
 			Constructor c = clazz.getConstructor(new Class[] { Map.class, Class.class } );
 			ret = (MultiCollection) c.newInstance(new Object[] { map, type });
 		}
@@ -75,7 +75,7 @@ public class MultiCollectionCodec extends AbstractCodec
 			Field typefield = MultiCollection.class.getDeclaredField("type");
 			typefield.setAccessible(true);
 			Class type = (Class) typefield.get(mc);
-			ec.writeString(SReflect.getClassName(type));
+			ec.writeClass(type);
 		}
 		catch (Exception e)
 		{

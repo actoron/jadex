@@ -1,17 +1,20 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
+import java.awt.Color;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 /**
- *  Codec for encoding and decoding Class objects.
+ *  Codec for encoding and decoding Date objects.
  *
  */
-public class ClassCodec extends AbstractCodec
+public class DateCodec extends AbstractCodec
 {
 	/**
 	 *  Tests if the decoder can decode the class.
@@ -20,7 +23,7 @@ public class ClassCodec extends AbstractCodec
 	 */
 	public boolean isApplicable(Class clazz)
 	{
-		return Class.class.equals(clazz);
+		return Date.class.equals(clazz);
 	}
 	
 	/**
@@ -32,15 +35,9 @@ public class ClassCodec extends AbstractCodec
 	 */
 	public Object createObject(Class clazz, DecodingContext context)
 	{
-		Class ret = null;
-		try
-		{
-			ret = SReflect.classForName(context.readClassname(), context.getClassloader());
-		}
-		catch (ClassNotFoundException e)
-		{
-			throw new RuntimeException(e);
-		}
+		ByteBuffer buf = context.getByteBuffer(8);
+		buf.order(ByteOrder.BIG_ENDIAN);
+		Date ret = new Date(buf.getLong());
 		return ret;
 	}
 	
@@ -51,22 +48,19 @@ public class ClassCodec extends AbstractCodec
 	 */
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
 	{
-		return Class.class.equals(clazz);
+		return isApplicable(clazz);
 	}
 	
-	/**
-	 *  Process an object.
-	 *  @param object The object.
-	 *  @return The processed object.
-	 */
 	/**
 	 *  Encode the object.
 	 */
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		//ec.writeString(SReflect.getClassName((Class) object));
-		ec.writeClassname(SReflect.getClassName(((Class) object)));
+		long time = ((Date) object).getTime();
+		ByteBuffer buf = ec.getByteBuffer(8);
+		buf.order(ByteOrder.BIG_ENDIAN);
+		buf.putLong(time);
 		
 		return object;
 	}

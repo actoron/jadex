@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * Context for decoding a binary-encoded object.
@@ -36,6 +37,12 @@ public class DecodingContext
 	/** The String pool. */
 	//protected Map<Integer, String> stringpool;
 	protected List<String> stringpool;
+	
+	/** The class name pool. */
+	protected List<String> classnamepool;
+	
+	/** The package fragment pool. */
+	protected List<String> pkgpool;
 	
 	/** The current bitfield (used for boolean values). */
 	protected byte bitfield;
@@ -69,7 +76,9 @@ public class DecodingContext
 		this.usercontext = usercontext;
 		this.offset = offset;
 		this.stringpool = new ArrayList<String>();
-		this.stringpool.addAll(BinarySerializer.DEFAULT_STRINGS);
+		this.classnamepool = new ArrayList<String>();
+		this.pkgpool = new ArrayList<String>();
+		//this.stringpool.addAll(BinarySerializer.DEFAULT_STRINGS);
 		this.knownobjects = new HashMap<Integer, Object>();
 		this.bitfield = 0;
 		this.bitpos = 8;
@@ -214,6 +223,47 @@ public class DecodingContext
 	}
 	
 	/**
+	 *  Helper method for decoding a class name.
+	 *  @return String encoded at the current position.
+	 */
+	public String readClassname()
+	{
+		String ret = null;
+		
+		int classid = (int) readVarInt();
+		if (classid >= classnamepool.size())
+		{
+			int count = (int) readVarInt();
+			StringBuilder cnb = new StringBuilder();
+			for (int i = 0; i < count; ++i)
+			{
+				int fragid = (int) readVarInt();
+				String frag = null;
+				if (fragid >= pkgpool.size())
+				{
+					frag = readString();
+					pkgpool.add(frag);
+				}
+				else
+				{
+					frag = pkgpool.get(fragid);
+				}
+				cnb.append(frag);
+				cnb.append(".");
+			}
+			cnb.append(readString());
+			ret = cnb.toString();
+			classnamepool.add(ret);
+		}
+		else
+		{
+			ret = classnamepool.get(classid);
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 *  Helper method for decoding a string.
 	 *  @return String encoded at the current position.
 	 */
@@ -233,6 +283,10 @@ public class DecodingContext
 				ret = new String(content, offset, length, "UTF-8");
 			}
 			catch (UnsupportedEncodingException e)
+			{
+				throw new RuntimeException(e);
+			}
+			catch (Exception e)
 			{
 				throw new RuntimeException(e);
 			}

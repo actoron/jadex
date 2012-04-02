@@ -22,13 +22,13 @@ public class BinarySerializer
 	//public static final NullCodec NULL_HANDLER = new NullCodec();
 	
 	/** Marker for null values */
-	protected static final String NULL_MARKER = "N";
+	protected static final String NULL_MARKER = "0";
 	
 	/** Marker for references */
-	protected static final String REFERENCE_MARKER = "R";
+	protected static final String REFERENCE_MARKER = "1";
 	
 	/** Common known default Strings */
-	public static final List<String> DEFAULT_STRINGS = Collections.synchronizedList(new ArrayList<String>());
+	/*public static final List<String> DEFAULT_STRINGS = Collections.synchronizedList(new ArrayList<String>());
 	static
 	{
 		DEFAULT_STRINGS.add(NULL_MARKER);
@@ -50,7 +50,7 @@ public class BinarySerializer
 		DEFAULT_STRINGS.add(SReflect.getClassName(Byte.class));
 		DEFAULT_STRINGS.add(SReflect.getClassName(char.class));
 		DEFAULT_STRINGS.add(SReflect.getClassName(Character.class));
-	}
+	}*/
 	
 	/** 
 	 *  Handlers for encoding.
@@ -76,6 +76,7 @@ public class BinarySerializer
 		/*end[android]*/
 		ENCODER_HANDLERS.add(new URLCodec());
 		ENCODER_HANDLERS.add(new TupleCodec());
+		ENCODER_HANDLERS.add(new DateCodec());
 		ENCODER_HANDLERS.add(new InetAddressCodec());
 		ENCODER_HANDLERS.add(new LoggingLevelCodec());
 		ENCODER_HANDLERS.add(new LogRecordCodec());
@@ -117,7 +118,7 @@ public class BinarySerializer
 			{
 				EncodingContext ec = (EncodingContext) context;
 				int ref = ((Integer)match).intValue();
-				ec.writeString(REFERENCE_MARKER);
+				ec.writeClassname(REFERENCE_MARKER);
 				ec.writeVarInt(ref);
 			}
 		};
@@ -137,7 +138,15 @@ public class BinarySerializer
 	public static Object objectFromByteArray(byte[] val, List<IDecoderHandler> postprocessors, Object usercontext, ClassLoader classloader)
 	{
 		DecodingContext context = new DecodingContext(val, postprocessors, usercontext, classloader);
-		return decodeObject(context);
+		try
+		{
+			return decodeObject(context);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**
@@ -183,7 +192,7 @@ public class BinarySerializer
 	 */
 	protected static Object decodeObject(DecodingContext context)
 	{
-		String classname = context.readString();
+		String classname = context.readClassname();
 		
 		Class clazz = null;
 		try

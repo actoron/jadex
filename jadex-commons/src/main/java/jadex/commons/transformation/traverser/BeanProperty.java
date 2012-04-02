@@ -189,31 +189,41 @@ public class BeanProperty
 		if (delegateprovider != null)
 		{
 			IBeanAccessorDelegate accdel = delegateprovider.getDelegate(object.getClass());
-			ret = accdel.getPropertyValue(object, property);
-		}
-		else if (getGetter() != null)
-		{
 			try
 			{
-				ret = getGetter().invoke(object, new Object[0]);
+				ret = accdel.getPropertyValue(object, property);
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
 			}
 		}
-		else
+		
+		if (ret == null)
 		{
-			try
+			if (getGetter() != null)
 			{
-				Field field = getField();
-				if (!field.isAccessible())
-					field.setAccessible(true);
-				ret = field.get(object);
+				try
+				{
+					ret = getGetter().invoke(object, new Object[0]);
+				}
+				catch (Exception e)
+				{
+					throw new RuntimeException(e);
+				}
 			}
-			catch (Exception e)
+			else
 			{
-				e.printStackTrace();
+				try
+				{
+					Field field = getField();
+					if (!field.isAccessible())
+						field.setAccessible(true);
+					ret = field.get(object);
+				}
+				catch (Exception e)
+				{
+					throw new RuntimeException(e);
+				}
 			}
 		}
 		

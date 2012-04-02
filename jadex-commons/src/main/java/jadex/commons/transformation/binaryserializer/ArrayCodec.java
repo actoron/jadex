@@ -166,7 +166,7 @@ public class ArrayCodec extends AbstractCodec
 				if (val == null)
 				{
 					ec.writeBoolean(false);
-					ec.writeString(BinarySerializer.NULL_MARKER);
+					ec.writeClassname(BinarySerializer.NULL_MARKER);
 					//BinarySerializer.NULL_HANDLER.process(val, compclazz, null, null, null, false, ec);
 				}
 				else

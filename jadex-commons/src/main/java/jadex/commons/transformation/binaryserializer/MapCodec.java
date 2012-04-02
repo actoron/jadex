@@ -95,7 +95,7 @@ public class MapCodec extends AbstractCodec
 			Object ev = entry.getKey();
 			if (ev == null)
 			{
-				ec.writeString(BinarySerializer.NULL_MARKER);
+				ec.writeClassname(BinarySerializer.NULL_MARKER);
 				//BinarySerializer.NULL_HANDLER.process(null, null, processors, traverser, traversed, clone, ec);
 			}
 			else
@@ -106,7 +106,7 @@ public class MapCodec extends AbstractCodec
 			ev = entry.getValue();
 			if (ev == null)
 			{
-				ec.writeString(BinarySerializer.NULL_MARKER);
+				ec.writeClassname(BinarySerializer.NULL_MARKER);
 				//BinarySerializer.NULL_HANDLER.process(null, null, processors, traverser, traversed, clone, ec);
 			}
 			else

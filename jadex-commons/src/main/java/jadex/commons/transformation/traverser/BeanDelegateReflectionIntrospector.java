@@ -8,16 +8,19 @@ import jadex.commons.transformation.annotations.IncludeFields;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import javassist.CannotCompileException;
 import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
+import javassist.bytecode.DuplicateMemberException;
 
 
 /**
@@ -333,172 +336,170 @@ public class BeanDelegateReflectionIntrospector implements IBeanIntrospector, IB
 	public IBeanAccessorDelegate getDelegate(Class clazz)
 	{
 		IBeanAccessorDelegate ret = delegates.get(clazz);
-		
 		if (ret == null)
 		{
-			synchronized (delegates)
+			Map properties = getBeanProperties(clazz, true);
+			ClassLoader cl = clazz.getClassLoader();
+			ClassPool pool = new ClassPool(null);
+			pool.appendSystemPath();
+			pool.insertClassPath(new ClassClassPath(clazz));
+			try
 			{
-				ret = delegates.get(clazz);
-				if (ret == null)
+				String accname = clazz.getPackage().getName() + "." + clazz + "AccessorDelegate";
+				CtClass dclazz = pool.makeClass(accname);
+				CtClass dinterface = pool.get(IBeanAccessorDelegate.class.getName());
+				dclazz.addInterface(dinterface);
+				StringBuilder getmethodsrc = new StringBuilder();
+				StringBuilder setmethodsrc = new StringBuilder();
+				getmethodsrc.append("public final java.lang.Object getPropertyValue(Object object, String property) { ");
+				setmethodsrc.append("public final void setPropertyValue(Object object, String property, Object value) { ");
+				for (Object entry : properties.entrySet())
 				{
-					Map properties = getBeanProperties(clazz, true);
-					ClassLoader cl = clazz.getClassLoader();
-					ClassPool pool = new ClassPool(null);
-					pool.appendSystemPath();
-					pool.insertClassPath(new ClassClassPath(clazz));
+					String propname = (String) ((Map.Entry) entry).getKey();
+					BeanProperty prop = (BeanProperty) ((Map.Entry) entry).getValue();
+					
+					//Get
+					getmethodsrc.append("if (\"");
+					getmethodsrc.append(propname);
+					getmethodsrc.append("\".equals(property)) { ");
+					if (prop.getGetter() != null)
+					{
+						// Method access
+						getmethodsrc.append("return ");
+						if (prop.getType().isPrimitive())
+						{
+							//getmethodsrc.append("jadex.commons.SReflect.wrapValue(");
+							getmethodsrc.append("new ");
+							getmethodsrc.append(SReflect.getWrappedType(prop.getType()).getCanonicalName());
+							getmethodsrc.append("(");
+						}
+						getmethodsrc.append("((");
+						getmethodsrc.append(clazz.getCanonicalName());
+						getmethodsrc.append(") object).");
+						getmethodsrc.append(prop.getGetter().getName());
+						getmethodsrc.append("()");
+						if (prop.getType().isPrimitive())
+						{
+							getmethodsrc.append(")");
+						}
+						getmethodsrc.append("; } ");
+					}
+					else
+					{
+						// Field access
+						getmethodsrc.append("return ");
+						if (prop.getType().isPrimitive())
+						{
+							getmethodsrc.append("new ");
+							getmethodsrc.append(SReflect.getWrappedType(prop.getType()).getCanonicalName());
+							getmethodsrc.append("(");
+						}
+						getmethodsrc.append("((");
+						getmethodsrc.append(clazz.getCanonicalName());
+						getmethodsrc.append(") object).");
+						getmethodsrc.append(prop.getField().getName());
+						if (prop.getType().isPrimitive())
+							getmethodsrc.append(")");
+						getmethodsrc.append("; } ");
+					}
+					
+					//Set
+					setmethodsrc.append("if (\"");
+					setmethodsrc.append(propname);
+					setmethodsrc.append("\".equals(property)) { ");
+					if (prop.getSetter() != null)
+					{
+						// Method access
+						setmethodsrc.append("((");
+						setmethodsrc.append(clazz.getCanonicalName());
+						setmethodsrc.append(") object).");
+						setmethodsrc.append(prop.getSetter().getName());
+						setmethodsrc.append("(");
+						if (boolean.class.equals(prop.getType()))
+						{
+							setmethodsrc.append("((Boolean) value).booleanValue()");
+						}
+						else if (char.class.equals(prop.getType()))
+						{
+							setmethodsrc.append("((Character) value).charValue()");
+						}
+						else if (prop.getType().isPrimitive())
+						{
+							setmethodsrc.append("((java.lang.Number) value).");
+							setmethodsrc.append(prop.getType().getSimpleName());
+							setmethodsrc.append("Value()");
+						}
+						else
+						{
+							setmethodsrc.append("(");
+							setmethodsrc.append(prop.getSetterType().getCanonicalName());
+							setmethodsrc.append(") value");
+						}
+						setmethodsrc.append("); return;");
+					}
+					else
+					{
+						// Field access
+						setmethodsrc.append("((");
+						setmethodsrc.append(clazz.getCanonicalName());
+						setmethodsrc.append(") object).");
+						setmethodsrc.append(prop.getField().getName());
+						setmethodsrc.append(" = ");
+						if (boolean.class.equals(prop.getType()))
+						{
+							setmethodsrc.append("((Boolean) value).booleanValue()");
+						}
+						else if (char.class.equals(prop.getType()))
+						{
+							setmethodsrc.append("((Character) value).charValue()");
+						}
+						else if (prop.getType().isPrimitive())
+						{
+							setmethodsrc.append("((java.lang.Number) value).");
+							setmethodsrc.append(prop.getType().getSimpleName());
+							setmethodsrc.append("Value()");
+						}
+						else
+						{
+							setmethodsrc.append("((");
+							setmethodsrc.append(prop.getSetterType().getCanonicalName());
+							setmethodsrc.append(") value); return;");
+						}
+					}
+					setmethodsrc.append(" } ");
+				}
+				getmethodsrc.append("throw new RuntimeException(\"Bean property not found: \" + property); }");
+				setmethodsrc.append("throw new RuntimeException(\"Bean property not found: \" + property); }");
+				
+				CtMethod getmethod = CtMethod.make(getmethodsrc.toString(), dclazz);
+				dclazz.addMethod(getmethod);
+				CtMethod setmethod = CtMethod.make(setmethodsrc.toString(), dclazz);
+				dclazz.addMethod(setmethod);
+				Class delegateclazz = null;
+				try
+				{
+					 delegateclazz = dclazz.toClass(cl, clazz.getProtectionDomain());
+				}
+				catch (CannotCompileException e)
+				{
+					//e.printStackTrace();
 					try
 					{
-						String accname = clazz.getPackage().getName() + "." + clazz + "AccessorDelegate";
-						try
-						{
-							Class retclass = SReflect.classForName(accname, clazz.getClassLoader());
-							ret = (IBeanAccessorDelegate) retclass.newInstance();
-							delegates.put(clazz, ret);
-							return ret;
-						}
-						catch(Exception e)
-						{
-						}
-						CtClass dclazz = pool.makeClass(accname);
-						CtClass dinterface = pool.get(IBeanAccessorDelegate.class.getName());
-						dclazz.addInterface(dinterface);
-						StringBuilder getmethodsrc = new StringBuilder();
-						StringBuilder setmethodsrc = new StringBuilder();
-						getmethodsrc.append("public java.lang.Object getPropertyValue(Object object, String property) { ");
-						setmethodsrc.append("public void setPropertyValue(Object object, String property, Object value) { ");
-						for (Object entry : properties.entrySet())
-						{
-							String propname = (String) ((Map.Entry) entry).getKey();
-							BeanProperty prop = (BeanProperty) ((Map.Entry) entry).getValue();
-							
-							//Get
-							getmethodsrc.append("if (\"");
-							getmethodsrc.append(propname);
-							getmethodsrc.append("\".equals(property)) { ");
-							if (prop.getGetter() != null)
-							{
-								// Method access
-								getmethodsrc.append("return ");
-								if (prop.getType().isPrimitive())
-								{
-									//getmethodsrc.append("jadex.commons.SReflect.wrapValue(");
-									getmethodsrc.append("new ");
-									getmethodsrc.append(SReflect.getWrappedType(prop.getType()).getCanonicalName());
-									getmethodsrc.append("(");
-								}
-								getmethodsrc.append("((");
-								getmethodsrc.append(clazz.getCanonicalName());
-								getmethodsrc.append(") object).");
-								getmethodsrc.append(prop.getGetter().getName());
-								getmethodsrc.append("()");
-								if (prop.getType().isPrimitive())
-								{
-									getmethodsrc.append(")");
-								}
-								getmethodsrc.append("; } ");
-							}
-							else
-							{
-								// Field access
-								getmethodsrc.append("return ");
-								if (prop.getType().isPrimitive())
-								{
-									getmethodsrc.append("new ");
-									getmethodsrc.append(SReflect.getWrappedType(prop.getType()).getCanonicalName());
-									getmethodsrc.append("(");
-								}
-								getmethodsrc.append("((");
-								getmethodsrc.append(clazz.getCanonicalName());
-								getmethodsrc.append(") object).");
-								getmethodsrc.append(prop.getField().getName());
-								if (prop.getType().isPrimitive())
-									getmethodsrc.append(")");
-								getmethodsrc.append("; } ");
-							}
-							
-							//Set
-							setmethodsrc.append("if (\"");
-							setmethodsrc.append(propname);
-							setmethodsrc.append("\".equals(property)) { ");
-							if (prop.getSetter() != null)
-							{
-								// Method access
-								setmethodsrc.append("((");
-								setmethodsrc.append(clazz.getCanonicalName());
-								setmethodsrc.append(") object).");
-								setmethodsrc.append(prop.getSetter().getName());
-								setmethodsrc.append("(");
-								if (boolean.class.equals(prop.getType()))
-								{
-									setmethodsrc.append("((Boolean) value).booleanValue()");
-								}
-								else if (char.class.equals(prop.getType()))
-								{
-									setmethodsrc.append("((Character) value).charValue()");
-								}
-								else if (prop.getType().isPrimitive())
-								{
-									setmethodsrc.append("((java.lang.Number) value).");
-									setmethodsrc.append(prop.getType().getSimpleName());
-									setmethodsrc.append("Value()");
-								}
-								else
-								{
-									setmethodsrc.append("(");
-									setmethodsrc.append(prop.getSetterType().getCanonicalName());
-									setmethodsrc.append(") value");
-								}
-								setmethodsrc.append("); return;");
-							}
-							else
-							{
-								// Field access
-								setmethodsrc.append("((");
-								setmethodsrc.append(clazz.getCanonicalName());
-								setmethodsrc.append(") object).");
-								setmethodsrc.append(prop.getField().getName());
-								setmethodsrc.append(" = ");
-								if (boolean.class.equals(prop.getType()))
-								{
-									setmethodsrc.append("((Boolean) value).booleanValue()");
-								}
-								else if (char.class.equals(prop.getType()))
-								{
-									setmethodsrc.append("((Character) value).charValue()");
-								}
-								else if (prop.getType().isPrimitive())
-								{
-									setmethodsrc.append("((java.lang.Number) value).");
-									setmethodsrc.append(prop.getType().getSimpleName());
-									setmethodsrc.append("Value()");
-								}
-								else
-								{
-									setmethodsrc.append("((");
-									setmethodsrc.append(prop.getSetterType().getCanonicalName());
-									setmethodsrc.append(") value); return;");
-								}
-							}
-							setmethodsrc.append(" } ");
-						}
-						getmethodsrc.append("throw new RuntimeException(\"Bean property not found: \" + property); }");
-						setmethodsrc.append("throw new RuntimeException(\"Bean property not found: \" + property); }");
-						
-						CtMethod getmethod = CtMethod.make(getmethodsrc.toString(), dclazz);
-						dclazz.addMethod(getmethod);
-						CtMethod setmethod = CtMethod.make(setmethodsrc.toString(), dclazz);
-						dclazz.addMethod(setmethod);
-						Class delegateclazz = dclazz.toClass(cl, clazz.getProtectionDomain());
-						ret = (IBeanAccessorDelegate) delegateclazz.newInstance();
-						delegates.put(clazz, ret);
+						delegateclazz = SReflect.classForName(accname, clazz.getClassLoader());
 					}
-					catch(Exception e)
+					catch(Exception e2)
 					{
-						System.out.println(delegates.toString());
-						System.out.println(clazz);
-						e.printStackTrace();
+						throw new RuntimeException(e);
 					}
 				}
+				ret = (IBeanAccessorDelegate) delegateclazz.newInstance();
+				delegates.put(clazz, ret);
+			}
+			catch(Exception e)
+			{
+				System.out.println(delegates.toString());
+				System.out.println(clazz);
+				e.printStackTrace();
 			}
 		}
 		

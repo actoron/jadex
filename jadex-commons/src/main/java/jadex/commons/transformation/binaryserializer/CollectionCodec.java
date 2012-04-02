@@ -106,7 +106,7 @@ public class CollectionCodec extends AbstractCodec
 				}
 				else
 				{
-					ec.writeString(BinarySerializer.NULL_MARKER);
+					ec.writeClassname(BinarySerializer.NULL_MARKER);
 				}
 			}
 		}
