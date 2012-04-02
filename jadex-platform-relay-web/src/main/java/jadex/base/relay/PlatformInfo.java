@@ -249,6 +249,24 @@ public class PlatformInfo
 		return dbid;
 	}
 	
+	/**
+	 *  Get the city.
+	 *  Dynamically resolved by GeoIP, if available.
+	 */
+	public String	getCity()
+	{
+		return GeoIPService.getGeoIPService().getCity(hostip);
+	}
+	
+	/**
+	 *  Get the country.
+	 *  Dynamically resolved by GeoIP, if available.
+	 */
+	public String	getCountry()
+	{
+		return GeoIPService.getGeoIPService().getCountry(hostip);
+	}
+	
 	//-------- modifier methods --------
 	
 	/**

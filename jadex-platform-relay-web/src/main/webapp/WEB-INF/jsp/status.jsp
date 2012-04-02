@@ -13,6 +13,7 @@
 	<tr>
 		<th>Platform</th>
 		<th>Host (IP)</th>
+		<th>City, Country</th>
 		<th>Scheme</th>
 	<% if(history) { %>
 		<th>Connected</th>
@@ -33,6 +34,8 @@
 					<%= infos[i].getId() %> </td>
 				<td>
 					<%= infos[i].getHostName() %> (<%= infos[i].getHostIP() %>)</td>
+				<td>
+					<%= infos[i].getCity() %>, <%= infos[i].getCountry() %></td>
 				<td>
 					<%= infos[i].getScheme() %></td>
 			<% if(history) { %>

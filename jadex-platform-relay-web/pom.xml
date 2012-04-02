@@ -196,6 +196,10 @@
 			<version>10.8.2.2</version>
 			<scope>runtime</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.ow2.util</groupId>
+			<artifactId>util-geolocation-ejb</artifactId>
+			<version>1.0.31</version>
+		</dependency>
 	</dependencies>
 </project>
