@@ -13,7 +13,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -52,7 +52,7 @@ public class RemoteJarNode extends RemoteDirNode
 		final IRemoteFilter myfilter = factory.getFileFilter();
 		exta.scheduleStep(new IComponentStep<Collection>()
 		{
-			@XMLClassname("listFiles")
+			@Classname("listFiles")
 			public IFuture<Collection> execute(IInternalAccess ia)
 			{
 				final Future ret = new Future();

@@ -14,9 +14,9 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.transformation.annotations.Classname;
+import jadex.commons.transformation.annotations.IncludeFields;
 import jadex.tools.simcenter.ClockPanel.ClockState;
-import jadex.xml.annotation.XMLClassname;
-import jadex.xml.annotation.XMLIncludeFields;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -179,7 +179,7 @@ public class ContextPanel extends JPanel
 				final ISimulationService	simservice	= simp.getSimulationService();
 				access.scheduleStep(new IComponentStep<Void>()
 				{
-					@XMLClassname("addListener")
+					@Classname("addListener")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						RemoteSimServiceChangeListener	rccl	= new RemoteSimServiceChangeListener(id, ia, rcl, simservice);
@@ -210,7 +210,7 @@ public class ContextPanel extends JPanel
 	/**
 	 *  Information about the simulation to be transferred.
 	 */
-	@XMLIncludeFields
+	@IncludeFields
 	public static class SimulationState
 	{
 		//-------- attributes --------

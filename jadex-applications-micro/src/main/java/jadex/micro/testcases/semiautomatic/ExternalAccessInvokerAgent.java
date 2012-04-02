@@ -12,8 +12,8 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.MicroAgent;
-import jadex.xml.annotation.XMLClassname;
 
 import javax.swing.SwingUtilities;
 
@@ -49,7 +49,7 @@ public class ExternalAccessInvokerAgent extends MicroAgent
 								{
 									ea.scheduleStep(new IComponentStep<Void>()
 									{
-										@XMLClassname("exe")
+										@Classname("exe")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											System.out.println("Executing step on component: "+ia);

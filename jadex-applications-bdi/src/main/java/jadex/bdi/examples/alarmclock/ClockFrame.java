@@ -9,7 +9,7 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.AWTException;
 import java.awt.MenuItem;
@@ -174,7 +174,7 @@ public class ClockFrame extends JFrame
 				
 				ClockFrame.this.agent.scheduleStep(new IComponentStep<Void>()
 				{
-					@XMLClassname("settings")
+					@Classname("settings")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -324,7 +324,7 @@ public class ClockFrame extends JFrame
 
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("tray")
+			@Classname("tray")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -382,7 +382,7 @@ public class ClockFrame extends JFrame
 		{
 			agent.scheduleStep(new IComponentStep<Void>()
 			{
-				@XMLClassname("refresh")
+				@Classname("refresh")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					IBDIInternalAccess bia = (IBDIInternalAccess)ia;

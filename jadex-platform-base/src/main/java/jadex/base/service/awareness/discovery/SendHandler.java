@@ -7,7 +7,7 @@ import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.util.Timer;
 
@@ -55,7 +55,7 @@ public abstract class SendHandler
 		
 		agent.getMicroAgent().scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("send")
+			@Classname("send")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				final IComponentStep<Void> step = this;

@@ -10,7 +10,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -53,7 +53,7 @@ public class GuiOpenClosePlan extends Plan
 				{
 					getExternalAccess().scheduleStep(new IComponentStep<Void>()
 					{
-						@XMLClassname("closed")
+						@Classname("closed")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;

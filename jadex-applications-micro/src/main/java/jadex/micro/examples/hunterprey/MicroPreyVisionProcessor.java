@@ -9,13 +9,13 @@ import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.IPerceptProcessor;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.IMicroExternalAccess;
-import jadex.xml.annotation.XMLClassname;
 
 /**
  *  Dumb prey vision processer.
@@ -51,7 +51,7 @@ public class MicroPreyVisionProcessor	extends	SimplePropertyObject	implements IP
 						final IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
 						exta.scheduleStep(new IComponentStep<Void>()
 						{
-							@XMLClassname("food")
+							@Classname("food")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								MicroPreyAgent	mp	= (MicroPreyAgent)ia;

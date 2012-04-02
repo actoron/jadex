@@ -8,7 +8,7 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.jtable.ObjectTableModel;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -187,7 +187,7 @@ public class AlarmsGui extends JFrame
 	//						{
 								agent.scheduleStep(new IComponentStep<Void>()
 								{
-									@XMLClassname("alarms")
+									@Classname("alarms")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -273,7 +273,7 @@ public class AlarmsGui extends JFrame
 		alarm.addPropertyChangeListener(plis);
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("addAlarm")
+			@Classname("addAlarm")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -300,7 +300,7 @@ public class AlarmsGui extends JFrame
 //		System.out.println("Removing:"+alarm);
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("removeAlarm")
+			@Classname("removeAlarm")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

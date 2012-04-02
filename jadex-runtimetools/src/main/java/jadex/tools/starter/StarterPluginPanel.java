@@ -25,7 +25,7 @@ import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -115,7 +115,7 @@ public class StarterPluginPanel extends JPanel
 					final String	model	= spanel.lastfile;
 					jcc.getPlatformAccess().scheduleImmediate(new IComponentStep<Boolean>()
 					{
-						@XMLClassname("matchModel")
+						@Classname("matchModel")
 						public IFuture<Boolean> execute(IInternalAccess ia)
 						{
 							boolean	match	= false;

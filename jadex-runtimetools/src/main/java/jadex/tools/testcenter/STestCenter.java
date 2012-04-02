@@ -11,8 +11,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.xml.annotation.XMLClassname;
-
+import jadex.commons.transformation.annotations.Classname;
 /**
  *  Helper class to identify test cases.
  */
@@ -25,7 +24,7 @@ public class STestCenter
 	{
 		return access.scheduleImmediate(new IComponentStep<Boolean>()
 		{
-			@XMLClassname("isTestcase")
+			@Classname("isTestcase")
 			public IFuture<Boolean> execute(IInternalAccess ia)
 			{
 				final Future<Boolean>	ret	= new Future<Boolean>();

@@ -16,7 +16,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ public class DefaultComponentServiceViewerPanel extends AbstractComponentViewerP
 		
 		component.scheduleStep(new IComponentStep<List>()
 		{
-			@XMLClassname("Step")
+			@Classname("Step")
 //			public static final String XML_CLASSNAME = "Step"; 
 			
 			public IFuture<List> execute(final IInternalAccess ia)

@@ -4,7 +4,7 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -826,7 +826,7 @@ public class Test extends TestCase
 		final String	name	= tmp;
 		Object	obj	= new Object()
 		{
-			@XMLClassname("test")
+			@Classname("test")
 			public boolean equals(Object obj)
 			{
 				String	othername	= null;
@@ -865,7 +865,7 @@ public class Test extends TestCase
 		final boolean booli = tmp2;
 		Object	obj	= new Object()
 		{
-			@XMLClassname("test2")
+			@Classname("test2")
 			public boolean equals(Object obj)
 			{
 				String	othername	= null;

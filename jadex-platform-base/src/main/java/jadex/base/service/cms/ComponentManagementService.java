@@ -46,8 +46,8 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.kernelbase.IBootstrapFactory;
-import jadex.xml.annotation.XMLClassname;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -232,7 +232,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		{
 			exta.scheduleStep(new IComponentStep<IModelInfo>()
 			{
-				@XMLClassname("loadModel")
+				@Classname("loadModel")
 				public IFuture<IModelInfo> execute(final IInternalAccess ia)
 				{
 					final Future<IModelInfo> ret = new Future<IModelInfo>();

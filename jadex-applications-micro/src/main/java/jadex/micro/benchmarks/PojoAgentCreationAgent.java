@@ -11,6 +11,7 @@ import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.MicroAgent;
 import jadex.micro.PojoMicroAgent;
 import jadex.micro.annotation.Agent;
@@ -19,7 +20,6 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
-import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -157,7 +157,7 @@ public class PojoAgentCreationAgent
 								{
 									exta.scheduleStep(new IComponentStep<Void>()
 									{
-										@XMLClassname("deletePeers")
+										@Classname("deletePeers")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											((PojoAgentCreationAgent)((PojoMicroAgent)ia).getPojoAgent())

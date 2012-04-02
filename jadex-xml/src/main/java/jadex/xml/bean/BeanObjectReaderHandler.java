@@ -3,7 +3,10 @@ package jadex.xml.bean;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
+import jadex.commons.transformation.annotations.Classname;
+import jadex.commons.transformation.traverser.BeanDelegateReflectionIntrospector;
+import jadex.commons.transformation.traverser.BeanProperty;
+import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
@@ -16,7 +19,6 @@ import jadex.xml.SXML;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoTypeManager;
-import jadex.xml.annotation.XMLClassname;
 import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.LinkData;
 import jadex.xml.reader.ReadContext;
@@ -65,7 +67,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	protected Set no_typeinfos;
 	
 	/** The bean introspector. */
-	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
+	protected IBeanIntrospector introspector = new BeanDelegateReflectionIntrospector();
 //	protected IBeanIntrospector introspector = new BeanInfoIntrospector();
 	
 	/** The filter based post processors. */
@@ -374,7 +376,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			if(!ret)
 			{
-            	XMLClassname xmlc = SXML.getXMLClassnameAnnotation(clazz);
+            	Classname xmlc = SXML.getXMLClassnameAnnotation(clazz);
             	if(xmlc!=null)
             	{
     				ret = rawclname.equals(xmlc.value());	
@@ -1101,7 +1103,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 //						"attribute error", context, context.getParser().getLocation());
 				}
 			}
-			else if(prop instanceof XMLClassname)
+			else if(prop instanceof Classname)
 			{
 				// Annotation needs not to be set.
 				set	= true;

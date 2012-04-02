@@ -33,11 +33,11 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.tools.comanalyzer.chart.ChartPanel;
 import jadex.tools.comanalyzer.diagram.DiagramPanel;
 import jadex.tools.comanalyzer.graph.GraphPanel;
 import jadex.tools.comanalyzer.table.TablePanel;
-import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -1911,7 +1911,7 @@ public class ComanalyzerPlugin extends AbstractJCCPlugin
 	{
 		return new IFilter()
 		{
-			@XMLClassname("msgfilter")
+			@Classname("msgfilter")
 			public boolean filter(Object obj)
 			{
 				boolean	ret	= true;

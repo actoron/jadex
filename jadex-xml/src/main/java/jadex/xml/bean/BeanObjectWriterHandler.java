@@ -3,12 +3,15 @@ package jadex.xml.bean;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
+import jadex.commons.transformation.annotations.Classname;
+import jadex.commons.transformation.traverser.BeanDelegateReflectionIntrospector;
+import jadex.commons.transformation.traverser.BeanProperty;
+import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.BasicTypeConverter;
 import jadex.xml.IAttributeConverter;
 import jadex.xml.IContext;
-import jadex.xml.IPostProcessor;
 import jadex.xml.IPreProcessor;
 import jadex.xml.ISubObjectConverter;
 import jadex.xml.Namespace;
@@ -16,7 +19,6 @@ import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
-import jadex.xml.annotation.XMLClassname;
 import jadex.xml.writer.AbstractObjectWriterHandler;
 import jadex.xml.writer.WriteContext;
 
@@ -46,7 +48,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	//-------- attributes --------
 	
 	/** The bean introspector (also scans for public fields). */
-	protected IBeanIntrospector introspector = new BeanReflectionIntrospector();
+	protected IBeanIntrospector introspector = new BeanDelegateReflectionIntrospector();
 //	protected IBeanIntrospector introspector = new BeanInfoIntrospector();
 	
 	/** The namespaces by package. */
@@ -277,7 +279,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		
 		Method method = null;
 		Field field = null;
-		XMLClassname xmlc = null;
+		Classname xmlc = null;
 		
 		AccessInfo ai = info instanceof AttributeInfo? ((AttributeInfo)info).getAccessInfo(): 
 			info instanceof SubobjectInfo? ((SubobjectInfo)info).getAccessInfo(): null;
@@ -314,9 +316,9 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				}
 			}
 		}
-		else if(attr instanceof XMLClassname)
+		else if(attr instanceof Classname)
 		{
-			xmlc	= (XMLClassname)attr;
+			xmlc	= (Classname)attr;
 		}
 //		else if(attr instanceof QName)
 //		{
@@ -420,7 +422,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 			ret = (String)property;
 		else if(property instanceof QName)
 			ret = ((QName)property).getLocalPart();
-		else if(property instanceof XMLClassname)
+		else if(property instanceof Classname)
 			ret = SXML.XML_CLASSNAME;
 		else
 			throw new RuntimeException("Unknown property type: "+property);
@@ -503,7 +505,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 				// Do not allow strings -> avoids strings being written as attributes by default.
 				ret = !(value instanceof String) && value.getClass().equals(SReflect.getWrappedType(prop.getSetterType()));
 			}
-			else if(property instanceof XMLClassname)
+			else if(property instanceof Classname)
 			{
 				// Allow XML class name as attribute
 				ret	= true;

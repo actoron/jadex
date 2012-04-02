@@ -1,8 +1,8 @@
 package jadex.xml.test;
 
-import jadex.xml.annotation.XMLIncludeFields;
+import jadex.commons.transformation.annotations.IncludeFields;
 
-@XMLIncludeFields
+@IncludeFields
 public class D
 {
 	public String string;

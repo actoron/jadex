@@ -24,7 +24,7 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -220,7 +220,7 @@ public class ConversationPlugin extends AbstractJCCPlugin
 		
 		getJCC().getPlatformAccess().scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("installListener")
+			@Classname("installListener")
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				SServiceProvider.getService(ia.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)

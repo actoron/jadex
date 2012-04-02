@@ -13,7 +13,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -86,7 +86,7 @@ public class EnvironmentGui	extends JFrame
 
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("disp")
+			@Classname("disp")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -390,7 +390,7 @@ public class EnvironmentGui	extends JFrame
 
 								agent.scheduleStep(new IComponentStep<Void>()
 								{
-									@XMLClassname("mouse")
+									@Classname("mouse")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;

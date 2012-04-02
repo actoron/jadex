@@ -9,8 +9,8 @@ import jadex.commons.IRemoteChangeListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.IMicroExternalAccess;
-import jadex.xml.annotation.XMLClassname;
 
 /**
  *  The daemon service.
@@ -45,7 +45,7 @@ public class DaemonService extends BasicService implements IDaemonService
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("startPlatform")
+			@Classname("startPlatform")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;
@@ -67,7 +67,7 @@ public class DaemonService extends BasicService implements IDaemonService
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("shutdownPlatform")
+			@Classname("shutdownPlatform")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;
@@ -89,7 +89,7 @@ public class DaemonService extends BasicService implements IDaemonService
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("getPlatforms")
+			@Classname("getPlatforms")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;
@@ -109,7 +109,7 @@ public class DaemonService extends BasicService implements IDaemonService
 	{
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("addChangeListener")
+			@Classname("addChangeListener")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;
@@ -127,7 +127,7 @@ public class DaemonService extends BasicService implements IDaemonService
 	{
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("removeChangeListener")
+			@Classname("removeChangeListener")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				DaemonAgent agent = (DaemonAgent)ia;

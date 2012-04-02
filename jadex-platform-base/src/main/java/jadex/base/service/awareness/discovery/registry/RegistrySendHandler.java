@@ -10,7 +10,7 @@ import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -43,7 +43,7 @@ class RegistrySendHandler extends MasterSlaveSendHandler
 			
 			getAgent().getMicroAgent().scheduleStep(new IComponentStep<Void>()
 			{
-				@XMLClassname("send")
+				@Classname("send")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					final Future<Void> ret = new Future<Void>();

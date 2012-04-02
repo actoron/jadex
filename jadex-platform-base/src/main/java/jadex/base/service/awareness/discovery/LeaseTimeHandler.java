@@ -5,7 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -129,7 +129,7 @@ public class LeaseTimeHandler
 	{
 		agent.getMicroAgent().scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("rem")
+			@Classname("rem")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				List<DiscoveryEntry> todel = new ArrayList<DiscoveryEntry>();

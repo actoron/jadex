@@ -11,10 +11,10 @@ import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -63,7 +63,7 @@ class CleanerPanel extends JPanel
 			{
 				IFuture<DrawData>	fut	= agent.scheduleStep(new IComponentStep<DrawData>()
 				{
-					@XMLClassname("copy")
+					@Classname("copy")
 					public IFuture<DrawData> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;

@@ -21,7 +21,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -129,7 +129,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		dealerpan.setBackground(Color.WHITE);
 		access.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("dealerpan")
+			@Classname("dealerpan")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IFuture<IComponentManagementService>	cms	= ia.getServiceContainer().getRequiredService("cms");
@@ -155,7 +155,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			{
 				access.scheduleStep(new IComponentStep<Void>()
 				{
-					@XMLClassname("dealertf")
+					@Classname("dealertf")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ia.getServiceContainer().getRequiredService("cms")
@@ -209,7 +209,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("dispose")
+			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -276,7 +276,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("players")
+			@Classname("players")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -393,7 +393,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 			{
 				agent.scheduleStep(new IComponentStep<Void>()
 				{
-					@XMLClassname("close")
+					@Classname("close")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ia.getServiceContainer().getRequiredService("cms").addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
@@ -492,7 +492,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	{
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("startDealer")
+			@Classname("startDealer")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				final Future<Void>	ret	= new Future<Void>();
@@ -610,7 +610,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("destroy")
+			@Classname("destroy")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -823,7 +823,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 //			agent.getLogger().info("starting playerAgent: "+player.getName());
 			agent.scheduleStep(new IComponentStep<Void>()
 			{
-				@XMLClassname("start")
+				@Classname("start")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					try
@@ -923,7 +923,7 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 		{
 			agent.scheduleStep(new IComponentStep<Void>()
 			{
-				@XMLClassname("stop")
+				@Classname("stop")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					IBDIInternalAccess bia = (IBDIInternalAccess)ia;

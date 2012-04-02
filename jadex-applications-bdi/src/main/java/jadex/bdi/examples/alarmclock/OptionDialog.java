@@ -6,7 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.Dialog;
@@ -68,7 +68,7 @@ public class OptionDialog extends JDialog
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("create")
+			@Classname("create")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -250,7 +250,7 @@ public class OptionDialog extends JDialog
 										final Settings ns = Settings.loadSettings(file.getAbsolutePath());
 										agent.scheduleStep(new IComponentStep<Void>()
 										{
-											@XMLClassname("alarms")
+											@Classname("alarms")
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												IBDIInternalAccess bia = (IBDIInternalAccess)ia;

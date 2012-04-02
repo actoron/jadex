@@ -13,9 +13,8 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
-import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -154,7 +153,7 @@ public class AddRemotePathAction extends ToolTipAction
 						
 						treepanel.getExternalAccess().scheduleStep(new IComponentStep<FileData>()
 						{
-							@XMLClassname("getRemoteFile")
+							@Classname("getRemoteFile")
 							public IFuture<FileData> execute(IInternalAccess ia)
 							{
 								return new Future<FileData>(new FileData(new File(SUtil.convertPathToRelative(path))));

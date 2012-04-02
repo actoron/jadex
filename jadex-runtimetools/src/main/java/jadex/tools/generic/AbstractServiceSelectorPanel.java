@@ -8,7 +8,7 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -51,7 +51,7 @@ public abstract class AbstractServiceSelectorPanel extends AbstractSelectorPanel
 		final String	scope	= isRemote() ? RequiredServiceInfo.SCOPE_GLOBAL: RequiredServiceInfo.SCOPE_PLATFORM;
 		platform.scheduleStep(new IComponentStep<Collection<IService>>()
 		{
-			@XMLClassname("search-services")
+			@Classname("search-services")
 			public IFuture<Collection<IService>> execute(IInternalAccess ia)
 			{
 				return SServiceProvider.getServices(ia.getServiceContainer(), type, scope);

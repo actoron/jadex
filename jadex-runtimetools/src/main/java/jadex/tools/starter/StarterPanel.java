@@ -43,8 +43,8 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -322,7 +322,7 @@ public class StarterPanel extends JLayeredPane
 //					System.out.println("a: "+modelrid);
 					jcc.getPlatformAccess().scheduleStep(new IComponentStep<Map>()
 					{
-						@XMLClassname("start")
+						@Classname("start")
 						public IFuture<Map> execute(IInternalAccess ia)
 						{
 //							System.out.println("b: "+ia.getComponentIdentifier().getName());
@@ -1679,7 +1679,7 @@ public class StarterPanel extends JLayeredPane
 		final Future ret = new Future(); 
 		jcc.getPlatformAccess().scheduleStep(new IComponentStep<IComponentManagementService>()
 		{
-			@XMLClassname("create-component")
+			@Classname("create-component")
 			public IFuture<IComponentManagementService> execute(IInternalAccess ia)
 			{
 				Future ret = new Future();

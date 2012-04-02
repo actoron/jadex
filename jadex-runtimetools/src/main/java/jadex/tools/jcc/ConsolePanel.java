@@ -11,7 +11,7 @@ import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -208,7 +208,7 @@ public class ConsolePanel extends JPanel
 			
 			platformaccess.scheduleImmediate(new IComponentStep<Void>()
 			{
-				@XMLClassname("removeListener")
+				@Classname("removeListener")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					ConsoleListener	cl	= new ConsoleListener(id, ia, null);
@@ -263,7 +263,7 @@ public class ConsolePanel extends JPanel
 			
 			platformaccess.scheduleImmediate(new IComponentStep<Void>()
 			{
-				@XMLClassname("installListener")
+				@Classname("installListener")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					ConsoleListener	cl	= new ConsoleListener(id, ia, rcl);

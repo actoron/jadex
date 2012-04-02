@@ -15,7 +15,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.util.ArrayList;
@@ -72,7 +72,7 @@ public class DefaultBDIViewerPanel extends AbstractComponentViewerPanel
 				cl	= result;
 				component.scheduleStep(new IComponentStep<Void>()
 				{
-					@XMLClassname("createPanels")
+					@Classname("createPanels")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						final IBDIInternalAccess scope	= (IBDIInternalAccess)ia;

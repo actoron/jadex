@@ -1,18 +1,17 @@
 package jadex.xml.writer;
 
 import jadex.commons.SReflect;
+import jadex.commons.transformation.annotations.IncludeFields;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IObjectStringConverter;
-import jadex.xml.IPostProcessor;
 import jadex.xml.IPreProcessor;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoTypeManager;
-import jadex.xml.annotation.XMLIncludeFields;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -317,7 +316,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			// Hack!!! todo: must not be Java object (OAV) ?!
 			try
 			{
-				includefields	= object.getClass().isAnnotationPresent(XMLIncludeFields.class);
+				includefields	= object.getClass().isAnnotationPresent(IncludeFields.class);
 				if(!includefields)
 				{
 					Field field = object.getClass().getField(Writer.XML_INCLUDE_FIELDS);

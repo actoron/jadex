@@ -12,7 +12,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -135,7 +135,7 @@ public class EnvironmentGui	extends JFrame
 				
 				agent.scheduleStep(new IComponentStep<Void>()
 				{
-					@XMLClassname("end")
+					@Classname("end")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -159,7 +159,7 @@ public class EnvironmentGui	extends JFrame
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("dispose")
+			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -209,7 +209,7 @@ public class EnvironmentGui	extends JFrame
 
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("env")
+			@Classname("env")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -236,7 +236,7 @@ public class EnvironmentGui	extends JFrame
 						final Long val = new Long(roundtimetf.getText());
 						agent.scheduleStep(new IComponentStep<Void>()
 						{
-							@XMLClassname("roundtime")
+							@Classname("roundtime")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -302,7 +302,7 @@ public class EnvironmentGui	extends JFrame
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("roundcnt")
+			@Classname("roundcnt")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -328,7 +328,7 @@ public class EnvironmentGui	extends JFrame
 						final Long val = new Long(roundtimetf.getText());
 						agent.scheduleStep(new IComponentStep<Void>()
 						{
-							@XMLClassname("rt")
+							@Classname("rt")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -477,7 +477,7 @@ public class EnvironmentGui	extends JFrame
 	{
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("dummy")
+			@Classname("dummy")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

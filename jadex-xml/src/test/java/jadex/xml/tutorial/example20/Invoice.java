@@ -1,6 +1,6 @@
 package jadex.xml.tutorial.example20;
 
-import jadex.xml.annotation.XMLExclude;
+import jadex.commons.transformation.annotations.Exclude;
 
 
 /**
@@ -40,7 +40,7 @@ public class Invoice
 	 *  Get the name.
 	 *  @return The name.
 	 */
-	@XMLExclude
+	@Exclude
 	public String getName()
 	{
 		return this.name;
@@ -50,7 +50,7 @@ public class Invoice
 	 *  Set the name.
 	 *  @param name The name to set.
 	 */
-	@XMLExclude
+	@Exclude
 	public void setName(String name)
 	{
 		this.name = name;

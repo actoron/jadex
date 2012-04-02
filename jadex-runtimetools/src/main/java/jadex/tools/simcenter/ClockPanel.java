@@ -13,8 +13,8 @@ import jadex.commons.IRemoteChangeListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.xml.annotation.XMLClassname;
-import jadex.xml.annotation.XMLIncludeFields;
+import jadex.commons.transformation.annotations.Classname;
+import jadex.commons.transformation.annotations.IncludeFields;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -237,7 +237,7 @@ public class ClockPanel	extends JPanel
 							IExternalAccess	access	= (IExternalAccess)result;
 							access.scheduleStep(new IComponentStep<Void>()
 							{
-								@XMLClassname("setDilation")
+								@Classname("setDilation")
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
 									cs.setDilation(dil);
@@ -268,7 +268,7 @@ public class ClockPanel	extends JPanel
 							IExternalAccess	access	= (IExternalAccess)result;
 							access.scheduleStep(new IComponentStep<Void>()
 							{
-								@XMLClassname("setDilation")
+								@Classname("setDilation")
 								public IFuture<Void> execute(IInternalAccess ia)
 								{
 									cs.setDelta(tick);
@@ -418,7 +418,7 @@ public class ClockPanel	extends JPanel
 					final ISimulationService	simservice	= simp.getSimulationService();
 					access.scheduleStep(new IComponentStep<Void>()
 					{
-						@XMLClassname("addListener")
+						@Classname("addListener")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							RemoteClockChangeListener	rccl	= new RemoteClockChangeListener(id, ia, rcl, simservice);
@@ -450,7 +450,7 @@ public class ClockPanel	extends JPanel
 	/**
 	 *  Information about the clock to be transferred.
 	 */
-	@XMLIncludeFields
+	@IncludeFields
 	public static class ClockState
 	{
 		//-------- attributes --------

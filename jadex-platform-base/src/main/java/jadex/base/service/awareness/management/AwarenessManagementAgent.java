@@ -28,6 +28,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.TerminableIntermediateFuture;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -44,7 +45,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.xml.annotation.XMLClassname;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -595,7 +595,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	{
 		scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("rem")
+			@Classname("rem")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				List<DiscoveryInfo> todel = autodelete? new ArrayList<DiscoveryInfo>(): null;

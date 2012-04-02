@@ -24,7 +24,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.xml.annotation.XMLClassname;
 
 import java.net.URL;
 import java.util.Collection;
@@ -48,7 +47,6 @@ public class SRemoteGui
 		return ea.scheduleImmediate(new IComponentStep<Object[]>()
 		{
 			@Classname("getServiceInfos")
-			@XMLClassname("getServiceInfos")
 			public IFuture<Object[]> execute(IInternalAccess ia)
 			{
 				final Future<Object[]>	ret	= new Future<Object[]>();
@@ -103,7 +101,6 @@ public class SRemoteGui
 						exta.scheduleStep(new IComponentStep<Void>()
 						{
 							@Classname("installListener")
-							@XMLClassname("installListener")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								final Future<Void>	ret	= new Future<Void>();
@@ -146,7 +143,6 @@ public class SRemoteGui
 						exta.scheduleStep(new IComponentStep<Void>()
 						{
 							@Classname("deregisterListener")
-							@XMLClassname("deregisterListener")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								final Future<Void>	ret	= new Future<Void>();
@@ -186,7 +182,7 @@ public class SRemoteGui
 	{
 		return platformaccess.scheduleStep(new IComponentStep<Tuple2<String, String>>()
 		{
-			@XMLClassname("localizeModel")
+			@Classname("localizeModel")
 			public IFuture<Tuple2<String, String>> execute(IInternalAccess ia)
 			{
 				final Future<Tuple2<String, String>>	ret	= new Future<Tuple2<String, String>>();
@@ -219,7 +215,7 @@ public class SRemoteGui
 	{
 		return platformaccess.scheduleStep(new IComponentStep<IResourceIdentifier>()
 		{
-			@XMLClassname("createResourceIdentifier")
+			@Classname("createResourceIdentifier")
 			public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
 			{
 				Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();

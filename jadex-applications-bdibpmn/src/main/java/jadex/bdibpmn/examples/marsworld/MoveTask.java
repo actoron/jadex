@@ -6,13 +6,13 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
-import jadex.xml.annotation.XMLClassname;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -74,7 +74,7 @@ public class MoveTask extends AbstractTask
 				{
 					scope.scheduleStep(new IComponentStep<Void>()
 					{
-						@XMLClassname("addTarget")
+						@Classname("addTarget")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess bia = (IBDIInternalAccess)ia;

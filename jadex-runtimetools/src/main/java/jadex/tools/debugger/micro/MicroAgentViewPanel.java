@@ -11,9 +11,9 @@ import jadex.commons.IBreakpointPanel;
 import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.JSplitPanel;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.MicroAgent;
 import jadex.micro.MicroAgentInterpreter;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -206,7 +206,7 @@ public class MicroAgentViewPanel extends JPanel
 		{
 			protected IFilter filter = new IFilter()
 			{
-				@XMLClassname("filter")
+				@Classname("filter")
 				public boolean filter(Object obj)
 				{
 					IComponentChangeEvent cce = (IComponentChangeEvent)obj;
@@ -291,7 +291,7 @@ public class MicroAgentViewPanel extends JPanel
 		final IComponentListener lis = listener;
 		agent.scheduleImmediate(new IComponentStep<Void>()
 		{
-			@XMLClassname("installListener")
+			@Classname("installListener")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				List	events	= new ArrayList();
@@ -360,7 +360,7 @@ public class MicroAgentViewPanel extends JPanel
 		final IComponentListener lis = listener;
 		agent.scheduleImmediate(new IComponentStep<Void>()
 		{
-			@XMLClassname("dispose")
+			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.removeComponentListener(lis);

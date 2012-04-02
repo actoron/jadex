@@ -17,7 +17,7 @@ import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.util.Collections;
 import java.util.List;
@@ -200,7 +200,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 				{
 					exta.scheduleStep(new IComponentStep<IComponentIdentifier>()
 					{
-						@XMLClassname("rem")
+						@Classname("rem")
 						public IFuture<IComponentIdentifier> execute(IInternalAccess ia)
 						{
 //							ProxyAgent pa = (ProxyAgent)ia;

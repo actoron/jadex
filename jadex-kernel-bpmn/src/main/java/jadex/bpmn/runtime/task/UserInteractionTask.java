@@ -12,9 +12,9 @@ import jadex.bridge.TerminationAdapter;
 import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.javaccimpl.JavaCCExpressionParser;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
@@ -191,7 +191,7 @@ public class UserInteractionTask implements ITask
 		                
 		                instance.scheduleStep(new IComponentStep<Void>()
 						{
-		                	@XMLClassname("rem")
+		                	@Classname("rem")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								ia.removeComponentListener(lis);

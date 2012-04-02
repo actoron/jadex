@@ -21,7 +21,7 @@ import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -368,7 +368,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 			final String[] paths	= root.getPathEntries();
 			exta.scheduleStep(new IComponentStep<String[]>()
 			{
-				@XMLClassname("convertPathToRelative")
+				@Classname("convertPathToRelative")
 				public IFuture<String[]> execute(IInternalAccess ia)
 				{
 					for(int i=0; i<paths.length; i++)
@@ -479,7 +479,7 @@ public class FileTreePanel extends JPanel implements IPropertiesProvider
 						{
 							exta.scheduleStep(new IComponentStep<FileData[]>()
 							{
-								@XMLClassname("createRootEntries")
+								@Classname("createRootEntries")
 								public IFuture<FileData[]> execute(IInternalAccess ia)
 								{
 									FileData[]	ret	= new FileData[entries.length];

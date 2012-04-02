@@ -13,11 +13,11 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
-import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -65,7 +65,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								{
 									scheduleStep(new IComponentStep<Void>()
 									{
-										@XMLClassname("destroy1")
+										@Classname("destroy1")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
@@ -106,7 +106,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								{
 									scheduleStep(new IComponentStep<Void>()
 									{
-										@XMLClassname("destroy2")
+										@Classname("destroy2")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											if(exception instanceof RuntimeException)
@@ -131,7 +131,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								{
 									scheduleStep(new IComponentStep<Void>()
 									{
-										@XMLClassname("last")
+										@Classname("last")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											long killend = clock.getTime();
@@ -161,7 +161,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 								{
 									scheduleStep(new IComponentStep<Void>()
 									{
-										@XMLClassname("destroyMe")
+										@Classname("destroyMe")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											if(exception instanceof RuntimeException)

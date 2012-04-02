@@ -6,8 +6,8 @@ import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.IPojoMicroAgent;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -54,7 +54,7 @@ public class BotGuiF4 extends AbstractComponentViewerPanel
 		// Fetch initial values for text fields.
 		getActiveComponent().scheduleStep(new IComponentStep<String[]>()
 		{
-			@XMLClassname("fetch_values")
+			@Classname("fetch_values")
 			public IFuture<String[]> execute(IInternalAccess ia)
 			{
 				ChatBotF4Agent	chatbot	= (ChatBotF4Agent)((IPojoMicroAgent)ia).getPojoAgent();
@@ -77,7 +77,7 @@ public class BotGuiF4 extends AbstractComponentViewerPanel
 				final String	keyword	= tfkeyword.getText();
 				getActiveComponent().scheduleStep(new IComponentStep<Void>()
 				{
-					@XMLClassname("set_keyword")
+					@Classname("set_keyword")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ChatBotF4Agent	chatbot	= (ChatBotF4Agent)((IPojoMicroAgent)ia).getPojoAgent();
@@ -96,7 +96,7 @@ public class BotGuiF4 extends AbstractComponentViewerPanel
 				final String	reply	= tfreply.getText();
 				getActiveComponent().scheduleStep(new IComponentStep<Void>()
 				{
-					@XMLClassname("set_reply")
+					@Classname("set_reply")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ChatBotF4Agent	chatbot	= (ChatBotF4Agent)((IPojoMicroAgent)ia).getPojoAgent();

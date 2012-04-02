@@ -14,10 +14,10 @@ import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.ISpaceProcess;
-import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -111,7 +111,7 @@ public class CreateCollectionTruckProcess extends SimplePropertyObject implement
 										IBDIExternalAccess ex = (IBDIExternalAccess)result;
 										ex.scheduleStep(new IComponentStep<Void>()
 										{
-											@XMLClassname("rem")
+											@Classname("rem")
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												IBDIInternalAccess bia = (IBDIInternalAccess)ia;

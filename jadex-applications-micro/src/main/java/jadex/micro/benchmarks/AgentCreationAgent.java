@@ -11,12 +11,12 @@ import jadex.commons.Tuple;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
-import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -168,7 +168,7 @@ public class AgentCreationAgent extends MicroAgent
 										IMicroExternalAccess	exta	= (IMicroExternalAccess)result;
 										exta.scheduleStep(new IComponentStep<Void>()
 										{
-											@XMLClassname("deletePeers")
+											@Classname("deletePeers")
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												((AgentCreationAgent)ia).deletePeers(max, clock.getTime(), dur, pera, omem, upera, max, nested);

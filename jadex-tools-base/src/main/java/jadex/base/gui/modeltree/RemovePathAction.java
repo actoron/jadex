@@ -14,7 +14,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.ToolTipAction;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -96,7 +96,7 @@ public class RemovePathAction extends ToolTipAction
 				final String	path	= ((IFileNode)node).getFilePath();
 				treepanel.getExternalAccess().scheduleStep(new IComponentStep<Void>()
 				{
-					@XMLClassname("removeURL")
+					@Classname("removeURL")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						final Future	ret	= new Future();

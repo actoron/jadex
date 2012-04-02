@@ -13,7 +13,7 @@ import jadex.bridge.TerminationAdapter;
 import jadex.commons.SimplePropertyChangeSupport;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -74,7 +74,7 @@ public class HumanPlayerInterface extends GameStateFrame
 		// Close window on agent death.
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("human")
+			@Classname("human")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

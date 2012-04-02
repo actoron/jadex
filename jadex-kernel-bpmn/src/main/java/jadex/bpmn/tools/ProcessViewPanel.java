@@ -13,7 +13,7 @@ import jadex.commons.IFilter;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.jtable.ResizeableTableHeader;
 import jadex.commons.gui.jtable.TableSorter;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -113,7 +113,7 @@ public class ProcessViewPanel extends JPanel
 		{
 			protected IFilter filter = new IFilter()
 			{
-				@XMLClassname("filter")
+				@Classname("filter")
 				public boolean filter(Object obj)
 				{
 //					IComponentChangeEvent cce = (IComponentChangeEvent)obj;
@@ -177,7 +177,7 @@ public class ProcessViewPanel extends JPanel
 		final IComponentListener lis = listener;
 		access.scheduleImmediate(new IComponentStep<Void>()
 		{
-			@XMLClassname("installListener")
+			@Classname("installListener")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				// Post current state to remote listener
@@ -307,7 +307,7 @@ public class ProcessViewPanel extends JPanel
 		final IComponentListener lis = listener;
 		access.scheduleImmediate(new IComponentStep<Void>()
 		{
-			@XMLClassname("dispose")
+			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.removeComponentListener(lis);

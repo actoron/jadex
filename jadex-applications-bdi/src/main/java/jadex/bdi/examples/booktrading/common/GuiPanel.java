@@ -13,8 +13,8 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Binding;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -256,7 +256,7 @@ public class GuiPanel extends JPanel
 
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("refresh")
+			@Classname("refresh")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -306,7 +306,7 @@ public class GuiPanel extends JPanel
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("refreshDetails")
+			@Classname("refreshDetails")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -388,7 +388,7 @@ public class GuiPanel extends JPanel
 										
 										agent.scheduleStep(new IComponentStep<Void>()
 										{
-											@XMLClassname("add")
+											@Classname("add")
 											public IFuture<Void> execute(IInternalAccess ia)
 											{
 												IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -453,7 +453,7 @@ public class GuiPanel extends JPanel
 					
 					agent.scheduleStep(new IComponentStep<Void>()
 					{
-						@XMLClassname("remove")
+						@Classname("remove")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -540,7 +540,7 @@ public class GuiPanel extends JPanel
 											
 											agent.scheduleStep(new IComponentStep<Void>()
 											{
-												@XMLClassname("drop")
+												@Classname("drop")
 												public IFuture<Void> execute(IInternalAccess ia)
 												{
 													IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -633,7 +633,7 @@ public class GuiPanel extends JPanel
 	{
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("ref")
+			@Classname("ref")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -687,7 +687,7 @@ public class GuiPanel extends JPanel
 			
 			agent.scheduleStep(new IComponentStep<Void>()
 			{
-				@XMLClassname("refD")
+				@Classname("refD")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					IBDIInternalAccess bia = (IBDIInternalAccess)ia;

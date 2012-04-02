@@ -20,8 +20,8 @@ import jadex.commons.collection.SortedList;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.SGUI;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.rules.state.IOAVState;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -401,7 +401,7 @@ public class BDIViewerPanel extends JPanel
 		{
 			protected IFilter filter = new IFilter()
 			{
-				@XMLClassname("filter")
+				@Classname("filter")
 				public boolean filter(Object obj)
 				{
 					IComponentChangeEvent cce = (IComponentChangeEvent)obj;
@@ -535,7 +535,7 @@ public class BDIViewerPanel extends JPanel
 		final IComponentListener lis = listener;
 		access.scheduleImmediate(new IComponentStep<Void>()
 		{
-			@XMLClassname("installListener")
+			@Classname("installListener")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				BDIInterpreter	interpreter	= BDIInterpreter.getInterpreter(((CapabilityFlyweight)ia).getState());
@@ -625,7 +625,7 @@ public class BDIViewerPanel extends JPanel
 		final IComponentListener lis = listener;
 		return access.scheduleImmediate(new IComponentStep<Void>()
 		{
-			@XMLClassname("removeListener")
+			@Classname("removeListener")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				ia.removeComponentListener(lis);

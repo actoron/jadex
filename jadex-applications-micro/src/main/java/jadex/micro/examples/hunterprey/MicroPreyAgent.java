@@ -7,13 +7,13 @@ import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.extension.envsupport.environment.ISpaceAction;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Grid2D;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.micro.MicroAgent;
-import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +66,7 @@ public class MicroPreyAgent extends MicroAgent
 						{
 							getExternalAccess().scheduleStep(new IComponentStep<Void>()
 							{
-								@XMLClassname("act")
+								@Classname("act")
 								public IFuture<Void> execute(IInternalAccess agent)
 								{
 									// If move failed, forget about food and turn 90°.
@@ -102,7 +102,7 @@ public class MicroPreyAgent extends MicroAgent
 					{
 						getExternalAccess().scheduleStep(new IComponentStep<Void>()
 						{
-							@XMLClassname("act2")
+							@Classname("act2")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								act();

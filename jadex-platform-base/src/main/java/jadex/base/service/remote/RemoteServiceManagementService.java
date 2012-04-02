@@ -41,6 +41,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 /* $if !android $ */
+import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.binaryserializer.DecodingContext;
 import jadex.commons.transformation.binaryserializer.EncodingContext;
@@ -57,7 +58,6 @@ import jadex.xml.SXML;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
-import jadex.xml.annotation.XMLClassname;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.bean.JavaReader;
@@ -476,7 +476,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		component.scheduleStep(new IComponentStep<Object>()
 		{
-			@XMLClassname("getServiceProxies")
+			@Classname("getServiceProxies")
 			public IFuture<Object> execute(IInternalAccess ia)
 			{
 				final Future<Object> fut = new Future<Object>();
@@ -566,7 +566,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		component.scheduleStep(new IComponentStep<Object>()
 		{
-			@XMLClassname("getExternalAccessProxy")
+			@Classname("getExternalAccessProxy")
 			public IFuture<Object> execute(IInternalAccess ia)
 			{
 				final Future<Object> fut = new Future<Object>();
@@ -774,7 +774,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			component.scheduleStep(new IComponentStep<Void>()
 			{
-				@XMLClassname("sendMessage")
+				@Classname("sendMessage")
 				public IFuture<Void> execute(final IInternalAccess ia)
 				{
 					Future<Void>	pre	= new Future<Void>(); 

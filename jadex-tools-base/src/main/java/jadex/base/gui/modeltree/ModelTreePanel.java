@@ -29,7 +29,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.gui.PopupBuilder;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -213,7 +213,7 @@ public class ModelTreePanel extends FileTreePanel
 									
 									exta.scheduleStep(new IComponentStep<Integer>()
 									{
-										@XMLClassname("findchild")
+										@Classname("findchild")
 										public IFuture<Integer> execute(IInternalAccess ia)
 										{
 											int ret = SUtil.indexOfFilename(toremove, filenames);
@@ -279,7 +279,7 @@ public class ModelTreePanel extends FileTreePanel
 //			System.out.println("adding url: "+url);
 			exta.scheduleStep(new IComponentStep<Tuple2<URL, IResourceIdentifier>>()
 			{
-				@XMLClassname("addurl")
+				@Classname("addurl")
 				public IFuture<Tuple2<URL, IResourceIdentifier>> execute(IInternalAccess ia)
 				{
 					final URL	url	= SUtil.toURL(filename);
@@ -439,7 +439,7 @@ public class ModelTreePanel extends FileTreePanel
 		
 		exta.scheduleStep(new IComponentStep<IResourceIdentifier>()
 		{
-			@XMLClassname("createRid")
+			@Classname("createRid")
 			public IFuture<IResourceIdentifier> execute(IInternalAccess ia)
 			{
 				final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();

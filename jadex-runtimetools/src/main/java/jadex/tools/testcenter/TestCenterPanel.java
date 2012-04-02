@@ -29,8 +29,6 @@ import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.xml.PropertiesXMLHelper;
-import jadex.xml.annotation.XMLClassname;
-import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 import java.awt.BorderLayout;
@@ -48,7 +46,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;

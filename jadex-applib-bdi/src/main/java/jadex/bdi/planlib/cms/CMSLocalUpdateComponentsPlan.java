@@ -10,7 +10,7 @@ import jadex.bridge.service.types.cms.ICMSComponentListener;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.IFuture;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 /**
  *  Update the belief set containing the local components.
@@ -38,7 +38,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 				{
 					getExternalAccess().scheduleStep(new IComponentStep<Void>()
 					{
-						@XMLClassname("addFact")
+						@Classname("addFact")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							((IBDIInternalAccess)ia).getBeliefbase().getBeliefSet("components").addFact(desc);
@@ -59,7 +59,7 @@ public class CMSLocalUpdateComponentsPlan extends Plan
 				{
 					getExternalAccess().scheduleStep(new IComponentStep<Void>()
 					{
-						@XMLClassname("removeFact")
+						@Classname("removeFact")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							((IBDIInternalAccess)ia).getBeliefbase().getBeliefSet("components").removeFact(desc);

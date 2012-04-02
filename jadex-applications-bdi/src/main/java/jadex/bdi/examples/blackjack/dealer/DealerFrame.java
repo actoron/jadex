@@ -11,7 +11,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.Window;
 import java.awt.event.WindowAdapter;
@@ -72,7 +72,7 @@ public class DealerFrame extends GameStateFrame
 		});
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("dispose")
+			@Classname("dispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -118,7 +118,7 @@ public class DealerFrame extends GameStateFrame
 			{
 				agent.scheduleStep(new IComponentStep<Void>()
 				{
-					@XMLClassname("gamestate")
+					@Classname("gamestate")
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						IBDIInternalAccess bia = (IBDIInternalAccess)ia;

@@ -1,6 +1,5 @@
 package jadex.tools.convcenter;
 
-import jadex.base.Starter;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.bridge.IComponentStep;
@@ -9,7 +8,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.message.MessageType.ParameterSpecification;
@@ -21,7 +19,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -626,7 +624,7 @@ public class ConversationPanel extends JSplitPane
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("sendM")
+			@Classname("sendM")
 			public IFuture<Void> execute(final IInternalAccess ia)
 			{
 				final Future	ret	= new Future();

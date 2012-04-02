@@ -9,7 +9,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,7 +76,7 @@ public class RemoteFileSystemView extends FileSystemView
 		
 		exta.scheduleStep(new IComponentStep<Object[]>()
 		{
-			@XMLClassname("init")
+			@Classname("init")
 			public IFuture<Object[]> execute(IInternalAccess ia)
 			{
 				Object[]	ret	= new Object[4];
@@ -439,7 +439,7 @@ public class RemoteFileSystemView extends FileSystemView
 		{
 			exta.scheduleStep(new IComponentStep<FileData[]>()
 			{
-				@XMLClassname("getFiles")
+				@Classname("getFiles")
 				public IFuture<FileData[]> execute(IInternalAccess ia)
 				{
 //					FileSystemView view = FileSystemView.getFileSystemView();
@@ -476,7 +476,7 @@ public class RemoteFileSystemView extends FileSystemView
 		{
 			exta.scheduleStep(new IComponentStep<FileData>()
 			{
-				@XMLClassname("getHomeDirectory")
+				@Classname("getHomeDirectory")
 				public IFuture<FileData> execute(IInternalAccess ia)
 				{
 					FileSystemView view = FileSystemView.getFileSystemView();
@@ -510,7 +510,7 @@ public class RemoteFileSystemView extends FileSystemView
 		{
 			exta.scheduleStep(new IComponentStep<FileData>()
 			{
-				@XMLClassname("getCurrentDirectory")
+				@Classname("getCurrentDirectory")
 				public IFuture<FileData> execute(IInternalAccess ia)
 				{
 					String	path	= new File(".").getAbsolutePath();
@@ -548,7 +548,7 @@ public class RemoteFileSystemView extends FileSystemView
 		{
 			exta.scheduleStep(new IComponentStep<FileData>()
 			{
-				@XMLClassname("getDefaultDirectory")
+				@Classname("getDefaultDirectory")
 				public IFuture<FileData> execute(IInternalAccess ia)
 				{
 					FileSystemView view = FileSystemView.getFileSystemView();
@@ -651,7 +651,7 @@ public class RemoteFileSystemView extends FileSystemView
 			final FileData mydir = new FileData(dir);
 			exta.scheduleStep(new IComponentStep<FileData[]>()
 			{
-				@XMLClassname("getFiles")
+				@Classname("getFiles")
 				public IFuture<FileData[]> execute(IInternalAccess ia)
 				{
 					File dir = new File(mydir.getPath());
@@ -713,7 +713,7 @@ public class RemoteFileSystemView extends FileSystemView
 			final String path = dir.getAbsolutePath();
 			exta.scheduleStep(new IComponentStep<FileData>()
 			{
-				@XMLClassname("getParentDirectory")
+				@Classname("getParentDirectory")
 				public IFuture<FileData> execute(IInternalAccess ia)
 				{
 					FileSystemView view = FileSystemView.getFileSystemView();

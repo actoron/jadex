@@ -37,7 +37,6 @@ import jadex.commons.gui.SGUI;
 import jadex.commons.gui.TreeExpansionHandler;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.xml.annotation.XMLClassname;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -264,7 +263,6 @@ public class ComponentTreePanel extends JSplitPane
 								access.scheduleStep(new IComponentStep<Void>()
 								{
 									@Classname("proxykill")
-									@XMLClassname("proxykill")
 									public IFuture<Void>	execute(IInternalAccess ia)
 									{
 										SServiceProvider.getService(ia.getServiceContainer(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -856,7 +854,6 @@ public class ComponentTreePanel extends JSplitPane
 		access.scheduleStep(new IComponentStep<IComponentManagementService>()
 		{
 			@Classname("init")
-			@XMLClassname("init")
 			public IFuture<IComponentManagementService> execute(IInternalAccess ia)
 			{
 				final Future<IComponentManagementService> ret = new Future<IComponentManagementService>();

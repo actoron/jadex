@@ -23,8 +23,8 @@ import jadex.commons.gui.EditableList;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import jadex.commons.gui.jtable.DateTimeRenderer;
-import jadex.xml.annotation.XMLClassname;
-import jadex.xml.annotation.XMLIncludeFields;
+import jadex.commons.transformation.annotations.Classname;
+import jadex.commons.transformation.annotations.IncludeFields;
 
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -393,7 +393,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					final boolean on = cb.isSelected();
 					component.scheduleStep(new IComponentStep<Void>()
 					{
-						@XMLClassname("deoractivateDiscoveryMechanism")
+						@Classname("deoractivateDiscoveryMechanism")
 						public IFuture<Void> execute(final IInternalAccess ia)
 						{
 							final Future<Void>	ret	= new Future<Void>();
@@ -587,7 +587,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 		final Future<Void>	ret	= new Future<Void>();
 		component.scheduleStep(new IComponentStep<AwarenessSettings>()
 		{
-			@XMLClassname("refreshSettings")
+			@Classname("refreshSettings")
 			public IFuture<AwarenessSettings> execute(IInternalAccess ia)
 			{
 				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
@@ -621,7 +621,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	{
 		component.scheduleStep(new IComponentStep<DiscoveryInfo[]>()
 		{
-			@XMLClassname("getDiscoveryInfos")
+			@Classname("getDiscoveryInfos")
 			public IFuture<DiscoveryInfo[]> execute(IInternalAccess ia)
 			{
 				AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
@@ -663,7 +663,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	{
 		component.scheduleStep(new IComponentStep<Set<String>>()
 		{
-			@XMLClassname("getDiscoveryMechanisms")
+			@Classname("getDiscoveryMechanisms")
 			public IFuture<Set<String>> execute(IInternalAccess ia)
 			{
 				final Future<Set<String>> ret = new Future<Set<String>>();
@@ -724,7 +724,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			this.settings	= settings;	// todo: wait for step before setting?
 			component.scheduleStep(new IComponentStep<Void>()
 			{
-				@XMLClassname("applySettings")
+				@Classname("applySettings")
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					AwarenessManagementAgent agent	= (AwarenessManagementAgent)ia;
@@ -788,7 +788,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 	/**
 	 *  The awareness settings transferred between GUI and agent.
 	 */
-	@XMLIncludeFields
+	@IncludeFields
 	public static class AwarenessSettings
 	{
 		/** The inet address. */
@@ -1024,7 +1024,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 					AwarenessAgentPanel.this.panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 					AwarenessAgentPanel.this.component.scheduleStep(new IComponentStep<Void>()
 					{
-						@XMLClassname("createDeleteProxy")
+						@Classname("createDeleteProxy")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
 							AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;

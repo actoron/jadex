@@ -34,8 +34,8 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.ExternalAccess;
-import jadex.xml.annotation.XMLClassname;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -925,7 +925,7 @@ public class RemoteReferenceModule
 		
 		rsms.getComponent().scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("startRenewal")
+			@Classname("startRenewal")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(renewid == RemoteReferenceModule.this.renewid)
@@ -1021,7 +1021,7 @@ public class RemoteReferenceModule
 		
 		rsms.getComponent().scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("startRemoval")
+			@Classname("startRemoval")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(removeid == RemoteReferenceModule.this.removeid)

@@ -9,7 +9,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -90,7 +90,7 @@ public class BlocksworldGui	extends JFrame
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("start")
+			@Classname("start")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -183,7 +183,7 @@ public class BlocksworldGui	extends JFrame
 								newblocks.removeAllElements();
 								agent.scheduleStep(new IComponentStep<Void>()
 								{
-									@XMLClassname("clear")
+									@Classname("clear")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -223,7 +223,7 @@ public class BlocksworldGui	extends JFrame
 							{
 								agent.scheduleStep(new IComponentStep<Void>()
 								{
-									@XMLClassname("configure")
+									@Classname("configure")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -286,7 +286,7 @@ public class BlocksworldGui	extends JFrame
 							{
 								agent.scheduleStep(new IComponentStep<Void>()
 								{
-									@XMLClassname("createBlock")
+									@Classname("createBlock")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -349,7 +349,7 @@ public class BlocksworldGui	extends JFrame
 								delblocks.removeElement(block);
 								agent.scheduleStep(new IComponentStep<Void>()
 								{
-									@XMLClassname("deleteBlock")
+									@Classname("deleteBlock")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -384,7 +384,7 @@ public class BlocksworldGui	extends JFrame
 								final Object sel = mode.getSelectedItem();
 								agent.scheduleStep(new IComponentStep<Void>()
 								{
-									@XMLClassname("mode")
+									@Classname("mode")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -401,7 +401,7 @@ public class BlocksworldGui	extends JFrame
 							{
 								agent.scheduleStep(new IComponentStep<Void>()
 								{
-									@XMLClassname("step")
+									@Classname("step")
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
 										IBDIInternalAccess bia = (IBDIInternalAccess)ia;
@@ -481,7 +481,7 @@ public class BlocksworldGui	extends JFrame
 						
 						agent.scheduleStep(new IComponentStep<Void>()
 						{
-							@XMLClassname("disp")
+							@Classname("disp")
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
 								IBDIInternalAccess bia = (IBDIInternalAccess)ia;

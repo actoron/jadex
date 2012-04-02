@@ -47,9 +47,9 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
-import jadex.xml.annotation.XMLClassname;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -1060,7 +1060,7 @@ public class MessageService extends BasicService implements IMessageService
 	{
 		component.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("sendAlive")
+			@Classname("sendAlive")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				System.out.println("sendAlive: "+pcons+" "+icons);
@@ -1105,7 +1105,7 @@ public class MessageService extends BasicService implements IMessageService
 	{
 		component.scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("checkAlive")
+			@Classname("checkAlive")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 //				final IComponentStep<Void> step = this;

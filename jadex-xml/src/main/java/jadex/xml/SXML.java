@@ -1,7 +1,6 @@
 package jadex.xml;
 
-import jadex.xml.annotation.XMLClassname;
-import jadex.xml.bean.JavaWriter;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -40,21 +39,21 @@ public class SXML
 	/**
 	 *  Get the xmlclassname annotation.
 	 */
-	public static XMLClassname getXMLClassnameAnnotation(Class clazz)
+	public static Classname getXMLClassnameAnnotation(Class clazz)
 	{
-		XMLClassname	xmlc	= null;
+		Classname	xmlc	= null;
 		// Find annotation in fields or methods of class, because annotations are not supported on anonymous classes directly.
 		Field[] fields = clazz.getDeclaredFields();
 		for(int i=0; xmlc==null && i<fields.length; i++)
 		{
-			xmlc	= fields[i].getAnnotation(XMLClassname.class);
+			xmlc	= fields[i].getAnnotation(Classname.class);
 		}
 		if(xmlc==null)
 		{
 			Method[]	methods	= clazz.getDeclaredMethods();
 			for(int i=0; xmlc==null && i<methods.length; i++)
 			{
-				xmlc	= methods[i].getAnnotation(XMLClassname.class);
+				xmlc	= methods[i].getAnnotation(Classname.class);
 			}
 		}
 		return xmlc;

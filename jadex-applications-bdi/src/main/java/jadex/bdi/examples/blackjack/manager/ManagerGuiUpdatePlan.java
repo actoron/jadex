@@ -8,7 +8,7 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.bridge.fipa.SFipa;
 import jadex.commons.future.IFuture;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.EventQueue;
 
@@ -72,7 +72,7 @@ public class ManagerGuiUpdatePlan extends Plan
 		
 		getExternalAccess().scheduleStep(new IComponentStep<Void>()
 		{
-			@XMLClassname("guidispose")
+			@Classname("guidispose")
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				IBDIInternalAccess bia = (IBDIInternalAccess)ia;

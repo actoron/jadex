@@ -13,6 +13,7 @@ import jadex.commons.SUtil;
 import jadex.commons.SimplePropertyObject;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.IPerceptProcessor;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -22,7 +23,6 @@ import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.Vector1Double;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
-import jadex.xml.annotation.XMLClassname;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -129,7 +129,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 								{
 									exta.scheduleStep(new IComponentStep<Void>()
 									{
-										@XMLClassname("add")
+										@Classname("add")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -150,7 +150,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 								{
 									exta.scheduleStep(new IComponentStep<Void>()
 									{
-										@XMLClassname("remove")
+										@Classname("remove")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -171,7 +171,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 								{
 									exta.scheduleStep(new IComponentStep<Void>()
 									{
-										@XMLClassname("set")
+										@Classname("set")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -192,7 +192,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 								{
 									exta.scheduleStep(new IComponentStep<Void>()
 									{
-										@XMLClassname("unset")
+										@Classname("unset")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
@@ -213,7 +213,7 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 								{
 									exta.scheduleStep(new IComponentStep<Void>()
 									{
-										@XMLClassname("removeoutdated")
+										@Classname("removeoutdated")
 										public IFuture<Void> execute(IInternalAccess ia)
 										{
 											IBDIInternalAccess	scope	= (IBDIInternalAccess)ia;
