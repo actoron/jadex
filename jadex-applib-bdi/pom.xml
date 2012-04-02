@@ -220,13 +220,11 @@
 			<dependency> <groupId>jcq2k</groupId> <artifactId>jcq2k</artifactId>
 			<version>1</version> </dependency>
 		-->
-	<!-- 
 		<dependency>
 			<groupId>jivesoftware</groupId>
 			<artifactId>smack</artifactId>
-			<version>3.0.4</version>
+			<version>3.1.0</version>
 		</dependency>
- -->
 		<dependency>
 			<groupId>jivesoftware</groupId>
 			<artifactId>smackx</artifactId>
