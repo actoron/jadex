@@ -4,6 +4,7 @@ import java.io.File;
 
 import com.maxmind.geoip.Location;
 import com.maxmind.geoip.LookupService;
+import com.maxmind.geoip.regionName;
 
 /**
  *  Helper object to resolve IP addresses to Geo locations.
@@ -66,6 +67,35 @@ public class GeoIPService
 			{
 				Location	loc	= ls.getLocation(ip);
 				ret	= loc.city;
+			}
+			catch(Exception e)
+			{
+				// Ignore errors and let relay work without stats.
+				System.err.println("Warning: Could not get Geo location: "+ e);
+			}
+		}
+		
+		if(ret==null)
+		{
+			ret	= "unknown";
+		}
+		
+		return ret;
+	}
+
+	/**
+	 *  Fetch region name for an IP address.
+	 */
+	public String	getRegion(String ip)
+	{
+		String	ret	= null;
+		
+		if(ls!=null)
+		{
+			try
+			{
+				Location	loc	= ls.getLocation(ip);
+				ret	= regionName.regionNameByCode(loc.countryCode, loc.region);
 			}
 			catch(Exception e)
 			{

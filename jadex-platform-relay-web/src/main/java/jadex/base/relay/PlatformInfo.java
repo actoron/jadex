@@ -259,6 +259,15 @@ public class PlatformInfo
 	}
 	
 	/**
+	 *  Get the region (e.g. federal state).
+	 *  Dynamically resolved by GeoIP, if available.
+	 */
+	public String	getRegion()
+	{
+		return GeoIPService.getGeoIPService().getRegion(hostip);
+	}
+	
+	/**
 	 *  Get the country.
 	 *  Dynamically resolved by GeoIP, if available.
 	 */
