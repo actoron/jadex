@@ -27,16 +27,12 @@ import javassist.bytecode.DuplicateMemberException;
  * Introspector for Java beans. It uses the reflection to build up a map with
  * property infos (name, read/write method, etc.)
  */
-public class BeanDelegateReflectionIntrospector implements IBeanIntrospector, IBeanDelegateProvider
+public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospector implements IBeanDelegateProvider
 {
 	// -------- attributes --------
-
-	/** The cache for saving time for multiple lookups. */
-	protected LRU	beaninfos;
 	
 	/** Accessor delegate cache. */
 	protected Map<Class, IBeanAccessorDelegate> delegates;
-	//protected LRU	delegates;
 
 	// -------- constructors --------
 
@@ -53,288 +49,15 @@ public class BeanDelegateReflectionIntrospector implements IBeanIntrospector, IB
 	 */
 	public BeanDelegateReflectionIntrospector(int lrusize)
 	{
-		this.beaninfos = new LRU(lrusize);
+		super(lrusize);
 		this.delegates = new WeakHashMap<Class, IBeanAccessorDelegate>();
 	}
-
-	// -------- methods --------
-
-	/**
-	 * Get the bean properties for a specific clazz.
-	 */
-	public Map getBeanProperties(Class clazz, boolean includefields)
-	{
-		// includefields component of key is call based to avoid reflection calls during cache hits.
-		Tuple2<Class, Boolean> beaninfokey = new Tuple2<Class, Boolean>(clazz, includefields);
-		Map ret = (Map)beaninfos.get(beaninfokey);
-		
-		if(ret == null)
-		{
-			if (clazz.getAnnotation(IncludeFields.class) != null)
-				includefields = true;
-			try
-			{
-				Field incfield = clazz.getField("INCLUDE_FIELDS");
-				if (incfield.getBoolean(null))
-					includefields = true;
-			}
-			catch (Exception e)
-			{
-			}
-			
-			Method[] ms = clazz.getMethods();
-			HashMap getters = new HashMap();
-			ArrayList setters = new ArrayList();
-			for(int i = 0; i < ms.length; i++)
-			{
-				String method_name = ms[i].getName();
-				if((method_name.startsWith("is") || method_name.startsWith("get"))
-					&& ms[i].getParameterTypes().length == 0)
-				{
-					getters.put(method_name, ms[i]);
-				}
-				else if(method_name.startsWith("set")
-					&& ms[i].getParameterTypes().length == 1)
-				{
-					setters.add(ms[i]);
-				}
-			}
-
-			ret = new HashMap();
-			Iterator it = setters.iterator();
-
-			while(it.hasNext())
-			{
-				Method setter = (Method)it.next();
-				String setter_name = setter.getName();
-				String property_name = setter_name.substring(3);
-				Method getter = (Method)getters.get("get" + property_name);
-				if(getter == null)
-					getter = (Method)getters.get("is" + property_name);
-
-				if(getter != null)
-				{
-					Class[] setter_param_type = setter.getParameterTypes();
-					String property_java_name = Character.toLowerCase(property_name.charAt(0))
-						+ property_name.substring(1);
-					ret.put(property_java_name, new BeanProperty(property_java_name, 
-						getter.getReturnType(), getter, setter, setter_param_type[0], this));
-				}
-			}
-
-			// Get all public fields.
-			Field[] fields = clazz.getFields();
-			for(int i = 0; i < fields.length; i++)
-			{
-				String property_java_name = fields[i].getName();
-				if((includefields || fields[i].getAnnotation(Include.class) != null) && !ret.containsKey(property_java_name))
-				{
-					ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
-				}
-			}
-			
-			/*if(includefields)
-			{
-				Field[] fields = clazz.getFields();
-				for(int i = 0; i < fields.length; i++)
-				{
-					String property_java_name = fields[i].getName();
-					if(!ret.containsKey(property_java_name))
-					{
-						ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
-					}
-				}
-			}*/
-//			else
-//			{
-//				Field[] fields = clazz.getFields();
-//				for(int i = 0; i < fields.length; i++)
-//				{
-//					String property_java_name = fields[i].getName();
-//					if(!ret.containsKey(property_java_name))
-//					{
-//						ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
-//					}
-//				}
-//			}
-
-			// Get final values (val$xyz fields) for anonymous classes.
-			if(clazz.isAnonymousClass())
-			{
-				fields = clazz.getDeclaredFields();
-				for(int i = 0; i < fields.length; i++)
-				{
-					String property_java_name = fields[i].getName();
-					if(property_java_name.startsWith("val$"))
-					{
-						property_java_name = property_java_name.substring(4);
-						if(!ret.containsKey(property_java_name))
-						{
-							ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
-						}
-					}
-				}
-			}
-
-			beaninfos.put(beaninfokey, ret);
-		}
-
-		return ret;
-	}
-	
-	/*public IBeanAccessorDelegate getDelegate(Class clazz)
-	{
-		MappedBeanAccessorDelegate ret = (MappedBeanAccessorDelegate) delegates.get(clazz);
-		
-		if (ret == null)
-		{
-			ret = new MappedBeanAccessorDelegate();
-			Map properties = getBeanProperties(clazz, true);
-			ClassLoader cl = clazz.getClassLoader();
-			ClassPool pool = new ClassPool(null);
-			pool.appendSystemPath();
-			pool.insertClassPath(new ClassClassPath(clazz));
-			for (Object entry : properties.entrySet())
-			{
-				try
-				{
-					String propname = (String) ((Map.Entry) entry).getKey();
-					BeanProperty prop = (BeanProperty) ((Map.Entry) entry).getValue();
-					
-					CtClass gcclazz = pool.makeClass(this.getClass().getPackage().getName() + "." +
-							clazz + "AccessorDelegate" + propname + "Getter");
-					CtClass gcinterface = pool.get(IResultCommand.class.getName());
-					gcclazz.addInterface(gcinterface);
-					
-					StringBuilder methodsrc = new StringBuilder();
-					methodsrc.append("public Object execute(Object args) { return ");
-					if (prop.getGetter() != null)
-					{
-						if (prop.getType().isPrimitive())
-						{
-							methodsrc.append("new ");
-							methodsrc.append(SReflect.getWrappedType(prop.getType()).getCanonicalName());
-							methodsrc.append("(");
-						}
-						methodsrc.append("((");
-						methodsrc.append(clazz.getCanonicalName());
-						methodsrc.append(") args).");
-						methodsrc.append(prop.getGetter().getName());
-						methodsrc.append("()");
-						if (prop.getType().isPrimitive())
-						{
-							methodsrc.append(")");
-						}
-						methodsrc.append("; } ");
-					}
-					else
-					{
-						if (prop.getType().isPrimitive())
-						{
-							methodsrc.append("new ");
-							methodsrc.append(SReflect.getWrappedType(prop.getType()).getCanonicalName());
-							methodsrc.append("(");
-						}
-						methodsrc.append("((");
-						methodsrc.append(clazz.getCanonicalName());
-						methodsrc.append(") args).");
-						methodsrc.append(prop.getField().getName());
-						if (prop.getType().isPrimitive())
-							methodsrc.append(")");
-						methodsrc.append("; } ");
-					}
-					CtMethod gcmethod = CtMethod.make(methodsrc.toString(), gcclazz);
-					gcclazz.addMethod(gcmethod);
-					Class gcommandclass = gcclazz.toClass(cl, clazz.getProtectionDomain());
-					ret.addGetCommand(propname, (IResultCommand) gcommandclass.newInstance());
-					
-					CtClass scclazz = pool.makeClass(this.getClass().getPackage().getName() + "." +
-							clazz + "AccessorDelegate" + propname + "Setter");
-					CtClass scinterface = pool.get(ICommand.class.getName());
-					scclazz.addInterface(scinterface);
-					
-					methodsrc = new StringBuilder();
-					methodsrc.append("public void execute(Object args) { Object object = ((Object[]) args)[0]; Object value = ((Object[]) args)[1]; ");
-					if (prop.getSetter() != null)
-					{
-						// Method access
-						methodsrc.append("((");
-						methodsrc.append(clazz.getCanonicalName());
-						methodsrc.append(") object).");
-						methodsrc.append(prop.getSetter().getName());
-						methodsrc.append("(");
-						if (boolean.class.equals(prop.getType()))
-						{
-							methodsrc.append("((Boolean) value).booleanValue()");
-						}
-						else if (char.class.equals(prop.getType()))
-						{
-							methodsrc.append("((Character) value).charValue()");
-						}
-						else if (prop.getType().isPrimitive())
-						{
-							methodsrc.append("((java.lang.Number) value).");
-							methodsrc.append(prop.getType().getSimpleName());
-							methodsrc.append("Value()");
-						}
-						else
-						{
-							methodsrc.append("(");
-							methodsrc.append(prop.getSetterType().getCanonicalName());
-							methodsrc.append(") value");
-						}
-						methodsrc.append("); }");
-					}
-					else
-					{
-						// Field access
-						methodsrc.append("((");
-						methodsrc.append(clazz.getCanonicalName());
-						methodsrc.append(") object).");
-						methodsrc.append(prop.getField().getName());
-						methodsrc.append("=");
-						if (boolean.class.equals(prop.getType()))
-						{
-							methodsrc.append("((Boolean) value).booleanValue()");
-						}
-						else if (char.class.equals(prop.getType()))
-						{
-							methodsrc.append("((Character) value).charValue()");
-						}
-						else if (prop.getType().isPrimitive())
-						{
-							methodsrc.append("((java.lang.Number) value).");
-							methodsrc.append(prop.getType().getSimpleName());
-							methodsrc.append("Value()");
-						}
-						else
-						{
-							methodsrc.append("((");
-							methodsrc.append(prop.getSetterType().getCanonicalName());
-							methodsrc.append(") value);");
-						}
-						methodsrc.append("}");
-					}
-					
-					CtMethod scmethod = CtMethod.make(methodsrc.toString(), scclazz);
-					scclazz.addMethod(scmethod);
-					Class scommandclass = scclazz.toClass(cl, clazz.getProtectionDomain());
-					ret.addSetCommand(propname, (ICommand) scommandclass.newInstance());
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-			
-			delegates.put(clazz, ret);
-		}
-		
-		return ret;
-	}*/
 	
 	/**
-	 * 
+	 *  Retrieves a bean access delegate for fast access to bean properties.
+	 *  
+	 *  @param clazz The bean class.
+	 *  @return The bean access delegate.
 	 */
 	public IBeanAccessorDelegate getDelegate(Class clazz)
 	{
@@ -492,7 +215,7 @@ public class BeanDelegateReflectionIntrospector implements IBeanIntrospector, IB
 					}
 					catch(Exception e2)
 					{
-						throw new RuntimeException(e);
+						throw new RuntimeException(e2);
 					}
 				}
 				ret = (IBeanAccessorDelegate) delegateclazz.newInstance();
@@ -500,12 +223,37 @@ public class BeanDelegateReflectionIntrospector implements IBeanIntrospector, IB
 			}
 			catch(Exception e)
 			{
-				System.out.println(delegates.toString());
-				System.out.println(clazz);
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Creates a bean property based on getter/setter.
+	 *  
+	 *  @param name Property name
+	 *  @param type Property type.
+	 *  @param getter The getter method.
+	 *  @param setter The setter method.
+	 *  @param settertype The type used by the setter.
+	 *  @return The bean property.
+	 */
+	protected BeanProperty createBeanProperty(String name, Class type, Method getter, Method setter, Class settertype)
+	{
+		return new BeanProperty(name, type, getter, setter, settertype, this);
+	}
+	
+	/**
+	 *  Creates a bean property based on a field.
+	 * 
+	 *  @param name Property name
+	 *  @param field The field.
+	 *  @return The bean property.
+	 */
+	protected BeanProperty createBeanProperty(String name, Field field)
+	{
+		return new BeanProperty(name, field, this);
 	}
 }

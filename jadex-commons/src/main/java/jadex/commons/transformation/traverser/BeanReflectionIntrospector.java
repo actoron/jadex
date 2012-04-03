@@ -1,7 +1,12 @@
 package jadex.commons.transformation.traverser;
 
+import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
+import jadex.commons.transformation.annotations.Exclude;
+import jadex.commons.transformation.annotations.Include;
+import jadex.commons.transformation.annotations.IncludeFields;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -46,10 +51,24 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	 */
 	public Map getBeanProperties(Class clazz, boolean includefields)
 	{
-		Map ret = (Map)beaninfos.get(clazz);
-
+		// includefields component of key is call based to avoid reflection calls during cache hits.
+		Tuple2<Class, Boolean> beaninfokey = new Tuple2<Class, Boolean>(clazz, includefields);
+		Map ret = (Map)beaninfos.get(beaninfokey);
+		
 		if(ret == null)
 		{
+			if (clazz.getAnnotation(IncludeFields.class) != null)
+				includefields = true;
+			try
+			{
+				Field incfield = clazz.getField("INCLUDE_FIELDS");
+				if (incfield.getBoolean(null))
+					includefields = true;
+			}
+			catch (Exception e)
+			{
+			}
+			
 			Method[] ms = clazz.getMethods();
 			HashMap getters = new HashMap();
 			ArrayList setters = new ArrayList();
@@ -85,13 +104,36 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 					Class[] setter_param_type = setter.getParameterTypes();
 					String property_java_name = Character.toLowerCase(property_name.charAt(0))
 						+ property_name.substring(1);
-					ret.put(property_java_name, new BeanProperty(property_java_name, 
-						getter.getReturnType(), getter, setter, setter_param_type[0], null));
+					
+					Annotation exclude = null;
+					try
+					{
+						exclude = clazz.getField(property_name).getAnnotation(Exclude.class);
+					}
+					catch(NoSuchFieldException e)
+					{
+					}
+					
+					if (exclude == null)
+					{
+						ret.put(property_java_name, createBeanProperty(property_java_name, 
+							getter.getReturnType(), getter, setter, setter_param_type[0]));
+					}
 				}
 			}
 
 			// Get all public fields.
-			if(includefields)
+			Field[] fields = clazz.getFields();
+			for(int i = 0; i < fields.length; i++)
+			{
+				String property_java_name = fields[i].getName();
+				if((includefields || fields[i].getAnnotation(Include.class) != null) && fields[i].getAnnotation(Exclude.class) == null && !ret.containsKey(property_java_name))
+				{
+					ret.put(property_java_name, createBeanProperty(property_java_name, fields[i]));
+				}
+			}
+			
+			/*if(includefields)
 			{
 				Field[] fields = clazz.getFields();
 				for(int i = 0; i < fields.length; i++)
@@ -102,7 +144,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 						ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
 					}
 				}
-			}
+			}*/
 //			else
 //			{
 //				Field[] fields = clazz.getFields();
@@ -119,7 +161,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 			// Get final values (val$xyz fields) for anonymous classes.
 			if(clazz.isAnonymousClass())
 			{
-				Field[] fields = clazz.getDeclaredFields();
+				fields = clazz.getDeclaredFields();
 				for(int i = 0; i < fields.length; i++)
 				{
 					String property_java_name = fields[i].getName();
@@ -128,15 +170,42 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 						property_java_name = property_java_name.substring(4);
 						if(!ret.containsKey(property_java_name))
 						{
-							ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
+							ret.put(property_java_name, createBeanProperty(property_java_name, fields[i]));
 						}
 					}
 				}
 			}
 
-			beaninfos.put(clazz, ret);
+			beaninfos.put(beaninfokey, ret);
 		}
 
 		return ret;
+	}
+	
+	/**
+	 *  Creates a bean property based on getter/setter.
+	 *  
+	 *  @param name Property name
+	 *  @param type Property type.
+	 *  @param getter The getter method.
+	 *  @param setter The setter method.
+	 *  @param settertype The type used by the setter.
+	 *  @return The bean property.
+	 */
+	protected BeanProperty createBeanProperty(String name, Class type, Method getter, Method setter, Class settertype)
+	{
+		return new BeanProperty(name, type, getter, setter, settertype, null);
+	}
+	
+	/**
+	 *  Creates a bean property based on a field.
+	 * 
+	 *  @param name Property name
+	 *  @param field The field.
+	 *  @return The bean property.
+	 */
+	protected BeanProperty createBeanProperty(String name, Field field)
+	{
+		return new BeanProperty(name, field, null);
 	}
 }

@@ -57,12 +57,13 @@ public class BeanProperty
 	/**
 	 *  Create a new bean property.
 	 */
-	public BeanProperty(String name, Field field)
+	public BeanProperty(String name, Field field, IBeanDelegateProvider delegateprovider)
 	{
 		this.name = name;
 		this.type = field.getType();
 		this.settertype = type;
 		this.field = field;
+		this.delegateprovider = delegateprovider;
 	}
 
 	//-------- methods --------
