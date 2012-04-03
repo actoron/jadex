@@ -36,6 +36,8 @@
 		FixedJComboBox.java,
 		BrowserLauncher2.java,
 		BeanDelegateReflectionIntrospector.java,
+		ImageProcessor.java,
+		ColorProcessor.java,
 		gui" />
 
 	

@@ -36,5 +36,11 @@ public interface IAndroidContextService {
 	 * @return {@link File}
 	 */
 	public File getFile(String name);
+	
+	/**
+	 * Gets an Android Shared Preference Container.
+	 * @param preferenceFileName
+	 */
+	public IPreferences getSharedPreferences(String preferenceFileName);
 
 }

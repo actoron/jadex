@@ -6,6 +6,7 @@ import jadex.android.JadexAndroidContextNotFoundError;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.android.IAndroidContextService;
+import jadex.bridge.service.types.android.IPreferences;
 import jadex.commons.future.IFuture;
 
 import java.io.File;
@@ -14,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 /**
  * Provides Access to the Android Application Context and 
@@ -49,9 +51,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	 */
 	@Override
 	public FileOutputStream openFileOutputStream(String name) throws FileNotFoundException {
-		if (context == null) {
-			throw new JadexAndroidContextNotFoundError();
-		}
+		checkContext();
 		return context.openFileOutput(name, Context.MODE_PRIVATE);
 	}
 	
@@ -60,20 +60,22 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	 */
 	@Override
 	public FileInputStream openFileInputStream(String name) throws FileNotFoundException {
-		if (context == null) {
-			throw new JadexAndroidContextNotFoundError();
-		}
+		checkContext();
 		return context.openFileInput(name);
 	}
 	
 	@Override
 	public File getFile(String name) {
-		if (context == null) {
-			throw new JadexAndroidContextNotFoundError();
-		}
+		checkContext();
 		return context.getFileStreamPath(name);
 	}
-	
+
+
+	@Override
+	public IPreferences getSharedPreferences(String name) {
+		checkContext();
+		return AndroidSharedPreferencesWrapper.wrap(context.getSharedPreferences(name, Context.MODE_PRIVATE));
+	}
 
 	@Override
 	public void onContextDestroy(Context ctx) {
@@ -84,6 +86,10 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	public void onContextCreate(Context ctx) {
 		this.context = ctx;
 	}
-
 	
+	private void checkContext() throws JadexAndroidContextNotFoundError {
+		if (context == null) {
+			throw new JadexAndroidContextNotFoundError();
+		}
+	}
 }

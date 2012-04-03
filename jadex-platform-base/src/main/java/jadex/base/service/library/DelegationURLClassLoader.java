@@ -48,7 +48,11 @@ public class DelegationURLClassLoader extends URLClassLoader
 	 */
 	public DelegationURLClassLoader(IResourceIdentifier rid, ClassLoader basecl, DelegationURLClassLoader[] delegates)
 	{
+		/* $if !android $ */
 		super(rid!=null && rid.getLocalIdentifier()!=null? new URL[]{rid.getLocalIdentifier().getUrl()}: new URL[0], null);
+		/* $else $
+		super(rid!=null && rid.getLocalIdentifier()!=null? new URL[]{rid.getLocalIdentifier().getUrl()}: new URL[0], basecl);
+		$endif $ */
 		this.rid = rid;
 		this.basecl	= basecl;
 		this.delegates = delegates;
