@@ -44,24 +44,8 @@ public class ImageCodec extends AbstractCodec
 		// This is correct because this byte array is a technical object specific to the image and
 		// is not part of the object graph proper.
 		byte[] encimage = (byte[]) BinarySerializer.decodeObject(context);
+		ret = SGUI.imageFromBytes(encimage, clazz);
 		
-		String classname = SReflect.getClassName(clazz);
-		if(classname.indexOf("Toolkit")!=-1)
-		{
-			Toolkit t = Toolkit.getDefaultToolkit();
-			ret = t.createImage(encimage);
-		}
-		else
-		{
-			try
-			{
-				ret = ImageIO.read(new ByteArrayInputStream(encimage));
-			}
-			catch (IOException e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
 		return ret;
 	}
 	
@@ -81,15 +65,8 @@ public class ImageCodec extends AbstractCodec
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		try
-		{
-			byte[] encimg = SGUI.imageToStandardBytes((Image) object, "image/png");
-			traverser.traverse(encimg, encimg.getClass(), traversed, processors, clone, ec);
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		} 
+		byte[] encimg = SGUI.imageToStandardBytes((Image) object, "image/png");
+		traverser.traverse(encimg, encimg.getClass(), traversed, processors, clone, ec);
 		
 		return object;
 	}

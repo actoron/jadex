@@ -1,6 +1,7 @@
 package jadex.commons.gui;
 
 
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 
 import java.awt.BorderLayout;
@@ -30,6 +31,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -541,19 +543,45 @@ public class SGUI
 	}
 	
 	/**
+	 * 
+	 */
+	public static Image imageFromBytes(byte[] data, Class<?> clazz)
+	{
+		Image ret;
+		String classname = SReflect.getClassName(clazz);
+		if(classname.indexOf("Toolkit")!=-1)
+		{
+			Toolkit t = Toolkit.getDefaultToolkit();
+			ret = t.createImage(data);
+		}
+		else
+		{
+			try
+			{
+				ret = ImageIO.read(new ByteArrayInputStream(data));
+			}
+			catch (IOException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		return ret;
+	}
+	
+	/**
 	 *  Convert image to bytes.
 	 *  
 	 *  Method is a direct copy from protected method
 	 *  sun.awt.datatransfer.DataTransferer
 	 */
-	public static byte[] imageToStandardBytes(Image image, String mimeType) throws IOException
+	public static byte[] imageToStandardBytes(Image image, String mimeType)
 	{
 		IOException originalIOE = null;
 		Iterator writerIterator = ImageIO.getImageWritersByMIMEType(mimeType);
 		if(!writerIterator.hasNext())
 		{
-			throw new IOException("No registered service provider can encode "
-					+ " an image to " + mimeType);
+			throw new RuntimeException(new IOException("No registered service provider can encode "
+					+ " an image to " + mimeType));
 		}
 		if(image instanceof RenderedImage)
 		{
@@ -603,11 +631,11 @@ public class SGUI
 		{
 			if(originalIOE != null)
 			{
-				throw originalIOE;
+				throw new RuntimeException(originalIOE);
 			}
 			else
 			{
-				throw ioe;
+				throw new RuntimeException(ioe);
 			}
 		}
 	}

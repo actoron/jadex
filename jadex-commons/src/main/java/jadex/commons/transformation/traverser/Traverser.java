@@ -34,6 +34,7 @@ public class Traverser
 	{
 		processors = new ArrayList<ITraverseProcessor>();
 		processors.add(new ExcludeProcessor());
+		processors.add(new ImmutableProcessor());
 		processors.add(new CloneProcessor());
 		processors.add(new ArrayProcessor());
 		processors.add(new ListProcessor());
@@ -42,6 +43,9 @@ public class Traverser
 		processors.add(new CollectionProcessor());
 		processors.add(new IteratorProcessor());
 		processors.add(new EnumerationProcessor());
+		processors.add(new ColorProcessor());
+		processors.add(new LogRecordProcessor());
+		processors.add(new ImageProcessor());
 		processors.add(new BeanProcessor());
 //		processors.add(new FieldProcessor());
 	}
@@ -153,7 +157,7 @@ public class Traverser
 	}
 	
 	/**
-	 * Special handling for duplicate objects.
+	 *  Special handling for duplicate objects.
 	 */
 	public void handleDuplicate(Object object, Class<?> clazz, Object match, 
 			List<ITraverseProcessor> processors, boolean clone, Object context)

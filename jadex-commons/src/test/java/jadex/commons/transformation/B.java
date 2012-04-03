@@ -1,4 +1,4 @@
-package jadex.xml.test;
+package jadex.commons.transformation;
 
 
 public class B

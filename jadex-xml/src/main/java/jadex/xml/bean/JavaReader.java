@@ -5,6 +5,7 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.gui.SGUI;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -477,15 +478,17 @@ public class JavaReader
 						byte[] data = Base64.decode(encdata.getBytes());
 						
 						String classname = (String)rawattributes.get("classname");
-						if(classname.indexOf("Toolkit")!=-1)
-						{
-							Toolkit t = Toolkit.getDefaultToolkit();
-							ret = t.createImage(data);
-						}
-						else
-						{
-							ret = ImageIO.read(new ByteArrayInputStream(data));
-						}
+						ret = SGUI.imageFromBytes(data, SReflect.findClass(classname, null, context.getClassLoader()));
+						
+//						if(classname.indexOf("Toolkit")!=-1)
+//						{
+//							Toolkit t = Toolkit.getDefaultToolkit();
+//							ret = t.createImage(data);
+//						}
+//						else
+//						{
+//							ret = ImageIO.read(new ByteArrayInputStream(data));
+//						}
 						return ret;
 						/* $else $
 						return null;

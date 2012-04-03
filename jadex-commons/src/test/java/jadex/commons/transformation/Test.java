@@ -1,4 +1,4 @@
-package jadex.commons.binaryserializer.test;
+package jadex.commons.transformation;
 
 import jadex.commons.SReflect;
 import jadex.commons.Tuple;
@@ -30,13 +30,12 @@ import junit.framework.TestCase;
 /**
  *  Testcases for writer and reader.
  */
-public class Test extends TestCase
+public abstract class Test extends TestCase
 {
-	//-------- methods --------
 	/**
-	 *  Main for testing single methods.
+	 * 
 	 */
-	public static void main(String[] args)
+	public void performTests()
 	{
 //		try
 //		{
@@ -51,70 +50,68 @@ public class Test extends TestCase
 //			e.printStackTrace();
 //		}
 		
-		Test t = new Test();
-		
 		try
 		{
-			int cnt = 1;
+			int cnt = 1000;
 			long start = System.currentTimeMillis();
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-				t.testEnum();
-				t.testByte();
-				t.testDouble();
-//				t.testBigData();
-				t.testByteArray();
-				t.testBByteArray();
-				t.testIntArray();
-				t.testIntegerArray();
-				t.testDoubleArray();
-				t.testBDoubleArray();
-				t.testFloatArray();
-				t.testBFloatArray();
-				t.testLongArray();
-				t.testBLongArray();
-				t.testCharArray();
-				t.testCharacterArray();
-				t.testShortArray();
-				t.testBShortArray();
-				t.testBooleanArray();
-				t.testBBooleanArray();
-				t.testMultiCollection();
-				t.testEmptySet();
-				t.testEmptyList();
-				t.testEmptyMap();
-				t.testSpecialCharacter();
-				t.testBean();
-				t.testSelfReferenceBean();
-				t.testEmptyArray();
-				t.testArrayOrder();
-				t.testMultiArray();
-				t.testMultiArray2();
-				t.testMultiArrayAttribute();
-				t.testByteArrayAttribute();
-				t.testVectorModel();
-				t.testClass();
-				t.testDate();
-				t.testColor();
-				t.testArray();
-				t.testList();
-				t.testSet();
-				t.testMap();
-				t.testInnerClass();
-				t.testURL();
-				t.testLoggingLevel();
-				t.testLogRecord();
-				t.testInetAddress();
+				testEnum();
+				testByte();
+				testDouble();
+//				testBigData();
+				testByteArray();
+				testBByteArray();
+				testIntArray();
+				testIntegerArray();
+				testDoubleArray();
+				testBDoubleArray();
+				testFloatArray();
+				testBFloatArray();
+				testLongArray();
+				testBLongArray();
+				testCharArray();
+				testCharacterArray();
+				testShortArray();
+				testBShortArray();
+				testBooleanArray();
+				testBBooleanArray();
+				testMultiCollection();
+				testEmptySet();
+				testEmptyList();
+				testEmptyMap();
+				testSpecialCharacter();
+				testBean();
+				testSelfReferenceBean();
+				testEmptyArray();
+				testArrayOrder();
+				testMultiArray();
+				testMultiArray2();
+				testMultiArrayAttribute();
+				testByteArrayAttribute();
+				testVectorModel();
+				testClass();
+				testDate();
+				testColor();
+				testArray();
+				testList();
+				testSet();
+				testMap();
+				testInnerClass();
+				testURL();
+				testLoggingLevel();
+				testLogRecord();
+				testInetAddress();
 				
-				t.testBeanWithPublicFields();
-				t.testBeanWithIncludedFields();
-				t.testAnonymousInnerClass();
-				t.testAnonymousInnerClassWithSimpleTypes();
+				testBeanWithPublicFields();
+				testBeanWithIncludedFields();
+				testAnonymousInnerClass();
+				testAnonymousInnerClassWithSimpleTypes();
 				
-				t.testImage();
-				t.testTuple();
-				t.testTuple2();
+				testImage();
+				testTuple();
+				testTuple2();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -142,11 +139,11 @@ public class Test extends TestCase
 	protected void doWriteAndRead(Object wo, Comparator comp) throws Exception
 	{
 		//(new RuntimeException()).printStackTrace();
-		byte[] serialized = BinarySerializer.objectToByteArray(wo, null, null, null);
+		Object written = doWrite(wo);
 		
 //		System.out.println("xml is:"+new String(xml));
 		
-		Object ro = BinarySerializer.objectFromByteArray(serialized, null, null, null);
+		Object ro = doRead(written);
 		
 //		String xml = JavaWriter.objectToXML(wo, null);
 		
@@ -165,12 +162,33 @@ public class Test extends TestCase
 //		System.out.println("Read: "+ro+" / class="+ro.getClass());
 		
 //		System.out.println("equals: "+wo.equals(ro));
+		
+		compare(wo, ro, written, comp);
+		
+//		assertEquals("Written and read objects should be equal:", wo, ro);
+	}
+	
+	/**
+	 * 
+	 */
+	public abstract Object doWrite(Object wo);
+	
+	/**
+	 * 
+	 */
+	public abstract Object doRead(Object ro);
+	
+	/**
+	 * 
+	 */
+	public void compare(Object wo, Object ro, Object written, Comparator comp)
+	{
 		if(comp!=null)
 		{
 			if(comp.compare(wo, ro)!=0)
 			{
 				throw new RuntimeException("Not equal: "+wo+", "+ro+"\n"
-					+wo.getClass()+" \n"+ro.getClass()+" \n"+serialized);
+					+wo.getClass()+" \n"+ro.getClass()+" \n"+written);
 			}
 		}
 		else
@@ -178,11 +196,9 @@ public class Test extends TestCase
 			if(!wo.equals(ro) && !(wo.getClass().isArray() && Arrays.deepEquals((Object[])wo, (Object[])ro)))
 			{
 				throw new RuntimeException("Not equal: "+wo+", "+ro+"\n"
-					+wo.getClass()+" \n"+ro.getClass()+" \n"+serialized);
+					+wo.getClass()+" \n"+ro.getClass()+" \n"+written);
 			}
 		}
-		
-//		assertEquals("Written and read objects should be equal:", wo, ro);
 	}
 	
 	/**

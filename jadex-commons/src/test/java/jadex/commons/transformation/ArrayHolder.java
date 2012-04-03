@@ -1,4 +1,4 @@
-package jadex.xml.test;
+package jadex.commons.transformation;
 
 import jadex.commons.SUtil;
 

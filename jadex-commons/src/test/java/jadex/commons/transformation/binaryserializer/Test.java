@@ -1,7 +1,4 @@
-package jadex.xml.test;
-
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
+package jadex.commons.transformation.binaryserializer;
 
 
 /**
@@ -17,7 +14,7 @@ public class Test extends jadex.commons.transformation.Test
 	 */
 	public Object doWrite(Object wo)
 	{
-		return JavaWriter.objectToByteArray(wo, null);
+		return BinarySerializer.objectToByteArray(wo, null, null, null);
 	}
 	
 	/**
@@ -25,7 +22,7 @@ public class Test extends jadex.commons.transformation.Test
 	 */
 	public Object doRead(Object ro) 
 	{
-		return JavaReader.objectFromByteArray((byte[])ro, null);
+		return BinarySerializer.objectFromByteArray((byte[])ro, null, null, null);
 	}
 	
 	/**
@@ -37,4 +34,3 @@ public class Test extends jadex.commons.transformation.Test
 		t.performTests();
 	}
 }
-

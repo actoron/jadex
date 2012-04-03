@@ -304,12 +304,23 @@ public class JavaWriter extends Writer
 					}
 				}
 			};
+			
+			// java.lang.Class
+			IObjectStringConverter oclconv = new IObjectStringConverter()
+			{
+				public String convertObject(Object val, IContext context)
+				{
+					String	ret	= SReflect.getClassName(val.getClass());
+					return ret;
+				}
+			};
+			
 			/* $if !android $ */
 			TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName("typeinfo:java.awt.image", "Image")), 
 				new ObjectInfo(Image.class), new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("imgdata", AccessInfo.THIS), new AttributeConverter(null, imgconv)),
 				new AttributeInfo(new AccessInfo("data", null, AccessInfo.IGNORE_READWRITE)),
-				new AttributeInfo(new AccessInfo("classname", null, null, null, new BeanAccessInfo(null, Object.class.getMethod("getClass", new Class[0]))))},
+				new AttributeInfo(new AccessInfo("classname", AccessInfo.THIS), new AttributeConverter(null, oclconv))},
 				null
 			));
 			/* $else $

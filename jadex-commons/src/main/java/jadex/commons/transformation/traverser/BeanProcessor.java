@@ -1,5 +1,9 @@
 package jadex.commons.transformation.traverser;
 
+import jadex.commons.SReflect;
+import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
+
+import java.lang.reflect.Constructor;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +13,9 @@ import java.util.Map;
  */
 public class BeanProcessor implements ITraverseProcessor
 {
-	protected BeanReflectionIntrospector intro = new BeanReflectionIntrospector();
+//	protected BeanReflectionIntrospector intro = new BeanReflectionIntrospector();
+	/** Bean introspector for inspecting beans. */
+	protected IBeanIntrospector intro = BeanIntrospectorFactory.getInstance().getBeanIntrospector(5000);
 	
 	/**
 	 *  Test if the processor is appliable.
@@ -68,12 +74,13 @@ public class BeanProcessor implements ITraverseProcessor
 				{
 					String name = (String)it.next();
 					BeanProperty prop = (BeanProperty)props.get(name);
-					Object val = prop.getGetter().invoke(object, new Object[0]);
+					Object val = prop.getPropertyValue(object, name);//getGetter().invoke(object, new Object[0]);
 					if(val!=null) 
 					{
 						Object newval = traverser.traverse(val, prop.getType(), cloned, processors, clone, context);
 						if(clone || val!=newval)
-							prop.getSetter().invoke(ret, new Object[]{newval});
+							prop.setPropertyValue(ret, name, newval);
+//							prop.getSetter().invoke(ret, new Object[]{newval});
 					}
 				}
 				catch(Exception e)
@@ -96,7 +103,22 @@ public class BeanProcessor implements ITraverseProcessor
 		{
 			try
 			{
-				ret = object.getClass().newInstance();
+				Constructor	c	= clazz.getDeclaredConstructors()[0];
+				c.setAccessible(true);
+				Class[] paramtypes = c.getParameterTypes();
+				Object[] paramvalues = new Object[paramtypes.length];
+				for(int i=0; i<paramtypes.length; i++)
+				{
+					if(paramtypes[i].equals(boolean.class))
+					{
+						paramvalues[i] = Boolean.FALSE;
+					}
+					else if(SReflect.isBasicType(paramtypes[i]))
+					{
+						paramvalues[i] = 0;
+					}
+				}
+				ret = c.newInstance(paramvalues);
 			}
 			catch(Exception e)
 			{

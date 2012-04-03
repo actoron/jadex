@@ -1,17 +1,18 @@
-package jadex.xml.test;
+package jadex.commons.transformation;
 
-public class C
+import jadex.commons.transformation.annotations.IncludeFields;
+
+@IncludeFields
+public class D
 {
-	public static boolean XML_INCLUDE_FIELDS = true;
-	
 	public String string;
 	public int integer;
 	
-	public C()
+	public D()
 	{
 	}
 
-	public C(String string, int integer)
+	public D(String string, int integer)
 	{
 		this.string = string;
 		this.integer = integer;
@@ -26,9 +27,9 @@ public class C
 	{
 		boolean ret = false;
 		
-		if(obj instanceof C)
+		if(obj instanceof D)
 		{
-			C other = (C)obj;
+			D other = (D)obj;
 			ret = string.equals(other.string) && integer==other.integer;
 		}
 		

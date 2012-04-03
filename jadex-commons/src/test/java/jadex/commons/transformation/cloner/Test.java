@@ -1,8 +1,6 @@
-package jadex.xml.test;
+package jadex.commons.transformation.cloner;
 
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
-
+import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  Testcases for writer and reader.
@@ -17,7 +15,7 @@ public class Test extends jadex.commons.transformation.Test
 	 */
 	public Object doWrite(Object wo)
 	{
-		return JavaWriter.objectToByteArray(wo, null);
+		return Traverser.traverseObject(wo, Traverser.getDefaultProcessors(), true, null);
 	}
 	
 	/**
@@ -25,7 +23,7 @@ public class Test extends jadex.commons.transformation.Test
 	 */
 	public Object doRead(Object ro) 
 	{
-		return JavaReader.objectFromByteArray((byte[])ro, null);
+		return ro;
 	}
 	
 	/**
@@ -37,4 +35,3 @@ public class Test extends jadex.commons.transformation.Test
 		t.performTests();
 	}
 }
-

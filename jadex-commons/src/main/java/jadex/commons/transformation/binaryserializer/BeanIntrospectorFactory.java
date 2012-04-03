@@ -1,6 +1,6 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.transformation.traverser.*;
+import jadex.commons.transformation.traverser.BeanDelegateReflectionIntrospector;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 
 public class BeanIntrospectorFactory {

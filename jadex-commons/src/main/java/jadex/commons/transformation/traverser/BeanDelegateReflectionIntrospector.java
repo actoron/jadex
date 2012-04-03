@@ -333,6 +333,9 @@ public class BeanDelegateReflectionIntrospector implements IBeanIntrospector, IB
 		return ret;
 	}*/
 	
+	/**
+	 * 
+	 */
 	public IBeanAccessorDelegate getDelegate(Class clazz)
 	{
 		IBeanAccessorDelegate ret = delegates.get(clazz);

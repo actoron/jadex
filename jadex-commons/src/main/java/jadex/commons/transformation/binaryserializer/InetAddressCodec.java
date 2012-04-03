@@ -63,7 +63,7 @@ public class InetAddressCodec extends AbstractCodec
 	public Object encode(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 			Traverser traverser, Map<Object, Object> traversed, boolean clone, EncodingContext ec)
 	{
-		ec.writeString(((InetAddress) object).getHostAddress());
+		ec.writeString(((InetAddress)object).getHostAddress());
 		
 		return object;
 	}
