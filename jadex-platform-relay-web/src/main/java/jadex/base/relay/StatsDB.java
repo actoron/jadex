@@ -1,5 +1,7 @@
 package jadex.base.relay;
 
+import jadex.bridge.ComponentIdentifier;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -73,9 +75,28 @@ public class StatsDB
 					+ "BYTES	DOUBLE,"
 					+ "TRANSTIME	DOUBLE)");
 			}
-			
-			// Create some prepared statements.
-//			update	= con.prepareStatement("INSERT INTO relay.platforminfo (PLATFORM, HOSTIP, HOSTNAME, SCHEME, TIME) VALUES (?, ?, ?, ?, ?)");
+			else
+			{
+				// Update platform entries where disconnection was missed.
+				con.createStatement().executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
+				
+				// Add platform prefix column, if it doesn't exist.
+				rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PREFIX");
+				if(!rs.next())
+				{
+					con.createStatement().execute("ALTER TABLE RELAY.PLATFORMINFO ADD PREFIX VARCHAR(60)");
+					PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PREFIX=? WHERE ID=?");
+					
+					rs	= con.createStatement().executeQuery("select ID, PLATFORM from relay.platforminfo");
+					while(rs.next())
+					{
+						int	param	= 1;
+						update.setString(param++, ComponentIdentifier.getPlatformPrefix(rs.getString("PLATFORM")));
+						update.setInt(param++, rs.getInt("ID"));
+						update.executeUpdate();
+					}
+				}
+			}
 		}
 		catch(Exception e)
 		{
@@ -100,8 +121,8 @@ public class StatsDB
 					if(insert==null)
 					{
 						insert	= con.prepareStatement("INSERT INTO relay.platforminfo"
-							+ " (PLATFORM, HOSTIP, HOSTNAME, SCHEME, CONTIME, DISTIME, MSGS, BYTES, TRANSTIME)"
-							+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+							+ " (PLATFORM, HOSTIP, HOSTNAME, SCHEME, CONTIME, DISTIME, MSGS, BYTES, TRANSTIME, PREFIX)"
+							+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 							Statement.RETURN_GENERATED_KEYS);
 					}
 					
@@ -115,6 +136,7 @@ public class StatsDB
 					insert.setInt(param++, pi.getMessageCount());
 					insert.setDouble(param++, pi.getBytes());
 					insert.setDouble(param++, pi.getTransferTime());
+					insert.setString(param++, ComponentIdentifier.getPlatformPrefix(pi.getId()));
 					insert.executeUpdate();
 					ResultSet	keys	= insert.getGeneratedKeys();
 					keys.next();
@@ -125,7 +147,7 @@ public class StatsDB
 					if(update==null)
 					{
 						update	= con.prepareStatement("UPDATE relay.platforminfo"
-							+" SET PLATFORM=?, HOSTIP=?, HOSTNAME=?, SCHEME=?, CONTIME=?, DISTIME=?, MSGS=?, BYTES=?, TRANSTIME=?"
+							+" SET PLATFORM=?, HOSTIP=?, HOSTNAME=?, SCHEME=?, CONTIME=?, DISTIME=?, MSGS=?, BYTES=?, TRANSTIME=?, PREFIX=?"
 							+" WHERE ID=?");
 					}
 					
@@ -139,6 +161,7 @@ public class StatsDB
 					update.setInt(param++, pi.getMessageCount());
 					update.setDouble(param++, pi.getBytes());
 					update.setDouble(param++, pi.getTransferTime());
+					update.setString(param++, ComponentIdentifier.getPlatformPrefix(pi.getId()));
 					update.setInt(param++, pi.getDBId().intValue());
 					update.executeUpdate();
 				}
@@ -154,7 +177,7 @@ public class StatsDB
 	/**
 	 *  Get all saved platform infos (sorted by recency, newest first).
 	 */
-	public PlatformInfo[]	getPlatformInfos()
+	public PlatformInfo[]	getAllPlatformInfos()
 	{
 		List<PlatformInfo>	ret	= new ArrayList<PlatformInfo>();
 		
@@ -168,6 +191,37 @@ public class StatsDB
 					ret.add(new PlatformInfo(new Integer(rs.getInt("ID")), rs.getString("PLATFORM"), rs.getString("HOSTIP"),
 						rs.getString("HOSTNAME"), rs.getString("SCHEME"), rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
 						rs.getInt("MSGS"), rs.getDouble("BYTES"), rs.getDouble("TRANSTIME")));
+				}
+			}
+			catch(Exception e)
+			{
+				// Ignore errors and let relay work without stats.
+				System.err.println("Warning: Could not read from relay stats DB: "+ e);
+			}
+		}
+		return ret.toArray(new PlatformInfo[ret.size()]);
+	}
+	
+	/**
+	 *  Get cumulated platform infos (sorted by recency, newest first).
+	 */
+	public PlatformInfo[]	getPlatformInfos()
+	{
+		List<PlatformInfo>	ret	= new ArrayList<PlatformInfo>();
+		
+		if(con!=null)
+		{
+			try
+			{
+				ResultSet	rs	= con.createStatement().executeQuery(
+					"select prefix as PLATFORM, hostip, max(HOSTNAME) as HOSTNAME, "
+					+"count(id) as MSGS, max(CONTIME) AS CONTIME, min(CONTIME) AS DISTIME "
+					+"from relay.platforminfo group by hostip, prefix");
+				while(rs.next())
+				{
+					ret.add(new PlatformInfo(null, rs.getString("PLATFORM"), rs.getString("HOSTIP"),
+						rs.getString("HOSTNAME"), null, rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
+						rs.getInt("MSGS"), 0, 0));
 				}
 			}
 			catch(Exception e)
@@ -204,14 +258,16 @@ public class StatsDB
 	{
 		StatsDB	db	= getDB();
 		
-		PlatformInfo	pi	= new PlatformInfo("somid", "hostip", "somename", "prot");
+//		PlatformInfo	pi	= new PlatformInfo("somid", "hostip", "somename", "prot");
+//		printPlatformInfos(db.getPlatformInfos());
+//		
+//		pi.reconnect("hostip", "other hostname");
+//		pi.addMessage(123, 456);
+//		
+//		pi.disconnect();
 		printPlatformInfos(db.getPlatformInfos());
 		
-		pi.reconnect("hostip", "other hostname");
-		pi.addMessage(123, 456);
-		
-		pi.disconnect();
-		printPlatformInfos(db.getPlatformInfos());
+		printResultSet(db.con.createStatement().executeQuery("select * from relay.platforminfo"));
 	}
 	
 	/**
@@ -226,19 +282,19 @@ public class StatsDB
 		}		
 	}
 
-//	/**
-//	 *  Print out the contents of a result set.
-//	 */
-//	protected static void	printResultSet(ResultSet rs) throws Exception
-//	{
-//		while(rs.next())
-//		{
-//			int	cnt	= rs.getMetaData().getColumnCount();
-//			for(int i=1; i<=cnt; i++)
-//			{
-//				System.out.print(rs.getMetaData().getColumnName(i)+": "+rs.getString(i)+", ");
-//			}
-//			System.out.println();
-//		}		
-//	}
+	/**
+	 *  Print out the contents of a result set.
+	 */
+	protected static void	printResultSet(ResultSet rs) throws Exception
+	{
+		while(rs.next())
+		{
+			int	cnt	= rs.getMetaData().getColumnCount();
+			for(int i=1; i<=cnt; i++)
+			{
+				System.out.print(rs.getMetaData().getColumnName(i)+": "+rs.getString(i)+", ");
+			}
+			System.out.println();
+		}		
+	}
 }

@@ -55,9 +55,9 @@ public class GeoIPService
 	//-------- methods --------
 	
 	/**
-	 *  Fetch city name for an IP address.
+	 *  Fetch location name for an IP address.
 	 */
-	public String	getCity(String ip)
+	public String	getLocation(String ip)
 	{
 		String	ret	= null;
 		
@@ -67,64 +67,15 @@ public class GeoIPService
 			{
 				Location	loc	= ls.getLocation(ip);
 				ret	= loc.city;
-			}
-			catch(Exception e)
-			{
-				// Ignore errors and let relay work without stats.
-				System.err.println("Warning: Could not get Geo location: "+ e);
-			}
-		}
-		
-		if(ret==null)
-		{
-			ret	= "unknown";
-		}
-		
-		return ret;
-	}
-
-	/**
-	 *  Fetch region name for an IP address.
-	 */
-	public String	getRegion(String ip)
-	{
-		String	ret	= null;
-		
-		if(ls!=null)
-		{
-			try
-			{
-				Location	loc	= ls.getLocation(ip);
-				ret	= regionName.regionNameByCode(loc.countryCode, loc.region);
-			}
-			catch(Exception e)
-			{
-				// Ignore errors and let relay work without stats.
-				System.err.println("Warning: Could not get Geo location: "+ e);
-			}
-		}
-		
-		if(ret==null)
-		{
-			ret	= "unknown";
-		}
-		
-		return ret;
-	}
-
-	/**
-	 *  Fetch country information for an IP address.
-	 */
-	public String	getCountry(String ip)
-	{
-		String	ret	= null;
-		
-		if(ls!=null)
-		{
-			try
-			{
-				Location	loc	= ls.getLocation(ip);
-				ret	= loc.countryName;
+				String	reg	= regionName.regionNameByCode(loc.countryCode, loc.region);
+				if(!loc.city.equals(reg))
+				{
+					ret	+= ", "+reg;
+				}
+				if(!loc.countryName.equals(loc.city) && !loc.countryName.equals(reg))
+				{
+					ret	+= ", "+loc.countryName;
+				}
 			}
 			catch(Exception e)
 			{

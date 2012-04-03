@@ -5,16 +5,16 @@
 <%@ page import="jadex.base.relay.*" %>
 <%@ page import="java.util.*" %>
 
-<h2>Connected Platforms</h2>
+<h2>Platform Connection History</h2>
 <table>
 	<tr>
 		<th>&nbsp;</th>
 		<th>Platform</th>
 		<th>Host</th>
 		<th>Location</th>
-		<th>Connected Since</th>
-		<th>Received Messages</th>
-		<th>Avg. Transfer Rate</th>
+		<th>Last Seen</th>
+		<th>First Appeared</th>		
+		<th># Seen</th>
 	</tr>
 	
 	<%
@@ -26,9 +26,6 @@
 					<% if(infos[i].getCountryCode()!=null) {%>
 						<img src="<%= request.getContextPath() %>/resources/flags/flag-<%= infos[i].getCountryCode() %>.png"/>
 					<% } %>
-					<% if(infos[i].getScheme()!=null && infos[i].getScheme().endsWith("s")) {%>
-						<img src="<%= request.getContextPath() %>/resources/lock.png"/>
-					<% } %>
 					</td>
 				<td>
 					<%= infos[i].getId() %> </td>
@@ -38,13 +35,12 @@
 					<%= infos[i].getLocation() %></td>
 				<td>
 					<%= infos[i].getConnectTime() %></td>
+				<td>
+					<%= infos[i].getDisconnectTime() %></td>
 				<td class="number">
-					<%= infos[i].getMessageCount() %> (<%= infos[i].getByteCount() %>)</td>
-				<td class="number">
-					<%= infos[i].getTransferRate() %></td>
+					<%= infos[i].getMessageCount() %>
 			</tr>
 	<%	} %>
-
 </table>
 
 <jsp:include page="footer.jsp" flush="true"/>

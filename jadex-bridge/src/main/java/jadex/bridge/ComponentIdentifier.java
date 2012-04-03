@@ -351,6 +351,15 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 			ret = ret.substring(idx + 1);
 		return ret;
 	}
+	
+	/**
+	 *  Get the platform name without the suffix for name uniqueness.
+	 *  @return The platform name without suffix.
+	 */
+	public String getPlatformPrefix()
+	{
+		return getPlatformPrefix(getPlatformName());
+	}
 
 	/**
 	 *  The hash code of the object.
@@ -378,6 +387,21 @@ public class ComponentIdentifier implements IComponentIdentifier, Cloneable, Ser
 	 */
 	public String	toString()
 	{
+		return name;
+	}
+	
+	//-------- static part --------
+	
+	/**
+	 *  Get the stripped platform name.
+	 */
+	public static String	getPlatformPrefix(String name)
+	{
+		// Strip auto-generated platform suffix.
+		if(name.indexOf('_')!=-1)
+		{
+			name	= name.substring(0, name.lastIndexOf('_'));
+		}
 		return name;
 	}
 }

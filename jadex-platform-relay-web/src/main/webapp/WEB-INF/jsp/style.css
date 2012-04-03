@@ -165,6 +165,13 @@ th {
 	text-align: left;
 	font-size: medium;
 	padding-top: 10pt;
+	padding-left: 5pt;
+	padding-right: 5pt;
+}
+td {
+/*	color: #d3af41;*/
+	padding-left: 5pt;
+	padding-right: 5pt;
 }
 .plain {
 	font-size: small;
@@ -221,9 +228,6 @@ p, dl, ul, ol {
 	font-size: large;
 	font-weight: bold;
 }
-td {
-/*	color: #d3af41;*/
-}
 
 .boardlabel {
 	font-size: large;
@@ -240,8 +244,4 @@ tr.odd {
 
 .number {
 	text-align: right;
-}
-
-.flag {
-	float:	left;
 }

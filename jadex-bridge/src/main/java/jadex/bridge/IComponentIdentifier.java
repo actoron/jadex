@@ -29,11 +29,18 @@ public interface IComponentIdentifier
 	 *  @return The local name of an component.
 	 */
 	public String getLocalName();
+	
 	/**
 	 *  Get the platform name.
 	 *  @return The platform name.
 	 */
 	public String getPlatformName();
+	
+	/**
+	 *  Get the platform name without the suffix for name uniqueness.
+	 *  @return The platform name without suffix.
+	 */
+	public String getPlatformPrefix();
 	
 	/**
 	 *  Get the addresses.

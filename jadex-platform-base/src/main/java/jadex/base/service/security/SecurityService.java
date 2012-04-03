@@ -316,9 +316,9 @@ public class SecurityService implements ISecurityService
 	// Todo: password is transferred in plain text unless transport uses encryption.
 	public IFuture<String>	getTargetPassword(IComponentIdentifier target)
 	{
-		String	starget	= getStrippedPlatformName(target);
+		String	starget	= target.getPlatformPrefix();
 		String	ret	= passwords.get(starget);
-		if(ret==null && starget.equals(getStrippedPlatformName(component.getComponentIdentifier())))
+		if(ret==null && starget.equals(component.getComponentIdentifier().getPlatformPrefix()))
 		{
 			ret	= this.password;
 		}
@@ -339,12 +339,12 @@ public class SecurityService implements ISecurityService
 	{
 		if(password!=null)
 		{
-			passwords.put(getStrippedPlatformName(target), password);
+			passwords.put(target.getPlatformPrefix(), password);
 		}
 		else
 		{
 			// Use remove to avoid keeping old mappings forever (name would still be stored otherwise)
-			passwords.remove(getStrippedPlatformName(target));
+			passwords.remove(target.getPlatformPrefix());
 		}
 		return IFuture.DONE;		
 	}
@@ -405,10 +405,10 @@ public class SecurityService implements ISecurityService
 	 */
 	public IFuture<Void>	preprocessRequest(IAuthorizable request, IComponentIdentifier target)
 	{
-		String	stripped	= getStrippedPlatformName(target);
+		String	stripped	= target.getPlatformPrefix();
 		// Use stored password or local password for local targets.  
 		String	pw	= passwords.containsKey(stripped) ? passwords.get(stripped)
-			: stripped.equals(getStrippedPlatformName(component.getComponentIdentifier())) ? password : null;
+			: stripped.equals(component.getComponentIdentifier().getPlatformPrefix()) ? password : null;
 		
 		if(pw!=null)
 		{
@@ -423,23 +423,6 @@ public class SecurityService implements ISecurityService
 	}
 
 	//-------- static part --------
-	
-	/**
-	 *  Get the stripped platform name.
-	 *  @param cid	The component identifier.
-	 *  @return The platform name without auto-generated suffix.
-	 */
-	public static String	getStrippedPlatformName(IComponentIdentifier cid)
-	{		
-		// Strip auto-generated platform suffix (hack???).
-		// cf. Starter and SecurityService
-		String	ret	= cid.getPlatformName();
-		if(ret.indexOf('_')!=-1)
-		{
-			ret	= ret.substring(0, ret.lastIndexOf('_'));
-		}
-		return ret;
-	}
 	
 	/**
 	 *  Build the digest given the timestamp and password.

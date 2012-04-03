@@ -118,18 +118,20 @@ public class RelayServlet extends HttpServlet
 			// Render status page.
 			if(id==null)
 			{
+				String	view;
 				if("/history".equals(request.getServletPath()))
 				{
 					// Fetch array to avoid concurrency problems
 					request.setAttribute("platforms", StatsDB.getDB().getPlatformInfos());
-					request.setAttribute("history", Boolean.TRUE);
+//					request.setAttribute("history", Boolean.TRUE);
+					view	= "/WEB-INF/jsp/history.jsp";
 				}
 				else
 				{
 					// Fetch array to avoid concurrency problems
 					request.setAttribute("platforms", platforms.values().toArray(new PlatformInfo[0]));
+					view	= "/WEB-INF/jsp/status.jsp";
 				}
-				String	view	= "/WEB-INF/jsp/status.jsp";
 				RequestDispatcher	rd	= getServletContext().getRequestDispatcher(view);
 				rd.forward(request, response);
 			}

@@ -250,34 +250,16 @@ public class PlatformInfo
 	}
 	
 	/**
-	 *  Get the city.
+	 *  Get the location (i.e. city, region, country).
 	 *  Dynamically resolved by GeoIP, if available.
 	 */
-	public String	getCity()
+	public String	getLocation()
 	{
-		return GeoIPService.getGeoIPService().getCity(hostip);
+		return GeoIPService.getGeoIPService().getLocation(hostip);
 	}
 	
 	/**
-	 *  Get the region (e.g. federal state).
-	 *  Dynamically resolved by GeoIP, if available.
-	 */
-	public String	getRegion()
-	{
-		return GeoIPService.getGeoIPService().getRegion(hostip);
-	}
-	
-	/**
-	 *  Get the country.
-	 *  Dynamically resolved by GeoIP, if available.
-	 */
-	public String	getCountry()
-	{
-		return GeoIPService.getGeoIPService().getCountry(hostip);
-	}
-	
-	/**
-	 *  Get the country code.
+	 *  Get the country code (e.g. de, us, ...).
 	 *  Dynamically resolved by GeoIP, if available.
 	 */
 	public String	getCountryCode()
