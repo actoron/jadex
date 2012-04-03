@@ -32,6 +32,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -1058,6 +1059,9 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			// Try to find bean class information
 			
+			if(object.getClass()==Date.class)
+				System.out.println("hhh");
+			
 			Map props = introspector.getBeanProperties(object.getClass(), true);
 			Object prop = props.get(accessinfo instanceof String? accessinfo: xmlname.getLocalPart());
 			if(prop instanceof BeanProperty)
@@ -1102,6 +1106,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 //				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					// Ignore -> try other way of setting attribute
 //					context.getReporter().report("Failure setting attribute: "+e,
 //						"attribute error", context, context.getParser().getLocation());

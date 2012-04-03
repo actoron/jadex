@@ -260,6 +260,9 @@ public class JavaReader
 			
 			// java.util.Date
 			// No special read info necessary.
+			TypeInfo ti_date = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Date")}),
+				null, new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("time", null))}));
+			typeinfos.add(ti_date);		
 			
 			// java.lang.String
 			TypeInfo ti_string = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "String")}),
