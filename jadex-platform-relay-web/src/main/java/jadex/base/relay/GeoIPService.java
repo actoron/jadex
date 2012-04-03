@@ -67,14 +67,29 @@ public class GeoIPService
 			{
 				Location	loc	= ls.getLocation(ip);
 				ret	= loc.city;
+				
 				String	reg	= regionName.regionNameByCode(loc.countryCode, loc.region);
-				if(!loc.city.equals(reg))
+				if(ret==null)
+				{
+					ret	= reg;
+				}
+				else if(!ret.equals(reg))
 				{
 					ret	+= ", "+reg;
 				}
-				if(!loc.countryName.equals(loc.city) && !loc.countryName.equals(reg))
+				
+				if(ret==null)
+				{
+					ret	= loc.countryName;
+				}
+				else if(loc.countryName!=null && !loc.countryName.equals(loc.city) && !loc.countryName.equals(reg))
 				{
 					ret	+= ", "+loc.countryName;
+				}
+				
+				if(ret==null)
+				{
+					ret	= "unknown";
 				}
 			}
 			catch(Exception e)
@@ -105,6 +120,30 @@ public class GeoIPService
 			{
 				Location	loc	= ls.getLocation(ip);
 				ret	= loc.countryCode.toLowerCase();
+			}
+			catch(Exception e)
+			{
+				// Ignore errors and let relay work without stats.
+				System.err.println("Warning: Could not get Geo location: "+ e);
+			}
+		}
+		
+		return ret;
+	}
+
+	/**
+	 *  Get the position as latitude,longitude.
+	 */
+	public String	getPosition(String ip)
+	{
+		String	ret	= null;
+		
+		if(ls!=null)
+		{
+			try
+			{
+				Location	loc	= ls.getLocation(ip);
+				ret	= loc.latitude+","+loc.longitude;
 			}
 			catch(Exception e)
 			{

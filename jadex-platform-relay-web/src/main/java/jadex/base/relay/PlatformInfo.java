@@ -267,6 +267,14 @@ public class PlatformInfo
 		return GeoIPService.getGeoIPService().getCountryCode(hostip);
 	}
 	
+	/**
+	 *  Get the location as latitude,longitude.
+	 */
+	public String	getPosition()
+	{
+		return GeoIPService.getGeoIPService().getPosition(hostip);
+	}
+	
 	//-------- modifier methods --------
 	
 	/**
@@ -325,6 +333,17 @@ public class PlatformInfo
 		this.dbid	= dbid;
 	}
 	
+	/**
+	 *  Create a string representation.
+	 */
+	public String toString()
+	{
+		return "PlatformInfo(id="+getDBId()+", platform="+getId()+", host="+getHostName()+"("+getHostIP()+"), scheme="+getScheme()
+			+ ", connected="+getConnectTime()+", disconnected="+getDisconnectTime()
+			+ ", messages="+getMessageCount()+"("+getByteCount()+"), rate="+getTransferRate()
+			+ ")";
+	}
+	
 	//-------- helper methods --------
 	
 	/**
@@ -351,16 +370,5 @@ public class PlatformInfo
 		}
 		
 		return ret;
-	}
-
-	/**
-	 *  Create a string representation.
-	 */
-	public String toString()
-	{
-		return "PlatformInfo(id="+getDBId()+", platform="+getId()+", host="+getHostName()+"("+getHostIP()+"), scheme="+getScheme()
-			+ ", connected="+getConnectTime()+", disconnected="+getDisconnectTime()
-			+ ", messages="+getMessageCount()+"("+getByteCount()+"), rate="+getTransferRate()
-			+ ")";
 	}
 }

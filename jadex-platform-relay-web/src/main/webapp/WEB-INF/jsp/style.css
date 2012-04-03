@@ -245,3 +245,9 @@ tr.odd {
 .number {
 	text-align: right;
 }
+
+.map {
+/*	display: block;
+    margin-left: auto;
+    margin-right: auto;*/
+}
