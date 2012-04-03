@@ -14,7 +14,7 @@
 	for(int i=0; i<infos.length; i++)
 	{
 		markers.append("&markers=");
-		if(i<10)
+		if(i<9)
 		{
 			markers.append("label:");
 			markers.append(i+1);
