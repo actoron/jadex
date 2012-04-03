@@ -24,9 +24,7 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
-/* $if !android $ */
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
-/* $endif $ */
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
@@ -169,9 +167,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 									
 									String lang = (String)msg.get(SFipa.LANGUAGE);
 									if(RemoteServiceManagementService.RMS_JADEX_BINARY.equals(lang)) {
-										/* $if !android $ */
 										content = BinarySerializer.objectFromByteArray((byte[]) content, rms.getBinaryPostProcessors(), errors, cl);
-										/* $endif $ */
 									}
 									else {
 										content = Reader.objectFromXML(rms.getReader(), (String)content, cl, errors);
@@ -338,9 +334,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 																Object content = null;
 																if (RemoteServiceManagementService.RMS_JADEX_BINARY.equals(lang))
 																{
-																	/* $if !android $ */
 																	content = BinarySerializer.objectToByteArray(result, rms.getBinaryPreProcessors(), new Object[]{msg.get(SFipa.SENDER), addresses}, cl);
-																	/* $endif $ */
 																}
 																else
 																{

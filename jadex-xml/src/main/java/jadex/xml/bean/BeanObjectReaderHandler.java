@@ -4,7 +4,7 @@ import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.commons.transformation.traverser.BeanDelegateReflectionIntrospector;
+import jadex.commons.transformation.binaryserializer.BeanIntrospectorFactory;
 import jadex.commons.transformation.traverser.BeanProperty;
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.xml.AccessInfo;
@@ -67,8 +67,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 	protected Set no_typeinfos;
 	
 	/** The bean introspector. */
-	protected IBeanIntrospector introspector = new BeanDelegateReflectionIntrospector();
-//	protected IBeanIntrospector introspector = new BeanInfoIntrospector();
+	protected IBeanIntrospector introspector = BeanIntrospectorFactory.getInstance().getBeanIntrospector();
 	
 	/** The filter based post processors. */
 	protected Map<IFilter, IPostProcessor> postprocessors;

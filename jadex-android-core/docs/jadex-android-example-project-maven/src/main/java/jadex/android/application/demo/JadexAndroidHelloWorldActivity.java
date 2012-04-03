@@ -2,7 +2,6 @@ package jadex.android.application.demo;
 
 import jadex.android.JadexAndroidActivity;
 import jadex.base.Starter;
-import jadex.bpmn.runtime.task.PrintTask;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -16,7 +15,7 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.xml.annotation.XMLClassname;
+import jadex.commons.transformation.annotations.Classname;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -114,7 +113,7 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 				
 				IFuture<IComponentManagementService> scheduleStep = extAcc
 						.scheduleStep(new IComponentStep() {
-							@XMLClassname("create-component")
+							@Classname("create-component")
 							public IFuture<IComponentManagementService> execute(IInternalAccess ia) {
 								Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
 								SServiceProvider.getService(
@@ -147,7 +146,7 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 				
 				IFuture<IComponentManagementService> scheduleStep = extAcc
 						.scheduleStep(new IComponentStep() {
-							@XMLClassname("create-component")
+							@Classname("create-component")
 							public IFuture<IComponentManagementService> execute(IInternalAccess ia) {
 								Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
 								SServiceProvider.getService(

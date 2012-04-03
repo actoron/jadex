@@ -121,8 +121,6 @@
 		" />
 
 	<property name="exclude-jadex-platform-base" value="
-		JadexBinaryCodec.java,
-		JadexBinaryContentCodec.java
 		"/>
 			
 	<property name="exclude-jadex-kernel-extension-agr" value="

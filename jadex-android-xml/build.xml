@@ -14,14 +14,8 @@
 
 
 	<property name="exclude-jadex-xml" value="
-		BeanInfoIntrospector.java,
 		tutorial,
 		" />
-	<!-- XMLStreamReaderWrapper.java,
-		XMLStreamWriterWrapper.java,
-		Reader.java,
-		Writer.java -->
-
 	
 	<taskdef name="preprocess" classname="com.objfac.prebop.ant.PreprocessorTask">
 		<classpath>

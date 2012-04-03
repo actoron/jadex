@@ -2,8 +2,8 @@ package jadex.commons.transformation.binaryserializer;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.commons.transformation.traverser.BeanDelegateReflectionIntrospector;
 import jadex.commons.transformation.traverser.BeanProperty;
+import jadex.commons.transformation.traverser.IBeanIntrospector;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
@@ -26,7 +26,7 @@ public class BeanCodec extends AbstractCodec
 	protected static final int INTROSPECTOR_CACHE_SIZE = 5000;
 	
 	/** Bean introspector for inspecting beans. */
-	protected BeanDelegateReflectionIntrospector intro = new BeanDelegateReflectionIntrospector(INTROSPECTOR_CACHE_SIZE);
+	protected IBeanIntrospector intro = BeanIntrospectorFactory.getInstance().getBeanIntrospector(INTROSPECTOR_CACHE_SIZE);
 	
 	/**
 	 *  Tests if the decoder can decode the class.
