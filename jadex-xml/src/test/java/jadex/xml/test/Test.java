@@ -1,5 +1,7 @@
 package jadex.xml.test;
 
+import java.util.Date;
+
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
