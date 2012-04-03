@@ -121,7 +121,7 @@ public class BeanCodec extends AbstractCodec
 			try
 			{
 				val = BinarySerializer.decodeObject(context);
-				((BeanProperty) props.get(name)).setPropertyValue(object, name, val);
+				((BeanProperty) props.get(name)).setPropertyValue(object, val);
 			}
 			catch (Exception e)
 			{
@@ -185,7 +185,7 @@ public class BeanCodec extends AbstractCodec
 		for(Iterator it=props.keySet().iterator(); it.hasNext(); )
 		{
 			BeanProperty prop = (BeanProperty)props.get(it.next());
-			Object val = prop.getPropertyValue(object, prop.getName());
+			Object val = prop.getPropertyValue(object);
 			if (val != null)
 			{
 				names.add(prop.getName());

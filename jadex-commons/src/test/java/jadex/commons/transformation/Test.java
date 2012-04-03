@@ -37,6 +37,14 @@ public abstract class Test extends TestCase
 	 */
 	public void performTests()
 	{
+		performTests(1000);
+	}
+	
+	/**
+	 * 
+	 */
+	public void performTests(int cnt)
+	{
 //		try
 //		{
 //			InputStream is = SUtil.getResource("jadex/xml/test.xml", null);
@@ -52,7 +60,7 @@ public abstract class Test extends TestCase
 		
 		try
 		{
-			int cnt = 1000;
+//			int cnt = 1000;
 			long start = System.currentTimeMillis();
 			for(int i=0; i<cnt; i++)
 //			while(true)
@@ -162,7 +170,6 @@ public abstract class Test extends TestCase
 //		System.out.println("Read: "+ro+" / class="+ro.getClass());
 		
 //		System.out.println("equals: "+wo.equals(ro));
-		
 		compare(wo, ro, written, comp);
 		
 //		assertEquals("Written and read objects should be equal:", wo, ro);

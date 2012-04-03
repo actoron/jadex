@@ -184,7 +184,7 @@ public class BeanProperty
 	 *  
 	 *  @return The value of the bean property.
 	 */
-	public Object getPropertyValue(Object object, String property)
+	public Object getPropertyValue(Object object)
 	{
 		Object ret = null;
 		if (delegateprovider != null)
@@ -192,7 +192,7 @@ public class BeanProperty
 			IBeanAccessorDelegate accdel = delegateprovider.getDelegate(object.getClass());
 			try
 			{
-				ret = accdel.getPropertyValue(object, property);
+				ret = accdel.getPropertyValue(object, name);
 			}
 			catch (Exception e)
 			{
@@ -238,12 +238,12 @@ public class BeanProperty
 	 *  @param property The name of the property.
 	 *  @param value The new value.
 	 */
-	public void setPropertyValue(Object object, String property, Object value)
+	public void setPropertyValue(Object object, Object value)
 	{
 		if (delegateprovider != null)
 		{
 			IBeanAccessorDelegate accdel = delegateprovider.getDelegate(object.getClass());
-			accdel.setPropertyValue(object, property, value);
+			accdel.setPropertyValue(object, name, value);
 		}
 		else if (getGetter() != null)
 		{

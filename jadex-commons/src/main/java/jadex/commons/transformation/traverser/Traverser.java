@@ -46,6 +46,7 @@ public class Traverser
 		processors.add(new ColorProcessor());
 		processors.add(new LogRecordProcessor());
 		processors.add(new ImageProcessor());
+		processors.add(new DateProcessor());
 		processors.add(new BeanProcessor());
 //		processors.add(new FieldProcessor());
 	}

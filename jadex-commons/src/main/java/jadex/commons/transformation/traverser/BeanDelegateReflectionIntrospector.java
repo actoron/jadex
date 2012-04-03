@@ -1,17 +1,9 @@
 package jadex.commons.transformation.traverser;
 
 import jadex.commons.SReflect;
-import jadex.commons.Tuple2;
-import jadex.commons.collection.LRU;
-import jadex.commons.transformation.annotations.Include;
-import jadex.commons.transformation.annotations.IncludeFields;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -20,7 +12,6 @@ import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
-import javassist.bytecode.DuplicateMemberException;
 
 
 /**
@@ -96,11 +87,11 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 						{
 							//getmethodsrc.append("jadex.commons.SReflect.wrapValue(");
 							getmethodsrc.append("new ");
-							getmethodsrc.append(SReflect.getWrappedType(prop.getType()).getCanonicalName());
+							getmethodsrc.append(SReflect.getClassName(SReflect.getWrappedType(prop.getType())));
 							getmethodsrc.append("(");
 						}
 						getmethodsrc.append("((");
-						getmethodsrc.append(clazz.getCanonicalName());
+						getmethodsrc.append(SReflect.getClassName(clazz));
 						getmethodsrc.append(") object).");
 						getmethodsrc.append(prop.getGetter().getName());
 						getmethodsrc.append("()");
@@ -117,11 +108,11 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 						if (prop.getType().isPrimitive())
 						{
 							getmethodsrc.append("new ");
-							getmethodsrc.append(SReflect.getWrappedType(prop.getType()).getCanonicalName());
+							getmethodsrc.append(SReflect.getClassName(SReflect.getWrappedType(prop.getType())));
 							getmethodsrc.append("(");
 						}
 						getmethodsrc.append("((");
-						getmethodsrc.append(clazz.getCanonicalName());
+						getmethodsrc.append(SReflect.getClassName(clazz));
 						getmethodsrc.append(") object).");
 						getmethodsrc.append(prop.getField().getName());
 						if (prop.getType().isPrimitive())
@@ -137,7 +128,7 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 					{
 						// Method access
 						setmethodsrc.append("((");
-						setmethodsrc.append(clazz.getCanonicalName());
+						setmethodsrc.append(SReflect.getClassName(clazz));
 						setmethodsrc.append(") object).");
 						setmethodsrc.append(prop.getSetter().getName());
 						setmethodsrc.append("(");
@@ -158,7 +149,7 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 						else
 						{
 							setmethodsrc.append("(");
-							setmethodsrc.append(prop.getSetterType().getCanonicalName());
+							setmethodsrc.append(SReflect.getClassName(prop.getSetterType()));
 							setmethodsrc.append(") value");
 						}
 						setmethodsrc.append("); return;");
@@ -167,28 +158,31 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 					{
 						// Field access
 						setmethodsrc.append("((");
-						setmethodsrc.append(clazz.getCanonicalName());
+						setmethodsrc.append(SReflect.getClassName(clazz));
 						setmethodsrc.append(") object).");
 						setmethodsrc.append(prop.getField().getName());
 						setmethodsrc.append(" = ");
 						if (boolean.class.equals(prop.getType()))
 						{
 							setmethodsrc.append("((Boolean) value).booleanValue()");
+							setmethodsrc.append("; return;");
 						}
 						else if (char.class.equals(prop.getType()))
 						{
 							setmethodsrc.append("((Character) value).charValue()");
+							setmethodsrc.append("; return;");
 						}
 						else if (prop.getType().isPrimitive())
 						{
 							setmethodsrc.append("((java.lang.Number) value).");
 							setmethodsrc.append(prop.getType().getSimpleName());
 							setmethodsrc.append("Value()");
+							setmethodsrc.append("; return;");
 						}
 						else
 						{
 							setmethodsrc.append("((");
-							setmethodsrc.append(prop.getSetterType().getCanonicalName());
+							setmethodsrc.append(SReflect.getClassName(prop.getSetterType()));
 							setmethodsrc.append(") value); return;");
 						}
 					}
@@ -196,6 +190,7 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 				}
 				getmethodsrc.append("throw new RuntimeException(\"Bean property not found: \" + property); }");
 				setmethodsrc.append("throw new RuntimeException(\"Bean property not found: \" + property); }");
+//				System.out.println(setmethodsrc.toString());
 				
 				CtMethod getmethod = CtMethod.make(getmethodsrc.toString(), dclazz);
 				dclazz.addMethod(getmethod);
@@ -252,8 +247,8 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 	 *  @param field The field.
 	 *  @return The bean property.
 	 */
-	protected BeanProperty createBeanProperty(String name, Field field)
+	protected BeanProperty createBeanProperty(String name, Field field, boolean anonclass)
 	{
-		return new BeanProperty(name, field, this);
+		return anonclass? super.createBeanProperty(name, field, anonclass): new BeanProperty(name, field, this);
 	}
 }

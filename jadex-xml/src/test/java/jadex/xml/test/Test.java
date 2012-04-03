@@ -5,31 +5,32 @@ import jadex.xml.bean.JavaWriter;
 
 
 /**
- *  Testcases for writer and reader.
+ * Testcases for writer and reader.
  */
 public class Test extends jadex.commons.transformation.Test
 {
-	
-	//-------- methods --------
-	
+
+	// -------- methods --------
+
 	/**
 	 * 
 	 */
 	public Object doWrite(Object wo)
 	{
+
 		return JavaWriter.objectToByteArray(wo, null);
 	}
-	
+
 	/**
 	 * 
 	 */
-	public Object doRead(Object ro) 
+	public Object doRead(Object ro)
 	{
 		return JavaReader.objectFromByteArray((byte[])ro, null);
 	}
-	
+
 	/**
-	 *  Main for testing single methods.
+	 * Main for testing single methods.
 	 */
 	public static void main(String[] args)
 	{
@@ -37,4 +38,3 @@ public class Test extends jadex.commons.transformation.Test
 		t.performTests();
 	}
 }
-

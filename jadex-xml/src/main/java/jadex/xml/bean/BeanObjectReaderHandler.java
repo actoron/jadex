@@ -1067,34 +1067,39 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 
 				try
 				{
-					if(bprop.getSetter()!=null)
+					if(!SXML.XML_CLASSNAME.equals(bprop.getName()))
 					{
-						bprop.getSetter().invoke(object, new Object[]{arg});
-					}
-					else
-					{
-						if((bprop.getField().getModifiers()&Field.PUBLIC)==0)
-						{
-							if(SXML.XML_CLASSNAME.equals(bprop.getName()))
-							{
-								set = true;
-							}
-							else
-							{
-								bprop.getField().setAccessible(true);
-							}
-						}
-						if(!set)
-							bprop.getField().set(object, arg);
+						bprop.setPropertyValue(object, arg);
 					}
 					set = true;
+//					if(bprop.getSetter()!=null)
+//					{
+//						bprop.getSetter().invoke(object, new Object[]{arg});
+//					}
+//					else
+//					{
+//						if((bprop.getField().getModifiers()&Field.PUBLIC)==0)
+//						{
+//							if(SXML.XML_CLASSNAME.equals(bprop.getName()))
+//							{
+//								set = true;
+//							}
+//							else
+//							{
+//								bprop.getField().setAccessible(true);
+//							}
+//						}
+//						if(!set)
+//							bprop.getField().set(object, arg);
+//					}
+					
 				}
-				catch(InvocationTargetException e)
-				{
-					// Ignore -> try other way of setting attribute
-					context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
-						"attribute error", context, context.getParser().getLocation());
-				}
+//				catch(InvocationTargetException e)
+//				{
+//					// Ignore -> try other way of setting attribute
+//					context.getReporter().report("Failure invoking setter method: "+e.getTargetException(),
+//						"attribute error", context, context.getParser().getLocation());
+//				}
 				catch(Exception e)
 				{
 					// Ignore -> try other way of setting attribute

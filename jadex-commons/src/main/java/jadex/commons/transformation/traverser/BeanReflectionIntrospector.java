@@ -129,7 +129,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 				String property_java_name = fields[i].getName();
 				if((includefields || fields[i].getAnnotation(Include.class) != null) && fields[i].getAnnotation(Exclude.class) == null && !ret.containsKey(property_java_name))
 				{
-					ret.put(property_java_name, createBeanProperty(property_java_name, fields[i]));
+					ret.put(property_java_name, createBeanProperty(property_java_name, fields[i], false));
 				}
 			}
 			
@@ -170,7 +170,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 						property_java_name = property_java_name.substring(4);
 						if(!ret.containsKey(property_java_name))
 						{
-							ret.put(property_java_name, createBeanProperty(property_java_name, fields[i]));
+							ret.put(property_java_name, createBeanProperty(property_java_name, fields[i], true));
 						}
 					}
 				}
@@ -204,7 +204,7 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	 *  @param field The field.
 	 *  @return The bean property.
 	 */
-	protected BeanProperty createBeanProperty(String name, Field field)
+	protected BeanProperty createBeanProperty(String name, Field field, boolean anonclass)
 	{
 		return new BeanProperty(name, field, null);
 	}

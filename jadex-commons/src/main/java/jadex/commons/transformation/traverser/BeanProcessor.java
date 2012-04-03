@@ -74,12 +74,12 @@ public class BeanProcessor implements ITraverseProcessor
 				{
 					String name = (String)it.next();
 					BeanProperty prop = (BeanProperty)props.get(name);
-					Object val = prop.getPropertyValue(object, name);//getGetter().invoke(object, new Object[0]);
+					Object val = prop.getPropertyValue(object);//getGetter().invoke(object, new Object[0]);
 					if(val!=null) 
 					{
 						Object newval = traverser.traverse(val, prop.getType(), cloned, processors, clone, context);
 						if(clone || val!=newval)
-							prop.setPropertyValue(ret, name, newval);
+							prop.setPropertyValue(ret, newval);
 //							prop.getSetter().invoke(ret, new Object[]{newval});
 					}
 				}

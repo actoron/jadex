@@ -279,6 +279,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		Method method = null;
 		Field field = null;
 		Classname xmlc = null;
+		boolean found = false;
 		
 		AccessInfo ai = info instanceof AttributeInfo? ((AttributeInfo)info).getAccessInfo(): 
 			info instanceof SubobjectInfo? ((SubobjectInfo)info).getAccessInfo(): null;
@@ -295,11 +296,13 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		}
 		else if(attr instanceof BeanProperty)
 		{
-			method = ((BeanProperty)attr).getGetter();
-			if(method==null)
-			{
-				field = ((BeanProperty)attr).getField();
-			}
+			value = ((BeanProperty)attr).getPropertyValue(object);
+			found = true;
+//			method = ((BeanProperty)attr).getGetter();
+//			if(method==null)
+//			{
+//				field = ((BeanProperty)attr).getField();
+//			}
 		}
 		else if(attr instanceof String)
 		{
@@ -319,46 +322,45 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 		{
 			xmlc	= (Classname)attr;
 		}
-//		else if(attr instanceof QName)
-//		{
-//			method = findGetMethod(object, ((QName)attr).getLocalPart(), new String[]{"get", "is"});
-//		}
 		else
 		{
 			throw new RuntimeException("Unknown attribute type: "+attr);
 		}
 		
-		if(method!=null)
+		if(!found)
 		{
-			try
-			{	
-				value = method.invoke(object, new Object[0]);
-			}
-			catch(Exception e)
+			if(method!=null)
 			{
-				e.printStackTrace();
+				try
+				{	
+					value = method.invoke(object, new Object[0]);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
-		}
-		else if(field!=null)
-		{
-			try
+			else if(field!=null)
 			{
-				if((field.getModifiers()&Field.PUBLIC)==0)
-					field.setAccessible(true);
-				value = field.get(object);
+				try
+				{
+					if((field.getModifiers()&Field.PUBLIC)==0)
+						field.setAccessible(true);
+					value = field.get(object);
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
-			catch(Exception e)
+			else if(xmlc!=null)
 			{
-				e.printStackTrace();
+				value = xmlc.value();
 			}
-		}
-		else if(xmlc!=null)
-		{
-			value = xmlc.value();
-		}
-		else
-		{
-			throw new RuntimeException("Could not fetch value: "+object+" "+attr);
+			else
+			{
+				throw new RuntimeException("Could not fetch value: "+object+" "+attr);
+			}
 		}
 		
 		// Convert values.

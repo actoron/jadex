@@ -331,39 +331,42 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			}
 		}
 
-		Collection props = getProperties(object, context, includefields);
-		if(props!=null)
+		if(typeinfo==null)
 		{
-			for(Iterator it=props.iterator(); it.hasNext(); )
+			Collection props = getProperties(object, context, includefields);
+			if(props!=null)
 			{
-				Object property = it.next();
-				String propname = getPropertyName(property);
-
-				if(!doneprops.contains(propname))
+				for(Iterator it=props.iterator(); it.hasNext(); )
 				{
-					doneprops.add(propname);
-					Object value = getValue(object, property, context, null);
-					
-					if(value!=null)
+					Object property = it.next();
+					String propname = getPropertyName(property);
+	
+					if(!doneprops.contains(propname))
 					{
-						// Make to an attribute when
-						// a) it is a basic type
-						// b) it can be decoded to the right object type
-						Boolean pt = typeinfo!=null && typeinfo.getMappingInfo()!=null? typeinfo.getMappingInfo().getPreferTags(): null;
-						boolean prefertags = pt!=null? pt.booleanValue(): this.prefertags;
-						if(!prefertags && isBasicType(property, value) && isDecodableToSameType(property, value, context))
+						doneprops.add(propname);
+						Object value = getValue(object, property, context, null);
+						
+						if(value!=null)
 						{
-							if(!value.equals(getDefaultValue(property)))
-								wi.addAttribute(propname, value.toString());
-						}
-						else
-						{
-							// todo: remove
-							// Hack special case array, todo: support generically via typeinfo???
-							QName[] xmlpath = new QName[]{QName.valueOf(propname)};
-							QName[] path = createPath(xmlpath, value, context);
-							// todo: use some default for flattening
-							wi.addSubobject(path, value, flattening);
+							// Make to an attribute when
+							// a) it is a basic type
+							// b) it can be decoded to the right object type
+							Boolean pt = typeinfo!=null && typeinfo.getMappingInfo()!=null? typeinfo.getMappingInfo().getPreferTags(): null;
+							boolean prefertags = pt!=null? pt.booleanValue(): this.prefertags;
+							if(!prefertags && isBasicType(property, value) && isDecodableToSameType(property, value, context))
+							{
+								if(!value.equals(getDefaultValue(property)))
+									wi.addAttribute(propname, value.toString());
+							}
+							else
+							{
+								// todo: remove
+								// Hack special case array, todo: support generically via typeinfo???
+								QName[] xmlpath = new QName[]{QName.valueOf(propname)};
+								QName[] path = createPath(xmlpath, value, context);
+								// todo: use some default for flattening
+								wi.addSubobject(path, value, flattening);
+							}
 						}
 					}
 				}

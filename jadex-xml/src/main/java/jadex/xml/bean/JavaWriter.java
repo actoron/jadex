@@ -209,6 +209,7 @@ public class JavaWriter extends Writer
 			// Ignores several redundant bean attributes for performance reasons.
 			TypeInfo ti_date = new TypeInfo(null, new ObjectInfo(Date.class), 
 				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("time", null)),
 				new AttributeInfo(new AccessInfo("hours", null, AccessInfo.IGNORE_READWRITE)),
 				new AttributeInfo(new AccessInfo("minutes", null, AccessInfo.IGNORE_READWRITE)),
 				new AttributeInfo(new AccessInfo("seconds", null, AccessInfo.IGNORE_READWRITE)),
@@ -268,7 +269,8 @@ public class JavaWriter extends Writer
 						return ((Level)val).getName();
 					}
 				})),
-				new AttributeInfo(new AccessInfo("level", null))},
+				new AttributeInfo(new AccessInfo("level", null)),
+				new AttributeInfo(new AccessInfo("message", null))},
 				null
 			));
 			typeinfos.add(ti_record);
