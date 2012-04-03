@@ -53,19 +53,14 @@ public class SettingsService extends BasicService implements ISettingsService
 	 *  @param prefix The settings file prefix to be used (if any).
 	 *    Uses name from service provider, if no prefix is given.
 	 */
-	public SettingsService(String prefix, IInternalAccess access, boolean saveonexit)
+	public SettingsService(IInternalAccess access, boolean saveonexit)
 	{
 		super(access.getServiceContainer().getId(), ISettingsService.class, null);
 		this.access	= access;
 		this.providers	= new LinkedHashMap();
 		this.saveonexit	= saveonexit;
 		
-		if(prefix==null)
-		{
-			prefix	= access.getComponentIdentifier().getPlatformPrefix();
-		}
-			
-		filename	= prefix + SETTINGS_EXTENSION;
+		filename	= access.getComponentIdentifier().getPlatformPrefix() + SETTINGS_EXTENSION;
 	}
 	
 	//-------- BasicService overridings --------

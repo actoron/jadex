@@ -20,10 +20,10 @@ public class PlatformInfo
 	//-------- constants --------
 	
 	/** The short time format (only time). */
-	protected static final DateFormat	TIME_FORMAT_SHORT	= new SimpleDateFormat("k:mm:ss z");
+	public static final DateFormat	TIME_FORMAT_SHORT	= new SimpleDateFormat("k:mm:ss z");
 	
 	/** The long time format (time and date). */
-	protected static final DateFormat	TIME_FORMAT_LONG	= new SimpleDateFormat("k:mm:ss z, EEE, MMM d, yyyy");
+	public static final DateFormat	TIME_FORMAT_LONG	= new SimpleDateFormat("k:mm:ss z, EEE, MMM d, yyyy");
 	
 	//-------- attributes --------
 	

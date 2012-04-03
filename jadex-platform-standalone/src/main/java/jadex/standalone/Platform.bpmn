@@ -216,7 +216,7 @@
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qUmPEGe0EeGNgr0Hnnacqw" key="1:0" value="name"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qUmPEWe0EeGNgr0Hnnacqw" key="1:1" value="ISettingsService"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qUmPEme0EeGNgr0Hnnacqw" key="1:2" value="decoupled"/>
-    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qUmPE2e0EeGNgr0Hnnacqw" key="1:3" value="new SettingsService($args.platformname, $component, $args.saveonexit)"/>
+    <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qUmPE2e0EeGNgr0Hnnacqw" key="1:3" value="new SettingsService($component, $args.saveonexit)"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qUmPFGe0EeGNgr0Hnnacqw" key="1:4" value="jadex_providedservices_table_Initial-Impl_cc456de9-5d3a-412c-8399-73343899efe9_complex"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qUmPFWe0EeGNgr0Hnnacqw" key="2:0" value="name1"/>
     <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_qUmPFme0EeGNgr0Hnnacqw" key="2:1" value="jadex.bridge.service.types.threadpool.IThreadPoolService"/>

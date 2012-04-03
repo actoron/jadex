@@ -43,7 +43,11 @@ public class PropertiesXMLHelper
 		TypeInfo	propstype	= new TypeInfo(new XMLInfo(new QName(uri, "properties")), new ObjectInfo(Properties.class), 
 			new MappingInfo(null, 
 			new AttributeInfo[]{
-				new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE))},
+				new AttributeInfo(new AccessInfo(new QName("http://www.w3.org/2001/XMLSchema-instance", "schemaLocation"), null, AccessInfo.IGNORE_READWRITE)),
+				new AttributeInfo(new AccessInfo("name")),
+				new AttributeInfo(new AccessInfo("type")),
+				new AttributeInfo(new AccessInfo("id"))
+			},
 			new SubobjectInfo[]{
 				new SubobjectInfo(new XMLInfo(new QName(uri, "property")), new AccessInfo(new QName(uri, "property"), "properties"), null, true), 
 				new SubobjectInfo(new XMLInfo(new QName(uri, "properties")), new AccessInfo(new QName(uri, "properties"), "subproperties"), null, true)

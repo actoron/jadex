@@ -171,6 +171,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 									}
 									else {
 										content = Reader.objectFromXML(rms.getReader(), (String)content, cl, errors);
+//										System.out.println("ContentOO: "+getAgentName()+"\n"+content);
 									}
 									
 									// For corrupt result (e.g. if class not found) set exception to clean up waiting call.
@@ -339,6 +340,7 @@ public class RemoteServiceManagementAgent extends MicroAgent
 																else
 																{
 																	content = Writer.objectToXML(rms.getWriter(), result, cl, new Object[]{msg.get(SFipa.SENDER), addresses});
+//																	System.out.println("ReplyXML: "+getAgentName()+"\n"+content);
 																}
 																reply.put(SFipa.CONTENT, content);
 					//											System.out.println("content: "+content);

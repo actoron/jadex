@@ -30,9 +30,8 @@ public class AndroidSettingsService extends SettingsService {
 	 * @param access
 	 * @param saveonexit
 	 */
-	public AndroidSettingsService(String prefix, IInternalAccess access,
-			boolean saveonexit) {
-		super(prefix, access, saveonexit);
+	public AndroidSettingsService(IInternalAccess access, boolean saveonexit) {
+		super(access, saveonexit);
 	}
 
 	@Override

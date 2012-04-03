@@ -185,7 +185,7 @@ public class StatsDB
 		{
 			try
 			{
-				ResultSet	rs	= con.createStatement().executeQuery("select * from relay.platforminfo order by contime desc");
+				ResultSet	rs	= con.createStatement().executeQuery("select * from relay.platforminfo order by id asc");
 				while(rs.next())
 				{
 					ret.add(new PlatformInfo(new Integer(rs.getInt("ID")), rs.getString("PLATFORM"), rs.getString("HOSTIP"),

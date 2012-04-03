@@ -48,11 +48,15 @@ import jadex.commons.transformation.binaryserializer.IDecoderHandler;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 import jadex.micro.IMicroExternalAccess;
+import jadex.xml.AccessInfo;
+import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
 import jadex.xml.IPostProcessor;
 import jadex.xml.IPreProcessor;
+import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SXML;
+import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
@@ -198,7 +202,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		QName[] pr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyReference")};
 		TypeInfo ti_rr = new TypeInfo(new XMLInfo(pr), 
-			new ObjectInfo(ProxyReference.class, new RMIPostProcessor(rrm)));
+			new ObjectInfo(ProxyReference.class, new RMIPostProcessor(rrm)), 
+			new MappingInfo(null, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo("proxyInfo")),
+				new SubobjectInfo(new AccessInfo("remoteReference")),
+				new SubobjectInfo(new AccessInfo("cache"))}));
 		typeinfosread.add(ti_rr);
 
 		QName[] icp = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ServiceInputConnectionProxy")};
@@ -262,7 +270,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				return ret==null? src: ret;
 			}
 		};
-		TypeInfo ti_cids = new TypeInfo(new XMLInfo(ppr, cidpp), new ObjectInfo(IComponentIdentifier.class));
+		TypeInfo ti_cids = new TypeInfo(new XMLInfo(ppr, cidpp), new ObjectInfo(IComponentIdentifier.class),
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("name"))},
+				new SubobjectInfo[]{new SubobjectInfo(new AccessInfo("addresses"))}));
 		typeinfoswrite.add(ti_cids);
 		
 		BeanObjectWriterHandler wh = new BeanObjectWriterHandler(typeinfoswrite, true);
@@ -839,6 +849,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 															else
 															{
 																cont = Writer.objectToXML(getWriter(), content, cl, new Object[]{receiver, addresses});
+//																System.out.println("ContentXML: "+component.getComponentIdentifier()+"\n"+cont);
 															}
 															
 															msg.put(SFipa.CONTENT, cont);

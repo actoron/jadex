@@ -213,7 +213,7 @@
 			<implementation>
 				Boolean.TRUE.equals($args.android)
 				? jadex.base.service.settings.AndroidSettingsService.class.getConstructor(new Class[]{String.class, jadex.bridge.IInternalAccess.class, boolean.class}).newInstance(new Object[]{$args.platformname, $component, $args.saveonexit})
-				: new jadex.base.service.settings.SettingsService($args.platformname, $component, $args.saveonexit)
+				: new jadex.base.service.settings.SettingsService($component, $args.saveonexit)
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.threadpool.IThreadPoolService">

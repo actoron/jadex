@@ -1,6 +1,7 @@
 package jadex.commons.transformation.traverser;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -196,35 +197,33 @@ public class BeanProperty
 			}
 			catch (Exception e)
 			{
+				throw new RuntimeException(e);
 			}
 		}
 		
-		if (ret == null)
+		else if (getGetter() != null)
 		{
-			if (getGetter() != null)
+			try
 			{
-				try
-				{
-					ret = getGetter().invoke(object, new Object[0]);
-				}
-				catch (Exception e)
-				{
-					throw new RuntimeException(e);
-				}
+				ret = getGetter().invoke(object, new Object[0]);
 			}
-			else
+			catch (Exception e)
 			{
-				try
-				{
-					Field field = getField();
-					if (!field.isAccessible())
-						field.setAccessible(true);
-					ret = field.get(object);
-				}
-				catch (Exception e)
-				{
-					throw new RuntimeException(e);
-				}
+				throw new RuntimeException(e);
+			}
+		}
+		else
+		{
+			try
+			{
+				Field field = getField();
+				if (!field.isAccessible())
+					field.setAccessible(true);
+				ret = field.get(object);
+			}
+			catch (Exception e)
+			{
+				throw new RuntimeException(e);
 			}
 		}
 		
@@ -251,9 +250,13 @@ public class BeanProperty
 			{
 				getSetter().invoke(object, new Object[] { value });
 			}
-			catch (Exception e)
+			catch(Exception e)
 			{
-				e.printStackTrace();
+				Throwable	ex	= e;
+				if(ex instanceof InvocationTargetException)
+					ex	= ((InvocationTargetException)e).getTargetException();
+				
+				throw (ex instanceof RuntimeException) ? (RuntimeException)ex : new RuntimeException(ex);
 			}
 		}
 		else
@@ -267,7 +270,11 @@ public class BeanProperty
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+				Throwable	ex	= e;
+				if(ex instanceof InvocationTargetException)
+					ex	= ((InvocationTargetException)e).getTargetException();
+				
+				throw (ex instanceof RuntimeException) ? (RuntimeException)ex : new RuntimeException(ex);
 			}
 		}
 	}
