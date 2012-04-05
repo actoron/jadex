@@ -159,8 +159,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 				
 				lastack = seqnumber;
 
-				System.out.println("ack: "+seqnumber+" "+stop+" "+s+" "+sent.size());
-				System.out.println(sent);
+//				System.out.println("ack: "+seqnumber+" "+stop+" "+s+" "+sent.size());
+//				System.out.println(sent);
 				
 				// Try to send stored messages after some others have been acknowledged
 				sendStored();
@@ -514,7 +514,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	public boolean isDataFinished()
 	{
 		// All acks received and no unfinished multi packet
-		System.out.println("isDataFinished (unacknowledged, multipacketsize): "+sent.size()+" "+mpsize);
+//		System.out.println("isDataFinished (unacknowledged, multipacketsize): "+sent.size()+" "+mpsize);
 //		return sent.isEmpty() && (!multipackets || mpsize==0);
 		return !multipackets || mpsize==0;
 	}

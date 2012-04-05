@@ -592,28 +592,28 @@ public class SUtil
 	 */
 	public static String arrayToString(Object array)
 	{
-		String str = "";
+		StringBuffer str = new StringBuffer();
 
 		if(array != null && array.getClass().getComponentType() != null)
 		{
 			// inside arrays.
-			str += "[";
+			str.append("[");
 			for(int i = 0; i < Array.getLength(array); i++)
 			{
-				str += arrayToString(Array.get(array, i));
+				str.append(arrayToString(Array.get(array, i)));
 				if(i < Array.getLength(array) - 1)
 				{
-					str += ", ";
+					str.append(", ");
 				}
 			}
-			str += "]";
+			str.append("]");
 		}
 		else
 		{
 			// simple type
-			str += "" + array;
+			str.append(array);
 		}
-		return str;
+		return str.toString();
 	}
 
 	/**

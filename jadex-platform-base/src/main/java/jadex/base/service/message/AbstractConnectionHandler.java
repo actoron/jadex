@@ -350,7 +350,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 */
 	protected IFuture<Void> sendTask(AbstractSendTask task)
 	{
-		System.out.println("sendTask: "+SUtil.arrayToString(task.getProlog())+" "+task.getData().length);
+//		System.out.println("sendTask: "+SUtil.arrayToString(task.getProlog())+" "+task.getData().length);
 		
 		IComponentIdentifier[] recs = task.getReceivers();
 		if(recs.length!=1)
@@ -402,7 +402,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 			si.setTimer(createAckTimer(id));
 		}
 		
-		System.out.println("sent msg: "+si.getId()+" "+si.getTryCnt()+" "+SUtil.arrayToString(task.getReceivers()));
+//		System.out.println("sent msg: "+si.getId()+" "+si.getTryCnt()+" "+SUtil.arrayToString(task.getReceivers()));
 		
 		return ret;
 	}

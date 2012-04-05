@@ -1389,6 +1389,8 @@ public class MessageService extends BasicService implements IMessageService
 		}
 	}
 	
+	int cnt;
+	
 	/**
 	 *  Handle stream messages.
 	 */
@@ -1399,309 +1401,319 @@ public class MessageService extends BasicService implements IMessageService
 		 */
 		public void execute(Object obj)
 		{
-			byte[] rawmsg = (byte[])obj;
-			System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
-			int idx = 1;
-			byte type = rawmsg[idx++];
-			
-			byte[] codec_ids = new byte[rawmsg[idx++]];
-			byte[] bconid = new byte[4];
-			for(int i=0; i<codec_ids.length; i++)
+			try
 			{
-				codec_ids[i] = rawmsg[idx++];
-			}
-			for(int i=0; i<4; i++)
-			{
-				bconid[i] = rawmsg[idx++];
-			}
-			final int conid = SUtil.bytesToInt(bconid);
-			
-			int seqnumber = -1;
-			if(type==StreamSendTask.DATA_OUTPUT_INITIATOR || type==StreamSendTask.DATA_INPUT_PARTICIPANT)
-			{
+				byte[] rawmsg = (byte[])obj;
+				int mycnt = cnt++;
+	//			System.out.println("aaaa: "+mycnt+" "+getComponent().getComponentIdentifier());
+//				System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
+				int idx = 1;
+				byte type = rawmsg[idx++];
+				
+				byte[] codec_ids = new byte[rawmsg[idx++]];
+				byte[] bconid = new byte[4];
+				for(int i=0; i<codec_ids.length; i++)
+				{
+					codec_ids[i] = rawmsg[idx++];
+				}
 				for(int i=0; i<4; i++)
 				{
 					bconid[i] = rawmsg[idx++];
 				}
-				seqnumber = SUtil.bytesToInt(bconid);
-//				System.out.println("seqnr: "+seqnumber);
-			}
-			
-			final Object data;
-			if(codec_ids.length==0)
-			{
-				data = new byte[rawmsg.length-idx];
-				System.arraycopy(rawmsg, idx, data, 0, rawmsg.length-idx);
-			}
-			else
-			{
-				Object tmp = new ByteArrayInputStream(rawmsg, idx, rawmsg.length-idx);
-				for(int i=codec_ids.length-1; i>-1; i--)
-				{
-					ICodec dec = codecfactory.getCodec(codec_ids[i]);
-					tmp = dec.decode(tmp, classloader);
-				}
-				data = tmp;
-			}
-
-			// Handle output connection participant side
-			if(type==StreamSendTask.INIT_OUTPUT_INITIATOR)
-			{
-				IComponentIdentifier[] recs = (IComponentIdentifier[])data;
-				InputConnectionHandler ich = new InputConnectionHandler(MessageService.this);
-				final InputConnection con = new InputConnection(recs[0], recs[1], conid, false, ich);
-				pcons.put(new Integer(conid), ich);
-				System.out.println("created: "+con.hashCode());
+				final int conid = SUtil.bytesToInt(bconid);
 				
-				ich.initReceived();
-				
-				final Future<Void> ret = new Future<Void>();
-				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+				int seqnumber = -1;
+				if(type==StreamSendTask.DATA_OUTPUT_INITIATOR || type==StreamSendTask.DATA_INPUT_PARTICIPANT)
 				{
-					public void customResultAvailable(IComponentManagementService cms)
+					for(int i=0; i<4; i++)
 					{
-						AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(((IComponentIdentifier[])data)[1]);
-						if(component != null)
-						{
-							component.receiveStream(con);
-						}
+						bconid[i] = rawmsg[idx++];
 					}
-				});
-			}
-			else if(type==StreamSendTask.ACKINIT_OUTPUT_PARTICIPANT)
-			{
-				System.out.println("CCC: ack init");
-				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
-				if(och!=null)
-				{
-					och.ackReceived(StreamSendTask.INIT);
+					seqnumber = SUtil.bytesToInt(bconid);
+	//				System.out.println("seqnr: "+seqnumber);
 				}
-				else
-				{
-					System.out.println("OutputStream not found: "+conid);
-				}
-			}
-			else if(type==StreamSendTask.DATA_OUTPUT_INITIATOR)
-			{
-				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(new Integer(conid));
-				if(ich!=null)
-				{
-					ich.addData(seqnumber, (byte[])data);
-				}
-				else
-				{
-					System.out.println("InputStream not found (dai): "+conid);
-				}
-			}
-			else if(type==StreamSendTask.CLOSE_OUTPUT_INITIATOR)
-			{
-				System.out.println("CCC: close");
-				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(new Integer(conid));
-				if(ich!=null)
-				{
-					ich.closeReceived();
-				}
-				else
-				{
-					System.out.println("InputStream not found (coi): "+conid);
-				}
-			}
-			else if(type==StreamSendTask.ACKCLOSE_OUTPUT_PARTICIPANT)
-			{
-				System.out.println("CCC: ackclose");
-				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
-				if(och!=null)
-				{
-					och.ackReceived(StreamSendTask.CLOSE);
-//					och.ackCloseReceived();
-				}
-				else
-				{
-					System.out.println("OutputStream not found: "+conid);
-				}
-			}
-			else if(type==StreamSendTask.CLOSEREQ_OUTPUT_PARTICIPANT)
-			{
-				System.out.println("CCC: closereq");
-				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
-				if(och!=null)
-				{
-					och.closeRequestReceived();
-				}
-				else
-				{
-					System.out.println("OutputStream not found: "+conid);
-				}
-			}
-			else if(type==StreamSendTask.ACKCLOSEREQ_OUTPUT_INITIATOR)
-			{
-				System.out.println("CCC: ackclosereq");
-				InputConnectionHandler ich = (InputConnectionHandler)pcons.get(new Integer(conid));
-				if(ich!=null)
-				{
-					ich.ackReceived(StreamSendTask.CLOSEREQ);
-//					ich.ackCloseRequestReceived();
-				}
-				else
-				{
-					System.out.println("OutputStream not found: "+conid);
-				}
-			}
-			else if(type==StreamSendTask.ACKDATA_OUTPUT_PARTICIPANT)
-			{
-				// Handle input connection initiator side
-				OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
-				if(och!=null)
-				{
-					Tuple2<Integer, Boolean> tup = (Tuple2<Integer, Boolean>)data;
-					och.ackData(tup.getFirstEntity().intValue(), tup.getSecondEntity().booleanValue());
-				}
-				else
-				{
-					System.out.println("OutputStream not found: "+conid);
-				}
-			}
-			
-			else if(type==StreamSendTask.INIT_INPUT_INITIATOR)
-			{
-				IComponentIdentifier[] recs = (IComponentIdentifier[])data;
-				OutputConnectionHandler och = new OutputConnectionHandler(MessageService.this);
-				final OutputConnection con = new OutputConnection(recs[0], recs[1], conid, false, och);
-				pcons.put(new Integer(conid), och);
-//				System.out.println("created: "+con.hashCode());
 				
-				och.initReceived();
-				
-				final Future<Void> ret = new Future<Void>();
-				SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+				final Object data;
+				if(codec_ids.length==0)
 				{
-					public void customResultAvailable(IComponentManagementService cms)
+					data = new byte[rawmsg.length-idx];
+					System.arraycopy(rawmsg, idx, data, 0, rawmsg.length-idx);
+				}
+				else
+				{
+					Object tmp = new ByteArrayInputStream(rawmsg, idx, rawmsg.length-idx);
+					for(int i=codec_ids.length-1; i>-1; i--)
 					{
-						AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(((IComponentIdentifier[])data)[1]);
-						if(component != null)
-						{
-							component.receiveStream(con);
-//							pcons.put(new Integer(conid), con);
-						}
+						ICodec dec = codecfactory.getCodec(codec_ids[i]);
+						tmp = dec.decode(tmp, classloader);
 					}
-				});
+					data = tmp;
+				}
+	
+				// Handle output connection participant side
+				if(type==StreamSendTask.INIT_OUTPUT_INITIATOR)
+				{
+					IComponentIdentifier[] recs = (IComponentIdentifier[])data;
+					InputConnectionHandler ich = new InputConnectionHandler(MessageService.this);
+					final InputConnection con = new InputConnection(recs[0], recs[1], conid, false, ich);
+					pcons.put(new Integer(conid), ich);
+					System.out.println("created: "+con.hashCode());
+					
+					ich.initReceived();
+					
+					final Future<Void> ret = new Future<Void>();
+					SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+					{
+						public void customResultAvailable(IComponentManagementService cms)
+						{
+							AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(((IComponentIdentifier[])data)[1]);
+							if(component != null)
+							{
+								component.receiveStream(con);
+							}
+						}
+					});
+				}
+				else if(type==StreamSendTask.ACKINIT_OUTPUT_PARTICIPANT)
+				{
+//					System.out.println("CCC: ack init");
+					OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
+					if(och!=null)
+					{
+						och.ackReceived(StreamSendTask.INIT);
+					}
+					else
+					{
+						System.out.println("OutputStream not found: "+conid);
+					}
+				}
+				else if(type==StreamSendTask.DATA_OUTPUT_INITIATOR)
+				{
+					InputConnectionHandler ich = (InputConnectionHandler)pcons.get(new Integer(conid));
+					if(ich!=null)
+					{
+						ich.addData(seqnumber, (byte[])data);
+					}
+					else
+					{
+						System.out.println("InputStream not found (dai): "+conid);
+					}
+				}
+				else if(type==StreamSendTask.CLOSE_OUTPUT_INITIATOR)
+				{
+//					System.out.println("CCC: close");
+					InputConnectionHandler ich = (InputConnectionHandler)pcons.get(new Integer(conid));
+					if(ich!=null)
+					{
+						ich.closeReceived();
+					}
+					else
+					{
+						System.out.println("InputStream not found (coi): "+conid);
+					}
+				}
+				else if(type==StreamSendTask.ACKCLOSE_OUTPUT_PARTICIPANT)
+				{
+//					System.out.println("CCC: ackclose");
+					OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
+					if(och!=null)
+					{
+						och.ackReceived(StreamSendTask.CLOSE);
+	//					och.ackCloseReceived();
+					}
+					else
+					{
+						System.out.println("OutputStream not found: "+conid);
+					}
+				}
+				else if(type==StreamSendTask.CLOSEREQ_OUTPUT_PARTICIPANT)
+				{
+//					System.out.println("CCC: closereq");
+					OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
+					if(och!=null)
+					{
+						och.closeRequestReceived();
+					}
+					else
+					{
+						System.out.println("OutputStream not found: "+conid);
+					}
+				}
+				else if(type==StreamSendTask.ACKCLOSEREQ_OUTPUT_INITIATOR)
+				{
+//					System.out.println("CCC: ackclosereq");
+					InputConnectionHandler ich = (InputConnectionHandler)pcons.get(new Integer(conid));
+					if(ich!=null)
+					{
+						ich.ackReceived(StreamSendTask.CLOSEREQ);
+	//					ich.ackCloseRequestReceived();
+					}
+					else
+					{
+						System.out.println("OutputStream not found: "+conid);
+					}
+				}
+				else if(type==StreamSendTask.ACKDATA_OUTPUT_PARTICIPANT)
+				{
+					// Handle input connection initiator side
+					OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
+					if(och!=null)
+					{
+						Tuple2<Integer, Boolean> tup = (Tuple2<Integer, Boolean>)data;
+						och.ackData(tup.getFirstEntity().intValue(), tup.getSecondEntity().booleanValue());
+					}
+					else
+					{
+						System.out.println("OutputStream not found: "+conid);
+					}
+				}
+				
+				else if(type==StreamSendTask.INIT_INPUT_INITIATOR)
+				{
+					IComponentIdentifier[] recs = (IComponentIdentifier[])data;
+					OutputConnectionHandler och = new OutputConnectionHandler(MessageService.this);
+					final OutputConnection con = new OutputConnection(recs[0], recs[1], conid, false, och);
+					pcons.put(new Integer(conid), och);
+	//				System.out.println("created: "+con.hashCode());
+					
+					och.initReceived();
+					
+					final Future<Void> ret = new Future<Void>();
+					SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+					{
+						public void customResultAvailable(IComponentManagementService cms)
+						{
+							AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(((IComponentIdentifier[])data)[1]);
+							if(component != null)
+							{
+								component.receiveStream(con);
+	//							pcons.put(new Integer(conid), con);
+							}
+						}
+					});
+				}
+				else if(type==StreamSendTask.ACKINIT_INPUT_PARTICIPANT)
+				{
+					InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
+					if(ich!=null)
+					{
+						ich.ackReceived(StreamSendTask.INIT);
+					}
+					else
+					{
+						System.out.println("InputStream not found: "+conid);
+					}
+				}
+				else if(type==StreamSendTask.DATA_INPUT_PARTICIPANT)
+				{
+					InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
+					if(ich!=null)
+					{
+						ich.addData(seqnumber, (byte[])data);
+					}
+					else
+					{
+						System.out.println("InputStream not found: "+conid);
+					}
+				}
+				else if(type==StreamSendTask.ACKDATA_INPUT_INITIATOR)
+				{
+					OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(new Integer(conid));
+					if(och!=null)
+					{
+						Tuple2<Integer, Boolean> tup = (Tuple2<Integer, Boolean>)data;
+						och.ackData(tup.getFirstEntity().intValue(), tup.getSecondEntity().booleanValue());
+					}
+					else
+					{
+						System.out.println("OutputStream not found: "+conid);
+					}
+				}
+				else if(type==StreamSendTask.CLOSEREQ_INPUT_INITIATOR)
+				{
+					OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(new Integer(conid));
+					if(och!=null)
+					{
+						och.closeRequestReceived();
+					}
+					else
+					{
+						System.out.println("InputStream not found: "+conid);
+					}
+				}
+				else if(type==StreamSendTask.ACKCLOSEREQ_INPUT_PARTICIPANT)
+				{
+					InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
+					if(ich!=null)
+					{
+						ich.ackReceived(StreamSendTask.CLOSEREQ);
+					}
+					else
+					{
+						System.out.println("InputStream not found: "+conid);
+					}
+				}
+				else if(type==StreamSendTask.CLOSE_INPUT_PARTICIPANT)
+				{
+					InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
+					if(ich!=null)
+					{
+						ich.closeReceived();
+					}
+					else
+					{
+						System.out.println("OutputStream not found: "+conid);
+					}
+				}
+				else if(type==StreamSendTask.ACKCLOSE_INPUT_INITIATOR)
+				{
+					OutputConnectionHandler ich = (OutputConnectionHandler)pcons.get(new Integer(conid));
+					if(ich!=null)
+					{
+						ich.ackReceived(StreamSendTask.CLOSE);
+	//					ich.ackCloseReceived();
+					}
+					else
+					{
+						System.out.println("InputStream not found: "+conid);
+					}
+				}
+				
+				// Handle lease time update
+				else if(type==StreamSendTask.ALIVE_INITIATOR)
+				{
+	//				System.out.println("alive initiator");
+					AbstractConnectionHandler con = (AbstractConnectionHandler)pcons.get(new Integer(conid));
+					if(con!=null)
+					{
+						con.setAliveTime(System.currentTimeMillis());
+					}
+					else
+					{
+						System.out.println("Stream not found: "+conid);
+					}
+				}
+				else if(type==StreamSendTask.ALIVE_PARTICIPANT)
+				{
+	//				System.out.println("alive particpant");
+					AbstractConnectionHandler con = (AbstractConnectionHandler)icons.get(new Integer(conid));
+					if(con!=null)
+					{
+						con.setAliveTime(System.currentTimeMillis());
+					}
+					else
+					{
+						System.out.println("Stream not found: "+conid);
+					}
+				}
+	
+//				System.out.println("bbbb: "+mycnt+" "+getComponent().getComponentIdentifier());
 			}
-			else if(type==StreamSendTask.ACKINIT_INPUT_PARTICIPANT)
+			catch(Throwable e)
 			{
-				InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
-				if(ich!=null)
-				{
-					ich.ackReceived(StreamSendTask.INIT);
-				}
-				else
-				{
-					System.out.println("InputStream not found: "+conid);
-				}
-			}
-			else if(type==StreamSendTask.DATA_INPUT_PARTICIPANT)
-			{
-				InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
-				if(ich!=null)
-				{
-					ich.addData(seqnumber, (byte[])data);
-				}
-				else
-				{
-					System.out.println("InputStream not found: "+conid);
-				}
-			}
-			else if(type==StreamSendTask.ACKDATA_INPUT_INITIATOR)
-			{
-				OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(new Integer(conid));
-				if(och!=null)
-				{
-					Tuple2<Integer, Boolean> tup = (Tuple2<Integer, Boolean>)data;
-					och.ackData(tup.getFirstEntity().intValue(), tup.getSecondEntity().booleanValue());
-				}
-				else
-				{
-					System.out.println("OutputStream not found: "+conid);
-				}
-			}
-			else if(type==StreamSendTask.CLOSEREQ_INPUT_INITIATOR)
-			{
-				OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(new Integer(conid));
-				if(och!=null)
-				{
-					och.closeRequestReceived();
-				}
-				else
-				{
-					System.out.println("InputStream not found: "+conid);
-				}
-			}
-			else if(type==StreamSendTask.ACKCLOSEREQ_INPUT_PARTICIPANT)
-			{
-				InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
-				if(ich!=null)
-				{
-					ich.ackReceived(StreamSendTask.CLOSEREQ);
-//					ich.ackCloseRequestReceived();
-				}
-				else
-				{
-					System.out.println("InputStream not found: "+conid);
-				}
-			}
-			else if(type==StreamSendTask.CLOSE_INPUT_PARTICIPANT)
-			{
-				InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
-				if(ich!=null)
-				{
-					ich.closeReceived();
-				}
-				else
-				{
-					System.out.println("OutputStream not found: "+conid);
-				}
-			}
-			else if(type==StreamSendTask.ACKCLOSE_INPUT_INITIATOR)
-			{
-				OutputConnectionHandler ich = (OutputConnectionHandler)pcons.get(new Integer(conid));
-				if(ich!=null)
-				{
-					ich.ackReceived(StreamSendTask.CLOSE);
-//					ich.ackCloseReceived();
-				}
-				else
-				{
-					System.out.println("InputStream not found: "+conid);
-				}
-			}
-			
-			// Handle lease time update
-			else if(type==StreamSendTask.ALIVE_INITIATOR)
-			{
-//				System.out.println("alive initiator");
-				AbstractConnectionHandler con = (AbstractConnectionHandler)pcons.get(new Integer(conid));
-				if(con!=null)
-				{
-					con.setAliveTime(System.currentTimeMillis());
-				}
-				else
-				{
-					System.out.println("Stream not found: "+conid);
-				}
-			}
-			else if(type==StreamSendTask.ALIVE_PARTICIPANT)
-			{
-//				System.out.println("alive particpant");
-				AbstractConnectionHandler con = (AbstractConnectionHandler)icons.get(new Integer(conid));
-				if(con!=null)
-				{
-					con.setAliveTime(System.currentTimeMillis());
-				}
-				else
-				{
-					System.out.println("Stream not found: "+conid);
-				}
+				e.printStackTrace();
 			}
 		}
 	}

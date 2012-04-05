@@ -71,7 +71,7 @@ public class InitiatorAgent
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		tc.setTestCount(1);
+		tc.setTestCount(2);
 		
 		final Future<TestReport> ret = new Future<TestReport>();
 		ret.addResultListener(agent.createResultListener(new IResultListener<TestReport>()
@@ -100,31 +100,31 @@ public class InitiatorAgent
 //			}
 //		}));
 		
-		testRemote(2).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-		{
-			public void customResultAvailable(TestReport result)
-			{
-				tc.addReport(result);
-				ret.setResult(null);
-				agent.killAgent();
-			}
-		}));
-		
-//		testLocal(1).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+//		testRemote(2).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 //		{
 //			public void customResultAvailable(TestReport result)
 //			{
 //				tc.addReport(result);
-//				testRemote(2).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-//				{
-//					public void customResultAvailable(TestReport result)
-//					{
-//						tc.addReport(result);
-//						ret.setResult(null);
-//					}
-//				}));
+//				ret.setResult(null);
+//				agent.killAgent();
 //			}
 //		}));
+		
+		testLocal(1).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+		{
+			public void customResultAvailable(TestReport result)
+			{
+				tc.addReport(result);
+				testRemote(2).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+				{
+					public void customResultAvailable(TestReport result)
+					{
+						tc.addReport(result);
+						ret.setResult(null);
+					}
+				}));
+			}
+		}));
 	}
 	
 	/**
