@@ -138,9 +138,11 @@ public class ArrayCodec extends AbstractCodec
 	/**
 	 *  Test if the processor is applicable.
 	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
 		return clazz.isArray();
 	}
@@ -178,7 +180,7 @@ public class ArrayCodec extends AbstractCodec
 					if (ignoreclass)
 						ec.ignoreNextClassWrite();
 					
-					traverser.traverse(val, val.getClass(), traversed, processors, clone, ec);
+					traverser.traverse(val, val.getClass(), traversed, processors, clone, null, ec);
 				}
 			}
 		}

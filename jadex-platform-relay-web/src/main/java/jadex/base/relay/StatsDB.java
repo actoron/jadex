@@ -192,7 +192,7 @@ public class StatsDB
 	}
 	
 	/**
-	 *  Get all saved platform infos (sorted by recency, newest first).
+	 *  Get all saved platform infos (sorted by id, oldest first).
 	 */
 	public PlatformInfo[]	getAllPlatformInfos()
 	{
@@ -221,8 +221,9 @@ public class StatsDB
 	
 	/**
 	 *  Get cumulated platform infos (sorted by recency, newest first).
+	 *  @param limit	Limit the number of result (-1 for no limit);
 	 */
-	public PlatformInfo[]	getPlatformInfos()
+	public PlatformInfo[]	getPlatformInfos(int limit)
 	{
 		List<PlatformInfo>	ret	= new ArrayList<PlatformInfo>();
 		
@@ -234,7 +235,7 @@ public class StatsDB
 					"select prefix as PLATFORM, hostip, max(HOSTNAME) as HOSTNAME, "
 					+"count(id) as MSGS, max(CONTIME) AS CONTIME, min(CONTIME) AS DISTIME "
 					+"from relay.platforminfo group by hostip, prefix order by CONTIME desc");
-				while(rs.next())
+				while(rs.next() && (limit==-1 || ret.size()<limit))
 				{
 					ret.add(new PlatformInfo(null, rs.getString("PLATFORM"), rs.getString("HOSTIP"),
 						rs.getString("HOSTNAME"), null, rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
@@ -275,16 +276,21 @@ public class StatsDB
 	{
 		StatsDB	db	= getDB();
 		
-//		PlatformInfo	pi	= new PlatformInfo("somid", "hostip", "somename", "prot");
+//		for(int i=1; i<20; i++)
+//		{
+//			PlatformInfo	pi	= new PlatformInfo("somid"+i, "hostip", "somename", "prot");
+//		}
 //		printPlatformInfos(db.getPlatformInfos());
 //		
 //		pi.reconnect("hostip", "other hostname");
 //		pi.addMessage(123, 456);
 //		
 //		pi.disconnect();
-		printPlatformInfos(db.getPlatformInfos());
+		printPlatformInfos(db.getPlatformInfos(5));
+		System.out.println("---");
+		printPlatformInfos(db.getPlatformInfos(-1));
 		
-		printResultSet(db.con.createStatement().executeQuery("select * from relay.platforminfo"));
+//		printResultSet(db.con.createStatement().executeQuery("select * from relay.platforminfo"));
 	}
 	
 	/**

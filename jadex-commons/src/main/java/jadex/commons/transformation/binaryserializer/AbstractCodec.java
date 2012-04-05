@@ -14,7 +14,7 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 		EncodingContext ec = (EncodingContext) context;
 		
@@ -44,9 +44,9 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 		{
 			for (ITraverseProcessor preproc : preprocessors)
 			{
-				if (preproc.isApplicable(object, clazz, clone))
+				if (preproc.isApplicable(object, clazz, clone, null))
 				{
-					object = preproc.process(object, clazz, processors, traverser, traversed, clone, context);
+					object = preproc.process(object, clazz, processors, traverser, traversed, clone, null, context);
 				}
 			}
 		}

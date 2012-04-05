@@ -396,14 +396,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		binpreprocs = new ArrayList<ITraverseProcessor>();
 		ITraverseProcessor bpreproc = new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 			{
 				return ComponentIdentifier.class.equals(clazz);
 			}
 			
 			public Object process(Object object, Class<?> clazz,
 					List<ITraverseProcessor> processors, Traverser traverser,
-					Map<Object, Object> traversed, boolean clone, Object context)
+					Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				IComponentIdentifier src = (IComponentIdentifier)object;
 				ComponentIdentifier ret = null;
@@ -420,14 +420,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		bpreproc = new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 			{
 				return object != null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class);
 			}
 			
 			public Object process(Object object, Class<?> clazz,
 					List<ITraverseProcessor> processors, Traverser traverser,
-					Map<Object, Object> traversed, boolean clone, Object context)
+					Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				return BasicServiceInvocationHandler.getPojoServiceProxy(object);
 			}
@@ -436,14 +436,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		bpreproc = new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 			{
 				return marshal.isRemoteReference(object);
 			}
 			
 			public Object process(Object object, Class<?> clazz,
 					List<ITraverseProcessor> processors, Traverser traverser,
-					Map<Object, Object> traversed, boolean clone, Object context)
+					Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				try
 				{

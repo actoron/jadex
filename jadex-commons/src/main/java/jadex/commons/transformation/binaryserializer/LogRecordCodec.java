@@ -47,9 +47,11 @@ public class LogRecordCodec extends AbstractCodec
 	/**
 	 *  Test if the processor is applicable.
 	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
 		return isApplicable(clazz);
 	}
@@ -62,7 +64,7 @@ public class LogRecordCodec extends AbstractCodec
 	{
 		LogRecord rec = (LogRecord) object;
 		Level level = rec.getLevel();
-		traverser.traverse(level, level.getClass(), traversed, processors, clone, ec);
+		traverser.traverse(level, level.getClass(), traversed, processors, clone, null, ec);
 		ec.writeString(rec.getMessage());
 		ec.writeSignedVarInt(rec.getMillis());
 		

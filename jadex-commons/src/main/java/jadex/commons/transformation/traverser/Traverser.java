@@ -92,6 +92,19 @@ public class Traverser
 	 */
 	public static Object traverseObject(Object object, List<ITraverseProcessor> processors, boolean clone, Object context)
 	{
+		return traverseObject(object, processors, clone, null, context);
+	}
+	
+	/**
+	 *  Traverse an object.
+	 *  @param object The object to traverse.
+	 *  @param processors The lists of processors.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return The traversed (or modified) object.
+	 */
+	public static Object traverseObject(Object object, List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
+	{
 //		if(clone && object!=null && object.getClass().getName().indexOf("Prop")!=-1)
 //		System.out.println("Cloning: "+object);
 //		if(!clone) 
@@ -101,7 +114,7 @@ public class Traverser
 		try
 		{
 			// Must be identity hash map because otherwise empty collections will equal
-			ret = getInstance().traverse(object, null, new IdentityHashMap<Object, Object>(), processors, clone, context);
+			ret = getInstance().traverse(object, null, new IdentityHashMap<Object, Object>(), processors, clone, targetcl, context);
 		}
 		catch(RuntimeException e)
 		{
@@ -117,9 +130,13 @@ public class Traverser
 	
 	/**
 	 *  Traverse an object.
+	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
+	 *  @return The processed object.
 	 */
 	public Object traverse(Object object, Class<?> clazz, Map<Object, Object> traversed, 
-		List<ITraverseProcessor> processors, boolean clone, Object context)
+		List<ITraverseProcessor> processors, boolean clone, ClassLoader targetcl, Object context)
 	{
 		Object ret = object;
 		
@@ -145,10 +162,10 @@ public class Traverser
 			for(int i=0; i<processors.size() && !fin; i++)
 			{
 				ITraverseProcessor proc = processors.get(i);
-				if(proc.isApplicable(processed, clazz, clone))
+				if(proc.isApplicable(processed, clazz, clone, targetcl))
 				{
 //						System.out.println("traverse: "+object+" "+proc.getClass());
-					processed = proc.process(processed, clazz, processors, this, traversed, clone, context);
+					processed = proc.process(processed, clazz, processors, this, traversed, clone, targetcl, context);
 					ret	= processed;
 					fin = true;
 					//processorcache.put(clazz, proc);

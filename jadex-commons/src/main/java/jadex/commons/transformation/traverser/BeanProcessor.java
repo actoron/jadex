@@ -18,11 +18,13 @@ public class BeanProcessor implements ITraverseProcessor
 	protected IBeanIntrospector intro = BeanIntrospectorFactory.getInstance().getBeanIntrospector(5000);
 	
 	/**
-	 *  Test if the processor is appliable.
+	 *  Test if the processor is applicable.
 	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
 		return true;
 	}
@@ -30,13 +32,15 @@ public class BeanProcessor implements ITraverseProcessor
 	/**
 	 *  Process an object.
 	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 //		System.out.println("fp: "+object);
-		Object ret = getReturnObject(object, clazz, clone);
+		Object ret = getReturnObject(object, clazz, clone, targetcl);
 		traversed.put(object, ret);
 		
 		try
@@ -44,7 +48,7 @@ public class BeanProcessor implements ITraverseProcessor
 //			System.out.println("cloned: "+object.getClass());
 //			ret = object.getClass().newInstance();
 			
-			traverseProperties(object, traversed, processors, traverser, clone, ret, context);
+			traverseProperties(object, traversed, processors, traverser, clone, targetcl, ret, context);
 		}
 		catch(Exception e)
 		{
@@ -58,7 +62,7 @@ public class BeanProcessor implements ITraverseProcessor
 	 *  Clone all properties of an object.
 	 */
 	protected void traverseProperties(Object object, Map<Object, Object> cloned, 
-			List<ITraverseProcessor> processors, Traverser traverser, boolean clone, Object ret, Object context)
+			List<ITraverseProcessor> processors, Traverser traverser, boolean clone, ClassLoader targetcl, Object ret, Object context)
 	{
 		Class clazz = object.getClass();
 			
@@ -77,7 +81,7 @@ public class BeanProcessor implements ITraverseProcessor
 					Object val = prop.getPropertyValue(object);//getGetter().invoke(object, new Object[0]);
 					if(val!=null) 
 					{
-						Object newval = traverser.traverse(val, prop.getType(), cloned, processors, clone, context);
+						Object newval = traverser.traverse(val, prop.getType(), cloned, processors, clone, targetcl, context);
 						if(clone || val!=newval)
 							prop.setPropertyValue(ret, newval);
 //							prop.getSetter().invoke(ret, new Object[]{newval});
@@ -96,11 +100,14 @@ public class BeanProcessor implements ITraverseProcessor
 	/**
 	 *  Get the object that is returned.
 	 */
-	public Object getReturnObject(Object object, Class clazz, boolean clone)
+	public Object getReturnObject(Object object, Class clazz, boolean clone, ClassLoader targetcl)
 	{
 		Object ret = object;
-		if(clone)
+		if(clone || targetcl!=null && !clazz.equals(SReflect.classForName0(clazz.getName(), targetcl)))
 		{
+			if(targetcl!=null)
+				clazz	= SReflect.classForName0(clazz.getName(), targetcl);
+			
 			try
 			{
 				Constructor	c	= clazz.getDeclaredConstructors()[0];

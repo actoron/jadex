@@ -122,7 +122,7 @@ public class MarshalService extends BasicService implements IMarshalService
 		// Insert before FieldProcessor that is always applicable
 		processors.add(processors.size()-1, new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 			{
 				return object!=null && !(object instanceof BasicService) 
 					&& object.getClass().isAnnotationPresent(Service.class);
@@ -130,7 +130,7 @@ public class MarshalService extends BasicService implements IMarshalService
 			
 			public Object process(Object object, Class<?> clazz,
 				List<ITraverseProcessor> processors, Traverser traverser,
-				Map<Object, Object> traversed, boolean clone, Object context)
+				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				return BasicServiceInvocationHandler.getPojoServiceProxy(object);
 			}
@@ -139,14 +139,14 @@ public class MarshalService extends BasicService implements IMarshalService
 		// Add processor for streams
 		processors.add(processors.size()-1, new ITraverseProcessor()
 		{
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 			{
 				return object instanceof ServiceInputConnectionProxy;
 			}
 			
 			public Object process(Object object, Class<?> clazz,
 				List<ITraverseProcessor> processors, Traverser traverser,
-				Map<Object, Object> traversed, boolean clone, Object context)
+				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				ServiceInputConnectionProxy sicp = (ServiceInputConnectionProxy)object;
 				

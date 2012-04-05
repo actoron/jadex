@@ -1,11 +1,9 @@
 package jadex.bridge.service.types.factory;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-import jadex.bridge.ClassInfo;
 import jadex.bridge.modelinfo.ConfigurationInfo;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
@@ -14,6 +12,7 @@ import jadex.commons.SReflect;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.traverser.Traverser;
 
 /**
  *  Helper methods for loading component models without a running platform.
@@ -57,44 +56,8 @@ public class SBootstrapLoader
 						else
 						{
 							// Wrapper for model info from different class loaders.
-							ret.setResult((IModelInfo)Proxy.newProxyInstance(SBootstrapLoader.class.getClassLoader(),
-								new Class<?>[]{IModelInfo.class}, new InvocationHandler()
-							{
-								public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-								{
-									Object	ret	= model.getClass().getMethod(method.getName(), method.getParameterTypes())
-										.invoke(model, args);
-									
-									// Wrap arguments also...
-									if(method.getName().equals("getArguments"))
-									{
-										IArgument[]	iargs	= new IArgument[Array.getLength(ret)];
-										for(int i=0; i<iargs.length; i++)
-										{
-											final Object	arg	= Array.get(ret, i);
-											iargs[i]	= (IArgument)Proxy.newProxyInstance(SBootstrapLoader.class.getClassLoader(),
-												new Class<?>[]{IArgument.class}, new InvocationHandler()
-											{
-												public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-												{
-													Object	ret	= arg.getClass().getMethod(method.getName(), method.getParameterTypes())
-														.invoke(arg, args);
-													
-													// Wrap ClassInfos...
-													if(method.getName().equals("getClazz"))
-													{
-														ret	= new ClassInfo((String)ret.getClass().getMethod("getTypeName").invoke(ret));
-													}
-													
-													return ret;
-												}
-											});
-										}
-										ret	= iargs;
-									}
-									return ret;
-								}
-							}));
+							Object	traversed	= Traverser.traverseObject(model, Traverser.getDefaultProcessors(), false, getClass().getClassLoader(), null);
+							ret.setResult((IModelInfo)traversed);
 						}
 					}
 					else // if(method.getName().equals("exceptionOccurred"))

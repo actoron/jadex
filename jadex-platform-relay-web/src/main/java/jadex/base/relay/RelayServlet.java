@@ -119,9 +119,15 @@ public class RelayServlet extends HttpServlet
 			if(id==null)
 			{
 				String	view;
+				// todo: add request property
 				if("/history".equals(request.getServletPath()))
 				{
-					request.setAttribute("platforms", StatsDB.getDB().getPlatformInfos());
+					request.setAttribute("platforms", StatsDB.getDB().getPlatformInfos(20));
+					view	= "/WEB-INF/jsp/history.jsp";
+				}
+				else if("/history_all".equals(request.getServletPath()))
+				{
+					request.setAttribute("platforms", StatsDB.getDB().getPlatformInfos(-1));
 					view	= "/WEB-INF/jsp/history.jsp";
 				}
 				else if("/export".equals(request.getServletPath()))

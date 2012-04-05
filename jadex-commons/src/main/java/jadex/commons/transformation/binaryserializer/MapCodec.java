@@ -73,9 +73,11 @@ public class MapCodec extends AbstractCodec
 	/**
 	 *  Test if the processor is applicable.
 	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
 		return isApplicable(clazz);
 	}
@@ -100,7 +102,7 @@ public class MapCodec extends AbstractCodec
 			}
 			else
 			{
-				traverser.traverse(ev, ev.getClass(), traversed, processors, clone, ec);
+				traverser.traverse(ev, ev.getClass(), traversed, processors, clone, null, ec);
 			}
 			
 			ev = entry.getValue();
@@ -111,7 +113,7 @@ public class MapCodec extends AbstractCodec
 			}
 			else
 			{
-				traverser.traverse(ev, ev.getClass(), traversed, processors, clone, ec);
+				traverser.traverse(ev, ev.getClass(), traversed, processors, clone, null, ec);
 			}
 		}
 		

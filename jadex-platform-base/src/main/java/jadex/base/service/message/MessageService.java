@@ -388,12 +388,12 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			public Object process(Object object, Class<?> clazz,
 				List<ITraverseProcessor> processors, Traverser traverser,
-				Map<Object, Object> traversed, boolean clone, Object context)
+				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 			{
 				return internalUpdateComponentIdentifier((IComponentIdentifier)object);
 			}
 			
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 			{
 				return object instanceof IComponentIdentifier;
 			}

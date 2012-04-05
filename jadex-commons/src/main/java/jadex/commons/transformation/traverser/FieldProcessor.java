@@ -1,5 +1,7 @@
 package jadex.commons.transformation.traverser;
 
+import jadex.commons.SReflect;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
@@ -18,11 +20,13 @@ class FieldProcessor implements ITraverseProcessor
 	}
 	
 	/**
-	 *  Test if the processor is appliable.
+	 *  Test if the processor is applicable.
 	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
 		return true;
 	}
@@ -30,13 +34,15 @@ class FieldProcessor implements ITraverseProcessor
 	/**
 	 *  Process an object.
 	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return The processed object.
 	 */
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
-		Traverser traverser, Map<Object, Object> traversed, boolean clone, Object context)
+		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
 //		System.out.println("fp: "+object);
-		Object ret = getReturnObject(object, clazz, clone);
+		Object ret = getReturnObject(object, clazz, clone, targetcl);
 		traversed.put(object, ret);
 		
 		try
@@ -44,7 +50,7 @@ class FieldProcessor implements ITraverseProcessor
 //			System.out.println("cloned: "+object.getClass());
 //			ret = object.getClass().newInstance();
 			
-			traverseFields(object, traversed, processors, traverser, clone, ret, context);
+			traverseFields(object, traversed, processors, traverser, clone, targetcl, ret, context);
 		}
 		catch(Exception e)
 		{
@@ -58,7 +64,7 @@ class FieldProcessor implements ITraverseProcessor
 	 *  Clone all fields of an object.
 	 */
 	protected void traverseFields(Object object, Map<Object, Object> cloned, 
-			List<ITraverseProcessor> processors, Traverser traverser, boolean clone, Object ret, Object context)
+			List<ITraverseProcessor> processors, Traverser traverser, boolean clone, ClassLoader targetcl, Object ret, Object context)
 	{
 		Class clazz = object.getClass();
 			
@@ -78,7 +84,7 @@ class FieldProcessor implements ITraverseProcessor
 						val = fields[i].get(object);
 						if(val!=null) 
 						{
-							Object newval = traverser.traverse(val, fields[i].getType(), cloned, processors, clone, context);
+							Object newval = traverser.traverse(val, fields[i].getType(), cloned, processors, clone, targetcl, context);
 							if(clone || val!=newval)
 								fields[i].set(ret, newval);
 						}
@@ -97,14 +103,17 @@ class FieldProcessor implements ITraverseProcessor
 	/**
 	 *  Get the object that is returned.
 	 */
-	public Object getReturnObject(Object object, Class clazz, boolean clone)
+	public Object getReturnObject(Object object, Class clazz, boolean clone, ClassLoader targetcl)
 	{
 		Object ret = object;
-		if(clone)
+		if(clone || targetcl!=null && !clazz.equals(SReflect.classForName0(clazz.getName(), targetcl)))
 		{
+			if(targetcl!=null)
+				clazz	= SReflect.classForName0(clazz.getName(), targetcl);
+			
 			try
 			{
-				ret = object.getClass().newInstance();
+				ret = clazz.newInstance();
 			}
 			catch(Exception e)
 			{

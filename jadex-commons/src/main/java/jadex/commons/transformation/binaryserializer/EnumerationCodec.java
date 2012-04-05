@@ -51,11 +51,13 @@ public class EnumerationCodec extends AbstractCodec
 	}
 	
 	/**
-	 *  Test if the processor is appliable.
+	 *  Test if the processor is applicable.
 	 *  @param object The object.
+	 *  @param targetcl	If not null, the traverser should make sure that the result object is compatible with the class loader,
+	 *    e.g. by cloning the object using the class loaded from the target class loader.
 	 *  @return True, if is applicable. 
 	 */
-	public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
 		return isApplicable(clazz);
 	}
@@ -86,7 +88,7 @@ public class EnumerationCodec extends AbstractCodec
 			{
 				ec.writeVarInt(count);
 				Class valclazz = val!=null? val.getClass(): null;
-				traverser.traverse(val, valclazz, traversed, processors, clone, ec);
+				traverser.traverse(val, valclazz, traversed, processors, clone, null, ec);
 			}
 			++count;
 		}

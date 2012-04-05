@@ -123,7 +123,7 @@ public class BinarySerializer
 			}
 		};
 		//Traverser.traverseObject(val, ENCODER_HANDLERS, false, context);
-		traverser.traverse(val, null, new IdentityHashMap<Object, Object>(), ENCODER_HANDLERS, false, context);
+		traverser.traverse(val, null, new IdentityHashMap<Object, Object>(), ENCODER_HANDLERS, false, null, context);
 		
 		return context.getBytes();
 	}
