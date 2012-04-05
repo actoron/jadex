@@ -80,12 +80,25 @@ public class StatsDB
 				// Update platform entries where disconnection was missed.
 				con.createStatement().executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
 				
+				// Replace android platform names and-xxx to and_xxx
+				PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PLATFORM=?, PREFIX=? WHERE ID=?");
+				rs	= con.createStatement().executeQuery("select ID, PLATFORM from relay.platforminfo where PLATFORM like 'and-%'");
+				while(rs.next())
+				{
+					int	param	= 1;
+					String	name	= "and_"+rs.getString("PLATFORM").substring(4);
+					update.setString(param++, name);
+					update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
+					update.setInt(param++, rs.getInt("ID"));
+					update.executeUpdate();
+				}
+				
 				// Add platform prefix column, if it doesn't exist.
 				rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PREFIX");
 				if(!rs.next())
 				{
 					con.createStatement().execute("ALTER TABLE RELAY.PLATFORMINFO ADD PREFIX VARCHAR(60)");
-					PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PREFIX=? WHERE ID=?");
+					update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PREFIX=? WHERE ID=?");
 					
 					rs	= con.createStatement().executeQuery("select ID, PLATFORM from relay.platforminfo");
 					while(rs.next())
@@ -116,6 +129,10 @@ public class StatsDB
 		{
 			try
 			{
+				String name	= pi.getId();
+				if(name.startsWith("and-"))
+					name	= "and_"+name.substring(4);
+				
 				if(pi.getDBId()==null)
 				{
 					if(insert==null)
@@ -127,7 +144,7 @@ public class StatsDB
 					}
 					
 					int	param	= 1;
-					insert.setString(param++, pi.getId());
+					insert.setString(param++, name);
 					insert.setString(param++, pi.getHostIP());
 					insert.setString(param++, pi.getHostName());
 					insert.setString(param++, pi.getScheme());
@@ -136,7 +153,7 @@ public class StatsDB
 					insert.setInt(param++, pi.getMessageCount());
 					insert.setDouble(param++, pi.getBytes());
 					insert.setDouble(param++, pi.getTransferTime());
-					insert.setString(param++, ComponentIdentifier.getPlatformPrefix(pi.getId()));
+					insert.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
 					insert.executeUpdate();
 					ResultSet	keys	= insert.getGeneratedKeys();
 					keys.next();
@@ -152,7 +169,7 @@ public class StatsDB
 					}
 					
 					int	param	= 1;
-					update.setString(param++, pi.getId());
+					update.setString(param++, name);
 					update.setString(param++, pi.getHostIP());
 					update.setString(param++, pi.getHostName());
 					update.setString(param++, pi.getScheme());
@@ -161,7 +178,7 @@ public class StatsDB
 					update.setInt(param++, pi.getMessageCount());
 					update.setDouble(param++, pi.getBytes());
 					update.setDouble(param++, pi.getTransferTime());
-					update.setString(param++, ComponentIdentifier.getPlatformPrefix(pi.getId()));
+					update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
 					update.setInt(param++, pi.getDBId().intValue());
 					update.executeUpdate();
 				}
@@ -216,7 +233,7 @@ public class StatsDB
 				ResultSet	rs	= con.createStatement().executeQuery(
 					"select prefix as PLATFORM, hostip, max(HOSTNAME) as HOSTNAME, "
 					+"count(id) as MSGS, max(CONTIME) AS CONTIME, min(CONTIME) AS DISTIME "
-					+"from relay.platforminfo group by hostip, prefix");
+					+"from relay.platforminfo group by hostip, prefix order by CONTIME desc");
 				while(rs.next())
 				{
 					ret.add(new PlatformInfo(null, rs.getString("PLATFORM"), rs.getString("HOSTIP"),

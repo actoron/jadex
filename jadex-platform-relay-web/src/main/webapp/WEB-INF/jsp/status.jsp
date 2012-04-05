@@ -9,22 +9,29 @@
 %>
 
 <h2>Connected Platforms</h2>
-<% if(infos.length>0) {
+<%
+if(infos.length>0)
+{
 	StringBuffer markers	= new StringBuffer();
 	for(int i=0; i<infos.length; i++)
 	{
-		markers.append("&markers=");
-		if(i<9)
+		if(infos[i].getPosition()!=null)
 		{
-			markers.append("label:");
-			markers.append(i+1);
-			markers.append("|");
+			markers.append("&markers=");
+			if(i<9)
+			{
+				markers.append("label:");
+				markers.append(i+1);
+				markers.append("|");
+			}
+			markers.append(infos[i].getPosition());
 		}
-		markers.append(infos[i].getPosition());
 	}
-%>
-	<img class="map" src="http://maps.googleapis.com/maps/api/staticmap?size=700x450&sensor=false<%= markers %>"/>
-<% } %>
+	if(markers.length()>0)
+	{ %>
+		<img class="map" src="http://maps.googleapis.com/maps/api/staticmap?size=700x450&sensor=false<%= markers %>"/>
+<%	}
+} %>
 <table>
 	<tr>
 		<th>&nbsp;</th>

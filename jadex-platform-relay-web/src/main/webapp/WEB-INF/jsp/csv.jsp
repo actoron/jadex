@@ -16,8 +16,8 @@ ID;Platform;Host;IP;Scheme;Connected;Disconnected;Messages;Bytes;Transfer_Time
 		%>;<%= infos[i].getHostName()
 		%>;<%= infos[i].getHostIP()
 		%>;<%= infos[i].getScheme()
-		%>;<%= infos[i].getConnectDate().getTime()
-		%>;<%= infos[i].getDisconnectDate().getTime()
+		%>;<%= infos[i].getConnectDate()!=null ? infos[i].getConnectDate().getTime() : ""
+		%>;<%= infos[i].getDisconnectDate()!=null ? infos[i].getDisconnectDate().getTime() : ""
 		%>;<%= infos[i].getMessageCount()
 		%>;<%= infos[i].getBytes()
 		%>;<%= infos[i].getTransferTime() %>

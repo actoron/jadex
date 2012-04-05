@@ -66,30 +66,28 @@ public class GeoIPService
 			try
 			{
 				Location	loc	= ls.getLocation(ip);
-				ret	= loc.city;
-				
-				String	reg	= regionName.regionNameByCode(loc.countryCode, loc.region);
-				if(ret==null)
+				if(loc!=null)
 				{
-					ret	= reg;
-				}
-				else if(!ret.equals(reg))
-				{
-					ret	+= ", "+reg;
-				}
-				
-				if(ret==null)
-				{
-					ret	= loc.countryName;
-				}
-				else if(loc.countryName!=null && !loc.countryName.equals(loc.city) && !loc.countryName.equals(reg))
-				{
-					ret	+= ", "+loc.countryName;
-				}
-				
-				if(ret==null)
-				{
-					ret	= "unknown";
+					ret	= loc.city;
+					
+					String	reg	= regionName.regionNameByCode(loc.countryCode, loc.region);
+					if(ret==null)
+					{
+						ret	= reg;
+					}
+					else if(!ret.equals(reg))
+					{
+						ret	+= ", "+reg;
+					}
+					
+					if(ret==null)
+					{
+						ret	= loc.countryName;
+					}
+					else if(loc.countryName!=null && !loc.countryName.equals(loc.city) && !loc.countryName.equals(reg))
+					{
+						ret	+= ", "+loc.countryName;
+					}
 				}
 			}
 			catch(Exception e)
@@ -119,7 +117,10 @@ public class GeoIPService
 			try
 			{
 				Location	loc	= ls.getLocation(ip);
-				ret	= loc.countryCode.toLowerCase();
+				if(loc!=null)
+				{
+					ret	= loc.countryCode.toLowerCase();
+				}
 			}
 			catch(Exception e)
 			{
@@ -143,7 +144,10 @@ public class GeoIPService
 			try
 			{
 				Location	loc	= ls.getLocation(ip);
-				ret	= loc.latitude+","+loc.longitude;
+				if(loc!=null)
+				{
+					ret	= loc.latitude+","+loc.longitude;
+				}
 			}
 			catch(Exception e)
 			{
