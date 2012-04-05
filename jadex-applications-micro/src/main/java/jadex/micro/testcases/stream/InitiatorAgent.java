@@ -8,6 +8,9 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.LocalResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
@@ -49,9 +52,9 @@ import java.util.Collection;
 	@RequiredService(name="cms", type=IComponentManagementService.class, 
 		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
 })
-@ComponentTypes(
-	@ComponentType(name="receiver", filename="jadex/micro/testcases/stream/ReceiverAgent.class")
-)
+//@ComponentTypes(
+//	@ComponentType(name="receiver", filename="jadex/micro/testcases/stream/ReceiverAgent.class")
+//)
 @Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"jadex/micro/testcases/stream/test.jpg\""))
 //@Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"jadex/micro/testcases/stream/android-sdk_r07-windows.zip\""))
 @Results(@Result(name="testresults", clazz=Testcase.class))
@@ -201,7 +204,10 @@ public class InitiatorAgent
 			{
 				final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
 				IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
-				cms.createComponent(null, "receiver", new CreationInfo(agent.getComponentIdentifier()), reslis)
+				// "receiver" cannot use parent due to remote case new CreationInfo(agent.getComponentIdentifier())
+				IResourceIdentifier	rid	= new ResourceIdentifier(
+					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
+				cms.createComponent(null, "jadex/micro/testcases/stream/ReceiverAgent.class", new CreationInfo(rid), reslis)
 					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
 				{
 					public void customResultAvailable(final IComponentIdentifier cid) 
