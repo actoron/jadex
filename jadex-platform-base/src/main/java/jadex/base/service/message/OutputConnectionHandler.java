@@ -68,6 +68,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	
 	/** Close request flag (when a closereq message was received). */
 	protected boolean closereqflag;
+	protected Future<Void> closerefut;
 
 	/** Stop flag (is sent in ack from input side) to signal that the rceiver is flooded with data). */
 	protected Tuple2<Boolean, Integer> stopflag;
@@ -175,6 +176,22 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	//-------- methods called from connection ---------
 	
 	/**
+	 * 
+	 */
+	public void notifyInited()
+	{
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				sendStored();
+				checkClose();
+				return IFuture.DONE;
+			}
+		});
+	}
+	
+	/**
 	 *  Called from connection.
 	 *  Initiates closing procedure (is different for initiator and participant).
 	 */
@@ -186,31 +203,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("do close output side");
-				
-				if(isDataFinished())
-				{
-					sendAcknowledgedMessage(createTask(StreamSendTask.CLOSE, null, null), StreamSendTask.CLOSE)
-						.addResultListener(new IResultListener<Void>()
-					{
-						public void resultAvailable(Void result)
-						{
-							// Set connection as closed.
-							con.setClosed();
-							ret.setResult(null);
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							con.setClosed();
-							ret.setException(exception);
-						}
-					});
-				}
-				else
-				{
-					closereqflag = true;
-				}
+//				System.out.println("do close output side");
+				closereqflag = true;
+				checkClose();
 				
 				return IFuture.DONE;
 			}
@@ -320,16 +315,25 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	protected void sendStored()
 	{
 //		System.out.println("sendStored: "+sent.size());
-		int allowed = maxsend-sent.size();
-		for(int i=0; i<allowed && tosend.size()>0; i++)
-		{
-			Tuple2<StreamSendTask, Future<Void>> tup = tosend.remove(0);
-//			System.out.println("send Stored: "+tup.getFirstEntity().getSequenceNumber());
-			sendTask(tup.getFirstEntity(), tup.getSecondEntity());
 		
-			// Send only one test message if in stop mode.
-			if(isStop())
-				break;
+		int allowed = maxsend-sent.size();
+		
+		// Only send data messages after init 
+		// but cannot use isSendAllowed() as
+		// at least one message should be sent in case of stop
+		// to provoke acks with continue
+		if(con.isInited())
+		{
+			for(int i=0; i<allowed && tosend.size()>0; i++)
+			{
+				Tuple2<StreamSendTask, Future<Void>> tup = tosend.remove(0);
+	//			System.out.println("send Stored: "+tup.getFirstEntity().getSequenceNumber());
+				sendTask(tup.getFirstEntity(), tup.getSecondEntity());
+			
+				// Send only one test message if in stop mode.
+				if(isStop())
+					break;
+			}
 		}
 	}
 	
@@ -484,7 +488,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	 */
 	protected boolean isSendAllowed()
 	{
-		return maxsend-sent.size()>0 && !isStop();
+		return con.isInited() && maxsend-sent.size()>0 && !isStop();
 	}
 	
 	/**
@@ -510,8 +514,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	public boolean isDataFinished()
 	{
 		// All acks received and no unfinished multi packet
-		System.out.println("isDataFinished: "+sent.size()+" "+mpsize);
-		return sent.isEmpty() && (!multipackets || mpsize==0);
+		System.out.println("isDataFinished (unacknowledged, multipacketsize): "+sent.size()+" "+mpsize);
+//		return sent.isEmpty() && (!multipackets || mpsize==0);
+		return !multipackets || mpsize==0;
 	}
 	
 	/**
@@ -674,22 +679,57 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	/**
 	 * 
 	 */
-	protected void checkClose()
+	protected IFuture<Void> checkClose()
 	{
+		if(closerefut==null)
+			closerefut = new Future<Void>();
+		
 		// Try to close if close is requested.
-		if(isCloseRequested() && isDataFinished())
+		if(isCloseRequested() && isDataFinished() && con.isInited() && !con.isClosed())
 		{
+			// If close() was already called on connection directly perform close
 			if(con.isClosing())
 			{
-				doClose();
+				performClose().addResultListener(new DelegationResultListener<Void>(closerefut));
 			}
 			else
 			{
 				close();
 			}
-			closereqflag = false;
+			closereqflag = false; // ensure that close is executed only once
 		}
 //		else
 //			System.out.println("check close: "+isCloseRequested()+" "+isDataFinished());
+	
+		return closerefut;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> performClose()
+	{
+//		System.out.println("pclose");
+		
+		final Future<Void> ret = new Future<Void>();
+		
+		sendAcknowledgedMessage(createTask(StreamSendTask.CLOSE, null, null), StreamSendTask.CLOSE)
+			.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				// Set connection as closed.
+				con.setClosed();
+				ret.setResult(null);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				con.setClosed();
+				ret.setException(exception);
+			}
+		});
+		
+		return ret;
 	}
 }

@@ -9,6 +9,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
+import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -258,6 +259,13 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		return ret;
 	}
 	
+	/**
+	 * 
+	 */
+	public void notifyInited()
+	{
+	}
+	
 	//-------- internal methods --------
 	
 	/**
@@ -342,7 +350,8 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 */
 	protected IFuture<Void> sendTask(AbstractSendTask task)
 	{
-//		System.out.println("sendTask: "+task);
+		System.out.println("sendTask: "+SUtil.arrayToString(task.getProlog())+" "+task.getData().length);
+		
 		IComponentIdentifier[] recs = task.getReceivers();
 		if(recs.length!=1)
 			throw new RuntimeException("Must have exactly one receiver.");
@@ -393,7 +402,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 			si.setTimer(createAckTimer(id));
 		}
 		
-		System.out.println("sent msg: "+si.getId()+" "+si.getTryCnt());
+		System.out.println("sent msg: "+si.getId()+" "+si.getTryCnt()+" "+SUtil.arrayToString(task.getReceivers()));
 		
 		return ret;
 	}

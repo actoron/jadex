@@ -1,6 +1,5 @@
 package jadex.base.service.message;
 
-import jadex.bridge.IConnection;
 import jadex.commons.future.IFuture;
 
 /**
@@ -24,6 +23,11 @@ public interface IAbstractConnectionHandler
 	 *  Send init message.
 	 */
 	public IFuture<Void> sendInit();
+	
+	/**
+	 * 
+	 */
+	public void notifyInited();
 	
 	/**
 	 *  Called from connection.

@@ -40,6 +40,13 @@ public class LocalAbstractConnectionHandler implements IAbstractConnectionHandle
 	}
 	
 	/**
+	 * 
+	 */
+	public void notifyInited()
+	{
+	}
+	
+	/**
 	 *  Called from connection.
 	 *  Initiates closing procedure (is different for initiator and participant).
 	 */

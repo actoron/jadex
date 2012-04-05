@@ -118,9 +118,13 @@ public abstract class AbstractConnection implements IConnection
 	 *  Set the inited.
 	 *  @param inited The inited to set.
 	 */
-	public synchronized void setInited()
+	public void setInited()
 	{
-		this.inited = true;
+		synchronized(this)
+		{
+			this.inited = true;
+		}
+		ch.notifyInited();
 	}
 	
 	/**

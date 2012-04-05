@@ -293,7 +293,7 @@ public class InitiatorAgent
 							read += is.read(buf);
 						}
 						con.write(buf);
-						System.out.println("wrote: "+size);
+//						System.out.println("wrote: "+size);
 						if(is.available()>0)
 						{
 							agent.scheduleStep(this);

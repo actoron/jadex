@@ -1400,7 +1400,7 @@ public class MessageService extends BasicService implements IMessageService
 		public void execute(Object obj)
 		{
 			byte[] rawmsg = (byte[])obj;
-//			System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
+			System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
 			int idx = 1;
 			byte type = rawmsg[idx++];
 			
@@ -1451,7 +1451,7 @@ public class MessageService extends BasicService implements IMessageService
 				InputConnectionHandler ich = new InputConnectionHandler(MessageService.this);
 				final InputConnection con = new InputConnection(recs[0], recs[1], conid, false, ich);
 				pcons.put(new Integer(conid), ich);
-//				System.out.println("created: "+con.hashCode());
+				System.out.println("created: "+con.hashCode());
 				
 				ich.initReceived();
 				
@@ -1476,7 +1476,6 @@ public class MessageService extends BasicService implements IMessageService
 				if(och!=null)
 				{
 					och.ackReceived(StreamSendTask.INIT);
-//					och.ackCloseReceived();
 				}
 				else
 				{
@@ -1492,7 +1491,7 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				else
 				{
-					System.out.println("InputStream not found: "+conid);
+					System.out.println("InputStream not found (dai): "+conid);
 				}
 			}
 			else if(type==StreamSendTask.CLOSE_OUTPUT_INITIATOR)
@@ -1505,7 +1504,7 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				else
 				{
-					System.out.println("InputStream not found: "+conid);
+					System.out.println("InputStream not found (coi): "+conid);
 				}
 			}
 			else if(type==StreamSendTask.ACKCLOSE_OUTPUT_PARTICIPANT)
