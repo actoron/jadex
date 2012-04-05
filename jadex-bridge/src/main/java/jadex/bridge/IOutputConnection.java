@@ -21,5 +21,6 @@ public interface IOutputConnection extends IConnection
 	/**
 	 *  Close the connection.
 	 */
+	// todo: make IFuture<Void> ?
 	public void close();
 }

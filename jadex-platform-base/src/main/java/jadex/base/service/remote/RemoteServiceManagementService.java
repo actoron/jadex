@@ -186,6 +186,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	{
 		super(component.getServiceProvider().getId(), IRemoteServiceManagementService.class, null);
 
+//		System.out.println("binary: "+binarymode);
+		
 		this.component = component;
 		this.rrm = new RemoteReferenceModule(this, libservice, marshal);
 		this.waitingcalls = new HashMap<String, Future<Object>>();
@@ -209,7 +211,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				new SubobjectInfo(new AccessInfo("cache"))}));
 		typeinfosread.add(ti_rr);
 
-		QName[] icp = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ServiceInputConnectionProxy")};
+		QName[] icp = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge.service.types.remote", "ServiceInputConnectionProxy")};
 		TypeInfo ti_icp = new TypeInfo(new XMLInfo(icp), 
 			new ObjectInfo(ServiceInputConnectionProxy.class, new IPostProcessor()
 		{
@@ -307,6 +309,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		{
 			public boolean filter(Object obj)
 			{
+//				System.out.println("obj: "+obj);
 				return obj instanceof ServiceInputConnectionProxy;
 			}
 		}, new IPreProcessor()
@@ -815,11 +818,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
 							msg.put(SFipa.CONVERSATION_ID, callid);
 			//				msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
-							if (binarymode)
+							if(binarymode)
+							{
 								msg.put(SFipa.LANGUAGE, RMS_JADEX_BINARY);
+							}
 							else
+							{
 								msg.put(SFipa.LANGUAGE, RMS_JADEX_XML);
-							
+							}
 							ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 								.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Object>(future)
 							{
@@ -842,7 +848,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 														{
 															Object cont = null;
 															// Hack!!! Manual encoding for using custom class loader at receiver side.
-															if (binarymode)
+															if(binarymode)
 															{
 																cont = BinarySerializer.objectToByteArray(content, binpreprocs, new Object[]{receiver, addresses}, cl);
 															}
@@ -853,7 +859,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 															}
 															
 															msg.put(SFipa.CONTENT, cont);
-	
 															
 	//														System.out.println("RMS sending to2: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
 					//										if(cont.indexOf("getServices")!=-1)

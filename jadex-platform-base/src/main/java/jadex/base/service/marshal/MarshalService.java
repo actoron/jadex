@@ -1,5 +1,9 @@
 package jadex.base.service.marshal;
 
+import jadex.base.service.message.InputConnection;
+import jadex.base.service.message.MessageService;
+import jadex.base.service.message.OutputConnection;
+import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -13,6 +17,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.types.marshal.IMarshalService;
+import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemotable;
 import jadex.commons.IRemoteChangeListener;
@@ -127,6 +132,27 @@ public class MarshalService extends BasicService implements IMarshalService
 				return BasicServiceInvocationHandler.getPojoServiceProxy(object);
 			}
 		});
+		
+//		// Add processor for streams
+//		processors.add(processors.size()-1, new ITraverseProcessor()
+//		{
+//			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+//			{
+//				return object instanceof ServiceInputConnectionProxy;
+//			}
+//			
+//			public Object process(Object object, Class< ? > clazz,
+//				List<ITraverseProcessor> processors, Traverser traverser,
+//				Map<Object, Object> traversed, boolean clone, Object context)
+//			{
+//				OutputConnection ocon = new OutputConnection(null, null, -1, true, null);
+//				
+//				IComponentIdentifier receiver = (IComponentIdentifier)((Object[])context.getUserContext())[0];
+//				ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
+//				OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+//				con.setOutputConnection(ocon);
+//			}
+//		});
 		
 		return IFuture.DONE;
 	}

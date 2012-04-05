@@ -13,7 +13,6 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,7 @@ import java.util.Map;
 /**
  *  The output connection handler. 
  */
-public class OutputConnectionHandler extends AbstractConnectionHandler
+public class OutputConnectionHandler extends AbstractConnectionHandler implements IOutputConnectionHandler
 {
 	//-------- attributes --------
 	

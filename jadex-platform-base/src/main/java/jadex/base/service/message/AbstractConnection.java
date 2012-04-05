@@ -1,6 +1,7 @@
 package jadex.base.service.message;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IConnection;
 import jadex.commons.future.IResultListener;
 
 /**
@@ -10,7 +11,7 @@ import jadex.commons.future.IResultListener;
  *  on their on thread. Calls from the connection handler occur on another
  *  thread so that these calls must be synchronized. 
  */
-public abstract class AbstractConnection
+public abstract class AbstractConnection implements IConnection
 {
 	//-------- attributes --------
 	
@@ -35,7 +36,7 @@ public abstract class AbstractConnection
 	protected boolean ini;
 	
 	/** The abstract connection handler. */
-	protected AbstractConnectionHandler ch;
+	protected IAbstractConnectionHandler ch;
 		
 	//-------- constructors --------
 	
@@ -43,7 +44,7 @@ public abstract class AbstractConnection
 	 *  Create a new input connection.
 	 */
 	public AbstractConnection(IComponentIdentifier sender, 
-		IComponentIdentifier receiver, int id, boolean input, boolean initiator, AbstractConnectionHandler ch)
+		IComponentIdentifier receiver, int id, boolean input, boolean initiator, IAbstractConnectionHandler ch)
 	{
 		this.initiator = sender;
 		this.participant = receiver;

@@ -23,7 +23,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	 *  Create a new connection.
 	 */
 	public OutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, 
-		int id, boolean initiator, OutputConnectionHandler ch)
+		int id, boolean initiator, IOutputConnectionHandler ch)
 	{
 		super(sender, receiver, id, false, initiator, ch);
 	}
@@ -41,7 +41,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 			if(closing || closed)
 				return new Future<Void>(new RuntimeException("Connection closed."));
 		}
-		return ((OutputConnectionHandler)ch).send(data);
+		return ((IOutputConnectionHandler)ch).send(data);
 	}
 	
 	/**

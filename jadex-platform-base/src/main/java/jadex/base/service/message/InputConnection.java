@@ -47,7 +47,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 *  Create a new input connection.
 	 */
 	public InputConnection(IComponentIdentifier sender, IComponentIdentifier receiver, 
-		int id, boolean initiator, AbstractConnectionHandler ch)
+		int id, boolean initiator, IAbstractConnectionHandler ch)
 	{
 		super(sender, receiver, id, true, initiator, ch);
 		this.data = new ArrayList<byte[]>();

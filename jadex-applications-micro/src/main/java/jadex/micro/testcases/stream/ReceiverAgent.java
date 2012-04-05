@@ -6,19 +6,27 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentKilled;
+import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentStreamArrived;
+import jadex.micro.annotation.Argument;
+import jadex.micro.annotation.Arguments;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
-import java.util.Iterator;
 
+@Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"copy.copy\""))
+@Results(@Result(name="filesize", clazz=long.class))
 @Agent
 public class ReceiverAgent
 {
 	@Agent
 	protected MicroAgent agent;
+	
+	@AgentArgument
+	protected String filename;
 	
 	/**
 	 * 
@@ -40,15 +48,12 @@ public class ReceiverAgent
 	{
 		try
 		{
-			final int[] cnt = new int[1];
-//			File f = new File("c:\\projects\\copy.jpg");
-//			final FileOutputStream fos = new FileOutputStream(f);
-//			File f = new File("copy.jpg");
-			File f = new File("copy.zip");
+			final long[] cnt = new long[1];
+			File f = new File(filename);
 			final FileOutputStream fos = new FileOutputStream(f);
 			
 			ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
-			fut.addResultListener(new IIntermediateResultListener<byte[]>()
+			fut.addResultListener(agent.createResultListener(new IIntermediateResultListener<byte[]>()
 			{
 				public void resultAvailable(Collection<byte[]> result)
 				{
@@ -84,6 +89,8 @@ public class ReceiverAgent
 					{
 						System.out.println("finished");
 						fos.close();
+						agent.setResultValue("filesize", new Long(cnt[0]));
+						agent.killAgent();
 					}
 					catch(Exception e)
 					{
@@ -93,12 +100,14 @@ public class ReceiverAgent
 				public void exceptionOccurred(Exception exception)
 				{
 					System.out.println("ex:"+exception);
+					agent.killAgent();
 				}
-			});
+			}));
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			agent.killAgent();
 		}
 	}
 	

@@ -14,7 +14,6 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +25,7 @@ import java.util.Map;
  *  Ensures that all calls from threads other than the message service component
  *  are scheduled on this thread to avoid multithreading issues in this class.
  */
-public class AbstractConnectionHandler
+public class AbstractConnectionHandler implements IAbstractConnectionHandler
 {
 	//-------- attributes --------
 	

@@ -1,5 +1,11 @@
 package jadex.bridge.modelinfo;
 
+import jadex.commons.Tuple2;
+
+import java.util.Collection;
+
+import javassist.bytecode.Descriptor.Iterator;
+
 
 
 /**
@@ -79,5 +85,29 @@ public class Argument	extends UnparsedExpression	implements IArgument
 		return "Argument(defaultvalue=" + this.value + ", description="
 			+ this.description + ", name=" + this.name + ", typename="
 			+ this.clazz + ")";
+	}
+	
+	
+	/**
+	 *  Get a specific result from a result collection.
+	 */
+	public static Object getResult(Collection<Tuple2<String, Object>> results, String name)
+	{
+		Object ret = null;
+		
+		if(results!=null)
+		{
+			for(java.util.Iterator<Tuple2<String, Object>> it=results.iterator(); it.hasNext(); )
+			{
+				Tuple2<String, Object> tup = it.next();
+				if(tup.getFirstEntity().equals(name))
+				{
+					ret = tup.getSecondEntity();
+					break;
+				}
+			}
+		}
+		
+		return ret;
 	}
 }

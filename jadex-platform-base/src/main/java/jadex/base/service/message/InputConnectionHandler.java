@@ -78,6 +78,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 			{
 				// Remember that close message was received, close the connection and send an ack.
 				System.out.println("close received");
+				sendDataAck(); // send missing acks to speedup closing
 				if(!con.isClosed())
 					con.setClosed();
 				sendTask(createTask(StreamSendTask.ACKCLOSE, null, null));
