@@ -55,7 +55,7 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 				return;
 		}
 		
-		((OutputConnectionHandler)ch).flush();
+		((IOutputConnectionHandler)ch).flush();
 	}
 	
 	/**

@@ -14,6 +14,12 @@ public interface IAbstractConnectionHandler
 	 */
 	public void setConnection(final AbstractConnection con);
 	
+//	/**
+//	 *  Get the connection.
+//	 *  @return The connection.
+//	 */
+//	public AbstractConnection getConnection();
+	
 	/**
 	 *  Send init message.
 	 */

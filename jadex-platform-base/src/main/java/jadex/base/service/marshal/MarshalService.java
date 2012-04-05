@@ -1,6 +1,9 @@
 package jadex.base.service.marshal;
 
 import jadex.base.service.message.InputConnection;
+import jadex.base.service.message.LocalAbstractConnectionHandler;
+import jadex.base.service.message.LocalInputConnectionHandler;
+import jadex.base.service.message.LocalOutputConnectionHandler;
 import jadex.base.service.message.MessageService;
 import jadex.base.service.message.OutputConnection;
 import jadex.base.service.remote.RemoteServiceManagementService;
@@ -133,26 +136,32 @@ public class MarshalService extends BasicService implements IMarshalService
 			}
 		});
 		
-//		// Add processor for streams
-//		processors.add(processors.size()-1, new ITraverseProcessor()
-//		{
-//			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
-//			{
-//				return object instanceof ServiceInputConnectionProxy;
-//			}
-//			
-//			public Object process(Object object, Class< ? > clazz,
-//				List<ITraverseProcessor> processors, Traverser traverser,
-//				Map<Object, Object> traversed, boolean clone, Object context)
-//			{
-//				OutputConnection ocon = new OutputConnection(null, null, -1, true, null);
-//				
-//				IComponentIdentifier receiver = (IComponentIdentifier)((Object[])context.getUserContext())[0];
-//				ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
-//				OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
-//				con.setOutputConnection(ocon);
-//			}
-//		});
+		// Add processor for streams
+		processors.add(processors.size()-1, new ITraverseProcessor()
+		{
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone)
+			{
+				return object instanceof ServiceInputConnectionProxy;
+			}
+			
+			public Object process(Object object, Class<?> clazz,
+				List<ITraverseProcessor> processors, Traverser traverser,
+				Map<Object, Object> traversed, boolean clone, Object context)
+			{
+				ServiceInputConnectionProxy sicp = (ServiceInputConnectionProxy)object;
+				
+				LocalInputConnectionHandler ich = new LocalInputConnectionHandler();
+				LocalOutputConnectionHandler och = new LocalOutputConnectionHandler(ich);
+				ich.setConnectionHandler(och);
+
+				InputConnection icon = new InputConnection(null, null, sicp.getConnectionId(), false, ich);
+				OutputConnection ocon = new OutputConnection(null, null, sicp.getConnectionId(), true, och);
+				
+				sicp.setOutputConnection(ocon);
+				
+				return icon;
+			}
+		});
 		
 		return IFuture.DONE;
 	}

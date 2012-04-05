@@ -13,5 +13,5 @@ public interface IStreamService
 	 *  Pass an input stream to the user.
 	 *  @return The output stream.
 	 */
-	public @Reference IFuture<IInputConnection> getInputStream();
+	public IFuture<IInputConnection> getInputStream();
 }

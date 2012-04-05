@@ -46,7 +46,9 @@ public class StreamProviderAgent implements IStreamService
 			{
 				oc.write(new byte[]{(byte)cnt[0]});
 				if(cnt[0]++<50)
-					agent.waitFor(1000, this);
+					agent.waitFor(100, this);
+				else
+					oc.close();
 				return IFuture.DONE;
 			}
 		};

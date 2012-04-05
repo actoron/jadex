@@ -12,4 +12,8 @@ public interface IOutputConnectionHandler extends IAbstractConnectionHandler
 	 */
 	public IFuture<Void> send(final byte[] dat);
 
+	/**
+	 *  Flush the data.
+	 */
+	public void flush();
 }
