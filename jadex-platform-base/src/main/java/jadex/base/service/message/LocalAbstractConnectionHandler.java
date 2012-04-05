@@ -35,7 +35,7 @@ public class LocalAbstractConnectionHandler implements IAbstractConnectionHandle
 	 */
 	public IFuture<Void> sendInit()
 	{
-		conhandler.initReceived();
+		getConnectionHandler().initReceived();
 		return IFuture.DONE;
 	}
 	
@@ -45,7 +45,9 @@ public class LocalAbstractConnectionHandler implements IAbstractConnectionHandle
 	 */
 	public IFuture<Void> doClose()
 	{
-		conhandler.close();
+		getConnectionHandler().close();
+		if(!getConnection().isClosed())
+			getConnection().setClosed();
 		return IFuture.DONE;
 	}
 	

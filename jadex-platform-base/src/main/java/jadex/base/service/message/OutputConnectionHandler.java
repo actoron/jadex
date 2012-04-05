@@ -214,6 +214,16 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 				
 				return IFuture.DONE;
 			}
+		}).addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				con.setClosed();
+				ret.setException(exception);
+			}
 		});
 		
 		return ret;

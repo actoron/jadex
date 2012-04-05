@@ -121,6 +121,14 @@ public class ServiceOutputConnection implements IOutputConnection
 	public IInputConnection getInputConnection()
 	{
 		return new ServiceInputConnectionProxy(this);
+	
+//		LocalInputConnectionHandler ich = new LocalInputConnectionHandler();
+//		LocalOutputConnectionHandler och = new LocalOutputConnectionHandler(ich);
+//		ich.setConnectionHandler(och);
+//
+//		InputConnection icon = new InputConnection(null, null, sicp.getConnectionId(), false, ich);
+//		OutputConnection ocon = new OutputConnection(null, null, sicp.getConnectionId(), true, och);
+
 	}
 	
 	/**

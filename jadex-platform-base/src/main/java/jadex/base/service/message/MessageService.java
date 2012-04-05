@@ -1116,7 +1116,7 @@ public class MessageService extends BasicService implements IMessageService
 					{
 						System.out.println("removed con: "+mypcons[i]);
 						mypcons[i].close();
-						pcons.remove(mypcons[i].getConnectionId());
+						pcons.remove(new Integer(mypcons[i].getConnectionId()));
 					}
 				}
 				AbstractConnectionHandler[] myicons = (AbstractConnectionHandler[])icons.values().toArray(new AbstractConnectionHandler[0]);
@@ -1124,9 +1124,9 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(!myicons[i].isConnectionAlive())
 					{
-						System.out.println("removed con: "+mypcons[i]);
+						System.out.println("removed con: "+myicons[i]);
 						myicons[i].close();
-						icons.remove(mypcons[i].getConnectionId());
+						icons.remove(new Integer(myicons[i].getConnectionId()));
 					}
 				}
 				
@@ -1680,7 +1680,7 @@ public class MessageService extends BasicService implements IMessageService
 			// Handle lease time update
 			else if(type==StreamSendTask.ALIVE_INITIATOR)
 			{
-				System.out.println("alive initiator");
+//				System.out.println("alive initiator");
 				AbstractConnectionHandler con = (AbstractConnectionHandler)pcons.get(new Integer(conid));
 				if(con!=null)
 				{
@@ -1693,7 +1693,7 @@ public class MessageService extends BasicService implements IMessageService
 			}
 			else if(type==StreamSendTask.ALIVE_PARTICIPANT)
 			{
-				System.out.println("alive particpant");
+//				System.out.println("alive particpant");
 				AbstractConnectionHandler con = (AbstractConnectionHandler)icons.get(new Integer(conid));
 				if(con!=null)
 				{
