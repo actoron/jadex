@@ -141,13 +141,6 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 		ITransport[] transports, byte[] codecids, ICodec[] codecs, Integer seqnumber)
 	{
 		super(receivers, transports, codecids, codecs);
-		
-		for(int i=0; i<receivers.length; i++)
-		{
-			if(receivers[i].getAddresses()==null)
-				throw new IllegalArgumentException("Addresses must not null");
-		}
-		
 		this.type = type;
 		this.message = message;
 		this.streamid = streamid;

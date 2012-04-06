@@ -46,6 +46,11 @@ public abstract class AbstractConnection implements IConnection
 	public AbstractConnection(IComponentIdentifier sender, 
 		IComponentIdentifier receiver, int id, boolean input, boolean initiator, IAbstractConnectionHandler ch)
 	{
+		if(sender.getAddresses()==null)
+			System.out.println("w sen");
+		if(receiver.getAddresses()==null)
+			System.out.println("w rec");
+		
 		this.initiator = sender;
 		this.participant = receiver;
 		this.id = id;

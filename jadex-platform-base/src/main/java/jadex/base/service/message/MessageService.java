@@ -212,7 +212,8 @@ public class MessageService extends BasicService implements IMessageService
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
 		OutputConnectionHandler och = new OutputConnectionHandler(this);
-		OutputConnection con = new OutputConnection(sender, receiver, conid, true, och);
+		OutputConnection con = new OutputConnection(internalUpdateComponentIdentifier(sender), 
+			internalUpdateComponentIdentifier(receiver), conid, true, och);
 		icons.put(conid, och);
 		return con;
 	}
@@ -234,7 +235,8 @@ public class MessageService extends BasicService implements IMessageService
 		int conid = uuconid.hashCode();
 		byte[] cids	= codecfactory.getDefaultCodecIds();
 		InputConnectionHandler ich = new InputConnectionHandler(this);
-		InputConnection con = new InputConnection(sender, receiver, conid, true, ich);
+		InputConnection con = new InputConnection(internalUpdateComponentIdentifier(sender), 
+			internalUpdateComponentIdentifier(receiver), conid, true, ich);
 		icons.put(conid, ich);
 		return new Future<IInputConnection>(con);	
 	}
@@ -1485,7 +1487,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found: "+conid);
+						System.out.println("OutputStream not found (ackinit): "+conid);
 					}
 				}
 				else if(type==StreamSendTask.DATA_OUTPUT_INITIATOR)
@@ -1524,7 +1526,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found: "+conid);
+						System.out.println("OutputStream not found (ackclose): "+conid);
 					}
 				}
 				else if(type==StreamSendTask.CLOSEREQ_OUTPUT_PARTICIPANT)
@@ -1537,7 +1539,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found: "+conid);
+						System.out.println("OutputStream not found (closereq): "+conid);
 					}
 				}
 				else if(type==StreamSendTask.ACKCLOSEREQ_OUTPUT_INITIATOR)
@@ -1551,7 +1553,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found: "+conid);
+						System.out.println("OutputStream not found (ackclosereq): "+conid);
 					}
 				}
 				else if(type==StreamSendTask.ACKDATA_OUTPUT_PARTICIPANT)
@@ -1565,7 +1567,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found: "+conid);
+						System.out.println("OutputStream not found (ackdata): "+conid);
 					}
 				}
 				
@@ -1603,7 +1605,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("InputStream not found: "+conid);
+						System.out.println("InputStream not found (ackinit): "+conid);
 					}
 				}
 				else if(type==StreamSendTask.DATA_INPUT_PARTICIPANT)
@@ -1615,7 +1617,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("InputStream not found: "+conid);
+						System.out.println("InputStream not found (data input): "+conid);
 					}
 				}
 				else if(type==StreamSendTask.ACKDATA_INPUT_INITIATOR)
@@ -1628,7 +1630,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found: "+conid);
+						System.out.println("OutputStream not found (ackdata): "+conid);
 					}
 				}
 				else if(type==StreamSendTask.CLOSEREQ_INPUT_INITIATOR)
@@ -1640,7 +1642,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("InputStream not found: "+conid);
+						System.out.println("InputStream not found (closereq): "+conid);
 					}
 				}
 				else if(type==StreamSendTask.ACKCLOSEREQ_INPUT_PARTICIPANT)
@@ -1652,7 +1654,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("InputStream not found: "+conid);
+						System.out.println("InputStream not found (ackclosereq): "+conid);
 					}
 				}
 				else if(type==StreamSendTask.CLOSE_INPUT_PARTICIPANT)
@@ -1664,7 +1666,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("OutputStream not found: "+conid);
+						System.out.println("OutputStream not found (closeinput): "+conid);
 					}
 				}
 				else if(type==StreamSendTask.ACKCLOSE_INPUT_INITIATOR)
@@ -1677,7 +1679,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("InputStream not found: "+conid);
+						System.out.println("InputStream not found (ackclose): "+conid);
 					}
 				}
 				
@@ -1692,7 +1694,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("Stream not found: "+conid);
+						System.out.println("Stream not found (alive ini): "+conid);
 					}
 				}
 				else if(type==StreamSendTask.ALIVE_PARTICIPANT)
@@ -1705,7 +1707,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("Stream not found: "+conid);
+						System.out.println("Stream not found (alive par): "+conid);
 					}
 				}
 	
