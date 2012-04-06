@@ -71,7 +71,7 @@ public class InitiatorAgent
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		tc.setTestCount(2);
+		tc.setTestCount(1);
 		
 		final Future<TestReport> ret = new Future<TestReport>();
 		ret.addResultListener(agent.createResultListener(new IResultListener<TestReport>()
@@ -90,15 +90,15 @@ public class InitiatorAgent
 			}
 		}));
 			
-//		testLocal(1).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-//		{
-//			public void customResultAvailable(TestReport result)
-//			{
-//				tc.addReport(result);
-//				ret.setResult(null);
-//				agent.killAgent();
-//			}
-//		}));
+		testLocal(1).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+		{
+			public void customResultAvailable(TestReport result)
+			{
+				tc.addReport(result);
+				ret.setResult(null);
+				agent.killAgent();
+			}
+		}));
 		
 //		testRemote(2).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 //		{
@@ -110,21 +110,21 @@ public class InitiatorAgent
 //			}
 //		}));
 		
-		testLocal(1).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-		{
-			public void customResultAvailable(TestReport result)
-			{
-				tc.addReport(result);
-				testRemote(2).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-				{
-					public void customResultAvailable(TestReport result)
-					{
-						tc.addReport(result);
-						ret.setResult(null);
-					}
-				}));
-			}
-		}));
+//		testLocal(1).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+//		{
+//			public void customResultAvailable(TestReport result)
+//			{
+//				tc.addReport(result);
+//				testRemote(2).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+//				{
+//					public void customResultAvailable(TestReport result)
+//					{
+//						tc.addReport(result);
+//						ret.setResult(null);
+//					}
+//				}));
+//			}
+//		}));
 	}
 	
 	/**
