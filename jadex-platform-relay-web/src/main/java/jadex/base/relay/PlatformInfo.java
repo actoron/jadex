@@ -334,6 +334,14 @@ public class PlatformInfo
 	}
 	
 	/**
+	 *  The the platform id.
+	 */
+	public void setId(String id)
+	{
+		this.id	= id;
+	}
+	
+	/**
 	 *  Create a string representation.
 	 */
 	public String toString()
@@ -342,6 +350,22 @@ public class PlatformInfo
 			+ ", connected="+getConnectTime()+", disconnected="+getDisconnectTime()
 			+ ", messages="+getMessageCount()+"("+getByteCount()+"), rate="+getTransferRate()
 			+ ")";
+	}
+
+	/**
+	 *  Set the disconnect time.
+	 */
+	public void setDisconnectDate(Date distime)
+	{
+		this.disconnect_time	= distime;
+	}
+	
+	/**
+	 *  Set the connect time.
+	 */
+	public void setConnectDate(Date contime)
+	{
+		this.connect_time	= contime;
 	}
 	
 	//-------- helper methods --------

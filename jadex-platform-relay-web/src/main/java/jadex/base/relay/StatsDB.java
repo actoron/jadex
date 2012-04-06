@@ -12,7 +12,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StatsDB
 {
@@ -77,22 +79,6 @@ public class StatsDB
 			}
 			else
 			{
-				// Update platform entries where disconnection was missed.
-				con.createStatement().executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
-				
-				// Replace android platform names and-xxx to and_xxx
-				PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PLATFORM=?, PREFIX=? WHERE ID=?");
-				rs	= con.createStatement().executeQuery("select ID, PLATFORM from relay.platforminfo where PLATFORM like 'and-%'");
-				while(rs.next())
-				{
-					int	param	= 1;
-					String	name	= "and_"+rs.getString("PLATFORM").substring(4);
-					update.setString(param++, name);
-					update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
-					update.setInt(param++, rs.getInt("ID"));
-					update.executeUpdate();
-				}
-				
 				// Add platform prefix column, if it doesn't exist.
 				rs	= meta.getColumns(null, "RELAY", "PLATFORMINFO", "PREFIX");
 				if(!rs.next())
@@ -109,6 +95,22 @@ public class StatsDB
 						update.executeUpdate();
 					}
 				}
+				
+				// Update platform entries where disconnection was missed.
+				con.createStatement().executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
+				
+				// Replace android platform names and-xxx to and_xxx
+				PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PLATFORM=?, PREFIX=? WHERE ID=?");
+				rs	= con.createStatement().executeQuery("select ID, PLATFORM from relay.platforminfo where PLATFORM like 'and-%'");
+				while(rs.next())
+				{
+					int	param	= 1;
+					String	name	= "and_"+rs.getString("PLATFORM").substring(4);
+					update.setString(param++, name);
+					update.setString(param++, ComponentIdentifier.getPlatformPrefix(name));
+					update.setInt(param++, rs.getInt("ID"));
+					update.executeUpdate();
+				}				
 			}
 		}
 		catch(Exception e)
@@ -231,15 +233,36 @@ public class StatsDB
 		{
 			try
 			{
+				Map<String, PlatformInfo>	map	= new HashMap<String, PlatformInfo>();
 				ResultSet	rs	= con.createStatement().executeQuery(
 					"select prefix as PLATFORM, hostip, max(HOSTNAME) as HOSTNAME, "
 					+"count(id) as MSGS, max(CONTIME) AS CONTIME, min(CONTIME) AS DISTIME "
 					+"from relay.platforminfo group by hostip, prefix order by CONTIME desc");
 				while(rs.next() && (limit==-1 || ret.size()<limit))
 				{
-					ret.add(new PlatformInfo(null, rs.getString("PLATFORM"), rs.getString("HOSTIP"),
-						rs.getString("HOSTNAME"), null, rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
-						rs.getInt("MSGS"), 0, 0));
+					if(map.containsKey(rs.getString("HOSTIP")))
+					{
+						PlatformInfo	pi	= map.get(rs.getString("HOSTIP"));
+						if(pi.getId().indexOf(rs.getString("PLATFORM"))==-1)
+						{
+							pi.setId(pi.getId()+", "+rs.getString("PLATFORM"));
+							if(rs.getTimestamp("CONTIME").getTime()>pi.getConnectDate().getTime())
+							{
+								pi.setConnectDate(rs.getTimestamp("CONTIME"));
+							}
+							if(rs.getTimestamp("DISTIME").getTime()<pi.getDisconnectDate().getTime())
+							{
+								pi.setDisconnectDate(rs.getTimestamp("DISTIME"));
+							}
+						}
+					}
+					else
+					{
+						map.put(rs.getString("HOSTIP"), new PlatformInfo(null, rs.getString("PLATFORM"), rs.getString("HOSTIP"),
+							rs.getString("HOSTNAME"), null, rs.getTimestamp("CONTIME"), rs.getTimestamp("DISTIME"),
+							rs.getInt("MSGS"), 0, 0));
+						ret.add(map.get(rs.getString("HOSTIP")));
+					}
 				}
 			}
 			catch(Exception e)
@@ -276,7 +299,7 @@ public class StatsDB
 	{
 		StatsDB	db	= getDB();
 		
-//		for(int i=1; i<20; i++)
+//		for(int i=1; i<5; i++)
 //		{
 //			PlatformInfo	pi	= new PlatformInfo("somid"+i, "hostip", "somename", "prot");
 //		}
