@@ -140,7 +140,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		}
 		else
 		{
-			final ServiceInvocationContext sic = new ServiceInvocationContext(proxy, getInterceptors());
+			final ServiceInvocationContext sic = new ServiceInvocationContext(proxy, getInterceptors(), getServiceIdentifier().getProviderId().getRoot());
 			
 			List<Object> myargs = args!=null? SUtil.arrayToList(args): null;
 			

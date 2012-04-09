@@ -60,8 +60,8 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	 */
 	public RemoteResultCommand(Object result, Exception exception, String callid, boolean isref, String methodname)
 	{
-//		if(methodname!=null && methodname.equals("getResult"))
-//			System.out.println("callid of getResult result: "+callid);
+//		if(methodname!=null && methodname.equals("getInputStream"))
+//			System.out.println("callid of getResult result: "+callid+" "+result);
 		
 		this.result = result;
 		this.exceptioninfo = exception!=null? new ExceptionInfo(exception): null;

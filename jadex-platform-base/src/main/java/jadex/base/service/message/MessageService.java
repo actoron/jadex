@@ -202,7 +202,7 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public IInputConnection getParticipantInputConnection(int conid)
 	{
-		return (IInputConnection)pcons.get(conid);
+		return pcons.get(conid)==null? null: (IInputConnection)pcons.get(conid).getConnection();
 	}
 	
 	/**
@@ -230,16 +230,23 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Create a virtual input connection.
 	 */
-	public IFuture<IInputConnection> createInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
+	public IInputConnection internalCreateInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
 	{
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
-		byte[] cids	= codecfactory.getDefaultCodecIds();
 		InputConnectionHandler ich = new InputConnectionHandler(this);
 		InputConnection con = new InputConnection(internalUpdateComponentIdentifier(sender), 
 			internalUpdateComponentIdentifier(receiver), conid, true, ich);
 		icons.put(conid, ich);
-		return new Future<IInputConnection>(con);	
+		return con;
+	}
+	
+	/**
+	 *  Create a virtual input connection.
+	 */
+	public IFuture<IInputConnection> createInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
+	{
+		return new Future<IInputConnection>(internalCreateInputConnection(sender, receiver));
 	}
 
 	/**

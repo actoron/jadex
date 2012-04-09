@@ -437,7 +437,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	{
 //		if(value.getClass().equals(String.class))
 //			System.out.println("string sdklhgb");
-		return BasicTypeConverter.isBuiltInType(value.getClass());
+		return value==null? false: BasicTypeConverter.isBuiltInType(value.getClass());
 	}
 	
 	/**
@@ -445,7 +445,7 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	 */
 	protected Collection getProperties(Object object, IContext context, boolean includefields)
 	{
-		return introspector.getBeanProperties(object.getClass(), includefields).values();
+		return object==null? Collections.EMPTY_LIST: introspector.getBeanProperties(object.getClass(), includefields).values();
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package jadex.bridge.service.component;
 
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -40,13 +41,20 @@ public class ServiceInvocationContext
 	/** The stack of used interceptors. */
 	protected List used;
 	
+	/** The caller component. */
+	protected IComponentIdentifier caller;
+	
+	/** The platform identifier. */
+	protected IComponentIdentifier platform;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new context.
 	 */
-	public ServiceInvocationContext(Object proxy, IServiceInvocationInterceptor[] interceptors)
+	public ServiceInvocationContext(Object proxy, IServiceInvocationInterceptor[] interceptors, IComponentIdentifier platform)
 	{
+		this.platform = platform;
 		this.proxy = proxy;
 		this.object = new ArrayList();
 		this.method = new ArrayList();
@@ -55,6 +63,8 @@ public class ServiceInvocationContext
 		
 		this.used = new ArrayList();
 		this.interceptors = interceptors;
+		
+		this.caller = IComponentIdentifier.LOCAL.get();
 	}
 
 	//-------- methods --------
@@ -166,8 +176,8 @@ public class ServiceInvocationContext
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		if(method.getName().equals("getResult"))
-//			System.out.println("invoke: "+Thread.currentThread());
+//		if(method.getName().equals("getInputStream"))
+//			System.out.println("invoke: "+caller);
 		
 		push(object, method, args, null);
 		
@@ -273,6 +283,14 @@ public class ServiceInvocationContext
 			Object res = this.result.remove(this.result.size()-1);
 			result.set(result.size()-1, res);
 		}
+	}
+	
+	/**
+	 *  Test if a call is remote.
+	 */
+	public boolean isRemoteCall()
+	{
+		return caller==null? false: !caller.getRoot().equals(platform);
 	}
 	
 //	/**

@@ -2,6 +2,7 @@ package jadex.micro.testcases.stream;
 
 import jadex.bridge.IInputConnection;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -45,6 +46,7 @@ public class StreamUserAgent
 					{
 						System.out.println("received icon: "+is);
 						StreamUserAgent.this.icon = is;
+						final long[] size = new long[1];
 						is.aread().addResultListener(new IIntermediateResultListener<byte[]>()
 						{
 							public void resultAvailable(Collection<byte[]> result)
@@ -53,11 +55,12 @@ public class StreamUserAgent
 							}
 							public void intermediateResultAvailable(byte[] result)
 							{
-								System.out.println("Intermediate result: "+result);
+								size[0] += result.length;
+								System.out.println("Intermediate result: "+SUtil.arrayToString(result));
 							}
 							public void finished()
 							{
-								System.out.println("finished");
+								System.out.println("finished, size: "+size[0]);
 							}
 							public void exceptionOccurred(Exception exception)
 							{
