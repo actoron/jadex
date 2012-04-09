@@ -5,8 +5,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
-import jadex.commons.Tuple2;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
@@ -45,6 +44,10 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	/** The current timer. */
 	protected ITimer datatimer;
 	
+	
+	/** The last sequence number. */
+	protected int lastseqno;
+	
 	//-------- constructors --------
 	
 	/**
@@ -60,6 +63,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	
 		this.ackcnt = 10;
 		this.lastack = -1;
+		this.lastseqno = -1;
 	}
 
 	//-------- methods called from message service --------
@@ -69,19 +73,29 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 * 
 	 *  Called when a close message was received.
 	 *  participant acks and closes
+	 *  
+	 *  @param seqno The last data packet.
 	 */
-	public void closeReceived()
+	public void closeReceived(final int seqno)
 	{
 		scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				// Remember that close message was received, close the connection and send an ack.
-				System.out.println("close received");
-				sendDataAck(); // send missing acks to speedup closing
-				if(!con.isClosed())
-					con.setClosed();
+//				System.out.println("close received: "+seqno+" "+rseqno+" "+getConnectionId());
 				sendTask(createTask(StreamSendTask.ACKCLOSE, null, null));
+				if(seqno==rseqno)
+				{
+					sendDataAck(); // send missing acks to speedup closing
+					if(!con.isClosed())
+						con.setClosed();
+				}
+				else
+				{
+					// closes later unilaterally
+					lastseqno = seqno;
+				}
 				return IFuture.DONE;
 			}
 		});
@@ -104,7 +118,13 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 				
 				// Needs nothing to do with ack response.
 				sendAcknowledgedMessage(createTask(StreamSendTask.CLOSEREQ, null, null), StreamSendTask.CLOSEREQ)
-					.addResultListener(new DelegationResultListener<Void>(ret));
+					.addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						ret.setResult(null);
+					}	
+				});
 				
 				return IFuture.DONE;
 			}
@@ -133,7 +153,8 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		
 					// If packet is the next one deliver to stream
 					// else store in map till the next one arrives
-					if(seqnumber==getSequenceNumber()+1)
+					int expseqno = getSequenceNumber()+1;
+					if(seqnumber==expseqno)
 					{
 						forwardData(dat);
 						
@@ -147,7 +168,13 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 					}
 					else
 					{
-						data.put(new Integer(seqnumber), dat);
+						Object old = data.put(new Integer(seqnumber), dat);
+						// ack msg may be lost, repeat ack msg
+						if(old!=null)
+						{
+							// todo: ack also more than one packet?
+							sendDataAck(seqnumber, seqnumber, false);
+						}
 						if(data.size()>maxbuf)
 						{
 							System.out.println("Closing connection due to package loss: "+seqnumber+" :"+data.size());
@@ -174,9 +201,16 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		
 		// Directly acknowledge when ackcnt packets have been received
 		// or start time to acknowledge less packages in an interval.
-		if(seqno%ackcnt==0)
+		if(seqno%ackcnt==0 || seqno==lastseqno)
 		{
 			sendDataAck();
+			
+			// if last packet was received close this side
+			if(seqno==lastseqno)
+			{
+				if(!con.isClosed())
+					con.setClosed();
+			}
 		}
 		else 
 		{
@@ -246,10 +280,17 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		{
 //			System.out.println("send ack: "+rseqno);
 			// tuple contains seqno and stop flag
-			sendTask(createTask(StreamSendTask.ACKDATA, new Tuple2<Integer, Boolean>(rseqno, 
-				isStop()? Boolean.TRUE: Boolean.FALSE), true, null));
+			sendDataAck(Math.max(0, rseqno-ackcnt), rseqno, isStop());
 			lastack = rseqno;
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void sendDataAck(int startseqno, int endseqno, boolean stop)
+	{
+		sendTask(createTask(StreamSendTask.ACKDATA, new AckInfo(startseqno, endseqno, stop), true, null));
 	}
 	
 	/**
@@ -268,4 +309,6 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	{
 		return getInputConnection().getStoredDataSize()>=maxstored;
 	}
+	
+	
 }

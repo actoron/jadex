@@ -36,7 +36,7 @@ public class ReceiverAgent
 	{
 		// todo: how to avoid garbage collection of connection?
 //		final IInputConnection con = (IInputConnection)msg.get(SFipa.CONTENT);
-		System.out.println("received: "+con+" "+con.hashCode());
+//		System.out.println("received: "+con+" "+con.hashCode());
 		
 		receiveBehavior((IInputConnection)con);
 	}
@@ -73,7 +73,7 @@ public class ReceiverAgent
 				{
 					cnt[0] += result.length;
 //					if(cnt[0]%1000==0)
-						System.out.println("bytes: "+cnt[0]);
+//						System.out.println("bytes: "+cnt[0]);
 					try
 					{
 						fos.write(result);
@@ -87,7 +87,7 @@ public class ReceiverAgent
 				{
 					try
 					{
-						System.out.println("finished");
+						System.out.println("finished, size: "+cnt[0]);
 						fos.close();
 						agent.setResultValue("filesize", new Long(cnt[0]));
 						agent.killAgent();

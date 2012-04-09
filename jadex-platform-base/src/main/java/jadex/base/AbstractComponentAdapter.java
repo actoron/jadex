@@ -547,7 +547,7 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	
 	/**
 	 *  Gracefully terminate the component.
-	 *  This method is called from ams and delegated to the reasoning engine,
+	 *  This method is called from cms and delegated to the reasoning engine,
 	 *  which might perform arbitrary cleanup actions, goals, etc.
 	 *  @return A future top indicate, when cleanup of the component is finished.
 	 */

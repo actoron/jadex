@@ -55,8 +55,8 @@ import java.util.Collection;
 //@ComponentTypes(
 //	@ComponentType(name="receiver", filename="jadex/micro/testcases/stream/ReceiverAgent.class")
 //)
-@Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"jadex/micro/testcases/stream/test.jpg\""))
-//@Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"jadex/micro/testcases/stream/android-sdk_r07-windows.zip\""))
+//@Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"jadex/micro/testcases/stream/test.jpg\""))
+@Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"jadex/micro/testcases/stream/android-sdk_r07-windows.zip\""))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 
 public class InitiatorAgent
@@ -71,7 +71,7 @@ public class InitiatorAgent
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		tc.setTestCount(1);
+		tc.setTestCount(2);
 		
 		final Future<TestReport> ret = new Future<TestReport>();
 		ret.addResultListener(agent.createResultListener(new IResultListener<TestReport>()
@@ -90,15 +90,15 @@ public class InitiatorAgent
 			}
 		}));
 			
-		testLocal(1).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-		{
-			public void customResultAvailable(TestReport result)
-			{
-				tc.addReport(result);
-				ret.setResult(null);
-				agent.killAgent();
-			}
-		}));
+//		testLocal(1).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+//		{
+//			public void customResultAvailable(TestReport result)
+//			{
+//				tc.addReport(result);
+//				ret.setResult(null);
+//				agent.killAgent();
+//			}
+//		}));
 		
 //		testRemote(2).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 //		{
@@ -110,21 +110,21 @@ public class InitiatorAgent
 //			}
 //		}));
 		
-//		testLocal(1).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-//		{
-//			public void customResultAvailable(TestReport result)
-//			{
-//				tc.addReport(result);
-//				testRemote(2).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-//				{
-//					public void customResultAvailable(TestReport result)
-//					{
-//						tc.addReport(result);
-//						ret.setResult(null);
-//					}
-//				}));
-//			}
-//		}));
+		testLocal(1).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+		{
+			public void customResultAvailable(TestReport result)
+			{
+				tc.addReport(result);
+				testRemote(2).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+				{
+					public void customResultAvailable(TestReport result)
+					{
+						tc.addReport(result);
+						ret.setResult(null);
+					}
+				}));
+			}
+		}));
 	}
 	
 	/**
@@ -145,7 +145,8 @@ public class InitiatorAgent
 		// Start platform
 		String url	= "new String[]{\"../jadex-applications-micro/target/classes\"}";	// Todo: support RID for all loaded models.
 //		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
-		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
+//		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
+		Starter.createPlatform(new String[]{"-libpath", url,
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 //			"-logging_level", "java.util.logging.Level.INFO",
 			"-gui", "false", "-usepass", "false", "-simulation", "false"
@@ -204,6 +205,7 @@ public class InitiatorAgent
 			{
 				final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
 				IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
+				
 				// "receiver" cannot use parent due to remote case new CreationInfo(agent.getComponentIdentifier())
 				IResourceIdentifier	rid	= new ResourceIdentifier(
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
@@ -240,6 +242,9 @@ public class InitiatorAgent
 	 */
 	public IFuture<TestReport> sendBehavior(int testno, final IOutputConnection con, IFuture<Collection<Tuple2<String, Object>>> resfut)
 	{
+		final long start = System.currentTimeMillis();
+		final long[] filesize = new long[1];
+
 		final Future<TestReport> ret = new Future<TestReport>();
 		
 		try
@@ -247,7 +252,6 @@ public class InitiatorAgent
 			final InputStream is = SUtil.getResource((String)agent.getArgument("filename"), agent.getClassLoader());
 			
 			final TestReport tr = new TestReport(""+testno, "Test if file is transferred correctly.");
-			final long[] filesize = new long[1];
 			
 			resfut.addResultListener(new IResultListener<Collection<Tuple2<String,Object>>>()
 			{
@@ -258,6 +262,8 @@ public class InitiatorAgent
 					{
 						if(fs.longValue()==filesize[0])
 						{
+							long end = System.currentTimeMillis();
+							System.out.println("Needed "+(end-start)/1000.0+" seconds for "+filesize[0]/1024+" kbytes.");
 							tr.setSucceeded(true);
 						}
 						else

@@ -55,6 +55,7 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -190,8 +191,8 @@ public class MessageService extends BasicService implements IMessageService
 		deliveryhandlers.put(MapSendTask.MESSAGE_TYPE_MAP, new MapDeliveryHandler());
 		deliveryhandlers.put(StreamSendTask.MESSAGE_TYPE_STREAM, new StreamDeliveryHandler());
 		
-		this.icons = new HashMap<Integer, AbstractConnectionHandler>();
-		this.pcons = new HashMap<Integer, AbstractConnectionHandler>();
+		this.icons = Collections.synchronizedMap(new HashMap<Integer, AbstractConnectionHandler>());
+		this.pcons = Collections.synchronizedMap(new HashMap<Integer, AbstractConnectionHandler>());
 	}
 	
 	//-------- interface methods --------
@@ -1116,7 +1117,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(!mypcons[i].isConnectionAlive())
 					{
-						System.out.println("removed con: "+mypcons[i]);
+//						System.out.println("removed con: "+mypcons[i]);
 						mypcons[i].close();
 						pcons.remove(new Integer(mypcons[i].getConnectionId()));
 					}
@@ -1126,7 +1127,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					if(!myicons[i].isConnectionAlive())
 					{
-						System.out.println("removed con: "+myicons[i]);
+//						System.out.println("removed con: "+myicons[i]);
 						myicons[i].close();
 						icons.remove(new Integer(myicons[i].getConnectionId()));
 					}
@@ -1459,7 +1460,7 @@ public class MessageService extends BasicService implements IMessageService
 					InputConnectionHandler ich = new InputConnectionHandler(MessageService.this);
 					final InputConnection con = new InputConnection(recs[0], recs[1], conid, false, ich);
 					pcons.put(new Integer(conid), ich);
-					System.out.println("created: "+con.hashCode());
+//					System.out.println("created for: "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
 					
 					ich.initReceived();
 					
@@ -1483,7 +1484,7 @@ public class MessageService extends BasicService implements IMessageService
 					OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
 					if(och!=null)
 					{
-						och.ackReceived(StreamSendTask.INIT);
+						och.ackReceived(StreamSendTask.INIT, data);
 					}
 					else
 					{
@@ -1499,7 +1500,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 					else
 					{
-						System.out.println("InputStream not found (dai): "+conid);
+						System.out.println("InputStream not found (dai): "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
 					}
 				}
 				else if(type==StreamSendTask.CLOSE_OUTPUT_INITIATOR)
@@ -1508,7 +1509,7 @@ public class MessageService extends BasicService implements IMessageService
 					InputConnectionHandler ich = (InputConnectionHandler)pcons.get(new Integer(conid));
 					if(ich!=null)
 					{
-						ich.closeReceived();
+						ich.closeReceived(SUtil.bytesToInt((byte[])data));
 					}
 					else
 					{
@@ -1521,7 +1522,7 @@ public class MessageService extends BasicService implements IMessageService
 					OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
 					if(och!=null)
 					{
-						och.ackReceived(StreamSendTask.CLOSE);
+						och.ackReceived(StreamSendTask.CLOSE, data);
 	//					och.ackCloseReceived();
 					}
 					else
@@ -1548,7 +1549,7 @@ public class MessageService extends BasicService implements IMessageService
 					InputConnectionHandler ich = (InputConnectionHandler)pcons.get(new Integer(conid));
 					if(ich!=null)
 					{
-						ich.ackReceived(StreamSendTask.CLOSEREQ);
+						ich.ackReceived(StreamSendTask.CLOSEREQ, data);
 	//					ich.ackCloseRequestReceived();
 					}
 					else
@@ -1562,8 +1563,8 @@ public class MessageService extends BasicService implements IMessageService
 					OutputConnectionHandler och = (OutputConnectionHandler)icons.get(new Integer(conid));
 					if(och!=null)
 					{
-						Tuple2<Integer, Boolean> tup = (Tuple2<Integer, Boolean>)data;
-						och.ackData(tup.getFirstEntity().intValue(), tup.getSecondEntity().booleanValue());
+						AckInfo ackinfo = (AckInfo)data;
+						och.ackDataReceived(ackinfo);
 					}
 					else
 					{
@@ -1601,7 +1602,7 @@ public class MessageService extends BasicService implements IMessageService
 					InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
 					if(ich!=null)
 					{
-						ich.ackReceived(StreamSendTask.INIT);
+						ich.ackReceived(StreamSendTask.INIT, data);
 					}
 					else
 					{
@@ -1625,8 +1626,8 @@ public class MessageService extends BasicService implements IMessageService
 					OutputConnectionHandler och = (OutputConnectionHandler)pcons.get(new Integer(conid));
 					if(och!=null)
 					{
-						Tuple2<Integer, Boolean> tup = (Tuple2<Integer, Boolean>)data;
-						och.ackData(tup.getFirstEntity().intValue(), tup.getSecondEntity().booleanValue());
+						AckInfo ackinfo = (AckInfo)data;
+						och.ackDataReceived(ackinfo);	
 					}
 					else
 					{
@@ -1650,7 +1651,7 @@ public class MessageService extends BasicService implements IMessageService
 					InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
 					if(ich!=null)
 					{
-						ich.ackReceived(StreamSendTask.CLOSEREQ);
+						ich.ackReceived(StreamSendTask.CLOSEREQ, data);
 					}
 					else
 					{
@@ -1662,7 +1663,7 @@ public class MessageService extends BasicService implements IMessageService
 					InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
 					if(ich!=null)
 					{
-						ich.closeReceived();
+						ich.closeReceived((Integer)data);
 					}
 					else
 					{
@@ -1674,7 +1675,7 @@ public class MessageService extends BasicService implements IMessageService
 					OutputConnectionHandler ich = (OutputConnectionHandler)pcons.get(new Integer(conid));
 					if(ich!=null)
 					{
-						ich.ackReceived(StreamSendTask.CLOSE);
+						ich.ackReceived(StreamSendTask.CLOSE, data);
 	//					ich.ackCloseReceived();
 					}
 					else

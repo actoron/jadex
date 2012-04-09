@@ -64,7 +64,7 @@ public class SubscriptionIntermediateFuture<E> extends TerminableIntermediateFut
      */
     public void	addResultListener(IResultListener<Collection<E>> listener)
     {
-    	System.out.println("adding: "+listener);
+//    	System.out.println("adding listener: "+listener);
     	boolean first;
     	synchronized(this)
 		{

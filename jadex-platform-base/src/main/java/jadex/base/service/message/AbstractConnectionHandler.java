@@ -9,8 +9,8 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
-import jadex.commons.SUtil;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -120,7 +120,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 *  This will cancel the timer (resending) task
 	 *  and call the future of sendAcknowledgedMessage().
 	 */
-	public void ackReceived(final Object id)
+	public void ackReceived(final Object id, final Object content)
 	{
 		scheduleStep(new IComponentStep<Void>()
 		{
@@ -130,7 +130,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 				if(si!=null)
 				{
 					si.getTimer().cancel();
-					si.getResult().setResult(null);
+					si.getResult().setResult(content);
 				}
 				return IFuture.DONE;
 			}
@@ -235,7 +235,13 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 			{
 				AbstractSendTask task = createTask(StreamSendTask.INIT, new IComponentIdentifier[]{
 					getConnection().getInitiator(), getConnection().getParticipant()}, true, null);
-				sendAcknowledgedMessage(task, StreamSendTask.INIT).addResultListener(new DelegationResultListener<Void>(ret));
+				sendAcknowledgedMessage(task, StreamSendTask.INIT).addResultListener(new ExceptionDelegationResultListener<Object, Void>(ret)
+				{
+					public void customResultAvailable(Object result)
+					{
+						ret.setResult(null);
+					}
+				});
 				return IFuture.DONE;
 			}
 		});
@@ -252,7 +258,8 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				sendTask(createTask(StreamSendTask.ALIVE, null, null)).addResultListener(new DelegationResultListener<Void>(ret));
+				sendTask(createTask(StreamSendTask.ALIVE, null, null))
+					.addResultListener(new DelegationResultListener<Void>(ret));
 				return IFuture.DONE;
 			}
 		});
@@ -381,17 +388,17 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 *  @param id The id of the call (e.g. sequence number).
 	 *  @return Exception if sending and resending failed.
 	 */
-	protected IFuture<Void> sendAcknowledgedMessage(AbstractSendTask task, Object id)
+	protected IFuture<Object> sendAcknowledgedMessage(AbstractSendTask task, Object id)
 	{
 		SendInfo si = unacked.get(id);
 		
-		Future<Void> ret;
+		Future<Object> ret;
 
 		sendTask(task); // .addResultListener(new DelegationResultListener<Void>(fut));
 		
 		if(si==null)
 		{
-			ret = new Future<Void>();
+			ret = new Future<Object>();
 			si = new SendInfo(task, id, 1, createAckTimer(id), ret);
 			unacked.put(id, si);
 		}
@@ -491,7 +498,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		protected ITimer timer;
 		
 		/** The result future of the call. */
-		protected Future<Void> result;
+		protected Future<Object> result;
 
 		//-------- constructors --------
 
@@ -499,7 +506,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		 *  Create a new send info.
 		 */
 		public SendInfo(AbstractSendTask task, Object id, int trycnt,
-				ITimer timer, Future<Void> result)
+				ITimer timer, Future<Object> result)
 		{
 			this.task = task;
 			this.id = id;
@@ -586,7 +593,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		 *  Get the result.
 		 *  @return the result.
 		 */
-		public Future<Void> getResult()
+		public Future<Object> getResult()
 		{
 			return result;
 		}
@@ -595,7 +602,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		 *  Set the result.
 		 *  @param result The result to set.
 		 */
-		public void setResult(Future<Void> result)
+		public void setResult(Future<Object> result)
 		{
 			this.result = result;
 		}

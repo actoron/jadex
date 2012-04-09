@@ -5,6 +5,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
+import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -32,9 +33,6 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 
 	/** The current sequence number. */
 	protected int seqnumber;
-	
-	/** The last acknowledged packet number. */
-	protected int lastack;
 	
 	/** The max number of packets that can be sent without an ack is received. */
 	protected int maxsend;
@@ -68,10 +66,13 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	
 	/** Close request flag (when a closereq message was received). */
 	protected boolean closereqflag;
-	protected Future<Void> closerefut;
+//	protected Future<Void> closerefut;
 
 	/** Stop flag (is sent in ack from input side) to signal that the rceiver is flooded with data). */
 	protected Tuple2<Boolean, Integer> stopflag;
+	
+	/** Flag if close was already sent. */
+	protected boolean closesent;
 	
 	//-------- constructors --------
 	
@@ -97,7 +98,6 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		this.tosend = new ArrayList<Tuple2<StreamSendTask, Future<Void>>>();
 		this.sent = new HashMap<Integer, Tuple2<StreamSendTask, Integer>>();
 		this.seqnumber = 0;
-		this.lastack = 0;
 		
 		this.maxsend = 20;
 		this.ackcnt = 10;
@@ -136,29 +136,22 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	 *  
 	 *  Uses: sent, lastack
 	 */
-	public void ackData(final int seqnumber, final boolean stop)
+	public void ackDataReceived(final AckInfo ackinfo)
 	{
 		scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				// Update stop if newer
-				if(stopflag.getSecondEntity().intValue()<seqnumber)
-					stopflag = new Tuple2<Boolean, Integer>(stop? Boolean.TRUE: Boolean.FALSE, new Integer(seqnumber));
+				// Update stop if newer sequence number
+				if(stopflag.getSecondEntity().intValue()<ackinfo.getEndSequenceNumber())
+					stopflag = new Tuple2<Boolean, Integer>(ackinfo.isStop()? Boolean.TRUE: Boolean.FALSE, new Integer(ackinfo.getEndSequenceNumber()));
 				
-				int s = sent.size();
-				
-//				for(int i=seqnumber; i>lastack && cnt<ackcnt; i--)
-				for(int i=0; i<ackcnt && seqnumber-i>lastack; i++)
+				// remove all acked packets
+				for(int i=ackinfo.getStartSequenceNumber(); i<=ackinfo.getEndSequenceNumber(); i++)
 				{
-					Tuple2<StreamSendTask, Integer> tup = sent.remove(new Integer(seqnumber-i));
-					if(tup==null)
-						System.out.println("Ack error: fix me!!!");
-//						throw new RuntimeException("Ack not possible, data not found.");
+					Tuple2<StreamSendTask, Integer> tup = sent.remove(new Integer(i));
 				}
-				
-				lastack = seqnumber;
-
+					
 //				System.out.println("ack: "+seqnumber+" "+stop+" "+s+" "+sent.size());
 //				System.out.println(sent);
 				
@@ -294,7 +287,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		
 		if(isSendAllowed())
 		{
-			System.out.println("send: "+task.getSequenceNumber());
+//			System.out.println("send: "+task.getSequenceNumber());
 			ret = sendTask(task, null);
 		}
 		else
@@ -511,12 +504,21 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	/**
 	 *  Tests if the data processing of the connection is finished. 
 	 */
-	public boolean isDataFinished()
+	protected boolean isDataSendFinished()
 	{
-		// All acks received and no unfinished multi packet
+		// No packet to send any more?
 //		System.out.println("isDataFinished (unacknowledged, multipacketsize): "+sent.size()+" "+mpsize);
 //		return sent.isEmpty() && (!multipackets || mpsize==0);
-		return !multipackets || mpsize==0;
+		return tosend.isEmpty() && !multipackets || mpsize==0;
+	}
+	
+	/**
+	 *  Tests if the data processing of the connection is finished. 
+	 */
+	protected boolean isDataAckFinished()
+	{
+		// All acks received
+		return sent.isEmpty();
 	}
 	
 	/**
@@ -679,18 +681,29 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	/**
 	 * 
 	 */
-	protected IFuture<Void> checkClose()
+	protected void checkClose()
 	{
-		if(closerefut==null)
-			closerefut = new Future<Void>();
-		
 		// Try to close if close is requested.
-		if(isCloseRequested() && isDataFinished() && con.isInited() && !con.isClosed())
+		if(isCloseRequested() && isDataSendFinished() && con.isInited() && !con.isClosed())
 		{
 			// If close() was already called on connection directly perform close
 			if(con.isClosing())
 			{
-				performClose().addResultListener(new DelegationResultListener<Void>(closerefut));
+//				System.out.println("sending close output side");
+				// Send close message and wait until it was acked
+				sendAcknowledgedMessage(createTask(StreamSendTask.CLOSE, SUtil.intToBytes(seqnumber), null), StreamSendTask.CLOSE)
+					.addResultListener(new IResultListener<Object>()
+				{
+					public void resultAvailable(Object result)
+					{
+						closesent = true;
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						closesent = true;
+					}
+				});
 			}
 			else
 			{
@@ -698,38 +711,14 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			}
 			closereqflag = false; // ensure that close is executed only once
 		}
-//		else
-//			System.out.println("check close: "+isCloseRequested()+" "+isDataFinished());
-	
-		return closerefut;
-	}
-	
-	/**
-	 * 
-	 */
-	protected IFuture<Void> performClose()
-	{
-//		System.out.println("pclose");
 		
-		final Future<Void> ret = new Future<Void>();
-		
-		sendAcknowledgedMessage(createTask(StreamSendTask.CLOSE, null, null), StreamSendTask.CLOSE)
-			.addResultListener(new IResultListener<Void>()
+		// If all data sent and acked and not already closed and close message was acked
+		if(isDataSendFinished() && isDataAckFinished() && !con.isClosed() && closesent)
 		{
-			public void resultAvailable(Void result)
-			{
-				// Set connection as closed.
-				con.setClosed();
-				ret.setResult(null);
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				con.setClosed();
-				ret.setException(exception);
-			}
-		});
-		
-		return ret;
+//			System.out.println("close end output side");
+			// Set connection as closed.
+			con.setClosed();
+		}
 	}
+	
 }
