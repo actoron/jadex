@@ -1,7 +1,7 @@
 package jadex.micro.testcases.stream;
 
 import jadex.bridge.IInputConnection;
-import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.IOutputConnection;
 import jadex.commons.future.IFuture;
 
 /**
@@ -11,7 +11,21 @@ public interface IStreamService
 {
 	/**
 	 *  Pass an input stream to the user.
-	 *  @return The output stream.
+	 *  @return The input stream.
 	 */
 	public IFuture<IInputConnection> getInputStream();
+
+	/**
+	 *  Pass an output stream to the user.
+	 *  @return The input stream.
+	 */
+	public IFuture<IOutputConnection> getOutputStream();
+
+	
+//	/**
+//	 *  Pass an output stream from the user.
+//	 *  @param con The output stream.
+//	 */
+//	public IFuture<Void> passOutputStream(IOutputConnection con);
+
 }

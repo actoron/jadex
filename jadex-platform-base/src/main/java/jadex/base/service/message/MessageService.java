@@ -206,6 +206,14 @@ public class MessageService extends BasicService implements IMessageService
 	}
 	
 	/**
+	 * 
+	 */
+	public IOutputConnection getParticipantOutputConnection(int conid)
+	{
+		return pcons.get(conid)==null? null: (IOutputConnection)pcons.get(conid).getConnection();
+	}
+	
+	/**
 	 *  Create a virtual output connection.
 	 */
 	public OutputConnection internalCreateOutputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
@@ -230,7 +238,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Create a virtual input connection.
 	 */
-	public IInputConnection internalCreateInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
+	public InputConnection internalCreateInputConnection(IComponentIdentifier sender, IComponentIdentifier receiver)
 	{
 		UUID uuconid = UUID.randomUUID();
 		int conid = uuconid.hashCode();
@@ -1530,7 +1538,6 @@ public class MessageService extends BasicService implements IMessageService
 					if(och!=null)
 					{
 						och.ackReceived(StreamSendTask.CLOSE, data);
-	//					och.ackCloseReceived();
 					}
 					else
 					{
@@ -1670,7 +1677,7 @@ public class MessageService extends BasicService implements IMessageService
 					InputConnectionHandler ich = (InputConnectionHandler)icons.get(new Integer(conid));
 					if(ich!=null)
 					{
-						ich.closeReceived((Integer)data);
+						ich.closeReceived(SUtil.bytesToInt((byte[])data));
 					}
 					else
 					{
@@ -1683,7 +1690,6 @@ public class MessageService extends BasicService implements IMessageService
 					if(ich!=null)
 					{
 						ich.ackReceived(StreamSendTask.CLOSE, data);
-	//					ich.ackCloseReceived();
 					}
 					else
 					{

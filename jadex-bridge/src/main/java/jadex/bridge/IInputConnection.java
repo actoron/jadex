@@ -32,11 +32,11 @@ public interface IInputConnection extends IConnection
 //	public IIntermediateFuture<Byte> aread();
 	public ISubscriptionIntermediateFuture<byte[]> aread();
 	
-	/**
-	 *  Asynchronous read. 
-	 *  @return Bytes one by one till end of stream or closed.
-	 */
-	public IFuture<Byte> areadNext();
+//	/**
+//	 *  Asynchronous read. 
+//	 *  @return Bytes one by one till end of stream or closed.
+//	 */
+//	public IFuture<Byte> areadNext();
 	
 //	/**
 //	 *  Blocking read. Read the next byte.

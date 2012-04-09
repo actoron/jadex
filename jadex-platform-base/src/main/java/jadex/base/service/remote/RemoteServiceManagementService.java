@@ -16,6 +16,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IOutputConnection;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -34,6 +35,7 @@ import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
+import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
@@ -233,6 +235,26 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		}));
 		typeinfosread.add(ti_icp);
 		
+		QName[] ocp = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge.service.types.remote", "ServiceOutputConnectionProxy")};
+		TypeInfo ti_ocp = new TypeInfo(new XMLInfo(ocp), 
+			new ObjectInfo(ServiceOutputConnectionProxy.class, new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)object;
+				int conid = ocp.getConnectionId();
+				IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(conid);
+				return ocon;
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		}));
+		typeinfosread.add(ti_ocp);
+	
+		
 		this.reader = new Reader(new TypeInfoPathManager(typeinfosread), false, false, false, new XMLReporter()
 		{
 			public void report(String message, String error, Object info, Location location)
@@ -308,6 +330,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		}, preproc);
 		
 		// Streams
+		
+		// output connection as result of call
 		wh.addPreProcessor(new IFilter()
 		{
 			public boolean filter(Object obj)
@@ -324,6 +348,27 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
 				con.setConnectionId(ocon.getConnectionId());
 				con.setOutputConnection(ocon);
+				return con;
+			}
+		});
+		
+		// input connection proxy as result of call
+		wh.addPreProcessor(new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+//				System.out.println("obj: "+obj);
+				return obj instanceof ServiceOutputConnectionProxy;
+			}
+		}, new IPreProcessor()
+		{
+			public Object preProcess(IContext context, Object object)
+			{
+				IComponentIdentifier receiver = (IComponentIdentifier)((Object[])context.getUserContext())[0];
+				ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
+				InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+				con.setConnectionId(icon.getConnectionId());
+				con.setInputConnection(icon);
 				return con;
 			}
 		});

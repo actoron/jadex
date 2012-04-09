@@ -3,10 +3,14 @@ package jadex.micro.testcases.stream;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.Implementation;
@@ -15,6 +19,7 @@ import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -59,35 +64,49 @@ public class StreamProviderAgent implements IStreamService
 		return ret;
 	}
 	
+	/**
+	 *  Pass an Input stream to the user.
+	 *  @return The Input stream.
+	 */
+	public IFuture<IOutputConnection> getOutputStream()
+	{
+		Future<IOutputConnection> ret = new Future<IOutputConnection>();
+		
+		final ServiceInputConnection ic = new ServiceInputConnection();
+
+		final long[] size = new long[1];
+		ic.aread().addResultListener(new IIntermediateResultListener<byte[]>()
+		{
+			public void resultAvailable(Collection<byte[]> result)
+			{
+				System.out.println("Result: "+result);
+			}
+			public void intermediateResultAvailable(byte[] result)
+			{
+				size[0] += result.length;
+				System.out.println("Intermediate result: "+SUtil.arrayToString(result));
+			}
+			public void finished()
+			{
+				System.out.println("finished, size: "+size[0]);
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("ex:"+exception);
+			}
+		});
+		
+		ret.setResult(ic.getOutputConnection());
+		return ret;
+	}
+	
 //	/**
-//	 *  Pass an Input stream to the user.
-//	 *  @return The Input stream.
+//	 *  Pass an output stream from the user.
+//	 *  @param con The output stream.
 //	 */
-//	public IFuture<InputStream> getInputStream()
+//	public IFuture<Void> passOutputStream(IOutputConnection con)
 //	{
-//		Future<InputStream> ret = new Future<InputStream>();
-//		
-//		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-//		final PrintWriter pw = new PrintWriter(bos);
-//
-//		final int[] cnt = new int[]{0};
-//		IComponentStep<Void> step = new IComponentStep<Void>()
-//		{
-//			public IFuture<Void> execute(IInternalAccess ia)
-//			{
-//				pw.write("step ");
-//				if(cnt[0]++<5)
-//					agent.waitFor(1000, this);
-//				return IFuture.DONE;
-//			}
-//		};
-//		
-//		agent.waitFor(1000, step);
-//		
-//		ret.setResult(null);//;new MagicInputStream(bos));
-//		
-//		return ret;
+//		con.
 //	}
-//	
 	
 }

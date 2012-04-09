@@ -3,17 +3,16 @@ package jadex.bridge.service.types.remote;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 /**
  * 
  */
-public class ServiceInputConnectionProxy implements IInputConnection
+public class ServiceOutputConnectionProxy implements IOutputConnection
 {
 	/** The original connection. */
-	protected ServiceOutputConnection con;
+	protected ServiceInputConnection con;
 	
 	/** The connection id. */
 	protected int conid;
@@ -21,7 +20,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	/**
 	 * 
 	 */
-	public ServiceInputConnectionProxy()
+	public ServiceOutputConnectionProxy()
 	{
 		// Bean constructor.
 	}
@@ -29,7 +28,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	/**
 	 * 
 	 */
-	public ServiceInputConnectionProxy(ServiceOutputConnection con)
+	public ServiceOutputConnectionProxy(ServiceInputConnection con)
 	{
 		this.con = con;
 	}
@@ -37,9 +36,9 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	/**
 	 * 
 	 */
-	public void setOutputConnection(IOutputConnection ocon)
+	public void setInputConnection(IInputConnection icon)
 	{
-		con.setOutputConnection(ocon);
+		con.setInputConnection(icon);
 	}
 	
 	/**
@@ -59,26 +58,30 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	{
 		this.conid = conid;
 	}
-
+	
+	
+	
 	/**
-	 * 
+	 *  Write the content to the stream.
+	 *  @param data The data.
 	 */
-	public int read(byte[] buffer)
+	public IFuture<Void> write(byte[] data)
+	{
+		return new Future<Void>(new UnsupportedOperationException());
+	}
+	
+	/**
+	 *  Flush the data.
+	 */
+	public void flush()
 	{
 		throw new UnsupportedOperationException();
 	}
 	
 	/**
-	 * 
+	 *  Close the connection.
 	 */
-	public int read()
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
-	 * 
-	 */
+	// todo: make IFuture<Void> ?
 	public void close()
 	{
 		throw new UnsupportedOperationException();
@@ -99,18 +102,4 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	{
 		throw new UnsupportedOperationException();
 	}
-
-	/**
-	 * 
-	 */
-	public ISubscriptionIntermediateFuture<byte[]> aread()
-	{
-		throw new UnsupportedOperationException();
-	}
-	
-	
-//	public IFuture<Byte> areadNext()
-//	{
-//		throw new UnsupportedOperationException();
-//	}
 }

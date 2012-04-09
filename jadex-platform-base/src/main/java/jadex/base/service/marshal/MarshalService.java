@@ -21,6 +21,7 @@ import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
+import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IChangeListener;
 import jadex.commons.IRemotable;
 import jadex.commons.IRemoteChangeListener;
@@ -160,6 +161,32 @@ public class MarshalService extends BasicService implements IMarshalService
 				sicp.setOutputConnection(ocon);
 				
 				return icon;
+			}
+		});
+		
+		// Add processor for streams
+		processors.add(processors.size()-1, new ITraverseProcessor()
+		{
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			{
+				return object instanceof ServiceOutputConnectionProxy;
+			}
+			
+			public Object process(Object object, Class<?> clazz,
+				List<ITraverseProcessor> processors, Traverser traverser,
+				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			{
+				ServiceOutputConnectionProxy socp = (ServiceOutputConnectionProxy)object;
+				
+				LocalOutputConnectionHandler och = new LocalOutputConnectionHandler();
+				LocalInputConnectionHandler ich = new LocalInputConnectionHandler(och);
+				och.setConnectionHandler(ich);
+
+				InputConnection icon = new InputConnection(null, null, socp.getConnectionId(), false, ich);
+				socp.setInputConnection(icon);
+				OutputConnection ocon = new OutputConnection(null, null, socp.getConnectionId(), true, och);
+				
+				return ocon;
 			}
 		});
 		
