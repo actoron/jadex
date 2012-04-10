@@ -4,15 +4,20 @@ import java.io.IOException;
 
 import org.xmlpull.v1.XmlSerializer;
 
-import javaxx.xml.stream.XMLStreamException;
-import javaxx.xml.stream.XMLStreamWriter;
-
-public class XMLWriterStartTagOperation implements IXMLWriterOperation {
+/**
+ * startTag Operation
+ */
+public class XMLWriterStartTagCommand implements IXMLWriterCommand {
 	
 	private String name;
 	private String namespace;
 
-	public XMLWriterStartTagOperation(String namespace, String name) {
+	/**
+	 * Constructor
+	 * @param namespace
+	 * @param name
+	 */
+	public XMLWriterStartTagCommand(String namespace, String name) {
 		this.namespace = namespace;
 		this.name = name;
 	}

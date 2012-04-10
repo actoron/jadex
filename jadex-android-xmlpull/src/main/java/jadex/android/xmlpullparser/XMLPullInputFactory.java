@@ -5,13 +5,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 
 import javaxx.xml.stream.EventFilter;
 import javaxx.xml.stream.StreamFilter;
@@ -24,29 +20,46 @@ import javaxx.xml.stream.XMLStreamReader;
 import javaxx.xml.stream.util.XMLEventAllocator;
 import javaxx.xml.transform.Source;
 
+import org.xmlpull.v1.XmlPullParser;
+
+/**
+ * Factory for creating an Android XML Pull Parser that is wrapped for
+ * implementing StaX API. This Implementation will throw Exceptions for Methods not
+ * currently supported.
+ */
 public class XMLPullInputFactory extends XMLInputFactory {
 
 	private Map<String, Object> properties = new HashMap<String, Object>();
 
 	private XMLReporter reporter;
 
-	private static Map<String, String> TRANSLATE_FEATURES_TOPULL = new HashMap<String, String>();
+	/**
+	 * Maps StaX Features to Android Pull Parser Features.
+	 */
+	private static Map<String, String> TRANSLATE_FEATURES_TO_PULL = new HashMap<String, String>();
 
 	static {
-		TRANSLATE_FEATURES_TOPULL.put(XMLInputFactory.IS_VALIDATING, XmlPullParser.FEATURE_VALIDATION);
-		TRANSLATE_FEATURES_TOPULL.put(XMLInputFactory.SUPPORT_DTD, XmlPullParser.FEATURE_PROCESS_DOCDECL);
-		TRANSLATE_FEATURES_TOPULL.put(XMLInputFactory.IS_NAMESPACE_AWARE, XmlPullParser.FEATURE_PROCESS_NAMESPACES);
-		TRANSLATE_FEATURES_TOPULL.put(XMLInputFactory.IS_COALESCING, XMLInputFactory.IS_COALESCING);
-		TRANSLATE_FEATURES_TOPULL.put(XMLInputFactory.REPORTER, XMLInputFactory.REPORTER);
+		TRANSLATE_FEATURES_TO_PULL.put(XMLInputFactory.IS_VALIDATING,
+				XmlPullParser.FEATURE_VALIDATION);
+		TRANSLATE_FEATURES_TO_PULL.put(XMLInputFactory.SUPPORT_DTD,
+				XmlPullParser.FEATURE_PROCESS_DOCDECL);
+		TRANSLATE_FEATURES_TO_PULL.put(XMLInputFactory.IS_NAMESPACE_AWARE,
+				XmlPullParser.FEATURE_PROCESS_NAMESPACES);
+		TRANSLATE_FEATURES_TO_PULL.put(XMLInputFactory.IS_COALESCING,
+				XMLInputFactory.IS_COALESCING);
+		TRANSLATE_FEATURES_TO_PULL.put(XMLInputFactory.REPORTER,
+				XMLInputFactory.REPORTER);
 	}
 
 	@Override
-	public XMLStreamReader createXMLStreamReader(InputStream stream) throws XMLStreamException {
+	public XMLStreamReader createXMLStreamReader(InputStream stream)
+			throws XMLStreamException {
 		return createXMLStreamReader(new InputStreamReader(stream));
 	}
 
 	@Override
-	public XMLStreamReader createXMLStreamReader(InputStream stream, String encoding) throws XMLStreamException {
+	public XMLStreamReader createXMLStreamReader(InputStream stream,
+			String encoding) throws XMLStreamException {
 		try {
 			return createXMLStreamReader(new InputStreamReader(stream, encoding));
 		} catch (UnsupportedEncodingException e) {
@@ -55,19 +68,23 @@ public class XMLPullInputFactory extends XMLInputFactory {
 	}
 
 	@Override
-	public XMLStreamReader createXMLStreamReader(Reader reader) throws XMLStreamException {
+	public XMLStreamReader createXMLStreamReader(Reader reader)
+			throws XMLStreamException {
 		return createXMLStreamReader(null, reader);
 	}
 
 	@Override
-	public XMLStreamReader createXMLStreamReader(String systemId, InputStream stream) throws XMLStreamException {
+	public XMLStreamReader createXMLStreamReader(String systemId,
+			InputStream stream) throws XMLStreamException {
 		return createXMLStreamReader(systemId, new InputStreamReader(stream));
 	}
 
 	@Override
-	public XMLStreamReader createXMLStreamReader(String systemId, Reader reader) throws XMLStreamException {
+	public XMLStreamReader createXMLStreamReader(String systemId, Reader reader)
+			throws XMLStreamException {
 		try {
-			XMLPullStreamReader xmlPullStreamReader = new XMLPullStreamReader(reader);
+			XMLPullStreamReader xmlPullStreamReader = new XMLPullStreamReader(
+					reader);
 			passProperties(xmlPullStreamReader);
 			return xmlPullStreamReader;
 		} catch (Exception e) {
@@ -76,68 +93,85 @@ public class XMLPullInputFactory extends XMLInputFactory {
 	}
 
 	@Override
-	public XMLStreamReader createXMLStreamReader(Source source) throws XMLStreamException {
-		try {
-			XMLPullStreamReader xmlPullStreamReader = new XMLPullStreamReader(source);
-			return xmlPullStreamReader;
-		} catch (XmlPullParserException e) {
-			throw new XMLStreamException(e.getMessage());
-		}
+	public XMLStreamReader createXMLStreamReader(Source source)
+			throws XMLStreamException {
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": createXMLStreamReader not supported!");
 	}
 
 	@Override
-	public XMLEventReader createXMLEventReader(Reader reader) throws XMLStreamException {
-		throw new XMLStreamException("createXMLEventReader not supported.");
+	public XMLEventReader createXMLEventReader(Reader reader)
+			throws XMLStreamException {
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": createXMLEventReader not supported!");
 	}
 
 	@Override
-	public XMLEventReader createXMLEventReader(String systemId, Reader reader) throws XMLStreamException {
-		throw new XMLStreamException("createXMLEventReader not supported.");
+	public XMLEventReader createXMLEventReader(String systemId, Reader reader)
+			throws XMLStreamException {
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": createXMLEventReader not supported!");
 	}
 
 	@Override
-	public XMLEventReader createXMLEventReader(XMLStreamReader reader) throws XMLStreamException {
-		throw new XMLStreamException("createXMLEventReader not supported.");
+	public XMLEventReader createXMLEventReader(XMLStreamReader reader)
+			throws XMLStreamException {
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": createXMLEventReader not supported!");
 	}
 
 	@Override
-	public XMLEventReader createXMLEventReader(Source source) throws XMLStreamException {
-		throw new XMLStreamException("createXMLEventReader not supported.");
+	public XMLEventReader createXMLEventReader(Source source)
+			throws XMLStreamException {
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": createXMLEventReader not supported!");
 	}
 
 	@Override
-	public XMLEventReader createXMLEventReader(InputStream stream) throws XMLStreamException {
-		throw new XMLStreamException("createXMLEventReader not supported.");
+	public XMLEventReader createXMLEventReader(InputStream stream)
+			throws XMLStreamException {
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": createXMLEventReader not supported!");
 	}
 
 	@Override
-	public XMLEventReader createXMLEventReader(InputStream stream, String encoding) throws XMLStreamException {
-		throw new XMLStreamException("createXMLEventReader not supported.");
+	public XMLEventReader createXMLEventReader(InputStream stream,
+			String encoding) throws XMLStreamException {
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": createXMLEventReader not supported!");
 	}
 
 	@Override
-	public XMLEventReader createXMLEventReader(String systemId, InputStream stream) throws XMLStreamException {
-		throw new XMLStreamException("createXMLEventReader not supported.");
+	public XMLEventReader createXMLEventReader(String systemId,
+			InputStream stream) throws XMLStreamException {
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": createXMLEventReader not supported!");
 	}
 
 	@Override
-	public XMLStreamReader createFilteredReader(XMLStreamReader reader, StreamFilter filter) throws XMLStreamException {
-		throw new XMLStreamException("createFilteredReader not supported.");
+	public XMLStreamReader createFilteredReader(XMLStreamReader reader,
+			StreamFilter filter) throws XMLStreamException {
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": createFilteredReader not supported!");
 	}
 
 	@Override
-	public XMLEventReader createFilteredReader(XMLEventReader reader, EventFilter filter) throws XMLStreamException {
-		throw new XMLStreamException("createFilteredReader not supported.");
+	public XMLEventReader createFilteredReader(XMLEventReader reader,
+			EventFilter filter) throws XMLStreamException {
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": createFilteredReader not supported!");
 	}
 
 	@Override
 	public XMLResolver getXMLResolver() {
-		throw new IllegalArgumentException(this.getClass().getName() + ": getXMLResolver not supported!");
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": getXMLResolver not supported!");
 	}
 
 	@Override
 	public void setXMLResolver(XMLResolver resolver) {
-		throw new IllegalArgumentException(this.getClass().getName() + ": setXMLResolver not supported!");
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": setXMLResolver not supported!");
 
 	}
 
@@ -148,17 +182,19 @@ public class XMLPullInputFactory extends XMLInputFactory {
 
 	@Override
 	public void setXMLReporter(XMLReporter reporter) {
-		throw new IllegalArgumentException(this.getClass().getName() + ": setXMLReporter not supported!");
+		this.reporter = reporter;
 	}
 
 	@Override
-	public void setProperty(String name, Object value) throws IllegalArgumentException {
+	public void setProperty(String name, Object value)
+			throws IllegalArgumentException {
 		if (name.equals(XMLInputFactory.REPORTER)) {
 			reporter = (XMLReporter) value;
 		} else if (isPropertySupported(name)) {
 			properties.put(name, value);
 		} else {
-			throw new IllegalArgumentException("This property is not supported: " + name);
+			throw new IllegalArgumentException(
+					"This property is not supported: " + name);
 		}
 	}
 
@@ -169,36 +205,33 @@ public class XMLPullInputFactory extends XMLInputFactory {
 
 	@Override
 	public boolean isPropertySupported(String name) {
-		return TRANSLATE_FEATURES_TOPULL.containsKey(name);
+		return TRANSLATE_FEATURES_TO_PULL.containsKey(name);
 	}
 
 	@Override
 	public void setEventAllocator(XMLEventAllocator allocator) {
-		throw new IllegalArgumentException(this.getClass().getName() + ": setEventAllocator not supported!");
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": setEventAllocator not supported!");
 	}
 
 	@Override
 	public XMLEventAllocator getEventAllocator() {
-		throw new IllegalArgumentException(this.getClass().getName() + ": getEventAllocator not supported!");
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": getEventAllocator not supported!");
 	}
 
 	private void passProperties(XMLPullStreamReader xmlPullStreamReader) {
 		if (reporter != null) {
 			xmlPullStreamReader.setReporter(reporter);
 		}
+		// remove validation feature, because its not supported by the current
+		// android implementation
+		properties.remove(XmlPullParser.FEATURE_VALIDATION);
 
 		Set<Entry<String, Object>> entrySet = properties.entrySet();
 		for (Entry<String, Object> entry : entrySet) {
-			String feature = TRANSLATE_FEATURES_TOPULL.get(entry.getKey());
+			String feature = TRANSLATE_FEATURES_TO_PULL.get(entry.getKey());
 			Object value = entry.getValue();
-			// if (feature.equals(XmlPullParser.FEATURE_VALIDATION) && value ==
-			// Boolean.TRUE) {
-			// xmlPullStreamReader.setFeature(XmlPullParser.FEATURE_PROCESS_DOCDECL,
-			// true);
-			// }
-			if (feature.equals(XmlPullParser.FEATURE_VALIDATION)) {
-				return;
-			}
 			xmlPullStreamReader.setFeature(feature, (Boolean) value);
 		}
 

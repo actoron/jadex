@@ -4,10 +4,6 @@ import jadex.commons.Tuple2;
 
 import java.util.Collection;
 
-import javassist.bytecode.Descriptor.Iterator;
-
-
-
 /**
  *  Simple default implementation for an argument.
  */

@@ -19,14 +19,16 @@ import javaxx.xml.stream.XMLReporter;
 import javaxx.xml.stream.XMLStreamConstants;
 import javaxx.xml.stream.XMLStreamException;
 import javaxx.xml.stream.XMLStreamReader;
-import javaxx.xml.transform.Source;
 
-import org.apache.http.MethodNotSupportedException;
-import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+/**
+ * The XMLPullStreamReader implements the StaX
+ * {@link javax.xml.stream.XMLStreamReader} interface, but uses the Android XML
+ * Pull Parser.
+ */
 public class XMLPullStreamReader implements XMLStreamReader {
 
 	private XmlPullParser parser;
@@ -35,36 +37,73 @@ public class XMLPullStreamReader implements XMLStreamReader {
 	private Reader inputReader;
 	private XMLReporter reporter;
 
+	/**
+	 * The following Tag Types are not supported by Android Pull Parser.
+	 * 
+	 */
 	public static final int ATTRIBUTE = 100;
 	public static final int NAMESPACE = 101;
 	public static final int NOTATION_DECLARATION = 102;
 	public static final int ENTITY_DECLARATION = 103;
 
-	private final static int[] TRANSLATE_EVENTS_FROMPULL = { XMLStreamConstants.START_DOCUMENT,
-			XMLStreamConstants.END_DOCUMENT, XMLStreamConstants.START_ELEMENT, XMLStreamConstants.END_ELEMENT,
-			XMLStreamConstants.CHARACTERS, XMLStreamConstants.CDATA, XMLStreamConstants.ENTITY_REFERENCE,
-			XMLStreamConstants.SPACE, XMLStreamConstants.PROCESSING_INSTRUCTION, XMLStreamConstants.COMMENT,
-			XMLStreamConstants.DTD };
+	/**
+	 * StaX Tag Types.
+	 * Array Index is Pull Tag Type.
+	 */
+	private final static int[] TRANSLATE_EVENTS_FROM_PULL = {
+			XMLStreamConstants.START_DOCUMENT, XMLStreamConstants.END_DOCUMENT,
+			XMLStreamConstants.START_ELEMENT, XMLStreamConstants.END_ELEMENT,
+			XMLStreamConstants.CHARACTERS, XMLStreamConstants.CDATA,
+			XMLStreamConstants.ENTITY_REFERENCE, XMLStreamConstants.SPACE,
+			XMLStreamConstants.PROCESSING_INSTRUCTION,
+			XMLStreamConstants.COMMENT, XMLStreamConstants.DTD };
 
-	private final static int[] TRANSLATE_EVENTS_TOPULL = { XmlPullParser.START_TAG, XmlPullParser.END_TAG,
-			XmlPullParser.PROCESSING_INSTRUCTION, XmlPullParser.TEXT, XmlPullParser.COMMENT,
-			XmlPullParser.IGNORABLE_WHITESPACE, XmlPullParser.START_DOCUMENT, XmlPullParser.END_DOCUMENT,
-			XmlPullParser.ENTITY_REF, ATTRIBUTE, XmlPullParser.DOCDECL, XmlPullParser.CDSECT, NAMESPACE,
-			NOTATION_DECLARATION, ENTITY_DECLARATION };
+	/**
+	 * Pull Tag Types.
+	 * Array Index is StaX Tag Type.
+	 */
+	private final static int[] TRANSLATE_EVENTS_TO_PULL = {
+			XmlPullParser.START_TAG, XmlPullParser.END_TAG,
+			XmlPullParser.PROCESSING_INSTRUCTION, XmlPullParser.TEXT,
+			XmlPullParser.COMMENT, XmlPullParser.IGNORABLE_WHITESPACE,
+			XmlPullParser.START_DOCUMENT, XmlPullParser.END_DOCUMENT,
+			XmlPullParser.ENTITY_REF, ATTRIBUTE, XmlPullParser.DOCDECL,
+			XmlPullParser.CDSECT, NAMESPACE, NOTATION_DECLARATION,
+			ENTITY_DECLARATION };
 
-	public XMLPullStreamReader(Source source) throws XmlPullParserException {
-		throw new XmlPullParserException("Creating StreamWriter from result not supported.");
-	}
-
-	public XMLPullStreamReader(InputStream stream) throws XmlPullParserException, UnsupportedEncodingException {
+	/**
+	 * Create an XMLPullStreamReader for a given InputStream, using the default
+	 * encoding.
+	 * 
+	 * @param stream
+	 * @throws XmlPullParserException
+	 * @throws UnsupportedEncodingException
+	 */
+	public XMLPullStreamReader(InputStream stream)
+			throws XmlPullParserException, UnsupportedEncodingException {
 		this(stream, XMLPullStreamWriter.DEFAULT_ENCODING);
 	}
 
-	public XMLPullStreamReader(InputStream stream, String encoding) throws XmlPullParserException,
-			UnsupportedEncodingException {
+	/**
+	 * Create an XMLPullStreamReader for a given input Stream with specified
+	 * encoding.
+	 * 
+	 * @param stream
+	 * @param encoding
+	 * @throws XmlPullParserException
+	 * @throws UnsupportedEncodingException
+	 */
+	public XMLPullStreamReader(InputStream stream, String encoding)
+			throws XmlPullParserException, UnsupportedEncodingException {
 		this(new InputStreamReader(stream, encoding));
 	}
 
+	/**
+	 * Create an XMLPullStreamReader for a given Reader.
+	 * 
+	 * @param reader
+	 * @throws XmlPullParserException
+	 */
 	public XMLPullStreamReader(Reader reader) throws XmlPullParserException {
 		factory = XmlPullParserFactory.newInstance();
 		factory.setNamespaceAware(true);
@@ -73,15 +112,27 @@ public class XMLPullStreamReader implements XMLStreamReader {
 		hasNext = true;
 		inputReader = reader;
 	}
-	
-	public void setFeature(String feature, boolean value) throws IllegalArgumentException {
+
+	/**
+	 * Delegates to XMLPullParser.setFeature()
+	 * @param feature
+	 * @param value
+	 * @throws IllegalArgumentException
+	 */
+	public void setFeature(String feature, boolean value)
+			throws IllegalArgumentException {
 		try {
 			parser.setFeature(feature, value);
 		} catch (XmlPullParserException e) {
 			throw new IllegalArgumentException(e.getMessage());
 		}
 	}
-	
+
+	/**
+	 * Sets the XMLReporter for this Reader.
+	 * Currently, this is not used. 
+	 * @param reporter
+	 */
 	public void setReporter(XMLReporter reporter) {
 		this.reporter = reporter;
 	}
@@ -105,7 +156,8 @@ public class XMLPullStreamReader implements XMLStreamReader {
 	}
 
 	@Override
-	public void require(int type, String namespaceURI, String localName) throws XMLStreamException {
+	public void require(int type, String namespaceURI, String localName)
+			throws XMLStreamException {
 		type = translateEventToPullParser(type);
 		try {
 			parser.require(type, namespaceURI, localName);
@@ -204,7 +256,8 @@ public class XMLPullStreamReader implements XMLStreamReader {
 
 	@Override
 	public QName getAttributeName(int index) {
-		return new QName(parser.getNamespace(), parser.getAttributeName(index), parser.getAttributePrefix(index));
+		return new QName(parser.getNamespace(), parser.getAttributeName(index),
+				parser.getAttributePrefix(index));
 	}
 
 	@Override
@@ -253,7 +306,7 @@ public class XMLPullStreamReader implements XMLStreamReader {
 			return parser.getNamespacePrefix(index);
 		} catch (XmlPullParserException e) {
 			e.printStackTrace();
-			return "";
+			return XMLConstants.DEFAULT_NS_PREFIX;
 		}
 	}
 
@@ -263,7 +316,7 @@ public class XMLPullStreamReader implements XMLStreamReader {
 			return parser.getNamespaceUri(index);
 		} catch (XmlPullParserException e) {
 			e.printStackTrace();
-			return "";
+			return XMLConstants.NULL_NS_URI;
 		}
 	}
 
@@ -308,21 +361,20 @@ public class XMLPullStreamReader implements XMLStreamReader {
 	}
 
 	@Override
-	public int getTextCharacters(int sourceStart, char[] target, int targetStart, int length) throws XMLStreamException {
+	public int getTextCharacters(int sourceStart, char[] target,
+			int targetStart, int length) throws XMLStreamException {
 		char[] chars = parser.getTextCharacters(new int[2]);
-		char[] myBuffer = new char[length];
 		int i = 0;
-
 		for (; i < length; i++) {
 			target[i + targetStart] = chars[i + sourceStart];
 		}
-
 		return i;
 	}
 
 	@Override
 	public int getTextStart() {
-		throw new Error(this.getClass().getName() + ": getTextStart() is not supported.");
+		throw new Error(this.getClass().getName()
+				+ ": getTextStart() is not supported.");
 	}
 
 	@Override
@@ -343,18 +395,22 @@ public class XMLPullStreamReader implements XMLStreamReader {
 		} catch (XmlPullParserException e) {
 			e.printStackTrace();
 		}
-		return (eventType == XmlPullParser.TEXT || eventType == XmlPullParser.COMMENT
-				|| eventType == XmlPullParser.ENTITY_REF || eventType == XmlPullParser.IGNORABLE_WHITESPACE || eventType == XmlPullParser.DOCDECL);
+		return (eventType == XmlPullParser.TEXT
+				|| eventType == XmlPullParser.COMMENT
+				|| eventType == XmlPullParser.ENTITY_REF
+				|| eventType == XmlPullParser.IGNORABLE_WHITESPACE || eventType == XmlPullParser.DOCDECL);
 	}
 
 	@Override
 	public Location getLocation() {
-		return new XMLPullLocation(parser.getLineNumber(), parser.getColumnNumber(), 0, null, null);
+		return new XMLPullLocation(parser.getLineNumber(),
+				parser.getColumnNumber(), 0, null, null);
 	}
 
 	@Override
 	public QName getName() {
-		return new QName(parser.getNamespace(), parser.getName(), parser.getPrefix());
+		return new QName(parser.getNamespace(), parser.getName(),
+				parser.getPrefix());
 	}
 
 	@Override
@@ -385,40 +441,47 @@ public class XMLPullStreamReader implements XMLStreamReader {
 
 	@Override
 	public String getVersion() {
-		throw new Error(this.getClass().getName() + ": getVersion() is not supported.");
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": getVersion() is not supported.");
 	}
 
 	@Override
 	public boolean isStandalone() {
-		throw new Error(this.getClass().getName() + ": isStandalone() is not supported.");
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": isStandalone() is not supported.");
 	}
 
 	@Override
 	public boolean standaloneSet() {
-		throw new Error(this.getClass().getName() + ": standaloneSet() is not supported.");
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": standaloneSet() is not supported.");
 	}
 
 	@Override
 	public String getCharacterEncodingScheme() {
-		throw new Error(this.getClass().getName() + ": getCharacterEncodingScheme() is not supported.");
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": getCharacterEncodingScheme() is not supported.");
 	}
 
 	@Override
 	public String getPITarget() {
-		throw new Error(this.getClass().getName() + ": getPITarget() is not supported.");
+		throw new MethodNotImplementedError(this.getClass().getName()
+				+ ": getPITarget() is not supported.");
 	}
 
 	@Override
 	public String getPIData() {
-		throw new Error(this.getClass().getName() + ": getPIData() is not supported.");
+		throw new Error(this.getClass().getName()
+				+ ": getPIData() is not supported.");
 	}
 
-	private int translateEventFromPullParser(int next) throws XMLStreamException {
-		if (next < TRANSLATE_EVENTS_FROMPULL.length) {
+	private int translateEventFromPullParser(int next)
+			throws XMLStreamException {
+		if (next < TRANSLATE_EVENTS_FROM_PULL.length) {
 			if (next == XmlPullParser.END_DOCUMENT) {
 				hasNext = false;
 			}
-			next = TRANSLATE_EVENTS_FROMPULL[next];
+			next = TRANSLATE_EVENTS_FROM_PULL[next];
 			return next;
 		} else {
 			throw new XMLStreamException("Unknown token type: " + next);
@@ -426,8 +489,8 @@ public class XMLPullStreamReader implements XMLStreamReader {
 	}
 
 	private int translateEventToPullParser(int next) throws XMLStreamException {
-		if (next < TRANSLATE_EVENTS_TOPULL.length) {
-			next = TRANSLATE_EVENTS_TOPULL[next];
+		if (next < TRANSLATE_EVENTS_TO_PULL.length) {
+			next = TRANSLATE_EVENTS_TO_PULL[next];
 			return next;
 		} else {
 			throw new XMLStreamException("Unknown token type: " + next);
@@ -479,7 +542,8 @@ public class XMLPullStreamReader implements XMLStreamReader {
 		private int column;
 		private int line;
 
-		public XMLPullLocation(int line, int column, int charOffset, String publicId, String systemId) {
+		public XMLPullLocation(int line, int column, int charOffset,
+				String publicId, String systemId) {
 			this.line = line;
 			this.column = column;
 			this.charOffset = charOffset;
@@ -513,6 +577,5 @@ public class XMLPullStreamReader implements XMLStreamReader {
 		}
 
 	}
-
 
 }

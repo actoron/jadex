@@ -4,47 +4,75 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import javaxx.xml.XMLConstants;
 import javaxx.xml.namespace.NamespaceContext;
 import javaxx.xml.stream.XMLStreamException;
 import javaxx.xml.stream.XMLStreamWriter;
-import javaxx.xml.transform.Result;
 
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
+/**
+ * The XMLPullStreamWriter implements the StaX
+ * {@link javax.xml.stream.XMLStreamWriter} interface, but uses the Android XML
+ * API.
+ */
 public class XMLPullStreamWriter implements XMLStreamWriter {
 
 	private XmlSerializer serializer;
 
-	// private Queue<IXMLWriterOperation> cachedOperations = new
-	// LinkedList<IXMLWriterOperation>();
-	private IXMLWriterOperation cachedWriterOperation;
+	private IXMLWriterCommand cachedWriterOperation;
 
 	/** The default encoding. */
 	public static String DEFAULT_ENCODING = "utf-8";
 
-	public XMLPullStreamWriter(Result result) throws XmlPullParserException {
-		throw new XmlPullParserException("Creating StreamWriter from result not supported.");
-	}
-	
-	public XMLPullStreamWriter(OutputStream stream) throws XmlPullParserException, IllegalArgumentException,
+	/**
+	 * Creates a new XMLPullStreamWriter using the given {@link OutputStream} to
+	 * write the XML Data to. Uses the default character encoding.
+	 * 
+	 * @param stream
+	 * @throws XmlPullParserException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalStateException
+	 * @throws IOException
+	 */
+	public XMLPullStreamWriter(OutputStream stream)
+			throws XmlPullParserException, IllegalArgumentException,
 			IllegalStateException, IOException {
 		this(stream, DEFAULT_ENCODING);
 	}
 
-	public XMLPullStreamWriter(OutputStream stream, String encoding) throws XmlPullParserException,
-	IllegalArgumentException, IllegalStateException, IOException {
+	/**
+	 * Creates a new XMLPullStreamWriter using the given {@link OutputStream} to
+	 * write the XML Data to. Uses the given character encoding.
+	 * 
+	 * @param stream
+	 * @param encoding
+	 * @throws XmlPullParserException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalStateException
+	 * @throws IOException
+	 */
+	public XMLPullStreamWriter(OutputStream stream, String encoding)
+			throws XmlPullParserException, IllegalArgumentException,
+			IllegalStateException, IOException {
 		this(new OutputStreamWriter(stream, encoding));
 	}
 
-	public XMLPullStreamWriter(Writer stream) throws XmlPullParserException, IllegalArgumentException,
-			IllegalStateException, IOException {
+	/**
+	 * Creates a new XMLPullStreamWriter using the given {@link Writer} to write
+	 * the XML Data.
+	 * 
+	 * @param stream
+	 * @throws XmlPullParserException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalStateException
+	 * @throws IOException
+	 */
+	public XMLPullStreamWriter(Writer stream) throws XmlPullParserException,
+			IllegalArgumentException, IllegalStateException, IOException {
 		XmlPullParserFactory parserFactory = XmlPullParserFactory.newInstance();
 		parserFactory.setNamespaceAware(true);
 		serializer = parserFactory.newSerializer();
@@ -57,19 +85,22 @@ public class XMLPullStreamWriter implements XMLStreamWriter {
 	}
 
 	@Override
-	public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
+	public void writeStartElement(String namespaceURI, String localName)
+			throws XMLStreamException {
 		writeStartElement(null, localName, namespaceURI);
 	}
 
 	@Override
-	public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+	public void writeStartElement(String prefix, String localName,
+			String namespaceURI) throws XMLStreamException {
 		try {
 			if (prefix != null) {
 				serializer.setPrefix(prefix, namespaceURI);
 			}
 			// cachedOperations.add(new XMLWriterStartTagOperation(namespaceURI,
 			// localName));
-			cachedWriterOperation = new XMLWriterStartTagOperation(namespaceURI, localName);
+			cachedWriterOperation = new XMLWriterStartTagCommand(
+					namespaceURI, localName);
 		} catch (Exception e) {
 			throw new XMLStreamException(e.getMessage());
 		}
@@ -81,12 +112,14 @@ public class XMLPullStreamWriter implements XMLStreamWriter {
 	}
 
 	@Override
-	public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
+	public void writeEmptyElement(String namespaceURI, String localName)
+			throws XMLStreamException {
 		writeEmptyElement(null, localName, namespaceURI);
 	}
 
 	@Override
-	public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
+	public void writeEmptyElement(String prefix, String localName,
+			String namespaceURI) throws XMLStreamException {
 		try {
 			if (prefix != null) {
 				serializer.setPrefix(prefix, namespaceURI);
@@ -135,18 +168,20 @@ public class XMLPullStreamWriter implements XMLStreamWriter {
 	}
 
 	@Override
-	public void writeAttribute(String localName, String value) throws XMLStreamException {
+	public void writeAttribute(String localName, String value)
+			throws XMLStreamException {
 		writeAttribute(XMLConstants.NULL_NS_URI, localName, value);
 	}
 
 	@Override
-	public void writeAttribute(String namespaceURI, String localName, String value) throws XMLStreamException {
+	public void writeAttribute(String namespaceURI, String localName,
+			String value) throws XMLStreamException {
 		writeAttribute(null, namespaceURI, localName, value);
 	}
 
 	@Override
-	public void writeAttribute(String prefix, String namespaceURI, String localName, String value)
-			throws XMLStreamException {
+	public void writeAttribute(String prefix, String namespaceURI,
+			String localName, String value) throws XMLStreamException {
 		doStartElement();
 		try {
 			if (prefix != null) {
@@ -160,7 +195,8 @@ public class XMLPullStreamWriter implements XMLStreamWriter {
 	}
 
 	@Override
-	public void writeNamespace(final String prefix, final String namespaceURI) throws XMLStreamException {
+	public void writeNamespace(final String prefix, final String namespaceURI)
+			throws XMLStreamException {
 		try {
 			if (!serializer.getPrefix(namespaceURI, false).equals(prefix)) {
 				serializer.setPrefix(prefix, namespaceURI);
@@ -171,7 +207,8 @@ public class XMLPullStreamWriter implements XMLStreamWriter {
 	}
 
 	@Override
-	public void writeDefaultNamespace(String namespaceURI) throws XMLStreamException {
+	public void writeDefaultNamespace(String namespaceURI)
+			throws XMLStreamException {
 		writeNamespace(XMLConstants.DEFAULT_NS_PREFIX, namespaceURI);
 	}
 
@@ -186,7 +223,8 @@ public class XMLPullStreamWriter implements XMLStreamWriter {
 	}
 
 	@Override
-	public void writeProcessingInstruction(String target) throws XMLStreamException {
+	public void writeProcessingInstruction(String target)
+			throws XMLStreamException {
 		try {
 			// serializer.processingInstruction(target);
 		} catch (Exception e) {
@@ -195,7 +233,8 @@ public class XMLPullStreamWriter implements XMLStreamWriter {
 	}
 
 	@Override
-	public void writeProcessingInstruction(String target, String data) throws XMLStreamException {
+	public void writeProcessingInstruction(String target, String data)
+			throws XMLStreamException {
 		try {
 			serializer.processingInstruction(data);
 		} catch (Exception e) {
@@ -246,12 +285,14 @@ public class XMLPullStreamWriter implements XMLStreamWriter {
 		// serializer.setProperty(XML, value)
 		// serializer.startDocument(DEFAULT_ENCODING, true);
 		// } catch (Exception e) {
-		throw new XMLStreamException("writeStartDocument(version) unsupported!)");
+		throw new XMLStreamException(
+				"writeStartDocument(version) unsupported!)");
 		// }
 	}
 
 	@Override
-	public void writeStartDocument(String encoding, String version) throws XMLStreamException {
+	public void writeStartDocument(String encoding, String version)
+			throws XMLStreamException {
 		try {
 			serializer.startDocument(encoding, false);
 		} catch (Exception e) {
@@ -271,7 +312,8 @@ public class XMLPullStreamWriter implements XMLStreamWriter {
 	}
 
 	@Override
-	public void writeCharacters(char[] text, int start, int len) throws XMLStreamException {
+	public void writeCharacters(char[] text, int start, int len)
+			throws XMLStreamException {
 		try {
 			serializer.text(new String(text).substring(start, start + len));
 		} catch (Exception e) {
@@ -303,9 +345,11 @@ public class XMLPullStreamWriter implements XMLStreamWriter {
 	}
 
 	@Override
-	public void setNamespaceContext(NamespaceContext context) throws XMLStreamException {
+	public void setNamespaceContext(NamespaceContext context)
+			throws XMLStreamException {
 		context.getPrefixes(XMLConstants.NULL_NS_URI);
-		throw new XMLStreamException("setNamespaceContext(NamespaceContext context) unsupported!)");
+		throw new XMLStreamException(
+				"setNamespaceContext(NamespaceContext context) unsupported!)");
 	}
 
 	@Override
@@ -319,10 +363,8 @@ public class XMLPullStreamWriter implements XMLStreamWriter {
 	}
 
 	private void doStartElement() throws XMLStreamException {
-		// if (!cachedOperations.isEmpty()) {
 		if (cachedWriterOperation != null) {
-			// IXMLWriterOperation op = cachedOperations.poll();
-			IXMLWriterOperation op = cachedWriterOperation;
+			IXMLWriterCommand op = cachedWriterOperation;
 			cachedWriterOperation = null;
 			try {
 				op.execute(serializer);
