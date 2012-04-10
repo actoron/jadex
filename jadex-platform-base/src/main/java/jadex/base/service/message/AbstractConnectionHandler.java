@@ -3,12 +3,9 @@ package jadex.base.service.message;
 import jadex.base.service.message.MessageService.SendManager;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.codecs.ICodec;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.types.clock.ITimedObject;
-import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -17,6 +14,7 @@ import jadex.commons.future.IResultListener;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimerTask;
 
 /**
  *  Abstract base class for connection handlers.
@@ -436,46 +434,68 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 *  @param id The message id.
 	 *  @return The timer.
 	 */
-	protected ITimer createAckTimer(final Object id)
+	protected TimerTask	createAckTimer(final Object id)
 	{
 		// Test if packets have been sent till last timer was inited
-		ITimer ret = ms.getClockService().createTimer(acktimeout, new ITimedObject()
+		return ms.waitForRealDelay(acktimeout, new IComponentStep<Void>()
 		{
-			public void timeEventOccurred(long currenttime)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				try
+				SendInfo si = unacked.get(id);
+				if(si!=null)
 				{
-					scheduleStep(new IComponentStep<Void>()
+					if(si.getTryCnt()>=maxresends)
 					{
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
-							SendInfo si = unacked.get(id);
-							if(si!=null)
-							{
-								if(si.getTryCnt()>=maxresends)
-								{
-									System.out.println("Message could not be sent.");
-									si.getResult().setException(new RuntimeException("Message could not be sent."));
-									unacked.remove(id);
-								}
-								else
-								{
-									sendAcknowledgedMessage(si.getTask(), id);
-									createAckTimer(id);
-								}
-							}
-							return IFuture.DONE;
-						}
-					});
+						System.out.println("Message could not be sent.");
+						si.getResult().setException(new RuntimeException("Message could not be sent."));
+						unacked.remove(id);
+					}
+					else
+					{
+						sendAcknowledgedMessage(si.getTask(), id);
+						createAckTimer(id);
+					}
 				}
-				catch(ComponentTerminatedException e)
-				{
-					// nop
-				}
+				return IFuture.DONE;
 			}
 		});
+//		ITimer ret = ms.getClockService().createTimer(, new ITimedObject()
+//		{
+//			public void timeEventOccurred(long currenttime)
+//			{
+//				try
+//				{
+//					scheduleStep(new IComponentStep<Void>()
+//					{
+//						public IFuture<Void> execute(IInternalAccess ia)
+//						{
+//							SendInfo si = unacked.get(id);
+//							if(si!=null)
+//							{
+//								if(si.getTryCnt()>=maxresends)
+//								{
+//									System.out.println("Message could not be sent.");
+//									si.getResult().setException(new RuntimeException("Message could not be sent."));
+//									unacked.remove(id);
+//								}
+//								else
+//								{
+//									sendAcknowledgedMessage(si.getTask(), id);
+//									createAckTimer(id);
+//								}
+//							}
+//							return IFuture.DONE;
+//						}
+//					});
+//				}
+//				catch(ComponentTerminatedException e)
+//				{
+//					// nop
+//				}
+//			}
+//		});
 		
-		return ret;
+//		return ret;
 	}
 	
 	/**
@@ -495,7 +515,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		protected int trycnt;
 		
 		/** The timer for triggering resends. */
-		protected ITimer timer;
+		protected TimerTask timer;
 		
 		/** The result future of the call. */
 		protected Future<Object> result;
@@ -506,7 +526,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		 *  Create a new send info.
 		 */
 		public SendInfo(AbstractSendTask task, Object id, int trycnt,
-				ITimer timer, Future<Object> result)
+				TimerTask timer, Future<Object> result)
 		{
 			this.task = task;
 			this.id = id;
@@ -575,7 +595,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		 *  Get the timer.
 		 *  @return the timer.
 		 */
-		public ITimer getTimer()
+		public TimerTask getTimer()
 		{
 			return timer;
 		}
@@ -584,7 +604,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		 *  Set the timer.
 		 *  @param timer The timer to set.
 		 */
-		public void setTimer(ITimer timer)
+		public void setTimer(TimerTask timer)
 		{
 			this.timer = timer;
 		}

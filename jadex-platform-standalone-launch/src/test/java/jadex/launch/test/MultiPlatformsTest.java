@@ -26,7 +26,7 @@ public class MultiPlatformsTest extends TestCase
 		{
 			if(i%10==0)
 				System.out.println("Starting platform "+i);
-			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases",
+			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases_*",
 				"-gui", "false", "-printpass", "false",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}

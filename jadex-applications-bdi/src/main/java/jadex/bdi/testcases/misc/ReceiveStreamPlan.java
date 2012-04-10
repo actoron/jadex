@@ -21,20 +21,20 @@ public class ReceiveStreamPlan extends Plan
 		IInputConnection con = (IInputConnection)msg.getParameter(SFipa.CONTENT).getValue();
 		
 		int cnt = 0;
-		try
-		{
-			while(true)
-			{
-				byte b = con.areadNext().get(this);
-				cnt++;
-				System.out.println("Read: "+b);
-			}
-		}
-		catch(Exception e)
-		{
-			// stream closed
-//			e.printStackTrace();
-		}
+//		try
+//		{
+//			while(true)
+//			{
+//				byte b = con.areadNext().get(this);
+//				cnt++;
+//				System.out.println("Read: "+b);
+//			}
+//		}
+//		catch(Exception e)
+//		{
+//			// stream closed
+////			e.printStackTrace();
+//		}
 		
 		TestReport	report	= new TestReport("#1", "Testing stream read.");
 		if(cnt==5)

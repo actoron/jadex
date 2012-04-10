@@ -1,16 +1,14 @@
 package jadex.base.service.message;
 
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.types.clock.ITimedObject;
-import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimerTask;
 
 /**
  *  Handler that sits between connection and message service.
@@ -42,7 +40,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	protected int ackcnt;
 	
 	/** The current timer. */
-	protected ITimer datatimer;
+	protected TimerTask datatimer;
 	
 	
 	/** The last sequence number. */
@@ -244,30 +242,19 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	{
 		// Test if packets have been received till creation
 		if(datatimer==null && rseqno>lastack)
-			datatimer = ms.getClockService().createTimer(acktimeout, new ITimedObject()
 		{
-			public void timeEventOccurred(long currenttime)
+			datatimer = ms.waitForRealDelay(acktimeout, new IComponentStep<Void>()
 			{
-				try
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					scheduleStep(new IComponentStep<Void>()
-					{
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
 	//						System.out.println("timer ack");
-							sendDataAck();
-							datatimer = null;
-							createDataTimer();	
-							return IFuture.DONE;
-						}
-					});
+					sendDataAck();
+					datatimer = null;
+					createDataTimer();	
+					return IFuture.DONE;
 				}
-				catch(ComponentTerminatedException e)
-				{
-					// nop
-				}
-			}
-		});
+			});
+		}
 	}
 	
 	/**

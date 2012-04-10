@@ -24,9 +24,11 @@
 		<beliefref name="timeout"  exported="true">
 			<concrete ref="testcap.timeout"/>
 		</beliefref>
+		<!-- 
 		<beliefref name="testresults"  result="true">
 			<concrete ref="testcap.testresults"/>
 		</beliefref>
+		 -->
 	</beliefs>
 	
 	<plans>

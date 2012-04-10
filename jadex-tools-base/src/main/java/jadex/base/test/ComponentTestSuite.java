@@ -13,7 +13,6 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.SComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.commons.SUtil;
 import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
@@ -57,7 +56,7 @@ public class ComponentTestSuite extends TestSuite
 	{
 		this(new String[]
 		{
-			"-platformname", SUtil.createUniqueId("testcases", 3),
+			"-platformname", "testcases_*",
 			"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
 			"-simulation", "true",
 			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",

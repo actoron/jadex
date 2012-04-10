@@ -6,6 +6,7 @@ import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.ComponentIdentifier;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
 import jadex.bridge.DefaultMessageAdapter;
 import jadex.bridge.IComponentIdentifier;
@@ -61,6 +62,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -588,14 +591,14 @@ public class MessageService extends BasicService implements IMessageService
 		return codecfactory;
 	}
 	
-	/**
-	 *  Get the clock service.
-	 *  @return The clock service.
-	 */
-	public IClockService getClockService()
-	{
-		return clockservice;
-	}
+//	/**
+//	 *  Get the clock service.
+//	 *  @return The clock service.
+//	 */
+//	public IClockService getClockService()
+//	{
+//		return clockservice;
+//	}
 	
 //	/**
 //	 *  Deliver a message to some components.
@@ -1097,17 +1100,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 				}
 				
-				ia.waitForDelay(StreamSendTask.MIN_LEASETIME, this).addResultListener(new IResultListener<Void>()
-				{
-					public void resultAvailable(Void result)
-					{
-//						System.out.println(result);
-					}
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-					}
-				});
+				waitForRealDelay(StreamSendTask.MIN_LEASETIME, this);
 				
 				return IFuture.DONE;
 			}
@@ -1148,7 +1141,7 @@ public class MessageService extends BasicService implements IMessageService
 					}
 				}
 				
-				ia.waitForDelay(StreamSendTask.MIN_LEASETIME, this);
+				waitForRealDelay(StreamSendTask.MIN_LEASETIME, this);
 				
 				return IFuture.DONE;
 			}
@@ -1423,8 +1416,8 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				byte[] rawmsg = (byte[])obj;
 				int mycnt = cnt++;
-	//			System.out.println("aaaa: "+mycnt+" "+getComponent().getComponentIdentifier());
-//				System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
+				System.out.println("aaaa: "+mycnt+" "+getComponent().getComponentIdentifier());
+				System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
 				int idx = 1;
 				byte type = rawmsg[idx++];
 				
@@ -1475,7 +1468,7 @@ public class MessageService extends BasicService implements IMessageService
 					InputConnectionHandler ich = new InputConnectionHandler(MessageService.this);
 					final InputConnection con = new InputConnection(recs[0], recs[1], conid, false, ich);
 					pcons.put(new Integer(conid), ich);
-//					System.out.println("created for: "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
+					System.out.println("created for: "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
 					
 					ich.initReceived();
 					
@@ -1918,6 +1911,45 @@ public class MessageService extends BasicService implements IMessageService
 				}
 			});
 		}
+	}
+	
+	/** The (real) system clock timer. */
+	protected Timer	timer;
+	
+	/**
+	 *  Wait for a time delay on the (real) system clock.
+	 */
+	public TimerTask	waitForRealDelay(long delay, final IComponentStep<?> step)
+	{
+		if(timer==null)
+		{
+			synchronized(this)
+			{
+				if(timer==null)
+				{
+					timer	= new Timer(component.getComponentIdentifier().getName()+".message.timer", true);
+				}
+			}
+		}
+		
+		TimerTask	ret	= new TimerTask()
+		{
+			public void run()
+			{
+				try
+				{
+					component.scheduleStep(step);
+				}
+				catch(ComponentTerminatedException cte)
+				{
+					// ignore and stop timer.
+					timer.cancel();
+				}
+			}
+		};
+		timer.schedule(ret, delay);
+		
+		return ret;
 	}
 }
 

@@ -36,7 +36,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.UUID;
 
 /**
  *  Starter class for  
@@ -249,32 +252,58 @@ public class Starter
 					if(model.getReport()!=null)
 						throw new RuntimeException("Error loading model:\n"+model.getReport().getErrorText());
 					
-					// Create an instance of the component.
+					// Build platform name.
 					Object pfname = getArgumentValue(PLATFORM_NAME, model, cmdargs, compargs);
-					String	platformname; 
+					String	platformname	= null; 
 					if(pfname==null)
 					{
 						try
 						{
-							String	name	= InetAddress.getLocalHost().getHostName();
-							// Replace special characters used in component ids.
-							if(name!=null)
-							{
-								name	= name.replace('.', '$'); // Dot in host name on Mac !?
-								name	= name.replace('@', '$'); // Probably not needed, but just to be sure.
-							}
-							platformname = SUtil.createUniqueId(name, 3);
+							platformname	= InetAddress.getLocalHost().getHostName();
+							platformname	+= "_*";
 						}
 						catch(UnknownHostException e)
 						{
-							platformname = SUtil.createUniqueId("platform", 3);
 						}
 					}
 					else
 					{
 						platformname	= pfname.toString(); 
 					}
+					// Replace special characters used in component ids.
+					if(platformname!=null)
+					{
+						platformname	= platformname.replace('.', '$'); // Dot in host name on Mac !?
+						platformname	= platformname.replace('@', '$');
+					}
+					else
+					{
+						platformname = "platform_*";
+					}
+					Random	rnd	= new Random();
+					StringBuffer	buf	= new StringBuffer();
+					StringTokenizer	stok	= new StringTokenizer(platformname, "*+", true);
+					while(stok.hasMoreTokens())
+					{
+						String	tok	= stok.nextToken();
+						if(tok.equals("+"))
+						{
+							buf.append(Integer.toHexString(rnd.nextInt(16)));
+						}
+						else if(tok.equals("*"))
+						{
+							buf.append(Integer.toHexString(rnd.nextInt(16)));
+							buf.append(Integer.toHexString(rnd.nextInt(16)));
+							buf.append(Integer.toHexString(rnd.nextInt(16)));
+						}
+						else
+						{
+							buf.append(tok);
+						}
+					}
+					platformname = buf.toString();
 					
+					// Create an instance of the component.
 					final IComponentIdentifier cid = new ComponentIdentifier(platformname);
 					if(IComponentIdentifier.LOCAL.get()==null)
 						IComponentIdentifier.LOCAL.set(cid);

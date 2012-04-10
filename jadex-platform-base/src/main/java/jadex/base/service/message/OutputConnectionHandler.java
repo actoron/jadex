@@ -1,10 +1,7 @@
 package jadex.base.service.message;
 
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.types.clock.ITimedObject;
-import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
@@ -17,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimerTask;
 
 /**
  *  The output connection handler. 
@@ -42,7 +40,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	protected int ackcnt;
 	
 	/** The acknowledgement timer. */
-	protected ITimer acktimer;
+	protected TimerTask acktimer;
 	
 	
 	/** Flag if multipackets should be used. */
@@ -61,7 +59,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	protected long mpsendtimeout;
 
 	/** The multipacket send timer. */
-	protected ITimer mpsendtimer;
+	protected TimerTask mpsendtimer;
 	
 	
 	/** Close request flag (when a closereq message was received). */
@@ -149,7 +147,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 				// remove all acked packets
 				for(int i=ackinfo.getStartSequenceNumber(); i<=ackinfo.getEndSequenceNumber(); i++)
 				{
-					Tuple2<StreamSendTask, Integer> tup = sent.remove(new Integer(i));
+//					Tuple2<StreamSendTask, Integer> tup =
+						sent.remove(new Integer(i));
 				}
 					
 //				System.out.println("ack: "+seqnumber+" "+stop+" "+s+" "+sent.size());
@@ -563,27 +562,14 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	{
 		if(mpsendtimer!=null)
 			mpsendtimer.cancel();
-		mpsendtimer = ms.getClockService().createTimer(mpsendtimeout, new ITimedObject()
+		mpsendtimer = ms.waitForRealDelay(mpsendtimeout, new IComponentStep<Void>()
 		{
-			public void timeEventOccurred(long currenttime)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				try
-				{
-					scheduleStep(new IComponentStep<Void>()
-					{
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
-							// Send the packet if it is still the correct one
-							if(seqno==getSequenceNumber())
-								sendMultiPacket();
-							return IFuture.DONE;
-						}
-					});
-				}
-				catch(ComponentTerminatedException e)
-				{
-					// nop
-				}
+				// Send the packet if it is still the correct one
+				if(seqno==getSequenceNumber())
+					sendMultiPacket();
+				return IFuture.DONE;
 			}
 		});
 	}
@@ -600,38 +586,25 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			if(getSequenceNumber()>seqno)
 			{
 //				final int sq = seqno + ackcnt;
-				acktimer = ms.getClockService().createTimer(acktimeout, new ITimedObject()
+				acktimer = ms.waitForRealDelay(acktimeout, new IComponentStep<Void>()
 				{
-					public void timeEventOccurred(long currenttime)
+					public IFuture<Void> execute(IInternalAccess ia)
 					{
-						try
+						scheduleStep(new IComponentStep<Void>()
 						{
-							scheduleStep(new IComponentStep<Void>()
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								public IFuture<Void> execute(IInternalAccess ia)
+								// Send all packets of the segment again.
+								for(int i=0; i<ackcnt; i++)
 								{
-									scheduleStep(new IComponentStep<Void>()
-									{
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-											// Send all packets of the segment again.
-											for(int i=0; i<ackcnt; i++)
-											{
-												resend(i+seqno);
-											}
-											acktimer = null;
-											createAckTimer(seqno + ackcnt);
-											return IFuture.DONE;
-										}
-									});
-									return IFuture.DONE;
+									resend(i+seqno);
 								}
-							});
-						}
-						catch(ComponentTerminatedException e)
-						{
-							// nop
-						}
+								acktimer = null;
+								createAckTimer(seqno + ackcnt);
+								return IFuture.DONE;
+							}
+						});
+						return IFuture.DONE;
 					}
 				});
 			}
@@ -647,33 +620,20 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	 */
 	protected void createDataTimer()
 	{
-		ms.getClockService().createTimer(10000, new ITimedObject()
+		ms.waitForRealDelay(10000, new IComponentStep<Void>()
 		{
-			public void timeEventOccurred(long currenttime)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				try
-				{
-					scheduleStep(new IComponentStep<Void>()
-					{
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
-	//						System.out.println("data timer triggered");
-							
-							sendStored();
-							
-							checkClose();
-							
-							if(!isClosed())
-								createDataTimer();
-							
-							return IFuture.DONE;
-						}
-					});
-				}
-				catch(ComponentTerminatedException e)
-				{
-					// nop
-				}
+//						System.out.println("data timer triggered");
+				
+				sendStored();
+				
+				checkClose();
+				
+				if(!isClosed())
+					createDataTimer();
+				
+				return IFuture.DONE;
 			}
 		});
 	}

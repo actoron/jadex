@@ -38,7 +38,7 @@ public class MicroCreationTest extends TestCase
 	{
 		long timeout	= 300000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
-		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks",
+		IExternalAccess	platform	= (IExternalAccess)Starter.createPlatform(new String[]{"-platformname", "benchmarks_*",
 //			"-kernels", "all",
 //			"-logging_level", "java.util.logging.Level.INFO",
 			"-libpath", "new String[]{\""+new File("../jadex-applications-micro/target/classes").toURI().toURL().toString()+"\"}",

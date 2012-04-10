@@ -34,9 +34,10 @@ public class CreatePlatformTask implements ITask
 		String url	= "new String[]{\"../jadex-applications-bpmn/target/classes\"}";	// Todo: support RID for all loaded models.
 //		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 		
-		Starter.createPlatform(new String[]{"-platformname", "testcases_1", "-libpath", url,
+		Starter.createPlatform(new String[]{"-platformname", "testcases_*", "-libpath", url,
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
-			"-gui", "false", "-usepass", "false"//, "-simulation", "false"
+			"-gui", "false"
+//			"-usepass", "false"//, "-simulation", "false"
 //			"-logging_level", "java.util.logging.Level.INFO"
 			})
 			.addResultListener(process.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)

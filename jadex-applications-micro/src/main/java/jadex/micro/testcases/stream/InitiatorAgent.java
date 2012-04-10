@@ -30,13 +30,10 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.ComponentType;
-import jadex.micro.annotation.ComponentTypes;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
-import jadex.micro.testcases.KillAgent;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -146,10 +143,12 @@ public class InitiatorAgent
 		String url	= "new String[]{\"../jadex-applications-micro/target/classes\"}";	// Todo: support RID for all loaded models.
 //		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 //		Starter.createPlatform(new String[]{"-platformname", "testi_1", "-libpath", url,
-		Starter.createPlatform(new String[]{"-libpath", url,
+		Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 //			"-logging_level", "java.util.logging.Level.INFO",
-			"-gui", "false", "-usepass", "false", "-simulation", "false"
+			"-gui", "false",
+//			"-usepass", "false",
+			"-simulation", "false"
 		}).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
