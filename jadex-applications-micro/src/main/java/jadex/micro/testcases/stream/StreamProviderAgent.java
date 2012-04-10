@@ -41,26 +41,9 @@ public class StreamProviderAgent implements IStreamService
 	public IFuture<IInputConnection> getInputStream()
 	{
 		Future<IInputConnection> ret = new Future<IInputConnection>();
-		
-		final ServiceOutputConnection oc = new ServiceOutputConnection();
-
-		final int[] cnt = new int[]{0};
-		IComponentStep<Void> step = new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				oc.write(new byte[]{(byte)cnt[0]});
-				if(cnt[0]++<50)
-					agent.waitFor(100, this);
-				else
-					oc.close();
-				return IFuture.DONE;
-			}
-		};
-		
-		agent.waitFor(1000, step);
+		ServiceOutputConnection oc = new ServiceOutputConnection();
+		write(oc, agent);
 		ret.setResult(oc.getInputConnection());
-		
 		return ret;
 	}
 	
@@ -71,15 +54,44 @@ public class StreamProviderAgent implements IStreamService
 	public IFuture<IOutputConnection> getOutputStream()
 	{
 		Future<IOutputConnection> ret = new Future<IOutputConnection>();
+		ServiceInputConnection ic = new ServiceInputConnection();
+		read(ic);
+		ret.setResult(ic.getOutputConnection());
+		return ret;
+	}
+	
+	/**
+	 *  Pass an Input stream to the user.
+	 *  @return The Input stream.
+	 */
+	public IFuture<Long> passInputStream(IInputConnection con)
+	{
+		return read(con);
+	}
+	
+	/**
+	 *  Pass an output stream from the user.
+	 *  @param con The output stream.
+	 */
+	public IFuture<Long> passOutputStream(IOutputConnection con)
+	{
+		return write(con, agent);
+	}
+	
+	/**
+	 * 
+	 */
+	public static IFuture<Long> read(IInputConnection con)
+	{
+		final Future<Long> ret = new Future<Long>();
 		
-		final ServiceInputConnection ic = new ServiceInputConnection();
-
 		final long[] size = new long[1];
-		ic.aread().addResultListener(new IIntermediateResultListener<byte[]>()
+		con.aread().addResultListener(new IIntermediateResultListener<byte[]>()
 		{
 			public void resultAvailable(Collection<byte[]> result)
 			{
 				System.out.println("Result: "+result);
+				ret.setResult(new Long(size[0]));
 			}
 			public void intermediateResultAvailable(byte[] result)
 			{
@@ -89,24 +101,55 @@ public class StreamProviderAgent implements IStreamService
 			public void finished()
 			{
 				System.out.println("finished, size: "+size[0]);
+				ret.setResult(new Long(size[0]));
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				System.out.println("ex:"+exception);
+				ret.setException(exception);
 			}
 		});
 		
-		ret.setResult(ic.getOutputConnection());
 		return ret;
 	}
 	
-//	/**
-//	 *  Pass an output stream from the user.
-//	 *  @param con The output stream.
-//	 */
-//	public IFuture<Void> passOutputStream(IOutputConnection con)
-//	{
-//		con.
-//	}
+	/**
+	 * 
+	 */
+	public static IFuture<Long> write(final IOutputConnection con, final IInternalAccess agent)
+	{
+		final Future<Long> ret = new Future<Long>();
+		
+		final long[] size = new long[1];
+		final int[] cnt = new int[]{0};
+		IComponentStep<Void> step = new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				con.write(new byte[]{(byte)cnt[0]});
+				size[0]++;
+				if(cnt[0]++<50)
+				{
+					agent.waitForDelay(50, this);
+				}
+				else
+				{
+					con.close();
+					ret.setResult(new Long(size[0]));
+				}
+				return IFuture.DONE;
+			}
+		};
+		agent.waitForDelay(1000, step);
+		
+		return ret;
+	}
 	
+	/**
+	 * 
+	 */
+	public static long getWriteLength()
+	{
+		return 51;
+	}
 }

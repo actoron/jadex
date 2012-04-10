@@ -353,7 +353,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 *  the other side could not be reached.
 	 *  @param task The task.
 	 */
-	protected IFuture<Void> sendTask(AbstractSendTask task)
+	protected IFuture<Void> sendTask(final AbstractSendTask task)
 	{
 //		System.out.println("sendTask: "+SUtil.arrayToString(task.getProlog())+" "+task.getData().length);
 		
@@ -367,6 +367,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		{
 			public void resultAvailable(Void result)
 			{
+//				System.out.println("sent: "+SUtil.arrayToString(task.getProlog()));
 				// nop if could be sent
 			}
 			public void exceptionOccurred(Exception exception)

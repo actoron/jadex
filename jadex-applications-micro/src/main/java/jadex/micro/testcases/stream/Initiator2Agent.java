@@ -1,41 +1,39 @@
 package jadex.micro.testcases.stream;
 
-import java.util.Collection;
-
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.message.IMessageService;
+import jadex.commons.Tuple2;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentBody;
-import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.ComponentType;
-import jadex.micro.annotation.ComponentTypes;
-import jadex.micro.annotation.RequiredService;
-import jadex.micro.annotation.RequiredServices;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  *  Agent that provides a service with a stream.
  */
 @Agent
-@RequiredServices(
-{
-	@RequiredService(name="msgservice", type=IMessageService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
-	@RequiredService(name="cms", type=IComponentManagementService.class, 
-		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
-})
-@ComponentTypes(
-	@ComponentType(name="receiver", filename="jadex/micro/testcases/stream/Receiver2Agent.class")
-)
-public class Initiator2Agent
+//@RequiredServices(
+//{
+//	@RequiredService(name="msgservice", type=IMessageService.class, 
+//		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+//	@RequiredService(name="cms", type=IComponentManagementService.class, 
+//		binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM))
+//})
+//@ComponentTypes(
+//	@ComponentType(name="receiver", filename="jadex/micro/testcases/stream/Receiver2Agent.class")
+//)
+public class Initiator2Agent extends TestAgent
 {
 	@Agent
 	protected MicroAgent agent;
@@ -45,48 +43,119 @@ public class Initiator2Agent
 	/**
 	 * 
 	 */
-	@AgentBody
-	public IFuture<Void> body()
+	protected IFuture<Void> performTests(final Testcase tc)
 	{
 		final Future<Void> ret = new Future<Void>();
-		IFuture<IComponentManagementService> cmsfut = agent.getServiceContainer().getRequiredService("cms");
-		cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		
+		testLocal(1).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			public void customResultAvailable(TestReport result)
 			{
-				cms.createComponent(null, "receiver", new CreationInfo(agent.getComponentIdentifier()), null)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
+				tc.addReport(result);
+				testRemote(2).addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<TestReport, Void>(ret)
 				{
-					public void customResultAvailable(final IComponentIdentifier cid) 
+					public void customResultAvailable(TestReport result)
 					{
-						IFuture<IMessageService> msfut = agent.getServiceContainer().getRequiredService("msgservice");
-						msfut.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+						tc.addReport(result);
+						ret.setResult(null);
+					}
+				}));
+			}
+		}));
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<TestReport> testLocal(int testno)
+	{
+		return performTest(agent.getServiceProvider(), agent.getComponentIdentifier().getRoot(), testno);
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<TestReport> testRemote(final int testno)
+	{
+		final Future<TestReport> ret = new Future<TestReport>();
+		
+		createPlatform().addResultListener(agent.createResultListener(
+			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
+		{
+			public void customResultAvailable(final IExternalAccess platform)
+			{
+				performTest(platform.getServiceProvider(), platform.getComponentIdentifier(), testno)
+					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+				{
+					public void customResultAvailable(final TestReport result)
+					{
+						platform.killComponent();
+//							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
+//						{
+//							public void customResultAvailable(Map<String, Object> v)
+//							{
+//								ret.setResult(result);
+//							}
+//						});
+						ret.setResult(result);
+					}
+				}));
+			}
+		}));
+		
+		return ret;
+	}
+	
+	/**
+	 *  Perform the test. Consists of the following steps:
+	 *  - start a receiver agent
+	 *  - create connection
+	 */
+	protected IFuture<TestReport> performTest(final IServiceProvider provider, final IComponentIdentifier root, final int testno)
+	{
+		final Future<TestReport> ret = new Future<TestReport>();
+
+		final Future<TestReport> res = new Future<TestReport>();
+		
+		ret.addResultListener(new DelegationResultListener<TestReport>(res)
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				TestReport tr = new TestReport("#"+testno, "Tests if streams work");
+				tr.setReason(exception.getMessage());
+				super.resultAvailable(tr);
+			}
+		});
+		
+		final Future<Collection<Tuple2<String, Object>>> resfut = new Future<Collection<Tuple2<String, Object>>>();
+		IResultListener<Collection<Tuple2<String, Object>>> reslis = new DelegationResultListener<Collection<Tuple2<String,Object>>>(resfut);
+		
+		createComponent(provider, "jadex/micro/testcases/stream/Receiver2Agent.class", root, reslis)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+		{
+			public void customResultAvailable(final IComponentIdentifier cid) 
+			{
+				IFuture<IMessageService> msfut = agent.getServiceContainer().getRequiredService("msgservice");
+				msfut.addResultListener(new ExceptionDelegationResultListener<IMessageService, TestReport>(ret)
+				{
+					public void customResultAvailable(IMessageService ms)
+					{
+						ms.createInputConnection(agent.getComponentIdentifier(), cid)
+							.addResultListener(new ExceptionDelegationResultListener<IInputConnection, TestReport>(ret)
 						{
-							public void customResultAvailable(IMessageService ms)
+							public void customResultAvailable(final IInputConnection icon) 
 							{
-								ms.createInputConnection(agent.getComponentIdentifier(), cid)
-									.addResultListener(new ExceptionDelegationResultListener<IInputConnection, Void>(ret)
+								receiveBehavior(testno, icon, resfut).addResultListener(new DelegationResultListener<TestReport>(ret)
 								{
-									public void customResultAvailable(final IInputConnection icon) 
+									public void customResultAvailable(final TestReport tr)
 									{
-										Initiator2Agent.this.icon = icon;
-										icon.aread().addResultListener(new IIntermediateResultListener<byte[]>()
+										destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String,Object>, TestReport>(ret)
 										{
-											public void resultAvailable(Collection<byte[]> result)
+											public void customResultAvailable(Map<String,Object> result) 
 											{
-												System.out.println("Result: "+result);
-											}
-											public void intermediateResultAvailable(byte[] result)
-											{
-												System.out.println("Intermediate result: "+result);
-											}
-											public void finished()
-											{
-												System.out.println("finished");
-											}
-											public void exceptionOccurred(Exception exception)
-											{
-												System.out.println("ex:"+exception);
+												ret.setResult(tr);
 											}
 										});
 									}
@@ -98,7 +167,21 @@ public class Initiator2Agent
 			}
 		});
 		
+		return res;
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture<TestReport> receiveBehavior(int testno, final IInputConnection con, IFuture<Collection<Tuple2<String, Object>>> resfut)
+	{
+		final Future<TestReport> ret = new Future<TestReport>();
+		
+		final TestReport tr = new TestReport(""+testno, "Test if file is transferred correctly.");
+		StreamProviderAgent.read(con).addResultListener(new TestReportListener(tr, ret, Receiver2Agent.getNumberOfBytes()));
+			
 		return ret;
 	}
+	
 }
 

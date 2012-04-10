@@ -21,11 +21,16 @@ public interface IStreamService
 	 */
 	public IFuture<IOutputConnection> getOutputStream();
 
+	/**
+	 *  Pass an Input stream to the user.
+	 *  @return The Input stream.
+	 */
+	public IFuture<Long> passInputStream(IInputConnection con);
 	
-//	/**
-//	 *  Pass an output stream from the user.
-//	 *  @param con The output stream.
-//	 */
-//	public IFuture<Void> passOutputStream(IOutputConnection con);
-
+	/**
+	 *  Pass an output stream from the user.
+	 *  @param con The output stream.
+	 */
+	public IFuture<Long> passOutputStream(IOutputConnection con);
+	
 }

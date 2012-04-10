@@ -17,23 +17,19 @@ public class Receiver2Agent
 	@Agent
 	protected MicroAgent agent;
 	
-	protected IOutputConnection con;
-	
 	/**
 	 * 
 	 */
 	@AgentStreamArrived
 	public void streamArrvied(final IOutputConnection con)
 	{
-		// todo: how to avoid garbage collection of connection?
-		this.con = (IOutputConnection)con;
 		System.out.println("received: "+con+" "+con.hashCode());
 		
-		final Future<Void> ret = new Future<Void>();
+//		final Future<Void> ret = new Future<Void>();
 		final IComponentStep<Void> step = new IComponentStep<Void>()
 		{
 			final int[] cnt = new int[]{1};
-			final int max = 100;
+			final int max = getMax();
 			final IComponentStep<Void> self = this;
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
@@ -46,7 +42,7 @@ public class Receiver2Agent
 					{
 						if(cnt[0]++<max)
 						{
-							agent.waitFor(200, self);
+							agent.waitFor(50, self);
 						}
 						else
 						{
@@ -65,10 +61,20 @@ public class Receiver2Agent
 		agent.waitFor(200, step);
 	}
 	
-	@AgentKilled
-	public void killed()
+	/**
+	 * 
+	 */
+	public static int getMax()
 	{
-		if(con!=null)
-			con.close();
+		return 100;
 	}
+	
+	/**
+	 * 
+	 */
+	public static int getNumberOfBytes()
+	{
+		return getMax()*(getMax()+1)/2;
+	}
+	
 }

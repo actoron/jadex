@@ -1416,8 +1416,8 @@ public class MessageService extends BasicService implements IMessageService
 			{
 				byte[] rawmsg = (byte[])obj;
 				int mycnt = cnt++;
-				System.out.println("aaaa: "+mycnt+" "+getComponent().getComponentIdentifier());
-				System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
+//				System.out.println("aaaa: "+mycnt+" "+getComponent().getComponentIdentifier());
+//				System.out.println("Received binary: "+SUtil.arrayToString(rawmsg));
 				int idx = 1;
 				byte type = rawmsg[idx++];
 				
@@ -1468,7 +1468,7 @@ public class MessageService extends BasicService implements IMessageService
 					InputConnectionHandler ich = new InputConnectionHandler(MessageService.this);
 					final InputConnection con = new InputConnection(recs[0], recs[1], conid, false, ich);
 					pcons.put(new Integer(conid), ich);
-					System.out.println("created for: "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
+//					System.out.println("created for: "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
 					
 					ich.initReceived();
 					

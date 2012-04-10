@@ -12,7 +12,7 @@ public class IntermediateDelegationResultListener<E> implements IIntermediateRes
 	//-------- attributes --------
 	
 	/** The future to which calls are delegated. */
-	protected IntermediateFuture future;
+	protected IntermediateFuture<E> future;
 	
 	//-------- constructors --------
 	
