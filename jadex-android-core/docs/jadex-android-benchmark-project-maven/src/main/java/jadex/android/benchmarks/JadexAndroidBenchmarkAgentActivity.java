@@ -24,11 +24,11 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Binding;
 import jadex.micro.benchmarks.MessagePerformanceAgent;
 import jadex.micro.benchmarks.PojoAgentCreationAgent;
 import jadex.micro.examples.chat.IChatService;
-import jadex.xml.annotation.XMLClassname;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -404,7 +404,7 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 	{
 		return platform.scheduleStep(new IComponentStep<Collection<Tuple2<String, Object>>>()
 		{
-			@XMLClassname("create-component")
+			@Classname("create-component")
 			public IFuture<Collection<Tuple2<String, Object>>> execute(IInternalAccess ia)
 			{
 				final Future<Collection<Tuple2<String, Object>>>	fut	= new Future<Collection<Tuple2<String, Object>>>();
