@@ -28,6 +28,7 @@ import java.util.Collection;
  */
 @Agent
 @Arguments(replace=false, value=@Argument(name="filename", clazz=String.class, defaultvalue="\"jadex/micro/testcases/stream/test.jpg\""))
+//@Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"jadex/micro/testcases/stream/android-sdk_r07-windows.zip\""))
 public class InitiatorAgent extends TestAgent
 {
 	/**
@@ -201,20 +202,32 @@ public class InitiatorAgent extends TestAgent
 				{
 					try
 					{
+						final IComponentStep<Void> self = this;
 						int size = Math.min(200000, is.available());
 						filesize[0] += size;
 						byte[] buf = new byte[size];
 						int read = 0;
 						while(read!=buf.length)
 						{
-							read += is.read(buf);
+							read += is.read(buf, read, buf.length-read);
 						}
 						con.write(buf);
 //						System.out.println("wrote: "+size);
 						if(is.available()>0)
 						{
-							agent.scheduleStep(this);
-//							agent.waitFor(10, this);
+							con.waitForReady().addResultListener(new IResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+									agent.scheduleStep(self);
+//									agent.waitFor(10, self);
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									exception.printStackTrace();
+									con.close();
+								}
+							});
 						}
 						else
 						{

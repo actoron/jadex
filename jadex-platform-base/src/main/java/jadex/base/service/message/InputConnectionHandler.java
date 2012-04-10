@@ -56,7 +56,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		super(ms);
 		this.rseqno = 0;
 		this.maxbuf = 1000;
-		this.maxstored = 5000; 
+		this.maxstored = 10000; 
 		this.data = new HashMap<Integer, byte[]>();
 	
 		this.ackcnt = 10;
@@ -296,6 +296,5 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	{
 		return getInputConnection().getStoredDataSize()>=maxstored;
 	}
-	
 	
 }

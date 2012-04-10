@@ -32,6 +32,12 @@ public interface IInputConnection extends IConnection
 //	public IIntermediateFuture<Byte> aread();
 	public ISubscriptionIntermediateFuture<byte[]> aread();
 	
+	/**
+	 *  Get the number of available bytes.
+	 *  @return The number of available bytes. 
+	 */
+	public int available();
+	
 //	/**
 //	 *  Asynchronous read. 
 //	 *  @return Bytes one by one till end of stream or closed.

@@ -250,6 +250,15 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		return ofut;
 	}
 	
+	/**
+	 *  Get the number of available bytes.
+	 *  @return The number of available bytes. 
+	 */
+	public int available()
+	{
+		return getStoredDataSize();
+	}
+	
 //	/**
 //	 *  Blocking read. Read the next byte.
 //	 *  @return The next byte or -1 if the end of the stream has been reached.

@@ -77,6 +77,20 @@ public class ServiceInputConnection implements IInputConnection
 		return ret;
 	}
 	
+	/**
+	 *  Get the number of available bytes.
+	 *  @return The number of available bytes. 
+	 */
+	public int available()
+	{
+		int ret = 0;
+		if(con!=null)
+		{
+			ret = con.available();
+		}
+		return ret;
+	}
+	
 //	/**
 //	 *  Asynchronous read. 
 //	 *  @return Bytes one by one till end of stream or closed.
@@ -92,9 +106,13 @@ public class ServiceInputConnection implements IInputConnection
 	public int getConnectionId()
 	{
 		if(con!=null)
+		{
 			return con.getConnectionId();
+		}
 		else
+		{
 			throw new RuntimeException("Uninitialized connection.");
+		}
 	}
 	
 	/**

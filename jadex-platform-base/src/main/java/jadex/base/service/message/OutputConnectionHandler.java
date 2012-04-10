@@ -64,13 +64,15 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	
 	/** Close request flag (when a closereq message was received). */
 	protected boolean closereqflag;
-//	protected Future<Void> closerefut;
 
 	/** Stop flag (is sent in ack from input side) to signal that the rceiver is flooded with data). */
 	protected Tuple2<Boolean, Integer> stopflag;
 	
 	/** Flag if close was already sent. */
 	protected boolean closesent;
+	
+	/** Future used in waitForReady(). */
+	protected Future<Void> readyfuture;
 	
 	//-------- constructors --------
 	
@@ -156,6 +158,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 				
 				// Try to send stored messages after some others have been acknowledged
 				sendStored();
+				
+				// Check ready state.
+				checkWaitForReady();
 				
 				// Try to close if close is requested.
 				checkClose();
@@ -254,6 +259,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 					doSendData(task).addResultListener(new DelegationResultListener<Void>(ret));
 				}
 				
+				// Check ready state.
+				checkWaitForReady();
+				
 				return IFuture.DONE;
 			}
 		});
@@ -272,9 +280,58 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			{
 				if(multipackets)
 					sendMultiPacket();
+				sendStored();
+				checkWaitForReady();
 				return IFuture.DONE;
 			}
 		});
+	}
+	
+	/**
+	 *  Wait until the connection is ready for the next write.
+	 *  @return Calls future when next data can be written.
+	 */
+	public IFuture<Void> waitForReady()
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				if(readyfuture!=null)
+				{
+					ret.setException(new RuntimeException("Must not be called twice without waiting for result."));
+				}
+				else
+				{
+					readyfuture = ret;
+				}
+				return IFuture.DONE;
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void checkWaitForReady()
+	{
+		if(readyfuture!=null)
+		{
+			if(con.isInited() && sent.size()-maxsend>0 && !isStop() && !isClosed())
+			{
+				Future<Void> ret = readyfuture;
+				readyfuture = null;
+				ret.setResult(null);
+			}
+			else if(isClosed())
+			{
+				readyfuture.setException(new RuntimeException("Connection closed."));
+			}
+		}
 	}
 	
 	/**
@@ -601,6 +658,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 								}
 								acktimer = null;
 								createAckTimer(seqno + ackcnt);
+								checkWaitForReady();
 								return IFuture.DONE;
 							}
 						});
@@ -624,7 +682,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-//						System.out.println("data timer triggered");
+//				System.out.println("data timer triggered");
 				
 				sendStored();
 				

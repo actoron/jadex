@@ -19,6 +19,12 @@ public interface IOutputConnection extends IConnection
 	public void flush();
 	
 	/**
+	 *  Wait until the connection is ready for the next write.
+	 *  @return Calls future when next data can be written.
+	 */
+	public IFuture<Void> waitForReady();
+	
+	/**
 	 *  Close the connection.
 	 */
 	// todo: make IFuture<Void> ?

@@ -3,9 +3,13 @@ package jadex.micro.examples.chat;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.remote.ServiceOutputConnection;
+import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -19,8 +23,14 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,8 +41,11 @@ import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -120,6 +133,63 @@ public class ChatPanel extends JPanel
 				return this;
 			}
 		});
+
+		final JFileChooser chooser = new JFileChooser(".");
+		
+		
+		MouseListener lis = new MouseAdapter()
+		{
+			public void mousePressed(MouseEvent e) 
+			{
+				trigger(e);
+			}
+
+			public void mouseReleased(MouseEvent e) 
+			{
+				trigger(e);
+			}
+			
+			protected void trigger(MouseEvent e)
+			{
+				if(e.isPopupTrigger()) 
+				{
+					int row = table.rowAtPoint(e.getPoint());
+					IComponentIdentifier cid = (IComponentIdentifier)((UserTableModel)table.getModel()).getValueAt(row, 0);
+					createMenu(cid).show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+			
+			protected JPopupMenu createMenu(final IComponentIdentifier cid)
+			{
+				final JPopupMenu menu = new JPopupMenu();
+				JMenuItem mi = new JMenuItem("Send file ...");
+				mi.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						if(JFileChooser.APPROVE_OPTION==chooser.showOpenDialog(ChatPanel.this))
+						{
+							sendFile(chooser.getSelectedFile(), cid).addResultListener(new IResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+									System.out.println("transferred file");
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									System.out.println("ex: "+exception.getMessage());
+								}
+							});
+						}
+					}
+				});
+				menu.add(mi);
+				return menu;
+			}
+		};
+		table.addMouseListener(lis);
+		table.getTableHeader().addMouseListener(lis);
+		
 		JPanel	listpan	= new JPanel(new BorderLayout());
 		listpan.add(userpan, BorderLayout.CENTER);
 
@@ -208,7 +278,7 @@ public class ChatPanel extends JPanel
 				final Future<Void>	ret	= new Future<Void>();
 				
 				// Keep track of search and called chats (only accessed from component thread).
-				final Set<IFuture<?>>	futures	= new HashSet<IFuture<?>>();
+				final Set<IFuture<?>> futures	= new HashSet<IFuture<?>>();
 				
 				final IIntermediateFuture<IChatService> ifut = ia.getServiceContainer().getRequiredServices("chatservices");
 				futures.add(ifut);
@@ -513,5 +583,95 @@ public class ChatPanel extends JPanel
 		public void removeTableModelListener(TableModelListener l)
 		{
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> sendFile(final File file, final IComponentIdentifier cid)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		agent.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				IFuture<IChatService> fut = ia.getServiceContainer().getService(IChatService.class, cid);
+				fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IChatService, Void>(ret)
+				{
+					public void customResultAvailable(IChatService cs)
+					{
+						try
+						{
+							final ServiceOutputConnection ocon = new ServiceOutputConnection();
+							final IInputConnection icon = ocon.getInputConnection();
+	
+							cs.sendFile(file.getName(), icon).addResultListener(new DelegationResultListener<Void>(ret));
+						
+							final InputStream is = new FileInputStream(file);
+							final long[] filesize = new long[1];
+						
+							IComponentStep<Void> step = new IComponentStep<Void>()
+							{
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									try
+									{
+										final IComponentStep<Void> self = this;
+										int size = Math.min(200000, is.available());
+										filesize[0] += size;
+										byte[] buf = new byte[size];
+										int read = 0;
+										while(read!=buf.length)
+										{
+											read += is.read(buf, read, buf.length-read);
+										}
+										ocon.write(buf);
+										System.out.println("wrote: "+size);
+										if(is.available()>0)
+										{
+											ocon.waitForReady().addResultListener(new IResultListener<Void>()
+											{
+												public void resultAvailable(Void result)
+												{
+													agent.scheduleStep(self);
+	//												agent.waitFor(10, self);
+												}
+												public void exceptionOccurred(Exception exception)
+												{
+													exception.printStackTrace();
+													ocon.close();
+												}
+											});
+										}
+										else
+										{
+											ocon.close();
+										}
+									}
+									catch(Exception e)
+									{
+										e.printStackTrace();
+										ret.setException(e);
+									}
+									
+									return IFuture.DONE;
+								}
+							};
+							agent.scheduleStep(step);
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+							ret.setExceptionIfUndone(e);
+						}
+					}
+				}));
+				
+				return IFuture.DONE;
+			}
+		});
+		
+		return ret;
 	}
 }

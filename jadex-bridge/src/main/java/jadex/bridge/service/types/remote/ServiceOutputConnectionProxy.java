@@ -79,6 +79,15 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 	}
 	
 	/**
+	 *  Wait until the connection is ready for the next write.
+	 *  @return Calls future when next data can be written.
+	 */
+	public IFuture<Void> waitForReady()
+	{
+		return new Future<Void>(new UnsupportedOperationException());
+	}
+	
+	/**
 	 *  Close the connection.
 	 */
 	// todo: make IFuture<Void> ?

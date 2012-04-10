@@ -59,6 +59,15 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	}
 	
 	/**
+	 *  Wait until the connection is ready for the next write.
+	 *  @return Calls future when next data can be written.
+	 */
+	public IFuture<Void> waitForReady()
+	{
+		return ((IOutputConnectionHandler)ch).waitForReady();
+	}
+	
+	/**
 	 *  Close the connection.
 	 *  Notifies the other side that the connection has been closed.
 	 */

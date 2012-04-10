@@ -27,6 +27,9 @@ public class ServiceOutputConnection implements IOutputConnection
 	/** The buffer. */
 	protected List<byte[]> buffer;
 	
+	/** The ready future. */
+	protected Future<Void> readyfuture;
+	
 	/**
 	 * 
 	 */
@@ -67,6 +70,30 @@ public class ServiceOutputConnection implements IOutputConnection
 		{
 			flushed = true;
 		}
+	}
+	
+	/**
+	 *  Wait until the connection is ready for the next write.
+	 *  @return Calls future when next data can be written.
+	 */
+	public IFuture<Void> waitForReady()
+	{
+		Future<Void> ret = new Future<Void>();
+		
+		if(ocon!=null)
+		{
+			ocon.waitForReady().addResultListener(new DelegationResultListener<Void>(ret));
+		}
+		else if(readyfuture==null)
+		{
+			readyfuture = ret;
+		}
+		else
+		{
+			ret.setException(new RuntimeException("Must not be called twice without waiting for result."));
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -150,6 +177,11 @@ public class ServiceOutputConnection implements IOutputConnection
 		if(flushed)
 		{
 			ocon.flush();
+		}
+		
+		if(readyfuture!=null)
+		{
+			ocon.waitForReady().addResultListener(new DelegationResultListener<Void>(readyfuture));
 		}
 		
 		if(closed)

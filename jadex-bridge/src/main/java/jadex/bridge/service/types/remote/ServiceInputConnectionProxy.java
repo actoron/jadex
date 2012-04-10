@@ -77,6 +77,15 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	}
 	
 	/**
+	 *  Get the number of available bytes.
+	 *  @return The number of available bytes. 
+	 */
+	public int available()
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
 	 * 
 	 */
 	public void close()

@@ -1,5 +1,6 @@
 package jadex.micro.examples.chat;
 
+import jadex.bridge.IInputConnection;
 import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.IFuture;
 
@@ -34,4 +35,11 @@ public interface IChatService
 	 *  @param status The new status.
 	 */
 	public IFuture<Void>	status(String status);
+	
+	/**
+	 *  Send a file.
+	 *  @param filename The filename.
+	 *  @param con The connection.
+	 */
+	public IFuture<Void>	sendFile(String filename, IInputConnection con);
 }
