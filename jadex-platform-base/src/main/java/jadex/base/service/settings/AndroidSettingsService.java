@@ -7,9 +7,12 @@ import jadex.bridge.service.types.android.IPreferences;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.io.File;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Android settings service implementation.
@@ -20,18 +23,20 @@ public class AndroidSettingsService extends SettingsService {
 
 	private final String DEFAULT_PREFS_NAME = "jadex.base.service.settings.AndroidSettingsService.DEFAULT_PREFS_NAME";
 
-	private Properties properties;
 	private IPreferences preferences;
+
+	private boolean preferFileProperties;
 
 	/**
 	 * Creates an Android Settings Service
 	 * 
-	 * @param prefix
 	 * @param access
 	 * @param saveonexit
+	 * @param preferFileProperties if true, property in file overwrites property found in preferences
 	 */
-	public AndroidSettingsService(IInternalAccess access, boolean saveonexit) {
+	public AndroidSettingsService(IInternalAccess access, boolean saveonexit, boolean preferFileProperties) {
 		super(access, saveonexit);
+		this.preferFileProperties = preferFileProperties;
 	}
 
 	@Override
@@ -55,24 +60,33 @@ public class AndroidSettingsService extends SettingsService {
 	@Override
 	public IFuture<Properties> loadProperties() {
 		preferences = contextService.getSharedPreferences(DEFAULT_PREFS_NAME);
-//		preferences.setString("securityservice.password", "andori");
+		// preferences.setString("securityservice.password", "andori");
 		IFuture<Properties> loadProperties = super.loadProperties();
 		loadProperties
 				.addResultListener(new DefaultResultListener<Properties>() {
 
 					@Override
 					public void resultAvailable(Properties result) {
-						overloadProperties(props, preferences, "");
+						// overloadProperties(props, preferences, "");
+						loadPreferencesIntoProperties(props, preferences, preferFileProperties);
 					}
+
 				});
 		return loadProperties;
 	}
 
 	@Override
 	public IFuture<Void> saveProperties() {
+		Future<Void> ret = new Future<Void>();
 		savePropertiesAsPreferences(props, preferences, "");
-		preferences.commit();
-		return super.saveProperties();
+		boolean committed = preferences.commit();
+		if (committed) {
+			ret.setResult(null);
+		} else {
+			ret.setException(new Exception(
+					"Could not save Preferences as Properties!"));
+		}
+		return ret;
 	}
 
 	@Override
@@ -85,8 +99,40 @@ public class AndroidSettingsService extends SettingsService {
 		return super.getProperties(id);
 	}
 
-	private static void overloadProperties(Properties props, IPreferences prefs,
-			String path) {
+	private static void loadPreferencesIntoProperties(Properties props,
+			IPreferences preferences, boolean preferFileProperties) {
+		Map<String, ?> prefs = preferences.getAll();
+		for (Entry<String, ?> pref : prefs.entrySet()) {
+			String[] key = pref.getKey().split("\\.");
+			String targetPropValue = (String) pref.getValue();
+			Properties parentProps = props;
+
+			for (int i = 0; i < key.length - 1; i++) {
+				String id = key[i];
+
+				Properties childProps = parentProps.getSubproperty(id);
+
+				if (childProps == null) {
+					childProps = new Properties(null, id, null);
+					parentProps.addSubproperties(childProps);
+				}
+
+				parentProps = childProps;
+			}
+
+			String targetPropId = key[key.length - 1];
+			Property targetProp = parentProps.getProperty(targetPropId);
+			if (targetProp == null) {
+				targetProp = new Property(targetPropId, targetPropValue);
+				parentProps.addProperty(targetProp);
+			} else if (!preferFileProperties){
+				parentProps.getProperty(targetPropId).setValue(targetPropValue);
+			}
+		}
+	}
+
+	private static void overloadProperties(Properties props,
+			IPreferences prefs, String path) {
 		String appendType = props.getType();
 		if (appendType != null) {
 			path = path + appendType + ".";
@@ -120,7 +166,7 @@ public class AndroidSettingsService extends SettingsService {
 			String prefKey = path + type;
 			prefs.setString(prefKey, value);
 		}
-		
+
 		for (Properties subprops : props.getSubproperties()) {
 			savePropertiesAsPreferences(subprops, prefs, path);
 		}

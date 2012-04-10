@@ -45,8 +45,8 @@ public class XMLPullInputFactory extends XMLInputFactory {
 				XmlPullParser.FEATURE_PROCESS_DOCDECL);
 		TRANSLATE_FEATURES_TO_PULL.put(XMLInputFactory.IS_NAMESPACE_AWARE,
 				XmlPullParser.FEATURE_PROCESS_NAMESPACES);
-		TRANSLATE_FEATURES_TO_PULL.put(XMLInputFactory.IS_COALESCING,
-				XMLInputFactory.IS_COALESCING);
+//		TRANSLATE_FEATURES_TO_PULL.put(XMLInputFactory.IS_COALESCING,
+//				XMLInputFactory.IS_COALESCING);
 		TRANSLATE_FEATURES_TO_PULL.put(XMLInputFactory.REPORTER,
 				XMLInputFactory.REPORTER);
 	}
@@ -226,13 +226,15 @@ public class XMLPullInputFactory extends XMLInputFactory {
 		}
 		// remove validation feature, because its not supported by the current
 		// android implementation
-		properties.remove(XmlPullParser.FEATURE_VALIDATION);
+		properties.remove(XMLInputFactory.IS_VALIDATING);
 
 		Set<Entry<String, Object>> entrySet = properties.entrySet();
 		for (Entry<String, Object> entry : entrySet) {
 			String feature = TRANSLATE_FEATURES_TO_PULL.get(entry.getKey());
 			Object value = entry.getValue();
-			xmlPullStreamReader.setFeature(feature, (Boolean) value);
+			if (feature != null) {
+				xmlPullStreamReader.setFeature(feature, (Boolean) value);
+			}
 		}
 
 	}
