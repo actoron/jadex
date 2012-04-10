@@ -38,6 +38,15 @@ public class PropertiesPanel	extends	JPanel
 	protected boolean adddummy;
 	
 	//-------- constructors --------
+
+	/**
+	 *  Create new properties panel.
+	 */
+	public PropertiesPanel()
+	{
+		this(null);
+	}
+
 	
 	/**
 	 *  Create new properties panel.
@@ -45,7 +54,8 @@ public class PropertiesPanel	extends	JPanel
 	public PropertiesPanel(String title)
 	{
 		super(new GridBagLayout());
-		setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), title));
+		if(title!=null)
+			setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), title));
 		this.components	= new HashMap();
 
 		this.gbc	= new GridBagConstraints();

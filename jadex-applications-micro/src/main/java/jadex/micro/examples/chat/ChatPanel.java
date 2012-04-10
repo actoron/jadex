@@ -5,6 +5,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
@@ -13,9 +14,13 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.gui.JSplitPanel;
+import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 
@@ -33,6 +38,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -41,10 +47,14 @@ import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -135,8 +145,6 @@ public class ChatPanel extends JPanel
 		});
 
 		final JFileChooser chooser = new JFileChooser(".");
-		
-		
 		MouseListener lis = new MouseAdapter()
 		{
 			public void mousePressed(MouseEvent e) 
@@ -538,6 +546,170 @@ public class ChatPanel extends JPanel
 		});
 	}
 	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> sendFile(final File file, final IComponentIdentifier cid)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		agent.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				IFuture<IChatService> fut = ia.getServiceContainer().getService(IChatService.class, cid);
+				fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IChatService, Void>(ret)
+				{
+					public void customResultAvailable(IChatService cs)
+					{
+						try
+						{
+							final ServiceOutputConnection ocon = new ServiceOutputConnection();
+							final IInputConnection icon = ocon.getInputConnection();
+							final InputStream is = new FileInputStream(file);
+							
+							ITerminableIntermediateFuture<Double> fut = cs.sendFile(file.getName(), is.available(), icon);
+							final boolean[] started = new boolean[1];
+							fut.addResultListener(new IIntermediateResultListener<Double>()
+							{
+								public void intermediateResultAvailable(Double result)
+								{
+									if(!started[0])
+									{
+										started[0] = true;
+										send(is, ocon);//.addResultListener(new DelegationResultListener<Void>(ret));
+									}
+									System.out.println("percent done: "+result.doubleValue());
+								}
+								
+								public void finished()
+								{
+									System.out.println("sending finished");
+									ret.setResult(null);
+								}
+								
+								public void resultAvailable(Collection<Double> result)
+								{
+									System.out.println("result");
+									ret.setResult(null);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									System.out.println("exception: "+exception);
+									ret.setException(exception);
+								}
+							});
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+							ret.setExceptionIfUndone(e);
+						}
+					}
+				}));
+				
+				return IFuture.DONE;
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> send(final InputStream is, final IOutputConnection ocon)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		final long[] filesize = new long[1];
+		
+		IComponentStep<Void> step = new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				try
+				{
+					final IComponentStep<Void> self = this;
+					int size = Math.min(200000, is.available());
+					filesize[0] += size;
+					byte[] buf = new byte[size];
+					int read = 0;
+					while(read!=buf.length)
+					{
+						read += is.read(buf, read, buf.length-read);
+					}
+					ocon.write(buf);
+					System.out.println("wrote: "+size);
+					if(is.available()>0)
+					{
+						agent.scheduleStep(self);
+//						ocon.waitForReady().addResultListener(new IResultListener<Void>()
+//						{
+//							public void resultAvailable(Void result)
+//							{
+//								agent.scheduleStep(self);
+////												agent.waitFor(10, self);
+//							}
+//							public void exceptionOccurred(Exception exception)
+//							{
+//								exception.printStackTrace();
+//								ocon.close();
+//							}
+//						});
+					}
+					else
+					{
+						ocon.close();
+						ret.setResult(null);
+					}
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					ret.setException(e);
+				}
+				
+				return IFuture.DONE;
+			}
+		};
+		agent.scheduleStep(step);
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public IFuture<File> acceptFile(final String filename, final long size, final IComponentIdentifier sender)
+	{
+		final Future<File> ret = new Future<File>();
+		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				PropertiesPanel pp = new PropertiesPanel();
+				final JTextField fn = pp.createTextField("Filename: ", "./"+filename);
+				pp.createTextField("Size [bytes]: ", ""+size);
+				pp.createTextField("Sender: ", ""+(sender==null? sender: sender.getName()));
+				
+				if(0==JOptionPane.showOptionDialog(null, pp, "Incoming File Transfer", JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Accept", "Cancel"}, "Accept"))
+				{
+					ret.setResult(new File(fn.getText()));
+				}
+				else
+				{
+					ret.setException(new RuntimeException("Denied"));
+				}
+			}
+		});
+	
+		return ret;
+	}
+	
 	//-------- helper classes --------
 	
 	/**
@@ -585,94 +757,4 @@ public class ChatPanel extends JPanel
 		}
 	}
 	
-	/**
-	 * 
-	 */
-	protected IFuture<Void> sendFile(final File file, final IComponentIdentifier cid)
-	{
-		final Future<Void> ret = new Future<Void>();
-		
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				IFuture<IChatService> fut = ia.getServiceContainer().getService(IChatService.class, cid);
-				fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IChatService, Void>(ret)
-				{
-					public void customResultAvailable(IChatService cs)
-					{
-						try
-						{
-							final ServiceOutputConnection ocon = new ServiceOutputConnection();
-							final IInputConnection icon = ocon.getInputConnection();
-	
-							cs.sendFile(file.getName(), icon).addResultListener(new DelegationResultListener<Void>(ret));
-						
-							final InputStream is = new FileInputStream(file);
-							final long[] filesize = new long[1];
-						
-							IComponentStep<Void> step = new IComponentStep<Void>()
-							{
-								public IFuture<Void> execute(IInternalAccess ia)
-								{
-									try
-									{
-										final IComponentStep<Void> self = this;
-										int size = Math.min(200000, is.available());
-										filesize[0] += size;
-										byte[] buf = new byte[size];
-										int read = 0;
-										while(read!=buf.length)
-										{
-											read += is.read(buf, read, buf.length-read);
-										}
-										ocon.write(buf);
-										System.out.println("wrote: "+size);
-										if(is.available()>0)
-										{
-											agent.scheduleStep(self);
-//											ocon.waitForReady().addResultListener(new IResultListener<Void>()
-//											{
-//												public void resultAvailable(Void result)
-//												{
-//													agent.scheduleStep(self);
-//	//												agent.waitFor(10, self);
-//												}
-//												public void exceptionOccurred(Exception exception)
-//												{
-//													exception.printStackTrace();
-//													ocon.close();
-//												}
-//											});
-										}
-										else
-										{
-											ocon.close();
-										}
-									}
-									catch(Exception e)
-									{
-										e.printStackTrace();
-										ret.setException(e);
-									}
-									
-									return IFuture.DONE;
-								}
-							};
-							agent.scheduleStep(step);
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-							ret.setExceptionIfUndone(e);
-						}
-					}
-				}));
-				
-				return IFuture.DONE;
-			}
-		});
-		
-		return ret;
-	}
 }

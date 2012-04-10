@@ -1,10 +1,5 @@
 package jadex.micro.examples.chat;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.Collection;
-import java.util.Iterator;
-
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
@@ -20,9 +15,17 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.micro.annotation.Binding;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Collection;
+import java.util.Iterator;
 
 
 /**
@@ -125,82 +128,104 @@ public class ChatService implements IChatService
 	
 	/**
 	 *  Send a file.
+	 *  @param filename The filename.
 	 *  @param con The connection.
 	 */
-	public IFuture<Void> sendFile(String filename, IInputConnection con)
+	public ITerminableIntermediateFuture<Double> sendFile(String filename, final long size, final IInputConnection con)
 	{
-		final Future<Void> ret = new Future<Void>();
-		try
-		{
-			final long[] cnt = new long[1];
-			final File f = new File("./"+filename);
-			final FileOutputStream fos = new FileOutputStream(f);
-			
-			ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
-			fut.addResultListener(agent.createResultListener(new IIntermediateResultListener<byte[]>()
-			{
-				public void resultAvailable(Collection<byte[]> result)
-				{
-					try
-					{
-						for(Iterator<byte[]> it=result.iterator(); it.hasNext(); )
-						{
-							byte[] data = it.next();
-							cnt[0] += data.length;
-							fos.write(data);
-						}
-						finished();
-					}
-					catch(Exception e)
-					{
-						ret.setExceptionIfUndone(e);
-						e.printStackTrace();
-					}
-				}
-				
-				public void intermediateResultAvailable(byte[] result)
-				{
-					cnt[0] += result.length;
-	//				if(cnt[0]%1000==0)
-	//					System.out.println("bytes: "+cnt[0]);
-					try
-					{
-						fos.write(result);
-					}
-					catch(Exception e)
-					{
-						ret.setExceptionIfUndone(e);
-						e.printStackTrace();
-					}
-				}
-				
-				public void finished()
-				{
-					try
-					{
-						System.out.println("Received file: "+f.getAbsolutePath()+", size: "+cnt[0]);
-						fos.close();
-					}
-					catch(Exception e)
-					{
-						ret.setExceptionIfUndone(e);
-						e.printStackTrace();
-					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					ret.setExceptionIfUndone(exception);
-					System.out.println("ex:"+exception);
-				}
-			}));
-		}
-		catch(Exception e)
-		{
-			ret.setExceptionIfUndone(e);
-			e.printStackTrace();
-		}
+		final TerminableIntermediateFuture<Double> ret = new TerminableIntermediateFuture<Double>();
 		
+		IFuture<File> fut = chatpanel.acceptFile(filename, size, IComponentIdentifier.CALLER.get());
+		fut.addResultListener(new IResultListener<File>()
+		{
+			public void resultAvailable(final File f)
+			{
+				try
+				{
+					final long[] cnt = new long[1];
+//					final File f = new File("./"+filename);
+					final FileOutputStream fos = new FileOutputStream(f);
+
+					// Enable sending
+					ret.addIntermediateResult(new Double(0));
+					
+					ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
+					fut.addResultListener(agent.createResultListener(new IIntermediateResultListener<byte[]>()
+					{
+						public void resultAvailable(Collection<byte[]> result)
+						{
+							try
+							{
+								for(Iterator<byte[]> it=result.iterator(); it.hasNext(); )
+								{
+									byte[] data = it.next();
+									cnt[0] += data.length;
+									fos.write(data);
+								}
+								finished();
+							}
+							catch(Exception e)
+							{
+								ret.setExceptionIfUndone(e);
+								e.printStackTrace();
+							}
+						}
+						
+						public void intermediateResultAvailable(byte[] result)
+						{
+							cnt[0] += result.length;
+			//				if(cnt[0]%1000==0)
+			//					System.out.println("bytes: "+cnt[0]);
+							try
+							{
+								fos.write(result);
+							}
+							catch(Exception e)
+							{
+								ret.setExceptionIfUndone(e);
+								e.printStackTrace();
+							}
+							
+							ret.addIntermediateResult(new Double(((double)cnt[0])/size));
+						}
+						
+						public void finished()
+						{
+//							ret.addIntermediateResult(new Double(1));
+							
+							try
+							{
+								System.out.println("Received file: "+f.getAbsolutePath()+", size: "+cnt[0]);
+								fos.close();
+								ret.setFinished();
+							}
+							catch(Exception e)
+							{
+								ret.setExceptionIfUndone(e);
+								e.printStackTrace();
+							}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setExceptionIfUndone(exception);
+							System.out.println("ex:"+exception);
+						}
+					}));
+				}
+				catch(Exception e)
+				{
+					ret.setExceptionIfUndone(e);
+					e.printStackTrace();
+				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setException(exception);
+			}
+		});
+			
 		return ret;
 	}
 }
