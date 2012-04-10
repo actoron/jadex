@@ -1,12 +1,12 @@
 package jadex.simulation.examples.marsworld.sentry;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.planlib.PlanFinishedTaskCondition;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.fipa.SFipa;
 import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;
 import jadex.extension.envsupport.environment.AbstractTask;
@@ -17,7 +17,6 @@ import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.simulation.examples.marsworld.RequestProduction;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,7 +47,7 @@ public class AnalyzeTargetPlan extends Plan {
 			space.addTaskListener(taskid, myself.getId(), res);
 
 			res.waitForResult();
-			// System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");
+			// System.out.println("Analyzed target: "+getAgentName()+", "+ore+" ore found.");w
 			if (((Number) target.getProperty(AnalyzeTargetTask.PROPERTY_ORE)).intValue() > 0)
 				callProducerAgent(target);
 		} catch (Exception e) {

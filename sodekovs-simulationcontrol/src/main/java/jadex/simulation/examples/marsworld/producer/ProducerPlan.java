@@ -1,19 +1,16 @@
 package jadex.simulation.examples.marsworld.producer;
 
-import java.util.ArrayList;
-
-import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.fipa.SFipa;
 import jadex.extension.agr.AGRSpace;
 import jadex.extension.agr.Group;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.ContinuousSpace2D;
-import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.simulation.examples.marsworld.RequestCarry;
 import jadex.simulation.examples.marsworld.RequestProduction;

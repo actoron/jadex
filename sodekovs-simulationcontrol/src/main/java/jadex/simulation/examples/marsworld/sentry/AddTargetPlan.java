@@ -1,8 +1,8 @@
 package jadex.simulation.examples.marsworld.sentry;
 
-import jadex.base.fipa.SFipa;
 import jadex.bdi.runtime.IMessageEvent;
 import jadex.bdi.runtime.Plan;
+import jadex.bridge.fipa.SFipa;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
