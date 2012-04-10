@@ -63,7 +63,7 @@
 			<plugin>
 				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
 				<artifactId>android-maven-plugin</artifactId>
-				<version>3.0.0-alpha-14</version>
+				<version>3.1.1</version>
 				<configuration>
 					<androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
 					<assetsDirectory>${project.basedir}/assets</assetsDirectory>
@@ -84,6 +84,12 @@
 						<noLocals>false</noLocals>
 						<optimize>true</optimize>
 					</dex>
+					
+					<manifest>
+							<versionName>${project.version}</versionName>
+							<debuggable>true</debuggable>
+							<versionCodeAutoIncrement>true</versionCodeAutoIncrement>
+						</manifest>
 				</configuration>
 				<extensions>true</extensions>
 			</plugin>
