@@ -1,7 +1,6 @@
 package jadex.android.application.demo;
 
 import jadex.android.JadexAndroidActivity;
-import jadex.base.Starter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -18,7 +17,6 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.util.HashMap;
-import java.util.UUID;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -87,89 +85,16 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 			if (view == startPlatformButton) {
 				startPlatformButton.setEnabled(false);
 				textView.setText("Starting Jadex Platform...");
-				new Thread(new Runnable() {
-					public void run() {
-						IFuture<IExternalAccess> future = Starter
-								.createPlatform(new String[] {
-										"-logging_level", "java.util.logging.Level.INFO",
-										"-extensions", "null",
-										"-wspublish", "false",
-										"-android", "true",
-										"-kernels", "\"component, micro, bpmn\"",
-//										"-tcptransport", "false",
-//										"-niotcptransport", "false",
-//										"-relaytransport", "true",
-//										"-relayaddress", "\"http://134.100.11.200:8080/jadex-platform-relay-web/\"",					
-//										"-saveonexit", "false", "-gui", "false",
-										"-autoshutdown", "false",
-										"-platformname", "and-" + createRandomPlattformID(),
-										"-saveonexit", "false", "-gui", "false" });
-						future.addResultListener(platformResultListener);
-					}
-				}).start();
+				startJadexPlatform().addResultListener(platformResultListener);
 				
 			} else if (view == startAgentButton) {
 				startAgentButton.setEnabled(false);
+				startMicroAgent("HelloWorldAgent " + num, AndroidAgent.class).addResultListener(agentCreatedResultListener);
 				
-				IFuture<IComponentManagementService> scheduleStep = extAcc
-						.scheduleStep(new IComponentStep() {
-							@Classname("create-component")
-							public IFuture<IComponentManagementService> execute(IInternalAccess ia) {
-								Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
-								SServiceProvider.getService(
-										ia.getServiceContainer(),
-										IComponentManagementService.class,
-										RequiredServiceInfo.SCOPE_PLATFORM)
-										.addResultListener(
-												ia.createResultListener(new DelegationResultListener<IComponentManagementService>(
-														ret)));
-
-								return ret;
-							}
-						});
-				scheduleStep.addResultListener(new DefaultResultListener<IComponentManagementService>() {
-
-					public void resultAvailable(IComponentManagementService cms) {
-						HashMap<String, Object> args = new HashMap<String, Object>();
-
-						cms.createComponent(
-								"HelloWorldAgent " + num,
-								AndroidAgent.class.getName().replaceAll("\\.",
-										"/")
-										+ ".class", new CreationInfo(args),
-								null).addResultListener(
-								agentCreatedResultListener);
-					}
-				});
 			} else if (view == startBPMNButton) {
 				startBPMNButton.setEnabled(false);
+				startBPMNAgent("SimpleWorkflow " + num, "jadex/android/application/demo/bpmn/SimpleWorkflow.bpmn").addResultListener(bpmnCreatedResultListener);
 				
-				IFuture<IComponentManagementService> scheduleStep = extAcc
-						.scheduleStep(new IComponentStep() {
-							@Classname("create-component")
-							public IFuture<IComponentManagementService> execute(IInternalAccess ia) {
-								Future<IComponentManagementService> ret = new Future<IComponentManagementService>();
-								SServiceProvider.getService(
-										ia.getServiceContainer(),
-										IComponentManagementService.class,
-										RequiredServiceInfo.SCOPE_PLATFORM)
-										.addResultListener(
-												ia.createResultListener(new DelegationResultListener<IComponentManagementService>(
-														ret)));
-
-								return ret;
-							}
-						});
-				scheduleStep.addResultListener(new DefaultResultListener<IComponentManagementService>() {
-
-					public void resultAvailable(IComponentManagementService cms) {
-						HashMap<String, Object> args = new HashMap<String, Object>();
-
-						args.put("androidContext", JadexAndroidHelloWorldActivity.this);
-						cms.createComponent("SimpleWorkflow " + num,
-								"jadex/android/application/demo/bpmn/SimpleWorkflow.bpmn", new CreationInfo(args), null).addResultListener(bpmnCreatedResultListener);
-					}
-				});
 			}
 		}
 	};
@@ -217,8 +142,4 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 		}
 	};
 	
-	protected String createRandomPlattformID() {
-		UUID randomUUID = UUID.randomUUID();
-		return randomUUID.toString().substring(0, 5);
-	}
 }

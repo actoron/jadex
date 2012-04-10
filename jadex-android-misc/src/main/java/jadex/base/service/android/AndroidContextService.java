@@ -1,7 +1,7 @@
 package jadex.base.service.android;
 
-import jadex.android.JadexAndroidActivity;
-import jadex.android.JadexAndroidActivity.AndroidContextChangeListener;
+import jadex.android.ContextProvidingActivity;
+import jadex.android.ContextProvidingActivity.AndroidContextChangeListener;
 import jadex.android.JadexAndroidContextNotFoundError;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
@@ -15,7 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 /**
  * Provides Access to the Android Application Context and 
@@ -32,7 +31,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	 */
 	public AndroidContextService(IServiceProvider provider) {
 		super(provider.getId(), IAndroidContextService.class, null);
-		JadexAndroidActivity.addContextChangeListener(this);
+		ContextProvidingActivity.addContextChangeListener(this);
 	}
 	
 	@Override
@@ -42,7 +41,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	
 	@Override
 	public IFuture<Void> shutdownService() {
-		JadexAndroidActivity.removeContextChangeListener(this);
+		ContextProvidingActivity.removeContextChangeListener(this);
 		return super.shutdownService();
 	}
 	
