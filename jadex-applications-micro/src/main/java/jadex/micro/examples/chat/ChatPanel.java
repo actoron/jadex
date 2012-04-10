@@ -630,19 +630,20 @@ public class ChatPanel extends JPanel
 										System.out.println("wrote: "+size);
 										if(is.available()>0)
 										{
-											ocon.waitForReady().addResultListener(new IResultListener<Void>()
-											{
-												public void resultAvailable(Void result)
-												{
-													agent.scheduleStep(self);
-	//												agent.waitFor(10, self);
-												}
-												public void exceptionOccurred(Exception exception)
-												{
-													exception.printStackTrace();
-													ocon.close();
-												}
-											});
+											agent.scheduleStep(self);
+//											ocon.waitForReady().addResultListener(new IResultListener<Void>()
+//											{
+//												public void resultAvailable(Void result)
+//												{
+//													agent.scheduleStep(self);
+//	//												agent.waitFor(10, self);
+//												}
+//												public void exceptionOccurred(Exception exception)
+//												{
+//													exception.printStackTrace();
+//													ocon.close();
+//												}
+//											});
 										}
 										else
 										{
