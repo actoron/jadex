@@ -1,5 +1,7 @@
 package jadex.base.gui.config;
 
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.gui.PropertiesPanel;
@@ -195,6 +197,7 @@ public class ClasspathPanel	extends JPanel
 							}
 						}
 					}
+					jar.close();
 				}
 				else
 				{
@@ -207,5 +210,36 @@ public class ClasspathPanel	extends JPanel
 			e.printStackTrace();
 		}
 		return ret.toArray(new String[ret.size()]);
+	}
+	
+	/**
+	 *  Get the settings as properties.
+	 */
+	public Properties	getProperties()
+	{
+		Properties	props	= new Properties();
+		for(int i=0; i<model.getRowCount(); i++)
+		{
+			File	entry	= (File)model.getValueAt(i, 0);
+			props.addProperty(new Property("ENTRY", entry.getAbsolutePath()));
+		}
+		return props;
+	}
+
+	
+	/**
+	 *  Set the settings as properties.
+	 */
+	public void	setProperties(Properties props)
+	{
+		for(int i=model.getRowCount()-1; i>=0; i--)
+		{
+			model.removeRow(i);
+		}
+		Property[]	entries	= props.getProperties("ENTRY");
+		for(int i=0; i<entries.length; i++)
+		{
+			model.addRow(new Object[]{new File(entries[i].getValue())});
+		}
 	}
 }

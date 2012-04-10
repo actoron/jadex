@@ -225,52 +225,41 @@ public class PlatformConfigPanel	extends JPanel
 						final Properties	props	= (Properties)PropertiesXMLHelper.getPropertyReader().read(is, getClass().getClassLoader(), null);
 						is.close();
 						
-						factory.setSelectedItem(props.getStringProperty(Starter.COMPONENT_FACTORY));
-						model.setSelectedItem(props.getStringProperty(Starter.CONFIGURATION_FILE));
-						
-						loadModel(model, factory, config)
-							.addResultListener(new SwingDefaultResultListener<Void>(PlatformConfigPanel.this)
+						if(props.getSubproperty("Classpath")!=null)
 						{
-							public void customResultAvailable(Void result)
+							classpath.setProperties(props.getSubproperty("Classpath"));
+						}
+						
+						if(props.getStringProperty(Starter.CONFIGURATION_FILE)!=null)
+						{
+							factory.setSelectedItem(props.getStringProperty(Starter.COMPONENT_FACTORY));
+							model.setSelectedItem(props.getStringProperty(Starter.CONFIGURATION_FILE));
+							
+							loadModel(model, factory, config)
+								.addResultListener(new SwingDefaultResultListener<Void>(PlatformConfigPanel.this)
 							{
-								if(props.getProperty(Starter.CONFIGURATION_NAME)!=null)
+								public void customResultAvailable(Void result)
 								{
-									config.setSelectedItem(props.getStringProperty(Starter.CONFIGURATION_NAME));
+									if(props.getProperty(Starter.CONFIGURATION_NAME)!=null)
+									{
+										config.setSelectedItem(props.getStringProperty(Starter.CONFIGURATION_NAME));
+									}
+									
+									Property[]	argprops	= props.getProperties("argument");
+									for(int i=0; i<argprops.length; i++)
+									{
+										argmodel.getArguments().put(argprops[i].getName(), argprops[i].getValue());
+									}
+									argmodel.fireTableDataChanged();
 								}
-								
-								Property[]	argprops	= props.getProperties("argument");
-								for(int i=0; i<argprops.length; i++)
-								{
-									argmodel.getArguments().put(argprops[i].getName(), argprops[i].getValue());
-								}
-								argmodel.fireTableDataChanged();
-							}
-						});
+							});
+						}
 					}
 					catch(Exception ex)
 					{
 						SGUI.showError(PlatformConfigPanel.this, "Load Problem", "Warning: Could not load settings: "+ex, ex);
 					}
 				}
-				
-				Properties	props	= new Properties();
-				props.addProperty(new Property(Starter.COMPONENT_FACTORY, (String)factory.getSelectedItem()));
-				props.addProperty(new Property(Starter.CONFIGURATION_FILE, (String)model.getSelectedItem()));
-				
-				if(config.isEnabled())
-				{
-					props.addProperty(new Property(Starter.CONFIGURATION_NAME, (String)config.getSelectedItem()));					
-				}
-				
-				if(argmodel!=null)
-				{
-					Map<String, String>	margs	= argmodel.getArguments();
-					for(String arg: margs.keySet())
-					{
-						props.addProperty(new Property(arg, "argument", margs.get(arg)));
-					}
-				}
-				
 			}
 		});
 		
@@ -295,6 +284,8 @@ public class PlatformConfigPanel	extends JPanel
 						props.addProperty(new Property(arg, "argument", margs.get(arg)));											
 					}
 				}
+				
+				props.addSubproperties("Classpath", classpath.getProperties());
 				
 				int	ok	= fc.showOpenDialog(PlatformConfigPanel.this);
 				if(ok==JFileChooser.APPROVE_OPTION)
@@ -347,12 +338,13 @@ public class PlatformConfigPanel	extends JPanel
 				try
 				{
 					Class<?> starterclass = SReflect.classForName(Starter.class.getName(), classpath.getClassLoader());
-					Object	fut	= starterclass.getMethod("createPlatform", new Class<?>[]{Object[].class}).
+					Object	fut	= starterclass.getMethod("createPlatform", new Class<?>[]{String[].class}).
 						invoke(null, new Object[]{args.toArray(new String[args.size()])});
 				}
 				catch(Exception ex)
 				{
 					// TODO: handle exception
+					ex.printStackTrace();
 				}
 //					.addResultListener(new SwingDefaultResultListener<IExternalAccess>(PlatformConfigPanel.this)
 //				{

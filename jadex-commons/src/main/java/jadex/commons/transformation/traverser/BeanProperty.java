@@ -188,17 +188,10 @@ public class BeanProperty
 	public Object getPropertyValue(Object object)
 	{
 		Object ret = null;
-		if (delegateprovider != null)
+		IBeanAccessorDelegate accdel = delegateprovider!=null ? delegateprovider.getDelegate(object.getClass()) : null;
+		if(accdel!=null)
 		{
-			IBeanAccessorDelegate accdel = delegateprovider.getDelegate(object.getClass());
-			try
-			{
-				ret = accdel.getPropertyValue(object, name);
-			}
-			catch (Exception e)
-			{
-				throw new RuntimeException(e);
-			}
+			ret = accdel.getPropertyValue(object, name);
 		}
 		
 		else if (getGetter() != null)
@@ -239,9 +232,9 @@ public class BeanProperty
 	 */
 	public void setPropertyValue(Object object, Object value)
 	{
-		if (delegateprovider != null)
+		IBeanAccessorDelegate accdel = delegateprovider!=null ? delegateprovider.getDelegate(object.getClass()) : null;
+		if(accdel!=null)
 		{
-			IBeanAccessorDelegate accdel = delegateprovider.getDelegate(object.getClass());
 			accdel.setPropertyValue(object, name, value);
 		}
 		else if (getGetter() != null)

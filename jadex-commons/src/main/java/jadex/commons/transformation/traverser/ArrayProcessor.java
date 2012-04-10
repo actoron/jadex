@@ -63,10 +63,10 @@ public class ArrayProcessor implements ITraverseProcessor
 	{
 		Object ret = object;
 		
-		if(clone || targetcl!=null && !clazz.equals(SReflect.classForName0(clazz.getName(), targetcl)))
+		if(clone || targetcl!=null && !clazz.equals(SReflect.classForName0(SReflect.getClassName(clazz), targetcl)))
 		{
 			if(targetcl!=null)
-				clazz	= SReflect.classForName0(clazz.getName(), targetcl);
+				clazz	= SReflect.classForName0(SReflect.getClassName(clazz), targetcl);
 			
 			int length = Array.getLength(object);
 			Class type = clazz.getComponentType();

@@ -82,7 +82,7 @@ public class BeanProcessor implements ITraverseProcessor
 					if(val!=null) 
 					{
 						Object newval = traverser.traverse(val, prop.getType(), cloned, processors, clone, targetcl, context);
-						if(clone || val!=newval)
+						if(object!=ret || val!=newval)
 							prop.setPropertyValue(ret, newval);
 //							prop.getSetter().invoke(ret, new Object[]{newval});
 					}
@@ -100,7 +100,7 @@ public class BeanProcessor implements ITraverseProcessor
 	/**
 	 *  Get the object that is returned.
 	 */
-	public Object getReturnObject(Object object, Class clazz, boolean clone, ClassLoader targetcl)
+	public Object getReturnObject(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
 		Object ret = object;
 		if(clone || targetcl!=null && !clazz.equals(SReflect.classForName0(clazz.getName(), targetcl)))
@@ -108,9 +108,19 @@ public class BeanProcessor implements ITraverseProcessor
 			if(targetcl!=null)
 				clazz	= SReflect.classForName0(clazz.getName(), targetcl);
 			
+			Constructor	c;
+			
 			try
 			{
-				Constructor	c	= clazz.getDeclaredConstructors()[0];
+				c	= clazz.getConstructor(new Class[0]);
+			}
+			catch(NoSuchMethodException nsme)
+			{
+				c	= clazz.getDeclaredConstructors()[0];
+			}
+
+			try
+			{
 				c.setAccessible(true);
 				Class[] paramtypes = c.getParameterTypes();
 				Object[] paramvalues = new Object[paramtypes.length];

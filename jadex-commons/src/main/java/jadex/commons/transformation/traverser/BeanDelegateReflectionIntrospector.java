@@ -52,9 +52,9 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 	 */
 	public IBeanAccessorDelegate getDelegate(Class clazz)
 	{
-		IBeanAccessorDelegate ret = delegates.get(clazz);
-		if (ret == null)
+		if(!delegates.containsKey(clazz))
 		{
+			IBeanAccessorDelegate	ret	= null;
 			Map properties = getBeanProperties(clazz, true);
 			ClassLoader cl = clazz.getClassLoader();
 			ClassPool pool = new ClassPool(null);
@@ -62,7 +62,7 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 			pool.insertClassPath(new ClassClassPath(clazz));
 			try
 			{
-				String accname = clazz.getPackage().getName() + "." + clazz + "AccessorDelegate";
+				String accname = clazz.getPackage().getName() + "." + clazz.getSimpleName() + "AccessorDelegate";
 				CtClass dclazz = pool.makeClass(accname);
 				CtClass dinterface = pool.get(IBeanAccessorDelegate.class.getName());
 				dclazz.addInterface(dinterface);
@@ -203,26 +203,26 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 				}
 				catch (CannotCompileException e)
 				{
-					//e.printStackTrace();
-					try
-					{
-						delegateclazz = SReflect.classForName(accname, clazz.getClassLoader());
-					}
-					catch(Exception e2)
-					{
-						throw new RuntimeException(e2);
-					}
+//					e.printStackTrace();
+//					try
+//					{
+						delegateclazz = SReflect.classForName0(accname, clazz.getClassLoader());
+//					}
+//					catch(Exception e2)
+//					{
+//						throw new RuntimeException(e2);
+//					}
 				}
-				ret = (IBeanAccessorDelegate) delegateclazz.newInstance();
-				delegates.put(clazz, ret);
+				ret = delegateclazz!=null ? (IBeanAccessorDelegate)delegateclazz.newInstance() : null;
 			}
 			catch(Exception e)
 			{
-				throw new RuntimeException(e);
+//				throw new RuntimeException(e);
 			}
+			delegates.put(clazz, ret);
 		}
 		
-		return ret;
+		return delegates.get(clazz);		
 	}
 	
 	/**
