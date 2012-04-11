@@ -40,8 +40,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -331,6 +334,33 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 				});
 			}
 		});
+		
+		Intent	intent	= getIntent();
+		if(intent!=null && Intent.ACTION_SEND.equals(intent.getAction()))
+		{
+			System.out.println("Intent: "+intent);
+			System.out.println("Type: "+intent.getType());
+			Bundle	extras	= intent.getExtras();
+			if(extras!=null)
+			{
+				String	text	= (String) extras.get(Intent.EXTRA_TEXT);
+				Uri	uri	= (Uri)extras.get(Intent.EXTRA_STREAM);
+				System.out.println("Text: "+text);	
+				System.out.println("Uri: "+uri);
+						 
+				// Convert the image URI to the direct file system path of the image file
+				String[]	proj	= new String[]{MediaStore.Images.Media.DATA};
+				Cursor cursor = managedQuery(uri,
+					proj,	// Which columns to return
+					null,	// WHERE clause; which rows to return (all rows)
+					null,	// WHERE clause selection arguments (none)
+					null);	// Order-by clause (ascending by name)
+				int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+				cursor.moveToFirst();
+				String	path	= cursor.getString(column_index);
+				System.out.println("Path: "+path);
+			}
+		}
 		
 		// Start the platform
 		bindService(new Intent(this, JadexPlatformService.class), new ServiceConnection()

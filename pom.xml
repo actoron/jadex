@@ -508,7 +508,7 @@
 			</build>
 			
 			<modules>
-				<module>jadex-libservice-maven</module>
+				<module>jadex-platform-extension-maven</module>
 			</modules>
 		</profile>
 		
@@ -652,7 +652,6 @@
 				<module>jadex-bridge</module>
 				<module>jadex-platform-base</module>
 				<module>jadex-nuggets</module>
-				<module>jadex-libservice-maven</module>
 
 				<module>jadex-kernel-base</module>
 				<module>jadex-kernel-component</module>
@@ -694,6 +693,7 @@
 				<module>jadex-platform-standalone-maven-launch</module>
 				<module>jadex-platform-relay-web</module>
 				<module>jadex-platform-extension-webservice</module>
+				<module>jadex-platform-extension-maven</module>
 				
 				<module>jadex-rules-eca</module>
 
