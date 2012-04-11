@@ -27,6 +27,9 @@ import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -826,14 +829,38 @@ public class ChatPanel extends JPanel
 			public void run()
 			{
 				PropertiesPanel pp = new PropertiesPanel();
-				final JTextField fn = pp.createTextField("Filename: ", "./"+filename);
+				JPanel fnp = new JPanel(new GridBagLayout());
+				final JTextField tfpath = new JTextField(".", 15);
+				JButton bupath = new JButton("...");
+				bupath.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						JFileChooser ch = new JFileChooser(tfpath.getText());
+						ch.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						if(JFileChooser.APPROVE_OPTION==ch.showOpenDialog(ChatPanel.this))
+						{
+							tfpath.setText(ch.getSelectedFile().getAbsolutePath());
+						}
+					}
+				});
+				bupath.setMargin(new Insets(0,0,0,0));
+//				JTextField tfname = new JTextField(filename, 15);
+				fnp.add(tfpath, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.WEST, 
+					GridBagConstraints.BOTH, new Insets(0,0,0,2),0,0));
+				fnp.add(bupath, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.WEST, 
+					GridBagConstraints.NONE, new Insets(0,2,0,0),0,0));
+//				fnp.add(tfname, new GridBagConstraints(2,0,1,1,1,1,GridBagConstraints.WEST, 
+//					GridBagConstraints.BOTH, new Insets(0,2,0,2),0,0));
+				pp.addComponent("File path: ", fnp);
+				final JTextField tfname = pp.createTextField("File name: ", filename, true);
 				pp.createTextField("Size [bytes]: ", ""+size);
 				pp.createTextField("Sender: ", ""+(sender==null? sender: sender.getName()));
 				
 				if(0==JOptionPane.showOptionDialog(null, pp, "Incoming File Transfer", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Accept", "Reject"}, "Accept"))
 				{
-					ret.setResult(new File(fn.getText()));
+					ret.setResult(new File(tfpath.getText()+File.separatorChar+tfname.getText()));
 				}
 				else
 				{
