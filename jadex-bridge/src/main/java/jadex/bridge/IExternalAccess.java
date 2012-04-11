@@ -1,6 +1,5 @@
 package jadex.bridge;
 
-import java.util.Collection;
 import java.util.Map;
 
 import jadex.bridge.modelinfo.IExtensionInstance;

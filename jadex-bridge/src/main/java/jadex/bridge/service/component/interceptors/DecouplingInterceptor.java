@@ -244,8 +244,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		}
 		else
 		{
-//			if(sic.getMethod().getName().equals("add"))
-//				System.out.println("decouple: "+Thread.currentThread());
+			if(sic.getMethod().getName().equals("getServiceProxies"))
+				System.out.println("decouple: "+Thread.currentThread());
 			ea.scheduleStep(new InvokeMethodStep(sic, IComponentIdentifier.LOCAL.get()))
 				.addResultListener(new CopyReturnValueResultListener(ret, sic));
 		}

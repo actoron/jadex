@@ -14,6 +14,7 @@ import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
@@ -615,9 +616,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param cid Component target id.
 	 *  @return External access of remote component. 
 	 */
-	public IFuture<Object> getExternalAccessProxy(final IComponentIdentifier cid)
+	public IFuture<IExternalAccess> getExternalAccessProxy(final IComponentIdentifier cid)
 	{
-		final Future<Object> ret = new Future<Object>();
+		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		component.scheduleStep(new IComponentStep<Object>()
 		{
@@ -625,11 +626,11 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			public IFuture<Object> execute(IInternalAccess ia)
 			{
 				final Future<Object> fut = new Future<Object>();
-				ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(fut)
-				{
-					public void customResultAvailable(IComponentManagementService cms)
-					{
+//				ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//					.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Object>(fut)
+//				{
+//					public void customResultAvailable(IComponentManagementService cms)
+//					{
 						// Hack! create remote rms cid with "rms" assumption.
 //						IComponentIdentifier rrms = cms.createComponentIdentifier("rms@"+cid.getPlatformName(), false, cid.getAddresses());
 						IComponentIdentifier rrms = new ComponentIdentifier("rms@"+cid.getPlatformName(), cid.getAddresses());
@@ -637,12 +638,18 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 						
 						sendMessage(rrms, content, callid, -1, fut);
-					}
-				});
+//					}
+//				});
 				
 				return fut;
 			}
-		}).addResultListener(new DelegationResultListener<Object>(ret));
+		}).addResultListener(new ExceptionDelegationResultListener<Object, IExternalAccess>(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				ret.setResult((IExternalAccess) result);
+			}
+		});
 		
 		return ret;
 	}

@@ -11,6 +11,7 @@ import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -487,21 +488,43 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 			return new Future<T>(new ComponentTerminatedException(id));
 
 		final Future<T> ret = new Future<T>();
-		SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
-			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
+		// Local?
+//		if(cid.getPlatformName().equals(id.getPlatformName()))
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
+				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
 			{
-				cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+				public void customResultAvailable(IComponentManagementService cms)
 				{
-					public void customResultAvailable(IExternalAccess ea)
+					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
 					{
-						SServiceProvider.getDeclaredService(ea.getServiceProvider(), type)
-							.addResultListener(new DelegationResultListener<T>(ret));
-					}
-				});
-			}
-		});
+						public void customResultAvailable(IExternalAccess ea)
+						{
+							SServiceProvider.getDeclaredService(ea.getServiceProvider(), type)
+								.addResultListener(new DelegationResultListener<T>(ret));
+						}
+					});
+				}
+			});
+		}
+//		else
+//		{
+//			SServiceProvider.getServiceUpwards(this, IRemoteServiceManagementService.class)
+//				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService cms)
+//				{
+//					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
+//					{
+//						public void customResultAvailable(IExternalAccess ea)
+//						{
+//							SServiceProvider.getDeclaredService(ea.getServiceProvider(), type)
+//								.addResultListener(new DelegationResultListener<T>(ret));
+//						}
+//					});
+//				}
+//			});
+//		}
 		return ret;
 	}
 

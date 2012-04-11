@@ -1709,14 +1709,22 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		if(isRemoteComponent(cid))
 		{
 //			System.out.println("getExternalAccess: remote");
-			getRemoteCMS(cid).addResultListener(createResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+			agent.getServiceContainer().searchService(IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IExternalAccess>(ret)
 			{
-				public void customResultAvailable(IComponentManagementService rcms)
+				public void customResultAvailable(IRemoteServiceManagementService rms)
 				{
-					rcms.getExternalAccess(cid).addResultListener(
-						createResultListener(new DelegationResultListener<IExternalAccess>(ret)));
+					rms.getExternalAccessProxy(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 				}
-			}));
+			});
+	
+	//		getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+	//		{
+	//			public void customResultAvailable(IComponentManagementService rcms)
+	//			{
+	//				rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+	//			}
+	//		});
 		}
 		else
 		{

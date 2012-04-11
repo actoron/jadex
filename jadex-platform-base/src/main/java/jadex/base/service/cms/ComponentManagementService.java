@@ -1865,13 +1865,22 @@ public abstract class ComponentManagementService extends BasicService implements
 		if(isRemoteComponent(cid))
 		{
 //			System.out.println("getExternalAccess: remote");
-			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+			SServiceProvider.getService(exta.getServiceProvider(), IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, IExternalAccess>(ret)
 			{
-				public void customResultAvailable(IComponentManagementService rcms)
+				public void customResultAvailable(IRemoteServiceManagementService rms)
 				{
-					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+					rms.getExternalAccessProxy(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
 				}
 			});
+
+//			getRemoteCMS(cid).addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IExternalAccess>(ret)
+//			{
+//				public void customResultAvailable(IComponentManagementService rcms)
+//				{
+//					rcms.getExternalAccess(cid).addResultListener(new DelegationResultListener<IExternalAccess>(ret));
+//				}
+//			});
 		}
 		else
 		{
