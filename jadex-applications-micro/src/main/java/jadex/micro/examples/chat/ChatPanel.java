@@ -228,15 +228,24 @@ public class ChatPanel extends JPanel
 					{
 						if(JFileChooser.APPROVE_OPTION==chooser.showOpenDialog(ChatPanel.this))
 						{
-							sendFile(chooser.getSelectedFile(), cid).addResultListener(new IResultListener<Void>()
+							final File file = chooser.getSelectedFile();
+							final FileInfo fi = new FileInfo(file, cid, file.length(), 0, FileInfo.WAITING);
+							sendFile(fi, cid).addResultListener(new IResultListener<Void>()
 							{
 								public void resultAvailable(Void result)
 								{
-									System.out.println("transferred file");
+									fi.setState(FileInfo.COMPLETED);
+									updateUpload(fi);
+//									System.out.println("transferred file");
 								}
 								public void exceptionOccurred(Exception exception)
 								{
-									System.out.println("ex: "+exception.getMessage());
+									if(exception instanceof RuntimeException && ((RuntimeException)exception).getMessage().equals("Rejected"))
+										fi.setState(FileInfo.REJECTED);
+									else
+										fi.setState(FileInfo.ERROR);
+									updateUpload(fi);
+//									System.out.println("ex: "+exception.getMessage());
 								}
 							});
 						}
@@ -632,7 +641,7 @@ public class ChatPanel extends JPanel
 	/**
 	 * 
 	 */
-	protected IFuture<Void> sendFile(final File file, final IComponentIdentifier cid)
+	protected IFuture<Void> sendFile(final FileInfo fi, final IComponentIdentifier cid)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
@@ -645,6 +654,7 @@ public class ChatPanel extends JPanel
 				{
 					public void customResultAvailable(IChatService cs)
 					{
+						final File file = fi.getFile();
 						final ServiceOutputConnection ocon = new ServiceOutputConnection();
 						final IInputConnection icon = ocon.getInputConnection();
 						final long size = file.length();
@@ -658,7 +668,7 @@ public class ChatPanel extends JPanel
 								if(!started[0])
 								{
 									started[0] = true;
-									send(file, ocon, cid);//.addResultListener(new DelegationResultListener<Void>(ret));
+									send(fi, ocon, cid);//.addResultListener(new DelegationResultListener<Void>(ret));
 								}
 							}
 							
@@ -676,7 +686,7 @@ public class ChatPanel extends JPanel
 							
 							public void exceptionOccurred(Exception exception)
 							{
-								System.out.println("exception: "+exception);
+//								System.out.println("exception: "+exception);
 								ret.setException(exception);
 							}
 						});
@@ -693,13 +703,13 @@ public class ChatPanel extends JPanel
 	/**
 	 * 
 	 */
-	protected IFuture<Void> send(final File file, final IOutputConnection ocon, final IComponentIdentifier receiver)
+	protected IFuture<Void> send(final FileInfo fi, final IOutputConnection ocon, final IComponentIdentifier receiver)
 	{
 		final Future<Void> ret = new Future<Void>();
 		try
 		{
 			final long[] filesize = new long[1];
-			final FileInfo fi = new FileInfo(file, receiver, file.length(), 0, FileInfo.WAITING);
+			final File file = fi.getFile();
 			final FileInputStream fis = new FileInputStream(file);
 			
 			IComponentStep<Void> step = new IComponentStep<Void>()
@@ -788,13 +798,13 @@ public class ChatPanel extends JPanel
 				pp.createTextField("Sender: ", ""+(sender==null? sender: sender.getName()));
 				
 				if(0==JOptionPane.showOptionDialog(null, pp, "Incoming File Transfer", JOptionPane.YES_NO_OPTION,
-					JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Accept", "Cancel"}, "Accept"))
+					JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Accept", "Reject"}, "Accept"))
 				{
 					ret.setResult(new File(fn.getText()));
 				}
 				else
 				{
-					ret.setException(new RuntimeException("Denied"));
+					ret.setException(new RuntimeException("Rejected"));
 				}
 			}
 		});

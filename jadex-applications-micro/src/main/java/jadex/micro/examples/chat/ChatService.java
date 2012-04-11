@@ -225,7 +225,8 @@ public class ChatService implements IChatService
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				
+				fi.setState(FileInfo.REJECTED);
+				chatpanel.updateDownload(fi);
 				ret.setException(exception);
 			}
 		});
