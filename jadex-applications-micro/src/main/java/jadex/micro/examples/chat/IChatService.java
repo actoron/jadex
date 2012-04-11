@@ -42,5 +42,5 @@ public interface IChatService
 	 *  @param filename The filename.
 	 *  @param con The connection.
 	 */
-	public ITerminableIntermediateFuture<Double> sendFile(String filename, long size, IInputConnection con);
+	public ITerminableIntermediateFuture<Long> sendFile(String filename, long size, IInputConnection con);
 }

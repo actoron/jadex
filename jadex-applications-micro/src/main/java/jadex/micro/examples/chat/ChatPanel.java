@@ -9,7 +9,7 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -18,7 +18,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
@@ -35,7 +34,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -47,20 +45,21 @@ import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelListener;
@@ -106,6 +105,18 @@ public class ChatPanel extends JPanel
 	/** The dead users determined during a request. */
 	protected Set<IComponentIdentifier>	deadusers;
 	
+	/** The downloads. */
+	protected Map<Integer, FileInfo> downloads;
+	
+	/** The uploads. */
+	protected Map<Integer, FileInfo> uploads;
+
+	/** The download table. */
+	protected JTable dtable;
+	
+	/** The upload table. */
+	protected JTable utable;
+	
 	//-------- constructors --------
 	
 	/**
@@ -116,6 +127,58 @@ public class ChatPanel extends JPanel
 		this.agent	= agent;
 		this.clock	= clock;
 		this.users	= new LinkedHashMap<IComponentIdentifier, ChatUser>();
+		this.downloads = new LinkedHashMap<Integer, FileInfo>();
+		this.uploads = new LinkedHashMap<Integer, FileInfo>();
+		
+		DefaultTableCellRenderer userrend = new DefaultTableCellRenderer()
+		{
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
+			{
+				super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+				IComponentIdentifier	cid	= (IComponentIdentifier)value;
+				this.setText(cid.getName());
+				this.setToolTipText("State: "+users.get(cid));
+				Icon	icon	= users.get(cid).getIcon();
+				this.setIcon(icon);
+				return this;
+			}
+		};
+		
+		DefaultTableCellRenderer cidrend = new DefaultTableCellRenderer()
+		{
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
+			{
+				super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+				IComponentIdentifier	cid	= (IComponentIdentifier)value;
+				this.setText(cid.getName());
+				this.setToolTipText(SUtil.arrayToString(cid.getAddresses()));
+				return this;
+			}
+		};
+		
+		DefaultTableCellRenderer filecellrend = new DefaultTableCellRenderer()
+		{
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
+			{
+				super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+				File f = (File)value;
+				this.setText(f.getName());
+				this.setToolTipText(f.getAbsolutePath());
+				return this;
+			}
+		};
+		DefaultTableCellRenderer progressrend = new DefaultTableCellRenderer()
+		{
+			JProgressBar bar = new JProgressBar(0,100);
+			{
+				bar.setStringPainted(true);
+			}
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
+			{
+				bar.setValue((int)(((Double)value).doubleValue()*100));
+				return bar;
+			}
+		};
 		
 		chatarea = new JTextArea(10, 30)
 		{
@@ -130,19 +193,7 @@ public class ChatPanel extends JPanel
 		
 		table	= new JTable(new UserTableModel());
 		JScrollPane userpan = new JScrollPane(table);
-		table.getColumnModel().getColumn(0).setCellRenderer(new DefaultTableCellRenderer()
-		{
-			public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
-			{
-				super.getTableCellRendererComponent(table, value, selected, focus, row, column);
-				IComponentIdentifier	cid	= (IComponentIdentifier)value;
-				this.setText(cid.getName());
-				this.setToolTipText("State: "+users.get(cid));
-				Icon	icon	= users.get(cid).getIcon();
-				this.setIcon(icon);
-				return this;
-			}
-		});
+		table.getColumnModel().getColumn(0).setCellRenderer(userrend);
 
 		final JFileChooser chooser = new JFileChooser(".");
 		MouseListener lis = new MouseAdapter()
@@ -263,9 +314,41 @@ public class ChatPanel extends JPanel
 		JSplitPanel	split	= new JSplitPanel(JSplitPanel.HORIZONTAL_SPLIT, listpan, main);
 		split.setOneTouchExpandable(true);
 		split.setDividerLocation(0.3);
+		
+		JPanel msgpane = new JPanel(new BorderLayout());
+		msgpane.add(split, BorderLayout.CENTER);
+		msgpane.add(south, BorderLayout.SOUTH);
+		
+//		JSplitPanel udpane = new JSplitPanel(JSplitPanel.VERTICAL_SPLIT);
+		dtable = new JTable(new FileTableModel(true));
+		utable = new JTable(new FileTableModel(false));
+//		dtable.setPreferredSize(new Dimension(400, 100));
+//		utable.setPreferredSize(new Dimension(400, 100));
+		JScrollPane dtpan = new JScrollPane(dtable);
+		JScrollPane utpan = new JScrollPane(utable);
+//		dtpan.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Downloads"));
+//		utpan.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Uploads"));
+//		udpane.add(dtpan);
+//		udpane.add(utpan);
+//		udpane.add(dtable);
+//		udpane.add(utable);
+//		udpane.setOneTouchExpandable(true);
+//		udpane.setDividerLocation(0.5);
+		
+		dtable.getColumnModel().getColumn(0).setCellRenderer(filecellrend);
+		dtable.getColumnModel().getColumn(1).setCellRenderer(cidrend);
+		dtable.getColumnModel().getColumn(4).setCellRenderer(progressrend);
+		utable.getColumnModel().getColumn(0).setCellRenderer(filecellrend);
+		utable.getColumnModel().getColumn(1).setCellRenderer(cidrend);
+		utable.getColumnModel().getColumn(4).setCellRenderer(progressrend);
+		
+		JTabbedPane tpane = new JTabbedPane();
+		tpane.add("Messaging", msgpane);
+		tpane.add("Downloads", dtpan);
+		tpane.add("Uploads", utpan);
+		
 		this.setLayout(new BorderLayout());
-		this.add(split, BorderLayout.CENTER);
-		this.add(south, BorderLayout.SOUTH);
+		this.add(tpane, BorderLayout.CENTER);
 		
 		// Post availability, also gets list of initial users.
 		postStatus(IChatService.STATE_IDLE);
@@ -562,50 +645,41 @@ public class ChatPanel extends JPanel
 				{
 					public void customResultAvailable(IChatService cs)
 					{
-						try
+						final ServiceOutputConnection ocon = new ServiceOutputConnection();
+						final IInputConnection icon = ocon.getInputConnection();
+						final long size = file.length();
+						
+						ITerminableIntermediateFuture<Long> fut = cs.sendFile(file.getName(), size, icon);
+						final boolean[] started = new boolean[1];
+						fut.addResultListener(new IIntermediateResultListener<Long>()
 						{
-							final ServiceOutputConnection ocon = new ServiceOutputConnection();
-							final IInputConnection icon = ocon.getInputConnection();
-							final InputStream is = new FileInputStream(file);
-							
-							ITerminableIntermediateFuture<Double> fut = cs.sendFile(file.getName(), is.available(), icon);
-							final boolean[] started = new boolean[1];
-							fut.addResultListener(new IIntermediateResultListener<Double>()
+							public void intermediateResultAvailable(Long result)
 							{
-								public void intermediateResultAvailable(Double result)
+								if(!started[0])
 								{
-									if(!started[0])
-									{
-										started[0] = true;
-										send(is, ocon);//.addResultListener(new DelegationResultListener<Void>(ret));
-									}
-									System.out.println("percent done: "+result.doubleValue());
+									started[0] = true;
+									send(file, ocon, cid);//.addResultListener(new DelegationResultListener<Void>(ret));
 								}
-								
-								public void finished()
-								{
-									System.out.println("sending finished");
-									ret.setResult(null);
-								}
-								
-								public void resultAvailable(Collection<Double> result)
-								{
-									System.out.println("result");
-									ret.setResult(null);
-								}
-								
-								public void exceptionOccurred(Exception exception)
-								{
-									System.out.println("exception: "+exception);
-									ret.setException(exception);
-								}
-							});
-						}
-						catch(Exception e)
-						{
-							e.printStackTrace();
-							ret.setExceptionIfUndone(e);
-						}
+							}
+							
+							public void finished()
+							{
+//								System.out.println("sending finished");
+								ret.setResult(null);
+							}
+							
+							public void resultAvailable(Collection<Long> result)
+							{
+//								System.out.println("result");
+								ret.setResult(null);
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								System.out.println("exception: "+exception);
+								ret.setException(exception);
+							}
+						});
 					}
 				}));
 				
@@ -619,62 +693,80 @@ public class ChatPanel extends JPanel
 	/**
 	 * 
 	 */
-	protected IFuture<Void> send(final InputStream is, final IOutputConnection ocon)
+	protected IFuture<Void> send(final File file, final IOutputConnection ocon, final IComponentIdentifier receiver)
 	{
 		final Future<Void> ret = new Future<Void>();
-		
-		final long[] filesize = new long[1];
-		
-		IComponentStep<Void> step = new IComponentStep<Void>()
+		try
 		{
-			public IFuture<Void> execute(IInternalAccess ia)
+			final long[] filesize = new long[1];
+			final FileInfo fi = new FileInfo(file, receiver, file.length(), 0, FileInfo.WAITING);
+			final FileInputStream fis = new FileInputStream(file);
+			
+			IComponentStep<Void> step = new IComponentStep<Void>()
 			{
-				try
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					final IComponentStep<Void> self = this;
-					int size = Math.min(200000, is.available());
-					filesize[0] += size;
-					byte[] buf = new byte[size];
-					int read = 0;
-					while(read!=buf.length)
+					try
 					{
-						read += is.read(buf, read, buf.length-read);
+						
+						final IComponentStep<Void> self = this;
+						int size = Math.min(200000, fis.available());
+						filesize[0] += size;
+						byte[] buf = new byte[size];
+						int read = 0;
+						while(read!=buf.length)
+						{
+							read += fis.read(buf, read, buf.length-read);
+						}
+						ocon.write(buf);
+//						System.out.println("wrote: "+size);
+						
+						fi.setState(FileInfo.TRANSFERRING);
+						fi.setDone(filesize[0]);
+						updateUpload(fi);
+						if(fis.available()>0)
+						{
+							ia.waitForDelay(1000, self);
+	//						agent.scheduleStep(self);
+	//						ocon.waitForReady().addResultListener(new IResultListener<Void>()
+	//						{
+	//							public void resultAvailable(Void result)
+	//							{
+	//								agent.scheduleStep(self);
+	////												agent.waitFor(10, self);
+	//							}
+	//							public void exceptionOccurred(Exception exception)
+	//							{
+	//								exception.printStackTrace();
+	//								ocon.close();
+	//							}
+	//						});
+						}
+						else
+						{
+							ocon.close();
+							fi.setState(FileInfo.COMPLETED);
+							updateUpload(fi);
+							ret.setResult(null);
+						}
 					}
-					ocon.write(buf);
-					System.out.println("wrote: "+size);
-					if(is.available()>0)
+					catch(Exception e)
 					{
-						agent.scheduleStep(self);
-//						ocon.waitForReady().addResultListener(new IResultListener<Void>()
-//						{
-//							public void resultAvailable(Void result)
-//							{
-//								agent.scheduleStep(self);
-////												agent.waitFor(10, self);
-//							}
-//							public void exceptionOccurred(Exception exception)
-//							{
-//								exception.printStackTrace();
-//								ocon.close();
-//							}
-//						});
+						fi.setState(FileInfo.ERROR);
+						updateUpload(fi);
+						e.printStackTrace();
+						ret.setException(e);
 					}
-					else
-					{
-						ocon.close();
-						ret.setResult(null);
-					}
+					
+					return IFuture.DONE;
 				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-					ret.setException(e);
-				}
-				
-				return IFuture.DONE;
-			}
-		};
-		agent.scheduleStep(step);
+			};
+			agent.scheduleStep(step);
+		}
+		catch(Exception e)
+		{
+			ret.setExceptionIfUndone(e);
+		}
 		
 		return ret;
 	}
@@ -708,6 +800,34 @@ public class ChatPanel extends JPanel
 		});
 	
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	public void updateDownload(final FileInfo fi)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				((FileTableModel)dtable.getModel()).updateFile(fi);
+			}
+		});
+	}
+	
+	/**
+	 * 
+	 */
+	public void updateUpload(final FileInfo fi)
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				((FileTableModel)utable.getModel()).updateFile(fi);
+			}
+		});
 	}
 	
 	//-------- helper classes --------
@@ -757,4 +877,120 @@ public class ChatPanel extends JPanel
 		}
 	}
 	
+	/**
+	 *  Table model for up/downloads.
+	 */
+	public class FileTableModel	extends DefaultTableModel
+	{
+		protected boolean down;
+		protected String[]	columns;
+
+		public FileTableModel(boolean down)
+		{
+			this.down = down;
+			columns = new String[]{"Name", down? "Sender": "Receiver", "Size", "Done", "%", "State"};
+		}
+
+		protected JTable getTable()
+		{
+			return down? dtable: utable;
+		}
+		protected Map<Integer, FileInfo> getDataMap()
+		{
+			return down? downloads: uploads;
+		}
+		public int getColumnCount()
+		{
+			return columns.length;
+		}
+		public String getColumnName(int i)
+		{
+			return columns[i];
+		}
+		public Class<?> getColumnClass(int i)
+		{
+			return String.class;
+		}
+		public int getRowCount()
+		{
+			return getDataMap().size();
+		}
+		public Object getValueAt(int row, int column)
+		{
+			Object ret;
+			FileInfo[] files = getDataMap().values().toArray(new FileInfo[getDataMap().size()]);
+			if(column==0)
+			{
+				ret = files[row].getFile();
+			}
+			else if(column==1)
+			{
+				ret = files[row].getSender();
+			}
+			else if(column==2)
+			{
+				ret = files[row].getSize();
+			}
+			else if(column==3)
+			{
+				ret = files[row].getDone();
+			}
+			else if(column==4)
+			{
+				ret = new Double(((double)files[row].getDone())/files[row].getSize());
+			}
+			else if(column==5)
+			{
+				ret = files[row].getState();
+			}
+			else
+			{
+				throw new RuntimeException("Unknown column");
+			}
+			return ret;
+		}
+		
+		public boolean isCellEditable(int row, int column)
+		{
+			return false;
+		}
+		public void setValueAt(Object val, int row, int column)
+		{
+		}
+		
+		public void addTableModelListener(TableModelListener l)
+		{
+		}
+		public void removeTableModelListener(TableModelListener l)
+		{
+		}
+		
+		public void updateFile(FileInfo fi)
+		{
+			FileInfo oldfi = getDataMap().put(fi.getId(), fi);
+//			if(oldfi!=null)
+//			{
+//				int row = 0;
+//				for(Iterator<Integer> it=downloads.keySet().iterator(); it.hasNext(); row++)
+//				{
+//					Integer nextid = it.next();
+//					if(nextid==oldfi.getId())
+//						break;
+//				}
+//				System.out.println("update old: "+row);
+//				fireTableRowsUpdated(row, row);
+////				fireTableDataChanged();
+//			}
+//			else
+//			{
+//				System.out.println("update new: "+(downloads.size()-1));
+//				fireTableRowsInserted(downloads.size()-1, downloads.size()-1);
+//			}
+			
+			fireTableDataChanged();
+			getTable().getParent().invalidate();
+			getTable().getParent().doLayout();
+			getTable().repaint();
+		}
+	}
 }

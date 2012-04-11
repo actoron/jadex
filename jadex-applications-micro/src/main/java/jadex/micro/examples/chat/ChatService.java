@@ -131,44 +131,41 @@ public class ChatService implements IChatService
 	 *  @param filename The filename.
 	 *  @param con The connection.
 	 */
-	public ITerminableIntermediateFuture<Double> sendFile(String filename, final long size, final IInputConnection con)
+	public ITerminableIntermediateFuture<Long> sendFile(String filename, final long size, final IInputConnection con)
 	{
-		final TerminableIntermediateFuture<Double> ret = new TerminableIntermediateFuture<Double>();
-		
-		IFuture<File> fut = chatpanel.acceptFile(filename, size, IComponentIdentifier.CALLER.get());
+		final TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
+		final IComponentIdentifier sender = IComponentIdentifier.CALLER.get();
+
+		final FileInfo fi = new FileInfo(new File(filename), sender, size, 0, FileInfo.WAITING);
+		chatpanel.updateDownload(fi);
+
+		// Check if user wants file
+		IFuture<File> fut = chatpanel.acceptFile(filename, size, sender);
 		fut.addResultListener(new IResultListener<File>()
 		{
 			public void resultAvailable(final File f)
 			{
 				try
 				{
+					fi.setFile(f);
+					chatpanel.updateDownload(fi);
 					final long[] cnt = new long[1];
 //					final File f = new File("./"+filename);
 					final FileOutputStream fos = new FileOutputStream(f);
 
 					// Enable sending
-					ret.addIntermediateResult(new Double(0));
+					ret.addIntermediateResult(new Long(0));
 					
 					ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
 					fut.addResultListener(agent.createResultListener(new IIntermediateResultListener<byte[]>()
 					{
 						public void resultAvailable(Collection<byte[]> result)
 						{
-							try
+							for(Iterator<byte[]> it=result.iterator(); it.hasNext(); )
 							{
-								for(Iterator<byte[]> it=result.iterator(); it.hasNext(); )
-								{
-									byte[] data = it.next();
-									cnt[0] += data.length;
-									fos.write(data);
-								}
-								finished();
+								intermediateResultAvailable(it.next());
 							}
-							catch(Exception e)
-							{
-								ret.setExceptionIfUndone(e);
-								e.printStackTrace();
-							}
+							finished();
 						}
 						
 						public void intermediateResultAvailable(byte[] result)
@@ -179,28 +176,34 @@ public class ChatService implements IChatService
 							try
 							{
 								fos.write(result);
+								fi.setState(FileInfo.TRANSFERRING);
+								fi.setDone(cnt[0]);
+								chatpanel.updateDownload(fi);
+								ret.addIntermediateResult(new Long(cnt[0]));
 							}
 							catch(Exception e)
 							{
+								fi.setState(FileInfo.ERROR);
+								chatpanel.updateDownload(fi);
 								ret.setExceptionIfUndone(e);
 								e.printStackTrace();
 							}
-							
-							ret.addIntermediateResult(new Double(((double)cnt[0])/size));
 						}
 						
 						public void finished()
 						{
-//							ret.addIntermediateResult(new Double(1));
-							
 							try
 							{
 								System.out.println("Received file: "+f.getAbsolutePath()+", size: "+cnt[0]);
 								fos.close();
+								fi.setState(FileInfo.COMPLETED);
+								chatpanel.updateDownload(fi);
 								ret.setFinished();
 							}
 							catch(Exception e)
 							{
+								fi.setState(FileInfo.ERROR);
+								chatpanel.updateDownload(fi);
 								ret.setExceptionIfUndone(e);
 								e.printStackTrace();
 							}
@@ -222,6 +225,7 @@ public class ChatService implements IChatService
 			
 			public void exceptionOccurred(Exception exception)
 			{
+				
 				ret.setException(exception);
 			}
 		});
