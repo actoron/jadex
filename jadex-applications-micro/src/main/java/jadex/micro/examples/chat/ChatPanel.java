@@ -12,12 +12,14 @@ import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.SUtil;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
@@ -240,10 +242,18 @@ public class ChatPanel extends JPanel
 								}
 								public void exceptionOccurred(Exception exception)
 								{
-									if(exception instanceof RuntimeException && ((RuntimeException)exception).getMessage().equals("Rejected"))
+									if(exception instanceof FutureTerminatedException || FileInfo.ABORTED.equals(exception.getMessage()))
+									{
+										fi.setState(FileInfo.ABORTED);
+									}
+									else if(FileInfo.REJECTED.equals(exception.getMessage()))
+									{	
 										fi.setState(FileInfo.REJECTED);
+									}
 									else
+									{
 										fi.setState(FileInfo.ERROR);
+									}
 									updateUpload(fi);
 //									System.out.println("ex: "+exception.getMessage());
 								}
@@ -350,6 +360,13 @@ public class ChatPanel extends JPanel
 		utable.getColumnModel().getColumn(0).setCellRenderer(filecellrend);
 		utable.getColumnModel().getColumn(1).setCellRenderer(cidrend);
 		utable.getColumnModel().getColumn(4).setCellRenderer(progressrend);
+		
+		CancelMouseAdapter dlis = new CancelMouseAdapter(dtable, agent);
+		CancelMouseAdapter ulis = new CancelMouseAdapter(utable, agent);
+		dtable.addMouseListener(dlis);
+		dtable.getTableHeader().addMouseListener(dlis);
+		utable.addMouseListener(ulis);
+		utable.getTableHeader().addMouseListener(ulis);
 		
 		JTabbedPane tpane = new JTabbedPane();
 		tpane.add("Messaging", msgpane);
@@ -639,7 +656,7 @@ public class ChatPanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Called from sender side to iniate a send action.
 	 */
 	protected IFuture<Void> sendFile(final FileInfo fi, final IComponentIdentifier cid)
 	{
@@ -659,12 +676,17 @@ public class ChatPanel extends JPanel
 						final IInputConnection icon = ocon.getInputConnection();
 						final long size = file.length();
 						
+						// Call chat service of receiver 
 						ITerminableIntermediateFuture<Long> fut = cs.sendFile(file.getName(), size, icon);
+						
 						final boolean[] started = new boolean[1];
+						
+						// Receives notifications how many bytes were received. 
 						fut.addResultListener(new IIntermediateResultListener<Long>()
 						{
 							public void intermediateResultAvailable(Long result)
 							{
+								// Start sending after first intermediate result was received
 								if(!started[0])
 								{
 									started[0] = true;
@@ -686,6 +708,7 @@ public class ChatPanel extends JPanel
 							
 							public void exceptionOccurred(Exception exception)
 							{
+								// Called when receiver terminates call via terminable future
 //								System.out.println("exception: "+exception);
 								ret.setException(exception);
 							}
@@ -701,7 +724,8 @@ public class ChatPanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Called from file sender.
+	 *  Writes bytes from file input stream to output connection.
 	 */
 	protected IFuture<Void> send(final FileInfo fi, final IOutputConnection ocon, final IComponentIdentifier receiver)
 	{
@@ -716,9 +740,16 @@ public class ChatPanel extends JPanel
 			{
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
+					// Stop transfer on error etc.
+					if(fi.isFinished())
+					{
+						ocon.close();
+						ret.setException(new RuntimeException(fi.getState()));
+						return IFuture.DONE;
+					}
+					
 					try
 					{
-						
 						final IComponentStep<Void> self = this;
 						int size = Math.min(200000, fis.available());
 						filesize[0] += size;
@@ -804,7 +835,7 @@ public class ChatPanel extends JPanel
 				}
 				else
 				{
-					ret.setException(new RuntimeException("Rejected"));
+					ret.setException(new RuntimeException(FileInfo.REJECTED));
 				}
 			}
 		});
@@ -841,6 +872,63 @@ public class ChatPanel extends JPanel
 	}
 	
 	//-------- helper classes --------
+	
+	/**
+	 * 
+	 */
+	public static class CancelMouseAdapter extends MouseAdapter
+	{
+		protected JTable table;
+		protected IExternalAccess agent;
+		
+		public CancelMouseAdapter(JTable table, IExternalAccess agent)
+		{
+			this.table = table;
+			this.agent = agent;
+		}
+		
+		public void mousePressed(MouseEvent e) 
+		{
+			trigger(e);
+		}
+
+		public void mouseReleased(MouseEvent e) 
+		{
+			trigger(e);
+		}
+		
+		protected void trigger(MouseEvent e)
+		{
+			if(e.isPopupTrigger()) 
+			{
+				int row = table.rowAtPoint(e.getPoint());
+				FileInfo fi = ((FileTableModel)table.getModel()).getValueAt(row);
+				createMenu(fi).show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
+		
+		protected JPopupMenu createMenu(final FileInfo fi)
+		{
+			final JPopupMenu menu = new JPopupMenu();
+			JMenuItem mi = new JMenuItem("Cancel transfer");
+			mi.addActionListener(new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					agent.scheduleStep(new IComponentStep<Void>()
+					{
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							fi.cancel();
+							return IFuture.DONE;
+						}
+					});
+				}
+			});
+			menu.add(mi);
+			return menu;
+		}
+	};
 	
 	/**
 	 *  Table model for list of users.
@@ -958,6 +1046,12 @@ public class ChatPanel extends JPanel
 				throw new RuntimeException("Unknown column");
 			}
 			return ret;
+		}
+		
+		public FileInfo getValueAt(int row)
+		{
+			FileInfo[] files = getDataMap().values().toArray(new FileInfo[getDataMap().size()]);
+			return files[row];
 		}
 		
 		public boolean isCellEditable(int row, int column)

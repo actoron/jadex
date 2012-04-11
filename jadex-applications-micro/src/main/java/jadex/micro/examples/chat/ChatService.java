@@ -137,6 +137,13 @@ public class ChatService implements IChatService
 		final IComponentIdentifier sender = IComponentIdentifier.CALLER.get();
 
 		final FileInfo fi = new FileInfo(new File(filename), sender, size, 0, FileInfo.WAITING);
+		fi.setCancelCommand(new Runnable()
+		{
+			public void run()
+			{
+				ret.terminate();
+			}
+		});
 		chatpanel.updateDownload(fi);
 
 		// Check if user wants file
@@ -156,7 +163,7 @@ public class ChatService implements IChatService
 					// Enable sending
 					ret.addIntermediateResult(new Long(0));
 					
-					ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
+					final ISubscriptionIntermediateFuture<byte[]> fut = ((IInputConnection)con).aread();
 					fut.addResultListener(agent.createResultListener(new IIntermediateResultListener<byte[]>()
 					{
 						public void resultAvailable(Collection<byte[]> result)
@@ -170,6 +177,14 @@ public class ChatService implements IChatService
 						
 						public void intermediateResultAvailable(byte[] result)
 						{
+							// Check if was aborted on receiver side
+							if(fi.isFinished())
+							{
+								ret.setFinishedIfUndone();
+								fut.terminate();
+								return;
+							}
+							
 							cnt[0] += result.length;
 			//				if(cnt[0]%1000==0)
 			//					System.out.println("bytes: "+cnt[0]);
@@ -179,7 +194,8 @@ public class ChatService implements IChatService
 								fi.setState(FileInfo.TRANSFERRING);
 								fi.setDone(cnt[0]);
 								chatpanel.updateDownload(fi);
-								ret.addIntermediateResult(new Long(cnt[0]));
+								boolean set = ret.addIntermediateResultIfUndone(new Long(cnt[0]));
+								// todo: close con?
 							}
 							catch(Exception e)
 							{
@@ -194,11 +210,21 @@ public class ChatService implements IChatService
 						{
 							try
 							{
-								System.out.println("Received file: "+f.getAbsolutePath()+", size: "+cnt[0]);
 								fos.close();
-								fi.setState(FileInfo.COMPLETED);
+								if(cnt[0]==size)
+								{
+									System.out.println("Received file: "+f.getAbsolutePath()+", size: "+cnt[0]);
+									fi.setState(FileInfo.COMPLETED);
+									boolean set = ret.setFinishedIfUndone();
+								}
+								else
+								{
+									fi.setState(FileInfo.ABORTED);
+									ret.setExceptionIfUndone(new RuntimeException(FileInfo.ABORTED));
+								}
 								chatpanel.updateDownload(fi);
-								ret.setFinished();
+								
+								// todo: close con?
 							}
 							catch(Exception e)
 							{

@@ -3,6 +3,7 @@ package jadex.micro.examples.chat;
 import java.io.File;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
  * 
@@ -36,6 +37,9 @@ public class FileInfo
 	
 	/** The state. */
 	protected String state;
+	
+	/** The cancel command. */
+	protected Runnable cancelcommand;
 
 	/**
 	 * @param file
@@ -157,9 +161,53 @@ public class FileInfo
 		{
 			throw new RuntimeException("Unknown state: "+state);
 		}
+		if(ERROR.equals(state))
+			System.out.println("herehhh");
 		this.state = state;
 	}
 
+	/**
+	 * 
+	 */
+	public void cancel()
+	{
+		if(!isFinished())
+		{
+			if(cancelcommand!=null)
+			{
+				cancelcommand.run();
+				cancelcommand = null;
+			}
+			setState(FileInfo.ABORTED);
+		}
+	}
+	
+//	/**
+//	 *  Get the cancel command.
+//	 *  @return the cancel command.
+//	 */
+//	public Runnable getCancelCommand()
+//	{
+//		return cancelcommand;
+//	}
+	
+	/**
+	 *  Set the cancel command.
+	 *  @param cancel command The cancel command to set.
+	 */
+	public void setCancelCommand(Runnable cancelcommand)
+	{
+		this.cancelcommand = cancelcommand;
+	}
+
+	/**
+	 * 
+	 */
+	public boolean isFinished()
+	{
+		return COMPLETED.equals(state) || ABORTED.equals(state) || ERROR.equals(state) || REJECTED.equals(state);
+	}
+	
 	/**
 	 * 
 	 */
