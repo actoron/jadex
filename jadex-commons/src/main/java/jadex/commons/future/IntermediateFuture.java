@@ -256,6 +256,33 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
     }
     
     /**
+     *  Declare that the future is finished.
+     */
+    public boolean setFinishedIfUndone()
+    {
+    	Collection	res;
+    	synchronized(this)
+		{
+        	if(isDone())
+        	{
+        		return false;
+        	}
+        	else
+        	{
+        		res	= getIntermediateResults();
+    			// Hack!!! Set results to avoid inconsistencies between super.result and this.results,
+        		// because getIntermediateResults() returns empty list when results==null.
+        		if(results==null)
+        		{
+        			results	= res;
+        		}
+        	}
+		}
+    	super.setResult(res);
+    	return true;
+    }
+    
+    /**
      *  Add a result listener.
      *  @param listsner The listener.
      */

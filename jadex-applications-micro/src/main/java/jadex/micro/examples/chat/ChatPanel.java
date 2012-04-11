@@ -65,6 +65,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -215,6 +216,7 @@ public class ChatPanel extends JPanel
 				if(e.isPopupTrigger()) 
 				{
 					int row = table.rowAtPoint(e.getPoint());
+					table.setRowSelectionInterval(row, row);
 					IComponentIdentifier cid = (IComponentIdentifier)((UserTableModel)table.getModel()).getValueAt(row, 0);
 					createMenu(cid).show(e.getComponent(), e.getX(), e.getY());
 				}
@@ -361,8 +363,8 @@ public class ChatPanel extends JPanel
 		utable.getColumnModel().getColumn(1).setCellRenderer(cidrend);
 		utable.getColumnModel().getColumn(4).setCellRenderer(progressrend);
 		
-		CancelMouseAdapter dlis = new CancelMouseAdapter(dtable, agent);
-		CancelMouseAdapter ulis = new CancelMouseAdapter(utable, agent);
+		FileTransferMouseAdapter dlis = new FileTransferMouseAdapter(dtable, agent);
+		FileTransferMouseAdapter ulis = new FileTransferMouseAdapter(utable, agent);
 		dtable.addMouseListener(dlis);
 		dtable.getTableHeader().addMouseListener(dlis);
 		utable.addMouseListener(ulis);
@@ -813,7 +815,7 @@ public class ChatPanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Open dialog and check if user wants to receive the file.
 	 */
 	public IFuture<File> acceptFile(final String filename, final long size, final IComponentIdentifier sender)
 	{
@@ -844,7 +846,7 @@ public class ChatPanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Update the fileinfo in the download area.
 	 */
 	public void updateDownload(final FileInfo fi)
 	{
@@ -858,7 +860,7 @@ public class ChatPanel extends JPanel
 	}
 	
 	/**
-	 * 
+	 *  Update the fileinfo in the upload area.
 	 */
 	public void updateUpload(final FileInfo fi)
 	{
@@ -874,14 +876,14 @@ public class ChatPanel extends JPanel
 	//-------- helper classes --------
 	
 	/**
-	 * 
+	 *  Mouse listener that allows to manipulate transfers.
 	 */
-	public static class CancelMouseAdapter extends MouseAdapter
+	public static class FileTransferMouseAdapter extends MouseAdapter
 	{
 		protected JTable table;
 		protected IExternalAccess agent;
 		
-		public CancelMouseAdapter(JTable table, IExternalAccess agent)
+		public FileTransferMouseAdapter(JTable table, IExternalAccess agent)
 		{
 			this.table = table;
 			this.agent = agent;
@@ -903,11 +905,11 @@ public class ChatPanel extends JPanel
 			{
 				int row = table.rowAtPoint(e.getPoint());
 				FileInfo fi = ((FileTableModel)table.getModel()).getValueAt(row);
-				createMenu(fi).show(e.getComponent(), e.getX(), e.getY());
+				createMenu(row, fi).show(e.getComponent(), e.getX(), e.getY());
 			}
 		}
 		
-		protected JPopupMenu createMenu(final FileInfo fi)
+		protected JPopupMenu createMenu(final int row, final FileInfo fi)
 		{
 			final JPopupMenu menu = new JPopupMenu();
 			JMenuItem mi = new JMenuItem("Cancel transfer");
@@ -926,6 +928,19 @@ public class ChatPanel extends JPanel
 				}
 			});
 			menu.add(mi);
+			if(fi.isFinished())
+			{
+				mi = new JMenuItem("Remove");
+				menu.add(mi);
+				mi.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						((FileTableModel)table.getModel()).removeRow(row);
+					}
+				});
+			}
+			
 			return menu;
 		}
 	};
@@ -978,7 +993,7 @@ public class ChatPanel extends JPanel
 	/**
 	 *  Table model for up/downloads.
 	 */
-	public class FileTableModel	extends DefaultTableModel
+	public class FileTableModel	extends AbstractTableModel
 	{
 		protected boolean down;
 		protected String[]	columns;
@@ -1053,7 +1068,13 @@ public class ChatPanel extends JPanel
 			FileInfo[] files = getDataMap().values().toArray(new FileInfo[getDataMap().size()]);
 			return files[row];
 		}
-		
+		public void removeRow(int row) 
+		{
+			FileInfo[] files = getDataMap().values().toArray(new FileInfo[getDataMap().size()]);
+			getDataMap().remove(files[row].getId());
+	        fireTableRowsDeleted(row, row);
+	        refresh();
+	    }
 		public boolean isCellEditable(int row, int column)
 		{
 			return false;
@@ -1090,7 +1111,11 @@ public class ChatPanel extends JPanel
 //				System.out.println("update new: "+(downloads.size()-1));
 //				fireTableRowsInserted(downloads.size()-1, downloads.size()-1);
 //			}
-			
+			refresh();
+		}
+		
+		public void refresh()
+		{
 			fireTableDataChanged();
 			getTable().getParent().invalidate();
 			getTable().getParent().doLayout();
