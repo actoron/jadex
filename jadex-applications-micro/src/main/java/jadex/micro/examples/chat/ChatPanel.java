@@ -748,7 +748,7 @@ public class ChatPanel extends JPanel
 			
 			IComponentStep<Void> step = new IComponentStep<Void>()
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
+				public IFuture<Void> execute(final IInternalAccess ia)
 				{
 					// Stop transfer on error etc.
 					if(fi.isFinished())
@@ -777,21 +777,22 @@ public class ChatPanel extends JPanel
 						updateUpload(fi);
 						if(fis.available()>0)
 						{
-							ia.waitForDelay(1000, self);
+//							ia.waitForDelay(1000, self);
 	//						agent.scheduleStep(self);
-	//						ocon.waitForReady().addResultListener(new IResultListener<Void>()
-	//						{
-	//							public void resultAvailable(Void result)
-	//							{
-	//								agent.scheduleStep(self);
-	////												agent.waitFor(10, self);
-	//							}
-	//							public void exceptionOccurred(Exception exception)
-	//							{
-	//								exception.printStackTrace();
-	//								ocon.close();
-	//							}
-	//						});
+							ocon.waitForReady().addResultListener(ia.createResultListener(new IResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+//									ia.waitForDelay(1000, self);
+									agent.scheduleStep(self);
+	//								agent.waitFor(10, self);
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									exception.printStackTrace();
+									ocon.close();
+								}
+							}));
 						}
 						else
 						{

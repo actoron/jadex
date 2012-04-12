@@ -305,7 +305,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 				}
 				else
 				{
+					System.out.println("readyfuture inited");
 					readyfuture = ret;
+					checkWaitForReady();
 				}
 				return IFuture.DONE;
 			}
@@ -321,8 +323,10 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	{
 		if(readyfuture!=null)
 		{
-			if(con.isInited() && sent.size()-maxsend>0 && !isStop() && !isClosed())
+			System.out.println("waitforready: "+con.isInited()+" "+(maxsend-sent.size())+" "+isStop()+" "+isClosed());
+			if(con.isInited() && maxsend-sent.size()>0 && !isStop() && !isClosed())
 			{
+				System.out.println("readyfuture fired");
 				Future<Void> ret = readyfuture;
 				readyfuture = null;
 				ret.setResult(null);
