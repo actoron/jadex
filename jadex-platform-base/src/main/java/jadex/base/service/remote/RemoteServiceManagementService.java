@@ -38,11 +38,13 @@ import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
+import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
@@ -142,7 +144,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	protected IMicroExternalAccess component;
 	
 	/** The map of waiting calls (callid -> future). */
-	protected Map<String, Future<Object>> waitingcalls;
+	protected Map<String, WaitingCallInfo> waitingcalls;
 	
 	/** The map of processing calls (callid -> terniable future). */
 	protected Map<String, Object> processingcalls;
@@ -194,7 +196,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		
 		this.component = component;
 		this.rrm = new RemoteReferenceModule(this, libservice, marshal);
-		this.waitingcalls = new HashMap<String, Future<Object>>();
+		this.waitingcalls = new HashMap<String, WaitingCallInfo>();
 		this.processingcalls = new HashMap<String, Object>();
 		this.terminationcommands = new LRU<String, Runnable>(100);
 		this.timer	= new Timer(true);
@@ -745,10 +747,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param callid The callid.
 	 *  @param future The future.
 	 */
-	public void putWaitingCall(String callid, Future<Object> future)
+	public void putWaitingCall(String callid, Future<Object> future, TimeoutTimerTask tt)
 	{
 		getRemoteReferenceModule().checkThread();
-		waitingcalls.put(callid, future);
+		waitingcalls.put(callid, new WaitingCallInfo(future, tt));
 	}
 	
 	/**
@@ -756,7 +758,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param callid The callid.
 	 *  @return The future.
 	 */
-	public Future<Object> getWaitingCall(String callid)
+	public WaitingCallInfo getWaitingCall(String callid)
 	{
 		getRemoteReferenceModule().checkThread();
 		return waitingcalls.get(callid);
@@ -767,7 +769,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param callid The callid.
 	 *  @return The future.
 	 */
-	public Future<Object> removeWaitingCall(String callid)
+	public WaitingCallInfo removeWaitingCall(String callid)
 	{
 		getRemoteReferenceModule().checkThread();
 		return waitingcalls.remove(callid);
@@ -831,7 +833,16 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		return rrm;
 	}
 	
-//	protected static Map errors = Collections.synchronizedMap(new LRU(200));
+	/**
+	 *  Get the timer.
+	 *  @return the timer.
+	 */
+	public Timer getTimer()
+	{
+		return timer;
+	}
+
+	//	protected static Map errors = Collections.synchronizedMap(new LRU(200));
 //	public Map interestingcalls = new HashMap();
 	/**
 	 *  Send the request message of a remote method invocation.
@@ -866,7 +877,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						{
 							final long timeout = to<=0? DEFAULT_TIMEOUT: to;
 							
-							putWaitingCall(callid, future);
+							final TimeoutTimerTask tt = new TimeoutTimerTask(timeout, future, callid, receiver, RemoteServiceManagementService.this); 
+							putWaitingCall(callid, future, tt);
+							
 							// Remove waiting call when future is done
 							future.addResultListener(new IResultListener<Object>()
 							{
@@ -880,6 +893,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 									ia.getLogger().info("Remote exception occurred: "+receiver+", "+exception.toString());
 								}
 							});
+							
 	//						System.out.println("Waitingcalls: "+waitingcalls.size());
 							
 							final Map<String, Object> msg = new HashMap<String, Object>();
@@ -942,33 +956,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 																{
 	//																System.out.println("sent: "+callid);
 																	// ok message could be sent.
-																	timer.schedule(new TimerTask()
-																	{
-																		public void run()
-																		{
-																			ia.getExternalAccess().scheduleStep(new IComponentStep<Void>()
-																			{
-																				public IFuture<Void> execute(IInternalAccess ia)
-																				{
-																					if(!future.isDone())
-																					{
-																						removeWaitingCall(callid);
-																						future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "+SUtil.arrayToString(msg.get(SFipa.RECEIVERS))+", "+callid)
-																						{
-																							public void printStackTrace()
-																							{
-																								Thread.dumpStack();
-																								super.printStackTrace();
-																							}
-																						}
-																						);
-																					}
-																					return IFuture.DONE;
-																				}
-																			});
-					//														System.out.println("timeout triggered: "+msg);
-																		}
-																	}, timeout);
+																	timer.schedule(tt, timeout);
 																}
 															});
 														}
@@ -999,6 +987,147 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	{
 		timer.cancel();
 		return super.shutdownService();
+	}
+	
+	/**
+	 * 
+	 */
+	public static class TimeoutTimerTask extends TimerTask
+	{
+		protected Future<?> future;
+		
+		protected String callid;
+		
+		protected IComponentIdentifier receiver;
+		
+		protected RemoteServiceManagementService rms;
+		
+		protected long timeout;
+		
+		/**
+		 * 
+		 */
+		public TimeoutTimerTask(long timeout, Future<?> future, String callid, 
+			IComponentIdentifier receiver, RemoteServiceManagementService rms)
+		{
+			this.timeout = timeout;
+			this.future = future;
+			this.callid = callid;
+			this.receiver = receiver;
+			this.rms = rms;
+		}
+		
+		/**
+		 * 
+		 */
+		public TimeoutTimerTask(TimeoutTimerTask tt)
+		{
+			this(tt.timeout, tt.future, tt.callid, tt.receiver, tt.rms);
+		}
+		
+		/**
+		 * 
+		 */
+		public void start()
+		{
+			rms.getTimer().schedule(this, timeout);
+		}
+
+		/**
+		 * 
+		 */
+		public void run()
+		{
+			rms.getComponent().scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					if(!future.isDone())
+					{
+						rms.removeWaitingCall(callid);
+						future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "
+							+receiver+", "+callid)
+						{
+							public void printStackTrace()
+							{
+								Thread.dumpStack();
+								super.printStackTrace();
+							}
+						}
+						);
+					}
+					return IFuture.DONE;
+				}
+			});
+//								System.out.println("timeout triggered: "+msg);
+		}
+	};
+
+	/**
+	 * 
+	 */
+	public static class WaitingCallInfo
+	{
+		/** The future. */
+		protected Future<Object> future;
+		
+		/** The timer task. */
+		protected TimeoutTimerTask timertask;
+
+		/**
+		 *  Create a new info.
+		 */
+		public WaitingCallInfo(Future<Object> future, TimeoutTimerTask timertask)
+		{
+			this.future = future;
+			this.timertask = timertask;
+		}
+
+		/**
+		 *  Get the future.
+		 *  @return the future.
+		 */
+		public Future<Object> getFuture()
+		{
+			return future;
+		}
+
+		/**
+		 *  Set the future.
+		 *  @param future The future to set.
+		 */
+		public void setFuture(Future<Object> future)
+		{
+			this.future = future;
+		}
+
+		/**
+		 *  Get the timertask.
+		 *  @return the timertask.
+		 */
+		public TimeoutTimerTask getTimerTask()
+		{
+			return timertask;
+		}
+
+		/**
+		 *  Set the timertask.
+		 *  @param timertask The timertask to set.
+		 */
+		public void setTimerTask(TimeoutTimerTask timertask)
+		{
+			this.timertask = timertask;
+		}
+		
+		/**
+		 * 
+		 */
+		public void refresh()
+		{
+			timertask.cancel();
+			timertask = new TimeoutTimerTask(timertask);
+			timertask.start();
+		}
 	}
 }
 

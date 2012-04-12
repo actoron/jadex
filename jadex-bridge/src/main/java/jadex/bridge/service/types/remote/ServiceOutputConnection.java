@@ -1,17 +1,25 @@
 package jadex.bridge.service.types.remote;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.TerminableFuture;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ *  A service output connection can be used to write data to a remote input connection.
+ *  For this purpose getInputConnection() has to be called and transferred to the
+ *  remote side.
  */
 public class ServiceOutputConnection implements IOutputConnection
 {
@@ -30,8 +38,12 @@ public class ServiceOutputConnection implements IOutputConnection
 	/** The ready future. */
 	protected Future<Void> readyfuture;
 	
+	/** The transfer future. */
+	protected ITerminableFuture<Void> transferfuture;
+
+	
 	/**
-	 * 
+	 *  Create a new connection.
 	 */
 	public ServiceOutputConnection()
 	{
@@ -155,11 +167,10 @@ public class ServiceOutputConnection implements IOutputConnection
 //
 //		InputConnection icon = new InputConnection(null, null, sicp.getConnectionId(), false, ich);
 //		OutputConnection ocon = new OutputConnection(null, null, sicp.getConnectionId(), true, och);
-
 	}
 	
 	/**
-	 * 
+	 *  Set the real output connection to the other side.
 	 */
 	protected void setOutputConnection(IOutputConnection ocon)
 	{
@@ -189,4 +200,119 @@ public class ServiceOutputConnection implements IOutputConnection
 			ocon.close();
 		}
 	}
+	
+	/**
+	 * 
+	 */
+	public ITerminableFuture<Void> writeFromInputStream(final InputStream is, final IExternalAccess agent)
+	{
+		final TerminableFuture<Void> ret = new TerminableFuture<Void>();
+		
+		if(ocon==null)
+		{
+			if(transferfuture==null)
+			{
+				transferfuture = ret;
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Must not be called twice."));
+			}
+		}
+		else
+		{
+			doWriteFromInputStream(is, agent).addResultListener(new DelegationResultListener<Void>(ret));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected IFuture<Void> doWriteFromInputStream(final InputStream is, final IExternalAccess agent)
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		try
+		{
+			final long[] cnt = new long[1];
+				
+			IComponentStep<Void> step = new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					// Stop transfer on stop
+					if(ret.isDone())
+					{
+						ocon.close();
+						return IFuture.DONE;
+					}
+					
+					try
+					{
+						final IComponentStep<Void> self = this;
+						int size = Math.min(200000, is.available());
+						cnt[0] += size;
+						byte[] buf = new byte[size];
+						int read = 0;
+						while(read!=buf.length)
+						{
+							read += is.read(buf, read, buf.length-read);
+						}
+						ocon.write(buf);
+//						System.out.println("wrote: "+size);
+						
+//						fi.setState(FileInfo.TRANSFERRING);
+//						fi.setDone(cnt[0]);
+//						updateUpload(fi);
+						
+						if(is.available()>0)
+						{
+							ia.waitForDelay(1000, self);
+	//						agent.scheduleStep(self);
+	//						ocon.waitForReady().addResultListener(new IResultListener<Void>()
+	//						{
+	//							public void resultAvailable(Void result)
+	//							{
+	//								agent.scheduleStep(self);
+	////												agent.waitFor(10, self);
+	//							}
+	//							public void exceptionOccurred(Exception exception)
+	//							{
+	//								exception.printStackTrace();
+	//								ocon.close();
+	//							}
+	//						});
+						}
+						else
+						{
+							ocon.close();
+//							fi.setState(FileInfo.COMPLETED);
+//							updateUpload(fi);
+							ret.setResult(null);
+						}
+					}
+					catch(Exception e)
+					{
+//						fi.setState(FileInfo.ERROR);
+//						updateUpload(fi);
+						e.printStackTrace();
+						ret.setException(e);
+					}
+					
+					return IFuture.DONE;
+				}
+			};
+			agent.scheduleStep(step);
+		
+		}
+		catch(Exception e)
+		{
+			ret.setExceptionIfUndone(e);
+		}
+		
+		return ret;
+	}
+	
 }

@@ -4,6 +4,7 @@ import jadex.base.service.remote.ExceptionInfo;
 import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.base.service.remote.RemoteServiceManagementService;
+import jadex.base.service.remote.RemoteServiceManagementService.WaitingCallInfo;
 import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
@@ -114,19 +115,20 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 //		if(methodname!=null && methodname.equals("getInputStream"))
 //			System.out.println("callid of getResult result: "+callid);
 		
-		Future future = (Future)rsms.getWaitingCall(callid);
+		WaitingCallInfo wci = rsms.getWaitingCall(callid);
 		
 //		Object call = rsms.interestingcalls.remove(callid);
 //		if(call!=null)
 //			System.out.println("here");
 		
-		if(future==null)
+		if(wci==null)
 		{
 			// NOP, ignore invocation results that arrive late.
 //			System.out.println("Unexpected result, no outstanding call for:" +callid);
 		}
 		else //if(!future.isDone())
 		{
+			Future future = wci.getFuture();
 			if(exceptioninfo!=null)
 			{
 				future.setExceptionIfUndone(exceptioninfo.recreateException());

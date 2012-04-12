@@ -1,7 +1,13 @@
 package jadex.base.service.remote.commands;
 
+import java.util.TimerTask;
+
 import jadex.base.service.remote.RemoteServiceManagementService;
+import jadex.base.service.remote.RemoteServiceManagementService.TimeoutTimerTask;
+import jadex.base.service.remote.RemoteServiceManagementService.WaitingCallInfo;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
@@ -51,19 +57,22 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 //		if(callid.equals(RemoteMethodInvocationHandler.debugcallid))
 //			System.out.println("debuggcallid");
 		
-		IntermediateFuture future = (IntermediateFuture)rsms.getWaitingCall(callid);
+		WaitingCallInfo wci = rsms.getWaitingCall(callid);
 		
 //		Object call = rsms.interestingcalls.remove(callid);
 //		if(call!=null)
 //			System.out.println("here");
 		
-		if(future==null)
+		if(wci==null)
 		{
 			// NOP, ignore invocation results that arrive late.
 //			System.out.println("Unexpected result, no outstanding call for:" +callid);
 		}
 		else //if(!future.isDone())
 		{
+			wci.refresh();
+			
+			IntermediateFuture future = (IntermediateFuture)wci.getFuture();
 			if(finished)
 			{
 				future.setFinished();
