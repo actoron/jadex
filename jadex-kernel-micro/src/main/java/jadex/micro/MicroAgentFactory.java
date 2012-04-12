@@ -26,6 +26,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 
+import java.lang.reflect.Modifier;
 import java.util.Map;
 
 /* $if !android $ */
@@ -286,9 +287,63 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	 *  @param The imports (if any).
 	 *  @return True, if startable (and loadable).
 	 */
-	public IFuture<Boolean> isStartable(String model, String[] imports, IResourceIdentifier rid)
+	public IFuture<Boolean> isStartable(final String model, final String[] imports, final IResourceIdentifier rid)
 	{
-		return isLoadable(model, imports, rid);
+		final Future<Boolean> ret = new Future<Boolean>();
+		
+		isLoadable(model, imports, rid).addResultListener(new DelegationResultListener<Boolean>(ret)
+		{
+			public void customResultAvailable(Boolean result)
+			{
+				if(!result.booleanValue())
+				{
+					ret.setResult(Boolean.FALSE);
+				}
+				else
+				{
+					loadModel(model, imports, rid).addResultListener(new ExceptionDelegationResultListener<IModelInfo, Boolean>(ret)
+					{
+						public void customResultAvailable(final IModelInfo mi) 
+						{
+							if(libservice!=null)
+							{
+								libservice.getClassLoader(rid)
+									.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Boolean>(ret)
+								{
+									public void customResultAvailable(ClassLoader cl)
+									{
+										try
+										{
+											Class<?> clazz = getMicroAgentClass(mi.getFullName()+"Agent", null, cl);
+											ret.setResult(!Modifier.isAbstract(clazz.getModifiers()));
+										}
+										catch(Exception e)
+										{
+											ret.setException(e);
+										}
+									}
+								});		
+							}
+							else
+							{
+								try
+								{
+									ClassLoader cl = getClass().getClassLoader();
+									Class<?> clazz = getMicroAgentClass(mi.getFullName()+"Agent", null, cl);
+									ret.setResult(!Modifier.isAbstract(clazz.getModifiers()));
+								}
+								catch(Exception e)
+								{
+									ret.setException(e);
+								}
+							}
+						}
+					});
+				}
+			}
+		});
+		
+		return ret;
 	}
 
 	/**

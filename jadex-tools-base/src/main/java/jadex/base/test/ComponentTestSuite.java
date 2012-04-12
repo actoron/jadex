@@ -142,50 +142,53 @@ public class ComponentTestSuite extends TestSuite
 					// rootcomp.getModel().getResourceIdentifier()
 					if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath, null).get(ts)).booleanValue())
 					{
-						try
+						if(((Boolean)SComponentFactory.isStartable(rootcomp, abspath, null).get(ts)).booleanValue())
 						{
-							IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath, null).get(ts);
-							boolean istest = false;
-							if(model!=null && model.getReport()==null)
+							try
 							{
-								IArgument[]	results	= model.getResults();
-								for(int i=0; !istest && i<results.length; i++)
+								IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath, null).get(ts);
+								boolean istest = false;
+								if(model!=null && model.getReport()==null)
 								{
-									if(results[i].getName().equals("testresults") && Testcase.class.equals(
-										results[i].getClazz().getType(libsrv.getClassLoader(model.getResourceIdentifier()).get(ts), model.getAllImports())))
+									IArgument[]	results	= model.getResults();
+									for(int i=0; !istest && i<results.length; i++)
 									{
-										istest	= true;
+										if(results[i].getName().equals("testresults") && Testcase.class.equals(
+											results[i].getClazz().getType(libsrv.getClassLoader(model.getResourceIdentifier()).get(ts), model.getAllImports())))
+										{
+											istest	= true;
+										}
 									}
 								}
-							}
-							if(istest)
-							{
-								addTest(new ComponentTest(cms, model));
-							}
-							else if(model.getReport()!=null)
-							{
-								addTest(new BrokenComponentTest(abspath, model.getReport()));
-							}
-						}
-						catch(final RuntimeException e)
-						{
-							addTest(new BrokenComponentTest(abspath, new IErrorReport()
-							{
-								public String getErrorText()
+								if(istest)
 								{
-									return "Error loading model: "+e;
+									addTest(new ComponentTest(cms, model));
 								}
-								
-								public String getErrorHTML()
+								else if(model.getReport()!=null)
 								{
-									return getErrorText();
+									addTest(new BrokenComponentTest(abspath, model.getReport()));
 								}
-								
-								public Map<String, String> getDocuments()
+							}
+							catch(final RuntimeException e)
+							{
+								addTest(new BrokenComponentTest(abspath, new IErrorReport()
 								{
-									return null;
-								}
-							}));							
+									public String getErrorText()
+									{
+										return "Error loading model: "+e;
+									}
+									
+									public String getErrorHTML()
+									{
+										return getErrorText();
+									}
+									
+									public Map<String, String> getDocuments()
+									{
+										return null;
+									}
+								}));							
+							}
 						}
 					}
 				}
