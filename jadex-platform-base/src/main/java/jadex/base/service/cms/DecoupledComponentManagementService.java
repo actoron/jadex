@@ -106,8 +106,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	/** The message service (cached to avoid using futures). */
 	protected IMessageService	msgservice;
 	
-	/** The marshal service (cached to avoid using futures). */
-	protected IMarshalService	marshalservice;
+//	/** The marshal service (cached to avoid using futures). */
+//	protected IMarshalService	marshalservice;
 	
 	/** The root component. */
 	protected IComponentAdapter root;
@@ -2309,12 +2309,12 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 					{
 						exeservice	= result;
 						
-						SServiceProvider.getService(agent.getServiceContainer(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
-						{
-							public void customResultAvailable(IMarshalService result)
-							{
-								marshalservice	= result;
+//						SServiceProvider.getService(agent.getServiceContainer(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//							.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
+//						{
+//							public void customResultAvailable(IMarshalService result)
+//							{
+//								marshalservice	= result;
 						
 								SServiceProvider.getService(agent.getServiceContainer(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 									.addResultListener(createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
@@ -2338,8 +2338,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 										}
 									}
 								}));
-							}
-						}));
+//							}
+//						}));
 					}
 				}));
 			}
@@ -2371,7 +2371,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		this.agent	= null;
 		this.factories	= null;
 		this.localtypes	= null;
-		this.marshalservice	= null;
+//		this.marshalservice	= null;
 		this.msgservice	= null;
 		
 		/*final Future ret = new Future();

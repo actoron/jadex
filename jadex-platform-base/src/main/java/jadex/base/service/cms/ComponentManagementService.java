@@ -100,8 +100,8 @@ public abstract class ComponentManagementService extends BasicService implements
 	/** The message service (cached to avoid using futures). */
 	protected IMessageService	msgservice;
 	
-	/** The marshal service (cached to avoid using futures). */
-	protected IMarshalService	marshalservice;
+//	/** The marshal service (cached to avoid using futures). */
+//	protected IMarshalService	marshalservice;
 	
 	/** The root component. */
 	protected IComponentAdapter root;
@@ -2558,12 +2558,12 @@ public abstract class ComponentManagementService extends BasicService implements
 							{
 								exeservice	= result;
 								
-								SServiceProvider.getService(exta.getServiceProvider(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
-								{
-									public void customResultAvailable(IMarshalService result)
-									{
-										marshalservice	= result;
+//								SServiceProvider.getService(exta.getServiceProvider(), IMarshalService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+//									.addResultListener(new ExceptionDelegationResultListener<IMarshalService, Void>(ret)
+//								{
+//									public void customResultAvailable(IMarshalService result)
+//									{
+//										marshalservice	= result;
 								
 										SServiceProvider.getService(exta.getServiceProvider(), IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 											.addResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
@@ -2590,8 +2590,8 @@ public abstract class ComponentManagementService extends BasicService implements
 												}
 											}
 										});
-									}
-								});
+//									}
+//								});
 //								boolean	setresult;
 //								synchronized(services)
 //								{
@@ -2633,7 +2633,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		this.exta	= null;
 		this.factories	= null;
 		this.localtypes	= null;
-		this.marshalservice	= null;
+//		this.marshalservice	= null;
 		this.msgservice	= null;
 		
 		shutdowned = true;
