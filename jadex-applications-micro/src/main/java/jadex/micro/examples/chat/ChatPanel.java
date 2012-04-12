@@ -719,6 +719,11 @@ public class ChatPanel extends JPanel
 							}
 						});
 					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						exception.printStackTrace();
+					}
 				}));
 				
 				return IFuture.DONE;

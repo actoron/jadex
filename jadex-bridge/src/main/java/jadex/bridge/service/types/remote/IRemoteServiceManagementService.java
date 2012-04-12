@@ -34,7 +34,7 @@ public interface IRemoteServiceManagementService extends IService
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public IFuture<Object> getServiceProxy(IComponentIdentifier cid, Class<?> service, String scope);
+	public <T> IFuture<T> getServiceProxy(IComponentIdentifier cid, Class<T> service, String scope);
 	
 	/**
 	 *  Get all service proxies from a remote component.
@@ -44,7 +44,7 @@ public interface IRemoteServiceManagementService extends IService
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public IFuture<Object> getServiceProxies(IComponentIdentifier cid, Class<?> service, String scope);
+	public <T> IFuture<T> getServiceProxies(IComponentIdentifier cid, Class<T> service, String scope);
 
 	/**
 	 *  Get all declared service proxies from a remote component.

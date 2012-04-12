@@ -1,8 +1,6 @@
 package jadex.base.service.remote;
 
 import jadex.base.service.message.InputConnection;
-import jadex.base.service.message.LocalInputConnectionHandler;
-import jadex.base.service.message.LocalOutputConnectionHandler;
 import jadex.base.service.message.MessageService;
 import jadex.base.service.message.OutputConnection;
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
@@ -566,18 +564,23 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public IFuture<Object> getServiceProxy(final IComponentIdentifier cid, final Class<?> service, String scope)
+	public <T> IFuture<T> getServiceProxy(final IComponentIdentifier cid, final Class<T> service, String scope)
 	{
-		Future<Object>	ret	= new Future<Object>();
+		final Future<T>	ret	= new Future<T>();
 		getServiceProxies(cid, SServiceProvider.getSearchManager(false, scope), SServiceProvider.getVisitDecider(true, scope), 
-			new TypeResultSelector(service, true)).addResultListener(new DelegationResultListener<Object>(ret)
+			new TypeResultSelector(service, true)).addResultListener(new ExceptionDelegationResultListener<Object, T>(ret)
 		{
 			public void customResultAvailable(Object result)
 			{
-				if(result!=null && !((Collection<Object>)result).isEmpty())
-					super.customResultAvailable(((Collection<Object>)result).iterator().next());
+				if(result!=null && !((Collection<?>)result).isEmpty())
+				{
+					Object	o	= ((Collection<?>)result).iterator().next();
+					ret.setResult((T)o);
+				}
 				else
+				{
 					super.exceptionOccurred(new ServiceNotFoundException("No proxy for service found: "+cid+", "+service.getName()));
+				}
 			}
 		});
 		return ret;
@@ -591,10 +594,21 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  @param scope	The search scope. 
 	 *  @return The service proxy.
 	 */
-	public IFuture<Object> getServiceProxies(IComponentIdentifier cid, Class<?> service, String scope)
+	public <T> IFuture<T> getServiceProxies(IComponentIdentifier cid, Class<T> service, String scope)
 	{
-		return getServiceProxies(cid, SServiceProvider.getSearchManager(true, scope), SServiceProvider.getVisitDecider(false, scope), 
-			new TypeResultSelector(service, true));
+		final Future<T>	ret	= new Future<T>();
+		
+		getServiceProxies(cid, SServiceProvider.getSearchManager(true, scope),
+				SServiceProvider.getVisitDecider(false, scope), new TypeResultSelector(service, true))
+			.addResultListener(new ExceptionDelegationResultListener<Object, T>(ret)
+		{
+			public void customResultAvailable(Object result)
+			{
+				ret.setResult((T)result);
+			}
+		});
+		
+		return ret;
 	}
 	
 	/**

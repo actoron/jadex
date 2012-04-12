@@ -161,7 +161,7 @@ public class FileInfo
 		{
 			throw new RuntimeException("Unknown state: "+state);
 		}
-		if(ERROR.equals(state))
+		if(ABORTED.equals(state))
 			System.out.println("herehhh");
 		this.state = state;
 	}

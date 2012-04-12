@@ -122,7 +122,8 @@ public class ChatService implements IChatService
 	 */
 	public IFuture<Void>	status(String status)
 	{
-		chatpanel.setUserState(IComponentIdentifier.CALLER.get(), status);
+		if(chatpanel!=null)	// is null for initial self-announcement.
+			chatpanel.setUserState(IComponentIdentifier.CALLER.get(), status);
 		return IFuture.DONE;		
 	}
 	

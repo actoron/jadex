@@ -489,7 +489,7 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 
 		final Future<T> ret = new Future<T>();
 		// Local?
-//		if(cid.getPlatformName().equals(id.getPlatformName()))
+		if(cid.getPlatformName().equals(id.getPlatformName()))
 		{
 			SServiceProvider.getServiceUpwards(this, IComponentManagementService.class)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
@@ -507,24 +507,18 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 				}
 			});
 		}
-//		else
-//		{
-//			SServiceProvider.getServiceUpwards(this, IRemoteServiceManagementService.class)
-//				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, T>(ret)
-//			{
-//				public void customResultAvailable(IComponentManagementService cms)
-//				{
-//					cms.getExternalAccess(cid).addResultListener(new ExceptionDelegationResultListener<IExternalAccess, T>(ret)
-//					{
-//						public void customResultAvailable(IExternalAccess ea)
-//						{
-//							SServiceProvider.getDeclaredService(ea.getServiceProvider(), type)
-//								.addResultListener(new DelegationResultListener<T>(ret));
-//						}
-//					});
-//				}
-//			});
-//		}
+		else
+		{
+			SServiceProvider.getService(this, IRemoteServiceManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new ExceptionDelegationResultListener<IRemoteServiceManagementService, T>(ret)
+			{
+				public void customResultAvailable(IRemoteServiceManagementService rms)
+				{
+					rms.getServiceProxy(cid, type, RequiredServiceInfo.SCOPE_LOCAL)
+						.addResultListener(new DelegationResultListener<T>(ret));
+				}
+			});
+		}
 		return ret;
 	}
 
