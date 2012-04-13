@@ -267,6 +267,7 @@ public class HttpRelayTransport implements ITransport
 		// Connection available or dead.
 		if(time!=null && time.longValue()!=0 && Math.abs(time.longValue())+ALIVETIME>System.currentTimeMillis())
 		{
+//			System.out.println("sending: "+task.hashCode());
 			IResultCommand<IFuture<Void>, Void>	send	= new IResultCommand<IFuture<Void>, Void>()
 			{
 				public IFuture<Void> execute(Void args)
@@ -282,6 +283,18 @@ public class HttpRelayTransport implements ITransport
 						// Connection dead.
 						ret	= new Future<Void>(new RuntimeException("No connection to "+address));
 					}
+					
+//					ret.addResultListener(new IResultListener<Void>()
+//					{
+//						public void resultAvailable(Void result)
+//						{
+//							System.out.println("sent: "+task.hashCode());
+//						}
+//						public void exceptionOccurred(Exception exception)
+//						{
+//							System.out.println("send failed: "+task.hashCode());
+//						}
+//					});
 					return ret;
 				}
 			};
@@ -291,6 +304,7 @@ public class HttpRelayTransport implements ITransport
 		// Ping required or already running.
 		else
 		{
+//			System.out.println("queueing: "+task.hashCode());
 			queueReadySendTask(address, task, time==null || time.longValue()!=0);
 		}
 	}

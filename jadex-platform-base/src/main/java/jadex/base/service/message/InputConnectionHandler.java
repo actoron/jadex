@@ -112,7 +112,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				// Send a close request
-				System.out.println("do close input side");
+//				System.out.println("do close input side");
 				
 				// Needs nothing to do with ack response.
 				sendAcknowledgedMessage(createTask(StreamSendTask.CLOSEREQ, null, null), StreamSendTask.CLOSEREQ)
@@ -147,25 +147,27 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 			{
 				if(!con.isClosed())
 				{
-					System.out.println("received: "+seqnumber);
-		
 					// If packet is the next one deliver to stream
 					// else store in map till the next one arrives
 					int expseqno = getSequenceNumber()+1;
 					if(seqnumber==expseqno)
 					{
+//						System.out.println("forwarding: "+seqnumber);
+						
 						forwardData(dat);
 						
 						// Forward possibly stored data
 						byte[] nextdata = data.remove(new Integer(getSequenceNumber()+1));
 						for(; nextdata!=null ;)
 						{
+//							System.out.println("forwarding stored: "+(getSequenceNumber()+1));
 							forwardData(nextdata);
 							nextdata = data.remove(new Integer(getSequenceNumber()+1));
 						}
 					}
 					else
 					{
+//						System.out.println("storing: "+seqnumber+", size="+data.size());
 						Object old = data.put(new Integer(seqnumber), dat);
 						// ack msg may be lost, repeat ack msg
 						if(old!=null)
@@ -265,7 +267,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		// Only send acks if new packets have arrived.
 		if(getSequenceNumber()>lastack)
 		{
-//			System.out.println("send ack: "+rseqno);
+//			System.out.println("send ack: "+Math.max(0, rseqno-ackcnt)+".."+rseqno);
 			// tuple contains seqno and stop flag
 			sendDataAck(Math.max(0, rseqno-ackcnt), rseqno, isStop());
 			lastack = rseqno;

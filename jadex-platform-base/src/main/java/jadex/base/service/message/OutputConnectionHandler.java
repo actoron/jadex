@@ -305,7 +305,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 				}
 				else
 				{
-					System.out.println("readyfuture inited");
+//					System.out.println("readyfuture inited");
 					readyfuture = ret;
 					checkWaitForReady();
 				}
@@ -326,7 +326,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			System.out.println("waitforready: "+con.isInited()+" "+(maxsend-sent.size())+" "+isStop()+" "+isClosed());
 			if(con.isInited() && maxsend-sent.size()>0 && !isStop() && !isClosed())
 			{
-				System.out.println("readyfuture fired");
+//				System.out.println("readyfuture fired");
 				Future<Void> ret = readyfuture;
 				readyfuture = null;
 				ret.setResult(null);
@@ -367,9 +367,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	 */
 	protected void sendStored()
 	{
-//		System.out.println("sendStored: "+sent.size());
-		
 		int allowed = maxsend-sent.size();
+		
+//		System.out.println("sendStored: sent="+sent.size()+", allowed="+allowed+", tosend="+tosend.size());
 		
 		// Only send data messages after init 
 		// but cannot use isSendAllowed() as

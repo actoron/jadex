@@ -158,7 +158,7 @@ public class RelayServlet extends HttpServlet
 				{
 					opencnt1++;
 				}
-				System.out.println("Entering GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
+//				System.out.println("Entering GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
 				
 				
 				PlatformInfo	info	= platforms.get(id);
@@ -272,7 +272,7 @@ public class RelayServlet extends HttpServlet
 				{
 					opencnt1--;
 				}
-				System.out.println("Leaving GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
+//				System.out.println("Leaving GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
 			}
 		}
 	}
@@ -286,7 +286,7 @@ public class RelayServlet extends HttpServlet
 		{
 			opencnt2++;
 		}
-		System.out.println("Entering POST request. opencnt="+opencnt2+", mapsize="+map.size());
+//		System.out.println("Entering POST request. opencnt="+opencnt2+", mapsize="+map.size());
 //		String	s;
 //		s	= request.getContextPath();
 //		s	= request.getPathInfo();
@@ -350,7 +350,7 @@ public class RelayServlet extends HttpServlet
 		{
 			opencnt2--;
 		}
-		System.out.println("Leaving POST request. opencnt="+opencnt2+", mapsize="+map.size());
+//		System.out.println("Leaving POST request. opencnt="+opencnt2+", mapsize="+map.size());
 	}
 	
 	//-------- helper methods --------
