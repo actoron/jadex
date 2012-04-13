@@ -777,22 +777,22 @@ public class ChatPanel extends JPanel
 						updateUpload(fi);
 						if(fis.available()>0)
 						{
-//							ia.waitForDelay(1000, self);
+							ia.waitForDelay(100, self);
 	//						agent.scheduleStep(self);
-							ocon.waitForReady().addResultListener(ia.createResultListener(new IResultListener<Void>()
-							{
-								public void resultAvailable(Void result)
-								{
-//									ia.waitForDelay(1000, self);
-									agent.scheduleStep(self);
-	//								agent.waitFor(10, self);
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									exception.printStackTrace();
-									ocon.close();
-								}
-							}));
+//							ocon.waitForReady().addResultListener(ia.createResultListener(new IResultListener<Void>()
+//							{
+//								public void resultAvailable(Void result)
+//								{
+////									ia.waitForDelay(1000, self);
+//									agent.scheduleStep(self);
+//	//								agent.waitFor(10, self);
+//								}
+//								public void exceptionOccurred(Exception exception)
+//								{
+//									exception.printStackTrace();
+//									ocon.close();
+//								}
+//							}));
 						}
 						else
 						{
