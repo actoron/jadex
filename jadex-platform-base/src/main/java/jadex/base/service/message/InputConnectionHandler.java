@@ -147,7 +147,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 			{
 				if(!con.isClosed())
 				{
-//					System.out.println("received: "+seqnumber);
+					System.out.println("received: "+seqnumber);
 		
 					// If packet is the next one deliver to stream
 					// else store in map till the next one arrives
@@ -157,11 +157,11 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 						forwardData(dat);
 						
 						// Forward possibly stored data
-						byte[] nextdata = data.get(new Integer(getSequenceNumber()));
+						byte[] nextdata = data.remove(new Integer(getSequenceNumber()+1));
 						for(; nextdata!=null ;)
 						{
 							forwardData(nextdata);
-							nextdata = data.get(new Integer(getSequenceNumber()));
+							nextdata = data.remove(new Integer(getSequenceNumber()+1));
 						}
 					}
 					else
