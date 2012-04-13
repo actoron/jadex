@@ -333,7 +333,16 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			}
 			else if(isClosed())
 			{
-				readyfuture.setException(new RuntimeException("Connection closed."));
+				Future<Void> ret = readyfuture;
+				readyfuture = null;
+				ret.setException(new RuntimeException("Connection closed.")
+				{
+					public void printStackTrace()
+					{
+						Thread.dumpStack();
+						super.printStackTrace();
+					}
+				});
 			}
 		}
 	}

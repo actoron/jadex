@@ -363,19 +363,19 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		SendManager sm = ms.getSendManager(recs[0]);
 		
 		IFuture<Void> ret = sm.addMessage(task);
-		ret.addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-//				System.out.println("sent: "+SUtil.arrayToString(task.getProlog()));
-				// nop if could be sent
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				// close connection in case of send error.
-				getConnection().setClosed();
-			}
-		});
+//		ret.addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+////				System.out.println("sent: "+SUtil.arrayToString(task.getProlog()));
+//				// nop if could be sent
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				// close connection in case of send error.
+//				getConnection().setClosed();
+//			}
+//		});
 		
 		return ret;
 	}

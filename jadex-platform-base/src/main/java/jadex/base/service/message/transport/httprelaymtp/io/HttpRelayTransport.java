@@ -1,6 +1,7 @@
 package jadex.base.service.message.transport.httprelaymtp.io;
 
 import jadex.base.service.awareness.discovery.relay.IRelayAwarenessService;
+import jadex.base.service.message.AbstractSendTask;
 import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
@@ -256,6 +257,19 @@ public class HttpRelayTransport implements ITransport
 	public void	sendMessage(String address, ISendTask task)
 	{
 		internalSendMessage(address.substring(6), task);	// strip 'relay-' prefix.
+		
+		((AbstractSendTask)task).getFuture().addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				System.err.print("Relay error:");
+				exception.printStackTrace();
+			}
+		});
 	}
 	
 	/**
@@ -281,6 +295,7 @@ public class HttpRelayTransport implements ITransport
 					else
 					{
 						// Connection dead.
+//						System.err.println("Relay. Dead connection to: "+address);
 						ret	= new Future<Void>(new RuntimeException("No connection to "+address));
 					}
 					
