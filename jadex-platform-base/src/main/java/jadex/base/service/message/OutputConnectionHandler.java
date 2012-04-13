@@ -323,7 +323,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	{
 		if(readyfuture!=null)
 		{
-			System.out.println("waitforready: "+con.isInited()+" "+(maxsend-sent.size())+" "+isStop()+" "+isClosed());
+//			System.out.println("waitforready: "+con.isInited()+" "+(maxsend-sent.size())+" "+isStop()+" "+isClosed());
 			if(con.isInited() && maxsend-sent.size()>0 && !isStop() && !isClosed())
 			{
 //				System.out.println("readyfuture fired");
