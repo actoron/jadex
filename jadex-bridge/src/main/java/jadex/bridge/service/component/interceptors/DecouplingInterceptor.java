@@ -34,6 +34,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -244,8 +245,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		}
 		else
 		{
-			if(sic.getMethod().getName().equals("getServiceProxies"))
-				System.out.println("decouple: "+Thread.currentThread());
+//			if(sic.getMethod().getName().equals("getServiceProxies"))
+//				System.out.println("decouple: "+Thread.currentThread());
 			ea.scheduleStep(new InvokeMethodStep(sic, IComponentIdentifier.LOCAL.get()))
 				.addResultListener(new CopyReturnValueResultListener(ret, sic));
 		}
@@ -446,6 +447,12 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				{
 					TerminableIntermediateDelegationFuture<Object> fut = new TerminableIntermediateDelegationFuture<Object>((ITerminableIntermediateFuture)res)
 					{
+						public void	setResult(Collection<Object> result)
+						{
+							Collection<Object> res = (Collection)doCopy(copy, deffilter, result);
+							super.setResult(res);
+					    }
+						
 						public void addIntermediateResult(Object result)
 						{
 					    	Object res = doCopy(copy, deffilter, result);
@@ -459,6 +466,12 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				{
 					IntermediateFuture<Object>	fut	= new IntermediateFuture<Object>()
 					{
+						public void	setResult(Collection<Object> result)
+						{
+							Collection<Object> res = (Collection)doCopy(copy, deffilter, result);
+							super.setResult(res);
+					    }
+						
 						public void addIntermediateResult(Object result)
 						{
 					    	Object res = doCopy(copy, deffilter, result);
