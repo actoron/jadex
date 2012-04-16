@@ -2,22 +2,9 @@ package jadex.android.application.demo;
 
 import jadex.android.JadexAndroidActivity;
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.transformation.annotations.Classname;
-
-import java.util.HashMap;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -31,8 +18,6 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 	
 	private Button startAgentButton;
 	private Button startBPMNButton;
-	
-	private IExternalAccess extAcc;
 	
 	private int num;
 	
@@ -69,9 +54,10 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 			@Override
 			public void handleMessage(final Message msg) {
 				runOnUiThread(new Runnable() {
-					
+
 					public void run() {
-						Toast makeText = Toast.makeText(JadexAndroidHelloWorldActivity.this, msg.getData().getString("text"), Toast.LENGTH_SHORT);
+						Toast makeText = Toast.makeText(JadexAndroidHelloWorldActivity.this,
+								msg.getData().getString("text"), Toast.LENGTH_SHORT);
 						makeText.show();
 					}
 				});
@@ -86,7 +72,6 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 				startPlatformButton.setEnabled(false);
 				textView.setText("Starting Jadex Platform...");
 				startJadexPlatform().addResultListener(platformResultListener);
-				
 			} else if (view == startAgentButton) {
 				startAgentButton.setEnabled(false);
 				startMicroAgent("HelloWorldAgent " + num, AndroidAgent.class).addResultListener(agentCreatedResultListener);
@@ -94,7 +79,6 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 			} else if (view == startBPMNButton) {
 				startBPMNButton.setEnabled(false);
 				startBPMNAgent("SimpleWorkflow " + num, "jadex/android/application/demo/bpmn/SimpleWorkflow.bpmn").addResultListener(bpmnCreatedResultListener);
-				
 			}
 		}
 	};
@@ -102,9 +86,7 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 	private IResultListener<IExternalAccess> platformResultListener = new DefaultResultListener<IExternalAccess>() {
 
 		public void resultAvailable(IExternalAccess result) {
-			extAcc = result;
 			runOnUiThread(new Runnable() {
-
 				public void run() {
 					startAgentButton.setEnabled(true);
 					startBPMNButton.setEnabled(true);

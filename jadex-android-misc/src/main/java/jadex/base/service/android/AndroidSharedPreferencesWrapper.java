@@ -53,6 +53,8 @@ public class AndroidSharedPreferencesWrapper implements IPreferences{
 		if (prefEditor != null) {
 			result = prefEditor.commit();
 			prefEditor = null;
+		} else {
+			result = true;
 		}
 		return result;
 	}

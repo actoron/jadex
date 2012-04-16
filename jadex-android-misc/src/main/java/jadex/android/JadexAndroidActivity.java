@@ -61,6 +61,11 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 	}
 	
 	protected IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId) {
+		return startJadexPlatform(kernels, platformId, "");
+		
+	}
+	
+	protected IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options) {
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		final StringBuffer kernelString = new StringBuffer("\"");
@@ -72,24 +77,26 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 		}
 		kernelString.append("\"");
 		
+		final String defOptions = "-logging_level java.util.logging.Level.INFO" +
+		" -extensions null" +
+		" -wspublish false" +
+		" -android true" +
+		" -kernels " + kernelString.toString() +
+		" -binarymessages true" +
+//		" -tcptransport false" +
+//		" -niotcptransport false" +
+//		" -relaytransport true" +
+//		" -relayaddress \"http://134.100.11.200:8080/jadex-platform-relay-web/\"" +				
+//		" -saveonexit false -gui false" +
+		" -autoshutdown false" +
+		" -platformname " + platformId +
+		" -saveonexit true -gui false" +
+		" ";
+		
 		new Thread(new Runnable() {
 			public void run() {
 				IFuture<IExternalAccess> future = Starter
-						.createPlatform(new String[] {
-								"-logging_level", "java.util.logging.Level.INFO",
-								"-extensions", "null",
-								"-wspublish", "false",
-								"-android", "true",
-								"-kernels", kernelString.toString(),
-								"-binarymessages", "true",
-//								"-tcptransport", "false",
-//								"-niotcptransport", "false",
-//								"-relaytransport", "true",
-//								"-relayaddress", "\"http://134.100.11.200:8080/jadex-platform-relay-web/\"",					
-//								"-saveonexit", "false", "-gui", "false",
-								"-autoshutdown", "false",
-								"-platformname", platformId,
-								"-saveonexit", "true", "-gui", "false" });
+						.createPlatform((defOptions + options).split("\\s+"));
 				future.addResultListener(new IResultListener<IExternalAccess>() {
 
 					@Override
