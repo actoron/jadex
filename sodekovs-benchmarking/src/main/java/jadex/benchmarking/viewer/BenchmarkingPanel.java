@@ -1,6 +1,5 @@
 package jadex.benchmarking.viewer;
 
-import jadex.base.gui.SwingDefaultResultListener;
 import jadex.base.gui.componentviewer.IServiceViewerPanel;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.benchmarking.helper.CheckFileThread;
@@ -12,6 +11,7 @@ import jadex.commons.Properties;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
