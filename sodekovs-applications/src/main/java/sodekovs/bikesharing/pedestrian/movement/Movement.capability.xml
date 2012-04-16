@@ -1,0 +1,98 @@
+<!--
+	The movement capability supplies the agents with basic
+	goals, plans and beliefs for moving around.
+-->
+<capability xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+	                    http://jadex.sourceforge.net/jadex-bdi-2.0.xsd"
+	name="Movement"
+	package="sodekovs.bikesharing.pedestrian.movement">
+
+	<imports>		
+		<import>java.util.*</import>
+		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.extension.envsupport.environment.space2d.*</import>
+		<import>jadex.extension.envsupport.math.*</import>
+		<import>jadex.commons.future.*</import>		
+	</imports>
+
+	<beliefs>
+		<!-- Environment. -->
+		<belief name="environment" class="ContinuousSpace2D"> 			
+ 			<fact class="IFuture">$scope.getParentAccess().getExtension("my2dspace")</fact>
+ 		</belief>
+ 		
+ 		<!-- Myself. -->
+ 		<belief name="myself" class="ISpaceObject" exported="true"> 			
+ 			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
+ 		</belief>
+
+		<!-- The seen targets. -->
+		<beliefset name="my_targets" class="ISpaceObject" exported="true" />
+					
+	</beliefs>
+
+	<goals>
+		<!-- Move to a certain location. -->
+		<achievegoal name="move_dest" exported="true">
+			<parameter name="destination" class="IVector2"/>
+		</achievegoal>
+
+		<!-- Walk around without target when nothing else to do. -->
+		<performgoal name="walk_around" retry="true" exclude="never" exported="true">
+			<!-- <dropcondition language="jcl">
+				Arrays.asList($beliefbase.foodSources).size() &gt; 0
+			</dropcondition> -->
+  		</performgoal>
+  		
+  		<!-- This goal is used to mine food.-->
+		<!-- <achievegoal name="food_mining" exclude="never" retry="false">
+			<unique />
+			<creationcondition language="jcl">				
+				Arrays.asList($beliefbase.foodSources).size() &gt; 0
+			</creationcondition>
+			<deliberation>
+				<inhibits ref="pheromone_follow" />
+			</deliberation>
+		</achievegoal> -->		
+	</goals>
+
+	<plans>
+		<!-- Go to a destination. -->
+		<plan name="go_destination">
+			<parameter name="destination" class="IVector2">
+ 				<goalmapping ref="move_dest.destination"/>
+			</parameter>
+			<body class="MoveToLocationPlan"/>
+			<trigger>
+				<goal ref="move_dest"/>
+ 				<!-- <goal ref="missionend"/>-->
+			</trigger>
+		</plan>
+
+		<!-- Walk around randomly. -->
+		<plan name="randomwalk">
+			<body class="RandomWalkPlan"/>
+			<trigger>
+				<goal ref="walk_around"/>
+			</trigger>
+		</plan>
+		
+		<!-- Mine food. -->
+		<!-- <plan name="foodMining">
+			<body class="FoodMiningPlan" />
+			<trigger>
+				<goal ref="food_mining" />
+			</trigger>
+		</plan> -->		
+	</plans>
+	
+	<configurations>
+		<configuration name="default">		
+			<goals>
+				<initialgoal ref="walk_around"/>
+			</goals>
+		</configuration>
+	</configurations>
+</capability>

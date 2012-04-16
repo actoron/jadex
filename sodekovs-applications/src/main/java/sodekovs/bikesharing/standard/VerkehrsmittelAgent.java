@@ -67,6 +67,7 @@ public class VerkehrsmittelAgent extends MicroAgent
 
 	public IFuture<Void> executeBody()
 	{
+		System.out.println("#VerkehrsmittelAgent# Started...");
 		IExternalAccess	paexta = (IExternalAccess)getParentAccess();
 		paexta.getExtension("simulationsspace")
 			.addResultListener(createResultListener(new DefaultResultListener()
@@ -352,7 +353,7 @@ public class VerkehrsmittelAgent extends MicroAgent
 	{
 		Object sender = msg.get("sender");
 		Object content = msg.get("content");
-//		System.out.println("Nachricht, inhalt: " + content);
+		System.out.println("#VerkehrsmittelAgent# Nachricht, inhalt: " + content);
 		
 		if ( sender instanceof IComponentIdentifier && EndstationsAgent.FAHRLOS.equals(content) )
 		{

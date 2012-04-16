@@ -45,7 +45,7 @@ import sodekovs.bikesharing.zeit.Zeitverwaltung;
 /**
  * Startet die Simulation
  * 
- * @author David Georg Reichelt
+ * @author David Georg Reichelt & Ante Vilenica
  * 
  */
 public class StartSimulationProzess extends SimplePropertyObject implements
@@ -73,10 +73,12 @@ public class StartSimulationProzess extends SimplePropertyObject implements
 	
 	boolean gestartet = false;
 	public void execute( IClockService clock, IEnvironmentSpace space) {
-		if ( gestartet )
+		if ( gestartet ){
+			System.out.println("Called init process.");
 			return;
+		}
 		gestartet = true;
-		System.out.println("Start");
+		System.out.println("Start init process.");
 		Zeitverwaltung.createInstance(100);
 		// System.out.println("Zeit: " + clock.getTime() );
 		// System.out.println( Zeitverwaltung.gibInstanz().gibTageszeit());
@@ -179,9 +181,9 @@ public class StartSimulationProzess extends SimplePropertyObject implements
 			properties.put(SucheNeuenWegPlan.FAHRRADPRAEFERENZ,
 					new Double(Math.sqrt(Math.random())));
 //					1.0);
-//			System.out.println("Erstelle Verkehrsteilnehmer");
+			System.out.println("Erstelle Verkehrsteilnehmer");
 			grid.createSpaceObject("verkehrsteilnehmer", properties, null);
-			// System.out.println("Index: " + i);
+			 System.out.println("Index: " + i);
 		}
 
 	}
@@ -255,16 +257,16 @@ public class StartSimulationProzess extends SimplePropertyObject implements
 		Document doc = db.parse(file);
 
 		NodeList nl = doc.getElementsByTagName("stationen");
-		Node stationsNode = nl.item(0);
+//		Node stationsNode = nl.item(0);
 
-		List<ISpaceObject> bahnStationsVisualisierungen = new LinkedList<ISpaceObject>();
-
-		erstellBahnstationen(grid, bahnStationsVisualisierungen, stationsNode);
-
-		nl = doc.getElementsByTagName("linien");
-		Node linienVaterNode = nl.item(0);
-
-		erstellLinien(grid, bahnStationsVisualisierungen, linienVaterNode);
+//		List<ISpaceObject> bahnStationsVisualisierungen = new LinkedList<ISpaceObject>();
+//
+//		erstellBahnstationen(grid, bahnStationsVisualisierungen, stationsNode);
+//
+//		nl = doc.getElementsByTagName("linien");
+//		Node linienVaterNode = nl.item(0);
+//
+//		erstellLinien(grid, bahnStationsVisualisierungen, linienVaterNode);
 
 		nl = doc.getElementsByTagName("fahrradverleihstationen");
 		Node fahrradVaterNode = nl.item(0);
