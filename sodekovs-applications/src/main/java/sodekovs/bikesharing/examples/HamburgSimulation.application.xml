@@ -7,7 +7,7 @@
 	                    http://jadex.sourceforge.net/jadex-application-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
-	name="HamburgSimulation" package="sodekovs.bikesharing.simulation">
+	name="HamburgSimulation" package="sodekovs.bikesharing.examples">
 
 	<imports>
 		<import>jadex.extension.envsupport.environment.space2d.*</import>

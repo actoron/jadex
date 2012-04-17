@@ -28,6 +28,16 @@
 				<component type="RemoteSimulationClient" master="false"/>
 			</components>
 		</configuration>
+		<configuration name="Simulate Bikesharing Hamburg with included Remote Client">
+			<components>
+				<component type="SimulationManager" master="true">
+					<arguments>
+						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/bikesharing/examples/HamburgSimulation-Conf.xml"</argument>			
+					</arguments>
+				</component>
+				<component type="RemoteSimulationClient" master="false"/>
+			</components>
+		</configuration>
 	<configuration name="Simulate MarsWorld with included Remote Client">
 			<components>
 				<component type="SimulationManager" master="true">
