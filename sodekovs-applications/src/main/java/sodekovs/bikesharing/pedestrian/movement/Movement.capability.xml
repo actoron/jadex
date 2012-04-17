@@ -28,8 +28,12 @@
  			<fact>$beliefbase.environment.getAvatar($scope.getComponentDescription(), $scope.getAgentModel().getFullName())</fact>
  		</belief>
 
-		<!-- The seen targets. -->
-		<beliefset name="my_targets" class="ISpaceObject" exported="true" />
+		<!-- Is the pedestrian currently driving bike? -->
+		<belief name="drives_bike" class="boolean" updaterate="1000" evaluationmode="pull" exported="true">
+			<fact>
+ 				$beliefbase.myself.getProperty("drives_bike")
+ 			</fact>
+		</belief>
 					
 	</beliefs>
 
@@ -40,11 +44,22 @@
 		</achievegoal>
 
 		<!-- Walk around without target when nothing else to do. -->
-		<performgoal name="walk_around" retry="true" exclude="never" exported="true">
+		<achievegoal name="walk_around" retry="true" exclude="never" exported="true">
 			<!-- <dropcondition language="jcl">
 				Arrays.asList($beliefbase.foodSources).size() &gt; 0
 			</dropcondition> -->
-  		</performgoal>
+  		</achievegoal>
+  		
+  		<!-- Realize default behaviour of pedestrian:
+  		 * 1) Go to next bike station
+ 		 * 2) Rent bike and drive randomly to a bike station
+         * 3) Return bike 
+  		-->
+		<achievegoal name="default_behaviour" retry="true" exclude="never" exported="true">
+			<!-- <dropcondition language="jcl">
+				Arrays.asList($beliefbase.foodSources).size() &gt; 0
+			</dropcondition> -->
+  		</achievegoal>
   		
   		<!-- This goal is used to mine food.-->
 		<!-- <achievegoal name="food_mining" exclude="never" retry="false">
@@ -76,6 +91,14 @@
 			<body class="RandomWalkPlan"/>
 			<trigger>
 				<goal ref="walk_around"/>
+			</trigger>
+		</plan>
+		
+		<!-- Default behaviour. -->
+		<plan name="default_behaviour_plan">
+			<body class="DefaultBehaviourPlan"/>
+			<trigger>
+				<goal ref="default_behaviour"/>
 			</trigger>
 		</plan>
 		

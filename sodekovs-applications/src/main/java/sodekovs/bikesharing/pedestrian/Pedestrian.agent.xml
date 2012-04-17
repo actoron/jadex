@@ -32,6 +32,12 @@
 			<fact language="jcl">$beliefbase.myself.position</fact>
 		</belief>
 		
+		<!-- Currently driving bike or no? -->
+		<beliefref name="drives_bike">
+			<concrete ref="move.drives_bike"/>
+		</beliefref>
+		
+		
 		<!-- <beliefset name="wege" class="VerkehrsteilnehmerWeg"/>
 		<belief name="weganzahl" class="Integer"><fact>new Integer(0)</fact></belief>
 		<belief name="risikopraeferenz" class="java.lang.Double"><fact>new java.lang.Double(1.0)</fact></belief>

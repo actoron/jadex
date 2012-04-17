@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xml>
 
-<fahrgaeste anzahl="50"/>
+<fahrgaeste anzahl="10"/>
 
 <startorte>
 	<ort x="28.0" y="05.0" gewicht="2"/>

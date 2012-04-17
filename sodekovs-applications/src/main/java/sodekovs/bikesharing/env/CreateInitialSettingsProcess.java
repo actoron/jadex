@@ -38,9 +38,9 @@ import sodekovs.util.math.GetRandom;
  * Process is responsible to create the init setting of pedestrians.
  */
 public class CreateInitialSettingsProcess extends SimplePropertyObject implements ISpaceProcess {
-	// -------- attributes --------
-	public static String pedestriansdata = "E:/Workspaces/Jadex/Jadex Test Instanz/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrgastDaten.xml";
-	public static String bikestationdata = "E:/Workspaces/Jadex/Jadex Test Instanz/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrplanDaten.xml";
+	// -------- attributes --------			
+	public static String pedestriansdata = "E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrgastDaten.xml";
+	public static String bikestationdata = "E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrplanDaten.xml";
 
 	// -------- constructors --------
 
@@ -62,6 +62,9 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	 *            The space this process is running in.
 	 */
 	public void start(IClockService clock, final IEnvironmentSpace space) {
+		
+		
+		
 		try {
 			createPedestrians(pedestriansdata, space);
 			createBikeStations(bikestationdata, space);
