@@ -21,7 +21,7 @@ public class AndroidSettingsService extends SettingsService {
 
 	protected IAndroidContextService contextService;
 
-	private final String DEFAULT_PREFS_NAME = "jadex.base.service.settings.AndroidSettingsService.DEFAULT_PREFS_NAME";
+	public static final String DEFAULT_PREFS_NAME = "jadex.base.service.settings.AndroidSettingsService.DEFAULT_PREFS_NAME";
 
 	private IPreferences preferences;
 
@@ -76,7 +76,7 @@ public class AndroidSettingsService extends SettingsService {
 	}
 
 	@Override
-	public IFuture<Void> saveProperties() {
+	public IFuture<Void> saveProperties(boolean shutdown) {
 		Future<Void> ret = new Future<Void>();
 		savePropertiesAsPreferences(props, preferences, "");
 		boolean committed = preferences.commit();

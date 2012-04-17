@@ -33,16 +33,6 @@
 			<version>2.2.1</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<!-- To get all android-related errors, uncomment the following dependency 
-			and remove the JRE from eclipse build path. -->
-		<!-- <dependency> -->
-		<!-- <groupId>proprietary</groupId> -->
-		<!-- <artifactId>android</artifactId> -->
-		<!-- <version>2.2.1</version> -->
-		<!-- <scope>system</scope> -->
-		<!-- <systemPath>ENTER PATH TO VERSION-SPECIFIC ANDROID.JAR HERE</systemPath> -->
-		<!-- </dependency> -->
 	</dependencies>
 
 	<build>

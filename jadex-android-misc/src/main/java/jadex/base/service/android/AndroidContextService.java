@@ -1,7 +1,8 @@
 package jadex.base.service.android;
 
 import jadex.android.ContextProvidingActivity;
-import jadex.android.ContextProvidingActivity.AndroidContextChangeListener;
+import jadex.android.JadexAndroidContext;
+import jadex.android.JadexAndroidContext.AndroidContextChangeListener;
 import jadex.android.JadexAndroidContextNotFoundError;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
@@ -31,7 +32,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	 */
 	public AndroidContextService(IServiceProvider provider) {
 		super(provider.getId(), IAndroidContextService.class, null);
-		ContextProvidingActivity.addContextChangeListener(this);
+		JadexAndroidContext.getInstance().addContextChangeListener(this);
 	}
 	
 	@Override
@@ -41,7 +42,7 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	
 	@Override
 	public IFuture<Void> shutdownService() {
-		ContextProvidingActivity.removeContextChangeListener(this);
+		JadexAndroidContext.getInstance().removeContextChangeListener(this);
 		return super.shutdownService();
 	}
 	

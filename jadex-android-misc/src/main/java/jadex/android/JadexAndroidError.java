@@ -6,5 +6,19 @@ package jadex.android;
  */
 public class JadexAndroidError extends Error {
 	private static final long serialVersionUID = -6629474526395117954L;
+	private String msg;
+	
+	public JadexAndroidError() {
+		this.msg = "";
+	}
+	
+	public JadexAndroidError(String msg) {
+		this.msg = msg;
+	}
+	
+	@Override
+	public String getMessage() {
+		return this.msg;
+	}
 
 }

@@ -1,14 +1,20 @@
 package jadex.android.application.demo;
 
 import jadex.android.JadexAndroidActivity;
+import jadex.android.controlcenter.JadexAndroidControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
@@ -36,7 +42,7 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
+		
 		startPlatformButton = (Button) findViewById(R.id.startPlatformButton);
 		startPlatformButton.setOnClickListener(buttonListener);
 		
@@ -64,7 +70,22 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 			}
 		};
 	}
-
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(0,0,0, "Control Center");
+		return true;
+	}	
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == 0) {
+			Intent i = new Intent(this, JadexAndroidControlCenter.class);
+			startActivity(i);
+		}
+		return true;
+	}
+	
 	private OnClickListener buttonListener = new OnClickListener() {
 
 		public void onClick(View view) {

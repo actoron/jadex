@@ -35,7 +35,7 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 	
 	public static final String[] DEFAULT_KERNELS = new String[]{KERNEL_COMPONENT, KERNEL_MICRO, KERNEL_BPMN};
 	
-	private IExternalAccess extAcc;
+	private JadexAndroidContext jadexAndroidContext = JadexAndroidContext.getInstance();
 	
 	/**
 	 * Returns the External Access Object of the Jadex Platform.
@@ -43,11 +43,11 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 	 */
 	public IExternalAccess getExternalPlatformAccess() throws JadexAndroidPlatformNotStartedError {
 		checkIfJadexIsRunning("getExternalPlatformAccess()");
-		return extAcc;
+		return JadexAndroidContext.getInstance().getExternalPlattformAccess();
 	}
 	
 	private void checkIfJadexIsRunning(String caller) {
-		if (extAcc == null) {
+		if (!jadexAndroidContext.isJadexRunning()) {
 			throw new JadexAndroidPlatformNotStartedError(caller);		
 		}
 	}
@@ -66,6 +66,10 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 	}
 	
 	protected IFuture<IExternalAccess> startJadexPlatform(final String[] kernels, final String platformId, final String options) {
+		if (jadexAndroidContext.isJadexRunning()){
+			throw new JadexAndroidError("Platform was already started!");
+		}
+		
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
 		
 		final StringBuffer kernelString = new StringBuffer("\"");
@@ -101,7 +105,7 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 
 					@Override
 					public void resultAvailable(IExternalAccess result) {
-						extAcc = result;
+						jadexAndroidContext.setExternalPlattformAccess(result);
 						ret.setResult(result);
 					}
 
@@ -158,7 +162,7 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 	}
 	
 	private IFuture<IComponentManagementService> getCMS() {
-		return extAcc.scheduleStep(new IComponentStep<IComponentManagementService>() {
+		return jadexAndroidContext.getExternalPlattformAccess().scheduleStep(new IComponentStep<IComponentManagementService>() {
 			@Classname("create-component")
 			public IFuture<IComponentManagementService> execute(
 					IInternalAccess ia) {

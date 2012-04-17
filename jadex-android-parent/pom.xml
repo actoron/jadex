@@ -188,10 +188,8 @@
 						<!-- <sharedUserId>anId</sharedUserId> -->
 						<!-- <debuggable>true|false</debuggable> -->
 						<!-- </manifest> -->
-
-
-
 					</configuration>
+					<extensions>true</extensions>
 				</plugin>
 
 				<plugin>
