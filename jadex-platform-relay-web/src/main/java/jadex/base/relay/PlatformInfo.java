@@ -1,6 +1,7 @@
 package jadex.base.relay;
 
 import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.commons.SUtil;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -205,7 +206,7 @@ public class PlatformInfo
 	 */
 	public String	getByteCount()
 	{
-		return bytesToString(bytes_received);
+		return SUtil.bytesToString((long)bytes_received);
 	}
 	
 	/**
@@ -222,7 +223,7 @@ public class PlatformInfo
 	public String	getTransferRate()
 	{
 		double	val	= bytes_received / total_transmission_time;
-		return bytesToString(val) + " / sec.";
+		return SUtil.bytesToString((long)val) + " / sec.";
 	}
 	
 	/**
@@ -366,33 +367,5 @@ public class PlatformInfo
 	public void setConnectDate(Date contime)
 	{
 		this.connect_time	= contime;
-	}
-	
-	//-------- helper methods --------
-	
-	/**
-	 *  Get bytes as string.
-	 */
-	public static String	bytesToString(double bytes)
-	{
-		String	ret;
-		if(bytes>1024*1024*1024)
-		{
-			ret	= ((int)(bytes/(1024*1024*1024)*10))/10.0 + " GB"; 
-		}
-		else if(bytes>1024*1024)
-		{
-			ret	= ((int)(bytes/(1024*1024)*10))/10.0 + " MB"; 
-		}
-		else if(bytes>1024)
-		{
-			ret	= ((int)(bytes/(1024)*10))/10.0 + " KB"; 
-		}
-		else
-		{
-			ret	= Integer.toString((int)bytes)+ " B"; 
-		}
-		
-		return ret;
-	}
+	}	
 }

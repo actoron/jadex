@@ -140,7 +140,6 @@ public abstract class AbstractConnection implements IConnection
 	 */
 	public synchronized void setClosed()
 	{
-		Thread.dumpStack();
 		this.closed = true;
 	}
 	

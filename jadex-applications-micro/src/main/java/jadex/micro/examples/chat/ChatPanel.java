@@ -19,7 +19,6 @@ import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
-import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
@@ -63,8 +62,6 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelListener;
@@ -162,6 +159,18 @@ public class ChatPanel extends JPanel
 			}
 		};
 		
+		DefaultTableCellRenderer byterend = new DefaultTableCellRenderer()
+		{
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
+			{
+				super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+				long	bytes	= ((Number)value).longValue();
+				this.setText(SUtil.bytesToString(bytes));
+				this.setToolTipText(bytes+" bytes");
+				return this;
+			}
+		};
+		
 		DefaultTableCellRenderer filecellrend = new DefaultTableCellRenderer()
 		{
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
@@ -183,6 +192,27 @@ public class ChatPanel extends JPanel
 			{
 				bar.setValue((int)(((Double)value).doubleValue()*100));
 				return bar;
+			}
+		};
+		
+		DefaultTableCellRenderer speedrend = new DefaultTableCellRenderer()
+		{
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
+			{
+				super.getTableCellRendererComponent(table, value, selected, focus, row, column);
+				FileInfo	info	= (FileInfo) value;
+				if(FileInfo.TRANSFERRING.equals(info.getState()))
+				{
+					double	bytes	= info.getSpeed();
+					this.setText(SUtil.bytesToString((long)bytes)+"/sec.");
+					this.setToolTipText(bytes+" bytes/sec.");
+				}
+				else
+				{
+					this.setText("");
+					this.setToolTipText("");
+				}
+				return this;
 			}
 		};
 		
@@ -237,6 +267,7 @@ public class ChatPanel extends JPanel
 						{
 							final File file = chooser.getSelectedFile();
 							final FileInfo fi = new FileInfo(file, cid, file.length(), 0, FileInfo.WAITING);
+							updateUpload(fi);
 							sendFile(fi, cid).addResultListener(new IResultListener<Void>()
 							{
 								public void resultAvailable(Void result)
@@ -361,10 +392,17 @@ public class ChatPanel extends JPanel
 		
 		dtable.getColumnModel().getColumn(0).setCellRenderer(filecellrend);
 		dtable.getColumnModel().getColumn(1).setCellRenderer(cidrend);
+		dtable.getColumnModel().getColumn(2).setCellRenderer(byterend);
+		dtable.getColumnModel().getColumn(3).setCellRenderer(byterend);
 		dtable.getColumnModel().getColumn(4).setCellRenderer(progressrend);
+		dtable.getColumnModel().getColumn(6).setCellRenderer(speedrend);
+		
 		utable.getColumnModel().getColumn(0).setCellRenderer(filecellrend);
 		utable.getColumnModel().getColumn(1).setCellRenderer(cidrend);
+		utable.getColumnModel().getColumn(2).setCellRenderer(byterend);
+		utable.getColumnModel().getColumn(3).setCellRenderer(byterend);
 		utable.getColumnModel().getColumn(4).setCellRenderer(progressrend);
+		utable.getColumnModel().getColumn(6).setCellRenderer(speedrend);
 		
 		FileTransferMouseAdapter dlis = new FileTransferMouseAdapter(dtable, agent);
 		FileTransferMouseAdapter ulis = new FileTransferMouseAdapter(utable, agent);
@@ -469,7 +507,7 @@ public class ChatPanel extends JPanel
 					public void intermediateResultAvailable(final IChatService chat)
 					{
 						setReceiving(chat, -1, false);	// Adds user if not already known.
-						
+//						System.out.println("sid: "+((IService)chat).getServiceIdentifier());
 						chat.status(status);
 					}
 					
@@ -796,6 +834,7 @@ public class ChatPanel extends JPanel
 						}
 						else
 						{
+							fis.close();
 							ocon.close();
 							fi.setState(FileInfo.COMPLETED);
 							updateUpload(fi);
@@ -860,7 +899,7 @@ public class ChatPanel extends JPanel
 //					GridBagConstraints.BOTH, new Insets(0,2,0,2),0,0));
 				pp.addComponent("File path: ", fnp);
 				final JTextField tfname = pp.createTextField("File name: ", filename, true);
-				pp.createTextField("Size [bytes]: ", ""+size);
+				pp.createTextField("Size: ", SUtil.bytesToString(size));
 				pp.createTextField("Sender: ", ""+(sender==null? sender: sender.getName()));
 				
 				if(0==JOptionPane.showOptionDialog(null, pp, "Incoming File Transfer", JOptionPane.YES_NO_OPTION,
@@ -878,32 +917,48 @@ public class ChatPanel extends JPanel
 		return ret;
 	}
 	
+	long lastdupdate;
+	
 	/**
 	 *  Update the fileinfo in the download area.
 	 */
 	public void updateDownload(final FileInfo fi)
 	{
-		SwingUtilities.invokeLater(new Runnable()
+		// Update 5 times per second or if state is not transferring.
+		long	update	= System.currentTimeMillis();
+		if(update-lastdupdate>=200 || !FileInfo.TRANSFERRING.equals(fi.getState()))
 		{
-			public void run()
+			lastdupdate	= update;
+			SwingUtilities.invokeLater(new Runnable()
 			{
-				((FileTableModel)dtable.getModel()).updateFile(fi);
-			}
-		});
+				public void run()
+				{
+					((FileTableModel)dtable.getModel()).updateFile(fi);
+				}
+			});
+		}
 	}
+	
+	long lastuupdate;
 	
 	/**
 	 *  Update the fileinfo in the upload area.
 	 */
 	public void updateUpload(final FileInfo fi)
 	{
-		SwingUtilities.invokeLater(new Runnable()
+		// Update 5 times per second or if state is not transferring.
+		long	update	= System.currentTimeMillis();
+		if(update-lastuupdate>=200 || !FileInfo.TRANSFERRING.equals(fi.getState()))
 		{
-			public void run()
+			lastuupdate	= update;
+			SwingUtilities.invokeLater(new Runnable()
 			{
-				((FileTableModel)utable.getModel()).updateFile(fi);
-			}
-		});
+				public void run()
+				{
+					((FileTableModel)utable.getModel()).updateFile(fi);
+				}
+			});
+		}
 	}
 	
 	//-------- helper classes --------
@@ -1034,7 +1089,7 @@ public class ChatPanel extends JPanel
 		public FileTableModel(boolean down)
 		{
 			this.down = down;
-			columns = new String[]{"Name", down? "Sender": "Receiver", "Size", "Done", "%", "State"};
+			columns = new String[]{"Name", down? "Sender": "Receiver", "Size", "Done", "%", "State", "Speed", "Remaining Time"};
 		}
 
 		protected JTable getTable()
@@ -1089,6 +1144,25 @@ public class ChatPanel extends JPanel
 			{
 				ret = files[row].getState();
 			}
+			else if(column==6)
+			{
+				ret = files[row];
+			}
+			else if(column==7)
+			{
+				if(FileInfo.TRANSFERRING.equals(files[row].getState()))
+				{
+					long	time	= (long)((files[row].getSize()-files[row].getDone())/files[row].getSpeed());
+					long	hrs	= time / 3600;
+					long	min	= time % 3600 / 60;
+					long	sec	= time % 60;
+					ret	= hrs + ":" + (min<10 ? "0"+min : min) + ":" + (sec<10 ? "0"+sec : sec);
+				}
+				else
+				{
+					ret	= "";
+				}
+			}
 			else
 			{
 				throw new RuntimeException("Unknown column");
@@ -1125,7 +1199,7 @@ public class ChatPanel extends JPanel
 		
 		public void updateFile(FileInfo fi)
 		{
-			FileInfo oldfi = getDataMap().put(fi.getId(), fi);
+			/*FileInfo oldfi =*/ getDataMap().put(fi.getId(), fi);
 //			if(oldfi!=null)
 //			{
 //				int row = 0;
@@ -1147,12 +1221,26 @@ public class ChatPanel extends JPanel
 			refresh();
 		}
 		
+		boolean dorefresh;
+		
 		public void refresh()
 		{
-			fireTableDataChanged();
-			getTable().getParent().invalidate();
-			getTable().getParent().doLayout();
-			getTable().repaint();
+			if(!dorefresh)
+			{
+				dorefresh	= true;
+				
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						dorefresh	= false;
+						fireTableDataChanged();
+						getTable().getParent().invalidate();
+						getTable().getParent().doLayout();
+						getTable().repaint();
+					}
+				});
+			}
 		}
 	}
 }

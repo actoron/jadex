@@ -1,7 +1,6 @@
 package jadex.base.service.message.transport.httprelaymtp.io;
 
 import jadex.base.service.awareness.discovery.relay.IRelayAwarenessService;
-import jadex.base.service.message.AbstractSendTask;
 import jadex.base.service.message.ISendTask;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
@@ -44,7 +43,13 @@ public class HttpRelayTransport implements ITransport
 	protected static final long	ALIVETIME	= 30000;
 	
 	/** The maximum number of workers for an address. */
-	protected static final int	MAX_WORKERS	= 16;
+	protected static final int	MAX_WORKERS	= 1;	// Using more than one worker breaks keepalive!? grrr...
+	
+	/** A buffer for reading response data (ignored but needs to be read for connection to be reusable). */
+	protected static final byte[]	RESPONSE_BUF	= new byte[8192];
+	
+//	/** Lock for synchronizing access to the URL connection pool. */
+//	protected static final Object	POOL_LOCK	= new Object();
 	
 	// HACK!!! Disable all certificate checking (only until we find a more fine-grained solution)
 	static
@@ -258,18 +263,18 @@ public class HttpRelayTransport implements ITransport
 	{
 		internalSendMessage(address.substring(6), task);	// strip 'relay-' prefix.
 		
-		((AbstractSendTask)task).getFuture().addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				System.err.print("Relay error:");
-				exception.printStackTrace();
-			}
-		});
+//		((AbstractSendTask)task).getFuture().addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//			}
+//			
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				System.err.print("Relay error:");
+//				exception.printStackTrace();
+//			}
+//		});
 	}
 	
 	/**
@@ -368,6 +373,7 @@ public class HttpRelayTransport implements ITransport
 				public void run()
 				{
 					// Start new server ping.
+//					System.out.println("pinging: "+address);
 					try
 					{
 						URL	url	= new URL(address + (address.endsWith("/") ? "ping" : "/ping"));
@@ -377,6 +383,10 @@ public class HttpRelayTransport implements ITransport
 						if(code!=HttpURLConnection.HTTP_OK)
 							throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
 						addresses.put(address, new Long(System.currentTimeMillis()));
+						while(con.getInputStream().read(RESPONSE_BUF)!=-1)
+						{
+						}
+						con.getInputStream().close();
 					}
 					catch(Exception e)
 					{
@@ -440,6 +450,7 @@ public class HttpRelayTransport implements ITransport
 			{
 				public void run()
 				{
+//					System.out.println("starting worker");
 					boolean	again	= true;
 					
 					while(again)
@@ -476,7 +487,6 @@ public class HttpRelayTransport implements ITransport
 						
 						if(task!=null)
 						{
-//							System.out.println("using worker");
 							try
 							{
 								// Message service only calls transport.sendMessage() with receivers on same destination
@@ -484,28 +494,44 @@ public class HttpRelayTransport implements ITransport
 								IComponentIdentifier	targetid	= task.getReceivers()[0].getRoot();
 								byte[]	iddata	= targetid.getName().getBytes("UTF-8");
 								
+								HttpURLConnection	con;
+								OutputStream	out;
+								int	code;
 								URL	url	= new URL(address);
-								HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
+								con	= (HttpURLConnection)url.openConnection();
 			
 								con.setRequestMethod("POST");
 								con.setDoOutput(true);
 								con.setUseCaches(false);
 								con.setRequestProperty("Content-Type", "application/octet-stream");
 								con.setRequestProperty("Content-Length", ""+(4+iddata.length+4+task.getProlog().length+task.getData().length));
-								con.connect();
+
+//								synchronized(POOL_LOCK)
+								{
+									con.connect();
+							
+									out	= con.getOutputStream();
+
+									out.write(SUtil.intToBytes(iddata.length));
+									out.write(iddata);
+									out.write(SUtil.intToBytes(task.getProlog().length+task.getData().length));
+									out.write(task.getProlog());
+									out.write(task.getData());
+									out.flush();
+	//								out.close();
+							
+									code	= con.getResponseCode();
+								}
 								
-								OutputStream	out	= con.getOutputStream();
-								out.write(SUtil.intToBytes(iddata.length));
-								out.write(iddata);
-								out.write(SUtil.intToBytes(task.getProlog().length+task.getData().length));
-								out.write(task.getProlog());
-								out.write(task.getData());
-								out.flush();
-								
-								int	code	= con.getResponseCode();
 								if(code!=HttpURLConnection.HTTP_OK)
-									throw new IOException("HTTP code "+code+": "+con.getResponseMessage());
+								{
+									throw new IOException("HTTP code "+code+": "+con.getResponseMessage()+" target="+targetid);
+								}
 								addresses.put(address, new Long(System.currentTimeMillis()));
+								while(con.getInputStream().read(RESPONSE_BUF)!=-1)
+								{
+								}
+//								con.getInputStream().close();
 								
 								ret.setResult(null);
 							}
@@ -515,6 +541,7 @@ public class HttpRelayTransport implements ITransport
 							}
 						}
 					}
+//					System.out.println("stopping worker");
 				}
 			});
 		}

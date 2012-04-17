@@ -25,6 +25,7 @@ import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -48,6 +49,18 @@ import java.util.jar.JarFile;
  */
 public class SUtil
 {
+	/** Units for representing byte values. */
+	public static final String[]	BYTE_UNITS	= new String[]{"B", "KB", "MB", "GB", "TB", "PB", "EB"};	// captures up to Long.MAX_VALUE (= 7.99 EB)
+	
+	/** The byte formatter for one predecimal digit. */
+	public static final DecimalFormat	BYTEFORMATTER1	= new DecimalFormat("0.00");
+
+	/** The byte formatter for two predecimal digits. */
+	public static final DecimalFormat	BYTEFORMATTER2	= new DecimalFormat("00.0");
+
+	/** The byte formatter for three predecimal digits. */
+	public static final DecimalFormat	BYTEFORMATTER3	= new DecimalFormat("000");
+
 	/** Constant that indicates a conversion of all known characters. */
 	public static final int			CONVERT_ALL				= 1;
 
@@ -1903,6 +1916,73 @@ public class SUtil
 
 		return buffer;
 	}
+	
+	
+	/**
+	 *  Get bytes as human readable string.
+	 */
+	public static String	bytesToString(long bytes)
+	{
+		String ret;
+		if(bytes>0)
+		{
+		    int	unit	= (int)(Math.log10(bytes)/Math.log10(1024));	// 1=bytes, 2=kBytes, ...
+		    double	value	= bytes/Math.pow(1024, unit);	// value between 1.0 .. 1023.999...
+		    ret	= value>=100 ? BYTEFORMATTER3.format(value)
+		    	: value>=10 ? BYTEFORMATTER2.format(value)
+		    	: BYTEFORMATTER1.format(value);
+		    ret	+= " "+BYTE_UNITS[unit];
+		}
+		else
+		{
+			ret = bytes + BYTE_UNITS[0];
+		}
+	    return ret;
+		
+//		String	ret;
+//		if(bytes>=1024*1024*1024*100L)
+//		{
+//			ret	= bytes/(1024*1024*1024) + " GB"; 
+//		}
+//		else if(bytes>=1024*1024*1024*10L)
+//		{
+//			ret	= (bytes*10/(1024*1024*1024))/10.0 + " GB"; 
+//		}
+//		else if(bytes>=1024*1024*1024)
+//		{
+//			ret	= (bytes*100/(1024*1024*1024))/100.0 + " GB"; 
+//		}
+//		else if(bytes>=1024*1024*100)
+//		{
+//			ret	= bytes/(1024*1024) + " MB"; 
+//		}
+//		else if(bytes>=1024*1024*10)
+//		{
+//			ret	= (bytes*10/(1024*1024))/10.0 + " MB"; 
+//		}
+//		else if(bytes>=1024*1024)
+//		{
+//			ret	= (bytes*100/(1024*1024))/100.0 + " MB"; 
+//		}
+//		else if(bytes>=1024*100)
+//		{
+//			ret	= bytes/1024 + " KB"; 
+//		}
+//		else if(bytes>=1024*10)
+//		{
+//			ret	= (bytes*10/1024)/10.0 + " KB"; 
+//		}
+//		else if(bytes>=1024)
+//		{
+//			ret	= (bytes*100/1024)/100.0 + " KB"; 
+//		}
+//		else
+//		{
+//			ret	= Long.toString(bytes)+ " B"; 
+//		}
+//		return ret;
+	}
+
 
 	/**
 	 *  Convert an URL to a local file name.
@@ -2375,5 +2455,4 @@ public class SUtil
 			this.out	= out;
 		}
 	}
-	
 }

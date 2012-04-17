@@ -3,7 +3,6 @@ package jadex.micro.examples.chat;
 import java.io.File;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
  * 
@@ -35,6 +34,15 @@ public class FileInfo
 	/** The done size. */
 	protected long done;
 	
+	/** The upload/download speed calculated as dynamic moving average (bytes/sec). */
+	protected double	speed;
+	
+	/** The time (millis) of the last update (for calculating speed). */
+	protected long	lastupdate;
+	
+	/** The doen size of the last update (for calculating speed). */
+	protected long	lastdone;
+	
 	/** The state. */
 	protected String state;
 	
@@ -58,6 +66,7 @@ public class FileInfo
 		this.sender = sender;
 		this.size = size;
 		this.done = done;
+		this.lastupdate	= System.currentTimeMillis();
 	}
 
 	/**
@@ -130,6 +139,20 @@ public class FileInfo
 	public void setDone(long done)
 	{
 		this.done = done;
+		
+		// Calculate speed every second.
+		long	update	= System.currentTimeMillis();
+		if(update-this.lastupdate>=1000)
+		{
+			long	dbytes	= done - lastdone;
+			double	dtime	= (update - lastupdate)/1000.0;		
+			double	speed	= dbytes/dtime;
+			
+			lastupdate	= update;
+			lastdone	= done;
+			this.speed	= this.speed==0 ? speed : this.speed*0.9 + speed*0.1;	// EMA(10)
+	//		System.out.println("curspeed: "+speed+" avgspeed: "+this.speed);
+		}
 	}
 	
 	/**
@@ -151,6 +174,15 @@ public class FileInfo
 	}
 
 	/**
+	 *  Get the speed.
+	 *  @return the speed.
+	 */
+	public double getSpeed()
+	{
+		return speed;
+	}
+
+	/**
 	 *  Set the state.
 	 *  @param state The state to set.
 	 */
@@ -161,8 +193,8 @@ public class FileInfo
 		{
 			throw new RuntimeException("Unknown state: "+state);
 		}
-		if(ABORTED.equals(state))
-			System.out.println("herehhh");
+//		if(ABORTED.equals(state))
+//			System.out.println("herehhh");
 		this.state = state;
 	}
 

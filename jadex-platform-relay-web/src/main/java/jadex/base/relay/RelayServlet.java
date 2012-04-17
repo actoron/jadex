@@ -158,7 +158,7 @@ public class RelayServlet extends HttpServlet
 				{
 					opencnt1++;
 				}
-//				System.out.println("Entering GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
+				System.out.println("Entering GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
 				
 				
 				PlatformInfo	info	= platforms.get(id);
@@ -272,7 +272,7 @@ public class RelayServlet extends HttpServlet
 				{
 					opencnt1--;
 				}
-//				System.out.println("Leaving GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
+				System.out.println("Leaving GET request. opencnt="+opencnt1+", mapsize="+map.size()+", infosize="+platforms.size());
 			}
 		}
 	}

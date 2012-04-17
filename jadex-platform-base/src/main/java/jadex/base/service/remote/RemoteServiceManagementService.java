@@ -442,6 +442,39 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		};
 		binpostprocs.add(rmipostproc);
 		
+		binpostprocs.add(new IDecoderHandler()
+		{
+			public boolean isApplicable(Class clazz)
+			{
+				return ServiceInputConnectionProxy.class.equals(clazz);
+			}
+			
+			public Object decode(Class clazz, DecodingContext context)
+			{
+				ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)context.getLastObject();
+				int conid = icp.getConnectionId();
+				IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(conid);
+				return icon;
+			}
+		});
+				
+		binpostprocs.add(new IDecoderHandler()
+		{
+			public boolean isApplicable(Class clazz)
+			{
+				return ServiceOutputConnectionProxy.class.equals(clazz);
+			}
+			
+			public Object decode(Class clazz, DecodingContext context)
+			{
+				ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)context.getLastObject();
+				int conid = ocp.getConnectionId();
+				IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(conid);
+				return ocon;
+			}
+		});
+				
+		
 		binpreprocs = new ArrayList<ITraverseProcessor>();
 		ITraverseProcessor bpreproc = new ITraverseProcessor()
 		{
@@ -507,6 +540,48 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			}
 		};
 		binpreprocs.add(bpreproc);
+		
+		// output connection as result of call
+		binpreprocs.add(new ITraverseProcessor()
+		{
+			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors,
+				Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			{
+				Object[] uc = (Object[])((EncodingContext) context).getUserContext();
+				IComponentIdentifier receiver = (IComponentIdentifier)uc[0];
+				ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
+				OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+				con.setConnectionId(ocon.getConnectionId());
+				con.setOutputConnection(ocon);
+				return con;
+			}
+			
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			{
+				return object instanceof ServiceInputConnectionProxy;
+			}
+		});
+		
+		// input connection proxy as result of call
+		binpreprocs.add(new ITraverseProcessor()
+		{
+			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors,
+				Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			{
+				Object[] uc = (Object[])((EncodingContext) context).getUserContext();
+				IComponentIdentifier receiver = (IComponentIdentifier)uc[0];
+				ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
+				InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+				con.setConnectionId(icon.getConnectionId());
+				con.setInputConnection(icon);
+				return con;
+			}
+			
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			{
+				return object instanceof ServiceOutputConnectionProxy;
+			}
+		});
 	}
 	
 	//-------- methods --------
