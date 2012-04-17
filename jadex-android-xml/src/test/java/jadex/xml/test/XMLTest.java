@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
  * Testcases for writer and reader.
  */
 @RunWith(CustomTestRunner.class)
-public class Test {
+public class XMLTest {
 
 	// -------- test methods --------
 
