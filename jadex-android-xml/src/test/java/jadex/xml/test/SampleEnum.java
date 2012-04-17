@@ -3,7 +3,7 @@ package jadex.xml.test;
 /**
  * 
  */
-public enum TestEnum
+public enum SampleEnum
 {
 	A, B, C;
 }

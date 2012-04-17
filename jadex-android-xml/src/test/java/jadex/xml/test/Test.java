@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
  * Testcases for writer and reader.
  */
 @RunWith(CustomTestRunner.class)
-public class Testt {
+public class Test {
 
 	// -------- test methods --------
 
@@ -127,7 +127,7 @@ public class Testt {
 	public void testEnum() throws Exception
 	{
 //		System.out.println("test enum: "+(TestEnum.A instanceof Enum));
-		doWriteAndRead(TestEnum.A);
+		doWriteAndRead(SampleEnum.A);
 	}
 	
 	/**
