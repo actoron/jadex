@@ -15,7 +15,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
@@ -29,6 +29,7 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -44,9 +45,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -62,6 +67,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelListener;
@@ -81,6 +87,21 @@ public class ChatPanel extends JPanel
 	
 	/** The time format. */
 	public static final DateFormat	df	= new SimpleDateFormat("HH:mm:ss");
+	
+	/** The notification sound for a newly online user. */
+	public static final String	NOTIFICATION_NEW_USER	= "sound/new_msg.wav";
+	
+	/** The notification sound for a new message. */
+	public static final String	NOTIFICATION_NEW_MSG	= "sound/new_msg.wav";
+	
+	/** The notification sound for an incoming file request. */
+	public static final String	NOTIFICATION_NEW_FILE	= "sound/new_msg.wav";
+	
+	/** The notification sound for a successfully completed file. */
+	public static final String	NOTIFICATION_FILE_COMPLETE	= "sound/new_msg.wav";
+	
+	/** The notification sound for an aborted or failed file transfer. */
+	public static final String	NOTIFICATION_FILE_ABORT	= "sound/new_msg.wav";
 	
 	//-------- attributes --------
 	
@@ -108,12 +129,6 @@ public class ChatPanel extends JPanel
 	/** The dead users determined during a request. */
 	protected Set<IComponentIdentifier>	deadusers;
 	
-	/** The downloads. */
-	protected Map<Integer, FileInfo> downloads;
-	
-	/** The uploads. */
-	protected Map<Integer, FileInfo> uploads;
-
 	/** The download table. */
 	protected JTable dtable;
 	
@@ -130,9 +145,7 @@ public class ChatPanel extends JPanel
 		this.agent	= agent;
 		this.clock	= clock;
 		this.users	= new LinkedHashMap<IComponentIdentifier, ChatUser>();
-		this.downloads = new LinkedHashMap<Integer, FileInfo>();
-		this.uploads = new LinkedHashMap<Integer, FileInfo>();
-		
+
 		DefaultTableCellRenderer userrend = new DefaultTableCellRenderer()
 		{
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
@@ -230,6 +243,43 @@ public class ChatPanel extends JPanel
 		table	= new JTable(new UserTableModel());
 		JScrollPane userpan = new JScrollPane(table);
 		table.getColumnModel().getColumn(0).setCellRenderer(userrend);
+		table.setTransferHandler(new TransferHandler()
+		{
+			public boolean	canImport(TransferHandler.TransferSupport support)
+			{
+				boolean	ret	= support.isDrop() && support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)
+					&& (support.getSourceDropActions()&TransferHandler.COPY)!=0;
+				
+				if(ret)
+					support.setDropAction(TransferHandler.COPY);
+
+				return ret;
+			}
+
+			public boolean importData(TransferHandler.TransferSupport support)
+			{
+				boolean	success;
+				try
+				{
+					JTable.DropLocation	droploc	= (JTable.DropLocation)support.getDropLocation();
+					IComponentIdentifier	cid	= (IComponentIdentifier)table.getModel().getValueAt(droploc.getRow(), 0);
+					
+					List<File>	files	= (List<File>)support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+//					System.out.println("importData: "+files);
+					for(File file: files)
+					{
+						sendFile(file, cid);
+					}
+					success	= true;
+				}
+				catch(Exception e)
+				{
+					System.err.println("Drop error: "+e);
+					success	= false;
+				}
+			    return success;
+			}  
+		});
 
 		final JFileChooser chooser = new JFileChooser(".");
 		MouseListener lis = new MouseAdapter()
@@ -265,35 +315,8 @@ public class ChatPanel extends JPanel
 					{
 						if(JFileChooser.APPROVE_OPTION==chooser.showOpenDialog(ChatPanel.this))
 						{
-							final File file = chooser.getSelectedFile();
-							final FileInfo fi = new FileInfo(file, cid, file.length(), 0, FileInfo.WAITING);
-							updateUpload(fi);
-							sendFile(fi, cid).addResultListener(new IResultListener<Void>()
-							{
-								public void resultAvailable(Void result)
-								{
-									fi.setState(FileInfo.COMPLETED);
-									updateUpload(fi);
-//									System.out.println("transferred file");
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									if(exception instanceof FutureTerminatedException || FileInfo.ABORTED.equals(exception.getMessage()))
-									{
-										fi.setState(FileInfo.ABORTED);
-									}
-									else if(FileInfo.REJECTED.equals(exception.getMessage()))
-									{	
-										fi.setState(FileInfo.REJECTED);
-									}
-									else
-									{
-										fi.setState(FileInfo.ERROR);
-									}
-									updateUpload(fi);
-//									System.out.println("ex: "+exception.getMessage());
-								}
-							});
+							File file = chooser.getSelectedFile();
+							sendFile(file, cid);
 						}
 					}
 				});
@@ -657,6 +680,8 @@ public class ChatPanel extends JPanel
 					.append(cid.getName()).append("]: ").append(text).append(lf);
 				chatarea.append(buf.toString());
 				
+				notifyChatEvent(NOTIFICATION_NEW_MSG);
+				
 				deadusers.remove(cid);
 				ChatUser	cu	= users.get(cid);
 				if(cu==null)
@@ -701,14 +726,16 @@ public class ChatPanel extends JPanel
 	/**
 	 *  Called from sender side to iniate a send action.
 	 */
-	protected IFuture<Void> sendFile(final FileInfo fi, final IComponentIdentifier cid)
+	protected void sendFile(File file, final IComponentIdentifier cid)
 	{
-		final Future<Void> ret = new Future<Void>();
+		final FileInfo fi = new FileInfo(file, cid, file.length(), 0, FileInfo.WAITING);
+		updateUpload(fi);
 		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
+				final Future<Void> ret = new Future<Void>();
 				IFuture<IChatService> fut = ia.getServiceContainer().getService(IChatService.class, cid);
 				fut.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IChatService, Void>(ret)
 				{
@@ -725,7 +752,7 @@ public class ChatPanel extends JPanel
 						final boolean[] started = new boolean[1];
 						
 						// Receives notifications how many bytes were received. 
-						fut.addResultListener(new IIntermediateResultListener<Long>()
+						fut.addResultListener(new IntermediateExceptionDelegationResultListener<Long, Void>(ret)
 						{
 							public void intermediateResultAvailable(Long result)
 							{
@@ -743,32 +770,43 @@ public class ChatPanel extends JPanel
 								ret.setResult(null);
 							}
 							
-							public void resultAvailable(Collection<Long> result)
+							public void customResultAvailable(Collection<Long> result)
 							{
 //								System.out.println("result");
 								ret.setResult(null);
 							}
-							
-							public void exceptionOccurred(Exception exception)
-							{
-								// Called when receiver terminates call via terminable future
-//								System.out.println("exception: "+exception);
-								ret.setException(exception);
-							}
 						});
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						exception.printStackTrace();
-					}
+					}					
 				}));
 				
-				return IFuture.DONE;
+				return ret;
+			}
+		}).addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				fi.setState(FileInfo.COMPLETED);
+				updateUpload(fi);
+//				System.out.println("transferred file");
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				if(exception instanceof FutureTerminatedException || FileInfo.ABORTED.equals(exception.getMessage()))
+				{
+					fi.setState(FileInfo.ABORTED);
+				}
+				else if(FileInfo.REJECTED.equals(exception.getMessage()))
+				{	
+					fi.setState(FileInfo.REJECTED);
+				}
+				else
+				{
+					fi.setState(FileInfo.ERROR);
+				}
+				updateUpload(fi);
+//				System.out.println("ex: "+exception.getMessage());
 			}
 		});
-		
-		return ret;
 	}
 	
 	/**
@@ -917,6 +955,25 @@ public class ChatPanel extends JPanel
 		return ret;
 	}
 	
+
+	/**
+	 *  Play a notification sound.
+	 */
+	protected void	notifyChatEvent(String sound)
+	{
+		try
+		{
+			Clip	clip	= AudioSystem.getClip();
+			AudioInputStream	ais	= AudioSystem.getAudioInputStream(getClass().getResourceAsStream(sound));
+			clip.open(ais);
+			clip.start();
+		}
+		catch(Exception e)
+		{
+			System.err.println("Couldn't play notification sound: "+e);
+		}
+	}
+	
 	long lastdupdate;
 	
 	/**
@@ -960,7 +1017,7 @@ public class ChatPanel extends JPanel
 			});
 		}
 	}
-	
+
 	//-------- helper classes --------
 	
 	/**
@@ -1000,26 +1057,57 @@ public class ChatPanel extends JPanel
 		protected JPopupMenu createMenu(final int row, final FileInfo fi)
 		{
 			final JPopupMenu menu = new JPopupMenu();
-			JMenuItem mi = new JMenuItem("Cancel transfer");
-			mi.addActionListener(new ActionListener()
+			if(!fi.isFinished())
 			{
-				public void actionPerformed(ActionEvent e)
+				JMenuItem mi = new JMenuItem("Cancel transfer");
+				mi.addActionListener(new ActionListener()
 				{
-					agent.scheduleStep(new IComponentStep<Void>()
+					public void actionPerformed(ActionEvent e)
 					{
-						public IFuture<Void> execute(IInternalAccess ia)
+						agent.scheduleStep(new IComponentStep<Void>()
 						{
-							fi.cancel();
-							return IFuture.DONE;
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								fi.cancel();
+								return IFuture.DONE;
+							}
+						});
+					}
+				});
+				menu.add(mi);
+				
+				if(table.getRowCount()>1)
+				{
+					mi = new JMenuItem("Cancel all transfers");
+					mi.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							final FileInfo[]	infos	= ((FileTableModel)table.getModel()).getDataMap().values().toArray(new FileInfo[0]);
+							
+							agent.scheduleStep(new IComponentStep<Void>()
+							{
+								public IFuture<Void> execute(IInternalAccess ia)
+								{
+									for(int i=0; i<infos.length; i++)
+									{
+										if(!infos[i].isFinished())
+										{
+											infos[i].cancel();
+										}
+									}
+									return IFuture.DONE;
+								}
+							});
 						}
 					});
+					menu.add(mi);
 				}
-			});
-			menu.add(mi);
+			}
+			
 			if(fi.isFinished())
 			{
-				mi = new JMenuItem("Remove");
-				menu.add(mi);
+				JMenuItem mi = new JMenuItem("Remove");
 				mi.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
@@ -1027,6 +1115,27 @@ public class ChatPanel extends JPanel
 						((FileTableModel)table.getModel()).removeRow(row);
 					}
 				});
+				menu.add(mi);
+
+				if(table.getRowCount()>1)
+				{
+					mi = new JMenuItem("Remove all finished");
+					mi.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							final FileInfo[]	infos	= ((FileTableModel)table.getModel()).getDataMap().values().toArray(new FileInfo[0]);
+							for(int i=infos.length-1; i>=0; i--)
+							{
+								if(infos[i].isFinished())
+								{
+									((FileTableModel)table.getModel()).removeRow(i);
+								}
+							}
+						}
+					});
+					menu.add(mi);
+				}
 			}
 			
 			return menu;
@@ -1085,20 +1194,23 @@ public class ChatPanel extends JPanel
 	{
 		protected boolean down;
 		protected String[]	columns;
+		protected Map<Integer, FileInfo>	data;
 
 		public FileTableModel(boolean down)
 		{
 			this.down = down;
-			columns = new String[]{"Name", down? "Sender": "Receiver", "Size", "Done", "%", "State", "Speed", "Remaining Time"};
+			this.columns = new String[]{"Name", down? "Sender": "Receiver", "Size", "Done", "%", "State", "Speed", "Remaining Time"};
+			this.data	= new LinkedHashMap<Integer, FileInfo>();
 		}
 
 		protected JTable getTable()
 		{
+			// Hack!!! Table required for repaint
 			return down? dtable: utable;
 		}
 		protected Map<Integer, FileInfo> getDataMap()
 		{
-			return down? downloads: uploads;
+			return data;
 		}
 		public int getColumnCount()
 		{

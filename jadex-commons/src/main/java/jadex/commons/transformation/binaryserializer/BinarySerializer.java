@@ -7,10 +7,8 @@ import jadex.commons.transformation.traverser.Traverser;
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *  Object serializer for encoding to and decoding from a compact binary format.
@@ -144,7 +142,7 @@ public class BinarySerializer
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}

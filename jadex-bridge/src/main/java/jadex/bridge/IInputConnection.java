@@ -1,7 +1,5 @@
 package jadex.bridge;
 
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 
 

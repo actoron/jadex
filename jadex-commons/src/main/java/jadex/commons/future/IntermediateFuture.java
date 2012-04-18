@@ -83,11 +83,11 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
         		if(this.exception!=null)
         		{
 //        			this.exception.printStackTrace();
-            		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_EXCEPTION, this, this.exception, exception);
+            		throw new DuplicateResultException(DuplicateResultException.TYPE_EXCEPTION_RESULT, this, this.exception, result);
         		}
         		else
         		{
-            		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_EXCEPTION, this, result, exception);        			
+            		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT, this, this.result, result);        			
         		}
         	}
 	   	

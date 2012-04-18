@@ -7,10 +7,10 @@ import java.util.Collection;
  */
 public abstract class IntermediateExceptionDelegationResultListener<E, T> implements IIntermediateResultListener<E>
 {
-//-------- attributes --------
+	//-------- attributes --------
 	
 	/** The future to which calls are delegated. */
-	protected IntermediateFuture<T> future;
+	protected Future<T> future;
 	
 //	protected DebugException	ex;
 	
@@ -19,7 +19,7 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 	/**
 	 *  Create a new listener.
 	 */
-	public IntermediateExceptionDelegationResultListener(IntermediateFuture<T> future)
+	public IntermediateExceptionDelegationResultListener(Future<T> future)
 	{
 		this.future = future;
 //		this.ex	= new DebugException();
@@ -80,19 +80,13 @@ public abstract class IntermediateExceptionDelegationResultListener<E, T> implem
 	 *  intermediateResultAvailable method was called for all
 	 *  intermediate results before.
      */
-    public void finished()
-    {
-    	future.setFinished();
-    }
+    public abstract void finished();
 	
 	/**
 	 *  Called when the result is available.
 	 * @param result The result.
 	 */
 	public abstract void customResultAvailable(Collection<E> result);
-//	{
-//		future.setResult(result);
-//	}
 
 	/**
 	 *  Called when an exception occurred.

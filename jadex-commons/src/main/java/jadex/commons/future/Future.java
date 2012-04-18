@@ -226,7 +226,7 @@ public class Future<E> implements IFuture<E>
         		}
         		else
         		{
-            		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_EXCEPTION, this, result, exception);        			
+            		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_EXCEPTION, this, this.result, exception);        			
         		}
         	}
         	else if(DEBUG)
@@ -305,7 +305,7 @@ public class Future<E> implements IFuture<E>
         		}
         		else
         		{
-            		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT, this, result, result);        			
+            		throw new DuplicateResultException(DuplicateResultException.TYPE_RESULT_RESULT, this, this.result, result);        			
         		}
         	}
         	else if(DEBUG)

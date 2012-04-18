@@ -214,7 +214,7 @@ public class ChatService implements IChatService
 								fos.close();
 								if(cnt[0]==size)
 								{
-									System.out.println("Received file: "+f.getAbsolutePath()+", size: "+cnt[0]);
+//									System.out.println("Received file: "+f.getAbsolutePath()+", size: "+cnt[0]);
 									fi.setState(FileInfo.COMPLETED);
 									boolean set = ret.setFinishedIfUndone();
 								}
