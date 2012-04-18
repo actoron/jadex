@@ -36,6 +36,9 @@ public class XMLPullStreamReader implements XMLStreamReader {
 	private boolean hasNext;
 	private Reader inputReader;
 	private XMLReporter reporter;
+	
+	/** The default encoding. */
+	public static String DEFAULT_ENCODING = "utf-8";
 
 	/**
 	 * The following Tag Types are not supported by Android Pull Parser.

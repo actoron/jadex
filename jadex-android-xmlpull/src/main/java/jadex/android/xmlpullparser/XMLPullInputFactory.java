@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.xml.stream.XMLOutputFactory;
+
 import javaxx.xml.stream.EventFilter;
 import javaxx.xml.stream.StreamFilter;
 import javaxx.xml.stream.XMLEventReader;
@@ -54,7 +56,7 @@ public class XMLPullInputFactory extends XMLInputFactory {
 	@Override
 	public XMLStreamReader createXMLStreamReader(InputStream stream)
 			throws XMLStreamException {
-		return createXMLStreamReader(new InputStreamReader(stream));
+		return createXMLStreamReader(stream, XMLPullStreamReader.DEFAULT_ENCODING);
 	}
 
 	@Override
