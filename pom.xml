@@ -509,6 +509,7 @@
 			
 			<modules>
 				<module>jadex-platform-extension-maven</module>
+				<module>jadex-platform-extension-natmtp</module>
 			</modules>
 		</profile>
 		
@@ -694,7 +695,8 @@
 				<module>jadex-platform-relay-web</module>
 				<module>jadex-platform-extension-webservice</module>
 				<module>jadex-platform-extension-maven</module>
-				
+				<module>jadex-platform-extension-natmtp</module>
+								
 				<module>jadex-rules-eca</module>
 
 				<module>jadex-platform-wfms</module>
