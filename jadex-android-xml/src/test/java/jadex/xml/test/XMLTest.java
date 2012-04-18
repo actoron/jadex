@@ -761,7 +761,7 @@ public class XMLTest {
 	@Test
 	public void testSpecialCharacter() throws Exception
 	{
-		String str = "ö\n";
+		String str = "\u00F6\n";
 		
 		doWriteAndRead(str);
 	}
