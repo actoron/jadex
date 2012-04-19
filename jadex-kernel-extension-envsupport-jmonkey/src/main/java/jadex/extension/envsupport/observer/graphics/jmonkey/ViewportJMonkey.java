@@ -13,6 +13,7 @@ import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.DomeJMonkey
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.IJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.Object3dJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.SphereJMonkeyRenderer;
+import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.Text3dJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.TorusJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.SkyJMonkeyRenderer;
 import jadex.extension.envsupport.observer.graphics.jmonkey.renderer.special.TerrainJMonkeyRenderer;
@@ -105,7 +106,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 		RENDERERS[4] = new DomeJMonkeyRenderer();
 		RENDERERS[5] = new TorusJMonkeyRenderer();
 		RENDERERS[6] = new Object3dJMonkeyRenderer();
-		// RENDERERS[7] = new Text3dJMonkeyRenderer();
+		RENDERERS[7] = new Text3dJMonkeyRenderer();
 		RENDERERS[8] = new SkyJMonkeyRenderer();
 		RENDERERS[9] = new TerrainJMonkeyRenderer();
 	}
