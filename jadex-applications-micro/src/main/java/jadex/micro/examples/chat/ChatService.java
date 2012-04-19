@@ -195,7 +195,7 @@ public class ChatService implements IChatService
 								fi.setState(FileInfo.TRANSFERRING);
 								fi.setDone(cnt[0]);
 								chatpanel.updateDownload(fi);
-								boolean set = ret.addIntermediateResultIfUndone(new Long(cnt[0]));
+								ret.addIntermediateResultIfUndone(new Long(cnt[0]));
 								// todo: close con?
 							}
 							catch(Exception e)
@@ -203,7 +203,6 @@ public class ChatService implements IChatService
 								fi.setState(FileInfo.ERROR);
 								chatpanel.updateDownload(fi);
 								ret.setExceptionIfUndone(e);
-								e.printStackTrace();
 							}
 						}
 						
@@ -216,7 +215,7 @@ public class ChatService implements IChatService
 								{
 //									System.out.println("Received file: "+f.getAbsolutePath()+", size: "+cnt[0]);
 									fi.setState(FileInfo.COMPLETED);
-									boolean set = ret.setFinishedIfUndone();
+									ret.setFinishedIfUndone();
 								}
 								else
 								{
@@ -232,14 +231,12 @@ public class ChatService implements IChatService
 								fi.setState(FileInfo.ERROR);
 								chatpanel.updateDownload(fi);
 								ret.setExceptionIfUndone(e);
-								e.printStackTrace();
 							}
 						}
 						
 						public void exceptionOccurred(Exception exception)
 						{
 							ret.setExceptionIfUndone(exception);
-							System.out.println("ex:"+exception);
 						}
 					}));
 				}

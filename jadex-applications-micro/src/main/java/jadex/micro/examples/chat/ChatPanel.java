@@ -15,10 +15,10 @@ import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
+import jadex.commons.future.IntermediateExceptionDelegationResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
@@ -26,6 +26,7 @@ import jadex.commons.gui.future.SwingDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -39,6 +40,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -89,19 +92,19 @@ public class ChatPanel extends JPanel
 	public static final DateFormat	df	= new SimpleDateFormat("HH:mm:ss");
 	
 	/** The notification sound for a newly online user. */
-	public static final String	NOTIFICATION_NEW_USER	= "sound/new_msg.wav";
+	public static final String	NOTIFICATION_NEW_USER	= "sounds/new_msg.wav";
 	
 	/** The notification sound for a new message. */
-	public static final String	NOTIFICATION_NEW_MSG	= "sound/new_msg.wav";
+	public static final String	NOTIFICATION_NEW_MSG	= "sounds/new_msg.wav";
 	
 	/** The notification sound for an incoming file request. */
-	public static final String	NOTIFICATION_NEW_FILE	= "sound/new_msg.wav";
+	public static final String	NOTIFICATION_NEW_FILE	= "sounds/new_msg.wav";
 	
 	/** The notification sound for a successfully completed file. */
-	public static final String	NOTIFICATION_FILE_COMPLETE	= "sound/new_msg.wav";
+	public static final String	NOTIFICATION_FILE_COMPLETE	= "sounds/new_msg.wav";
 	
 	/** The notification sound for an aborted or failed file transfer. */
-	public static final String	NOTIFICATION_FILE_ABORT	= "sound/new_msg.wav";
+	public static final String	NOTIFICATION_FILE_ABORT	= "sounds/new_msg.wav";
 	
 	//-------- attributes --------
 	
@@ -724,7 +727,7 @@ public class ChatPanel extends JPanel
 	}
 	
 	/**
-	 *  Called from sender side to iniate a send action.
+	 *  Called from sender side to initiate a send action.
 	 */
 	protected void sendFile(File file, final IComponentIdentifier cid)
 	{
@@ -865,8 +868,10 @@ public class ChatPanel extends JPanel
 								}
 								public void exceptionOccurred(Exception exception)
 								{
-									exception.printStackTrace();
 									ocon.close();
+									fi.setState(FileInfo.ERROR);
+									updateUpload(fi);
+									ret.setException(exception);
 								}
 							}));
 						}
@@ -883,7 +888,6 @@ public class ChatPanel extends JPanel
 					{
 						fi.setState(FileInfo.ERROR);
 						updateUpload(fi);
-						e.printStackTrace();
 						ret.setException(e);
 					}
 					
@@ -964,7 +968,8 @@ public class ChatPanel extends JPanel
 		try
 		{
 			Clip	clip	= AudioSystem.getClip();
-			AudioInputStream	ais	= AudioSystem.getAudioInputStream(getClass().getResourceAsStream(sound));
+			InputStream	is	= getClass().getResourceAsStream(sound);
+			AudioInputStream	ais	= AudioSystem.getAudioInputStream(is);
 			clip.open(ais);
 			clip.start();
 		}
@@ -1049,8 +1054,11 @@ public class ChatPanel extends JPanel
 			if(e.isPopupTrigger()) 
 			{
 				int row = table.rowAtPoint(e.getPoint());
-				FileInfo fi = ((FileTableModel)table.getModel()).getValueAt(row);
-				createMenu(row, fi).show(e.getComponent(), e.getX(), e.getY());
+				if(row!=-1)
+				{
+					FileInfo fi = ((FileTableModel)table.getModel()).getValueAt(row);
+					createMenu(row, fi).show(e.getComponent(), e.getX(), e.getY());
+				}
 			}
 		}
 		
@@ -1107,7 +1115,48 @@ public class ChatPanel extends JPanel
 			
 			if(fi.isFinished())
 			{
-				JMenuItem mi = new JMenuItem("Remove");
+				JMenuItem mi = new JMenuItem("Open");
+				mi.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						try
+						{
+							Desktop.getDesktop().open(fi.getFile().getCanonicalFile());
+						}
+						catch(IOException ex)
+						{
+							try
+							{
+								Runtime.getRuntime().exec(fi.getFile().getCanonicalPath());
+							}
+							catch(Exception exe)
+							{
+								SGUI.showError(table, "Error Opening File", "File '"+fi.getFile().getName()+"' could not be opened.", exe);
+							}
+						}
+					}
+				});
+				menu.add(mi);
+
+				mi = new JMenuItem("Open folder");
+				mi.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						try
+						{
+							Desktop.getDesktop().open(fi.getFile().getParentFile().getCanonicalFile());
+						}
+						catch(IOException ex)
+						{
+							SGUI.showError(table, "Error Opening Folder", "Folder '"+fi.getFile().getParentFile().getName()+"'could not be opened.", ex);
+						}
+					}
+				});
+				menu.add(mi);
+
+				mi = new JMenuItem("Remove");
 				mi.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)

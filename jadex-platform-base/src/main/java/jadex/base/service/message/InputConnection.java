@@ -5,7 +5,6 @@ import jadex.bridge.IInputConnection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 
 import java.util.ArrayList;
@@ -180,36 +179,23 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 		{
 			if(ifuture!=null || ofuture!=null)
 				return new SubscriptionIntermediateFuture<byte[]>(new RuntimeException("Stream has reader"));
-			ifuture = new SubscriptionIntermediateFuture<byte[]>();
+			ifuture = new SubscriptionIntermediateFuture<byte[]>(new Runnable()
+			{
+				public void run()
+				{
+					close();
+				}
+			});
 			cl = closed;
 		}
 			
-		try
+		for(byte[] next=getNextByteArray(); next!=null; next=getNextByteArray())
 		{
-			try
-			{
-				for(byte[] next=getNextByteArray(); next!=null; next=getNextByteArray())
-				{
-					ifuture.addIntermediateResult(next);
-				}
-//				for(int val=internalRead(); val!=-1; )
-//				{
-//					ifuture.addIntermediateResult(new Byte((byte)val));
-//				}
-			}
-			catch(Exception e)
-			{
-				// catch stream closed exception
-			}
-			if(cl && position==size)
-			{
-				ifuture.setFinished();
-//				future.setException(new RuntimeException("Stream closed"));
-			}
+			ifuture.addIntermediateResultIfUndone(next);
 		}
-		catch(Exception e)
+		if(cl && position==size)
 		{
-			ifuture.setException(e);
+			ifuture.setFinishedIfUndone();
 		}
 		
 		return ifuture;
@@ -309,31 +295,27 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	{
 //		System.out.println("added: "+data.length+" "+position+" "+size);
 
-		IntermediateFuture<byte[]> iret;
 		Future<Byte> oret = null;
-		boolean cl;
 		synchronized(this)
 		{
 			this.data.add(data);
 			this.size += data.length;
 
-			iret = ifuture;
 			if(ofuture!=null)
 			{
 				oret = ofuture;
 				ofuture = null;
 			}
-			cl = closed;
 		}
 		
-		if(iret!=null)
+		if(ifuture!=null)
 		{
 			for(byte[] next=getNextByteArray(); next!=null; next=getNextByteArray())
 			{
-				ifuture.addIntermediateResult(next);
+				ifuture.addIntermediateResultIfUndone(next);
 			}
-			if(cl && position == size)
-				ifuture.setFinished();
+			if(closed && position==size)
+				ifuture.setFinishedIfUndone();
 		}
 		else if(oret!=null)
 		{
@@ -348,24 +330,21 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	{
 		super.setClosed();
 		
-		IntermediateFuture<byte[]> iret;
 		Future<Byte> oret;
 		boolean cl;
 		synchronized(this)
 		{
 			super.setClosed();
-			iret = ifuture;
 			oret = ofuture;
-			cl = position == size;
+			cl = position==size;
 		}
 		
 //		System.out.println("setClosed(InputCon): "+position+" "+size+" "+cl);
 		
 		// notify async listener if last byte has been read and stream is closed.
-		if(iret!=null && cl)
+		if(ifuture!=null && cl)
 		{
-			iret.setFinished();
-//			ret.setException(new RuntimeException("Stream closed"));
+			ifuture.setFinishedIfUndone();
 		}
 		else if(oret!=null && cl)
 		{
