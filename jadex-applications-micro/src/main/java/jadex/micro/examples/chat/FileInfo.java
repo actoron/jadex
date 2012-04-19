@@ -66,7 +66,6 @@ public class FileInfo
 		this.sender = sender;
 		this.size = size;
 		this.done = done;
-		this.lastupdate	= System.currentTimeMillis();
 	}
 
 	/**
@@ -140,9 +139,14 @@ public class FileInfo
 	{
 		this.done = done;
 		
-		// Calculate speed every second.
+		// Calculate speed every second, but only start timer after first update received.
 		long	update	= System.currentTimeMillis();
-		if(update-this.lastupdate>=1000)
+		if(lastupdate==0)
+		{
+			lastupdate	= update;
+			lastdone	= done;
+		}
+		else if(update-this.lastupdate>=1000)
 		{
 			long	dbytes	= done - lastdone;
 			double	dtime	= (update - lastupdate)/1000.0;		

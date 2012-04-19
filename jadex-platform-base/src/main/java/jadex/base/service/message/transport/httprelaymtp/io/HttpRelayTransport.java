@@ -43,7 +43,7 @@ public class HttpRelayTransport implements ITransport
 	protected static final long	ALIVETIME	= 30000;
 	
 	/** The maximum number of workers for an address. */
-	protected static final int	MAX_WORKERS	= 1;	// Using more than one worker breaks keepalive!? grrr...
+	protected static final int	MAX_WORKERS;
 	
 	/** A buffer for reading response data (ignored but needs to be read for connection to be reusable). */
 	protected static final byte[]	RESPONSE_BUF	= new byte[8192];
@@ -51,9 +51,26 @@ public class HttpRelayTransport implements ITransport
 //	/** Lock for synchronizing access to the URL connection pool. */
 //	protected static final Object	POOL_LOCK	= new Object();
 	
-	// HACK!!! Disable all certificate checking (only until we find a more fine-grained solution)
 	static
 	{
+		// Can only use as many workers as connections are allowed
+		// (otherwise runs out of ports when sending many messages, e.g. from streams)
+		int	maxworkers;
+		try
+		{
+			String prop = System.getProperty("http.maxConnections");
+			maxworkers	= prop!=null  ? Integer.parseInt(prop)
+				: 5; // Default according to http://docs.oracle.com/javase/1.4.2/docs/guide/net/properties.html
+		}
+		catch(Exception e)
+		{
+			maxworkers	= 1; // Not efficient, but uses the least ports, if keep-alive not available.
+		}
+		MAX_WORKERS	= maxworkers;
+//		System.out.println("Relay maxworkers: "+maxworkers);
+		
+		
+		// HACK!!! Disable all certificate checking (only until we find a more fine-grained solution)
         try
         {
 	        TrustManager[] trustAllCerts = new TrustManager[]
