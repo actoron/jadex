@@ -253,8 +253,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		
 		try
 		{
-			final boolean terminable = SReflect.isSupertype(ITerminableFuture.class, method.getReturnType())
-				|| SReflect.isSupertype(ITerminableIntermediateFuture.class, method.getReturnType());
+			final boolean terminable = SReflect.isSupertype(ITerminableFuture.class, method.getReturnType());
 			
 //			System.out.println("invoke: "+m);
 			

@@ -240,7 +240,7 @@ public class ChatService implements IChatService, IChatGuiService
 					{
 						ret.addIntermediateResultIfUndone(chat);	// Might return after later exception in service search!?
 						
-						if(finished && --cnt==0)
+						if(--cnt==0 && finished)
 						{
 							ret.setFinished();
 						}
@@ -248,7 +248,7 @@ public class ChatService implements IChatService, IChatGuiService
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						if(finished && --cnt==0)
+						if(--cnt==0 && finished)
 						{
 							ret.setFinished();
 						}
@@ -289,7 +289,7 @@ public class ChatService implements IChatService, IChatGuiService
 					{
 						ret.addIntermediateResultIfUndone(chat);	// Might return after later exception in service search!?
 						
-						if(finished && --cnt==0)
+						if(--cnt==0 && finished)
 						{
 							ret.setFinished();
 						}
@@ -297,7 +297,7 @@ public class ChatService implements IChatService, IChatGuiService
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						if(finished && --cnt==0)
+						if(--cnt==0 && finished)
 						{
 							ret.setFinished();
 						}
@@ -430,7 +430,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		final TransferInfo fi = new TransferInfo(false, null, file, cid, file.length());
+		final TransferInfo fi = new TransferInfo(false, null, file, cid, new File(file).length());
 		fi.setState(TransferInfo.STATE_WAITING);
 		
 		IFuture<IChatService> fut = agent.getServiceContainer().getService(IChatService.class, cid);
@@ -628,12 +628,16 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  Called from file sender.
 	 *  Writes bytes from file input stream to output connection.
 	 */
-	protected void	doUpload(final TransferInfo fi, final IOutputConnection ocon, final IComponentIdentifier receiver)
+	protected void	doUpload(final TransferInfo ti, final IOutputConnection ocon, final IComponentIdentifier receiver)
 	{
+		assert TransferInfo.STATE_WAITING.equals(ti.getState());
+		ti.setState(TransferInfo.STATE_TRANSFERRING);
+		publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+		
 		try
 		{
 			final long[] filesize = new long[1];
-			final File file = new File(fi.getFile());
+			final File file = new File(ti.getFile());
 			final FileInputStream fis = new FileInputStream(file);
 			
 			IComponentStep<Void> step = new IComponentStep<Void>()
@@ -641,7 +645,7 @@ public class ChatService implements IChatService, IChatGuiService
 				public IFuture<Void> execute(final IInternalAccess ia)
 				{
 					// Stop transfer on error etc.
-					if(fi.isFinished())
+					if(ti.isFinished())
 					{
 						ocon.close();
 						return IFuture.DONE;
@@ -661,8 +665,8 @@ public class ChatService implements IChatService, IChatGuiService
 						ocon.write(buf);
 //						System.out.println("wrote: "+size);
 						
-						fi.setDone(filesize[0]);
-						publishEvent(ChatEvent.TYPE_FILE, nick, fi.getOther(), fi);
+						ti.setDone(filesize[0]);
+						publishEvent(ChatEvent.TYPE_FILE, nick, ti.getOther(), ti);
 						
 						if(fis.available()>0)
 						{
@@ -679,8 +683,8 @@ public class ChatService implements IChatService, IChatGuiService
 								public void exceptionOccurred(Exception exception)
 								{
 									ocon.close();
-									fi.setState(TransferInfo.STATE_ERROR);
-									publishEvent(ChatEvent.TYPE_FILE, nick, fi.getOther(), fi);
+									ti.setState(TransferInfo.STATE_ERROR);
+									publishEvent(ChatEvent.TYPE_FILE, nick, ti.getOther(), ti);
 								}
 							}));
 						}
@@ -688,13 +692,13 @@ public class ChatService implements IChatService, IChatGuiService
 						{
 							fis.close();
 							ocon.close();
-							fi.setState(TransferInfo.STATE_COMPLETED);
-							publishEvent(ChatEvent.TYPE_FILE, nick, fi.getOther(), fi);						}
+							ti.setState(TransferInfo.STATE_COMPLETED);
+							publishEvent(ChatEvent.TYPE_FILE, nick, ti.getOther(), ti);						}
 					}
 					catch(Exception e)
 					{
-						fi.setState(TransferInfo.STATE_ERROR);
-						publishEvent(ChatEvent.TYPE_FILE, nick, fi.getOther(), fi);					}
+						ti.setState(TransferInfo.STATE_ERROR);
+						publishEvent(ChatEvent.TYPE_FILE, nick, ti.getOther(), ti);					}
 					
 					return IFuture.DONE;
 				}

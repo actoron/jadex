@@ -20,8 +20,8 @@ public class ChatPlugin extends AbstractServicePlugin
 
 	static
 	{
-		icons.put("chat", SGUI.makeIcon(ChatPlugin.class, "/jadex/tools/common/images/libcenter.png"));
-		icons.put("chat_sel", SGUI.makeIcon(ChatPlugin.class, "/jadex/tools/common/images/libcenter_sel.png"));
+		icons.put("chat", SGUI.makeIcon(ChatPlugin.class, "images/chat.png"));
+		icons.put("chat_sel", SGUI.makeIcon(ChatPlugin.class, "images/chat.png"));
 	}
 
 	//-------- methods --------
@@ -58,5 +58,13 @@ public class ChatPlugin extends AbstractServicePlugin
 	public Icon getToolIcon(boolean selected)
 	{
 		return selected? icons.getIcon("chat_sel"): icons.getIcon("chat");
+	}
+
+	/**
+	 *  Get the plugin name.
+	 */
+	public String getName()
+	{
+		return "Chat";
 	}
 }

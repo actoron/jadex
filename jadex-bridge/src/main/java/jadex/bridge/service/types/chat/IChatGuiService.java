@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.chat;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
@@ -31,6 +32,7 @@ public interface IChatGuiService
 	 *  Subscribe to events from the chat service.
 	 *  @return A future publishing chat events as intermediate results.
 	 */
+	@Timeout(3153600000000L)	// = 100 years ;-) Todo: support -1 for no timer
 	public ISubscriptionIntermediateFuture<ChatEvent>	subscribeToEvents();
 	
 	//-------- chatting --------

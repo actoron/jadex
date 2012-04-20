@@ -1119,9 +1119,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				{
 					if(!future.isDone())
 					{
-						rms.removeWaitingCall(callid);
+						WaitingCallInfo	wci	= rms.removeWaitingCall(callid);
 						future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "
-							+receiver+", "+callid)
+							+receiver+", "+callid+", "+wci)
 						{
 							public void printStackTrace()
 							{
