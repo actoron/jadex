@@ -136,9 +136,10 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-	//			System.out.println("Selected : "+selcb.getSelectedItem());
+//				System.out.println("Selected item: "+selcb.getSelectedItem()+" index: "+selcb.getSelectedIndex());
 				
-				final Object sel = selcb.getSelectedIndex()!=-1 ? selcb.getModel().getElementAt(selcb.getSelectedIndex()) : null;
+				// ????
+				final Object sel = selcb.getSelectedIndex()!=-1 ? selcb.getModel().getElementAt(selcb.getSelectedIndex()) : selcb.getSelectedItem();
 				
 				if(sel==null || ocl.isAvailable(sel))
 				{

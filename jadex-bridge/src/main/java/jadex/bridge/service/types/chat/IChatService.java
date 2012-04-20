@@ -1,4 +1,4 @@
-package jadex.micro.examples.chat;
+package jadex.bridge.service.types.chat;
 
 import jadex.bridge.IInputConnection;
 import jadex.bridge.service.annotation.Security;
@@ -27,20 +27,29 @@ public interface IChatService
 	
 	/**
 	 *  Post a message
+	 *  @param nick The sender's nick name.
 	 *  @param text The text message.
 	 */
-	public IFuture<Void> message(String text);
+	public IFuture<Void> message(String nick, String text);
 	
 	/**
-	 *  Post a status change.
+	 *  Post a status or nick name change.
+	 *  @param nick The (possibly changed) nick name.
 	 *  @param status The new status.
 	 */
-	public IFuture<Void> status(String status);
+	public IFuture<Void> status(String nick, String status);
 	
 	/**
 	 *  Send a file.
+	 *  
+	 *  @param nick The sender's nick name.
 	 *  @param filename The filename.
+	 *  @param size The size of the file.
+	 *  @param id An optional id to identify the transfer (e.g. for resume after error).
 	 *  @param con The connection.
+	 *  
+	 *  @return The returned future publishes updates about the total number of bytes received.
+	 *    Exception messages of the returned future correspond to file transfer states (aborted vs. error vs. rejected).
 	 */
-	public ITerminableIntermediateFuture<Long> sendFile(String filename, long size, IInputConnection con);
+	public ITerminableIntermediateFuture<Long> sendFile(String nick, String filename, long size, String id, IInputConnection con);
 }

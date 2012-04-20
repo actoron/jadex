@@ -1,28 +1,27 @@
 package jadex.bridge.service.component.interceptors;
 
-import java.lang.reflect.Method;
-import java.util.Collection;
-
 import jadex.bridge.service.annotation.PostCondition;
 import jadex.bridge.service.annotation.PostConditions;
 import jadex.bridge.service.annotation.PreCondition;
 import jadex.bridge.service.annotation.PreConditions;
-import jadex.bridge.service.annotation.Reference;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
-import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.javaparser.SJavaParser;
+
+import java.util.Collection;
 
 /**
  * 
@@ -208,18 +207,36 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 			
 			if(res instanceof IFuture)
 			{
-				if(res instanceof ITerminableFuture)
+				if(res instanceof ISubscriptionIntermediateFuture)
 				{
-					TerminableDelegationFuture<Object> fut = new TerminableDelegationFuture<Object>((ITerminableFuture)res)
+					SubscriptionIntermediateDelegationFuture<Object> fut = new SubscriptionIntermediateDelegationFuture<Object>((ISubscriptionIntermediateFuture)res)
 					{
-						public void	setResult(Object result)
+						public void	setResult(Collection<Object> result)
 						{
-					    	Exception ex = checkPostConditions(sic, result, null);
+							Exception ex = checkPostConditions(sic, result, null);
 					    	if(ex==null)
 					    		super.setResult(result);
 					    	else
 					    		super.setException(ex);
-					    }	
+					    }
+						
+						public void addIntermediateResult(Object result)
+						{
+							Exception ex = checkPostConditions(sic, null, result);
+					    	if(ex==null)
+					    		super.addIntermediateResult(result);
+					    	else
+					    		super.setExceptionIfUndone(ex);
+						}	
+						
+						public void setFinished()
+						{
+							Exception ex = checkPostConditions(sic, getIntermediateResults(), null);
+					    	if(ex==null)
+					    		super.setResult(result);
+					    	else
+					    		super.setException(ex);
+						}
 					};
 //					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
 					res	= fut;
@@ -254,6 +271,22 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 					    	else
 					    		super.setException(ex);
 						}
+					};
+//					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
+					res	= fut;
+				}
+				else if(res instanceof ITerminableFuture)
+				{
+					TerminableDelegationFuture<Object> fut = new TerminableDelegationFuture<Object>((ITerminableFuture)res)
+					{
+						public void	setResult(Object result)
+						{
+					    	Exception ex = checkPostConditions(sic, result, null);
+					    	if(ex==null)
+					    		super.setResult(result);
+					    	else
+					    		super.setException(ex);
+					    }	
 					};
 //					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
 					res	= fut;

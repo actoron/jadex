@@ -1,5 +1,7 @@
-package jadex.micro.examples.chat;
+package jadex.base.service.chat;
 
+import jadex.bridge.service.types.chat.IChatGuiService;
+import jadex.bridge.service.types.chat.IChatService;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Binding;
 import jadex.micro.annotation.Description;
@@ -13,7 +15,10 @@ import jadex.micro.annotation.RequiredServices;
  *  Chat micro agent. 
  */
 @Description("This agent offers a chat service.")
-@ProvidedServices(@ProvidedService(type=IChatService.class, implementation=@Implementation(ChatService.class)))
+@ProvidedServices({
+	@ProvidedService(name="chat", type=IChatService.class, implementation=@Implementation(ChatService.class)),
+	@ProvidedService(type=IChatGuiService.class, implementation=@Implementation(expression="$component.getRawService(\"chat\")"))
+})
 @RequiredServices(
 	@RequiredService(name="chatservices", type=IChatService.class, multiple=true,
 		binding=@Binding(dynamic=true, scope=Binding.SCOPE_GLOBAL))

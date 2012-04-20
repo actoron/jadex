@@ -4,7 +4,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
@@ -20,12 +19,13 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableDelegationFuture;
-import jadex.commons.future.TerminableDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.transformation.traverser.FilterProcessor;
 import jadex.commons.transformation.traverser.Traverser;
@@ -430,15 +430,21 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						return marshal.isLocalReference(object);
 					}
 				};
-				if(res instanceof ITerminableFuture)
+				if(res instanceof ISubscriptionIntermediateFuture)
 				{
-					TerminableDelegationFuture<Object> fut = new TerminableDelegationFuture<Object>((ITerminableFuture)res)
+					SubscriptionIntermediateDelegationFuture<Object> fut = new SubscriptionIntermediateDelegationFuture<Object>((ISubscriptionIntermediateFuture)res)
 					{
-						public void	setResult(Object result)
+						public void	setResult(Collection<Object> result)
+						{
+							Collection<Object> res = (Collection)doCopy(copy, deffilter, result);
+							super.setResult(res);
+					    }
+						
+						public void addIntermediateResult(Object result)
 						{
 					    	Object res = doCopy(copy, deffilter, result);
-							super.setResult(res);
-					    }	
+							super.addIntermediateResult(res);
+						}	
 					};
 //					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
 					res	= fut;
@@ -458,6 +464,19 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					    	Object res = doCopy(copy, deffilter, result);
 							super.addIntermediateResult(res);
 						}	
+					};
+//					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
+					res	= fut;
+				}
+				else if(res instanceof ITerminableFuture)
+				{
+					TerminableDelegationFuture<Object> fut = new TerminableDelegationFuture<Object>((ITerminableFuture)res)
+					{
+						public void	setResult(Object result)
+						{
+					    	Object res = doCopy(copy, deffilter, result);
+							super.setResult(res);
+					    }	
 					};
 //					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
 					res	= fut;

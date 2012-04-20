@@ -11,7 +11,7 @@ import javax.swing.JComponent;
 /**
  *  Simple default viewer panel.
  */
-public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
+public abstract class AbstractServiceViewerPanel<T> implements IServiceViewerPanel
 {
 	//-------- attributes --------
 	
@@ -19,7 +19,7 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	protected IControlCenter jcc;
 	
 	/** The service. */
-	protected IService service;
+	protected T service;
 	
 	//-------- methods --------
 	
@@ -32,7 +32,7 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	public IFuture<Void> init(IControlCenter jcc, IService service)
 	{
 		this.jcc = jcc;
-		this.service = service;
+		this.service = (T) service;
 		return IFuture.DONE;
 	}
 	
@@ -87,7 +87,7 @@ public abstract class AbstractServiceViewerPanel implements IServiceViewerPanel
 	/**
 	 *  Get the service.
 	 */
-	public IService getService()
+	public T getService()
 	{
 		return service;
 	}

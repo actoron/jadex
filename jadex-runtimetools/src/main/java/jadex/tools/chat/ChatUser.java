@@ -1,7 +1,8 @@
-package jadex.micro.examples.chat;
+package jadex.tools.chat;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
+import jadex.bridge.service.types.chat.IChatService;
 import jadex.commons.gui.SGUI;
 
 import javax.swing.Icon;
@@ -115,5 +116,13 @@ public class ChatUser
 		{
 			this.receiving	= -1;
 		}
+	}
+
+	/**
+	 *  Get the state.
+	 */
+	public String getState()
+	{
+		return state;
 	}
 }

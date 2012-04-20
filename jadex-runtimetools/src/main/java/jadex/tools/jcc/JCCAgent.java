@@ -10,6 +10,7 @@ import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Description;
 import jadex.tools.awareness.AwarenessComponentPlugin;
+import jadex.tools.chat.ChatPlugin;
 import jadex.tools.convcenter.ConversationPlugin;
 import jadex.tools.debugger.DebuggerPlugin;
 import jadex.tools.deployer.DeployerPlugin;
@@ -48,6 +49,7 @@ public class JCCAgent extends MicroAgent
 		cc.init(getExternalAccess(),
 			new String[]{
 				StarterPlugin.class.getName(),
+				ChatPlugin.class.getName(),
 //				StarterServicePlugin.class.getName(),
 				DFServicePlugin.class.getName(),
 				ConversationPlugin.class.getName(),

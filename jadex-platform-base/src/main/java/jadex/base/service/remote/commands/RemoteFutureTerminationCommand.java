@@ -5,7 +5,6 @@ import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.service.annotation.Security;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
 
@@ -69,10 +68,7 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 		if(tfut!=null)
 		{
 //			System.out.println("terminating remote future: "+tfut.hashCode());
-			if(tfut instanceof ITerminableFuture)
-				((ITerminableFuture)tfut).terminate();
-			else
-				((ITerminableIntermediateFuture)tfut).terminate();
+			((ITerminableFuture)tfut).terminate();
 		}
 		else
 		{
@@ -85,10 +81,7 @@ public class RemoteFutureTerminationCommand extends AbstractRemoteCommand
 					if(tfut!=null)
 					{
 //						System.out.println("terminated future afterwards");
-						if(tfut instanceof ITerminableFuture)
-							((ITerminableFuture)tfut).terminate();
-						else
-							((ITerminableIntermediateFuture)tfut).terminate();
+						((ITerminableFuture)tfut).terminate();
 					}
 				}
 			});

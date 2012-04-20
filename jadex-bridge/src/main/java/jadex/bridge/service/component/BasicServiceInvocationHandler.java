@@ -31,15 +31,16 @@ import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
+import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableDelegationFuture;
 import jadex.commons.future.TerminableDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
-import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.javaparser.SJavaParser;
 
@@ -145,17 +146,17 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			
 			List<Object> myargs = args!=null? SUtil.arrayToList(args): null;
 			
-			if(SReflect.isSupertype(ITerminableFuture.class, method.getReturnType()))
+			if(SReflect.isSupertype(ISubscriptionIntermediateFuture.class, method.getReturnType()))
 			{
-				final TerminableDelegationFuture fut = new TerminableDelegationFuture();
+				final SubscriptionIntermediateDelegationFuture fut = new SubscriptionIntermediateDelegationFuture();
 				ret = fut;
 				sic.invoke(service, method, myargs).addResultListener(new DelegationResultListener(fut)
 				{
 					public void customResultAvailable(Object result)
 					{
 //						System.out.println("result rec: "+sic.getResult());
-						ITerminableFuture<?> src = (ITerminableFuture)sic.getResult();
-						src.addResultListener(new TerminableDelegationResultListener(fut, src));
+						ISubscriptionIntermediateFuture src = (ISubscriptionIntermediateFuture)sic.getResult();
+						src.addResultListener(new TerminableIntermediateDelegationResultListener(fut, src));
 					}
 				});
 			}
@@ -170,6 +171,20 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 //						System.out.println("result rec: "+sic.getResult());
 						ITerminableIntermediateFuture src = (ITerminableIntermediateFuture)sic.getResult();
 						src.addResultListener(new TerminableIntermediateDelegationResultListener(fut, src));
+					}
+				});
+			}
+			else if(SReflect.isSupertype(ITerminableFuture.class, method.getReturnType()))
+			{
+				final TerminableDelegationFuture fut = new TerminableDelegationFuture();
+				ret = fut;
+				sic.invoke(service, method, myargs).addResultListener(new DelegationResultListener(fut)
+				{
+					public void customResultAvailable(Object result)
+					{
+//						System.out.println("result rec: "+sic.getResult());
+						ITerminableFuture<?> src = (ITerminableFuture)sic.getResult();
+						src.addResultListener(new TerminableDelegationResultListener(fut, src));
 					}
 				});
 			}

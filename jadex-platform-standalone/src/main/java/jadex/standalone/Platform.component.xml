@@ -118,6 +118,9 @@
 		<!-- The base classloader. -->
 		<argument name="baseclassloader" class="ClassLoader"></argument>
 				
+		<!-- Start the chat agent for instant messaging and file transfer with user Jadex users. -->
+		<argument name="chat" class="boolean">true</argument>
+		
 		<!-- Start the awareness agent (awa) for automatic platform discovery. -->
 		<argument name="awareness" class="boolean">true</argument>
 		<!-- Start the awareness agent discovery mechanisms. -->
@@ -189,8 +192,9 @@
 		<componenttype filename="jadex/gpmn/KernelGPMN.component.xml" name="kernel_gpmn"/>
 		<componenttype filename="jadex/component/KernelMulti.component.xml" name="kernel_multi"/>
 		<componenttype filename="jadex/base/service/remote/RemoteServiceManagementAgent.class" name="rms"/>
+		<componenttype filename="jadex/base/service/chat/Chat.component.xml" name="chat"/>
 		<componenttype filename="jadex/base/service/awareness/management/AwarenessManagementAgent.class" name="awa"/>
-
+		
 		<!-- <componenttype filename="jadex/tools/jcc/JCC.agent.xml" name="jcc"/> -->
 		<!--<componenttype filename="jadex/tools/jcc/JCCAgent.class" name="jcc"/>-->
 		<componenttype filename="/jadex/tools/jcc/JCCAgent.class" name="jcc"/>
@@ -355,6 +359,7 @@
 						<argument name="binarymessages">$args.binarymessages</argument>
 					</arguments>
 				</component>
+				<component name="chat" type="chat" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;chat&quot;)) ? 1 : 0"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
 						<argument name="mechanisms">$args.awamechanisms</argument>
@@ -391,6 +396,7 @@
 						<argument name="binarymessages">$args.binarymessages</argument>
 					</arguments>
 				</component>
+				<component name="chat" type="chat" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;chat&quot;)) ? 1 : 0"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
 						<argument name="mechanisms">$args.awamechanisms</argument>
