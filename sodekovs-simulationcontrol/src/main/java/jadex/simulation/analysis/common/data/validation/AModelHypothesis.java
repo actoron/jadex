@@ -24,7 +24,7 @@ public class AModelHypothesis extends ADataObject implements IAModelHypothesis {
 		super();
 		synchronized (mutex) {
 
-			view = new AModelHypothesisView(this);
+			// view = new AModelHypothesisView(this);
 		}
 	}
 
@@ -35,11 +35,9 @@ public class AModelHypothesis extends ADataObject implements IAModelHypothesis {
 
 			this.inputParameter = inputParameter;
 			this.outputParameter = outputParameter;
-			view = new AModelHypothesisView(this);
+			// view = new AModelHypothesisView(this);
 		}
 	}
-	
-	
 
 	// ------ Interface IAModel ------
 

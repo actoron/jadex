@@ -45,42 +45,42 @@ public interface IASummaryParameter extends IAParameter
 	 * 
 	 * @return The sum or <code>Double.NaN</code> if no values have been added
 	 */
-	public abstract Double getSum();
+	public abstract Double getSumValue();
 
 	/**
 	 * Returns the mean of the values that have been added.
 	 * 
 	 * @return the mean
 	 */
-	public abstract Double getMean();
+	public abstract Double getMeanValue();
 
 	/**
 	 * Returns the standard deviation of the values that have been added.
 	 * 
 	 * @return the standard deviation
 	 */
-	public abstract Double getStandardDeviation();
+	public abstract Double getStandardDeviationValue();
 
 	/**
 	 * Returns the variance of the values that have been added.
 	 * 
 	 * @return the variance
 	 */
-	public abstract Double getVariance();
+	public abstract Double getVarianceValue();
 
 	/**
 	 * Returns the maximum of the values that have been added.
 	 * 
 	 * @return the maximum
 	 */
-	public abstract Double getMax();
+	public abstract Double getMaxValue();
 
 	/**
 	 * Returns the minimum of the values that have been added.
 	 * 
 	 * @return the minimum
 	 */
-	public abstract Double getMin();
+	public abstract Double getMinValue();
 
 	/**
 	 * test if summary is empty false if n <= 0.

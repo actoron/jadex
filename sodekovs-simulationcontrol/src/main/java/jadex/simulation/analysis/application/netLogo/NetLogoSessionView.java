@@ -29,7 +29,7 @@ public class NetLogoSessionView extends JPanel implements IASessionView
 	private SessionProperties prop = null;
 	private JComponent component = new JPanel(new GridBagLayout());
 	
-	public NetLogoSessionView( IAnalysisSessionService service, final UUID id, final IAParameterEnsemble config)
+	public NetLogoSessionView( IAnalysisSessionService service, final String id, final IAParameterEnsemble config)
 	{
 		super();
 		this.service = service;

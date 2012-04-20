@@ -29,9 +29,9 @@ public class AAllocateExperimentsService extends ABasicAnalysisSessionService im
 	}
 
 	@Override
-	public IFuture allocateExperiment(UUID sessionId, IAExperimentBatch experiments)
+	public IFuture allocateExperiment(String sessionId, IAExperimentBatch experiments)
 	{
-		if (sessionId == null ) sessionId = (UUID) createSession(null).get(susThread);
+		if (sessionId == null ) sessionId = (String) createSession(null).get(susThread);
 		ADataSessionView view = (ADataSessionView) sessionViews.get(sessionId);
 		view.startGUI(experiments);
 		

@@ -21,7 +21,7 @@ public class AValidationProcessService extends ASubProcessService implements IAV
 	}
 	
 	@Override
-	public IFuture validate(UUID session)
+	public IFuture validate(String session)
 	{
 		return startSubprocess(session, "Validation", "jadex/simulation/analysis/process/validation/Validation.bpmn", null);
 	}

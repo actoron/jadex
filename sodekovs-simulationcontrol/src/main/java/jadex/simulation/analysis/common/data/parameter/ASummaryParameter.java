@@ -25,14 +25,14 @@ public class ASummaryParameter extends ABasicParameter implements
 	public ASummaryParameter() {
 		super();
 		synchronized (mutex) {
-			view = new ASummaryParameterView(this);
+//			view = new ASummaryParameterView(this);
 		}
 	}
 
 	public ASummaryParameter(String name) {
 		super(name, Double.class, null);
 		synchronized (mutex) {
-			view = new ASummaryParameterView(this);
+//			view = new ASummaryParameterView(this);
 		}
 	}
 
@@ -55,6 +55,28 @@ public class ASummaryParameter extends ABasicParameter implements
 	private ISingleStatistic variance = new Variance();
 
 	private List<Double> values = new LinkedList<Double>();
+	
+	
+
+	public ISingleStatistic getMin() {
+		return min;
+	}
+
+	public ISingleStatistic getMax() {
+		return max;
+	}
+
+	public ISingleStatistic getMean() {
+		return mean;
+	}
+
+	public ISingleStatistic getSum() {
+		return sum;
+	}
+
+	public ISingleStatistic getVariance() {
+		return variance;
+	}
 
 	public void setN(Double n) {
 		synchronized (mutex) {
@@ -113,7 +135,7 @@ public class ASummaryParameter extends ABasicParameter implements
 
 	@Override
 	public Object getValue() {
-		return getMean();
+		return getMeanValue();
 	}
 
 	/*
@@ -171,7 +193,7 @@ public class ASummaryParameter extends ABasicParameter implements
 	 * ()
 	 */
 	@Override
-	public Double getSum() {
+	public Double getSumValue() {
 		return sum.getResult();
 	}
 
@@ -183,7 +205,7 @@ public class ASummaryParameter extends ABasicParameter implements
 	 * ()
 	 */
 	@Override
-	public Double getMean() {
+	public Double getMeanValue() {
 		// System.out.println(mean);
 		// System.out.println(mean.getResult());
 		if (mean != null) {
@@ -200,12 +222,12 @@ public class ASummaryParameter extends ABasicParameter implements
 	 * getStandardDeviation()
 	 */
 	@Override
-	public Double getStandardDeviation() {
+	public Double getStandardDeviationValue() {
 		synchronized (mutex) {
 			double stdDev = Double.NaN;
 			if (getN() > 0) {
 				if (getN() > 1) {
-					stdDev = Math.sqrt(getVariance());
+					stdDev = Math.sqrt(getVarianceValue());
 				} else {
 					stdDev = 0.0;
 				}
@@ -221,7 +243,7 @@ public class ASummaryParameter extends ABasicParameter implements
 	 * getVariance()
 	 */
 	@Override
-	public Double getVariance() {
+	public Double getVarianceValue() {
 		return variance.getResult();
 	}
 
@@ -233,7 +255,7 @@ public class ASummaryParameter extends ABasicParameter implements
 	 * ()
 	 */
 	@Override
-	public Double getMax() {
+	public Double getMaxValue() {
 		return max.getResult();
 	}
 
@@ -245,7 +267,7 @@ public class ASummaryParameter extends ABasicParameter implements
 	 * ()
 	 */
 	@Override
-	public Double getMin() {
+	public Double getMinValue() {
 		return min.getResult();
 	}
 

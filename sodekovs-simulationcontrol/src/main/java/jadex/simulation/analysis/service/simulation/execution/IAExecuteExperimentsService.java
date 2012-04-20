@@ -25,7 +25,7 @@ public interface IAExecuteExperimentsService extends IAnalysisSessionService
 	 *            experiment to simulate
 	 * @param view
 	 */
-	public IFuture executeExperiment(UUID session, IAExperiment experiment);
+	public IFuture executeExperiment(String session, IAExperiment experiment);
 
 	/**
 	 * Return the model which the service support

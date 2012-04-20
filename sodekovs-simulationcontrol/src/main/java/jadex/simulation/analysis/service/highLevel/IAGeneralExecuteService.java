@@ -22,5 +22,5 @@ public interface IAGeneralExecuteService extends IAnalysisSessionService
 	 *            experiments to evaluate
 	 * @return IAExperimentBatch, executed results
 	 */
-	public IFuture execute(UUID session, IAExperimentBatch experiments);
+	public IFuture execute(String session, IAExperimentBatch experiments);
 }

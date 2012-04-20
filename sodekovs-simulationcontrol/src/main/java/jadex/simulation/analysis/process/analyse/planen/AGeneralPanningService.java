@@ -20,7 +20,7 @@ public class AGeneralPanningService extends ASubProcessService implements IAGene
 	}
 
 	@Override
-	public IFuture plan(UUID session)
+	public IFuture plan(String session)
 	{
 		return startSubprocess(session, "AllgemeinPlanen", "jadex/simulation/analysis/process/analyse/planen/AllgemeinPlanen.bpmn", null);
 	}

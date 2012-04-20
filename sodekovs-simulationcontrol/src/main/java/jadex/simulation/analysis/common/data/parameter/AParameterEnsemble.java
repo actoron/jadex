@@ -22,7 +22,7 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 		super();
 		synchronized (mutex)
 		{
-		view = new AParameterEnsembleView(this);
+//		view = new AParameterEnsembleView(this);
 		}
 	}
 	
@@ -33,7 +33,7 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 		{
 			parametersMap = Collections.synchronizedMap(new HashMap<String, IAParameter>());
 		}
-		view = new AParameterEnsembleView(this);
+//		view = new AParameterEnsembleView(this);
 	}
 	
 	

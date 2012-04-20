@@ -65,7 +65,7 @@ public class OptimisationConfigTask extends ATask
 		
 		
 		
-		UUID session = (UUID) service.configurateOptimisation(null, method, methodParameter, solution, objective, config).get(susThread);
+		String session = (String) service.configurateOptimisation(null, method, methodParameter, solution, objective, config).get(susThread);
 		context.setParameterValue("service", service);
 		context.setParameterValue("session", session);
 		
@@ -87,7 +87,7 @@ public class OptimisationConfigTask extends ATask
 		ParameterMetaInfo servicemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT,
 				IAOptimisationService.class, "service", null, "Service");
 		ParameterMetaInfo sessionmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_OUT,
-				UUID.class, "session", null, "Session");
+				String.class, "session", null, "Session");
 
 		return new TaskMetaInfo(desc, new ParameterMetaInfo[] { expemi,sessionmi, servicemi });
 	}

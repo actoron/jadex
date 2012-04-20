@@ -1,15 +1,13 @@
 package jadex.simulation.analysis.common.data.parameter.statistics;
 
 /**
- * /**
- * Code was created by the Author within a Simulation Project at the University of Hamburg
- * the variance of values
+ * /** Code was created by the Author within a Simulation Project at the
+ * University of Hamburg the variance of values
  * 
  * @author 5Haubeck
  */
-public class Variance extends AbstractSingleStatistic
-{
-	protected double n;
+public class Variance extends AbstractSingleStatistic {
+	protected double nValue;
 
 	protected double meanVar;
 
@@ -17,58 +15,80 @@ public class Variance extends AbstractSingleStatistic
 
 	protected Mean mean;
 
-	public Variance()
-	{
-		n = 0.0;
+	public Variance() {
+		nValue = 0.0;
 		meanVar = Double.NaN;
 		mean = new Mean();
 	}
 
-	@Override
-	public synchronized void addValue(final double d)
-	{
-		if (n == 0)
-		{
-			meanVar = 0.0;
-		}
-		mean.addValue(d);
-		n++;
-		meanVar += ((double) n - 1) * mean.dev * mean.nDev;
-		value = meanVar / (mean.n - 1.0);
+	public double getnValue() {
+		return nValue;
+	}
+
+	public void setnValue(double nValue) {
+		this.nValue = nValue;
+	}
+
+	public double getMeanVar() {
+		return meanVar;
+	}
+
+	public void setMeanVar(double meanVar) {
+		this.meanVar = meanVar;
+	}
+
+	public double getValue() {
+		return value;
+	}
+
+	public void setValue(double value) {
+		this.value = value;
+	}
+
+	public Mean getMean() {
+		return mean;
+	}
+
+	public void setMean(Mean mean) {
+		this.mean = mean;
 	}
 
 	@Override
-	public synchronized void clear()
-	{
+	public synchronized void addValue(final double d) {
+		if (nValue == 0) {
+			meanVar = 0.0;
+		}
+		mean.addValue(d);
+		nValue++;
+		meanVar += ((double) nValue - 1) * mean.dev * mean.nDev;
+		value = meanVar / (mean.nValue - 1.0);
+	}
+
+	@Override
+	public synchronized void clear() {
 		meanVar = Double.NaN;
-		n = 0.0;
+		nValue = 0.0;
 		mean.clear();
 	}
 
 	@Override
-	public synchronized Double getResult()
-	{
-		if (mean.n == 0)
-		{
+	public synchronized Double getResult() {
+		if (mean.nValue == 0) {
 			return Double.NaN;
-		} else if (mean.n == 1)
-		{
+		} else if (mean.nValue == 1) {
 			return 0.0;
-		} else
-		{
+		} else {
 			return value;
 		}
 	}
 
 	@Override
-	public synchronized Double getN()
-	{
-		return new Double(n);
+	public synchronized double getN() {
+		return nValue;
 	}
 
 	@Override
-	public synchronized String toString()
-	{
-		return "Variance(" + n + " , " + value + ")";
+	public synchronized String toString() {
+		return "Variance(" + nValue + " , " + value + ")";
 	}
 }

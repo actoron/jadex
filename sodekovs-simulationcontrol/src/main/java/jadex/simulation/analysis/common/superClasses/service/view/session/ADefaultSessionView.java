@@ -28,7 +28,7 @@ public class ADefaultSessionView extends JDesktopPane implements IASessionView
 	protected JPanel content = new JPanel(new GridBagLayout());
 	final protected ADefaultSessionView me = this;
 
-	public ADefaultSessionView(IAnalysisSessionService service, final UUID id, final IAParameterEnsemble configuration)
+	public ADefaultSessionView(IAnalysisSessionService service, final String id, final IAParameterEnsemble configuration)
 	{
 		super();
 		service.addListener(this);

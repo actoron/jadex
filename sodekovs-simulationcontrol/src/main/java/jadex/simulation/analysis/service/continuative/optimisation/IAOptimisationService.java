@@ -32,7 +32,7 @@ public interface IAOptimisationService extends IAnalysisSessionService
 	 *            special configurations for this optimizationsession
 	 * @return UUID session of configuration
 	 */
-	public IFuture configurateOptimisation(UUID session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAObjectiveFunction objective, IAParameterEnsemble config);
+	public IFuture configurateOptimisation(String session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAObjectiveFunction objective, IAParameterEnsemble config);
 
 	/**
 	 * Returns supported methods
@@ -57,7 +57,7 @@ public interface IAOptimisationService extends IAnalysisSessionService
 	 *            evaluated experiments
 	 * @return IAExperimentBatch next experiments to evaluate
 	 */
-	public IFuture nextSolutions(UUID session,
+	public IFuture nextSolutions(String session,
 			IAExperimentBatch previousSolutions);
 
 	/**
@@ -67,7 +67,7 @@ public interface IAOptimisationService extends IAnalysisSessionService
 	 *            session of optimization
 	 * @return Boolean true if optimization is terminated
 	 */
-	public IFuture checkEndofOptimisation(UUID session);
+	public IFuture checkEndofOptimisation(String session);
 
 	/**
 	 * Optimum of optimization
@@ -76,7 +76,7 @@ public interface IAOptimisationService extends IAnalysisSessionService
 	 *            session of optimization
 	 * @return IAParameterEnsemble experiment with highest objectives
 	 */
-	public IFuture getOptimum(UUID session);
+	public IFuture getOptimum(String session);
 
 	/**
 	 * Value of optimization
@@ -85,5 +85,5 @@ public interface IAOptimisationService extends IAnalysisSessionService
 	 *            session of optimization
 	 * @return IAParameterEnsemble value of best experiment
 	 */
-	public IFuture getOptimumValue(UUID session);
+	public IFuture getOptimumValue(String session);
 }

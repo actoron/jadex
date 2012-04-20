@@ -24,7 +24,7 @@ public class OptSessionView extends JPanel implements IASessionView
 	private SessionProperties prop = null;
 	private JComponent component = new JPanel();
 	
-	public OptSessionView(IAnalysisSessionService service, final UUID id, final IAParameterEnsemble config)
+	public OptSessionView(IAnalysisSessionService service, final String id, final IAParameterEnsemble config)
 	{
 		super(new GridBagLayout());
 		this.service = service;

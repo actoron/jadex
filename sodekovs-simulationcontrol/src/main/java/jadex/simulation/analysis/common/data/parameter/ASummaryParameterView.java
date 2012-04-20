@@ -55,7 +55,7 @@ public class ASummaryParameterView extends ABasicParameterView implements IAData
 				meanLabel.setPreferredSize(new Dimension(150,20));
 				componentP.add(meanLabel, new GridBagConstraints(0, gridY, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-				JTextField meanValue = new JTextField(parameter.getMean().toString());
+				JTextField meanValue = new JTextField(parameter.getMeanValue().toString());
 				meanValue.setEditable(false);
 				meanValue.setPreferredSize(new Dimension(400, 20));
 				componentP.add(meanValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
@@ -65,7 +65,7 @@ public class ASummaryParameterView extends ABasicParameterView implements IAData
 				varLabel.setPreferredSize(new Dimension(150,20));
 				componentP.add(varLabel, new GridBagConstraints(0, gridY, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-				JTextField varValue = new JTextField(parameter.getVariance().toString());
+				JTextField varValue = new JTextField(parameter.getVarianceValue().toString());
 				varValue.setEditable(false);
 				varValue.setPreferredSize(new Dimension(400, 20));
 				componentP.add(varValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
@@ -75,7 +75,7 @@ public class ASummaryParameterView extends ABasicParameterView implements IAData
 				stdLabel.setPreferredSize(new Dimension(150,20));
 				componentP.add(stdLabel, new GridBagConstraints(0, gridY, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-				JTextField stdValue = new JTextField(parameter.getStandardDeviation().toString());
+				JTextField stdValue = new JTextField(parameter.getStandardDeviationValue().toString());
 				stdValue.setEditable(false);
 				stdValue.setPreferredSize(new Dimension(400, 20));
 				componentP.add(stdValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
@@ -85,7 +85,7 @@ public class ASummaryParameterView extends ABasicParameterView implements IAData
 				minLabel.setPreferredSize(new Dimension(150,20));
 				componentP.add(minLabel, new GridBagConstraints(0, gridY, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-				JTextField minValue = new JTextField(parameter.getMin().toString());
+				JTextField minValue = new JTextField(parameter.getMinValue().toString());
 				minValue.setEditable(false);
 				minValue.setPreferredSize(new Dimension(400, 20));
 				componentP.add(minValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
@@ -95,7 +95,7 @@ public class ASummaryParameterView extends ABasicParameterView implements IAData
 				maxLabel.setPreferredSize(new Dimension(150,20));
 				componentP.add(maxLabel, new GridBagConstraints(0, gridY, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-				JTextField maxValue = new JTextField(parameter.getMax().toString());
+				JTextField maxValue = new JTextField(parameter.getMaxValue().toString());
 				maxValue.setEditable(false);
 				maxValue.setPreferredSize(new Dimension(400, 20));
 				componentP.add(maxValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
@@ -105,7 +105,7 @@ public class ASummaryParameterView extends ABasicParameterView implements IAData
 				sumLabel.setPreferredSize(new Dimension(150,20));
 				componentP.add(sumLabel, new GridBagConstraints(0, gridY, 1, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));
 
-				JTextField sumValue = new JTextField(parameter.getSum().toString());
+				JTextField sumValue = new JTextField(parameter.getSumValue().toString());
 				sumValue.setEditable(false);
 				sumValue.setPreferredSize(new Dimension(400, 20));
 				componentP.add(sumValue, new GridBagConstraints(1, gridY, GridBagConstraints.REMAINDER, 1, 0, 0, GridBagConstraints.WEST, GridBagConstraints.BOTH, insets, 0, 0));

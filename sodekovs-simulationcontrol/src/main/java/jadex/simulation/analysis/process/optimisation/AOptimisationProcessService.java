@@ -21,7 +21,7 @@ public class AOptimisationProcessService extends ASubProcessService implements I
 	}
 	
 	@Override
-	public IFuture optimize(UUID session)
+	public IFuture optimize(String session)
 	{
 		return startSubprocess(session, "Optimierung", "jadex/simulation/analysis/process/optimisation/Optimierung.bpmn", null);
 	}
@@ -29,7 +29,7 @@ public class AOptimisationProcessService extends ASubProcessService implements I
 	@Override
 	public IFuture createSession(IAParameterEnsemble configuration)
 	{
-			UUID id = UUID.randomUUID();
+		String id = UUID.randomUUID().toString();
 			if (configuration == null) configuration = new AParameterEnsemble("Session Konfiguration");
 			sessions.put(id, configuration);
 			configuration.setEditable(false);

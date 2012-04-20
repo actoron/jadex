@@ -41,10 +41,10 @@ public class NetLogoExecuteExperimentsService extends ABasicAnalysisSessionServi
 	/**
 	 * Simulate an experiment
 	 */
-	public IFuture executeExperiment(UUID session, final IAExperiment exp) {
+	public IFuture executeExperiment(String session, final IAExperiment exp) {
 		final Future res = new Future();
 
-		if (session == null) session = (UUID) createSession(null).get(susThread);
+		if (session == null) session = (String) createSession(null).get(susThread);
 		
 		if ((Boolean)exp.getExperimentParameter("Visualisierung").getValue())
 		{		

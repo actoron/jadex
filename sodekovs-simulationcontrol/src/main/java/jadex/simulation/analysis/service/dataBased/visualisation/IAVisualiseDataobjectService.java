@@ -22,5 +22,5 @@ public interface IAVisualiseDataobjectService extends IAnalysisSessionService
 	 *            IADataObject to display
 	 * @return IADataObject, displayed object
 	 */
-	public IFuture show(UUID session, IADataObject dataObject);
+	public IFuture show(String session, IADataObject dataObject);
 }

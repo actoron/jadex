@@ -18,9 +18,9 @@ public class AVisualiseDataobjectService extends ABasicAnalysisSessionService im
 	}
 
 	@Override
-	public IFuture show(UUID sessionId, IADataObject dataObject)
+	public IFuture show(String sessionId, IADataObject dataObject)
 	{
-			if (sessionId == null) sessionId = (UUID) createSession(null).get(susThread);
+			if (sessionId == null) sessionId = (String) createSession(null).get(susThread);
 			ADataSessionView view = (ADataSessionView) sessionViews.get(sessionId);
 			view.startGUI(dataObject);
 			 sessionViews.put(sessionId,view);

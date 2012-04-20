@@ -31,7 +31,7 @@ public class GeneralExecuteTask extends ATask
 	{
 		super.execute(context, instance);
 		IAGeneralExecuteService service = (IAGeneralExecuteService) SServiceProvider.getService(instance.getServiceProvider(), IAGeneralExecuteService.class).get(susThread);
-		UUID session = (UUID) service.createSession(null).get(susThread);
+		String session = (String) service.createSession(null).get(susThread);
 		((ASubProcessTaskView)view).setSubProcess((ASubProcessView) service.getSessionView(session).get(susThread));
 		IAExperimentBatch experiments = (IAExperimentBatch) context.getParameterValue("experiments");
 		

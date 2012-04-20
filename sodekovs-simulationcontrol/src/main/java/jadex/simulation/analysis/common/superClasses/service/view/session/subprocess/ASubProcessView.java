@@ -56,7 +56,7 @@ public class ASubProcessView extends JDesktopPane implements IASessionView, IALi
 		
 	}
 	
-	public void init(final IExternalAccess instance, final UUID id, final IAParameterEnsemble configuration)
+	public void init(final IExternalAccess instance, final String id, final IAParameterEnsemble configuration)
 	{
 		synchronized (mutex)
 		{

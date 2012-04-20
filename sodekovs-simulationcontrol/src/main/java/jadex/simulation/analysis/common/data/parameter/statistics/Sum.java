@@ -9,28 +9,49 @@ package jadex.simulation.analysis.common.data.parameter.statistics;
 public class Sum extends AbstractSingleStatistic
 {
 
-	private double n;
+	private double nvalue;
 
 	private double value;
 
 	public Sum()
 	{
-		n = 0.0;
+		nvalue = 0.0;
 		value = Double.NaN;
 	}
 
 	@Override
 	public void addValue(final double d)
 	{
-		if (n == 0)
+		if (nvalue == 0)
 		{
 			value = d;
 		} else
 		{
 			value += d;
 		}
-		n++;
+		nvalue++;
 	}
+	
+	
+	
+	
+
+	public double getNvalue() {
+		return nvalue;
+	}
+
+	public void setNvalue(double nvalue) {
+		this.nvalue = nvalue;
+	}
+
+	public double getValue() {
+		return value;
+	}
+
+	public void setValue(double value) {
+		this.value = value;
+	}
+
 
 	@Override
 	public Double getResult()
@@ -39,21 +60,21 @@ public class Sum extends AbstractSingleStatistic
 	}
 
 	@Override
-	public Double getN()
+	public double getN()
 	{
-		return new Double(n);
+		return nvalue;
 	}
 
 	@Override
 	public void clear()
 	{
 		value = Double.NaN;
-		n = 0;
+		nvalue = 0;
 	}
 	
 	@Override
 	public synchronized String toString()
 	{
-		return "Sum(" + n + " , "+ value +")";
+		return "Sum(" + nvalue + " , "+ value +")";
 	}
 }

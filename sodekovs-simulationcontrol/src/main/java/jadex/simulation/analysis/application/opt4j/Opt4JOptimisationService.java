@@ -46,7 +46,7 @@ import com.google.inject.Module;
 public class Opt4JOptimisationService extends ABasicAnalysisSessionService implements IAOptimisationService
 {
 	Set<String> methods = new HashSet<String>();
-	Map<UUID, Map<String, Object>> sessionState = new HashMap<UUID, Map<String, Object>>();
+	Map<String, Map<String, Object>> sessionState = new HashMap<String, Map<String, Object>>();
 
 	public Opt4JOptimisationService(IExternalAccess access)
 	{
@@ -78,7 +78,7 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 	}
 
 	@Override
-	public IFuture nextSolutions(UUID session, IAExperimentBatch previousSolutions)
+	public IFuture nextSolutions(String session, IAExperimentBatch previousSolutions)
 	{
 		Map<String, Object> state = sessionState.get(session);
 		
@@ -164,16 +164,16 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 	}
 
 	@Override
-	public IFuture checkEndofOptimisation(UUID session)
+	public IFuture checkEndofOptimisation(String session)
 	{
 		return new Future((Boolean) sessionState.get(session).get("terminate"));
 	}
 
 	@Override
-	public IFuture<UUID> configurateOptimisation(UUID session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAObjectiveFunction objective, IAParameterEnsemble config)
+	public Future<String> configurateOptimisation(String session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAObjectiveFunction objective, IAParameterEnsemble config)
 	{
 		// session erstellen
-		UUID newSession = null;
+		String newSession = null;
 		if (session != null)
 		{
 			if (sessions.containsKey(session))
@@ -183,9 +183,9 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 		}
 		if (newSession == null)
 		{
-			newSession = (UUID) createSession(null).get(susThread);
+			newSession = (String) createSession(null).get(susThread);
 		}
-		final UUID sess = newSession;
+		final String sess = newSession;
 		
 		if (method.equals("Evolutionaerer Algorithmus"))
 		{
@@ -240,17 +240,17 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 		}
 		
 		
-		return new Future<UUID>(sess);
+		return new Future<String>(sess.toString());
 	}
 
 	@Override
-	public IFuture getOptimum(UUID session)
+	public IFuture getOptimum(String session)
 	{
 		return new Future((IAParameterEnsemble) sessionState.get(session).get("optimum"));
 	}
 
 	@Override
-	public IFuture getOptimumValue(UUID session)
+	public IFuture getOptimumValue(String session)
 	{
 		return new Future((Double) sessionState.get(session).get("optimumValue"));
 	}

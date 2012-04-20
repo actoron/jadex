@@ -20,8 +20,8 @@ public class ABasicAnalysisSessionService extends ABasicAnalysisService implemen
 {
 	//TODO: IMPLEMENT concurrent boolean
 	protected Boolean concurrent = true;  
-	protected Map<UUID, IAParameterEnsemble> sessions;
-	protected Map<UUID, IASessionView> sessionViews;
+	protected Map<String, IAParameterEnsemble> sessions;
+	protected Map<String, IASessionView> sessionViews;
 
 	public ABasicAnalysisSessionService(IExternalAccess access, Class serviceInterface, Boolean concurrent)
 	{
@@ -29,8 +29,8 @@ public class ABasicAnalysisSessionService extends ABasicAnalysisService implemen
 		synchronized (mutex)
 		{
 			this.concurrent = concurrent;
-			sessions = Collections.synchronizedMap(new HashMap<UUID, IAParameterEnsemble>());
-			sessionViews = Collections.synchronizedMap(new HashMap<UUID, IASessionView>());
+			sessions = Collections.synchronizedMap(new HashMap<String, IAParameterEnsemble>());
+			sessionViews = Collections.synchronizedMap(new HashMap<String, IASessionView>());
 			Map prop = getPropertyMap();
 			prop.put(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, "jadex.simulation.analysis.common.superClasses.service.view.session.SessionServiceViewerPanel");
 			setPropertyMap(prop);
@@ -46,18 +46,18 @@ public class ABasicAnalysisSessionService extends ABasicAnalysisService implemen
 		synchronized (mutex)
 		{
 			
-			UUID id = UUID.randomUUID();
+			String id = UUID.randomUUID().toString();
 			if (configuration == null) configuration = new AParameterEnsemble("Session Konfiguration");
 			sessions.put(id, configuration);
 			configuration.setEditable(false);
 			sessionViews.put(id, new ADefaultSessionView(this,id, configuration));
 			notify(new AServiceEvent(this,AConstants.SERVICE_SESSION_START, id));
-			return new Future(id);
+			return new Future(id.toString());
 		}
 	}
 
 	@Override
-	public void closeSession(UUID id)
+	public void closeSession(String id)
 	{
 		synchronized (mutex)
 		{
@@ -66,7 +66,7 @@ public class ABasicAnalysisSessionService extends ABasicAnalysisService implemen
 	}
 
 	@Override
-	public IFuture getSessionView(UUID id)
+	public IFuture getSessionView(String id)
 	{
 		return new Future(sessionViews.get(id));
 	}
@@ -78,7 +78,7 @@ public class ABasicAnalysisSessionService extends ABasicAnalysisService implemen
 	}
 	
 	@Override
-	public IFuture getSessionConfiguration(UUID id)
+	public IFuture getSessionConfiguration(String id)
 	{
 		return new Future(sessions.get(id));
 	}

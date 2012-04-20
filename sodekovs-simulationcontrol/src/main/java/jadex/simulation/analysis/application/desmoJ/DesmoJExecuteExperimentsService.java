@@ -49,7 +49,7 @@ public class DesmoJExecuteExperimentsService extends ABasicAnalysisSessionServic
 	/**
 	 * Simulate an experiment
 	 */
-	public IFuture executeExperiment(UUID session, IAExperiment exp)
+	public IFuture executeExperiment(String session, IAExperiment exp)
 	{
 		final Future res = new Future();
 		DesmoJSessionView view = (DesmoJSessionView) sessionViews.get(session);

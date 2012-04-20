@@ -24,5 +24,5 @@ public interface IAAllocateExperimentsService extends IAnalysisSessionService
 	 *            experiments to allocate
 	 * @return List<IAExecuteExperimentsService>, List of experiments to allocate
 	 */
-	public IFuture allocateExperiment(UUID session, IAExperimentBatch experiments);
+	public IFuture allocateExperiment(String session, IAExperimentBatch experiments);
 }

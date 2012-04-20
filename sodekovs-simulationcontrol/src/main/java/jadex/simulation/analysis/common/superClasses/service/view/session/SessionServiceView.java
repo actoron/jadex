@@ -37,8 +37,8 @@ public class SessionServiceView extends DefaultServiceView
 		{
 			public void run()
 			{
-				Set<UUID> setIDs = (Set<UUID>) sservice.getSessions().get(susThread);
-				for (UUID id : setIDs)
+				Set<String> setIDs = (Set<String>) sservice.getSessions().get(susThread);
+				for (String id : setIDs)
 				{
 					JComponent comp = (JComponent) sservice.getSessionView(id).get(susThread);
 					addTab("Session " + sessionCount, comp);
@@ -58,7 +58,7 @@ public class SessionServiceView extends DefaultServiceView
 			{
 				public void run()
 				{
-					UUID id = (UUID) ((AServiceEvent)event).getValue();
+					String id = (String) ((AServiceEvent)event).getValue();
 					JComponent comp = (JComponent) sservice.getSessionView(id).get(susThread);
 					addTab("Session " + sessionCount, comp);
 					sessionCount++;

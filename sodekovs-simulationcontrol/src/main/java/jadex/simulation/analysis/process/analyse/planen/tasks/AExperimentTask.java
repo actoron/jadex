@@ -40,7 +40,7 @@ public class AExperimentTask extends ATask
 			IAVisualiseDataobjectService service = (IAVisualiseDataobjectService) SServiceProvider.getService(instance.getServiceProvider(), IAVisualiseDataobjectService.class).get(new ThreadSuspendable(this));
 			IAModel model = (IAModel) context.getParameterValue("model");
 			IAExperiment exp = AExperimentFactory.createDefaultExperiment(model);
-			UUID session = (UUID) service.show(null, exp).get(susThread);
+			String session = (String) service.show(null, exp).get(susThread);
 			
 			((AServiceCallUserTaskView) view).addServiceGUI((JComponent) service.getSessionView(session).get(susThread), new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 			notify(new ATaskEvent(this, context, instance, AConstants.TASK_USER));

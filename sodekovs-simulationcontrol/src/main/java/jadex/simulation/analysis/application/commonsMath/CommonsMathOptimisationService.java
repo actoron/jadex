@@ -40,21 +40,21 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 {
 	private CommonsMathOptimisationService me = this;
 	private Set<String> methods = new HashSet<String>();
-	private Map<UUID, Map<String, Object>> sessionState;
+	private Map<String, Map<String, Object>> sessionState;
 
 	public CommonsMathOptimisationService(IExternalAccess access)
 	{
 		super(access, IAOptimisationService.class, true);
-		sessionState = new HashMap<UUID, Map<String, Object>>();
+		sessionState = new HashMap<String, Map<String, Object>>();
 		methods.add("Simplex Algorithmus");
 	}
 
 	@Override
-	public IFuture configurateOptimisation(UUID session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAObjectiveFunction objective, IAParameterEnsemble config)
+	public IFuture configurateOptimisation(String session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAObjectiveFunction objective, IAParameterEnsemble config)
 
 	{
 		// session erstellen
-		UUID newSession = null;
+		String newSession = null;
 		if (session != null)
 		{
 			if (sessions.containsKey(session))
@@ -64,9 +64,9 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 		}
 		if (newSession == null)
 		{
-			newSession = (UUID) createSession(null).get(susThread);
+			newSession = (String) createSession(null).get(susThread);
 		}
-		final UUID sess = newSession;
+		final String sess = newSession;
 
 		if (method.equals("Simplex Algorithmus"))
 		{
@@ -178,7 +178,7 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 	}
 
 	@Override
-	public IFuture nextSolutions(UUID session, IAExperimentBatch previousSolutions)
+	public IFuture nextSolutions(String session, IAExperimentBatch previousSolutions)
 	{
 		Map<String, Object> state = sessionState.get(session);
 		NelderMeadSimplexSim simplex = (NelderMeadSimplexSim) state.get("simplex");
@@ -520,19 +520,19 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 	}
 
 	@Override
-	public IFuture checkEndofOptimisation(UUID session)
+	public IFuture checkEndofOptimisation(String session)
 	{
 		return new Future((Boolean) sessionState.get(session).get("terminate"));
 	}
 
 	@Override
-	public IFuture getOptimum(UUID session)
+	public IFuture getOptimum(String session)
 	{
 		return new Future((IAParameterEnsemble) sessionState.get(session).get("optimum"));
 	}
 
 	@Override
-	public IFuture getOptimumValue(UUID session)
+	public IFuture getOptimumValue(String session)
 	{
 		return new Future((Double) sessionState.get(session).get("optimumValue"));
 	}

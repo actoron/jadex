@@ -23,7 +23,7 @@ public class AGeneralExecuteService extends ASubProcessService implements IAGene
 	}
 
 	@Override
-	public IFuture execute(UUID session, IAExperimentBatch experiment)
+	public IFuture execute(String session, IAExperimentBatch experiment)
 	{
 		synchronized (mutex)
 		{

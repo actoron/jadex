@@ -39,7 +39,7 @@ public class DefineHypothesisTask extends ATask
 		super.execute(context, instance);
 		AModelHypothesis hypo = new AModelHypothesis("Hypothesis", new ABasicParameter("HypothesisInput", Double.class, new Double(0.0)), new ABasicParameter("HypothesisOutput", Double.class, new Double(0.0)), false);
 		IAVisualiseDataobjectService service = (IAVisualiseDataobjectService) SServiceProvider.getService(instance.getServiceProvider(), IAVisualiseDataobjectService.class).get(new ThreadSuspendable(this));
-		UUID session = (UUID) service.show(null, hypo).get(susThread);
+		String session = (String) service.show(null, hypo).get(susThread);
 		
 		((AServiceCallUserTaskView) view).addServiceGUI((JComponent) service.getSessionView(session).get(susThread), new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 		notify(new ATaskEvent(this, context, instance, AConstants.TASK_USER));

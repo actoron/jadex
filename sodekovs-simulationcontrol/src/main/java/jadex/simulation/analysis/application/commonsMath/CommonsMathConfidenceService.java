@@ -35,7 +35,7 @@ public class CommonsMathConfidenceService extends ABasicAnalysisService implemen
 		Double pvalue = 0.0;
 		try
 		{
-			pvalue = 1-ttest.tTest(parameter.getMean()*(1-intervallPercent),values);
+			pvalue = 1-ttest.tTest(parameter.getMeanValue()*(1-intervallPercent),values);
 		}
 		catch (Exception e)
 		{

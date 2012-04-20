@@ -37,7 +37,7 @@ public class AModel extends ADataObject implements IAModel {
 
 		this.inputParameters.setName("Inputparameter");
 		this.outputParameters.setName("Outputparameter");
-		view = new AModelView(this);
+//		view = new AModelView(this);
 	}
 
 	public AModel(String name, Modeltype type, String modelpath) {

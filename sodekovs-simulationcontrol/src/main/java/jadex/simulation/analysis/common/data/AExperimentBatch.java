@@ -25,7 +25,9 @@ public class AExperimentBatch extends ADataObject implements IAExperimentBatch {
 
 	public AExperimentBatch() {
 		synchronized (mutex) {
-			view = new AExperimentBatchView(this);
+//			view = new AExperimentBatchView(this);
+			allocation = Collections
+					.synchronizedMap(new HashMap<IAExperiment, IAnalysisService>());
 		}
 	}
 
@@ -34,7 +36,7 @@ public class AExperimentBatch extends ADataObject implements IAExperimentBatch {
 		synchronized (mutex) {
 			experimentMap = Collections
 					.synchronizedMap(new HashMap<String, IAExperiment>());
-			view = new AExperimentBatchView(this);
+//			view = new AExperimentBatchView(this);
 			allocation = Collections
 					.synchronizedMap(new HashMap<IAExperiment, IAnalysisService>());
 		}

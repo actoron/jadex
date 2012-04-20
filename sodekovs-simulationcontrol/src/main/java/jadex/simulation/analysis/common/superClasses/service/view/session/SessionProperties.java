@@ -14,7 +14,7 @@ import java.util.UUID;
  */
 public class SessionProperties extends PropertiesPanel
 {
-	public SessionProperties(UUID session, final IAParameterEnsemble config)
+	public SessionProperties(String session, final IAParameterEnsemble config)
 	{
 		super(" Session Eigenschaften ");
 		setPreferredSize(new Dimension(900, 150));

@@ -19,5 +19,5 @@ public interface IAValidationProcessService extends IAnalysisSessionService
 	 *            if any, already opened session
 	 * @return Object, if any, result of execution
 	 */
-	public IFuture validate(UUID session);
+	public IFuture validate(String session);
 }

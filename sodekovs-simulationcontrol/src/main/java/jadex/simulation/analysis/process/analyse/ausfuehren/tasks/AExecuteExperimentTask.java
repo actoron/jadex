@@ -48,7 +48,7 @@ public class AExecuteExperimentTask extends ATask
 				{
 					service = (IAExecuteExperimentsService) SServiceProvider.getService(instance.getServiceProvider(), IAExecuteExperimentsService.class).get(susThread);
 				}
-				UUID session = (UUID) service.createSession(null).get(susThread);
+				String session = (String) service.createSession(null).get(susThread);
 				JComponent sesview =  (JComponent) service.getSessionView(session).get(susThread);
 				((AServiceCallTaskView) view).addServiceGUI(sesview, new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 				service.executeExperiment(session,exp).addResultListener(new IResultListener()

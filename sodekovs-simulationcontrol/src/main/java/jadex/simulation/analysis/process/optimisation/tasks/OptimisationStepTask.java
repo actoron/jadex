@@ -31,7 +31,7 @@ public class OptimisationStepTask extends ATask
 
 		IAExperimentBatch experiments = (IAExperimentBatch) context.getParameterValue("experiments");
 		IAOptimisationService service = (IAOptimisationService) context.getParameterValue("service");
-		UUID session = (UUID) context.getParameterValue("session");
+		String session = (String) context.getParameterValue("session");
 		experiments = (IAExperimentBatch) service.nextSolutions(session, experiments).get(susThread);
 		context.setParameterValue("experiments", experiments);
 		context.setParameterValue("service", service);
@@ -62,11 +62,11 @@ public class OptimisationStepTask extends ATask
 		ParameterMetaInfo servicemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_INOUT,
 				IAOptimisationService.class, "service", null, "Service");
 		ParameterMetaInfo sessionmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_INOUT,
-				UUID.class, "session", null, "Session");
+				String.class, "session", null, "Session");
 		ParameterMetaInfo optmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_INOUT,
-				UUID.class, "optimum", null, "Optimum");
+				String.class, "optimum", null, "Optimum");
 		ParameterMetaInfo optValuemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_INOUT,
-				UUID.class, "optimumValue", null, "Wert des Optimum");
+				String.class, "optimumValue", null, "Wert des Optimum");
 		ParameterMetaInfo again = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_IN,
 				Boolean.class, "again", null, "Terminierungsindikator flag");
 

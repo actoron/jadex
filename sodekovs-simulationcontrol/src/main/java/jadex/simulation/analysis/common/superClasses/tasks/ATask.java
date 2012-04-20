@@ -22,7 +22,7 @@ import java.util.UUID;
 public class ATask extends AObservable implements IATask
 {
 	protected Integer taskNumber;
-	protected UUID id = UUID.randomUUID();
+	protected String id = UUID.randomUUID().toString();
 	protected MActivity activity;
 	protected ITaskContext context;
 	protected BpmnInterpreter instance;
@@ -42,7 +42,7 @@ public class ATask extends AObservable implements IATask
 	}
 
 	@Override
-	public UUID getID()
+	public String getID()
 	{
 		return id;
 	}

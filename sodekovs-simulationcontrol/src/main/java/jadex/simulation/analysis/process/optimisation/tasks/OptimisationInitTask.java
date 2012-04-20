@@ -28,7 +28,7 @@ public class OptimisationInitTask extends ATask
 	{
 		super.execute(context, instance);
 		IAOptimisationService service = (IAOptimisationService) context.getParameterValue("service");
-		UUID session = (UUID) context.getParameterValue("session");
+		String session = (String) context.getParameterValue("session");
 		IAExperimentBatch experiments = (IAExperimentBatch) service.nextSolutions(session, null).get(susThread);
 		context.setParameterValue("experiments", experiments);
 		context.setParameterValue("service", service);
@@ -51,7 +51,7 @@ public class OptimisationInitTask extends ATask
 		ParameterMetaInfo servicemi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_INOUT,
 				IAOptimisationService.class, "service", null, "Service");
 		ParameterMetaInfo sessionmi = new ParameterMetaInfo(ParameterMetaInfo.DIRECTION_INOUT,
-				UUID.class, "session", null, "Session");
+				String.class, "session", null, "Session");
 
 		return new TaskMetaInfo(desc, new ParameterMetaInfo[] { expmi, sessionmi, servicemi });
 	}

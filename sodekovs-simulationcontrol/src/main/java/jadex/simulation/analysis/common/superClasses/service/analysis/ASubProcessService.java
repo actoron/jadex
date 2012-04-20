@@ -31,7 +31,7 @@ import java.util.UUID;
  */
 public class ASubProcessService extends ABasicAnalysisSessionService
 {
-	protected Map<UUID, IExternalAccess> sessionValues;
+	protected Map<String, IExternalAccess> sessionValues;
 	
 	//damit nicht Garbage collected?
 	protected Set<ASubProcessView> views = new HashSet<ASubProcessView>();
@@ -39,18 +39,18 @@ public class ASubProcessService extends ABasicAnalysisSessionService
 	public ASubProcessService(IExternalAccess access, Class serviceInterface)
 	{
 		super(access, serviceInterface, true);
-		sessionValues = Collections.synchronizedMap(new HashMap<UUID, IExternalAccess>());
+		sessionValues = Collections.synchronizedMap(new HashMap<String, IExternalAccess>());
 	}
 
-	protected IFuture startSubprocess(UUID preSession, String name, String model, Map arguments)
+	protected IFuture startSubprocess(String preSession, String name, String model, Map arguments)
 	{
 		synchronized (mutex)
 		{
 			final Future ret = new Future();
-			UUID newSession = preSession;
-			if (preSession == null) newSession = (UUID) createSession(null).get(susThread);
+			String newSession = preSession;
+			if (preSession == null) newSession = (String) createSession(null).get(susThread);
 
-			final UUID session = newSession;
+			final String session = newSession;
 
 			IResultListener lis = new IResultListener()
 			{
@@ -108,7 +108,7 @@ public class ASubProcessService extends ABasicAnalysisSessionService
 	{
 		synchronized (mutex)
 		{
-			UUID id = UUID.randomUUID();
+			String id = UUID.randomUUID().toString();
 			if (configuration == null) configuration = new AParameterEnsemble("Session Konfiguration");
 			sessions.put(id, configuration);
 			configuration.setEditable(false);

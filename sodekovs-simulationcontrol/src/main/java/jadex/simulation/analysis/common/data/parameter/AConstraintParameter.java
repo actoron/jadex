@@ -15,7 +15,13 @@ import javax.swing.JFrame;
 public class AConstraintParameter extends ABasicParameter implements IAParameter
 {
 	protected Set<IAConstraint> constraints;
+	
+	public AConstraintParameter() {
+		super();
+//		view = new AConstraintParameterView(this);
+	}
 
+	
 	public AConstraintParameter(String name, Object value)
 	{
 		super(name, Double.class, value);
@@ -23,7 +29,7 @@ public class AConstraintParameter extends ABasicParameter implements IAParameter
 		{
 			this.constraints = Collections.synchronizedSet(new HashSet<IAConstraint>());
 			addConstraint(new ABorderConstraint(100.0, 0.0));
-			view = new AConstraintParameterView(this);
+//			view = new AConstraintParameterView(this);
 		}
 	}
 
@@ -37,11 +43,21 @@ public class AConstraintParameter extends ABasicParameter implements IAParameter
 	}
 
 	// ----- Interface IAConstraintParameter -----
+	
+	
 
 	public Set<IAConstraint> getConstraints()
 	{
 		return constraints;
 	}
+
+	public void setConstraints(Set<IAConstraint> constraints) {
+		synchronized (mutex)
+		{
+		this.constraints = constraints;
+		}
+	}
+
 
 	public void addConstraint(IAConstraint constraint)
 	{

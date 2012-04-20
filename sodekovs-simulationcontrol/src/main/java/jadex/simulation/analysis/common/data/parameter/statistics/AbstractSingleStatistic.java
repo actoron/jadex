@@ -13,6 +13,7 @@ public abstract class AbstractSingleStatistic implements ISingleStatistic
 	public abstract void clear();
 
 	public abstract void addValue(final double d);
+	
 
 	/**
 	 * Adds all values by calling addValue(Double d)

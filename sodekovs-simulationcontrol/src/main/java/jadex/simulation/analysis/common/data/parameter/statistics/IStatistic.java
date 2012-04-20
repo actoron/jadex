@@ -25,7 +25,7 @@ public interface IStatistic
      * Returns the number of values
      * @return the number of values.
      */
-    public Double getN();
+    public double getN();
     
     /**
      * Clears the Statistic

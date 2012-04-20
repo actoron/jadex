@@ -33,7 +33,7 @@ public class ASaveDataobjectView extends JPanel implements IASessionView
 	private SessionProperties prop;
 	private JComponent component = new JPanel();
 	
-	public ASaveDataobjectView(IAnalysisSessionService service, UUID id, IAParameterEnsemble config)
+	public ASaveDataobjectView(IAnalysisSessionService service, String id, IAParameterEnsemble config)
 	{
 		super();
 		this.service = (DerbySaveDataobjectService) service;

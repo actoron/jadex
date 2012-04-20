@@ -21,7 +21,7 @@ public interface IATask extends ITask, IAObservable
 	 * Returns the number of the task
 	 * @return Integer as Identifier
 	 */
-	public UUID getID();
+	public String getID();
 	
 	/**
 	 * Returns the activity of the task

@@ -24,7 +24,7 @@ public class ADataSessionView extends JPanel implements IASessionView
 	private SessionProperties prop = null;
 	private JComponent component = new JPanel(new GridBagLayout());
 
-	public ADataSessionView( IAnalysisSessionService service, final UUID id, final IAParameterEnsemble config)
+	public ADataSessionView( IAnalysisSessionService service, final String id, final IAParameterEnsemble config)
 	{
 		super(new GridBagLayout());
 		this.service = service;

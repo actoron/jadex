@@ -27,7 +27,7 @@ public class DesmoJSessionView extends JTextArea implements IASessionView
 	private SessionProperties prop = null;
 	private JTextArea component = new JTextArea();
 	
-	public DesmoJSessionView( IAnalysisSessionService service, final UUID id, final IAParameterEnsemble config)
+	public DesmoJSessionView( IAnalysisSessionService service, final String id, final IAParameterEnsemble config)
 	{
 		super();
 		this.service = service;

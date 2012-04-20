@@ -68,8 +68,8 @@ public class OptJTestAgent extends MicroAgent
 			}
 		};
 		
-		IFuture<UUID> fut = service.configurateOptimisation(null, "Evolutionaerer Algorithmus", null, ensSol, zf, ensConf);
-		UUID session = (UUID) fut.get(new ThreadSuspendable(this));
+		IFuture<String> fut = service.configurateOptimisation(null, "Evolutionaerer Algorithmus", null, ensSol, zf, ensConf);
+		String session = (String) fut.get(new ThreadSuspendable(this));
 		
 		IAParameterEnsemble expParameters = new AParameterEnsemble("Experiment Parameter");
 		expParameters.addParameter(new ABasicParameter("Wiederholungen", Integer.class, 10));

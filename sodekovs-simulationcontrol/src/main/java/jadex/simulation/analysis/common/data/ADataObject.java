@@ -14,29 +14,29 @@ import java.util.UUID;
  */
 public class ADataObject extends AObservable implements IADataObject {
 
-	private UUID id = UUID.randomUUID();
+	private String id = UUID.randomUUID().toString();
 	protected Boolean editable = Boolean.TRUE;
 	protected String name = "defaultName";
 	protected IADataView view;
 
 	public ADataObject() {
 		synchronized (mutex) {
-			view = new ADataObjectView(this);
+//			view = new ADataObjectView(this);
 		}
 	}
 
 	public ADataObject(String name) {
 		synchronized (mutex) {
 			setName(name);
-			view = new ADataObjectView(this);
+//			view = new ADataObjectView(this);
 		}
 	}
 
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(UUID id) {
+	public void setId(String id) {
 		synchronized (mutex) {
 			this.id = id;
 		}

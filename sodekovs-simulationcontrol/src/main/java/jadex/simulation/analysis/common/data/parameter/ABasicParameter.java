@@ -13,12 +13,13 @@ import jadex.simulation.analysis.common.util.AConstants;
  * 
  */
 public class ABasicParameter extends ADataObject implements IAParameter {
-	protected Object value = "";
+	
 	private Class type = Object.class;
 	protected Boolean onlyValue = Boolean.TRUE;
+	protected Object value = "";
 
 	public ABasicParameter() {
-		view = new ABasicParameterView(this);
+//		view = new ABasicParameterView(this);
 	}
 
 	public ABasicParameter(String name, Class type, Object value) {
@@ -26,7 +27,7 @@ public class ABasicParameter extends ADataObject implements IAParameter {
 		synchronized (mutex) {
 			setValueClass(type);
 			setValue(value);
-			view = new ABasicParameterView(this);
+//			view = new ABasicParameterView(this);
 		}
 	}
 
@@ -86,15 +87,15 @@ public class ABasicParameter extends ADataObject implements IAParameter {
 				this.value = "";
 			}
 
-			else if (value.getClass().equals(getValueClass())) {
+//			else if (value.getClass().equals(getValueClass())) {
 				synchronized (mutex) {
 					this.value = value;
 					// System.out.println(getName() + ": value=" + value);
 				}
-			} else {
-				throw new RuntimeException("Parametervalue falsch gesetzt "
-						+ this);
-			}
+//			} else {
+//				throw new RuntimeException("Parametervalue falsch gesetzt "
+//						+ this);
+//			}
 			notify(new ADataEvent(this, AConstants.PARAMETER_VALUE, value));
 		}
 	}

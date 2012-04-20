@@ -37,7 +37,7 @@ public class AModelTask extends ATask
 		IAVisualiseDataobjectService service = (IAVisualiseDataobjectService) SServiceProvider.getService(instance.getServiceProvider(), IAVisualiseDataobjectService.class).get(susThread);
 		
 		IAModel model = AModelFactory.createTestAModel(Modeltype.Jadex); 
-		UUID session = (UUID) service.show(null, model).get(susThread);
+		String session = (String) service.show(null, model).get(susThread);
 		
 		((AServiceCallUserTaskView) view).addServiceGUI((JComponent) service.getSessionView(session).get(susThread), new GridBagConstraints(0, 0, GridBagConstraints.REMAINDER, 1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH, new Insets(1, 1, 1, 1), 0, 0));
 		notify(new ATaskEvent(this, context, instance, AConstants.TASK_USER));

@@ -19,5 +19,5 @@ public interface IAOptimisationProcessService extends IAnalysisSessionService
 	 *            if any, already opened session
 	 * @return Object, if any, result of execution
 	 */
-	public IFuture optimize(UUID session);
+	public IFuture optimize(String session);
 }

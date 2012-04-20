@@ -27,7 +27,7 @@ public class AExperiment extends ADataObject implements IAExperiment {
 	public AExperiment() {
 		super();
 		synchronized (mutex) {
-			view = new AExperimentView(this);
+//			view = new AExperimentView(this);
 		}
 	}
 
@@ -45,7 +45,7 @@ public class AExperiment extends ADataObject implements IAExperiment {
 			setExperimentParamters(expParameters);
 			setConfigParamters(inputParameters);
 			setResultParamters(outputParameters);
-			view = new AExperimentView(this);
+//			view = new AExperimentView(this);
 		}
 	}
 

@@ -19,6 +19,6 @@ public interface IAGeneralAnalysisProcessService extends IAnalysisSessionService
 	 *            if any, already opened session
 	 * @return Object, if any, result of execution
 	 */
-	public IFuture analyse(UUID session);
+	public IFuture analyse(String session);
 
 }

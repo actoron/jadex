@@ -18,7 +18,7 @@ public interface IAnalysisSessionService extends IAnalysisService
 	 * Create a session for this service with the given configuration (can be null)
 	 * If a configuration parameter is not provided, the default value is used.
 	 * @param configuration Configuration to use as {@link IAParameterEnsemble}.
-	 * @return  id as a {@link UUID} of the session
+	 * @return  id as a {@link String} of the session
 	 */
 	public IFuture createSession(IAParameterEnsemble configuration);
 
@@ -26,14 +26,14 @@ public interface IAnalysisSessionService extends IAnalysisService
 	 * Close a Session
 	 * @param id the id of the session
 	 */
-	public void closeSession(UUID id);
+	public void closeSession(String id);
 	
 	/**
 	 * Get the View of the given Session
 	 * @param id the id of the session
 	 * @return {@link IASessionView} as IFuture
 	 */
-	public IFuture getSessionView(UUID id);
+	public IFuture getSessionView(String id);
 
 	/**
 	 * Get the Session
@@ -46,6 +46,6 @@ public interface IAnalysisSessionService extends IAnalysisService
 	 * @param {@link UUID} as Identifier
 	 * @return {@link IAParameterEnsemble} as configuration
 	 */
-	public IFuture getSessionConfiguration(UUID id);
+	public IFuture getSessionConfiguration(String id);
 
 }

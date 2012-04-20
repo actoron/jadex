@@ -42,7 +42,7 @@ public class JadexExecuteExperimentsService extends ABasicAnalysisSessionService
 	/**
 	 * Simulate an experiment
 	 */
-	public IFuture executeExperiment(UUID session, final IAExperiment exp)
+	public IFuture executeExperiment(String session, final IAExperiment exp)
 	{
 		final Future res = new Future();
 		// not integrated yet

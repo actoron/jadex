@@ -19,7 +19,7 @@ public class JadexSessionView extends JTextArea implements IASessionView
 	private SessionProperties prop = null;
 	private JComponent component = new JPanel();
 	
-	public JadexSessionView( IAnalysisSessionService service, final UUID id, final IAParameterEnsemble config)
+	public JadexSessionView( IAnalysisSessionService service, final String id, final IAParameterEnsemble config)
 	{
 		super();
 		this.service = service;

@@ -19,5 +19,5 @@ public interface IAGeneralPlanningService extends IAnalysisSessionService
 	 *            if any, already opened session
 	 * @return IAExperimentBatcj, experiments to execute
 	 */
-	public IFuture plan(UUID session);
+	public IFuture plan(String session);
 }

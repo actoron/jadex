@@ -19,7 +19,7 @@ public class AGeneralAnalysisProcessService extends ASubProcessService implement
 	}
 
 	@Override
-	public IFuture analyse(UUID session)
+	public IFuture analyse(String session)
 	{
 		return startSubprocess(session, "AllgemeineAnalyse", "jadex/simulation/analysis/process/analyse/AllgemeineAnalyse.bpmn", null);
 	}
