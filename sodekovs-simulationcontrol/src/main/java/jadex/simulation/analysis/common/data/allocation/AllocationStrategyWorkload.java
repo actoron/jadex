@@ -15,12 +15,13 @@ import java.util.TreeSet;
  */
 public class AllocationStrategyWorkload extends Object implements IAllocationStrategy
 {
-	private ThreadSuspendable sus = new ThreadSuspendable(this);
-
+	public AllocationStrategyWorkload() {
+	}
+	
 	@Override
 	public int compare(IAnalysisService serviceA, IAnalysisService serviceB)
 	{
-		Double result = (((Double) serviceB.getWorkload().get(sus)) - (Double) serviceA.getWorkload().get(sus));
+		Double result = (((Double) serviceB.getWorkload().get(new ThreadSuspendable(this))) - (Double) serviceA.getWorkload().get(new ThreadSuspendable(this)));
 		return result.intValue();
 	}
 
@@ -32,7 +33,7 @@ public class AllocationStrategyWorkload extends Object implements IAllocationStr
 				{
 					public int compare(IAnalysisService service1, IAnalysisService service2)
 					{
-						Double result = (((Double) service2.getWorkload().get(sus)) - (Double) service1.getWorkload().get(sus));
+						Double result = (((Double) service2.getWorkload().get(new ThreadSuspendable(this))) - (Double) service1.getWorkload().get(new ThreadSuspendable(this)));
 						return result.intValue();
 					}
 				}

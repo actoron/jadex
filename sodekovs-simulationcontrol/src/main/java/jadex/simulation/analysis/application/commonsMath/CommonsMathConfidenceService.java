@@ -6,15 +6,13 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.simulation.analysis.common.data.parameter.IASummaryParameter;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisService;
-import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.continuative.computation.IAConfidenceService;
 
-import org.apache.commons.math.stat.inference.TTest;
-import org.apache.commons.math.stat.inference.TTestImpl;
+import org.apache.commons.math3.stat.inference.TTest;
 
 public class CommonsMathConfidenceService extends ABasicAnalysisService implements IAConfidenceService
 {
-	private TTest ttest = new TTestImpl();
+	private TTest ttest = new TTest();
 
 	public CommonsMathConfidenceService(IExternalAccess access)
 	{

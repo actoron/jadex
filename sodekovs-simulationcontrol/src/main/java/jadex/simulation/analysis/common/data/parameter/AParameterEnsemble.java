@@ -18,6 +18,14 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 {
 	private Map<String, IAParameter> parametersMap;
 
+	public AParameterEnsemble() {
+		super();
+		synchronized (mutex)
+		{
+		view = new AParameterEnsembleView(this);
+		}
+	}
+	
 	public AParameterEnsemble(String name)
 	{
 		super(name);
@@ -26,6 +34,18 @@ public class AParameterEnsemble extends ADataObject implements IAParameterEnsemb
 			parametersMap = Collections.synchronizedMap(new HashMap<String, IAParameter>());
 		}
 		view = new AParameterEnsembleView(this);
+	}
+	
+	
+
+	public Map<String, IAParameter> getParametersMap() {
+		return parametersMap;
+	}
+
+	public void setParametersMap(Map<String, IAParameter> parametersMap) {
+		synchronized (mutex) {
+			this.parametersMap = parametersMap;
+		}
 	}
 
 	// TODO: Add to view

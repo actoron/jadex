@@ -13,6 +13,9 @@ import java.util.TreeMap;
 
 public class ASeriesParameter extends ABasicParameter implements IASeriesParameter
 {
+	public ASeriesParameter() {
+	}
+	
 	/* values are ordered by key in this treemap*/
 	TreeMap<Double, Double> values = new TreeMap<Double, Double>();
 
@@ -20,11 +23,29 @@ public class ASeriesParameter extends ABasicParameter implements IASeriesParamet
 	{
 		super(name, Double.class, null);
 	}
+	
+	
+
+	public TreeMap<Double, Double> getValues() {
+		return values;
+	}
+
+
+
+	public void setValues(TreeMap<Double, Double> values) {
+		synchronized (mutex) {
+			this.values = values;
+		}
+	}
+
+
 
 	@Override
 	public void update(Double time, Double value)
 	{
+		synchronized (mutex) {
 		values.put(time, value);	
+		}
 	}
 
 	@Override

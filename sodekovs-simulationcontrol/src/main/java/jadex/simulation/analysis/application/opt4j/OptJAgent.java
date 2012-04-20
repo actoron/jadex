@@ -14,10 +14,10 @@ import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisatio
 @Description("Agent offer IAOptimisationService")
  @ProvidedServices({@ProvidedService(type=IAOptimisationService.class,
  implementation=@Implementation(expression="new Opt4JOptimisationService($component.getExternalAccess())"))})
-@GuiClass(ComponentServiceViewerPanel.class)
-@Properties(
-{
-	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.util.controlComponentJadexPanel.ControlComponentViewerPanel\"")
-})
+//@GuiClass(ComponentServiceViewerPanel.class)
+//@Properties(
+//{
+//	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.util.controlComponentJadexPanel.ControlComponentViewerPanel\"")
+//})
 public class OptJAgent extends MicroAgent
 {}

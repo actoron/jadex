@@ -28,11 +28,11 @@ import java.util.UUID;
 @Description("Agent offer IAOptimisationService")
  @ProvidedServices({@ProvidedService(type=IAOptimisationService.class,
  implementation=@Implementation(expression="new Opt4JOptimisationService($component.getExternalAccess())"))})
-@GuiClass(ComponentServiceViewerPanel.class)
-@Properties(
-{
-	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.util.controlComponentJadexPanel.ControlComponentViewerPanel\"")
-})
+//@GuiClass(ComponentServiceViewerPanel.class)
+//@Properties(
+//{
+//	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.util.controlComponentJadexPanel.ControlComponentViewerPanel\"")
+//})
 public class OptJTestAgent extends MicroAgent
 {
 	@Override
@@ -68,8 +68,9 @@ public class OptJTestAgent extends MicroAgent
 			}
 		};
 		
+		IFuture<UUID> fut = service.configurateOptimisation(null, "Evolutionaerer Algorithmus", null, ensSol, zf, ensConf);
+		UUID session = (UUID) fut.get(new ThreadSuspendable(this));
 		
-		UUID session = (UUID) service.configurateOptimisation(null, "Evolutionaerer Algorithmus", null, ensSol, zf, ensConf).get(new ThreadSuspendable(this));
 		IAParameterEnsemble expParameters = new AParameterEnsemble("Experiment Parameter");
 		expParameters.addParameter(new ABasicParameter("Wiederholungen", Integer.class, 10));
 		expParameters.addParameter(new ABasicParameter("Visualisierung", Boolean.class, Boolean.TRUE));

@@ -16,6 +16,10 @@ import java.util.TreeSet;
 public class AllocationStrategyRandom extends Object implements IAllocationStrategy
 {
 	Random random = new Random();
+	
+	public AllocationStrategyRandom() {
+		random = new Random();
+	}
 
 	@Override
 	public int compare(IAnalysisService serviceA, IAnalysisService serviceB)

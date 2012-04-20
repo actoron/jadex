@@ -170,7 +170,7 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 	}
 
 	@Override
-	public IFuture configurateOptimisation(UUID session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAObjectiveFunction objective, IAParameterEnsemble config)
+	public IFuture<UUID> configurateOptimisation(UUID session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAObjectiveFunction objective, IAParameterEnsemble config)
 	{
 		// session erstellen
 		UUID newSession = null;
@@ -240,7 +240,7 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 		}
 		
 		
-		return new Future(sess);
+		return new Future<UUID>(sess);
 	}
 
 	@Override

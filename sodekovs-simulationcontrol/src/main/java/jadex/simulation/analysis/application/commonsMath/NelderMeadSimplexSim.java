@@ -3,9 +3,8 @@ package jadex.simulation.analysis.application.commonsMath;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.apache.commons.math.exception.MathUserException;
-import org.apache.commons.math.optimization.RealPointValuePair;
-import org.apache.commons.math.optimization.direct.NelderMeadSimplex;
+import org.apache.commons.math3.optimization.PointValuePair;
+import org.apache.commons.math3.optimization.direct.NelderMeadSimplex;
 
 /**
  * Extended NelderSimplex for Simulation
@@ -54,12 +53,12 @@ public class NelderMeadSimplexSim extends NelderMeadSimplex
 		this.sigma = sigma;
 	}
 
-	public boolean tryReflect(RealPointValuePair reflected, Comparator<RealPointValuePair> comparator)
+	public boolean tryReflect(PointValuePair reflected, Comparator<PointValuePair> comparator)
 	{
 		sort(comparator);
-		final RealPointValuePair best = getPoint(0);
+		final PointValuePair best = getPoint(0);
 		final int n = getDimension();
-		final RealPointValuePair secondBest = getPoint(n - 1);
+		final PointValuePair secondBest = getPoint(n - 1);
 		if (comparator.compare(best, reflected) <= 0 &&
 				comparator.compare(reflected, secondBest) < 0)
 		{
@@ -73,12 +72,12 @@ public class NelderMeadSimplexSim extends NelderMeadSimplex
 		}
 	}
 
-	public double[] getExpand(RealPointValuePair reflected, Comparator<RealPointValuePair> comparator)
+	public double[] getExpand(PointValuePair reflected, Comparator<PointValuePair> comparator)
 	{
 		sort(comparator);
 		final int n = getDimension();
 		final double[] centroid = new double[n];
-		final RealPointValuePair worst = getPoint(n);
+		final PointValuePair worst = getPoint(n);
 		final double[] xWorst = worst.getPointRef();
 		for (int i = 0; i < n; i++)
 		{
@@ -93,7 +92,7 @@ public class NelderMeadSimplexSim extends NelderMeadSimplex
 		{
 			xR[j] = centroid[j] + rho * (centroid[j] - xWorst[j]);
 		}
-		final RealPointValuePair best = getPoint(0);
+		final PointValuePair best = getPoint(0);
 		if (comparator.compare(reflected, best) < 0)
 		{
 			// Compute the expansion point.
@@ -107,7 +106,7 @@ public class NelderMeadSimplexSim extends NelderMeadSimplex
 		return null;
 	}
 
-	public void tryExpand(RealPointValuePair reflected, RealPointValuePair expanded, Comparator<RealPointValuePair> comparator)
+	public void tryExpand(PointValuePair reflected, PointValuePair expanded, Comparator<PointValuePair> comparator)
 	{
 		sort(comparator);
 		if (comparator.compare(expanded, reflected) < 0) {
@@ -119,12 +118,12 @@ public class NelderMeadSimplexSim extends NelderMeadSimplex
         }
 	}
 	
-	public double[] getOutContracted(RealPointValuePair reflected, Comparator<RealPointValuePair> comparator)
+	public double[] getOutContracted(PointValuePair reflected, Comparator<PointValuePair> comparator)
 	{
 		sort(comparator);
 		final int n = getDimension();
 		final double[] centroid = new double[n];
-		final RealPointValuePair worst = getPoint(n);
+		final PointValuePair worst = getPoint(n);
 		final double[] xWorst = worst.getPointRef();
 		for (int i = 0; i < n; i++)
 		{
@@ -150,12 +149,12 @@ public class NelderMeadSimplexSim extends NelderMeadSimplex
 		return null;
 	}
 	
-	public double[] getInContracted(RealPointValuePair reflected, Comparator<RealPointValuePair> comparator)
+	public double[] getInContracted(PointValuePair reflected, Comparator<PointValuePair> comparator)
 	{
 		sort(comparator);
 		final int n = getDimension();
 		final double[] centroid = new double[n];
-		final RealPointValuePair worst = getPoint(n);
+		final PointValuePair worst = getPoint(n);
 		final double[] xWorst = worst.getPointRef();
 		for (int i = 0; i < n; i++)
 		{
@@ -172,7 +171,7 @@ public class NelderMeadSimplexSim extends NelderMeadSimplex
 		return xC;
 	}
 
-	public boolean tryOutContracted(RealPointValuePair reflected, RealPointValuePair outContracted,  Comparator<RealPointValuePair> comparator)
+	public boolean tryOutContracted(PointValuePair reflected, PointValuePair outContracted,  Comparator<PointValuePair> comparator)
 	{
 		sort(comparator);
 		if (comparator.compare(outContracted, reflected) <= 0) {
@@ -183,11 +182,11 @@ public class NelderMeadSimplexSim extends NelderMeadSimplex
 		return false;
 	}
 
-	public boolean tryInContracted(RealPointValuePair inContracted, Comparator<RealPointValuePair> comparator)
+	public boolean tryInContracted(PointValuePair inContracted, Comparator<PointValuePair> comparator)
 	{
 		sort(comparator);
 		final int n = getDimension();
-		final RealPointValuePair worst = getPoint(n);
+		final PointValuePair worst = getPoint(n);
 		if (comparator.compare(inContracted, worst) < 0) {
             // Accept the contraction point.
             replaceWorstPoint(inContracted, comparator);
@@ -196,7 +195,7 @@ public class NelderMeadSimplexSim extends NelderMeadSimplex
 		return false;
 	}
 
-	public void shrink(Comparator<RealPointValuePair> comparator)
+	public void shrink(Comparator<PointValuePair> comparator)
 	{
 		sort(comparator);
 		final int n = getDimension();
@@ -206,18 +205,18 @@ public class NelderMeadSimplexSim extends NelderMeadSimplex
             for (int j = 0; j < n; j++) {
                 x[j] = xSmallest[j] + sigma * (x[j] - xSmallest[j]);
             }
-            setPoint(i, new RealPointValuePair(x, Double.NaN, false));
+            setPoint(i, new PointValuePair(x, Double.NaN, false));
         }
 	}
 
 	//
-	public double[] iterate(Comparator<RealPointValuePair> comparator) throws MathUserException
+	public double[] iterate(Comparator<PointValuePair> comparator)
 	{
 		sort(comparator);
 		final int n = getDimension();
 
 		// Interesting values.
-		final RealPointValuePair worst = getPoint(n);
+		final PointValuePair worst = getPoint(n);
 		final double[] xWorst = worst.getPointRef();
 
 		// Compute the centroid of the best vertices (dismissing the worst
@@ -246,14 +245,14 @@ public class NelderMeadSimplexSim extends NelderMeadSimplex
 		return xR;
 	}
 	
-	private void sort(Comparator<RealPointValuePair> comparator)
+	private void sort(Comparator<PointValuePair> comparator)
 	{
-		RealPointValuePair[] simplex = getPoints();
+		PointValuePair[] simplex = getPoints();
 		Arrays.sort(simplex, comparator);
 		setPoints(simplex);
 	}
 	
-	public void setSimplex(RealPointValuePair[] points)
+	public void setSimplex(PointValuePair[] points)
 	{
 		setPoints(points);
 	}

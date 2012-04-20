@@ -16,16 +16,22 @@ import jadex.simulation.analysis.common.data.parameter.statistics.Variance;
 
 /**
  * ASummaryParameter class, which holds some values
+ * 
  * @author 5Haubeck
- *
+ * 
  */
-public class ASummaryParameter extends ABasicParameter implements IASummaryParameter
-{
-	public ASummaryParameter(String name)
-	{
+public class ASummaryParameter extends ABasicParameter implements
+		IASummaryParameter {
+	public ASummaryParameter() {
+		super();
+		synchronized (mutex) {
+			view = new ASummaryParameterView(this);
+		}
+	}
+
+	public ASummaryParameter(String name) {
 		super(name, Double.class, null);
-		synchronized (mutex)
-		{
+		synchronized (mutex) {
 			view = new ASummaryParameterView(this);
 		}
 	}
@@ -47,40 +53,79 @@ public class ASummaryParameter extends ABasicParameter implements IASummaryParam
 
 	/** Variance statistic */
 	private ISingleStatistic variance = new Variance();
-	
+
 	private List<Double> values = new LinkedList<Double>();
 
+	public void setN(Double n) {
+		synchronized (mutex) {
+			this.n = n;
+		}
+	}
+
+	public void setMin(ISingleStatistic min) {
+		synchronized (mutex) {
+			this.min = min;
+		}
+	}
+
+	public void setMax(ISingleStatistic max) {
+		synchronized (mutex) {
+			this.max = max;
+		}
+	}
+
+	public void setMean(ISingleStatistic mean) {
+		synchronized (mutex) {
+			this.mean = mean;
+		}
+	}
+
+	public void setSum(ISingleStatistic sum) {
+		synchronized (mutex) {
+			this.sum = sum;
+		}
+	}
+
+	public void setVariance(ISingleStatistic variance) {
+		synchronized (mutex) {
+
+			this.variance = variance;
+		}
+	}
+
+	public void setValues(List<Double> values) {
+		synchronized (mutex) {
+			this.values = values;
+		}
+	}
+
 	@Override
-	public void setValue(Object value)
-	{
-		synchronized (mutex)
-		{
-			if (value instanceof Double)
-			{
+	public void setValue(Object value) {
+		synchronized (mutex) {
+			if (value instanceof Double) {
 				addValue((Double) value);
-			}
-			else
-			{
-//				new UnsupportedDataTypeException(value.getClass() + "not supported. Summary only support Doubles");
+			} else {
+				// new UnsupportedDataTypeException(value.getClass() +
+				// "not supported. Summary only support Doubles");
 			}
 		}
 	}
 
 	@Override
-	public Object getValue()
-	{
+	public Object getValue() {
 		return getMean();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#addValue(java.lang.Double)
+	 * 
+	 * @see
+	 * jadex.simulation.analysis.common.data.parameter.IASummaryParameter#addValue
+	 * (java.lang.Double)
 	 */
 	@Override
-	public void addValue(Double value)
-	{
-		synchronized (mutex)
-		{
+	public void addValue(Double value) {
+		synchronized (mutex) {
 			sum.addValue(value);
 			min.addValue(value);
 			max.addValue(value);
@@ -93,15 +138,15 @@ public class ASummaryParameter extends ABasicParameter implements IASummaryParam
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#addValues(java.lang.Double[])
+	 * 
+	 * @see
+	 * jadex.simulation.analysis.common.data.parameter.IASummaryParameter#addValues
+	 * (java.lang.Double[])
 	 */
 	@Override
-	public void addValues(Double[] values)
-	{
-		synchronized (mutex)
-		{
-			for (double d : values)
-			{
+	public void addValues(Double[] values) {
+		synchronized (mutex) {
+			for (double d : values) {
 				addValue(d);
 			}
 		}
@@ -109,60 +154,59 @@ public class ASummaryParameter extends ABasicParameter implements IASummaryParam
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getN()
+	 * 
+	 * @see
+	 * jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getN()
 	 */
 	@Override
-	public Double getN()
-	{
+	public Double getN() {
 		return n;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getSum()
+	 * 
+	 * @see
+	 * jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getSum
+	 * ()
 	 */
 	@Override
-	public Double getSum()
-	{
+	public Double getSum() {
 		return sum.getResult();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getMean()
+	 * 
+	 * @see
+	 * jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getMean
+	 * ()
 	 */
 	@Override
-	public Double getMean()
-	{
-//		System.out.println(mean);
-//		System.out.println(mean.getResult());
-		if (mean != null)
-		{
+	public Double getMean() {
+		// System.out.println(mean);
+		// System.out.println(mean.getResult());
+		if (mean != null) {
 			return mean.getResult();
-		} else
-		{
+		} else {
 			return Double.NaN;
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getStandardDeviation()
+	 * 
+	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#
+	 * getStandardDeviation()
 	 */
 	@Override
-	public Double getStandardDeviation()
-	{
-		synchronized (mutex)
-		{
+	public Double getStandardDeviation() {
+		synchronized (mutex) {
 			double stdDev = Double.NaN;
-			if (getN() > 0)
-			{
-				if (getN() > 1)
-				{
+			if (getN() > 0) {
+				if (getN() > 1) {
 					stdDev = Math.sqrt(getVariance());
-				}
-				else
-				{
+				} else {
 					stdDev = 0.0;
 				}
 			}
@@ -172,60 +216,65 @@ public class ASummaryParameter extends ABasicParameter implements IASummaryParam
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getVariance()
+	 * 
+	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#
+	 * getVariance()
 	 */
 	@Override
-	public Double getVariance()
-	{
+	public Double getVariance() {
 		return variance.getResult();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getMax()
+	 * 
+	 * @see
+	 * jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getMax
+	 * ()
 	 */
 	@Override
-	public Double getMax()
-	{
+	public Double getMax() {
 		return max.getResult();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getMin()
+	 * 
+	 * @see
+	 * jadex.simulation.analysis.common.data.parameter.IASummaryParameter#getMin
+	 * ()
 	 */
 	@Override
-	public Double getMin()
-	{
+	public Double getMin() {
 		return min.getResult();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#isEmpty()
+	 * 
+	 * @see
+	 * jadex.simulation.analysis.common.data.parameter.IASummaryParameter#isEmpty
+	 * ()
 	 */
 	@Override
-	public boolean isEmpty()
-	{
-		if (n <= 0)
-		{
+	public boolean isEmpty() {
+		if (n <= 0) {
 			return true;
-		}
-		else
-		{
+		} else {
 			return false;
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see jadex.simulation.analysis.common.data.parameter.IASummaryParameter#clear()
+	 * 
+	 * @see
+	 * jadex.simulation.analysis.common.data.parameter.IASummaryParameter#clear
+	 * ()
 	 */
 	@Override
-	public void clear()
-	{
-		synchronized (mutex)
-		{
+	public void clear() {
+		synchronized (mutex) {
 			this.n = 0.0;
 			min.clear();
 			max.clear();
@@ -236,20 +285,17 @@ public class ASummaryParameter extends ABasicParameter implements IASummaryParam
 	}
 
 	@Override
-	public List<Double> getValues()
-	{
+	public List<Double> getValues() {
 		return values;
 	}
-	
+
 	@Override
-	public ADataObject clonen()
-	{
+	public ADataObject clonen() {
 		ASummaryParameter clone = new ASummaryParameter(name);
 		Boolean oValue = onlyValue;
 		clone.setEditable(editable);
 		clone.setValueEditable(oValue);
-		for (int i = 0; i < values.toArray().length; i++)
-		{
+		for (int i = 0; i < values.toArray().length; i++) {
 			clone.addValues((Double[]) values.toArray());
 		}
 

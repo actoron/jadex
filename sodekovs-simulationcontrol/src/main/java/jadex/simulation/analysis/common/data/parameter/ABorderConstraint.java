@@ -10,10 +10,32 @@ public class ABorderConstraint extends Object implements IAConstraint
 	Double upperBorder;
 	Double lowerBorder;
 	
+	public ABorderConstraint()
+	{
+	}
+	
 	public ABorderConstraint(Double up, Double down)
 	{
 		upperBorder = up;
 		lowerBorder = down;
+	}
+	
+	
+
+	public Double getUpperBorder() {
+		return upperBorder;
+	}
+
+	public void setUpperBorder(Double upperBorder) {
+		this.upperBorder = upperBorder;
+	}
+
+	public Double getLowerBorder() {
+		return lowerBorder;
+	}
+
+	public void setLowerBorder(Double lowerBorder) {
+		this.lowerBorder = lowerBorder;
 	}
 
 	@Override
@@ -25,25 +47,4 @@ public class ABorderConstraint extends Object implements IAConstraint
 		if (value<=lowerBorder) result = false;
 		return result;
 	}
-	
-	public void setUpperBound(Double up)
-	{
-		upperBorder = up;
-	}
-	
-	public void setLowerBound(Double low)
-	{
-		lowerBorder = low;
-	}
-	
-	public Double getUpperBound()
-	{
-		return upperBorder;
-	}
-	
-	public Double getLowerBound()
-	{
-		return lowerBorder;
-	}
-
 }

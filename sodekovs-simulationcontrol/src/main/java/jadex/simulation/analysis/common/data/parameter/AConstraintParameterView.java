@@ -55,7 +55,7 @@ public class AConstraintParameterView extends ABasicParameterView implements IAD
 				final ABorderConstraint constrain = (ABorderConstraint) parameter.getConstraints().iterator().next();
 
 				JLabel oben = new JLabel("Obere Grenze:");
-				final JValidatorTextField obenField = new JValidatorTextField(constrain.getUpperBound().toString());
+				final JValidatorTextField obenField = new JValidatorTextField(constrain.getUpperBorder().toString());
 				obenField_ = obenField;
 				obenField.setValidator(new ParserClassValidator(SAnalysisClassLoader.getClassLoader(), parameter.getValueClass()));
 				obenField.addFocusListener(new FocusListener()
@@ -87,7 +87,7 @@ public class AConstraintParameterView extends ABasicParameterView implements IAD
 				gridY++;
 
 				JLabel unten = new JLabel("Untere Grenze:");
-				final JValidatorTextField untenField = new JValidatorTextField(constrain.getLowerBound().toString());
+				final JValidatorTextField untenField = new JValidatorTextField(constrain.getLowerBorder().toString());
 				untenField_ = untenField;
 				untenField.setValidator(new ParserClassValidator(SAnalysisClassLoader.getClassLoader(), parameter.getValueClass()));
 				untenField.addFocusListener(new FocusListener()
@@ -135,16 +135,16 @@ public class AConstraintParameterView extends ABasicParameterView implements IAD
 				Double dValue = (Double) value;
 				if (up)
 				{
-					if (!(constrain.getUpperBound() == dValue))
+					if (!(constrain.getUpperBorder() == dValue))
 					{
-						constrain.setUpperBound(dValue);
+						constrain.setUpperBorder(dValue);
 					}
 				}
 				else
 				{
-					if (!(constrain.getLowerBound() == dValue))
+					if (!(constrain.getLowerBorder() == dValue))
 					{
-						constrain.setLowerBound(dValue);
+						constrain.setLowerBorder(dValue);
 					}
 				}
 

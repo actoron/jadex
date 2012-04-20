@@ -24,13 +24,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.math.analysis.MultivariateRealFunction;
-import org.apache.commons.math.exception.MathUserException;
-import org.apache.commons.math.exception.MaxCountExceededException;
-import org.apache.commons.math.optimization.ConvergenceChecker;
-import org.apache.commons.math.optimization.RealPointValuePair;
-import org.apache.commons.math.optimization.SimpleScalarValueChecker;
-import org.apache.commons.math.util.Incrementor;
+import org.apache.commons.math3.analysis.MultivariateFunction;
+import org.apache.commons.math3.exception.MaxCountExceededException;
+import org.apache.commons.math3.optimization.ConvergenceChecker;
+import org.apache.commons.math3.optimization.PointValuePair;
+import org.apache.commons.math3.optimization.SimpleValueChecker;
+import org.apache.commons.math3.util.Incrementor;
 
 /**
  * Optimisation with CommonsMath. Simplex Algorithmus
@@ -92,10 +91,10 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 
 			// comparator (to sort RealPointValuePair in simplex)
 			final boolean isMinim = objective.MinGoal();
-			final Comparator<RealPointValuePair> comparator = new Comparator<RealPointValuePair>()
+			final Comparator<PointValuePair> comparator = new Comparator<PointValuePair>()
 			{
-				public int compare(final RealPointValuePair o1,
-								final RealPointValuePair o2)
+				public int compare(final PointValuePair o1,
+								final PointValuePair o2)
 			{
 				final double v1 = o1.getValue();
 				final double v2 = o2.getValue();
@@ -104,9 +103,9 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 			};
 			state.put("comparator", comparator);
 
-			final MultivariateRealFunction evalFunc = new MultivariateRealFunction()
+			final MultivariateFunction evalFunc = new MultivariateFunction()
 			{
-				public double value(double[] point) throws MathUserException
+				public double value(double[] point)
 			{
 				return Double.NaN;
 			}
@@ -114,7 +113,7 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 			state.put("evaluator", evalFunc);
 			//
 			// // evaluator
-			SimpleScalarValueChecker checker = new SimpleScalarValueChecker();
+			SimpleValueChecker checker = new SimpleValueChecker();
 			state.put("checker", checker);
 
 			// start and mapping
@@ -183,10 +182,10 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 	{
 		Map<String, Object> state = sessionState.get(session);
 		NelderMeadSimplexSim simplex = (NelderMeadSimplexSim) state.get("simplex");
-		Comparator<RealPointValuePair> comparator = (Comparator<RealPointValuePair>) state.get("comparator");
+		Comparator<PointValuePair> comparator = (Comparator<PointValuePair>) state.get("comparator");
 		Incrementor evaluations = (Incrementor) state.get("evaluations");
-		ConvergenceChecker<RealPointValuePair> checker = (ConvergenceChecker<RealPointValuePair>) state.get("checker");
-		MultivariateRealFunction evalFunc = (MultivariateRealFunction) state.get("evaluator");
+		ConvergenceChecker<PointValuePair> checker = (ConvergenceChecker<PointValuePair>) state.get("checker");
+		MultivariateFunction evalFunc = (MultivariateFunction) state.get("evaluator");
 		Boolean terminate = (Boolean) sessionState.get(session).get("terminate");
 		List<Map.Entry<String, IAParameter>> mappings = (List<Map.Entry<String, IAParameter>>) sessionState.get(session).get("mappings");
 		Integer iteration = (Integer) sessionState.get(session).get("iteration");
@@ -226,13 +225,13 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 
 				if (iterState == 0)
 				{
-					RealPointValuePair[] lastsimplex = simplex.getPoints();
+					PointValuePair[] lastsimplex = simplex.getPoints();
 					for (IAExperiment exp : previousSolutions.getExperiments().values())
 					{
 						for (int k = 0; k < lastsimplex.length; k++)
 						{
 							Integer found = 0;
-							RealPointValuePair realPointValuePair = lastsimplex[k];
+							PointValuePair realPointValuePair = lastsimplex[k];
 							double[] point = realPointValuePair.getPoint();
 							for (int j = 0; j < point.length; j++)
 							{
@@ -240,7 +239,7 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 							}
 							if (found == point.length)
 							{
-								RealPointValuePair newPoint = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
+								PointValuePair newPoint = new PointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
 								lastsimplex[k] = newPoint;
 							}
 						}
@@ -284,7 +283,7 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 				{
 					// reflect
 					IAExperiment exp = (IAExperiment) previousSolutions.getExperiments().values().iterator().next();
-					RealPointValuePair reflected = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
+					PointValuePair reflected = new PointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
 					if (simplex.tryReflect(reflected, comparator))
 					{
 						state.put("state", new Integer(0));
@@ -350,8 +349,8 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 				{
 					// expand!
 					IAExperiment exp = (IAExperiment) previousSolutions.getExperiments().values().iterator().next();
-					RealPointValuePair expanded = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
-					RealPointValuePair reflected = (RealPointValuePair) sessionState.get(session).get("reflected");
+					PointValuePair expanded = new PointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
+					PointValuePair reflected = (PointValuePair) sessionState.get(session).get("reflected");
 					simplex.tryExpand(reflected, expanded, comparator);
 					state.put("state", new Integer(0));
 					state.put("reflected", null);
@@ -360,8 +359,8 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 				{
 					// outcontract!
 					IAExperiment exp = (IAExperiment) previousSolutions.getExperiments().values().iterator().next();
-					RealPointValuePair outContracted = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
-					RealPointValuePair reflected = (RealPointValuePair) sessionState.get(session).get("reflected");
+					PointValuePair outContracted = new PointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
+					PointValuePair reflected = (PointValuePair) sessionState.get(session).get("reflected");
 					if (simplex.tryOutContracted(reflected, outContracted, comparator))
 					{
 						state.put("state", new Integer(0));
@@ -370,10 +369,10 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 					else
 					{
 						simplex.shrink(comparator);
-						RealPointValuePair[] nextsimplex = simplex.getPoints();
+						PointValuePair[] nextsimplex = simplex.getPoints();
 						for (int i = 0; i < nextsimplex.length; i++)
 						{
-							final RealPointValuePair vertex = nextsimplex[i];
+							final PointValuePair vertex = nextsimplex[i];
 							final double[] point = vertex.getPointRef();
 
 							if (Double.isNaN(vertex.getValue()))
@@ -400,8 +399,8 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 				{
 					// incontract!
 					IAExperiment exp = (IAExperiment) previousSolutions.getExperiments().values().iterator().next();
-					RealPointValuePair inContracted = new RealPointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
-					RealPointValuePair reflected = (RealPointValuePair) sessionState.get(session).get("reflected");
+					PointValuePair inContracted = new PointValuePair(getPointsOfExperiment(exp, mappings), (Double) objective.evaluate(exp.getResultParameters()).get(susThread), true);
+					PointValuePair reflected = (PointValuePair) sessionState.get(session).get("reflected");
 					if (simplex.tryOutContracted(reflected, inContracted, comparator))
 					{
 						state.put("state", new Integer(0));
@@ -410,10 +409,10 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 					else
 					{
 						simplex.shrink(comparator);
-						RealPointValuePair[] nextsimplex = simplex.getPoints();
+						PointValuePair[] nextsimplex = simplex.getPoints();
 						for (int i = 0; i < nextsimplex.length; i++)
 						{
-							final RealPointValuePair vertex = nextsimplex[i];
+							final PointValuePair vertex = nextsimplex[i];
 							final double[] point = vertex.getPointRef();
 
 							if (Double.isNaN(vertex.getValue()))
@@ -442,10 +441,10 @@ public class CommonsMathOptimisationService extends ABasicAnalysisSessionService
 		{
 			IAExperiment startExp = (IAExperiment) previousSolutions.getExperiments().values().iterator().next();
 			state.put("baseExperiment", startExp);
-			RealPointValuePair[] nextsimplex = simplex.getPoints();
+			PointValuePair[] nextsimplex = simplex.getPoints();
 			for (int i = 0; i < nextsimplex.length; i++)
 			{
-				final RealPointValuePair vertex = nextsimplex[i];
+				final PointValuePair vertex = nextsimplex[i];
 				final double[] point = vertex.getPointRef();
 
 				if (Double.isNaN(vertex.getValue()))

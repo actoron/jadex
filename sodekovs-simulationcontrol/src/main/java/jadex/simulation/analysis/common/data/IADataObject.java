@@ -28,7 +28,7 @@ public interface IADataObject extends IAObservable
 	 * Returns a ID for the dataObject
 	 * @return ID as UUID
 	 */
-	public UUID getID();
+	public UUID getId();
 
 	/**
 	 * Returns the name for the dataObject
