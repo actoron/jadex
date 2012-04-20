@@ -1,17 +1,21 @@
 package jadex.simulation.analysis.application.opt4j;
 
 import java.util.Collection;
+import java.util.Map;
 
-import org.opt4j.core.Archive;
 import org.opt4j.core.Individual;
-import org.opt4j.core.IndividualBuilder;
-import org.opt4j.core.Population;
-import org.opt4j.core.optimizer.Completer;
+import org.opt4j.core.IndividualFactory;
+import org.opt4j.core.Objective;
+import org.opt4j.core.Objective.Sign;
+import org.opt4j.core.optimizer.Archive;
 import org.opt4j.core.optimizer.Control;
-import org.opt4j.core.optimizer.Iterations;
+import org.opt4j.core.optimizer.IndividualCompleter;
+import org.opt4j.core.optimizer.Iteration;
 import org.opt4j.core.optimizer.OptimizerIterationListener;
+import org.opt4j.core.optimizer.Population;
 import org.opt4j.core.optimizer.StopException;
 import org.opt4j.core.optimizer.TerminationException;
+import org.opt4j.core.problem.PhenotypeWrapper;
 import org.opt4j.optimizer.ea.EvolutionaryAlgorithm;
 import org.opt4j.optimizer.ea.Mating;
 import org.opt4j.optimizer.ea.Selector;
@@ -19,110 +23,103 @@ import org.opt4j.start.Constant;
 
 import com.google.inject.Inject;
 
-public class EvolutionaryAlgorithmSim extends EvolutionaryAlgorithm
-{
+public class EvolutionaryAlgorithmSim extends EvolutionaryAlgorithm {
+	
 	Boolean terminated = false;
-
-	// private Collection<Individual> toEvaluate = new HashSet<Individual>();
+	private final IndividualFactory myIndividualFactory;
 
 	@Inject
 	public EvolutionaryAlgorithmSim(
 			Population population,
 			Archive archive,
-			IndividualBuilder individualBuilder,
-			Completer completer,
+			IndividualFactory individualFactory,
+			IndividualCompleter completer,
 			Control control,
 			Selector selector,
 			Mating mating,
-			@Iterations int generations,
+			Iteration iteration,
 			@Constant(value = "alpha", namespace = EvolutionaryAlgorithm.class) int alpha,
 			@Constant(value = "mu", namespace = EvolutionaryAlgorithm.class) int mu,
-			@Constant(value = "lambda", namespace = EvolutionaryAlgorithm.class) int lambda)
-	{
-		super(population, archive, individualBuilder, completer, control, selector, mating, generations, alpha, mu, lambda);
-	};
+			@Constant(value = "lambda", namespace = EvolutionaryAlgorithm.class) int lambda) {
+		super(population, archive, individualFactory, completer, control,
+				selector, mating, iteration, alpha, mu, lambda);
+		myIndividualFactory = individualFactory;
+	}
 
 	@Override
-	public void optimize() throws TerminationException, StopException
-	{
-		try
-		{
-			if (iteration == 0)
-			{
-				System.out.println("*****" + getIteration());
-//				System.out.println("ITERATION:" + iteration);
-//				System.out.println("GENERATION:" + generations);
-				selector.init(alpha + lambda);
+	public void optimize() throws TerminationException, StopException {
+		try {
+			selector.init(alpha + lambda);
 
-				while (population.size() < alpha)
-				{
-					population.add(individualBuilder.build());
+			if (population.isEmpty()) {
+				System.out.println("ITERATION: " + getIteration());
+
+				
+
+				while (population.size() < alpha) {
+					population.add(myIndividualFactory.create());
 				}
 
 				completer.complete(population);
-
-				iteration++;
-				control.checkpointStop();
-			}
-			else 
-			{
-//				System.out.println("ITERATION:" + iteration);
-//				System.out.println("GENERATION:" + generations);
+			} else {
+				
+				if (population.size() > alpha) {
+					Collection<Individual> lames = selector.getLames(
+							population.size() - alpha, population);
+					population.removeAll(lames);
+				}
+				
 				archive.update(population);
-				for (OptimizerIterationListener listener : iterationListeners)
-				{
-					listener.iterationComplete(this, iteration);
+				Individual indi = archive.iterator().next();
+				System.out.println("Dif-"+ ((PhenotypeWrapper<Map<String, Integer>>) indi.getPhenotype()).get().get("diffusion-rate"));
+				System.out.println("Eva-"+ ((PhenotypeWrapper<Map<String, Integer>>) indi.getPhenotype()).get().get("evaporation-rate"));
+				System.out.println("Value-"+indi.getObjectives().get(new Objective("ticks", Sign.MIN)).getDouble());
+				
+				iteration.next();
+				for (OptimizerIterationListener listener : iterationListeners) {
+					listener.iterationComplete(this, iteration.value());
+				}
+				control.checkpointStop();
+
+				System.out.println("ITERATION: " + getIteration());
+
+				int offspringCount = lambda;
+
+				while (population.size() < alpha && offspringCount > 0) {
+					population.add(myIndividualFactory.create());
+					offspringCount--;
 				}
 
-				Collection<Individual> lames = selector
-						.getLames(lambda, population);
+				if (offspringCount < lambda) { // evaluate new individuals first
+					completer.complete(population);
+				} else {
+
+					Collection<Individual> parents = selector.getParents(mu,
+							population);
+					Collection<Individual> offspring = mating.getOffspring(
+							offspringCount, parents);
+					population.addAll(offspring);
+
+					completer.complete(population);
+				}
 				
-//				for (Individual individual : lames)
-//				{
-//					System.out.println("lame: " + individual.getPhenotype() + " = " + individual.getObjectives());
-//				}
 				
-				population.removeAll(lames);
-
-				Collection<Individual> parents = selector
-						.getParents(mu, population);
-
-				Collection<Individual> offspring = mating.getOffspring(lambda,
-						parents);
-				population.addAll(offspring);
-
-				// evaluate offspring before selecting lames
-//				completer.complete(offspring);
-
-				completer.complete(population);
-				// archive.update(population);
-				// for (OptimizerIterationListener listener : iterationListeners)
-				// {
-				// listener.iterationComplete(this, iteration);
-				// }
-				iteration++;
-				control.checkpointStop();
-				if (iteration >= generations)
-				{
-//					System.out.println("--ITERATION:" + iteration);
-//					System.out.println("--GENERATION:" + generations);
+				if (iteration.value() >= iteration.max()) {
+					// System.out.println("--ITERATION:" + iteration);
+					// System.out.println("--GENERATION:" + generations);
 					throw new TerminationException();
 				}
 			}
-		}
-		catch (TerminationException e)
-		{
+		} catch (TerminationException e) {
 			terminated = true;
 		}
 	}
 
-	public Boolean getTerminated()
-	{
+	public Boolean getTerminated() {
 		return terminated;
 	}
 
-	public Population getPopulation()
-	{
+	public Population getPopulation() {
 		return population;
 	}
 }

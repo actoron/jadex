@@ -24,16 +24,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
-import org.opt4j.core.Archive;
 import org.opt4j.core.Individual;
 import org.opt4j.core.Objective;
 import org.opt4j.core.Objective.Sign;
 import org.opt4j.core.Objectives;
-import org.opt4j.core.Population;
+import org.opt4j.core.Phenotype;
+import org.opt4j.core.optimizer.Archive;
 import org.opt4j.core.optimizer.Optimizer;
-import org.opt4j.core.problem.Phenotype;
+import org.opt4j.core.optimizer.Population;
 import org.opt4j.core.problem.PhenotypeWrapper;
 import org.opt4j.start.Opt4JTask;
 
@@ -43,31 +42,28 @@ import com.google.inject.Module;
  * Opt4J implementation of {@link IAOptimisationService}vice
  */
 @Service
-public class Opt4JOptimisationService extends ABasicAnalysisSessionService implements IAOptimisationService
-{
+public class Opt4JOptimisationService extends ABasicAnalysisSessionService
+		implements IAOptimisationService {
 	Set<String> methods = new HashSet<String>();
 	Map<String, Map<String, Object>> sessionState = new HashMap<String, Map<String, Object>>();
 
-	public Opt4JOptimisationService(IExternalAccess access)
-	{
+	public Opt4JOptimisationService(IExternalAccess access) {
 		super(access, IAOptimisationService.class, true);
 		methods.add("Evolutionaerer Algorithmus");
 	}
 
 	@Override
-	public IFuture supportedMethods()
-	{
+	public IFuture supportedMethods() {
 		return new Future(methods);
 	}
 
 	@Override
-	public IFuture getMethodParameter(String methodName)
-	{
+	public IFuture getMethodParameter(String methodName) {
 		Future result = new Future();
-		if (methodName.equals("Evolutionaerer Algorithmus"))
-		{
+		if (methodName.equals("Evolutionaerer Algorithmus")) {
 			AParameterEnsemble ens = new AParameterEnsemble("methodParameter");
-			ens.addParameter(new ABasicParameter("generations", Integer.class, 10));
+			ens.addParameter(new ABasicParameter("generations", Integer.class,
+					10));
 			ens.addParameter(new ABasicParameter("alpha", Integer.class, 10));
 			ens.addParameter(new ABasicParameter("lambda", Integer.class, 4));
 			ens.addParameter(new ABasicParameter("crossover", Double.class, 0.5));
@@ -78,84 +74,107 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 	}
 
 	@Override
-	public IFuture nextSolutions(String session, IAExperimentBatch previousSolutions)
-	{
+	public IFuture nextSolutions(String session,
+			IAExperimentBatch previousSolutions) {
 		Map<String, Object> state = sessionState.get(session);
-		
-		Boolean terminate = (Boolean) sessionState.get(session).get("terminate");
-		List<Map.Entry<String, IAParameter>> mappings = (List<Map.Entry<String, IAParameter>>) sessionState.get(session).get("mappings");
-		Collection<Module> modules =  (Collection<Module>) sessionState.get(session).get("modules");
-		Opt4JTask task =  (Opt4JTask) sessionState.get(session).get("task");
-		Integer iteration = (Integer) sessionState.get(session).get("iteration");
-		IAExperiment baseExperiment = (IAExperiment) sessionState.get(session).get("baseExperiment");
-		
+
+		Boolean terminate = (Boolean) sessionState.get(session)
+				.get("terminate");
+		List<Map.Entry<String, IAParameter>> mappings = (List<Map.Entry<String, IAParameter>>) sessionState
+				.get(session).get("mappings");
+		Collection<Module> modules = (Collection<Module>) sessionState.get(
+				session).get("modules");
+		Opt4JTask task = (Opt4JTask) sessionState.get(session).get("task");
+		Integer iteration = (Integer) sessionState.get(session)
+				.get("iteration");
+		IAExperiment baseExperiment = (IAExperiment) sessionState.get(session)
+				.get("baseExperiment");
+
 		Archive archive = task.getInstance(Archive.class);
-		EvolutionaryAlgorithmSim opti = (EvolutionaryAlgorithmSim) task.getInstance(Optimizer.class);
-//		
-		if (iteration > 0)
-		{
-			//set Experiment results
+		EvolutionaryAlgorithmSim opti = (EvolutionaryAlgorithmSim) task
+				.getInstance(Optimizer.class);
+		//
+		if (iteration > 0) {
+			// set Experiment results
 			Population pop = opti.getPopulation();
-			for (IAExperiment exp : previousSolutions.getExperiments().values())
-			{
-				for (Individual individual : pop)
-				{
-					Boolean found = true;
-					Phenotype point = individual.getPhenotype();
-					System.out.println(point.getClass());
-					System.out.println(point);
-					Objectives objectives = new Objectives();
-					Objective objective = new Objective("Sum", Sign.MIN);
-					objectives.add(objective, 10);
-					individual.setObjectives(objectives);
+			for (IAExperiment exp : previousSolutions.getExperiments().values()) {
+				for (Individual individual : pop) {
+					if (!individual.isEvaluated()) {
+						if (((PhenotypeWrapper<Map<String, Integer>>) individual
+								.getPhenotype()).get().get("diffusion-rate") == ((Integer) exp
+								.getConfigParameter("diffusion-rate").getValue())
+								&& ((PhenotypeWrapper<Map<String, Integer>>) individual
+										.getPhenotype()).get().get(
+										"evaporation-rate") == ((Integer) exp
+										.getConfigParameter("evaporation-rate")
+										.getValue())) {
+							Objectives objectives = new Objectives();
+							Objective objective = new Objective("ticks",
+									Sign.MIN);
+							objectives.add(objective, (Double) exp
+									.getResultParameter("ticks").getValue());
+							individual.setObjectives(objectives);
+						}
+					}
 				}
+
 			}
 
-			//check converged
-			if (opti.getTerminated())
-			{
+			// check converged
+			if (opti.getTerminated()) {
 				// We have found an optimum.
 				terminate = true;
 				sessionState.get(session).put("terminate", terminate);
-				
+
 				System.out.println("OPTIMUM!");
 				Individual best = archive.iterator().next();
-				PhenotypeWrapper<Map<String, Double>> pheno = (PhenotypeWrapper<Map<String, Double>>) best.getPhenotype();
-				
-				IAParameterEnsemble result = (IAParameterEnsemble) ((IAExperiment) state.get("baseExperiment")).getConfigParameters().clonen();
+				PhenotypeWrapper<Map<String, Integer>> pheno = (PhenotypeWrapper<Map<String, Integer>>) best
+						.getPhenotype();
 
-				Iterator it = pheno.get().values().iterator();
-				for (int j = 0; j < 2; j++)
-				{
-					result.getParameter(mappings.get(j).getKey()).setValue(it.next());
-				}
-				
-				state.put("optimum",result);
-				state.put("optimumValue", best.getObjectives().getValues().iterator().next());
+				// IAParameterEnsemble result = (IAParameterEnsemble)
+				// ((IAExperiment) state
+				// .get("baseExperiment")).getConfigParameters().clonen();
+
+				// Iterator it = pheno.get().values().iterator();
+				// for (int j = 0; j < 2; j++) {
+				// result.getParameter(mappings.get(j).getKey()).setValue(
+				// it.next());
+				// }
+
+				// state.put("optimum", result);
+				// state.put("optimumValue", best.getObjectives().getValues()
+				// .iterator().next());
 			}
-		} else
-		{
-			state.put("baseExperiment", (IAExperiment) previousSolutions.getExperiments().values().iterator().next());
-			baseExperiment = (IAExperiment) sessionState.get(session).get("baseExperiment");
+		} else {
+			state.put("baseExperiment", (IAExperiment) previousSolutions
+					.getExperiments().values().iterator().next());
+			baseExperiment = (IAExperiment) sessionState.get(session).get(
+					"baseExperiment");
 
 		}
-		
+
 		// next iteration
-		IAExperimentBatch newExperiments = new AExperimentBatch("solutions");
-		if (!terminate)
-		{
-			try
-			{
+		IAExperimentBatch newExperiments = new AExperimentBatch("solutions"
+				+ iteration);
+		if (!terminate) {
+			try {
 				task.execute();
-			}
-			catch (Exception e)
-			{
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			Population pop = opti.getPopulation();
-			for (Individual individual : pop)
-			{
-				newExperiments.addExperiment((IAExperiment)baseExperiment.clonen());
+			for (Individual individual : pop) {
+				IAExperiment exp = (IAExperiment) baseExperiment.clonen();
+				exp.setName(individual.toString());
+				((ABasicParameter) exp.getConfigParameter("diffusion-rate"))
+						.setValue(((PhenotypeWrapper<Map<String, Integer>>) individual
+								.getPhenotype()).get().get("diffusion-rate"));
+				((ABasicParameter) exp.getConfigParameter("evaporation-rate"))
+						.setValue(((PhenotypeWrapper<Map<String, Integer>>) individual
+								.getPhenotype()).get().get("evaporation-rate"));
+				((ABasicParameter) exp.getResultParameter("ticks"))
+						.setValue(Double.NaN);
+				newExperiments.addExperiment(exp);
 			}
 			iteration++;
 			sessionState.get(session).put("iteration", iteration);
@@ -164,60 +183,56 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 	}
 
 	@Override
-	public IFuture checkEndofOptimisation(String session)
-	{
+	public IFuture checkEndofOptimisation(String session) {
 		return new Future((Boolean) sessionState.get(session).get("terminate"));
 	}
 
 	@Override
-	public Future<String> configurateOptimisation(String session, String method, IAParameterEnsemble methodParameter, IAParameterEnsemble solution, IAObjectiveFunction objective, IAParameterEnsemble config)
-	{
+	public Future<String> configurateOptimisation(String session,
+			String method, IAParameterEnsemble methodParameter,
+			IAParameterEnsemble solution, IAObjectiveFunction objective,
+			IAParameterEnsemble config) {
 		// session erstellen
 		String newSession = null;
-		if (session != null)
-		{
-			if (sessions.containsKey(session))
-			{
+		if (session != null) {
+			if (sessions.containsKey(session)) {
 				newSession = session;
 			}
 		}
-		if (newSession == null)
-		{
+		if (newSession == null) {
 			newSession = (String) createSession(null).get(susThread);
 		}
 		final String sess = newSession;
-		
-		if (method.equals("Evolutionaerer Algorithmus"))
-		{
+
+		if (method.equals("Evolutionaerer Algorithmus")) {
 			// set states
 			Map<String, Object> state = new HashMap<String, Object>();
 
-			//mapings
+			// mapings
 			List<Map.Entry<String, IAParameter>> mappings = new LinkedList<Map.Entry<String, IAParameter>>();
-			for (Map.Entry<String, IAParameter> para : solution.getParameters().entrySet())
-			{
+			for (Map.Entry<String, IAParameter> para : solution.getParameters()
+					.entrySet()) {
 				mappings.add(para);
 			}
-			
+
 			double[] start = new double[mappings.size()];
-			for (int i = 0; i < start.length; i++)
-			{
+			for (int i = 0; i < start.length; i++) {
 				start[i] = (Double) mappings.get(i).getValue().getValue();
 			}
 			state.put("mappings", mappings);
 			state.put("start", start);
-			
+
 			EvolutionaryAlgorithmSimModule evolutionaryAlgorithm = new EvolutionaryAlgorithmSimModule();
-			evolutionaryAlgorithm.setGenerations(10);		
+			evolutionaryAlgorithm.setGenerations(10);
 			evolutionaryAlgorithm.setAlpha(10);
 			evolutionaryAlgorithm.setLambda(5);
-			evolutionaryAlgorithm.setCrossoverRate(1);
-			evolutionaryAlgorithm.setMu(4);
+			evolutionaryAlgorithm.setCrossoverRate(0.5);
+			evolutionaryAlgorithm.setMu(5);
 
 			SimulationModule simulation = new SimulationModule();
-			
+
 			SimulationCompleterModule simulationCompleter = new SimulationCompleterModule();
-			
+
 			ViewerSimModule viewer = new ViewerSimModule();
 			viewer.setCloseOnStop(false);
 
@@ -226,34 +241,32 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService imple
 			modules.add(simulation);
 			modules.add(simulationCompleter);
 			modules.add(viewer);
-			
+
 			state.put("modules", modules);
 			state.put("iteration", new Integer(0));
 			state.put("terminate", false);
-			
+
 			Opt4JTask task = new Opt4JTask(false);
 			task.init(modules);
 			task.open();
 			state.put("task", task);
-			
+
 			sessionState.put(sess, state);
 		}
-		
-		
+
 		return new Future<String>(sess.toString());
 	}
 
 	@Override
-	public IFuture getOptimum(String session)
-	{
-		return new Future((IAParameterEnsemble) sessionState.get(session).get("optimum"));
+	public IFuture getOptimum(String session) {
+		return new Future((IAParameterEnsemble) sessionState.get(session).get(
+				"optimum"));
 	}
 
 	@Override
-	public IFuture getOptimumValue(String session)
-	{
-		return new Future((Double) sessionState.get(session).get("optimumValue"));
+	public IFuture getOptimumValue(String session) {
+		return new Future((Double) sessionState.get(session)
+				.get("optimumValue"));
 	}
-	
-	
+
 }

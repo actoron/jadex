@@ -31,10 +31,10 @@ public class AModelFactory
 
 		if (type == Modeltype.NetLogo)
 		{
-			modelName = "AntsStop";
-			inputParameters.addParameter(new AConstraintParameter("population", 100d));
-			inputParameters.addParameter(new AConstraintParameter("diffusion-rate", 40d));
-			inputParameters.addParameter(new AConstraintParameter("evaporation-rate", 10d));
+			modelName = "AntsStop5";
+			inputParameters.addParameter(new ABasicParameter("population", Double.class, 100.0));
+			inputParameters.addParameter(new ABasicParameter("diffusion-rate",Double.class, 40.0));
+			inputParameters.addParameter(new ABasicParameter("evaporation-rate",Double.class, 10.0));
 			outputParameters.addParameter(new ASummaryParameter("ticks"));
 			path = "/sodekovs-simulationcontrol/src/main/java/jadex/simulation/analysis/application/netLogo/models/";
 		}

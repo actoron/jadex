@@ -12,6 +12,7 @@ import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimen
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.UUID;
 
@@ -93,27 +94,29 @@ public class NetLogoExecuteExperimentsService extends ABasicAnalysisSessionServi
 				rep++;
 			}
 			frame.dispose();
+			res.setResult(exp);
 			}
         	catch(Exception ex) {
         		ex.printStackTrace();
         	}
 		} else
 		{
-			JTextArea compLite = new JTextArea();
-			((NetLogoSessionView)sessionViews.get(session)).showLite(compLite);
+//			JTextArea compLite = new JTextArea();
+//			((NetLogoSessionView)sessionViews.get(session)).showLite(compLite);
 			HeadlessWorkspace workspace =
 				HeadlessWorkspace.newInstance();
 		try {
 			String filePre = new File("..").getCanonicalPath() + "/sodekovs-simulationcontrol/src/main/java/jadex/simulation/analysis/application/netLogo/models/";
 			String FileName = filePre + exp.getModel().getName() +".nlogo";
-			compLite.append("### netLogo 4.1.2 ###");
-			compLite.append("Open file" + FileName + "\n");
+//			compLite.append("### netLogo 4.1.2 ###");
+//			compLite.append("Open file" + FileName + "\n");
 			
 			workspace.open(FileName);
-			 IAParameterEnsemble inputPara = exp.getModel().getInputParameters();
+			 IAParameterEnsemble inputPara = exp.getConfigParameters();
 	            for (IAParameter parameter : inputPara.getParameters().values()) {
 					String comm = "set " + parameter.getName() + " " + parameter.getValue().toString();
 					workspace.command(comm);
+					System.out.print(parameter.getName() + " " + parameter.getValue().toString() +" ");
 				}
 	          
 	            Integer rep = 0;
@@ -121,20 +124,25 @@ public class NetLogoExecuteExperimentsService extends ABasicAnalysisSessionServi
 				
 				while(rep < replicationen)
 				{
-					compLite.append("Start " +  exp.getModel().getName() + "\n");
+//					compLite.append("Start " +  exp.getModel().getName() + "\n");
 					workspace.command("setup");
 					workspace.command("go");
-			        exp.getResultParameter("ticks").setValue(workspace.report("ticks"));
-					compLite.append("End " +  exp.getModel().getName() + "\n");
+					
+					Double result = (Double) workspace.report("ticks");
+					System.out.print(" >" + result);
+			        exp.getResultParameter("ticks").setValue(result);
+			        
+//					compLite.append("End " +  exp.getModel().getName() + "\n");
 					rep++;
 				}
+				System.out.println();
 			
 			workspace.dispose();
+			res.setResult(exp);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		}
-		res.setResult(exp);
 		return res;
 	}
 	

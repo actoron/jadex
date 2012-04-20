@@ -1,8 +1,8 @@
 package jadex.simulation.analysis.application.opt4j;
 
+import org.opt4j.core.IndividualStateListener;
 import org.opt4j.viewer.ControlButtons;
 import org.opt4j.viewer.ControlToolBarService;
-import org.opt4j.viewer.ConvergencePlotData;
 import org.opt4j.viewer.Progress;
 import org.opt4j.viewer.StatusBar;
 import org.opt4j.viewer.ViewerModule;
@@ -26,8 +26,7 @@ public class ViewerSimModule extends ViewerModule
 		addOptimizerIterationListener(Progress.class);
 		addOptimizerStateListener(ControlButtons.class);
 		
-		addOptimizerIterationListener(ConvergencePlotData.class);
-		addIndividualStateListener(ConvergencePlotData.class);
+		addOptimizerIterationListener(ConvergencePlotDataSim.class);
 		
 		addToolBarService(ControlToolBarService.class);
 		addToolBarService(ViewsToolBarService.class);

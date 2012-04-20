@@ -20,9 +20,12 @@ import jadex.simulation.analysis.common.data.optimisation.IAObjectiveFunction;
 import jadex.simulation.analysis.common.data.parameter.ABasicParameter;
 import jadex.simulation.analysis.common.data.parameter.AParameterEnsemble;
 import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
+import jadex.simulation.analysis.common.data.simulation.Modeltype;
 import jadex.simulation.analysis.common.util.controlComponentJadexPanel.ComponentServiceViewerPanel;
 import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
+import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimentsService;
 
+import java.util.Random;
 import java.util.UUID;
 
 @Description("Agent offer IAOptimisationService")
@@ -42,14 +45,11 @@ public class OptJTestAgent extends MicroAgent
 		AParameterEnsemble ensConf = new AParameterEnsemble("config");
 		
 		AParameterEnsemble ensSol = new AParameterEnsemble("solution");
-		ensSol.addParameter(new ABasicParameter("in1", Double.class, 5.0));
-		ensSol.addParameter(new ABasicParameter("in2", Double.class, 10.0));
-		ensSol.addParameter(new ABasicParameter("in3", Double.class, 0.0));
+		ensSol.addParameter(new ABasicParameter("diffusion-rate", Double.class, 50.0));
+		ensSol.addParameter(new ABasicParameter("evaporation-rate", Double.class, 10.0));
 		
 		AParameterEnsemble ensRes = new AParameterEnsemble("result");
-		ensRes.addParameter(new ABasicParameter("out1", Double.class, Double.NaN));
-		ensRes.addParameter(new ABasicParameter("out2", Double.class, Double.NaN));
-		ensRes.addParameter(new ABasicParameter("out3", Double.class, Double.NaN));
+		ensRes.addParameter(new ABasicParameter("ticks", Double.class, Double.NaN));
 		
 		IAObjectiveFunction zf = new IAObjectiveFunction()
 		{
@@ -57,7 +57,8 @@ public class OptJTestAgent extends MicroAgent
 			@Override
 			public IFuture evaluate(IAParameterEnsemble ensemble)
 			{
-				Double result = (Double)ensemble.getParameter("out1").getValue() + (Double)ensemble.getParameter("out2").getValue() + (Double)ensemble.getParameter("out3").getValue();
+				System.out.println("ERROR");
+				Double result = 10.0;
 				return new Future(result);
 			}
 
@@ -72,12 +73,12 @@ public class OptJTestAgent extends MicroAgent
 		String session = (String) fut.get(new ThreadSuspendable(this));
 		
 		IAParameterEnsemble expParameters = new AParameterEnsemble("Experiment Parameter");
-		expParameters.addParameter(new ABasicParameter("Wiederholungen", Integer.class, 10));
-		expParameters.addParameter(new ABasicParameter("Visualisierung", Boolean.class, Boolean.TRUE));
-		expParameters.addParameter(new ABasicParameter("Mittelwert Prozent", Double.class, 10.0));
-		expParameters.addParameter(new ABasicParameter("alpha", Double.class, 95.0));
+		expParameters.addParameter(new ABasicParameter("Wiederholungen", Integer.class, 5));
+		expParameters.addParameter(new ABasicParameter("Visualisierung", Boolean.class, Boolean.FALSE));
+//		expParameters.addParameter(new ABasicParameter("Mittelwert Prozent", Double.class, 10.0));
+//		expParameters.addParameter(new ABasicParameter("alpha", Double.class, 95.0));
 		
-		AExperiment exp = new AExperiment("exp1", AModelFactory.createTestAModel(), expParameters, ensSol, ensRes);
+		AExperiment exp = new AExperiment("base", AModelFactory.createTestAModel(Modeltype.NetLogo), expParameters, ensSol, ensRes);
 		AExperimentBatch batch = new AExperimentBatch("batch1");
 		batch.addExperiment(exp);
 		batch = (AExperimentBatch) service.nextSolutions(session, batch).get(new ThreadSuspendable(this));
@@ -85,12 +86,11 @@ public class OptJTestAgent extends MicroAgent
 		{
 			for (IAExperiment experiment : batch.getExperiments().values())
 			{
-				experiment.getResultParameter("out1").setValue(new Double(2));
-				experiment.getResultParameter("out2").setValue(new Double(1));
-				experiment.getResultParameter("out3").setValue(new Double(3));
+				IAExecuteExperimentsService serviceExe = (IAExecuteExperimentsService) SServiceProvider.getService(getServiceProvider(), IAExecuteExperimentsService.class).get(new ThreadSuspendable(this));
+				serviceExe.executeExperiment(null, experiment).get(new ThreadSuspendable(this));		
 			}
 			batch = (AExperimentBatch) service.nextSolutions(session, batch).get(new ThreadSuspendable(this));
-			System.out.println(batch);
+//			System.out.println(batch);
 		}
 		return IFuture.DONE;
 		
