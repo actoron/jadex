@@ -1,14 +1,13 @@
 package jadex.commons.transformation.traverser;
 
-
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
- *  Allows processing java.util.Date.
+ *  Allows processing java.util.UUID.
  */
-public class DateProcessor implements ITraverseProcessor
+public class UUIDProcessor implements ITraverseProcessor
 {
 	/**
 	 *  Test if the processor is applicable.
@@ -19,7 +18,7 @@ public class DateProcessor implements ITraverseProcessor
 	 */
 	public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
 	{
-		return object instanceof Date;
+		return object instanceof UUID;
 	}
 	
 	/**
@@ -32,7 +31,7 @@ public class DateProcessor implements ITraverseProcessor
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
-		return clone? new Date(((Date)object).getTime()): object;
+		UUID uuid = (UUID)object;
+		return clone? new UUID(uuid.getMostSignificantBits(), uuid.getLeastSignificantBits()): object;
 	}
 }
-

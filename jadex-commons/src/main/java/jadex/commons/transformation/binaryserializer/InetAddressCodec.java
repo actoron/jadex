@@ -11,7 +11,6 @@ import java.util.Map;
 
 /**
  *  Codec for encoding and decoding InetAddress objects.
- *
  */
 public class InetAddressCodec extends AbstractCodec
 {

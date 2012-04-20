@@ -49,7 +49,6 @@ import java.util.Map;
 {
 	@Argument(name="testcnt", clazz=int.class, defaultvalue="2")
 })
-//@Arguments(@Argument(name="filename", clazz=String.class, defaultvalue="\"jadex/micro/testcases/stream/android-sdk_r07-windows.zip\""))
 @Results(@Result(name="testresults", clazz=Testcase.class))
 public abstract class TestAgent
 {

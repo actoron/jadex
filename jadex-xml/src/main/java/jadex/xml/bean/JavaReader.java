@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -116,6 +117,7 @@ public class JavaReader
 	 *	- java.lang.Character
 	 *	- jadex.commons.Tuple
 	 *	- jadex.commons.Tuple2
+	 *  - java.util.UUID
 	 */
 	public static Set<TypeInfo> getTypeInfos()
 	{
@@ -823,6 +825,22 @@ public class JavaReader
 				new SubobjectInfo(new AccessInfo("secondEntity", "secondEntity", null, null, new BeanAccessInfo(AccessInfo.THIS)))
 			}));
 			typeinfos.add(ti_tuple2);
+			
+			TypeInfo ti_uuid	= new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "UUID")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						long msb = Long.parseLong((String)rawattributes.get("mostSignificantBits"));
+						long lsb = Long.parseLong((String)rawattributes.get("leastSignificantBits"));
+						return new UUID(msb, lsb);
+					}
+				}
+			), new MappingInfo(null, new AttributeInfo[]{
+					new AttributeInfo(new AccessInfo("mostSignificantBits", null, AccessInfo.IGNORE_READWRITE)),
+					new AttributeInfo(new AccessInfo("leastSignificantBits", null, AccessInfo.IGNORE_READWRITE))
+			}));
+			typeinfos.add(ti_uuid);
 		}
 		catch(NoSuchMethodException e)
 		{

@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -65,6 +66,7 @@ public abstract class Test extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
+				testUUID();
 				testEnum();
 				testByte();
 				testDouble();
@@ -149,7 +151,7 @@ public abstract class Test extends TestCase
 		//(new RuntimeException()).printStackTrace();
 		Object written = doWrite(wo);
 		
-//		System.out.println("xml is:"+new String(xml));
+//		System.out.println("xml is:"+new String((byte[])written));
 		
 		Object ro = doRead(written);
 		
@@ -206,6 +208,15 @@ public abstract class Test extends TestCase
 					+wo.getClass()+" \n"+ro.getClass()+" \n"+written);
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void testUUID() throws Exception
+	{
+//		System.out.println("test enum: "+(TestEnum.A instanceof Enum));
+		doWriteAndRead(UUID.randomUUID());
 	}
 	
 	/**

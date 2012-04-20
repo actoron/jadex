@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -120,6 +121,7 @@ public class JavaWriter extends Writer
 	 *	- java.lang.Character
 	 *	- jadex.commons.Tuple
 	 *	- jadex.commons.Tuple2
+	 *  - java.util.UUID
 	 */
 	public static Set<TypeInfo> getTypeInfos()
 	{
@@ -732,7 +734,16 @@ public class JavaWriter extends Writer
 				new SubobjectInfo(new AccessInfo("firstEntity")),
 				new SubobjectInfo(new AccessInfo("secondEntity"))
 			}));
-			typeinfos.add(ti_tuple2);			
+			typeinfos.add(ti_tuple2);		
+			
+			// java.util.UUID
+			TypeInfo ti_uuid = new TypeInfo(null, new ObjectInfo(UUID.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("leastSignificantBits", null)),
+				new AttributeInfo(new AccessInfo("mostSignificantBits", null))},
+				null
+			));
+			typeinfos.add(ti_uuid);
 		}
 		catch(Exception e)
 		{

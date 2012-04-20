@@ -19,7 +19,6 @@ public class Test extends jadex.commons.transformation.Test
 	 */
 	public Object doWrite(Object wo)
 	{
-
 		return JavaWriter.objectToByteArray(wo, null);
 	}
 
