@@ -1,6 +1,5 @@
 package jadex.base.service.android;
 
-import jadex.android.ContextProvidingActivity;
 import jadex.android.JadexAndroidContext;
 import jadex.android.JadexAndroidContext.AndroidContextChangeListener;
 import jadex.android.JadexAndroidContextNotFoundError;

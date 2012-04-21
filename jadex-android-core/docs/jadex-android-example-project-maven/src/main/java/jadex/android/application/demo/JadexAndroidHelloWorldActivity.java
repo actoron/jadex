@@ -1,6 +1,8 @@
 package jadex.android.application.demo;
 
+import jadex.android.EventReceiver;
 import jadex.android.JadexAndroidActivity;
+import jadex.android.JadexAndroidEvent;
 import jadex.android.controlcenter.JadexAndroidControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -33,9 +35,9 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 	
 	private static Handler handler;
 	
-	public static Handler getHandler() {
-		return handler;
-	}
+//	public static Handler getHandler() {
+//		return handler;
+//	}
 
 	/** Called when the activity is first created. */
 	@Override
@@ -56,19 +58,45 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 		
 		textView = (TextView) findViewById(R.id.infoTextView);
 		
-		handler = new Handler() {
+//		handler = new Handler() {
+//			@Override
+//			public void handleMessage(final Message msg) {
+//				runOnUiThread(new Runnable() {
+//
+//					public void run() {
+//						Toast makeText = Toast.makeText(JadexAndroidHelloWorldActivity.this,
+//								msg.getData().getString("text"), Toast.LENGTH_SHORT);
+//						makeText.show();
+//					}
+//				});
+//			}
+//		};
+		
+		registerEventReceiver("showToast", new EventReceiver<JadexAndroidEvent>() {
+
 			@Override
-			public void handleMessage(final Message msg) {
+			public void receiveEvent(final JadexAndroidEvent event) {
 				runOnUiThread(new Runnable() {
 
 					public void run() {
 						Toast makeText = Toast.makeText(JadexAndroidHelloWorldActivity.this,
-								msg.getData().getString("text"), Toast.LENGTH_SHORT);
+								event.message, Toast.LENGTH_SHORT);
 						makeText.show();
 					}
 				});
 			}
-		};
+
+			@Override
+			public Class getEventClass() {
+				return JadexAndroidEvent.class;
+			}
+		});
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		refreshButtons();
 	}
 	
 	@Override
@@ -86,13 +114,32 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 		return true;
 	}
 	
+	private void refreshButtons() {
+		if (isJadexPlatformRunning()) {
+			startPlatformButton.setText("Stop Platform");
+			startAgentButton.setEnabled(true);
+			startBPMNButton.setEnabled(true);
+		} else {
+			startPlatformButton.setText("Start Platform");
+			startAgentButton.setEnabled(false);
+			startBPMNButton.setEnabled(false);
+		}
+		startPlatformButton.setEnabled(true);
+	}
+	
 	private OnClickListener buttonListener = new OnClickListener() {
 
 		public void onClick(View view) {
 			if (view == startPlatformButton) {
-				startPlatformButton.setEnabled(false);
-				textView.setText("Starting Jadex Platform...");
-				startJadexPlatform().addResultListener(platformResultListener);
+				if (isJadexPlatformRunning()) {
+					shutdownJadexPlatform();
+					textView.setText("Platform stopped.");
+					refreshButtons();
+				} else {
+					startPlatformButton.setEnabled(false);
+					textView.setText("Starting Jadex Platform...");
+					startJadexPlatform().addResultListener(platformResultListener);
+				}
 			} else if (view == startAgentButton) {
 				startAgentButton.setEnabled(false);
 				startMicroAgent("HelloWorldAgent " + num, AndroidAgent.class).addResultListener(agentCreatedResultListener);
@@ -109,9 +156,9 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 		public void resultAvailable(IExternalAccess result) {
 			runOnUiThread(new Runnable() {
 				public void run() {
-					startAgentButton.setEnabled(true);
-					startBPMNButton.setEnabled(true);
+					
 					textView.setText("Platform started");
+					refreshButtons();
 				}
 			});
 		}

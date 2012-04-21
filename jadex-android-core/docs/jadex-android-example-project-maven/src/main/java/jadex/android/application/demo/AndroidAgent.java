@@ -1,9 +1,15 @@
 package jadex.android.application.demo;
 
+import jadex.android.JadexAndroidContext;
+import jadex.android.JadexAndroidEvent;
+import jadex.base.service.android.AndroidContextService;
 import jadex.bridge.fipa.SFipa;
+import jadex.bridge.modelinfo.Startable;
+import jadex.bridge.service.types.android.IAndroidContextService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
 
 import java.util.Map;
@@ -53,10 +59,13 @@ public class AndroidAgent extends MicroAgent
 	 */
 	protected void showAndroidMessage(String msg)
 	{
-		Message message = new Message();
-		Bundle bundle = new Bundle();
-		bundle.putString("text", msg);
-		message.setData(bundle);
-		JadexAndroidHelloWorldActivity.getHandler().sendMessage(message);
+//		Message message = new Message();
+//		Bundle bundle = new Bundle();
+//		bundle.putString("text", msg);
+//		message.setData(bundle);
+//		JadexAndroidHelloWorldActivity.getHandler().sendMessage(message);
+		JadexAndroidEvent event = new JadexAndroidEvent();
+		event.message = msg;
+		JadexAndroidContext.getInstance().dispatchEvent("showToast", event);
 	}
 }
