@@ -47,6 +47,12 @@ public interface IControlCenter
 	//-------- GUI helper methods --------
 	
 	/**
+	 *  Switch to a plugin.
+	 *  Shows the plugin, if available.
+	 */
+	public void	showPlugin(String name);
+
+	/**
 	 *  Add a new platform control center
 	 *  or switch to tab if already exists.
 	 */
@@ -60,9 +66,16 @@ public interface IControlCenter
 	public void setStatusText(String text);
 	
 	/**
+	 *  Get a component from the status bar.
+	 *  @param id	Id used for adding a component.
+	 *  @return	The component to display.
+	 */
+	public JComponent	getStatusComponent(Object id);
+
+	/**
 	 *  Add a component to the status bar.
 	 *  @param id	An id for later reference.
-	 *  @param comp	An id for later reference.
+	 *  @param comp	The component to display.
 	 */
 	public void	addStatusComponent(Object id, JComponent comp);
 

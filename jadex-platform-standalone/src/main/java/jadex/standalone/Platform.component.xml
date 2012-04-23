@@ -359,7 +359,6 @@
 						<argument name="binarymessages">$args.binarymessages</argument>
 					</arguments>
 				</component>
-				<component name="chat" type="chat" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;chat&quot;)) ? 1 : 0"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
 						<argument name="mechanisms">$args.awamechanisms</argument>
@@ -367,6 +366,7 @@
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
 				</component>
+				<component name="chat" type="chat" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;chat&quot;)) ? 1 : 0"/>
 				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;) &amp;&amp; !$args.android) ? 1 : 0">
 					<arguments>
 						<argument name="saveonexit">$args.saveonexit</argument>
@@ -396,7 +396,6 @@
 						<argument name="binarymessages">$args.binarymessages</argument>
 					</arguments>
 				</component>
-				<component name="chat" type="chat" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;chat&quot;)) ? 1 : 0"/>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
 						<argument name="mechanisms">$args.awamechanisms</argument>
@@ -404,6 +403,7 @@
 						<argument name="excludes">$args.awaexcludes</argument>
 					</arguments>
 				</component>
+				<component name="chat" type="chat" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;chat&quot;)) ? 1 : 0"/>
 				<component name="jcc" type="jcc" number="Boolean.TRUE.equals($args.get(&quot;gui&quot;) &amp;&amp; !$args.android) ? 1 : 0">
 					<arguments>
 						<argument name="saveonexit">$args.saveonexit</argument>

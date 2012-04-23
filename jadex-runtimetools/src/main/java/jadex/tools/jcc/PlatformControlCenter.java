@@ -472,6 +472,28 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	{
 		controlcenter.showPlatform(platformaccess);
 	}
+	
+	/**
+	 *  Switch to a plugin.
+	 *  Shows the plugin, if available.
+	 */
+	public void	showPlugin(String name)
+	{
+		IControlCenterPlugin	plugin	= null;
+		for(Iterator<IControlCenterPlugin> it=plugins.keySet().iterator(); plugin==null && it.hasNext(); )
+		{
+			IControlCenterPlugin	next	= it.next();
+			if(next.getName().equals(name))
+			{
+				plugin	= next;
+			}
+		}
+		
+		if(plugin!=null)
+		{
+			pccpanel.setPerspective(plugin);
+		}
+	}
 
 	/**
 	 * Set a text to be displayed in the status bar. The text will be removed
@@ -480,6 +502,16 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	public void setStatusText(String text)
 	{
 		controlcenter.getWindow().getStatusBar().setText(text);
+	}
+	
+	/**
+	 *  Get a component from the status bar.
+	 *  @param id	Id used for adding a component.
+	 *  @return	The component to display.
+	 */
+	public JComponent	getStatusComponent(Object id)
+	{
+		return (JComponent)controlcenter.getWindow().getStatusBar().getStatusComponent(id);		
 	}
 
 	/**

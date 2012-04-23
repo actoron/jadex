@@ -760,7 +760,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				table.getParent().doLayout();
 				table.repaint();
 				
-				notifyChatEvent(NOTIFICATION_NEW_USER, cid, null, !isnew);
+				if(isnew)
+				{
+					notifyChatEvent(NOTIFICATION_NEW_USER, cid, null, false);
+				}
 			}
 		});
 	}
@@ -835,29 +838,62 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		// Ignore own messages and own online/offline state changes
 		if(!((IService)getService()).getServiceIdentifier().getProviderId().equals(source))
 		{
+			String	text	= null;
 			if(NOTIFICATION_NEW_MSG.equals(type))
 			{
-				getJCC().setStatusText("New chat message from "+source+": "+value);
+				text	= "New chat message from "+source+": "+value;
 			}
 			else if(NOTIFICATION_NEW_USER.equals(type))
 			{
-				getJCC().setStatusText("New chat user online: "+source);
+				text	= "New chat user online: "+source;
 			}
 			else if(NOTIFICATION_NEW_FILE.equals(type))
 			{
-				getJCC().setStatusText("New file upload request from "+source+": "+new File(((TransferInfo)value).getFile()).getName());
+				text	= "New file upload request from "+source+": "+new File(((TransferInfo)value).getFile()).getName();
 			}
 			else if(NOTIFICATION_FILE_COMPLETE.equals(type))
 			{
-				getJCC().setStatusText(((TransferInfo)value).isDownload()
+				text	= ((TransferInfo)value).isDownload()
 					? "Completed downloading '"+new File(((TransferInfo)value).getFile()).getName()+"' from "+source
-					: "Completed uploading '"+new File(((TransferInfo)value).getFile()).getName()+"' to "+source);
+					: "Completed uploading '"+new File(((TransferInfo)value).getFile()).getName()+"' to "+source;
 			}
 			else if(NOTIFICATION_FILE_ABORT.equals(type))
 			{
-				getJCC().setStatusText(((TransferInfo)value).isDownload()
+				text	= ((TransferInfo)value).isDownload()
 					? "Problem while downloading '"+new File(((TransferInfo)value).getFile()).getName()+"' from "+source
-					: "Problem while uploading '"+new File(((TransferInfo)value).getFile()).getName()+"' to "+source);
+					: "Problem while uploading '"+new File(((TransferInfo)value).getFile()).getName()+"' to "+source;
+			}
+			
+			if(text!=null)
+			{
+				// Add status component, if panel is not showing.
+				if(!panel.isShowing())
+				{
+					JComponent	scomp	= getJCC().getStatusComponent("chat-status-comp");
+					if(scomp==null)
+					{
+						scomp	= new JButton(ChatPlugin.getIcon());
+						((JButton)scomp).setMargin(new Insets(0, 0, 0, 0));
+						((JButton)scomp).addActionListener(new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								getJCC().showPlugin(ChatPlugin.PLUGIN_NAME);
+								getJCC().removeStatusComponent("chat-status-comp");
+							}
+						});
+						getJCC().addStatusComponent("chat-status-comp", scomp);
+					}
+					String	tip	= scomp.getToolTipText();
+					if(tip==null || !tip.contains(text))
+					{
+						tip	= (tip==null || tip.length()==0) ? "<html>"+text+"</html>"
+								: tip.substring(0, tip.length()-7)+"<br/>"+text+"</html>";
+						scomp.setToolTipText(tip);
+					}
+				}
+				
+				getJCC().setStatusText(text);
 			}
 			
 			if(!quiet)

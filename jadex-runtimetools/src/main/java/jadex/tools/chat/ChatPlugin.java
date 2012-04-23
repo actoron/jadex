@@ -18,10 +18,22 @@ public class ChatPlugin extends AbstractServicePlugin
 {
 	//-------- constants --------
 
+	/** The plugin name. */
+	public static final String	PLUGIN_NAME	= "Chat";
+	
 	static
 	{
 		icons.put("chat", SGUI.makeIcon(ChatPlugin.class, "images/chat.png"));
 		icons.put("chat_sel", SGUI.makeIcon(ChatPlugin.class, "images/chat.png"));
+		icons.put("chat_small", SGUI.makeIcon(ChatPlugin.class, "images/chat_small.png"));
+	}
+	
+	/**
+	 *  Get the icon for the chat.
+	 */
+	public static Icon	getIcon()
+	{
+		return icons.getIcon("chat_small");
 	}
 
 	//-------- methods --------
@@ -73,6 +85,6 @@ public class ChatPlugin extends AbstractServicePlugin
 	 */
 	public String getName()
 	{
-		return "Chat";
+		return PLUGIN_NAME;
 	}
 }

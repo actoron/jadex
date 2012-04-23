@@ -5,11 +5,14 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.awareness.DiscoveryInfo;
+import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -68,6 +71,9 @@ public class ChatService implements IChatService, IChatGuiService
 	/** The currently managed file transfers. */
 	protected Map<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>	transfers;
 	
+	/** Flag to avoid duplicate initialization/shutdown due to duplicate use of implementation. */
+	protected boolean	running;
+	
 	//-------- initialization methods --------
 	
 	/**
@@ -76,29 +82,79 @@ public class ChatService implements IChatService, IChatGuiService
 	@ServiceStart
 	public IFuture<Void> start()
 	{
-		final Future<Void>	ret	= new Future<Void>();
-
-		// Todo: load settings
-		this.nick	= SUtil.createUniqueId("user", 3);
-		this.transfers	= new LinkedHashMap<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>();
-		
-		IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
-		chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
+		if(running)
 		{
-			public void intermediateResultAvailable(IChatService chat)
+			return IFuture.DONE;
+		}
+		else
+		{
+			running	= true;
+			final Future<Void>	ret	= new Future<Void>();
+	
+			// Todo: load settings
+			this.nick	= SUtil.createUniqueId("user", 3);
+			this.transfers	= new LinkedHashMap<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>();
+			
+			IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
+			chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
 			{
-				chat.status(nick, STATE_IDLE);
-			}
-			public void finished()
+				public void intermediateResultAvailable(IChatService chat)
+				{
+					chat.status(nick, STATE_IDLE);
+				}
+				public void finished()
+				{
+					ret.setResult(null);
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setResult(null);
+				}
+			});
+			
+			// Post status, when new platforms become available.
+			agent.getServiceContainer().searchService(IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new IResultListener<IAwarenessManagementService>()
 			{
-				ret.setResult(null);
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setResult(null);
-			}
-		});
-		return ret;
+				public void resultAvailable(IAwarenessManagementService awa)
+				{
+					awa.subscribeToPlatformList(false).addResultListener(new IntermediateDefaultResultListener<DiscoveryInfo>()
+					{
+						public void intermediateResultAvailable(DiscoveryInfo info)
+						{
+							IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
+							chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
+							{
+								public void intermediateResultAvailable(IChatService chat)
+								{
+									chat.status(nick, STATE_IDLE);
+								}
+								
+								public void finished() {}
+	
+								public void exceptionOccurred(Exception exception)
+								{
+									// ignore
+								}
+							});
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							// ignore
+						}
+					});
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+					// ignore
+					exception.printStackTrace();
+				}
+			});
+			
+			return ret;
+		}
 	}
 	
 	/**
@@ -107,39 +163,47 @@ public class ChatService implements IChatService, IChatGuiService
 	@ServiceShutdown
 	public IFuture<Void> shutdown()
 	{
-		final Future<Void>	ret	= new Future<Void>();
-		
-		if(subscribers!=null)
+		if(!running)
 		{
-			for(SubscriptionIntermediateFuture<ChatEvent> fut: subscribers)
-			{
-				fut.terminate();
-			}
+			return IFuture.DONE;
 		}
-		
-		// Todo: required services don't work in service shutdown!?
-		IIntermediateFuture<IChatService>	chatfut	= SServiceProvider.getServices(agent.getServiceContainer(), IChatService.class, Binding.SCOPE_GLOBAL);
-//		IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
-		chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
+		else
 		{
-			public void intermediateResultAvailable(IChatService chat)
+			running	= false;
+			final Future<Void>	ret	= new Future<Void>();
+			
+			if(subscribers!=null)
 			{
-				// Hack!!! change local id from rms to chat agent.
-				IComponentIdentifier id	= IComponentIdentifier.LOCAL.get();
-				IComponentIdentifier.LOCAL.set(agent.getComponentIdentifier());
-				chat.status(nick, STATE_DEAD);
-				IComponentIdentifier.LOCAL.set(id);
+				for(SubscriptionIntermediateFuture<ChatEvent> fut: subscribers)
+				{
+					fut.terminate();
+				}
 			}
-			public void finished()
+			
+			// Todo: required services don't work in service shutdown!?
+			IIntermediateFuture<IChatService>	chatfut	= SServiceProvider.getServices(agent.getServiceContainer(), IChatService.class, Binding.SCOPE_GLOBAL);
+	//		IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
+			chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
 			{
-				ret.setResult(null);
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				ret.setResult(null);
-			}
-		});
-		return ret;
+				public void intermediateResultAvailable(IChatService chat)
+				{
+					// Hack!!! change local id from rms to chat agent.
+					IComponentIdentifier id	= IComponentIdentifier.LOCAL.get();
+					IComponentIdentifier.LOCAL.set(agent.getComponentIdentifier());
+					chat.status(nick, STATE_DEAD);
+					IComponentIdentifier.LOCAL.set(id);
+				}
+				public void finished()
+				{
+					ret.setResult(null);
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					ret.setResult(null);
+				}
+			});
+			return ret;
+		}
 	}
 	
 	//-------- IChatService interface --------
