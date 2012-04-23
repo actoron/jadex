@@ -1,6 +1,5 @@
 package jadex.bridge.service.types.chat;
 
-import java.io.File;
 import java.util.UUID;
 
 import jadex.bridge.IComponentIdentifier;
@@ -156,6 +155,19 @@ public class TransferInfo
 	public void setDone(long done)
 	{
 		this.done = done;
+	}
+	
+	/**
+	 *  Update the transfer info.
+	 *  Use this method instead of set done for having the transfer speed calculated.
+	 *  @param done The done to set.
+	 *  @return True, when a new speed has been calculated (approx. once per second).
+	 */
+	public boolean	update(long done)
+	{
+		boolean	ret	= false;
+		
+		setDone(done);
 		
 		// Calculate speed every second, but only start timer after first update received.
 		long	update	= System.currentTimeMillis();
@@ -174,7 +186,10 @@ public class TransferInfo
 			lastdone	= done;
 			this.speed	= this.speed==0 ? speed : this.speed*0.9 + speed*0.1;	// EMA(10)
 	//		System.out.println("curspeed: "+speed+" avgspeed: "+this.speed);
+			ret	= true;
 		}
+		
+		return ret;
 	}
 	
 	/**

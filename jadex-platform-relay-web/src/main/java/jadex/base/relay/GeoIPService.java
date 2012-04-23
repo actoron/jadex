@@ -1,6 +1,12 @@
 package jadex.base.relay;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.zip.GZIPInputStream;
 
 import com.maxmind.geoip.Location;
 import com.maxmind.geoip.LookupService;
@@ -9,7 +15,7 @@ import com.maxmind.geoip.regionName;
 /**
  *  Helper object to resolve IP addresses to Geo locations.
  *  Uses free API and database file available at: http://www.maxmind.com/app/geolitecity
- *  Requires GeoLiteCity.dat to be present in <user.home>/.relaystats directory.
+ *  Downloads GeoLiteCity.dat into <user.home>/.relaystats directory.
  */
 public class GeoIPService
 {
@@ -31,26 +37,8 @@ public class GeoIPService
 	/** The lookup service (if any). */
 	protected LookupService	ls;
 	
-	//-------- constructors --------
-	
-	/**
-	 *  Create the db object.
-	 */
-	public GeoIPService()
-	{
-		try
-		{
-			// Set up geo ip lookup service.
-			String	systemdir	= new File(System.getProperty("user.home"), ".relaystats").getAbsolutePath();
-			System.out.println("Expecting GeoLiteCity.dat in: "+systemdir);
-		    ls	= new LookupService(new File(systemdir, "GeoLiteCity.dat").getAbsolutePath(), LookupService.GEOIP_MEMORY_CACHE);
-		}
-		catch(Exception e)
-		{
-			// Ignore errors and let relay work without geo location.
-			System.err.println("Warning: Relay could not initialize GeoIP service: "+ e);
-		}
-	}
+	/** The date of the last update check. */
+	protected long	lastupdate;
 	
 	//-------- methods --------
 	
@@ -59,6 +47,7 @@ public class GeoIPService
 	 */
 	public String	getLocation(String ip)
 	{
+		updateDB();
 		String	ret	= null;
 		
 		if(ls!=null)
@@ -110,6 +99,7 @@ public class GeoIPService
 	 */
 	public String	getCountryCode(String ip)
 	{
+		updateDB();
 		String	ret	= null;
 		
 		if(ls!=null)
@@ -137,6 +127,7 @@ public class GeoIPService
 	 */
 	public String	getPosition(String ip)
 	{
+		updateDB();
 		String	ret	= null;
 		
 		if(ls!=null)
@@ -157,5 +148,77 @@ public class GeoIPService
 		}
 		
 		return ret;
+	}
+	
+	/**
+	 *  Download / check for updates of the GeoIP database.
+	 */
+	public void	updateDB()
+	{
+		// Check every 12 hours
+		long	update	= System.currentTimeMillis(); 
+		if(update-lastupdate>12*60*60*1000)
+		{
+			synchronized(this)
+			{
+				if(update-lastupdate>12*60*60*1000)
+				{
+					lastupdate	= update;
+					
+					String	systemdir	= new File(System.getProperty("user.home"), ".relaystats").getAbsolutePath();
+					File	dbfile	= new File(systemdir, "GeoLiteCity.dat");
+					
+					try
+					{
+						URL	url	= new URL("http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz");
+						HttpURLConnection	con	= (HttpURLConnection)url.openConnection();
+						if(con.getLastModified()>dbfile.lastModified())	// 0 for non-existant file
+						{
+							// Close lookup service before updating the database.
+							if(ls!=null)
+							{
+								ls.close();
+								ls	= null;
+							}
+							
+							File	tmpfile	= new File(dbfile.getParentFile(), "GeoLiteCity.dat.tmp");
+							InputStream	is	= new GZIPInputStream(con.getInputStream());
+							OutputStream	os	= new FileOutputStream(tmpfile);
+							byte[]	buf	= new byte[8192];
+							int read;
+							while((read=is.read(buf))!=-1)
+							{
+								os.write(buf, 0, read);
+							}
+							os.close();
+							is.close();
+							if(dbfile.exists())
+								dbfile.delete();
+							tmpfile.renameTo(dbfile);
+							System.out.println("Downloaded GeoIP database to: "+dbfile);
+						}
+					}
+					catch(Exception e)
+					{
+						System.err.println("Warning: Relay could not access GeoIP database: "+ e);
+					}
+
+					if(ls==null)
+					{
+						try
+						{
+							// Set up geo ip lookup service.
+							System.out.println("Using GeoIP database from: "+dbfile);
+						    ls	= new LookupService(dbfile.getAbsolutePath(), LookupService.GEOIP_MEMORY_CACHE);
+						}
+						catch(Exception e)
+						{
+							// Ignore errors and let relay work without geo location.
+							System.err.println("Warning: Relay could not initialize GeoIP service: "+ e);
+						}
+					}
+				}
+			}
+		}
 	}
 }

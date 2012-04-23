@@ -566,8 +566,10 @@ public class ChatService implements IChatService, IChatGuiService
 					try
 					{
 						fos.write(result);
-						ti.setDone(ti.getDone()+result.length);
-						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+						if(ti.update(ti.getDone()+result.length))
+						{
+							publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+						}
 						ret.addIntermediateResultIfUndone(new Long(ti.getDone()));
 						// todo: close con?
 					}
@@ -636,12 +638,12 @@ public class ChatService implements IChatService, IChatGuiService
 		
 		try
 		{
-			final long[] filesize = new long[1];
-			final File file = new File(ti.getFile());
-			final FileInputStream fis = new FileInputStream(file);
+			final FileInputStream fis = new FileInputStream(new File(ti.getFile()));
 			
 			IComponentStep<Void> step = new IComponentStep<Void>()
 			{
+				long filesize	= 0;
+				
 				public IFuture<Void> execute(final IInternalAccess ia)
 				{
 					// Stop transfer on error etc.
@@ -655,7 +657,7 @@ public class ChatService implements IChatService, IChatGuiService
 					{
 						final IComponentStep<Void> self = this;
 						int size = Math.min(200000, fis.available());
-						filesize[0] += size;
+						filesize += size;
 						byte[] buf = new byte[size];
 						int read = 0;
 						while(read!=buf.length)
@@ -665,8 +667,10 @@ public class ChatService implements IChatService, IChatGuiService
 						ocon.write(buf);
 //						System.out.println("wrote: "+size);
 						
-						ti.setDone(filesize[0]);
-						publishEvent(ChatEvent.TYPE_FILE, nick, ti.getOther(), ti);
+						if(ti.update(filesize))
+						{
+							publishEvent(ChatEvent.TYPE_FILE, nick, ti.getOther(), ti);
+						}
 						
 						if(fis.available()>0)
 						{
