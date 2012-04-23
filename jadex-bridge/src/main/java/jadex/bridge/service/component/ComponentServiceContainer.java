@@ -14,6 +14,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.bridge.service.PublishInfo;
 import jadex.bridge.service.RequiredServiceBinding;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
@@ -90,7 +91,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 		}
 		
 		IFuture<T>	fut	= super.getRequiredService(info, binding, rebind);
-		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut);
+		
+		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
 	}
 	
 	/**
@@ -114,7 +116,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 			return new IntermediateFuture<T>(new ComponentTerminatedException(id));
 
 		IIntermediateFuture<T>	fut	= super.getRequiredServices(info, binding, rebind);
-		return new ComponentIntermediateFuture<T>(instance.getExternalAccess(), adapter, fut);
+		
+		return (IIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
 	}
 	
 	/**
@@ -136,7 +139,8 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 					instance.getExternalAccess(), adapter, (IService)result, null, null, null));
 			}
 		});
-		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut);
+		
+		return (IFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
 	}
 	
 	/**
@@ -158,8 +162,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 					instance.getExternalAccess(), adapter, (IService)result, null, new RequiredServiceInfo(type), null));
 			}
 		});
-		
-		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut);
+		return (IFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
 	}
 	
 	// todo: remove
@@ -182,7 +185,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 					instance.getExternalAccess(), adapter, (IService)result, null, new RequiredServiceInfo(type), null));
 			}
 		});
-		return new ComponentFuture<T>(instance.getExternalAccess(), adapter, fut);
+		return (IFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
 	}
 
 	/**
@@ -204,7 +207,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 					adapter, (IService)result, null, new RequiredServiceInfo(type), null));
 			}
 		});
-		return new ComponentIntermediateFuture<T>(instance.getExternalAccess(), adapter, fut);
+		return (IIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
 	}
 	
 	/**
@@ -226,7 +229,7 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 					adapter, (IService)result, null, new RequiredServiceInfo(type), null));
 			}
 		});
-		return new ComponentIntermediateFuture<T>(instance.getExternalAccess(), adapter, fut);
+		return (IIntermediateFuture<T>)FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
 	}
 	
 	/**

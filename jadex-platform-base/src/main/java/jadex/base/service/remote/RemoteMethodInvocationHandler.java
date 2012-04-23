@@ -5,6 +5,7 @@ import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -173,6 +174,36 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		{
 			future = new Future();
 		}
+		
+//		FutureFunctionality func = new FutureFunctionality()
+//		{
+//			public IFuture<Void> terminate() 
+//			{
+//				Future res = new Future();
+////				res.addResultListener(new IResultListener()
+////				{
+////					public void resultAvailable(Object result)
+////					{
+////						System.out.println("received result: "+result);
+////					}
+////					public void exceptionOccurred(Exception exception)
+////					{
+////						System.out.println("received exception: "+exception);
+////					}
+////				});
+//				final String mycallid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
+//				RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid);
+//				// Can be invoked directly, because internally redirects to agent thread.
+////				System.out.println("sending terminate");
+//				rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
+//					content, mycallid, to, res);
+//			
+//				return IFuture.DONE;
+//			}
+//		};
+//
+//		future = FutureFunctionality.getDelegationFuture(type, func);
+		
 		Object ret = future;
 		
 //		if(method.getName().indexOf("store")!=-1)

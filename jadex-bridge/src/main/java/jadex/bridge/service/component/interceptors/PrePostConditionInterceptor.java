@@ -36,32 +36,7 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		Exception ex = null;
-		PreConditions pcons = context.getMethod().getAnnotation(PreConditions.class);
-		PreCondition[] pcs = pcons.value();
-		final Object[] args = context.getArgumentArray();
-		for(int i=0; ex ==null && i<pcs.length; i++)
-		{
-			if(pcs[i].value()==PreCondition.Type.NOTNULL)
-			{
-				int[] argnos = pcs[i].argno();
-				for(int j=0; ex==null && j<argnos.length; j++)
-				{
-					if(args[argnos[j]]==null)
-					{
-						ex = new ConditionException("Precondition violated, argument null: "+argnos[j]);
-					}
-				}
-			}
-			else if(pcs[i].value()==PreCondition.Type.EXPRESSION)
-			{
-				Object res = SJavaParser.evaluateExpression(pcs[i].expression(), new PrePostConditionFetcher(context.getArgumentArray(), null, null));
-				if(!(res instanceof Boolean) || !((Boolean)res).booleanValue())
-				{
-					ex = new ConditionException("Precondition violated: "+pcs[i].expression());
-				}
-			}
-		}
+		Exception ex = checkPreConditions(context);
 		
 		if(ex==null)
 		{
@@ -78,6 +53,42 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 	/**
 	 * 
 	 */
+	protected ConditionException checkPreConditions(ServiceInvocationContext context)
+	{
+		ConditionException ex = null;
+
+		PreConditions pcons = context.getMethod().getAnnotation(PreConditions.class);
+		PreCondition[] pcs = pcons.value();
+		final Object[] args = context.getArgumentArray();
+		for(int i=0; ex==null && i<pcs.length; i++)
+		{
+			if(pcs[i].value()==PreCondition.Type.NOTNULL)
+			{
+				int[] argnos = pcs[i].argno();
+				for(int j=0; ex==null && j<argnos.length; j++)
+				{
+					if(args[argnos[j]]==null)
+					{
+						ex = new ConditionException("Precondition violated, argument null: "+argnos[j]);
+					}
+				}
+			}
+			else if(pcs[i].value()==PreCondition.Type.EXPRESSION)
+			{
+				Object resu = SJavaParser.evaluateExpression(pcs[i].expression(), new PrePostConditionFetcher(context.getArgumentArray(), null, null));
+				if(!(resu instanceof Boolean) || !((Boolean)resu).booleanValue())
+				{
+					ex = new ConditionException("Precondition violated: "+pcs[i].expression());
+				}
+			}
+		}
+		
+		return ex;
+	}
+	
+	/**
+	 * 
+	 */
 	protected ConditionException checkPostConditions(ServiceInvocationContext context, Object res, Object ires)
 	{
 		ConditionException ex = null;
@@ -89,14 +100,14 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 			{
 				if(res==null)// || ires==null) ?
 				{
-					throw new ConditionException("Postcondition violated, result nulls.");
+					ex = new ConditionException("Postcondition violated, result nulls.");
 				}
 			}
 			else if(pcs[i].value()==PostCondition.Type.EXPRESSION)
 			{
 				Object val = SJavaParser.evaluateExpression(pcs[i].expression(), new PrePostConditionFetcher(context.getArgumentArray(), res, ires));
 				if(!(val instanceof Boolean) || !((Boolean)val).booleanValue())
-					throw new ConditionException("Postcondition violated: "+pcs[i].expression());
+					ex = new ConditionException("Postcondition violated: "+pcs[i].expression());
 			}
 		}
 		
@@ -200,26 +211,49 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 			{
 				FutureFunctionality func = new FutureFunctionality()
 				{
-					public Object intermediateResultAvailable(Object result)
+					public Object addIntermediateResult(Object result)
 					{
-						checkPostConditions(sic, null, result);
-						return result;
+						ConditionException ex = checkPostConditions(sic, null, result);
+						if(ex!=null)
+							throw ex;
+						else
+							return result;
 					}
 					
-					public void finished(Collection<Object> results)
+					public Object addIntermediateResultIfUndone(Object result)
 					{
-						 checkPostConditions(sic, results, null);
+						return addIntermediateResult(result);
 					}
 					
-					public Object resultAvailable(Object result)
+					public void setFinished(Collection<Object> results)
 					{
-						checkPostConditions(sic, result, null);
-						return result;
+						ConditionException ex = checkPostConditions(sic, results, null);
+						if(ex!=null)
+							throw ex;
+					}
+					
+					public void setFinishedIfUndone(Collection<Object> results)
+					{
+						setFinished(results);
+					}
+					
+					public Object setResult(Object result)
+					{
+						ConditionException ex = checkPostConditions(sic, result, null);
+						if(ex!=null)
+							throw ex;
+						else
+							return result;
+					}
+					
+					public Object setResultIfUndone(Object result)
+					{
+						return setResult(result);
 					}
 				};
 				
 				Future<?> fut = FutureFunctionality.getDelegationFuture((IFuture)res, func);
-				((IFuture)res).addResultListener(new DelegationResultListener(fut));
+//				((IFuture)res).addResultListener(new DelegationResultListener(fut));
 				sic.setResult(fut);
 				
 //				if(res instanceof ISubscriptionIntermediateFuture)

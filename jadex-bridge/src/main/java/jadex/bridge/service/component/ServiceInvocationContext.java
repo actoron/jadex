@@ -166,8 +166,8 @@ public class ServiceInvocationContext
 	 */
 	public void setResult(Object result)
 	{
-		if(getMethod().getName().indexOf("subsc")!=-1)
-			System.out.println("gotta");
+//		if(getMethod().getName().indexOf("subsc")!=-1)
+//			System.out.println("gotta");
 		this.result.set(used.size()-1, result);
 	}
 
