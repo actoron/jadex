@@ -11,7 +11,6 @@ import jadex.simulation.analysis.common.superClasses.service.view.session.Sessio
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.UUID;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;

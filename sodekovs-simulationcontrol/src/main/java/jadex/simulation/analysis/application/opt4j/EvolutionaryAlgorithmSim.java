@@ -1,7 +1,11 @@
 package jadex.simulation.analysis.application.opt4j;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Map;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.opt4j.core.Individual;
 import org.opt4j.core.IndividualFactory;
@@ -26,6 +30,7 @@ import com.google.inject.Inject;
 public class EvolutionaryAlgorithmSim extends EvolutionaryAlgorithm {
 	
 	Boolean terminated = false;
+	Logger logger;
 	private final IndividualFactory myIndividualFactory;
 
 	@Inject
@@ -52,8 +57,24 @@ public class EvolutionaryAlgorithmSim extends EvolutionaryAlgorithm {
 			selector.init(alpha + lambda);
 
 			if (population.isEmpty()) {
-				System.out.println("ITERATION: " + getIteration());
+				logger = Logger.getLogger("optimisation");
+				FileHandler fh = null;
 
+				try
+				{
+					String dir = System.getProperty("user.home") + "\\logs";
+					File f = new File(dir);
+					if (!f.isDirectory())
+						f.mkdir();
+					fh = new FileHandler("%h/logs/" + "optimisation" + ".log", true);
+				} catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+				fh.setFormatter(new GnuLogger());
+				logger.addHandler(fh);
+				logger.setLevel(Level.ALL);
+				logger.setUseParentHandlers(false);
 				
 
 				while (population.size() < alpha) {
@@ -71,14 +92,21 @@ public class EvolutionaryAlgorithmSim extends EvolutionaryAlgorithm {
 				
 				archive.update(population);
 				Individual indi = archive.iterator().next();
-				System.out.println("Dif-"+ ((PhenotypeWrapper<Map<String, Integer>>) indi.getPhenotype()).get().get("diffusion-rate"));
-				System.out.println("Eva-"+ ((PhenotypeWrapper<Map<String, Integer>>) indi.getPhenotype()).get().get("evaporation-rate"));
-				System.out.println("Value-"+indi.getObjectives().get(new Objective("ticks", Sign.MIN)).getDouble());
+//				System.out.println("Dif-"+ ((PhenotypeWrapper<Map<String, Integer>>) indi.getPhenotype()).get().get("diffusion-rate"));
+//				System.out.println("Eva-"+ ((PhenotypeWrapper<Map<String, Integer>>) indi.getPhenotype()).get().get("evaporation-rate"));
+//				System.out.println("Value-"+indi.getObjectives().get(new Objective("ticks", Sign.MIN)).getDouble());
+				
 				
 				iteration.next();
 				for (OptimizerIterationListener listener : iterationListeners) {
 					listener.iterationComplete(this, iteration.value());
 				}
+				
+				for (Individual individual : population) {
+					logger.info((((PhenotypeWrapper<Map<String, Integer>>) individual.getPhenotype()).get().get("diffusion-rate")) + " " + (((PhenotypeWrapper<Map<String, Integer>>) individual
+							.getPhenotype()).get().get("evaporation-rate")) + " " + individual.getObjectives().get(new Objective("ticks",Sign.MIN)).getValue());
+				}
+				
 				control.checkpointStop();
 
 				System.out.println("ITERATION: " + getIteration());
@@ -107,6 +135,11 @@ public class EvolutionaryAlgorithmSim extends EvolutionaryAlgorithm {
 				if (iteration.value() >= iteration.max()) {
 					// System.out.println("--ITERATION:" + iteration);
 					// System.out.println("--GENERATION:" + generations);
+					
+					Individual best = archive.iterator().next();
+					logger.info("BEST: " + (((PhenotypeWrapper<Map<String, Integer>>) best.getPhenotype()).get().get("diffusion-rate")) + " " + (((PhenotypeWrapper<Map<String, Integer>>) best
+							.getPhenotype()).get().get("evaporation-rate")) + " " + best.getObjectives().get(new Objective("ticks",Sign.MIN)).getValue());
+					
 					throw new TerminationException();
 				}
 			}

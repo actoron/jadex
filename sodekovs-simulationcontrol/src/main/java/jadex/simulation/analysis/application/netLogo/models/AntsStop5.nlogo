@@ -16,7 +16,11 @@ patches-own [
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
 to setup
-  clear-all
+  ;; (for this model to work with NetLogo's new plotting features,
+  ;; __clear-all-and-reset-ticks should be replaced with clear-all at
+  ;; the beginning of your setup procedure and reset-ticks at the end
+  ;; of the procedure.)
+  __clear-all-and-reset-ticks
   set-default-shape turtles "bug"
   crt population
   [ set size 2         ;; easier to see
@@ -73,7 +77,7 @@ end
 ;;;;;;;;;;;;;;;;;;;;;
 
 to go
-  while [foodout > 0 and ticks < 5000]
+  while [foodout > 0 and ticks < 10000]
   [ goTick ]
 end
 
@@ -202,6 +206,7 @@ GRAPHICS-WINDOW
 1
 1
 ticks
+30.0
 
 BUTTON
 13
@@ -218,6 +223,7 @@ NIL
 NIL
 NIL
 NIL
+1
 
 SLIDER
 13
@@ -264,6 +270,7 @@ NIL
 NIL
 NIL
 NIL
+1
 
 SWITCH
 104
@@ -305,10 +312,11 @@ food
 120.0
 true
 false
+"" ""
 PENS
-"food-in-pile1" 1.0 0 -11221820 true
-"food-in-pile2" 1.0 0 -13791810 true
-"food-in-pile3" 1.0 0 -13345367 true
+"food-in-pile1" 1.0 0 -11221820 true "" ""
+"food-in-pile2" 1.0 0 -13791810 true "" ""
+"food-in-pile3" 1.0 0 -13345367 true "" ""
 
 MONITOR
 13
@@ -336,38 +344,35 @@ NIL
 NIL
 NIL
 NIL
+1
 
 @#$#@#$#@
-WHAT IS IT?
------------
+## WHAT IS IT?
+
 In this project, a colony of ants forages for food. Though each ant follows a set of simple rules, the colony as a whole acts in a sophisticated way.
 
+## HOW IT WORKS
 
-HOW IT WORKS
-------------
 When an ant finds a piece of food, it carries the food back to the nest, dropping a chemical as it moves. When other ants "sniff" the chemical, they follow the chemical toward the food. As more ants carry food to the nest, they reinforce the chemical trail.
 
+## HOW TO USE IT
 
-HOW TO USE IT
--------------
 Click the SETUP button to set up the ant nest (in violet, at center) and three piles of food. Click the GO button to start the simulation. The chemical is shown in a green-to-white gradient.
 
 The EVAPORATION-RATE slider controls the evaporation rate of the chemical. The DIFFUSION-RATE slider controls the diffusion rate of the chemical. There is an on-off PLOT? switch.  Turning off the plotting lets the model run faster.
 
 If you want to change the number of ants, move the POPULATION slider before pressing SETUP.
 
+## THINGS TO NOTICE
 
-THINGS TO NOTICE
-----------------
 The ant colony generally exploits the food source in order, starting with the food closest to the nest, and finishing with the food most distant from the nest. It is more difficult for the ants to form a stable trail to the more distant food, since the chemical trail has more time to evaporate and diffuse before being reinforced.
 
 Once the colony finishes collecting the closest food, the chemical trail to that food naturally disappears, freeing up ants to help collect the other food sources. The more distant food sources require a larger "critical number" of ants to form a stable trail.
 
 The consumption of the food is shown in a plot.  The line colors in the plot match the colors of the food piles.
 
+## EXTENDING THE MODEL
 
-EXTENDING THE MODEL
--------------------
 Try different placements for the food sources. What happens if two food sources are equidistant from the nest? When that happens in the real world, ant colonies typically exploit one source then the other (not at the same time).
 
 In this project, the ants use a "trick" to find their way back to the nest: they follow the "nest scent." Real ants use a variety of different approaches to find their way back to the nest. Try to implement some alternative strategies.
@@ -376,30 +381,27 @@ The ants only respond to chemical levels between 0.05 and 2.  The lower limit is
 
 In the UPHILL-CHEMICAL procedure, the ant "follows the gradient" of the chemical. That is, it "sniffs" in three directions, then turns in the direction where the chemical is strongest. You might want to try variants of the UPHILL-CHEMICAL procedure, changing the number and placement of "ant sniffs."
 
+## NETLOGO FEATURES
 
-NETLOGO FEATURES
-----------------
 The built-in DIFFUSE primitive lets us diffuse the chemical easily without complicated code.
 
 The primitive PATCH-RIGHT-AND-AHEAD is used so to make the ants smell in different directions without actually turning.
 
+## HOW TO CITE
 
-HOW TO CITE
------------
-If you mention this model in an academic publication, we ask that you include these citations for the model itself and for the NetLogo software:
-- Wilensky, U. (1997).  NetLogo Ants model.  http://ccl.northwestern.edu/netlogo/models/Ants.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
+If you mention this model in an academic publication, we ask that you include these citations for the model itself and for the NetLogo software:  
+- Wilensky, U. (1997).  NetLogo Ants model.  http://ccl.northwestern.edu/netlogo/models/Ants.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.  
 - Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
-In other publications, please use:
+In other publications, please use:  
 - Copyright 1997 Uri Wilensky. All rights reserved. See http://ccl.northwestern.edu/netlogo/models/Ants for terms of use.
 
+## COPYRIGHT NOTICE
 
-COPYRIGHT NOTICE
-----------------
 Copyright 1997 Uri Wilensky. All rights reserved.
 
-Permission to use, modify or redistribute this model is hereby granted, provided that both of the following requirements are followed:
-a) this copyright notice is included.
+Permission to use, modify or redistribute this model is hereby granted, provided that both of the following requirements are followed:  
+a) this copyright notice is included.  
 b) this model will not be redistributed for profit without permission from Uri Wilensky. Contact Uri Wilensky for appropriate licenses for redistribution for profit.
 
 This model was created as part of the project: CONNECTED MATHEMATICS: MAKING SENSE OF COMPLEX PHENOMENA THROUGH BUILDING OBJECT-BASED PARALLEL MODELS (OBPML).  The project gratefully acknowledges the support of the National Science Foundation (Applications of Advanced Technologies Program) -- grant numbers RED #9552950 and REC #9632612.
@@ -407,7 +409,6 @@ This model was created as part of the project: CONNECTED MATHEMATICS: MAKING SEN
 This model was developed at the MIT Media Lab using CM StarLogo.  See Resnick, M. (1994) "Turtles, Termites and Traffic Jams: Explorations in Massively Parallel Microworlds."  Cambridge, MA: MIT Press.  Adapted to StarLogoT, 1997, as part of the Connected Mathematics Project.
 
 This model was converted to NetLogo as part of the projects: PARTICIPATORY SIMULATIONS: NETWORK-BASED DESIGN FOR SYSTEMS LEARNING IN CLASSROOMS and/or INTEGRATED SIMULATION AND MODELING ENVIRONMENT. The project gratefully acknowledges the support of the National Science Foundation (REPP & ROLE programs) -- grant numbers REC #9814682 and REC-0126227. Converted from StarLogoT to NetLogo, 1998.
-
 @#$#@#$#@
 default
 true
@@ -692,7 +693,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 4.1.2
+NetLogo 5.0.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@

@@ -14,10 +14,14 @@ import jadex.simulation.analysis.service.simulation.execution.IAExecuteExperimen
 @Description("Agent offer IAExecuteExperimentsService")
  @ProvidedServices({@ProvidedService(type=IAExecuteExperimentsService.class,
  implementation=@Implementation(expression="new NetLogoExecuteExperimentsService($component.getExternalAccess())"))})
-@GuiClass(ComponentServiceViewerPanel.class)
-@Properties(
-{
-	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.util.controlComponentJadexPanel.ControlComponentViewerPanel\"")
-})
+//@GuiClass(ComponentServiceViewerPanel.class)
+//@Properties(
+//{
+//	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.util.controlComponentJadexPanel.ControlComponentViewerPanel\"")
+//})
 public class NetLogoAgent extends MicroAgent
-{}
+{
+	public NetLogoAgent() {
+		// TODO Auto-generated constructor stub
+	}
+}

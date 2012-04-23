@@ -120,12 +120,12 @@
 		<dependency>
 			<groupId>analyse</groupId>
 			<artifactId>netLogo</artifactId>
-			<version>4.1.2</version>
+			<version>5.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>analyse</groupId>
 			<artifactId>opt4j</artifactId>
-			<version>2.3</version>
+			<version>2.6</version>
 		</dependency>
 		<dependency>
 			<groupId>analyse</groupId>

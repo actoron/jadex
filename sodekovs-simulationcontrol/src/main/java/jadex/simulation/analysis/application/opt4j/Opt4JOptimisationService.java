@@ -15,6 +15,7 @@ import jadex.simulation.analysis.common.data.parameter.IAParameterEnsemble;
 import jadex.simulation.analysis.common.superClasses.service.analysis.ABasicAnalysisSessionService;
 import jadex.simulation.analysis.service.continuative.optimisation.IAOptimisationService;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,6 +25,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.opt4j.core.Individual;
 import org.opt4j.core.Objective;
@@ -63,11 +67,11 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService
 		if (methodName.equals("Evolutionaerer Algorithmus")) {
 			AParameterEnsemble ens = new AParameterEnsemble("methodParameter");
 			ens.addParameter(new ABasicParameter("generations", Integer.class,
-					10));
-			ens.addParameter(new ABasicParameter("alpha", Integer.class, 10));
-			ens.addParameter(new ABasicParameter("lambda", Integer.class, 4));
+					20));
+			ens.addParameter(new ABasicParameter("alpha", Integer.class, 8));
+			ens.addParameter(new ABasicParameter("lambda", Integer.class, 3));
 			ens.addParameter(new ABasicParameter("crossover", Double.class, 0.5));
-			ens.addParameter(new ABasicParameter("mu", Double.class, 4));
+			ens.addParameter(new ABasicParameter("mu", Double.class, 3));
 			result.setResult(ens);
 		}
 		return result;
@@ -98,26 +102,31 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService
 			// set Experiment results
 			Population pop = opti.getPopulation();
 			for (IAExperiment exp : previousSolutions.getExperiments().values()) {
-				for (Individual individual : pop) {
-					if (!individual.isEvaluated()) {
-						if (((PhenotypeWrapper<Map<String, Integer>>) individual
-								.getPhenotype()).get().get("diffusion-rate") == ((Integer) exp
-								.getConfigParameter("diffusion-rate").getValue())
-								&& ((PhenotypeWrapper<Map<String, Integer>>) individual
-										.getPhenotype()).get().get(
-										"evaporation-rate") == ((Integer) exp
-										.getConfigParameter("evaporation-rate")
-										.getValue())) {
-							Objectives objectives = new Objectives();
-							Objective objective = new Objective("ticks",
-									Sign.MIN);
-							objectives.add(objective, (Double) exp
-									.getResultParameter("ticks").getValue());
-							individual.setObjectives(objectives);
+				if (exp.isEvaluated())
+				{
+					for (Individual individual : pop) {
+						if (!individual.isEvaluated()) {
+							if (((PhenotypeWrapper<Map<String, Integer>>) individual
+									.getPhenotype()).get().get("diffusion-rate") == ((Integer) exp
+									.getConfigParameter("diffusion-rate").getValue())
+									&& ((PhenotypeWrapper<Map<String, Integer>>) individual
+											.getPhenotype()).get().get(
+											"evaporation-rate") == ((Integer) exp
+											.getConfigParameter("evaporation-rate")
+											.getValue())) {
+								Objectives objectives = new Objectives();
+								Objective objective = new Objective("ticks",
+										Sign.MIN);
+								objectives.add(objective, (Double) exp
+										.getResultParameter("ticks").getValue());
+								individual.setObjectives(objectives);
+							}
 						}
 					}
+				} else
+				{
+					throw new RuntimeException("EVALUATION");
 				}
-
 			}
 
 			// check converged
@@ -164,17 +173,20 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService
 			}
 			Population pop = opti.getPopulation();
 			for (Individual individual : pop) {
-				IAExperiment exp = (IAExperiment) baseExperiment.clonen();
-				exp.setName(individual.toString());
-				((ABasicParameter) exp.getConfigParameter("diffusion-rate"))
-						.setValue(((PhenotypeWrapper<Map<String, Integer>>) individual
-								.getPhenotype()).get().get("diffusion-rate"));
-				((ABasicParameter) exp.getConfigParameter("evaporation-rate"))
-						.setValue(((PhenotypeWrapper<Map<String, Integer>>) individual
-								.getPhenotype()).get().get("evaporation-rate"));
-				((ABasicParameter) exp.getResultParameter("ticks"))
-						.setValue(Double.NaN);
-				newExperiments.addExperiment(exp);
+				if (!individual.isEvaluated())
+				{
+					IAExperiment exp = (IAExperiment) baseExperiment.clonen();
+					exp.setName(individual.toString());
+					((ABasicParameter) exp.getConfigParameter("diffusion-rate"))
+							.setValue(((PhenotypeWrapper<Map<String, Integer>>) individual
+									.getPhenotype()).get().get("diffusion-rate"));
+					((ABasicParameter) exp.getConfigParameter("evaporation-rate"))
+							.setValue(((PhenotypeWrapper<Map<String, Integer>>) individual
+									.getPhenotype()).get().get("evaporation-rate"));
+					((ABasicParameter) exp.getResultParameter("ticks"))
+							.setValue(Double.NaN);
+					newExperiments.addExperiment(exp);
+				}				
 			}
 			iteration++;
 			sessionState.get(session).put("iteration", iteration);
@@ -223,11 +235,12 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService
 			state.put("start", start);
 
 			EvolutionaryAlgorithmSimModule evolutionaryAlgorithm = new EvolutionaryAlgorithmSimModule();
-			evolutionaryAlgorithm.setGenerations(10);
-			evolutionaryAlgorithm.setAlpha(10);
-			evolutionaryAlgorithm.setLambda(5);
+			evolutionaryAlgorithm.setGenerations(50);
+			evolutionaryAlgorithm.setAlpha(25);
+			evolutionaryAlgorithm.setLambda(10);
 			evolutionaryAlgorithm.setCrossoverRate(0.5);
-			evolutionaryAlgorithm.setMu(5);
+			evolutionaryAlgorithm.setMu(10);
+			
 
 			SimulationModule simulation = new SimulationModule();
 
