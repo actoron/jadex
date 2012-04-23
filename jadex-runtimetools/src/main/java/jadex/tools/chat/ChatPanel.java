@@ -17,11 +17,13 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.gui.JSplitPanel;
 import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -129,6 +131,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	
 	/** The upload table. */
 	protected JTable utable;
+	
+	/** Registration at the service. */
+	ISubscriptionIntermediateFuture<ChatEvent>	subscription;
 	
 	//-------- constructors --------
 	
@@ -325,7 +330,6 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						{
 							public void actionPerformed(ActionEvent e)
 							{
-								notifyChatEvent(NOTIFICATION_NEW_FILE);
 								if(JFileChooser.APPROVE_OPTION==chooser.showOpenDialog(panel))
 								{
 									File file = chooser.getSelectedFile();
@@ -461,9 +465,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				panel	= new JPanel(new BorderLayout());
 				panel.add(tpane, BorderLayout.CENTER);
 				
-				getService().subscribeToEvents().addResultListener(new IntermediateDefaultResultListener<ChatEvent>()
+				subscription	= getService().subscribeToEvents();
+				subscription.addResultListener(new SwingIntermediateDefaultResultListener<ChatEvent>(panel)
 				{
-					public void intermediateResultAvailable(ChatEvent ce)
+					public void customIntermediateResultAvailable(ChatEvent ce)
 					{
 						if(ChatEvent.TYPE_MESSAGE.equals(ce.getType()))
 						{
@@ -487,28 +492,46 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							
 							if(ti.isDownload() && TransferInfo.STATE_WAITING.equals(ti.getState()))
 							{
-								acceptFile(new File(ti.getFile()).getName(), ti.getSize(), ti.getOther())
-									.addResultListener(new IResultListener<File>()
+								notifyChatEvent(NOTIFICATION_NEW_FILE);
+								
+								if(panel.isShowing())
 								{
-									public void resultAvailable(File result)
+									acceptFile(new File(ti.getFile()).getName(), ti.getSize(), ti.getOther())
+										.addResultListener(new IResultListener<File>()
 									{
-										getService().acceptFile(ti.getId(), result.getAbsolutePath());
-									}
-									
-									public void exceptionOccurred(Exception exception)
-									{
-										getService().rejectFile(ti.getId());
-									}
-								});
+										public void resultAvailable(File result)
+										{
+											getService().acceptFile(ti.getId(), result.getAbsolutePath());
+										}
+										
+										public void exceptionOccurred(Exception exception)
+										{
+											getService().rejectFile(ti.getId());
+										}
+									});
+								}
 							}
-						} 
+						}
+					}
+					
+					public void customExceptionOccurred(Exception exception)
+					{
+						if(!isShutdown())
+						{
+							super.customExceptionOccurred(exception);
+						}
 					}
 				});
 				
-				// Post availability, also gets list of initial users.
-				postStatus(IChatService.STATE_IDLE);
-				
 				ret.setResult(null);
+				
+				getService().findUsers().addResultListener(new SwingIntermediateDefaultResultListener<IChatService>(panel)
+				{
+					public void customIntermediateResultAvailable(IChatService chat)
+					{
+						setReceiving(chat, -1, false);
+					}
+				});
 			}
 		});
 		
@@ -521,6 +544,22 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public JComponent getComponent()
 	{
 		return panel;
+	}
+	
+	/**
+	 *  Informs the panel that it should stop all its computation
+	 */
+	public IFuture<Void> shutdown()
+	{
+		Future<Void>	ret	= new Future<Void>();
+		super.shutdown().addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				subscription.terminate();				
+			}
+		});
+		return ret;
 	}
 	
 	//-------- methods called from gui --------
@@ -755,7 +794,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				pp.createTextField("Size: ", SUtil.bytesToString(size));
 				pp.createTextField("Sender: ", ""+(sender==null? sender: sender.getName()));
 				
-				if(0==JOptionPane.showOptionDialog(null, pp, "Incoming File Transfer", JOptionPane.YES_NO_OPTION,
+				if(0==JOptionPane.showOptionDialog(panel, pp, "Incoming File Transfer", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Accept", "Reject"}, "Accept"))
 				{
 					ret.setResult(new File(tfpath.getText()+File.separatorChar+tfname.getText()));

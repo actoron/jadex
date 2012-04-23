@@ -74,28 +74,29 @@ public class ChatService implements IChatService, IChatGuiService
 	@ServiceStart
 	public IFuture<Void> start()
 	{
+		final Future<Void>	ret	= new Future<Void>();
+
+		// Todo: load settings
 		this.nick	= SUtil.createUniqueId("user", 3);
 		this.transfers	= new LinkedHashMap<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>();
 		
-		// Todo: load settings
-//		final Future<Void>	ret	= new Future<Void>();
-//		agent.getServiceContainer().searchService(IClockService.class, Binding.SCOPE_PLATFORM)
-//			.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
-//		{
-//			public void customResultAvailable(final IClockService clock)
-//			{
-//				ChatPanel.createGui(exta, clock)
-//					.addResultListener(new ExceptionDelegationResultListener<ChatPanel, Void>(ret)
-//				{
-//					public void customResultAvailable(ChatPanel result)
-//					{
-//						chatpanel = result;
-//						ret.setResult(null);
-//					}
-//				});
-//			}
-//		});
-		return IFuture.DONE;
+		IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
+		chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
+		{
+			public void intermediateResultAvailable(IChatService chat)
+			{
+				chat.status(nick, STATE_IDLE);
+			}
+			public void finished()
+			{
+				ret.setResult(null);
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				ret.setResult(null);
+			}
+		});
+		return ret;
 	}
 	
 	/**
@@ -104,9 +105,16 @@ public class ChatService implements IChatService, IChatGuiService
 	@ServiceShutdown
 	public IFuture<Void> shutdown()
 	{
-//		chatpanel.dispose();
-		
 		final Future<Void>	ret	= new Future<Void>();
+		
+		if(subscribers!=null)
+		{
+			for(SubscriptionIntermediateFuture<ChatEvent> fut: subscribers)
+			{
+				fut.terminate();
+			}
+		}
+		
 		// Todo: required services don't work in service shutdown!?
 		IIntermediateFuture<IChatService>	chatfut	= SServiceProvider.getServices(agent.getServiceContainer(), IChatService.class, Binding.SCOPE_GLOBAL);
 //		IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
@@ -140,8 +148,8 @@ public class ChatService implements IChatService, IChatGuiService
 	 */
 	public IFuture<Void>	message(String nick, String text)
 	{
-		publishEvent(ChatEvent.TYPE_MESSAGE, nick, IComponentIdentifier.CALLER.get(), text);
-		return IFuture.DONE;
+		boolean	published	= publishEvent(ChatEvent.TYPE_MESSAGE, nick, IComponentIdentifier.CALLER.get(), text);
+		return published ? IFuture.DONE : new Future<Void>(new RuntimeException("No GUI, message was discarded."));
 	}
 
 	/**
@@ -215,6 +223,16 @@ public class ChatService implements IChatService, IChatGuiService
 		subscribers.add(ret);
 		
 		return ret;		
+	}
+	
+	/**
+	 *  Search for available chat services.
+	 *  @return The currently available remote services.
+	 */
+	public IIntermediateFuture<IChatService> findUsers()
+	{
+		IIntermediateFuture<IChatService> ret	= agent.getServiceContainer().getRequiredServices("chatservices");
+		return ret;
 	}
 	
 	/**
@@ -457,6 +475,7 @@ public class ChatService implements IChatService, IChatGuiService
 						if(!started)
 						{
 							started = true;
+							ret.setResult(null);
 							doUpload(fi, ocon, cid);
 						}
 					}
@@ -505,14 +524,19 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  @param cid	The component ID.
 	 *  @param value The event value.
 	 */
-	protected void publishEvent(String type, String nick, IComponentIdentifier cid,	Object value)
+	protected boolean	publishEvent(String type, String nick, IComponentIdentifier cid,	Object value)
 	{
+		boolean	ret	= false;
 		if(subscribers!=null)
 		{
 			ChatEvent	ce	= new ChatEvent(type, nick, cid, value);
 			for(Iterator<SubscriptionIntermediateFuture<ChatEvent>> it=subscribers.iterator(); it.hasNext(); )
 			{
-				if(!it.next().addIntermediateResultIfUndone(ce))
+				if(it.next().addIntermediateResultIfUndone(ce))
+				{
+					ret	= true;
+				}
+				else
 				{
 					it.remove();
 				}
@@ -523,6 +547,7 @@ public class ChatService implements IChatService, IChatGuiService
 				subscribers	= null;
 			}
 		}
+		return ret;
 	}
 
 	/**

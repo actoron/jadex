@@ -38,6 +38,12 @@ public interface IChatGuiService
 	//-------- chatting --------
 	
 	/**
+	 *  Search for available chat services.
+	 *  @return The currently available remote services.
+	 */
+	public IIntermediateFuture<IChatService> findUsers();
+	
+	/**
 	 *  Post a message.
 	 *  Searches for available chat services and posts the message to all.
 	 *  @param text The text message.

@@ -21,6 +21,9 @@ public abstract class AbstractServiceViewerPanel<T> implements IServiceViewerPan
 	/** The service. */
 	protected T service;
 	
+	/** True, after shutdown. */
+	protected boolean	shutdown;
+	
 	//-------- methods --------
 	
 	/**
@@ -41,9 +44,19 @@ public abstract class AbstractServiceViewerPanel<T> implements IServiceViewerPan
 	 */
 	public IFuture<Void> shutdown()
 	{
+		assert !shutdown;
+		this.shutdown	= true;
 		return IFuture.DONE;
 	}
 
+	/**
+	 *  Test if the panel is already shut down.
+	 */
+	public boolean	isShutdown()
+	{
+		return shutdown;
+	}
+	
 	/**
 	 *  The id used for mapping properties.
 	 */

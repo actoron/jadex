@@ -89,6 +89,7 @@ public abstract class SwingDefaultResultListener<E> extends DefaultResultListene
 		}
 		else
 		{
+//			Thread.dumpStack();
 			SwingUtilities.invokeLater(new Runnable()
 			{
 				public void run()

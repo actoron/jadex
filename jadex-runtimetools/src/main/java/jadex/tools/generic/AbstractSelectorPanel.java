@@ -111,19 +111,28 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 		JPanel northp = new JPanel(new GridBagLayout());
 		northp.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED), "Instance Settings "));
 		
-		final JButton refreshb = new JButton("Refresh");
+		JButton closeb = new JButton("Close");
+		JButton refreshb = new JButton("Refresh");
+		closeb.setMaximumSize(refreshb.getMaximumSize());
+		closeb.setPreferredSize(refreshb.getPreferredSize());
+		closeb.setMinimumSize(refreshb.getMinimumSize());
+		
 		int x=0;
 		JLabel instl = new JLabel("Instance");
 		instl.setToolTipText("Use the combo box to select the instance to be presented below.");
 		selcb.setToolTipText("Use the combo box to select the instance to be presented below.");
+		refreshb.setToolTipText("Refresh the list of available instances.");
+		closeb.setToolTipText("Close the currently selected instance.");
 		northp.add(instl, new GridBagConstraints(x++, 0, 1, 1, 0, 0, 
-			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,2,0,2), 0, 0));
+				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,2,0,2), 0, 0));
 		northp.add(selcb,  new GridBagConstraints(x++, 0, 1, 1, 1, 0, 
 			GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0,2,0,2), 0, 0));
 		northp.add(remotecb,  new GridBagConstraints(x++, 0, 1, 1, 0, 0, 
 			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,2,0,2), 0, 0));
 		northp.add(refreshb,  new GridBagConstraints(x++, 0, 1, 1, 0, 0, 
 			GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,2,0,2), 0, 0));
+		northp.add(closeb, new GridBagConstraints(x++, 0, 1, 1, 0, 0, 
+				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0,2,0,2), 0, 0));
 		
 		refreshb.addActionListener(new ActionListener() 
 		{
@@ -132,14 +141,23 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 				refreshCombo();
 			}
 		});
+		closeb.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				Object sel = selcb.getSelectedIndex()!=-1 ? selcb.getModel().getElementAt(selcb.getSelectedIndex()) : null;// selcb.getSelectedItem();
+				if(sel!=null)
+				{
+					removePanel(sel);
+				}
+			}
+		});
 		selcb.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
 //				System.out.println("Selected item: "+selcb.getSelectedItem()+" index: "+selcb.getSelectedIndex());
-				
-				// ????
-				final Object sel = selcb.getSelectedIndex()!=-1 ? selcb.getModel().getElementAt(selcb.getSelectedIndex()) : selcb.getSelectedItem();
+				final Object sel = selcb.getSelectedIndex()!=-1 ? selcb.getModel().getElementAt(selcb.getSelectedIndex()) : null;// selcb.getSelectedItem();
 				
 				if(sel==null || ocl.isAvailable(sel))
 				{
@@ -190,6 +208,16 @@ public abstract class AbstractSelectorPanel<E> extends JSplitPanel implements IP
 		{
 			centerp.remove(panel.getComponent());
 			panel.shutdown();
+			
+			boolean	found	= false;
+			for(int i=0; !found && i<selcb.getModel().getSize(); i++)
+			{
+				if(selcb.getModel().getElementAt(i).equals(ocl.getCurrentKey()))
+				{
+					found	= true;
+					selcb.setSelectedItem(ocl.getCurrentKey());
+				}
+			}
 		}
 	}
 	

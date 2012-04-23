@@ -136,9 +136,10 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		{
 			ret	= getServiceIdentifier();
 		}
-		else if(args!=null && args.length==1 && "equals".equals(method.getName()) && Object.class.equals(method.getParameterTypes()[0]))
+		else if(args!=null && args.length==1 && args[0]!=null && "equals".equals(method.getName()) && Object.class.equals(method.getParameterTypes()[0]))
 		{
-			ret	= equals(args[0]);
+			Object	cmp	= Proxy.isProxyClass(args[0].getClass()) ? Proxy.getInvocationHandler(args[0]) : args[0];
+			ret	= equals(cmp);
 		}
 		else
 		{

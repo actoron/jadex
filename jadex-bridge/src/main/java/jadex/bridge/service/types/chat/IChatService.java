@@ -26,6 +26,11 @@ public interface IChatService
 	//-------- methods --------
 	
 	/**
+	 *  Get the user name.
+	 */
+	public IFuture<String>	getNickName();
+	
+	/**
 	 *  Post a message
 	 *  @param nick The sender's nick name.
 	 *  @param text The text message.

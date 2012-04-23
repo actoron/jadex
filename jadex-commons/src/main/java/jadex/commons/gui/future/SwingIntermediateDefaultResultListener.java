@@ -3,7 +3,9 @@ package jadex.commons.gui.future;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.gui.SGUI;
 
+import java.awt.Component;
 import java.util.Collection;
+import java.util.logging.Logger;
 
 import javax.swing.SwingUtilities;
 
@@ -13,6 +15,32 @@ import javax.swing.SwingUtilities;
  */
 public abstract class SwingIntermediateDefaultResultListener<E> extends SwingDefaultResultListener<Collection<E>>	implements IIntermediateResultListener<E>
 {
+	//-------- constructors --------
+	
+	/**
+	 *  Create a new listener.
+	 */
+	public SwingIntermediateDefaultResultListener()
+	{
+	}
+	
+	/**
+	 *  Create a new listener.
+	 *  @param parent The parent component (when errors should be shown as dialog).
+	 */
+	public SwingIntermediateDefaultResultListener(Component parent)
+	{
+		super(parent);
+	}
+	
+	/**
+	 *  Create a new listener.
+	 *  @param logger The logger.
+	 */
+	public SwingIntermediateDefaultResultListener(Logger logger)
+	{
+		super(logger);
+	}
 	//-------- template methods --------
 
 	/**

@@ -6,8 +6,8 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.LayoutManager2;
 import java.awt.Rectangle;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -30,7 +30,7 @@ public class ObjectCardLayout implements LayoutManager2
 	protected int	vgap;
 
 	/**	The components. */
-	protected Map	components;
+	protected Map<Object, Component>	components;
 	
 	/** The current component (if any). */
 	protected Component	current;
@@ -47,7 +47,7 @@ public class ObjectCardLayout implements LayoutManager2
 	{
 		this.hgap	= 0;
 		this.vgap	= 0;
-		this.components	= new HashMap();
+		this.components	= new LinkedHashMap<Object, Component>();
 	}
 
 	//-------- methods --------
@@ -66,10 +66,10 @@ public class ObjectCardLayout implements LayoutManager2
 		}
 
 		// Find new component.
-		Component comp	= (Component)components.get(object);
+		Component comp	= components.get(object);
 		if(comp==null)
 		{
-			comp	= (Component)components.get(DEFAULT_COMPONENT);
+			comp	= components.get(DEFAULT_COMPONENT);
 			curkey	= null;
 		}
 		else
@@ -80,6 +80,10 @@ public class ObjectCardLayout implements LayoutManager2
 		// Show new component (if any).
 		if(comp!=null)
 		{
+			// Re-add for keeping usage order
+			components.remove(object);
+			components.put(object, comp);
+			
 			comp.setVisible(true);
 			comp.getParent().validate();
 		}
@@ -102,7 +106,7 @@ public class ObjectCardLayout implements LayoutManager2
 	 */
 	public Component getComponent(Object object)
 	{
-		return (Component)components.get(object);
+		return components.get(object);
 	}
 	
 	/**
@@ -211,7 +215,7 @@ public class ObjectCardLayout implements LayoutManager2
 	 */
 	public void	removeLayoutComponent(Component comp) 
 	{
-		for(Iterator i=components.values().iterator(); i.hasNext();) 
+		for(Iterator<Component> i=components.values().iterator(); i.hasNext();) 
 		{
 			if(i.next().equals(comp)) 
 			{
@@ -223,7 +227,13 @@ public class ObjectCardLayout implements LayoutManager2
 		if(comp==current)
 		{
 			comp.getParent().repaint();
-			show(DEFAULT_COMPONENT);
+			// Traverse entries to fetch last shown panel id.
+			Object	show	= null;
+			for(Object tmp: components.keySet())
+			{
+				show	= tmp;
+			}
+			show(show!=null ? show : DEFAULT_COMPONENT);
 		}
 	}
 	

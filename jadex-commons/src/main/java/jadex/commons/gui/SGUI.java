@@ -304,6 +304,8 @@ public class SGUI
 	 */
 	public static void showError(Component parent, String errortitle, String errormessage, final Exception exception)
 	{
+//		Thread.dumpStack();
+		
 		final String	text;
 //		String	exmsg	= exception==null ? null : exception.getMessage();
 		if(errormessage==null)// && exmsg==null)
