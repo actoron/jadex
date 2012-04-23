@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Message queue application.
+-->
+<componenttype xmlns="http://jadex.sourceforge.net/jadex"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://jadex.sourceforge.net/jadex
+						http://jadex.sourceforge.net/jadex-component-2.0.xsd"
+	name="Scenario" package="jadex.micro.examples.messagequeue">
+	
+	<componenttypes>
+		<componenttype name="messagequeue" filename="jadex.micro.examples.messagequeue.MessageQueueAgent.class"/>
+		<componenttype name="user" filename="jadex.micro.examples.messagequeue.UserAgent.class"/>
+	</componenttypes>
+	
+	<configurations>
+		<configuration name="Default">
+			<components>
+				<component type="messagequeue"/>
+				<component type="user" number="2"/>
+			</components>
+		</configuration>
+	</configurations>
+</componenttype>
