@@ -10,15 +10,6 @@ import jadex.commons.IValueFetcher;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminableFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
-import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
-import jadex.commons.future.TerminableDelegationFuture;
-import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.javaparser.SJavaParser;
 
 import java.util.Collection;
@@ -87,9 +78,9 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 	/**
 	 * 
 	 */
-	protected Exception checkPostConditions(ServiceInvocationContext context, Object res, Object ires)
+	protected ConditionException checkPostConditions(ServiceInvocationContext context, Object res, Object ires)
 	{
-		Exception ex = null;
+		ConditionException ex = null;
 		PostConditions pcons = context.getMethod().getAnnotation(PostConditions.class);
 		PostCondition[] pcs = pcons.value();
 		for(int i=0; ex==null && i<pcs.length; i++)
@@ -98,14 +89,14 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 			{
 				if(res==null)// || ires==null) ?
 				{
-					ex = new ConditionException("Postcondition violated, result nulls.");
+					throw new ConditionException("Postcondition violated, result nulls.");
 				}
 			}
 			else if(pcs[i].value()==PostCondition.Type.EXPRESSION)
 			{
 				Object val = SJavaParser.evaluateExpression(pcs[i].expression(), new PrePostConditionFetcher(context.getArgumentArray(), res, ires));
 				if(!(val instanceof Boolean) || !((Boolean)val).booleanValue())
-					ex = new ConditionException("Postcondition violated: "+pcs[i].expression());
+					throw new ConditionException("Postcondition violated: "+pcs[i].expression());
 			}
 		}
 		
@@ -207,141 +198,165 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 			
 			if(res instanceof IFuture)
 			{
-				if(res instanceof ISubscriptionIntermediateFuture)
+				FutureFunctionality func = new FutureFunctionality()
 				{
-					SubscriptionIntermediateDelegationFuture<Object> fut = new SubscriptionIntermediateDelegationFuture<Object>((ISubscriptionIntermediateFuture)res)
+					public Object intermediateResultAvailable(Object result)
 					{
-						public void	setResult(Collection<Object> result)
-						{
-							Exception ex = checkPostConditions(sic, result, null);
-					    	if(ex==null)
-					    		super.setResult(result);
-					    	else
-					    		super.setException(ex);
-					    }
-						
-						public void addIntermediateResult(Object result)
-						{
-							Exception ex = checkPostConditions(sic, null, result);
-					    	if(ex==null)
-					    		super.addIntermediateResult(result);
-					    	else
-					    		super.setExceptionIfUndone(ex);
-						}	
-						
-						public void setFinished()
-						{
-							Exception ex = checkPostConditions(sic, getIntermediateResults(), null);
-					    	if(ex==null)
-					    		super.setResult(result);
-					    	else
-					    		super.setException(ex);
-						}
-					};
-//					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
-					res	= fut;
-				}
-				else if(res instanceof ITerminableIntermediateFuture)
-				{
-					TerminableIntermediateDelegationFuture<Object> fut = new TerminableIntermediateDelegationFuture<Object>((ITerminableIntermediateFuture)res)
+						checkPostConditions(sic, null, result);
+						return result;
+					}
+					
+					public void finished(Collection<Object> results)
 					{
-						public void	setResult(Collection<Object> result)
-						{
-							Exception ex = checkPostConditions(sic, result, null);
-					    	if(ex==null)
-					    		super.setResult(result);
-					    	else
-					    		super.setException(ex);
-					    }
-						
-						public void addIntermediateResult(Object result)
-						{
-							Exception ex = checkPostConditions(sic, null, result);
-					    	if(ex==null)
-					    		super.addIntermediateResult(result);
-					    	else
-					    		super.setExceptionIfUndone(ex);
-						}	
-						
-						public void setFinished()
-						{
-							Exception ex = checkPostConditions(sic, getIntermediateResults(), null);
-					    	if(ex==null)
-					    		super.setResult(result);
-					    	else
-					    		super.setException(ex);
-						}
-					};
-//					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
-					res	= fut;
-				}
-				else if(res instanceof ITerminableFuture)
-				{
-					TerminableDelegationFuture<Object> fut = new TerminableDelegationFuture<Object>((ITerminableFuture)res)
+						 checkPostConditions(sic, results, null);
+					}
+					
+					public Object resultAvailable(Object result)
 					{
-						public void	setResult(Object result)
-						{
-					    	Exception ex = checkPostConditions(sic, result, null);
-					    	if(ex==null)
-					    		super.setResult(result);
-					    	else
-					    		super.setException(ex);
-					    }	
-					};
-//					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
-					res	= fut;
-				}
-				else if(res instanceof IIntermediateFuture)
-				{
-					IntermediateFuture<Object>	fut	= new IntermediateFuture<Object>()
-					{
-						public void	setResult(Collection<Object> result)
-						{
-							Exception ex = checkPostConditions(sic, result, null);
-					    	if(ex==null)
-					    		super.setResult(result);
-					    	else
-					    		super.setException(ex);
-					    }
-						
-						public void addIntermediateResult(Object result)
-						{
-							Exception ex = checkPostConditions(sic, null, result);
-					    	if(ex==null)
-					    		super.addIntermediateResult(result);
-					    	else
-					    		super.setExceptionIfUndone(ex);
-						}
-						
-						public void setFinished()
-						{
-							Exception ex = checkPostConditions(sic, getIntermediateResults(), null);
-					    	if(ex==null)
-					    		super.setResult(result);
-					    	else
-					    		super.setException(ex);
-						}
-					};
-					((IntermediateFuture<Object>)res).addResultListener(new IntermediateDelegationResultListener<Object>(fut));
-					res	= fut;
-				}
-				else
-				{
-					Future<Object>	fut	= new Future<Object>()
-					{
-					    public void	setResult(Object result)
-					    {
-					    	Exception ex = checkPostConditions(sic, result, null);
-					    	if(ex==null)
-					    		super.setResult(result);
-					    	else
-					    		super.setException(ex);
-					    }							
-					};							
-					((Future<Object>)res).addResultListener(new DelegationResultListener<Object>(fut));
-					res	= fut;
-				}
-				sic.setResult(res);
+						checkPostConditions(sic, result, null);
+						return result;
+					}
+				};
+				
+				Future<?> fut = FutureFunctionality.getDelegationFuture((IFuture)res, func);
+				((IFuture)res).addResultListener(new DelegationResultListener(fut));
+				sic.setResult(fut);
+				
+//				if(res instanceof ISubscriptionIntermediateFuture)
+//				{
+//					SubscriptionIntermediateDelegationFuture<Object> fut = new SubscriptionIntermediateDelegationFuture<Object>((ISubscriptionIntermediateFuture)res)
+//					{
+//						public void	setResult(Collection<Object> result)
+//						{
+//							Exception ex = checkPostConditions(sic, result, null);
+//					    	if(ex==null)
+//					    		super.setResult(result);
+//					    	else
+//					    		super.setException(ex);
+//					    }
+//						
+//						public void addIntermediateResult(Object result)
+//						{
+//							Exception ex = checkPostConditions(sic, null, result);
+//					    	if(ex==null)
+//					    		super.addIntermediateResult(result);
+//					    	else
+//					    		super.setExceptionIfUndone(ex);
+//						}	
+//						
+//						public void setFinished()
+//						{
+//							Exception ex = checkPostConditions(sic, getIntermediateResults(), null);
+//					    	if(ex==null)
+//					    		super.setResult(result);
+//					    	else
+//					    		super.setException(ex);
+//						}
+//					};
+////					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
+//					res	= fut;
+//				}
+//				else if(res instanceof ITerminableIntermediateFuture)
+//				{
+//					TerminableIntermediateDelegationFuture<Object> fut = new TerminableIntermediateDelegationFuture<Object>((ITerminableIntermediateFuture)res)
+//					{
+//						public void	setResult(Collection<Object> result)
+//						{
+//							Exception ex = checkPostConditions(sic, result, null);
+//					    	if(ex==null)
+//					    		super.setResult(result);
+//					    	else
+//					    		super.setException(ex);
+//					    }
+//						
+//						public void addIntermediateResult(Object result)
+//						{
+//							Exception ex = checkPostConditions(sic, null, result);
+//					    	if(ex==null)
+//					    		super.addIntermediateResult(result);
+//					    	else
+//					    		super.setExceptionIfUndone(ex);
+//						}	
+//						
+//						public void setFinished()
+//						{
+//							Exception ex = checkPostConditions(sic, getIntermediateResults(), null);
+//					    	if(ex==null)
+//					    		super.setResult(result);
+//					    	else
+//					    		super.setException(ex);
+//						}
+//					};
+////					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
+//					res	= fut;
+//				}
+//				else if(res instanceof ITerminableFuture)
+//				{
+//					TerminableDelegationFuture<Object> fut = new TerminableDelegationFuture<Object>((ITerminableFuture)res)
+//					{
+//						public void	setResult(Object result)
+//						{
+//					    	Exception ex = checkPostConditions(sic, result, null);
+//					    	if(ex==null)
+//					    		super.setResult(result);
+//					    	else
+//					    		super.setException(ex);
+//					    }	
+//					};
+////					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
+//					res	= fut;
+//				}
+//				else if(res instanceof IIntermediateFuture)
+//				{
+//					IntermediateFuture<Object>	fut	= new IntermediateFuture<Object>()
+//					{
+//						public void	setResult(Collection<Object> result)
+//						{
+//							Exception ex = checkPostConditions(sic, result, null);
+//					    	if(ex==null)
+//					    		super.setResult(result);
+//					    	else
+//					    		super.setException(ex);
+//					    }
+//						
+//						public void addIntermediateResult(Object result)
+//						{
+//							Exception ex = checkPostConditions(sic, null, result);
+//					    	if(ex==null)
+//					    		super.addIntermediateResult(result);
+//					    	else
+//					    		super.setExceptionIfUndone(ex);
+//						}
+//						
+//						public void setFinished()
+//						{
+//							Exception ex = checkPostConditions(sic, getIntermediateResults(), null);
+//					    	if(ex==null)
+//					    		super.setResult(result);
+//					    	else
+//					    		super.setException(ex);
+//						}
+//					};
+//					((IntermediateFuture<Object>)res).addResultListener(new IntermediateDelegationResultListener<Object>(fut));
+//					res	= fut;
+//				}
+//				else
+//				{
+//					Future<Object>	fut	= new Future<Object>()
+//					{
+//					    public void	setResult(Object result)
+//					    {
+//					    	Exception ex = checkPostConditions(sic, result, null);
+//					    	if(ex==null)
+//					    		super.setResult(result);
+//					    	else
+//					    		super.setException(ex);
+//					    }							
+//					};							
+//					((Future<Object>)res).addResultListener(new DelegationResultListener<Object>(fut));
+//					res	= fut;
+//				}
+//				sic.setResult(res);
 			}
 			else
 			{

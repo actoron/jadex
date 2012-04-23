@@ -19,6 +19,7 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -430,90 +431,104 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						return marshal.isLocalReference(object);
 					}
 				};
-				if(res instanceof ISubscriptionIntermediateFuture)
+				
+				FutureFunctionality func = new FutureFunctionality()
 				{
-					SubscriptionIntermediateDelegationFuture<Object> fut = new SubscriptionIntermediateDelegationFuture<Object>((ISubscriptionIntermediateFuture)res)
+					public Object intermediateResultAvailable(Object result)
 					{
-						public void	setResult(Collection<Object> result)
-						{
-							Collection<Object> res = (Collection)doCopy(copy, deffilter, result);
-							super.setResult(res);
-					    }
-						
-						public void addIntermediateResult(Object result)
-						{
-					    	Object res = doCopy(copy, deffilter, result);
-							super.addIntermediateResult(res);
-						}	
-					};
-//					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
-					res	= fut;
-				}
-				else if(res instanceof ITerminableIntermediateFuture)
-				{
-					TerminableIntermediateDelegationFuture<Object> fut = new TerminableIntermediateDelegationFuture<Object>((ITerminableIntermediateFuture)res)
+						return doCopy(copy, deffilter, result);
+					}
+					public Object resultAvailable(Collection<Object> result)
 					{
-						public void	setResult(Collection<Object> result)
-						{
-							Collection<Object> res = (Collection)doCopy(copy, deffilter, result);
-							super.setResult(res);
-					    }
-						
-						public void addIntermediateResult(Object result)
-						{
-					    	Object res = doCopy(copy, deffilter, result);
-							super.addIntermediateResult(res);
-						}	
-					};
-//					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
-					res	= fut;
-				}
-				else if(res instanceof ITerminableFuture)
-				{
-					TerminableDelegationFuture<Object> fut = new TerminableDelegationFuture<Object>((ITerminableFuture)res)
-					{
-						public void	setResult(Object result)
-						{
-					    	Object res = doCopy(copy, deffilter, result);
-							super.setResult(res);
-					    }	
-					};
-//					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
-					res	= fut;
-				}
-				else if(res instanceof IIntermediateFuture)
-				{
-					IntermediateFuture<Object>	fut	= new IntermediateFuture<Object>()
-					{
-						public void	setResult(Collection<Object> result)
-						{
-							Collection<Object> res = (Collection)doCopy(copy, deffilter, result);
-							super.setResult(res);
-					    }
-						
-						public void addIntermediateResult(Object result)
-						{
-					    	Object res = doCopy(copy, deffilter, result);
-							super.addIntermediateResult(res);
-						}
-					};
-					((IntermediateFuture<Object>)res).addResultListener(new IntermediateDelegationResultListener<Object>(fut));
-					res	= fut;
-				}
-				else
-				{
-					Future<Object>	fut	= new Future<Object>()
-					{
-					    public void	setResult(Object result)
-					    {
-					    	Object res = doCopy(copy, deffilter, result);
-							super.setResult(res);
-					    }							
-					};							
-					((Future<Object>)res).addResultListener(new DelegationResultListener<Object>(fut));
-					res	= fut;
-				}
-				sic.setResult(res);
+						return doCopy(copy, deffilter, result);
+					}
+				};
+//				if(res instanceof ISubscriptionIntermediateFuture)
+//				{
+//					SubscriptionIntermediateDelegationFuture<Object> fut = new SubscriptionIntermediateDelegationFuture<Object>((ISubscriptionIntermediateFuture)res)
+//					{
+//						public void	setResult(Collection<Object> result)
+//						{
+//							Collection<Object> res = (Collection)doCopy(copy, deffilter, result);
+//							super.setResult(res);
+//					    }
+//						
+//						public void addIntermediateResult(Object result)
+//						{
+//					    	Object res = doCopy(copy, deffilter, result);
+//							super.addIntermediateResult(res);
+//						}	
+//					};
+////					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
+//					res	= fut;
+//				}
+//				else if(res instanceof ITerminableIntermediateFuture)
+//				{
+//					TerminableIntermediateDelegationFuture<Object> fut = new TerminableIntermediateDelegationFuture<Object>((ITerminableIntermediateFuture)res)
+//					{
+//						public void	setResult(Collection<Object> result)
+//						{
+//							Collection<Object> res = (Collection)doCopy(copy, deffilter, result);
+//							super.setResult(res);
+//					    }
+//						
+//						public void addIntermediateResult(Object result)
+//						{
+//					    	Object res = doCopy(copy, deffilter, result);
+//							super.addIntermediateResult(res);
+//						}	
+//					};
+////					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
+//					res	= fut;
+//				}
+//				else if(res instanceof ITerminableFuture)
+//				{
+//					TerminableDelegationFuture<Object> fut = new TerminableDelegationFuture<Object>((ITerminableFuture)res)
+//					{
+//						public void	setResult(Object result)
+//						{
+//					    	Object res = doCopy(copy, deffilter, result);
+//							super.setResult(res);
+//					    }	
+//					};
+////					((Future<Object>)res).addResultListener(new TerminableDelegationResultListener<Object>(fut, (ITerminableFuture)res));
+//					res	= fut;
+//				}
+//				else if(res instanceof IIntermediateFuture)
+//				{
+//					IntermediateFuture<Object>	fut	= new IntermediateFuture<Object>()
+//					{
+//						public void	setResult(Collection<Object> result)
+//						{
+//							Collection<Object> res = (Collection)doCopy(copy, deffilter, result);
+//							super.setResult(res);
+//					    }
+//						
+//						public void addIntermediateResult(Object result)
+//						{
+//					    	Object res = doCopy(copy, deffilter, result);
+//							super.addIntermediateResult(res);
+//						}
+//					};
+//					((IntermediateFuture<Object>)res).addResultListener(new IntermediateDelegationResultListener<Object>(fut));
+//					res	= fut;
+//				}
+//				else
+//				{
+//					Future<Object>	fut	= new Future<Object>()
+//					{
+//					    public void	setResult(Object result)
+//					    {
+//					    	Object res = doCopy(copy, deffilter, result);
+//							super.setResult(res);
+//					    }							
+//					};							
+//					((Future<Object>)res).addResultListener(new DelegationResultListener<Object>(fut));
+//					res	= fut;
+//				}
+				Future fut = FutureFunctionality.getDelegationFuture((IFuture)res, func);
+				sic.setResult(fut);
+				((IFuture)res).addResultListener(new DelegationResultListener(fut));
 			}
 			super.customResultAvailable(null);
 		}
@@ -561,4 +576,5 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 			return "invokeMethod("+sic.getMethod()+", "+sic.getArguments()+")";
 		}
 	}
+	
 }
