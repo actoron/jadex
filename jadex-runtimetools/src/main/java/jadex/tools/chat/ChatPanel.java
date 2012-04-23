@@ -495,14 +495,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						else if(ChatEvent.TYPE_FILE.equals(ce.getType()))
 						{
 							final TransferInfo	ti	= (TransferInfo) ce.getValue();
-							if(ti.isDownload())
-							{
-								updateDownload(ti);
-							}
-							else
-							{
-								updateUpload(ti);								
-							}
+							updateTransfer(ti);
 							
 							if(ti.isDownload() && TransferInfo.STATE_WAITING.equals(ti.getState()))
 							{
@@ -544,6 +537,14 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					public void customIntermediateResultAvailable(IChatService chat)
 					{
 						setReceiving(chat, -1, false);
+					}
+				});
+				
+				getService().getFileTransfers().addResultListener(new SwingIntermediateDefaultResultListener<TransferInfo>(panel)
+				{
+					public void customIntermediateResultAvailable(TransferInfo ti)
+					{
+						updateTransfer(ti);
 					}
 				});
 			}
@@ -805,14 +806,19 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				pp.createTextField("Size: ", SUtil.bytesToString(size));
 				pp.createTextField("Sender: ", ""+(sender==null? sender: sender.getName()));
 				
-				if(0==JOptionPane.showOptionDialog(panel, pp, "Incoming File Transfer", JOptionPane.YES_NO_OPTION,
-					JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Accept", "Reject"}, "Accept"))
+				int res	= JOptionPane.showOptionDialog(panel, pp, "Incoming File Transfer", JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Accept", "Reject", "Cancel"}, "Accept");
+				if(0==res)
 				{
 					ret.setResult(new File(tfpath.getText()+File.separatorChar+tfname.getText()));
 				}
-				else
+				else if(1==res)
 				{
 					ret.setException(new RuntimeException(TransferInfo.STATE_REJECTED));
+				}
+				else
+				{
+					// No result for future -> nop
 				}
 			}
 		});
@@ -826,54 +832,56 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	protected void	notifyChatEvent(String type, IComponentIdentifier source, Object value, boolean quiet)
 	{
-		if(NOTIFICATION_NEW_MSG.equals(type))
+		// Ignore own messages and own online/offline state changes
+		if(!((IService)getService()).getServiceIdentifier().getProviderId().equals(source))
 		{
-			getJCC().setStatusText("New chat message from "+source+": "+value);
-		}
-		else if(NOTIFICATION_NEW_USER.equals(type))
-		{
-			getJCC().setStatusText("New chat user online: "+source);
-		}
-		else if(NOTIFICATION_NEW_FILE.equals(type))
-		{
-			getJCC().setStatusText("New file upload request from "+source+": "+new File(((TransferInfo)value).getFile()).getName());
-		}
-		else if(NOTIFICATION_FILE_COMPLETE.equals(type))
-		{
-			getJCC().setStatusText(((TransferInfo)value).isDownload()
-				? "Completed downloading '"+new File(((TransferInfo)value).getFile()).getName()+"' from "+source
-				: "Completed uploading '"+new File(((TransferInfo)value).getFile()).getName()+"' to "+source);
-		}
-		else if(NOTIFICATION_FILE_ABORT.equals(type))
-		{
-			getJCC().setStatusText(((TransferInfo)value).isDownload()
-				? "Problem while downloading '"+new File(((TransferInfo)value).getFile()).getName()+"' from "+source
-				: "Problem while uploading '"+new File(((TransferInfo)value).getFile()).getName()+"' to "+source);
-		}
-		
-		if(!quiet)
-		{
-			try
+			if(NOTIFICATION_NEW_MSG.equals(type))
 			{
-				Clip	clip	= AudioSystem.getClip();
-				InputStream	is	= getClass().getResourceAsStream(NOTIFICATION_SOUNDS.get(type));
-				AudioInputStream	ais	= AudioSystem.getAudioInputStream(is);
-				clip.open(ais);
-				clip.start();
+				getJCC().setStatusText("New chat message from "+source+": "+value);
 			}
-			catch(Exception e)
+			else if(NOTIFICATION_NEW_USER.equals(type))
 			{
-				System.err.println("Couldn't play notification sound: "+e);
+				getJCC().setStatusText("New chat user online: "+source);
+			}
+			else if(NOTIFICATION_NEW_FILE.equals(type))
+			{
+				getJCC().setStatusText("New file upload request from "+source+": "+new File(((TransferInfo)value).getFile()).getName());
+			}
+			else if(NOTIFICATION_FILE_COMPLETE.equals(type))
+			{
+				getJCC().setStatusText(((TransferInfo)value).isDownload()
+					? "Completed downloading '"+new File(((TransferInfo)value).getFile()).getName()+"' from "+source
+					: "Completed uploading '"+new File(((TransferInfo)value).getFile()).getName()+"' to "+source);
+			}
+			else if(NOTIFICATION_FILE_ABORT.equals(type))
+			{
+				getJCC().setStatusText(((TransferInfo)value).isDownload()
+					? "Problem while downloading '"+new File(((TransferInfo)value).getFile()).getName()+"' from "+source
+					: "Problem while uploading '"+new File(((TransferInfo)value).getFile()).getName()+"' to "+source);
+			}
+			
+			if(!quiet)
+			{
+				try
+				{
+					Clip	clip	= AudioSystem.getClip();
+					InputStream	is	= getClass().getResourceAsStream(NOTIFICATION_SOUNDS.get(type));
+					AudioInputStream	ais	= AudioSystem.getAudioInputStream(is);
+					clip.open(ais);
+					clip.start();
+				}
+				catch(Exception e)
+				{
+					System.err.println("Couldn't play notification sound: "+e);
+				}
 			}
 		}
 	}
 	
-	long lastdupdate;
-	
 	/**
-	 *  Update the fileinfo in the download area.
+	 *  Update the fileinfo in the upload/download area.
 	 */
-	public void updateDownload(final TransferInfo fi)
+	public void updateTransfer(final TransferInfo fi)
 	{
 		if(TransferInfo.STATE_COMPLETED.equals(fi.getState()))
 		{
@@ -883,53 +891,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		{
 			notifyChatEvent(NOTIFICATION_FILE_ABORT, fi.getOther(), fi, false);
 		}
-		
-		// Update 5 times per second or if state is not transferring.
-		long	update	= System.currentTimeMillis();
-		if(update-lastdupdate>=200 || !TransferInfo.STATE_TRANSFERRING.equals(fi.getState()))
-		{
-			lastdupdate	= update;
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					((FileTableModel)dtable.getModel()).updateFile(fi);
-				}
-			});
-		}
-	}
-	
-	long lastuupdate;
-	
-	/**
-	 *  Update the fileinfo in the upload area.
-	 */
-	public void updateUpload(final TransferInfo fi)
-	{
-		if(TransferInfo.STATE_COMPLETED.equals(fi.getState()))
-		{
-			notifyChatEvent(NOTIFICATION_FILE_COMPLETE, fi.getOther(), fi, false);
-		}
-		else if(fi.isFinished())
-		{
-			notifyChatEvent(NOTIFICATION_FILE_ABORT, fi.getOther(), fi, false);
-		}
-		
-		// Update 5 times per second or if state is not transferring.
-		long	update	= System.currentTimeMillis();
-		if(update-lastuupdate>=200 || !TransferInfo.STATE_TRANSFERRING.equals(fi.getState()))
-		{
-			lastuupdate	= update;
-			SwingUtilities.invokeLater(new Runnable()
-			{
-				public void run()
-				{
-					((FileTableModel)utable.getModel()).updateFile(fi);
-				}
-			});
-		}
-	}
 
+		((FileTableModel)(fi.isDownload()?dtable:utable).getModel()).updateFile(fi);
+	}
+	
 	//-------- helper classes --------
 	
 	/**
@@ -974,7 +939,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			{
 				if(fi.isDownload() && TransferInfo.STATE_WAITING.equals(fi.getState()))
 				{
-					JMenuItem mi = new JMenuItem("Cancel transfer");
+					JMenuItem mi = new JMenuItem("Accept/reject transfer...");
 					mi.addActionListener(new ActionListener()
 					{
 						public void actionPerformed(ActionEvent e)

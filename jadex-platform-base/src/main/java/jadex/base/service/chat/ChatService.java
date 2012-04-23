@@ -37,10 +37,12 @@ import jadex.micro.annotation.Binding;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -336,6 +338,20 @@ public class ChatService implements IChatService, IChatGuiService
 	}
 	
 	/**
+	 *  Get a snapshot of the currently managed file transfers.
+	 */
+	public IIntermediateFuture<TransferInfo>	getFileTransfers()
+	{
+		List<TransferInfo>	ret	= new ArrayList<TransferInfo>();
+		for(Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection> tup: transfers.values())
+		{
+			ret.add(tup.getFirstEntity());
+		}
+		return new IntermediateFuture<TransferInfo>(ret);
+	}
+
+	
+	/**
 	 *  Accept a waiting file transfer.
 	 *  @param id	The transfer id. 
 	 *  @param file	The location of the file (possibly changed by user). 
@@ -450,6 +466,7 @@ public class ChatService implements IChatService, IChatGuiService
 
 		final TransferInfo fi = new TransferInfo(false, null, file, cid, new File(file).length());
 		fi.setState(TransferInfo.STATE_WAITING);
+		publishEvent(ChatEvent.TYPE_FILE, null, cid, fi);
 		
 		IFuture<IChatService> fut = agent.getServiceContainer().getService(IChatService.class, cid);
 		fut.addResultListener(new ExceptionDelegationResultListener<IChatService, Void>(ret)
@@ -483,13 +500,13 @@ public class ChatService implements IChatService, IChatGuiService
 					public void finished()
 					{
 						fi.setState(TransferInfo.STATE_COMPLETED);
-						publishEvent(ChatEvent.TYPE_FILE, nick, cid, fi);
+						publishEvent(ChatEvent.TYPE_FILE, null, cid, fi);
 					}
 					
 					public void customResultAvailable(Collection<Long> result)
 					{
 						fi.setState(TransferInfo.STATE_COMPLETED);
-						publishEvent(ChatEvent.TYPE_FILE, nick, cid, fi);
+						publishEvent(ChatEvent.TYPE_FILE, null, cid, fi);
 					}
 
 					public void exceptionOccurred(Exception exception)
@@ -506,7 +523,7 @@ public class ChatService implements IChatService, IChatGuiService
 						{
 							fi.setState(TransferInfo.STATE_ERROR);
 						}
-						publishEvent(ChatEvent.TYPE_FILE, nick, cid, fi);
+						publishEvent(ChatEvent.TYPE_FILE, null, cid, fi);
 					}
 				});
 			}					
@@ -694,7 +711,7 @@ public class ChatService implements IChatService, IChatGuiService
 						
 						if(ti.update(filesize))
 						{
-							publishEvent(ChatEvent.TYPE_FILE, nick, ti.getOther(), ti);
+							publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 						}
 						
 						if(fis.available()>0)
@@ -713,7 +730,7 @@ public class ChatService implements IChatService, IChatGuiService
 								{
 									ocon.close();
 									ti.setState(TransferInfo.STATE_ERROR);
-									publishEvent(ChatEvent.TYPE_FILE, nick, ti.getOther(), ti);
+									publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 								}
 							}));
 						}
@@ -722,12 +739,14 @@ public class ChatService implements IChatService, IChatGuiService
 							fis.close();
 							ocon.close();
 							ti.setState(TransferInfo.STATE_COMPLETED);
-							publishEvent(ChatEvent.TYPE_FILE, nick, ti.getOther(), ti);						}
+							publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);			
+						}
 					}
 					catch(Exception e)
 					{
 						ti.setState(TransferInfo.STATE_ERROR);
-						publishEvent(ChatEvent.TYPE_FILE, nick, ti.getOther(), ti);					}
+						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);		
+					}
 					
 					return IFuture.DONE;
 				}

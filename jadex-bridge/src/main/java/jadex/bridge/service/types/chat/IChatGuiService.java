@@ -60,6 +60,11 @@ public interface IChatGuiService
 	//-------- file handling --------
 	
 	/**
+	 *  Get a snapshot of the currently managed file transfers.
+	 */
+	public IIntermediateFuture<TransferInfo>	getFileTransfers();
+	
+	/**
 	 *  Send a local file to the target component.
 	 *  @param filename	The file name.
 	 *  @param cid	The id of a remote chat component.
