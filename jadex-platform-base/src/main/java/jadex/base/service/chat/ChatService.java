@@ -112,47 +112,6 @@ public class ChatService implements IChatService, IChatGuiService
 				}
 			});
 			
-			// Post status, when new platforms become available.
-			agent.getServiceContainer().searchService(IAwarenessManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new IResultListener<IAwarenessManagementService>()
-			{
-				public void resultAvailable(IAwarenessManagementService awa)
-				{
-					awa.subscribeToPlatformList(false).addResultListener(new IntermediateDefaultResultListener<DiscoveryInfo>()
-					{
-						public void intermediateResultAvailable(DiscoveryInfo info)
-						{
-							IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
-							chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
-							{
-								public void intermediateResultAvailable(IChatService chat)
-								{
-									chat.status(nick, STATE_IDLE);
-								}
-								
-								public void finished() {}
-	
-								public void exceptionOccurred(Exception exception)
-								{
-									// ignore
-								}
-							});
-						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							// ignore
-						}
-					});
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					// ignore
-					exception.printStackTrace();
-				}
-			});
-			
 			return ret;
 		}
 	}
