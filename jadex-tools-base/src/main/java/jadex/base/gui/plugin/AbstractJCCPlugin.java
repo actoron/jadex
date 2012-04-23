@@ -57,6 +57,14 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	
 	//-------- constructors --------
 	
+	/**
+	 *  Lazy plugins are inited on first access.
+	 */
+	public boolean	isLazy()
+	{
+		return true;
+	}
+	
 	/** 
 	 *  Initialize the plugin.
 	 */

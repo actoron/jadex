@@ -27,6 +27,14 @@ public class ChatPlugin extends AbstractServicePlugin
 	//-------- methods --------
 	
 	/**
+	 *  Overridden to activate chat on JCC startup.
+	 */
+	public boolean isLazy()
+	{
+		return false;
+	}
+	
+	/**
 	 *  Get the service type.
 	 *  @return The service type.
 	 */

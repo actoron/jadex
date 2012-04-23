@@ -43,6 +43,7 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -89,19 +90,32 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public static final DateFormat	df	= new SimpleDateFormat("HH:mm:ss");
 	
 	/** The notification sound for a newly online user. */
-	public static final String	NOTIFICATION_NEW_USER	= "sounds/gong.wav";
+	public static final String	NOTIFICATION_NEW_USER	= "newuser";
 	
 	/** The notification sound for a new message. */
-	public static final String	NOTIFICATION_NEW_MSG	= "sounds/ping.wav";
+	public static final String	NOTIFICATION_NEW_MSG	= "newmsg";
 	
 	/** The notification sound for an incoming file request. */
-	public static final String	NOTIFICATION_NEW_FILE	= "sounds/cuckoo_clock.wav";
+	public static final String	NOTIFICATION_NEW_FILE	= "newfile";
 	
 	/** The notification sound for a successfully completed file. */
-	public static final String	NOTIFICATION_FILE_COMPLETE	= "sounds/music_box.wav";
+	public static final String	NOTIFICATION_FILE_COMPLETE	= "filecomplete";
 	
 	/** The notification sound for an aborted or failed file transfer. */
-	public static final String	NOTIFICATION_FILE_ABORT	= "sounds/blurps.wav";
+	public static final String	NOTIFICATION_FILE_ABORT	= "fileabort";
+	
+	/** The default notification sounds. */
+	protected static Map<String, String>	NOTIFICATION_SOUNDS;
+	
+	static
+	{
+		NOTIFICATION_SOUNDS	= new HashMap<String, String>();
+		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_USER, "sounds/gong.wav");
+		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_MSG, "sounds/ping.wav");
+		NOTIFICATION_SOUNDS.put(NOTIFICATION_NEW_FILE, "sounds/cuckoo_clock.wav");
+		NOTIFICATION_SOUNDS.put(NOTIFICATION_FILE_COMPLETE, "sounds/music_box.wav");
+		NOTIFICATION_SOUNDS.put(NOTIFICATION_FILE_ABORT, "sounds/blurps.wav");
+	}
 	
 	//-------- attributes --------
 	
@@ -492,7 +506,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							
 							if(ti.isDownload() && TransferInfo.STATE_WAITING.equals(ti.getState()))
 							{
-								notifyChatEvent(NOTIFICATION_NEW_FILE);
+								notifyChatEvent(NOTIFICATION_NEW_FILE, ti.getOther(), ti, false);
 								
 								if(panel.isShowing())
 								{
@@ -695,7 +709,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							.append(cid.getName()).append("]: ").append(text).append(lf);
 						chatarea.append(buf.toString());
 						
-						notifyChatEvent(NOTIFICATION_NEW_MSG);
+						notifyChatEvent(NOTIFICATION_NEW_MSG, cid, text, false);
 						
 						if(deadusers!=null)
 							deadusers.remove(cid);
@@ -745,10 +759,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				table.getParent().doLayout();
 				table.repaint();
 				
-				if(isnew)
-				{
-					notifyChatEvent(NOTIFICATION_NEW_USER);
-				}
+				notifyChatEvent(NOTIFICATION_NEW_USER, cid, null, !isnew);
 			}
 		});
 	}
@@ -811,21 +822,49 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	
 
 	/**
-	 *  Play a notification sound.
+	 *  Show a status message and optionally play a notification sound.
 	 */
-	protected void	notifyChatEvent(String sound)
+	protected void	notifyChatEvent(String type, IComponentIdentifier source, Object value, boolean quiet)
 	{
-		try
+		if(NOTIFICATION_NEW_MSG.equals(type))
 		{
-			Clip	clip	= AudioSystem.getClip();
-			InputStream	is	= getClass().getResourceAsStream(sound);
-			AudioInputStream	ais	= AudioSystem.getAudioInputStream(is);
-			clip.open(ais);
-			clip.start();
+			getJCC().setStatusText("New chat message from "+source+": "+value);
 		}
-		catch(Exception e)
+		else if(NOTIFICATION_NEW_USER.equals(type))
 		{
-			System.err.println("Couldn't play notification sound: "+e);
+			getJCC().setStatusText("New chat user online: "+source);
+		}
+		else if(NOTIFICATION_NEW_FILE.equals(type))
+		{
+			getJCC().setStatusText("New file upload request from "+source+": "+new File(((TransferInfo)value).getFile()).getName());
+		}
+		else if(NOTIFICATION_FILE_COMPLETE.equals(type))
+		{
+			getJCC().setStatusText(((TransferInfo)value).isDownload()
+				? "Completed downloading '"+new File(((TransferInfo)value).getFile()).getName()+"' from "+source
+				: "Completed uploading '"+new File(((TransferInfo)value).getFile()).getName()+"' to "+source);
+		}
+		else if(NOTIFICATION_FILE_ABORT.equals(type))
+		{
+			getJCC().setStatusText(((TransferInfo)value).isDownload()
+				? "Problem while downloading '"+new File(((TransferInfo)value).getFile()).getName()+"' from "+source
+				: "Problem while uploading '"+new File(((TransferInfo)value).getFile()).getName()+"' to "+source);
+		}
+		
+		if(!quiet)
+		{
+			try
+			{
+				Clip	clip	= AudioSystem.getClip();
+				InputStream	is	= getClass().getResourceAsStream(NOTIFICATION_SOUNDS.get(type));
+				AudioInputStream	ais	= AudioSystem.getAudioInputStream(is);
+				clip.open(ais);
+				clip.start();
+			}
+			catch(Exception e)
+			{
+				System.err.println("Couldn't play notification sound: "+e);
+			}
 		}
 	}
 	
@@ -838,11 +877,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	{
 		if(TransferInfo.STATE_COMPLETED.equals(fi.getState()))
 		{
-			notifyChatEvent(NOTIFICATION_FILE_COMPLETE);
+			notifyChatEvent(NOTIFICATION_FILE_COMPLETE, fi.getOther(), fi, false);
 		}
 		else if(fi.isFinished())
 		{
-			notifyChatEvent(NOTIFICATION_FILE_ABORT);
+			notifyChatEvent(NOTIFICATION_FILE_ABORT, fi.getOther(), fi, false);
 		}
 		
 		// Update 5 times per second or if state is not transferring.
@@ -869,11 +908,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	{
 		if(TransferInfo.STATE_COMPLETED.equals(fi.getState()))
 		{
-			notifyChatEvent(NOTIFICATION_FILE_COMPLETE);
+			notifyChatEvent(NOTIFICATION_FILE_COMPLETE, fi.getOther(), fi, false);
 		}
 		else if(fi.isFinished())
 		{
-			notifyChatEvent(NOTIFICATION_FILE_ABORT);
+			notifyChatEvent(NOTIFICATION_FILE_ABORT, fi.getOther(), fi, false);
 		}
 		
 		// Update 5 times per second or if state is not transferring.
@@ -933,6 +972,31 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			final JPopupMenu menu = new JPopupMenu();
 			if(!fi.isFinished())
 			{
+				if(fi.isDownload() && TransferInfo.STATE_WAITING.equals(fi.getState()))
+				{
+					JMenuItem mi = new JMenuItem("Cancel transfer");
+					mi.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							acceptFile(new File(fi.getFile()).getName(), fi.getSize(), fi.getOther())
+								.addResultListener(new IResultListener<File>()
+							{
+								public void resultAvailable(File result)
+								{
+									getService().acceptFile(fi.getId(), result.getAbsolutePath());
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									getService().rejectFile(fi.getId());
+								}
+							});
+						}
+					});
+					menu.add(mi);
+				}
+				
 				JMenuItem mi = new JMenuItem("Cancel transfer");
 				mi.addActionListener(new ActionListener()
 				{
@@ -963,6 +1027,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					});
 					menu.add(mi);
 				}
+
 			}
 			
 			if(fi.isFinished())

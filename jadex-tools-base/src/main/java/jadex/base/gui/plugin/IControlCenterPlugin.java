@@ -14,6 +14,11 @@ import javax.swing.JMenu;
 public interface IControlCenterPlugin extends IPropertiesProvider
 {	
 	/**
+	 *  Lazy plugins are inited on first access.
+	 */
+	public boolean	isLazy();
+
+	/**
 	 *  This initializes a plugin and is done in context of a swing thread.
 	 */
 	public IFuture<Void> init(IControlCenter main);

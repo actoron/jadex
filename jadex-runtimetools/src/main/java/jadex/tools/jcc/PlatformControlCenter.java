@@ -1,6 +1,5 @@
 package jadex.tools.jcc;
 
-import jadex.base.Starter;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.plugin.IControlCenter;
@@ -18,6 +17,7 @@ import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
@@ -90,9 +90,23 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 							try
 							{
 								Class plugin_class = SReflect.classForName(plugin_classes[i], cl);
-								IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
+								final IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
 								plugins.put(p, null);
-								setStatusText("Plugin loaded successfully: "+ p.getName());
+								
+								if(p.isLazy())
+								{
+									setStatusText("Plugin loaded successfully: "+ p.getName());									
+								}
+								else
+								{
+									initPlugin(p).addResultListener(new SwingDefaultResultListener<Void>(pccpanel)
+									{
+										public void customResultAvailable(Void result)
+										{
+											setStatusText("Plugin loaded successfully: "+ p.getName());
+										}
+									});
+								}
 							}
 							catch(Exception e)
 							{
@@ -279,31 +293,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		
 		if(plugins.get(plugin) == null)
 		{
-			try
-			{
-				plugin.init(this).addResultListener(new SwingDelegationResultListener<Void>(ret)
-				{
-					public void customResultAvailable(Void result)
-					{
-						JComponent comp = plugin.getView();
-						plugins.put(plugin, comp);
-						if(props.getSubproperty(plugin.getName())!=null)
-						{
-							plugin.setProperties(props.getSubproperty(plugin.getName()))
-								.addResultListener(new SwingDelegationResultListener<Void>(ret));
-						}
-						else
-						{
-							ret.setResult(null);
-						}
-					}
-				});
-				
-			}
-			catch(Exception e)
-			{
-				ret.setException(e);
-			}
+			initPlugin(plugin).addResultListener(new SwingDelegationResultListener<Void>(ret));
 		}
 		else
 		{
@@ -320,6 +310,37 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			}
 		}
 		
+		return ret;
+	}
+
+	protected IFuture<Void> initPlugin(final IControlCenterPlugin plugin)
+	{
+		final Future<Void> ret	= new Future<Void>();
+		try
+		{
+			plugin.init(this).addResultListener(new SwingDelegationResultListener<Void>(ret)
+			{
+				public void customResultAvailable(Void result)
+				{
+					JComponent comp = plugin.getView();
+					plugins.put(plugin, comp);
+					if(props.getSubproperty(plugin.getName())!=null)
+					{
+						plugin.setProperties(props.getSubproperty(plugin.getName()))
+							.addResultListener(new SwingDelegationResultListener<Void>(ret));
+					}
+					else
+					{
+						ret.setResult(null);
+					}
+				}
+			});
+			
+		}
+		catch(Exception e)
+		{
+			ret.setException(e);
+		}
 		return ret;
 	}
 	

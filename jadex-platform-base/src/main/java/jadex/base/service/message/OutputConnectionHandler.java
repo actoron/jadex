@@ -530,7 +530,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			{
 //				System.out.println("resend: "+seqnumber);
 				StreamSendTask task = tup.getFirstEntity();
-				ret = sendTask(tup.getFirstEntity());
+				ret = sendTask(task);
 				sent.put(task.getSequenceNumber(), new Tuple2<StreamSendTask, Integer>(task, new Integer(tup.getSecondEntity().intValue()+1)));
 			}
 		}
