@@ -18,13 +18,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  This agent represents the central message queue. It offers a 
+ *  message queue service that is used by the clients.
  */
 @Agent
 @Service
 @ProvidedServices(@ProvidedService(type=IMessageQueueService.class, implementation=@Implementation(expression="$pojoagent")))
 public class MessageQueueAgent implements IMessageQueueService
 {
+	//-------- attributes --------
+	
 	/** The agent. */
 	@Agent
 	protected MicroAgent agent;
@@ -32,8 +35,10 @@ public class MessageQueueAgent implements IMessageQueueService
 	/** The map of subscribers. */
 	protected Map<String, List<SubscriptionIntermediateFuture<Event>>> subscribers;
 	
+	//-------- methods --------
+
 	/**
-	 * 
+	 *  Called on agent creation.
 	 */
 	@AgentCreated
 	public void agentCreated()
@@ -42,7 +47,11 @@ public class MessageQueueAgent implements IMessageQueueService
 	}
 	
 	/**
-	 * 
+	 *  Subscribe to a specific topic. New events that fit to the topic
+	 *  are forwarded to all subscribers as intermediate results.
+	 *  A subscribe can unsubscribe by terminating the future.
+	 *  @param topic The topic.
+	 *  @return The events.
 	 */
 	public ISubscriptionIntermediateFuture<Event> subscribe(String topic)
 	{
@@ -60,18 +69,24 @@ public class MessageQueueAgent implements IMessageQueueService
 	}
 	
 	/**
-	 * 
+	 *  Publish a new event to the queue.
+	 *  @param topic The topic.
+	 *  @param event The event to publish.
 	 */
 	public IFuture<Void> publish(String topic, Event event)
 	{
+//		System.out.println("pub: "+topic+" "+event);
 		List<SubscriptionIntermediateFuture<Event>> subs = subscribers.get(topic);
 		if(subs!=null)
 		{
 			for(Iterator<SubscriptionIntermediateFuture<Event>> it = subs.iterator(); it.hasNext(); )
 			{
 				SubscriptionIntermediateFuture<Event> sub = it.next();
-				if(sub.addIntermediateResultIfUndone(event))
+				if(!sub.addIntermediateResultIfUndone(event))
+				{
+					System.out.println("Removed: "+sub);
 					it.remove();
+				}
 			}
 			if(subs.isEmpty())
 				subscribers.remove(topic);

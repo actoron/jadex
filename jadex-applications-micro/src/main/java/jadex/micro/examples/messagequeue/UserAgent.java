@@ -24,6 +24,8 @@ import jadex.micro.annotation.RequiredServices;
 @Arguments(@Argument(name="topic", clazz=String.class, defaultvalue="\"default_topic\""))
 public class UserAgent
 {
+	//-------- attributes --------
+	
 	/** The agent. */
 	@Agent
 	protected MicroAgent agent;
@@ -32,12 +34,14 @@ public class UserAgent
 	@AgentService
 	protected IMessageQueueService mq;
 	
-	/** . */
+	/** The topic argument. */
 	@AgentArgument
 	protected String topic;
 	
+	//-------- methods --------
+	
 	/**
-	 * 
+	 *  The agent body.
 	 */
 	@AgentBody
 	public void body()
@@ -61,11 +65,15 @@ public class UserAgent
 			final int[] cnt = new int[1];
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				mq.publish(topic, new Event("some type", cnt[0]++));
+				mq.publish(topic, new Event("some type", cnt[0]++, agent.getComponentIdentifier()));
 				if(cnt[0]<10)
+				{
 					agent.waitFor(1000, this);
+				}
 				else
+				{
 					fut.terminate();
+				}
 				return IFuture.DONE;
 			}
 		};

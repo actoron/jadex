@@ -17,6 +17,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Timeout
 {
+	/** Constant for no timeout. */
+	public static final long NONE = -1;
+	
 	/**
 	 *  The timeout period after which the remote invocation
 	 *  is aborted when no result is received.
