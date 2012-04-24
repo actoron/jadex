@@ -544,6 +544,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						setReceiving(chat, -1, false);
 					}
+					public void customExceptionOccurred(Exception exception)
+					{
+						super.customExceptionOccurred(exception);
+					}
 				});
 				
 				getService().getFileTransfers().addResultListener(new SwingIntermediateDefaultResultListener<TransferInfo>(panel)

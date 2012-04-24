@@ -1,5 +1,6 @@
 package jadex.base.service.remote;
 
+import jadex.bridge.service.annotation.Timeout;
 import jadex.commons.MethodInfo;
 import jadex.commons.SUtil;
 
@@ -104,7 +105,7 @@ public class ProxyInfo
 	 */
 	public long	getMethodTimeout(Method method)
 	{
-		long	ret	= -1;
+		long	ret	= Timeout.DEFAULT_REMOTE;
 		MethodInfo	key	= new MethodInfo(method);
 		if(timeouts!=null && timeouts.containsKey(key))
 		{

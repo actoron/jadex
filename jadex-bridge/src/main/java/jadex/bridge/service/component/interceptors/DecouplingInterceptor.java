@@ -4,22 +4,29 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TimeoutIntermediateResultListener;
+import jadex.bridge.TimeoutResultListener;
+import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.commons.IFilter;
+import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
@@ -434,27 +441,126 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				
 				FutureFunctionality func = new FutureFunctionality()
 				{
-					public Object addIntermediateResult(Object result)
+					TimeoutException ex = null;
+					
+					public synchronized Object addIntermediateResult(Object result)
 					{
+						if(ex!=null)
+							throw ex;
 						return doCopy(copy, deffilter, result);
 					}
 					
-					public Object addIntermediateResultIfUndone(Object result)
+					public synchronized Object addIntermediateResultIfUndone(Object result)
 					{
+						if(ex!=null)
+							throw ex;
 						return doCopy(copy, deffilter, result);
 					}
 					
-					public Object setResult(Object result)
+					public synchronized void setFinished(Collection<Object> results)
 					{
+						if(ex!=null)
+							throw ex;
+					}
+					
+					public synchronized void setFinishedIfUndone(Collection<Object> results)
+					{
+						if(ex!=null)
+							throw ex;
+					}
+					
+					public synchronized Object setResult(Object result)
+					{
+						if(ex!=null)
+							throw ex;
 						return doCopy(copy, deffilter, result);
 					}
 					
-					public Object setResultIfUndone(Object result)
+					public synchronized Object setResultIfUndone(Object result)
 					{
+						if(ex!=null)
+							throw ex;
 						return doCopy(copy, deffilter, result);
+					}
+					
+					public synchronized Exception setException(Exception exception)
+					{
+						if(ex!=null)
+							throw ex;
+						if(exception instanceof TimeoutException)
+							ex = (TimeoutException)exception;
+						return exception;
+					}
+					
+					public synchronized Exception setExceptionIfUndone(Exception exception)
+					{
+						if(ex!=null)
+							throw ex;
+						if(exception instanceof TimeoutException)
+							ex = (TimeoutException)exception;
+						return exception;
 					}
 				};
-				Future fut = FutureFunctionality.getDelegationFuture((IFuture)res, func);
+				
+				final Future fut = FutureFunctionality.getDelegationFuture((IFuture)res, func);
+				
+				// Add timeout handling for local case.
+				if(!sic.isRemoteCall())
+				{
+					long to = BasicServiceContainer.getMethodTimeout(
+						sic.getObject().getClass().getInterfaces(), method, sic.isRemoteCall());
+//					System.out.println("local timeout is: "+to+" "+method.getName());
+					if(to>=0)
+					{
+						if(fut instanceof IIntermediateFuture)
+						{
+							fut.addResultListener(new TimeoutIntermediateResultListener(to, ea, new IIntermediateResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+									// Ignore if result is normally set.
+								}
+								public void resultAvailable(Collection result)
+								{
+									// Ignore if result is normally set.
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									// Forward timeout exception to future.
+									if(exception instanceof TimeoutException)
+									{
+										fut.setExceptionIfUndone(exception);
+									}
+								}
+								public void intermediateResultAvailable(Object result)
+								{
+								}
+								public void finished()
+								{
+								}
+							}));
+						}
+						else
+						{
+							fut.addResultListener(new TimeoutResultListener(to, ea, new IResultListener()
+							{
+								public void resultAvailable(Object result)
+								{
+									// Ignore if result is normally set.
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									// Forward timeout exception to future.
+									if(exception instanceof TimeoutException)
+									{
+										fut.setExceptionIfUndone(exception);
+									}
+								}
+							}));
+						}
+					}
+				}
+				
 				sic.setResult(fut);
 			}
 			super.customResultAvailable(null);
@@ -470,12 +576,18 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		protected ServiceInvocationContext sic;
 		protected IComponentIdentifier caller;
 
+		/**
+		 *  Create an invoke method step.
+		 */
 		public InvokeMethodStep(ServiceInvocationContext sic, IComponentIdentifier caller)
 		{
 			this.sic = sic;
 			this.caller = caller;
 		}
 
+		/**
+		 *  Execute the step.
+		 */
 		public IFuture<Void> execute(IInternalAccess ia)
 		{					
 			IFuture<Void> ret;

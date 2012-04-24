@@ -3,6 +3,7 @@ package jadex.bridge.service;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.search.IResultSelector;
@@ -12,6 +13,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
+import jadex.commons.SReflect;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -20,6 +22,7 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateFuture;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -857,5 +860,45 @@ public abstract class BasicServiceContainer implements  IServiceContainer
 	public boolean equals(Object obj)
 	{
 		return obj instanceof IServiceContainer && ((IServiceContainer)obj).getId().equals(getId());
+	}
+	
+	/**
+	 *  Get the default timeout for a method.
+	 */
+	public static long getMethodTimeout(Class<?>[] interfaces, Method method, boolean remote)
+	{
+		long ret = Timeout.UNSET;
+		
+		Class<?>[] allinterfaces = SReflect.getSuperInterfaces(interfaces);
+		
+		long deftimeout	= Timeout.UNSET;
+		for(int i=0; deftimeout==Timeout.UNSET && i<allinterfaces.length; i++)
+		{
+			// Default timeout for interface (only if method is declared in this interface)
+			if(allinterfaces[i].isAnnotationPresent(Timeout.class) && 
+				SReflect.getMethod(allinterfaces[i], method.getName(), method.getParameterTypes())!=null)
+			{
+				Timeout	ta	= (Timeout)allinterfaces[i].getAnnotation(Timeout.class);
+				deftimeout = remote? ta.remote(): ta.local();
+				if(Timeout.UNSET==deftimeout)
+					deftimeout = ta.value();
+			}
+		}
+		
+		// Timeout on method overrides global timeout settings
+		if(method.isAnnotationPresent(Timeout.class))
+		{
+			Timeout	ta	= method.getAnnotation(Timeout.class);
+			ret = remote? ta.remote(): ta.local();
+			if(Timeout.UNSET==ret)
+				ret = ta.value();
+		}
+		
+		if(Timeout.UNSET!=deftimeout && Timeout.UNSET==ret)
+		{
+			ret = deftimeout;
+		}
+		
+		return ret==Timeout.UNSET? remote? Timeout.DEFAULT_REMOTE: Timeout.DEFAULT_LOCAL: ret;
 	}
 }

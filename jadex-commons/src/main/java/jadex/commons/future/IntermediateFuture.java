@@ -288,6 +288,9 @@ public class IntermediateFuture<E> extends Future<Collection <E>> implements	IIn
      */
     public void	addResultListener(IResultListener<Collection<E>> listener)
     {
+//    	if(getClass().getName().indexOf("Delegating")!=-1)
+//    		System.out.println("lis: "+listener.getClass()+" "+this);
+    	
     	if(listener==null)
     		throw new RuntimeException();
     	

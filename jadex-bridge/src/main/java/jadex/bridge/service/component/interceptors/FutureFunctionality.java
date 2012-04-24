@@ -14,7 +14,9 @@ import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
 import jadex.commons.future.TerminableDelegationFuture;
+import jadex.commons.future.TerminableDelegationResultListener;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
+import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 
 import java.util.Collection;
 
@@ -209,6 +211,43 @@ public class FutureFunctionality
 		
 		return ret;
 	}
+	
+	/**
+	 * 
+	 */
+	public static void connectDelegationFuture(Future target, IFuture source)
+	{
+		if(source instanceof ISubscriptionIntermediateFuture)
+		{
+			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
+				(TerminableIntermediateDelegationFuture)target, (ISubscriptionIntermediateFuture)source);
+			source.addResultListener(lis);
+		}
+		else if(source instanceof ITerminableIntermediateFuture)
+		{
+			TerminableIntermediateDelegationResultListener lis = new TerminableIntermediateDelegationResultListener(
+				(TerminableIntermediateDelegationFuture)target, (ITerminableIntermediateFuture)source);
+			source.addResultListener(lis);
+		}
+		else if(source instanceof ITerminableFuture)
+		{
+			TerminableDelegationResultListener lis = new TerminableDelegationResultListener(
+				(TerminableDelegationFuture)target, (ITerminableFuture)source);
+			source.addResultListener(lis);
+		}
+		else if(source instanceof IIntermediateFuture)
+		{
+			source.addResultListener(new IntermediateDelegationResultListener((IntermediateFuture)target));
+		}
+		else if(source instanceof IFuture)
+		{
+			source.addResultListener(new DelegationResultListener((Future)target));
+		}
+		else
+		{
+			throw new IllegalArgumentException("Unknown source type: "+source.getClass());
+		}
+	}
 }
 
 /**
@@ -358,7 +397,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(Exception e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setException(e);
+			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
 		}
 	}
 	
@@ -395,7 +434,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.setException(exception);
+				DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
 			}
 		});
 	}
@@ -413,7 +452,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.setException(exception);
+				DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
 			}
 		});
 	}
@@ -582,7 +621,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.setException(e);
+			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(e);
 		}
 	}
 	
@@ -619,7 +658,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingTerminableIntermediateDelegationFuture.super.setException(exception);
+				DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
 			}
 		});
 	}
@@ -637,7 +676,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingTerminableIntermediateDelegationFuture.super.setException(exception);
+				DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
 			}
 		});
 	}
@@ -733,7 +772,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableDelegationFuture.super.setException(e);
+			DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(e);
 		}
 	}
 	
@@ -770,7 +809,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingTerminableDelegationFuture.super.setException(exception);
+				DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(exception);
 			}
 		});
 	}
@@ -849,6 +888,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 	 */
 	public void addIntermediateResult(Object result)
 	{
+//		System.out.println("ires: "+result+" "+this);
 		try
 		{
 			Object res = func.addIntermediateResult(result);
@@ -885,6 +925,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 	 */
 	public void setFinished()
 	{
+//		System.out.println("finished: "+result+" "+this);
 		try
 		{
 			func.setFinished((Collection<Object>)getIntermediateResults());
@@ -928,7 +969,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 		}
 		catch(Exception e)
 		{
-			DelegatingIntermediateFuture.super.setException(e);
+			DelegatingIntermediateFuture.super.setExceptionIfUndone(e);
 		}
 	}
 	
@@ -965,7 +1006,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingIntermediateFuture.super.setException(exception);
+				DelegatingIntermediateFuture.super.setExceptionIfUndone(exception);
 			}
 		});
 	}
@@ -983,7 +1024,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingIntermediateFuture.super.setException(exception);
+				DelegatingIntermediateFuture.super.setExceptionIfUndone(exception);
 			}
 		});
 	}
@@ -1053,7 +1094,7 @@ class DelegatingFuture extends Future<Object>
 		}
 		catch(Exception e)
 		{
-			DelegatingFuture.super.setException(e);
+			DelegatingFuture.super.setExceptionIfUndone(e);
 		}
 	}
 	
@@ -1090,7 +1131,7 @@ class DelegatingFuture extends Future<Object>
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
-				DelegatingFuture.super.setException(exception);
+				DelegatingFuture.super.setExceptionIfUndone(exception);
 			}
 		});
 	}

@@ -189,6 +189,7 @@ public class Starter
 	public static IFuture<IExternalAccess> createPlatform(String[] args)
 	{
 		final Future<IExternalAccess> ret = new Future<IExternalAccess>();
+		
 		try
 		{
 			// Absolute start time (for testing and benchmarking).

@@ -10,6 +10,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.modelinfo.UnparsedExpression;
+import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Excluded;
@@ -301,12 +302,12 @@ public class RemoteReferenceModule
 		for(int i=0; i<allinterfaces.length; i++)
 		{
 			// Default timeout for interface
-			Long	deftimeout	= null;
-			if(allinterfaces[i].isAnnotationPresent(Timeout.class))
-			{
-				Timeout	ta	= (Timeout)allinterfaces[i].getAnnotation(Timeout.class);
-				deftimeout	= new Long(ta.value());
-			}
+//			Long	deftimeout	= null;
+//			if(allinterfaces[i].isAnnotationPresent(Timeout.class))
+//			{
+//				Timeout	ta	= (Timeout)allinterfaces[i].getAnnotation(Timeout.class);
+//				deftimeout	= new Long(ta.value());
+//			}
 			
 			boolean	allex	= allinterfaces[i].isAnnotationPresent(Excluded.class);
 			Method[]	methods	= allinterfaces[i].getDeclaredMethods();
@@ -377,15 +378,19 @@ public class RemoteReferenceModule
 				}
 				
 				// Timeout
-				if(methods[j].isAnnotationPresent(Timeout.class))
-				{
-					Timeout	ta	= methods[j].getAnnotation(Timeout.class);
-					ret.addMethodTimeout(new MethodInfo(methods[j]), ta.value());
-				}
-				else if(deftimeout!=null)
-				{
-					ret.addMethodTimeout(new MethodInfo(methods[j]), deftimeout.longValue());					
-				}
+//				if(methods[j].isAnnotationPresent(Timeout.class))
+//				{
+//					Timeout	ta	= methods[j].getAnnotation(Timeout.class);
+//					ret.addMethodTimeout(new MethodInfo(methods[j]), ta.value());
+//				}
+//				else if(deftimeout!=null)
+//				{
+//					ret.addMethodTimeout(new MethodInfo(methods[j]), deftimeout.longValue());					
+//				}
+				long to = BasicServiceContainer.getMethodTimeout(remoteinterfaces, methods[j], true);
+				// Do not save default value (overhead)
+				if(to!=Timeout.UNSET && to!=Timeout.DEFAULT_REMOTE)
+					ret.addMethodTimeout(new MethodInfo(methods[j]), to);
 			}
 		}
 		
@@ -1081,7 +1086,7 @@ public class RemoteReferenceModule
 	 *  Send addRef to the origin process of the remote reference.
 	 *  @param rr The remote reference.
 	 */
-	protected Future<Void> sendAddRemoteReference(final RemoteReference rr)
+	public Future<Void> sendAddRemoteReference(final RemoteReference rr)
 	{
 		checkThread();
 		// DGC: notify rr origin that a new proxy of target object exists
@@ -1099,7 +1104,7 @@ public class RemoteReferenceModule
 				ret.setResult(null);
 			}
 		});
-		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, -1, fut);
+		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, Timeout.DEFAULT_REMOTE, fut);
 		
 		return ret;
 	}
@@ -1139,7 +1144,7 @@ public class RemoteReferenceModule
 				ret.setResult(null);
 			}
 		});
-		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, -1, fut);
+		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, Timeout.DEFAULT_REMOTE, fut);
 		return ret;
 	}
 	

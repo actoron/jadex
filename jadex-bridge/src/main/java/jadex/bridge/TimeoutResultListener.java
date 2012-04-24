@@ -7,6 +7,7 @@ import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClock;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
+import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.IResultListener;
@@ -28,6 +29,15 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 	
 	/** The timeout occurred flag. */
 	protected boolean notified;
+	
+	/** The timer. */
+	protected Object timer;
+	
+	/** The timeout. */
+	protected long timeout;
+	
+	/** The realtime flag. */
+	protected boolean realtime;
 	
 	//-------- constructors --------
 
@@ -52,70 +62,10 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 			
 		this.listener = listener;
 		this.exta = exta;
+		this.timeout = timeout;
+		this.realtime = realtime;
 		
-		// Initialize timeout
-		if(timeout>0)
-		{
-			SServiceProvider.getServiceUpwards(exta.getServiceProvider(), IClockService.class)
-				.addResultListener(new DefaultResultListener<IClockService>()
-			{
-				public void resultAvailable(IClockService clock)
-				{
-					try
-					{
-						final Runnable notify = new Runnable()
-						{
-							public void run()
-							{
-								boolean notify = false;
-								synchronized(TimeoutResultListener.this)
-								{
-									if(!notified)
-									{
-										notify = true;
-										notified = true;
-									}
-								}
-								if(notify)
-									listener.exceptionOccurred(new TimeoutException());
-							}
-						};
-						
-						if(realtime && !IClock.TYPE_SYSTEM.equals(clock.getClockType()))
-						{
-							Timer t = new Timer();
-							t.schedule(new TimerTask()
-							{
-								public void run()
-								{
-									notify.run();
-								}
-							}, timeout);
-						}
-						else
-						{
-							clock.createTimer(timeout, new ITimedObject()
-							{
-								public void timeEventOccurred(long currenttime)
-								{
-									notify.run();
-								}
-							});
-						}
-					}
-					catch(Exception e)
-					{
-						// todo: should not happen
-						// causes null pointer exception on clock
-					}
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					System.out.println("Could not get clock service.");
-				}
-			});
-		}
+		initTimer();
 	}
 
 	//-------- methods --------
@@ -133,6 +83,7 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 			{
 				notify = true;
 				notified = true;
+				cancel();
 			}
 		}
 		if(notify)
@@ -152,9 +103,102 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 			{
 				notify = true;
 				notified = true;
+				cancel();
 			}
 		}
 		if(notify)
 			listener.exceptionOccurred(exception);
+	}
+	
+	/**
+	 *  Cancel the timeout.
+	 */
+	public synchronized void cancel()
+	{
+		if(timer instanceof TimerTask)
+		{
+			((TimerTask)timer).cancel();
+		}
+		else if(timer instanceof ITimer)
+		{
+			((ITimer)timer).cancel();
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected synchronized void initTimer()
+	{
+		// Initialize timeout
+		
+		SServiceProvider.getServiceUpwards(exta.getServiceProvider(), IClockService.class)
+			.addResultListener(new DefaultResultListener<IClockService>()
+		{
+			public void resultAvailable(IClockService clock)
+			{
+				try
+				{
+					final Runnable notify = new Runnable()
+					{
+						public void run()
+						{
+							boolean notify = false;
+							synchronized(TimeoutResultListener.this)
+							{
+								if(!notified)
+								{
+									notify = true;
+									notified = true;
+								}
+							}
+							if(notify)
+								listener.exceptionOccurred(new TimeoutException());
+						}
+					};
+					
+					synchronized(TimeoutResultListener.this)
+					{
+						// Do not create new timer if already notified
+						if(timeout>0 && !notified)
+						{
+							if(realtime && !IClock.TYPE_SYSTEM.equals(clock.getClockType()))
+							{
+								Timer t = new Timer();
+								TimerTask tt = new TimerTask()
+								{
+									public void run()
+									{
+										notify.run();
+									}
+								};
+								timer = tt;
+								t.schedule(tt, timeout);
+							}
+							else
+							{
+								timer = clock.createTimer(timeout, new ITimedObject()
+								{
+									public void timeEventOccurred(long currenttime)
+									{
+										notify.run();
+									}
+								});
+							}
+						}
+					}
+				}
+				catch(Exception e)
+				{
+					// todo: should not happen
+					// causes null pointer exception on clock when clock is uninitialized
+				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				System.out.println("Could not get clock service.");
+			}
+		});
 	}
 }

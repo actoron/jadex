@@ -17,6 +17,9 @@ public abstract class DefaultResultListener<E> implements IResultListener<E>
 //	/** The static instance. */
 //	private static IResultListener instance;
 	
+	/** The exception (for debugging). */
+	private Exception exception;
+	
 	//-------- constructors --------
 	
 	/**
@@ -26,6 +29,8 @@ public abstract class DefaultResultListener<E> implements IResultListener<E>
 	public DefaultResultListener()
 	{
 		this.logger = Logger.getLogger("default-result-listener");
+		if(Future.DEBUG)
+			exception = new RuntimeException();
 	}
 	
 	/**
@@ -73,7 +78,7 @@ public abstract class DefaultResultListener<E> implements IResultListener<E>
 	 */
 	public void exceptionOccurred(Exception exception)
 	{
-		exception.printStackTrace();
+		this.exception.printStackTrace();
 		logger.severe("Exception occurred: "+exception);
 	}
 }

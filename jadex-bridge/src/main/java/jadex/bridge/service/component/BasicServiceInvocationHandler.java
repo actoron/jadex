@@ -17,6 +17,7 @@ import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.bridge.service.component.interceptors.DecouplingReturnInterceptor;
 import jadex.bridge.service.component.interceptors.DelegationInterceptor;
+import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.component.interceptors.MethodInvocationInterceptor;
 import jadex.bridge.service.component.interceptors.PrePostConditionInterceptor;
 import jadex.bridge.service.component.interceptors.RecoveryInterceptor;
@@ -25,22 +26,11 @@ import jadex.bridge.service.component.interceptors.ValidationInterceptor;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
-import jadex.commons.future.ITerminableFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
-import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
-import jadex.commons.future.TerminableDelegationFuture;
-import jadex.commons.future.TerminableDelegationResultListener;
-import jadex.commons.future.TerminableIntermediateDelegationFuture;
-import jadex.commons.future.TerminableIntermediateDelegationResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.javaparser.SJavaParser;
 
@@ -49,7 +39,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -147,88 +136,27 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			
 			List<Object> myargs = args!=null? SUtil.arrayToList(args): null;
 			
-			if(SReflect.isSupertype(ISubscriptionIntermediateFuture.class, method.getReturnType()))
+			if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
 			{
-				final SubscriptionIntermediateDelegationFuture fut = new SubscriptionIntermediateDelegationFuture();
-				ret = fut;
-				sic.invoke(service, method, myargs).addResultListener(new DelegationResultListener(fut)
+				ret = FutureFunctionality.getDelegationFuture(method.getReturnType(), new FutureFunctionality());
+				final Future fret = (Future)ret;
+//				System.out.println("fret: "+fret+" "+method);
+//				fret.addResultListener(new IResultListener()
+//				{
+//					public void resultAvailable(Object result)
+//					{
+//						System.out.println("fret res: "+result);
+//					}
+//					public void exceptionOccurred(Exception exception)
+//					{
+//						System.out.println("fret ex: "+exception);
+//					}
+//				});
+				sic.invoke(service, method, myargs).addResultListener(new ExceptionDelegationResultListener((Future)ret)
 				{
 					public void customResultAvailable(Object result)
 					{
-//						System.out.println("result rec: "+sic.getResult());
-						ISubscriptionIntermediateFuture src = (ISubscriptionIntermediateFuture)sic.getResult();
-						src.addResultListener(new TerminableIntermediateDelegationResultListener(fut, src));
-					}
-				});
-			}
-			else if(SReflect.isSupertype(ITerminableIntermediateFuture.class, method.getReturnType()))
-			{
-				final TerminableIntermediateDelegationFuture fut = new TerminableIntermediateDelegationFuture();
-				ret = fut;
-				sic.invoke(service, method, myargs).addResultListener(new DelegationResultListener(fut)
-				{
-					public void customResultAvailable(Object result)
-					{
-//						System.out.println("result rec: "+sic.getResult());
-						ITerminableIntermediateFuture src = (ITerminableIntermediateFuture)sic.getResult();
-						src.addResultListener(new TerminableIntermediateDelegationResultListener(fut, src));
-					}
-				});
-			}
-			else if(SReflect.isSupertype(ITerminableFuture.class, method.getReturnType()))
-			{
-				final TerminableDelegationFuture fut = new TerminableDelegationFuture();
-				ret = fut;
-				sic.invoke(service, method, myargs).addResultListener(new DelegationResultListener(fut)
-				{
-					public void customResultAvailable(Object result)
-					{
-//						System.out.println("result rec: "+sic.getResult());
-						ITerminableFuture<?> src = (ITerminableFuture)sic.getResult();
-						src.addResultListener(new TerminableDelegationResultListener(fut, src));
-					}
-				});
-			}
-			else if(SReflect.isSupertype(IIntermediateFuture.class, method.getReturnType()))
-			{
-				final IntermediateFuture fut = new IntermediateFuture();
-				ret = fut;
-				sic.invoke(service, method, myargs).addResultListener(new IntermediateDelegationResultListener(fut)
-				{
-					public void customResultAvailable(Collection result)
-					{
-						if(sic.getResult() instanceof IIntermediateFuture)
-						{
-							((IIntermediateFuture)sic.getResult()).addResultListener(new IntermediateDelegationResultListener(fut));
-						}
-						else if(sic.getResult() instanceof IFuture)
-						{
-							((IFuture)sic.getResult()).addResultListener(new DelegationResultListener(fut));
-						}
-						else
-						{
-							fut.setResult((Collection)sic.getResult());
-						}
-					}
-				});
-			}
-			else if(SReflect.isSupertype(IFuture.class, method.getReturnType()))
-			{
-				final Future fut = new Future();
-				ret = fut;
-				
-				sic.invoke(service, method, myargs).addResultListener(new DelegationResultListener(fut)
-				{
-					public void customResultAvailable(Object result)
-					{
-						if(sic.getResult() instanceof IFuture)
-						{
-							((IFuture)sic.getResult()).addResultListener(new DelegationResultListener(fut));
-						}
-						else
-						{
-							fut.setResult(sic.getResult());
-						}
+						FutureFunctionality.connectDelegationFuture((Future)fret, (IFuture)sic.getResult());
 					}
 				});
 			}

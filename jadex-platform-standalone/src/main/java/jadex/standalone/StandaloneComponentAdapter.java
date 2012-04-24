@@ -64,7 +64,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 				catch(RuntimeException e)
 				{
 					logger.warning("Wakeup failed, execution service is shutting down: "+getComponentIdentifier());
-//					e.printStackTrace();
+					e.printStackTrace();
 				}
 			}
 		});

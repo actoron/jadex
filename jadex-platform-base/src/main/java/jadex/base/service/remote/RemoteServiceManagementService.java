@@ -20,6 +20,7 @@ import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
+import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.AnyResultSelector;
 import jadex.bridge.service.search.IResultSelector;
@@ -622,7 +623,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						RemoteSearchCommand content = new RemoteSearchCommand(cid, manager, 
 							decider, selector, callid);
 						
-						sendMessage(rrms, content, callid, -1, fut);
+						sendMessage(rrms, content, callid, Timeout.DEFAULT_REMOTE, fut);
 					}
 				});
 				
@@ -728,7 +729,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 						
-						sendMessage(rrms, content, callid, -1, fut);
+						sendMessage(rrms, content, callid, Timeout.DEFAULT_REMOTE, fut);
 //					}
 //				});
 				
@@ -950,9 +951,10 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					{
 						public void customResultAvailable(Void v)
 						{
-							final long timeout = to<=0? DEFAULT_TIMEOUT: to;
+//							final long timeout = to<=0? DEFAULT_TIMEOUT: to;
 							
-							final TimeoutTimerTask tt = new TimeoutTimerTask(timeout, future, callid, receiver, RemoteServiceManagementService.this); 
+							final TimeoutTimerTask tt = to>=0? new TimeoutTimerTask(to, future, callid, receiver, RemoteServiceManagementService.this): null;
+							System.out.println("remote timeout is: "+to);
 							putWaitingCall(callid, future, tt);
 							
 							// Remove waiting call when future is done
@@ -1031,7 +1033,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 																{
 	//																System.out.println("sent: "+callid);
 																	// ok message could be sent.
-																	timer.schedule(tt, timeout);
+																	if(to>=0)
+																		timer.schedule(tt, to);
 																}
 															});
 														}
@@ -1199,9 +1202,12 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		 */
 		public void refresh()
 		{
-			timertask.cancel();
-			timertask = new TimeoutTimerTask(timertask);
-			timertask.start();
+			if(timertask!=null)
+			{
+				timertask.cancel();
+				timertask = new TimeoutTimerTask(timertask);
+				timertask.start();
+			}
 		}
 	}
 }
