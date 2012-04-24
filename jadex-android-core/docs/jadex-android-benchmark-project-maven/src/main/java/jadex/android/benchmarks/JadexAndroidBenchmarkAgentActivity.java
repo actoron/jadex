@@ -291,38 +291,44 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 													
 													public void resultAvailable(final Collection<IChatService> results)
 													{
-														AlertDialog.Builder	builder	= new AlertDialog.Builder(JadexAndroidBenchmarkAgentActivity.this);
-														builder.setTitle("Choose send target");
-														List<CharSequence>	items	= new ArrayList<CharSequence>();
-														for(IChatService chat: results)
+														runOnUiThread(new Runnable()
 														{
-															items.add(((IService)chat).getServiceIdentifier().getProviderId().getName());
-														}
-														builder.setSingleChoiceItems(items.toArray(new CharSequence[items.size()]), -1, new DialogInterface.OnClickListener()
-														{
-															public void onClick(DialogInterface dialog, int which)
+															public void run()
 															{
-																if(which!=-1)
+																AlertDialog.Builder	builder	= new AlertDialog.Builder(JadexAndroidBenchmarkAgentActivity.this);
+																builder.setTitle("Choose send target");
+																List<CharSequence>	items	= new ArrayList<CharSequence>();
+																for(IChatService chat: results)
 																{
-																	IChatService	chat	= new ArrayList<IChatService>(results).get(which);
-																	System.out.println("Sending to: "+chat);
-																	chatgui.sendFile(path, ((IService)chat).getServiceIdentifier().getProviderId())
-																		.addResultListener(new IResultListener<Void>()
-																	{
-																		public void resultAvailable(Void result)
-																		{
-																			System.out.println("Transfer started.");
-																		}
-																		public void exceptionOccurred(Exception exception)
-																		{
-																			System.out.println("Transfer failed to initialize: "+exception);
-																		}
-																	});
+																	items.add(((IService)chat).getServiceIdentifier().getProviderId().getName());
 																}
+																builder.setSingleChoiceItems(items.toArray(new CharSequence[items.size()]), -1, new DialogInterface.OnClickListener()
+																{
+																	public void onClick(DialogInterface dialog, int which)
+																	{
+																		if(which!=-1)
+																		{
+																			IChatService	chat	= new ArrayList<IChatService>(results).get(which);
+																			System.out.println("Sending to: "+chat);
+																			chatgui.sendFile(path, ((IService)chat).getServiceIdentifier().getProviderId())
+																				.addResultListener(new IResultListener<Void>()
+																			{
+																				public void resultAvailable(Void result)
+																				{
+																					System.out.println("Transfer started.");
+																				}
+																				public void exceptionOccurred(Exception exception)
+																				{
+																					System.out.println("Transfer failed to initialize: "+exception);
+																				}
+																			});
+																		}
+																	}
+																});
+																AlertDialog alert = builder.create();
+																alert.show();
 															}
 														});
-														AlertDialog alert = builder.create();
-														alert.show();
 													}
 												});
 											}

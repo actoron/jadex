@@ -387,8 +387,8 @@ public class RemoteReferenceModule
 //				{
 //					ret.addMethodTimeout(new MethodInfo(methods[j]), deftimeout.longValue());					
 //				}
-				if(methods[j].getName().indexOf("subscribe")!=-1)
-					System.out.println("hjgff");
+//				if(methods[j].getName().indexOf("subscribe")!=-1)
+//					System.out.println("hjgff");
 				long to = BasicServiceContainer.getMethodTimeout(remoteinterfaces, methods[j], true);
 				// Do not save default value (overhead)
 				if(to!=Timeout.UNSET && to!=Timeout.DEFAULT_REMOTE)
