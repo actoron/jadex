@@ -53,6 +53,7 @@ import java.util.Set;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -68,6 +69,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.TransferHandler;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -872,14 +874,28 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					JComponent	scomp	= getJCC().getStatusComponent("chat-status-comp");
 					if(scomp==null)
 					{
-						scomp	= new JButton(ChatPlugin.getIcon());
-						((JButton)scomp).setMargin(new Insets(0, 0, 0, 0));
-						((JButton)scomp).addActionListener(new ActionListener()
+						final JButton but	= new JButton(ChatPlugin.getStatusIcon(false));
+						scomp	= but;
+						final Timer	timer	= new Timer(500, new ActionListener()
+						{
+							boolean	star;
+							public void actionPerformed(ActionEvent e)
+							{
+								star	= !star;
+								but.setIcon(ChatPlugin.getStatusIcon(star));
+								but.repaint();
+							}
+						});
+						timer.setRepeats(true);
+						timer.start();
+						but.setMargin(new Insets(0, 0, 0, 0));
+						but.addActionListener(new ActionListener()
 						{
 							public void actionPerformed(ActionEvent e)
 							{
 								getJCC().showPlugin(ChatPlugin.PLUGIN_NAME);
 								getJCC().removeStatusComponent("chat-status-comp");
+								timer.stop();
 							}
 						});
 						getJCC().addStatusComponent("chat-status-comp", scomp);

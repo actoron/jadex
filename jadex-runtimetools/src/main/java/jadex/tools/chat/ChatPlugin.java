@@ -26,14 +26,15 @@ public class ChatPlugin extends AbstractServicePlugin
 		icons.put("chat", SGUI.makeIcon(ChatPlugin.class, "images/chat.png"));
 		icons.put("chat_sel", SGUI.makeIcon(ChatPlugin.class, "images/chat.png"));
 		icons.put("chat_small", SGUI.makeIcon(ChatPlugin.class, "images/chat_small.png"));
+		icons.put("chat_small_star", SGUI.makeIcon(ChatPlugin.class, "images/chat_small_star.png"));
 	}
 	
 	/**
 	 *  Get the icon for the chat.
 	 */
-	public static Icon	getIcon()
+	public static Icon	getStatusIcon(boolean star)
 	{
-		return icons.getIcon("chat_small");
+		return star ? icons.getIcon("chat_small_star") : icons.getIcon("chat_small");
 	}
 
 	//-------- methods --------
