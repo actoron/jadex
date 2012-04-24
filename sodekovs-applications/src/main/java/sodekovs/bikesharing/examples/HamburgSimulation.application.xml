@@ -37,6 +37,7 @@
 
 			<env:processtypes>
 				<env:processtype name="init" class="CreateInitialSettingsProcess" />
+				<env:processtype name="manageTimeSlices" class="ManageTimeSlicesProcess" />
 			</env:processtypes>
 
 			<!-- Entwurfsentscheidung: Verkehrsmittel haben die Eigenschaft, ob sie 
@@ -277,6 +278,7 @@
 				<env:envspace name="my2dspace" type="HamburgSimulation" width="100" height="100">				
 				 	<env:processes>
 						<env:process type="init"/>								
+						<env:process type="manageTimeSlices"/>
 					</env:processes> 
 
 					<env:objects>

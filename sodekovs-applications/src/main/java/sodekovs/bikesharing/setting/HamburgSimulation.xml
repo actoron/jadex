@@ -1,7 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SimulationDescription xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BikeDataSchema.xsd">
   <TimeSlices>
-    <TimeSlice offset="300" startTime="120">
+    <TimeSlice offset="300" startTime="500">
+      <ProbabilitiesForStations>
+        <ProbabilitiesForStation departureProbability="0.32" stationID="Rathaus">
+          <DestinationProbability destination="Osterstrasse" probability="0.1"/>
+          <DestinationProbability destination="Hagenbecks" probability="0.05"/>
+          <DestinationProbability destination="Hbf" probability="0.21"/>
+        </ProbabilitiesForStation>
+      </ProbabilitiesForStations>
+    </TimeSlice>
+    <TimeSlice offset="500" startTime="800">
+      <ProbabilitiesForStations>
+        <ProbabilitiesForStation departureProbability="0.32" stationID="Rathaus">
+          <DestinationProbability destination="Osterstrasse" probability="0.1"/>
+          <DestinationProbability destination="Hagenbecks" probability="0.05"/>
+          <DestinationProbability destination="Hbf" probability="0.21"/>
+        </ProbabilitiesForStation>
+      </ProbabilitiesForStations>
+    </TimeSlice>
+    <TimeSlice offset="800" startTime="120">
       <ProbabilitiesForStations>
         <ProbabilitiesForStation departureProbability="0.32" stationID="Rathaus">
           <DestinationProbability destination="Osterstrasse" probability="0.1"/>

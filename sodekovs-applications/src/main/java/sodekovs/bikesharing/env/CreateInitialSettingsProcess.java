@@ -40,10 +40,10 @@ import sodekovs.util.misc.XMLHandler;
  * Process is responsible to create the init setting of pedestrians.
  */
 public class CreateInitialSettingsProcess extends SimplePropertyObject implements ISpaceProcess {
-	// -------- attributes --------			
-	public static String pedestriansdataOLD = "E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrgastDaten.xml";
-	public static String bikestationdataOLD = "E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrplanDaten.xml";
-	public static String simulationSetup = "E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml";
+	// -------- attributes --------
+	public static String pedestriansdataOLD = "E:/Workspaces/Jadex/Jadex mit altem Maven 2/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrgastDaten.xml";
+	public static String bikestationdataOLD = "E:/Workspaces/Jadex/Jadex mit altem Maven 2/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrplanDaten.xml";
+	public static String simulationSetup = "E:/Workspaces/Jadex/Jadex mit altem Maven 2/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml";
 
 	// -------- constructors --------
 
@@ -65,14 +65,12 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	 *            The space this process is running in.
 	 */
 	public void start(IClockService clock, final IEnvironmentSpace space) {
-		
-		
-		
+
 		try {
 			createPedestrians(pedestriansdataOLD, space);
-//			createBikeStationsOld(bikestationdataOLD, space);
+			// createBikeStationsOld(bikestationdataOLD, space);
 			createBikeStations(simulationSetup, space);
-			// System.out.println("Created bike stations accoring to xml file.");
+			// System.out.println("Created bike stations according to xml file.");
 			// macheVerkehrsteilnehmer(fahrgastdaten, grid);
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
@@ -111,12 +109,17 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	/**
 	 * // * Create and start a pedestrian component. //
 	 */
-	// private void createPedestrians(IComponentManagementService cms, final IEnvironmentSpace space) {
-	// cms.createComponent("Pedestrian-" + GetRandom.getRandom(100000), "sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml",
-	// new CreationInfo(null, new HashMap<String, Object>(), space.getExternalAccess().getComponentIdentifier(), false, false), null).addResultListener(new DefaultResultListener() {
+	// private void createPedestrians(IComponentManagementService cms, final
+	// IEnvironmentSpace space) {
+	// cms.createComponent("Pedestrian-" + GetRandom.getRandom(100000),
+	// "sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml",
+	// new CreationInfo(null, new HashMap<String, Object>(),
+	// space.getExternalAccess().getComponentIdentifier(), false, false),
+	// null).addResultListener(new DefaultResultListener() {
 	// public void resultAvailable(Object result) {
 	// System.out.println("Created Component Pedestrian");
-	// System.out.println("pedestrian in Space?: " + space.getSpaceObjectsByType("pedestrian").length);
+	// System.out.println("pedestrian in Space?: " +
+	// space.getSpaceObjectsByType("pedestrian").length);
 	// }
 	// });
 	// }
@@ -174,7 +177,8 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 			Vector2Double trinkort = zielorte.get(zufallEnde).gibAlsVektor();
 			Vector2Double essort = zielorte.get(zufallEnde).gibAlsVektor();
 
-			// System.out.println("Trinkort: " + trinkort + ZielWaehlPlan.TRINKORT);
+			// System.out.println("Trinkort: " + trinkort +
+			// ZielWaehlPlan.TRINKORT);
 
 			HashMap<String, Object> properties = new HashMap<String, Object>();
 			properties.put("type", "verkehrsteilnehmer");
@@ -198,25 +202,27 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 				// createPedestrians(cms, space);
 
 				for (HashMap<String, Object> pedestrian : pedestrians) {
-					
-					//TODO: Hack: Add more properties here
-					HashMap<String, Object> tmp= new HashMap<String, Object>();
+
+					// TODO: Hack: Add more properties here
+					HashMap<String, Object> tmp = new HashMap<String, Object>();
 					tmp.put(Space2D.PROPERTY_POSITION, pedestrian.get(Space2D.PROPERTY_POSITION));
-					
+
 					cms.createComponent("Pedestrian-" + GetRandom.getRandom(100000), "sodekovs/bikesharing/pedestrian/Pedestrian.agent.xml",
-							new CreationInfo(null, tmp, space.getExternalAccess().getComponentIdentifier(), false, false), null).addResultListener(
-							new DefaultResultListener() {
-								public void resultAvailable(Object result) {
-//									System.out.println("Created Component Pedestrian");
-//									System.out.println("pedestrian in Space?: " + space.getSpaceObjectsByType("pedestrian").length);
-								}
-							});
+							new CreationInfo(null, tmp, space.getExternalAccess().getComponentIdentifier(), false, false), null).addResultListener(new DefaultResultListener() {
+						public void resultAvailable(Object result) {
+							// System.out.println("Created Component Pedestrian");
+							// System.out.println("pedestrian in Space?: "
+							// +
+							// space.getSpaceObjectsByType("pedestrian").length);
+						}
+					});
 				}
 			}
 
 		});
-		
-//		System.out.println("#CreateInitialSettingsProcess# pedestrians in Space?: " + space.getSpaceObjectsByType("pedestrian").length);
+
+		// System.out.println("#CreateInitialSettingsProcess# pedestrians in Space?: "
+		// + space.getSpaceObjectsByType("pedestrian").length);
 	}
 
 	/**
@@ -276,7 +282,8 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 		Node fahrradVaterNode = nl.item(0);
 
 		// erstellFahrradVerleihStationen(fahrradVaterNode);
-		// List<FahrradVerleihStation> verleihStationen = new ArrayList<FahrradVerleihStation>();
+		// List<FahrradVerleihStation> verleihStationen = new
+		// ArrayList<FahrradVerleihStation>();
 		for (int fahrradstationNr = 0; fahrradstationNr < fahrradVaterNode.getChildNodes().getLength(); fahrradstationNr++) {
 			Node fahrradStation = fahrradVaterNode.getChildNodes().item(fahrradstationNr);
 			if (fahrradStation.hasAttributes()) {
@@ -288,7 +295,8 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 				props.put("name", attributes.getNamedItem("name").getNodeValue());
 				props.put("capacity", new Integer(attributes.getNamedItem("kapazitaet").getNodeValue()));
 				props.put("stock", new Integer(attributes.getNamedItem("initialeRaeder").getNodeValue()));
-				// FahrradVerleihStation f = new FahrradVerleihStation(position, capacity, stock, name);
+				// FahrradVerleihStation f = new FahrradVerleihStation(position,
+				// capacity, stock, name);
 
 				space.createSpaceObject("bikestation", props, null);
 				// verleihStationen.add(f);
@@ -299,7 +307,7 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 
 		// erstellVerleihObjekte(grid);
 	}
-	
+
 	/**
 	 * *****************NEWS VERSION FOR SODEKOVS Project******************
 	 * 
@@ -314,38 +322,22 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	 * @throws SAXException
 	 */
 	private void createBikeStations(String path, IEnvironmentSpace space) throws ParserConfigurationException, SAXException, IOException {
-//		File file = new File(path);
-//		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-//		DocumentBuilder db = dbf.newDocumentBuilder();
-//		Document doc = db.parse(file);
-//
-//		NodeList nl = doc.getElementsByTagName("stationen");
-//		nl = doc.getElementsByTagName("fahrradverleihstationen");
-//		Node fahrradVaterNode = nl.item(0);
 		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(simulationSetup, SimulationDescription.class);
-		
 
-		// erstellFahrradVerleihStationen(fahrradVaterNode);
-		// List<FahrradVerleihStation> verleihStationen = new ArrayList<FahrradVerleihStation>();
-//		for (int fahrradstationNr = 0; fahrradstationNr < fahrradVaterNode.getChildNodes().getLength(); fahrradstationNr++) {
-//			Node fahrradStation = fahrradVaterNode.getChildNodes().item(fahrradstationNr);
-//			if (fahrradStation.hasAttributes()) {
-		for(Station station : scenario.getStations().getStation()){
-			
-				HashMap<String, Object> props = new HashMap<String, Object>();
-//				NamedNodeMap attributes = fahrradStation.getAttributes();
-				double x = new Double(station.getLongitude());
-				double y = new Double(station.getLatitude());
-				props.put("position", new Vector2Double(x, y));
-				props.put("stationID", station.getStationID());
-				props.put("capacity", station.getNumberOfDocks());
-				props.put("stock", station.getNumberOfBikes());
+		for (Station station : scenario.getStations().getStation()) {
 
-				space.createSpaceObject("bikestation", props, null);
-				// verleihStationen.add(f);
-				// System.out.println("Erstelle Station: " + position);
-			}
-//		}
+			HashMap<String, Object> props = new HashMap<String, Object>();
+			double x = new Double(station.getLongitude());
+			double y = new Double(station.getLatitude());
+			props.put("position", new Vector2Double(x, y));
+			props.put("stationID", station.getStationID());
+			props.put("capacity", station.getNumberOfDocks());
+			props.put("stock", station.getNumberOfBikes());
+
+			space.createSpaceObject("bikestation", props, null);
+			// System.out.println("Erstelle Station: " + position);
+		}
+		// }
 		// FahrradVerleihStationen.erstellInstanz(verleihStationen);
 
 		// erstellVerleihObjekte(grid);
