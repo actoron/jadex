@@ -17,7 +17,7 @@ public interface IMessageQueueService
 	 *  @param topic The topic.
 	 *  @return The events.
 	 */
-	@Timeout(local=5000, remote=6000)
+	@Timeout(Timeout.NONE)
 	public ISubscriptionIntermediateFuture<Event> subscribe(String topic);
 	
 	/**

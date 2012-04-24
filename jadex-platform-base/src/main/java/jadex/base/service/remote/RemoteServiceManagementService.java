@@ -954,7 +954,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 //							final long timeout = to<=0? DEFAULT_TIMEOUT: to;
 							
 							final TimeoutTimerTask tt = to>=0? new TimeoutTimerTask(to, future, callid, receiver, RemoteServiceManagementService.this): null;
-//							System.out.println("remote timeout is: "+to);
+							System.out.println("remote timeout is: "+to);
 							putWaitingCall(callid, future, tt);
 							
 							// Remove waiting call when future is done
