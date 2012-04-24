@@ -3,9 +3,11 @@ package jadex.base.service.android;
 import jadex.android.JadexAndroidContext;
 import jadex.android.JadexAndroidContext.AndroidContextChangeListener;
 import jadex.android.JadexAndroidContextNotFoundError;
+import jadex.android.WrongEventClassException;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.android.IAndroidContextService;
+import jadex.bridge.service.types.android.IJadexAndroidEvent;
 import jadex.bridge.service.types.android.IPreferences;
 import jadex.commons.future.IFuture;
 
@@ -15,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 import android.content.Context;
+import android.util.Log;
 
 /**
  * Provides Access to the Android Application Context and 
@@ -24,6 +27,7 @@ import android.content.Context;
 public class AndroidContextService extends BasicService implements AndroidContextChangeListener, IAndroidContextService{
 
 	private Context context;
+	private JadexAndroidContext jadexAndroidContext;
 
 	/**
 	 * Constructor
@@ -31,7 +35,8 @@ public class AndroidContextService extends BasicService implements AndroidContex
 	 */
 	public AndroidContextService(IServiceProvider provider) {
 		super(provider.getId(), IAndroidContextService.class, null);
-		JadexAndroidContext.getInstance().addContextChangeListener(this);
+		jadexAndroidContext = JadexAndroidContext.getInstance();
+		jadexAndroidContext.addContextChangeListener(this);
 	}
 	
 	@Override
@@ -91,4 +96,15 @@ public class AndroidContextService extends BasicService implements AndroidContex
 			throw new JadexAndroidContextNotFoundError();
 		}
 	}
+
+	@Override
+	public boolean dispatchUiEvent(IJadexAndroidEvent event) {
+		try {
+			return jadexAndroidContext.dispatchEvent(event);
+		} catch (WrongEventClassException e) {
+			Log.e("AndroidContextService", e.getMessage());
+			return false;
+		}
+	}
+	
 }

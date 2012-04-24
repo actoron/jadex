@@ -1,26 +1,30 @@
 package jadex.android.application.demo;
 
-import jadex.android.JadexAndroidContext;
-import jadex.android.JadexAndroidEvent;
-import jadex.base.service.android.AndroidContextService;
 import jadex.bridge.fipa.SFipa;
-import jadex.bridge.modelinfo.Startable;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.types.android.IAndroidContextService;
 import jadex.bridge.service.types.message.MessageType;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
+import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.Description;
+import jadex.micro.annotation.RequiredService;
+import jadex.micro.annotation.RequiredServices;
 
 import java.util.Map;
 
-import android.os.Bundle;
-import android.os.Message;
+import android.util.Log;
 
 /**
  *  Simple example agent that shows messages
  *  when it is started, stopped and when it receives a message. 
  */
+@Description("Sample Android Agent.")
+@RequiredServices({
+		@RequiredService(name="androidcontext", type=IAndroidContextService.class, binding=@Binding(scope=RequiredServiceInfo.SCOPE_PLATFORM)),
+})
 public class AndroidAgent extends MicroAgent
 {
 	//-------- methods --------
@@ -59,13 +63,21 @@ public class AndroidAgent extends MicroAgent
 	 */
 	protected void showAndroidMessage(String msg)
 	{
-//		Message message = new Message();
-//		Bundle bundle = new Bundle();
-//		bundle.putString("text", msg);
-//		message.setData(bundle);
-//		JadexAndroidHelloWorldActivity.getHandler().sendMessage(message);
-		JadexAndroidEvent event = new JadexAndroidEvent();
-		event.message = msg;
-		JadexAndroidContext.getInstance().dispatchEvent("showToast", event);
+		final ShowToastEvent event = new ShowToastEvent();
+		event.setMessage(msg);
+		getRequiredService("androidcontext").addResultListener(new DefaultResultListener<Object>() {
+
+			@Override
+			public void resultAvailable(Object result) {
+				IAndroidContextService contextService = (IAndroidContextService) result;
+				boolean dispatchUiEvent = contextService.dispatchUiEvent(event);
+				Log.d("Agent", "dispatched: " + dispatchUiEvent);
+			}
+			
+			@Override
+			public void exceptionOccurred(Exception exception) {
+				exception.printStackTrace();
+			}
+		});
 	}
 }

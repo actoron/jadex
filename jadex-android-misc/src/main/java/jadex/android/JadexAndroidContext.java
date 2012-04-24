@@ -1,7 +1,9 @@
 package jadex.android;
 
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.service.types.android.IJadexAndroidEvent;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +19,7 @@ public class JadexAndroidContext {
 	private Context lastContext;
 
 	private List<AndroidContextChangeListener> contextListeners;
-	private Map<String, List<EventReceiver<?>>> eventReceivers;
+	private Map<String, List<IEventReceiver<?>>> eventReceivers;
 
 	/**
 	 * Listener Interface
@@ -43,7 +45,7 @@ public class JadexAndroidContext {
 	 */
 	private JadexAndroidContext() {
 		contextListeners = new ArrayList<AndroidContextChangeListener>();
-		eventReceivers = new HashMap<String, List<EventReceiver<?>>>();
+		eventReceivers = new HashMap<String, List<IEventReceiver<?>>>();
 	}
 
 	/**
@@ -152,28 +154,42 @@ public class JadexAndroidContext {
 		}
 	}
 
-	public void registerEventListener(String eventName, EventReceiver<?> rec) {
-		List<EventReceiver<?>> receivers = this.eventReceivers.get(eventName);
+	public void registerEventListener(String eventName, IEventReceiver<?> rec) {
+		List<IEventReceiver<?>> receivers = this.eventReceivers.get(eventName);
 		if (receivers == null) {
-			receivers = new ArrayList<EventReceiver<?>>();
+			receivers = new ArrayList<IEventReceiver<?>>();
 			eventReceivers.put(eventName, receivers);
 		}
 		receivers.add(rec);
 	}
 
-	public boolean dispatchEvent(String eventName, Object event) {
+	public boolean dispatchEvent(IJadexAndroidEvent event)
+			throws WrongEventClassException {
 		boolean result = false;
-		List<EventReceiver<?>> list = eventReceivers.get(eventName);
+		List<IEventReceiver<?>> list = eventReceivers.get(event.getType());
 		if (list != null) {
-			for (EventReceiver<?> eventReceiver : list) {
-				Class eventClass = eventReceiver.getEventClass();
-				try {
-					Method method = eventReceiver.getClass().getMethod(
-							"receiveEvent", eventClass);
-					Object cast = eventClass.cast(event);
-					method.invoke(eventReceiver, cast);
+			for (IEventReceiver<?> eventReceiver : list) {
+				Class<?> eventClass = eventReceiver.getEventClass();
+				if (eventClass.equals(event.getClass())) {
+					try {
+						Method method = eventReceiver.getClass().getMethod(
+								"receiveEvent", eventClass);
+						method.invoke(eventReceiver, eventClass.cast(event));
+					} catch (SecurityException e) {
+						e.printStackTrace();
+					} catch (NoSuchMethodException e) {
+						e.printStackTrace();
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						e.printStackTrace();
+					}
 					result = true;
-				} catch (Exception e) {
+				} else {
+					throw new WrongEventClassException(
+							eventReceiver.getEventClass(), event.getClass(), "");
 				}
 			}
 		}
@@ -181,9 +197,9 @@ public class JadexAndroidContext {
 	}
 
 	public boolean unregisterEventListener(String eventName,
-			EventReceiver<?> rec) {
+			IEventReceiver<?> rec) {
 		boolean removed = false;
-		List<EventReceiver<?>> list = eventReceivers.get(eventName);
+		List<IEventReceiver<?>> list = eventReceivers.get(eventName);
 		if (list != null) {
 			removed = list.remove(rec);
 		}

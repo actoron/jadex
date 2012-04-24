@@ -19,6 +19,7 @@ import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.types.android.IAndroidContextService;
+import jadex.bridge.service.types.android.IJadexAndroidEvent;
 import jadex.bridge.service.types.android.IPreferences;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Properties;
@@ -263,6 +264,11 @@ public class AndroidSettingsServiceTest extends TestCase {
 					e.printStackTrace();
 					return null;
 				}
+			}
+
+			@Override
+			public boolean dispatchUiEvent(IJadexAndroidEvent event) {
+				return false;
 			}
 		};
 

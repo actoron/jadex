@@ -1,8 +1,7 @@
 package jadex.android.application.demo;
 
-import jadex.android.EventReceiver;
+import jadex.android.IEventReceiver;
 import jadex.android.JadexAndroidActivity;
-import jadex.android.JadexAndroidEvent;
 import jadex.android.controlcenter.JadexAndroidControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -11,12 +10,9 @@ import jadex.commons.future.IResultListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
@@ -72,24 +68,25 @@ public class JadexAndroidHelloWorldActivity extends JadexAndroidActivity {
 //			}
 //		};
 		
-		registerEventReceiver("showToast", new EventReceiver<JadexAndroidEvent>() {
+		registerEventReceiver(ShowToastEvent.TYPE, new IEventReceiver<ShowToastEvent>() {
 
 			@Override
-			public void receiveEvent(final JadexAndroidEvent event) {
+			public void receiveEvent(final ShowToastEvent event) {
 				runOnUiThread(new Runnable() {
 
 					public void run() {
 						Toast makeText = Toast.makeText(JadexAndroidHelloWorldActivity.this,
-								event.message, Toast.LENGTH_SHORT);
+								event.getMessage(), Toast.LENGTH_SHORT);
 						makeText.show();
 					}
 				});
 			}
 
 			@Override
-			public Class getEventClass() {
-				return JadexAndroidEvent.class;
+			public Class<ShowToastEvent> getEventClass() {
+				return ShowToastEvent.class;
 			}
+
 		});
 	}
 	

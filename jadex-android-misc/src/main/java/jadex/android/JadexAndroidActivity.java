@@ -203,11 +203,11 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 		});
 	}
 	
-	protected void registerEventReceiver(String eventName, EventReceiver<?> rec) {
+	protected void registerEventReceiver(String eventName, IEventReceiver<?> rec) {
 		jadexAndroidContext.registerEventListener(eventName, rec);
 	}
 	
-	protected void unregisterEventReceiver(String eventName, EventReceiver<?> rec) {
+	protected void unregisterEventReceiver(String eventName, IEventReceiver<?> rec) {
 		jadexAndroidContext.unregisterEventListener(eventName, rec);
 	}
 	
