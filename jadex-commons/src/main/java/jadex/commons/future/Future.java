@@ -42,7 +42,7 @@ public class Future<E> implements IFuture<E>
 	public static final boolean DEBUG = true;
 	
 	/** Disable Stack unfolding for easier debugging. */
-	public static final boolean NO_STACK_COMPACTION = true;
+	public static final boolean NO_STACK_COMPACTION = false;
 	
 	/** The empty future. */
 	public static final IFuture<?>	EMPTY	= new Future<Object>(null);
@@ -93,7 +93,7 @@ public class Future<E> implements IFuture<E>
 	{
     	if(DEBUG)
     	{
-    		creation	= new DebugException("future creation");
+    		creation	= new DebugException("future creation: "+this);
     	}
 	}
 	
@@ -473,7 +473,9 @@ public class Future<E> implements IFuture<E>
 					}
 					else
 					{
-						((IResultListener)tup.getSecondEntity()).resultAvailable(fut.result); 
+//						int	len	= list.size();
+						((IResultListener)tup.getSecondEntity()).resultAvailable(fut.result);
+//						System.out.println(this+": "+tup+ (list.size()>=len ? " -> "+list.subList(len, list.size()) : ""));
 					}
 				}
     		}

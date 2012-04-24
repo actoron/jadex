@@ -178,7 +178,7 @@ public class ServiceInvocationContext
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-//		if(method.getName().equals("getInputStream"))
+//		if(method.getName().equals("testResultReferences"))
 //			System.out.println("invoke: "+caller);
 		
 		push(object, method, args, null);
@@ -211,6 +211,12 @@ public class ServiceInvocationContext
 					pop();
 					ret.setException(exception);
 				}
+				
+				public String toString()
+				{
+					return "ServiceInvocationContext$1(method="+method.getName()+", result="+result+")";
+				}
+
 			});
 		}
 		else
