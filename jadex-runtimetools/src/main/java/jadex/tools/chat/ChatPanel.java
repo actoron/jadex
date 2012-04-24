@@ -34,6 +34,8 @@ import java.awt.Insets;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -53,7 +55,6 @@ import java.util.Set;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -147,6 +148,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	
 	/** The upload table. */
 	protected JTable utable;
+	
+	/** The tabbed pane. */
+	protected JTabbedPane	tpane;
 	
 	/** Registration at the service. */
 	ISubscriptionIntermediateFuture<ChatEvent>	subscription;
@@ -473,7 +477,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				utable.addMouseListener(ulis);
 				utable.getTableHeader().addMouseListener(ulis);
 				
-				JTabbedPane tpane = new JTabbedPane();
+				tpane = new JTabbedPane();
 				tpane.add("Messaging", msgpane);
 				tpane.add("Downloads", dtpan);
 				tpane.add("Uploads", utpan);
@@ -883,7 +887,6 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							{
 								star	= !star;
 								but.setIcon(ChatPlugin.getStatusIcon(star));
-								but.repaint();
 							}
 						});
 						timer.setRepeats(true);
@@ -910,6 +913,28 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				}
 				
 				getJCC().setStatusText(text);
+			}
+
+			// Add icon to tab, if changed but not currently shown 
+			final int	tab	= value instanceof TransferInfo ? ((TransferInfo) value).isDownload() ? 1 : 2
+				: NOTIFICATION_NEW_MSG.equals(type) ? 0 : -1;	// ignore new users.
+			if(tab!=-1 && !tpane.getComponentAt(tab).isShowing())
+			{
+				tpane.setIconAt(tab, ChatPlugin.getTabIcon());
+				tpane.getComponentAt(tab).addComponentListener(new ComponentListener()
+				{
+					public void componentShown(ComponentEvent e)
+					{
+						tpane.setIconAt(tab, null);
+						tpane.getComponentAt(tab).removeComponentListener(this);
+					}
+					
+					public void componentResized(ComponentEvent e) {}
+					
+					public void componentMoved(ComponentEvent e) {}
+					
+					public void componentHidden(ComponentEvent e) {}
+				});
 			}
 			
 			if(!quiet)

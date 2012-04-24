@@ -27,6 +27,7 @@ public class ChatPlugin extends AbstractServicePlugin
 		icons.put("chat_sel", SGUI.makeIcon(ChatPlugin.class, "images/chat.png"));
 		icons.put("chat_small", SGUI.makeIcon(ChatPlugin.class, "images/chat_small.png"));
 		icons.put("chat_small_star", SGUI.makeIcon(ChatPlugin.class, "images/chat_small_star.png"));
+		icons.put("star", SGUI.makeIcon(ChatPlugin.class, "images/star.png"));
 	}
 	
 	/**
@@ -35,6 +36,14 @@ public class ChatPlugin extends AbstractServicePlugin
 	public static Icon	getStatusIcon(boolean star)
 	{
 		return star ? icons.getIcon("chat_small_star") : icons.getIcon("chat_small");
+	}
+
+	/**
+	 *  Get the icon for a changed tab.
+	 */
+	public static Icon	getTabIcon()
+	{
+		return icons.getIcon("star");
 	}
 
 	//-------- methods --------
