@@ -22,9 +22,9 @@ public class TimeoutException	extends RuntimeException
 		super(message);
 	}
 	
-	public void printStackTrace()
-	{
-		Thread.dumpStack();
-		super.printStackTrace();
-	}
+//	public void printStackTrace()
+//	{
+//		Thread.dumpStack();
+//		super.printStackTrace();
+//	}
 }

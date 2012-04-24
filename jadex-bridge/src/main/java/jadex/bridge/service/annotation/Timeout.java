@@ -23,12 +23,12 @@ public @interface Timeout
 	/** Constant for unset. */
 	public static final long UNSET = -2;
 
-	/** Constant for local default timeout. */
-	public static final long DEFAULT_LOCAL = 10000;
-
 	/** Constant for remote default timeout. */
 	public static final long DEFAULT_REMOTE = 30000;
-	
+
+	/** Constant for local default timeout. */
+	public static final long DEFAULT_LOCAL = DEFAULT_REMOTE;
+
 	/**
 	 *  The timeout period after which the remote invocation
 	 *  is aborted when no result is received.
