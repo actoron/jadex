@@ -9,11 +9,13 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.types.chat.ChatEvent;
+import jadex.bridge.service.types.chat.IChatGuiService;
+import jadex.bridge.service.types.chat.IChatService;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.ChangeEvent;
 import jadex.commons.IChangeListener;
-import jadex.commons.ICommand;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DefaultResultListener;
@@ -21,23 +23,26 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Binding;
 import jadex.micro.benchmarks.MessagePerformanceAgent;
 import jadex.micro.benchmarks.PojoAgentCreationAgent;
-import jadex.micro.examples.chat.IChatService;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
@@ -53,7 +58,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  *  Activity (screen) for the jadex android benchmark app.
@@ -66,12 +70,14 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 	/** The jadex platform access. */
 	private IExternalAccess platform;
 	
+	/** The chat gui service. */
+	private IChatGuiService	chatgui;
+	
+	/** The chat subscription. */
+	private ISubscriptionIntermediateFuture<ChatEvent>	subscription;
+	
 	/** The text view for showing results. */
 	private TextView textView;
-	
-	/** The chat agent (if any). */
-	private IComponentIdentifier	chatcid;
-
 	
 	//-------- methods --------
 
@@ -143,174 +149,48 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.agntmain);
 
-		final Button	chat	= (Button)findViewById(R.id.chat);
 		final Button	send	= (Button)findViewById(R.id.send);
-		final EditText	name	= (EditText)findViewById(R.id.chatname);
 		final EditText	msg	= (EditText)findViewById(R.id.chatmsg);
-		chat.setEnabled(false);
-		send.setEnabled(false);
-		name.setEnabled(false);
 		msg.setEnabled(false);
+		send.setEnabled(false);
 		
-		chat.setOnClickListener(new OnClickListener()
-		{
-			public void onClick(View v)
-			{
-				chat.setEnabled(false);
-				name.setEnabled(false);
-				send.setEnabled(false);
-				msg.setEnabled(false);
-				platform.scheduleStep(new IComponentStep<IComponentIdentifier>()
-				{
-					public IFuture<IComponentIdentifier> execute(IInternalAccess ia)
-					{
-						final Future<IComponentIdentifier>	fut	= new Future<IComponentIdentifier>();
-						ia.getServiceContainer().searchService(IComponentManagementService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-							.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(fut)
-						{
-							public void customResultAvailable(IComponentManagementService cms)
-							{
-								if(chatcid==null)
-								{
-									ICommand	toastcmd	= new ICommand()
-									{
-										public void execute(final Object args)
-										{
-											runOnUiThread(new Runnable()
-											{
-												public void run()
-												{
-													Toast.makeText(getApplicationContext(), ""+args, Toast.LENGTH_SHORT).show();
-												}
-											});
-										}
-									};
-									Map<String, Object>	args	= new HashMap<String, Object>();
-									args.put("toastcmd", toastcmd);
-									cms.createComponent(name.getText().toString(), "jadex.android.benchmarks.ChatAgent.class", new CreationInfo(args), null)
-										.addResultListener(new DelegationResultListener<IComponentIdentifier>(fut));
-								}
-								else
-								{
-									cms.destroyComponent(chatcid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, IComponentIdentifier>(fut)
-									{
-										public void customResultAvailable(Map<String, Object> result)
-										{
-											fut.setResult(null);
-										}
-									});
-								}
-							}
-						});
-						
-						return fut;
-					}
-				}).addResultListener(new IResultListener<IComponentIdentifier>()
-				{
-					public void resultAvailable(final IComponentIdentifier result)
-					{
-						runOnUiThread(new Runnable()
-						{
-							public void run()
-							{
-								chatcid	= result;
-								chat.setEnabled(true);
-								if(result!=null)
-								{
-									chat.setText("Exit Chat");
-									send.setEnabled(true);
-									msg.setEnabled(true);
-									System.out.println("Connected to chat.");
-								}
-								else
-								{
-									chat.setText("Enter Chat");
-									name.setEnabled(true);
-									System.out.println("Disconnected from chat.");									
-								}
-							}
-						});
-					}
-					
-					public void exceptionOccurred(Exception exception)
-					{
-						System.out.println("Chat connection problem: "+exception);
-						exception.printStackTrace();
-						runOnUiThread(new Runnable()
-						{
-							public void run()
-							{
-								chat.setEnabled(true);
-							}
-						});
-					}
-				});
-			}
-		});
-
 		send.setOnClickListener(new OnClickListener()
 		{
 			public void onClick(View v)
 			{
-				if(chatcid==null)
-					return;
-				
 				send.setEnabled(false);
 				msg.setEnabled(false);
 				
-				SServiceProvider.getService(platform.getServiceProvider(), IComponentManagementService.class, Binding.SCOPE_PLATFORM)
-					.addResultListener(new DefaultResultListener<IComponentManagementService>()
+				SServiceProvider.getService(platform.getServiceProvider(), IChatGuiService.class, Binding.SCOPE_PLATFORM)
+					.addResultListener(new DefaultResultListener<IChatGuiService>()
 				{
-					public void resultAvailable(IComponentManagementService cms)
+					public void resultAvailable(IChatGuiService chat)
 					{
-						cms.getExternalAccess(chatcid).addResultListener(new DefaultResultListener<IExternalAccess>()
+						chat.message(msg.getText().toString()).addResultListener(new IResultListener<Collection<IChatService>>()
 						{
-							public void resultAvailable(IExternalAccess exta)
+							public void resultAvailable(Collection<IChatService> result)
 							{
-								exta.scheduleStep(new IComponentStep<Void>()
+								runOnUiThread(new Runnable()
 								{
-									public IFuture<Void> execute(IInternalAccess ia)
+									public void run()
 									{
-										IIntermediateFuture<IChatService>	chats	= ia.getServiceContainer().getRequiredServices("chats");
-										chats.addResultListener(new IIntermediateResultListener<IChatService>()
-										{
-											public void intermediateResultAvailable(IChatService result)
-											{
-												result.message(msg.getText().toString());
-											}
-											
-											public void finished()
-											{
-												runOnUiThread(new Runnable()
-												{
-													public void run()
-													{
-														msg.setText("");
-														send.setEnabled(true);
-														msg.setEnabled(true);								
-													}
-												});
-											}
-											
-											public void exceptionOccurred(Exception exception)
-											{
-												System.out.println("Chat message problem: "+exception);
-												exception.printStackTrace();
-												runOnUiThread(new Runnable()
-												{
-													public void run()
-													{
-														send.setEnabled(true);
-														msg.setEnabled(true);								
-													}
-												});
-											}
-											
-											public void resultAvailable(Collection<IChatService> result)
-											{
-											}
-										});
-										return IFuture.DONE;
+										msg.setText("");
+										send.setEnabled(true);
+										msg.setEnabled(true);								
+									}
+								});
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								System.out.println("Chat message problem: "+exception);
+								exception.printStackTrace();
+								runOnUiThread(new Runnable()
+								{
+									public void run()
+									{
+										send.setEnabled(true);
+										msg.setEnabled(true);								
 									}
 								});
 							}
@@ -335,33 +215,6 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 			}
 		});
 		
-		Intent	intent	= getIntent();
-		if(intent!=null && Intent.ACTION_SEND.equals(intent.getAction()))
-		{
-			System.out.println("Intent: "+intent);
-			System.out.println("Type: "+intent.getType());
-			Bundle	extras	= intent.getExtras();
-			if(extras!=null)
-			{
-				String	text	= (String) extras.get(Intent.EXTRA_TEXT);
-				Uri	uri	= (Uri)extras.get(Intent.EXTRA_STREAM);
-				System.out.println("Text: "+text);	
-				System.out.println("Uri: "+uri);
-						 
-				// Convert the image URI to the direct file system path of the image file
-				String[]	proj	= new String[]{MediaStore.Images.Media.DATA};
-				Cursor cursor = managedQuery(uri,
-					proj,	// Which columns to return
-					null,	// WHERE clause; which rows to return (all rows)
-					null,	// WHERE clause selection arguments (none)
-					null);	// Order-by clause (ascending by name)
-				int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-				cursor.moveToFirst();
-				String	path	= cursor.getString(column_index);
-				System.out.println("Path: "+path);
-			}
-		}
-		
 		// Start the platform
 		bindService(new Intent(this, JadexPlatformService.class), new ServiceConnection()
 		{
@@ -377,32 +230,108 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 						{
 							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								ia.getServiceContainer().searchService(IChatService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(new IResultListener<IChatService>()
+								ia.getServiceContainer().searchService(IChatGuiService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+									.addResultListener(new IResultListener<IChatGuiService>()
 								{
-									public void resultAvailable(final IChatService result)
+									public void resultAvailable(IChatGuiService res)
 									{
+										chatgui	= res;
+										subscription	= chatgui.subscribeToEvents();
+										subscription.addResultListener(new IntermediateDefaultResultListener<ChatEvent>()
+										{
+											public void intermediateResultAvailable(ChatEvent ce)
+											{
+												if(ChatEvent.TYPE_MESSAGE.equals(ce.getType()))
+												{
+													StringBuffer buf = new StringBuffer();
+													buf.append("[").append(ce.getComponentIdentifier().getName()).append("]: ").append(ce.getValue());
+													System.out.println(buf);
+												}
+											}
+										});
+										
 										runOnUiThread(new Runnable()
 										{
 											public void run()
 											{
-												chatcid	= ((IService)result).getServiceIdentifier().getProviderId();
+												System.out.println("Connected to chat.");
 												msg.setEnabled(true);
 												send.setEnabled(true);
-												chat.setText("Exit Chat");
 											}
 										});
+										
+										Intent	intent	= getIntent();
+										if(intent!=null && Intent.ACTION_SEND.equals(intent.getAction()))
+										{
+											System.out.println("Intent: "+intent);
+											System.out.println("Type: "+intent.getType());
+											Bundle	extras	= intent.getExtras();
+											if(extras!=null)
+											{
+												String	text	= (String) extras.get(Intent.EXTRA_TEXT);
+												Uri	uri	= (Uri)extras.get(Intent.EXTRA_STREAM);
+												System.out.println("Text: "+text);	
+												System.out.println("Uri: "+uri);
+														 
+												// Convert the image URI to the direct file system path of the image file
+												String[]	proj	= new String[]{MediaStore.Images.Media.DATA};
+												Cursor cursor = managedQuery(uri,
+													proj,	// Which columns to return
+													null,	// WHERE clause; which rows to return (all rows)
+													null,	// WHERE clause selection arguments (none)
+													null);	// Order-by clause (ascending by name)
+												int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+												cursor.moveToFirst();
+												final String	path	= cursor.getString(column_index);
+												System.out.println("Path: "+path);
+												
+												chatgui.findUsers().addResultListener(new IResultListener<Collection<IChatService>>()
+												{
+													public void exceptionOccurred(Exception exception) {}
+													
+													public void resultAvailable(final Collection<IChatService> results)
+													{
+														AlertDialog.Builder	builder	= new AlertDialog.Builder(JadexAndroidBenchmarkAgentActivity.this);
+														builder.setTitle("Choose send target");
+														List<CharSequence>	items	= new ArrayList<CharSequence>();
+														for(IChatService chat: results)
+														{
+															items.add(((IService)chat).getServiceIdentifier().getProviderId().getName());
+														}
+														builder.setSingleChoiceItems(items.toArray(new CharSequence[items.size()]), -1, new DialogInterface.OnClickListener()
+														{
+															public void onClick(DialogInterface dialog, int which)
+															{
+																if(which!=-1)
+																{
+																	IChatService	chat	= new ArrayList<IChatService>(results).get(which);
+																	System.out.println("Sending to: "+chat);
+																	chatgui.sendFile(path, ((IService)chat).getServiceIdentifier().getProviderId())
+																		.addResultListener(new IResultListener<Void>()
+																	{
+																		public void resultAvailable(Void result)
+																		{
+																			System.out.println("Transfer started.");
+																		}
+																		public void exceptionOccurred(Exception exception)
+																		{
+																			System.out.println("Transfer failed to initialize: "+exception);
+																		}
+																	});
+																}
+															}
+														});
+														AlertDialog alert = builder.create();
+														alert.show();
+													}
+												});
+											}
+										}
 									}
 									public void exceptionOccurred(Exception exception)
 									{
-										runOnUiThread(new Runnable()
-										{
-											public void run()
-											{
-												chat.setEnabled(true);
-												name.setEnabled(true);
-											}
-										});
+										// No chat service.
+										System.out.println("Not connected to chat: "+exception);
 									}
 								});
 								
@@ -423,6 +352,14 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 			{
 			}
 		}, Context.BIND_AUTO_CREATE);
+	}
+	
+	/**
+	 *  Cleanup on exit.
+	 */
+	protected void onDestroy()
+	{
+		subscription.terminate();
 	}
 		
 	//-------- helper methods --------
