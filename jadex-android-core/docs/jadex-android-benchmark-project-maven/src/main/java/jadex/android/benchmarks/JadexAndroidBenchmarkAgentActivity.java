@@ -306,6 +306,7 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 																{
 																	public void onClick(DialogInterface dialog, int which)
 																	{
+																		dialog.dismiss();
 																		if(which!=-1)
 																		{
 																			IChatService	chat	= new ArrayList<IChatService>(results).get(which);
