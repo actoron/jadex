@@ -8,15 +8,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
 import android.preference.Preference;
-import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceGroup;
+import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.PreferenceScreen;
 import android.view.View;
-import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -24,126 +25,79 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class JadexAndroidControlCenter extends Activity implements AndroidContextChangeListener {
+public class JadexAndroidControlCenter extends Activity {
+	
+	private SharedPreferences sharedPreferences;
+	
 	public JadexAndroidControlCenter() {
 	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		JadexAndroidContext.getInstance().addContextChangeListener(this);
-		SharedPreferences sharedPreferences = JadexAndroidContext.getInstance().getAndroidContext().getSharedPreferences(AndroidSettingsService.DEFAULT_PREFS_NAME, Context.MODE_PRIVATE);
+		sharedPreferences = JadexAndroidContext
+				.getInstance()
+				.getAndroidContext()
+				.getSharedPreferences(
+						AndroidSettingsService.DEFAULT_PREFS_NAME,
+						Context.MODE_PRIVATE);
 		
 		LinearLayout main = new LinearLayout(this);
 		main.setOrientation(LinearLayout.VERTICAL);
 		
-		CheckBox box;
-		EditText text;
-		TextView label;
-		LinearLayout subLayout;
-		
+		JadexStringPreference editTextPreference;
+		JadexBooleanPreference booleanPreference;
+
 		Map<String, ?> prefs = sharedPreferences.getAll();
-		
+
 		for (Entry<String, ?> entry : prefs.entrySet()) {
 			Object value = entry.getValue();
 			if (value instanceof String) {
 				if (value.equals("false") || value.equals("true")) {
-					box = new CheckBox(this);
-					box.setText(entry.getKey());
-					box.setChecked(value.equals("true"));
-					//box.setOnCheckedChangeListener(occl);
-					main.addView(box);
+					booleanPreference = new JadexBooleanPreference(this);
+					booleanPreference.setKey(entry.getKey());
+					booleanPreference.setTitle(entry.getKey());
+					booleanPreference.setChecked(value.equals("true"));
+					booleanPreference.setOnPreferenceChangeListener(opcl);
+					main.addView(booleanPreference.getView(null, main));
 				} else {
-//					subLayout = new LinearLayout(this);
-//					subLayout.setOrientation(LinearLayout.VERTICAL);
-//					
-//					label = new TextView(this);
-//					label.setText(entry.getKey());
-//					text = new EditText(this);
-//					text.setText(entry.getValue().toString());
-//					
-//					subLayout.addView(label);
-//					subLayout.addView(text);
-//					main.addView(subLayout);
-					
-					final JadexStringPreference editTextPreference = new JadexStringPreference(this);
-					editTextPreference.setDefaultValue(entry.getValue().toString());
-					editTextPreference.setText(entry.getValue().toString());
-					
-					
-					editTextPreference.setSummary(entry.getKey());
+					editTextPreference = new JadexStringPreference(
+							this);
+
 					editTextPreference.setKey(entry.getKey());
 					editTextPreference.setTitle(entry.getKey());
+					editTextPreference.setValue((String) entry.getValue());
+					editTextPreference.setSummary("Aktueller Wert: "
+							+ (String) entry.getValue());
+					editTextPreference.setOnPreferenceChangeListener(opcl);
 
-					editTextPreference.setEnabled(true);
-					editTextPreference.setSelectable(true);
-					editTextPreference.setPersistent(false);
-//					editTextPreference.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-//						
-//						@Override
-//						public boolean onPreferenceClick(Preference preference) {
-//							editTextPreference.getDialog().show();
-//							return true;
-//						}
-//					});
-					
-					//editTextPreference.setDialogLayoutResource(5);
-					//editTextPreference.setDialogTitle("test");
-					//editTextPreference.setDialogMessage("bla");
-					
 					View view = editTextPreference.getView(null, main);
-					view.setEnabled(true);
-					view.setClickable(true);
-					view.setOnClickListener(new OnClickListener() {
-						
-						@Override
-						public void onClick(View v) {
-							editTextPreference.showDialog();
-						}
-					});
 					main.addView(view);
 				}
 			}
 		}
-		
+
 		setContentView(main);
 	}
-	
-//	@Override
-//	public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen,
-//			Preference preference) {
-//		System.out.println("preference clicked: " + preference.getKey());
-//		return super.onPreferenceTreeClick(preferenceScreen, preference);
-//	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		JadexAndroidContext.getInstance().removeContextChangeListener(this);
 	}
 
-	@Override
-	public void onContextDestroy(Context ctx) {
-	}
 
-	@Override
-	public void onContextCreate(Context ctx) {
-	}
-	
-	
-//	private PreferenceScreen createJadexCorePrefScreen() {
-//		PreferenceScreen screen = PreferenceScreen.
-//		
-//		return screen;
-//	}
-	
-	private OnCheckedChangeListener occl = new OnCheckedChangeListener() {
+	private OnPreferenceChangeListener opcl = new OnPreferenceChangeListener() {
 
 		@Override
-		public void onCheckedChanged(CompoundButton buttonView,
-				boolean isChecked) {
-			System.out.println("checked: " + isChecked);
+		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			System.out.println("changed: " + newValue);
+			//((JadexBooleanPreference)preference).setChecked((Boolean) newValue);
+			String key = preference.getKey();
+			Editor edit = sharedPreferences.edit();
+			edit.putString(key, newValue.toString());
+			edit.commit();
+			return true;
 		}
-		
 	};
+	
 }
