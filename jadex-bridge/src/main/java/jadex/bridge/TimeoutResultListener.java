@@ -197,7 +197,8 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("Could not get clock service.");
+//				exception.printStackTrace();
+//				System.out.println("Could not get clock service.");
 			}
 		});
 	}

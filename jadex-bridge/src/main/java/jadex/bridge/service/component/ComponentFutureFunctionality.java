@@ -8,7 +8,6 @@ import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 
 public class ComponentFutureFunctionality extends FutureFunctionality
@@ -68,10 +67,46 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 		return ret;
 	};
 	
+//	/**
+//	 *  Schedule listener notification on component thread. 
+//	 */
+//	public IFuture<Void> notifyIntermediateResult(IIntermediateResultListener<Object> listener, Object result)
+//	{
+//		final Future<Void> ret = new Future<Void>();
+//		// Hack!!! Notify multiple results at once?
+//		if(adapter.isExternalThread())
+//		{
+//			try
+//			{
+//				ea.scheduleStep(new IComponentStep<Void>()
+//				{
+//					public IFuture<Void> execute(IInternalAccess ia)
+//					{
+//						ret.setResult(null);
+////						ComponentIntermediateFuture.super.notifyIntermediateResult(listener, result);
+//						return IFuture.DONE;
+//					}
+//				});
+//			}
+//			catch(ComponentTerminatedException e)
+//			{
+//				ret.setException(e);
+////				ComponentIntermediateFuture.super.notifyListener(listener);
+//			}				
+//		}
+//		else
+//		{
+//			ret.setResult(null);
+////			super.notifyIntermediateResult(listener, result);
+//		}
+//		
+//		return ret;
+//	}
+	
 	/**
-	 *  Schedule listener notification on component thread. 
+	 * 
 	 */
-	public IFuture<Void> notifyIntermediateResult(IIntermediateResultListener<Object> listener, Object result)
+	public IFuture<Void> startScheduledNotifications()
 	{
 		final Future<Void> ret = new Future<Void>();
 		// Hack!!! Notify multiple results at once?

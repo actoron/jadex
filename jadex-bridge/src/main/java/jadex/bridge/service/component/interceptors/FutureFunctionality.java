@@ -129,10 +129,18 @@ public class FutureFunctionality
 		return IFuture.DONE;
 	}
 	
+//	/**
+//	 *  Schedule listener notification on component thread. 
+//	 */
+//	public IFuture<Void> notifyIntermediateResult(final IIntermediateResultListener<Object> listener, final Object result)
+//	{
+//		return IFuture.DONE;
+//	}
+	
 	/**
-	 *  Schedule listener notification on component thread. 
+	 * 
 	 */
-	public IFuture<Void> notifyIntermediateResult(final IIntermediateResultListener<Object> listener, final Object result)
+	public IFuture<Void> startScheduledNotifications()
 	{
 		return IFuture.DONE;
 	}
@@ -421,41 +429,60 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		return ret;
 	}
 	
-	/**
-	 *  Notify the listener.
-	 */
-	protected void notifyListener(final IResultListener<Collection<Object>> listener)
-	{
-		func.notifyListener(listener).addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.notifyListener(listener);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
-			}
-		});
-	}
+//	/**
+//	 *  Notify the listener.
+//	 */
+//	protected void notifyListener(final IResultListener<Collection<Object>> listener)
+//	{
+//		func.notifyListener(listener).addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				DelegatingSubscriptionIntermediateDelegationFuture.super.notifyListener(listener);
+//			}	
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+//			}
+//		});
+//	}
+//	
+//	/**
+//	 *  Schedule listener notification on component thread. 
+//	 */
+//	protected void notifyIntermediateResult(final IIntermediateResultListener<Object> listener, final Object result)
+//	{
+//		func.notifyIntermediateResult(listener, result).addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void v)
+//			{
+//				DelegatingSubscriptionIntermediateDelegationFuture.super.notifyIntermediateResult(listener, result);
+//			}	
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+//			}
+//		});
+//	}
 	
 	/**
-	 *  Schedule listener notification on component thread. 
-	 */
-	protected void notifyIntermediateResult(final IIntermediateResultListener<Object> listener, final Object result)
-	{
-		func.notifyIntermediateResult(listener, result).addResultListener(new IResultListener<Void>()
+     *  Start scheduled listener notifications if not already running.
+     *  Must not be called from synchronized block.
+     */
+    protected void	startScheduledNotifications()
+    {
+    	func.startScheduledNotifications().addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void v)
 			{
-				DelegatingSubscriptionIntermediateDelegationFuture.super.notifyIntermediateResult(listener, result);
+				DelegatingSubscriptionIntermediateDelegationFuture.super.startScheduledNotifications();
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
 				DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
 			}
 		});
-	}
+    }
 	
 	/**
 	 *  Terminate the future.
@@ -645,41 +672,60 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		return ret;
 	}
 	
-	/**
-	 *  Notify the listener.
-	 */
-	protected void notifyListener(final IResultListener<Collection<Object>> listener)
-	{
-		func.notifyListener(listener).addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.notifyListener(listener);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
-			}
-		});
-	}
+//	/**
+//	 *  Notify the listener.
+//	 */
+//	protected void notifyListener(final IResultListener<Collection<Object>> listener)
+//	{
+//		func.notifyListener(listener).addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				DelegatingTerminableIntermediateDelegationFuture.super.notifyListener(listener);
+//			}	
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+//			}
+//		});
+//	}
+//	
+//	/**
+//	 *  Schedule listener notification on component thread. 
+//	 */
+//	protected void notifyIntermediateResult(final IIntermediateResultListener<Object> listener, final Object result)
+//	{
+//		func.notifyIntermediateResult(listener, result).addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void v)
+//			{
+//				DelegatingTerminableIntermediateDelegationFuture.super.notifyIntermediateResult(listener, result);
+//			}	
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+//			}
+//		});
+//	}
 	
 	/**
-	 *  Schedule listener notification on component thread. 
-	 */
-	protected void notifyIntermediateResult(final IIntermediateResultListener<Object> listener, final Object result)
-	{
-		func.notifyIntermediateResult(listener, result).addResultListener(new IResultListener<Void>()
+     *  Start scheduled listener notifications if not already running.
+     *  Must not be called from synchronized block.
+     */
+    protected void	startScheduledNotifications()
+    {
+    	func.startScheduledNotifications().addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void v)
 			{
-				DelegatingTerminableIntermediateDelegationFuture.super.notifyIntermediateResult(listener, result);
+				DelegatingTerminableIntermediateDelegationFuture.super.startScheduledNotifications();
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
 				DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
 			}
 		});
-	}
+    }
 	
 	/**
 	 *  Terminate the future.
@@ -993,41 +1039,60 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 		return ret;
 	}
 	
-	/**
-	 *  Notify the listener.
-	 */
-	protected void notifyListener(final IResultListener<Collection<Object>> listener)
-	{
-		func.notifyListener(listener).addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-				DelegatingIntermediateFuture.super.notifyListener(listener);
-			}	
-			public void exceptionOccurred(Exception exception)
-			{
-				DelegatingIntermediateFuture.super.setExceptionIfUndone(exception);
-			}
-		});
-	}
+//	/**
+//	 *  Notify the listener.
+//	 */
+//	protected void notifyListener(final IResultListener<Collection<Object>> listener)
+//	{
+//		func.notifyListener(listener).addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void result)
+//			{
+//				DelegatingIntermediateFuture.super.notifyListener(listener);
+//			}	
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				DelegatingIntermediateFuture.super.setExceptionIfUndone(exception);
+//			}
+//		});
+//	}
+//	
+//	/**
+//	 *  Schedule listener notification on component thread. 
+//	 */
+//	protected void notifyIntermediateResult(final IIntermediateResultListener<Object> listener, final Object result)
+//	{
+//		func.notifyIntermediateResult(listener, result).addResultListener(new IResultListener<Void>()
+//		{
+//			public void resultAvailable(Void v)
+//			{
+//				DelegatingIntermediateFuture.super.notifyIntermediateResult(listener, result);
+//			}	
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				DelegatingIntermediateFuture.super.setExceptionIfUndone(exception);
+//			}
+//		});
+//	}
 	
 	/**
-	 *  Schedule listener notification on component thread. 
-	 */
-	protected void notifyIntermediateResult(final IIntermediateResultListener<Object> listener, final Object result)
-	{
-		func.notifyIntermediateResult(listener, result).addResultListener(new IResultListener<Void>()
+     *  Start scheduled listener notifications if not already running.
+     *  Must not be called from synchronized block.
+     */
+    protected void	startScheduledNotifications()
+    {
+    	func.startScheduledNotifications().addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void v)
 			{
-				DelegatingIntermediateFuture.super.notifyIntermediateResult(listener, result);
+				DelegatingIntermediateFuture.super.startScheduledNotifications();
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
 				DelegatingIntermediateFuture.super.setExceptionIfUndone(exception);
 			}
 		});
-	}
+    }
 };
 
 /**
