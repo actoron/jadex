@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,19 +27,23 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import sodekovs.bikesharing.model.SimulationDescription;
+import sodekovs.bikesharing.model.Station;
 import sodekovs.bikesharing.simulation.Bereich;
 import sodekovs.bikesharing.simulation.Ort;
 import sodekovs.bikesharing.verkehrsteilnehmer.SucheNeuenWegPlan;
 import sodekovs.bikesharing.verkehrsteilnehmer.ZielWaehlPlan;
 import sodekovs.util.math.GetRandom;
+import sodekovs.util.misc.XMLHandler;
 
 /**
  * Process is responsible to create the init setting of pedestrians.
  */
 public class CreateInitialSettingsProcess extends SimplePropertyObject implements ISpaceProcess {
 	// -------- attributes --------			
-	public static String pedestriansdata = "E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrgastDaten.xml";
-	public static String bikestationdata = "E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrplanDaten.xml";
+	public static String pedestriansdataOLD = "E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrgastDaten.xml";
+	public static String bikestationdataOLD = "E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrplanDaten.xml";
+	public static String simulationSetup = "E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml";
 
 	// -------- constructors --------
 
@@ -66,8 +69,9 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 		
 		
 		try {
-			createPedestrians(pedestriansdata, space);
-			createBikeStations(bikestationdata, space);
+			createPedestrians(pedestriansdataOLD, space);
+//			createBikeStationsOld(bikestationdataOLD, space);
+			createBikeStations(simulationSetup, space);
 			// System.out.println("Created bike stations accoring to xml file.");
 			// macheVerkehrsteilnehmer(fahrgastdaten, grid);
 		} catch (ParserConfigurationException e) {
@@ -249,6 +253,8 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	}
 
 	/**
+	 * *****************DAVIDS VERSION******************
+	 * 
 	 * Create bikestations according to the xml setup file.
 	 * 
 	 * @param path
@@ -259,7 +265,7 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	private void createBikeStations(String path, IEnvironmentSpace space) throws ParserConfigurationException, SAXException, IOException {
+	private void createBikeStationsOld(String path, IEnvironmentSpace space) throws ParserConfigurationException, SAXException, IOException {
 		File file = new File(path);
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder();
@@ -289,6 +295,57 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 				// System.out.println("Erstelle Station: " + position);
 			}
 		}
+		// FahrradVerleihStationen.erstellInstanz(verleihStationen);
+
+		// erstellVerleihObjekte(grid);
+	}
+	
+	/**
+	 * *****************NEWS VERSION FOR SODEKOVS Project******************
+	 * 
+	 * Create bikestations according to the xml setup file.
+	 * 
+	 * @param path
+	 *            path of the xml file
+	 * @param grid
+	 *            the used space
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 * @throws SAXException
+	 */
+	private void createBikeStations(String path, IEnvironmentSpace space) throws ParserConfigurationException, SAXException, IOException {
+//		File file = new File(path);
+//		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//		DocumentBuilder db = dbf.newDocumentBuilder();
+//		Document doc = db.parse(file);
+//
+//		NodeList nl = doc.getElementsByTagName("stationen");
+//		nl = doc.getElementsByTagName("fahrradverleihstationen");
+//		Node fahrradVaterNode = nl.item(0);
+		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(simulationSetup, SimulationDescription.class);
+		
+
+		// erstellFahrradVerleihStationen(fahrradVaterNode);
+		// List<FahrradVerleihStation> verleihStationen = new ArrayList<FahrradVerleihStation>();
+//		for (int fahrradstationNr = 0; fahrradstationNr < fahrradVaterNode.getChildNodes().getLength(); fahrradstationNr++) {
+//			Node fahrradStation = fahrradVaterNode.getChildNodes().item(fahrradstationNr);
+//			if (fahrradStation.hasAttributes()) {
+		for(Station station : scenario.getStations().getStation()){
+			
+				HashMap<String, Object> props = new HashMap<String, Object>();
+//				NamedNodeMap attributes = fahrradStation.getAttributes();
+				double x = new Double(station.getLongitude());
+				double y = new Double(station.getLatitude());
+				props.put("position", new Vector2Double(x, y));
+				props.put("stationID", station.getStationID());
+				props.put("capacity", station.getNumberOfDocks());
+				props.put("stock", station.getNumberOfBikes());
+
+				space.createSpaceObject("bikestation", props, null);
+				// verleihStationen.add(f);
+				// System.out.println("Erstelle Station: " + position);
+			}
+//		}
 		// FahrradVerleihStationen.erstellInstanz(verleihStationen);
 
 		// erstellVerleihObjekte(grid);
