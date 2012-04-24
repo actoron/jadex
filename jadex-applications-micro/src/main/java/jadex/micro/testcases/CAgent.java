@@ -201,8 +201,6 @@ public class CAgent extends MicroAgent implements ICService
 										}
 										testcases.add(tr);
 										
-										System.out.println("nowxxxxxxxxxxxxxx");
-										
 										final Object[]	args	= new Object[]{arg, new Object()};
 										cservice.testResultReferences(args)
 											.addResultListener(new ExceptionDelegationResultListener<Collection<Object>, Void>(ret)

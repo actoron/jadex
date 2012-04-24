@@ -512,52 +512,52 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 //					System.out.println("local timeout is: "+to+" "+method.getName());
 					if(to>=0)
 					{
-						if(fut instanceof IIntermediateFuture)
-						{
-							fut.addResultListener(new TimeoutIntermediateResultListener(to, ea, new IIntermediateResultListener()
-							{
-								public void resultAvailable(Object result)
-								{
-									// Ignore if result is normally set.
-								}
-								public void resultAvailable(Collection result)
-								{
-									// Ignore if result is normally set.
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									// Forward timeout exception to future.
-									if(exception instanceof TimeoutException)
-									{
-										fut.setExceptionIfUndone(exception);
-									}
-								}
-								public void intermediateResultAvailable(Object result)
-								{
-								}
-								public void finished()
-								{
-								}
-							}));
-						}
-						else
-						{
-							fut.addResultListener(new TimeoutResultListener(to, ea, new IResultListener()
-							{
-								public void resultAvailable(Object result)
-								{
-									// Ignore if result is normally set.
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									// Forward timeout exception to future.
-									if(exception instanceof TimeoutException)
-									{
-										fut.setExceptionIfUndone(exception);
-									}
-								}
-							}));
-						}
+//						if(fut instanceof IIntermediateFuture)
+//						{
+//							fut.addResultListener(new TimeoutIntermediateResultListener(to, ea, new IIntermediateResultListener()
+//							{
+//								public void resultAvailable(Object result)
+//								{
+//									// Ignore if result is normally set.
+//								}
+//								public void resultAvailable(Collection result)
+//								{
+//									// Ignore if result is normally set.
+//								}
+//								public void exceptionOccurred(Exception exception)
+//								{
+//									// Forward timeout exception to future.
+//									if(exception instanceof TimeoutException)
+//									{
+//										fut.setExceptionIfUndone(exception);
+//									}
+//								}
+//								public void intermediateResultAvailable(Object result)
+//								{
+//								}
+//								public void finished()
+//								{
+//								}
+//							}));
+//						}
+//						else
+//						{
+//							fut.addResultListener(new TimeoutResultListener(to, ea, new IResultListener()
+//							{
+//								public void resultAvailable(Object result)
+//								{
+//									// Ignore if result is normally set.
+//								}
+//								public void exceptionOccurred(Exception exception)
+//								{
+//									// Forward timeout exception to future.
+//									if(exception instanceof TimeoutException)
+//									{
+//										fut.setExceptionIfUndone(exception);
+//									}
+//								}
+//							}));
+//						}
 					}
 				}
 				

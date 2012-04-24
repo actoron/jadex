@@ -134,11 +134,13 @@ public class InvokerAgent
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
+				System.out.println("vvvvvvvvvvvvvvvvvvv");
 				performTest(platform.getServiceProvider(), platform.getComponentIdentifier(), testno, delay, max)
 					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
 				{
 					public void customResultAvailable(final TestReport result)
 					{
+						System.out.println("wwwwwwwwwwwwwwwwwwww");
 						platform.killComponent();
 //							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
 //						{
