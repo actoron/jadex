@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimulationDescription xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BikeDataSchema.xsd">
+  <TimeSlices>
+    <TimeSlice offset="300" startTime="120">
+      <ProbabilitiesForStations>
+        <ProbabilitiesForStation departureProbability="0.32" stationID="Rathaus">
+          <DestinationProbability destination="Osterstrasse" probability="0.1"/>
+          <DestinationProbability destination="Hagenbecks" probability="0.05"/>
+          <DestinationProbability destination="Hbf" probability="0.21"/>
+        </ProbabilitiesForStation>
+      </ProbabilitiesForStations>
+    </TimeSlice>
+  </TimeSlices>
+  <Stations>
+    <Station latitude="54.07" longitude="10.07" numberOfBikes="10" numberOfDocks="30" stationID="Osterstrasse"/>
+    <Station latitude="4.17" longitude="12.47" numberOfBikes="17" numberOfDocks="32" stationID="Rathaus"/>
+    <Station latitude="7.15" longitude="21.37" numberOfBikes="7" numberOfDocks="38" stationID="Hagenbecks"/>
+    <Station latitude="31.49" longitude="34.27" numberOfBikes="27" numberOfDocks="20" stationID="Hbf"/>
+  </Stations>
+</SimulationDescription>
