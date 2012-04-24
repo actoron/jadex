@@ -1,16 +1,22 @@
 package jadex.android;
 
 import jadex.base.Starter;
+import jadex.base.service.message.MessageService;
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
+import jadex.bridge.service.types.message.IMessageService;
+import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
@@ -18,6 +24,7 @@ import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import android.util.Log;
@@ -203,12 +210,69 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 		});
 	}
 	
+	private IFuture<IMessageService> getMS() {
+		return jadexAndroidContext.getExternalPlattformAccess().scheduleStep(new IComponentStep<IMessageService>() {
+			@Classname("create-component")
+			public IFuture<IMessageService> execute(
+					IInternalAccess ia) {
+				Future<IMessageService> ret = new Future<IMessageService>();
+				SServiceProvider
+						.getService(ia.getServiceContainer(),
+								IMessageService.class,
+								RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(
+								ia.createResultListener(new DelegationResultListener<IMessageService>(
+										ret)));
+
+				return ret;
+			}
+		});
+	}
+	
 	protected void registerEventReceiver(String eventName, IEventReceiver<?> rec) {
 		jadexAndroidContext.registerEventListener(eventName, rec);
 	}
 	
 	protected void unregisterEventReceiver(String eventName, IEventReceiver<?> rec) {
 		jadexAndroidContext.unregisterEventListener(eventName, rec);
+	}
+
+	/**
+	 * Sends a FIPA Message to the specified receiver.
+	 * The Sender is automatically set to the Platform.
+	 * 
+	 * @param message
+	 * @param receiver
+	 * @return Future<Void>
+	 */
+	protected Future<Void> sendMessage(final Map<String,Object> message, IComponentIdentifier receiver) {
+		message.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(), receiver);
+		IComponentIdentifier cid = getExternalPlatformAccess().getComponentIdentifier();
+		message.put(SFipa.FIPA_MESSAGE_TYPE.getSenderIdentifier(), cid);
+		return sendMessage(message, SFipa.FIPA_MESSAGE_TYPE);
+	}
+	
+	/**
+	 * Sends a Message to a Component on the Jadex Platform.
+	 * @param message
+	 * @param type
+	 * @return Future<Void>
+	 */
+	protected Future<Void> sendMessage(final Map<String,Object> message, final MessageType type) {
+		checkIfJadexIsRunning("sendMessage");
+		
+		final Future<Void> ret = new Future<Void>();
+		
+		getMS().addResultListener(new DefaultResultListener<IMessageService>() {
+
+			@Override
+			public void resultAvailable(IMessageService ms) {
+				ms.sendMessage(message, type, getExternalPlatformAccess().getComponentIdentifier(), null, null)
+						.addResultListener(new DelegationResultListener<Void>(ret));
+			}
+		});
+		
+		return ret;
 	}
 	
 	protected String createRandomPlatformID() {

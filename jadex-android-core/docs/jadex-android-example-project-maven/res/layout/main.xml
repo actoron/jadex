@@ -14,12 +14,27 @@
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:text="Start Jadex Platform"
-	android:id="@+id/startPlatformButton"/>	
-<Button 
-	android:layout_width="fill_parent"
-	android:layout_height="wrap_content"
-	android:text="Start Jadex Agent"
-	android:id="@+id/startAgentButton"/>
+	android:id="@+id/startPlatformButton"/>
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <Button
+        android:id="@+id/startAgentButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.86"
+        android:text="Start Jadex Agent" />
+
+    <Button
+        android:id="@+id/pingButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ping Agent" />
+
+</LinearLayout>
+
 <Button 
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"

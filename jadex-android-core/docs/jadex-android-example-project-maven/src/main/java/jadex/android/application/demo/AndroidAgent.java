@@ -37,6 +37,8 @@ public class AndroidAgent extends MicroAgent
 		showAndroidMessage("This is Agent <<" + this.getAgentName() + ">> saying hello!");
 		return new Future<Void>();
 	}
+	
+	
 
 	/**
 	 *  Called when the agent is killed.
@@ -52,7 +54,9 @@ public class AndroidAgent extends MicroAgent
 	 */
 	public void messageArrived(Map<String, Object> msg, MessageType mt)
 	{
-		showAndroidMessage(msg.get(SFipa.PERFORMATIVE)+"("+msg.get(SFipa.CONTENT)+")");
+		if (msg.get(SFipa.CONTENT).equals("ping")) {
+			showAndroidMessage(getAgentName() + ": pong");
+		}
 	}
 	
 	//-------- helper methods --------
