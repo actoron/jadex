@@ -134,7 +134,7 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	 *  @param is The input stream.
 	 *  @param component The component.
 	 */
-	public ITerminableIntermediateFuture<Long> readFromOutputStream(final OutputStream os, final IExternalAccess component)
+	public ITerminableIntermediateFuture<Long> writeToOutputStream(final OutputStream os, final IExternalAccess component)
 	{
 		throw new UnsupportedOperationException();
 	}

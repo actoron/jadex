@@ -385,7 +385,7 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 	 *  @param is The input stream.
 	 *  @param component The component.
 	 */
-	public ITerminableIntermediateFuture<Long> readFromOutputStream(final OutputStream os, final IExternalAccess component)
+	public ITerminableIntermediateFuture<Long> writeToOutputStream(final OutputStream os, final IExternalAccess component)
 	{
 		final TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
 		

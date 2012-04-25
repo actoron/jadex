@@ -203,17 +203,17 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 										FileContent frag = FileContent.createFragment(fis, source.getName(), getCnt()==fragments-1? last: fragmentsize, len);
 										
 										// Note: uses a swing listener to avoid stack overflow when running on one thread
-										ds.putFile(frag, sel_2, (String)result).addResultListener(new SwingDefaultResultListener()
-										{
-											public void customResultAvailable(Object result)
-											{
-												clis.resultAvailable(result);
-											}
-											public void customExceptionOccurred(Exception exception)
-											{
-												clis.exceptionOccurred(exception);
-											}
-										});
+//										ds.putFile(frag, sel_2, (String)result).addResultListener(new SwingDefaultResultListener()
+//										{
+//											public void customResultAvailable(Object result)
+//											{
+//												clis.resultAvailable(result);
+//											}
+//											public void customExceptionOccurred(Exception exception)
+//											{
+//												clis.exceptionOccurred(exception);
+//											}
+//										});
 									}
 								}
 							};
@@ -221,7 +221,7 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 					
 							
 							FileContent frag = FileContent.createFragment(fis, source.getName(), 0==fragments-1? last: fragmentsize, len);
-							ds.putFile(frag, sel_2, null).addResultListener(lis);
+//							ds.putFile(frag, sel_2, null).addResultListener(lis);
 						}
 						catch(Exception ex)
 						{

@@ -216,7 +216,7 @@ public class ServiceInputConnection implements IInputConnection
 	 *  @param is The input stream.
 	 *  @param component The component.
 	 */
-	public ITerminableIntermediateFuture<Long> readFromOutputStream(final OutputStream os, final IExternalAccess component)
+	public ITerminableIntermediateFuture<Long> writeToOutputStream(final OutputStream os, final IExternalAccess component)
 	{
 		final TerminableIntermediateDelegationFuture<Long> ret = new TerminableIntermediateDelegationFuture<Long>();
 		
@@ -228,7 +228,7 @@ public class ServiceInputConnection implements IInputConnection
 				{
 					public void execute(Object args)
 					{
-						ITerminableIntermediateFuture<Long> src = con.readFromOutputStream(os, component);
+						ITerminableIntermediateFuture<Long> src = con.writeToOutputStream(os, component);
 						TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, src);
 						src.addResultListener(lis);
 					}
@@ -241,7 +241,7 @@ public class ServiceInputConnection implements IInputConnection
 		}
 		else
 		{
-			ITerminableIntermediateFuture<Long> src = con.readFromOutputStream(os, component);
+			ITerminableIntermediateFuture<Long> src = con.writeToOutputStream(os, component);
 			TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, src);
 			src.addResultListener(lis);
 		}

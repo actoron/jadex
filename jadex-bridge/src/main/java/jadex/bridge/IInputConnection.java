@@ -57,11 +57,11 @@ public interface IInputConnection extends IConnection
 	public void close();
 	
 	/**
-	 *  Read all data from output stream to the connection.
+	 *  Write all data from the connection to the output stream.
 	 *  The result is an intermediate future that reports back the size that was read.
 	 *  It can also be used to terminate reading.
 	 *  @param is The input stream.
 	 *  @param component The component.
 	 */
-	public ITerminableIntermediateFuture<Long> readFromOutputStream(final OutputStream os, final IExternalAccess component);
+	public ITerminableIntermediateFuture<Long> writeToOutputStream(final OutputStream os, final IExternalAccess component);
 }

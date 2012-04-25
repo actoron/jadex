@@ -602,7 +602,7 @@ public class ChatService implements IChatService, IChatGuiService
 			ret.addIntermediateResult(new Long(0));
 			
 			final FileOutputStream fos = new FileOutputStream(ti.getFile());
-			final ITerminableIntermediateFuture<Long> fut = con.readFromOutputStream(fos, agent.getExternalAccess());
+			final ITerminableIntermediateFuture<Long> fut = con.writeToOutputStream(fos, agent.getExternalAccess());
 			
 			fut.addResultListener(new IIntermediateResultListener<Long>()
 			{
