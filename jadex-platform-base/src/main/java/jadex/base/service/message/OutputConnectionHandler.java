@@ -105,7 +105,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		this.seqnumber = 0;
 		
 		this.maxsend = 20;
-		this.maxqueued = 1;
+		this.maxqueued = 2;
 		this.ackcnt = 10;
 		
 		this.multipackets = true;
