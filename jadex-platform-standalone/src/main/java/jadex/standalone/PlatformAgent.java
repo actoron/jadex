@@ -136,7 +136,7 @@ import java.util.logging.Level;
 	@ProvidedService(type=IComponentManagementService.class, implementation=@Implementation(expression="new DecoupledComponentManagementService($component.getComponentAdapter(), $args.componentfactory, $args.parametercopy)")),
 	@ProvidedService(type=IDF.class, implementation=@Implementation(expression="new DirectoryFacilitatorService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(expression="new SimulationService($component)")),
-	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService($component.getServiceProvider())")),
+	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService()")),
 	@ProvidedService(type=IPublishService.class, name="wspub", implementation=@Implementation(expression="new DefaultWebServicePublishService()")),
 	@ProvidedService(type=IPublishService.class, name="rspub", implementation=@Implementation(expression="new DefaultRestServicePublishService()")),
 	@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new SecurityService($args.usepass, $args.printpass)"))

@@ -299,7 +299,7 @@
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.deployment.IDeploymentService">
 			<implementation>
-				new jadex.base.service.deployment.DeploymentService($component.getServiceProvider())
+				new jadex.base.service.deployment.DeploymentService()
 			</implementation>		
 		</providedservice>
 		<providedservice name="publish_ws" class="jadex.bridge.service.types.publish.IPublishService">
