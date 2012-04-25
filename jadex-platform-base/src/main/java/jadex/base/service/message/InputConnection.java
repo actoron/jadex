@@ -1,13 +1,22 @@
 package jadex.base.service.message;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
+import jadex.bridge.IInternalAccess;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminableIntermediateFuture;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -366,6 +375,93 @@ public class InputConnection extends AbstractConnection implements IInputConnect
 			}
 		}
 //		System.out.println("vvvvv stored: "+ret+" "+data.size());
+		return ret;
+	}
+	
+	/**
+	 *  Read all data from output stream to the connection.
+	 *  The result is an intermediate future that reports back the size that was read.
+	 *  It can also be used to terminate reading.
+	 *  @param is The input stream.
+	 *  @param component The component.
+	 */
+	public ITerminableIntermediateFuture<Long> readFromOutputStream(final OutputStream os, final IExternalAccess component)
+	{
+		final TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
+		
+		try
+		{
+			final long[] filesize = new long[1];
+			
+			component.scheduleStep(new IComponentStep<Void>()
+			{
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					final ISubscriptionIntermediateFuture<byte[]> fut = aread();
+
+					fut.addResultListener(ia.createResultListener(new IIntermediateResultListener<byte[]>()
+					{
+						public void resultAvailable(Collection<byte[]> result)
+						{
+							for(Iterator<byte[]> it=result.iterator(); it.hasNext(); )
+							{
+								intermediateResultAvailable(it.next());
+							}
+							finished();
+						}
+						
+						public void intermediateResultAvailable(byte[] result)
+						{
+//							System.out.println("got: "+result.length);
+							
+							// Check if was aborted on receiver side
+							if(ret.isDone())
+							{
+								fut.terminate();
+								return;
+							}
+							
+							try
+							{
+								os.write(result);
+								filesize[0] += result.length;
+								ret.addIntermediateResultIfUndone(new Long(filesize[0]));
+								// todo: close con?
+							}
+							catch(Exception e)
+							{
+								ret.setExceptionIfUndone(e);
+							}
+						}
+						
+						public void finished()
+						{
+							try
+							{
+								os.close();
+								ret.setFinishedIfUndone();
+								// todo: close con?
+							}
+							catch(Exception e)
+							{
+								ret.setExceptionIfUndone(e);
+							}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							ret.setExceptionIfUndone(exception);
+						}
+					}));
+					
+					return IFuture.DONE;
+				}
+			});
+		}
+		catch(Exception e)
+		{
+			ret.setExceptionIfUndone(e);
+		}
 		return ret;
 	}
 }

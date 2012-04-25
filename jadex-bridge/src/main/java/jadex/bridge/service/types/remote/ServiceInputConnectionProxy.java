@@ -1,11 +1,15 @@
 package jadex.bridge.service.types.remote;
 
+import java.io.OutputStream;
+
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
  * 
@@ -122,4 +126,16 @@ public class ServiceInputConnectionProxy implements IInputConnection
 //	{
 //		throw new UnsupportedOperationException();
 //	}
+	
+	/**
+	 *  Read all data from output stream to the connection.
+	 *  The result is an intermediate future that reports back the size that was read.
+	 *  It can also be used to terminate reading.
+	 *  @param is The input stream.
+	 *  @param component The component.
+	 */
+	public ITerminableIntermediateFuture<Long> readFromOutputStream(final OutputStream os, final IExternalAccess component)
+	{
+		throw new UnsupportedOperationException();
+	}
 }

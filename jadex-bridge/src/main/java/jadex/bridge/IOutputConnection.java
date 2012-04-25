@@ -1,6 +1,9 @@
 package jadex.bridge;
 
+import java.io.InputStream;
+
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
  *  Interface for output connection.
@@ -29,4 +32,14 @@ public interface IOutputConnection extends IConnection
 	 */
 	// todo: make IFuture<Void> ?
 	public void close();
+	
+	/**
+	 *  Write all data from input stream to the connection.
+	 *  The result is an intermediate future that reports back the size that was written.
+	 *  It can also be used to terminate sending.
+	 *  @param is The input stream.
+	 *  @param agen
+	 */
+	public ITerminableIntermediateFuture<Long> writeFromInputStream(final InputStream is, final IExternalAccess component);
+	
 }

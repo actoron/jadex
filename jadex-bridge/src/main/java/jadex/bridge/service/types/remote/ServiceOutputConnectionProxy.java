@@ -1,10 +1,14 @@
 package jadex.bridge.service.types.remote;
 
+import java.io.InputStream;
+
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 
 /**
  * 
@@ -108,6 +112,14 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 	 * 
 	 */
 	public IComponentIdentifier getParticipant()
+	{
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 *  Do write all data from the input stream.  
+	 */
+	public ITerminableIntermediateFuture<Long> writeFromInputStream(final InputStream is, final IExternalAccess component)
 	{
 		throw new UnsupportedOperationException();
 	}

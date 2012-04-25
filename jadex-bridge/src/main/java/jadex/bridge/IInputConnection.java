@@ -1,6 +1,9 @@
 package jadex.bridge;
 
+import java.io.OutputStream;
+
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 
 
 /**
@@ -52,4 +55,13 @@ public interface IInputConnection extends IConnection
 	 *  Close the stream.
 	 */
 	public void close();
+	
+	/**
+	 *  Read all data from output stream to the connection.
+	 *  The result is an intermediate future that reports back the size that was read.
+	 *  It can also be used to terminate reading.
+	 *  @param is The input stream.
+	 *  @param component The component.
+	 */
+	public ITerminableIntermediateFuture<Long> readFromOutputStream(final OutputStream os, final IExternalAccess component);
 }

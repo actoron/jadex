@@ -1,18 +1,14 @@
 package jadex.base.service.chat;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.awareness.DiscoveryInfo;
-import jadex.bridge.service.types.awareness.IAwarenessManagementService;
 import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
@@ -593,7 +589,7 @@ public class ChatService implements IChatService, IChatGuiService
 	/**
 	 *  Perform a download.
 	 */
-	protected void	doDownload(final TransferInfo ti, final TerminableIntermediateFuture<Long> ret, IInputConnection con)
+	protected void	doDownload(final TransferInfo ti, final TerminableIntermediateFuture<Long> ret, final IInputConnection con)
 	{
 		assert TransferInfo.STATE_WAITING.equals(ti.getState());
 		ti.setState(TransferInfo.STATE_TRANSFERRING);
@@ -601,86 +597,56 @@ public class ChatService implements IChatService, IChatGuiService
 		
 		try
 		{
-			final FileOutputStream fos = new FileOutputStream(ti.getFile());
-	
 			// Enable sending
 			ret.addIntermediateResult(new Long(0));
 			
-			final ISubscriptionIntermediateFuture<byte[]> fut = con.aread();
-			fut.addResultListener(agent.createResultListener(new IIntermediateResultListener<byte[]>()
+			final FileOutputStream fos = new FileOutputStream(ti.getFile());
+			final ITerminableIntermediateFuture<Long> fut = con.readFromOutputStream(fos, agent.getExternalAccess());
+			
+			fut.addResultListener(new IIntermediateResultListener<Long>()
 			{
-				public void resultAvailable(Collection<byte[]> result)
+				public void resultAvailable(Collection<Long> result)
 				{
-					for(Iterator<byte[]> it=result.iterator(); it.hasNext(); )
-					{
-						intermediateResultAvailable(it.next());
-					}
 					finished();
 				}
-				
-				public void intermediateResultAvailable(byte[] result)
+				public void intermediateResultAvailable(Long filesize)
 				{
-					// Check if was aborted on receiver side
-					if(ti.isFinished())
+					if(TransferInfo.STATE_ABORTED.equals(ti.getState()))
 					{
-						ret.setFinishedIfUndone();
 						fut.terminate();
-						return;
 					}
-					
-					try
+					if(ti.update(filesize))
 					{
-						fos.write(result);
-						if(ti.update(ti.getDone()+result.length))
-						{
-							publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
-						}
-						ret.addIntermediateResultIfUndone(new Long(ti.getDone()));
-						// todo: close con?
-					}
-					catch(Exception e)
-					{
-						ti.setState(TransferInfo.STATE_ERROR);
 						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
-						ret.setExceptionIfUndone(new RuntimeException(TransferInfo.STATE_ERROR, e));
 					}
 				}
-				
 				public void finished()
 				{
 					try
 					{
 						fos.close();
-						if(ti.getDone()==ti.getSize())
-						{
-	//						System.out.println("Received file: "+f.getAbsolutePath()+", size: "+cnt[0]);
-							ti.setState(TransferInfo.STATE_COMPLETED);
-							ret.setFinishedIfUndone();
-						}
-						else
-						{
-							ti.setState(TransferInfo.STATE_ABORTED);
-							ret.setExceptionIfUndone(new RuntimeException(TransferInfo.STATE_ABORTED));
-						}
-						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
-						
-						// todo: close con?
 					}
 					catch(Exception e)
 					{
-						ti.setState(TransferInfo.STATE_ERROR);
-						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
-						ret.setExceptionIfUndone(new RuntimeException(TransferInfo.STATE_ERROR, e));
 					}
+					con.close();
+					ti.setState(TransferInfo.STATE_COMPLETED);
+					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);			
 				}
-				
 				public void exceptionOccurred(Exception exception)
 				{
+					try
+					{
+						fos.close();
+					}
+					catch(Exception e)
+					{
+					}
+					con.close();
 					ti.setState(TransferInfo.STATE_ERROR);
 					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
-					ret.setExceptionIfUndone(new RuntimeException(TransferInfo.STATE_ERROR, exception));
 				}
-			}));
+			});
 		}
 		catch(Exception e)
 		{
@@ -689,13 +655,113 @@ public class ChatService implements IChatService, IChatGuiService
 			ret.setExceptionIfUndone(new RuntimeException(TransferInfo.STATE_ERROR, e));
 		}
 	}
+	
+//	/**
+//	 *  Perform a download.
+//	 */
+//	protected void	doDownload(final TransferInfo ti, final TerminableIntermediateFuture<Long> ret, IInputConnection con)
+//	{
+//		assert TransferInfo.STATE_WAITING.equals(ti.getState());
+//		ti.setState(TransferInfo.STATE_TRANSFERRING);
+//		publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//		
+//		try
+//		{
+//			final FileOutputStream fos = new FileOutputStream(ti.getFile());
+//	
+//			// Enable sending
+//			ret.addIntermediateResult(new Long(0));
+//			
+//			final ISubscriptionIntermediateFuture<byte[]> fut = con.aread();
+//			fut.addResultListener(agent.createResultListener(new IIntermediateResultListener<byte[]>()
+//			{
+//				public void resultAvailable(Collection<byte[]> result)
+//				{
+//					for(Iterator<byte[]> it=result.iterator(); it.hasNext(); )
+//					{
+//						intermediateResultAvailable(it.next());
+//					}
+//					finished();
+//				}
+//				
+//				public void intermediateResultAvailable(byte[] result)
+//				{
+//					// Check if was aborted on receiver side
+//					if(ti.isFinished())
+//					{
+//						ret.setFinishedIfUndone();
+//						fut.terminate();
+//						return;
+//					}
+//					
+//					try
+//					{
+//						fos.write(result);
+//						if(ti.update(ti.getDone()+result.length))
+//						{
+//							publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//						}
+//						ret.addIntermediateResultIfUndone(new Long(ti.getDone()));
+//						// todo: close con?
+//					}
+//					catch(Exception e)
+//					{
+//						ti.setState(TransferInfo.STATE_ERROR);
+//						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//						ret.setExceptionIfUndone(new RuntimeException(TransferInfo.STATE_ERROR, e));
+//					}
+//				}
+//				
+//				public void finished()
+//				{
+//					try
+//					{
+//						fos.close();
+//						if(ti.getDone()==ti.getSize())
+//						{
+//	//						System.out.println("Received file: "+f.getAbsolutePath()+", size: "+cnt[0]);
+//							ti.setState(TransferInfo.STATE_COMPLETED);
+//							ret.setFinishedIfUndone();
+//						}
+//						else
+//						{
+//							ti.setState(TransferInfo.STATE_ABORTED);
+//							ret.setExceptionIfUndone(new RuntimeException(TransferInfo.STATE_ABORTED));
+//						}
+//						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//						
+//						// todo: close con?
+//					}
+//					catch(Exception e)
+//					{
+//						ti.setState(TransferInfo.STATE_ERROR);
+//						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//						ret.setExceptionIfUndone(new RuntimeException(TransferInfo.STATE_ERROR, e));
+//					}
+//				}
+//				
+//				public void exceptionOccurred(Exception exception)
+//				{
+//					ti.setState(TransferInfo.STATE_ERROR);
+//					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//					ret.setExceptionIfUndone(new RuntimeException(TransferInfo.STATE_ERROR, exception));
+//				}
+//			}));
+//		}
+//		catch(Exception e)
+//		{
+//			ti.setState(TransferInfo.STATE_ERROR);
+//			publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//			ret.setExceptionIfUndone(new RuntimeException(TransferInfo.STATE_ERROR, e));
+//		}
+//	}
 
 	/**
 	 *  Perform an upload.
 	 *  Called from file sender.
 	 *  Writes bytes from file input stream to output connection.
 	 */
-	protected void	doUpload(final TransferInfo ti, final ServiceOutputConnection ocon, final IComponentIdentifier receiver)
+	protected void	doUpload(final TransferInfo ti, final IOutputConnection ocon, final IComponentIdentifier receiver)
 	{
 		assert TransferInfo.STATE_WAITING.equals(ti.getState());
 		ti.setState(TransferInfo.STATE_TRANSFERRING);

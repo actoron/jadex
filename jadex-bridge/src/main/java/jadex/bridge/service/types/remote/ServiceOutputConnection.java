@@ -1,19 +1,18 @@
 package jadex.bridge.service.types.remote;
 
 import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
-import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.commons.ICommand;
+import jadex.commons.IResultCommand;
+import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.future.TerminableIntermediateDelegationResultListener;
-import jadex.commons.future.TerminableIntermediateFuture;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ import java.util.List;
 public class ServiceOutputConnection implements IOutputConnection
 {
 	/** The remote output connection. */
-	protected IOutputConnection ocon;
+	protected IOutputConnection con;
 
 	/** The closed flag. */
 	protected boolean closed;
@@ -42,9 +41,8 @@ public class ServiceOutputConnection implements IOutputConnection
 	protected Future<Void> readyfuture;
 	
 	/** The transfer future. */
-	protected ITerminableIntermediateFuture<Long> transferfuture;
+	protected ICommand transfercommand;
 
-	
 	/**
 	 *  Create a new connection.
 	 */
@@ -60,9 +58,9 @@ public class ServiceOutputConnection implements IOutputConnection
 	public IFuture<Void> write(byte[] data)
 	{
 		Future<Void> ret = new Future<Void>();
-		if(ocon!=null)
+		if(con!=null)
 		{
-			ocon.write(data).addResultListener(new DelegationResultListener<Void>(ret));
+			con.write(data).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else
 		{
@@ -77,9 +75,9 @@ public class ServiceOutputConnection implements IOutputConnection
 	 */
 	public void flush()
 	{
-		if(ocon!=null)
+		if(con!=null)
 		{
-			ocon.flush();
+			con.flush();
 		}
 		else
 		{
@@ -95,9 +93,9 @@ public class ServiceOutputConnection implements IOutputConnection
 	{
 		Future<Void> ret = new Future<Void>();
 		
-		if(ocon!=null)
+		if(con!=null)
 		{
-			ocon.waitForReady().addResultListener(new DelegationResultListener<Void>(ret));
+			con.waitForReady().addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		else if(readyfuture==null)
 		{
@@ -119,8 +117,8 @@ public class ServiceOutputConnection implements IOutputConnection
 		if(!closed)
 		{
 			closed = true;
-			if(ocon!=null)
-				ocon.close();
+			if(con!=null)
+				con.close();
 		}
 	}
 	
@@ -129,8 +127,8 @@ public class ServiceOutputConnection implements IOutputConnection
 	 */
 	public int getConnectionId()
 	{
-		if(ocon!=null)
-			return ocon.getConnectionId();
+		if(con!=null)
+			return con.getConnectionId();
 		else
 			throw new RuntimeException("Uninitialized connection.");
 	}
@@ -140,8 +138,8 @@ public class ServiceOutputConnection implements IOutputConnection
 	 */
 	public IComponentIdentifier getInitiator()
 	{
-		if(ocon!=null)
-			return ocon.getInitiator();
+		if(con!=null)
+			return con.getInitiator();
 		else
 			throw new RuntimeException("Uninitialized connection.");
 	}
@@ -151,8 +149,8 @@ public class ServiceOutputConnection implements IOutputConnection
 	 */
 	public IComponentIdentifier getParticipant()
 	{
-		if(ocon!=null)
-			return ocon.getParticipant();
+		if(con!=null)
+			return con.getParticipant();
 		else
 			throw new RuntimeException("Uninitialized connection.");
 	}
@@ -177,10 +175,10 @@ public class ServiceOutputConnection implements IOutputConnection
 	 */
 	protected void setOutputConnection(IOutputConnection ocon)
 	{
-		if(this.ocon!=null)
+		if(this.con!=null)
 			throw new RuntimeException("Connection already set.");
 		
-		this.ocon = ocon;
+		this.con = ocon;
 		
 		while(buffer.size()>0)
 		{
@@ -202,6 +200,11 @@ public class ServiceOutputConnection implements IOutputConnection
 		{
 			ocon.close();
 		}
+		
+		if(transfercommand!=null)
+		{
+			transfercommand.execute(null);
+		}
 	}
 	
 	/**
@@ -215,11 +218,19 @@ public class ServiceOutputConnection implements IOutputConnection
 	{
 		final TerminableIntermediateDelegationFuture<Long> ret = new TerminableIntermediateDelegationFuture<Long>();
 		
-		if(ocon==null)
+		if(con==null)
 		{
-			if(transferfuture==null)
+			if(transfercommand==null)
 			{
-				transferfuture = ret;
+				transfercommand = new ICommand()
+				{
+					public void execute(Object args)
+					{
+						ITerminableIntermediateFuture<Long> src = con.writeFromInputStream(is, component);
+						TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, src);
+						src.addResultListener(lis);
+					}
+				};
 			}
 			else
 			{
@@ -228,7 +239,7 @@ public class ServiceOutputConnection implements IOutputConnection
 		}
 		else
 		{
-			ITerminableIntermediateFuture<Long> src = doWriteFromInputStream(is, component);
+			ITerminableIntermediateFuture<Long> src = con.writeFromInputStream(is, component);
 			TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, src);
 			src.addResultListener(lis);
 		}
@@ -236,98 +247,5 @@ public class ServiceOutputConnection implements IOutputConnection
 		return ret;
 	}
 	
-	/**
-	 *  Do write all data from the input stream.  
-	 */
-	protected ITerminableIntermediateFuture<Long> doWriteFromInputStream(final InputStream is, final IExternalAccess component)
-	{
-		final TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
-		
-		try
-		{
-			IComponentStep<Void> step = new IComponentStep<Void>()
-			{
-				long filesize = 0;
-				
-				public IFuture<Void> execute(final IInternalAccess ia)
-				{
-					// Stop transfer on error etc.
-					if(ret.isDone())
-					{
-						ocon.close();
-						return IFuture.DONE;
-					}
-					
-					try
-					{
-						final IComponentStep<Void> self = this;
-						int size = Math.min(200000, is.available());
-						filesize += size;
-						byte[] buf = new byte[size];
-						int read = 0;
-						while(read!=buf.length)
-						{
-							read += is.read(buf, read, buf.length-read);
-						}
-						ocon.write(buf);
-//						System.out.println("wrote: "+size);
-						
-						ret.addIntermediateResultIfUndone(new Long(filesize));
-						
-						if(is.available()>0)
-						{
-//							ia.waitForDelay(100, self);
-	//						agent.scheduleStep(self);
-							ocon.waitForReady().addResultListener(ia.createResultListener(new IResultListener<Void>()
-							{
-								public void resultAvailable(Void result)
-								{
-//									ia.waitForDelay(1000, self);
-									component.scheduleStep(self);
-	//								agent.waitFor(10, self);
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									ocon.close();
-									ret.setException(exception);
-									try
-									{
-										is.close();
-									}
-									catch(Exception e)
-									{
-									}
-								}
-							}));
-						}
-						else
-						{
-							ocon.close();
-							ret.setFinishedIfUndone();
-							is.close();
-						}
-					}
-					catch(Exception e)
-					{
-						try
-						{
-							is.close();
-						}
-						catch(Exception ex)
-						{
-						}
-						ret.setExceptionIfUndone(e);
-					}
-					
-					return IFuture.DONE;
-				}
-			};
-			component.scheduleStep(step);
-		}
-		catch(Exception e)
-		{
-		}
-		
-		return ret;
-	}
+	
 }

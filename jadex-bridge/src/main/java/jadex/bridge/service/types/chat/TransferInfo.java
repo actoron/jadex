@@ -262,7 +262,7 @@ public class TransferInfo
 		{
 			throw new RuntimeException("Unknown state: "+state);
 		}
-//		if(ABORTED.equals(state))
+//		if(STATE_ERROR.equals(state))
 //			System.out.println("herehhh");
 		this.state = state;
 	}

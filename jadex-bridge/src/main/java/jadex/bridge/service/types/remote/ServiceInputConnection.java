@@ -1,16 +1,33 @@
 package jadex.bridge.service.types.remote;
 
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
+import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.service.types.chat.ChatEvent;
+import jadex.bridge.service.types.chat.TransferInfo;
+import jadex.commons.ICommand;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.SubscriptionIntermediateFuture;
+import jadex.commons.future.TerminableIntermediateDelegationFuture;
+import jadex.commons.future.TerminableIntermediateDelegationResultListener;
+import jadex.commons.future.TerminableIntermediateFuture;
 
 /**
  * 
@@ -25,6 +42,12 @@ public class ServiceInputConnection implements IInputConnection
 	
 	/** The buffer. */
 	protected SubscriptionIntermediateFuture<byte[]> future;
+	
+	/** The transfer future. */
+	protected ITerminableIntermediateFuture<Long> transferfuture;
+
+	/** The transfer future. */
+	protected ICommand transfercommand;
 	
 	/**
 	 * 
@@ -171,6 +194,11 @@ public class ServiceInputConnection implements IInputConnection
 		{
 			con.close();
 		}
+		
+		if(transfercommand!=null)
+		{
+			transfercommand.execute(null);
+		}
 	}
 	
 	/**
@@ -180,4 +208,45 @@ public class ServiceInputConnection implements IInputConnection
 	{
 		return new ServiceOutputConnectionProxy(this);
 	}
+	
+	/**
+	 *  Read all data from output stream to the connection.
+	 *  The result is an intermediate future that reports back the size that was read.
+	 *  It can also be used to terminate reading.
+	 *  @param is The input stream.
+	 *  @param component The component.
+	 */
+	public ITerminableIntermediateFuture<Long> readFromOutputStream(final OutputStream os, final IExternalAccess component)
+	{
+		final TerminableIntermediateDelegationFuture<Long> ret = new TerminableIntermediateDelegationFuture<Long>();
+		
+		if(con==null)
+		{
+			if(transfercommand==null)
+			{
+				transfercommand = new ICommand()
+				{
+					public void execute(Object args)
+					{
+						ITerminableIntermediateFuture<Long> src = con.readFromOutputStream(os, component);
+						TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, src);
+						src.addResultListener(lis);
+					}
+				};
+			}
+			else
+			{
+				ret.setException(new RuntimeException("Must not be called twice."));
+			}
+		}
+		else
+		{
+			ITerminableIntermediateFuture<Long> src = con.readFromOutputStream(os, component);
+			TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, src);
+			src.addResultListener(lis);
+		}
+		
+		return ret;
+	}
+		
 }
