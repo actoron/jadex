@@ -23,10 +23,16 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.commons.transformation.annotations.Classname;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
+import android.provider.Settings;
 import android.util.Log;
 
 /**
@@ -46,9 +52,21 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 	public static final String[] DEFAULT_KERNELS = new String[]{KERNEL_COMPONENT, KERNEL_MICRO, KERNEL_BPMN};
 	
 	private JadexAndroidContext jadexAndroidContext;
+	private Set<String> identifiers;
 	
 	public JadexAndroidActivity() {
 		super();
+		identifiers = new HashSet<String>();
+		identifiers.add(android.os.Build.BRAND.toLowerCase());
+		identifiers.add(android.os.Build.MANUFACTURER.toLowerCase());
+		if (!android.os.Build.MANUFACTURER.equals(android.os.Build.UNKNOWN)) {
+			// stupid full text on x86 emulator, so skip it if emulated
+			identifiers.add(android.os.Build.MODEL.toLowerCase());
+			identifiers.add(android.os.Build.DEVICE.toLowerCase());
+		}
+		identifiers.add(android.os.Build.PRODUCT.toLowerCase());
+		identifiers.add(android.os.Build.BOARD.toLowerCase());
+		
 		jadexAndroidContext = JadexAndroidContext.getInstance();
 	}
 	
@@ -277,6 +295,22 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 	
 	protected String createRandomPlatformID() {
 		UUID randomUUID = UUID.randomUUID();
-		return "and-" + randomUUID.toString().substring(0, 5);
+		StringBuilder sb = new StringBuilder();
+		for (String identifier: identifiers) {
+			if (!identifier.equals(android.os.Build.UNKNOWN)) {
+				sb.append(identifier);
+			}
+		}
+		// ** Uncomment for unique device names **
+//		int deviceFingerPrint = android.os.Build.FINGERPRINT.hashCode();
+//		String hexString = Integer.toHexString(deviceFingerPrint);
+//		if (hexString.length() > 1) {
+//			sb.append(hexString.substring(0,2));
+//		} else {
+//		}
+		
+		sb.append("_");
+		sb.append(randomUUID.toString().substring(0,3));
+		return sb.toString();
 	}
 }
