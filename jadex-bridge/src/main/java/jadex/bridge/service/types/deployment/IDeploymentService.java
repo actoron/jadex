@@ -33,7 +33,7 @@ public interface IDeploymentService //extends IService
 	 *  @param path The target path.
 	 *  @return True, when the file has been copied.
 	 */
-	public ITerminableIntermediateFuture<Long> uploadFile(IInputConnection con, String path);
+	public ITerminableIntermediateFuture<Long> uploadFile(IInputConnection con, String path, String name);
 	
 	/**
 	 *  Rename a file.

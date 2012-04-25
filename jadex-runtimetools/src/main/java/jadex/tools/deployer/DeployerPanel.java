@@ -8,19 +8,24 @@ import jadex.base.gui.filetree.RemoteFileNode;
 import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.service.types.deployment.FileContent;
 import jadex.bridge.service.types.deployment.IDeploymentService;
+import jadex.bridge.service.types.remote.ServiceOutputConnection;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Collection;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -28,6 +33,7 @@ import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 
 /**
@@ -168,80 +174,40 @@ public class DeployerPanel extends JPanel implements IPropertiesProvider
 					{
 						final File source = new File(sel_1);
 						
-						final int fragmentsize = IDeploymentService.FRAGMENT_SIZE;
-						final int len = (int)source.length();
-						int num = (int)(len/fragmentsize);
-						final int last = (int)(len%fragmentsize);
-						final int fragments = num + (last>0? 1: 0);
-						
 						try
 						{
 							final FileInputStream fis = new FileInputStream(source);
-							
-							final CounterResultListener lis = new CounterResultListener(fragments, new SwingDefaultResultListener()
+							ServiceOutputConnection soc = new ServiceOutputConnection();
+							soc.writeFromInputStream(fis, jcc.getPlatformAccess());
+							ITerminableIntermediateFuture<Long> fut = ds.uploadFile(soc.getInputConnection(), sel_2, source.getName());
+							fut.addResultListener(new SwingIntermediateDefaultResultListener<Long>()
 							{
-								public void customResultAvailable(Object result)
+								public void customIntermediateResultAvailable(Long result)
 								{
+									jcc.setStatusText("Copy "+(result/source.length())+"% done");
+								}
+								
+								public void customFinished()
+								{
+									jcc.setStatusText("Copied: "+sel_1+" to "+sel_2);
 									second.refreshTreePaths(null);
-									jcc.setStatusText("Copied: "+sel_1+" to: "+sel_2);
+								}
+								
+								public void customResultAvailable(Collection<Long> result)
+								{
+									finished();
 								}
 								
 								public void customExceptionOccurred(Exception exception)
 								{
 									jcc.setStatusText("Copy error: "+sel_1+" to: "+sel_2+" exception: "+exception);
 								}
-							})
-							{
-								public void intermediateResultAvailable(Object result)
-								{
-									if(getCnt()<fragments)
-									{
-										final CounterResultListener clis = this;
-										int percent = (int)(((double)getCnt())/fragments*100);
-										jcc.setStatusText("Copy "+percent+"% done");
-//										System.out.println("Copy "+percent+"% done");
-										FileContent frag = FileContent.createFragment(fis, source.getName(), getCnt()==fragments-1? last: fragmentsize, len);
-										
-										// Note: uses a swing listener to avoid stack overflow when running on one thread
-//										ds.putFile(frag, sel_2, (String)result).addResultListener(new SwingDefaultResultListener()
-//										{
-//											public void customResultAvailable(Object result)
-//											{
-//												clis.resultAvailable(result);
-//											}
-//											public void customExceptionOccurred(Exception exception)
-//											{
-//												clis.exceptionOccurred(exception);
-//											}
-//										});
-									}
-								}
-							};
-							
-					
-							
-							FileContent frag = FileContent.createFragment(fis, source.getName(), 0==fragments-1? last: fragmentsize, len);
-//							ds.putFile(frag, sel_2, null).addResultListener(lis);
+							});
 						}
 						catch(Exception ex)
 						{
 							jcc.setStatusText("Copy error: "+sel_1);
 						}
-						
-//						ds.putFile(new FileContent(source), sel_2)
-//							.addResultListener(new SwingDefaultResultListener()
-//						{
-//							public void customResultAvailable(Object result)
-//							{
-//								second.refreshTreePaths(null);
-//								jcc.setStatusText("Copied: "+sel_1+" to: "+sel_2);
-//							}
-//							
-//							public void customExceptionOccurred(Exception exception)
-//							{
-//								jcc.setStatusText("Copy error: "+sel_1+" to: "+sel_2+" exception: "+exception);
-//							}
-//						});
 					}
 				}
 			}
