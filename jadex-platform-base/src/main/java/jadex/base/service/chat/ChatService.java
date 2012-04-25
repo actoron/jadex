@@ -507,7 +507,7 @@ public class ChatService implements IChatService, IChatGuiService
 					
 					public void intermediateResultAvailable(Long result)
 					{
-						System.out.println("rec: "+result);
+//						System.out.println("rec: "+result);
 						// Start sending after first intermediate result was received
 						if(!started)
 						{
