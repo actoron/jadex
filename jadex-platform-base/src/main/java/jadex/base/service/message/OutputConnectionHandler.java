@@ -34,10 +34,15 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	
 	/** The max number of packets that can be sent without an ack is received. */
 	protected int maxsend;
-
+	
+	/** The max number of messages that can be sending concurrently (i.e. passed to message service but sending not yet completed). */
+	protected int maxqueued;
 
 	/** The number of received elements after which an ack is sent. */
 	protected int ackcnt;
+	
+	/** The number of sending messages (i.e. passed to message service but sending not yet completed). */
+	protected int queuecnt;
 	
 	/** The acknowledgement timer. */
 	protected TimerTask acktimer;
@@ -100,6 +105,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		this.seqnumber = 0;
 		
 		this.maxsend = 20;
+		this.maxqueued = 1;
 		this.ackcnt = 10;
 		
 		this.multipackets = true;
@@ -324,7 +330,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		if(readyfuture!=null)
 		{
 //			System.out.println("waitforready: "+con.isInited()+" "+(maxsend-sent.size())+" "+isStop()+" "+isClosed());
-			if(con.isInited() && maxsend-sent.size()>0 && !isStop() && !isClosed())
+			if(con.isInited() && sent.size()<maxsend && queuecnt<maxqueued && !isStop() && !isClosed())
 			{
 //				System.out.println("readyfuture fired");
 				Future<Void> ret = readyfuture;
@@ -500,6 +506,30 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		{
 			sendTask(task).addResultListener(new DelegationResultListener<Void>(fut));
 		}
+		
+		synchronized(this)
+		{
+			queuecnt++;
+		}
+		ret.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				synchronized(OutputConnectionHandler.this)
+				{
+					queuecnt--;
+				}
+				checkWaitForReady();
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				synchronized(OutputConnectionHandler.this)
+				{
+					queuecnt--;
+				}				
+				checkWaitForReady();
+			}
+		});
 		
 		// add task to unacknowledged sent list 
 		sent.put(task.getSequenceNumber(), new Tuple2<StreamSendTask, Integer>(task, new Integer(1)));
