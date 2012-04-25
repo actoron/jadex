@@ -103,7 +103,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		this.ackcnt = 10;
 		
 		this.multipackets = true;
-		this.mpmaxsize = 50000;
+		this.mpmaxsize = 5000;
 		this.multipacket = new ArrayList<byte[]>();
 		this.mpsize = 0;
 		this.mpsendtimeout = 3000;

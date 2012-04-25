@@ -507,6 +507,7 @@ public class ChatService implements IChatService, IChatGuiService
 					
 					public void intermediateResultAvailable(Long result)
 					{
+						System.out.println("rec: "+result);
 						// Start sending after first intermediate result was received
 						if(!started)
 						{
@@ -615,6 +616,7 @@ public class ChatService implements IChatService, IChatGuiService
 					{
 						fut.terminate();
 					}
+					ret.addIntermediateResult(new Long(filesize));
 					if(ti.update(filesize))
 					{
 						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
