@@ -9,8 +9,11 @@ import jadex.bridge.IOutputConnection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.ITerminableFuture;
-import jadex.commons.future.TerminableFuture;
+import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableIntermediateFuture;
+import jadex.commons.future.TerminableIntermediateDelegationFuture;
+import jadex.commons.future.TerminableIntermediateDelegationResultListener;
+import jadex.commons.future.TerminableIntermediateFuture;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -39,7 +42,7 @@ public class ServiceOutputConnection implements IOutputConnection
 	protected Future<Void> readyfuture;
 	
 	/** The transfer future. */
-	protected ITerminableFuture<Void> transferfuture;
+	protected ITerminableIntermediateFuture<Long> transferfuture;
 
 	
 	/**
@@ -202,11 +205,15 @@ public class ServiceOutputConnection implements IOutputConnection
 	}
 	
 	/**
-	 * 
+	 *  Write all data from input stream to the connection.
+	 *  The result is an intermediate future that reports back the size that was written.
+	 *  It can also be used to terminate sending.
+	 *  @param is The input stream.
+	 *  @param agen
 	 */
-	public ITerminableFuture<Void> writeFromInputStream(final InputStream is, final IExternalAccess agent)
+	public ITerminableIntermediateFuture<Long> writeFromInputStream(final InputStream is, final IExternalAccess component)
 	{
-		final TerminableFuture<Void> ret = new TerminableFuture<Void>();
+		final TerminableIntermediateDelegationFuture<Long> ret = new TerminableIntermediateDelegationFuture<Long>();
 		
 		if(ocon==null)
 		{
@@ -221,28 +228,30 @@ public class ServiceOutputConnection implements IOutputConnection
 		}
 		else
 		{
-			doWriteFromInputStream(is, agent).addResultListener(new DelegationResultListener<Void>(ret));
+			ITerminableIntermediateFuture<Long> src = doWriteFromInputStream(is, component);
+			TerminableIntermediateDelegationResultListener<Long> lis = new TerminableIntermediateDelegationResultListener<Long>(ret, src);
+			src.addResultListener(lis);
 		}
 		
 		return ret;
 	}
 	
 	/**
-	 * 
+	 *  Do write all data from the input stream.  
 	 */
-	protected IFuture<Void> doWriteFromInputStream(final InputStream is, final IExternalAccess agent)
+	protected ITerminableIntermediateFuture<Long> doWriteFromInputStream(final InputStream is, final IExternalAccess component)
 	{
-		final Future<Void> ret = new Future<Void>();
+		final TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
 		
 		try
 		{
-			final long[] cnt = new long[1];
-				
 			IComponentStep<Void> step = new IComponentStep<Void>()
 			{
-				public IFuture<Void> execute(IInternalAccess ia)
+				long filesize = 0;
+				
+				public IFuture<Void> execute(final IInternalAccess ia)
 				{
-					// Stop transfer on stop
+					// Stop transfer on error etc.
 					if(ret.isDone())
 					{
 						ocon.close();
@@ -253,7 +262,7 @@ public class ServiceOutputConnection implements IOutputConnection
 					{
 						final IComponentStep<Void> self = this;
 						int size = Math.min(200000, is.available());
-						cnt[0] += size;
+						filesize += size;
 						byte[] buf = new byte[size];
 						int read = 0;
 						while(read!=buf.length)
@@ -263,56 +272,62 @@ public class ServiceOutputConnection implements IOutputConnection
 						ocon.write(buf);
 //						System.out.println("wrote: "+size);
 						
-//						fi.setState(FileInfo.TRANSFERRING);
-//						fi.setDone(cnt[0]);
-//						updateUpload(fi);
+						ret.addIntermediateResultIfUndone(new Long(filesize));
 						
 						if(is.available()>0)
 						{
-							ia.waitForDelay(1000, self);
+//							ia.waitForDelay(100, self);
 	//						agent.scheduleStep(self);
-	//						ocon.waitForReady().addResultListener(new IResultListener<Void>()
-	//						{
-	//							public void resultAvailable(Void result)
-	//							{
-	//								agent.scheduleStep(self);
-	////												agent.waitFor(10, self);
-	//							}
-	//							public void exceptionOccurred(Exception exception)
-	//							{
-	//								exception.printStackTrace();
-	//								ocon.close();
-	//							}
-	//						});
+							ocon.waitForReady().addResultListener(ia.createResultListener(new IResultListener<Void>()
+							{
+								public void resultAvailable(Void result)
+								{
+//									ia.waitForDelay(1000, self);
+									component.scheduleStep(self);
+	//								agent.waitFor(10, self);
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									ocon.close();
+									ret.setException(exception);
+									try
+									{
+										is.close();
+									}
+									catch(Exception e)
+									{
+									}
+								}
+							}));
 						}
 						else
 						{
 							ocon.close();
-//							fi.setState(FileInfo.COMPLETED);
-//							updateUpload(fi);
-							ret.setResult(null);
+							ret.setFinishedIfUndone();
+							is.close();
 						}
 					}
 					catch(Exception e)
 					{
-//						fi.setState(FileInfo.ERROR);
-//						updateUpload(fi);
-						e.printStackTrace();
-						ret.setException(e);
+						try
+						{
+							is.close();
+						}
+						catch(Exception ex)
+						{
+						}
+						ret.setExceptionIfUndone(e);
 					}
 					
 					return IFuture.DONE;
 				}
 			};
-			agent.scheduleStep(step);
-		
+			component.scheduleStep(step);
 		}
 		catch(Exception e)
 		{
-			ret.setExceptionIfUndone(e);
 		}
 		
 		return ret;
 	}
-	
 }

@@ -695,7 +695,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  Called from file sender.
 	 *  Writes bytes from file input stream to output connection.
 	 */
-	protected void	doUpload(final TransferInfo ti, final IOutputConnection ocon, final IComponentIdentifier receiver)
+	protected void	doUpload(final TransferInfo ti, final ServiceOutputConnection ocon, final IComponentIdentifier receiver)
 	{
 		assert TransferInfo.STATE_WAITING.equals(ti.getState());
 		ti.setState(TransferInfo.STATE_TRANSFERRING);
@@ -704,80 +704,147 @@ public class ChatService implements IChatService, IChatGuiService
 		try
 		{
 			final FileInputStream fis = new FileInputStream(new File(ti.getFile()));
-			
-			IComponentStep<Void> step = new IComponentStep<Void>()
+			final ITerminableIntermediateFuture<Long> fut = ocon.writeFromInputStream(fis, agent.getExternalAccess());
+
+			fut.addResultListener(new IIntermediateResultListener<Long>()
 			{
-				long filesize	= 0;
-				
-				public IFuture<Void> execute(final IInternalAccess ia)
+				public void resultAvailable(Collection<Long> result)
 				{
-					// Stop transfer on error etc.
-					if(ti.isFinished())
+					finished();
+				}
+				public void intermediateResultAvailable(Long filesize)
+				{
+					if(TransferInfo.STATE_ABORTED.equals(ti.getState()))
 					{
 						ocon.close();
-						return IFuture.DONE;
+						fut.terminate();
 					}
-					
+					if(ti.update(filesize))
+					{
+						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+					}
+				}
+				public void finished()
+				{
 					try
 					{
-						final IComponentStep<Void> self = this;
-						int size = Math.min(200000, fis.available());
-						filesize += size;
-						byte[] buf = new byte[size];
-						int read = 0;
-						while(read!=buf.length)
-						{
-							read += fis.read(buf, read, buf.length-read);
-						}
-						ocon.write(buf);
-//						System.out.println("wrote: "+size);
-						
-						if(ti.update(filesize))
-						{
-							publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
-						}
-						
-						if(fis.available()>0)
-						{
-//							ia.waitForDelay(100, self);
-	//						agent.scheduleStep(self);
-							ocon.waitForReady().addResultListener(ia.createResultListener(new IResultListener<Void>()
-							{
-								public void resultAvailable(Void result)
-								{
-//									ia.waitForDelay(1000, self);
-									agent.getExternalAccess().scheduleStep(self);
-	//								agent.waitFor(10, self);
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									ocon.close();
-									ti.setState(TransferInfo.STATE_ERROR);
-									publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
-								}
-							}));
-						}
-						else
-						{
-							fis.close();
-							ocon.close();
-							ti.setState(TransferInfo.STATE_COMPLETED);
-							publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);			
-						}
+						fis.close();
 					}
 					catch(Exception e)
 					{
-						ti.setState(TransferInfo.STATE_ERROR);
-						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);		
 					}
-					
-					return IFuture.DONE;
+					ocon.close();
+					ti.setState(TransferInfo.STATE_COMPLETED);
+					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);			
 				}
-			};
-			agent.getExternalAccess().scheduleStep(step);
+				public void exceptionOccurred(Exception exception)
+				{
+					try
+					{
+						fis.close();
+					}
+					catch(Exception e)
+					{
+					}
+					ocon.close();
+					ti.setState(TransferInfo.STATE_ERROR);
+					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+				}
+			});
 		}
 		catch(Exception e)
 		{
 		}
 	}
+	
+//	/**
+//	 *  Perform an upload.
+//	 *  Called from file sender.
+//	 *  Writes bytes from file input stream to output connection.
+//	 */
+//	protected void	doUpload(final TransferInfo ti, final IOutputConnection ocon, final IComponentIdentifier receiver)
+//	{
+//		assert TransferInfo.STATE_WAITING.equals(ti.getState());
+//		ti.setState(TransferInfo.STATE_TRANSFERRING);
+//		publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//		
+//		try
+//		{
+//			final FileInputStream fis = new FileInputStream(new File(ti.getFile()));
+//			
+//			IComponentStep<Void> step = new IComponentStep<Void>()
+//			{
+//				long filesize	= 0;
+//				
+//				public IFuture<Void> execute(final IInternalAccess ia)
+//				{
+//					// Stop transfer on error etc.
+//					if(ti.isFinished())
+//					{
+//						ocon.close();
+//						return IFuture.DONE;
+//					}
+//					
+//					try
+//					{
+//						final IComponentStep<Void> self = this;
+//						int size = Math.min(200000, fis.available());
+//						filesize += size;
+//						byte[] buf = new byte[size];
+//						int read = 0;
+//						while(read!=buf.length)
+//						{
+//							read += fis.read(buf, read, buf.length-read);
+//						}
+//						ocon.write(buf);
+////						System.out.println("wrote: "+size);
+//						
+//						if(ti.update(filesize))
+//						{
+//							publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//						}
+//						
+//						if(fis.available()>0)
+//						{
+////							ia.waitForDelay(100, self);
+//	//						agent.scheduleStep(self);
+//							ocon.waitForReady().addResultListener(ia.createResultListener(new IResultListener<Void>()
+//							{
+//								public void resultAvailable(Void result)
+//								{
+////									ia.waitForDelay(1000, self);
+//									agent.getExternalAccess().scheduleStep(self);
+//	//								agent.waitFor(10, self);
+//								}
+//								public void exceptionOccurred(Exception exception)
+//								{
+//									ocon.close();
+//									ti.setState(TransferInfo.STATE_ERROR);
+//									publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+//								}
+//							}));
+//						}
+//						else
+//						{
+//							fis.close();
+//							ocon.close();
+//							ti.setState(TransferInfo.STATE_COMPLETED);
+//							publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);			
+//						}
+//					}
+//					catch(Exception e)
+//					{
+//						ti.setState(TransferInfo.STATE_ERROR);
+//						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);		
+//					}
+//					
+//					return IFuture.DONE;
+//				}
+//			};
+//			agent.getExternalAccess().scheduleStep(step);
+//		}
+//		catch(Exception e)
+//		{
+//		}
+//	}
 }
