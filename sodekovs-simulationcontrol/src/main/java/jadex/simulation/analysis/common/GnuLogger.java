@@ -1,4 +1,4 @@
-package jadex.simulation.analysis.application.opt4j;
+package jadex.simulation.analysis.common;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Formatter;

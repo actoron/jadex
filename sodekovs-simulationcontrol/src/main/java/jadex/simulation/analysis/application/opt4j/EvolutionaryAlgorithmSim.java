@@ -1,5 +1,7 @@
 package jadex.simulation.analysis.application.opt4j;
 
+import jadex.simulation.analysis.common.GnuLogger;
+
 import java.io.File;
 import java.util.Collection;
 import java.util.Map;

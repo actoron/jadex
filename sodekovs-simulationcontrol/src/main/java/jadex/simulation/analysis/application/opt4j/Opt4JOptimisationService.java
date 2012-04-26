@@ -235,11 +235,11 @@ public class Opt4JOptimisationService extends ABasicAnalysisSessionService
 			state.put("start", start);
 
 			EvolutionaryAlgorithmSimModule evolutionaryAlgorithm = new EvolutionaryAlgorithmSimModule();
-			evolutionaryAlgorithm.setGenerations(50);
-			evolutionaryAlgorithm.setAlpha(25);
-			evolutionaryAlgorithm.setLambda(10);
-			evolutionaryAlgorithm.setCrossoverRate(0.5);
-			evolutionaryAlgorithm.setMu(10);
+			evolutionaryAlgorithm.setGenerations(30);
+			evolutionaryAlgorithm.setAlpha(20);
+			evolutionaryAlgorithm.setLambda(7);
+			evolutionaryAlgorithm.setCrossoverRate(0.4);
+			evolutionaryAlgorithm.setMu(7);
 			
 
 			SimulationModule simulation = new SimulationModule();

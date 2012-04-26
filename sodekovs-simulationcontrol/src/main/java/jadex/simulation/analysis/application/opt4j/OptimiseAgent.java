@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 //{
 //	@NameValue(name="viewerpanel.componentviewerclass", value="\"jadex.simulation.analysis.common.util.controlComponentJadexPanel.ControlComponentViewerPanel\"")
 //})
-public class OptJTestAgent extends MicroAgent
+public class OptimiseAgent extends MicroAgent
 {
 	@Override
 	public IFuture<Void> executeBody()
@@ -73,7 +73,7 @@ public class OptJTestAgent extends MicroAgent
 		final String session = (String) fut.get(new ThreadSuspendable(this));
 		
 		IAParameterEnsemble expParameters = new AParameterEnsemble("Experiment Parameter");
-		expParameters.addParameter(new ABasicParameter("Wiederholungen", Integer.class, 1));
+		expParameters.addParameter(new ABasicParameter("Wiederholungen", Integer.class, 30));
 		expParameters.addParameter(new ABasicParameter("Visualisierung", Boolean.class, Boolean.FALSE));
 //		expParameters.addParameter(new ABasicParameter("Mittelwert Prozent", Double.class, 10.0));
 //		expParameters.addParameter(new ABasicParameter("alpha", Double.class, 95.0));
@@ -82,7 +82,6 @@ public class OptJTestAgent extends MicroAgent
 		AExperimentBatch batch = new AExperimentBatch("batch1");
 		batch.addExperiment(exp);
 		batch = (AExperimentBatch) service.nextSolutions(session, batch).get(new ThreadSuspendable(this));
-		int i = 1;
 		while (!(Boolean)service.checkEndofOptimisation(session).get(new ThreadSuspendable(this)))
 		{
 			
@@ -114,7 +113,6 @@ public class OptJTestAgent extends MicroAgent
 			}
 
 			batch = (AExperimentBatch) service.nextSolutions(session, batch).get(new ThreadSuspendable(this));
-			i++;
 		}
 		return IFuture.DONE;
 		

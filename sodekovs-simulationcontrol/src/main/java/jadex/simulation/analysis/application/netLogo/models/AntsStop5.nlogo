@@ -77,7 +77,7 @@ end
 ;;;;;;;;;;;;;;;;;;;;;
 
 to go
-  while [foodout > 0 and ticks < 10000]
+  while [foodout > 0]
   [ goTick ]
 end
 
