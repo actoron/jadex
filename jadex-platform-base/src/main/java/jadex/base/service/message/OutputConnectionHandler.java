@@ -511,6 +511,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		{
 			queuecnt++;
 		}
+		System.out.println("queue: "+queuecnt);
 		ret.addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
