@@ -84,6 +84,9 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 
 	/** The parameter copy allowed flag. */
 	protected boolean copy;
+
+	/** The flag is local timeouts should be realtime. */
+	protected boolean realtime;
 	
 	/** The result listener. */
 	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
@@ -95,7 +98,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public AbstractInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, 
-		final RequiredServiceBinding[] bindings, boolean copy, 
+		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{
 		this.config = config!=null? config: model.getConfigurationNames().length>0? 
@@ -104,6 +107,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		this.parent = parent;
 		this.bindings = bindings;
 		this.copy = copy;
+		this.realtime = realtime;
 		this.resultlistener = resultlistener;
 		if(factory != null)
 			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
@@ -454,6 +458,15 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	public boolean isCopy()
 	{
 		return copy;
+	}
+
+	/**
+	 *  Get the realtime.
+	 *  @return The realtime.
+	 */
+	public boolean isRealtime()
+	{
+		return realtime;
 	}
 
 }

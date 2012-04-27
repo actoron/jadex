@@ -256,7 +256,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	 * @return An instance of a component.
 	 */
 	public IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(final IComponentDescription desc, final IComponentAdapterFactory factory, final IModelInfo modelinfo, 
-		final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, final boolean copy, 
+		final String config, final Map<String, Object> arguments, final IExternalAccess parent, final RequiredServiceBinding[] bindings, final boolean copy, final boolean realtime,
 		final IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> init)
 	{
 		final Future<Tuple2<IComponentInstance, IComponentAdapter>> ret = new Future<Tuple2<IComponentInstance, IComponentAdapter>>();
@@ -282,7 +282,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 						IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 						state.addSubstate(amodel.getState());
 						
-						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, resultlistener, init);
+						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
 						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
 					}
 					catch(Exception e)
@@ -311,7 +311,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 				IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 				state.addSubstate(amodel.getState());
 				
-				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, resultlistener, init);
+				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
 				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
 			}
 			catch(Exception e)
@@ -334,7 +334,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	 * @return An instance of a component.
 	 */
 	public Tuple2<IComponentInstance, IComponentAdapter> createComponentInstance(IComponentDescription desc, IComponentAdapterFactory factory, OAVAgentModel amodel, 
-		String config, Map<String, Object> arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> ret)
+		String config, Map<String, Object> arguments, IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> ret)
 	{
 		// Create type model for agent instance (e.g. holding dynamically loaded java classes).
 		OAVTypeModel tmodel	= new OAVTypeModel(desc.getName().getLocalName()+"_typemodel", amodel.getState().getTypeModel().getClassLoader());
@@ -344,7 +344,7 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 		state.addSubstate(amodel.getState());
 		
-		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, resultlistener, ret);
+		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, ret);
 		return new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter());
 	}
 	

@@ -330,7 +330,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Static method for creating a standard service proxy for a provided service.
 	 */
 	public static IInternalService createProvidedServiceProxy(IInternalAccess ia, IComponentAdapter adapter, Object service, 
-		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, IResourceIdentifier rid)
+		String name, Class type, String proxytype, IServiceInvocationInterceptor[] ics, boolean copy, boolean realtime, IResourceIdentifier rid)
 	{
 		IInternalService	ret;
 		
@@ -347,7 +347,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 		if(!PROXYTYPE_RAW.equals(proxytype) || (ics!=null && ics.length>0))
 		{
 			BasicServiceInvocationHandler handler = createHandler(name, ia, type, service);
-			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy);
+			BasicServiceInvocationHandler.addInterceptors(handler, service, ics, adapter, ia, proxytype, copy, realtime);
 			ret	= (IInternalService)Proxy.newProxyInstance(ia.getClassLoader(), new Class[]{IInternalService.class, type}, handler);
 //			ret	= (IInternalService)Proxy.newProxyInstance(ia.getExternalAccess()
 //				.getModel().getClassLoader(), new Class[]{IInternalService.class, type}, handler);
@@ -497,7 +497,8 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 	 *  Add the standard and custom interceptors.
 	 */
 	protected static void addInterceptors(BasicServiceInvocationHandler handler, Object service, 
-		IServiceInvocationInterceptor[] ics, IComponentAdapter adapter, IInternalAccess ia, String proxytype, boolean copy)
+		IServiceInvocationInterceptor[] ics, IComponentAdapter adapter, IInternalAccess ia, String proxytype, 
+		boolean copy, boolean realtime)
 	{
 		// Only add standard interceptors if not raw.
 		if(!PROXYTYPE_RAW.equals(proxytype))
@@ -511,7 +512,7 @@ public class BasicServiceInvocationHandler implements InvocationHandler
 			handler.addFirstServiceInterceptor(new ValidationInterceptor());
 			if(!PROXYTYPE_DIRECT.equals(proxytype))
 			{
-				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia.getExternalAccess(), adapter, copy));
+				handler.addFirstServiceInterceptor(new DecouplingInterceptor(ia.getExternalAccess(), adapter, copy, realtime));
 			}
 		}
 		

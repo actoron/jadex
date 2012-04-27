@@ -40,10 +40,10 @@ public class BDIAgentInterpreter extends MicroAgentInterpreter
 	 */
 	public BDIAgentInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, 
 		final BDIModel model, Class agentclass, final Map args, final String config, 
-		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, 
+		final IExternalAccess parent, RequiredServiceBinding[] bindings, boolean copy, boolean realtime,
 		final IIntermediateResultListener<Tuple2<String, Object>> listener, final Future<Void> inited)
 	{
-		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, listener, inited);
+		super(desc, factory, model, agentclass, args, config, parent, bindings, copy, realtime, listener, inited);
 		this.bdimodel = model;
 	}
 	

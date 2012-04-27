@@ -565,6 +565,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public abstract boolean isCopy();
 	
+	/**
+	 *  Get the realtime.
+	 *  @return The realtime.
+	 */
+	public abstract boolean isRealtime();
+	
 	//-------- methods --------
 	
 	/**
@@ -1140,7 +1146,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		final Future<IInternalService> ret = new Future<IInternalService>();
 		
 		final IInternalService proxy = BasicServiceInvocationHandler.createProvidedServiceProxy(
-			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), getModel().getResourceIdentifier());
+			getInternalAccess(), getComponentAdapter(), service, name, type, proxytype, ics, isCopy(), isRealtime(), getModel().getResourceIdentifier());
 		getServiceContainer().addService(proxy, info).addResultListener(new ExceptionDelegationResultListener<Void, IInternalService>(ret)
 		{
 			public void customResultAvailable(Void result)

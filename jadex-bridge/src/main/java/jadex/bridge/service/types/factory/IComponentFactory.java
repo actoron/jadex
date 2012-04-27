@@ -103,7 +103,7 @@ public interface IComponentFactory
 	@Excluded
 	public @Reference IFuture<Tuple2<IComponentInstance, IComponentAdapter>> createComponentInstance(@Reference IComponentDescription desc, 
 		IComponentAdapterFactory factory, IModelInfo model, String config, Map<String, Object> arguments, 
-		IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, boolean copy, 
+		IExternalAccess parent, @Reference RequiredServiceBinding[] bindings, boolean copy, boolean realtime,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, Future<Void> init);
 
 }

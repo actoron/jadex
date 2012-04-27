@@ -86,6 +86,8 @@ public class Starter
 	/** The parameter copy flag. */
 	public static final String PARAMETERCOPY = "parametercopy";
 
+	/** The realtime timeout flag. */
+	public static final String REALTIMETIMEOUT = "realtimetimeout";
 	
 	/** The reserved platform parameters. */
 	public static final Set<String> RESERVED;
@@ -375,8 +377,9 @@ public class Starter
 								});
 								
 								boolean copy = !Boolean.FALSE.equals(getArgumentValue(PARAMETERCOPY, model, cmdargs, compargs));
+								boolean realtime = !Boolean.FALSE.equals(getArgumentValue(REALTIMETIMEOUT, model, cmdargs, compargs));
 								// what about platform result listener?!
-								cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs), compargs, null, null, copy, null, future)
+								cfac.createComponentInstance(desc, afac, model, getConfigurationName(model, cmdargs), compargs, null, null, copy, realtime, null, future)
 									.addResultListener(new ExceptionDelegationResultListener<Tuple2<IComponentInstance, IComponentAdapter>, IExternalAccess>(ret)
 								{
 									public void customResultAvailable(Tuple2<IComponentInstance, IComponentAdapter> root)

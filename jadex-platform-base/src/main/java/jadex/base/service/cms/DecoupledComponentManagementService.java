@@ -131,6 +131,9 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	/** The default copy parameters flag for service calls. */
 	protected boolean copy;
 	
+	/** The realtime timeout flag. */
+	protected boolean realtime;
+	
 	/** The locked components. */
 	protected Map<IComponentIdentifier, LockEntry> lockentries;
 	
@@ -142,7 +145,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
      */
     public DecoupledComponentManagementService(IComponentAdapter root)
 	{
-    	this(root, null, true);
+    	this(root, null, true, true);
     }
     
     /**
@@ -150,11 +153,12 @@ public abstract class DecoupledComponentManagementService implements IComponentM
      *  @param exta	The service provider.
      */
     public DecoupledComponentManagementService(IComponentAdapter root, 
-    	IBootstrapFactory componentfactory, boolean copy)
+    	IBootstrapFactory componentfactory, boolean copy, boolean realtime)
 	{
 		this.root = root;
 		this.componentfactory = componentfactory;
 		this.copy = copy;
+		this.realtime = realtime;
 		
 		// Todo: why some collections synchronized? single thread access!?
 		this.adapters = SCollection.createHashMap();
@@ -596,7 +600,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 																		: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 																						
 																	factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-																		config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, reslis, resfut)
+																		config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, realtime, reslis, resfut)
 																		.addResultListener(createResultListener(new IResultListener<Tuple2<IComponentInstance, IComponentAdapter>>()
 																	{
 																		public void resultAvailable(Tuple2<IComponentInstance, IComponentAdapter> comp)

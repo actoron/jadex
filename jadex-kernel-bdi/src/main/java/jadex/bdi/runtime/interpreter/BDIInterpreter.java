@@ -225,6 +225,10 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	
 	/** The parameter copy flag. */
 	protected boolean copy;
+
+	/** The realtime local timeout flag. */
+	protected boolean realtime;
+
 	
 	/** The result listener. */
 	protected IIntermediateResultListener<Tuple2<String, Object>> resultlistener;
@@ -240,7 +244,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	 */
 	public BDIInterpreter(IComponentDescription desc, IComponentAdapterFactory factory, final IOAVState state, final OAVAgentModel model, 
 		final String config, final Map<String, Object> arguments, final IExternalAccess parent, RequiredServiceBinding[] bindings, 
-		final Map kernelprops, boolean copy, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
+		final Map kernelprops, boolean copy, boolean realtime, IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited)
 	{	
 		this.initthread = Thread.currentThread();
 		
@@ -254,6 +258,7 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		this.microplansteps = true;
 		this.externalthreads	= Collections.synchronizedSet(SCollection.createLinkedHashSet());
 		this.copy = copy;
+		this.realtime = realtime;
 		this.resultlistener = resultlistener;
 		this.inited = inited;
 		
@@ -2043,4 +2048,14 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		
 		resultlistener.intermediateResultAvailable(new Tuple2<String, Object>(name, value));
 	}
+
+	/**
+	 *  Get the realtime.
+	 *  @return The realtime.
+	 */
+	public boolean isRealtime()
+	{
+		return realtime;
+	}
+	
 }

@@ -112,6 +112,8 @@
 		<argument name="parametercopy" class="boolean">true</argument>
 		<!-- Flag if decoupled service cms should be used. -->
 		<argument name="decoupledcms" class="boolean">true</argument>
+		<!-- Flag if local timeouts should be realtime (instead of clock dependent) . -->
+		<argument name="realtimetimeout" class="boolean">true</argument>
 
 		<!-- Additional library paths (classpath entries) for loading agent models and classes. -->
 		<argument name="libpath" class="String"></argument>
@@ -275,7 +277,7 @@
 			 <implementation proxytype="raw">
 				!$args.decoupledcms
 				? new jadex.standalone.service.ComponentManagementService($component, $component.getComponentAdapter(), 
-					$args.componentfactory, $args.parametercopy)
+					$args.componentfactory, $args.parametercopy, $args.realtimetimeout)
 				: null
 			</implementation>
 		</providedservice>
@@ -283,7 +285,7 @@
 			<implementation>
 				$args.decoupledcms
 				? new jadex.standalone.service.DecoupledComponentManagementService($component.getComponentAdapter(), 
-					$args.componentfactory, $args.parametercopy)
+					$args.componentfactory, $args.parametercopy, $args.realtimetimeout)
 				: null
 			</implementation>
 		</providedservice>

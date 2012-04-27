@@ -57,11 +57,11 @@ public class ComponentInterpreter extends AbstractInterpreter implements IIntern
 	 */
 	public ComponentInterpreter(final IComponentDescription desc, final IModelInfo model, final String config, 
 		final IComponentAdapterFactory factory, final IExternalAccess parent, final Map<String, Object> arguments, 
-		final RequiredServiceBinding[] bindings, boolean copy, 
+		final RequiredServiceBinding[] bindings, boolean copy, boolean realtime,
 		IIntermediateResultListener<Tuple2<String, Object>> resultlistener, final Future<Void> inited,
 		ClassLoader classloader)
 	{
-		super(desc, model, config, factory, parent, bindings, copy, resultlistener, inited);
+		super(desc, model, config, factory, parent, bindings, copy, realtime, resultlistener, inited);
 		this.steps = new ArrayList();
 		this.classloader = classloader;
 	

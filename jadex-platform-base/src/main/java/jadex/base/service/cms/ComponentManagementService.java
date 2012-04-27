@@ -125,6 +125,9 @@ public abstract class ComponentManagementService extends BasicService implements
 	/** The default copy parameters flag for service calls. */
 	protected boolean copy;
 	
+	/** The realtime timeout flag. */
+	protected boolean realtime;
+	
 	/** The locked components. */
 	protected Map<IComponentIdentifier, LockEntry> lockentries;
 	
@@ -148,7 +151,7 @@ public abstract class ComponentManagementService extends BasicService implements
      */
     public ComponentManagementService(IInternalAccess exta, IComponentAdapter root)
 	{
-    	this(exta, root, null, true);
+    	this(exta, root, null, true, true);
     }
     
     /**
@@ -156,7 +159,7 @@ public abstract class ComponentManagementService extends BasicService implements
      *  @param exta	The service provider.
      */
     public ComponentManagementService(IInternalAccess exta, IComponentAdapter root, 
-    	IBootstrapFactory componentfactory, boolean copy)
+    	IBootstrapFactory componentfactory, boolean copy, boolean realtime)
 	{
 		super(exta.getServiceContainer().getId(), IComponentManagementService.class, null);
 
@@ -165,6 +168,7 @@ public abstract class ComponentManagementService extends BasicService implements
 		this.root = root;
 		this.componentfactory = componentfactory;
 		this.copy = copy;
+		this.realtime = realtime;
 		
 		// Todo: why some collections synchronized? single thread access!?
 		this.adapters = SCollection.createHashMap();
@@ -646,7 +650,7 @@ public abstract class ComponentManagementService extends BasicService implements
 																					: lmodel.getConfigurationNames().length>0 ? lmodel.getConfigurationNames()[0] : null;
 																									
 																				factory.createComponentInstance(ad, getComponentAdapterFactory(), lmodel, 
-																					config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, reslis, resfut)
+																					config, cinfo.getArguments(), parent, cinfo.getRequiredServiceBindings(), copy, realtime, reslis, resfut)
 																					.addResultListener(new IResultListener<Tuple2<IComponentInstance, IComponentAdapter>>()
 																				{
 																					public void resultAvailable(Tuple2<IComponentInstance, IComponentAdapter> comp)
