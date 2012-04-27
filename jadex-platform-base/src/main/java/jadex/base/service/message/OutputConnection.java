@@ -68,9 +68,9 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	
 	/**
 	 *  Wait until the connection is ready for the next write.
-	 *  @return Calls future when next data can be written.
+	 *  @return Calls future when next data can be written. Provides a value of how much data should be given to the connection for best performance.
 	 */
-	public IFuture<Void> waitForReady()
+	public IFuture<Integer> waitForReady()
 	{
 		return ((IOutputConnectionHandler)ch).waitForReady();
 	}
@@ -99,90 +99,90 @@ public class OutputConnection extends AbstractConnection implements IOutputConne
 	{
 		final TerminableIntermediateFuture<Long> ret = new TerminableIntermediateFuture<Long>();
 		
-		try
+		component.scheduleStep(new IComponentStep<Void>()
 		{
-			IComponentStep<Void> step = new IComponentStep<Void>()
+			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				long filesize = 0;
-				
-				public IFuture<Void> execute(final IInternalAccess ia)
+				waitForReady().addResultListener(ia.createResultListener(new IResultListener<Integer>()
 				{
-					// Stop transfer on error etc.
-					if(ret.isDone())
-					{
-						close();
-						return IFuture.DONE;
-					}
+					long filesize = 0;
 					
-					try
+					public void resultAvailable(Integer bytes)
 					{
-						final IComponentStep<Void> self = this;
-						int size = Math.min(200000, is.available());
-						filesize += size;
-						byte[] buf = new byte[size];
-						int read = 0;
-						while(read!=buf.length)
+						// Stop transfer on cancel etc.
+						if(ret.isDone())
 						{
-							read += is.read(buf, read, buf.length-read);
-						}
-						write(buf);
-//						System.out.println("wrote: "+size);
-						
-						ret.addIntermediateResultIfUndone(new Long(filesize));
-						
-						if(is.available()>0)
-						{
-//							ia.waitForDelay(100, self);
-	//						agent.scheduleStep(self);
-							waitForReady().addResultListener(ia.createResultListener(new IResultListener<Void>()
+							close();
+							try
 							{
-								public void resultAvailable(Void result)
-								{
-//									ia.waitForDelay(1000, self);
-									component.scheduleStep(self);
-	//								agent.waitFor(10, self);
-								}
-								public void exceptionOccurred(Exception exception)
-								{
-									close();
-									ret.setException(exception);
-									try
-									{
-										is.close();
-									}
-									catch(Exception e)
-									{
-									}
-								}
-							}));
+								is.close();
+							}
+							catch(Exception e)
+							{
+							}
 						}
 						else
 						{
-							close();
-							ret.setFinishedIfUndone();
-							is.close();
+							try
+							{
+								int size = Math.min(bytes.intValue(), is.available());
+								filesize += size;
+								byte[] buf = new byte[size];
+								int read = 0;
+								// Hack!!! Should only read once, as subsequent reads might block, because available() only provides an estimate
+								while(read!=buf.length)
+								{
+									read += is.read(buf, read, buf.length-read);
+								}
+								write(buf);
+	//							System.out.println("wrote: "+size);
+								
+								ret.addIntermediateResultIfUndone(new Long(filesize));
+								
+								// Hack!!! Should not assume that stream is at end, only if currently no bytes are available
+								if(is.available()>0)
+								{
+									waitForReady().addResultListener(ia.createResultListener(this));
+								}
+								else
+								{
+									close();
+									ret.setFinishedIfUndone();
+									is.close();
+								}
+							}
+							catch(Exception e)
+							{
+								close();
+								ret.setExceptionIfUndone(e);
+								try
+								{
+									is.close();
+								}
+								catch(Exception ex)
+								{
+								}							
+							}
 						}
 					}
-					catch(Exception e)
+					
+					public void exceptionOccurred(Exception exception)
 					{
+						close();
+						ret.setExceptionIfUndone(exception);
 						try
 						{
 							is.close();
 						}
-						catch(Exception ex)
+						catch(Exception e)
 						{
 						}
-						ret.setExceptionIfUndone(e);
 					}
-					
-					return IFuture.DONE;
-				}
-			};
-			component.scheduleStep(step);
-		}
-		catch(Exception e)
-		{
-		}
+				}));
+
+				return IFuture.DONE;
+			}
+		});
 		
 		return ret;
 	}

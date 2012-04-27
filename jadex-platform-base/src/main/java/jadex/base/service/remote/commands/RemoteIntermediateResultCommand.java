@@ -53,7 +53,7 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 	 */
 	public IIntermediateFuture execute(IMicroExternalAccess component, RemoteServiceManagementService rsms)
 	{
-//		System.out.println("result command: "+result+" "+exceptioninfo+" "+callid);
+//		System.out.println("intermediate result command: "+result+" "+exceptioninfo+" "+callid);
 //		if(callid.equals(RemoteMethodInvocationHandler.debugcallid))
 //			System.out.println("debuggcallid");
 		

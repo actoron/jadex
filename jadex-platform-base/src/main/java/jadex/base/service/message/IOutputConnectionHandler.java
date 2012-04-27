@@ -14,9 +14,9 @@ public interface IOutputConnectionHandler extends IAbstractConnectionHandler
 
 	/**
 	 *  Wait until the connection is ready for the next write.
-	 *  @return Calls future when next data can be written.
+	 *  @return Calls future when next data can be written. Provides a value of how much data should be given to the connection for best performance.
 	 */
-	public IFuture<Void> waitForReady();
+	public IFuture<Integer> waitForReady();
 	
 	/**
 	 *  Flush the data.

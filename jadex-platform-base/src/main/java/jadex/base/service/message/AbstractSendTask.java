@@ -79,6 +79,21 @@ public abstract class AbstractSendTask implements ISendTask
 		this.future	= new Future<Void>();
 	}
 	
+	/**
+	 *  Shallow copy a task.
+	 */
+	public AbstractSendTask(AbstractSendTask task)
+	{
+		this.data	= task.data;
+		this.prolog	= task.prolog;
+		this.codecids	= task.codecids;
+		this.codecs	= task.codecs;
+		this.receivers	= task.receivers;
+		this.transports	= task.transports;
+		
+		this.future	= new Future<Void>();
+	}
+	
 	//-------- methods --------
 	
 	/**

@@ -11,9 +11,11 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimerTask;
 
 /**
@@ -21,10 +23,14 @@ import java.util.TimerTask;
  */
 public class OutputConnectionHandler extends AbstractConnectionHandler implements IOutputConnectionHandler
 {
+	//-------- constants --------
+	
+	/** The delay before sending
+	
 	//-------- attributes --------
 	
 	/** The data sent (not acknowledged). */
-	protected Map<Integer, Tuple2<StreamSendTask, Integer>> sent;
+	protected Map<Integer, DataSendInfo> sent;
 	
 	/** The data to send. */
 	protected List<Tuple2<StreamSendTask, Future<Void>>> tosend;
@@ -60,6 +66,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	/** The current multipacket size. */
 	protected int mpsize;
 	
+	/** The current multipacket future (shared by all write requests that put data in the same multi packet). */
+	protected Future<Void>	mpfut;
+	
 	/** The max delay before a multipacket is sent (even if not full). */
 	protected long mpsendtimeout;
 
@@ -77,23 +86,10 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	protected boolean closesent;
 	
 	/** Future used in waitForReady(). */
-	protected Future<Void> readyfuture;
+	protected Future<Integer> readyfuture;
 	
 	//-------- constructors --------
 	
-//	/**
-//	 *  Creat a new handler.
-//	 */
-//	public OutputConnectionHandler(MessageService ms)
-//	{
-//		this();
-//	}
-	
-//	/**
-//	 *  Creat a new handler.
-//	 */
-//	public OutputConnectionHandler(MessageService ms, int maxresends, long acktimeout, 
-//		long leasetime)
 	/**
 	 *  Creat a new handler.
 	 */
@@ -101,21 +97,21 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	{
 		super(ms);//, maxresends, acktimeout, leasetime);
 		this.tosend = new ArrayList<Tuple2<StreamSendTask, Future<Void>>>();
-		this.sent = new HashMap<Integer, Tuple2<StreamSendTask, Integer>>();
+		this.sent = new LinkedHashMap<Integer, DataSendInfo>();
 		this.seqnumber = 0;
 		
-		this.maxsend = 20;
-		this.maxqueued = 2;
+		this.maxsend = 25;
+		this.maxqueued = 4;
 		this.ackcnt = 10;
 		
 		this.multipackets = true;
-		this.mpmaxsize = 50000;
+		this.mpmaxsize = 10000;
 		this.multipacket = new ArrayList<byte[]>();
 		this.mpsize = 0;
 		this.mpsendtimeout = 3000;
 		this.stopflag = new Tuple2<Boolean, Integer>(Boolean.FALSE, -1);
 		
-		createDataTimer();
+//		createDataTimer();
 	}
 	
 	//-------- methods called from message service --------
@@ -155,12 +151,18 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 				// remove all acked packets
 				for(int i=ackinfo.getStartSequenceNumber(); i<=ackinfo.getEndSequenceNumber(); i++)
 				{
-//					Tuple2<StreamSendTask, Integer> tup =
-						sent.remove(new Integer(i));
+					DataSendInfo tup = sent.remove(new Integer(i));
+					if(tup!=null)
+					{
+						tup.getFuture().setResult(null);
+					}
 				}
 					
-//				System.out.println("ack: "+seqnumber+" "+stop+" "+s+" "+sent.size());
+//				System.out.println("ack "+System.currentTimeMillis()+": seq="+seqnumber+" stop="+ackinfo.isStop()+" startack="+ackinfo.getStartSequenceNumber()+" endack="+ackinfo.getEndSequenceNumber()+" sent="+sent.size());
 //				System.out.println(sent);
+				
+				// Trigger resend of unacknowledged messages, if necessary.
+				checkResend();
 				
 				// Try to send stored messages after some others have been acknowledged
 				sendStored();
@@ -285,7 +287,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
 				if(multipackets)
-					sendMultiPacket();
+					sendAcknowledgedMultiPacket();
 				sendStored();
 				checkWaitForReady();
 				return IFuture.DONE;
@@ -295,11 +297,11 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	
 	/**
 	 *  Wait until the connection is ready for the next write.
-	 *  @return Calls future when next data can be written.
+	 *  @return Calls future when next data can be written. Provides a value of how much data should be given to the connection for best performance.
 	 */
-	public IFuture<Void> waitForReady()
+	public IFuture<Integer> waitForReady()
 	{
-		final Future<Void> ret = new Future<Void>();
+		final Future<Integer> ret = new Future<Integer>();
 		
 		scheduleStep(new IComponentStep<Void>()
 		{
@@ -322,6 +324,8 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		return ret;
 	}
 	
+	//-------- internal methods (single threaded) --------
+	
 	/**
 	 * 
 	 */
@@ -330,16 +334,16 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		if(readyfuture!=null)
 		{
 //			System.out.println("waitforready: "+con.isInited()+" "+(maxsend-sent.size())+" "+isStop()+" "+isClosed());
-			if(con.isInited() && sent.size()<maxsend && queuecnt<maxqueued && !isStop() && !isClosed())
+			if(isSendAllowed() && !isClosed())
 			{
 //				System.out.println("readyfuture fired");
-				Future<Void> ret = readyfuture;
+				Future<Integer> ret = readyfuture;
 				readyfuture = null;
-				ret.setResult(null);
+				ret.setResult(new Integer(mpmaxsize));	// todo: packet size*allowed messages?
 			}
 			else if(isClosed())
 			{
-				Future<Void> ret = readyfuture;
+				Future<Integer> ret = readyfuture;
 				readyfuture = null;
 				ret.setException(new RuntimeException("Connection closed."));
 			}
@@ -355,12 +359,12 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		
 		if(isSendAllowed())
 		{
-//			System.out.println("send: "+task.getSequenceNumber());
-			ret = sendTask(task, null);
+//			System.out.println("send "+System.currentTimeMillis()+": "+task.getSequenceNumber());
+			ret = sendData(task);
 		}
 		else
 		{
-//			System.out.println("store: "+task.getSequenceNumber());
+//			System.out.println("store "+System.currentTimeMillis()+": "+task.getSequenceNumber());
 			ret = new Future<Void>();
 			tosend.add(new Tuple2<StreamSendTask, Future<Void>>(task, (Future<Void>)ret));
 		}
@@ -375,26 +379,19 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	 */
 	protected void sendStored()
 	{
-		int allowed = maxsend-sent.size();
-		
 //		System.out.println("sendStored: sent="+sent.size()+", allowed="+allowed+", tosend="+tosend.size());
 		
-		// Only send data messages after init 
-		// but cannot use isSendAllowed() as
-		// at least one message should be sent in case of stop
-		// to provoke acks with continue
-		if(con.isInited())
+		// Cannot use just isSendAllowed() as at least one message
+		// should be sent in case of stop to provoke acks with continue
+		boolean	test	= con.isInited() && sent.size()<maxsend && queuecnt<maxqueued;
+		while(!tosend.isEmpty() && (isSendAllowed() || test))
 		{
-			for(int i=0; i<allowed && tosend.size()>0; i++)
-			{
-				Tuple2<StreamSendTask, Future<Void>> tup = tosend.remove(0);
-	//			System.out.println("send Stored: "+tup.getFirstEntity().getSequenceNumber());
-				sendTask(tup.getFirstEntity(), tup.getSecondEntity());
-			
-				// Send only one test message if in stop mode.
-				if(isStop())
-					break;
-			}
+			Tuple2<StreamSendTask, Future<Void>> tup = tosend.remove(0);
+//			System.out.println("send Stored: "+tup.getFirstEntity().getSequenceNumber());
+			sendData(tup.getFirstEntity()).addResultListener(new DelegationResultListener<Void>(tup.getSecondEntity()));
+		
+			// Send only one test message if in stop mode.
+			test	= false;
 		}
 	}
 	
@@ -411,7 +408,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		int start = 0;
 		int len = Math.min(mpmaxsize-mpsize, data.length);
 		
-		List<IFuture<Void>> futs = new ArrayList<IFuture<Void>>();
+		Set<IFuture<Void>> futs = new HashSet<IFuture<Void>>();
 		while(len>0)
 		{
 			byte[] part = new byte[len];
@@ -425,9 +422,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		{
 			CounterResultListener<Void> lis = new CounterResultListener<Void>(futs.size(), 
 				new DelegationResultListener<Void>((Future<Void>)ret));
-			for(int i=0; i<futs.size(); i++)
+			for(IFuture<Void> fut: futs)
 			{
-				futs.get(i).addResultListener(lis);
+				fut.addResultListener(lis);
 			}
 		}
 		else
@@ -446,7 +443,9 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	 */
 	protected IFuture<Void> addMultiPacketChunk(byte[] data)
 	{
-		IFuture<Void> ret = IFuture.DONE;
+		if(mpfut==null)
+			mpfut	= new Future<Void>();
+		IFuture<Void>	ret	= mpfut;
 		
 		// Install send timer on first packet
 		if(mpsize==0)
@@ -456,7 +455,10 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		mpsize += data.length;
 		
 		if(mpsize==mpmaxsize)
-			ret = sendMultiPacket();
+		{
+			sendAcknowledgedMultiPacket().addResultListener(new DelegationResultListener<Void>(mpfut));
+			mpfut	= null;
+		}
 		
 		return ret;
 	}
@@ -466,7 +468,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	 * 
 	 *  Send a multi packet.
 	 */
-	protected IFuture<Void> sendMultiPacket()
+	protected IFuture<Void> sendAcknowledgedMultiPacket()
 	{
 		IFuture<Void> ret = IFuture.DONE;
 		
@@ -482,7 +484,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			}
 			
 			StreamSendTask task = (StreamSendTask)createTask(StreamSendTask.DATA, target, getNextSequenceNumber());
-			doSendData(task);
+			ret	= doSendData(task);
 			
 			multipacket.clear();
 			mpsize = 0;
@@ -492,81 +494,83 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	}
 	
 	/**
-	 *  Called internally.
+	 *  Send or resend a data message.
 	 */
-	public IFuture<Void> sendTask(StreamSendTask task, Future<Void> fut)
+	public IFuture<Void> sendData(StreamSendTask task)
 	{
-		IFuture<Void> ret = fut;
-		
-		if(ret==null)
+		DataSendInfo tup = sent.get(task.getSequenceNumber());
+		if(tup==null)
 		{
-			ret = sendTask(task);
+			// First try.
+			tup	= new DataSendInfo(task);
+			
+			// add task to unacknowledged sent list 
+			sent.put(task.getSequenceNumber(), tup);
 		}
 		else
 		{
-			sendTask(task).addResultListener(new DelegationResultListener<Void>(fut));
+			// Retry -> clone task for resend
+			task	= tup.retry();
 		}
 		
-		synchronized(this)
-		{
-			queuecnt++;
-		}
-		System.out.println("queue: "+queuecnt);
-		ret.addResultListener(new IResultListener<Void>()
+		sendTask(task);
+		
+		queuecnt++;
+//		System.out.println("queue: "+queuecnt);
+//		final int	seqno	= task.getSequenceNumber();
+		task.getFuture().addResultListener(new IResultListener<Void>()
 		{
 			public void resultAvailable(Void result)
 			{
-				synchronized(OutputConnectionHandler.this)
-				{
-					queuecnt--;
-				}
-				checkWaitForReady();
+//				System.out.println("Sent "+System.currentTimeMillis()+": seq="+seqno);
+				sendDone();
 			}
+			
 			public void exceptionOccurred(Exception exception)
 			{
-				synchronized(OutputConnectionHandler.this)
+//				System.out.println("Not sent "+System.currentTimeMillis()+": seq="+seqno+", "+exception);
+//				exception.printStackTrace();
+				sendDone();
+			}
+			
+			protected void sendDone()
+			{
+				scheduleStep(new IComponentStep<Void>()
 				{
-					queuecnt--;
-				}				
-				checkWaitForReady();
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						queuecnt--;
+						sendStored();
+						checkWaitForReady();
+						return IFuture.DONE;
+					}
+				});				
 			}
 		});
 		
-		// add task to unacknowledged sent list 
-		sent.put(task.getSequenceNumber(), new Tuple2<StreamSendTask, Integer>(task, new Integer(1)));
-		
-		// create timer if none is active
-		createAckTimer(task.getSequenceNumber());
-		
-		return ret;
+		return tup.getFuture();
 	}
 	
 	/**
-	 *  Called from timer.
-	 *  
-	 *  Uses: sent
+	 *  Triggers resends of packets if no ack has been received in acktimeout.
+	 *  @param id The message id.
+	 *  @return The timer.
 	 */
-	public IFuture<Void> resend(int seqnumber)
+	protected TimerTask	createBulkAckTimer(final Object id)
 	{
-		IFuture<Void> ret = IFuture.DONE;
-		
-		Tuple2<StreamSendTask, Integer> tup = sent.get(new Integer(seqnumber));
-		if(tup!=null)
+		// Test if packets have been sent till last timer was inited
+		return ms.waitForRealDelay(acktimeout, new IComponentStep<Void>()
 		{
-			if(tup.getSecondEntity().intValue()==maxresends)
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				con.close();
+				DataSendInfo tup = sent.get(id);
+				if(tup!=null)
+				{
+					tup.doResend();
+				}
+				return IFuture.DONE;
 			}
-			else
-			{
-//				System.out.println("resend: "+seqnumber);
-				StreamSendTask task = tup.getFirstEntity();
-				ret = sendTask(task);
-				sent.put(task.getSequenceNumber(), new Tuple2<StreamSendTask, Integer>(task, new Integer(tup.getSecondEntity().intValue()+1)));
-			}
-		}
-		
-		return ret;
+		});
 	}
 	
 	/**
@@ -574,7 +578,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 	 */
 	protected boolean isSendAllowed()
 	{
-		return con.isInited() && maxsend-sent.size()>0 && !isStop();
+		return con.isInited() && sent.size()<maxsend && queuecnt<maxqueued && !isStop();
 	}
 	
 	/**
@@ -662,72 +666,7 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			{
 				// Send the packet if it is still the correct one
 				if(seqno==getSequenceNumber())
-					sendMultiPacket();
-				return IFuture.DONE;
-			}
-		});
-	}
-	
-	/**
-	 *  Triggers resends of packets if no ack has been received in acktimeout.
-	 */
-	protected void createAckTimer(final int seqno)
-	{
-		// Test if packets have been sent till last timer was inited
-		if(acktimer==null)
-		{
-			// If more packets have been sent 
-			if(getSequenceNumber()>seqno)
-			{
-//				final int sq = seqno + ackcnt;
-				acktimer = ms.waitForRealDelay(acktimeout, new IComponentStep<Void>()
-				{
-					public IFuture<Void> execute(IInternalAccess ia)
-					{
-						scheduleStep(new IComponentStep<Void>()
-						{
-							public IFuture<Void> execute(IInternalAccess ia)
-							{
-								// Send all packets of the segment again.
-								for(int i=0; i<ackcnt; i++)
-								{
-									resend(i+seqno);
-								}
-								acktimer = null;
-								createAckTimer(seqno + ackcnt);
-								checkWaitForReady();
-								return IFuture.DONE;
-							}
-						});
-						return IFuture.DONE;
-					}
-				});
-			}
-			else
-			{
-				acktimer = null;
-			}
-		}
-	}
-	
-	/**
-	 *  
-	 */
-	protected void createDataTimer()
-	{
-		ms.waitForRealDelay(10000, new IComponentStep<Void>()
-		{
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-//				System.out.println("data timer triggered");
-				
-				sendStored();
-				
-				checkClose();
-				
-				if(!isClosed())
-					createDataTimer();
-				
+					sendAcknowledgedMultiPacket();
 				return IFuture.DONE;
 			}
 		});
@@ -776,4 +715,125 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 		}
 	}
 	
+	/**
+	 *  Check resending of unacknowledged messages.
+	 */
+	public void	checkResend()
+	{
+		// Iterate in insertion order -> oldest first
+		for(DataSendInfo tup: sent.values())
+		{
+			if(tup.getSequenceNumber()<getSequenceNumber()-60)
+			{
+				tup.checkResend();
+			}
+			else
+			{
+				// No need to check newer messages.
+				break;
+			}
+		}
+	}
+	
+	//-------- helper classes --------
+	
+	/**
+	 *  Info about a sent but not yet acknowledged data message.
+	 */
+	public class DataSendInfo
+	{
+		//-------- attributes --------
+		
+		/** The task. */
+		protected StreamSendTask	task;
+		
+		/** The future. */
+		protected Future<Void>	fut;
+		
+		/** The try count. */
+		protected int	tries;
+		
+		/** The timer. */
+		protected TimerTask	timer;
+		
+		/** The sequence number during the last sending. */
+		protected long	lastsend;
+		
+		//-------- constructors --------
+		
+		/**
+		 *  Create a send info.
+		 */
+		public DataSendInfo(StreamSendTask task)
+		{
+			this.task	= task;
+			this.fut	= new Future<Void>();
+			this.tries	= 1;
+			timer	= createBulkAckTimer(task.getSequenceNumber());
+			lastsend	= OutputConnectionHandler.this.getSequenceNumber();
+		}
+		
+		//-------- methods --------
+		
+		/**
+		 *  Get the sequence number.
+		 */
+		public int	getSequenceNumber()
+		{
+			return task.getSequenceNumber();
+		}
+		
+		/**
+		 *  Get the future.
+		 */
+		public Future<Void>	getFuture()
+		{
+			return fut;
+		}
+		
+		/**
+		 *  Retry sending the message.
+		 *  @return task	The task for resend.
+		 */
+		public StreamSendTask	retry()
+		{
+			if(timer!=null)
+				timer.cancel();
+			timer	= createBulkAckTimer(task.getSequenceNumber());
+			lastsend	= OutputConnectionHandler.this.getSequenceNumber();
+			tries++;
+			task	= new StreamSendTask(task);
+//			System.out.println("Retry: #"+tries+", seq="+task.getSequenceNumber());
+			return task;
+		}
+		
+		/**
+		 *  Called when the message should be resent.
+		 */
+		public void	doResend()
+		{
+			if(tries>=maxresends)
+			{
+//				System.out.println("Message could not be sent.");
+				fut.setException(new RuntimeException("Message could not be sent."));
+				sent.remove(task.getSequenceNumber());
+				con.close();
+			}
+			else
+			{
+				sendData(task);
+			}			
+		}
+		
+		/**
+		 *  Check, if the message should be resent.
+		 */
+		public void	checkResend()
+		{
+			if(lastsend<OutputConnectionHandler.this.getSequenceNumber()-60)
+			{
+				doResend();
+			}
+		}
+	}
 }

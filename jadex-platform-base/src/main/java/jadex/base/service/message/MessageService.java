@@ -35,7 +35,6 @@ import jadex.commons.ICommand;
 import jadex.commons.IFilter;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.MultiCollection;
 import jadex.commons.collection.SCollection;
@@ -62,6 +61,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -119,6 +119,9 @@ public class MessageService extends BasicService implements IMessageService
 	
 	/** The library service. */
 	protected ILibraryService libservice;
+	
+	/** The execution service. */
+	protected IExecutionService exeservice;
 	
 	/** The class loader of the message service (only for envelope en/decoding, content is handled by receiver class loader). */
 	protected ClassLoader classloader;
@@ -820,47 +823,82 @@ public class MessageService extends BasicService implements IMessageService
 		{
 			public void customResultAvailable(Void result)
 			{
-				ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
 				if(transports.size()==0)
 				{
 					ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
 				}
 				else
 				{
-					CollectionResultListener<Void> lis = new CollectionResultListener<Void>(tps.length, true,
-						new ExceptionDelegationResultListener<Collection<Void>, Void>(ret)
+					SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+						.addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
 					{
-						public void customResultAvailable(Collection<Void> result)
+						public void customResultAvailable(IExecutionService result)
 						{
-							if(result.isEmpty())
+							exeservice	= result;
+							
+							ITransport[] tps = (ITransport[])transports.toArray(new ITransport[transports.size()]);
+							CollectionResultListener<Void> lis = new CollectionResultListener<Void>(tps.length, true,
+								new ExceptionDelegationResultListener<Collection<Void>, Void>(ret)
 							{
-								ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
-							}
-							else
-							{
-								SServiceProvider.getService(component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-									.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
+								public void customResultAvailable(Collection<Void> result)
 								{
-									public void customResultAvailable(IClockService result)
+									if(result.isEmpty())
 									{
-										clockservice = result;
-										SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-											.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
+										ret.setException(new RuntimeException("MessageService has no working transport for sending messages."));
+									}
+									else
+									{
+										SServiceProvider.getService(component.getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 										{
-											public void customResultAvailable(ILibraryService result)
+											public void customResultAvailable(IClockService result)
 											{
-												libservice = result;
-												libservice.getClassLoader(component.getModel().getResourceIdentifier())
-													.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
+												clockservice = result;
+												SServiceProvider.getService(component.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+													.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
 												{
-													public void customResultAvailable(ClassLoader result)
+													public void customResultAvailable(ILibraryService result)
 													{
-														classloader = result;
-														startStreamSendAliveBehavior();
-														startStreamCheckAliveBehavior();
-														ret.setResult(null);
+														libservice = result;
+														libservice.getClassLoader(component.getModel().getResourceIdentifier())
+															.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
+														{
+															public void customResultAvailable(ClassLoader result)
+															{
+																classloader = result;
+																startStreamSendAliveBehavior();
+																startStreamCheckAliveBehavior();
+																ret.setResult(null);
+															}
+														});
 													}
 												});
+											}
+										});
+									}
+								}
+							});
+							
+							for(int i=0; i<tps.length; i++)
+							{
+								final ITransport	transport	= tps[i];
+								IFuture<Void>	fut	= transport.start();
+								fut.addResultListener(lis);
+								fut.addResultListener(new IResultListener<Void>()
+								{
+									public void resultAvailable(Void result)
+									{
+									}
+									
+									public void exceptionOccurred(final Exception exception)
+									{
+										transports.remove(transport);
+										component.scheduleStep(new IComponentStep<Void>()
+										{
+											public IFuture<Void> execute(IInternalAccess ia)
+											{
+												ia.getLogger().warning("Could not initialize transport: "+transport+" reason: "+exception);
+												return IFuture.DONE;
 											}
 										});
 									}
@@ -868,32 +906,6 @@ public class MessageService extends BasicService implements IMessageService
 							}
 						}
 					});
-					
-					for(int i=0; i<tps.length; i++)
-					{
-						final ITransport	transport	= tps[i];
-						IFuture<Void>	fut	= transport.start();
-						fut.addResultListener(lis);
-						fut.addResultListener(new IResultListener<Void>()
-						{
-							public void resultAvailable(Void result)
-							{
-							}
-							
-							public void exceptionOccurred(final Exception exception)
-							{
-								transports.remove(transport);
-								component.scheduleStep(new IComponentStep<Void>()
-								{
-									public IFuture<Void> execute(IInternalAccess ia)
-									{
-										ia.getLogger().warning("Could not initialize transport: "+transport+" reason: "+exception);
-										return IFuture.DONE;
-									}
-								});
-							}
-						});
-					}
 				}
 			}
 		});
@@ -937,24 +949,17 @@ public class MessageService extends BasicService implements IMessageService
 		};
 		super.shutdownService().addResultListener(crl);
 
-		SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-			.addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(ret)
+		for(int i=0; i<sms.length; i++)
 		{
-			public void customResultAvailable(IExecutionService exe)
-			{
-				for(int i=0; i<sms.length; i++)
-				{
-//					System.err.println("MessageService executor cancel: "+sms[i]);
-					exe.cancel(sms[i]).addResultListener(crl);
-				}
-				
-				for(int i=0; i<transports.size(); i++)
-				{
-//					System.err.println("MessageService transport shutdown: "+transports.get(i));
-					((ITransport)transports.get(i)).shutdown().addResultListener(crl);
-				}
-			}
-		});
+//			System.err.println("MessageService executor cancel: "+sms[i]);
+			exeservice.cancel(sms[i]).addResultListener(crl);
+		}
+		
+		for(int i=0; i<transports.size(); i++)
+		{
+//			System.err.println("MessageService transport shutdown: "+transports.get(i));
+			((ITransport)transports.get(i)).shutdown().addResultListener(crl);
+		}
 		
 		return ret;
 	}
@@ -1294,34 +1299,34 @@ public class MessageService extends BasicService implements IMessageService
 		 */
 		public IFuture<Void> addMessage(final AbstractSendTask task)
 		{
-			isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(task.getFuture())
+//			if(new Random().nextInt(1000)==0)
+//			{
+//				task.getFuture().setException(new RuntimeException("Random message error for testing: "+task.getFuture()));
+//			}
+//			else
 			{
-				public void customResultAvailable(Boolean result)
+				isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(task.getFuture())
 				{
-					if(result.booleanValue())
+					public void customResultAvailable(Boolean result)
 					{
-						synchronized(SendManager.this)
+						if(result.booleanValue())
 						{
-							tasks.add(task);
-						}
-						
-						SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, 
-							RequiredServiceInfo.SCOPE_PLATFORM).addResultListener(new ExceptionDelegationResultListener<IExecutionService, Void>(task.getFuture())
-						{
-							public void customResultAvailable(IExecutionService result)
+							synchronized(SendManager.this)
 							{
-								result.execute(SendManager.this);
+								tasks.add(task);
 							}
-						});
+							
+							exeservice.execute(SendManager.this);
+						}
+						// Fail when service was shut down. 
+						else
+						{
+	//						System.out.println("message not added");
+							task.getFuture().setException(new ServiceTerminatedException(getServiceIdentifier()));
+						}
 					}
-					// Fail when service was shut down. 
-					else
-					{
-//						System.out.println("message not added");
-						task.getFuture().setException(new ServiceTerminatedException(getServiceIdentifier()));
-					}
-				}
-			});
+				});
+			}
 			
 			return task.getFuture();
 		}
@@ -1382,21 +1387,7 @@ public class MessageService extends BasicService implements IMessageService
 				messages.add(msg);
 			}
 			
-			SServiceProvider.getService(component.getServiceProvider(), IExecutionService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(new DefaultResultListener()
-			{
-				public void resultAvailable(Object result)
-				{
-					try
-					{
-						((IExecutionService)result).execute(DeliverMessage.this);
-					}
-					catch(RuntimeException e)
-					{
-						// ignore if execution service is shutting down.
-					}
-				}
-			});
+			exeservice.execute(DeliverMessage.this);
 		}
 	}
 	

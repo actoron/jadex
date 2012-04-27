@@ -147,6 +147,19 @@ public class StreamSendTask extends AbstractSendTask implements ISendTask
 		this.seqnumber = seqnumber;
 	}
 	
+	/**
+	 *  Create a shallow copy.
+	 */
+	public StreamSendTask(StreamSendTask task)
+	{
+		super(task);
+		
+		this.type = task.type;
+		this.message = task.message;
+		this.streamid = task.streamid;
+		this.seqnumber = task.seqnumber;
+	}
+	
 	//-------- methods used by message service --------
 	
 	/**

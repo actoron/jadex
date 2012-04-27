@@ -1,5 +1,6 @@
 package jadex.base.service.message;
 
+import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 /**
@@ -48,10 +49,10 @@ public class LocalOutputConnectionHandler extends LocalAbstractConnectionHandler
 	 *  Wait until the connection is ready for the next write.
 	 *  @return Calls future when next data can be written.
 	 */
-	public IFuture<Void> waitForReady()
+	public IFuture<Integer> waitForReady()
 	{
 		// todo: how to implement locally without timer :-( ?
-		return IFuture.DONE;
+		return new Future<Integer>(32768);	// todo: useful value?
 	}
 	
 //	/**

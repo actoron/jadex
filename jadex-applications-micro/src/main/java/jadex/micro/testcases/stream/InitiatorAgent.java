@@ -215,9 +215,9 @@ public class InitiatorAgent extends TestAgent
 //						System.out.println("wrote: "+size);
 						if(is.available()>0)
 						{
-							con.waitForReady().addResultListener(new IResultListener<Void>()
+							con.waitForReady().addResultListener(new IResultListener<Integer>()
 							{
-								public void resultAvailable(Void result)
+								public void resultAvailable(Integer result)
 								{
 									agent.scheduleStep(self);
 //									agent.waitFor(10, self);

@@ -2,6 +2,7 @@ package jadex.base.service.message;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.commons.Tuple2;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -19,8 +20,14 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 {
 	//-------- attributes -------- 
 	
-	/** The last received sequence number. */
+	/** The last in order received sequence number. */
 	protected int rseqno;
+	
+	/** The highest yet (may be out of order) received sequence number. */
+	protected int maxseqno;
+	
+	/** The highest yet (may be out of order) acknowledged sequence number (only used to trigger new acks every x messages). */
+	protected int maxackseqno;
 	
 	/** The maximum buffer size for out of order packets. */
 	protected int maxbuf;
@@ -29,8 +36,8 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	protected int maxstored;
 	
 	/** The data (stored here only as long as it is out of order or incomplete). 
-	    Ready data will be forwarded to the connection. */
-	protected Map<Integer, byte[]> data;
+	    Ready data will be forwarded to the connection. Also remembers if an acknowledgement has been sent.*/
+	protected Map<Integer, Tuple2<byte[], Boolean>> data;
 	
 	
 	/** The last sequence number acknowledged. */
@@ -55,9 +62,10 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	{
 		super(ms);
 		this.rseqno = 0;
+		this.maxseqno = 0;
 		this.maxbuf = 1000;
 		this.maxstored = 10000; 
-		this.data = new HashMap<Integer, byte[]>();
+		this.data = new HashMap<Integer, Tuple2<byte[], Boolean>>();
 	
 		this.ackcnt = 10;
 		this.lastack = -1;
@@ -147,6 +155,8 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 			{
 				if(!con.isClosed())
 				{
+					maxseqno	= Math.max(maxseqno, seqnumber);
+					
 					// If packet is the next one deliver to stream
 					// else store in map till the next one arrives
 					int expseqno = getSequenceNumber()+1;
@@ -157,30 +167,44 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 						forwardData(dat);
 						
 						// Forward possibly stored data
-						byte[] nextdata = data.remove(new Integer(getSequenceNumber()+1));
+						Tuple2<byte[], Boolean> nextdata = data.remove(new Integer(getSequenceNumber()+1));
 						for(; nextdata!=null ;)
 						{
 //							System.out.println("forwarding stored: "+(getSequenceNumber()+1));
-							forwardData(nextdata);
+							forwardData(nextdata.getFirstEntity());
 							nextdata = data.remove(new Integer(getSequenceNumber()+1));
 						}
 					}
 					else
 					{
 //						System.out.println("storing: "+seqnumber+", size="+data.size());
-						Object old = data.put(new Integer(seqnumber), dat);
 						// ack msg may be lost, repeat ack msg
-						if(old!=null)
+						if(data.containsKey(new Integer(seqnumber)))
 						{
 							// todo: ack also more than one packet?
 							sendDataAck(seqnumber, seqnumber, false);
 						}
-						if(data.size()>maxbuf)
+						else
 						{
-							System.out.println("Closing connection due to package loss: "+seqnumber+" :"+data.size());
-							con.close();
-							data.clear();
+							data.put(new Integer(seqnumber), new Tuple2<byte[], Boolean>(dat, Boolean.FALSE));
+							if(data.size()>maxbuf)
+							{
+								System.out.println("Closing connection due to package loss: "+seqnumber+" :"+data.size());
+								con.close();
+								data.clear();
+							}
 						}
+					}
+					
+					// Directly acknowledge when ackcnt packets have been received
+					// or start timer to acknowledge less packages in an interval.
+					if(maxseqno>maxackseqno+ackcnt || maxseqno==lastseqno)
+					{
+						sendDataAck();
+					}
+					else 
+					{
+						createDataTimer(acktimeout);
 					}
 				}
 				
@@ -199,22 +223,11 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 		int seqno = getNextReceivedSequenceNumber();
 		getInputConnection().addData(data);
 		
-		// Directly acknowledge when ackcnt packets have been received
-		// or start time to acknowledge less packages in an interval.
-		if(seqno%ackcnt==0 || seqno==lastseqno)
+		// if last packet was received close this side
+		if(seqno==lastseqno)
 		{
-			sendDataAck();
-			
-			// if last packet was received close this side
-			if(seqno==lastseqno)
-			{
-				if(!con.isClosed())
-					con.setClosed();
-			}
-		}
-		else 
-		{
-			createDataTimer();
+			if(!con.isClosed())
+				con.setClosed();
 		}
 	}
 	
@@ -240,7 +253,7 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 *  Create a new data ack timer.
 	 *  Sends an ack automatically after some timeout.
 	 */
-	public void createDataTimer()
+	public void createDataTimer(long acktimeout)
 	{
 		// Test if packets have been received till creation
 		if(datatimer==null && rseqno>lastack)
@@ -252,7 +265,6 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	//						System.out.println("timer ack");
 					sendDataAck();
 					datatimer = null;
-					createDataTimer();	
 					return IFuture.DONE;
 				}
 			});
@@ -264,14 +276,42 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 	 */
 	protected void sendDataAck()
 	{
-		// Only send acks if new packets have arrived.
-		if(getSequenceNumber()>lastack)
+		// Send missing acks for all available data
+		int seqno	= maxseqno;
+		while(seqno>lastack)
 		{
-//			System.out.println("send ack: "+Math.max(0, rseqno-ackcnt)+".."+rseqno);
-			// tuple contains seqno and stop flag
-			sendDataAck(Math.max(0, rseqno-ackcnt), rseqno, isStop());
-			lastack = rseqno;
+			// Skip empty or acknowledged slots.
+			while(seqno>getSequenceNumber() && (!data.containsKey(new Integer(seqno)) || data.get(new Integer(seqno)).getSecondEntity().booleanValue()))
+			{
+				seqno--;
+			}
+
+			int end	= seqno;	// End of block.
+			int start	= seqno;	// Start of block.
+			// Find block of received messages (don't exclude already acknowledged to reduce number of required messages)
+			while(seqno>getSequenceNumber() && seqno>lastack && data.containsKey(new Integer(seqno)))
+			{
+				if(!data.get(new Integer(seqno)).getSecondEntity().booleanValue())
+				{
+					data.put(new Integer(seqno), new Tuple2<byte[], Boolean>(data.get(new Integer(seqno)).getFirstEntity(), Boolean.TRUE));
+					start	= seqno;	// Only start from unacknowledged message.
+				}
+				seqno--;
+			}
+			
+			if(seqno==getSequenceNumber())	// acknowldege forwarded data, if block expands to current rseqno.
+			{
+				start	= lastack+1;
+				lastack	= end;
+			}
+			
+			if(start<end)	// found at least one message?
+			{
+//				System.out.println("send ack: start="+start+" end="+end+" cur="+rseqno+" last="+lastack);
+				sendDataAck(start, end, isStop());
+			}
 		}
+		maxackseqno	= maxseqno;
 	}
 	
 	/**

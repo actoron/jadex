@@ -255,8 +255,9 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				sendTask(createTask(StreamSendTask.ALIVE, null, null))
-					.addResultListener(new DelegationResultListener<Void>(ret));
+				AbstractSendTask	task	= createTask(StreamSendTask.ALIVE, null, null);
+				sendTask(task);
+				task.getFuture().addResultListener(new DelegationResultListener<Void>(ret));
 				return IFuture.DONE;
 			}
 		});
@@ -327,7 +328,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	 *  @param seqnumber The sequence number.
 	 *  @return The task for sending the message.
 	 */
-	protected AbstractSendTask createTask(String type, Object content, Integer seqnumber)
+	protected AbstractSendTask createTask(String type, byte[] content, Integer seqnumber)
 	{
 		return createTask(type, content, false, seqnumber);
 	}
@@ -348,11 +349,10 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	}
 	
 	/**
-	 *  Send a task. Automatically closes the stream if
-	 *  the other side could not be reached.
+	 *  Send a task.
 	 *  @param task The task.
 	 */
-	protected IFuture<Void> sendTask(final AbstractSendTask task)
+	protected void sendTask(final AbstractSendTask task)
 	{
 //		System.out.println("sendTask: "+SUtil.arrayToString(task.getProlog())+" "+task.getData().length);
 		
@@ -361,7 +361,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 			throw new RuntimeException("Must have exactly one receiver.");
 		SendManager sm = ms.getSendManager(recs[0]);
 		
-		IFuture<Void> ret = sm.addMessage(task);
+		sm.addMessage(task);
 //		ret.addResultListener(new IResultListener<Void>()
 //		{
 //			public void resultAvailable(Void result)
@@ -375,8 +375,6 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 //				getConnection().setClosed();
 //			}
 //		});
-		
-		return ret;
 	}
 	
 	/**

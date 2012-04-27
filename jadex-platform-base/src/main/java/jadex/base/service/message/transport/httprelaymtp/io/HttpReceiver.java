@@ -6,7 +6,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
@@ -58,7 +57,7 @@ public class HttpReceiver
 		SServiceProvider.getService(access.getServiceProvider(), IMessageService.class, Binding.SCOPE_PLATFORM)
 			.addResultListener(new DefaultResultListener<IMessageService>()
 		{
-			public void resultAvailable(IMessageService ms)
+			public void resultAvailable(final IMessageService ms)
 			{
 				// Todo: update cid at runtime?
 				ms.updateComponentIdentifier(access.getComponentIdentifier().getRoot())
@@ -131,26 +130,15 @@ public class HttpReceiver
 														{
 															public IFuture<Void> execute(final IInternalAccess ia)
 															{
-																ia.getServiceContainer().searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-																	.addResultListener(new IResultListener<IMessageService>()
+																try
 																{
-																	public void resultAvailable(IMessageService ms)
-																	{
-																		try
-																		{
-																			ms.deliverMessage(rawmsg);
-																		}
-																		catch(Exception e)
-																		{
-																			ia.getLogger().warning("Exception when delivering message: "+e+", "+rawmsg);													
-																		}
-																	}
-																	
-																	public void exceptionOccurred(Exception e)
-																	{
-																		ia.getLogger().warning("Exception when delivering message: "+e+", "+rawmsg);
-																	}
-																});
+																	ms.deliverMessage(rawmsg);
+																}
+																catch(Exception e)
+																{
+																	ia.getLogger().warning("Exception when delivering message: "+e+", "+rawmsg);													
+																}
+																
 																return IFuture.DONE;
 															}
 														});

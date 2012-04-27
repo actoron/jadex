@@ -5,8 +5,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
 import jadex.commons.ICommand;
-import jadex.commons.IResultCommand;
-import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -38,7 +36,7 @@ public class ServiceOutputConnection implements IOutputConnection
 	protected List<byte[]> buffer;
 	
 	/** The ready future. */
-	protected Future<Void> readyfuture;
+	protected Future<Integer> readyfuture;
 	
 	/** The transfer future. */
 	protected ICommand transfercommand;
@@ -89,13 +87,13 @@ public class ServiceOutputConnection implements IOutputConnection
 	 *  Wait until the connection is ready for the next write.
 	 *  @return Calls future when next data can be written.
 	 */
-	public IFuture<Void> waitForReady()
+	public IFuture<Integer> waitForReady()
 	{
-		Future<Void> ret = new Future<Void>();
+		Future<Integer> ret = new Future<Integer>();
 		
 		if(con!=null)
 		{
-			con.waitForReady().addResultListener(new DelegationResultListener<Void>(ret));
+			con.waitForReady().addResultListener(new DelegationResultListener<Integer>(ret));
 		}
 		else if(readyfuture==null)
 		{
@@ -193,7 +191,7 @@ public class ServiceOutputConnection implements IOutputConnection
 		
 		if(readyfuture!=null)
 		{
-			ocon.waitForReady().addResultListener(new DelegationResultListener<Void>(readyfuture));
+			ocon.waitForReady().addResultListener(new DelegationResultListener<Integer>(readyfuture));
 		}
 		
 		if(closed)
