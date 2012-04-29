@@ -4,13 +4,18 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.android.IAndroidContextService;
 import jadex.bridge.service.types.android.IPreferences;
+import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -58,45 +63,26 @@ public class AndroidSettingsService extends SettingsService {
 	}
 
 	@Override
-	public IFuture<Properties> loadProperties() {
-		preferences = contextService.getSharedPreferences(DEFAULT_PREFS_NAME);
+	protected Properties readPropertiesFromStore() {
+		this.preferences = contextService.getSharedPreferences(DEFAULT_PREFS_NAME);
 		// preferences.setString("securityservice.password", "andori");
-		IFuture<Properties> loadProperties = super.loadProperties();
-		loadProperties
-				.addResultListener(new DefaultResultListener<Properties>() {
-
-					@Override
-					public void resultAvailable(Properties result) {
-						// overloadProperties(props, preferences, "");
-						loadPreferencesIntoProperties(props, preferences, preferFileProperties);
-					}
-
-				});
-		return loadProperties;
+		Properties props = new Properties();
+		try {
+			props = super.readPropertiesFromStore();
+		} catch (Exception e) {
+		}
+		loadPreferencesIntoProperties(props, this.preferences, preferFileProperties);
+		return props;
 	}
 
 	@Override
-	public IFuture<Void> saveProperties(boolean shutdown) {
-		Future<Void> ret = new Future<Void>();
+	protected void writePropertiesToStore(Properties props)
+			throws IOException {
 		savePropertiesAsPreferences(props, preferences, "");
 		boolean committed = preferences.commit();
-		if (committed) {
-			ret.setResult(null);
-		} else {
-			ret.setException(new Exception(
-					"Could not save Preferences as Properties!"));
+		if (!committed) {
+			throw new IOException("Could not save Preferences as Properties!");
 		}
-		return ret;
-	}
-
-	@Override
-	public IFuture<Void> setProperties(String id, Properties props) {
-		return super.setProperties(id, props);
-	}
-
-	@Override
-	public IFuture<Properties> getProperties(String id) {
-		return super.getProperties(id);
 	}
 
 	private static void loadPreferencesIntoProperties(Properties props,

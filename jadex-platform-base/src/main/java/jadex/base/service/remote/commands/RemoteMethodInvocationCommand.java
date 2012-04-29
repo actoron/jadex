@@ -180,7 +180,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 							sec	= clazz.getAnnotation(Security.class);
 							if(sec==null)
 							{
-								classes.addAll(Arrays.asList(clazz.getInterfaces()));
+								classes.addAll(Arrays.asList((Class<?>[])clazz.getInterfaces()));
 								if(clazz.getSuperclass()!=null)
 								{
 									classes.add(clazz.getSuperclass());

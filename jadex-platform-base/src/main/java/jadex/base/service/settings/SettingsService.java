@@ -14,7 +14,9 @@ import jadex.xml.PropertiesXMLHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -229,11 +231,7 @@ public class SettingsService extends BasicService implements ISettingsService
 		
 		try
 		{
-			// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
-			File file = getFile(filename);
-			FileInputStream fis = new FileInputStream(file.exists() ? file : getFile("default"+SETTINGS_EXTENSION));
-			props	= (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, getClass().getClassLoader(), null);
-			fis.close();
+			props = readPropertiesFromStore();
 		}
 		catch(Exception e)
 		{
@@ -262,6 +260,24 @@ public class SettingsService extends BasicService implements ISettingsService
 	}
 	
 	/**
+	 * Reads and returns the stored Properties, usually from a file.
+	 * @return {@link Properties}
+	 * @throws FileNotFoundException
+	 * @throws Exception
+	 * @throws IOException
+	 */
+	protected Properties readPropertiesFromStore() throws FileNotFoundException, Exception,
+			IOException {
+		Properties ret;
+		// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
+		File file = getFile(filename);
+		FileInputStream fis = new FileInputStream(file.exists() ? file : getFile("default"+SETTINGS_EXTENSION));
+		ret	= (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, getClass().getClassLoader(), null);
+		fis.close();
+		return ret;
+	}
+
+	/**
 	 *  Save the platform properties to the default location.
 	 *  @return A future indicating when properties have been saved.
 	 */
@@ -286,11 +302,7 @@ public class SettingsService extends BasicService implements ISettingsService
 			{
 				try
 				{
-					// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
-					File file = getFile(filename);
-					FileOutputStream os = new FileOutputStream(file);
-					PropertiesXMLHelper.getPropertyWriter().write(props, os, getClass().getClassLoader(), null);
-					os.close();
+					writePropertiesToStore(props);
 				}
 				catch(Exception e)
 				{
@@ -298,6 +310,8 @@ public class SettingsService extends BasicService implements ISettingsService
 				}
 				ret.setResult(null);
 			}
+
+			
 		};
 		rl	= shutdown ? rl : access.createResultListener(rl); 
 		final CounterResultListener	crl	= new CounterResultListener(providers.size(), rl);
@@ -320,6 +334,24 @@ public class SettingsService extends BasicService implements ISettingsService
 		}
 		
 		return ret;
+	}
+	
+
+	/**
+	 * Writes the given properties into a Store, usually a file.
+	 * @throws FileNotFoundException
+	 * @throws Exception
+	 * @throws IOException
+	 */
+	protected void writePropertiesToStore(Properties props) throws FileNotFoundException,
+			Exception, IOException {
+		// Todo: Which class loader to use? library service unavailable, because
+		// it depends on settings service?
+		File file = getFile(filename);
+		FileOutputStream os = new FileOutputStream(file);
+		PropertiesXMLHelper.getPropertyWriter().write(props, os,
+				getClass().getClassLoader(), null);
+		os.close();
 	}
 	
 	//-------- Helper methods --------
