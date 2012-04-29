@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.preference.EditTextPreference;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -82,7 +83,9 @@ public class JadexStringPreference extends EditTextPreference implements
 		mDialog = null;
 		boolean result = mWhichButtonClicked == DialogInterface.BUTTON_POSITIVE;
 		onDialogClosed(result);
-		getView(view, parent);
+		view = getView(view, parent);
+		notifyChanged();
 	}
+	
 
 }

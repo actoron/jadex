@@ -2,6 +2,7 @@ package jadex.android.controlcenter;
 
 import android.content.Context;
 import android.preference.CheckBoxPreference;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -23,8 +24,8 @@ public class JadexBooleanPreference extends CheckBoxPreference implements
 	protected View onCreateView(ViewGroup parent) {
 		View view = super.onCreateView(parent);
 		view.setOnClickListener(this);
-		view.setEnabled(true);
-		view.setClickable(true);
+		view.setEnabled(false);
+		view.setClickable(false);
 		return view;
 	}
 
@@ -40,5 +41,5 @@ public class JadexBooleanPreference extends CheckBoxPreference implements
 		super.onClick();
 		getView(v, parent);
 	}
-
+	
 }

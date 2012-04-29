@@ -3,7 +3,10 @@ package jadex.android.controlcenter;
 import jadex.android.JadexAndroidContext;
 import jadex.base.service.settings.AndroidSettingsService;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import android.app.ListActivity;
 import android.content.Context;
@@ -11,9 +14,11 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.PreferenceActivity;
 import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.PreferenceScreen;
 
-public class JadexAndroidControlCenter extends ListActivity {
+public class JadexAndroidControlCenter extends PreferenceActivity {
 
 	private SharedPreferences sharedPreferences;
 
@@ -30,15 +35,28 @@ public class JadexAndroidControlCenter extends ListActivity {
 						AndroidSettingsService.DEFAULT_PREFS_NAME,
 						Context.MODE_PRIVATE);
 
-		// LinearLayout main = new LinearLayout(this);
-		// main.setOrientation(LinearLayout.VERTICAL);
 		Map<String, ?> prefs = sharedPreferences.getAll();
-		// ListView main = new ListView(this);
-		PreferenceListAdapter adapter = new PreferenceListAdapter(this, prefs);
-		adapter.setOnPreferenceChangeListener(opcl);
-		// main.setAdapter(adapter);
-		// setContentView(main);
-		setListAdapter(adapter);
+		
+		setPreferenceScreen(createPreferenceHierarchy(prefs));
+	}
+
+	private PreferenceScreen createPreferenceHierarchy(Map<String, ?> prefs) {
+        PreferenceScreen root = getPreferenceManager().createPreferenceScreen(this);
+        
+        JadexPreferenceCategory pGroup;
+		List<String> addedProviders = new ArrayList<String>();
+		for (Entry<String, ?> entry : prefs.entrySet()) {
+			String key = entry.getKey();
+			String provider = ((String) key).split("\\.")[0];
+			if (!addedProviders.contains(provider)) {
+				addedProviders.add(provider);
+				pGroup = new JadexPreferenceCategory(this, provider, prefs);
+				pGroup.setOnPreferenceChangeListener(opcl);
+				root.addPreference(pGroup);
+			}
+		}
+        
+        return root;
 	}
 
 	@Override
