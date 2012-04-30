@@ -59,6 +59,7 @@ import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -74,6 +75,8 @@ import javax.swing.Timer;
 import javax.swing.TransferHandler;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -255,7 +258,6 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 
 				users	= new LinkedHashMap<IComponentIdentifier, ChatUser>();
 
-				
 				chatarea = new JTextArea(10, 30)
 				{
 					public void append(String text)
@@ -266,8 +268,28 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				};
 				chatarea.setEditable(false);
 				JScrollPane main = new JScrollPane(chatarea);
+
+				final JLabel lto = new JLabel("To: all");
 				
 				table	= new JTable(new UserTableModel());
+				table.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+				{
+					public void valueChanged(ListSelectionEvent e)
+					{
+//						System.out.println(SUtil.arrayToString(table.getSelectedRows()));
+						int[] sels = table.getSelectedRows();
+						StringBuffer buf = new StringBuffer("To: ");
+						for(int i=0; i<sels.length; i++)
+						{
+							IComponentIdentifier cid = (IComponentIdentifier)table.getModel().getValueAt(sels[i], 0);
+							buf.append(cid.getLocalName());
+							if(i+1<sels.length)
+								buf.append(", ");
+						}
+						lto.setText(buf.toString());
+					}
+				});
+				
 				JScrollPane userpan = new JScrollPane(table);
 				table.getColumnModel().getColumn(0).setCellRenderer(userrend);
 				table.setTransferHandler(new TransferHandler()
@@ -376,6 +398,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				JPanel south = new JPanel(new BorderLayout());
 				final JTextField tf = new JTextField();
 				final JButton send = new JButton("Send");
+				south.add(lto, BorderLayout.WEST);
 				south.add(tf, BorderLayout.CENTER);
 				south.add(send, BorderLayout.EAST);
 				tf.getDocument().addDocumentListener(new DocumentListener()
@@ -596,7 +619,13 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public IFuture<Void>	tell(String text, final int request)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		getService().message(text).addResultListener(new IntermediateDefaultResultListener<IChatService>()
+		int[] sels = table.getSelectedRows();
+		IComponentIdentifier[] recs = new IComponentIdentifier[sels.length];
+		for(int i=0; i<sels.length; i++)
+		{
+			recs[i] = (IComponentIdentifier)table.getModel().getValueAt(sels[i], 0);
+		}
+		getService().message(text, recs).addResultListener(new IntermediateDefaultResultListener<IChatService>()
 		{
 			public void intermediateResultAvailable(final IChatService chat)
 			{

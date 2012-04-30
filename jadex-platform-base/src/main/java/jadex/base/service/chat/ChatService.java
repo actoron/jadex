@@ -5,6 +5,7 @@ import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -34,6 +35,7 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.micro.annotation.Binding;
+import jadex.micro.annotation.RequiredService;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -293,47 +295,88 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  @param text The text message.
 	 *  @return The remote services, to which the message was successfully posted.
 	 */
-	public IIntermediateFuture<IChatService> message(final String text)
+	public IIntermediateFuture<IChatService> message(final String text, final IComponentIdentifier[] receivers)
 	{
 		final IntermediateFuture<IChatService>	ret	= new IntermediateFuture<IChatService>();
-		final IIntermediateFuture<IChatService> ifut = agent.getServiceContainer().getRequiredServices("chatservices");
-		ifut.addResultListener(new IntermediateDelegationResultListener<IChatService>(ret)
+		
+		if(receivers.length>0)
 		{
-			boolean	finished;
-			int cnt;
-			public void intermediateResultAvailable(final IChatService chat)
+			final int[] cnt = new int[]{receivers.length};
+			for(int i=0; i<receivers.length; i++)
 			{
-				cnt++;
-				chat.message(nick, text).addResultListener(new IResultListener<Void>()
+				agent.getServiceContainer().getService(IChatService.class, receivers[i])
+					.addResultListener(new IResultListener<IChatService>()
 				{
-					public void resultAvailable(Void result)
+					public void resultAvailable(final IChatService chat)
 					{
-						ret.addIntermediateResultIfUndone(chat);	// Might return after later exception in service search!?
-						
-						if(--cnt==0 && finished)
+						chat.message(nick, text).addResultListener(new IResultListener<Void>()
 						{
-							ret.setFinished();
-						}
+							public void resultAvailable(Void result)
+							{
+								ret.addIntermediateResultIfUndone(chat);	// Might return after later exception in service search!?
+								
+								if(--cnt[0]==0)
+									ret.setFinished();
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								if(--cnt[0]==0)
+									ret.setFinished();
+							}
+						});
+						
+						ret.addIntermediateResult(chat);
 					}
-					
 					public void exceptionOccurred(Exception exception)
 					{
-						if(--cnt==0 && finished)
-						{
+						if(--cnt[0]==0)
 							ret.setFinished();
-						}
 					}
 				});
 			}
-			public void finished()
+		}
+		else //if(receivers.length==0)
+		{
+			final IIntermediateFuture<IChatService> ifut = agent.getServiceContainer().getRequiredServices("chatservices");
+			ifut.addResultListener(new IntermediateDelegationResultListener<IChatService>(ret)
 			{
-				finished	= true;
-				if(finished && cnt==0)
+				boolean	finished;
+				int cnt;
+				public void intermediateResultAvailable(final IChatService chat)
 				{
-					ret.setFinished();
+					cnt++;
+					chat.message(nick, text).addResultListener(new IResultListener<Void>()
+					{
+						public void resultAvailable(Void result)
+						{
+							ret.addIntermediateResultIfUndone(chat);	// Might return after later exception in service search!?
+							
+							if(--cnt==0 && finished)
+							{
+								ret.setFinished();
+							}
+						}
+						
+						public void exceptionOccurred(Exception exception)
+						{
+							if(--cnt==0 && finished)
+							{
+								ret.setFinished();
+							}
+						}
+					});
 				}
-			}
-		});
+				public void finished()
+				{
+					finished	= true;
+					if(finished && cnt==0)
+					{
+						ret.setFinished();
+					}
+				}
+			});
+		}
 		
 		return ret;
 	}

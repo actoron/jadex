@@ -418,7 +418,7 @@ public class SelectorThread implements Runnable
 				connections.put(address, new NIOTCPDeadConnection());
 			}
 			ret.setException(e);
-			System.out.println("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPDeadConnection.DEADSPAN/1000+" seconds): "+address+", "+e);
+//			System.out.println("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPDeadConnection.DEADSPAN/1000+" seconds): "+address+", "+e);
 			logger.info("NIOTCP receiving error while opening connection (address marked as dead for "+NIOTCPDeadConnection.DEADSPAN/1000+" seconds): "+address+", "+e);
 //			e.printStackTrace();
 			key.cancel();

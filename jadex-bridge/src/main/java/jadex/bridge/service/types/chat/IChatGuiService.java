@@ -49,7 +49,7 @@ public interface IChatGuiService
 	 *  @param text The text message.
 	 *  @return The remote services, to which the message was successfully posted.
 	 */
-	public IIntermediateFuture<IChatService> message(String text);
+	public IIntermediateFuture<IChatService> message(String text, IComponentIdentifier[] receivers);
 	
 	/**
 	 *  Post a status change.
