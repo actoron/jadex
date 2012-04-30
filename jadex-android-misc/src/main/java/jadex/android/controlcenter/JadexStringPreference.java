@@ -10,8 +10,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
-public class JadexStringPreference extends EditTextPreference implements
-		OnClickListener {
+public class JadexStringPreference extends EditTextPreference implements OnClickListener {
 
 	private int mWhichButtonClicked;
 	private AlertDialog.Builder mBuilder;
@@ -62,17 +61,17 @@ public class JadexStringPreference extends EditTextPreference implements
 		view.setOnClickListener(this);
 		return view;
 	}
-
-	@Override
-	public void setKey(String key) {
-		super.setKey(key);
-	}
-
+	
 	@Override
 	public void setText(String text) {
 		super.setText(text);
 		setSummary("Aktueller Wert: "
 				+ text);
+	}
+	
+	public void setValue(Object value) {
+		String text = (String) value;
+		setText(text);
 	}
 
 	@Override

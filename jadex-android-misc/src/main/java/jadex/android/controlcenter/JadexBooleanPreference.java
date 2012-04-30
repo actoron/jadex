@@ -7,8 +7,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
-public class JadexBooleanPreference extends CheckBoxPreference implements
-		OnClickListener {
+public class JadexBooleanPreference extends CheckBoxPreference implements OnClickListener {
 
 	private View view;
 	private ViewGroup parent;
@@ -40,6 +39,15 @@ public class JadexBooleanPreference extends CheckBoxPreference implements
 	public void onClick(View v) {
 		super.onClick();
 		getView(v, parent);
+	}
+
+
+	public void setValue(Object value) {
+		if (value instanceof String) {
+			setChecked(Boolean.parseBoolean((String) value));
+		} else {
+			setChecked((Boolean) value);
+		}
 	}
 	
 }

@@ -71,7 +71,7 @@ public class AndroidSettingsService extends SettingsService {
 			props = super.readPropertiesFromStore();
 		} catch (Exception e) {
 		}
-		//loadPreferencesIntoProperties(props, this.preferences, preferFileProperties);
+		loadPreferencesIntoProperties(props, this.preferences, preferFileProperties);
 		return props;
 	}
 
@@ -117,28 +117,6 @@ public class AndroidSettingsService extends SettingsService {
 		}
 	}
 
-	private static void overloadProperties(Properties props,
-			IPreferences prefs, String path) {
-		String appendType = props.getType();
-		if (appendType != null) {
-			path = path + appendType + ".";
-		}
-
-		for (Property prop : props.getProperties()) {
-			String type = prop.getType();
-			String value = prop.getValue();
-			String prefKey = path + type;
-			String prefValue = prefs.getString(prefKey, null);
-			if (prefValue != null) {
-				prop.setValue(prefValue.toString());
-			}
-		}
-
-		for (Properties subprops : props.getSubproperties()) {
-			overloadProperties(subprops, prefs, path);
-		}
-	}
-
 	private static void savePropertiesAsPreferences(Properties props,
 			IPreferences prefs, String path) {
 		String appendType = props.getType();
@@ -147,9 +125,11 @@ public class AndroidSettingsService extends SettingsService {
 		}
 
 		for (Property prop : props.getProperties()) {
+			String name = prop.getName();
 			String type = prop.getType();
 			String value = prop.getValue();
 			String prefKey = path + type;
+			
 			prefs.setString(prefKey, value);
 		}
 

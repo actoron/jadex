@@ -56,6 +56,9 @@ public class SecurityService implements ISecurityService
 	/** Flag to enable / disable password protection. */
 	protected Boolean	usepass;
 	
+	/** Determines if password was specified during creation. (i.e. in Platform Configuration) */
+	protected boolean fixedUsepass;
+	
 	/** Print password on startup or change. */
 	protected boolean	printpass;
 	
@@ -81,6 +84,7 @@ public class SecurityService implements ISecurityService
 	public SecurityService(Boolean usepass, boolean printpass)
 	{
 		this.usepass = usepass;
+		this.fixedUsepass = usepass != null;
 		this.printpass = printpass;
 	}
 	
@@ -121,7 +125,7 @@ public class SecurityService implements ISecurityService
 								{
 									public IFuture<Void> execute(IInternalAccess ia)
 									{
-										if(usepass==null)
+										if(!fixedUsepass)
 										{
 											boolean up = props.getBooleanProperty("usepass");
 											usepass	= up? Boolean.TRUE: Boolean.FALSE;
