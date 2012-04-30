@@ -31,8 +31,6 @@ public class DomeJMonkeyRenderer extends AbstractJMonkeyRenderer
 
 
 			geo = new Geometry(identifier, dome);
-			
-			geo.setModelBound(new BoundingBox());
 
 			return geo;
 			

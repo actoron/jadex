@@ -28,9 +28,6 @@ public class SphereJMonkeyRenderer extends AbstractJMonkeyRenderer
 			sphere = new Sphere(30, 30, 1);
 		
 			geo = new Geometry(identifier, sphere);
-
-			geo.setModelBound(new BoundingBox());
-			
 			
 			return geo;
 }

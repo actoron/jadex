@@ -1,5 +1,8 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey.renderer;
 
+import java.awt.Color;
+
+import jadex.extension.envsupport.observer.graphics.drawable.Text;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
@@ -9,7 +12,12 @@ import com.jme3.bounding.BoundingBox;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.font.Rectangle;
+import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
+import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
 
@@ -22,19 +30,39 @@ public class Text3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 	public Spatial draw(DrawableCombiner3d dc, Primitive3d primitive,
 			Object obj, ViewportJMonkey vp)
 	{
-		 text = (String)((Text3d)primitive).getText();
+		Node textnode = new Node(identifier);
+		
+		Text3d textP = (Text3d)primitive;
+		// text = (String)((Text3d)primitive).getText();
+		String text = Text3d.getReplacedText(dc, obj, textP.getText(), vp);
+//		 text = ((String)dc.getBoundValue(obj, ((Text3d)primitive).getText(), vp));
+		 System.out.println("text: " + text);
+		 if (text==null)
+		 {
+			text= ((Text3d)primitive).getText();
+		 }
+			Color c =  (Color)primitive.getColor();
+			float alpha= ((float)c.getAlpha())/255;
+			ColorRGBA color = new ColorRGBA(((float)c.getRed())/255,((float)c.getGreen())/255,((float)c.getBlue())/255, alpha);
 	    
 	    	        BitmapFont fnt = assetManager.loadFont("Interface/Fonts/Default.fnt");
 	    	        BitmapText txt = new BitmapText(fnt, false);
-	    	        txt.setBox(new Rectangle(0, 0, 6, 3));
+	    	        
+	    	        //TODO: what is the use of setBox?
+	    	        txt.setBox(new Rectangle(-1, -1, 2, 2));
 	    	        txt.setQueueBucket(Bucket.Transparent);
-	    	        txt.setSize( 1.5f );
+	    	        txt.setSize( 0.1f );
 	    	        txt.setText(text);
-
+	    	        txt.setColor(color);
+	    	        
+					
 
 		txt.setModelBound(new BoundingBox());
 
-		return txt;
+		textnode.attachChild(txt);
+		
+		
+		return textnode;
 
 
 	}

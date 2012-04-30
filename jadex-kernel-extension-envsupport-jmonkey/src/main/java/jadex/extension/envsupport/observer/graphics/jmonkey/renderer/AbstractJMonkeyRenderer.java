@@ -3,13 +3,16 @@ package jadex.extension.envsupport.observer.graphics.jmonkey.renderer;
 import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
+import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
 import jadex.extension.envsupport.observer.graphics.jmonkey.ViewportJMonkey;
+import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
 import java.awt.Color;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.ColorRGBA;
@@ -17,6 +20,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.texture.Texture;
 
@@ -93,7 +97,7 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 				spatial.setLocalRotation(quatation);
 				
 				// Set the Material
-				if(spatial instanceof Geometry && primitive.getType()!=6 && primitive.getType()!=8 &&  primitive.getType()!=9) // And not a Node -> Object3D
+				if((spatial instanceof Geometry) && primitive.getType()!=6  && primitive.getType()!=8 &&  primitive.getType()!=9) // And not a Node -> Object3D
 				{   
 					Material mat_tt = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 //					Material mat_tt = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");				
@@ -161,6 +165,34 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 			sp.setLocalScale(sizelocal);
 			sp.setLocalTranslation(positionlocal);
 			sp.setLocalRotation(quatation);
+			
+//			 Special Case: 3d-Text
+			if(primitive.getType() == 7)
+			{
+				if(sp instanceof Node)
+				{
+					Node textnode = (Node)sp;
+					Spatial textspatial = textnode.getChild(0);
+					if(textspatial instanceof BitmapText)
+					{
+						BitmapText txt=(BitmapText) textspatial;
+						
+						Text3d textP = (Text3d)primitive;
+						// text = (String)((Text3d)primitive).getText();
+						String text = Text3d.getReplacedText(dc, obj, textP.getText(), vp);
+						
+//						String text = ((String)dc.getBoundValue(obj, ((Text3d)primitive).getText(), vp));
+//						 if (text==null)
+//						 {
+//							text= ((Text3d)primitive).getText();
+//						 }
+						
+						txt.setText(text);
+					}
+
+				}
+					
+			}
 		}
 		else
 		{

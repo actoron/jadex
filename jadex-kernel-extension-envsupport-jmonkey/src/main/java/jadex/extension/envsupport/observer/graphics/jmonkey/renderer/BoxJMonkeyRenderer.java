@@ -24,7 +24,6 @@ public class BoxJMonkeyRenderer extends AbstractJMonkeyRenderer
 		box = new Box(Vector3f.ZERO, 1, 1, 1);
 
 		geo = new Geometry(identifier, box);
-		geo.setModelBound(new BoundingBox());
 
 		return geo;
 

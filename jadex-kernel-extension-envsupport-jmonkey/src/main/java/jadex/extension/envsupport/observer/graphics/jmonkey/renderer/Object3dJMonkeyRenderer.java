@@ -28,8 +28,6 @@ public class Object3dJMonkeyRenderer extends AbstractJMonkeyRenderer
 
         object = assetManager.loadModel(file);
         
-//        object.setModelBound(new BoundingBox());
-        
         object.setName(identifier);
         
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");

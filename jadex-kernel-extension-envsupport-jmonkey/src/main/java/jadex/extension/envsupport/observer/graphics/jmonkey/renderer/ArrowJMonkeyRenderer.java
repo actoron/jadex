@@ -24,8 +24,6 @@ public class ArrowJMonkeyRenderer extends AbstractJMonkeyRenderer
 		    arrow.setLineWidth(2); 
 
 			geo = new Geometry(identifier, arrow);
-			
-			geo.setModelBound(new BoundingBox());
 
 			return geo;
 			

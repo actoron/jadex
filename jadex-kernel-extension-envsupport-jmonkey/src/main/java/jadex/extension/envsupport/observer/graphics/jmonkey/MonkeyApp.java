@@ -1,10 +1,15 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
+import jadex.extension.envsupport.observer.graphics.drawable3d.Text3d;
+
+import java.security.KeyRep;
 import java.util.Collection;
+import java.util.List;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.AssetManager;
 import com.jme3.collision.CollisionResults;
+import com.jme3.font.BitmapText;
 import com.jme3.input.FlyByCamera;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -49,6 +54,8 @@ public class MonkeyApp extends SimpleApplication
 
 	// Helper Classes
 	private monkeyApp_Grid	_gridHandler;
+	
+	private int				 _selectedTarget;
 
 	public MonkeyApp(float areaSize)
 	{
@@ -57,6 +64,7 @@ public class MonkeyApp extends SimpleApplication
 		_staticNode = new Node("staticNode");
 		_gridNode = new Node("gridNode");
 		_walkCam = false;
+		_selectedTarget = -1;
 	}
 
 	@Override
@@ -72,7 +80,7 @@ public class MonkeyApp extends SimpleApplication
 
 
 		this.rootNode.attachChild(_geometryNode);
-//		this.rootNode.attachChild(_gridNode);
+		// this.rootNode.attachChild(_gridNode);
 		this.rootNode.attachChild(_staticNode);
 
 
@@ -89,7 +97,7 @@ public class MonkeyApp extends SimpleApplication
 	/** Custom Keybinding: Map named actions to inputs. */
 	private void initKeys()
 	{
-		
+
 		inputManager.addMapping("Select", new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
 		// You can map one or several inputs to one named action
 		inputManager.addMapping("Random", new KeyTrigger(KeyInput.KEY_SPACE));
@@ -125,6 +133,13 @@ public class MonkeyApp extends SimpleApplication
 					}
 
 				}
+				
+				
+				if(name.equals("Select") && keyPressed)
+				{
+					fireSelection();
+				}
+				
 				else if(name.equals("ZoomIn"))
 				{
 					moveCamera(1, false);
@@ -141,6 +156,11 @@ public class MonkeyApp extends SimpleApplication
 			}
 
 		};
+		
+
+														
+
+												
 
 
 		inputManager.addListener(actionListener, new String[]{"Random"});
@@ -148,7 +168,7 @@ public class MonkeyApp extends SimpleApplication
 		inputManager.addListener(actionListener, new String[]{"ChangeCam"});
 		inputManager.addListener(actionListener, new String[]{"ZoomIn"});
 		inputManager.addListener(actionListener, new String[]{"ZoomOut"});
-		inputManager.addListener(analogListener, new String[]{"Select"});
+		inputManager.addListener(actionListener, new String[]{"Select"});
 
 
 	}
@@ -204,6 +224,36 @@ public class MonkeyApp extends SimpleApplication
 			loc.setY(getHeightAt(loc.x, loc.z));
 			cam.setLocation(loc);
 		}
+
+		// for(Spatial spatial : _geometryNode.getChildren())
+		// {
+		// if(spatial instanceof Node)
+		// {
+		// Node objectnode = (Node)spatial;
+		// List<Spatial> spatis = (List<Spatial>)objectnode.getChildren();
+		//
+		// for(Spatial sp : spatis)
+		// {
+		// if(sp instanceof Node)
+		// {
+		// Node obnode = (Node)sp;
+		// Spatial text = (Spatial)obnode.getChild(0);
+		//
+		// if(text instanceof BitmapText)
+		// {
+		// BitmapText txt = (BitmapText)text;
+		// // txt.lookAt(cam.getLocation(), Vector3f.UNIT_Y);
+		//
+		// sp.lookAt(cam.getLocation(), Vector3f.UNIT_Y);
+		//
+		// }
+		// }
+		// }
+		//
+		//
+		// }
+		// }
+
 
 	}
 
@@ -306,41 +356,64 @@ public class MonkeyApp extends SimpleApplication
 		_areaSize = scale;
 
 	}
-	
-	/*
-	 * Use later for Selectioncontroll
-	 */
-	private AnalogListener analogListener = new AnalogListener() {
-	    public void onAnalog(String name, float intensity, float tpf) {
-	      if (name.equals("Select")) {
-	        // Reset results list.
-	        CollisionResults results = new CollisionResults();
-	        // Convert screen click to 3d position
-	        Vector2f click2d = inputManager.getCursorPosition();
-	        Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
-	        Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalize();
-	        // Aim the ray from the clicked spot forwards.
-	        Ray ray = new Ray(click3d, dir);
-	        // Collect intersections between ray and all nodes in results list.
-	        rootNode.collideWith(ray, results);
-	        // (Print the results so we see what is going on:)
-	        for (int i = 0; i < results.size(); i++) {
-	          // (For each "hit", we know distance, impact point, geometry.)
-	          float dist = results.getCollision(i).getDistance();
-	          Vector3f pt = results.getCollision(i).getContactPoint();
-	          String target = results.getCollision(i).getGeometry().getName();
-	          System.out.println("Selection #" + i + ": " + target + " at " + pt + ", " + dist + " WU away.");
-	        }
-	        // Use the results -- we rotate the selected geometry.
-	        if (results.size() > 0) {
-	          Geometry target = results.getClosestCollision().getGeometry();
-	          // Here comes the action:
-	          System.out.println("target: " + target.getName());
-	          
-	        }
-	      } // else if ...
-	    }
-	  };
 
+	private void fireSelection()
+	{
+		// Reset results list.
+		CollisionResults results = new CollisionResults();
+		// Convert screen click
+		// to 3d position
+		Vector2f click2d = inputManager.getCursorPosition();
+		Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 0f).clone();
+		Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d.x, click2d.y), 1f).subtractLocal(click3d).normalize();
+		// Aim the ray from the
+		// clicked spot
+		// forwards.
+		Ray ray = new Ray(click3d, dir);
+		// Collect intersections
+		// between ray and all
+		// nodes in results
+		// list.
+//		rootNode.collideWith(ray, results);
+		_geometryNode.collideWith(ray, results);
+
+		int selection = -1;
+		if(results.size() > 0)
+		{
+			Geometry target = results.getClosestCollision().getGeometry();
+			// Here comes the
+			// action:
+			Spatial selectedsp = target;
+			
+			// we look for the SpaceObject-Parent
+			if(selectedsp != null)
+			{
+				while(!Character.isDigit(selectedsp.getName().charAt(0)))
+				{
+					selectedsp = selectedsp.getParent();
+				}
+				
+				selection = Integer.parseInt(selectedsp.getName());
+			}
+		}
+		setSelectedTarget(selection);
+		
+	} // else if ...
+
+	/**
+	 * @return the _selectedTarget
+	 */
+	public int getSelectedTarget()
+	{
+		return _selectedTarget;
+	}
+
+	/**
+	 * @param _selectedTarget the _selectedTarget to set
+	 */
+	public void setSelectedTarget(int selectedTarget)
+	{
+		this._selectedTarget = selectedTarget;
+	}
 
 }

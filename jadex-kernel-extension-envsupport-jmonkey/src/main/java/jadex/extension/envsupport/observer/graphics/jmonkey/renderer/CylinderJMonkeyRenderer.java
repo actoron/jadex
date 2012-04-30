@@ -27,8 +27,6 @@ public class CylinderJMonkeyRenderer extends AbstractJMonkeyRenderer
 
 		geo = new Geometry(identifier, cylinder);
 
-		geo.setModelBound(new BoundingBox());
-
 		return geo;
 
 
