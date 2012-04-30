@@ -1,18 +1,23 @@
 package jadex.bridge.service.component.interceptors;
 
-import jadex.bridge.service.annotation.PostCondition;
-import jadex.bridge.service.annotation.PostConditions;
-import jadex.bridge.service.annotation.PreCondition;
-import jadex.bridge.service.annotation.PreConditions;
+import jadex.bridge.service.annotation.CheckIndex;
+import jadex.bridge.service.annotation.CheckNotNull;
+import jadex.bridge.service.annotation.CheckState;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.IValueFetcher;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.javaparser.SJavaParser;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -25,7 +30,34 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 	 */
 	public boolean isApplicable(ServiceInvocationContext context)
 	{
-		return context.getMethod().isAnnotationPresent(PreConditions.class);
+		boolean ret = false;
+		Annotation[] methodannos = context.getMethod().getAnnotations();
+		for(int i=0; !ret && i<methodannos.length; i++)
+		{
+			ret = isPrePostCondition(methodannos[i]);
+		}
+		if(!ret)
+		{
+			Annotation[][] paramannos = context.getMethod().getParameterAnnotations();
+			for(int i=0; !ret && i<paramannos.length; i++)
+			{
+				for(int j=0; !ret && j<paramannos[i].length; j++)
+				{
+					ret = isPrePostCondition(paramannos[i][j]);
+				}
+			}
+		}
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected boolean isPrePostCondition(Annotation anno)
+	{
+		return anno instanceof CheckNotNull 
+			|| anno instanceof CheckState
+			|| anno instanceof CheckIndex;
 	}
 	
 	/**
@@ -53,65 +85,135 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 	/**
 	 * 
 	 */
-	protected ConditionException checkPreConditions(ServiceInvocationContext context)
+	protected RuntimeException checkPreConditions(ServiceInvocationContext context)
 	{
-		ConditionException ex = null;
-
-		PreConditions pcons = context.getMethod().getAnnotation(PreConditions.class);
-		PreCondition[] pcs = pcons.value();
+		RuntimeException ret = null;
 		final Object[] args = context.getArgumentArray();
-		for(int i=0; ex==null && i<pcs.length; i++)
+
+		Annotation[][] paramannos = context.getMethod().getParameterAnnotations();
+		for(int i=0; ret==null && i<paramannos.length; i++)
 		{
-			if(pcs[i].value()==PreCondition.Type.NOTNULL)
+			for(int j=0; ret==null && j<paramannos[i].length; j++)
 			{
-				int[] argnos = pcs[i].argno();
-				for(int j=0; ex==null && j<argnos.length; j++)
+				if(paramannos[i][j] instanceof CheckNotNull)
 				{
-					if(args[argnos[j]]==null)
+					if(args[i]==null)
 					{
-						ex = new ConditionException("Precondition violated, argument null: "+argnos[j]);
+						ret = new NullPointerException();
 					}
 				}
-			}
-			else if(pcs[i].value()==PreCondition.Type.EXPRESSION)
-			{
-				Object resu = SJavaParser.evaluateExpression(pcs[i].expression(), new PrePostConditionFetcher(context.getArgumentArray(), null, null));
-				if(!(resu instanceof Boolean) || !((Boolean)resu).booleanValue())
+				else if(paramannos[i][j] instanceof CheckIndex)
 				{
-					ex = new ConditionException("Precondition violated: "+pcs[i].expression());
+					CheckIndex ci = (CheckIndex)paramannos[i][j];
+					int test = ((Number)args[i]).intValue();
+					if(test<0)
+					{
+						ret = new IndexOutOfBoundsException();
+					}
+					else
+					{
+						int idx = ci.value();
+						if(args[idx] instanceof Collection)
+						{
+							if(test>=((Collection)args[idx]).size())
+							{
+								ret = new IndexOutOfBoundsException();
+							}
+						}
+						else if(args[idx]!=null && args[idx].getClass().isArray())
+						{
+							if(test>=Array.getLength(args[idx]))
+							{
+								ret = new IndexOutOfBoundsException();
+							}
+						}
+						else if(args[idx] instanceof Map)
+						{
+							if(test>=((Map)args[idx]).size())
+							{
+								ret = new IndexOutOfBoundsException();
+							}
+						}
+					}
 				}
+				else if(paramannos[i][j] instanceof CheckState)
+				{
+					CheckState ci = (CheckState)paramannos[i][j];
+					Object resu = SJavaParser.evaluateExpression(ci.value(), new PrePostConditionFetcher(args, 
+						args[i], null, null));
+					if(!(resu instanceof Boolean) || !((Boolean)resu).booleanValue())
+					{
+						ret = new IllegalStateException("Precondition violated: "+ci.value()+" arg: "+args[i]);
+					}
+				}	
 			}
 		}
 		
-		return ex;
+		return ret;
 	}
 	
 	/**
 	 * 
 	 */
-	protected ConditionException checkPostConditions(ServiceInvocationContext context, Object res, Object ires)
+	protected RuntimeException checkPostConditions(ServiceInvocationContext context, Object res, 
+		boolean intermediate, List<Object> ires)
 	{
-		ConditionException ex = null;
-		PostConditions pcons = context.getMethod().getAnnotation(PostConditions.class);
-		PostCondition[] pcs = pcons.value();
-		for(int i=0; ex==null && i<pcs.length; i++)
+		RuntimeException ret = null;
+
+		Annotation[] annos = context.getMethod().getAnnotations();
+		for(int i=0; ret==null && i<annos.length; i++)
 		{
-			if(pcs[i].value()==PostCondition.Type.NOTNULL)
+			if(annos[i] instanceof CheckNotNull)
 			{
-				if(res==null)// || ires==null) ?
+				CheckNotNull cnn = (CheckNotNull)annos[i];
+				if(intermediate && cnn.intermediate() || (!intermediate && !cnn.intermediate()))
 				{
-					ex = new ConditionException("Postcondition violated, result nulls.");
+					if(res==null)
+					{
+						ret = new NullPointerException();
+					}
 				}
 			}
-			else if(pcs[i].value()==PostCondition.Type.EXPRESSION)
+			else if(annos[i] instanceof CheckState)
 			{
-				Object val = SJavaParser.evaluateExpression(pcs[i].expression(), new PrePostConditionFetcher(context.getArgumentArray(), res, ires));
-				if(!(val instanceof Boolean) || !((Boolean)val).booleanValue())
-					ex = new ConditionException("Postcondition violated: "+pcs[i].expression());
-			}
+				CheckState ci = (CheckState)annos[i];
+				if(intermediate && ci.intermediate() || (!intermediate && !ci.intermediate()))
+				{
+					Object[] args = context.getArgumentArray();
+					Object resu = SJavaParser.evaluateExpression(ci.value(), new PrePostConditionFetcher(args, 
+						null, res, ires));
+					if(!(resu instanceof Boolean) || !((Boolean)resu).booleanValue())
+					{
+						ret = new IllegalStateException("Precondition violated: "+ci.value());
+					}
+				}
+			}	
 		}
 		
-		return ex;
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected int getKeepForPostConditions(ServiceInvocationContext context)
+	{
+		int ret = 0;
+
+		Annotation[] annos = context.getMethod().getAnnotations();
+		for(int i=0; i<annos.length; i++)
+		{
+			if(annos[i] instanceof CheckState)
+			{
+				CheckState ci = (CheckState)annos[i];
+				if(ci.intermediate())
+				{
+					ret = Math.max(ret, ci.keep());
+				}
+			}	
+		}
+		
+		return ret;
 	}
 	
 	/**
@@ -122,20 +224,24 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 		/** The arguments. */
 		protected Object[] args;
 		
+		/** The current arguments. */
+		protected Object currentarg;
+		
 		/** The result. */
 		protected Object result;
 		
-		/** The intermediate result. */
-		protected Object iresult;
+		/** The intermediate results. */
+		protected List<Object> ires;
 		
 		/**
 		 * 
 		 */
-		public PrePostConditionFetcher(Object[] args, Object result, Object iresult)
+		public PrePostConditionFetcher(Object[] args, Object currentarg, Object result, List<Object> ires)
 		{
 			this.args = args;
+			this.currentarg = currentarg;
 			this.result = result;
-			this.iresult = iresult;
+			this.ires = ires;
 		}
 		
 		/**
@@ -148,18 +254,24 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 			{
 				ret = result;
 			}
-			else if("$ires".equals(name))
+			else if(name.startsWith("$res["))
 			{
-				ret = iresult;
+				String numtext = name.substring(5, name.length()-1);
+				int num = Integer.parseInt(numtext);
+				ret = ires.get(ires.size()-num);
 			}
 			else
 			{
 				int idx = name.indexOf("$arg");
-				if(idx>-1)
+				if(idx>-1 && idx+4<name.length())
 				{
 					String numtext = name.substring(idx+4);
 					int num = Integer.parseInt(numtext);
-					return args[num];
+					ret = args[num];
+				}
+				else
+				{
+					ret = currentarg;
 				}
 			}
 			return ret;
@@ -211,9 +323,26 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 			{
 				FutureFunctionality func = new FutureFunctionality()
 				{
+					List<Object> ires;
+					
+					protected void addIntermediateResultToStore(Object result, int keep)
+					{
+						if(keep>0)
+						{
+							if(ires==null)
+								ires = new ArrayList<Object>();
+							ires.add(result);
+							if(ires.size()>keep)
+								ires.remove(0);
+						}
+					}
+					
 					public Object addIntermediateResult(Object result)
 					{
-						ConditionException ex = checkPostConditions(sic, null, result);
+						int keep = getKeepForPostConditions(sic);
+						addIntermediateResultToStore(result, keep);
+						
+						RuntimeException ex = checkPostConditions(sic, result, true, ires);
 						if(ex!=null)
 							throw ex;
 						else
@@ -227,7 +356,7 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 					
 					public void setFinished(Collection<Object> results)
 					{
-						ConditionException ex = checkPostConditions(sic, results, null);
+						RuntimeException ex = checkPostConditions(sic, results, false, ires);
 						if(ex!=null)
 							throw ex;
 					}
@@ -239,7 +368,7 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 					
 					public Object setResult(Object result)
 					{
-						ConditionException ex = checkPostConditions(sic, result, null);
+						RuntimeException ex = checkPostConditions(sic, result, false, ires);
 						if(ex!=null)
 							throw ex;
 						else
@@ -257,7 +386,7 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 			}
 			else
 			{
-				Exception ex = checkPostConditions(sic, result, null);
+				Exception ex = checkPostConditions(sic, result, false, null);
 		    	if(ex!=null)
 		    		super.exceptionOccurred(ex);
 			}
