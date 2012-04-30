@@ -74,21 +74,21 @@ public abstract class AbstractCodec implements ITraverseProcessor, IDecoderHandl
 	 *  @param ec The encoding context.
 	 *  @return True, if a reference has been encoded, false otherwise.
 	 */
-	/*//public int encodeReference(Object object, Class clazz, EncodingContext ec)
-	//{
-		//Integer ref = ec.getKnownObjects().get(object);
-		//if (ref != null)
-		//{
-			//ec.writeString("R");
-			//ec.writeVarInt(ref.intValue());
-			//return true;
-			return 1;
-		//}
-		
-		//ec.getKnownObjects().put(object, ec.getKnownObjects().size());
-		
-		//return false;
-	//}*/
+//	public int encodeReference(Object object, Class clazz, EncodingContext ec)
+//	{
+//		Integer ref = ec.getKnownObjects().get(object);
+//		if (ref != null)
+//		{
+//			//ec.writeString("R");
+//			//ec.writeVarInt(ref.intValue());
+//			//return true;
+//			return 1;
+//		}
+//		
+//		ec.getKnownObjects().put(object, ec.getKnownObjects().size());
+//		
+//		return false;
+//	}
 	
 	/**
 	 *  Encode the object.
