@@ -40,9 +40,9 @@ public class Main
 
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos
-		Reader xmlreader = new Reader(new TypeInfoPathManager(typeinfos), false, false, false, null, new BeanObjectReaderHandler());
+		Reader xmlreader = new Reader(false, false, false, null);
 		InputStream is = SUtil.getResource("jadex/xml/tutorial/jibx/example03/data.xml", null);
-		Object object = xmlreader.read(is, null, null);
+		Object object = xmlreader.read(new TypeInfoPathManager(typeinfos), new BeanObjectReaderHandler(), is, null, null);
 		is.close();
 		
 		// The typeinfos need to be refined for writing.
@@ -71,9 +71,9 @@ public class Main
 		})));
 		
 		// Write the xml to the output file.
-		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos), false, true);
+		Writer xmlwriter = new Writer(false, true);
 		OutputStream os = new FileOutputStream("out.xml");
-		xmlwriter.write(object, os, null, null);
+		xmlwriter.write(new BeanObjectWriterHandler(typeinfos), object, os, null, null);
 		os.close();
 		
 		// And print out the result.

@@ -53,10 +53,10 @@ public class Main
 		})));
 		
 		// Write the xml to the output file.
-		Writer xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos, false, true), false);
-		String xml1 = Writer.objectToXML(xmlwriter, pl, null);
-		xmlwriter = new Writer(new BeanObjectWriterHandler(typeinfos, false, true, false), false);
-		String xml2 = Writer.objectToXML(xmlwriter, pl, null);
+		Writer xmlwriter = new Writer(false);
+		String xml1 = Writer.objectToXML(xmlwriter, pl, null, new BeanObjectWriterHandler(typeinfos, false, true));
+		xmlwriter = new Writer(false);
+		String xml2 = Writer.objectToXML(xmlwriter, pl, null, new BeanObjectWriterHandler(typeinfos, false, true, false));
 		
 		// And print out the result.
 		System.out.println("Wrote xml 1: "+xml1);

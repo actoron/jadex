@@ -4,9 +4,9 @@ import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteReference;
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.base.service.remote.RemoteServiceManagementService;
-import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.annotation.Security;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.commons.SReflect;
@@ -18,10 +18,8 @@ import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
-import jadex.xml.writer.WriteContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -60,10 +58,10 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	protected String callid;
 	
 	/** The security level (set by postprocessing). */
-	protected String	securitylevel;
+	protected String securitylevel;
 	
 	/** The target object (set by postprocessing). */
-	protected Object	target;
+	protected Object target;
 	
 	/** The caller. */
 	protected IComponentIdentifier caller;
@@ -119,20 +117,20 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			public void customResultAvailable(Void result)
 			{
 				// Do we still need this code? Is done via post processor during marshalling.
-				if(parametertypes.length>0)
-				{
-					RMIPreProcessor preproc = new RMIPreProcessor(rrm);
-					boolean[] refs = SServiceProvider.getRemoteReferenceInfo(method, false);
-					WriteContext context = new WriteContext(null, new Object[]{target, null}, null, null);
-					for(int i=0; i<parametertypes.length; i++)
-					{
-						if(refs[i] || rrm.getMarshalService().isRemoteReference(parametervalues[i]))
-						{
-//							System.out.println("found ref: "+parametervalues[i]);
-							parametervalues[i] = preproc.preProcess(context, parametervalues[i]);
-						}
-					}
-				}
+//				if(parametertypes.length>0)
+//				{
+//					RMIPreProcessor preproc = new RMIPreProcessor(rrm);
+//					boolean[] refs = SServiceProvider.getRemoteReferenceInfo(method, false);
+//					WriteContext context = new WriteContext(null, new Object[]{target, null}, null, null);
+//					for(int i=0; i<parametertypes.length; i++)
+//					{
+//						if(refs[i] || rrm.getMarshalService().isRemoteReference(parametervalues[i]))
+//						{
+////							System.out.println("found ref: "+parametervalues[i]);
+//							parametervalues[i] = preproc.preProcess(context, parametervalues[i]);
+//						}
+//					}
+//				}
 				
 				returnisref = SServiceProvider.isReturnValueRemoteReference(method, false);
 				super.customResultAvailable(result);
@@ -218,24 +216,6 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		invokeMethod(ret, rsms);
 		IComponentIdentifier.LOCAL.set(component.getComponentIdentifier());
 		
-//		rsms.getRemoteReferenceModule().getTargetObject(getRemoteReference())
-//			.addResultListener(new IResultListener() // todo: createResultListener?!
-//		{
-//			public void resultAvailable(Object result)
-//			{
-//				invokeMethod(result, ret);//.addResultListener(new DelegationResultListener(ret));
-//			}
-//			
-//			public void exceptionOccurred(Exception exception)
-//			{
-////				ret.setResult(new RemoteResultCommand(null, new RuntimeException(
-////					"Target object not found: "+getRemoteReference()), callid, false, methodname));
-//				ret.addIntermediateResult(new RemoteResultCommand(null, new RuntimeException(
-//					"Target object not found: "+getRemoteReference()), callid, false, methodname));
-//				ret.setFinished();
-//			}
-//		});
-		
 		return ret;
 	}
 
@@ -250,6 +230,14 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		
 //		if("addMessageListener".equals(methodname))
 //			System.out.println("remote addMessageListener");
+		
+		IComponentIdentifier tmp = null;
+		Object ti = getRemoteReference().getTargetIdentifier();
+		if(ti instanceof IComponentIdentifier)
+			tmp = (IComponentIdentifier)ti;
+		else if(ti instanceof IServiceIdentifier)
+			tmp = ((IServiceIdentifier)ti).getProviderId();
+		final IComponentIdentifier ridcom = tmp;
 		
 		try
 		{
@@ -279,13 +267,13 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 					public void intermediateResultAvailable(Object result)
 					{
 //						System.out.println("inter: "+result);
-						ret.addIntermediateResult(new RemoteIntermediateResultCommand(result, callid, returnisref, methodname, false));
+						ret.addIntermediateResult(new RemoteIntermediateResultCommand(ridcom, result, callid, returnisref, methodname, false));
 					}
 					
 					public void finished()
 					{
 //						System.out.println("fin");
-						ret.addIntermediateResult(new RemoteIntermediateResultCommand(null, callid, returnisref, methodname, true));
+						ret.addIntermediateResult(new RemoteIntermediateResultCommand(ridcom, null, callid, returnisref, methodname, true));
 						ret.setFinished();
 						rsms.removeProcessingCall(callid);
 					}
@@ -293,7 +281,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 					public void resultAvailable(Object result)
 					{
 //						System.out.println("ra");
-						ret.addIntermediateResult(new RemoteResultCommand(result, null, callid, returnisref, methodname));
+						ret.addIntermediateResult(new RemoteResultCommand(ridcom, result, null, callid, returnisref, methodname));
 						ret.setFinished();
 						rsms.removeProcessingCall(callid);
 					}
@@ -301,7 +289,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 					public void resultAvailable(Collection result)
 					{
 //						System.out.println("ra");
-						ret.addIntermediateResult(new RemoteResultCommand(result, null, callid, returnisref, methodname));
+						ret.addIntermediateResult(new RemoteResultCommand(ridcom, result, null, callid, returnisref, methodname));
 						ret.setFinished();
 						rsms.removeProcessingCall(callid);
 					}
@@ -309,7 +297,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 					public void exceptionOccurred(Exception exception)
 					{
 //						System.out.println("ex: "+exception);
-						ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false, methodname));
+						ret.addIntermediateResult(new RemoteResultCommand(ridcom, null, exception, callid, false, methodname));
 						ret.setFinished();
 						rsms.removeProcessingCall(callid);
 					}
@@ -321,14 +309,14 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 				{
 					public void resultAvailable(Object result)
 					{
-						ret.addIntermediateResult(new RemoteResultCommand(result, null, callid, returnisref, methodname));
+						ret.addIntermediateResult(new RemoteResultCommand(ridcom, result, null, callid, returnisref, methodname));
 						ret.setFinished();
 						rsms.removeProcessingCall(callid);
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false, methodname));
+						ret.addIntermediateResult(new RemoteResultCommand(ridcom, null, exception, callid, false, methodname));
 						ret.setFinished();
 						rsms.removeProcessingCall(callid);
 					}
@@ -336,7 +324,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			}
 			else
 			{
-				ret.addIntermediateResult(new RemoteResultCommand(res, null, callid, returnisref, methodname));
+				ret.addIntermediateResult(new RemoteResultCommand(ridcom, res, null, callid, returnisref, methodname));
 				ret.setFinished();
 				rsms.removeProcessingCall(callid);
 			}
@@ -348,7 +336,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 			{
 				exception	= (Exception)((InvocationTargetException)exception).getTargetException();
 			}
-			ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false, methodname));
+			ret.addIntermediateResult(new RemoteResultCommand(ridcom, null, exception, callid, false, methodname));
 			ret.setFinished();
 			rsms.removeProcessingCall(callid);
 		}
@@ -485,6 +473,15 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		this.returnisref = returnisref;
 	}
 
+	/**
+	 *  Get the receiver component (if other than rms).
+	 *  @return the real receiver.
+	 */
+	public IComponentIdentifier getSender()
+	{
+		return caller;
+	}
+	
 	/**
 	 *  Get the string representation.
 	 */

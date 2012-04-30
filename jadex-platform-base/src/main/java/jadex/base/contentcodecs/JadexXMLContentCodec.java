@@ -1,10 +1,15 @@
 package jadex.base.contentcodecs;
 
 import jadex.bridge.service.types.message.IContentCodec;
+import jadex.commons.Tuple2;
+import jadex.xml.TypeInfoPathManager;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
+import jadex.xml.reader.IObjectReaderHandler;
+import jadex.xml.writer.IObjectWriterHandler;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -35,9 +40,11 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object val, ClassLoader classloader)
+	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info)
 	{
-		byte[] ret = JavaWriter.objectToByteArray(val, classloader);
+		Object[] infos = info==null? null: info.get(getClass());
+		IObjectWriterHandler handler = (IObjectWriterHandler)(infos!=null? infos[1]: null);
+		byte[] ret = JavaWriter.objectToByteArray(val, classloader, handler);
 		if(DEBUG)
 			System.out.println("encode content: "+ret);
 		return ret;
@@ -48,9 +55,11 @@ public class JadexXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public Object decode(byte[] val, ClassLoader classloader)
+	public Object decode(byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info)
 	{
-		Object ret = JavaReader.objectFromByteArray(val, classloader);
+		Object[] infos = info==null? null: info.get(getClass());
+		Tuple2<TypeInfoPathManager, IObjectReaderHandler>  tup = (Tuple2<TypeInfoPathManager, IObjectReaderHandler>)(infos!=null? infos[0]: null);
+		Object ret = JavaReader.objectFromByteArray(val, classloader, tup==null? null: tup.getFirstEntity(), tup==null? null: tup.getSecondEntity());
 		if(DEBUG)
 			System.out.println("decode content: "+ret);
 		return ret;

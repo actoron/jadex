@@ -33,7 +33,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	//-------- attributes --------
 
 	/** The providerid (i.e. the component to start with searching). */
-	protected Object providerid;
+	protected IComponentIdentifier providerid;
 	
 	/** The serach manager. */
 	protected ISearchManager manager;
@@ -48,7 +48,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	protected String callid;
 	
 	/** The security level (set by postprocessing). */
-	protected String	securitylevel;
+	protected String securitylevel;
 
 	//-------- constructors --------
 	
@@ -62,7 +62,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	/**
 	 *  Create a new remote search command.
 	 */
-	public RemoteSearchCommand(Object providerid, ISearchManager manager, 
+	public RemoteSearchCommand(IComponentIdentifier providerid, ISearchManager manager, 
 		IVisitDecider decider, IResultSelector selector, String callid)
 	{
 		this.providerid = providerid;
@@ -171,14 +171,14 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 								}
 								
 //								ret.setResult(new RemoteResultCommand(content, null , callid, false));
-								ret.addIntermediateResult(new RemoteResultCommand(content, null , callid, false));
+								ret.addIntermediateResult(new RemoteResultCommand(null, content, null , callid, false));
 								ret.setFinished();
 							}
 							
 							public void exceptionOccurred(Exception exception)
 							{
 //								ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-								ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false));
+								ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false));
 								ret.setFinished();
 							}
 						});
@@ -187,7 +187,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 					public void exceptionOccurred(Exception exception)
 					{
 //						ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-						ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false));
+						ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false));
 						ret.setFinished();
 					}
 				});
@@ -196,7 +196,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 			public void exceptionOccurred(Exception exception)
 			{
 //				ret.setResult(new RemoteResultCommand(null, exception, callid, false));
-				ret.addIntermediateResult(new RemoteResultCommand(null, exception, callid, false));
+				ret.addIntermediateResult(new RemoteResultCommand(null, null, exception, callid, false));
 				ret.setFinished();
 			}
 		});
@@ -208,7 +208,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 *  Get the providerid.
 	 *  @return the providerid.
 	 */
-	public Object getProviderId()
+	public IComponentIdentifier getProviderId()
 	{
 		return providerid;
 	}
@@ -217,7 +217,7 @@ public class RemoteSearchCommand extends AbstractRemoteCommand
 	 *  Set the providerid.
 	 *  @param providerid The providerid to set.
 	 */
-	public void setProviderId(Object providerid)
+	public void setProviderId(IComponentIdentifier providerid)
 	{
 		this.providerid = providerid;
 	}

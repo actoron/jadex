@@ -266,13 +266,13 @@ public class SettingsService extends BasicService implements ISettingsService
 	 * @throws Exception
 	 * @throws IOException
 	 */
-	protected Properties readPropertiesFromStore() throws FileNotFoundException, Exception,
-			IOException {
+	protected Properties readPropertiesFromStore() throws FileNotFoundException, IOException 
+	{
 		Properties ret;
 		// Todo: Which class loader to use? library service unavailable, because it depends on settings service?
 		File file = getFile(filename);
 		FileInputStream fis = new FileInputStream(file.exists() ? file : getFile("default"+SETTINGS_EXTENSION));
-		ret	= (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, getClass().getClassLoader(), null);
+		ret	= (Properties)PropertiesXMLHelper.read(fis, getClass().getClassLoader());
 		fis.close();
 		return ret;
 	}
@@ -344,13 +344,13 @@ public class SettingsService extends BasicService implements ISettingsService
 	 * @throws IOException
 	 */
 	protected void writePropertiesToStore(Properties props) throws FileNotFoundException,
-			Exception, IOException {
+			Exception, IOException 
+	{
 		// Todo: Which class loader to use? library service unavailable, because
 		// it depends on settings service?
 		File file = getFile(filename);
 		FileOutputStream os = new FileOutputStream(file);
-		PropertiesXMLHelper.getPropertyWriter().write(props, os,
-				getClass().getClassLoader(), null);
+		PropertiesXMLHelper.write(props, os, getClass().getClassLoader());
 		os.close();
 	}
 	

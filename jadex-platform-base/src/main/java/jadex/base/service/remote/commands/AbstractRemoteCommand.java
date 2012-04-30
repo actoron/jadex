@@ -18,13 +18,17 @@ import jadex.commons.future.IResultListener;
  */
 public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implements IRemoteCommand
 {
+	/** The receiver (for processing the command in rmipreprocessor, will not be transferred). */
+	protected IComponentIdentifier receiver;
+	
 	//-------- constructors --------
 	
 	/**
 	 *  Bean constructor.
 	 */
-	public AbstractRemoteCommand()
+	public AbstractRemoteCommand()//IComponentIdentifier receiver)
 	{
+//		this.receiver = receiver;
 	}
 	
 	//-------- methods --------
@@ -34,6 +38,9 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 	 */
 	public IFuture<Void>	preprocessCommand(IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
 	{
+		// Hack needed for rmi preprocessor
+		this.receiver = target;
+		
 		final Future<Void>	ret	= new Future<Void>();
 		component.getServiceContainer().searchService(ISecurityService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new IResultListener<ISecurityService>()
@@ -66,5 +73,23 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 	public IFuture<Void>	postprocessCommand(IInternalAccess component, RemoteReferenceModule rrm, final IComponentIdentifier target)
 	{
 		return IFuture.DONE;
+	}
+
+	/**
+	 *  Get the receiver (rms of other side).
+	 *  @return the receiver.
+	 */
+	public IComponentIdentifier getReceiver()
+	{
+		return receiver;
+	}
+	
+	/**
+	 *  Get the sender component (if other than rms).
+	 *  @return the real receiver.
+	 */
+	public IComponentIdentifier getSender()
+	{
+		return null;
 	}
 }

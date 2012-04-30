@@ -3,6 +3,7 @@ package jadex.xml.reader;
 import jadex.commons.collection.MultiCollection;
 import jadex.xml.IContext;
 import jadex.xml.StackElement;
+import jadex.xml.TypeInfoPathManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +26,12 @@ $endif $ */
 public class ReadContext implements IContext
 {
 	//-------- attributes --------
+	
+	/** The type info path manager. */
+	protected TypeInfoPathManager pathmanager;
+	
+	/** The default object handler. */
+	protected IObjectReaderHandler defaulthandler;
 	
 	/** The parser. */
 	protected XMLStreamReader parser;
@@ -67,9 +74,9 @@ public class ReadContext implements IContext
 	/**
 	 * @param parser
 	 */
-	public ReadContext(XMLStreamReader parser, XMLReporter reporter, Object callcontext, ClassLoader classloader)
+	public ReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, XMLStreamReader parser, XMLReporter reporter, Object callcontext, ClassLoader classloader)
 	{
-		this(parser, reporter, callcontext, classloader, null, new ArrayList(), 
+		this(pathmanager, handler, parser, reporter, callcontext, classloader, null, new ArrayList(), 
 			null, null, new HashMap(), 0, new MultiCollection());
 	}
 	
@@ -82,9 +89,11 @@ public class ReadContext implements IContext
 	 * @param comment
 	 * @param readobjects
 	 */
-	public ReadContext(XMLStreamReader parser,  XMLReporter reporter, Object callcontext, ClassLoader classloader, Object root, List stack,
+	public ReadContext(TypeInfoPathManager pathmanager, IObjectReaderHandler handler, XMLStreamReader parser,  XMLReporter reporter, Object callcontext, ClassLoader classloader, Object root, List stack,
 		StackElement topse, String comment, Map readobjects, int readignore, MultiCollection postprocessors)
 	{
+		this.pathmanager = pathmanager;
+		this.defaulthandler = handler;
 		this.parser = parser;
 		this.reporter = reporter;
 		this.callcontext = callcontext;
@@ -117,6 +126,24 @@ public class ReadContext implements IContext
 //	{
 //		this.parser = parser;
 //	}
+
+	/**
+	 *  Get the pathManager.
+	 *  @return the pathManager.
+	 */
+	public TypeInfoPathManager getPathManager()
+	{
+		return pathmanager;
+	}
+	
+	/**
+	 *  Get the defaulthandler.
+	 *  @return the defaulthandler.
+	 */
+	public IObjectReaderHandler getDefaultHandler()
+	{
+		return defaulthandler;
+	}
 
 	/**
 	 *  Get the reporter.

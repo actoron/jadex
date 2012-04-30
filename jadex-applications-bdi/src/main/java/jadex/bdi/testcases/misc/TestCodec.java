@@ -4,6 +4,7 @@ import jadex.bridge.service.types.message.IContentCodec;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -33,7 +34,7 @@ public class TestCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object val, ClassLoader classloader)
+	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info)
 	{
 		return "97".getBytes();
 	}
@@ -43,7 +44,7 @@ public class TestCodec implements IContentCodec, Serializable
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public Object decode(byte[] val, ClassLoader classloader)
+	public Object decode(byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info)
 	{
 		return "97".equals(new String(val, Charset.forName("UTF-8"))) ? new Integer(98) : new Integer(96);
 //		try

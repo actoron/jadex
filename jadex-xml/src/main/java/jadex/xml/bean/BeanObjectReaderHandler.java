@@ -1059,7 +1059,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			// Try to find bean class information
 			
-			Map props = introspector.getBeanProperties(object.getClass(), true);
+			Map props = introspector.getBeanProperties(object.getClass(), true, true);
 			Object prop = props.get(accessinfo instanceof String? accessinfo: xmlname.getLocalPart());
 			if(prop instanceof BeanProperty)
 			{
@@ -1248,7 +1248,7 @@ public class BeanObjectReaderHandler implements IObjectReaderHandler
 			
 			// Try to find bean class information
 			
-			Map props = introspector.getBeanProperties(object.getClass(), true);
+			Map props = introspector.getBeanProperties(object.getClass(), true, true);
 			BeanProperty prop = (BeanProperty)props.get(accessinfo instanceof String? accessinfo: xmlattrname.getLocalPart());
 			if(prop!=null)
 			{

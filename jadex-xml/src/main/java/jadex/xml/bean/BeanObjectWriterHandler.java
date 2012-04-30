@@ -443,9 +443,13 @@ public class BeanObjectWriterHandler extends AbstractObjectWriterHandler
 	/**
 	 *  Get the properties of an object. 
 	 */
-	protected Collection getProperties(Object object, IContext context, boolean includefields)
+	protected Collection getProperties(Object object, IContext context, boolean includemethods, boolean includefields)
 	{
-		return object==null? Collections.EMPTY_LIST: introspector.getBeanProperties(object.getClass(), includefields).values();
+		Object o = introspector.getBeanProperties(object.getClass(), includemethods, includefields);
+		if(o==null)
+			System.out.println("ssss");
+		
+		return object==null? Collections.EMPTY_LIST: introspector.getBeanProperties(object.getClass(), includemethods, includefields).values();
 	}
 
 	/**

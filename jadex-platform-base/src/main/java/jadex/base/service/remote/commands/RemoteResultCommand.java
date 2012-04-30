@@ -1,20 +1,18 @@
 package jadex.base.service.remote.commands;
 
 import jadex.base.service.remote.ExceptionInfo;
-import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.base.service.remote.RemoteServiceManagementService.WaitingCallInfo;
-import jadex.base.service.remote.xml.RMIPreProcessor;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.annotation.Security;
 import jadex.commons.SReflect;
+import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
-import jadex.xml.writer.WriteContext;
 
 /**
  *  Command that represents the result(s) of a remote command.
@@ -23,6 +21,9 @@ import jadex.xml.writer.WriteContext;
 public class RemoteResultCommand extends AbstractRemoteCommand
 {
 	//-------- attributes --------
+	
+	/** The sending component. */
+	protected IComponentIdentifier sender;
 	
 	/** The result. */
 	protected Object result;
@@ -51,20 +52,21 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	/**
 	 *  Create a new remote result command.
 	 */
-	public RemoteResultCommand(Object result, Exception exception, String callid, boolean isref)
+	public RemoteResultCommand(IComponentIdentifier sender, Object result, Exception exception, String callid, boolean isref)
 	{
-		this(result, exception, callid, isref, null);
+		this(sender, result, exception, callid, isref, null);
 	}
 	
 	/**
 	 *  Create a new remote result command.
 	 */
-	public RemoteResultCommand(Object result, Exception exception, String callid, boolean isref, String methodname)
+	public RemoteResultCommand(IComponentIdentifier sender, Object result, Exception exception, String callid, boolean isref, String methodname)
 	{
 //		if(methodname!=null && methodname.equals("getInputStream"))
 //			System.out.println("callid of getResult result: "+callid+" "+result);
 		
 		this.result = result;
+		this.sender = sender;
 		this.exceptioninfo = exception!=null? new ExceptionInfo(exception): null;
 		this.callid = callid;
 		this.isref = isref;
@@ -80,24 +82,25 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		// Do not preprocess result commands in security service, as results are allowed by default.
-//		super.preprocessCommand(component, rrm, target)
-//			.addResultListener(new DelegationResultListener<Void>(ret)
-//		{
-//			public void customResultAvailable(Void v)
-//			{
-				if(result!=null)
-				{
-					if(isref || rrm.getMarshalService().isRemoteReference(result))
-					{
-						RMIPreProcessor preproc = new RMIPreProcessor(rrm);
-						WriteContext context = new WriteContext(null, new Object[]{target, null}, null, null);
-						result = preproc.preProcess(context, result);
-					}
-				}
+		super.preprocessCommand(component, rrm, target)
+			.addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void v)
+			{
+//				if(result!=null)
+//				{
+//					if(isref || rrm.getMarshalService().isRemoteReference(result))
+//					{
+//						RMIPreProcessor preproc = new RMIPreProcessor(rrm);
+//						WriteContext context = new WriteContext(null, new Object[]{target, null}, null, null);
+//						result = preproc.preProcess(context, result);
+//					}
+//				}
 				ret.setResult(null);
-//			}
-//		});
+			}
+		});
 		return ret;
+//		return IFuture.DONE;
 	}
 	
 	/**
@@ -225,7 +228,25 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 	{
 		this.methodname = methodname;
 	}
-	
+
+	/**
+	 *  Get the sender.
+	 *  @return the sender.
+	 */
+	public IComponentIdentifier getSender()
+	{
+		return sender;
+	}
+
+	/**
+	 *  Set the sender.
+	 *  @param sender The sender to set.
+	 */
+	public void setSender(IComponentIdentifier sender)
+	{
+		this.sender = sender;
+	}
+
 	/**
 	 *  Get as string.
 	 */

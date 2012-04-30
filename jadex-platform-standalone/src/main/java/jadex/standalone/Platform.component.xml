@@ -269,7 +269,9 @@
 				new jadex.bridge.service.types.message.MessageType[]
 				{
 					new jadex.bridge.fipa.FIPAMessageType()
-				}, null, $args.binarymessages? new jadex.base.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.base.service.message.transport.codecs.JadexBinaryCodec.class, jadex.base.service.message.transport.codecs.GZIPCodec.class} ): new jadex.base.service.message.transport.codecs.CodecFactory()
+				}, null, 
+					$args.binarymessages? jadex.bridge.fipa.SFipa.JADEX_BINARY: jadex.bridge.fipa.SFipa.JADEX_XML, 
+					$args.binarymessages? new jadex.base.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.base.service.message.transport.codecs.JadexBinaryCodec.class, jadex.base.service.message.transport.codecs.GZIPCodec.class} ): new jadex.base.service.message.transport.codecs.CodecFactory()
 				)
 			</implementation>
 		</providedservice>
@@ -357,9 +359,9 @@
 				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;gpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<!-- <component name="kernel_bdiv3" type="kernel_bdiv3" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bdiv3&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/> -->
 				<component name="rms" type="rms" daemon="true">
-					<arguments>
+					<!--  <arguments>
 						<argument name="binarymessages">$args.binarymessages</argument>
-					</arguments>
+					</arguments> -->
 				</component>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>
@@ -394,9 +396,9 @@
 				<component name="kernel_bpmn" type="kernel_bpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;bpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="kernel_gpmn" type="kernel_gpmn" daemon="true" number="$args.get(&quot;kernels&quot;).indexOf(&quot;gpmn&quot;)!=-1||$args.get(&quot;kernels&quot;).indexOf(&quot;all&quot;)!=-1? 1 : 0"/>
 				<component name="rms" type="rms" daemon="true">
-					<arguments>
+					<!-- <arguments>
 						<argument name="binarymessages">$args.binarymessages</argument>
-					</arguments>
+					</arguments> -->
 				</component>
 				<component name="awa" type="awa" daemon="true" number="Boolean.TRUE.equals($args.get(&quot;awareness&quot;)) ? 1 : 0">
 					<arguments>

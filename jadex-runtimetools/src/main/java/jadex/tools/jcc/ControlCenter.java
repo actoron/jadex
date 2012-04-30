@@ -166,7 +166,7 @@ public class ControlCenter
 //							ClassLoader cl = ((ILibraryService)result).getClassLoader();
 //							ClassLoader cl = getPCC().getClassLoader(null);
 							FileInputStream fis = new FileInputStream(file);
-							props	= (Properties)PropertiesXMLHelper.getPropertyReader().read(fis, cl, null);
+							props	= (Properties)PropertiesXMLHelper.read(fis, cl);
 							fis.close();
 							
 							Properties windowprops = props.getSubproperty("window");
@@ -279,7 +279,7 @@ public class ControlCenter
 							FileOutputStream os = new FileOutputStream(file);
 //							PropertiesXMLHelper.getPropertyWriter().write(props, os, ((ILibraryService)result).getClassLoader(), null);
 //							PropertiesXMLHelper.getPropertyWriter().write(props, os, getPCC().getClassLoader(null), null);
-							PropertiesXMLHelper.getPropertyWriter().write(props, os, cl, null);
+							PropertiesXMLHelper.write(props, os, cl);
 							os.close();
 							window.getStatusBar().setText("Settings saved successfully: "+ file.getAbsolutePath());
 							ret.setResult(null);

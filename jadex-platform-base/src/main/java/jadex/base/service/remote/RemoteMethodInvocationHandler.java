@@ -264,6 +264,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 				pr.getRemoteReference(), method, args, callid, IComponentIdentifier.LOCAL.get());
 			
 			// Can be invoked directly, because internally redirects to agent thread.
+//			System.out.println("invoke: "+method.getName());
 //			if(method.getName().equals("getResult"))
 //				System.out.println("sending invoke");
 			rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 

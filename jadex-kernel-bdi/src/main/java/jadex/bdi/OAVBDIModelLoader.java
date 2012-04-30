@@ -174,7 +174,6 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			}
 		};
 		
-		
 		state.addStateListener(listener, false);
 		// Use index map to keep insertion order for elements.
 		MultiCollection	entries	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
@@ -185,7 +184,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 		user.put(ComponentXMLReader.CONTEXT_ENTRIES, entries);
 		try
 		{
-			mi = (ModelInfo)reader.read(info.getInputStream(), classloader, user);
+			mi = (ModelInfo)reader.read(OAVBDIXMLReader.getReaderManager(), OAVBDIXMLReader.getReaderHandler(), info.getInputStream(), classloader, user);
 			handle	= user.get(CONTEXT_OAVROOT);
 		}
 		catch(Exception e)

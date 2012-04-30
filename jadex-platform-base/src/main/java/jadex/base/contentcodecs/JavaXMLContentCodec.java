@@ -13,6 +13,7 @@ $endif $ */
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -40,7 +41,7 @@ public class JavaXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public synchronized byte[] encode(Object val, ClassLoader classloader)
+	public synchronized byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info)
 	{
 		ByteArrayOutputStream bs = new ByteArrayOutputStream();
 		XMLEncoder e = new XMLEncoder(bs);
@@ -64,7 +65,7 @@ public class JavaXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public synchronized Object decode(final byte[] val, ClassLoader classloader)
+	public synchronized Object decode(final byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info)
 	{
 		assert val != null;
 

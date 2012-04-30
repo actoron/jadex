@@ -25,7 +25,8 @@ public interface IMessageService extends IService
 	 *  @param cl The class loader used by the sending component (i.e. corresponding to classes of objects in the message map).
 	 *  @return Future that indicates an exception when messages could not be delivered to components. 
 	 */
-	public IFuture<Void> sendMessage(Map<String, Object> message, MessageType msgtype, IComponentIdentifier sender, IResourceIdentifier rid, byte[] codecids);
+	public IFuture<Void> sendMessage(Map<String, Object> message, MessageType msgtype, 
+		IComponentIdentifier sender, IResourceIdentifier rid, byte[] codecids);
 	
 //	/**
 //	 *  Deliver a message to some components.

@@ -2,8 +2,13 @@ package jadex.base.contentcodecs;
 
 import jadex.bridge.service.types.message.IContentCodec;
 import jadex.commons.transformation.binaryserializer.BinarySerializer;
+import jadex.commons.transformation.binaryserializer.IDecoderHandler;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
+import jadex.xml.writer.IObjectWriterHandler;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -17,7 +22,7 @@ public class JadexBinaryContentCodec implements IContentCodec, Serializable
 	public static final String	JADEX_BINARY	= "jadex-binary";
 	
 	/** The debug flag. */
-	protected boolean DEBUG = true;
+	protected boolean DEBUG = false;
 	
 	/**
 	 *  Test if the codec can be used with the provided meta information.
@@ -34,9 +39,11 @@ public class JadexBinaryContentCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object val, ClassLoader classloader)
+	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info)
 	{
-		byte[] ret = BinarySerializer.objectToByteArray(val, null, null, classloader);
+		Object[] infos = info==null? null: info.get(getClass());
+		List<ITraverseProcessor> preprocessors = (List<ITraverseProcessor>)(infos!=null? infos[1]: null);
+		byte[] ret = BinarySerializer.objectToByteArray(val, preprocessors, null, classloader);
 		if(DEBUG)
 			System.out.println("encode content: "+ret);
 		return ret;
@@ -47,9 +54,11 @@ public class JadexBinaryContentCodec implements IContentCodec, Serializable
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public Object decode(byte[] val, ClassLoader classloader)
+	public Object decode(byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info)
 	{
-		Object ret = BinarySerializer.objectFromByteArray(val, null, null, classloader);
+		Object[] infos = info==null? null: info.get(getClass());
+		List<IDecoderHandler> postprocessors = (List<IDecoderHandler>)(infos!=null? infos[0]: null);
+		Object ret = BinarySerializer.objectFromByteArray(val, postprocessors, null, classloader);
 		if(DEBUG)
 			System.out.println("decode content: "+ret);
 		return ret;

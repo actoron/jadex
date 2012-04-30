@@ -96,7 +96,7 @@ public class MessageReceiverBehaviour extends CyclicBehaviour
 			{
 				IContentCodec codec = ma.getMessageType().findContentCodec(compcodecs, ma, params[i]);
 				if(codec==null)
-					codec = ma.getMessageType().findContentCodec(jadex.base.service.message.MessageService.DEFCODECS, ma, params[i]);
+					codec = ma.getMessageType().findContentCodec(jadex.base.service.message.MessageService.CODECS, ma, params[i]);
 				if(codec!=null)
 				{
 					try

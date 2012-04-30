@@ -23,6 +23,9 @@ public class WriteContext implements IContext
 {
 	//-------- attributes --------
 	
+	/** The handler. */
+	protected IObjectWriterHandler handler;
+	
 	/** The writer. */
 	protected XMLStreamWriter writer;
 	
@@ -59,17 +62,18 @@ public class WriteContext implements IContext
 	/**
 	 *  Create a new write context.
 	 */
-	public WriteContext(XMLStreamWriter writer, Object usercontext, Object rootobject, ClassLoader classloader)
+	public WriteContext(IObjectWriterHandler handler, XMLStreamWriter writer, Object usercontext, Object rootobject, ClassLoader classloader)
 	{
-		this(writer, usercontext, rootobject, classloader, new IdentityHashMap(), new ArrayList(), new MultiCollection());
+		this(handler, writer, usercontext, rootobject, classloader, new IdentityHashMap(), new ArrayList(), new MultiCollection());
 	}
 		
 	/**
 	 *  Create a new read context.
 	 */
-	public WriteContext(XMLStreamWriter writer, Object usercontext, Object rootobject, ClassLoader classloader, 
+	public WriteContext(IObjectWriterHandler handler, XMLStreamWriter writer, Object usercontext, Object rootobject, ClassLoader classloader, 
 		Map writtenobs, List stack, MultiCollection preprocessors)
 	{
+		this.handler = handler;
 		this.writer = writer;
 		this.usercontext = usercontext;
 		this.rootobject = rootobject;
@@ -82,6 +86,24 @@ public class WriteContext implements IContext
 	//-------- methods --------
 	
 	/**
+	 *  Get the handler.
+	 *  @return the handler.
+	 */
+	public IObjectWriterHandler getHandler()
+	{
+		return handler;
+	}
+
+	/**
+	 *  Set the handler.
+	 *  @param handler The handler to set.
+	 */
+	public void setHandler(IObjectWriterHandler handler)
+	{
+		this.handler = handler;
+	}
+
+	/**
 	 *  Get the writer.
 	 *  @return The writer.
 	 */
@@ -89,7 +111,7 @@ public class WriteContext implements IContext
 	{
 		return this.writer;
 	}
-
+	
 	/**
 	 *  Set the writer.
 	 *  @param writer The writer to set.

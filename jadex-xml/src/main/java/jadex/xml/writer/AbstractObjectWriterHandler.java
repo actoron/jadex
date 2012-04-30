@@ -305,9 +305,11 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			
 		// Get properties from type inspection.
 		
+		boolean includemethods = false;
 		boolean includefields = false;
 		if(typeinfo!=null)
 		{
+			includemethods = typeinfo.isIncludeMethods();
 			includefields = typeinfo.isIncludeFields();
 		}
 		else
@@ -330,43 +332,51 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 			{
 			}
 		}
+		
 
+		Collection props = null;
 		if(typeinfo==null)
 		{
-			Collection props = getProperties(object, context, includefields);
-			if(props!=null)
+			props = getProperties(object, context, true, includefields);
+		}
+		// Read properties if force flag set
+		else if(includemethods || includefields)
+		{
+			props = getProperties(object, context, includemethods, includefields);
+		}
+		
+		if(props!=null)
+		{
+			for(Iterator it=props.iterator(); it.hasNext(); )
 			{
-				for(Iterator it=props.iterator(); it.hasNext(); )
+				Object property = it.next();
+				String propname = getPropertyName(property);
+
+				if(!doneprops.contains(propname))
 				{
-					Object property = it.next();
-					String propname = getPropertyName(property);
-	
-					if(!doneprops.contains(propname))
+					doneprops.add(propname);
+					Object value = getValue(object, property, context, null);
+					
+					if(value!=null)
 					{
-						doneprops.add(propname);
-						Object value = getValue(object, property, context, null);
-						
-						if(value!=null)
+						// Make to an attribute when
+						// a) it is a basic type
+						// b) it can be decoded to the right object type
+						Boolean pt = typeinfo!=null && typeinfo.getMappingInfo()!=null? typeinfo.getMappingInfo().getPreferTags(): null;
+						boolean prefertags = pt!=null? pt.booleanValue(): this.prefertags;
+						if(!prefertags && isBasicType(property, value) && isDecodableToSameType(property, value, context))
 						{
-							// Make to an attribute when
-							// a) it is a basic type
-							// b) it can be decoded to the right object type
-							Boolean pt = typeinfo!=null && typeinfo.getMappingInfo()!=null? typeinfo.getMappingInfo().getPreferTags(): null;
-							boolean prefertags = pt!=null? pt.booleanValue(): this.prefertags;
-							if(!prefertags && isBasicType(property, value) && isDecodableToSameType(property, value, context))
-							{
-								if(!value.equals(getDefaultValue(property)))
-									wi.addAttribute(propname, value.toString());
-							}
-							else
-							{
-								// todo: remove
-								// Hack special case array, todo: support generically via typeinfo???
-								QName[] xmlpath = new QName[]{QName.valueOf(propname)};
-								QName[] path = createPath(xmlpath, value, context);
-								// todo: use some default for flattening
-								wi.addSubobject(path, value, flattening);
-							}
+							if(!value.equals(getDefaultValue(property)))
+								wi.addAttribute(propname, value.toString());
+						}
+						else
+						{
+							// todo: remove
+							// Hack special case array, todo: support generically via typeinfo???
+							QName[] xmlpath = new QName[]{QName.valueOf(propname)};
+							QName[] path = createPath(xmlpath, value, context);
+							// todo: use some default for flattening
+							wi.addSubobject(path, value, flattening);
 						}
 					}
 				}
@@ -469,7 +479,7 @@ public abstract class AbstractObjectWriterHandler implements IObjectWriterHandle
 	/**
 	 *  Get the properties of an object. 
 	 */
-	protected abstract Collection getProperties(Object object, IContext context, boolean includefields);
+	protected abstract Collection getProperties(Object object, IContext context, boolean includemethods, boolean includefields);
 
 	/**
 	 *  Test is a value is a basic type (and can be mapped to an attribute).

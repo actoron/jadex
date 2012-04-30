@@ -27,6 +27,9 @@ public class MappingInfo
 	
 	//-------- extra writing info --------
 	
+	/** The include methods flag. */
+	protected Boolean includemethods;
+
 	/** The include fields flag. */
 	protected Boolean includefields;
 	
@@ -38,17 +41,17 @@ public class MappingInfo
 	/**
 	 *  Create a new mapping info.
 	 */
-	public MappingInfo(Boolean includefields)
+	public MappingInfo(Boolean includemethods, Boolean includefields)
 	{
-		this(includefields, null);
+		this(includemethods, includefields, null);
 	}
 	
 	/**
 	 *  Create a new mapping info.
 	 */
-	public MappingInfo(Boolean includefields, Boolean prefertags)
+	public MappingInfo(Boolean includemethods, Boolean includefields, Boolean prefertags)
 	{
-		this(null, null, null, null, null, includefields, prefertags);
+		this(null, null, null, null, null, includemethods, includefields, prefertags);
 	}
 	
 	/**
@@ -109,7 +112,7 @@ public class MappingInfo
 		Object contentinfo, AttributeInfo[] attributeinfos,
 		SubobjectInfo[] subobjectinfos)
 	{
-		this(supertype, commentinfo, contentinfo, attributeinfos, subobjectinfos, null, null);
+		this(supertype, commentinfo, contentinfo, attributeinfos, subobjectinfos, null, null, null);
 	}
 
 	/**
@@ -117,13 +120,14 @@ public class MappingInfo
 	 */
 	public MappingInfo(TypeInfo supertype, Object commentinfo,
 		Object contentinfo, AttributeInfo[] attributeinfos,
-		SubobjectInfo[] subobjectinfos, Boolean includefields, Boolean prefertags)
+		SubobjectInfo[] subobjectinfos, Boolean includemethods, Boolean includefields, Boolean prefertags)
 	{
 		this.supertype = supertype;
 		this.commentinfo = commentinfo;
 		this.contentinfo = contentinfo;
 		this.attributeinfos = attributeinfos;
 		this.subobjectinfos = subobjectinfos;
+		this.includemethods = includemethods;
 		this.includefields = includefields;
 		this.prefertags = prefertags;
 	
@@ -185,6 +189,15 @@ public class MappingInfo
 	public Boolean getIncludeFields()
 	{
 		return includefields;
+	}
+	
+	/**
+	 *  Get the includemethods.
+	 *  @return the includemethods.
+	 */
+	public Boolean getIncludeMethods()
+	{
+		return includemethods;
 	}
 
 	/**

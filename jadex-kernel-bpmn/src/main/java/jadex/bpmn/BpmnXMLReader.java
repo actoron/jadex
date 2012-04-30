@@ -56,6 +56,7 @@ import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanAccessInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 
@@ -109,6 +110,11 @@ public class BpmnXMLReader
 	 */
 	public static final String LIST_ELEMENT_ATTRIBUTE_DELIMITER = "\u240B"; //"#|#";
 
+	/** The manager. */
+	protected static TypeInfoPathManager manager;
+	
+	/** The handler. */
+	protected static IObjectReaderHandler handler;
 	
 	//-------- attributes --------
 	
@@ -156,7 +162,7 @@ public class BpmnXMLReader
 	// Initialize reader instance.
 	static
 	{
-		reader = new Reader(new TypeInfoPathManager(getXMLMapping()), false, false, new XMLReporter()
+		reader = new Reader(false, false, new XMLReporter()
 		{
 			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
 			{
@@ -180,6 +186,9 @@ public class BpmnXMLReader
 				report.put(stack, msg+pos);
 			}
 		});
+		
+		manager = new TypeInfoPathManager(getXMLMapping());
+		handler = new BeanObjectReaderHandler(getXMLMapping());
 	}
 	
 	/**
@@ -200,7 +209,7 @@ public class BpmnXMLReader
 		Map	user	= new HashMap();
 		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
 		user.put(CONTEXT_ENTRIES, report);
-		MBpmnModel ret = (MBpmnModel)reader.read(rinfo.getInputStream(), classloader, user);
+		MBpmnModel ret = (MBpmnModel)reader.read(manager, handler, rinfo.getInputStream(), classloader, user);
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
 //		ret.setClassloader(classloader);

@@ -1,6 +1,7 @@
 package jadex.base.service.remote.xml;
 
 import jadex.base.service.remote.RemoteReferenceModule;
+import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.xml.IContext;
 import jadex.xml.IPreProcessor;
@@ -39,8 +40,9 @@ public class RMIPreProcessor implements IPreProcessor
 	{
 		try
 		{
-			Object[] uc = (Object[])context.getUserContext();
-			return rrm.getProxyReference(object, (IComponentIdentifier)uc[0], context.getClassLoader());
+			IComponentIdentifier rec = ((AbstractRemoteCommand)context.getRootObject()).getReceiver();
+//			Object[] uc = (Object[])context.getUserContext(); (IComponentIdentifier)uc[0]
+			return rrm.getProxyReference(object, rec, context.getClassLoader());
 		}
 		catch(Exception e)
 		{

@@ -91,7 +91,7 @@ public class BinarySerializer
 	{
 		DECODER_HANDLERS = new ArrayList<IDecoderHandler>();
 		//DECODER_HANDLERS.add(NULL_HANDLER);
-		for (int i = 0; i < ENCODER_HANDLERS.size(); ++i)
+		for(int i = 0; i < ENCODER_HANDLERS.size(); ++i)
 			DECODER_HANDLERS.add((IDecoderHandler) ENCODER_HANDLERS.get(i));
 	}
 	
@@ -106,14 +106,12 @@ public class BinarySerializer
 	 */
 	public static byte[] objectToByteArray(Object val, List<ITraverseProcessor> preprocessors, Object usercontext, ClassLoader classloader)
 	{
-		EncodingContext context = new EncodingContext(usercontext, preprocessors, classloader);
+		EncodingContext context = new EncodingContext(val, usercontext, preprocessors, classloader);
 		
 		Traverser traverser = new Traverser()
 		{
-			public void handleDuplicate(Object object, Class<?> clazz,
-					Object match,
-					List<ITraverseProcessor> processors, boolean clone,
-					Object context)
+			public void handleDuplicate(Object object, Class<?> clazz, Object match,
+				List<ITraverseProcessor> processors, boolean clone, Object context)
 			{
 				EncodingContext ec = (EncodingContext) context;
 				int ref = ((Integer)match).intValue();

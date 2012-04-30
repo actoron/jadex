@@ -75,9 +75,9 @@ public class Main
 		
 		// Create an xml reader with standard bean object reader and the
 		// custom typeinfos
-		Reader xmlreader = new Reader(new TypeInfoPathManager(typeinfos), false, false, false, null, new BeanObjectReaderHandler());
+		Reader xmlreader = new Reader(false, false, false, null);
 		InputStream is = SUtil.getResource("jadex/xml/tutorial/jibx/example21/data0.xml", null);
-		Object object1 = xmlreader.read(is, null, null);
+		Object object1 = xmlreader.read(new TypeInfoPathManager(typeinfos), new BeanObjectReaderHandler(), is, null, null);
 		is.close();
 		
 		// And print out the result.
@@ -120,9 +120,9 @@ public class Main
 			}, null))
 		})));	
 		
-		xmlreader = new Reader(new TypeInfoPathManager(typeinfos), false, false, false, null, new BeanObjectReaderHandler());
+		xmlreader = new Reader(false, false, false, null);
 		is = SUtil.getResource("jadex/xml/tutorial/jibx/example21/data1.xml", null);
-		Object object2 = xmlreader.read(is, null, null);
+		Object object2 = xmlreader.read(new TypeInfoPathManager(typeinfos), new BeanObjectReaderHandler(), is, null, null);
 		is.close();
 		
 		System.out.println("Read object 2: "+object2);

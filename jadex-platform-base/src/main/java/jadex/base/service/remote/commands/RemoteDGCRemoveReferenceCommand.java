@@ -5,8 +5,6 @@ import jadex.base.service.remote.RemoteReference;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.Security;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IntermediateFuture;
 import jadex.micro.IMicroExternalAccess;
@@ -71,7 +69,7 @@ public class RemoteDGCRemoveReferenceCommand extends AbstractRemoteCommand
 		{
 			rsms.getRemoteReferenceModule().removeRemoteReference(rr, holder);
 //			ret.setResult(new RemoteResultCommand(null, null, callid, false));
-			ret.addIntermediateResult(new RemoteResultCommand(null, null, callid, false));
+			ret.addIntermediateResult(new RemoteResultCommand(null, null, null, callid, false));
 			ret.setFinished();
 		}
 		catch(Exception e)

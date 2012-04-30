@@ -222,7 +222,7 @@ public class PlatformConfigPanel	extends JPanel
 						if(!filename.endsWith(".launch.xml"))
 							filename	+= ".launch.xml";
 						FileInputStream is = new FileInputStream(new File(filename));
-						final Properties	props	= (Properties)PropertiesXMLHelper.getPropertyReader().read(is, getClass().getClassLoader(), null);
+						final Properties	props	= (Properties)PropertiesXMLHelper.read(is, getClass().getClassLoader());
 						is.close();
 						
 						if(props.getSubproperty("Classpath")!=null)
@@ -296,7 +296,7 @@ public class PlatformConfigPanel	extends JPanel
 						if(!filename.endsWith(".launch.xml"))
 							filename	+= ".launch.xml";
 						FileOutputStream os = new FileOutputStream(new File(filename));
-						PropertiesXMLHelper.getPropertyWriter().write(props, os, getClass().getClassLoader(), null);
+						PropertiesXMLHelper.write(props, os, getClass().getClassLoader());
 						os.close();
 					}
 					catch(Exception ex)

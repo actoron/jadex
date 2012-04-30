@@ -50,9 +50,6 @@ public class Writer
 	
 	//-------- attributes --------
 	
-	/** The object creator. */
-	protected IObjectWriterHandler handler;
-	
 	/** Control flag for generating ids. */
 	protected boolean genids;	
 	
@@ -63,29 +60,28 @@ public class Writer
 
 	/**
 	 *  Create a new reader (with genids=true and indent=true).
-	 *  @param handler The handler.
+	 *  @param readerhandler The handler.
 	 */
-	public Writer(IObjectWriterHandler handler)
+	public Writer()
 	{
-		this(handler, true);
+		this(true);
 	}
 	
 	/**
 	 *  Create a new reader (with genids=true and indent=true).
-	 *  @param handler The handler.
+	 *  @param readerhandler The handler.
 	 */
-	public Writer(IObjectWriterHandler handler, boolean genids)
+	public Writer(boolean genids)
 	{
-		this(handler, genids, true);
+		this(genids, true);
 	}
 	
 	/**
 	 *  Create a new reader.
-	 *  @param handler The handler.
+	 *  @param readerhandler The handler.
 	 */
-	public Writer(IObjectWriterHandler handler, boolean genids, boolean indent)
+	public Writer(boolean genids, boolean indent)
 	{
-		this.handler = handler;
 		this.genids = genids;
 		this.indent = indent;
 	}
@@ -98,9 +94,9 @@ public class Writer
 	 *  @param classloader The classloader.
 	 * 	@param context The context.
  	 */
-	public void write(Object object, OutputStream out, ClassLoader classloader, final Object context) throws Exception
+	public void write(IObjectWriterHandler handler, Object object, OutputStream out, ClassLoader classloader, final Object context) throws Exception
 	{
-		write(object, DEFAULT_ENCODING, out, classloader, context);
+		write(handler, object, DEFAULT_ENCODING, out, classloader, context);
 	}
 		
 	/**
@@ -109,7 +105,7 @@ public class Writer
 	 *  @param classloader The classloader.
 	 * 	@param context The context.
  	 */
-	public void write(Object object, String encoding, OutputStream out, ClassLoader classloader, final Object context) throws Exception
+	public void write(IObjectWriterHandler handler, Object object, String encoding, OutputStream out, ClassLoader classloader, final Object context) throws Exception
 	{
 		XMLStreamWriter	writer;
 		synchronized(FACTORY)
@@ -120,7 +116,7 @@ public class Writer
 		writer.writeStartDocument(encoding, "1.0"); 
 		writer.writeCharacters(lf);
 		
-		WriteContext wc = new WriteContext(writer, context, object, classloader);
+		WriteContext wc = new WriteContext(handler, writer, context, object, classloader);
 		writeObject(wc, object, null);
 		writer.writeEndDocument();
 		writer.close();
@@ -152,11 +148,11 @@ public class Writer
 //		if(object.getClass().getName().indexOf("ComponentIdentifier")!=-1)
 //			System.out.println("cfs");
 		
-		TypeInfo typeinfo = handler.getTypeInfo(object, getXMLPath(stack), wc); 
+		TypeInfo typeinfo = wc.getHandler().getTypeInfo(object, getXMLPath(stack), wc); 
 		QName[] path = new QName[0];
 		
 		// Preprocess object.
-		IPreProcessor[] preprocs = handler.getPreProcessors(object, typeinfo);
+		IPreProcessor[] preprocs = wc.getHandler().getPreProcessors(object, typeinfo);
 		if(preprocs!=null && preprocs.length>0)
 		{
 //			System.out.println("found: "+object);
@@ -186,12 +182,12 @@ public class Writer
 		}
 
 		if(tag==null)
-			tag = handler.getTagName(object, wc);
+			tag = wc.getHandler().getTagName(object, wc);
 		
 		// Create tag with prefix if it has a namespace but no prefix.
 		if(!XMLConstants.NULL_NS_URI.equals(tag.getNamespaceURI()) && XMLConstants.DEFAULT_NS_PREFIX.equals(tag.getPrefix()))
 		{
-			tag = handler.getTagWithPrefix(tag, wc);
+			tag = wc.getHandler().getTagWithPrefix(tag, wc);
 		}
 		
 		if(genids && wc.getWrittenObjects().containsKey(object))
@@ -213,7 +209,7 @@ public class Writer
 				}
 			}
 			
-			WriteObjectInfo wi = handler.getObjectWriteInfo(object, typeinfo, wc);
+			WriteObjectInfo wi = wc.getHandler().getObjectWriteInfo(object, typeinfo, wc);
 
 			// Comment
 			
@@ -254,7 +250,7 @@ public class Writer
 						// Create tag with prefix if it has a namespace but no prefix.
 						if(!XMLConstants.NULL_NS_URI.equals(attrname.getNamespaceURI()) && XMLConstants.DEFAULT_NS_PREFIX.equals(attrname.getPrefix()))
 						{
-							attrname = handler.getTagWithPrefix(tag, wc);
+							attrname = wc.getHandler().getTagWithPrefix(tag, wc);
 						}
 						String uri = attrname.getNamespaceURI();
 						String prefix = attrname.getPrefix();
@@ -491,41 +487,41 @@ public class Writer
 	/**
 	 *  Convert to a string.
 	 */
-	public static String objectToXML(Writer writer, Object val, ClassLoader classloader)
+	public static String objectToXML(Writer writer, Object val, ClassLoader classloader, IObjectWriterHandler handler)
 	{
 		try
 		{
-			return new String(objectToByteArray(writer, val, classloader), "UTF-8");
+			return new String(objectToByteArray(writer, val, classloader, handler), "UTF-8");
 		}
 		catch (UnsupportedEncodingException e)
 		{
 			System.err.println("Warning: no UTF-8 available");
-			return new String(objectToByteArray(writer, val, classloader));
+			return new String(objectToByteArray(writer, val, classloader, handler));
 		}
 	}
 	
 	/**
 	 *  Convert to a string.
 	 */
-	public static String objectToXML(Writer writer, Object val, ClassLoader classloader, Object context)
+	public static String objectToXML(Writer writer, Object val, ClassLoader classloader, Object context, IObjectWriterHandler handler)
 	{
 		try
 		{
-			return new String(objectToByteArray(writer, val, classloader, context), "UTF-8");
+			return new String(objectToByteArray(writer, val, classloader, context, handler), "UTF-8");
 		}
 		catch (UnsupportedEncodingException e)
 		{
 			System.err.println("Warning: no UTF-8 available");
-			return new String(objectToByteArray(writer, val, classloader, context));
+			return new String(objectToByteArray(writer, val, classloader, context, handler));
 		}
 	}
 	
 	/**
 	 *  Convert to a byte array.
 	 */
-	public static byte[] objectToByteArray(Writer writer, Object val, ClassLoader classloader)
+	public static byte[] objectToByteArray(Writer writer, Object val, ClassLoader classloader, IObjectWriterHandler handler)
 	{
-		return objectToByteArray(writer, val, classloader, null);
+		return objectToByteArray(writer, val, classloader, null, handler);
 	}
 	
 	
@@ -533,12 +529,12 @@ public class Writer
 	/**
 	 *  Convert to a byte array.
 	 */
-	public static byte[] objectToByteArray(Writer writer, Object val, ClassLoader classloader, Object context)
+	public static byte[] objectToByteArray(Writer writer, Object val, ClassLoader classloader, Object context, IObjectWriterHandler handler)
 	{
 		try
 		{
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			writer.write(val, bos, classloader, context);
+			writer.write(handler, val, bos, classloader, context);
 			byte[] ret = bos.toByteArray();
 			bos.close();
 			return ret;
@@ -554,11 +550,11 @@ public class Writer
 	/**
 	 *  Write to output stream.
 	 */
-	public static void objectToOutputStream(Writer writer, Object val, OutputStream os, ClassLoader classloader, Object context)
+	public static void objectToOutputStream(Writer writer, Object val, OutputStream os, ClassLoader classloader, Object context, IObjectWriterHandler handler)
 	{
 		try
 		{
-			writer.write(val, os, classloader, context);
+			writer.write(handler, val, os, classloader, context);
 		}
 		catch(Exception e)
 		{

@@ -4,9 +4,15 @@ import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.BeanObjectWriterHandler;
+import jadex.xml.bean.JavaReader;
+import jadex.xml.bean.JavaWriter;
+import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.Reader;
+import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.Writer;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,11 +32,21 @@ public class PropertiesXMLHelper
 	/** The type infos. */
 	public static Set typeinfos;
 	
-	/** The writer. */
-	public static Writer writer;
+//	/** The writer. */
+//	public static Writer writer;
+//	
+//	/** The reader. */
+//	public static Reader reader;
 	
-	/** The reader. */
-	public static Reader reader;
+	/** The path manager. */
+	protected static TypeInfoPathManager pathmanager;
+
+	/** The reader handler. */
+	protected static IObjectReaderHandler readerhandler;
+
+	/** The writer handler. */
+	protected static IObjectWriterHandler writerhandler;
+
 	
 	//-------- static initializer --------
 	
@@ -62,40 +78,135 @@ public class PropertiesXMLHelper
 	}
 	
 	/**
-	 *  Get the xml properties writer.
-	 *  @return The writer.
+	 *  Convert to a string.
 	 */
-	public static Writer getPropertyWriter()
+	public static String write(Object val, ClassLoader classloader)
 	{
-		if(writer==null)
-		{
-			synchronized(PropertiesXMLHelper.class)
-			{
-				if(writer==null)
-				{
-					writer = new jadex.xml.writer.Writer(new BeanObjectWriterHandler(typeinfos));
-				}
-			}
-		}
-		return writer;
+		return Writer.objectToXML(new Writer(), val, classloader, getObjectWriterHandler());
 	}
 	
 	/**
-	 *  Get the xml properties reader.
-	 *  @return The reader.
+	 *  Convert to a string.
 	 */
-	public static Reader getPropertyReader()
+	public static void write(Object val, OutputStream os, ClassLoader classloader)
 	{
-		if(reader==null)
+		Writer.objectToOutputStream(new Writer(), val, os, classloader, null, getObjectWriterHandler());
+	}
+	
+	/**
+	 *  Convert an xml to an object.
+	 *  @param val The string value.
+	 *  @return The decoded object.
+	 */
+	public static <T> T read(String val, ClassLoader classloader)
+	{
+		return (T)Reader.objectFromXML(new Reader(), val, classloader, getPathManager(), getObjectReaderHandler());
+	}
+	
+	/**
+	 *  Convert an xml to an object.
+	 *  @param val The string value.
+	 *  @return The decoded object.
+	 */
+	public static <T> T read(InputStream is, ClassLoader classloader)
+	{
+		return (T)Reader.objectFromInputStream(new Reader(), is, classloader, getPathManager(), getObjectReaderHandler());
+	}
+	
+	
+//	/**
+//	 *  Get the xml properties writer.
+//	 *  @return The writer.
+//	 */
+//	public static Writer getPropertyWriter()
+//	{
+//		if(writer==null)
+//		{
+//			synchronized(PropertiesXMLHelper.class)
+//			{
+//				if(writer==null)
+//				{
+//					writer = new jadex.xml.writer.Writer(new BeanObjectWriterHandler(typeinfos));
+//				}
+//			}
+//		}
+//		return writer;
+//	}
+//	
+//	/**
+//	 *  Get the xml properties reader.
+//	 *  @return The reader.
+//	 */
+//	public static Reader getPropertyReader()
+//	{
+//		if(reader==null)
+//		{
+//			synchronized(PropertiesXMLHelper.class)
+//			{
+//				if(reader==null)
+//				{
+//					reader = new jadex.xml.reader.Reader(new TypeInfoPathManager(typeinfos));
+//				}
+//			}
+//		}
+//		return reader;
+//	}
+	
+	/**
+	 *  Get the default Java reader.
+	 *  @return The Java reader.
+	 */
+	public static TypeInfoPathManager getPathManager()
+	{
+		if(pathmanager==null)
 		{
-			synchronized(PropertiesXMLHelper.class)
+			synchronized(JavaReader.class)
 			{
-				if(reader==null)
+				if(pathmanager==null)
 				{
-					reader = new jadex.xml.reader.Reader(new TypeInfoPathManager(typeinfos));
+					pathmanager = new TypeInfoPathManager(typeinfos);
 				}
 			}
 		}
-		return reader;
+		return pathmanager;
+	}
+	
+	
+	/**
+	 *  Get the default Java reader.
+	 *  @return The Java reader.
+	 */
+	public static IObjectReaderHandler getObjectReaderHandler()
+	{
+		if(readerhandler==null)
+		{
+			synchronized(JavaReader.class)
+			{
+				if(readerhandler==null)
+				{
+					readerhandler = new BeanObjectReaderHandler(typeinfos);
+				}
+			}
+		}
+		return readerhandler;
+	}
+	
+	/**
+	 *  Get the default Java writer.
+	 *  @return The Java writer.
+	 */
+	public static IObjectWriterHandler getObjectWriterHandler()
+	{
+		if(writerhandler==null)
+		{
+			synchronized(JavaWriter.class)
+			{
+				if(writerhandler==null)
+				{
+					writerhandler = new BeanObjectWriterHandler(typeinfos);
+				}
+			}
+		}
+		return writerhandler;
 	}
 }

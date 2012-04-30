@@ -47,7 +47,7 @@ public class ReaderBenchmark
 		Map	user	= new HashMap();
 		user.put(OAVObjectReaderHandler.CONTEXT_STATE, state);
 		user.put(ComponentXMLReader.CONTEXT_ENTRIES, new MultiCollection());
-		Object	obj	= reader.read(new FileInputStream(args[0]), null, user);
+		Object	obj	= reader.read(OAVBDIXMLReader.getReaderManager(), OAVBDIXMLReader.getReaderHandler(), new FileInputStream(args[0]), null, user);
 		
 		// Start tests.
 		int cnt	= 100;
@@ -90,7 +90,7 @@ public class ReaderBenchmark
 			Map	user	= new HashMap();
 			user.put(OAVObjectReaderHandler.CONTEXT_STATE, states[i]);
 			user.put(ComponentXMLReader.CONTEXT_ENTRIES, new MultiCollection());
-			reader.read(new FileInputStream(arg), null, user);
+			reader.read(OAVBDIXMLReader.getReaderManager(), OAVBDIXMLReader.getReaderHandler(), new FileInputStream(arg), null, user);
 		}
 		return states;
 	}

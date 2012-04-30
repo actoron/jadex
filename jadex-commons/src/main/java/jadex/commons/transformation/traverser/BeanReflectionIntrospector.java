@@ -1,6 +1,7 @@
 package jadex.commons.transformation.traverser;
 
 import jadex.commons.Tuple2;
+import jadex.commons.Tuple3;
 import jadex.commons.collection.LRU;
 import jadex.commons.transformation.annotations.Exclude;
 import jadex.commons.transformation.annotations.Include;
@@ -49,115 +50,102 @@ public class BeanReflectionIntrospector implements IBeanIntrospector
 	/**
 	 * Get the bean properties for a specific clazz.
 	 */
-	public Map getBeanProperties(Class clazz, boolean includefields)
+	public Map getBeanProperties(Class clazz, boolean includemethods, boolean includefields)
 	{
 		// includefields component of key is call based to avoid reflection calls during cache hits.
-		Tuple2<Class, Boolean> beaninfokey = new Tuple2<Class, Boolean>(clazz, includefields);
+		Tuple3<Class, Boolean, Boolean> beaninfokey = new Tuple3<Class, Boolean, Boolean>(clazz, includemethods, includefields);
 		Map ret = (Map)beaninfos.get(beaninfokey);
 		
 		if(ret == null)
 		{
-			if (clazz.getAnnotation(IncludeFields.class) != null)
+			if(clazz.isAnnotationPresent(IncludeFields.class))
+			{
 				includefields = true;
-			try
-			{
-				Field incfield = clazz.getField("INCLUDE_FIELDS");
-				if (incfield.getBoolean(null))
-					includefields = true;
 			}
-			catch (Exception e)
+			if(!includefields)
 			{
+				try
+				{
+					Field incfield = clazz.getField("INCLUDE_FIELDS");
+					if(incfield.getBoolean(null))
+						includefields = true;
+				}
+				catch (Exception e)
+				{
+				}
 			}
 			
-			Method[] ms = clazz.getMethods();
-			HashMap getters = new HashMap();
-			ArrayList setters = new ArrayList();
-			for(int i = 0; i < ms.length; i++)
-			{
-				String method_name = ms[i].getName();
-				if((method_name.startsWith("is") || method_name.startsWith("get"))
-					&& ms[i].getParameterTypes().length == 0)
-				{
-					getters.put(method_name, ms[i]);
-				}
-				else if(method_name.startsWith("set")
-					&& ms[i].getParameterTypes().length == 1)
-				{
-					setters.add(ms[i]);
-				}
-			}
-
+			// todo: allow including single method pairs
 			ret = new HashMap();
-			Iterator it = setters.iterator();
 
-			while(it.hasNext())
+			if(includemethods)
 			{
-				Method setter = (Method)it.next();
-				String setter_name = setter.getName();
-				String property_name = setter_name.substring(3);
-				Method getter = (Method)getters.get("get" + property_name);
-				if(getter == null)
-					getter = (Method)getters.get("is" + property_name);
-
-				if(getter != null)
+				Method[] ms = clazz.getMethods();
+				HashMap getters = new HashMap();
+				ArrayList setters = new ArrayList();
+				for(int i = 0; i < ms.length; i++)
 				{
-					Class[] setter_param_type = setter.getParameterTypes();
-					String property_java_name = Character.toLowerCase(property_name.charAt(0))
-						+ property_name.substring(1);
-					
-					Annotation exclude = null;
-					try
+					String method_name = ms[i].getName();
+					if((method_name.startsWith("is") || method_name.startsWith("get"))
+						&& ms[i].getParameterTypes().length == 0)
 					{
-						exclude = clazz.getField(property_name).getAnnotation(Exclude.class);
+						getters.put(method_name, ms[i]);
 					}
-					catch(NoSuchFieldException e)
+					else if(method_name.startsWith("set")
+						&& ms[i].getParameterTypes().length == 1)
 					{
+						setters.add(ms[i]);
 					}
-					
-					if (exclude == null)
+				}
+	
+				Iterator it = setters.iterator();
+	
+				while(it.hasNext())
+				{
+					Method setter = (Method)it.next();
+					String setter_name = setter.getName();
+					String property_name = setter_name.substring(3);
+					Method getter = (Method)getters.get("get" + property_name);
+					if(getter == null)
+						getter = (Method)getters.get("is" + property_name);
+	
+					if(getter != null)
 					{
-						ret.put(property_java_name, createBeanProperty(property_java_name, 
-							getter.getReturnType(), getter, setter, setter_param_type[0]));
+						Class[] setter_param_type = setter.getParameterTypes();
+						String property_java_name = Character.toLowerCase(property_name.charAt(0))
+							+ property_name.substring(1);
+						
+						boolean exclude = false;
+						try
+						{
+							Field f = clazz.getField(property_name);
+							exclude = f.isAnnotationPresent(Exclude.class);
+						}
+						catch(NoSuchFieldException e)
+						{
+						}
+						
+						if(!exclude)
+						{
+							ret.put(property_java_name, createBeanProperty(property_java_name, 
+								getter.getReturnType(), getter, setter, setter_param_type[0]));
+						}
 					}
 				}
 			}
-
+			
 			// Get all public fields.
 			Field[] fields = clazz.getFields();
 			for(int i = 0; i < fields.length; i++)
 			{
 				String property_java_name = fields[i].getName();
-				if((includefields || fields[i].getAnnotation(Include.class) != null) && fields[i].getAnnotation(Exclude.class) == null && !ret.containsKey(property_java_name))
+				if((includefields || fields[i].isAnnotationPresent(Include.class)) 
+					&& fields[i].getAnnotation(Exclude.class) == null && !ret.containsKey(property_java_name))
 				{
 					ret.put(property_java_name, createBeanProperty(property_java_name, fields[i], false));
 				}
 			}
 			
-			/*if(includefields)
-			{
-				Field[] fields = clazz.getFields();
-				for(int i = 0; i < fields.length; i++)
-				{
-					String property_java_name = fields[i].getName();
-					if(!ret.containsKey(property_java_name))
-					{
-						ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
-					}
-				}
-			}*/
-//			else
-//			{
-//				Field[] fields = clazz.getFields();
-//				for(int i = 0; i < fields.length; i++)
-//				{
-//					String property_java_name = fields[i].getName();
-//					if(!ret.containsKey(property_java_name))
-//					{
-//						ret.put(property_java_name, new BeanProperty(property_java_name, fields[i]));
-//					}
-//				}
-//			}
-
 			// Get final values (val$xyz fields) for anonymous classes.
 			if(clazz.isAnonymousClass())
 			{

@@ -30,7 +30,7 @@ public class BeanToHTMLMapper implements IValueMapper
 		
 		ret.append("<h1>").append(SReflect.getUnqualifiedClassName(result.getClass())).append("</h1>");
 		
-		Map<String, BeanProperty> props = in.getBeanProperties(result.getClass(), false);
+		Map<String, BeanProperty> props = in.getBeanProperties(result.getClass(), true, false);
 		for(Iterator<String> it=props.keySet().iterator(); it.hasNext(); )
 		{
 			String name = it.next();

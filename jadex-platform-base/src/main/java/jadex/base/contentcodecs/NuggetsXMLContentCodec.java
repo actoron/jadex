@@ -5,6 +5,7 @@ import jadex.commons.SReflect;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Properties;
 
 //import nuggets.Nuggets;
@@ -57,7 +58,7 @@ public class NuggetsXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-	public byte[] encode(Object val, ClassLoader classloader)
+	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info)
 	{
 		if(otx==null)
 			init(classloader);
@@ -79,7 +80,7 @@ public class NuggetsXMLContentCodec implements IContentCodec, Serializable
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public Object decode(byte[] val, ClassLoader classloader)
+	public Object decode(byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info)
 	{
 		if(otx==null)
 			init(classloader);

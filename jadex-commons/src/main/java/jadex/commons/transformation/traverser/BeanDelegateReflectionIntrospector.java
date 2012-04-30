@@ -55,7 +55,7 @@ public class BeanDelegateReflectionIntrospector extends BeanReflectionIntrospect
 		if(!delegates.containsKey(clazz))
 		{
 			IBeanAccessorDelegate	ret	= null;
-			Map properties = getBeanProperties(clazz, true);
+			Map properties = getBeanProperties(clazz, true, true);
 			ClassLoader cl = clazz.getClassLoader();
 			ClassPool pool = new ClassPool(null);
 			pool.appendSystemPath();

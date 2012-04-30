@@ -171,6 +171,15 @@ public class TypeInfo	extends AbstractInfo
 	}
 	
 	/**
+	 *  Get the includemethods.
+	 *  @return The includemethods.
+	 */
+	public boolean isIncludeMethods()
+	{
+		return mapinfo!=null? mapinfo.getIncludeMethods()!=null && mapinfo.getIncludeMethods().booleanValue(): false;
+	}
+	
+	/**
 	 *  Get the attribute info.
 	 *  @param xmlname The xml name of the attribute.
 	 *  @return The attribute info.

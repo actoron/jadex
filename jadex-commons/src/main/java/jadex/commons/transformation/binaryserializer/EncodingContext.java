@@ -2,12 +2,10 @@ package jadex.commons.transformation.binaryserializer;
 
 import jadex.commons.SReflect;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
-import jadex.commons.transformation.traverser.Traverser;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -54,14 +52,18 @@ public class EncodingContext
 	/** Flag indicating class names should be written (can be temporarily disable for one write). */
 	protected boolean writeclass;
 	
+	/** The root object. */
+	protected Object rootobject;
+	
 	/**
 	 *  Creates an encoding context.
 	 *  @param usercontext A user context.
 	 *  @param preprocessors The preprocessors.
 	 *  @param classloader The classloader.
 	 */
-	public EncodingContext(Object usercontext, List<ITraverseProcessor> preprocessors, ClassLoader classloader)
+	public EncodingContext(Object rootobject, Object usercontext, List<ITraverseProcessor> preprocessors, ClassLoader classloader)
 	{
+		this.rootobject = rootobject;
 		this.usercontext = usercontext;
 		this.preprocessors = preprocessors;
 		this.classloader = classloader;
@@ -86,6 +88,15 @@ public class EncodingContext
 		return buffer.toByteArray();
 	}
 	
+	/**
+	 *  Get the rootobject.
+	 *  @return the rootobject.
+	 */
+	public Object getRootObject()
+	{
+		return rootobject;
+	}
+
 	/**
 	 *  Returns the user context.
 	 *  @return The user context.
@@ -140,6 +151,10 @@ public class EncodingContext
 		return buffer.getByteBuffer(length);
 	}
 	
+	/**
+	 * 
+	 * @param bool
+	 */
 	public void writeBoolean(boolean bool)
 	{
 		//byte val = (byte) ((Boolean.TRUE.equals(bool))? 1 : 0);
@@ -160,6 +175,10 @@ public class EncodingContext
 		++bitpos;
 	}
 	
+	/**
+	 * 
+	 * @param clazz
+	 */
 	public void writeClass(Class clazz)
 	{
 
@@ -182,6 +201,11 @@ public class EncodingContext
 		}
 	}
 	
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 */
 	public int writeClassname(String name)
 	{
 		Integer classid = classnamepool.get(name);
@@ -241,6 +265,10 @@ public class EncodingContext
 		return classid.intValue();
 	}
 	
+	/**
+	 * 
+	 * @param string
+	 */
 	public void writeString(String string)
 	{
 		Integer sid = stringpool.get(string);
@@ -265,6 +293,10 @@ public class EncodingContext
 			writeVarInt(sid);
 	}
 	
+	/**
+	 * 
+	 * @param value
+	 */
 	public void writeVarInt(long value)
 	{
 		int size = VarInt.getEncodedSize(value);
@@ -273,6 +305,10 @@ public class EncodingContext
 		VarInt.encode(value, buffer.getBufferAccess(), pos, size);
 	}
 	
+	/**
+	 * 
+	 * @param value
+	 */
 	public void writeSignedVarInt(long value)
 	{
 		boolean neg = value < 0;

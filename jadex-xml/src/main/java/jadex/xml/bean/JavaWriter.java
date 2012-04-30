@@ -18,7 +18,10 @@ import jadex.xml.MappingInfo;
 import jadex.xml.ObjectInfo;
 import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
+import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
+import jadex.xml.reader.IObjectReaderHandler;
+import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.Writer;
 
 /* $if !android $ */
@@ -53,6 +56,9 @@ public class JavaWriter extends Writer
 	/** The static writer instance. */
 	protected static Writer writer;
 	
+	/** The object handler. */
+	protected static IObjectWriterHandler handler;
+	
 	/* $if !android $ */
 	protected static final Color TRANSPARENT_WHITE = new Color( 255, 255, 255, 0); 
 	/* $endif $ */
@@ -61,11 +67,11 @@ public class JavaWriter extends Writer
 	
 	/**
 	 *  Create a new reader.
-	 *  @param handler The handler.
+	 *  @param readerhandler The handler.
 	 */
-	public JavaWriter(Set typeinfos)
+	public JavaWriter()
 	{
-		super(new BeanObjectWriterHandler(joinTypeInfos(typeinfos), true));
+		super(true);
 	}
 	
 	//-------- methods --------
@@ -757,9 +763,7 @@ public class JavaWriter extends Writer
 	 */
 	public static String objectToXML(Object val, ClassLoader classloader)
 	{
-		if(writer==null)
-			createWriter();
-		return Writer.objectToXML(writer, val, classloader);
+		return objectToXML(val, classloader, null);
 	}
 	
 	/**
@@ -767,9 +771,7 @@ public class JavaWriter extends Writer
 	 */
 	public static byte[] objectToByteArray(Object val, ClassLoader classloader)
 	{
-		if(writer==null)
-			createWriter();
-		return Writer.objectToByteArray(writer, val, classloader);
+		return objectToByteArray(val, classloader, null);
 	}
 	
 	/**
@@ -777,9 +779,31 @@ public class JavaWriter extends Writer
 	 */
 	public static void objectToOutputStream(Object val, OutputStream os, ClassLoader classloader)
 	{
-		if(writer==null)
-			createWriter();
-		Writer.objectToOutputStream(writer, val, os, classloader, null);
+		objectToOutputStream(val, os, classloader, null);
+	}
+	
+	/**
+	 *  Convert to a string.
+	 */
+	public static String objectToXML(Object val, ClassLoader classloader, IObjectWriterHandler handler)
+	{
+		return Writer.objectToXML(getInstance(), val, classloader, handler==null? getObjectHandler(): handler);
+	}
+	
+	/**
+	 *  Convert to a byte array.
+	 */
+	public static byte[] objectToByteArray(Object val, ClassLoader classloader, IObjectWriterHandler handler)
+	{
+		return Writer.objectToByteArray(getInstance(), val, classloader, handler==null? getObjectHandler(): handler);
+	}
+	
+	/**
+	 *  Write to output stream.
+	 */
+	public static void objectToOutputStream(Object val, OutputStream os, ClassLoader classloader, IObjectWriterHandler handler)
+	{
+		Writer.objectToOutputStream(getInstance(), val, os, classloader, null, handler==null? getObjectHandler(): handler);
 	}
 	
 	
@@ -787,22 +811,37 @@ public class JavaWriter extends Writer
 	 *  Get the default Java writer.
 	 *  @return The Java writer.
 	 */
-	public static Writer getInstance()
+	private static Writer getInstance()
 	{
 		if(writer==null)
-			createWriter();
+		{
+			synchronized(JavaWriter.class)
+			{
+				if(writer==null)
+				{
+					writer = new JavaWriter();
+				}
+			}
+		}
 		return writer;
 	}
 	
 	/**
-	 *  Conditionally create the writer instance.
-	 *  Note that the synchronized check needs to be done.
-	 *  Otherwise double creation may happen (leading to
-	 *  concurrency issues).
+	 *  Get the default Java reader.
+	 *  @return The Java reader.
 	 */
-	protected static synchronized void createWriter()
+	public static IObjectWriterHandler getObjectHandler()
 	{
-		if(writer==null)
-			writer = new JavaWriter(null);
+		if(handler==null)
+		{
+			synchronized(JavaWriter.class)
+			{
+				if(handler==null)
+				{
+					handler = new BeanObjectWriterHandler(getTypeInfos(), true);
+				}
+			}
+		}
+		return handler;
 	}
 }

@@ -1279,6 +1279,16 @@ public class RemoteReferenceModule
 	{
 		return marshalservice;
 	}
+
+	/**
+	 *  Get the libservice.
+	 *  @return the libservice.
+	 */
+	public ILibraryService getLibraryService()
+	{
+		return libservice;
+	}
+	
 	
 //	Code for retrying a command
 //	rsms.getComponent().scheduleStep(new ICommand()

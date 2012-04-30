@@ -66,6 +66,7 @@ public abstract class Test extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
+				testBean();
 				testUUID();
 				testEnum();
 				testByte();
@@ -92,7 +93,6 @@ public abstract class Test extends TestCase
 				testEmptyList();
 				testEmptyMap();
 				testSpecialCharacter();
-				testBean();
 				testSelfReferenceBean();
 				testEmptyArray();
 				testArrayOrder();

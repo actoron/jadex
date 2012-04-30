@@ -1,5 +1,8 @@
 package jadex.commons.transformation.binaryserializer;
 
+/**
+ * 
+ */
 public interface IDecoderHandler
 {
 	/**

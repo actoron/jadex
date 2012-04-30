@@ -61,11 +61,11 @@ public class Reader
 	
 	//-------- attributes --------
 	
-	/** The type info manager. */
-	protected TypeInfoPathManager tipmanager;
+//	/** The type info manager. */
+//	protected TypeInfoPathManager tipmanager;
 	
-	/** The default object reader handler (if any). */
-	protected IObjectReaderHandler defaulthandler;
+//	/** The default object reader handler (if any). */
+//	protected IObjectReaderHandler defaulthandler;
 	
 	/** The link mode. */
 	protected boolean bulklink;
@@ -77,41 +77,37 @@ public class Reader
 
 	/**
 	 *  Create a new reader.
-	 *  @param handler The handler.
+	 *  @param readerhandler The handler.
 	 */
-	public Reader(TypeInfoPathManager tipmanager)
+	public Reader()
 	{
-		this(tipmanager, false);
+		this(false);
 	}
 	
 	/**
 	 *  Create a new reader.
-	 *  @param handler The handler.
 	 */
-	public Reader(TypeInfoPathManager tipmanager, boolean bulklink)
+	public Reader(boolean bulklink)
 	{
-		this(tipmanager, bulklink, false, null);
+		this(bulklink, false, null);
 	}
 	
 	/**
 	 *  Create a new reader.
-	 *  @param handler The handler.
 	 */
-	public Reader(TypeInfoPathManager tipmanager, boolean bulklink, boolean validate, XMLReporter reporter)
+	public Reader(boolean bulklink, boolean validate, XMLReporter reporter)
 	{
 		// Xerces has a stackoverflow bug when coalescing is set to true :-(
-		this(tipmanager, bulklink, validate, false, reporter, null);
+		this(bulklink, validate, false, reporter);
 	}
 	
 	/**
 	 *  Create a new reader.
-	 *  @param handler The handler.
+	 *  @param readerhandler The handler.
 	 */
-	public Reader(TypeInfoPathManager tipmanager, boolean bulklink, boolean validate, boolean coalescing, XMLReporter reporter, IObjectReaderHandler defaulthandler)
+	public Reader(boolean bulklink, boolean validate, boolean coalescing, XMLReporter reporter)
 	{
-		this.tipmanager = tipmanager;
 		this.bulklink = bulklink;
-		this.defaulthandler = defaulthandler;
 		factory	= XMLInputFactory.newInstance();
 		
 		try
@@ -160,14 +156,14 @@ public class Reader
 	 *  @param classloader The classloader.
 	 * 	@param context The context.
  	 */
-	public Object read(java.io.Reader input, final ClassLoader classloader, final Object callcontext) throws Exception
+	public Object read(TypeInfoPathManager tipmanager, IObjectReaderHandler handler, java.io.Reader input, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
 		XMLStreamReader	parser;
 		synchronized(factory)
 		{
 			parser	= factory.createXMLStreamReader(input);
 		}
-		return read(parser, classloader, callcontext);
+		return read(tipmanager, handler, parser, classloader, callcontext);
 	}
 	
 	/**
@@ -176,14 +172,14 @@ public class Reader
 	 *  @param classloader The classloader.
 	 * 	@param context The context.
  	 */
-	public Object read(InputStream input, final ClassLoader classloader, final Object callcontext) throws Exception
+	public Object read(TypeInfoPathManager tipmanager, IObjectReaderHandler handler, InputStream input, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
 		XMLStreamReader	parser;
 		synchronized(factory)
 		{
 			parser	= factory.createXMLStreamReader(input);
 		}
-		return read(parser, classloader, callcontext);
+		return read(tipmanager, handler, parser, classloader, callcontext);
 	}
 
 	/**
@@ -192,9 +188,9 @@ public class Reader
 	 *  @param classloader The classloader.
 	 * 	@param context The context.
  	 */
-	public Object read(XMLStreamReader parser, final ClassLoader classloader, final Object callcontext) throws Exception
+	public Object read(TypeInfoPathManager tipmanager, IObjectReaderHandler handler, XMLStreamReader parser, final ClassLoader classloader, final Object callcontext) throws Exception
 	{
-		ReadContext readcontext = new ReadContext(parser, factory.getXMLReporter(), callcontext, classloader);
+		ReadContext readcontext = new ReadContext(tipmanager, handler, parser, factory.getXMLReporter(), callcontext, classloader);
 		READ_CONTEXT.set(readcontext);
 		try
 		{
@@ -322,7 +318,7 @@ public class Reader
 			QName[] fullpath = readcontext.getXMLPath(localname);
 			
 			// Get type info and corresponding handler.
-			TypeInfo typeinfo = tipmanager.getTypeInfo(localname, fullpath, rawattrs);
+			TypeInfo typeinfo = readcontext.getPathManager().getTypeInfo(localname, fullpath, rawattrs);
 			IObjectReaderHandler	handler	= typeinfo!=null ? typeinfo.getReaderHandler() : null;
 			if(handler==null)
 			{
@@ -330,9 +326,9 @@ public class Reader
 				{
 					handler	= readcontext.getTopStackElement().getReaderHandler();
 				}
-				else if(defaulthandler!=null)
+				else if(readcontext.getDefaultHandler()!=null)
 				{
-					handler	= defaulthandler;
+					handler	= readcontext.getDefaultHandler();
 				}
 				else
 				{
@@ -537,7 +533,7 @@ public class Reader
 			
 			QName localname = parser.getName();
 			QName[] fullpath = readcontext.getXMLPath();
-			final TypeInfo typeinfo = tipmanager.getTypeInfo(localname, fullpath, topse.getRawAttributes());
+			final TypeInfo typeinfo = readcontext.getPathManager().getTypeInfo(localname, fullpath, topse.getRawAttributes());
 	
 			// Hack. Change object to content when it is element of its own.
 			if((topse.getObject()==null && topse.getContent()!=null && topse.getContent().trim().length()>0) || topse.getObject()==STRING_MARKER)
@@ -707,23 +703,24 @@ public class Reader
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public static Object objectFromXML(Reader reader, String val, ClassLoader classloader)
+	public static Object objectFromXML(Reader reader, String val, ClassLoader classloader, TypeInfoPathManager manager, IObjectReaderHandler handler)
 	{
-		return objectFromXML(reader, val, classloader, null);
+		return objectFromXML(reader, val, classloader, null, manager, handler);
 	}
 	
 	/**
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public static Object objectFromXML(Reader reader, String val, ClassLoader classloader, Object context)
+	public static Object objectFromXML(Reader reader, String val, ClassLoader classloader, 
+		Object context, TypeInfoPathManager manager, IObjectReaderHandler handler)
 	{
 //		return objectFromByteArray(reader, val.getBytes(), classloader, context);
 		java.io.Reader rd = null;
 		try
 		{
 			rd = new StringReader(val);
-			Object ret = reader.read(rd, classloader, context);
+			Object ret = reader.read(manager, handler, rd, classloader, context);
 			return ret;
 		}
 		catch(Exception e)
@@ -751,39 +748,38 @@ public class Reader
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public static Object objectFromByteArray(Reader reader, byte[] val, ClassLoader classloader)
+	public static Object objectFromByteArray(Reader reader, byte[] val, ClassLoader classloader, TypeInfoPathManager manager, IObjectReaderHandler handler)
 	{
-		return objectFromInputStream(reader, new ByteArrayInputStream(val), classloader, null);
+		return objectFromInputStream(reader, new ByteArrayInputStream(val), classloader, null, manager, handler);
 	}
 	
 	/**
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public static Object objectFromByteArray(Reader reader, byte[] val, ClassLoader classloader, Object context)
+	public static Object objectFromByteArray(Reader reader, byte[] val, ClassLoader classloader, Object context, TypeInfoPathManager manager, IObjectReaderHandler handler)
 	{
-		return objectFromInputStream(reader, new ByteArrayInputStream(val), classloader, context);		
-	}
-
-	
-	/**
-	 *  @param val The string value.
-	 *  @return The encoded object.
-	 */
-	public static Object objectFromInputStream(Reader reader, InputStream val, ClassLoader classloader)
-	{
-		return objectFromInputStream(reader, val, classloader, null);
+		return objectFromInputStream(reader, new ByteArrayInputStream(val), classloader, context, manager, handler);		
 	}
 	
 	/**
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-	public static Object objectFromInputStream(Reader reader, InputStream bis, ClassLoader classloader, Object context)
+	public static Object objectFromInputStream(Reader reader, InputStream val, ClassLoader classloader, TypeInfoPathManager manager, IObjectReaderHandler handler)
+	{
+		return objectFromInputStream(reader, val, classloader, null, manager, handler);
+	}
+	
+	/**
+	 *  @param val The string value.
+	 *  @return The encoded object.
+	 */
+	public static Object objectFromInputStream(Reader reader, InputStream bis, ClassLoader classloader, Object context, TypeInfoPathManager manager, IObjectReaderHandler handler)
 	{
 		try
 		{
-			Object ret = reader.read(bis, classloader, context);
+			Object ret = reader.read(manager, handler, bis, classloader, context);
 			return ret;
 		}
 		catch(Exception e)

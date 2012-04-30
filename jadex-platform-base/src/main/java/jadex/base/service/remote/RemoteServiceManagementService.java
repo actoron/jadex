@@ -1,8 +1,11 @@
 package jadex.base.service.remote;
 
+import jadex.base.contentcodecs.JadexBinaryContentCodec;
+import jadex.base.contentcodecs.JadexXMLContentCodec;
 import jadex.base.service.message.InputConnection;
 import jadex.base.service.message.MessageService;
 import jadex.base.service.message.OutputConnection;
+import jadex.base.service.message.transport.codecs.JadexBinaryCodec;
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.base.service.remote.commands.RemoteGetExternalAccessCommand;
 import jadex.base.service.remote.commands.RemoteSearchCommand;
@@ -16,8 +19,11 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
+import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
+import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.Timeout;
@@ -29,6 +35,7 @@ import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.search.TypeResultSelector;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
@@ -38,23 +45,20 @@ import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;
 import jadex.commons.IFilter;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.transformation.annotations.Classname;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.commons.transformation.binaryserializer.DecodingContext;
 import jadex.commons.transformation.binaryserializer.EncodingContext;
 import jadex.commons.transformation.binaryserializer.IDecoderHandler;
 import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
-import jadex.micro.IMicroExternalAccess;
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeInfo;
 import jadex.xml.IContext;
@@ -71,8 +75,9 @@ import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.BeanObjectWriterHandler;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
-import jadex.xml.reader.ReadContext;
+import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.Reader;
+import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.Writer;
 
 import java.util.ArrayList;
@@ -84,17 +89,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/* $if !android $ */
 import javax.xml.namespace.QName;
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLReporter;
-import javax.xml.stream.XMLStreamException;
-/* $else $
-import javaxx.xml.namespace.QName;
-import javaxx.xml.stream.Location;
-import javaxx.xml.stream.XMLReporter;
-import javaxx.xml.stream.XMLStreamException;
-$endif $ */
 
 
 /**
@@ -104,18 +99,6 @@ $endif $ */
 public class RemoteServiceManagementService extends BasicService implements IRemoteServiceManagementService
 {
 	//-------- constants --------
-	
-	/** Language constant for binary-encoded messages.
-	 *  RMS needs its own language to prevent the message service
-	 *  from decoding RMS messages.
-	 */
-	public static String RMS_JADEX_BINARY = "rms-" + SFipa.JADEX_BINARY;
-	
-	/** Language constant for XML-encoded messages.
-	 *  RMS needs its own language to prevent the message service
-	 *  from decoding RMS messages.
-	 */
-	public static String RMS_JADEX_XML = "rms-" + SFipa.JADEX_XML;
 	
 	/** Excluded remote methods (for all methods)
 	 *	Excluded methods throw UnsupportedOperationException. */
@@ -142,7 +125,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	//-------- attributes --------
 	
 	/** The component. */
-	protected IMicroExternalAccess component;
+	protected IExternalAccess component;
 	
 	/** The map of waiting calls (callid -> future). */
 	protected Map<String, WaitingCallInfo> waitingcalls;
@@ -169,9 +152,6 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** Postprocessors for binary decoding. */
 	protected List<IDecoderHandler> binpostprocs;
 	
-	/** Flag whether to use binary encoding. */
-	protected boolean binarymode;
-	
 	/** The timer. */
 	protected Timer	timer;
 	
@@ -181,15 +161,13 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/** The message service. */
 	protected IMessageService msgservice;
 	
-//	protected Map<Integer, IInputConnection> icons;
-	
 	//-------- constructors --------
 	
 	/**
 	 *  Create a new remote service management service.
 	 */
-	public RemoteServiceManagementService(IMicroExternalAccess component, 
-		ILibraryService libservice, final IMarshalService marshal, final IMessageService msgservice, boolean binarymode)
+	public RemoteServiceManagementService(IExternalAccess component, 
+		ILibraryService libservice, final IMarshalService marshal, final IMessageService msgservice)//, boolean binarymode)
 	{
 		super(component.getServiceProvider().getId(), IRemoteServiceManagementService.class, null);
 
@@ -203,394 +181,30 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		this.timer	= new Timer(true);
 		this.marshal = marshal;
 		this.msgservice = msgservice;
-		this.binarymode = binarymode;
-//		this.icons = new HashMap<Integer, IInputConnection>();
 		
-		// Reader that supports conversion of proxyinfo to proxy.
-		Set<TypeInfo> typeinfosread = JavaReader.getTypeInfos();
-		
-		QName[] pr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyReference")};
-		TypeInfo ti_rr = new TypeInfo(new XMLInfo(pr), 
-			new ObjectInfo(ProxyReference.class, new RMIPostProcessor(rrm)), 
-			new MappingInfo(null, new SubobjectInfo[]{
-				new SubobjectInfo(new AccessInfo("proxyInfo")),
-				new SubobjectInfo(new AccessInfo("remoteReference")),
-				new SubobjectInfo(new AccessInfo("cache"))}));
-		typeinfosread.add(ti_rr);
-
-		QName[] icp = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge.service.types.remote", "ServiceInputConnectionProxy")};
-		TypeInfo ti_icp = new TypeInfo(new XMLInfo(icp), 
-			new ObjectInfo(ServiceInputConnectionProxy.class, new IPostProcessor()
-		{
-			public Object postProcess(IContext context, Object object)
-			{
-				ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)object;
-				int conid = icp.getConnectionId();
-				IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(conid);
-				return icon;
-			}
-			
-			public int getPass()
-			{
-				return 0;
-			}
-		}));
-		typeinfosread.add(ti_icp);
-		
-		QName[] ocp = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge.service.types.remote", "ServiceOutputConnectionProxy")};
-		TypeInfo ti_ocp = new TypeInfo(new XMLInfo(ocp), 
-			new ObjectInfo(ServiceOutputConnectionProxy.class, new IPostProcessor()
-		{
-			public Object postProcess(IContext context, Object object)
-			{
-				ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)object;
-				int conid = ocp.getConnectionId();
-				IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(conid);
-				return ocon;
-			}
-			
-			public int getPass()
-			{
-				return 0;
-			}
-		}));
-		typeinfosread.add(ti_ocp);
-	
-		
-		this.reader = new Reader(new TypeInfoPathManager(typeinfosread), false, false, false, new XMLReporter()
-		{
-			public void report(String message, String error, Object info, Location location)
-				throws XMLStreamException
-			{
-				List<Tuple>	errors	= (List<Tuple>)((ReadContext)Reader.READ_CONTEXT.get()).getUserContext();
-				errors.add(new Tuple(new Object[]{message, error, info, location}));
-			}
-		}, new BeanObjectReaderHandler(typeinfosread));
-		
-		
-		// Writer that supports conversion :
-		// isRemoteReference to remote reference
-		// pojo services to underlying service proxies 
-		// enhance component identifier with addresses
-		
-		Set<TypeInfo> typeinfoswrite = JavaWriter.getTypeInfos();
-		final RMIPreProcessor preproc = new RMIPreProcessor(rrm);
-		
-//		TypeInfo ti_proxyable = new TypeInfo(new XMLInfo(pr, null, false, preproc), 
-//			new ObjectInfo(IRemotable.class));
-//		typeinfoswrite.add(ti_proxyable);
-		
-		// Component identifier enhancement now done in MessageService sendMessage
-		QName[] ppr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge", "ComponentIdentifier")};
-		final IComponentIdentifier root = component.getComponentIdentifier().getRoot();
-		IPreProcessor cidpp = new IPreProcessor()
-		{
-			public Object preProcess(IContext context, Object object)
-			{
-				IComponentIdentifier src = (IComponentIdentifier)object;
-				ComponentIdentifier ret = null;
-				if(src.getPlatformName().equals(root.getLocalName()))
-				{
-					String[] addresses = (String[])((Object[])context.getUserContext())[1];
-					ret = new ComponentIdentifier(src.getName(), addresses);
-//					System.out.println("Rewritten cid: "+ret);
-				}
-				
-				return ret==null? src: ret;
-			}
-		};
-		TypeInfo ti_cids = new TypeInfo(new XMLInfo(ppr, cidpp), new ObjectInfo(IComponentIdentifier.class),
-			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("name"))},
-				new SubobjectInfo[]{new SubobjectInfo(new AccessInfo("addresses"))}));
-		typeinfoswrite.add(ti_cids);
-		
-		BeanObjectWriterHandler wh = new BeanObjectWriterHandler(typeinfoswrite, true);
-		
-		// Add pre processor thst maps pojo services to underlying service proxies 
-		// (have to be processed further with RMIPreprocessor)
-		wh.addPreProcessor(new IFilter()
-		{
-			public boolean filter(Object obj)
-			{
-				return obj!=null && !(obj instanceof BasicService) && obj.getClass().isAnnotationPresent(Service.class);
-			}
-		}, new IPreProcessor()
-		{
-			public Object preProcess(IContext context, Object object)
-			{
-				return BasicServiceInvocationHandler.getPojoServiceProxy(object);
-			}
-		});
-		
-		// Add preprocessor that tests if is remote reference and replaces with 
-		wh.addPreProcessor(new IFilter()
-		{
-			public boolean filter(Object obj)
-			{
-				return marshal.isRemoteReference(obj);
-			}
-		}, preproc);
-		
-		// Streams
-		
-		// output connection as result of call
-		wh.addPreProcessor(new IFilter()
-		{
-			public boolean filter(Object obj)
-			{
-//				System.out.println("obj: "+obj);
-				return obj instanceof ServiceInputConnectionProxy;
-			}
-		}, new IPreProcessor()
-		{
-			public Object preProcess(IContext context, Object object)
-			{
-				IComponentIdentifier receiver = (IComponentIdentifier)((Object[])context.getUserContext())[0];
-				ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
-				OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
-				con.setConnectionId(ocon.getConnectionId());
-				con.setOutputConnection(ocon);
-				return con;
-			}
-		});
-		
-		// input connection proxy as result of call
-		wh.addPreProcessor(new IFilter()
-		{
-			public boolean filter(Object obj)
-			{
-//				System.out.println("obj: "+obj);
-				return obj instanceof ServiceOutputConnectionProxy;
-			}
-		}, new IPreProcessor()
-		{
-			public Object preProcess(IContext context, Object object)
-			{
-				IComponentIdentifier receiver = (IComponentIdentifier)((Object[])context.getUserContext())[0];
-				ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
-				InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
-				con.setConnectionId(icon.getConnectionId());
-				con.setInputConnection(icon);
-				return con;
-			}
-		});
-		
-		this.writer = new Writer(wh);
-//		{
-//			public void writeObject(WriteContext wc, Object object, QName tag) throws Exception 
-//			{
-//				// todo: cleanup rmi pre/postprocessing 
-//				// extra preprocessing of commands should be removed
-//				// should instead use ifReference() with context information (how/where to express?)
-//				
-////				System.out.println("object: "+object);
-////				if(object instanceof RemoteResultCommand)
-////					System.out.println("huhuhu");
-//				
-//				if(marshal.isRemoteReference(object))
-//				{
-////					System.out.println("changed: "+object.getClass()+" "+object);
-//					object = preproc.preProcess(wc, object);
-//				}
-////				else
-////				{
-////					System.out.println("kept: "+object.getClass()+" "+object);
-////				}
-//				
-//				// Perform pojo service replacement (for local and remote calls).
-//				// Test if it is pojo service impl.
-//				// Has to be mapped to new proxy then
-//				
-//				if(object!=null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class))
-//				{
-////					System.out.println("test");
-//					// Check if the argument type refers to the pojo service
-////					Service ser = object.getClass().getAnnotation(Service.class);
-////					if(SReflect.isSupertype(ser.value(), sic.getMethod().getParameterTypes()[i]))
-//					{
-//						object = BasicServiceInvocationHandler.getPojoServiceProxy(object);
-////						System.out.println("proxy: "+object);
-//					}
-//				}
-//				
-//				super.writeObject(wc, object, tag);
-//			};
-//		};
-		
-		
-		// Equivalent pre- and postprocessors for binary mode.
-		
-		binpostprocs = new ArrayList<IDecoderHandler>();
-		IDecoderHandler rmipostproc = new IDecoderHandler()
-		{
-			public boolean isApplicable(Class clazz)
-			{
-				return ProxyReference.class.equals(clazz);
-			}
-			
-			public Object decode(Class clazz, DecodingContext context)
-			{
-				try
-				{
-					return rrm.getProxy((ProxyReference)context.getLastObject(), context.getClassloader());
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				}
-			}
-		};
-		binpostprocs.add(rmipostproc);
-		
-		binpostprocs.add(new IDecoderHandler()
-		{
-			public boolean isApplicable(Class clazz)
-			{
-				return ServiceInputConnectionProxy.class.equals(clazz);
-			}
-			
-			public Object decode(Class clazz, DecodingContext context)
-			{
-				ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)context.getLastObject();
-				int conid = icp.getConnectionId();
-				IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(conid);
-				return icon;
-			}
-		});
-				
-		binpostprocs.add(new IDecoderHandler()
-		{
-			public boolean isApplicable(Class clazz)
-			{
-				return ServiceOutputConnectionProxy.class.equals(clazz);
-			}
-			
-			public Object decode(Class clazz, DecodingContext context)
-			{
-				ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)context.getLastObject();
-				int conid = ocp.getConnectionId();
-				IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(conid);
-				return ocon;
-			}
-		});
-				
-		
-		binpreprocs = new ArrayList<ITraverseProcessor>();
-		ITraverseProcessor bpreproc = new ITraverseProcessor()
-		{
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
-			{
-				return ComponentIdentifier.class.equals(clazz);
-			}
-			
-			public Object process(Object object, Class<?> clazz,
-					List<ITraverseProcessor> processors, Traverser traverser,
-					Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
-			{
-				IComponentIdentifier src = (IComponentIdentifier)object;
-				ComponentIdentifier ret = null;
-				if(src.getPlatformName().equals(root.getLocalName()))
-				{
-					String[] addresses = (String[])((Object[])((EncodingContext) context).getUserContext())[1];
-					ret = new ComponentIdentifier(src.getName(), addresses);
-				}
-				
-				return ret==null? src: ret;
-			}
-		};
-		binpreprocs.add(bpreproc);
-		
-		bpreproc = new ITraverseProcessor()
-		{
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
-			{
-				return object != null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class);
-			}
-			
-			public Object process(Object object, Class<?> clazz,
-					List<ITraverseProcessor> processors, Traverser traverser,
-					Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
-			{
-				return BasicServiceInvocationHandler.getPojoServiceProxy(object);
-			}
-		};
-		binpreprocs.add(bpreproc);
-		
-		bpreproc = new ITraverseProcessor()
-		{
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
-			{
-				return marshal.isRemoteReference(object);
-			}
-			
-			public Object process(Object object, Class<?> clazz,
-					List<ITraverseProcessor> processors, Traverser traverser,
-					Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
-			{
-				try
-				{
-					Object[] uc = (Object[])((EncodingContext) context).getUserContext();
-					return rrm.getProxyReference(object, (IComponentIdentifier)uc[0], ((EncodingContext) context).getClassLoader());
-				}
-				catch(Exception e)
-				{
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				}
-			}
-		};
-		binpreprocs.add(bpreproc);
-		
-		// output connection as result of call
-		binpreprocs.add(new ITraverseProcessor()
-		{
-			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors,
-				Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
-			{
-				Object[] uc = (Object[])((EncodingContext) context).getUserContext();
-				IComponentIdentifier receiver = (IComponentIdentifier)uc[0];
-				ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
-				OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
-				con.setConnectionId(ocon.getConnectionId());
-				con.setOutputConnection(ocon);
-				return con;
-			}
-			
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
-			{
-				return object instanceof ServiceInputConnectionProxy;
-			}
-		});
-		
-		// input connection proxy as result of call
-		binpreprocs.add(new ITraverseProcessor()
-		{
-			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors,
-				Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
-			{
-				Object[] uc = (Object[])((EncodingContext) context).getUserContext();
-				IComponentIdentifier receiver = (IComponentIdentifier)uc[0];
-				ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
-				InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
-				con.setConnectionId(icon.getConnectionId());
-				con.setInputConnection(icon);
-				return con;
-			}
-			
-			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
-			{
-				return object instanceof ServiceOutputConnectionProxy;
-			}
-		});
+		((MessageService)msgservice).setContentCodecInfo(component.getComponentIdentifier(), getCodecInfo());
 	}
 	
 	//-------- methods --------
 	
-//	protected void addInputConnection(IInputConnection icon)
-//	{
-//		icons.put(icon.get, value);
-//	}
+	/**
+	 *  Get the rms codec info that needs to be used for encoding/decoding content.
+	 */
+	public Map<Class<?>, Object[]> getCodecInfo()
+	{
+		final Map<Class<?>, Object[]> infos = new HashMap<Class<?>, Object[]>();
+		final Object[] xmlinfo = new Object[2];
+		final Object[] bininfo = new Object[2];
+		infos.put(JadexXMLContentCodec.class, xmlinfo);
+		infos.put(JadexBinaryContentCodec.class, bininfo);
+		
+		xmlinfo[0] = getXMLReadInfo();
+		xmlinfo[1] = getXMLWriteInfo();
+		bininfo[0] = getBinaryReadInfo();
+		bininfo[1] = getBinaryWriteInfo();
+		
+		return infos;
+	}
 	
 	/**
 	 *  Get service proxies from a remote platform.
@@ -750,7 +364,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  Get the component.
 	 *  @return the component.
 	 */
-	public IMicroExternalAccess getComponent()
+	public IExternalAccess getComponent()
 	{
 		return component;
 	}
@@ -773,50 +387,14 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 		return waitingcalls;
 	}*/
 	
-	/**
-	 *  Get the reader.
-	 *  @return The reader.
-	 */
-	public Reader getReader()
-	{
-		return reader;
-	}
-
-	/**
-	 *  Get the writer.
-	 *  @return the writer.
-	 */
-	public Writer getWriter()
-	{
-		return writer;
-	}
-	
-	/**
-	 *  Get the preprocessors for binary encoding.
-	 *  @return Binary preprocessors.
-	 */
-	public List<ITraverseProcessor> getBinaryPreProcessors()
-	{
-		return binpreprocs;
-	}
-	
-	/**
-	 *  Get the postprocessors for binary decoding.
-	 *  @return Binary postprocessors.
-	 */
-	public List<IDecoderHandler> getBinaryPostProcessors()
-	{
-		return binpostprocs;
-	}
-	
-	/**
-	 *  Get the msg service.
-	 *  @return the msg service.
-	 */
-	public IMessageService getMessageService()
-	{
-		return msgservice;
-	}
+//	/**
+//	 *  Get the msg service.
+//	 *  @return the msg service.
+//	 */
+//	public IMessageService getMessageService()
+//	{
+//		return msgservice;
+//	}
 
 	/**
 	 *  Add a new waiting call.
@@ -927,7 +505,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	public void sendMessage(final IComponentIdentifier receiver, final Object content,
 		final String callid, final long to, final Future<Object> future)
 	{
-//		System.out.println("RMS sending: "+content);
+//		System.out.println("RMS sending: "+content+" "+receiver);
 		
 		try
 		{
@@ -947,7 +525,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						pre.setResult(null);
 					}
 					
-					pre.addResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
+					pre.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
 					{
 						public void customResultAvailable(Void v)
 						{
@@ -977,54 +555,39 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							msg.put(SFipa.SENDER, component.getComponentIdentifier());
 							msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
 							msg.put(SFipa.CONVERSATION_ID, callid);
-			//				msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);
-							if(binarymode)
+							
+							getResourceIdentifier(ia.getServiceContainer(), (AbstractRemoteCommand)content)
+								.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Object>(future)
 							{
-								msg.put(SFipa.LANGUAGE, RMS_JADEX_BINARY);
-							}
-							else
-							{
-								msg.put(SFipa.LANGUAGE, RMS_JADEX_XML);
-							}
-							ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-								.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Object>(future)
-							{
-								public void customResultAvailable(final ILibraryService ls)
+								public void customResultAvailable(IResourceIdentifier rid)
 								{
-									ia.getServiceContainer().searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-										.addResultListener(new ExceptionDelegationResultListener<IMessageService, Object>(future)
+									if(rid!=null)
 									{
-										public void customResultAvailable(final IMessageService ms)
+//										System.out.println("rid: "+rid+" "+content.getClass());
+										msg.put(SFipa.X_RID, rid);
+									}
+//									else
+//									{
+//										System.out.println("no rid: "+content.getClass());
+//									}
+									
+									ia.getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+										.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Object>(future)
+									{
+										public void customResultAvailable(final ILibraryService ls)
 										{
-											// todo: use rid of sender?! (not important as writer does not use classloader, only nuggets)
-											ls.getClassLoader(ia.getModel().getResourceIdentifier())
-												.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Object>(future)
+											ia.getServiceContainer().searchService(IMessageService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+												.addResultListener(new ExceptionDelegationResultListener<IMessageService, Object>(future)
 											{
-												public void customResultAvailable(final ClassLoader cl)
+												public void customResultAvailable(final IMessageService ms)
 												{
-													msgservice.getAddresses().addResultListener(new ExceptionDelegationResultListener<String[], Object>(future)
+													// todo: use rid of sender?! (not important as writer does not use classloader, only nuggets)
+													ls.getClassLoader(ia.getModel().getResourceIdentifier())
+														.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Object>(future)
 													{
-														public void customResultAvailable(String[] addresses)
+														public void customResultAvailable(final ClassLoader cl)
 														{
-															Object cont = null;
-															// Hack!!! Manual encoding for using custom class loader at receiver side.
-															if(binarymode)
-															{
-																cont = BinarySerializer.objectToByteArray(content, binpreprocs, new Object[]{receiver, addresses}, cl);
-															}
-															else
-															{
-																cont = Writer.objectToXML(getWriter(), content, cl, new Object[]{receiver, addresses});
-//																System.out.println("ContentXML: "+component.getComponentIdentifier()+"\n"+cont);
-															}
-															
-															msg.put(SFipa.CONTENT, cont);
-															
-	//														System.out.println("RMS sending to2: "+receiver+", "+(content!=null?SReflect.getClassName(content.getClass()):null));
-					//										if(cont.indexOf("getServices")!=-1)
-					//										{
-					//											interestingcalls.put(callid, cont);
-					//										}
+															msg.put(SFipa.CONTENT, content);
 															
 															ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), null)
 																.addResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
@@ -1044,9 +607,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 										}
 									});
 								}
-							});
+							}));
 						}
-					});
+					}));
 					
 					return IFuture.DONE;
 				}
@@ -1137,7 +700,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					return IFuture.DONE;
 				}
 			});
-//								System.out.println("timeout triggered: "+msg);
+//			System.out.println("timeout triggered: "+msg);
 		}
 	};
 
@@ -1209,6 +772,500 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				timertask.start();
 			}
 		}
+	}
+	
+	
+	/**
+	 * 
+	 */
+	protected Tuple2<TypeInfoPathManager, IObjectReaderHandler> getXMLReadInfo()
+	{
+		// Reader that supports conversion of proxyinfo to proxy.
+		Set<TypeInfo> typeinfosread = JavaReader.getTypeInfos();
+		
+		// Proxy reference -> proxy object
+		QName[] pr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.base.service.remote", "ProxyReference")};
+		TypeInfo ti_rr = new TypeInfo(new XMLInfo(pr), 
+			new ObjectInfo(ProxyReference.class, new RMIPostProcessor(rrm)), 
+			new MappingInfo(null, new SubobjectInfo[]{
+				new SubobjectInfo(new AccessInfo("proxyInfo")),
+				new SubobjectInfo(new AccessInfo("remoteReference")),
+				new SubobjectInfo(new AccessInfo("cache"))}));
+		typeinfosread.add(ti_rr);
+
+		// ServiceInputConnectionProxy -> real input connection
+		QName[] icp = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge.service.types.remote", "ServiceInputConnectionProxy")};
+		TypeInfo ti_icp = new TypeInfo(new XMLInfo(icp), 
+			new ObjectInfo(ServiceInputConnectionProxy.class, new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				try
+				{
+					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)object;
+					int conid = icp.getConnectionId();
+					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(conid);
+					return icon;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		}));
+		typeinfosread.add(ti_icp);
+		
+		// ServiceOutputConnectionProxy -> real output connection
+		QName[] ocp = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge.service.types.remote", "ServiceOutputConnectionProxy")};
+		TypeInfo ti_ocp = new TypeInfo(new XMLInfo(ocp), 
+			new ObjectInfo(ServiceOutputConnectionProxy.class, new IPostProcessor()
+		{
+			public Object postProcess(IContext context, Object object)
+			{
+				try
+				{
+					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)object;
+					int conid = ocp.getConnectionId();
+					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(conid);
+					return ocon;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+			
+			public int getPass()
+			{
+				return 0;
+			}
+		}));
+		typeinfosread.add(ti_ocp);
+		
+		return new Tuple2<TypeInfoPathManager, IObjectReaderHandler>(new TypeInfoPathManager(typeinfosread), new BeanObjectReaderHandler(typeinfosread));
+	}
+	
+	/**
+	 * 
+	 */
+	protected IObjectWriterHandler getXMLWriteInfo()
+	{
+		final RMIPreProcessor preproc = new RMIPreProcessor(rrm);
+		
+//		TypeInfo ti_proxyable = new TypeInfo(new XMLInfo(pr, null, false, preproc), 
+//			new ObjectInfo(IRemotable.class));
+//		typeinfoswrite.add(ti_proxyable);
+		
+		Set<TypeInfo> typeinfoswrite = JavaWriter.getTypeInfos();
+		
+		// Component identifier enhancement now done in MessageService sendMessage
+		QName[] ppr = new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"jadex.bridge", "ComponentIdentifier")};
+		final IComponentIdentifier root = component.getComponentIdentifier().getRoot();
+		IPreProcessor cidpp = new IPreProcessor()
+		{
+			public Object preProcess(IContext context, Object object)
+			{
+				try
+				{
+					IComponentIdentifier src = (IComponentIdentifier)object;
+					ComponentIdentifier ret = null;
+					if(src.getPlatformName().equals(root.getLocalName()))
+					{
+						String[] addresses = ((MessageService)msgservice).internalGetAddresses();
+						ret = new ComponentIdentifier(src.getName(), addresses);
+//						System.out.println("Rewritten cid: "+ret);
+					}
+					
+					return ret==null? src: ret;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+		};
+		TypeInfo ti_cids = new TypeInfo(new XMLInfo(ppr, cidpp), new ObjectInfo(IComponentIdentifier.class),
+			new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("name"))},
+			new SubobjectInfo[]{new SubobjectInfo(new AccessInfo("addresses"))}));
+		typeinfoswrite.add(ti_cids);
+		
+		BeanObjectWriterHandler wh = new BeanObjectWriterHandler(typeinfoswrite, true);
+		
+		// Add pre processor thst maps pojo services to underlying service proxies 
+		// (have to be processed further with RMIPreprocessor)
+		wh.addPreProcessor(new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+				return obj!=null && !(obj instanceof BasicService) && obj.getClass().isAnnotationPresent(Service.class);
+			}
+		}, new IPreProcessor()
+		{
+			public Object preProcess(IContext context, Object object)
+			{
+				try
+				{
+					return BasicServiceInvocationHandler.getPojoServiceProxy(object);
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+		});
+		
+		// Add preprocessor that tests if is remote reference and replaces with proxy reference
+		wh.addPreProcessor(new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+//				if(marshal.isRemoteReference(obj))
+//					System.out.println("rr: "+obj);
+				return marshal.isRemoteReference(obj);
+			}
+		}, preproc);
+		
+		// Streams
+		
+		// ServiceInputConnectionProxy -> ServiceInputConnectionProxy with real connection
+		wh.addPreProcessor(new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+//				System.out.println("obj: "+obj);
+				return obj instanceof ServiceInputConnectionProxy;
+			}
+		}, new IPreProcessor()
+		{
+			public Object preProcess(IContext context, Object object)
+			{
+				try
+				{
+					IComponentIdentifier receiver = ((AbstractRemoteCommand)context.getRootObject()).getReceiver();
+					ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
+					OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+					con.setConnectionId(ocon.getConnectionId());
+					con.setOutputConnection(ocon);
+					return con;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+		});
+		
+		// ServiceOutputConnectionProxy -> ServiceOutputConnectionProxy with real connection
+		wh.addPreProcessor(new IFilter()
+		{
+			public boolean filter(Object obj)
+			{
+//				System.out.println("obj: "+obj);
+				return obj instanceof ServiceOutputConnectionProxy;
+			}
+		}, new IPreProcessor()
+		{
+			public Object preProcess(IContext context, Object object)
+			{
+				try
+				{
+					IComponentIdentifier receiver = ((AbstractRemoteCommand)context.getRootObject()).getReceiver();
+					ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
+					InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+					con.setConnectionId(icon.getConnectionId());
+					con.setInputConnection(icon);
+					return con;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+		});
+		
+		return wh;
+	}
+	
+	/**
+	 * 
+	 */
+	protected List<IDecoderHandler> getBinaryReadInfo()
+	{
+		// Equivalent pre- and postprocessors for binary mode.
+		List<IDecoderHandler> procs = new ArrayList<IDecoderHandler>();
+		
+		// Proxy reference -> proxy object
+		IDecoderHandler rmipostproc = new IDecoderHandler()
+		{
+			public boolean isApplicable(Class clazz)
+			{
+				return ProxyReference.class.equals(clazz);
+			}
+			
+			public Object decode(Class clazz, DecodingContext context)
+			{
+				try
+				{
+					return rrm.getProxy((ProxyReference)context.getLastObject(), context.getClassloader());
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+			}
+		};
+		procs.add(rmipostproc);
+		
+		procs.add(new IDecoderHandler()
+		{
+			public boolean isApplicable(Class clazz)
+			{
+				return ServiceInputConnectionProxy.class.equals(clazz);
+			}
+			
+			public Object decode(Class clazz, DecodingContext context)
+			{
+				try
+				{
+					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)context.getLastObject();
+					int conid = icp.getConnectionId();
+					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(conid);
+					return icon;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+		});
+				
+		procs.add(new IDecoderHandler()
+		{
+			public boolean isApplicable(Class clazz)
+			{
+				return ServiceOutputConnectionProxy.class.equals(clazz);
+			}
+			
+			public Object decode(Class clazz, DecodingContext context)
+			{
+				try
+				{
+					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)context.getLastObject();
+					int conid = ocp.getConnectionId();
+					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(conid);
+					return ocon;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+		});
+		
+		return procs;
+	}
+	
+	/**
+	 * 
+	 */
+	protected List<ITraverseProcessor> getBinaryWriteInfo()
+	{
+		List<ITraverseProcessor> procs = new ArrayList<ITraverseProcessor>();
+		
+		ITraverseProcessor bpreproc = new ITraverseProcessor()
+		{
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			{
+				return ComponentIdentifier.class.equals(clazz);
+			}
+			
+			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, Traverser traverser,
+				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			{
+				try
+				{
+					IComponentIdentifier src = (IComponentIdentifier)object;
+					ComponentIdentifier ret = null;
+					if(src.getPlatformName().equals(component.getComponentIdentifier().getRoot().getLocalName()))
+					{
+						String[] addresses = ((MessageService)msgservice).internalGetAddresses();
+						ret = new ComponentIdentifier(src.getName(), addresses);
+					}
+					
+					return ret==null? src: ret;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+		};
+		procs.add(bpreproc);
+		
+		bpreproc = new ITraverseProcessor()
+		{
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			{
+				return object != null && !(object instanceof BasicService) && object.getClass().isAnnotationPresent(Service.class);
+			}
+			
+			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, Traverser traverser,
+				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			{
+				try
+				{
+					return BasicServiceInvocationHandler.getPojoServiceProxy(object);
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+		};
+		procs.add(bpreproc);
+
+		bpreproc = new ITraverseProcessor()
+		{
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			{
+//				if(marshal.isRemoteReference(object))
+//					System.out.println("rr: "+object);
+				return marshal.isRemoteReference(object);
+			}
+			
+			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, Traverser traverser,
+				Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			{
+				try
+				{
+					IComponentIdentifier receiver = ((AbstractRemoteCommand)((EncodingContext)context).getRootObject()).getReceiver();
+					return rrm.getProxyReference(object, receiver, ((EncodingContext)context).getClassLoader());
+				}
+				catch(Exception e)
+				{
+					e.printStackTrace();
+					throw new RuntimeException(e);
+				}
+			}
+		};
+		procs.add(bpreproc);
+		
+		// output connection as result of call
+		procs.add(new ITraverseProcessor()
+		{
+			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors,
+				Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			{
+				try
+				{
+					IComponentIdentifier receiver = ((AbstractRemoteCommand)((EncodingContext)context).getRootObject()).getReceiver();
+					ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
+					OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+					con.setConnectionId(ocon.getConnectionId());
+					con.setOutputConnection(ocon);
+					return con;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+			
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			{
+				return object instanceof ServiceInputConnectionProxy;
+			}
+		});
+		
+		// input connection proxy as result of call
+		procs.add(new ITraverseProcessor()
+		{
+			public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors,
+				Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
+			{
+				try
+				{
+					IComponentIdentifier receiver = ((AbstractRemoteCommand)((EncodingContext)context).getRootObject()).getReceiver();
+					ServiceOutputConnectionProxy con = (ServiceOutputConnectionProxy)object;
+					InputConnection icon = ((MessageService)msgservice).internalCreateInputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
+					con.setConnectionId(icon.getConnectionId());
+					con.setInputConnection(icon);
+					return con;
+				}
+				catch(RuntimeException e)
+				{
+					e.printStackTrace();
+					throw e;
+				}
+			}
+			
+			public boolean isApplicable(Object object, Class<?> clazz, boolean clone, ClassLoader targetcl)
+			{
+				return object instanceof ServiceOutputConnectionProxy;
+			}
+		});
+		
+		return procs;
+	}
+
+	/**
+	 * 
+	 */
+	protected static IFuture<IResourceIdentifier> getResourceIdentifier(IServiceProvider provider, AbstractRemoteCommand command)
+	{
+		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
+		ret.addResultListener(new IResultListener<IResourceIdentifier>()
+		{
+			public void resultAvailable(IResourceIdentifier result)
+			{
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				exception.printStackTrace();
+			}
+		});
+		
+		final IComponentIdentifier realrec = ((AbstractRemoteCommand)command).getSender();
+		if(realrec!=null)
+		{
+			SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
+				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IResourceIdentifier>(ret)
+			{
+				public void customResultAvailable(IComponentManagementService cms) 
+				{
+					cms.getComponentDescription(realrec).addResultListener(new DefaultResultListener<IComponentDescription>()
+					{
+						public void resultAvailable(IComponentDescription result) 
+						{
+							ret.setResult(result.getResourceIdentifier());
+						};
+					});
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		
+		return ret;
 	}
 }
 

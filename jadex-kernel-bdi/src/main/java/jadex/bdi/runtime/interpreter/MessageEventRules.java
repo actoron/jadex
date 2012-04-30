@@ -712,7 +712,8 @@ public class MessageEventRules
 					IContentCodec	codec	= mtype.findContentCodec(codecs, message, name);
 					if(codec!=null)
 					{
-						message.put(name, codec.encode(value, state.getTypeModel().getClassLoader()));
+						// todo: null? how to get the codec info?
+						message.put(name, codec.encode(value, state.getTypeModel().getClassLoader(), null));
 					}
 				}
 				

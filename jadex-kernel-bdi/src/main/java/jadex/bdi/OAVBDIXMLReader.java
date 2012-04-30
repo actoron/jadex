@@ -30,10 +30,13 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
+import jadex.xml.bean.BeanObjectReaderHandler;
 import jadex.xml.bean.IBeanObjectCreator;
 import jadex.xml.reader.IObjectLinker;
+import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
+import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.Writer;
 
 import java.util.ArrayList;
@@ -67,6 +70,16 @@ public class OAVBDIXMLReader
 	/** The singleton reader instance. */
 	protected static Reader reader;
 	protected static Writer writer;
+	
+	/** The manager. */
+	protected static TypeInfoPathManager manager;
+	
+	/** The handler. */
+	protected static IObjectReaderHandler readerhandler;
+
+	/** The writer handler. */
+	protected static IObjectWriterHandler writerhandler;
+
 	
 	// Initialize reader instance.
 	static
@@ -509,7 +522,7 @@ public class OAVBDIXMLReader
 		
 		// Different readers and writers should not work on the same typeinfos
 		// because they may alter them (e.g. add additional array types).
-		reader = new Reader(new TypeInfoPathManager(typeinfos), false, false, new XMLReporter()
+		reader = new Reader(false, false, new XMLReporter()
 		{
 			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
 			{
@@ -518,7 +531,12 @@ public class OAVBDIXMLReader
 				reportError(context, msg);
 			}
 		});
-		writer = new Writer(new OAVObjectWriterHandler(new HashSet(typeinfos)));
+		writer = new Writer();
+		
+		manager = new TypeInfoPathManager(typeinfos);
+		readerhandler = new BeanObjectReaderHandler(typeinfos);
+		
+		writerhandler = new OAVObjectWriterHandler(new HashSet(typeinfos));
 	}
 	
 	/**
@@ -535,6 +553,24 @@ public class OAVBDIXMLReader
 	public static Writer getWriter()
 	{
 		return writer;
+	}
+	
+	/**
+	 *  Get the manager.
+	 *  @return the manager.
+	 */
+	public static TypeInfoPathManager getReaderManager()
+	{
+		return manager;
+	}
+
+	/**
+	 *  Get the readerhandler.
+	 *  @return the readerhandler.
+	 */
+	public static IObjectReaderHandler getReaderHandler()
+	{
+		return readerhandler;
 	}
 
 	/**

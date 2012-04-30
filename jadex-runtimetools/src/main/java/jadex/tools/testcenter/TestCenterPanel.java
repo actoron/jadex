@@ -338,7 +338,7 @@ public class TestCenterPanel extends JSplitPanel
 										try
 										{
 											FileWriter fos = new FileWriter(f);
-											fos.write(JavaWriter.objectToXML(PropertiesXMLHelper.getPropertyWriter(), result, getClass().getClassLoader()));
+											fos.write(PropertiesXMLHelper.write(result, getClass().getClassLoader()));
 											fos.close();
 										}
 										catch(Exception e)
@@ -377,7 +377,7 @@ public class TestCenterPanel extends JSplitPanel
 								try
 								{
 									fis = new FileInputStream(file);
-									setProperties((Properties)PropertiesXMLHelper.getPropertyReader().read(fis, getClass().getClassLoader(), null));
+									setProperties((Properties)PropertiesXMLHelper.read(fis, getClass().getClassLoader()));
 								}
 								catch(Exception e)
 								{

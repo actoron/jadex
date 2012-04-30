@@ -5,6 +5,7 @@ import java.util.TimerTask;
 import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.base.service.remote.RemoteServiceManagementService.TimeoutTimerTask;
 import jadex.base.service.remote.RemoteServiceManagementService.WaitingCallInfo;
+import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.Future;
@@ -31,17 +32,17 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 	/**
 	 *  Create a new remote intermediate result command.
 	 */
-	public RemoteIntermediateResultCommand(Object result, String callid, boolean isref)
+	public RemoteIntermediateResultCommand(IComponentIdentifier realreceiver, Object result, String callid, boolean isref)
 	{
-		this(result, callid, isref, null, false);
+		this(realreceiver, result, callid, isref, null, false);
 	}
 	
 	/**
 	 *  Create a new remote intermediate result command.
 	 */
-	public RemoteIntermediateResultCommand(Object result, String callid, boolean isref, String methodname, boolean finished)
+	public RemoteIntermediateResultCommand(IComponentIdentifier realreceiver, Object result, String callid, boolean isref, String methodname, boolean finished)
 	{
-		super(result, null, callid, isref, methodname);
+		super(realreceiver, result, null, callid, isref, methodname);
 		this.finished = finished;
 	}
 	

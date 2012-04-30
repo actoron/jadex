@@ -23,7 +23,7 @@ public class TypeInfoPathManager
 	
 	/** The type mappings. */
 	protected Map typeinfos;
-
+	
 	//-------- constructors --------
 	
 	/**
@@ -100,5 +100,5 @@ public class TypeInfoPathManager
 			}
 		}
 		return ret;
-	}	
+	}
 }

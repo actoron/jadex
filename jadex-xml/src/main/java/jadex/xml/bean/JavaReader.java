@@ -23,6 +23,7 @@ import jadex.xml.SubobjectInfo;
 import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
+import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
 import java.awt.Color;
@@ -62,9 +63,15 @@ $endif $ */
 public class JavaReader
 {
 	//-------- attributes --------
-
+	
 	/** The reader. */
 	protected static Reader reader;
+	
+	/** The path manager. */
+	protected static TypeInfoPathManager pathmanager;
+
+	/** The type manager. */
+	protected static IObjectReaderHandler handler;
 
 	/**
 	 *  Join sets of typeinfos.
@@ -857,7 +864,7 @@ public class JavaReader
 	 */
 	public static <T> T objectFromXML(String val, ClassLoader classloader)
 	{
-		return (T)Reader.objectFromXML(getInstance(), val, classloader);
+		return objectFromXML(val, classloader, null, null);
 	}
 	
 	/**
@@ -868,7 +875,7 @@ public class JavaReader
 	 */
 	public static Object objectFromByteArray(byte[] val, ClassLoader classloader)
 	{
-		return Reader.objectFromByteArray(getInstance(), val, classloader);
+		return objectFromByteArray(val, classloader, null, null);
 	}
 	
 	/**
@@ -879,17 +886,62 @@ public class JavaReader
 	 */
 	public static Object objectFromInputStream(InputStream val, ClassLoader classloader)
 	{
-		return Reader.objectFromInputStream(getInstance(), val, classloader);
+		return Reader.objectFromInputStream(getInstance(), val, classloader, getPathManager(), getObjectHandler());
+	}
+	
+	/**
+	 *  Convert an xml to an object.
+	 *  @param val The string value.
+	 *  @return The decoded object.
+	 */
+	public static <T> T objectFromXML(String val, ClassLoader classloader, TypeInfoPathManager manager, IObjectReaderHandler handler)
+	{
+		return (T)Reader.objectFromXML(getInstance(), val, classloader,
+			manager==null? getPathManager(): manager, handler==null? getObjectHandler(): handler);
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The byte array.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	public static Object objectFromByteArray(byte[] val, ClassLoader classloader, 
+		TypeInfoPathManager manager, IObjectReaderHandler handler)
+	{
+		return Reader.objectFromByteArray(getInstance(), val, classloader, 
+			manager==null? getPathManager(): manager, handler==null? getObjectHandler(): handler);
+	}
+	
+	/**
+	 *  Convert a byte array (of an xml) to an object.
+	 *  @param val The input stream.
+	 *  @param classloader The class loader.
+	 *  @return The decoded object.
+	 */
+	public static Object objectFromInputStream(InputStream val, ClassLoader classloader,
+		TypeInfoPathManager manager, IObjectReaderHandler handler)
+	{
+		return Reader.objectFromInputStream(getInstance(), val, classloader, 
+			manager==null? getPathManager(): manager, handler==null? getObjectHandler(): handler);
 	}
 	
 	/**
 	 *  Get the default Java reader.
 	 *  @return The Java reader.
 	 */
-	public static Reader getInstance()
+	private static Reader getInstance()
 	{
 		if(reader==null)
-			createReader();
+		{
+			synchronized(JavaReader.class)
+			{
+				if(reader==null)
+				{
+					reader	= new Reader(false, false, false, null);
+				}
+			}
+		}
 		return reader;
 	}
 	
@@ -897,24 +949,47 @@ public class JavaReader
 	 *  Get the default Java reader.
 	 *  @return The Java reader.
 	 */
-	public static Reader	getReader(XMLReporter reporter)
+	private static Reader	getReader(XMLReporter reporter)
 	{
-		Set	typeinfos	= getTypeInfos();
-		return new Reader(new TypeInfoPathManager(typeinfos), false, false, false, reporter, new BeanObjectReaderHandler(typeinfos));
+		return new Reader(false, false, false, reporter);
 	}
 	
 	/**
-	 *  Conditionally create the reader instance.
-	 *  Note that the synchronized check needs to be done.
-	 *  Otherwise double creation may happen (leading to
-	 *  concurrency issues).
+	 *  Get the default Java reader.
+	 *  @return The Java reader.
 	 */
-	protected static synchronized void createReader()
+	public static TypeInfoPathManager getPathManager()
 	{
-		if(reader==null)
+		if(pathmanager==null)
 		{
-			Set	typeinfos	= getTypeInfos();
-			reader	= new Reader(new TypeInfoPathManager(typeinfos), false, false, false, null, new BeanObjectReaderHandler(typeinfos));
+			synchronized(JavaReader.class)
+			{
+				if(pathmanager==null)
+				{
+					pathmanager = new TypeInfoPathManager(getTypeInfos());
+				}
+			}
 		}
+		return pathmanager;
+	}
+	
+	
+	/**
+	 *  Get the default Java reader.
+	 *  @return The Java reader.
+	 */
+	public static IObjectReaderHandler getObjectHandler()
+	{
+		if(handler==null)
+		{
+			synchronized(JavaReader.class)
+			{
+				if(handler==null)
+				{
+					handler = new BeanObjectReaderHandler(getTypeInfos());
+				}
+			}
+		}
+		return handler;
 	}
 }

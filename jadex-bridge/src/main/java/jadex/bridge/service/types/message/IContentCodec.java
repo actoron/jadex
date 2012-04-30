@@ -1,5 +1,6 @@
 package jadex.bridge.service.types.message;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -19,14 +20,12 @@ public interface IContentCodec
 	 *  @param val The value.
 	 *  @return The encoded object.
 	 */
-//	public String encode(Object val, ClassLoader classloader);
-	public byte[] encode(Object val, ClassLoader classloader);
+	public byte[] encode(Object val, ClassLoader classloader, Map<Class<?>, Object[]> info);
 
 	/**
 	 *  Decode data with the codec.
 	 *  @param val The string value.
 	 *  @return The encoded object.
 	 */
-//	public Object decode(String val, ClassLoader classloader);
-	public Object decode(byte[] val, ClassLoader classloader);
+	public Object decode(byte[] val, ClassLoader classloader, Map<Class<?>, Object[]> info);
 }

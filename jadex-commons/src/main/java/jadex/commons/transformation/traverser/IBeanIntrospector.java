@@ -14,5 +14,5 @@ public interface IBeanIntrospector
 	 *  @param clazz The class to inspect.
 	 *  @return The map of properties (name -> BeanProperty).
 	 */
-	public Map getBeanProperties(Class clazz, boolean includefields);
+	public Map getBeanProperties(Class clazz, boolean includemethods, boolean includefields);
 }

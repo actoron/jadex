@@ -41,6 +41,7 @@ import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.ReadContext;
 import jadex.xml.reader.Reader;
 
@@ -82,6 +83,13 @@ public class ComponentXMLReader
 	/** The reader instance. */
 	protected Reader reader;
 	
+	/** The manager. */
+	protected TypeInfoPathManager manager;
+	
+	/** The handler. */
+	protected IObjectReaderHandler handler;
+	
+	/** The mappings. */
 	protected Set[] mappings;
 	
 	//-------- post processors and converters --------
@@ -157,7 +165,7 @@ public class ComponentXMLReader
 	 */
 	public ComponentXMLReader(Set mappings)
 	{
-		this.reader = new Reader(new TypeInfoPathManager(mappings), false, false, new XMLReporter()
+		this.reader = new Reader(false, false, new XMLReporter()
 		{
 			public void report(String msg, String type, Object info, Location location) throws XMLStreamException
 			{
@@ -180,6 +188,9 @@ public class ComponentXMLReader
 				report.put(stack, msg+pos);
 			}
 		});
+		
+		manager = new TypeInfoPathManager(mappings);
+		handler = new BeanObjectReaderHandler(mappings);
 	}
 	
 	//-------- methods --------
@@ -194,7 +205,7 @@ public class ComponentXMLReader
 		Map	user	= new HashMap();
 		MultiCollection	report	= new MultiCollection(new IndexMap().getAsMap(), LinkedHashSet.class);
 		user.put(CONTEXT_ENTRIES, report);
-		ModelInfo mi = (ModelInfo)reader.read(rinfo.getInputStream(), classloader, user);
+		ModelInfo mi = (ModelInfo)reader.read(manager, handler, rinfo.getInputStream(), classloader, user);
 		CacheableKernelModel ret = new CacheableKernelModel(mi);
 		
 		if(mi!=null)

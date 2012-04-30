@@ -70,7 +70,7 @@ public class BeanProcessor implements ITraverseProcessor
 		{
 			// Get all declared fields (public, protected and private)
 			
-			Map props = intro.getBeanProperties(clazz, false);
+			Map props = intro.getBeanProperties(clazz, true, false);
 			
 			for(Iterator it=props.keySet().iterator(); it.hasNext(); )
 			{

@@ -22,6 +22,7 @@ import jadex.xml.TypeInfo;
 import jadex.xml.TypeInfoPathManager;
 import jadex.xml.XMLInfo;
 import jadex.xml.bean.BeanObjectReaderHandler;
+import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.reader.Reader;
 
 import java.io.File;
@@ -56,12 +57,20 @@ public class GpmnXMLReader
 	/** The singleton reader instance. */
 	protected static Reader	reader;
 	
+	/** The manager. */
+	protected static TypeInfoPathManager manager;
+	
+	/** The handler. */
+	protected static IObjectReaderHandler handler;
+	
 	//-------- methods --------
 	
 	// Initialize reader instance.
 	static
 	{
-		reader = new Reader(new TypeInfoPathManager(getXMLMapping()));
+		reader = new Reader();
+		manager = new TypeInfoPathManager(getXMLMapping());
+		handler = new BeanObjectReaderHandler(getXMLMapping());
 	}
 	
 	/**
@@ -71,7 +80,7 @@ public class GpmnXMLReader
  	 */
 	protected static MGpmnModel read(ResourceInfo rinfo, ClassLoader classloader, IResourceIdentifier rid) throws Exception
 	{
-		MGpmnModel ret = (MGpmnModel)reader.read(rinfo.getInputStream(), classloader, null);
+		MGpmnModel ret = (MGpmnModel)reader.read(manager, handler, rinfo.getInputStream(), classloader, null);
 		ret.getModelInfo().setStartable(true);
 		ret.setFilename(rinfo.getFilename());
 		ret.setLastModified(rinfo.getLastModified());
@@ -97,7 +106,7 @@ public class GpmnXMLReader
 		ResourceInfo rinfo = SUtil.getResourceInfo0(filename, classloader);
 		if(rinfo==null)
 			throw new RuntimeException("Could not find resource: "+filename);
-		MGpmnModel ret = (MGpmnModel)reader.read(rinfo.getInputStream(), classloader, context);
+		MGpmnModel ret = (MGpmnModel)reader.read(manager, handler, rinfo.getInputStream(), classloader, context);
 		ret.getModelInfo().setStartable(true);
 		
 		ret.setLastModified(rinfo.getLastModified());

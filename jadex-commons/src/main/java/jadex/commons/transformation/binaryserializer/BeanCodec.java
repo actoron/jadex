@@ -111,7 +111,7 @@ public class BeanCodec extends AbstractCodec
 	public Object decodeSubObjects(Object object, Class clazz, DecodingContext context)
 	{
 		
-		Map props = intro.getBeanProperties(clazz, false);
+		Map props = intro.getBeanProperties(clazz, true, false);
 		
 		int size = (int) context.readVarInt();
 		for (int i = 0; i < size; ++i)
@@ -179,7 +179,7 @@ public class BeanCodec extends AbstractCodec
 			ec.writeBoolean(false);
 		}
 		
-		Map props = intro.getBeanProperties(clazz, false);
+		Map props = intro.getBeanProperties(clazz, true, false);
 		
 		List<String> names = new ArrayList<String>();
 		List<Object> values = new ArrayList<Object>();
