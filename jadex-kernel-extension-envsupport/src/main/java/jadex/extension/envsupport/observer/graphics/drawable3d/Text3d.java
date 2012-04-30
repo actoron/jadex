@@ -1,5 +1,8 @@
 package jadex.extension.envsupport.observer.graphics.drawable3d;
 
+import jadex.extension.envsupport.observer.graphics.IViewport;
+import jadex.extension.envsupport.observer.graphics.IViewport3d;
+import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.javaparser.IParsedExpression;
 
 /**
@@ -56,6 +59,34 @@ public class Text3d extends Primitive3d
 	public String getText()
 	{
 		return _text;
+	}
+	
+	
+	public final static String getReplacedText(DrawableCombiner3d dc, Object obj, String text, IViewport3d vp)
+	{
+		String[] tokens = text.split("\\$");
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < tokens.length; ++i)
+		{
+//			System.out.println("hier3");
+			if ((i & 1) == 0)
+			{
+				sb.append(tokens[i]);
+			}
+			else
+			{
+				if(tokens[i] == "")
+				{
+					sb.append("$");
+				}
+				else
+				{
+					sb.append(String.valueOf(dc.getBoundValue(obj, tokens[i], vp)));
+//					sb.append(String.valueOf(SObjectInspector.getProperty(obj, tokens[i])));
+				}
+			}
+		}
+		return sb.toString();
 	}
 }
 
