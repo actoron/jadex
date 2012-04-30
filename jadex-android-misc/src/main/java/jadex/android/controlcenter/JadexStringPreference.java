@@ -68,9 +68,11 @@ public class JadexStringPreference extends EditTextPreference implements
 		super.setKey(key);
 	}
 
-	public void setValue(String value) {
-		setDefaultValue(value);
-		setText(value);
+	@Override
+	public void setText(String text) {
+		super.setText(text);
+		setSummary("Aktueller Wert: "
+				+ text);
 	}
 
 	@Override
@@ -82,10 +84,10 @@ public class JadexStringPreference extends EditTextPreference implements
 	public void onDismiss(DialogInterface dialog) {
 		mDialog = null;
 		boolean result = mWhichButtonClicked == DialogInterface.BUTTON_POSITIVE;
+		if (result) {
+		}
 		onDialogClosed(result);
 		view = getView(view, parent);
-		notifyChanged();
 	}
 	
-
 }

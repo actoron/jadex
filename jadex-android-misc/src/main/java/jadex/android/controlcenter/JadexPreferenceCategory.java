@@ -1,5 +1,6 @@
 package jadex.android.controlcenter;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -15,13 +16,28 @@ public class JadexPreferenceCategory extends PreferenceCategory implements
 	private String provider;
 	private Map<String, ?> prefs;
 	private OnPreferenceChangeListener prefListener;
+	
+	private static Map<String,String> CATEGORY_TITLES;
+	
+	static {
+		CATEGORY_TITLES = new HashMap<String, String>();
+		CATEGORY_TITLES.put("securityservice", "Security Service");
+		CATEGORY_TITLES.put("clockservice", "Clock Service");
+		CATEGORY_TITLES.put("simulationservice", "Simulation Service");
+		CATEGORY_TITLES.put("awa", "Awareness");
+	}
 
 	public JadexPreferenceCategory(Context context, String provider,
 			Map<String, ?> prefs) {
 		super(context, null);
 		this.provider = provider;
 		this.prefs = prefs;
-		this.setTitle(provider);
+		
+		if (CATEGORY_TITLES.containsKey(provider)) {
+			this.setTitle(CATEGORY_TITLES.get(provider));
+		} else {
+			this.setTitle(provider);
+		}
 	}
 
 	@Override
@@ -31,7 +47,7 @@ public class JadexPreferenceCategory extends PreferenceCategory implements
 	}
 
 	private void createPreferenceHierarchy(Map<String, ?> prefs2) {
-		JadexStringPreference editTextPreference;
+		JadexStringPreference stringPreference;
 		JadexBooleanPreference booleanPreference;
 
 		for (Entry<String, ?> entry : prefs.entrySet()) {
@@ -48,17 +64,16 @@ public class JadexPreferenceCategory extends PreferenceCategory implements
 						 .setOnPreferenceChangeListener(defaultListener);
 						this.addPreference(booleanPreference);
 					} else {
-						editTextPreference = new JadexStringPreference(
+						stringPreference = new JadexStringPreference(
 								getContext());
 
-						editTextPreference.setKey(entry.getKey());
-						editTextPreference.setTitle(entry.getKey());
-						editTextPreference.setValue((String) entry.getValue());
-						editTextPreference.setSummary("Aktueller Wert: "
-								+ (String) entry.getValue());
-						editTextPreference
+						stringPreference.setKey(entry.getKey());
+						stringPreference.setTitle(entry.getKey());
+						stringPreference.setText((String) entry.getValue());
+				
+						stringPreference
 								.setOnPreferenceChangeListener(defaultListener);
-						this.addPreference(editTextPreference);
+						this.addPreference(stringPreference);
 					}
 				}
 			}

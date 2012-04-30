@@ -63,7 +63,7 @@ public class AndroidSettingsService extends SettingsService {
 	}
 
 	@Override
-	protected Properties readPropertiesFromStore() {
+	protected synchronized Properties readPropertiesFromStore() {
 		this.preferences = contextService.getSharedPreferences(DEFAULT_PREFS_NAME);
 		// preferences.setString("securityservice.password", "andori");
 		Properties props = new Properties();
@@ -71,12 +71,12 @@ public class AndroidSettingsService extends SettingsService {
 			props = super.readPropertiesFromStore();
 		} catch (Exception e) {
 		}
-		loadPreferencesIntoProperties(props, this.preferences, preferFileProperties);
+		//loadPreferencesIntoProperties(props, this.preferences, preferFileProperties);
 		return props;
 	}
 
 	@Override
-	protected void writePropertiesToStore(Properties props)
+	protected synchronized void writePropertiesToStore(Properties props)
 			throws IOException {
 		savePropertiesAsPreferences(props, preferences, "");
 		boolean committed = preferences.commit();
