@@ -40,7 +40,7 @@ public interface IContractService
 	/**
 	 * 
 	 */
-	public @CheckState(value="$res(-1) < $res", intermediate=true, keep=2) 
+	public @CheckState(value="$res[-1] < $res", intermediate=true, keep=2) 
 		IIntermediateFuture<Integer> getIncreasingValue();
 
 }

@@ -19,6 +19,7 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.MessageFailureException;
 import jadex.bridge.ServiceTerminatedException;
+import jadex.bridge.fipa.SFipa;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -61,7 +62,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -82,13 +83,12 @@ public class MessageService extends BasicService implements IMessageService
 	//-------- constants --------
 	
 	/** The default codecs. */
-    public static IContentCodec[] DEFCODECS = new IContentCodec[]
+    public static IContentCodec[] CODECS = new IContentCodec[]
     {
         new jadex.base.contentcodecs.JavaXMLContentCodec(),
         new jadex.base.contentcodecs.JadexXMLContentCodec(),
         new jadex.base.contentcodecs.NuggetsXMLContentCodec(),
 		new jadex.base.contentcodecs.JadexBinaryContentCodec(),
-        
     };
 
 	//-------- attributes --------
@@ -131,10 +131,7 @@ public class MessageService extends BasicService implements IMessageService
 	
 	/** The target managers (platform id->manager). */
 	protected LRU<IComponentIdentifier, SendManager> managers;
-	
-	/** The content codecs. */
-	protected List contentcodecs;
-	
+		
 	/** The codec factory for messages. */
 	protected CodecFactory codecfactory;
 	
@@ -148,6 +145,16 @@ public class MessageService extends BasicService implements IMessageService
 	/** The participant connections. */
 	protected Map<Integer, AbstractConnectionHandler> pcons;
 
+	
+	/** The content codecs. */
+	protected List contentcodecs;
+	
+	/** The default content language (if not specified). */
+	protected String deflanguage;
+	
+	/** The map of content codec infos. */
+	protected Map<IComponentIdentifier, Map<Class<?>, Object[]>> contentcodecinfos;
+	
 	//-------- constructors --------
 
 	/**
@@ -157,7 +164,7 @@ public class MessageService extends BasicService implements IMessageService
 	public MessageService(IExternalAccess component, Logger logger, ITransport[] transports, 
 		MessageType[] messagetypes)
 	{
-		this(component, logger, transports, messagetypes, null, null);
+		this(component, logger, transports, messagetypes, null, null, null);
 	}
 	
 	/**
@@ -165,7 +172,7 @@ public class MessageService extends BasicService implements IMessageService
 	 *  @param platform
 	 */
 	public MessageService(IExternalAccess component, Logger logger, ITransport[] transports, 
-		MessageType[] messagetypes, IContentCodec[] contentcodecs, CodecFactory codecfactory)
+		MessageType[] messagetypes, IContentCodec[] contentcodecs, String deflanguage, CodecFactory codecfactory)
 	{
 		super(component.getServiceProvider().getId(), IMessageService.class, null);
 
@@ -193,12 +200,17 @@ public class MessageService extends BasicService implements IMessageService
 		}
 		this.codecfactory = codecfactory!=null? codecfactory: new CodecFactory();
 		
+		// The default language for content.
+		this.deflanguage = deflanguage==null? SFipa.JADEX_XML: deflanguage;
+		
 		this.deliveryhandlers = new HashMap<Byte, ICommand>();
 		deliveryhandlers.put(MapSendTask.MESSAGE_TYPE_MAP, new MapDeliveryHandler());
 		deliveryhandlers.put(StreamSendTask.MESSAGE_TYPE_STREAM, new StreamDeliveryHandler());
 		
 		this.icons = Collections.synchronizedMap(new HashMap<Integer, AbstractConnectionHandler>());
 		this.pcons = Collections.synchronizedMap(new HashMap<Integer, AbstractConnectionHandler>());
+		
+		this.contentcodecinfos = Collections.synchronizedMap(new HashMap<IComponentIdentifier, Map<Class<?>, Object[]>>());
 	}
 	
 	//-------- interface methods --------
@@ -400,10 +412,11 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Extracted method to be callable from listener.
 	 */
-	protected void doSendMessage(Map<String, Object> msg, MessageType type, IExternalAccess comp, ClassLoader cl, Future<Void> ret, byte[] codecids)
+	protected void doSendMessage(Map<String, Object> msg, MessageType type, IExternalAccess comp, 
+		ClassLoader cl, Future<Void> ret, byte[] codecids)
 	{
 		Map<String, Object> msgcopy	= new HashMap<String, Object>(msg);
-		
+
 		// Conversion via platform specific codecs
 		// Hack?! Preprocess content to enhance component identifiers.
 		IContentCodec[] compcodecs = getContentCodecs(comp.getModel(), cl);
@@ -423,9 +436,10 @@ public class MessageService extends BasicService implements IMessageService
 			}
 		});
 		
-		for(Iterator<String> it=msgcopy.keySet().iterator(); it.hasNext(); )
+		String[] names = (String[])msgcopy.keySet().toArray(new String[0]);
+		for(int i=0; i<names.length; i++)
 		{
-			String	name	= it.next();
+			String	name	= names[i];
 			Object	value	= msgcopy.get(name);
 			value = Traverser.traverseObject(value, procs, false, null);
 			msgcopy.put(name, value);
@@ -436,14 +450,38 @@ public class MessageService extends BasicService implements IMessageService
 			
 			if(codec!=null)
 			{
-				msgcopy.put(name, codec.encode(value, cl));
+				msgcopy.put(name, codec.encode(value, cl, getContentCodecInfo(comp.getComponentIdentifier())));
 			}
 			else if(value!=null && !((value instanceof String) || (value instanceof byte[])) 
 				&& !(name.equals(type.getSenderIdentifier()) || name.equals(type.getReceiverIdentifier())
 					|| name.equals(type.getResourceIdIdentifier())))
 			{	
-				ret.setException(new ContentException("No content codec found for: "+name+", "+msgcopy));
-				return;
+				// HACK!!!
+				if(SFipa.FIPA_MESSAGE_TYPE.equals(type))
+				{
+					Properties props = new Properties();
+					props.put(SFipa.LANGUAGE, deflanguage);
+					IContentCodec[] codecs = getContentCodecs();
+					for(int j=0; j<codecs.length; j++)
+					{
+						if(codecs[j].match(props))
+						{
+							codec = codecs[j];
+							msgcopy.put(SFipa.LANGUAGE, deflanguage);
+							break;
+						}
+					}
+				}	
+				
+				if(codec!=null)
+				{
+					msgcopy.put(name, codec.encode(value, cl, getContentCodecInfo(comp.getComponentIdentifier())));
+				}
+				else
+				{
+					ret.setException(new ContentException("No content codec found for: "+name+", "+msgcopy));
+					return;
+				}
 			}
 		}
 		
@@ -556,7 +594,7 @@ public class MessageService extends BasicService implements IMessageService
 	 */
 	public IContentCodec[] getContentCodecs()
 	{
-		return contentcodecs==null? DEFCODECS: (IContentCodec[])contentcodecs.toArray(new IContentCodec[contentcodecs.size()]);
+		return contentcodecs==null? CODECS: (IContentCodec[])contentcodecs.toArray(new IContentCodec[contentcodecs.size()]);
 	}
 	
 	/**
@@ -583,6 +621,50 @@ public class MessageService extends BasicService implements IMessageService
 		}
 
 		return ret!=null? (IContentCodec[])ret.toArray(new IContentCodec[ret.size()]): null;
+	}
+	
+//	/**
+//	 *  Get a matching content codec.
+//	 *  @param props The properties.
+//	 *  @return The content codec.
+//	 */
+//	public Map<Class<?>, Object[]> getContentCodecInfo(IModelInfo model, ClassLoader cl)
+//	{
+//		Map<Class<?>, Object[]> ret = null;
+//		Map	props	= model.getProperties();
+//		if(props!=null)
+//		{
+//			for(Iterator it=props.keySet().iterator(); ret==null && it.hasNext();)
+//			{
+//				String name = (String)it.next();
+//				if(name.startsWith("contentcodecinfo"))
+//				{
+//					ret = (Map<Class<?>, Object[]>)model.getProperty(name, cl);
+//				}
+//			}
+//		}
+//
+//		return ret;
+//	}
+	
+	/**
+	 *  Get a matching content codec.
+	 *  @param props The properties.
+	 *  @return The content codec.
+	 */
+	public void setContentCodecInfo(IComponentIdentifier cid, Map<Class<?>, Object[]> info)
+	{
+		contentcodecinfos.put(cid, info);
+	}
+	
+	/**
+	 *  Get a matching content codec.
+	 *  @param props The properties.
+	 *  @return The content codec.
+	 */
+	public Map<Class<?>, Object[]> getContentCodecInfo(IComponentIdentifier cid)
+	{
+		return (Map<Class<?>, Object[]>)contentcodecinfos.get(cid);
 	}
 
 	/**
@@ -1824,7 +1906,7 @@ public class MessageService extends BasicService implements IMessageService
 											{
 												try
 												{
-													Object val = codec.decode((byte[])value, cl);
+													Object val = codec.decode((byte[])value, cl, getContentCodecInfo(component.getComponentIdentifier()));
 													message.put(name, val);
 												}
 												catch(Exception e)
