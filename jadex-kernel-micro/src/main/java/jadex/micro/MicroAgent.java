@@ -14,7 +14,6 @@ import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
@@ -248,6 +247,14 @@ public class MicroAgent implements IMicroAgent, IInternalAccess
 	public String getConfiguration()
 	{
 		return interpreter.getConfiguration();
+	}
+	
+	/**
+	 *  Get a raw reference to a provided service implementation.
+	 */
+	public Object getRawService(String name)
+	{
+		return interpreter.getRawService(name);
 	}
 	
 	/**

@@ -1,6 +1,7 @@
 package jadex.base.service.chat;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
@@ -15,7 +16,6 @@ import jadex.bridge.service.types.chat.IChatService;
 import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.commons.SUtil;
-import jadex.commons.Tuple2;
 import jadex.commons.Tuple3;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -68,7 +68,7 @@ public class ChatService implements IChatService, IChatGuiService
 	
 	/** The currently managed file transfers. */
 	protected Map<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>	transfers;
-	protected Map<String, Tuple2<TransferInfo, TerminableFuture<IOutputConnection>>>	transfers2;
+	protected Map<String, Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>>	transfers2;
 	
 	/** Flag to avoid duplicate initialization/shutdown due to duplicate use of implementation. */
 	protected boolean	running;
@@ -93,7 +93,7 @@ public class ChatService implements IChatService, IChatGuiService
 			// Todo: load settings
 			this.nick	= SUtil.createUniqueId("user", 3);
 			this.transfers	= new LinkedHashMap<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>();
-			this.transfers2	= new LinkedHashMap<String, Tuple2<TransferInfo, TerminableFuture<IOutputConnection>>>();
+			this.transfers2	= new LinkedHashMap<String, Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>>();
 			
 			IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
 			chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
@@ -233,7 +233,7 @@ public class ChatService implements IChatService, IChatGuiService
 		TransferInfo	ti	= new TransferInfo(true, id, filename, sender, size);
 		ti.setState(TransferInfo.STATE_WAITING);
 		
-		transfers2.put(ti.getId(), new Tuple2<TransferInfo, TerminableFuture<IOutputConnection>>(ti, ret));
+		transfers2.put(ti.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(ti, ret, null));
 		
 		publishEvent(ChatEvent.TYPE_FILE, nick, sender, ti);
 
@@ -397,7 +397,7 @@ public class ChatService implements IChatService, IChatGuiService
 		{
 			ret.add(tup.getFirstEntity());
 		}
-		for(Tuple2<TransferInfo, TerminableFuture<IOutputConnection>> tup: transfers2.values())
+		for(Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection> tup: transfers2.values())
 		{
 			ret.add(tup.getFirstEntity());
 		}
@@ -414,7 +414,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		IFuture<Void>	ret;
 		Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>	tup	= transfers.get(id);
-		Tuple2<TransferInfo, TerminableFuture<IOutputConnection>>	tup2	= transfers2.get(id);
+		Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>	tup2	= transfers2.get(id);
 		if(tup!=null)
 		{
 			TransferInfo	ti	= tup.getFirstEntity();
@@ -440,7 +440,7 @@ public class ChatService implements IChatService, IChatGuiService
 			if(TransferInfo.STATE_WAITING.equals(ti.getState()))
 			{
 				ServiceInputConnection	sic	= new ServiceInputConnection();
-				tup2.getSecondEntity().setResultIfUndone(sic.getOutputConnection());
+				((Future<IOutputConnection>) tup2.getSecondEntity()).setResultIfUndone(sic.getOutputConnection());
 				ti.setFile(file);
 				doDownload(ti, null, sic);
 				ret	= IFuture.DONE;
@@ -471,7 +471,7 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		IFuture<Void>	ret;
 		Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>	tup	= transfers.get(id);
-		Tuple2<TransferInfo, TerminableFuture<IOutputConnection>>	tup2	= transfers2.get(id);
+		Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>	tup2	= transfers2.get(id);
 		if(tup!=null)
 		{
 			TransferInfo	ti	= tup.getFirstEntity();
@@ -495,7 +495,7 @@ public class ChatService implements IChatService, IChatGuiService
 			TransferInfo	ti	= tup2.getFirstEntity();
 			if(TransferInfo.STATE_WAITING.equals(ti.getState()))
 			{
-				tup2.getSecondEntity().setException(new RuntimeException(TransferInfo.STATE_REJECTED));
+				((Future<IOutputConnection>) tup2.getSecondEntity()).setException(new RuntimeException(TransferInfo.STATE_REJECTED));
 				ret	= IFuture.DONE;
 			}
 			else if(TransferInfo.STATE_REJECTED.equals(ti.getState()))
@@ -524,18 +524,20 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		IFuture<Void>	ret;
 		Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>	tup	= transfers.get(id);
-		Tuple2<TransferInfo, TerminableFuture<IOutputConnection>>	tup2	= transfers2.get(id);
+		Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>	tup2	= transfers2.get(id);
 		if(tup!=null)
 		{
 			TransferInfo	ti	= tup.getFirstEntity();
 			if(TransferInfo.STATE_TRANSFERRING.equals(ti.getState()) || TransferInfo.STATE_WAITING.equals(ti.getState()))
 			{
+				ti.setState(TransferInfo.STATE_CANCELLING);
+				publishEvent(ChatEvent.TYPE_FILE, null, null, ti);
 				tup.getSecondEntity().terminate();
 				ret	= IFuture.DONE;
 			}
 			else if(TransferInfo.STATE_COMPLETED.equals(ti.getState()))
 			{
-				ret	= new Future<Void>(new RuntimeException("Transfer already comnpleted."));				
+				ret	= new Future<Void>(new RuntimeException("Transfer already completed."));				
 			}
 			else
 			{
@@ -548,17 +550,21 @@ public class ChatService implements IChatService, IChatGuiService
 			TransferInfo	ti	= tup2.getFirstEntity();
 			if(TransferInfo.STATE_WAITING.equals(ti.getState()))
 			{
+				ti.setState(TransferInfo.STATE_CANCELLING);
+				publishEvent(ChatEvent.TYPE_FILE, null, null, ti);
 				tup2.getSecondEntity().terminate();
 				ret	= IFuture.DONE;
 			}
 			else if(TransferInfo.STATE_TRANSFERRING.equals(ti.getState()))
 			{
-				tup2.getSecondEntity().get(null).close();
+				ti.setState(TransferInfo.STATE_CANCELLING);
+				publishEvent(ChatEvent.TYPE_FILE, null, null, ti);
+				tup2.getThirdEntity().close();
 				ret	= IFuture.DONE;
 			}
 			else if(TransferInfo.STATE_COMPLETED.equals(ti.getState()))
 			{
-				ret	= new Future<Void>(new RuntimeException("Transfer already comnpleted."));				
+				ret	= new Future<Void>(new RuntimeException("Transfer already completed."));				
 			}
 			else
 			{
@@ -576,23 +582,19 @@ public class ChatService implements IChatService, IChatGuiService
 
 	/**
 	 *  Send a local file to the target component.
-	 *  @param file	The file.
+	 *  @param filename	The file.
 	 *  @param cid	The id of a rmote chat component.
 	 */
-	public IFuture<Void>	sendFile(String file, final IComponentIdentifier cid)
+	public IFuture<Void>	sendFile(final String filename, final IComponentIdentifier cid)
 	{
 		final Future<Void> ret = new Future<Void>();
 
-		final TransferInfo fi = new TransferInfo(false, null, file, cid, new File(file).length());
-		fi.setState(TransferInfo.STATE_WAITING);
-		publishEvent(ChatEvent.TYPE_FILE, null, cid, fi);
-		
 		IFuture<IChatService> fut = agent.getServiceContainer().getService(IChatService.class, cid);
 		fut.addResultListener(new ExceptionDelegationResultListener<IChatService, Void>(ret)
 		{
 			public void customResultAvailable(IChatService cs)
 			{
-				final File file = new File(fi.getFile());
+				final File file = new File(filename);
 				final long size = file.length();
 				
 //				// Call chat service of receiver 
@@ -648,7 +650,11 @@ public class ChatService implements IChatService, IChatGuiService
 //				});
 				
 				// Call chat service of receiver (alternative interface)
+				final TransferInfo fi = new TransferInfo(false, null, filename, cid, new File(filename).length());
+				fi.setState(TransferInfo.STATE_WAITING);
 				ITerminableFuture<IOutputConnection> fut = cs.startUpload(nick, file.getName(), size, fi.getId());
+				transfers2.put(fi.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(fi, fut, null));
+				publishEvent(ChatEvent.TYPE_FILE, null, cid, fi);
 				fut.addResultListener(new ExceptionDelegationResultListener<IOutputConnection, Void>(ret)
 				{
 					public void customResultAvailable(IOutputConnection ocon)
@@ -659,7 +665,8 @@ public class ChatService implements IChatService, IChatGuiService
 					
 					public void exceptionOccurred(Exception exception)
 					{
-						if(exception instanceof FutureTerminatedException || TransferInfo.STATE_ABORTED.equals(exception.getMessage()))
+						if(exception instanceof FutureTerminatedException || TransferInfo.STATE_ABORTED.equals(exception.getMessage())
+							|| TransferInfo.STATE_CANCELLING.equals(fi.getState()))
 						{
 							fi.setState(TransferInfo.STATE_ABORTED);
 						}
@@ -723,6 +730,9 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		assert TransferInfo.STATE_WAITING.equals(ti.getState());
 		ti.setState(TransferInfo.STATE_TRANSFERRING);
+		Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>	tup2	= transfers2.get(ti.getId());
+		if(tup2!=null)
+			transfers2.put(ti.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(ti, tup2.getSecondEntity(), con));
 		publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 		
 		try
@@ -767,7 +777,7 @@ public class ChatService implements IChatService, IChatGuiService
 					{
 					}
 					con.close();
-					ti.setState(TransferInfo.STATE_COMPLETED);
+					ti.setState(ti.getSize()==ti.getDone() ? TransferInfo.STATE_COMPLETED : TransferInfo.STATE_ABORTED);
 					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);			
 				}
 				public void exceptionOccurred(Exception exception)
@@ -780,7 +790,7 @@ public class ChatService implements IChatService, IChatGuiService
 					{
 					}
 					con.close();
-					ti.setState(TransferInfo.STATE_ERROR);
+					ti.setState(TransferInfo.STATE_CANCELLING.equals(ti.getState()) ? TransferInfo.STATE_ABORTED : TransferInfo.STATE_ERROR);
 					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 				}
 			});
@@ -805,6 +815,9 @@ public class ChatService implements IChatService, IChatGuiService
 	{
 		assert TransferInfo.STATE_WAITING.equals(ti.getState());
 		ti.setState(TransferInfo.STATE_TRANSFERRING);
+		Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>	tup2	= transfers2.get(ti.getId());
+		if(tup2!=null)
+			transfers2.put(ti.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(ti, tup2.getSecondEntity(), ocon));
 		publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 		
 		try
@@ -853,7 +866,7 @@ public class ChatService implements IChatService, IChatGuiService
 					{
 					}
 					ocon.close();
-					ti.setState(TransferInfo.STATE_ERROR);
+					ti.setState(TransferInfo.STATE_CANCELLING.equals(ti.getState()) ? TransferInfo.STATE_ABORTED : TransferInfo.STATE_ERROR);
 					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 				}
 			});

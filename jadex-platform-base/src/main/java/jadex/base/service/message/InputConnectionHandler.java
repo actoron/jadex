@@ -128,8 +128,25 @@ public class InputConnectionHandler extends AbstractConnectionHandler
 				{
 					public void customResultAvailable(Object result)
 					{
+//						System.out.println("close ack");
 						ret.setResult(null);
-					}	
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+//						System.out.println("no close ack: "+exception);
+						// Todo: what about already received data!?
+						scheduleStep(new IComponentStep<Void>()
+						{
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								if(!con.isClosed())
+									con.setClosed();
+								return IFuture.DONE;
+							}
+						});
+						super.exceptionOccurred(exception);
+					}
 				});
 				
 				return IFuture.DONE;

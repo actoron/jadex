@@ -20,6 +20,9 @@ public class TransferInfo
 	/** State when transfer is in progress. */
 	public static final String STATE_TRANSFERRING = "Transferring";
 
+	/** State when cancel was requested. */
+	public static final String STATE_CANCELLING = "Cancelling";
+
 	/** State when transfer was successful. */
 	public static final String STATE_COMPLETED = "Completed";
 	
@@ -258,7 +261,7 @@ public class TransferInfo
 	public void setState(String state)
 	{
 		if(!STATE_WAITING.equals(state) && !STATE_TRANSFERRING.equals(state) && !STATE_COMPLETED.equals(state) 
-			&& !STATE_ABORTED.equals(state) && !STATE_ERROR.equals(state) && !STATE_REJECTED.equals(state))
+			&& !STATE_ABORTED.equals(state) && !STATE_ERROR.equals(state) && !STATE_REJECTED.equals(state) && !STATE_CANCELLING.equals(state))
 		{
 			throw new RuntimeException("Unknown state: "+state);
 		}

@@ -28,12 +28,6 @@ public interface IOutputConnection extends IConnection
 	public IFuture<Integer> waitForReady();
 	
 	/**
-	 *  Close the connection.
-	 */
-	// todo: make IFuture<Void> ?
-	public void close();
-	
-	/**
 	 *  Write all data from input stream to the connection.
 	 *  The result is an intermediate future that reports back the size that was written.
 	 *  It can also be used to terminate sending.

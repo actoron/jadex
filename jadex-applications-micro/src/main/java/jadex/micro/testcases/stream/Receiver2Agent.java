@@ -3,12 +3,10 @@ package jadex.micro.testcases.stream;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
-import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.AgentStreamArrived;
 
 @Agent
@@ -36,9 +34,12 @@ public class Receiver2Agent
 				byte[] tosend = new byte[cnt[0]];
 				for(int i=0; i<cnt[0]; i++)
 					tosend[i] = (byte)cnt[0];
-				con.write(tosend).addResultListener(new IResultListener<Void>()
+				
+//				System.out.println("Writing: "+tosend.length);
+				con.write(tosend);
+				con.waitForReady().addResultListener(new IResultListener<Integer>()
 				{
-					public void resultAvailable(Void result)
+					public void resultAvailable(Integer result)
 					{
 						if(cnt[0]++<max)
 						{

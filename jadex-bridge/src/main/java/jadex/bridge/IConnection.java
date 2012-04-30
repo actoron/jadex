@@ -20,4 +20,11 @@ public interface IConnection
 	 *  Get the participant.
 	 */
 	public IComponentIdentifier getParticipant();
+	
+	/**
+	 *  Close the connection.
+	 */
+	// todo: make IFuture<Void> ?
+	public void close();
 }
+

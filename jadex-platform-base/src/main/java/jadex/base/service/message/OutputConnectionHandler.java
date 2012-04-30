@@ -666,7 +666,11 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 			{
 				// Send the packet if it is still the correct one
 				if(seqno==getSequenceNumber())
-					sendAcknowledgedMultiPacket();
+				{
+					assert mpfut!=null;
+					sendAcknowledgedMultiPacket().addResultListener(new DelegationResultListener<Void>(mpfut));
+					mpfut	= null;
+				}
 				return IFuture.DONE;
 			}
 		});
@@ -690,12 +694,16 @@ public class OutputConnectionHandler extends AbstractConnectionHandler implement
 				{
 					public void resultAvailable(Object result)
 					{
+//						System.out.println("ack from close output side");
 						closesent = true;
+						checkClose();
 					}
 					
 					public void exceptionOccurred(Exception exception)
 					{
+//						System.out.println("no ack from close output side: "+exception);
 						closesent = true;
+						checkClose();
 					}
 				});
 			}

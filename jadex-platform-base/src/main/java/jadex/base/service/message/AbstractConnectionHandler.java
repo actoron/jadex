@@ -126,6 +126,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 				SendInfo si = unacked.remove(id);
 				if(si!=null)
 				{
+//					System.out.println("received ack: "+si.getId()+" "+si.getTryCnt());
 					si.getTimer().cancel();
 					si.getResult().setResult(content);
 				}
@@ -444,7 +445,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 				{
 					if(si.getTryCnt()>=maxresends)
 					{
-						System.out.println("Message could not be sent.");
+//						System.out.println("Message could not be sent.");
 						si.getResult().setException(new RuntimeException("Message could not be sent."));
 						unacked.remove(id);
 					}

@@ -52,11 +52,6 @@ public interface IInputConnection extends IConnection
 //	public int bread();
 	
 	/**
-	 *  Close the stream.
-	 */
-	public void close();
-	
-	/**
 	 *  Write all data from the connection to the output stream.
 	 *  The result is an intermediate future that reports back the size that was read.
 	 *  It can also be used to terminate reading.
