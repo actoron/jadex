@@ -5,6 +5,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -126,6 +127,7 @@ import java.util.TimerTask;
 	@RequiredService(name="discoveries", type=IDiscoveryService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT))
 })
 @Service(IAwarenessManagementService.class)
+//@GuiClassName("jadex.tools.android.awareness.AwaActivity", properties="settings")
 public class AwarenessManagementAgent extends MicroAgent implements IPropertiesProvider, IAwarenessManagementService
 {
 	//-------- attributes --------
