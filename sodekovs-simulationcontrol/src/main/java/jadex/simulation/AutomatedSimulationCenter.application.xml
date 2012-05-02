@@ -22,7 +22,17 @@
 			<components>
 				<component type="SimulationManager" master="true">
 					<arguments>
-						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/antworld/example/CISIS-Conf.xml"</argument>			
+						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/antworld/example/Antworld-Conf.xml"</argument>			
+					</arguments>
+				</component>
+				<component type="RemoteSimulationClient" master="false"/>
+			</components>
+		</configuration>
+	<configuration name="Simulate AntWorld with included Remote Client - CISIS Conference Snapshot">
+			<components>
+				<component type="SimulationManager" master="true">
+					<arguments>
+						<argument name="simulationDescriptionFile">"../sodekovs-applications/src/main/java/sodekovs/antworld/example/cisis/CISIS-Conf.xml"</argument>			
 					</arguments>
 				</component>
 				<component type="RemoteSimulationClient" master="false"/>
