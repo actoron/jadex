@@ -193,7 +193,15 @@ public class GeoIPService
 							os.close();
 							is.close();
 							if(dbfile.exists())
-								dbfile.delete();
+							{
+								// Keep last version, if there are problems with new version.
+								File	oldfile	= new File(dbfile.getParentFile(), "GeoLiteCity.dat.old");
+								if(oldfile.exists())
+								{
+									oldfile.delete();
+								}
+								dbfile.renameTo(oldfile);
+							}
 							tmpfile.renameTo(dbfile);
 							System.out.println("Downloaded GeoIP database to: "+dbfile);
 						}
