@@ -36,8 +36,12 @@
 		<env:envspacetype name="HamburgSimulation" width="100" height="100" class="ContinuousSpace2D">
 
 			<env:processtypes>
-				<env:processtype name="init" class="CreateInitialSettingsProcess" />
-				<env:processtype name="manageTimeSlices" class="ManageTimeSlicesProcess" />
+				<env:processtype name="init" class="CreateInitialSettingsProcess">
+					<env:property name="simDataSetupFilePath">null</env:property>
+				</env:processtype>
+				<env:processtype name="manageTimeSlices" class="ManageTimeSlicesProcess">
+					<env:property name="simDataSetupFilePath">null</env:property>
+				</env:processtype>
 			</env:processtypes>
 
 			<!-- Entwurfsentscheidung: Verkehrsmittel haben die Eigenschaft, ob sie 
@@ -277,8 +281,12 @@
 			<extension>
 				<env:envspace name="my2dspace" type="HamburgSimulation" width="100" height="100">				
 				 	<env:processes>
-						<env:process type="init"/>								
-						<env:process type="manageTimeSlices"/>
+						<env:process type="init">
+							<env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property>
+						</env:process>								
+						<env:process type="manageTimeSlices">
+							<env:property name="simDataSetupFilePath">"E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml"</env:property>
+						</env:process>
 					</env:processes> 
 
 					<env:objects>

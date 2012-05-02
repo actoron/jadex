@@ -2,14 +2,9 @@ package sodekovs.bikesharing.pedestrian.movement;
 
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
-import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.space2d.Space2D;
-import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
-
-import java.util.HashMap;
 
 /**
  * Wander around randomly.
@@ -33,7 +28,7 @@ public class RandomWalkPlan extends Plan {
 		IVector2 dest = ((Space2D) getBeliefbase().getBelief("environment").getFact()).getRandomPosition(Vector2Int.ZERO);
 //		ISpaceObject myself = (ISpaceObject) getBeliefbase().getBelief("myself").getFact();
 
-		System.out.println("Started rand walk plan and dispathed goal to walk randmomly.");
+//		System.out.println("Started rand walk plan and dispathed goal to walk randmomly.");
 		
 		//Move to a random destination
 		IGoal moveto = createGoal("move_dest");
@@ -41,7 +36,7 @@ public class RandomWalkPlan extends Plan {
 		dispatchSubgoalAndWait(moveto);
 		getLogger().info("Reached point: " + dest);
 		
-		System.out.println("Random walk finished. Dispath default behaviour.");
+//		System.out.println("Random walk finished. Dispath default behaviour.");
 		
 		//Start default behaviour
 		IGoal defaultBehaviour = createGoal("default_behaviour");
@@ -49,6 +44,6 @@ public class RandomWalkPlan extends Plan {
 		dispatchSubgoalAndWait(defaultBehaviour);
 		getLogger().info("Reached point: " + dest);
 		
-		System.out.println("Default behaviour finished.");
+//		System.out.println("Default behaviour finished.");
 	}
 }

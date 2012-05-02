@@ -43,7 +43,7 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	// -------- attributes --------
 	public static String pedestriansdataOLD = "E:/Workspaces/Jadex/Jadex mit altem Maven 2/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrgastDaten.xml";
 	public static String bikestationdataOLD = "E:/Workspaces/Jadex/Jadex mit altem Maven 2/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/FahrplanDaten.xml";
-	public static String simulationSetup = "E:/Workspaces/Jadex/Jadex mit altem Maven 2/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml";
+//	public static String simulationSetup = "E:/Workspaces/Jadex/Jadex mit altem Maven/jadex/sodekovs-applications/src/main/java/sodekovs/bikesharing/setting/HamburgSimulation.xml";
 
 	// -------- constructors --------
 
@@ -69,7 +69,9 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 		try {
 			createPedestrians(pedestriansdataOLD, space);
 			// createBikeStationsOld(bikestationdataOLD, space);
-			createBikeStations(simulationSetup, space);
+//			createBikeStations(simulationSetup, space);
+			createBikeStations((String)getProperty("simDataSetupFilePath"), space);
+						
 			// System.out.println("Created bike stations according to xml file.");
 			// macheVerkehrsteilnehmer(fahrgastdaten, grid);
 		} catch (ParserConfigurationException e) {
@@ -322,7 +324,7 @@ public class CreateInitialSettingsProcess extends SimplePropertyObject implement
 	 * @throws SAXException
 	 */
 	private void createBikeStations(String path, IEnvironmentSpace space) throws ParserConfigurationException, SAXException, IOException {
-		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(simulationSetup, SimulationDescription.class);
+		SimulationDescription scenario = (SimulationDescription) XMLHandler.parseXMLFromXMLFile(path, SimulationDescription.class);
 
 		for (Station station : scenario.getStations().getStation()) {
 

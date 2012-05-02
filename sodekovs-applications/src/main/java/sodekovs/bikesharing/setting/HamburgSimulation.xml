@@ -1,33 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SimulationDescription xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="BikeDataSchema.xsd">
   <TimeSlices>
-    <TimeSlice offset="300" startTime="500">
+    <TimeSlice offset="300" startTime="100">
       <ProbabilitiesForStations>
         <ProbabilitiesForStation departureProbability="0.32" stationID="Rathaus">
-          <DestinationProbability destination="Osterstrasse" probability="0.1"/>
-          <DestinationProbability destination="Hagenbecks" probability="0.05"/>
-          <DestinationProbability destination="Hbf" probability="0.21"/>
+        	<DestinationProbabilities>
+          		<DestinationProbability destination="Osterstrasse" probability="0.1"/>
+          		<DestinationProbability destination="Hagenbecks" probability="0.05"/>
+          		<DestinationProbability destination="Hbf" probability="0.21"/>
+          	</DestinationProbabilities>
+        </ProbabilitiesForStation>
+        <ProbabilitiesForStation departureProbability="0.36" stationID="Osterstrasse">
+        	<DestinationProbabilities>
+          		<DestinationProbability destination="Rathaus" probability="0.1"/>
+          		<DestinationProbability destination="Hagenbecks" probability="0.05"/>
+          		<DestinationProbability destination="Hbf" probability="0.21"/>
+          	</DestinationProbabilities>
+        </ProbabilitiesForStation>
+        <ProbabilitiesForStation departureProbability="0.66" stationID="Hagenbecks">
+        	<DestinationProbabilities>
+          		<DestinationProbability destination="Osterstrasse" probability="0.1"/>
+          		<DestinationProbability destination="Rathaus" probability="0.05"/>
+          		<DestinationProbability destination="Hbf" probability="0.21"/>
+          	</DestinationProbabilities>
+        </ProbabilitiesForStation>
+        <ProbabilitiesForStation departureProbability="0.16" stationID="Hbf">
+        	<DestinationProbabilities>
+          		<DestinationProbability destination="Osterstrasse" probability="0.1"/>
+          		<DestinationProbability destination="Hagenbecks" probability="0.05"/>
+		        <DestinationProbability destination="Rathaus" probability="0.21"/>
+		   	</DestinationProbabilities>
+        </ProbabilitiesForStation>
+      </ProbabilitiesForStations>
+    </TimeSlice> 
+    <TimeSlice offset="300" startTime="75">
+      <ProbabilitiesForStations>
+        <ProbabilitiesForStation departureProbability="0.32" stationID="Osterstrasse">
+        	<DestinationProbabilities>
+          		<DestinationProbability destination="Rathaus" probability="0.1"/>
+          		<DestinationProbability destination="Hagenbecks" probability="0.05"/>
+          		<DestinationProbability destination="Hbf" probability="0.21"/>
+          	</DestinationProbabilities>
+        </ProbabilitiesForStation>
+        <ProbabilitiesForStation departureProbability="0.63" stationID="Rathaus">
+        	<DestinationProbabilities>
+          		<DestinationProbability destination="Osterstrasse" probability="0.1"/>
+          		<DestinationProbability destination="Hagenbecks" probability="0.05"/>
+          		<DestinationProbability destination="Hbf" probability="0.21"/>
+          	</DestinationProbabilities>
+        </ProbabilitiesForStation>
+        <ProbabilitiesForStation departureProbability="0.16" stationID="Hagenbecks">
+        	<DestinationProbabilities>
+          		<DestinationProbability destination="Osterstrasse" probability="0.1"/>
+          		<DestinationProbability destination="Rathaus" probability="0.05"/>
+          		<DestinationProbability destination="Hbf" probability="0.21"/>
+          	</DestinationProbabilities>
+        </ProbabilitiesForStation>
+        <ProbabilitiesForStation departureProbability="0.75" stationID="Hbf">
+        	<DestinationProbabilities>
+          		<DestinationProbability destination="Osterstrasse" probability="0.1"/>
+          		<DestinationProbability destination="Hagenbecks" probability="0.05"/>
+		        <DestinationProbability destination="Rathaus" probability="0.21"/>
+		   	</DestinationProbabilities>
         </ProbabilitiesForStation>
       </ProbabilitiesForStations>
     </TimeSlice>
-    <TimeSlice offset="500" startTime="800">
+     <TimeSlice offset="300" startTime="140">
       <ProbabilitiesForStations>
-        <ProbabilitiesForStation departureProbability="0.32" stationID="Rathaus">
-          <DestinationProbability destination="Osterstrasse" probability="0.1"/>
-          <DestinationProbability destination="Hagenbecks" probability="0.05"/>
-          <DestinationProbability destination="Hbf" probability="0.21"/>
+        <ProbabilitiesForStation departureProbability="0.47" stationID="Osterstrasse">
+        	<DestinationProbabilities>
+          		<DestinationProbability destination="Rathaus" probability="0.1"/>
+          		<DestinationProbability destination="Hagenbecks" probability="0.05"/>
+          		<DestinationProbability destination="Hbf" probability="0.21"/>
+          	</DestinationProbabilities>
+        </ProbabilitiesForStation>
+        <ProbabilitiesForStation departureProbability="0.15" stationID="Rathaus">
+        	<DestinationProbabilities>
+          		<DestinationProbability destination="Osterstrasse" probability="0.1"/>
+          		<DestinationProbability destination="Hagenbecks" probability="0.05"/>
+          		<DestinationProbability destination="Hbf" probability="0.21"/>
+          	</DestinationProbabilities>
+        </ProbabilitiesForStation>
+        <ProbabilitiesForStation departureProbability="0.16" stationID="Hagenbecks">
+        	<DestinationProbabilities>
+          		<DestinationProbability destination="Osterstrasse" probability="0.1"/>
+          		<DestinationProbability destination="Rathaus" probability="0.05"/>
+          		<DestinationProbability destination="Hbf" probability="0.21"/>
+          	</DestinationProbabilities>
+        </ProbabilitiesForStation>
+        <ProbabilitiesForStation departureProbability="0.5" stationID="Hbf">
+        	<DestinationProbabilities>
+          		<DestinationProbability destination="Osterstrasse" probability="0.1"/>
+          		<DestinationProbability destination="Hagenbecks" probability="0.05"/>
+		        <DestinationProbability destination="Rathaus" probability="0.21"/>
+		   	</DestinationProbabilities>
         </ProbabilitiesForStation>
       </ProbabilitiesForStations>
-    </TimeSlice>
-    <TimeSlice offset="800" startTime="120">
-      <ProbabilitiesForStations>
-        <ProbabilitiesForStation departureProbability="0.32" stationID="Rathaus">
-          <DestinationProbability destination="Osterstrasse" probability="0.1"/>
-          <DestinationProbability destination="Hagenbecks" probability="0.05"/>
-          <DestinationProbability destination="Hbf" probability="0.21"/>
-        </ProbabilitiesForStation>
-      </ProbabilitiesForStations>
-    </TimeSlice>
+    </TimeSlice>  
   </TimeSlices>
   <Stations>
     <Station latitude="54.07" longitude="10.07" numberOfBikes="10" numberOfDocks="30" stationID="Osterstrasse"/>
