@@ -9,7 +9,7 @@
 	                    http://jadex.sourceforge.net/jadex-agrspace-2.0.xsd
 	                    http://jadex.sourceforge.net/jadex-envspace 
 	                    http://jadex.sourceforge.net/jadex-envspace-2.0.xsd"
-	name="Antworld" package="sodekovs.antworld.example">
+	name="Antworld-CISIS" package="sodekovs.antworld.example.cisis">
 
 	<imports>
 		<import>jadex.extension.envsupport.environment.space2d.*</import>
@@ -41,8 +41,8 @@
 		<argument name="tmp_start_time" class="long"></argument>
 		<argument name="al" class="int">new Integer(258)</argument>
 		<argument name="simulationFacts" class="Map" />
-		<!-- <argument name="nrr" typename="Int">new Integer(10)</argument> -->		
-		<argument name="NumberOfAnts" class="int">new Integer(100)</argument>
+		<!-- <argument name="nrr" typename="Int">new Integer(10)</argument> -->
+		<argument name="SentryNumber" class="int">new Integer(10)</argument>
 		<argument name="Experiment_id" class="String">"not set"</argument>
 		<argument name="walkingStrategy" class="int">new Integer(0)</argument>
 	</arguments>
@@ -353,7 +353,7 @@
 				</env:envspace>
 			</extensions>
 			<components>
-				<component type="Ant" number="$args.NumberOfAnts" />
+				<component type="Ant" number="10" />
 			</components>							
 		</configuration>
 
