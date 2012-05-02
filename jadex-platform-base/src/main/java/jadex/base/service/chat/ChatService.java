@@ -5,7 +5,6 @@ import jadex.bridge.IConnection;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceShutdown;
@@ -35,7 +34,6 @@ import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 import jadex.micro.annotation.Binding;
-import jadex.micro.annotation.RequiredService;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -916,6 +914,9 @@ public class ChatService implements IChatService, IChatGuiService
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
+			ti.setState(TransferInfo.STATE_ERROR);
+			publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 		}
 	}
 }

@@ -121,6 +121,15 @@ public class ComponentServiceContainer	extends BasicServiceContainer
 	}
 	
 	/**
+	 *  Get a service of a specific component.
+	 */
+	public <T> IFuture<T> getService(Class<T> type, IComponentIdentifier cid)
+	{
+		IFuture<T>	fut	= super.getService(type, cid);
+		return FutureFunctionality.getDelegationFuture(fut, new ComponentFutureFunctionality(instance.getExternalAccess(), adapter));
+	}
+	
+	/**
 	 *  Get one service of a type.
 	 *  @param type The class.
 	 *  @return The corresponding service.
