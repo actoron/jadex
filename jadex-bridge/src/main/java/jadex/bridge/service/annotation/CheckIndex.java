@@ -6,6 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 
+/**
+ *  Precondition for checking if the argument is a valid index.
+ *
+ *  The value of this precondition is used to determine
+ *  the argument number with the collection or array to check
+ *  the index against. The check tests index>=0 && index<collection.size()
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER})
 public @interface CheckIndex

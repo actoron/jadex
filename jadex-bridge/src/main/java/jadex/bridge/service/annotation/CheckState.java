@@ -6,7 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 
+ *  Pre or postcondition that a state is valid.
+ *  May refer to all arguments/results.
+ *  
+ *  Reserved variables are $arg for the current argument
+ *  and $arg0 - $argn for the arguments.
+ *  In case of a post condition the result is available
+ *  via $res and intermediate results via $res[0], $res[-1].
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.METHOD})
