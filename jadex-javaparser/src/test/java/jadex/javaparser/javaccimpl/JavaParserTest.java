@@ -17,6 +17,9 @@ import java.util.StringTokenizer;
 
 import junit.framework.TestCase;
 
+/**
+ * 
+ */
 public class JavaParserTest extends TestCase
 {
 	// Expressions known to be broken (excluded from test -> todo: fix!)

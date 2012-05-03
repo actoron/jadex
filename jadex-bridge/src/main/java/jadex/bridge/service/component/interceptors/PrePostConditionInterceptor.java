@@ -9,8 +9,9 @@ import jadex.commons.IValueFetcher;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.javaparser.SJavaParser;
+import jadex.javaparser.javaccimpl.ExpressionNode;
+import jadex.javaparser.javaccimpl.ParameterNode;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
+ *  Interceptor that checks annotated pre- and postconditions.
  */
 public class PrePostConditionInterceptor implements IServiceInvocationInterceptor
 {
@@ -51,7 +52,8 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 	}
 	
 	/**
-	 * 
+	 *  Check if an annotation belongs to the supported
+	 *  types of pre/postconditions.
 	 */
 	protected boolean isPrePostCondition(Annotation anno)
 	{
@@ -83,7 +85,7 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 	}
 	
 	/**
-	 * 
+	 *  Check the precondition.
 	 */
 	protected RuntimeException checkPreConditions(ServiceInvocationContext context)
 	{
@@ -99,39 +101,43 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 				{
 					if(args[i]==null)
 					{
-						ret = new NullPointerException();
+						ret = new IllegalArgumentException("Argument must not null: "+i);
 					}
 				}
 				else if(paramannos[i][j] instanceof CheckIndex)
 				{
-					CheckIndex ci = (CheckIndex)paramannos[i][j];
-					int test = ((Number)args[i]).intValue();
-					if(test<0)
+					if(args[i]!=null)
 					{
-						ret = new IndexOutOfBoundsException();
-					}
-					else
-					{
-						int idx = ci.value();
-						if(args[idx] instanceof Collection)
+						CheckIndex ci = (CheckIndex)paramannos[i][j];
+						int test = ((Number)args[i]).intValue();
+						if(test<0)
 						{
-							if(test>=((Collection)args[idx]).size())
-							{
-								ret = new IndexOutOfBoundsException();
-							}
+							ret = new IndexOutOfBoundsException();
 						}
-						else if(args[idx]!=null && args[idx].getClass().isArray())
+						else
 						{
-							if(test>=Array.getLength(args[idx]))
+							int idx = ci.value();
+							int size = -1;
+							if(args[idx] instanceof Collection)
 							{
-								ret = new IndexOutOfBoundsException();
+								size = ((Collection<?>)args[idx]).size();
 							}
-						}
-						else if(args[idx] instanceof Map)
-						{
-							if(test>=((Map)args[idx]).size())
+							else if(args[idx]!=null && args[idx].getClass().isArray())
 							{
-								ret = new IndexOutOfBoundsException();
+								size = Array.getLength(args[idx]);
+							}
+							else if(args[idx] instanceof Map)
+							{
+								size = ((Map<?, ?>)args[idx]).size();
+							}
+							else
+							{
+								ret = new RuntimeException("Unknown collection type: "+args[idx]);
+							}
+							
+							if(size!=-1 && test>=size)
+							{
+								ret = new IndexOutOfBoundsException("Index="+idx+" , Size="+size);
 							}
 						}
 					}
@@ -139,11 +145,18 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 				else if(paramannos[i][j] instanceof CheckState)
 				{
 					CheckState ci = (CheckState)paramannos[i][j];
-					Object resu = SJavaParser.evaluateExpression(ci.value(), new PrePostConditionFetcher(args, 
-						args[i], null, null));
-					if(!(resu instanceof Boolean) || !((Boolean)resu).booleanValue())
+					try
 					{
-						ret = new IllegalStateException("Precondition violated: "+ci.value()+" arg: "+args[i]);
+						Object resu = SJavaParser.evaluateExpression(ci.value(), new PrePostConditionFetcher(args, args[i], null, null));
+					
+						if(!(resu instanceof Boolean) || !((Boolean)resu).booleanValue())
+						{
+							ret = new IllegalStateException("Precondition violated: "+ci.value()+" arg: "+args[i]);
+						}
+					}
+					catch(Exception e)
+					{
+						ret = e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
 					}
 				}	
 			}
@@ -153,7 +166,7 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 	}
 	
 	/**
-	 * 
+	 *  Check the postconditions.
 	 */
 	protected RuntimeException checkPostConditions(ServiceInvocationContext context, Object res, 
 		boolean intermediate, List<Object> ires)
@@ -170,7 +183,7 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 				{
 					if(res==null)
 					{
-						ret = new NullPointerException();
+						ret = new IllegalArgumentException("Result must not null.");
 					}
 				}
 			}
@@ -180,11 +193,23 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 				if(intermediate && ci.intermediate() || (!intermediate && !ci.intermediate()))
 				{
 					Object[] args = context.getArgumentArray();
-					Object resu = SJavaParser.evaluateExpression(ci.value(), new PrePostConditionFetcher(args, 
-						null, res, ires));
-					if(!(resu instanceof Boolean) || !((Boolean)resu).booleanValue())
+					try
 					{
-						ret = new IllegalStateException("Precondition violated: "+ci.value());
+						Object resu = SJavaParser.evaluateExpression(ci.value(), new PrePostConditionFetcher(args, null, res, ires));
+						
+						if(!(resu instanceof Boolean) || !((Boolean)resu).booleanValue())
+						{
+							ret = new IllegalStateException("Postcondition violated: "+ci.value());
+						}
+					}
+					catch(IntermediateResultUnavailableException e)
+					{
+						System.out.println("Unavailable: "+context.getMethod().getName());
+						// no error if intermediate is not available, e.g. could be first call so that [-1] is not available
+					}
+					catch(Exception e)
+					{
+						ret = e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
 					}
 				}
 			}	
@@ -194,7 +219,8 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 	}
 	
 	/**
-	 * 
+	 *  Get the number of intermediate results that should be explicitly
+	 *  kept by the interceptor (only necessary for subscription futures).
 	 */
 	protected int getKeepForPostConditions(ServiceInvocationContext context)
 	{
@@ -208,16 +234,57 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 				CheckState ci = (CheckState)annos[i];
 				if(ci.intermediate())
 				{
-					ret = Math.max(ret, ci.keep());
+					if(ci.keep()>0)
+					{
+						ret = Math.max(ret, ci.keep());
+					}
+					else
+					{
+						try
+						{
+							ExpressionNode expr = (ExpressionNode)SJavaParser.parseExpression(ci.value(), null, null);
+							List<ExpressionNode> nodes = new ArrayList<ExpressionNode>();
+							nodes.add(expr);
+							
+							
+							while(nodes.size()>0)
+							{
+								ExpressionNode node = nodes.remove(0);
+								// add all child nodes
+								for(int k=0; k<node.jjtGetNumChildren(); k++)
+								{
+									nodes.add((ExpressionNode)node.jjtGetChild(k));
+								}
+								if(node instanceof ParameterNode)
+								{
+									String txt = ((ParameterNode)node).getText();
+									if(node instanceof ParameterNode && txt.startsWith("$res[-"))
+									{
+										String numtxt = txt.substring(6, txt.length()-1);
+										int kp = Integer.parseInt(numtxt);
+										if(kp>ret)
+											ret = kp;
+									}
+								}
+							}
+						}
+						catch(Exception e)
+						{
+							e.printStackTrace();
+						}
+					}
 				}
 			}	
 		}
+		
+//		System.out.println("keep: "+ret);
 		
 		return ret;
 	}
 	
 	/**
-	 * 
+	 *  Fetcher for pre and post condition.
+	 *  Supports $arg, $res and $res[-1], ... 
 	 */
 	public static class PrePostConditionFetcher implements IValueFetcher
 	{
@@ -250,7 +317,7 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 		public Object fetchValue(String name)
 		{
 			Object ret = null;
-			if("$res".equals(name))
+			if("$res".equals(name) || name.startsWith("$res[0]"))
 			{
 				ret = result;
 			}
@@ -258,7 +325,22 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 			{
 				String numtext = name.substring(5, name.length()-1);
 				int num = Integer.parseInt(numtext);
-				ret = ires.get(ires.size()-num);
+				if(ires!=null)
+				{
+					int idx = ires.size()+num;
+					if(idx>=0 && idx<ires.size())
+					{
+						ret = ires.get(idx);
+					}
+					else
+					{
+						throw new IntermediateResultUnavailableException();
+					}
+				}
+				else
+				{
+					throw new IntermediateResultUnavailableException();
+				}
 			}
 			else
 			{
@@ -314,13 +396,15 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 		 */
 		public void customResultAvailable(Void result)
 		{
-			Object	res	= sic.getResult();
+			final Object	res	= sic.getResult();
 			
 //			if(sic.getMethod().getName().equals("getInputStream"))
 //				System.out.println("heererrere");
 			
 			if(res instanceof IFuture)
 			{
+//				final IIntermediateFuture<?> iresfut = res instanceof IIntermediateFuture? (IIntermediateFuture<?>)res: null;
+				
 				FutureFunctionality func = new FutureFunctionality()
 				{
 					List<Object> ires;
@@ -338,11 +422,12 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 					}
 					
 					public Object addIntermediateResult(Object result)
-					{
+					{						
+						RuntimeException ex = checkPostConditions(sic, result, true, ires);
+						
 						int keep = getKeepForPostConditions(sic);
 						addIntermediateResultToStore(result, keep);
 						
-						RuntimeException ex = checkPostConditions(sic, result, true, ires);
 						if(ex!=null)
 							throw ex;
 						else
@@ -395,4 +480,24 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 		}
 	}
 
+	/**
+	 * 
+	 */
+	public static class IntermediateResultUnavailableException extends RuntimeException
+	{
+		/**
+		 *  Create a new exception.
+		 */
+	    public IntermediateResultUnavailableException() 
+	    {
+	    }
+
+	    /**
+	     *  Create a new exception.
+	     */
+	    public IntermediateResultUnavailableException(String message) 
+	    {
+	    	super(message);
+	    }
+	}
 }

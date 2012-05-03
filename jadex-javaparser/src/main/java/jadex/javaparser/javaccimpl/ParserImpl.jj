@@ -1308,7 +1308,7 @@ void PrimaryExpression()       :
  *  represented as primary prefix.
  */
 void PrimaryPrefix()       :
-{ String t=null; }
+{ String t=null; Token lit=null; }
 {
 	Literal()
 |	"(" Expression() ")"
@@ -1437,16 +1437,17 @@ void PrimaryPrefix()       :
 		((ReflectNode)jjtree.peekNode()).setText(t);
 		((ReflectNode)jjtree.peekNode()).setType(ReflectNode.STATIC_FIELD);
 	}
-	// Parameter.
-|/*@bgen(jjtree) #ParameterNode(true) */
+	
+	// Parameter[-x] for preconditions.
+	| LOOKAHEAD(2)/*@bgen(jjtree) #ParameterNode(true) */
         {
           ParameterNode jjtn004 = new ParameterNode(this, JJTPARAMETERNODE);
           boolean jjtc004 = true;
           jjtree.openNodeScope(jjtn004);
         }
         try {
-/*@egen*/	//LOOKAHEAD({params!=null && params.containsKey(getToken(1).image)})
-	( t=Identifier()
+/*@egen*/
+	( t=Identifier() "[" "-" lit=<INTEGER_LITERAL> "]"
 	)/*@bgen(jjtree)*/
         } catch (Throwable jjte004) {
           if (jjtc004) {
@@ -1465,6 +1466,39 @@ void PrimaryPrefix()       :
         } finally {
           if (jjtc004) {
             jjtree.closeNodeScope(jjtn004, true);
+          }
+        }
+/*@egen*/
+	{ ((ExpressionNode)jjtree.peekNode()).setText(t+"[-"+lit+"]");}
+	
+	// Parameter.
+|/*@bgen(jjtree) #ParameterNode(true) */
+        {
+          ParameterNode jjtn005 = new ParameterNode(this, JJTPARAMETERNODE);
+          boolean jjtc005 = true;
+          jjtree.openNodeScope(jjtn005);
+        }
+        try {
+/*@egen*/	//LOOKAHEAD({params!=null && params.containsKey(getToken(1).image)})
+	( t=Identifier()
+	)/*@bgen(jjtree)*/
+        } catch (Throwable jjte005) {
+          if (jjtc005) {
+            jjtree.clearNodeScope(jjtn005);
+            jjtc005 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte005 instanceof RuntimeException) {
+            throw (RuntimeException)jjte005;
+          }
+          if (jjte005 instanceof ParseException) {
+            throw (ParseException)jjte005;
+          }
+          throw (Error)jjte005;
+        } finally {
+          if (jjtc005) {
+            jjtree.closeNodeScope(jjtn005, true);
           }
         }
 /*@egen*/

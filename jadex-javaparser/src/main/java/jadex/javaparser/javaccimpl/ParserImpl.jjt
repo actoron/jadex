@@ -831,7 +831,7 @@ void PrimaryExpression() #void :
  *  represented as primary prefix.
  */
 void PrimaryPrefix() #void :
-{ String t=null; }
+{ String t=null; Token lit=null; }
 {
 	Literal()
 |	"(" Expression() ")"
@@ -879,6 +879,13 @@ void PrimaryPrefix() #void :
 		((ReflectNode)jjtree.peekNode()).setText(t);
 		((ReflectNode)jjtree.peekNode()).setType(ReflectNode.STATIC_FIELD);
 	}
+	
+	// Parameter[-x] for preconditions.
+	| LOOKAHEAD(2)
+	( t=Identifier() "[" "-" lit=<INTEGER_LITERAL> "]"
+	) #ParameterNode()
+	{ ((ExpressionNode)jjtree.peekNode()).setText(t+"[-"+lit+"]");}
+	
 	// Parameter.
 |	//LOOKAHEAD({params!=null && params.containsKey(getToken(1).image)})
 	( t=Identifier()

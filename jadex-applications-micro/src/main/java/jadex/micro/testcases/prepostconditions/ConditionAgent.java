@@ -1,9 +1,11 @@
 package jadex.micro.testcases.prepostconditions;
 
-import jadex.bridge.service.annotation.CheckIndex;
-import jadex.bridge.service.annotation.CheckNotNull;
-import jadex.bridge.service.annotation.CheckState;
+import jadex.base.test.TestReport;
+import jadex.base.test.Testcase;
 import jadex.bridge.service.annotation.Service;
+import jadex.commons.SReflect;
+import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
@@ -15,67 +17,124 @@ import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
+import jadex.micro.annotation.Result;
+import jadex.micro.annotation.Results;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ *  Agent that tests if contracts, i.e. pre- and postconditions on services work.
+ */
 @Agent
 @Service
 @ProvidedServices(@ProvidedService(type=IContractService.class, implementation=@Implementation(expression="$pojoagent")))
+@Results(@Result(name="testresults", description= "The test results.", clazz=Testcase.class))
 public class ConditionAgent implements IContractService
 {
+	/** The agent. */
 	@Agent
 	MicroAgent agent;
 	
-	protected int cnt;
-	
 	/**
-	 * 
+	 *  The body.
 	 */
 	@AgentBody
 	public IFuture<Void> body()
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IContractService ts = (IContractService)agent.getServiceContainer().getProvidedServices(IContractService.class)[0];
+		final List<TestReport> results = new ArrayList<TestReport>();
 		
-		// a!=null violated
-		ts.doSomething(null, 6, 2).addResultListener(new PrintListener<Integer>());
+		IContractService ts = (IContractService)agent.getServiceContainer().getProvidedServices(IContractService.class)[0];
+
+		CounterResultListener<Void> lis = new CounterResultListener<Void>(12, new DefaultResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+				agent.setResultValue("testresults", new Testcase(results.size(), 
+					(TestReport[])results.toArray(new TestReport[results.size()])));
+				ret.setResult(null);
+			}
+		});
 		
 		// all ok
-		ts.doSomething("hi", 6, 2).addResultListener(new PrintListener<Integer>());
+		TestReport tr = new TestReport("#1", "Normal call.");
+		results.add(tr);
+		ts.doSomething("hi", 6, 2).addResultListener(
+			new DetectionListener<Integer>(tr, null, lis));
+
+		// a!=null violated
+		tr = new TestReport("#2", "Test if null argument is detected");
+		results.add(tr);
+		ts.doSomething(null, 6, 2).addResultListener(
+			new DetectionListener<Integer>(tr, IllegalArgumentException.class, lis));
 		
 		// c>0 violated
-		ts.doSomething("hi", 6, -1).addResultListener(new PrintListener<Integer>());
+		tr = new TestReport("#3", "Test if arg>0 is detected");
+		results.add(tr);
+		ts.doSomething("hi", 6, -1).addResultListener(
+			new DetectionListener<Integer>(tr, IllegalStateException.class, lis));
 
 		// result!=null violated
-		ts.doSomething("null", 1, 1).addResultListener(new PrintListener<Integer>());
+		tr = new TestReport("#4", "Test if null result is detected.");
+		results.add(tr);
+		ts.doSomething("null", 1, 1).addResultListener(
+			new DetectionListener<Integer>(tr, IllegalArgumentException.class, lis));
 
 		// result <100 violated
-		ts.doSomething("hi", 1000, 1).addResultListener(new PrintListener<Integer>());
-		
+		tr = new TestReport("#5", "Test if result <100 is detected.");
+		results.add(tr);
+		ts.doSomething("hi", 1000, 1).addResultListener(
+			new DetectionListener<Integer>(tr, IllegalStateException.class, lis));
 		
 		List<String> names = new ArrayList<String>();
 		names.add("Alfons");
 		names.add("Berta");
 		names.add("Charlie");
 
-		// 
-		ts.getName(0, names).addResultListener(new PrintListener<String>());
-		ts.getName(1, names).addResultListener(new PrintListener<String>());
-		ts.getName(2, names).addResultListener(new PrintListener<String>());
-
-		ts.getName(-1, names).addResultListener(new PrintListener<String>());
-		ts.getName(3, names).addResultListener(new PrintListener<String>());
+		// all ok
+		tr = new TestReport("#6", "Normal call.");
+		results.add(tr);
+		ts.getName(0, names).addResultListener(new DetectionListener<String>(tr, null, lis));
 		
-		ts.getIncreasingValue().addResultListener(new PrintListener<Collection<Integer>>());
+		// all ok
+		tr = new TestReport("#7", "Normal call.");
+		results.add(tr);
+		ts.getName(1, names).addResultListener(new DetectionListener<String>(tr, null, lis));
+		
+		// all ok
+		tr = new TestReport("#8", "Normal call.");
+		results.add(tr);
+		ts.getName(2, names).addResultListener(new DetectionListener<String>(tr, null, lis));
 
+		// index<0
+		tr = new TestReport("#9", "Test if index<0 is detected.");
+		results.add(tr);
+		ts.getName(-1, names).addResultListener(new DetectionListener<String>(tr, IndexOutOfBoundsException.class, lis));
+		
+		// index>size
+		tr = new TestReport("#10", "Test if index>size is detected.");
+		results.add(tr);
+		ts.getName(3, names).addResultListener(new DetectionListener<String>(tr, IndexOutOfBoundsException.class, lis));
+		
+		// delivers one value out of range
+		tr = new TestReport("#11", "Test if intermediate result checks work with keep.");
+		results.add(tr);
+		ts.getIncreasingValue().addResultListener(new DetectionListener<Collection<Integer>>(tr, IllegalStateException.class, lis));
+		
+		// delivers one value out of range
+		tr = new TestReport("#12", "Test if intermediate result checks work without keep.");
+		results.add(tr);
+		ts.getIncreasingValue2().addResultListener(new DetectionListener<Collection<Integer>>(tr, IllegalStateException.class, lis));
+
+		
 		return ret;
 	}
 	
 	/**
-	 * 
+	 *  Test method for @CheckNotNull and @CheckState.
 	 */
 	public IFuture<Integer> doSomething(String a, int x, int y)
 	{
@@ -84,40 +143,97 @@ public class ConditionAgent implements IContractService
 	}
 	
 	/**
-	 * 
+	 *  Test method for @CheckIndex.
 	 */
-	public IFuture<String> getName(@CheckIndex(1) int idx, @CheckNotNull List<String> names)
+	public IFuture<String> getName(int idx, List<String> names)
 	{
 		return new Future<String>(names.get(idx));
 	}
 	
 	/**
-	 * 
+	 *  Test method for @CheckState with intermediate results.
+	 *  
+	 *  Will automatically try to determine the number of intermediate results to keep.
 	 */
-	public @CheckState(value="$res[-1] < $res", intermediate=true) IIntermediateFuture<Integer> getIncreasingValue()
+	public IIntermediateFuture<Integer> getIncreasingValue()
 	{
 		final IntermediateFuture<Integer> ret = new IntermediateFuture<Integer>();
 		
 		ret.addIntermediateResult(new Integer(1));
 		ret.addIntermediateResult(new Integer(2));
+		ret.addIntermediateResult(new Integer(3));
+		ret.addIntermediateResult(new Integer(4));
 		ret.addIntermediateResult(new Integer(0));
 		
 		return ret;
 	}
+	
+	/**
+	 *  Test method for @CheckState with intermediate results.
+	 */
+	public IIntermediateFuture<Integer> getIncreasingValue2()
+	{
+		return getIncreasingValue();
+	}
 
 	/**
-	 * 
+	 *  Helper class for interpreting results.
 	 */
-	public static class PrintListener<E> implements IResultListener<E>
+	public static class DetectionListener<E> implements IResultListener<E>
 	{
-		public void resultAvailable(Object result)
+		/** The test report. */
+		protected TestReport tr;
+		
+		/** The expected exception type. */
+		protected Class<? extends RuntimeException> expected;
+		
+		/** The delegation listener. */
+		protected IResultListener<?> delegate;
+		
+		/**
+		 *  Creata a new listener.
+		 */
+		public DetectionListener(TestReport tr, Class<? extends RuntimeException> expected, IResultListener<?> delegate)
 		{
-			System.out.println("invoked, result: "+result);
+			this.tr = tr;
+			this.expected = expected;
+			this.delegate = delegate;
 		}
 		
+		/**
+		 *  Called when result is available.
+		 */
+		public void resultAvailable(Object result)
+		{
+			if(expected==null)
+			{
+				tr.setSucceeded(true);
+			}
+			else
+			{
+				tr.setFailed("Expected exception: "+expected+" but no exception was thrown.");
+			}
+			delegate.resultAvailable(null);
+		}
+		
+		/**
+		 *  Called when exception occurred.
+		 */
 		public void exceptionOccurred(Exception exception)
 		{
-			System.out.println("exception occurred: "+exception);
+			if(expected==null)
+			{
+				tr.setFailed("No exception expected, but exception was thrown: "+exception);
+			}
+			else if(SReflect.isSupertype(expected, exception.getClass()))
+			{
+				tr.setSucceeded(true);
+			}
+			else
+			{
+				tr.setFailed("Wrong exception type received: "+exception);
+			}
+			delegate.resultAvailable(null);
 		}
 	}
 }
