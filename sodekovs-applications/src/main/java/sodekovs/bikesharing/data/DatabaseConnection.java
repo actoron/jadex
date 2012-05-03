@@ -26,7 +26,7 @@ public class DatabaseConnection {
 		try {
 			if (connection == null || connection.isClosed()) {
 				String dbUrl = "jdbc:mysql://141.22.64.3:3306/bicycle_rental";
-				String dbUser = "bicycle_rental";
+				String dbUser = "root";
 
 				Scanner s = new Scanner(System.in);
 				System.out.println("Please insert the password to connect to " + dbUrl + " as user " + dbUser + ":");
