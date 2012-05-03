@@ -10,14 +10,12 @@ import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Reference;
-import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.IServiceInvocationInterceptor;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.commons.IFilter;
-import jadex.commons.MethodInfo;
 import jadex.commons.SReflect;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DelegationResultListener;
@@ -27,15 +25,9 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
-import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
-import jadex.commons.future.ITerminableIntermediateFuture;
-import jadex.commons.future.IntermediateDelegationResultListener;
-import jadex.commons.future.IntermediateFuture;
-import jadex.commons.future.SubscriptionIntermediateDelegationFuture;
-import jadex.commons.future.TerminableDelegationFuture;
-import jadex.commons.future.TerminableIntermediateDelegationFuture;
 import jadex.commons.transformation.traverser.FilterProcessor;
+import jadex.commons.transformation.traverser.ITraverseProcessor;
 import jadex.commons.transformation.traverser.Traverser;
 
 import java.lang.reflect.InvocationHandler;
@@ -198,7 +190,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 							}
 						} : this.filter;
 						
-						List procs = marshal.getCloneProcessors();
+						List<ITraverseProcessor> procs = marshal.getCloneProcessors();
 						procs.add(procs.size()-2, new FilterProcessor(filter));
 						copyargs.add(Traverser.traverseObject(args[i], procs, true, null));
 //						copyargs.add(Traverser.traverseObject(args[i], marshal.getCloneProcessors(), filter));
@@ -301,7 +293,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						return obj==value ? false : deffilter.filter(obj);
 					}
 				} : deffilter;
-				List procs = marshal.getCloneProcessors();
+				List<ITraverseProcessor> procs = marshal.getCloneProcessors();
 				procs.add(procs.size()-1, new FilterProcessor(filter));
 				res = Traverser.traverseObject(value, procs, true, null);
 //				res = Traverser.deepCloneObject(value, marshal.getCloneProcessors(), filter);
@@ -425,7 +417,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		 */
 		public void customResultAvailable(Void result)
 		{
-			Object	res	= sic.getResult();
+			final Object	res	= sic.getResult();
 			
 //			if(sic.getMethod().getName().equals("getInputStream"))
 //				System.out.println("heererrere");
@@ -506,7 +498,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 					}
 				};
 				
-				final Future fut = FutureFunctionality.getDelegationFuture((IFuture)res, func);
+				final Future<?> fut = FutureFunctionality.getDelegationFuture((IFuture<?>)res, func);
 				
 				// Add timeout handling for local case.
 				if(!sic.isRemoteCall())
@@ -534,6 +526,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 									if(exception instanceof TimeoutException)
 									{
 										fut.setExceptionIfUndone(exception);
+										if(res instanceof ITerminableFuture<?>)
+										{
+											((ITerminableFuture)res).terminate();
+										}
 									}
 								}
 								public void intermediateResultAvailable(Object result)
@@ -558,6 +554,10 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 									if(exception instanceof TimeoutException)
 									{
 										fut.setExceptionIfUndone(exception);
+										if(res instanceof ITerminableFuture<?>)
+										{
+											((ITerminableFuture)res).terminate();
+										}
 									}
 								}
 							}));

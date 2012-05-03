@@ -1,7 +1,9 @@
 package jadex.base.service.chat;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
@@ -225,13 +227,32 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  
 	 *  @return When the upload is accepted, the output connection for sending the file is returned.
 	 */
-	public ITerminableFuture<IOutputConnection> startUpload(String nick, String filename, long size, String id)
+	public ITerminableFuture<IOutputConnection> startUpload(final String nick, String filename, long size, String id)
 	{
-		TerminableFuture<IOutputConnection> ret = new TerminableFuture<IOutputConnection>();
-		IComponentIdentifier sender = IComponentIdentifier.CALLER.get();
+		final IComponentIdentifier sender = IComponentIdentifier.CALLER.get();
 		
-		TransferInfo	ti	= new TransferInfo(true, id, filename, sender, size);
+		final TransferInfo	ti	= new TransferInfo(true, id, filename, sender, size);
 		ti.setState(TransferInfo.STATE_WAITING);
+		
+		// Todo: automatically decouple termination commands
+		final IExternalAccess	exta	= agent.getExternalAccess();
+		TerminableFuture<IOutputConnection> ret = new TerminableFuture<IOutputConnection>(new Runnable()
+		{
+			public void run()
+			{
+				// Called when request is externally terminated.
+				exta.scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						ti.setState(TransferInfo.STATE_REJECTED);
+						publishEvent(ChatEvent.TYPE_FILE, nick, sender, ti);
+						transfers2.remove(ti.getId());
+						return IFuture.DONE;
+					}
+				});
+			}
+		});
 		
 		transfers2.put(ti.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(ti, ret, null));
 		

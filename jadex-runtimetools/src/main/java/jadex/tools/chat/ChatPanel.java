@@ -319,13 +319,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 //							System.out.println("importData: "+files);
 							for(File file: files)
 							{
-								getService().sendFile(file.getAbsolutePath(), cid).addResultListener(new SwingDefaultResultListener<Void>(panel)
-								{
-									public void customResultAvailable(Void result)
-									{
-										// Transfer initiated -> ignore.
-									}
-								});
+								getService().sendFile(file.getAbsolutePath(), cid);
 							}
 							success	= true;
 						}
@@ -375,13 +369,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 								if(JFileChooser.APPROVE_OPTION==chooser.showOpenDialog(panel))
 								{
 									File file = chooser.getSelectedFile();
-									getService().sendFile(file.getAbsolutePath(), cid).addResultListener(new SwingDefaultResultListener<Void>(panel)
-									{
-										public void customResultAvailable(Void result)
-										{
-											// Transfer initiated -> ignore.
-										}
-									});
+									getService().sendFile(file.getAbsolutePath(), cid);
 								}
 							}
 						});
@@ -437,7 +425,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						tf.setText("");
 						typing	= false;
 						final int	request	= startRequest();
-						tell(msg, request).addResultListener(new SwingDefaultResultListener<Void>(panel)
+						tell(msg, request).addResultListener(new SwingDefaultResultListener<Void>()
 						{
 							public void customResultAvailable(Void result)
 							{
@@ -446,7 +434,6 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							
 							public void customExceptionOccurred(Exception exception)
 							{
-								super.customExceptionOccurred(exception);
 								endRequest(request);
 							}
 						});
@@ -509,7 +496,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				panel.add(tpane, BorderLayout.CENTER);
 				
 				subscription	= getService().subscribeToEvents();
-				subscription.addResultListener(new SwingIntermediateDefaultResultListener<ChatEvent>(panel)
+				subscription.addResultListener(new SwingIntermediateDefaultResultListener<ChatEvent>()
 				{
 					public void customIntermediateResultAvailable(ChatEvent ce)
 					{
@@ -552,16 +539,13 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					
 					public void customExceptionOccurred(Exception exception)
 					{
-						if(!isShutdown())
-						{
-							super.customExceptionOccurred(exception);
-						}
+						ret.setExceptionIfUndone(exception);
 					}
 				});
 				
-				ret.setResult(null);
+				ret.setResultIfUndone(null);
 				
-				getService().findUsers().addResultListener(new SwingIntermediateDefaultResultListener<IChatService>(panel)
+				getService().findUsers().addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
 				{
 					public void customIntermediateResultAvailable(IChatService chat)
 					{
@@ -569,15 +553,17 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					}
 					public void customExceptionOccurred(Exception exception)
 					{
-						super.customExceptionOccurred(exception);
 					}
 				});
 				
-				getService().getFileTransfers().addResultListener(new SwingIntermediateDefaultResultListener<TransferInfo>(panel)
+				getService().getFileTransfers().addResultListener(new SwingIntermediateDefaultResultListener<TransferInfo>()
 				{
 					public void customIntermediateResultAvailable(TransferInfo ti)
 					{
 						updateTransfer(ti);
+					}
+					public void customExceptionOccurred(Exception exception)
+					{
 					}
 				});
 			}
@@ -813,58 +799,52 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public IFuture<File> acceptFile(final String filename, final long size, final IComponentIdentifier sender)
 	{
-		final Future<File> ret = new Future<File>();
-		
-		SwingUtilities.invokeLater(new Runnable()
+		Future<File> ret = new Future<File>();
+
+		PropertiesPanel pp = new PropertiesPanel();
+		JPanel fnp = new JPanel(new GridBagLayout());
+		final JTextField tfpath = new JTextField(".", 15);
+		JButton bupath = new JButton("...");
+		bupath.addActionListener(new ActionListener()
 		{
-			public void run()
+			public void actionPerformed(ActionEvent e)
 			{
-				PropertiesPanel pp = new PropertiesPanel();
-				JPanel fnp = new JPanel(new GridBagLayout());
-				final JTextField tfpath = new JTextField(".", 15);
-				JButton bupath = new JButton("...");
-				bupath.addActionListener(new ActionListener()
+				JFileChooser ch = new JFileChooser(tfpath.getText());
+				ch.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				if(JFileChooser.APPROVE_OPTION==ch.showOpenDialog(panel))
 				{
-					public void actionPerformed(ActionEvent e)
-					{
-						JFileChooser ch = new JFileChooser(tfpath.getText());
-						ch.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-						if(JFileChooser.APPROVE_OPTION==ch.showOpenDialog(panel))
-						{
-							tfpath.setText(ch.getSelectedFile().getAbsolutePath());
-						}
-					}
-				});
-				bupath.setMargin(new Insets(0,0,0,0));
-//				JTextField tfname = new JTextField(filename, 15);
-				fnp.add(tfpath, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.WEST, 
-					GridBagConstraints.BOTH, new Insets(0,0,0,2),0,0));
-				fnp.add(bupath, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.WEST, 
-					GridBagConstraints.NONE, new Insets(0,2,0,0),0,0));
-//				fnp.add(tfname, new GridBagConstraints(2,0,1,1,1,1,GridBagConstraints.WEST, 
-//					GridBagConstraints.BOTH, new Insets(0,2,0,2),0,0));
-				pp.addComponent("File path: ", fnp);
-				final JTextField tfname = pp.createTextField("File name: ", filename, true);
-				pp.createTextField("Size: ", SUtil.bytesToString(size));
-				pp.createTextField("Sender: ", ""+(sender==null? sender: sender.getName()));
-				
-				int res	= JOptionPane.showOptionDialog(panel, pp, "Incoming File Transfer", JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Accept", "Reject", "Cancel"}, "Accept");
-				if(0==res)
-				{
-					ret.setResult(new File(tfpath.getText()+File.separatorChar+tfname.getText()));
-				}
-				else if(1==res)
-				{
-					ret.setException(new RuntimeException(TransferInfo.STATE_REJECTED));
-				}
-				else
-				{
-					// No result for future -> nop
+					tfpath.setText(ch.getSelectedFile().getAbsolutePath());
 				}
 			}
 		});
-	
+		bupath.setMargin(new Insets(0,0,0,0));
+//				JTextField tfname = new JTextField(filename, 15);
+		fnp.add(tfpath, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.WEST, 
+			GridBagConstraints.BOTH, new Insets(0,0,0,2),0,0));
+		fnp.add(bupath, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.WEST, 
+			GridBagConstraints.NONE, new Insets(0,2,0,0),0,0));
+//				fnp.add(tfname, new GridBagConstraints(2,0,1,1,1,1,GridBagConstraints.WEST, 
+//					GridBagConstraints.BOTH, new Insets(0,2,0,2),0,0));
+		pp.addComponent("File path: ", fnp);
+		final JTextField tfname = pp.createTextField("File name: ", filename, true);
+		pp.createTextField("Size: ", SUtil.bytesToString(size));
+		pp.createTextField("Sender: ", ""+(sender==null? sender: sender.getName()));
+		
+		int res	= JOptionPane.showOptionDialog(panel, pp, "Incoming File Transfer", JOptionPane.YES_NO_CANCEL_OPTION,
+			JOptionPane.QUESTION_MESSAGE, null, new Object[]{"Accept", "Reject", "Cancel"}, "Accept");
+		if(0==res)
+		{
+			ret.setResult(new File(tfpath.getText()+File.separatorChar+tfname.getText()));
+		}
+		else if(1==res)
+		{
+			ret.setException(new RuntimeException(TransferInfo.STATE_REJECTED));
+		}
+		else
+		{
+			// No result for future -> nop
+		}
+
 		return ret;
 	}
 	

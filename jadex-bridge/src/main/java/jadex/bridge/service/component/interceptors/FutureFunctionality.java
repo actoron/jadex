@@ -5,7 +5,6 @@ import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
-import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
@@ -117,7 +116,7 @@ public class FutureFunctionality
 	/**
 	 *  Terminate the future.
 	 */
-	public void terminate()
+	public void terminate(Exception reason)
 	{
 	}
 	
@@ -350,7 +349,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 		}
 		catch(Exception e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
 		}
 		
 		return ret;
@@ -487,16 +486,16 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	/**
 	 *  Terminate the future.
 	 */
-	public void terminate()
+	public void terminate(Exception reason)
 	{
 		try
 		{
-			func.terminate();
-			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate();
+			func.terminate(reason);
+			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(reason);
 		}
 		catch(Exception e)
 		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
 		}
 	}
 };
@@ -594,7 +593,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(e);
 		}
 		
 		return ret;
@@ -730,16 +729,16 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	/**
 	 *  Terminate the future.
 	 */
-	public void terminate()
+	public void terminate(Exception reason)
 	{
 		try
 		{
-			func.terminate();
-			DelegatingTerminableIntermediateDelegationFuture.super.terminate();
+			func.terminate(reason);
+			DelegatingTerminableIntermediateDelegationFuture.super.terminate(reason);
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(e);
 		}
 	}
 };
@@ -863,16 +862,16 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	/**
 	 *  Terminate the future.
 	 */
-	public void terminate()
+	public void terminate(Exception reason)
 	{
 		try
 		{
-			func.terminate();
-			DelegatingTerminableDelegationFuture.super.terminate();
+			func.terminate(reason);
+			DelegatingTerminableDelegationFuture.super.terminate(reason);
 		}
 		catch(Exception e)
 		{
-			DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(exception);
+			DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(e);
 		}
 	}
 };
@@ -960,7 +959,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 		}
 		catch(Exception e)
 		{
-			DelegatingIntermediateFuture.super.setExceptionIfUndone(exception);
+			DelegatingIntermediateFuture.super.setExceptionIfUndone(e);
 		}
 		
 		return ret;

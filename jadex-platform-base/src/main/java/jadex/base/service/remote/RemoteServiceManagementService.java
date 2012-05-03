@@ -45,12 +45,14 @@ import jadex.commons.IFilter;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
+import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
+import jadex.commons.future.ITerminableFuture;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.commons.transformation.binaryserializer.DecodingContext;
 import jadex.commons.transformation.binaryserializer.EncodingContext;
@@ -688,16 +690,16 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					if(!future.isDone())
 					{
 						WaitingCallInfo	wci	= rms.removeWaitingCall(callid);
-						future.setExceptionIfUndone(new RuntimeException("No reply received and timeout occurred: "
-							+receiver+", "+callid+", "+wci)
+						if(future instanceof ITerminableFuture)
 						{
-							public void printStackTrace()
-							{
-								Thread.dumpStack();
-								super.printStackTrace();
-							}
+							((ITerminableFuture<?>)future).terminate(new TimeoutException("No reply received and timeout occurred: "
+								+receiver+", "+callid+", "+wci));						
 						}
-						);
+						else
+						{
+							future.setExceptionIfUndone(new TimeoutException("No reply received and timeout occurred: "
+								+receiver+", "+callid+", "+wci));
+						}
 					}
 					return IFuture.DONE;
 				}

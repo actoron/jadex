@@ -5,7 +5,6 @@ import jadex.base.service.remote.commands.RemoteMethodInvocationCommand;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.component.interceptors.FutureFunctionality;
 import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.future.Future;
@@ -88,26 +87,33 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		{
 			future = new SubscriptionIntermediateDelegationFuture()
 			{
-				public void terminate() 
+				public void terminate(Exception reason) 
 				{
-					Future res = new Future();
-//					res.addResultListener(new IResultListener()
-//					{
-//						public void resultAvailable(Object result)
-//						{
-//							System.out.println("received result: "+result);
-//						}
-//						public void exceptionOccurred(Exception exception)
-//						{
-//							System.out.println("received exception: "+exception);
-//						}
-//					});
-					final String mycallid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
-					RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid);
-					// Can be invoked directly, because internally redirects to agent thread.
-//					System.out.println("sending terminate");
-					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-						content, mycallid, to, res);
+					// Set exception for local state (as rms removes waiting call, cannot receive remote result any more)
+					boolean	set	= setExceptionIfUndone(reason);
+					
+					// Send message to announce termination to remote
+					if(set)
+					{
+						Future res = new Future();
+	//					res.addResultListener(new IResultListener()
+	//					{
+	//						public void resultAvailable(Object result)
+	//						{
+	//							System.out.println("received result: "+result);
+	//						}
+	//						public void exceptionOccurred(Exception exception)
+	//						{
+	//							System.out.println("received exception: "+exception);
+	//						}
+	//					});
+						final String mycallid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
+						RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, reason);
+						// Can be invoked directly, because internally redirects to agent thread.
+	//					System.out.println("sending terminate");
+						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
+							content, mycallid, to, res);
+					}
 				};
 			};
 		}
@@ -115,26 +121,33 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		{
 			future = new TerminableIntermediateDelegationFuture()
 			{
-				public void terminate() 
+				public void terminate(Exception e) 
 				{
-					Future res = new Future();
-//					res.addResultListener(new IResultListener()
-//					{
-//						public void resultAvailable(Object result)
-//						{
-//							System.out.println("received result: "+result);
-//						}
-//						public void exceptionOccurred(Exception exception)
-//						{
-//							System.out.println("received exception: "+exception);
-//						}
-//					});
-					final String mycallid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
-					RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid);
-					// Can be invoked directly, because internally redirects to agent thread.
-//					System.out.println("sending terminate");
-					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-						content, mycallid, to, res);
+					// Set exception for local state (as rms removes waiting call, cannot receive remote result any more)
+					boolean	set	= setExceptionIfUndone(e);
+					
+					// Send message to announce termination to remote
+					if(set)
+					{
+						Future res = new Future();
+	//					res.addResultListener(new IResultListener()
+	//					{
+	//						public void resultAvailable(Object result)
+	//						{
+	//							System.out.println("received result: "+result);
+	//						}
+	//						public void exceptionOccurred(Exception exception)
+	//						{
+	//							System.out.println("received exception: "+exception);
+	//						}
+	//					});
+						final String mycallid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
+						RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, reason);
+						// Can be invoked directly, because internally redirects to agent thread.
+	//					System.out.println("sending terminate");
+						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
+							content, mycallid, to, res);
+					}
 				};
 			};
 		}
@@ -142,27 +155,33 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 		{
 			future = new TerminableDelegationFuture()
 			{
-				public void terminate() 
+				public void terminate(Exception reason) 
 				{
-					Future res = new Future();
-//					res.addResultListener(new IResultListener()
-//					{
-//						public void resultAvailable(Object result)
-//						{
-//							System.out.println("received result: "+result);
-//						}
-//						public void exceptionOccurred(Exception exception)
-//						{
-//							System.out.println("received exception: "+exception);
-//						}
-//					});
-					final String mycallid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
-					RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid);
-					// Can be invoked directly, because internally redirects to agent thread.
-//					System.out.println("sending terminate");
-					rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-						content, mycallid, to, res);
+					// Set exception for local state (as rms removes waiting call, cannot receive remote result any more)
+					boolean set	= setExceptionIfUndone(reason);
 					
+					// Send message to announce termination to remote
+					if(set)
+					{
+						Future res = new Future();
+	//					res.addResultListener(new IResultListener()
+	//					{
+	//						public void resultAvailable(Object result)
+	//						{
+	//							System.out.println("received result: "+result);
+	//						}
+	//						public void exceptionOccurred(Exception exception)
+	//						{
+	//							System.out.println("received exception: "+exception);
+	//						}
+	//					});
+						final String mycallid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
+						RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, reason);
+						// Can be invoked directly, because internally redirects to agent thread.
+	//					System.out.println("sending terminate");
+						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
+							content, mycallid, to, res);
+					}
 				};
 			};
 		}

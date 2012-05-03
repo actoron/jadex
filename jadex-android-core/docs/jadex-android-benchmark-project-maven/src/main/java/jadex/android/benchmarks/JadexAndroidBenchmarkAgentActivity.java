@@ -1,6 +1,7 @@
 package jadex.android.benchmarks;
 
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
+import jadex.bdi.puzzle.agent.Main;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -133,6 +134,18 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 			
 			ret	= true;
 	    }
+		else if(item.getItemId()==R.id.puzzle)
+		{
+			new Thread(new Runnable()
+			{
+				public void run()
+				{
+					Main.main(new String[0]);					
+				}
+			}).start();
+			
+			ret	= super.onOptionsItemSelected(item);
+		}
 		else
 		{
 			ret	= super.onOptionsItemSelected(item);
@@ -166,7 +179,8 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 				{
 					public void resultAvailable(IChatGuiService chat)
 					{
-						chat.message(msg.getText().toString()).addResultListener(new IResultListener<Collection<IChatService>>()
+						chat.message(msg.getText().toString(), new IComponentIdentifier[0])
+							.addResultListener(new IResultListener<Collection<IChatService>>()
 						{
 							public void resultAvailable(Collection<IChatService> result)
 							{

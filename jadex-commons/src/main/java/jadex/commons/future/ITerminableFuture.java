@@ -10,6 +10,12 @@ public interface ITerminableFuture<E> extends IFuture<E>
 {
 	/**
 	 *  Terminate the future.
+	 *  The exception will be set to FutureTerminatedException.
 	 */
 	public void terminate();
+	
+	/**
+	 *  Terminate the future and supply a custom reason.
+	 */
+	public void terminate(Exception reason);
 }

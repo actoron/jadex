@@ -20,7 +20,13 @@
 			<artifactId>jadex-android-misc</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-bdibpmn</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>com.google.android</groupId>
 			<artifactId>android</artifactId>

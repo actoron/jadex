@@ -38,24 +38,33 @@ public class TerminableFuture<E> extends Future<E> implements ITerminableFuture<
 	
 	/**
 	 *  Terminate the future.
+	 *  The exception will be set to FutureTerminatedException.
 	 */
 	public void terminate()
 	{
-		if(setExceptionIfUndone(new FutureTerminatedException()))
+		terminate(new FutureTerminatedException());
+	}
+	
+	/**
+	 *  Terminate the future and supply a custom reason.
+	 */
+	public void terminate(Exception reason)
+	{
+		if(setExceptionIfUndone(reason))
 		{
 			if(terminate!=null)
 				terminate.run();
 		}
 	}
-	
-	/**
-	 *  Test if future is terminated.
-	 *  @return True, if terminated.
-	 */
-	public boolean isTerminated()
-	{
-		return isDone() && exception instanceof FutureTerminatedException;
-	}
+
+//	/**
+//	 *  Test if future is terminated.
+//	 *  @return True, if terminated.
+//	 */
+//	public boolean isTerminated()
+//	{
+//		return isDone() && exception instanceof FutureTerminatedException;
+//	}
 	
 //	/**
 //	 *  Main for testing.

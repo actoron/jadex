@@ -21,6 +21,9 @@ public class TerminableDelegationFuture<E> extends Future<E> implements ITermina
 	/** Flag if source has been notified. */
 	protected boolean notified;
 
+	/** Exception used for notification. */
+	protected Exception reason;
+
 	//-------- constructors --------
 	
 	/**
@@ -59,13 +62,22 @@ public class TerminableDelegationFuture<E> extends Future<E> implements ITermina
 		}
 		
 		if(mynotify)
-			src.terminate();
+			src.terminate(reason);
 	}
 	
 	/**
 	 *  Terminate the future.
+	 *  The exception will be set to FutureTerminatedException.
 	 */
 	public void terminate()
+	{
+		terminate(new FutureTerminatedException());
+	}
+	
+	/**
+	 *  Terminate the future and supply a custom reason.
+	 */
+	public void terminate(Exception reason)
 	{
 		boolean mynotify;
 		synchronized(this)
@@ -75,19 +87,21 @@ public class TerminableDelegationFuture<E> extends Future<E> implements ITermina
 			mynotify = src!=null && !notified;
 			notify = src==null && !notified;
 			notified = notified || mynotify;
+			if(notify)
+				this.reason	= reason;
 		}
 		
 		if(mynotify)
-			src.terminate();
+			src.terminate(reason);
 	}
 	
-	/**
-	 *  Test if future is terminated.
-	 *  @return True, if terminated.
-	 */
-	public boolean isTerminated()
-	{
-		return isDone() && exception instanceof FutureTerminatedException;
-	}
+//	/**
+//	 *  Test if future is terminated.
+//	 *  @return True, if terminated.
+//	 */
+//	public boolean isTerminated()
+//	{
+//		return isDone() && exception instanceof FutureTerminatedException;
+//	}
 }
 

@@ -5,6 +5,8 @@
         <menu>
             <item android:id="@+id/creation"
                   android:title="Micro Creation" />
+            <item android:id="@+id/puzzle"
+                  android:title="Puzzle" />
             <item android:id="@+id/nocodec"
                   android:title="Message No Codec" />
             <item android:id="@+id/codec"
