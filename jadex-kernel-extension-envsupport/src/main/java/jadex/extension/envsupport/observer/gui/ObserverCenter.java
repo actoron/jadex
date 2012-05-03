@@ -8,6 +8,7 @@ import jadex.commons.IChangeListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.extension.envsupport.dataview.IDataView;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
@@ -86,7 +87,8 @@ public class ObserverCenter
 	private IPerspective selectedperspective;
 	
 	/** The current space */
-	private Space2D space;
+//	private Space2D space;
+	private AbstractEnvironmentSpace space;
 	
 	//TODO: move to Perspective!
 	/** Area size of the space */
@@ -277,7 +279,6 @@ public class ObserverCenter
 	public IVector2 getAreaSize()
 	{
 		return ((Space2D)space).getAreaSize().copy();
-
 	}
 	
 	/**
@@ -531,11 +532,20 @@ public class ObserverCenter
 		});
 	}
 	
+//	/**
+//	 * Returns the space.
+//	 * @return the space
+//	 */
+//	public Space2D getSpace()
+//	{
+//		return space;
+//	}
+	
 	/**
 	 * Returns the space.
 	 * @return the space
 	 */
-	public Space2D getSpace()
+	public AbstractEnvironmentSpace getSpace()
 	{
 		return space;
 	}
