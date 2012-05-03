@@ -11,6 +11,8 @@ import jadex.bridge.service.search.IResultSelector;
 import jadex.bridge.service.search.ISearchManager;
 import jadex.bridge.service.search.IVisitDecider;
 import jadex.bridge.service.search.SServiceProvider;
+import jadex.bridge.service.search.TypeResultSelector;
+import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.future.Future;
@@ -79,7 +81,11 @@ public class RemoteServiceContainer extends BasicServiceContainer
 				}
 				else
 				{
-//					System.out.println("remote search: "+componentid);
+					if(selector instanceof TypeResultSelector && ((TypeResultSelector) selector).getType().equals(IComponentManagementService.class))
+					{
+						System.out.println("remote search: "+componentid);
+						Thread.dumpStack();
+					}
 					// Hack! Use user search manager.
 					rms.getServiceProxies(componentid, SServiceProvider.sequentialmanager, decider, selector)
 						.addResultListener(new IResultListener()

@@ -521,6 +521,7 @@ public class ChatService implements IChatService, IChatGuiService
 				ti.setState(TransferInfo.STATE_REJECTED);
 				publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 				tup.getSecondEntity().setException(new RuntimeException(TransferInfo.STATE_REJECTED));
+				transfers.remove(id);
 				ret	= IFuture.DONE;
 			}
 			else if(TransferInfo.STATE_REJECTED.equals(ti.getState()))
@@ -541,6 +542,7 @@ public class ChatService implements IChatService, IChatGuiService
 				ti.setState(TransferInfo.STATE_REJECTED);
 				publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 				((Future<IOutputConnection>) tup2.getSecondEntity()).setException(new RuntimeException(TransferInfo.STATE_REJECTED));
+				transfers2.remove(id);
 				ret	= IFuture.DONE;
 			}
 			else if(TransferInfo.STATE_REJECTED.equals(ti.getState()))
@@ -723,6 +725,7 @@ public class ChatService implements IChatService, IChatGuiService
 						{
 							fi.setState(TransferInfo.STATE_ERROR);
 						}
+						transfers2.remove(fi.getId());
 						publishEvent(ChatEvent.TYPE_FILE, null, cid, fi);
 					}
 				});
@@ -823,7 +826,9 @@ public class ChatService implements IChatService, IChatGuiService
 					}
 					con.close();
 					ti.setState(ti.getSize()==ti.getDone() ? TransferInfo.STATE_COMPLETED : TransferInfo.STATE_ABORTED);
-					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);			
+					transfers.remove(ti.getId());
+					transfers2.remove(ti.getId());
+					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 				}
 				public void exceptionOccurred(Exception exception)
 				{
@@ -836,6 +841,8 @@ public class ChatService implements IChatService, IChatGuiService
 					}
 					con.close();
 					ti.setState(TransferInfo.STATE_CANCELLING.equals(ti.getState()) ? TransferInfo.STATE_ABORTED : TransferInfo.STATE_ERROR);
+					transfers.remove(ti.getId());
+					transfers2.remove(ti.getId());
 					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 				}
 			});
@@ -843,6 +850,8 @@ public class ChatService implements IChatService, IChatGuiService
 		catch(Exception e)
 		{
 			ti.setState(TransferInfo.STATE_ERROR);
+			transfers.remove(ti.getId());
+			transfers2.remove(ti.getId());
 			publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 			if(ret!=null)
 			{
@@ -899,6 +908,8 @@ public class ChatService implements IChatService, IChatGuiService
 					}
 					ocon.close();
 					ti.setState(TransferInfo.STATE_COMPLETED);
+					transfers.remove(ti.getId());
+					transfers2.remove(ti.getId());
 					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);			
 				}
 				public void exceptionOccurred(Exception exception)
@@ -912,14 +923,17 @@ public class ChatService implements IChatService, IChatGuiService
 					}
 					ocon.close();
 					ti.setState(TransferInfo.STATE_CANCELLING.equals(ti.getState()) ? TransferInfo.STATE_ABORTED : TransferInfo.STATE_ERROR);
+					transfers.remove(ti.getId());
+					transfers2.remove(ti.getId());
 					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 				}
 			});
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
 			ti.setState(TransferInfo.STATE_ERROR);
+			transfers.remove(ti.getId());
+			transfers2.remove(ti.getId());
 			publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 		}
 	}
