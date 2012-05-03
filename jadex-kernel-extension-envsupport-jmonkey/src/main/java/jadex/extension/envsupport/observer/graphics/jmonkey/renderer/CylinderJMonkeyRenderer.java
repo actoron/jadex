@@ -23,7 +23,8 @@ public class CylinderJMonkeyRenderer extends AbstractJMonkeyRenderer
 		float radius = (float)((Cylinder3d)primitive).getRadius();
 		float height = (float)((Cylinder3d)primitive).getHeight();
 		
-		cylinder = new Cylinder(30, 30, radius, height, true);
+		// Height *2 for same Scale like a box or sphere
+		cylinder = new Cylinder(30, 30, radius, height*2, true);
 
 		geo = new Geometry(identifier, cylinder);
 

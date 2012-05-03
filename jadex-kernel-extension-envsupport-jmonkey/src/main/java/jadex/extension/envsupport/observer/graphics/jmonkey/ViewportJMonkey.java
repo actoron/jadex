@@ -1,6 +1,7 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
 import jadex.extension.envsupport.environment.SpaceObject;
+import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.AbstractViewport3d;
@@ -52,7 +53,6 @@ import com.jme3.system.JmeCanvasContext;
  */
 /**
  * @author 7willuwe
- *
  */
 public class ViewportJMonkey extends AbstractViewport3d
 {
@@ -103,6 +103,8 @@ public class ViewportJMonkey extends AbstractViewport3d
 	/** The overal scale for the Application */
 	private final static int				_scaleApp		= 100;
 
+	private boolean							_isGrid			= false;
+
 	/** The 3d renderers. */
 	private static final IJMonkeyRenderer[]	RENDERERS		= new IJMonkeyRenderer[10];
 	static
@@ -133,9 +135,8 @@ public class ViewportJMonkey extends AbstractViewport3d
 		Thread.currentThread().setContextClassLoader(classloader);
 
 		_classloader = classloader;
-		_scale = _scaleApp / areaSize_.getXAsFloat();
 
-		_app = new MonkeyApp(_scale);
+		_app = new MonkeyApp();
 
 		AppSettings settings = new AppSettings(true);
 
@@ -159,7 +160,7 @@ public class ViewportJMonkey extends AbstractViewport3d
 			public Object call()
 			{
 				_scale = _scaleApp / areaSize_.getXAsFloat();
-				_app.setScale(_scale);
+				_app.setSpaceSize(areaSize_.getXAsFloat(), _isGrid);
 
 				if(_firstrun)
 				{
@@ -355,28 +356,25 @@ public class ViewportJMonkey extends AbstractViewport3d
 			{
 				_selectedObj = sobj;
 			}
-
+			
 			Object posObj = SObjectInspector.getProperty(sobj, "position");
+			Vector3f position = handleHeightValue(posObj);
+			
+			Vector3Double sizeDrawableD = (Vector3Double)combiner3d.getSize();
+			Vector3f sizeDrawable = new Vector3f(sizeDrawableD.getXAsFloat(), sizeDrawableD.getYAsFloat(), sizeDrawableD.getZAsFloat());
+			//TODO: good solution?
+			sizeDrawable = sizeDrawable.divide(2);
+
 			if(!_drawObjects.contains(identifier))
 			{
 				_drawObjects.add(identifier);
 				Node objectNode = new Node(identifier.toString());
-
-				Vector3f position = handleHeightValue(posObj);
-
-
-				Vector3Double sizeDrawableD = (Vector3Double)combiner3d.getSize();
-				Vector3f sizeDrawable = new Vector3f(sizeDrawableD.getXAsFloat(), sizeDrawableD.getYAsFloat(), sizeDrawableD.getZAsFloat());
-
-
 				// Use this distance Vector to calculate the Rotation of the
 				// Object
-				Quaternion quat = calculateRotation(position, objectNode.getLocalTranslation(), rotation3d);
-
-
-				if(quat != null)
-					objectNode.setLocalRotation(quat);
-
+//				Quaternion quat = calculateRotation(position, objectNode.getLocalTranslation(), rotation3d);
+//
+//				if(quat != null)
+//					objectNode.setLocalRotation(quat);
 				objectNode.setLocalScale(sizeDrawable);
 				objectNode.setLocalTranslation(position);
 
@@ -392,11 +390,6 @@ public class ViewportJMonkey extends AbstractViewport3d
 			}
 			else
 			{
-				Vector3f position = handleHeightValue(posObj);
-				Vector3Double sizeDrawableD = (Vector3Double)combiner3d.getSize();
-
-				Vector3f sizeDrawable = new Vector3f(sizeDrawableD.getXAsFloat(), sizeDrawableD.getYAsFloat(), sizeDrawableD.getZAsFloat());
-
 				Spatial node = _geometryNode.getChild(identifier.toString());
 				_tmpNode = (Node)node;
 
@@ -605,6 +598,14 @@ public class ViewportJMonkey extends AbstractViewport3d
 	public void setCapabilities(Collection<Caps> capabilities)
 	{
 		this._capabilities = capabilities;
+	}
+
+
+	@Override
+	public void isGridSpace(boolean isGrid)
+	{
+		_isGrid = isGrid;
+
 	}
 
 }

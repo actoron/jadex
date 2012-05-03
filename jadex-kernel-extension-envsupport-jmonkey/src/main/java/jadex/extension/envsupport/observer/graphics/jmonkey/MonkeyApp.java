@@ -43,6 +43,8 @@ public class MonkeyApp extends SimpleApplication
 	private boolean			_walkCam;
 
 	private float			_areaSize;
+	
+	private float 			_spaceSize;
 
 	private Node			_geometryNode;
 
@@ -57,9 +59,10 @@ public class MonkeyApp extends SimpleApplication
 	
 	private int				 _selectedTarget;
 
-	public MonkeyApp(float areaSize)
+	public MonkeyApp()
 	{
-		_areaSize = areaSize;
+		_areaSize = 100f;
+		_spaceSize = 1f;
 		_geometryNode = new Node("geometryNode");
 		_staticNode = new Node("staticNode");
 		_gridNode = new Node("gridNode");
@@ -74,12 +77,7 @@ public class MonkeyApp extends SimpleApplication
 		// Create the Cam
 		setCam("Default");
 
-		// Create the Grid
-		_gridHandler = new monkeyApp_Grid(_areaSize, assetManager);
-		_gridNode = _gridHandler.getGrid();
 
-
-		this.rootNode.attachChild(_geometryNode);
 		// this.rootNode.attachChild(_gridNode);
 		this.rootNode.attachChild(_staticNode);
 
@@ -225,36 +223,6 @@ public class MonkeyApp extends SimpleApplication
 			cam.setLocation(loc);
 		}
 
-		// for(Spatial spatial : _geometryNode.getChildren())
-		// {
-		// if(spatial instanceof Node)
-		// {
-		// Node objectnode = (Node)spatial;
-		// List<Spatial> spatis = (List<Spatial>)objectnode.getChildren();
-		//
-		// for(Spatial sp : spatis)
-		// {
-		// if(sp instanceof Node)
-		// {
-		// Node obnode = (Node)sp;
-		// Spatial text = (Spatial)obnode.getChild(0);
-		//
-		// if(text instanceof BitmapText)
-		// {
-		// BitmapText txt = (BitmapText)text;
-		// // txt.lookAt(cam.getLocation(), Vector3f.UNIT_Y);
-		//
-		// sp.lookAt(cam.getLocation(), Vector3f.UNIT_Y);
-		//
-		// }
-		// }
-		// }
-		//
-		//
-		// }
-		// }
-
-
 	}
 
 	public Node getGeometry()
@@ -349,11 +317,21 @@ public class MonkeyApp extends SimpleApplication
 			rootNode.attachChild(_terrain);
 		}
 	}
+	
+	private boolean gridCreated =  false;
 
-
-	public void setScale(float scale)
+	public void setSpaceSize(float scale, boolean isGrid)
 	{
-		_areaSize = scale;
+		if(!gridCreated)
+		{
+			_spaceSize = scale;
+			// Create the Grid
+			_gridHandler = new monkeyApp_Grid(_areaSize, _spaceSize, assetManager, isGrid);
+			_gridNode = _gridHandler.getGrid();
+			this.rootNode.attachChild(_geometryNode);
+			gridCreated = true;
+		}
+
 
 	}
 

@@ -163,7 +163,8 @@ public abstract class AbstractJMonkeyRenderer implements IJMonkeyRenderer
 			quatation = sp.getLocalRotation().fromAngles(angles);
 			
 			sp.setLocalScale(sizelocal);
-			sp.setLocalTranslation(positionlocal);
+			//TODO: das kann nicht gut sein oder?
+			sp.setLocalTranslation(positionlocal.mult(2));
 			sp.setLocalRotation(quatation);
 			
 //			 Special Case: 3d-Text
