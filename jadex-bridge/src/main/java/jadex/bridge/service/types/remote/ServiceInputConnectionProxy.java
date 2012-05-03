@@ -6,8 +6,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IOutputConnection;
-import jadex.commons.future.IFuture;
-import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ISubscriptionIntermediateFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
@@ -16,11 +14,17 @@ import jadex.commons.future.ITerminableIntermediateFuture;
  */
 public class ServiceInputConnectionProxy implements IInputConnection
 {
-	/** The original connection. */
+	/** The original connection (not transferred). */
 	protected ServiceOutputConnection con;
 	
 	/** The connection id. */
 	protected int conid;
+	
+	/** The initiator id. */
+	protected IComponentIdentifier	initiator;
+	
+	/** The participant id. */
+	protected IComponentIdentifier	participant;
 	
 	/**
 	 * 
@@ -44,6 +48,8 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	public void setOutputConnection(IOutputConnection ocon)
 	{
 		con.setOutputConnection(ocon);
+		initiator	= ocon.getInitiator();
+		participant	= ocon.getParticipant();
 	}
 	
 	/**
@@ -62,6 +68,42 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	public void setConnectionId(int conid)
 	{
 		this.conid = conid;
+	}
+
+	/**
+	 *  Get the initiator id.
+	 *  @return The initiator id.
+	 */
+	public IComponentIdentifier getInitiator()
+	{
+		return initiator;
+	}
+
+	/**
+	 *  Set the initiator.
+	 *  @param initiator The initiator to set.
+	 */
+	public void setInitiator(IComponentIdentifier initiator)
+	{
+		this.initiator = initiator;
+	}
+
+	/**
+	 *  Get the participant id.
+	 *  @return The participant id.
+	 */
+	public IComponentIdentifier getParticipant()
+	{
+		return participant;
+	}
+
+	/**
+	 *  Set the participant.
+	 *  @param participant The participant to set.
+	 */
+	public void setParticipant(IComponentIdentifier participant)
+	{
+		this.participant = participant;
 	}
 
 	/**
@@ -93,22 +135,6 @@ public class ServiceInputConnectionProxy implements IInputConnection
 	 * 
 	 */
 	public void close()
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * 
-	 */
-	public IComponentIdentifier getInitiator()
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * 
-	 */
-	public IComponentIdentifier getParticipant()
 	{
 		throw new UnsupportedOperationException();
 	}

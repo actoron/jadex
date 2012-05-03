@@ -42,7 +42,6 @@ import jadex.commons.collection.SCollection;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -218,17 +217,17 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 * 
 	 */
-	public IInputConnection getParticipantInputConnection(int conid)
+	public IInputConnection getParticipantInputConnection(int conid, IComponentIdentifier initiator, IComponentIdentifier participant)
 	{
-		return pcons.get(conid)==null? null: (IInputConnection)pcons.get(conid).getConnection();
+		return initInputConnection(conid, initiator, participant);
 	}
 	
 	/**
 	 * 
 	 */
-	public IOutputConnection getParticipantOutputConnection(int conid)
+	public IOutputConnection getParticipantOutputConnection(int conid, IComponentIdentifier initiator, IComponentIdentifier participant)
 	{
-		return pcons.get(conid)==null? null: (IOutputConnection)pcons.get(conid).getConnection();
+		return initOutputConnection(conid, initiator, participant);
 	}
 	
 	/**
@@ -1538,26 +1537,7 @@ public class MessageService extends BasicService implements IMessageService
 				if(type==StreamSendTask.INIT_OUTPUT_INITIATOR)
 				{
 					IComponentIdentifier[] recs = (IComponentIdentifier[])data;
-					InputConnectionHandler ich = new InputConnectionHandler(MessageService.this);
-					final InputConnection con = new InputConnection(recs[0], recs[1], conid, false, ich);
-					pcons.put(new Integer(conid), ich);
-//					System.out.println("created for: "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
-					
-					ich.initReceived();
-					
-					final Future<Void> ret = new Future<Void>();
-					SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-					{
-						public void customResultAvailable(IComponentManagementService cms)
-						{
-							AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(((IComponentIdentifier[])data)[1]);
-							if(component != null)
-							{
-								component.receiveStream(con);
-							}
-						}
-					});
+					initInputConnection(conid, recs[0], recs[1]);
 				}
 				else if(type==StreamSendTask.ACKINIT_OUTPUT_PARTICIPANT)
 				{
@@ -1655,27 +1635,7 @@ public class MessageService extends BasicService implements IMessageService
 				else if(type==StreamSendTask.INIT_INPUT_INITIATOR)
 				{
 					IComponentIdentifier[] recs = (IComponentIdentifier[])data;
-					OutputConnectionHandler och = new OutputConnectionHandler(MessageService.this);
-					final OutputConnection con = new OutputConnection(recs[0], recs[1], conid, false, och);
-					pcons.put(new Integer(conid), och);
-	//				System.out.println("created: "+con.hashCode());
-					
-					och.initReceived();
-					
-					final Future<Void> ret = new Future<Void>();
-					SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
-						.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
-					{
-						public void customResultAvailable(IComponentManagementService cms)
-						{
-							AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(((IComponentIdentifier[])data)[1]);
-							if(component != null)
-							{
-								component.receiveStream(con);
-	//							pcons.put(new Integer(conid), con);
-							}
-						}
-					});
+					initOutputConnection(conid, recs[0], recs[1]);
 				}
 				else if(type==StreamSendTask.ACKINIT_INPUT_PARTICIPANT)
 				{
@@ -2023,6 +1983,107 @@ public class MessageService extends BasicService implements IMessageService
 		timer.schedule(ret, delay);
 		
 		return ret;
+	}
+
+	/**
+	 *  Create local input connection side after receiving a remote init output message.
+	 *  May be called multiple times and does nothing, if connection already exists.
+	 */
+	protected IInputConnection	initInputConnection(final int conid, final IComponentIdentifier initiator, final IComponentIdentifier participant)
+	{
+		boolean	created;
+		InputConnectionHandler ich	= null;
+		InputConnection con	= null;
+		synchronized(this)
+		{
+			ich	= (InputConnectionHandler)pcons.get(new Integer(conid));
+			if(ich==null)
+			{
+				ich = new InputConnectionHandler(MessageService.this);
+				con = new InputConnection(initiator, participant, conid, false, ich);
+				pcons.put(new Integer(conid), ich);
+//				System.out.println("created for: "+conid+" "+pcons+" "+getComponent().getComponentIdentifier());
+				created	= true;
+			}
+			else
+			{
+				con	= ich.getInputConnection();
+				created	= false;
+			}
+		}
+		
+		if(created)
+		{
+			ich.initReceived();
+			
+			final InputConnection	fcon	= con;
+			final Future<Void> ret = new Future<Void>();
+			SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			{
+				public void customResultAvailable(IComponentManagementService cms)
+				{
+					AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(participant);
+					if(component != null)
+					{
+						component.receiveStream(fcon);
+					}
+				}
+			});
+		}
+		
+		return con;
+	}
+
+	/**
+	 *  Create local output connection side after receiving a remote init input message.
+	 *  May be called multiple times and does nothing, if connection already exists.
+	 */
+	protected IOutputConnection	initOutputConnection(final int conid, final IComponentIdentifier initiator, final IComponentIdentifier participant)
+	{
+		boolean	created;
+		OutputConnectionHandler och;
+		OutputConnection con	= null;
+		synchronized(this)
+		{
+			och	= (OutputConnectionHandler) pcons.get(new Integer(conid));
+			if(och==null)
+			{
+				och = new OutputConnectionHandler(MessageService.this);
+				con = new OutputConnection(initiator, participant, conid, false, och);
+				pcons.put(new Integer(conid), och);
+//				System.out.println("created: "+con.hashCode());
+				created	= true;
+			}
+			else
+			{
+				con	= och.getOutputConnection();
+				created	= false;
+			}
+		}
+		
+		if(och!=null)
+		{
+			och.initReceived();
+			
+			final OutputConnection	fcon	= con;
+			final Future<Void> ret = new Future<Void>();
+			SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+			{
+				public void customResultAvailable(IComponentManagementService cms)
+				{
+					AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(participant);
+					if(component != null)
+					{
+						component.receiveStream(fcon);
+	//							pcons.put(new Integer(conid), con);
+					}
+				}
+			});
+		}
+		
+		return con;
 	}
 }
 

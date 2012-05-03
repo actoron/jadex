@@ -5,7 +5,6 @@ import jadex.base.contentcodecs.JadexXMLContentCodec;
 import jadex.base.service.message.InputConnection;
 import jadex.base.service.message.MessageService;
 import jadex.base.service.message.OutputConnection;
-import jadex.base.service.message.transport.codecs.JadexBinaryCodec;
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.base.service.remote.commands.RemoteGetExternalAccessCommand;
 import jadex.base.service.remote.commands.RemoteSearchCommand;
@@ -20,7 +19,6 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.IResourceIdentifier;
-import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
@@ -807,8 +805,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				try
 				{
 					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)object;
-					int conid = icp.getConnectionId();
-					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(conid);
+					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(icp.getConnectionId(), icp.getInitiator(), icp.getParticipant());
 					return icon;
 				}
 				catch(RuntimeException e)
@@ -835,8 +832,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				try
 				{
 					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)object;
-					int conid = ocp.getConnectionId();
-					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(conid);
+					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(ocp.getConnectionId(), ocp.getInitiator(), ocp.getParticipant());
 					return ocon;
 				}
 				catch(RuntimeException e)
@@ -1044,8 +1040,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				try
 				{
 					ServiceInputConnectionProxy icp = (ServiceInputConnectionProxy)context.getLastObject();
-					int conid = icp.getConnectionId();
-					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(conid);
+					IInputConnection icon = ((MessageService)msgservice).getParticipantInputConnection(icp.getConnectionId(), icp.getInitiator(), icp.getParticipant());
 					return icon;
 				}
 				catch(RuntimeException e)
@@ -1068,8 +1063,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 				try
 				{
 					ServiceOutputConnectionProxy ocp = (ServiceOutputConnectionProxy)context.getLastObject();
-					int conid = ocp.getConnectionId();
-					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(conid);
+					IOutputConnection ocon = ((MessageService)msgservice).getParticipantOutputConnection(ocp.getConnectionId(), ocp.getInitiator(), ocp.getParticipant());
 					return ocon;
 				}
 				catch(RuntimeException e)
@@ -1181,8 +1175,8 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 					IComponentIdentifier receiver = ((AbstractRemoteCommand)((EncodingContext)context).getRootObject()).getReceiver();
 					ServiceInputConnectionProxy con = (ServiceInputConnectionProxy)object;
 					OutputConnection ocon = ((MessageService)msgservice).internalCreateOutputConnection(RemoteServiceManagementService.this.component.getComponentIdentifier(), receiver);
-					con.setConnectionId(ocon.getConnectionId());
 					con.setOutputConnection(ocon);
+					con.setConnectionId(ocon.getConnectionId());
 					return con;
 				}
 				catch(RuntimeException e)

@@ -518,6 +518,8 @@ public class ChatService implements IChatService, IChatGuiService
 			TransferInfo	ti	= tup.getFirstEntity();
 			if(TransferInfo.STATE_WAITING.equals(ti.getState()))
 			{
+				ti.setState(TransferInfo.STATE_REJECTED);
+				publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 				tup.getSecondEntity().setException(new RuntimeException(TransferInfo.STATE_REJECTED));
 				ret	= IFuture.DONE;
 			}
@@ -536,6 +538,8 @@ public class ChatService implements IChatService, IChatGuiService
 			TransferInfo	ti	= tup2.getFirstEntity();
 			if(TransferInfo.STATE_WAITING.equals(ti.getState()))
 			{
+				ti.setState(TransferInfo.STATE_REJECTED);
+				publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 				((Future<IOutputConnection>) tup2.getSecondEntity()).setException(new RuntimeException(TransferInfo.STATE_REJECTED));
 				ret	= IFuture.DONE;
 			}

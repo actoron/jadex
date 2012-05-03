@@ -1,12 +1,9 @@
 package jadex.base.service.marshal;
 
 import jadex.base.service.message.InputConnection;
-import jadex.base.service.message.LocalAbstractConnectionHandler;
 import jadex.base.service.message.LocalInputConnectionHandler;
 import jadex.base.service.message.LocalOutputConnectionHandler;
-import jadex.base.service.message.MessageService;
 import jadex.base.service.message.OutputConnection;
-import jadex.base.service.remote.RemoteServiceManagementService;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
@@ -18,7 +15,6 @@ import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
-import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.remote.ServiceInputConnectionProxy;
 import jadex.bridge.service.types.remote.ServiceOutputConnectionProxy;

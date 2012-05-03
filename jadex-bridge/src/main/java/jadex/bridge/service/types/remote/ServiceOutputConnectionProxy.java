@@ -21,6 +21,12 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 	/** The connection id. */
 	protected int conid;
 	
+	/** The initiator id. */
+	protected IComponentIdentifier	initiator;
+	
+	/** The participant id. */
+	protected IComponentIdentifier	participant;
+
 	/**
 	 * 
 	 */
@@ -43,6 +49,8 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 	public void setInputConnection(IInputConnection icon)
 	{
 		con.setInputConnection(icon);
+		initiator	= icon.getInitiator();
+		participant	= icon.getParticipant();
 	}
 	
 	/**
@@ -63,7 +71,41 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 		this.conid = conid;
 	}
 	
-	
+	/**
+	 *  Get the initiator id.
+	 *  @return The initiator id.
+	 */
+	public IComponentIdentifier getInitiator()
+	{
+		return initiator;
+	}
+
+	/**
+	 *  Set the initiator.
+	 *  @param initiator The initiator to set.
+	 */
+	public void setInitiator(IComponentIdentifier initiator)
+	{
+		this.initiator = initiator;
+	}
+
+	/**
+	 *  Get the participant id.
+	 *  @return The participant id.
+	 */
+	public IComponentIdentifier getParticipant()
+	{
+		return participant;
+	}
+
+	/**
+	 *  Set the participant.
+	 *  @param participant The participant to set.
+	 */
+	public void setParticipant(IComponentIdentifier participant)
+	{
+		this.participant = participant;
+	}
 	
 	/**
 	 *  Write the content to the stream.
@@ -100,22 +142,6 @@ public class ServiceOutputConnectionProxy implements IOutputConnection
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * 
-	 */
-	public IComponentIdentifier getInitiator()
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * 
-	 */
-	public IComponentIdentifier getParticipant()
-	{
-		throw new UnsupportedOperationException();
-	}
-	
 	/**
 	 *  Do write all data from the input stream.  
 	 */

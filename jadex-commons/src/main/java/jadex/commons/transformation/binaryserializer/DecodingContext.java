@@ -1,6 +1,5 @@
 package jadex.commons.transformation.binaryserializer;
 
-import jadex.commons.SReflect;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -8,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  * Context for decoding a binary-encoded object.
