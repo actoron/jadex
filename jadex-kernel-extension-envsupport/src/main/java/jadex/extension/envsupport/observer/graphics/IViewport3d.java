@@ -6,6 +6,7 @@ import java.util.List;
 
 
 import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 
@@ -58,6 +59,12 @@ public interface IViewport3d
 	public void startApp();
 	
 	/**
+	 *  Pause the internal 3d Application
+	 * 
+	 */
+	public void pauseApp();
+	
+	/**
 	 *  Stops the internal 3d Application
 	 * 
 	 */
@@ -75,17 +82,16 @@ public interface IViewport3d
 	 * 
 	 * @param areaSize maximum area size.
 	 */
-	public void setAreaSize(IVector2 areaSize);
+	public void setAreaSize(IVector2 vector);
 
 	/** 
 	 * Visuals that are handled as static´s
 	 * 
 	 * @param staticvisuals the Visuals
 	 */
-
 	public void setStaticList(Collection<DrawableCombiner3d> staticvisuals);
 
-	public void pauseApp();
+	public void isGridSpace(boolean isGrid);
 	
 
 }

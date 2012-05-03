@@ -1,6 +1,7 @@
 package jadex.extension.envsupport.observer.graphics;
 
 import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
@@ -29,7 +30,7 @@ public abstract class AbstractViewport3d implements IViewport3d
 	protected boolean			preserveAR_;
 	
 	/** Maximum displayable area */
-	protected Vector2Double		areaSize_;
+	protected IVector2		areaSize_;
 
 	/** Real size of the viewport including padding. */
 	protected Vector2Double		paddedSize_;
@@ -127,53 +128,7 @@ public abstract class AbstractViewport3d implements IViewport3d
 		return size_;
 	}
 
-	/**
-	 * Sets the size of the display area.
-	 * 
-	 * @param size size of the display area, may be padded to preserve aspect
-	 *        ratio
-	 */
-	public void setSize(IVector2 size)
-	{
-		Canvas canvas = canvas_;
-		if (canvas == null)
-			return;
-		
-		if (areaSize_.copy().divide(size).getMean().getAsDouble() > zoomLimit_)
-			return;
-		size_ = new Vector2Double(size);
 
-		double width = 1.0;
-		double height = 1.0;
-		if(preserveAR_)
-		{
-			double sizeAR = size.getXAsDouble() / size.getYAsDouble();
-			double windowAR = (double)canvas.getWidth()
-					/ (double)canvas.getHeight();
-
-			if(sizeAR > windowAR)
-			{
-				width = size.getXAsDouble();
-				//height = size.getXAsDouble() / windowAR;
-				double pixX = width / canvas.getWidth();
-				height = canvas.getHeight() * pixX;
-			}
-			else
-			{
-				//width = size.getYAsDouble() * windowAR;
-				height = size.getYAsDouble();
-				double pixY = height / canvas.getHeight();
-				width = canvas.getWidth() * pixY;
-			}
-		}
-		else
-		{
-			width = size.getXAsDouble();
-			height = size.getYAsDouble();
-		}
-
-		paddedSize_ = new Vector2Double(width, height);
-	}
 	
 	/**
 	 * Gets the maximum displayable size.
@@ -196,13 +151,7 @@ public abstract class AbstractViewport3d implements IViewport3d
 		{
 			public void run()
 			{
-				areaSize_ = new Vector2Double(areaSize);
-				setSize(areaSize.copy());
-
-				if (preserveAR_)
-				{
-					setPosition(paddedSize_.copy().subtract(areaSize_).multiply(0.5).negate());
-				}
+				areaSize_ = areaSize;
 			}
 		});
 	}
@@ -261,12 +210,6 @@ public abstract class AbstractViewport3d implements IViewport3d
 		IVector2 pixSize = getPixelSize();
 		pixPosition_ = position_.copy().divide(pixSize);
 		pixPosition_ = (new Vector2Double(new Vector2Int(pixPosition_))).multiply(pixSize);
-	}
-
-	public void setPreserveAspectRation(boolean preserveAR)
-	{
-		preserveAR_ = preserveAR;
-		setSize(size_);
 	}
 	
 	/**

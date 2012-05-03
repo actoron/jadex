@@ -3,6 +3,7 @@ package jadex.extension.envsupport.observer.perspective;
 import jadex.commons.meta.TypedPropertyObject;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.SpaceObject;
+import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.IVector3;
@@ -124,7 +125,7 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 		viewport3d = null;
 		
 		_markerPrimitive = new Primitive3d(Primitive3d.PRIMITIVE_TYPE_SPHERE, Vector3Double.getVector3(0.0, 0.0, 0.0), Vector3Double.getVector3(0.0,
-				0.0, 0.0), Vector3Double.getVector3(1.0, 1.0, 1.0), new Color(0f, 0f, 1f, 0.1f));
+				0.0, 0.0), Vector3Double.getVector3(1.25, 1.25, 1.25), new Color(0f, 0f, 1f, 0.1f));
 
 	}
 
@@ -267,7 +268,9 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 
 			// TODO alles ok hier?
 			viewport3d.setAreaSize(obscenter.getAreaSize());
-			// viewport3d.addViewportListener(selectioncontroller);
+			boolean isGrid = obscenter.getSpace().getClass().getSimpleName().startsWith("Grid");
+			viewport3d.isGridSpace(isGrid);
+//			// viewport3d.addViewportListener(selectioncontroller);
 		}
 		return viewport3d.getCanvas();
 	}
