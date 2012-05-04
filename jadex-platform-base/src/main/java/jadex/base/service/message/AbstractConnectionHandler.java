@@ -2,10 +2,10 @@ package jadex.base.service.message;
 
 import jadex.base.service.message.MessageService.SendManager;
 import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -346,7 +346,7 @@ public class AbstractConnectionHandler implements IAbstractConnectionHandler
 	{
 		return new StreamSendTask(getMessageType(type), content==null? StreamSendTask.EMPTY_BYTE_ARRAY: content,
 			getConnectionId(), getConnection().isInitiatorSide()? new IComponentIdentifier[]{getConnection().getParticipant()}: new IComponentIdentifier[]{getConnection().getInitiator()}, 
-			getTransports(), usecodecs? getCodecIds(): null, usecodecs? getCodecs(): null, seqnumber);
+			getTransports(), usecodecs? getCodecs(): null, seqnumber);
 	}
 	
 	/**

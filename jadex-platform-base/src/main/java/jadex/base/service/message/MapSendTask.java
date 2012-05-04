@@ -2,10 +2,12 @@ package jadex.base.service.message;
 
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
-import jadex.base.service.message.transport.codecs.ICodec;
+import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.MessageType;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -28,6 +30,9 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	
 	/** The message type. */
 	protected MessageType messagetype;
+	
+	/** The classloader. */
+	protected ClassLoader classloader;
 
 	//-------- constructors --------- 
 
@@ -35,16 +40,15 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 	 *  Create a new manager send task.
 	 */
 	public MapSendTask(Map<String, Object> message, MessageType messagetype, IComponentIdentifier[] receivers, 
-		ITransport[] transports, byte[] codecids, ICodec[] codecs)//, SendManager manager)
+		ITransport[] transports, ICodec[] codecs, ClassLoader classloader)//, SendManager manager)
 	{
-		super(receivers, transports, codecids, codecs);
-		if(codecids==null || codecids.length==0)
-			throw new IllegalArgumentException("Codec ids must not null.");
+		super(receivers, transports, codecs);
 		if(codecs==null || codecs.length==0)
 			throw new IllegalArgumentException("Codecs must not null.");
 		
 		this.message = message;
 		this.messagetype = messagetype;
+		this.classloader = classloader;
 	}
 	
 	//-------- methods used by message service --------
@@ -81,13 +85,7 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 				if(data==null)
 				{
 					MessageEnvelope	envelope = new MessageEnvelope(message, Arrays.asList(receivers),  messagetype.getName());
-					
-					Object enc_msg = envelope;
-					for(int i=0; i<codecs.length; i++)
-					{
-						enc_msg	= codecs[i].encode(enc_msg, getClass().getClassLoader());
-					}
-					data = (byte[])enc_msg;
+					data = createData(envelope, codecs, classloader);
 				}
 			}
 		}
@@ -108,13 +106,74 @@ public class MapSendTask extends AbstractSendTask implements ISendTask
 			{
 				if(prolog==null)
 				{
-					prolog = new byte[2+codecids.length];
-					prolog[0] = MESSAGE_TYPE_MAP;
-					prolog[1] = (byte)codecids.length;
-					System.arraycopy(codecids, 0, prolog, 2, codecids.length);
+					prolog = createProlog(codecids);
 				}
 			}
 		}
 		return prolog;
+	}
+	
+	/**
+	 *  Create prolog data.
+	 */
+	public static byte[] createProlog(byte[] codecids)
+	{
+		byte[] ret = new byte[2+codecids.length];
+		ret[0] = MESSAGE_TYPE_MAP;
+		ret[1] = (byte)codecids.length;
+		System.arraycopy(codecids, 0, ret, 2, codecids.length);
+		return ret;
+	}
+	
+	/**
+	 *  Create the data.
+	 */
+	public static byte[] createData(Object msg, ICodec[] codecs, ClassLoader cl)
+	{
+		Object ret = msg;
+		for(int i=0; i<codecs.length; i++)
+		{
+			ret	= codecs[i].encode(ret, cl);
+		}
+		return (byte[])ret;
+	}
+	
+	/**
+	 *  Encode a message.
+	 */
+	public static byte[] encodeMessage(Object msg, ICodec[] codecs, ClassLoader cl)
+	{
+		byte[] codecids = new byte[codecs.length];
+		for(int i=0; i<codecs.length; i++)
+			codecids[i] = codecs[i].getCodecId();
+		byte[] prolog = createProlog(codecids);
+		byte[] body = createData(msg, codecs, cl);
+		byte[] ret = new byte[prolog.length+body.length];
+		System.arraycopy(prolog, 0, ret, 0, prolog.length);
+		System.arraycopy(body, 0, ret, prolog.length, body.length);
+		return ret;
+	}
+	
+	/**
+	 *  Decode a message.
+	 */
+	public static Object decodeMessage(byte[] rawmsg, Map<Byte, ICodec> codecs, ClassLoader cl)
+	{
+		int	idx	= 0;
+		byte rmt = rawmsg[idx++];
+		byte[] codec_ids = new byte[rawmsg[idx++]];
+		for(int i=0; i<codec_ids.length; i++)
+		{
+			codec_ids[i] = rawmsg[idx++];
+		}
+
+		Object tmp = new ByteArrayInputStream(rawmsg, idx, rawmsg.length-idx);
+		for(int i=codec_ids.length-1; i>-1; i--)
+		{
+			ICodec dec = codecs.get(new Byte(codec_ids[i]));
+			tmp = dec.decode(tmp, cl);
+		}
+		
+		return tmp;
 	}
 }

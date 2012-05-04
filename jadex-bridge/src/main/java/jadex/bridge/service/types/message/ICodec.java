@@ -1,4 +1,4 @@
-package jadex.base.service.message.transport.codecs;
+package jadex.bridge.service.types.message;
 
 /**
  *  Encode and decode an object from a string representation.
@@ -7,6 +7,12 @@ public interface ICodec
 {
 	/** Constant for accessing the codec id. */
 	public static final String CODEC_ID = "CODEC_ID";
+	
+	/**
+	 *  Get the codec id.
+	 *  @return The codec id.
+	 */
+	public byte getCodecId();
 	
 	/**
 	 *  Encode data with the codec.
@@ -23,5 +29,5 @@ public interface ICodec
 	 */
 //	public Object decode(byte[] bytes, ClassLoader classloader);
 	public Object decode(Object bytes, ClassLoader classloader);
-
+	
 }

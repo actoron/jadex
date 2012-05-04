@@ -1,5 +1,6 @@
 package jadex.base.service.message.transport.codecs;
 
+import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.SReflect;
 
 import java.io.IOException;
@@ -30,6 +31,15 @@ public class NuggetsCodec implements ICodec
 	
 	//-------- methods --------
 
+	/**
+	 *  Get the codec id.
+	 *  @return The codec id.
+	 */
+	public byte getCodecId()
+	{
+		return CODEC_ID;
+	}
+	
 	/**
 	 *  Init the static methods.
 	 */

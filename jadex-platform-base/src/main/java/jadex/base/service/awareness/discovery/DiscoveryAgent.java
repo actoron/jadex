@@ -1,13 +1,17 @@
 package jadex.base.service.awareness.discovery;
 
+import jadex.base.service.message.MapSendTask;
+import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.IDiscoveryService;
 import jadex.bridge.service.types.awareness.IAwarenessManagementService;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -18,6 +22,7 @@ import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentArgument;
 import jadex.micro.annotation.AgentBody;
+import jadex.micro.annotation.AgentCreated;
 import jadex.micro.annotation.AgentKilled;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
@@ -34,6 +39,7 @@ import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
 import java.net.DatagramPacket;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -106,26 +112,45 @@ public abstract class DiscoveryAgent
 	
 //	/** The classloader. */
 //	protected ClassLoader classloader;
+	
+	/** The default codecs. */
+	protected ICodec[] defaultcodecs;
+	
+	/** The map of all codecs. */
+	protected Map<Byte, ICodec> allcodecs;
 
 	//-------- methods --------
 	
-//	@AgentCreated
-//	public IFuture<Void> agentCreated()
-//	{
-//		final Future<Void> ret = new Future<Void>();
-//		
-//		SServiceProvider.getServiceUpwards(agent.getServiceProvider(), ILibraryService.class)
-//			.addResultListener(new ExceptionDelegationResultListener<ILibraryService, Void>(ret)
-//		{
-//			public void customResultAvailable(ILibraryService result)
-//			{
-//				classloader = result.getClassLoader(getMicroAgent().getModel().getResourceIdentifier());
-//				ret.setResult(null);
-//			}	
-//		});
-//		
-//		return ret;
-//	}
+	@AgentCreated
+	public IFuture<Void> agentCreated()
+	{
+		final Future<Void> ret = new Future<Void>();
+		
+		SServiceProvider.getServiceUpwards(agent.getServiceProvider(), IMessageService.class)
+			.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IMessageService, Void>(ret)
+		{
+			public void customResultAvailable(final IMessageService msgser)
+			{
+				msgser.getDefaultCodecs().addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<ICodec[], Void>(ret)
+				{
+					public void customResultAvailable(ICodec[] result)
+					{
+						defaultcodecs = result;
+						msgser.getAllCodecs().addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<Map<Byte, ICodec>, Void>(ret)
+						{
+							public void customResultAvailable(Map<Byte, ICodec> result)
+							{
+								allcodecs = result;
+							}
+						}));
+					}
+				}));
+				ret.setResult(null);
+			}	
+		}));
+		
+		return ret;
+	}
 	
 	/**
 	 *  Execute the functional body of the agent.
@@ -429,10 +454,11 @@ public abstract class DiscoveryAgent
 	 *  @param object The object.
 	 *  @return The byte array.
 	 */
-	public static byte[] encodeObject(Object object, ClassLoader classloader)
+	public static byte[] encodeObject(Object object, ICodec[] codecs, ClassLoader classloader)
 	{
-		return GZIPCodec.encodeBytes(JavaWriter.objectToByteArray(object, 
-			classloader), classloader);
+		return MapSendTask.encodeMessage(object, codecs, classloader);
+//		return GZIPCodec.encodeBytes(JavaWriter.objectToByteArray(object, 
+//			classloader), classloader);
 	}
 	
 	/**
@@ -440,26 +466,46 @@ public abstract class DiscoveryAgent
 	 *  @param data The byte array.
 	 *  @return The object.
 	 */
-	public static Object decodeObject(byte[] data, ClassLoader classloader)
+	public static Object decodeObject(byte[] data, Map<Byte, ICodec> codecs, ClassLoader classloader)
 	{
-		return JavaReader.objectFromByteArray(GZIPCodec.decodeBytes(data, 
-			classloader), classloader);
+		System.out.println("size: "+data.length);
+		return MapSendTask.decodeMessage(data, codecs, classloader);
+//		return JavaReader.objectFromByteArray(GZIPCodec.decodeBytes(data, 
+//			classloader), classloader);
 //		return Reader.objectFromByteArray(reader, GZIPCodec.decodeBytes(data, 
 //			classloader), classloader);
 	}
 	
+//	/**
+//	 *  Decode a datagram packet.
+//	 *  @param sent The byte array.
+//	 *  @return The object.
+//	 */
+//	public static Object decodePacket(DatagramPacket pack, ClassLoader classloader)
+//	{
+//		byte[] data = new byte[pack.getLength()];
+//		System.arraycopy(pack.getData(), 0, data, 0, pack.getLength());
+//		return decodeObject(data, classloader);
+//	}
+	
 	/**
-	 *  Decode a datagram packet.
-	 *  @param sent The byte array.
-	 *  @return The object.
+	 *  Get the allcodecs.
+	 *  @return the allcodecs.
 	 */
-	public static Object decodePacket(DatagramPacket pack, ClassLoader classloader)
+	public Map<Byte, ICodec> getAllCodecs()
 	{
-		byte[] data = new byte[pack.getLength()];
-		System.arraycopy(pack.getData(), 0, data, 0, pack.getLength());
-		return decodeObject(data, classloader);
+		return allcodecs;
 	}
 	
+	/**
+	 *  Get the defaultcodecs.
+	 *  @return the defaultcodecs.
+	 */
+	public ICodec[] getDefaultCodecs()
+	{
+		return defaultcodecs;
+	}
+
 	/**
 	 *  Create awareness info of myself.
 	 */

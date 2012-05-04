@@ -1,5 +1,6 @@
 package jadex.base.service.message.transport.codecs;
 
+import jadex.bridge.service.types.message.ICodec;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
@@ -24,6 +25,15 @@ public class JadexXMLCodec implements ICodec
 	protected boolean DEBUG = false;
 	
 	//-------- methods --------
+	
+	/**
+	 *  Get the codec id.
+	 *  @return The codec id.
+	 */
+	public byte getCodecId()
+	{
+		return CODEC_ID;
+	}
 	
 	/**
 	 *  Encode an object.

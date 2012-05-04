@@ -1,5 +1,6 @@
 package jadex.base.service.message.transport.codecs;
 
+import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.ObjectInputStream;
 
 import java.io.ByteArrayInputStream;
@@ -24,6 +25,15 @@ public class SerialCodec implements ICodec
 
 	//-------- methods --------
 
+	/**
+	 *  Get the codec id.
+	 *  @return The codec id.
+	 */
+	public byte getCodecId()
+	{
+		return CODEC_ID;
+	}
+	
 	/**
 	 *  Encode data with the codec.
 	 *  @param val The value.

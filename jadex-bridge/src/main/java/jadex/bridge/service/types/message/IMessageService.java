@@ -85,7 +85,7 @@ public interface IMessageService extends IService
 	 *  @param codec The codec type.
 	 */
 	public IFuture<Void> removeMessageCodec(Class codec);
-
+	
 	/**
 	 *  Update component identifier with current addresses.
 	 *  @param cid The component identifier.
@@ -113,4 +113,16 @@ public interface IMessageService extends IService
 	 */
 	@Excluded
 	public MessageType getMessageType(String type);
+	
+	/**
+	 *  Get the codecs with message codecs.
+	 *  @return The codec factory.
+	 */
+	public IFuture<Map<Byte, ICodec>> getAllCodecs();
+	
+	/**
+	 *  Get the default codecs.
+	 *  @return The default codecs.
+	 */
+	public IFuture<ICodec[]> getDefaultCodecs();
 }

@@ -4,7 +4,6 @@ import jadex.base.AbstractComponentAdapter;
 import jadex.base.service.message.transport.ITransport;
 import jadex.base.service.message.transport.MessageEnvelope;
 import jadex.base.service.message.transport.codecs.CodecFactory;
-import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.ContentException;
@@ -28,6 +27,7 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.library.ILibraryService;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.IContentCodec;
 import jadex.bridge.service.types.message.IMessageListener;
 import jadex.bridge.service.types.message.IMessageService;
@@ -566,7 +566,7 @@ public class MessageService extends BasicService implements IMessageService
 			SendManager tm = (SendManager)it.next();
 			IComponentIdentifier[] recs = (IComponentIdentifier[])managers.getCollection(tm).toArray(new IComponentIdentifier[0]);
 			
-			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), cids, codecs);
+			MapSendTask task = new MapSendTask(msgcopy, type, recs, getTransports(), codecs, cl);
 			tm.addMessage(task).addResultListener(crl);
 //			task.getSendManager().addMessage(task).addResultListener(crl);
 		}
@@ -691,6 +691,24 @@ public class MessageService extends BasicService implements IMessageService
 //	{
 //		delivermsg.addMessage(new MessageEnvelope(msg, Arrays.asList(receivers), type));
 //	}
+	
+	/**
+	 *  Get the codecs with message codecs.
+	 *  @return The codec factory.
+	 */
+	public IFuture<Map<Byte, ICodec>> getAllCodecs()
+	{
+		return new Future<Map<Byte, ICodec>>(getCodecFactory().getAllCodecs());
+	}
+	
+	/**
+	 *  Get the default codecs.
+	 *  @return The default codecs.
+	 */
+	public IFuture<ICodec[]> getDefaultCodecs()
+	{
+		return new Future<ICodec[]>(getCodecFactory().getDefaultCodecs());
+	}
 	
 	/**
 	 *  Deliver a message to the intended components. Called from transports.
@@ -1777,22 +1795,23 @@ public class MessageService extends BasicService implements IMessageService
 			}
 			else
 			{
-				byte[]	rawmsg	= (byte[])obj;
-				int	idx	= 0;
-				byte rmt = rawmsg[idx++];
-				byte[] codec_ids = new byte[rawmsg[idx++]];
-				for(int i=0; i<codec_ids.length; i++)
-				{
-					codec_ids[i] = rawmsg[idx++];
-				}
-		
-				Object tmp = new ByteArrayInputStream(rawmsg, idx, rawmsg.length-idx);
-				for(int i=codec_ids.length-1; i>-1; i--)
-				{
-					ICodec dec = codecfactory.getCodec(codec_ids[i]);
-					tmp = dec.decode(tmp, classloader);
-				}
-				me	= (MessageEnvelope)tmp;
+				me = (MessageEnvelope)MapSendTask.decodeMessage((byte[])obj, codecfactory.getAllCodecs(), classloader);
+//				byte[]	rawmsg	= (byte[])obj;
+//				int	idx	= 0;
+//				byte rmt = rawmsg[idx++];
+//				byte[] codec_ids = new byte[rawmsg[idx++]];
+//				for(int i=0; i<codec_ids.length; i++)
+//				{
+//					codec_ids[i] = rawmsg[idx++];
+//				}
+//		
+//				Object tmp = new ByteArrayInputStream(rawmsg, idx, rawmsg.length-idx);
+//				for(int i=codec_ids.length-1; i>-1; i--)
+//				{
+//					ICodec dec = codecfactory.getCodec(codec_ids[i]);
+//					tmp = dec.decode(tmp, classloader);
+//				}
+//				me	= (MessageEnvelope)tmp;
 			}
 		
 			final Map<String, Object> msg	= me.getMessage();

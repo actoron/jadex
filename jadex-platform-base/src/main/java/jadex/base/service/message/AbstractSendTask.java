@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 import jadex.base.service.message.transport.ITransport;
-import jadex.base.service.message.transport.codecs.ICodec;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.MessageFailureException;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.commons.IResultCommand;
 import jadex.commons.SUtil;
@@ -64,13 +64,17 @@ public abstract class AbstractSendTask implements ISendTask
 	 *  Create a new task.
 	 */
 	public AbstractSendTask(IComponentIdentifier[] receivers, 
-		ITransport[] transports, byte[] codecids, ICodec[] codecs)
+		ITransport[] transports, ICodec[] codecs)
 	{
 		for(int i=0; i<receivers.length; i++)
 		{
 			if(receivers[i].getAddresses()==null)
 				throw new IllegalArgumentException("Addresses must not null");
 		}
+		
+		codecids = new byte[codecs.length];
+		for(int i=0; i<codecs.length; i++)
+			codecids[i] = codecs[i].getCodecId();
 		
 		this.receivers = receivers;
 		this.transports = new ArrayList<ITransport>(Arrays.asList(transports));

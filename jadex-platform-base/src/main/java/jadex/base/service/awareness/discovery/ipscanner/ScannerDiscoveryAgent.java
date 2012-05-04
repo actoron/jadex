@@ -203,7 +203,7 @@ public class ScannerDiscoveryAgent extends MasterSlaveDiscoveryAgent
 							{
 								InetAddress address = SUtil.getInetAddress();
 //								byte[] data = DiscoveryState.encodeObject(info, getMicroAgent().getModel().getClassLoader());
-								byte[] data = DiscoveryAgent.encodeObject(info, getMicroAgent().getClassLoader());
+								byte[] data = DiscoveryAgent.encodeObject(info, getDefaultCodecs(), getMicroAgent().getClassLoader());
 								((ScannerSendHandler)sender).send(data, address, port);
 							}
 							

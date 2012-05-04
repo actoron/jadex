@@ -1,6 +1,8 @@
 package jadex.base.service.message.transport.codecs;
 
 /* $if !android $ */
+import jadex.bridge.service.types.message.ICodec;
+
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -30,6 +32,15 @@ public class XMLCodec implements ICodec
 	public static final byte CODEC_ID = 3;
 
 	//-------- methods --------
+	
+	/**
+	 *  Get the codec id.
+	 *  @return The codec id.
+	 */
+	public byte getCodecId()
+	{
+		return CODEC_ID;
+	}
 	
 	/**
 	 *  Encode an object.

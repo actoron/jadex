@@ -1,8 +1,13 @@
 package jadex.base.service.message.transport.codecs;
 
+import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.collection.SCollection;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -25,6 +30,10 @@ public class CodecFactory
 
 	/** The default codec id. */
 	protected byte[] default_ids; 
+	
+	/** The default codecs. */
+	protected ICodec[] default_codecs; 
+
 	
 	//-------- constructors --------
 
@@ -61,6 +70,7 @@ public class CodecFactory
 		}
 		for(int i=0; i<codecs.length; i++)
 		{
+			// Add codec classes
 			addCodec(codecs[i]);
 		}
 		
@@ -123,6 +133,47 @@ public class CodecFactory
 		return ret;
 	}
 
+	/**
+	 *  Get all codecs.
+	 */
+	public Map<Byte, ICodec> getAllCodecs()
+	{
+		Map<Byte, ICodec> ret = new HashMap<Byte, ICodec>();
+		
+		for(Iterator<Byte> it = codecclasses.keySet().iterator(); it.hasNext(); )
+		{
+			Byte id = it.next();
+			ret.put(id, getCodec(id.byteValue()));
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 *  Get the default codecs.
+	 *  @return The default codecs.
+	 */
+	public ICodec[] getDefaultCodecs()
+	{
+		if(default_codecs==null)
+		{
+			synchronized(this)
+			{
+				if(default_codecs==null)
+				{
+					byte[] defids = getDefaultCodecIds();
+					default_codecs = new ICodec[defids.length];
+					for(int i=0; i<defids.length; i++)
+					{
+						default_codecs[i] = getCodec(defids[i]);
+					}
+				}
+			}
+		}
+		
+		return default_codecs;
+	}
+	
 	/**
 	 *  Set the default decoder/encoder id. 
 	 *  @param id The id.

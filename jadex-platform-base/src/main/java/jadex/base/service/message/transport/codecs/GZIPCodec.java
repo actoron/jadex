@@ -1,5 +1,6 @@
 package jadex.base.service.message.transport.codecs;
 
+import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.SUtil;
 
 import java.io.ByteArrayInputStream;
@@ -25,6 +26,15 @@ public class GZIPCodec implements ICodec
 	 */
 	public GZIPCodec()
 	{
+	}
+	
+	/**
+	 *  Get the codec id.
+	 *  @return The codec id.
+	 */
+	public byte getCodecId()
+	{
+		return CODEC_ID;
 	}
 	
 	/**
