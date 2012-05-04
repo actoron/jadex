@@ -6,6 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
+import jadex.commons.transformation.annotations.Classname;
 import jadex.extension.envsupport.environment.AbstractTask;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
@@ -102,6 +103,7 @@ public class MoveTask extends AbstractTask {
 		final Set objects = ((Space2D) space).getNearObjects((IVector2) obj.getProperty(Space2D.PROPERTY_POSITION), new Vector1Double(vision));
 		if (objects != null) {
 			agent.scheduleStep(new IComponentStep<Void>() {
+				@Classname("add")
 				public IFuture<Void> execute(IInternalAccess ia) {
 					IBDIInternalAccess bia = (IBDIInternalAccess) ia;
 					for (Iterator it = objects.iterator(); it.hasNext();) {
