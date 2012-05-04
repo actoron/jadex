@@ -559,7 +559,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 							msg.put(SFipa.RECEIVERS, new IComponentIdentifier[]{receiver});
 							msg.put(SFipa.CONVERSATION_ID, callid);
 							
-							getResourceIdentifier(ia.getServiceContainer(), (AbstractRemoteCommand)content)
+							getResourceIdentifier(ia.getServiceContainer(), ((AbstractRemoteCommand)content).getSender())
 								.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IResourceIdentifier, Object>(future)
 							{
 								public void customResultAvailable(IResourceIdentifier rid)
@@ -1227,7 +1227,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	/**
 	 * 
 	 */
-	protected static IFuture<IResourceIdentifier> getResourceIdentifier(IServiceProvider provider, AbstractRemoteCommand command)
+	protected static IFuture<IResourceIdentifier> getResourceIdentifier(IServiceProvider provider, final IComponentIdentifier sender)
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
 		ret.addResultListener(new IResultListener<IResourceIdentifier>()
@@ -1241,20 +1241,23 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			}
 		});
 		
-		final IComponentIdentifier realrec = ((AbstractRemoteCommand)command).getSender();
-		if(realrec!=null)
+		if(sender!=null)
 		{
 			SServiceProvider.getServiceUpwards(provider, IComponentManagementService.class)
 				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IResourceIdentifier>(ret)
 			{
 				public void customResultAvailable(IComponentManagementService cms) 
 				{
-					cms.getComponentDescription(realrec).addResultListener(new ExceptionDelegationResultListener<IComponentDescription, IResourceIdentifier>(ret)
+					cms.getComponentDescription(sender).addResultListener(new ExceptionDelegationResultListener<IComponentDescription, IResourceIdentifier>(ret)
 					{
 						public void customResultAvailable(IComponentDescription result) 
 						{
 							ret.setResult(result.getResourceIdentifier());
 						};
+						public void exceptionOccurred(Exception exception)
+						{
+							super.exceptionOccurred(exception);
+						}
 					});
 				}
 			});

@@ -468,7 +468,7 @@ public abstract class DiscoveryAgent
 	 */
 	public static Object decodeObject(byte[] data, Map<Byte, ICodec> codecs, ClassLoader classloader)
 	{
-		System.out.println("size: "+data.length);
+//		System.out.println("size: "+data.length);
 		return MapSendTask.decodeMessage(data, codecs, classloader);
 //		return JavaReader.objectFromByteArray(GZIPCodec.decodeBytes(data, 
 //			classloader), classloader);

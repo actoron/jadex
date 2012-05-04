@@ -231,13 +231,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 //		if("addMessageListener".equals(methodname))
 //			System.out.println("remote addMessageListener");
 		
-		IComponentIdentifier tmp = null;
-		Object ti = getRemoteReference().getTargetIdentifier();
-		if(ti instanceof IComponentIdentifier)
-			tmp = (IComponentIdentifier)ti;
-		else if(ti instanceof IServiceIdentifier)
-			tmp = ((IServiceIdentifier)ti).getProviderId();
-		final IComponentIdentifier ridcom = tmp;
+		final IComponentIdentifier ridcom = getRealReceiver();
 		
 		try
 		{
@@ -480,6 +474,22 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	public IComponentIdentifier getSender()
 	{
 		return caller;
+	}
+	
+	/**
+	 *  Get the real receiver (other than rms).
+	 *  @return the real receiver.
+	 */
+	public IComponentIdentifier getRealReceiver()
+	{
+		IComponentIdentifier ret = null;
+		Object ti = getRemoteReference().getTargetIdentifier();
+		if(ti instanceof IComponentIdentifier)
+			ret = (IComponentIdentifier)ti;
+		else if(ti instanceof IServiceIdentifier)
+			ret = ((IServiceIdentifier)ti).getProviderId();
+		
+		return ret;
 	}
 	
 	/**

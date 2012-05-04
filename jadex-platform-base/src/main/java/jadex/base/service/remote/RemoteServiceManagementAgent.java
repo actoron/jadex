@@ -132,6 +132,8 @@ public class RemoteServiceManagementAgent extends MicroAgent
 //		System.out.println("RMS received message: (sender)"+SUtil.arrayToString(((IComponentIdentifier)msg.get(SFipa.SENDER)).getAddresses()));
 //		System.out.println("RMS own addresses: (rec)"+SUtil.arrayToString(getComponentIdentifier().getAddresses()));
 		
+		final IResourceIdentifier[] rid = new IResourceIdentifier[1];
+		
 		if(SFipa.MESSAGE_TYPE_NAME_FIPA.equals(mt.getName()))
 		{
 			getServiceContainer().searchService(ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM)
@@ -204,9 +206,17 @@ public class RemoteServiceManagementAgent extends MicroAgent
 						{
 							public void resultAvailable(Void result)
 							{
-//								System.out.println("Command valid: "+com);
-								com.execute((IMicroExternalAccess)getExternalAccess(), rms)
-									.addResultListener(createResultListener(new IntermediateDelegationResultListener<IRemoteCommand>(reply)));
+								RemoteServiceManagementService.getResourceIdentifier(getServiceProvider(), ((AbstractRemoteCommand)com).getRealReceiver())
+									.addResultListener(new DefaultResultListener<IResourceIdentifier>()
+								{
+									public void resultAvailable(final IResourceIdentifier srid) 
+									{
+										rid[0] = srid;
+//										System.out.println("Command valid: "+com);
+										com.execute((IMicroExternalAccess)getExternalAccess(), rms)
+											.addResultListener(createResultListener(new IntermediateDelegationResultListener<IRemoteCommand>(reply)));
+									}
+								});
 							}
 							
 							public void exceptionOccurred(Exception exception)
@@ -264,32 +274,25 @@ public class RemoteServiceManagementAgent extends MicroAgent
 								{
 									public void resultAvailable(Void v)
 									{
-										RemoteServiceManagementService.getResourceIdentifier(getServiceProvider(), (AbstractRemoteCommand)result)
-											.addResultListener(new DefaultResultListener<IResourceIdentifier>()
+										createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener<Map<String, Object>>()
 										{
-											public void resultAvailable(final IResourceIdentifier rid) 
+											public void resultAvailable(Map<String, Object> reply)
 											{
-												createReply(msg, mt).addResultListener(createResultListener(new DefaultResultListener<Map<String, Object>>()
+												if(rid[0]!=null)
 												{
-													public void resultAvailable(Map<String, Object> reply)
-													{
-														if(rid!=null)
-														{
-//															System.out.println("rid: "+rid+" "+result.getClass());
-															reply.put(SFipa.X_RID, rid);
-														}
-//														else
-//														{
-//															System.out.println("no rid: "+result.getClass());
-//														}
-														reply.put(SFipa.CONTENT, result);
-//														System.out.println("content: "+result);
-//														System.out.println("reply: "+callid);
-														sendMessage(reply, mt);
-													}
-												}));
-											};
-										});
+//													System.out.println("rid: "+rid+" "+result.getClass());
+													reply.put(SFipa.X_RID, rid[0]);
+												}
+//												else
+//												{
+//													System.out.println("no rid: "+result.getClass());
+//												}
+												reply.put(SFipa.CONTENT, result);
+//												System.out.println("content: "+result);
+//												System.out.println("reply: "+callid);
+												sendMessage(reply, mt);
+											}
+										}));
 									}
 								});
 							}

@@ -4,6 +4,7 @@ import jadex.base.service.remote.IRemoteCommand;
 import jadex.base.service.remote.RemoteReferenceModule;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.ServiceNotFoundException;
 import jadex.bridge.service.types.security.DefaultAuthorizable;
@@ -86,9 +87,17 @@ public abstract class AbstractRemoteCommand	extends DefaultAuthorizable	implemen
 	
 	/**
 	 *  Get the sender component (if other than rms).
-	 *  @return the real receiver.
 	 */
 	public IComponentIdentifier getSender()
+	{
+		return null;
+	}
+	
+	/**
+	 *  Get the real receiver (other than rms).
+	 *  @return the real receiver.
+	 */
+	public IComponentIdentifier getRealReceiver()
 	{
 		return null;
 	}
