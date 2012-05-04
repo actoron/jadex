@@ -1871,8 +1871,11 @@ public class MessageService extends BasicService implements IMessageService
 												}
 												catch(Exception e)
 												{
-													ContentException ce = new ContentException(new String((byte[])value), e);
-													message.put(name, ce);
+													if(!(e instanceof ContentException))
+													{
+														e = new ContentException(new String((byte[])value), e);
+													}
+													message.put(name, e);
 												}
 											}
 										}

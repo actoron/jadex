@@ -46,7 +46,6 @@ import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.LRU;
 import jadex.commons.concurrent.TimeoutException;
-import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -1250,9 +1249,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 			{
 				public void customResultAvailable(IComponentManagementService cms) 
 				{
-					cms.getComponentDescription(realrec).addResultListener(new DefaultResultListener<IComponentDescription>()
+					cms.getComponentDescription(realrec).addResultListener(new ExceptionDelegationResultListener<IComponentDescription, IResourceIdentifier>(ret)
 					{
-						public void resultAvailable(IComponentDescription result) 
+						public void customResultAvailable(IComponentDescription result) 
 						{
 							ret.setResult(result.getResourceIdentifier());
 						};
