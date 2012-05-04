@@ -56,13 +56,16 @@ public class UserAgent
 			{
 				final int cmpcnt = 5;
 				final int rescnt = 5;
+				final int testcnt = 8;
 				final List<TestReport> reports = new ArrayList<TestReport>();
 				
-				CounterResultListener<Void> endlis = new CounterResultListener<Void>(8, new IResultListener<Void>()
+				CounterResultListener<Void> endlis = new CounterResultListener<Void>(testcnt, new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
-						agent.setResultValue("testresults", new Testcase(8, reports.toArray(new TestReport[reports.size()])));
+						System.out.println("countlis: "+agent.isComponentThread());
+						
+						agent.setResultValue("testresults", new Testcase(testcnt, reports.toArray(new TestReport[reports.size()])));
 						ret.setResult(null);
 					}
 
@@ -109,7 +112,6 @@ public class UserAgent
 				ser.getItems4(rescnt).addResultListener(new CustomResultListener<Collection<String>>(tr, cmpcnt*rescnt, endlis));
 			}	
 		});
-		
 
 		return ret;
 	}

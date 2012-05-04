@@ -149,4 +149,10 @@ public interface IInternalAccess
 //	 *  Wait for some time and execute a component step afterwards.
 //	 */
 //	public IFuture waitForImmediate(long delay, IComponentStep step);
+
+	/**
+	 *  Test if current thread is the component thread.
+	 *  @return True if the current thread is the component thread.
+	 */
+	public boolean isComponentThread();
 }

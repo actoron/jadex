@@ -1585,5 +1585,4 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	{
 		return model.getClassLoader();
 	}
-	
 }

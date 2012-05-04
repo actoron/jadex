@@ -1031,6 +1031,15 @@ public class CapabilityFlyweight extends ElementFlyweight implements ICapability
 		}
 	}
 	
+	/**
+	 *  Test if current thread is the component thread.
+	 *  @return True if the current thread is the component thread.
+	 */
+	public boolean isComponentThread()
+	{
+		return !getInterpreter().getComponentAdapter().isExternalThread();
+	}
+	
 //	/**
 //	 *  Get a required service.
 //	 *  @return The service.

@@ -1780,4 +1780,12 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		return ret;
 	}
 	
+	/**
+	 *  Test if current thread is the component thread.
+	 *  @return True if the current thread is the component thread.
+	 */
+	public boolean isComponentThread()
+	{
+		return !getComponentAdapter().isExternalThread();
+	}
 }

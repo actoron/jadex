@@ -560,5 +560,8 @@ public class AndroidSettingsServiceTest extends TestCase {
 			return null;
 		}
 
+		public boolean isComponentThread() {
+			return true;
+		}
 	}
 }

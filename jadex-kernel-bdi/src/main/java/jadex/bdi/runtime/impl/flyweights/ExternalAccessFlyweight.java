@@ -609,4 +609,13 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		
 		return ret;
 	}
+	
+	/**
+	 *  Test if current thread is external thread.
+	 *  @return True if the current thread is not the component thread.
+	 */
+	public boolean isExternalThread()
+	{
+		return getInterpreter().getAgentAdapter().isExternalThread();
+	}
 }

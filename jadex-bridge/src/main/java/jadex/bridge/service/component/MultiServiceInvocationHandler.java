@@ -62,6 +62,8 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 	 */
 	public Object invoke(Object proxy, Method method, final Object[] args) throws Throwable
 	{
+//		System.out.println("invoke: "+Thread.currentThread());
+		
 		Object gret;
 		Class<?> rettype = method.getReturnType();
 		
@@ -226,6 +228,7 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		 */
 		public void intermediateResultAvailable(T result)
 		{
+//			System.out.println("service found: "+Thread.currentThread()+" "+agent.isComponentThread());
 			// Found service -> invoke method
 			try
 			{
@@ -239,15 +242,22 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 						{
 							public void intermediateResultAvailable(Object result)
 							{
+								if(!agent.isComponentThread())
+									Thread.dumpStack();
+								
+//								System.out.println("ser iresult: "+agent.isComponentThread());
 								addResult(result);
 							}
 							public void finished()
 							{
+//								System.out.println("ser fini: "+agent.isComponentThread());
 								call.setResult(null);
 //								opencalls.remove(call);
 							}
 							public void resultAvailable(Collection<Object> result)
 							{
+//								System.out.println("ser resulta: "+agent.isComponentThread());
+
 								for(Iterator<Object> it=result.iterator(); it.hasNext(); )
 								{
 									addResult(result);
@@ -257,7 +267,7 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 							}
 							public void exceptionOccurred(Exception exception)
 							{
-								System.out.println("ex: "+exception);
+//								System.out.println("ex: "+exception);
 								call.setResult(null);
 //								opencalls.remove(call);
 							}
@@ -272,13 +282,15 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 						{
 							public void resultAvailable(Object result)
 							{
+//								System.out.println("ser resultb: "+agent.isComponentThread());
+								
 								addResult(result);
 								call.setResult(null);
 //								opencalls.remove(this);
 							}
 							public void exceptionOccurred(Exception exception)
 							{
-								System.out.println("ex: "+exception);
+//								System.out.println("ex: "+exception);
 								call.setResult(null);
 //								opencalls.remove(this);
 							}
@@ -307,12 +319,15 @@ public class MultiServiceInvocationHandler implements InvocationHandler
 		 */
 		public void finished()
 		{
+//			System.out.println("fin: "+Thread.currentThread()+" "+agent.isComponentThread());
 			if(calls.size()>0)
 			{
 				CounterResultListener<Void> lis = new CounterResultListener<Void>(calls.size(), true, new IResultListener<Void>()
 				{
 					public void resultAvailable(Void result)
 					{
+//						System.out.println("countlis1: "+agent.isComponentThread());
+
 						setFinished();
 					}
 

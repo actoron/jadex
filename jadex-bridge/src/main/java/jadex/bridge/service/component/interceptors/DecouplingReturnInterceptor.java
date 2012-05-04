@@ -59,7 +59,7 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 				{
 					FutureFunctionality func = new FutureFunctionality()
 					{
-						public IFuture<Void> notifyListener(IResultListener listener) 
+						public IFuture<Void> notifyListener(final IResultListener listener)
 						{
 							final Future<Void> ret = new Future<Void>();
 							// Hack!!! Notify multiple listeners at once?
@@ -92,37 +92,12 @@ public class DecouplingReturnInterceptor extends AbstractApplicableInterceptor
 							return ret;
 						};
 						
-						public IFuture<Void> notifyIntermediateResult(IIntermediateResultListener<Object> listener, Object result)
+						/**
+						 *  For intermediate results this method is called.
+						 */
+						public IFuture<Void> startScheduledNotifications()
 						{
-							final Future<Void> ret = new Future<Void>();
-							// Hack!!! Notify multiple results at once?
-							if(adapter.isExternalThread())
-							{
-								try
-								{
-									ea.scheduleStep(new IComponentStep<Void>()
-									{
-										public IFuture<Void> execute(IInternalAccess ia)
-										{
-											ret.setResult(null);
-//											ComponentIntermediateFuture.super.notifyIntermediateResult(listener, result);
-											return IFuture.DONE;
-										}
-									});
-								}
-								catch(ComponentTerminatedException e)
-								{
-									ret.setException(e);
-//									ComponentIntermediateFuture.super.notifyListener(listener);
-								}				
-							}
-							else
-							{
-								ret.setResult(null);
-//								super.notifyIntermediateResult(listener, result);
-							}
-							
-							return ret;
+							return notifyListener(null);
 						}
 					};
 					

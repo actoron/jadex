@@ -593,6 +593,15 @@ public class ExternalAccess implements IExternalAccess
 	{
 		return interpreter;
 	}
+	
+	/**
+	 *  Test if current thread is external thread.
+	 *  @return True if the current thread is not the component thread.
+	 */
+	public boolean isExternalThread()
+	{
+		return adapter.isExternalThread();
+	}
 
 	/**
 	 *  Get the string representation.

@@ -156,4 +156,10 @@ public interface IExternalAccess //extends IRemotable
 	 *  @return The argument value.
 	 * /
 	public Object getArgumentValue(String name);*/
+	
+//	/**
+//	 *  Test if current thread is external thread.
+//	 *  @return True if the current thread is not the component thread.
+//	 */
+//	public IFuture<Boolean> isExternalThread();
 }
