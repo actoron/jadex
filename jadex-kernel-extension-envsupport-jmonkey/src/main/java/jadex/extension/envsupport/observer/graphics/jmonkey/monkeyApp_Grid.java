@@ -1,6 +1,5 @@
 package jadex.extension.envsupport.observer.graphics.jmonkey;
 
-import org.lwjgl.Sys;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
