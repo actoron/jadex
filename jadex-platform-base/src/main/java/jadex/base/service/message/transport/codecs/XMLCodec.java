@@ -1,8 +1,8 @@
 package jadex.base.service.message.transport.codecs;
 
-/* $if !android $ */
 import jadex.bridge.service.types.message.ICodec;
 
+/* $if !android $ */
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
