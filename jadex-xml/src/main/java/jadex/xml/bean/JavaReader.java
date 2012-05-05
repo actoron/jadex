@@ -864,7 +864,7 @@ public class JavaReader
 	 */
 	public static <T> T objectFromXML(String val, ClassLoader classloader)
 	{
-		return objectFromXML(val, classloader, null, null);
+		return JavaReader.<T>objectFromXML(val, classloader, null, null);
 	}
 	
 	/**
