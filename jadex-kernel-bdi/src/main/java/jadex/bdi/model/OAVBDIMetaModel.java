@@ -695,6 +695,13 @@ public class OAVBDIMetaModel
 	
 	/** Body has class name attribute. */
 	public static OAVAttributeType body_has_impl;
+	
+	/** Body has required service name attribute. */
+	public static OAVAttributeType body_has_service;
+
+	/** Body has method name attribute. */
+	public static OAVAttributeType body_has_method;
+
 
 //	/** Body has inline attribute. */
 //	public static OAVAttributeType body_has_inline;
@@ -1197,6 +1204,8 @@ public class OAVBDIMetaModel
 //		body_has_class = body_type.createAttributeType("mbody_has_class", OAVJavaType.java_class_type, OAVAttributeType.NONE);
 //		body_has_classname = body_type.createAttributeType("mbody_has_classname", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 		body_has_impl = body_type.createAttributeType("mbody_has_impl", OAVJavaType.java_string_type, OAVAttributeType.NONE);
+		body_has_service = body_type.createAttributeType("mbody_has_service", OAVJavaType.java_string_type, OAVAttributeType.NONE);
+		body_has_method = body_type.createAttributeType("mbody_has_method", OAVJavaType.java_string_type, OAVAttributeType.NONE);
 //		body_has_inline = body_type.createAttributeType("mbody_has_inline", OAVJavaType.java_boolean_type);
 //		body_has_passed	= body_type.createAttributeType("mbody_has_passed", OAVJavaType.java_string_type);	// Todo: should be expression?
 //		body_has_failed	= body_type.createAttributeType("mbody_has_failed", OAVJavaType.java_string_type);	// Todo: should be expression?

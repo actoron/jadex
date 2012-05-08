@@ -82,31 +82,45 @@ public class JavaStandardPlanExecutor	implements IPlanExecutor, Serializable
 		Object	mbody	= state.getAttributeValue(mplan, OAVBDIMetaModel.plan_has_body);
 //		Class	clazz	= (Class)interpreter.getState().getAttributeValue(mbody, OAVBDIMetaModel.body_has_class);
 		String clname = (String)state.getAttributeValue(mbody, OAVBDIMetaModel.body_has_impl);
-		if(clname==null)
-			throw new RuntimeException("Classname must not be null: "+state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
-		Class clazz = SReflect.findClass(clname, interpreter.getModel(rcapability).getAllImports(), state.getTypeModel().getClassLoader());
+		String sername = (String)state.getAttributeValue(mbody, OAVBDIMetaModel.body_has_service);
 		
 		Object	body = null;
-		if(clazz!=null)
+		if(clname!=null)
 		{
-			try
+			Class clazz = SReflect.findClass(clname, interpreter.getModel(rcapability).getAllImports(), state.getTypeModel().getClassLoader());
+			
+			if(clazz!=null)
 			{
-				body = clazz.newInstance();
-				if(!(body instanceof Plan))
-					throw new RuntimeException("User plan has wrong baseclass. Expected jadex.bdi.runtime.Plan for standard plan.");
-				interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, body);
-			}
-			catch(Exception e)
-			{
-				// Use only RuntimeException from below
-				e.printStackTrace();
+				try
+				{
+					body = clazz.newInstance();
+					if(!(body instanceof Plan))
+						throw new RuntimeException("User plan has wrong baseclass. Expected jadex.bdi.runtime.Plan for standard plan.");
+					interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, body);
+				}
+				catch(Exception e)
+				{
+					// Use only RuntimeException from below
+					e.printStackTrace();
+				}
 			}
 		}
+		else if(sername!=null)
+		{
+			String methodname = (String)state.getAttributeValue(mbody, OAVBDIMetaModel.body_has_method);
+			body = new ServiceCallPlan(sername, methodname);
+			interpreter.getState().setAttributeValue(rplan, OAVBDIRuntimeModel.plan_has_body, body);
+		}
+		else 
+		{
+			throw new RuntimeException("Classname must not be null: "+state.getAttributeValue(state.getAttributeValue(rplan, OAVBDIRuntimeModel.element_has_model), OAVBDIMetaModel.modelelement_has_name));
+		}
+		
 
 		AbstractPlan.planinit.remove(refname);
 
 		if(body==null)
-			throw new RuntimeException("Plan body could not be created: "+clazz);
+			throw new RuntimeException("Plan body could not be created: "+clname!=null? clname: sername);
 
 		return body;
 	}

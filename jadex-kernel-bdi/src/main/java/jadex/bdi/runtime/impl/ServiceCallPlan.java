@@ -13,16 +13,36 @@ import java.util.Collection;
 */
 public class ServiceCallPlan extends Plan
 {
+	/** The service name. */
+	protected String service;
+	
+	/** The method. */
+	protected String method;
+	
+	/**
+	 * 
+	 */
+	public ServiceCallPlan(String service, String method)
+	{
+		this.service = service;
+		this.method = method;
+	}
+	
 	public void body()
 	{
+//		try
+//		{
 		boolean	success	= false;
-		String	service	= (String)getParameter("service").getValue();
-		String	method	= (String)getParameter("method").getValue();
-		Object[]	args	= (Object[])getParameter("args").getValue();
+//		String	service	= (String)getParameter("service").getValue();
+//		String	method	= (String)getParameter("method").getValue();
+//		Object[]	args	= (Object[])getParameter("args").getValue();
+		Object[] args = new Object[0];
+		
 		IIntermediateFuture<?>	services	= getServiceContainer().getRequiredServices(service);
 		// Todo: implement suspendable intermediate futures.
 //		while(!success && services.hasNextIntermediateResult(this))
 		Collection<?>	results	= services.get(this);
+//		System.out.println("received: "+results);
 		for(Object proxy: results)
 		{
 			try
@@ -44,5 +64,10 @@ public class ServiceCallPlan extends Plan
 		
 		if(!success)
 			fail();
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 	}
 }

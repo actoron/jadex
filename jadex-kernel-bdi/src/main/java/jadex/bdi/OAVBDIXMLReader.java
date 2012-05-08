@@ -80,7 +80,6 @@ public class OAVBDIXMLReader
 	/** The writer handler. */
 	protected static IObjectWriterHandler writerhandler;
 
-	
 	// Initialize reader instance.
 	static
 	{
@@ -120,25 +119,25 @@ public class OAVBDIXMLReader
 			null, null, new OAVObjectReaderHandler()));
 		
 		TypeInfo ti_performgoal = new TypeInfo(new XMLInfo(new QName(uri, "performgoal")), new ObjectInfo(OAVBDIMetaModel.performgoal_type),
-				null, null, new OAVObjectReaderHandler());
+			null, null, new OAVObjectReaderHandler());
 		TypeInfo ti_performgoalref = new TypeInfo(new XMLInfo(new QName(uri, "performgoalref")), new ObjectInfo(OAVBDIMetaModel.goalreference_type),
-				null, null, new OAVObjectReaderHandler());
+			null, null, new OAVObjectReaderHandler());
 		TypeInfo ti_achievegoal = new TypeInfo(new XMLInfo(new QName(uri, "achievegoal")), new ObjectInfo(OAVBDIMetaModel.achievegoal_type),
-				null, null, new OAVObjectReaderHandler());
+			null, null, new OAVObjectReaderHandler());
 		TypeInfo ti_achievegoalref = new TypeInfo(new XMLInfo(new QName(uri, "achievegoalref")), new ObjectInfo(OAVBDIMetaModel.goalreference_type),
-				null, null, new OAVObjectReaderHandler());
+			null, null, new OAVObjectReaderHandler());
 		TypeInfo ti_querygoal = new TypeInfo(new XMLInfo(new QName(uri, "querygoal")), new ObjectInfo(OAVBDIMetaModel.querygoal_type),
-				null, null, new OAVObjectReaderHandler());
+			null, null, new OAVObjectReaderHandler());
 		TypeInfo ti_querygoalref = new TypeInfo(new XMLInfo(new QName(uri, "querygoalref")), new ObjectInfo(OAVBDIMetaModel.goalreference_type),
-				null, null, new OAVObjectReaderHandler());
+			null, null, new OAVObjectReaderHandler());
 		TypeInfo ti_maintaingoal = new TypeInfo(new XMLInfo(new QName(uri, "maintaingoal")), new ObjectInfo(OAVBDIMetaModel.maintaingoal_type),
-				null, null, new OAVObjectReaderHandler());
+			null, null, new OAVObjectReaderHandler());
 		TypeInfo ti_maintaingoalref = new TypeInfo(new XMLInfo(new QName(uri, "maintaingoalref")), new ObjectInfo(OAVBDIMetaModel.goalreference_type),
-				null, null, new OAVObjectReaderHandler());
+			null, null, new OAVObjectReaderHandler());
 		TypeInfo ti_metagoal = new TypeInfo(new XMLInfo(new QName(uri, "metagoal")), new ObjectInfo(OAVBDIMetaModel.metagoal_type),
-				null, null, new OAVObjectReaderHandler());
+			null, null, new OAVObjectReaderHandler());
 		TypeInfo ti_metagoalref = new TypeInfo(new XMLInfo(new QName(uri, "metagoalref")), new ObjectInfo(OAVBDIMetaModel.goalreference_type),
-				null, null, new OAVObjectReaderHandler());
+			null, null, new OAVObjectReaderHandler());
 		typeinfos.add(ti_performgoal);
 		typeinfos.add(ti_performgoalref);
 		typeinfos.add(ti_achievegoal);
