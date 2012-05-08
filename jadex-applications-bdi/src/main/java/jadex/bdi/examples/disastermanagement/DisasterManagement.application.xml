@@ -165,6 +165,7 @@
 	<componenttypes>
 		<componenttype name="FireBrigade" filename="firebrigade/FireBrigade.agent.xml"/>
 		<componenttype name="Commander" filename="commander/Commander.agent.xml"/>
+		<componenttype name="Commander2" filename="commander2/Commander2.agent.xml"/>
 		<componenttype name="Ambulance" filename="ambulance/Ambulance.agent.xml"/>
 	</componenttypes>
 
@@ -257,7 +258,7 @@
 	 			</env:envspace>
 			</extensions>
 			<components>
-				<component type="Commander"/>
+				<component type="Commander2"/>
 			</components>
  		</configuration>
 
