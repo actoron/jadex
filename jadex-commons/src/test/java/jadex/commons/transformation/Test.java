@@ -863,7 +863,7 @@ public abstract class Test extends TestCase
 	 */
 	public void testSpecialCharacter() throws Exception
 	{
-		String str = "ö\n";
+		String str = "\u00DC\n";
 		
 		doWriteAndRead(str);
 	}
