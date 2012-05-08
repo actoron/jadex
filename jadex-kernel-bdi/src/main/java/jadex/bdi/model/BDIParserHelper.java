@@ -459,7 +459,27 @@ public class BDIParserHelper extends	DefaultParserHelper
 			}, new Object[]{capvar});
 			ret	= context.generateVariableBinding(rcapcon, name, valuesource);
 		}
-
+		
+		else if(ret==null && name.equals("$goal"))
+		{
+			ret = context.getVariable("?rgoal");
+		}
+		
+		else if(ret==null && name.equals("$plan"))
+		{
+			ret = context.getVariable("?rplan");
+		}
+		
+		else if(ret==null && name.equals("$event"))
+		{
+			ret = context.getVariable("?revent");
+		}
+		
+		else if(ret==null && name.equals("$ref"))
+		{
+			ret = context.getVariable("?refgoal");
+		}
+		
 		return ret;
 	}
 

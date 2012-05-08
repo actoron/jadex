@@ -233,6 +233,8 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 						ret = DebuggerPlugin.icons.getIcon("component_debugged");
 					}
 				}
+//				if(ret!=null)
+//					System.out.println("ov: "+ret);
 				return ret;
 			}
 			

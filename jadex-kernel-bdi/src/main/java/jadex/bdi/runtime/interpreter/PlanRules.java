@@ -1887,12 +1887,7 @@ public class PlanRules
 		capcon.addConstraint(new BoundConstraint(null, rcapa));
 		capcon.addConstraint(new BoundConstraint(OAVBDIRuntimeModel.capability_has_plans, rplan, IOperator.CONTAINS));
 		
-		return new Object[]{
-			new AndCondition(new ICondition[]{plancon, capcon}),
-			PLAN_ABORT,
-			null,
-			null,
-			Boolean.TRUE};
+		return new Object[]{new AndCondition(new ICondition[]{plancon, capcon}), PLAN_ABORT, null, null, Boolean.TRUE};
 	}	
 	
 	/**

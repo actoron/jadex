@@ -26,6 +26,7 @@ import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 
 /**
@@ -68,13 +69,28 @@ public abstract class AbstractJCCPlugin implements IControlCenterPlugin
 	/** 
 	 *  Initialize the plugin.
 	 */
-	public IFuture<Void> init(IControlCenter jcc)
+	public IFuture<Void> init(final IControlCenter jcc)
 	{
-		this.jcc = jcc;
-		this.main_panel = createView();
-		this.menu_bar = createMenuBar();
-		this.tool_bar = createToolBar();
-		return IFuture.DONE;
+		final Future<Void> ret = new Future<Void>();
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
+					AbstractJCCPlugin.this.jcc = jcc;
+					AbstractJCCPlugin.this.main_panel = createView();
+					AbstractJCCPlugin.this.menu_bar = createMenuBar();
+					AbstractJCCPlugin.this.tool_bar = createToolBar();
+					ret.setException(null);
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
+		});
+		return ret;
 	}
 	
 	/** 

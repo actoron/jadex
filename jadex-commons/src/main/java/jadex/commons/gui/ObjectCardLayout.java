@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.swing.SwingUtilities;
+
 
 /**
  *	A ObjectCardLayout is an object based cardlayout.
@@ -59,6 +61,8 @@ public class ObjectCardLayout implements LayoutManager2
 	 */
 	public void	show(Object object) 
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		// Hide current component.
 		if(current!=null)
 		{
@@ -75,15 +79,15 @@ public class ObjectCardLayout implements LayoutManager2
 		else
 		{
 			curkey	= object;
+			
+			// Re-add for keeping usage order
+			components.remove(object);
+			components.put(object, comp);
 		}
 
 		// Show new component (if any).
 		if(comp!=null)
 		{
-			// Re-add for keeping usage order
-			components.remove(object);
-			components.put(object, comp);
-			
 			comp.setVisible(true);
 			comp.getParent().validate();
 		}
@@ -98,6 +102,8 @@ public class ObjectCardLayout implements LayoutManager2
 	 */
 	public boolean isAvailable(Object object)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		return components.containsKey(object);
 	}
 	
@@ -106,6 +112,10 @@ public class ObjectCardLayout implements LayoutManager2
 	 */
 	public Component getComponent(Object object)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
+//		if(components.get(object)!=null)
+//			System.out.println("getC: "+object+" "+components.get(object));
 		return components.get(object);
 	}
 	
@@ -126,6 +136,8 @@ public class ObjectCardLayout implements LayoutManager2
 	 */
 	public void	addLayoutComponent(String name, Component comp) 
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		addLayoutComponent(comp, name);
 	}
 	
@@ -135,6 +147,8 @@ public class ObjectCardLayout implements LayoutManager2
 	 */
 	public void	layoutContainer(Container parent) 
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		Insets insets = parent.getInsets();
 		Rectangle bounds	= parent.getBounds();
 		int ncomponents = parent.getComponentCount();
@@ -157,6 +171,8 @@ public class ObjectCardLayout implements LayoutManager2
 	 */
 	public Dimension	minimumLayoutSize(Container parent) 
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		Insets insets = parent.getInsets();
 		int ncomponents = parent.getComponentCount();
 		int w = 0;
@@ -186,6 +202,8 @@ public class ObjectCardLayout implements LayoutManager2
 	 */
 	public Dimension	preferredLayoutSize(Container parent) 
 	{
+		assert SwingUtilities.isEventDispatchThread();
+
 		Insets insets = parent.getInsets();
 		int ncomponents = parent.getComponentCount();
 		int w = 0;
@@ -215,6 +233,8 @@ public class ObjectCardLayout implements LayoutManager2
 	 */
 	public void	removeLayoutComponent(Component comp) 
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 		for(Iterator<Component> i=components.values().iterator(); i.hasNext();) 
 		{
 			if(i.next().equals(comp)) 
@@ -248,6 +268,9 @@ public class ObjectCardLayout implements LayoutManager2
 	 */
 	public void	addLayoutComponent(Component component, final Object constraints) 
 	{	
+		assert SwingUtilities.isEventDispatchThread();
+
+//		System.out.println("added: "+constraints+" "+component);
 		if(constraints == null)
 			throw new RuntimeException("no_object_for_card_specified");
 		components.put(constraints, component);
