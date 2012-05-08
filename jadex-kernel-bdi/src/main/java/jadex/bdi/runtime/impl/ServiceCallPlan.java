@@ -1,4 +1,4 @@
-package jadex.bdi.examples.disastermanagement.commander2;
+package jadex.bdi.runtime.impl;
 
 import jadex.bdi.runtime.Plan;
 import jadex.commons.SReflect;
