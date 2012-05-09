@@ -128,6 +128,9 @@ public class JSplitPanel extends JSplitPane
 	
 	public void setDividerLocation(double proportionalLocation)
 	{
+		if(proportionalLocation<0 || proportionalLocation>1)
+			return;
+		
 		if(isPainted>0)
 		{
 			hasProportionalLocation = true;
