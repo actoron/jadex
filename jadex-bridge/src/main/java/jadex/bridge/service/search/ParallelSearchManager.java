@@ -159,7 +159,10 @@ public class ParallelSearchManager implements ISearchManager
 						for(Iterator it=((Collection)result).iterator(); it.hasNext(); )
 						{
 							Object next = it.next();
-							if(!endret.getIntermediateResults().contains(next))
+							
+							// Must recheck if already finished (otherwise duplicate results may occur).
+							if(!endret.getIntermediateResults().contains(next)
+								&& !selector.isFinished(endret.getIntermediateResults())) 
 							{
 //								System.out.println("found: "+next);
 								endret.addIntermediateResult(next);

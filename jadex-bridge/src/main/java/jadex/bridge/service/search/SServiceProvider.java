@@ -217,19 +217,22 @@ public class SServiceProvider
 			{
 				public void intermediateResultAvailable(IService result)
 				{
+//					if(type.getName().indexOf("IRepositoryAccess")!=-1)
+//						System.out.println("ir: "+result);
 					ret.setResult(result);
 				}
 				
 				public void finished()
 				{
-					if(!ret.isDone())
-						ret.setException(new ServiceNotFoundException(type.getName()));
+//					if(type.getName().indexOf("IRepositoryAccess")!=-1)
+//						System.out.println("fin");
+					ret.setExceptionIfUndone(new ServiceNotFoundException(type.getName()));
 				}
 				
 				public void resultAvailable(Collection<IService> result)
 				{
-					if(type.toString().indexOf("IFile")!=-1)
-						System.out.println("Search result: "+result);
+//					if(type.getName().indexOf("IRepositoryAccess")!=-1)
+//						System.out.println("ra: "+result);
 					Collection<IService> res = (Collection<IService>)result;
 					if(res==null || res.size()==0)
 					{
@@ -252,8 +255,10 @@ public class SServiceProvider
 				
 				public void exceptionOccurred(Exception exception)
 				{
-					if(type.toString().indexOf("IFile")!=-1)
-						System.out.println("Ex result: "+exception);
+					if(type.getName().indexOf("IRepositoryAccess")!=-1)
+						System.out.println("ex: "+exception);
+//					if(type.toString().indexOf("IFile")!=-1)
+//						System.out.println("Ex result: "+exception);
 					ret.setException(exception);
 				}
 			});

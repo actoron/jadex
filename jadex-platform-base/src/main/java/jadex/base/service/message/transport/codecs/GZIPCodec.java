@@ -75,9 +75,9 @@ public class GZIPCodec implements ICodec
 			gzos.close();
 			ret = baos.toByteArray();
 		}
-		catch (Exception e) 
+		catch(Exception e) 
 		{
-			e.printStackTrace();
+			throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
 		}
 		
 		return ret;
@@ -123,7 +123,7 @@ public class GZIPCodec implements ICodec
 		}
 		catch (Exception e) 
 		{
-			e.printStackTrace();
+			throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
 		}
 	
 		return ret;

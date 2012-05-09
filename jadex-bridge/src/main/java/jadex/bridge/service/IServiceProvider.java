@@ -20,6 +20,7 @@ public interface IServiceProvider extends IRemotable
 	 *  @param type The class.
 	 *  @return The corresponding services.
 	 */
+	// todo: make terminable
 	public IIntermediateFuture<IService> getServices(ISearchManager manager, IVisitDecider decider, IResultSelector selector);
 	
 	/**
