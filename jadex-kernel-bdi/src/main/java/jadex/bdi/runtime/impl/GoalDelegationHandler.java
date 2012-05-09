@@ -2,31 +2,23 @@ package jadex.bdi.runtime.impl;
 
 
 import jadex.bdi.model.IMParameter;
-import jadex.bdi.model.IMParameterElement;
+import jadex.bdi.model.IMParameterSet;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.runtime.AgentEvent;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bdi.runtime.IParameter;
-import jadex.bridge.IComponentIdentifier;
-import jadex.bridge.IComponentStep;
-import jadex.bridge.IExternalAccess;
-import jadex.bridge.IInternalAccess;
-import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bdi.runtime.IParameterSet;
 import jadex.bridge.service.annotation.Service;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.cms.CreationInfo;
-import jadex.bridge.service.types.cms.IComponentManagementService;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
+import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *  
@@ -71,6 +63,68 @@ public class GoalDelegationHandler  implements InvocationHandler
 		final Future<Object> ret = new Future<Object>();
 		
 		final IGoal goal = agent.getGoalbase().createGoal(goalname);
+		
+		Class<?>[] mptypes = method.getParameterTypes();
+		
+		List<IParameter> params = SUtil.arrayToList(goal.getParameters());
+		List<IParameterSet> paramsets = SUtil.arrayToList(goal.getParameterSets());
+		
+		for(int i=0; i<mptypes.length; i++)
+		{
+			boolean set = false;
+			if(args[i]!=null)
+			{
+				for(Iterator<IParameter> it = params.iterator(); it.hasNext(); )
+				{
+					IParameter p = it.next();
+					
+					IMParameter mp = (IMParameter)p.getModelElement();
+					if(OAVBDIMetaModel.PARAMETER_DIRECTION_IN.equals(mp.getDirection()))
+					{
+						if(SReflect.isSupertype(mp.getClazz(), mptypes[i]))
+						{
+							p.setValue(args[i]);
+							set = true;
+							it.remove();
+							break;
+						}
+					}
+					else
+					{
+						it.remove();
+					}
+				}
+				
+				if(!set)
+				{
+					for(Iterator<IParameterSet> it = paramsets.iterator(); it.hasNext(); )
+					{
+						IParameterSet ps = it.next();
+						
+						IMParameterSet mps = (IMParameterSet)ps.getModelElement();
+						if(OAVBDIMetaModel.PARAMETER_DIRECTION_IN.equals(mps.getDirection()) && mptypes[i].isArray())
+						{
+							if(SReflect.isSupertype(mps.getClazz(), mptypes[i].getComponentType()))
+							{
+								ps.addValues((Object[])args[i]);
+								set = true;
+								it.remove();
+								break;
+							}
+						}
+						else
+						{
+							it.remove();
+						}
+					}
+				}
+			}
+			
+			if(!set)
+				throw new RuntimeException("Could not map: "+args[i]);
+		}
+		
+		
 //		final Object handle = ((GoalFlyweight)paint).getHandle();
 		goal.addGoalListener(new IGoalListener()
 		{
@@ -78,20 +132,52 @@ public class GoalDelegationHandler  implements InvocationHandler
 			{
 				if(goal.isSucceeded())
 				{
-//					System.out.println("painter success: "+handle);
-//					Map<String, Object> results = new HashMap<String, Object>();
-//					IParameter[] params = goal.getParameters();
-//					for(int i=0; i<params.length; i++)
-//					{
-//						String dir = ((IMParameter)params[i].getModelElement()).getDirection();
-//						if(OAVBDIMetaModel.PARAMETER_DIRECTION_INOUT.equals(dir) || OAVBDIMetaModel.PARAMETER_DIRECTION_OUT.equals(dir))
-//							results.put(params[i].getName(), params[i].getValue());
-//					}
-					ret.setResult(null);
+					Class<?> rt = SReflect.unwrapGenericType(method.getReturnType());
+					Object rval = null;
+					
+					if(!Void.class.equals(rt))
+					{
+						boolean set = false;
+						
+						IParameter[] params = goal.getParameters();
+						for(int i=0; i<params.length; i++)
+						{
+							IMParameter mp = (IMParameter)params[i].getModelElement();
+							String dir = ((IMParameter)params[i].getModelElement()).getDirection();
+							if((OAVBDIMetaModel.PARAMETER_DIRECTION_INOUT.equals(dir) || OAVBDIMetaModel.PARAMETER_DIRECTION_OUT.equals(dir)) 
+								&& SReflect.isSupertype(mp.getClazz(), rt))
+							{
+								rval = params[i].getValue();
+								set = true;
+								break;
+							}
+						}
+						
+						if(!set)
+						{
+							IParameterSet[] paramsets = goal.getParameterSets();
+							for(int i=0; i<paramsets.length; i++)
+							{
+								IMParameterSet mps = (IMParameterSet)paramsets[i].getModelElement();
+								String dir = ((IMParameter)params[i].getModelElement()).getDirection();
+								if((OAVBDIMetaModel.PARAMETER_DIRECTION_INOUT.equals(dir) || OAVBDIMetaModel.PARAMETER_DIRECTION_OUT.equals(dir)) 
+									&& SReflect.isSupertype(mps.getClazz(), rt.getComponentType()))
+								{
+									paramsets[i].addValues((Object[])args[i]);
+									set = true;
+									break;
+								}
+							}
+						}
+						
+						if(!set)
+							throw new RuntimeException("Could not map result.");
+					}
+					
+					ret.setResult(rval);
 				}
 				else
 				{
-//						System.out.println("painter failure: "+handle);
 					ret.setException(goal.getException()!=null? goal.getException(): new RuntimeException());
 				}
 			}

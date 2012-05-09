@@ -3,7 +3,7 @@ package jadex.bdi.model;
 /**
  *  Create a new parameter set.
  */
-public interface IMParameterSet
+public interface IMParameterSet extends IMTypedElement
 {	
 	/**
 	 *  Get the parameter value.

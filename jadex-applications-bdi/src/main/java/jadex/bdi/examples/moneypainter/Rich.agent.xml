@@ -44,6 +44,8 @@
 		</plan> -->
 		
 		<plan name="letotherpaintone">
+			<parameter name="name" class="String"/>
+			<parameter name="result" class="String" direction="out"/>
 			<body service="paintservices" method="paintOneEuro"/>
 			<trigger>
 				<goal ref="getoneeuro"/>

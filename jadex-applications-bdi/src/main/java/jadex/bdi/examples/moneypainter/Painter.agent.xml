@@ -9,6 +9,10 @@
 	name="Painter"
 	package="jadex.bdi.examples.moneypainter">
 
+	<imports>
+		<import>jadex.bdi.runtime.interpreter.*</import>
+	</imports>
+
 	<beliefs>
 		<belief name="painter" class="Object"/>
 	</beliefs>
@@ -17,18 +21,18 @@
 		<achievegoal name="getoneeuro">
 			<parameter name="name" class="String">
 				<!-- todo: support also expressions such as $arg0+$arg1 -->
-				<servicemapping ref="paintservice.arg0"/> 
+				<!-- <servicemapping ref="paintservice.arg0"/>  -->
 			</parameter>
 			<parameter name="result" class="String" direction="out">
-				<servicemapping ref="paintservice.result"/>
+				<!-- <servicemapping ref="paintservice.result"/> -->
 			</parameter>
 		</achievegoal>
  	</goals>
 
 	<plans>
 		<plan name="paintone">
-			<parameter name="name" class="String">
-			</parameter>
+			<parameter name="name" class="String"/>
+			<parameter name="result" class="String" direction="out"/>
 			<body class="PaintOneEuroPlan"/>
 			<trigger>
 				<goal ref="getoneeuro"/>
@@ -42,7 +46,7 @@
 	<services>
 		<providedservice name="paintservice" class="IPaintMoneyService">
 			<!-- <implementation class="PaintMoneyService"/> -->
-			<implementation>BDIInterpreter.createGoalDelegationService($component, IPaintMoneyService.class)</implementation>
+			<implementation>BDIInterpreter.createServiceImplementation($scope, IPaintMoneyService.class, "getoneeuro")</implementation>
 		</providedservice>
 	</services>
 </agent>
