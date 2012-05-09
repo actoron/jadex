@@ -385,7 +385,7 @@ public class ReceiveRequest	implements IHttpRequest
 						String	s	= new String(chunkhead, 0, chunkheadpos-2, "UTF-8");
 						// Strip chunk extension (if any).
 						if(s.indexOf(';')!=-1)
-							s.substring(0, s.indexOf(';'));
+							s = s.substring(0, s.indexOf(';'));
 						
 						// Chunksize is encoded as string representing a hex value.
 						chunksize	= Integer.parseInt(s, 16);
