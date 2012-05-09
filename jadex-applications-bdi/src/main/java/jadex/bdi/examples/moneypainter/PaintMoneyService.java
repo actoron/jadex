@@ -22,27 +22,29 @@ public class PaintMoneyService implements IPaintMoneyService
 	/**
 	 *  Paint one euro.
 	 */
-	public IFuture<Void> paintOneEuro()
+	public IFuture<String> paintOneEuro(String name)
 	{
-		final Future<Void> ret = new Future<Void>();
+		final Future<String> ret = new Future<String>();
 		
 		if(agent.getBeliefbase().getBelief("painter").getFact()==null)
 		{
-			final IGoal paint = agent.getGoalbase().createGoal("getoneeuro");
-			final Object handle = ((GoalFlyweight)paint).getHandle();
-			paint.addGoalListener(new IGoalListener()
+			final IGoal goal = agent.getGoalbase().createGoal("getoneeuro");
+			goal.getParameter("name").setValue(name);
+			
+//			final Object handle = ((GoalFlyweight)goal).getHandle();
+			goal.addGoalListener(new IGoalListener()
 			{
 				public void goalFinished(AgentEvent ae)
 				{
-					if(paint.isSucceeded())
+					if(goal.isSucceeded())
 					{
 //						System.out.println("painter success: "+handle);
-						ret.setResult(null);
+						ret.setResult((String)goal.getParameter("result").getValue());
 					}
 					else
 					{
 //						System.out.println("painter failure: "+handle);
-						ret.setException(paint.getException()!=null? paint.getException(): new RuntimeException());
+						ret.setException(goal.getException()!=null? goal.getException(): new RuntimeException());
 					}
 				}
 				
@@ -50,7 +52,7 @@ public class PaintMoneyService implements IPaintMoneyService
 				{
 				}
 			});
-			agent.getGoalbase().dispatchTopLevelGoal(paint);
+			agent.getGoalbase().dispatchTopLevelGoal(goal);
 		}
 		else
 		{

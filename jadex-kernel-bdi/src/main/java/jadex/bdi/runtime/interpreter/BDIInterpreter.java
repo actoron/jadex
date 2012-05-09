@@ -4,6 +4,7 @@ import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
 import jadex.bdi.model.OAVCapabilityModel;
 import jadex.bdi.runtime.IBDIExternalAccess;
+import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IBelief;
 import jadex.bdi.runtime.IBeliefSet;
 import jadex.bdi.runtime.IBeliefbase;
@@ -14,6 +15,7 @@ import jadex.bdi.runtime.IGoalbase;
 import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.IPlanbase;
 import jadex.bdi.runtime.IPropertybase;
+import jadex.bdi.runtime.impl.GoalDelegationHandler;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ExternalAccessFlyweight;
 import jadex.bridge.ComponentTerminatedException;
@@ -63,6 +65,7 @@ import jadex.rules.state.IOAVState;
 import jadex.rules.state.IProfiler;
 
 import java.io.IOException;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -2056,6 +2059,15 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	public boolean isRealtime()
 	{
 		return realtime;
+	}
+	
+	/**
+	 *  Create a wrapper service implementation based on 
+	 */
+	public static Object createServiceImplementation(IBDIInternalAccess agent, Class<?> type, String goalname)
+	{
+		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
+			new GoalDelegationHandler(agent, goalname));
 	}
 	
 }

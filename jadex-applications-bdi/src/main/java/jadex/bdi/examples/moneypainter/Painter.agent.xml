@@ -14,11 +14,19 @@
 	</beliefs>
 
 	<goals>
-		<achievegoal name="getoneeuro"/>
+		<achievegoal name="getoneeuro">
+			<parameter name="name" class="String">
+				<servicemapping ref="paintservice.name"/>
+			</parameter>
+			<parameter name="result" class="">
+			</parameter>
+		</achievegoal>
  	</goals>
 
 	<plans>
 		<plan name="paintone">
+			<parameter name="name" class="String">
+			</parameter>
 			<body class="PaintOneEuroPlan"/>
 			<trigger>
 				<goal ref="getoneeuro"/>
@@ -30,8 +38,9 @@
 	</plans>
 
 	<services>
-		<providedservice class="IPaintMoneyService">
-			<implementation class="PaintMoneyService"/>
+		<providedservice name="paintservice" class="IPaintMoneyService">
+			<!-- <implementation class="PaintMoneyService"/> -->
+			<implementation>BDIInterpreter.createGoalDelegationService($component, IPaintMoneyService.class)</implementation>
 		</providedservice>
 	</services>
 </agent>

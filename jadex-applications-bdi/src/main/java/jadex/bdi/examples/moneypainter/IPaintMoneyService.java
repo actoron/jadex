@@ -10,5 +10,5 @@ public interface IPaintMoneyService
 	/**
 	 *  Paint one euro.
 	 */
-	public IFuture<Void> paintOneEuro();
+	public IFuture<String> paintOneEuro(String name);
 }
