@@ -16,9 +16,11 @@
 	<goals>
 		<achievegoal name="getoneeuro">
 			<parameter name="name" class="String">
-				<servicemapping ref="paintservice.name"/>
+				<!-- todo: support also expressions such as $arg0+$arg1 -->
+				<servicemapping ref="paintservice.arg0"/> 
 			</parameter>
-			<parameter name="result" class="">
+			<parameter name="result" class="String" direction="out">
+				<servicemapping ref="paintservice.result"/>
 			</parameter>
 		</achievegoal>
  	</goals>
