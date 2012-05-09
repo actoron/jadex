@@ -121,7 +121,7 @@ public class GZIPCodec implements ICodec
 				sum += len;
 			}
 		}
-		catch (Exception e) 
+		catch(Exception e) 
 		{
 			throw e instanceof RuntimeException? (RuntimeException)e: new RuntimeException(e);
 		}

@@ -2,6 +2,7 @@ package jadex.bdi.examples.disastermanagement.commander;
 
 import jadex.bdi.examples.disastermanagement.IExtinguishFireService;
 import jadex.bdi.runtime.Plan;
+import jadex.commons.future.ITerminableFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
@@ -9,6 +10,8 @@ import jadex.extension.envsupport.environment.ISpaceObject;
  */
 public class ExtinguishFirePlan extends Plan
 {
+	protected ITerminableFuture<Void>	ef;
+	
 	/**
 	 *  The body method is called on the
 	 *  instantiated plan instance from the scheduler.
@@ -17,7 +20,8 @@ public class ExtinguishFirePlan extends Plan
 	{
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 		IExtinguishFireService force = (IExtinguishFireService)getParameter("rescueforce").getValue();
-		force.extinguishFire(disaster).get(this);
+		ef	= force.extinguishFire(disaster);
+		ef.get(this);
 	}
 	
 	/**
@@ -25,9 +29,9 @@ public class ExtinguishFirePlan extends Plan
 	 */
 	public void aborted()
 	{
-		IExtinguishFireService force = (IExtinguishFireService)getParameter("rescueforce").getValue();
-//		System.out.println("Aborting force: "+force);
-		force.abort().get(this);
-//		System.out.println("Aborted force: "+force);
+		if(ef!=null)
+		{
+			ef.terminate();
+		}
 	}
 }

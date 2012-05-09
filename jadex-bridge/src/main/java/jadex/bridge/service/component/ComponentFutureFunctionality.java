@@ -34,7 +34,7 @@ public class ComponentFutureFunctionality extends FutureFunctionality
 	/**
 	 *  Schedule listener notification on component thread. 
 	 */
-	public IFuture<Void> notifyListener(IResultListener listener) 
+	public IFuture<Void> notifyListener(IResultListener<?> listener) 
 	{
 		final Future<Void> ret = new Future<Void>();
 		// Hack!!! Notify multiple listeners at once?

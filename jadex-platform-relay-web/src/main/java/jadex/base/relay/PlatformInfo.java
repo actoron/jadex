@@ -2,6 +2,9 @@ package jadex.base.relay;
 
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.commons.SUtil;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
+import jadex.commons.future.ThreadSuspendable;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -39,6 +42,9 @@ public class PlatformInfo
 	
 	/** The host name. */
 	protected String	hostname;
+	
+	/** The host name future for eager resolving. */
+	protected IFuture<String>	hostnamefut;
 	
 	/** The protocol (e.g. http or https). */
 	protected String	scheme;
@@ -89,6 +95,35 @@ public class PlatformInfo
 		this.msg_cnt	= msg_cnt;
 		this.bytes_received	= bytes_received;
 		this.total_transmission_time	= total_transmission_time;
+
+		// Resolve hostname, when only IP is supplied
+		// Prefetch the hostname in background as blocking getCanonicalHostName() can be slow due to network timeouts.
+		if(hostname.equals(hostip))
+		{
+			final Future<String>	fut	= new Future<String>();
+			new Thread(new Runnable()
+			{
+				public void run()
+				{
+					try
+					{
+						String	tmp	= InetAddress.getByName(PlatformInfo.this.hostip).getCanonicalHostName();
+						if(tmp.equals(PlatformInfo.this.hostip))
+						{
+							tmp	= "IP "+tmp;
+						}
+						fut.setResult(tmp);
+					}
+					catch(UnknownHostException e)
+					{
+						fut.setResult("unknown");
+					}
+					System.out.println("hostip: "+PlatformInfo.this.hostip+", "+fut.get(null));
+				}
+			}).start();
+			hostnamefut	= fut;
+		}
+
 	}
 	
 	//-------- methods --------
@@ -114,16 +149,10 @@ public class PlatformInfo
 	 */
 	public String	getHostName()
 	{
-		if(hostname.equals(hostip))
+		if(hostnamefut!=null)
 		{
-			try
-			{
-				hostname	= InetAddress.getByName(hostip).getCanonicalHostName();
-			}
-			catch(UnknownHostException e)
-			{
-				hostname	= "unknown";
-			}
+			this.hostname	= hostnamefut.get(new ThreadSuspendable());
+			this.hostnamefut	= null;
 		}
 		return hostname;
 	}

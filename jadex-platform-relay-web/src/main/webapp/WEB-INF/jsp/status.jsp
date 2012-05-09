@@ -13,18 +13,34 @@
 if(infos.length>0)
 {
 	StringBuffer markers	= new StringBuffer();
+	Set<String> positions	= new HashSet<String>();
 	for(int i=0; i<infos.length; i++)
 	{
 		if(infos[i].getPosition()!=null)
 		{
-			markers.append("&markers=");
 			if(i<9)
 			{
+				// Add labelled markers for first 1..9 entries
+				markers.append("&markers=");
 				markers.append("label:");
 				markers.append(i+1);
 				markers.append("|");
+				markers.append(infos[i].getPosition());
 			}
-			markers.append(infos[i].getPosition());
+			else if(i==9)
+			{
+				// Add unlabelled markers for each unique position of remaining entries
+				markers.append("&markers=");
+				markers.append(infos[i].getPosition());
+				positions.add(infos[i].getPosition());
+			}
+			else if(!positions.contains(infos[i].getPosition()))
+			{
+				// Add unlabelled markers for each unique position of remaining entries
+				markers.append("|");
+				markers.append(infos[i].getPosition());
+				positions.add(infos[i].getPosition());
+			}
 		}
 	}
 	if(markers.length()>0)

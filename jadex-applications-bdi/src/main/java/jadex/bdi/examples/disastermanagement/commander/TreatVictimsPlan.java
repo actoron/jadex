@@ -2,7 +2,7 @@ package jadex.bdi.examples.disastermanagement.commander;
 
 import jadex.bdi.examples.disastermanagement.ITreatVictimsService;
 import jadex.bdi.runtime.Plan;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.ITerminableFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
@@ -13,7 +13,7 @@ public class TreatVictimsPlan extends Plan
 	//-------- attributes --------
 	
 	/** The service future. */
-	protected IFuture	tv;
+	protected ITerminableFuture<Void>	tv;
 	
 	//-------- plan methods --------
 	
@@ -34,12 +34,11 @@ public class TreatVictimsPlan extends Plan
 	 */
 	public void aborted()
 	{
-		if(tv!=null && !tv.isDone())
+		if(tv!=null)
 		{
-			ITreatVictimsService force = (ITreatVictimsService)getParameter("rescueforce").getValue();
 			try
 			{
-				force.abort().get(this);
+				tv.terminate();
 			}
 			catch(Exception e)
 			{

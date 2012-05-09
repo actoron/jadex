@@ -2,6 +2,7 @@ package jadex.bdi.examples.disastermanagement.commander;
 
 import jadex.bdi.examples.disastermanagement.IClearChemicalsService;
 import jadex.bdi.runtime.Plan;
+import jadex.commons.future.ITerminableFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
@@ -9,6 +10,8 @@ import jadex.extension.envsupport.environment.ISpaceObject;
  */
 public class ClearChemicalsPlan extends Plan
 {
+	protected ITerminableFuture<Void>	cc;
+	
 	/**
 	 *  The body method is called on the
 	 *  instantiated plan instance from the scheduler.
@@ -17,7 +20,8 @@ public class ClearChemicalsPlan extends Plan
 	{
 		ISpaceObject disaster = (ISpaceObject)getParameter("disaster").getValue();
 		IClearChemicalsService force = (IClearChemicalsService)getParameter("rescueforce").getValue();
-		force.clearChemicals(disaster).get(this);
+		cc	= force.clearChemicals(disaster);
+		cc.get(this);
 	}
 	
 	/**
@@ -25,7 +29,9 @@ public class ClearChemicalsPlan extends Plan
 	 */
 	public void aborted()
 	{
-		IClearChemicalsService force = (IClearChemicalsService)getParameter("rescueforce").getValue();
-		force.abort().get(this);
+		if(cc!=null)
+		{
+			cc.terminate();
+		}
 	}
 }

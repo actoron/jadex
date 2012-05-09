@@ -3,6 +3,7 @@ package jadex.bdi.planlib.cms;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.Plan;
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.fipa.CMSCreateComponent;
 import jadex.bridge.fipa.Done;
 import jadex.bridge.fipa.SFipa;
@@ -28,6 +29,7 @@ public class CMSRemoteCreateComponentPlan extends Plan
 		ca.setSuspend(((Boolean)getParameter("suspend").getValue()).booleanValue());
 		ca.setMaster(((Boolean)getParameter("master").getValue()).booleanValue());
 		ca.setParent((IComponentIdentifier)getParameter("parent").getValue());
+		ca.setResourceIdentifier((IResourceIdentifier)getParameter("rid").getValue());
 
 		IGoal req = createGoal("rp_initiate");
 		req.getParameter("receiver").setValue(getParameter("cms").getValue());

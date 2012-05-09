@@ -1,5 +1,6 @@
 package jadex.micro.testcases.terminate;
 
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.ITerminableFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 
@@ -21,4 +22,11 @@ public interface ITerminableService
 	 *  @return The results.
 	 */
 	public ITerminableIntermediateFuture<String> getResults(long delay, int max);
+	
+	/**
+	 *  Be informed when one of the other methods futures is terminated.
+	 *  Returns an initial result when this future is registered.
+	 *  Is finished, when the terminate action of the other future was called.
+	 */
+	public IIntermediateFuture<Void>	terminateCalled();
 }

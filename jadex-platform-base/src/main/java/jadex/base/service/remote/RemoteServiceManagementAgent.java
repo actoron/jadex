@@ -1,8 +1,10 @@
 package jadex.base.service.remote;
 
+import jadex.base.service.remote.RemoteServiceManagementService.WaitingCallInfo;
 import jadex.base.service.remote.commands.AbstractRemoteCommand;
 import jadex.base.service.remote.commands.RemoteResultCommand;
 import jadex.bridge.ComponentTerminatedException;
+import jadex.bridge.ContentException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.fipa.SFipa;
@@ -10,15 +12,12 @@ import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
-import jadex.bridge.service.types.cms.IComponentDescription;
-import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.message.MessageType;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.bridge.service.types.security.ISecurityService;
-import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -28,18 +27,13 @@ import jadex.commons.future.IResultListener;
 import jadex.commons.future.IntermediateDefaultResultListener;
 import jadex.commons.future.IntermediateDelegationResultListener;
 import jadex.commons.future.IntermediateFuture;
-import jadex.commons.transformation.binaryserializer.BinarySerializer;
 import jadex.micro.IMicroExternalAccess;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Argument;
 import jadex.micro.annotation.Arguments;
-import jadex.xml.reader.Reader;
-import jadex.xml.writer.Writer;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -129,8 +123,9 @@ public class RemoteServiceManagementAgent extends MicroAgent
 	 */
 	public void messageArrived(final Map<String, Object> msg, final MessageType mt)
 	{
-//		System.out.println("RMS received message: (sender)"+SUtil.arrayToString(((IComponentIdentifier)msg.get(SFipa.SENDER)).getAddresses()));
-//		System.out.println("RMS own addresses: (rec)"+SUtil.arrayToString(getComponentIdentifier().getAddresses()));
+//		String	tmp	= (""+msg.get(SFipa.CONTENT)).replace("\n", " ").replace("\r", " ");
+//		System.out.println("RMS "+getComponentIdentifier()+" received message from "+msg.get(SFipa.SENDER)
+//			+": "+tmp.substring(0, Math.min(tmp.length(), 80)));
 		
 		final IResourceIdentifier[] rid = new IResourceIdentifier[1];
 		
@@ -154,9 +149,6 @@ public class RemoteServiceManagementAgent extends MicroAgent
 //					
 //					if(((String)content).indexOf("store")!=-1)
 //						System.out.println("store command: "+callid+" "+getComponentIdentifier());
-
-//					// For debugging.
-					final Object orig = content;
 
 					// Execute command.
 					if(content instanceof IRemoteCommand)
@@ -231,9 +223,26 @@ public class RemoteServiceManagementAgent extends MicroAgent
 							}
 						});								
 					}
-					else if(content!=null)
+					else if(content instanceof ContentException)
 					{
-						getLogger().info("RMS unexpected message content: "+msg.get(SFipa.SENDER)+", "+content);
+						getLogger().info("RMS received broken message content: "+msg.get(SFipa.SENDER)+", "+content);							
+						WaitingCallInfo	wci	= rms.getWaitingCall(callid);
+						if(wci!=null)
+						{
+							Future<?> future = wci.getFuture();
+							future.setExceptionIfUndone((Exception) content);
+						}
+						else
+						{
+							reply.addIntermediateResult(new RemoteResultCommand(null, null, new RuntimeException("RMS received broken message content: "+content), callid, false));
+							reply.setFinished();
+						}
+					}
+					else
+					{
+						getLogger().info("RMS received unexpected message content: "+msg.get(SFipa.SENDER)+", "+content);
+						reply.addIntermediateResult(new RemoteResultCommand(null, null, new RuntimeException("RMS received unexpected message content: "+content), callid, false));
+						reply.setFinished();
 					}
 
 					// Send reply.

@@ -1439,7 +1439,7 @@ void PrimaryPrefix()       :
 	}
 	
 	// Parameter[-x] for preconditions.
-	| LOOKAHEAD(2)/*@bgen(jjtree) #ParameterNode(true) */
+	| LOOKAHEAD(4)/*@bgen(jjtree) #ParameterNode(true) */
         {
           ParameterNode jjtn004 = new ParameterNode(this, JJTPARAMETERNODE);
           boolean jjtc004 = true;

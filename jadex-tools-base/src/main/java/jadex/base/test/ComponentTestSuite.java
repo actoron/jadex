@@ -6,6 +6,7 @@ import jadex.base.test.impl.Cleanup;
 import jadex.base.test.impl.ComponentTest;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IExternalAccess;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
@@ -17,6 +18,7 @@ import jadex.commons.future.ISuspendable;
 import jadex.commons.future.ThreadSuspendable;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,7 +69,7 @@ public class ComponentTestSuite extends TestSuite
 			"-welcome", "false",
 			"-autoshutdown", "false",
 			"-printpass", "false"
-		}, path, excludes, timeout);
+		}, path, root, excludes, timeout);
 	}
 	
 	/**
@@ -77,7 +79,7 @@ public class ComponentTestSuite extends TestSuite
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
 	 * @param timeout	The test suite timeout (if tests are not completed, execution will be aborted). 
 	 */
-	public ComponentTestSuite(String[] args, File path, String[] excludes, final long timeout) throws Exception
+	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final long timeout) throws Exception
 	{
 		super(path.toString());
 		
@@ -103,11 +105,13 @@ public class ComponentTestSuite extends TestSuite
 		IComponentManagementService cms = (IComponentManagementService)SServiceProvider.getServiceUpwards(rootcomp.getServiceProvider(), IComponentManagementService.class).get(ts);
 		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(rootcomp.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(ts);
 		
-		// Does not work because if urls are added the models must use rids to identify the resources
+		// Only works with x-rid hack or maven dependency service, because rms cannot use default classloader for decoding application messages.
+		final IResourceIdentifier	rid	= null;
+//		final IResourceIdentifier	rid;
 //		try
 //		{
 //			URL url = root.toURI().toURL();
-//			libsrv.addURL(url);
+//			rid	= libsrv.addURL(url).get(ts);
 //		}
 //		catch(Exception e)
 //		{
@@ -138,15 +142,13 @@ public class ComponentTestSuite extends TestSuite
 				}
 				else
 				{
-					// Should support/use libservice.getClassLoader(abspath) 
-					// rootcomp.getModel().getResourceIdentifier()
-					if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath, null).get(ts)).booleanValue())
+					if(((Boolean)SComponentFactory.isLoadable(rootcomp, abspath, rid).get(ts)).booleanValue())
 					{
-						if(((Boolean)SComponentFactory.isStartable(rootcomp, abspath, null).get(ts)).booleanValue())
+						if(((Boolean)SComponentFactory.isStartable(rootcomp, abspath, rid).get(ts)).booleanValue())
 						{
 							try
 							{
-								IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath, null).get(ts);
+								IModelInfo model = (IModelInfo)SComponentFactory.loadModel(rootcomp, abspath, rid).get(ts);
 								boolean istest = false;
 								if(model!=null && model.getReport()==null)
 								{
@@ -154,7 +156,7 @@ public class ComponentTestSuite extends TestSuite
 									for(int i=0; !istest && i<results.length; i++)
 									{
 										if(results[i].getName().equals("testresults") && Testcase.class.equals(
-											results[i].getClazz().getType(libsrv.getClassLoader(model.getResourceIdentifier()).get(ts), model.getAllImports())))
+											results[i].getClazz().getType(libsrv.getClassLoader(rid).get(ts), model.getAllImports())))
 										{
 											istest	= true;
 										}

@@ -8,8 +8,9 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.TerminableFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
@@ -24,10 +25,6 @@ public class TreatVictimsService implements ITreatVictimsService
 	@ServiceComponent
 	protected IBDIInternalAccess agent;
 	
-	public TreatVictimsService()
-	{
-	}
-	
 	//-------- methods --------
 	
 	/**
@@ -35,14 +32,31 @@ public class TreatVictimsService implements ITreatVictimsService
 	 *  @param disaster The disaster.
 	 *  @return Future, null when done.
 	 */
-	public IFuture<Void> treatVictims(final ISpaceObject disaster)
+	public ITerminableFuture<Void> treatVictims(final ISpaceObject disaster)
 	{
-		final Future<Void> ret = new Future<Void>();
+		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
+		{
+			public boolean checkTermination(Exception reason)
+			{
+				ISpaceObject myself	= (ISpaceObject)agent.getBeliefbase().getBelief("myself").getFact();
+				return !((Boolean)myself.getProperty(DeliverPatientTask.PROPERTY_PATIENT)).booleanValue();
+			}
+			
+			public void terminated(Exception reason)
+			{
+				IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("treat_victims");
+				for(int i=0; i<goals.length; i++)
+				{
+//					System.out.println("Dropping: "+goals[i]);
+					goals[i].drop();
+				}
+			}
+		});
 		
 		IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("treat_victims");
 		if(goals.length>0)
 		{
-			ret.setException(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
+			ret.setExceptionIfUndone(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
 		}
 		else
 		{
@@ -54,9 +68,9 @@ public class TreatVictimsService implements ITreatVictimsService
 				{
 //					System.out.println("tv fin: "+agent.getAgentName());
 					if(tv.isSucceeded())
-						ret.setResult(null);
+						ret.setResultIfUndone(null);
 					else
-						ret.setException(tv.getException());
+						ret.setExceptionIfUndone(tv.getException());
 				}
 				
 				public void goalAdded(AgentEvent ae)
@@ -70,33 +84,6 @@ public class TreatVictimsService implements ITreatVictimsService
 		return ret;
 	}
 	
-	/**
-	 *  Abort extinguishing fire.
-	 *  @return Future, null when done.
-	 */
-	public IFuture<Void> abort()
-	{
-		final Future<Void> ret = new Future<Void>();
-		
-		ISpaceObject myself	= (ISpaceObject)agent.getBeliefbase().getBelief("myself").getFact();
-		if(((Boolean)myself.getProperty(DeliverPatientTask.PROPERTY_PATIENT)).booleanValue())
-		{
-			ret.setException(new IllegalStateException("Can not abort with patient on board."));			
-		}
-		else
-		{
-			IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("treat_victims");
-			for(int i=0; i<goals.length; i++)
-			{
-//				System.out.println("Dropping: "+goals[i]);
-				goals[i].drop();
-			}
-			ret.setResult(null);
-		}
-		
-		return ret;
-	}
-
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation.

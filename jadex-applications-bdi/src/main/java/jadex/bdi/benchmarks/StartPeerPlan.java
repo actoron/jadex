@@ -184,6 +184,7 @@ public class StartPeerPlan extends Plan
 		sp.getParameter("configuration").setValue(getScope().getConfigurationName());
 		sp.getParameter("name").setValue(name);
 		sp.getParameter("arguments").setValue(args);
+		sp.getParameter("rid").setValue(getComponentDescription().getResourceIdentifier());
 		dispatchSubgoalAndWait(sp);
 		return (IComponentIdentifier)sp.getParameter("componentidentifier").getValue();
 	}

@@ -125,9 +125,19 @@ public class CreationInfo
 	 */
 	public CreationInfo(String config, Map<String, Object> args)
 	{
-		this(config, args, null);
+		this(config, args, (IComponentIdentifier)null);
 	}
 	
+	/**
+	 *  Create a new creation info.
+	 *  @param parent	The parent of the component to be created.
+	 */
+	public CreationInfo(String config, Map<String, Object> args, IResourceIdentifier rid)
+	{
+		this(config, args, null, null, null, null, null, null, null, rid);
+	}
+	
+
 	/**
 	 *  Create a new creation info.
 	 *  @param args	The arguments.

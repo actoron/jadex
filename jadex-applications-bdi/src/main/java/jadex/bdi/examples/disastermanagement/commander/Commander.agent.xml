@@ -186,19 +186,6 @@
 			<precondition>$goal.rescueforce instanceof ITreatVictimsService</precondition>
 		</plan>
 		
-		<!-- <plan name="free_units_plan">
- 			<parameterset name="units" class="IService">
-				<goalmapping ref="clear_chemicals.units"/>
-				<goalmapping ref="extinguish_fires.units"/>
-				<goalmapping ref="treat_victims.units"/>
-			</parameterset>
-			<body class="FreeUnitsPlan"/>
-			<trigger>
-				<goalfinished ref="clear_chemicals"/>
-				<goalfinished ref="extinguish_fires"/>
-				<goalfinished ref="treat_victims"/>
-			</trigger>
-		</plan> -->
 	</plans>
 	
 	<services>

@@ -635,7 +635,7 @@ public class ConversationPanel extends JSplitPane
 					public void customResultAvailable(Object result)
 					{
 						IMessageService	ms	= (IMessageService)result;
-						ms.sendMessage(sendmsg, mt, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), null)
+						ms.sendMessage(sendmsg, mt, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), null, null)
 							.addResultListener(ia.createResultListener(new DelegationResultListener(ret)));
 					}
 				}));

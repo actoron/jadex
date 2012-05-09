@@ -1,5 +1,6 @@
 package jadex.standalone;
 
+import jadex.bridge.service.types.android.IAndroidContextService;
 import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.deployment.IDeploymentService;
@@ -76,12 +77,14 @@ import java.util.logging.Level;
 @Arguments({
 	@Argument(name="platformname", clazz=String.class, defaultvalue="\"jadex\""),
 	@Argument(name="configname", clazz=String.class, defaultvalue="\"auto\""),
+	@Argument(name="android", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="autoshutdown", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="adapterfactory", clazz=Class.class, defaultvalue="ComponentAdapterFactory.class"),
 	@Argument(name="welcome", clazz=boolean.class, defaultvalue="true"),
 	
 	@Argument(name="gui", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="saveonexit", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="logging", clazz=boolean.class, defaultvalue="false"),
 	@Argument(name="logging_level", clazz=Level.class, defaultvalue="Level.SEVERE"),
 	@Argument(name="simulation", clazz=Boolean.class),
 	@Argument(name="parametercopy", clazz=boolean.class, defaultvalue="true"),
@@ -90,24 +93,35 @@ import java.util.logging.Level;
 	@Argument(name="libpath", clazz=String.class),
 	@Argument(name="baseclassloader", clazz=ClassLoader.class),
 
+	@Argument(name="chat", clazz=boolean.class, defaultvalue="true"),
+	
 	@Argument(name="awareness", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="awamechanisms", clazz=String[].class, defaultvalue="new String[]{\"Broadcast\", \"Multicast\"}"),
 	@Argument(name="awaincludes", clazz=String.class, defaultvalue="\"\""),
 	@Argument(name="awaexcludes", clazz=String.class, defaultvalue="\"\""),
 
+	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="false"),
+	
 	@Argument(name="usepass", clazz=Boolean.class),
 	@Argument(name="printpass", clazz=boolean.class, defaultvalue="true"),
 
 	@Argument(name="localtransport", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="tcptransport", clazz=boolean.class, defaultvalue="false"),
-	@Argument(name="niotcptransport", clazz=boolean.class, defaultvalue="true"),
-	@Argument(name="relaytransport", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="tcpport", clazz=int.class, defaultvalue="9876"),
+	@Argument(name="niotcptransport", clazz=boolean.class, defaultvalue="true"),
 	@Argument(name="niotcpport", clazz=int.class, defaultvalue="8765"),
+	@Argument(name="relaytransport", clazz=boolean.class, defaultvalue="true"),
+	@Argument(name="relayaddress", clazz=String.class, defaultvalue="jadex.base.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS"),
 
 	@Argument(name="extensions", clazz=String.class, defaultvalue="\"jadex/extension/envsupport/EnvSupportAgent.class, jadex/extension/agr/AGRAgent.class\""),
 
-	@Argument(name="kernels", clazz=String.class, defaultvalue="\"multi\"")
+	@Argument(name="wspublish", clazz=boolean.class, defaultvalue="false"),
+	
+	@Argument(name="rspublish", clazz=boolean.class, defaultvalue="false"),
+
+	@Argument(name="kernels", clazz=String.class, defaultvalue="\"multi\""),
+	
+	@Argument(name="maven_dependencies", clazz=boolean.class, defaultvalue="false")
 })
 
 @ComponentTypes({
@@ -121,25 +135,27 @@ import java.util.logging.Level;
 	@ComponentType(name="kernel_gpmn", filename="jadex/gpmn/KernelGPMN.component.xml"),
 	@ComponentType(name="kernel_multi", filename="jadex/micro/KernelMultiAgent.class"),
 	@ComponentType(name="rms", filename="jadex/base/service/remote/RemoteServiceManagementAgent.class"),
+	@ComponentType(name="chat", filename="jadex/base/service/chat/ChatAgent.class"),
 	@ComponentType(name="awa", filename="jadex/base/service/awareness/management/AwarenessManagementAgent.class"),
 	@ComponentType(name="jcc", filename="jadex/tools/jcc/JCCAgent.class")
 })
 
 @ProvidedServices({
 	@ProvidedService(type=IMarshalService.class, implementation=@Implementation(expression="new MarshalService($component.getExternalAccess())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IAndroidContextService.class, implementation=@Implementation(expression="Boolean.TRUE.equals($args.android)? jadex.base.service.android.AndroidContextService.class.getConstructor(new Class[]{jadex.bridge.service.IServiceProvider.class}).newInstance(new Object[]{$component.getServiceProvider()}): null")),
 	@ProvidedService(type=ISettingsService.class, implementation=@Implementation(expression="new SettingsService($component, $args.saveonexit)")),
 	@ProvidedService(type=IThreadPoolService.class, implementation=@Implementation(expression="new ThreadPoolService(new ThreadPool(new DefaultThreadPoolStrategy(0, 20, 30000, 0)), $component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IExecutionService.class, implementation=@Implementation(expression="$args.simulation==null || !$args.simulation.booleanValue()? new AsyncExecutionService($component.getServiceProvider()): new SyncExecutionService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IDependencyService.class, implementation=@Implementation(expression="new BasicDependencyService()")),
+	@ProvidedService(type=IDependencyService.class, implementation=@Implementation(expression="$args.maven_dependencies ? jadex.base.service.dependency.maven.MavenDependencyResolverService.class.newInstance(): new jadex.base.service.library.BasicDependencyService()")),
 	@ProvidedService(type=ILibraryService.class, implementation=@Implementation(expression="$args.libpath==null? new LibraryService(): new LibraryService(new URLClassLoader(SUtil.toURLs($args.libpath), $args.baseclassloader==null ? LibraryService.class.getClassLoader() : $args.baseclassloader))")),
 	@ProvidedService(type=IClockService.class, implementation=@Implementation(expression="$args.simulation==null || !$args.simulation.booleanValue()? new ClockService(new ClockCreationInfo(IClock.TYPE_SYSTEM, \"system_clock\", System.currentTimeMillis(), 100), $component.getServiceProvider(), $args.simulation): new ClockService(new ClockCreationInfo(IClock.TYPE_EVENT_DRIVEN, \"simulation_clock\", System.currentTimeMillis(), 100), $component.getServiceProvider(), $args.simulation)", proxytype=Implementation.PROXYTYPE_RAW)),
-	@ProvidedService(type=IMessageService.class, implementation=@Implementation(expression="new MessageService($component.getExternalAccess(), $component.getLogger(), new ITransport[]{$args.localtransport? new LocalTransport($component.getServiceProvider()): null, $args.tcptransport? new TCPTransport($component.getServiceProvider(), $args.tcpport): null, $args.niotcptransport? new NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null, $args.relaytransport? new HttpRelayTransport($component, SRelay.DEFAULT_ADDRESS): null}, new MessageType[]{new FIPAMessageType()}, null, new CodecFactory())", proxytype=Implementation.PROXYTYPE_RAW)),
+	@ProvidedService(type=IMessageService.class, implementation=@Implementation(expression="new jadex.base.service.message.MessageService($component.getExternalAccess(), $component.getLogger(), new jadex.base.service.message.transport.ITransport[]{$args.localtransport? new jadex.base.service.message.transport.localmtp.LocalTransport($component.getServiceProvider()): null,$args.tcptransport? new jadex.base.service.message.transport.tcpmtp.TCPTransport($component.getServiceProvider(), $args.tcpport): null,$args.niotcptransport? new jadex.base.service.message.transport.niotcpmtp.NIOTCPTransport($component.getServiceProvider(), $args.niotcpport, $component.getLogger()): null,$args.relaytransport? new jadex.base.service.message.transport.httprelaymtp.io.HttpRelayTransport($component, $args.relayaddress): null}, new jadex.bridge.service.types.message.MessageType[]{new jadex.bridge.fipa.FIPAMessageType()}, null, $args.binarymessages? jadex.bridge.fipa.SFipa.JADEX_BINARY: jadex.bridge.fipa.SFipa.JADEX_XML, $args.binarymessages? new jadex.base.service.message.transport.codecs.CodecFactory(null, new Class[]{jadex.base.service.message.transport.codecs.JadexBinaryCodec.class, jadex.base.service.message.transport.codecs.GZIPCodec.class} ): new jadex.base.service.message.transport.codecs.CodecFactory())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=IComponentManagementService.class, implementation=@Implementation(expression="new DecoupledComponentManagementService($component.getComponentAdapter(), $args.componentfactory, $args.parametercopy, $args.realtimetimeout)")),
 	@ProvidedService(type=IDF.class, implementation=@Implementation(expression="new DirectoryFacilitatorService($component.getServiceProvider())", proxytype=Implementation.PROXYTYPE_RAW)),
 	@ProvidedService(type=ISimulationService.class, implementation=@Implementation(expression="new SimulationService($component)")),
 	@ProvidedService(type=IDeploymentService.class, implementation=@Implementation(expression="new DeploymentService()")),
-	@ProvidedService(type=IPublishService.class, name="wspub", implementation=@Implementation(expression="new DefaultWebServicePublishService()")),
-	@ProvidedService(type=IPublishService.class, name="rspub", implementation=@Implementation(expression="new DefaultRestServicePublishService()")),
+	@ProvidedService(type=IPublishService.class, name="publish_ws", implementation=@Implementation(expression="Boolean.TRUE.equals($args.wspublish) ? jadex.extension.ws.publish.DefaultWebServicePublishService.class.newInstance() : null")),
+	@ProvidedService(type=IPublishService.class, name="publish_rs", implementation=@Implementation(expression="Boolean.TRUE.equals($args.rspublish) ? jadex.extension.rs.publish.DefaultRestServicePublishService.class.newInstance() : null")),
 	@ProvidedService(type=ISecurityService.class, implementation=@Implementation(expression="new SecurityService($args.usepass, $args.printpass)"))
 })
 
@@ -150,7 +166,7 @@ import java.util.logging.Level;
 @Properties(
 {
 	@NameValue(name="componentviewer.viewerclass", value="jadex.base.gui.componentviewer.DefaultComponentServiceViewerPanel.class"),
-	@NameValue(name="logging.level", value="$args.logging_level")
+	@NameValue(name="logging.level", value="$args.logging ? java.util.logging.Level.INFO : $args.logging_level")
 })
 
 @Configurations({
@@ -173,6 +189,7 @@ import java.util.logging.Level;
 				@NameValue(name="mechanisms", value="$args.awamechanisms"),
 				@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
+		@Component(name="chat", type="chat", daemon=true, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 		@Component(name="jcc", type="jcc", daemon=true, number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0", arguments=@NameValue(name="saveonexit", value="$args.saveonexit"))
 	}),
 	@Configuration(name="fixed", arguments={
@@ -194,6 +211,7 @@ import java.util.logging.Level;
 				@NameValue(name="mechanisms", value="$args.awamechanisms"),
 				@NameValue(name="includes", value="$args.awaincludes"),
 				@NameValue(name="excludes", value="$args.awaexcludes")}),
+		@Component(name="chat", type="chat", daemon=true, number="Boolean.TRUE.equals($args.get(\"chat\")) ? 1 : 0"),
 		@Component(name="jcc", type="jcc", daemon=true, number="Boolean.TRUE.equals($args.get(\"gui\")) ? 1 : 0", arguments=@NameValue(name="saveonexit", value="$args.saveonexit"))
 	})
 })

@@ -4,6 +4,7 @@ package jadex.base.test.impl;
 import jadex.base.test.TestReport;
 import jadex.base.test.Testcase;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Tuple2;
 import jadex.commons.future.IResultListener;
@@ -67,7 +68,7 @@ public class ComponentTest implements	Test
 		// Evaluate the results.
 		try
 		{
-			cms.createComponent(null, comp.getFilename(), null, trl).get(new ThreadSuspendable(), 300000);
+			cms.createComponent(null, comp.getFilename(), new CreationInfo(comp.getResourceIdentifier()), trl).get(new ThreadSuspendable(), 300000);
 			Testcase	tc	= trl.waitForResult();
 			TestReport[]	reports	= tc.getReports();
 			if(tc.getTestCount()!=reports.length)

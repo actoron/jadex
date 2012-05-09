@@ -111,10 +111,16 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 						RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, reason);
 						// Can be invoked directly, because internally redirects to agent thread.
 	//					System.out.println("sending terminate");
-						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
+						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), null,
 							content, mycallid, to, res);
 					}
-				};
+				}
+				
+				// Called from delegation listeners in RMS -> ignore if already terminated
+				public void setException(Exception exception)
+				{
+					super.setExceptionIfUndone(exception);
+				}
 			};
 		}
 		else if(SReflect.isSupertype(ITerminableIntermediateFuture.class, type))
@@ -142,13 +148,19 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 	//						}
 	//					});
 						final String mycallid = SUtil.createUniqueId(compid.getLocalName()+"."+method.toString());
-						RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, reason);
+						RemoteFutureTerminationCommand content = new RemoteFutureTerminationCommand(mycallid, callid, e);
 						// Can be invoked directly, because internally redirects to agent thread.
 	//					System.out.println("sending terminate");
 						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-							content, mycallid, to, res);
+							null, content, mycallid, to, res);
 					}
-				};
+				}
+				
+				// Called from delegation listeners in RMS -> ignore if already terminated
+				public void setException(Exception exception)
+				{
+					super.setExceptionIfUndone(exception);
+				}
 			};
 		}
 		else if(SReflect.isSupertype(ITerminableFuture.class, type))
@@ -180,9 +192,15 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 						// Can be invoked directly, because internally redirects to agent thread.
 	//					System.out.println("sending terminate");
 						rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-							content, mycallid, to, res);
+							null, content, mycallid, to, res);
 					}
-				};
+				}
+				
+				// Called from delegation listeners in RMS -> ignore if already terminated
+				public void setException(Exception exception)
+				{
+					super.setExceptionIfUndone(exception);
+				}
 			};
 		}
 		else if(SReflect.isSupertype(IIntermediateFuture.class, type))
@@ -287,7 +305,7 @@ public class RemoteMethodInvocationHandler implements InvocationHandler
 //			if(method.getName().equals("getResult"))
 //				System.out.println("sending invoke");
 			rsms.sendMessage(pr.getRemoteReference().getRemoteManagementServiceIdentifier(), 
-				content, callid, to, future);
+				null, content, callid, to, future);
 			
 			// Provide alternative immediate future result, if method is asynchronous.
 			if(method.getReturnType().equals(void.class) && !pi.isSynchronous(method))

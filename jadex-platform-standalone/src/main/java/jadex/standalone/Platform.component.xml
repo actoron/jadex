@@ -110,8 +110,6 @@
 		<argument name="simulation" class="Boolean"/>
 		<!-- Flag if copying parameters for local service calls is allowed. -->
 		<argument name="parametercopy" class="boolean">true</argument>
-		<!-- Flag if decoupled service cms should be used. -->
-		<argument name="decoupledcms" class="boolean">true</argument>
 		<!-- Flag if local timeouts should be realtime (instead of clock dependent) . -->
 		<argument name="realtimetimeout" class="boolean">true</argument>
 
@@ -276,19 +274,9 @@
 			</implementation>
 		</providedservice>
 		<providedservice name="cms" class="jadex.bridge.service.types.cms.IComponentManagementService">
-			 <implementation proxytype="raw">
-				!$args.decoupledcms
-				? new jadex.standalone.service.ComponentManagementService($component, $component.getComponentAdapter(), 
-					$args.componentfactory, $args.parametercopy, $args.realtimetimeout)
-				: null
-			</implementation>
-		</providedservice>
-		<providedservice name="cms_decoupled" class="jadex.bridge.service.types.cms.IComponentManagementService">
 			<implementation>
-				$args.decoupledcms
-				? new jadex.standalone.service.DecoupledComponentManagementService($component.getComponentAdapter(), 
+				new jadex.standalone.service.DecoupledComponentManagementService($component.getComponentAdapter(), 
 					$args.componentfactory, $args.parametercopy, $args.realtimetimeout)
-				: null
 			</implementation>
 		</providedservice>
 		<providedservice class="jadex.bridge.service.types.df.IDF">
@@ -308,12 +296,12 @@
 		</providedservice>
 		<providedservice name="publish_ws" class="jadex.bridge.service.types.publish.IPublishService">
 			<implementation>
-				Boolean.TRUE.equals($args.wspublish &amp;&amp; !$args.android) ? jadex.extension.ws.publish.DefaultWebServicePublishService.class.newInstance() : null
+				Boolean.TRUE.equals($args.wspublish) ? jadex.extension.ws.publish.DefaultWebServicePublishService.class.newInstance() : null
 			</implementation>
 		</providedservice>
 		<providedservice name="publish_rs" class="jadex.bridge.service.types.publish.IPublishService">
 			<implementation>
-				Boolean.TRUE.equals($args.rspublish &amp;&amp; !$args.android) ? jadex.extension.rs.publish.DefaultRestServicePublishService.class.newInstance() : null
+				Boolean.TRUE.equals($args.rspublish) ? jadex.extension.rs.publish.DefaultRestServicePublishService.class.newInstance() : null
 			</implementation>
 		</providedservice>
 		<!-- Todo start before message service because of relay !? -->

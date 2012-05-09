@@ -79,7 +79,10 @@ public abstract class DefaultResultListener<E> implements IResultListener<E>
 	public void exceptionOccurred(Exception exception)
 	{
 		if(Future.DEBUG)
+		{
 			this.exception.printStackTrace();
+			exception.printStackTrace();
+		}
 		logger.severe("Exception occurred: "+exception);
 	}
 }

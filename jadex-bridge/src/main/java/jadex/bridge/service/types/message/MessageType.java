@@ -183,6 +183,12 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	public abstract String getResourceIdIdentifier();
 
 	/**
+	 *  Get the identifier for fetching the resource identifier id.
+	 *  @return The resource identifier id.
+	 */
+	public abstract String getRealReceiverIdentifier();
+
+	/**
 	 *  Get the en/decode info (important) for a parameter/set.
 	 *  @param The name of the parameter/set.
 	 *  @return The en/decode infos.
@@ -194,7 +200,7 @@ public abstract class MessageType	implements Serializable //, Cloneable // todo
 	 *  @param The message.
 	 *  @return The simplified representation.
 	 */
-	public abstract String getSimplifiedRepresentation(Map msg);
+	public abstract String getSimplifiedRepresentation(Map<String, Object> msg);
 
 	/**
 	 *  Find a matching content codec for a given message parameter.

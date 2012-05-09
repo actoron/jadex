@@ -25,9 +25,10 @@ public class ConfigElementRefPlan extends Plan
 		// Create worker agent (kills itself automatically).
 		IGoal	create	= createGoal("cmscap.cms_create_component");
 		create.getParameter("type").setValue("/jadex/bdi/testcases/misc/ConfigElementRefWorker.agent.xml");
-		Map args = SCollection.createHashMap();
+		Map<String, Object> args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());
 		create.getParameter("arguments").setValue(args);
+		create.getParameter("rid").setValue(getComponentDescription().getResourceIdentifier());
 		dispatchSubgoalAndWait(create);
 		
 		// Wait for reports from worker agent.

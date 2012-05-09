@@ -14,7 +14,7 @@ public class TerminableFuture<E> extends Future<E> implements ITerminableFuture<
 	//-------- attributes --------
 	
 	/** The termination code. */
-	protected Runnable terminate;
+	protected ITerminationCommand terminate;
 	
 	//-------- constructors --------
 
@@ -29,7 +29,7 @@ public class TerminableFuture<E> extends Future<E> implements ITerminableFuture<
 	 *  Create a future that is already done.
 	 *  @param result	The result, if any.
 	 */
-	public TerminableFuture(Runnable terminate)
+	public TerminableFuture(ITerminationCommand terminate)
 	{
 		this.terminate = terminate;
 	}
@@ -50,10 +50,12 @@ public class TerminableFuture<E> extends Future<E> implements ITerminableFuture<
 	 */
 	public void terminate(Exception reason)
 	{
-		if(setExceptionIfUndone(reason))
+		boolean	term = terminate==null || terminate.checkTermination(reason);
+		
+		if(term && setExceptionIfUndone(reason))
 		{
 			if(terminate!=null)
-				terminate.run();
+				terminate.terminated(reason);
 		}
 	}
 

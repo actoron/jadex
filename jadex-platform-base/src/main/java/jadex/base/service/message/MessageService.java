@@ -24,6 +24,7 @@ import jadex.bridge.service.BasicService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.library.ILibraryService;
@@ -276,10 +277,16 @@ public class MessageService extends BasicService implements IMessageService
 
 	/**
 	 *  Send a message.
-	 *  @param message The native message.
+	 *  @param message The message as key value pairs.
+	 *  @param msgtype The message type.
+	 *  @param sender The sender component identifier.
+	 *  @param rid The resource identifier used by the sending component (i.e. corresponding to classes of objects in the message map).
+	 *  @param realrec The real receiver if different from the message receiver (e.g. message to rms encapsulating service call to other component).
+	 *  @param codecids The codecs to use for encoding (if different from default).
+	 *  @return Future that indicates an exception when messages could not be delivered to components. 
 	 */
-	public IFuture<Void> sendMessage(final Map<String, Object> origmsg, final MessageType type, 
-		IComponentIdentifier osender, final IResourceIdentifier rid, final byte[] codecids)
+	public IFuture<Void> sendMessage(Map<String, Object> origmsg, final MessageType type, 
+		IComponentIdentifier osender, final IResourceIdentifier rid, final IComponentIdentifier realrec, final byte[] codecids)
 	{
 		final Map<String, Object> msg = new HashMap<String, Object>(origmsg);
 		
@@ -353,10 +360,16 @@ public class MessageService extends BasicService implements IMessageService
 				}
 				
 				final String ridid = type.getResourceIdIdentifier();
-				if(msg.get(ridid)==null)
+				if(msg.get(ridid)==null && rid!=null)
 				{
 					msg.put(ridid, rid);
 				}
+				
+//				final String realrecid = type.getRealReceiverIdentifier();
+//				if(msg.get(realrecid)==null && realrec!=null)
+//				{
+//					msg.put(realrecid, realrec);
+//				}
 				
 				// Check receivers.
 				Object tmp = msg.get(type.getReceiverIdentifier());
@@ -1292,16 +1305,48 @@ public class MessageService extends BasicService implements IMessageService
 		final Future<ClassLoader> ret = new Future<ClassLoader>();
 		
 //		MessageType mt = getMessageType(type);
-		String ridid = mt.getResourceIdIdentifier();
-		final IResourceIdentifier rid = (IResourceIdentifier)msg.get(ridid);
+		final IResourceIdentifier rid = (IResourceIdentifier)msg.get(mt.getResourceIdIdentifier());
+		final IComponentIdentifier	realrec	= (IComponentIdentifier)msg.get(mt.getRealReceiverIdentifier());
 		if(rid!=null)
 		{
-			IFuture<ILibraryService> fut = SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class);
-			fut.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
+			SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class)
+				.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
 			{
 				public void customResultAvailable(ILibraryService ls)
 				{
 					ls.getClassLoader(rid).addResultListener(new DelegationResultListener<ClassLoader>(ret));
+				}
+				public void exceptionOccurred(Exception exception)
+				{
+					super.resultAvailable(null);
+				}
+			});
+		}
+		else if(realrec!=null)
+		{
+			SServiceProvider.getServiceUpwards(component.getServiceProvider(), IComponentManagementService.class)
+				.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, ClassLoader>(ret)
+			{
+				public void customResultAvailable(IComponentManagementService cms)
+				{
+					cms.getComponentDescription(realrec).addResultListener(new ExceptionDelegationResultListener<IComponentDescription, ClassLoader>(ret)
+					{
+						public void customResultAvailable(final IComponentDescription desc)
+						{
+							SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class)
+								.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
+							{
+								public void customResultAvailable(ILibraryService ls)
+								{
+									ls.getClassLoader(desc.getResourceIdentifier()).addResultListener(new DelegationResultListener<ClassLoader>(ret));
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									super.resultAvailable(null);
+								}
+							});
+						}
+					});
 				}
 				public void exceptionOccurred(Exception exception)
 				{
@@ -1815,7 +1860,7 @@ public class MessageService extends BasicService implements IMessageService
 			}
 		
 			final Map<String, Object> msg	= me.getMessage();
-			String type	= me.getTypeName();
+			final String type	= me.getTypeName();
 			final IComponentIdentifier[] receivers	= me.getReceivers();
 //			System.out.println("Received message: "+SUtil.arrayToString(receivers));
 			final MessageType	messagetype	= getMessageType(type);
@@ -1839,7 +1884,8 @@ public class MessageService extends BasicService implements IMessageService
 //				}
 //			});
 			
-			getRIDClassLoader(msg, getMessageType(type)).addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
+			getRIDClassLoader(msg, getMessageType(type))
+				.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
 			{
 				public void customResultAvailable(final ClassLoader classloader)
 				{
@@ -1850,8 +1896,9 @@ public class MessageService extends BasicService implements IMessageService
 						{
 							for(int i = 0; i < receivers.length; i++)
 							{
+								final IComponentIdentifier	receiver	= receivers[i]; 
 		//						final int cnt = i; 
-								AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(receivers[i]);
+								AbstractComponentAdapter component = (AbstractComponentAdapter)cms.getComponentAdapter(receiver);
 								if(component != null)
 								{
 									ClassLoader cl = classloader!=null? classloader: component.getComponentInstance().getClassLoader();
@@ -1906,7 +1953,7 @@ public class MessageService extends BasicService implements IMessageService
 									}
 									catch(Exception e)
 									{
-										logger.warning("Message could not be delivered to local receiver: " + receivers[i] + ", "+ message.get(messagetype.getIdIdentifier())+", "+e);
+										logger.warning("Message could not be delivered to local receiver: " + receiver + ", "+ message.get(messagetype.getIdIdentifier())+", "+e);
 		
 										// todo: notify sender that message could not be delivered!
 										// Problem: there is no connection back to the sender, so that
@@ -1915,7 +1962,7 @@ public class MessageService extends BasicService implements IMessageService
 								}
 								else
 								{
-									logger.warning("Message could not be delivered to local receiver: " + receivers[i] + ", "+ msg.get(messagetype.getIdIdentifier()));
+									logger.warning("Message could not be delivered to local receiver: " + receiver + ", "+ msg.get(messagetype.getIdIdentifier()));
 		
 									// todo: notify sender that message could not be delivered!
 									// Problem: there is no connection back to the sender, so that
@@ -1961,7 +2008,7 @@ public class MessageService extends BasicService implements IMessageService
 									}
 								}
 							}
-						}	
+						}
 					});
 				}
 			});

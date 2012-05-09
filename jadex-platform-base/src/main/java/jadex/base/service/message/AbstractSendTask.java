@@ -66,6 +66,8 @@ public abstract class AbstractSendTask implements ISendTask
 	public AbstractSendTask(IComponentIdentifier[] receivers, 
 		ITransport[] transports, ICodec[] codecs)
 	{
+		codecs = codecs==null? new ICodec[0]: codecs;
+
 		for(int i=0; i<receivers.length; i++)
 		{
 			if(receivers[i].getAddresses()==null)
@@ -73,13 +75,12 @@ public abstract class AbstractSendTask implements ISendTask
 		}
 		
 		codecids = new byte[codecs.length];
-		for(int i=0; i<codecs.length; i++)
+		for(int i=0; i<codecids.length; i++)
 			codecids[i] = codecs[i].getCodecId();
 		
 		this.receivers = receivers;
 		this.transports = new ArrayList<ITransport>(Arrays.asList(transports));
-		this.codecs = codecs==null? new ICodec[0]: codecs;
-		this.codecids = codecids==null? new byte[0]: codecids;
+		this.codecs	= codecs;
 		this.future	= new Future<Void>();
 	}
 	

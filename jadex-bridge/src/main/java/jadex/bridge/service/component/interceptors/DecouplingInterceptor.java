@@ -1,5 +1,6 @@
 package jadex.bridge.service.component.interceptors;
 
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
@@ -495,6 +496,36 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						if(exception instanceof TimeoutException)
 							ex = (TimeoutException)exception;
 						return exception;
+					}
+					
+					// Switch terminate() calls back to component thread.
+					public IFuture<Void> terminate(Exception reason)
+					{
+						final Future<Void> ret = new Future<Void>();
+						if(adapter.isExternalThread())
+						{
+							try
+							{
+								ea.scheduleStep(new IComponentStep<Void>()
+								{
+									public IFuture<Void> execute(IInternalAccess ia)
+									{
+										ret.setResult(null);
+										return IFuture.DONE;
+									}
+								});
+							}
+							catch(ComponentTerminatedException e)
+							{
+								ret.setException(e);
+							}				
+						}
+						else
+						{
+							ret.setResult(null);
+						}
+						
+						return ret;
 					}
 				};
 				

@@ -12,7 +12,7 @@ public class ThreadSuspendable implements ISuspendable
 	protected Object monitor;
 	
 	/** The future. */
-	protected IFuture	future;
+	protected IFuture<?>	future;
 	
 	//-------- constructors --------
 	
@@ -38,7 +38,7 @@ public class ThreadSuspendable implements ISuspendable
 	 *  Suspend the execution of the suspendable.
 	 *  @param timeout The timeout.
 	 */
-	public void suspend(IFuture future, long timeout)
+	public void suspend(IFuture<?> future, long timeout)
 	{
 		synchronized(monitor)
 		{
@@ -69,7 +69,7 @@ public class ThreadSuspendable implements ISuspendable
 	/**
 	 *  Resume the execution of the suspendable.
 	 */
-	public void resume(IFuture future)
+	public void resume(IFuture<?> future)
 	{
 		synchronized(monitor)
 		{

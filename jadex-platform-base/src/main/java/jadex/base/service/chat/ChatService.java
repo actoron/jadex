@@ -35,6 +35,7 @@ import jadex.commons.future.IntermediateFuture;
 import jadex.commons.future.SubscriptionIntermediateFuture;
 import jadex.commons.future.TerminableFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.micro.annotation.Binding;
 
 import java.io.File;
@@ -236,9 +237,9 @@ public class ChatService implements IChatService, IChatGuiService
 		
 		// Todo: automatically decouple termination commands
 		final IExternalAccess	exta	= agent.getExternalAccess();
-		TerminableFuture<IOutputConnection> ret = new TerminableFuture<IOutputConnection>(new Runnable()
+		TerminableFuture<IOutputConnection> ret = new TerminableFuture<IOutputConnection>(new TerminationCommand()
 		{
-			public void run()
+			public void terminated(Exception reason)
 			{
 				// Called when request is externally terminated.
 				exta.scheduleStep(new IComponentStep<Void>()

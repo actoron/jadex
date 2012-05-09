@@ -204,7 +204,7 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 					}
 					catch(IntermediateResultUnavailableException e)
 					{
-						System.out.println("Unavailable: "+context.getMethod().getName());
+//						System.out.println("Unavailable: "+context.getMethod().getName());
 						// no error if intermediate is not available, e.g. could be first call so that [-1] is not available
 					}
 					catch(Exception e)
@@ -466,7 +466,7 @@ public class PrePostConditionInterceptor implements IServiceInvocationIntercepto
 					}
 				};
 				
-				Future<?> fut = FutureFunctionality.getDelegationFuture((IFuture)res, func);
+				Future<?> fut = FutureFunctionality.getDelegationFuture((IFuture<?>)res, func);
 				sic.setResult(fut);
 			}
 			else

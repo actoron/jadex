@@ -32,6 +32,7 @@ public class CMTestPlan extends Plan
 		String	agenttype	= "/jadex/bdi/testcases/planlib/CMReceiver.agent.xml";
 		IGoal	ca	= createGoal("cmscap.cms_create_component");
 		ca.getParameter("type").setValue(agenttype);
+		ca.getParameter("rid").setValue(getComponentDescription().getResourceIdentifier());
 		dispatchSubgoalAndWait(ca);
 		IComponentIdentifier	receiver	= (IComponentIdentifier)ca.getParameter("componentidentifier").getValue();
 
@@ -78,6 +79,7 @@ public class CMTestPlan extends Plan
 		String	agenttype	= "/jadex/bdi/testcases/planlib/CMReceiver.agent.xml";
 		IGoal	ca	= createGoal("cmscap.cms_create_component");
 		ca.getParameter("type").setValue(agenttype);
+		ca.getParameter("rid").setValue(getComponentDescription().getResourceIdentifier());
 		dispatchSubgoalAndWait(ca);
 		IComponentIdentifier	receiver	= (IComponentIdentifier)ca.getParameter("componentidentifier").getValue();
 

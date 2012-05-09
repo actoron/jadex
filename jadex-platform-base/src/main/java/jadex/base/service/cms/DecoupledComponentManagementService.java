@@ -32,7 +32,6 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.bridge.service.types.library.ILibraryService;
-import jadex.bridge.service.types.marshal.IMarshalService;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
 import jadex.commons.ResourceInfo;
@@ -357,6 +356,11 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 												factory.loadModel(model, cinfo.getImports(), rid)
 													.addResultListener(createResultListener(new ExceptionDelegationResultListener<IModelInfo, IComponentIdentifier>(inited)
 												{
+													public void exceptionOccurred(Exception exception)
+													{
+														super.exceptionOccurred(exception);
+													}
+														
 													public void customResultAvailable(final IModelInfo lmodel)
 													{
 														if(lmodel.getReport()!=null)
@@ -2541,7 +2545,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	 */
 	protected void notifyListenersRemoved(final IComponentIdentifier cid, final IComponentDescription origdesc, final Map results)
 	{
-		updateComponentDescription((CMSComponentDescription)origdesc).addResultListener(createResultListener(new DefaultResultListener<IComponentDescription>()
+		updateComponentDescription((CMSComponentDescription)origdesc).addResultListener(createResultListener(new IResultListener<IComponentDescription>()
 		{
 			public void resultAvailable(IComponentDescription newdesc)
 			{
@@ -2571,6 +2575,11 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 						}
 					}));
 				}
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				resultAvailable(origdesc);
 			}
 		}));
 	}

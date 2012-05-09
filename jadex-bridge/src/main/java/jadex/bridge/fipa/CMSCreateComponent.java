@@ -1,6 +1,8 @@
 package jadex.bridge.fipa;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
+import jadex.commons.future.IRemoteResultListener;
 
 
 /**
@@ -33,6 +35,9 @@ public class CMSCreateComponent implements IComponentAction
 
 	/** Attribute for slot parent. */
 	protected IComponentIdentifier parent;
+
+	/** Attribute for slot rid. */
+	protected IResourceIdentifier rid;
 
 	//-------- constructors --------
 
@@ -124,6 +129,24 @@ public class CMSCreateComponent implements IComponentAction
 	public void setParent(IComponentIdentifier parent)
 	{
 		this.parent = parent;
+	}
+
+	/**
+	 *  Get the parent of this AMSCreateComponent.
+	 * @return parent
+	 */
+	public IResourceIdentifier getResourceIdentifier()
+	{
+		return this.rid;
+	}
+
+	/**
+	 *  Set the parent of this AMSCreateComponent.
+	 * @param parent the value to be set
+	 */
+	public void setResourceIdentifier(IResourceIdentifier rid)
+	{
+		this.rid = rid;
 	}
 
 	/**

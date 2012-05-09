@@ -74,15 +74,15 @@ public class DebuggerPlugin extends AbstractJCCPlugin
 	/**
 	 *  Get plugin properties to be saved in a project.
 	 */
-	public IFuture getProperties()
+	public IFuture<Properties> getProperties()
 	{
-		return new Future(null);
+		return new Future<Properties>((Properties)null);
 	}
 	
 	/**
 	 *  Set plugin properties loaded from a project.
 	 */
-	public IFuture setProperties(Properties props)
+	public IFuture<Void> setProperties(Properties props)
 	{
 		return IFuture.DONE;
 	}

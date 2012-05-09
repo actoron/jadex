@@ -75,7 +75,8 @@ public class StatsDB
 					+ "DISTIME	TIMESTAMP,"
 					+ "MSGS	INTEGER,"
 					+ "BYTES	DOUBLE,"
-					+ "TRANSTIME	DOUBLE)");
+					+ "TRANSTIME	DOUBLE,"
+					+ "PREFIX	VARCHAR(60))");
 			}
 			else
 			{
@@ -98,6 +99,9 @@ public class StatsDB
 				
 				// Update platform entries where disconnection was missed.
 				con.createStatement().executeUpdate("UPDATE RELAY.PLATFORMINFO SET DISTIME=CONTIME WHERE DISTIME IS NULL");
+				
+				// Update platform entries where hostname is same as ip.
+				con.createStatement().executeUpdate("UPDATE RELAY.PLATFORMINFO SET HOSTNAME='IP '||HOSTIP WHERE HOSTIP=HOSTNAME");
 				
 				// Replace android platform names and-xxx to and_xxx
 				PreparedStatement	update	= con.prepareStatement("UPDATE RELAY.PLATFORMINFO SET PLATFORM=?, PREFIX=? WHERE ID=?");
@@ -299,12 +303,12 @@ public class StatsDB
 	{
 		StatsDB	db	= getDB();
 		
-//		for(int i=1; i<5; i++)
-//		{
-//			PlatformInfo	pi	= new PlatformInfo("somid"+i, "hostip", "somename", "prot");
-//		}
-//		printPlatformInfos(db.getPlatformInfos());
-//		
+		for(int i=1; i<5; i++)
+		{
+			PlatformInfo	pi	= new PlatformInfo("somid"+i, "hostip", "somename", "prot");
+		}
+//		printPlatformInfos(db.getAllPlatformInfos());
+		
 //		pi.reconnect("hostip", "other hostname");
 //		pi.addMessage(123, 456);
 //		
@@ -313,7 +317,10 @@ public class StatsDB
 		System.out.println("---");
 		printPlatformInfos(db.getPlatformInfos(-1));
 		
-//		printResultSet(db.con.createStatement().executeQuery("select * from relay.platforminfo"));
+		printResultSet(db.con.createStatement().executeQuery("select * from relay.platforminfo"));
+		DatabaseMetaData	meta	= db.con.getMetaData();
+		printResultSet(meta.getColumns(null, "RELAY", "PLATFORMINFO", null));
+
 	}
 	
 	/**

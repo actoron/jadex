@@ -116,14 +116,15 @@ public class FutureFunctionality
 	/**
 	 *  Terminate the future.
 	 */
-	public void terminate(Exception reason)
+	public IFuture<Void>	terminate(Exception reason)
 	{
+		return IFuture.DONE;
 	}
 	
 	/**
 	 *  Notify the listener.
 	 */
-	public IFuture<Void> notifyListener(final IResultListener listener)
+	public IFuture<Void> notifyListener(final IResultListener<?> listener)
 	{
 		return IFuture.DONE;
 	}
@@ -478,6 +479,7 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
+				// Todo: why set exception on future!?
 				DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
 			}
 		});
@@ -486,17 +488,20 @@ class DelegatingSubscriptionIntermediateDelegationFuture extends SubscriptionInt
 	/**
 	 *  Terminate the future.
 	 */
-	public void terminate(Exception reason)
+	public void terminate(final Exception reason)
 	{
-		try
+		func.terminate(reason).addResultListener(new IResultListener<Void>()
 		{
-			func.terminate(reason);
-			DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(reason);
-		}
-		catch(Exception e)
-		{
-			DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(e);
-		}
+			public void resultAvailable(Void v)
+			{
+				DelegatingSubscriptionIntermediateDelegationFuture.super.terminate(reason);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Todo: why set exception on future!?
+				DelegatingSubscriptionIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+			}
+		});
 	}
 };
 
@@ -721,6 +726,7 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
+				// Todo: why set exception on future!?
 				DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
 			}
 		});
@@ -729,17 +735,20 @@ class DelegatingTerminableIntermediateDelegationFuture extends TerminableInterme
 	/**
 	 *  Terminate the future.
 	 */
-	public void terminate(Exception reason)
+	public void terminate(final Exception reason)
 	{
-		try
+		func.terminate(reason).addResultListener(new IResultListener<Void>()
 		{
-			func.terminate(reason);
-			DelegatingTerminableIntermediateDelegationFuture.super.terminate(reason);
-		}
-		catch(Exception e)
-		{
-			DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(e);
-		}
+			public void resultAvailable(Void v)
+			{
+				DelegatingTerminableIntermediateDelegationFuture.super.terminate(reason);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Todo: why set exception on future!?
+				DelegatingTerminableIntermediateDelegationFuture.super.setExceptionIfUndone(exception);
+			}
+		});
 	}
 };
 
@@ -854,6 +863,7 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
+				// Todo: why set exception on future!?
 				DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(exception);
 			}
 		});
@@ -862,17 +872,20 @@ class DelegatingTerminableDelegationFuture extends TerminableDelegationFuture<Ob
 	/**
 	 *  Terminate the future.
 	 */
-	public void terminate(Exception reason)
+	public void terminate(final Exception reason)
 	{
-		try
+		func.terminate(reason).addResultListener(new IResultListener<Void>()
 		{
-			func.terminate(reason);
-			DelegatingTerminableDelegationFuture.super.terminate(reason);
-		}
-		catch(Exception e)
-		{
-			DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(e);
-		}
+			public void resultAvailable(Void result)
+			{
+				DelegatingTerminableDelegationFuture.super.terminate(reason);
+			}	
+			public void exceptionOccurred(Exception exception)
+			{
+				// Todo: why set exception on future!?
+				DelegatingTerminableDelegationFuture.super.setExceptionIfUndone(exception);
+			}
+		});
 	}
 };
 
@@ -1088,6 +1101,7 @@ class DelegatingIntermediateFuture extends IntermediateFuture<Object>
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
+				// Todo: why set exception on future!?
 				DelegatingIntermediateFuture.super.setExceptionIfUndone(exception);
 			}
 		});
@@ -1195,6 +1209,7 @@ class DelegatingFuture extends Future<Object>
 			}	
 			public void exceptionOccurred(Exception exception)
 			{
+				// Todo: why set exception on future!?
 				DelegatingFuture.super.setExceptionIfUndone(exception);
 			}
 		});

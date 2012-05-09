@@ -59,6 +59,8 @@
 			</parameter>
 			<!-- Context the component should be started in. -->
 			<parameter name="parent" class="jadex.bridge.IComponentIdentifier"/>
+			<!-- Context the component should be started in. -->
+			<parameter name="rid" class="jadex.bridge.IResourceIdentifier"/>
 			
 		</achievegoal>
 
@@ -154,6 +156,9 @@
 			</parameter>
 			<parameter name="parent" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="cms_create_component.parent"/>
+			</parameter>
+			<parameter name="rid" class="jadex.bridge.IResourceIdentifier">
+ 				<goalmapping ref="cms_create_component.rid"/>
 			</parameter>
 			<body class="CMSLocalCreateComponentPlan" />
 			<trigger>
@@ -291,6 +296,9 @@
 			</parameter>
 			<parameter name="parent" class="jadex.bridge.IComponentIdentifier">
  				<goalmapping ref="cms_create_component.parent"/>
+			</parameter>
+			<parameter name="rid" class="jadex.bridge.IResourceIdentifier">
+ 				<goalmapping ref="cms_create_component.rid"/>
 			</parameter>
 			<body class="CMSRemoteCreateComponentPlan" />
 			<trigger>

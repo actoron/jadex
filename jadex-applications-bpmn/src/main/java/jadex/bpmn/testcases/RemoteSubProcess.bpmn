@@ -78,17 +78,17 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_YsYSoQrXEeGP-Kw9N9E5Mw" key="class" value="jadex.bpmn.runtime.task.WriteContextTask"/>
       </eAnnotations>
       <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Y7GrIArXEeGP-Kw9N9E5Mw" source="jadex_parameters_table">
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z5cisArXEeGP-Kw9N9E5Mw" key="dimension" value="2:4"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z5cisQrXEeGP-Kw9N9E5Mw" key="uniqueColumnIndex" value="1"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z5cisgrXEeGP-Kw9N9E5Mw" key="complexColumns" value=""/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z5ciswrXEeGP-Kw9N9E5Mw" key="0:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z5citArXEeGP-Kw9N9E5Mw" key="0:1" value="name"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z5citQrXEeGP-Kw9N9E5Mw" key="0:2" value="java.lang.String"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z5citgrXEeGP-Kw9N9E5Mw" key="0:3" value="&quot;testresults&quot;"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z5citwrXEeGP-Kw9N9E5Mw" key="1:0" value="in"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z5ciuArXEeGP-Kw9N9E5Mw" key="1:1" value="value"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z5ciuQrXEeGP-Kw9N9E5Mw" key="1:2" value="java.lang.Object"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Z5ciugrXEeGP-Kw9N9E5Mw" key="1:3" value="new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test subworkflow with results.&quot;, false, &quot;Wrong result received.&quot;)})"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekgz4JnOEeGFj5UWVEmyPQ" key="dimension" value="2:4"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekha8JnOEeGFj5UWVEmyPQ" key="uniqueColumnIndex" value="1"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekha8ZnOEeGFj5UWVEmyPQ" key="complexColumns" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekha8pnOEeGFj5UWVEmyPQ" key="0:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekha85nOEeGFj5UWVEmyPQ" key="0:1" value="name"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Ekha9JnOEeGFj5UWVEmyPQ" key="0:2" value="java.lang.String"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EkiCAJnOEeGFj5UWVEmyPQ" key="0:3" value="&quot;testresults&quot;"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EkiCAZnOEeGFj5UWVEmyPQ" key="1:0" value="in"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EkiCApnOEeGFj5UWVEmyPQ" key="1:1" value="value"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EkiCA5nOEeGFj5UWVEmyPQ" key="1:2" value="java.lang.Object"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_EkiCBJnOEeGFj5UWVEmyPQ" key="1:3" value="new Testcase(1, new TestReport[]{new TestReport(&quot;#1&quot;,  &quot;Test subworkflow with results.&quot;, false, &quot;Wrong result received: &quot;+out)})"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_20LhwQrZEeGP-Kw9N9E5Mw" iD="_20LhwArZEeGP-Kw9N9E5Mw" outgoingEdges="_jFYCkQreEeGP-Kw9N9E5Mw" name="Create Platform" activityType="Task">

@@ -7,8 +7,9 @@ import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.commons.future.Future;
-import jadex.commons.future.IFuture;
+import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.TerminableFuture;
+import jadex.commons.future.TerminationCommand;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
@@ -29,9 +30,20 @@ public class ExtinguishFireService implements IExtinguishFireService
 	 *  Extinguish a fire.
 	 *  @param disaster The disaster.
 	 */
-	public IFuture<Void> extinguishFire(final ISpaceObject disaster)
+	public ITerminableFuture<Void> extinguishFire(final ISpaceObject disaster)
 	{
-		final Future<Void> ret = new Future<Void>();
+		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
+		{
+			public void terminated(Exception reason)
+			{
+				IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("extinguish_fire");
+				for(int i=0; i<goals.length; i++)
+				{
+//					System.out.println("Dropping: "+goals[i]);
+					goals[i].drop();
+				}
+			}
+		});;
 		
 		IGoal[] exgoals = (IGoal[])agent.getGoalbase().getGoals("extinguish_fire");
 		if(exgoals.length>0)
@@ -70,27 +82,6 @@ public class ExtinguishFireService implements IExtinguishFireService
 		return ret;
 	}
 	
-	/**
-	 *  Abort extinguishing fire.
-	 *  @return Future, null when done.
-	 */
-	public IFuture<Void> abort()
-	{
-//		System.out.println("Aborting force: "+agent.getAgentName());
-		final Future<Void> ret = new Future<Void>();
-		
-		IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("extinguish_fire");
-		for(int i=0; i<goals.length; i++)
-		{
-//			System.out.println("Dropping: "+goals[i]);
-			goals[i].drop();
-		}
-		ret.setResult(null);
-		
-//		System.out.println("Aborted force: "+agent.getAgentName());
-		return ret;
-	}
-
 	/**
 	 *  Get the string representation.
 	 *  @return The string representation.

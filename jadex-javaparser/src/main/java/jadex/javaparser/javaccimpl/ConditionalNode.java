@@ -98,7 +98,9 @@ public class ConditionalNode	extends ExpressionNode
 		ExpressionNode	choice	= (ExpressionNode)jjtGetChild(0);
 		ExpressionNode	node1	= (ExpressionNode)jjtGetChild(1);
 		ExpressionNode	node2	= (ExpressionNode)jjtGetChild(2);
-		boolean	val	= ((Boolean)choice.getValue(fetcher)).booleanValue();
+		Object	cval	= choice.getValue(fetcher);
+		if(cval==null) System.out.println("choice: "+choice);
+		boolean	val	= ((Boolean)cval).booleanValue();
 		if(val)
 		{
 			ret	= node1.getValue(fetcher);

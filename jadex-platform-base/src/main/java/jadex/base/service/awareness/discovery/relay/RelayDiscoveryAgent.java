@@ -164,9 +164,8 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 										//if g
 										msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);	// Todo: remove need for nested codecs!?
 										
-										ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE,
-											agent.getComponentIdentifier(), agent.getModel().getResourceIdentifier(),
-											new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID}) // Use fixed codecs to avoid complex	codec handling in servlet
+										// Use fixed codecs to avoid complex codec handling in servlet
+										agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID})
 											.addResultListener(new DelegationResultListener<Void>(fut));
 									}
 								});

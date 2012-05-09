@@ -27,6 +27,7 @@ public class CMSCreateComponentPlan extends Plan
 		cag.getParameter("suspend").setValue(new Boolean(ca.isSuspend()));
 		cag.getParameter("master").setValue(new Boolean(ca.isMaster()));
 		cag.getParameter("parent").setValue(ca.getParent());
+		cag.getParameter("rid").setValue(ca.getResourceIdentifier());
 		dispatchSubgoalAndWait(cag);
 
 		ca.setComponentIdentifier((IComponentIdentifier)cag.getParameter("componentidentifier").getValue());

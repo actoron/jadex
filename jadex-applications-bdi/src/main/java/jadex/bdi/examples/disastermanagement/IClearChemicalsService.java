@@ -1,6 +1,6 @@
 package jadex.bdi.examples.disastermanagement;
 
-import jadex.commons.future.IFuture;
+import jadex.commons.future.ITerminableFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
@@ -13,11 +13,5 @@ public interface IClearChemicalsService
 	 *  @param disaster The disaster.
 	 *  @return Future, null when done.
 	 */
-	public IFuture<Void> clearChemicals(ISpaceObject disaster);
-
-	/**
-	 *  Abort clearing chemicals.
-	 *  @return Future, null when done.
-	 */
-	public IFuture<Void> abort();
+	public ITerminableFuture<Void> clearChemicals(ISpaceObject disaster);
 }

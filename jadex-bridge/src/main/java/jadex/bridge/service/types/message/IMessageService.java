@@ -19,14 +19,16 @@ public interface IMessageService extends IService
 {
 	/**
 	 *  Send a message.
-	 *  @param map The message as key value pairs.
+	 *  @param message The message as key value pairs.
 	 *  @param msgtype The message type.
 	 *  @param sender The sender component identifier.
-	 *  @param cl The class loader used by the sending component (i.e. corresponding to classes of objects in the message map).
+	 *  @param rid The resource identifier used by the sending component (i.e. corresponding to classes of objects in the message map).
+	 *  @param realrec The real receiver if different from the message receiver (e.g. message to rms encapsulating service call to other component).
+	 *  @param codecids The codecs to use for encoding (if different from default).
 	 *  @return Future that indicates an exception when messages could not be delivered to components. 
 	 */
 	public IFuture<Void> sendMessage(Map<String, Object> message, MessageType msgtype, 
-		IComponentIdentifier sender, IResourceIdentifier rid, byte[] codecids);
+		IComponentIdentifier sender, IResourceIdentifier rid, IComponentIdentifier realrec, byte[] codecids);
 	
 //	/**
 //	 *  Deliver a message to some components.

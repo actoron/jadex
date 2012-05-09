@@ -1,6 +1,7 @@
 package jadex.bridge.fipa;
 
 import jadex.bridge.IComponentIdentifier;
+import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.types.message.MessageType;
 
 import java.util.Date;
@@ -42,6 +43,8 @@ public class FIPAMessageType extends MessageType
 			// Extra parameters
 			new MessageType.ParameterSpecification(SFipa.X_MESSAGE_ID, String.class, false),
 			new MessageType.ParameterSpecification(SFipa.X_TIMESTAMP, String.class, false),
+			new MessageType.ParameterSpecification(SFipa.X_RID, IResourceIdentifier.class, false),
+			new MessageType.ParameterSpecification(SFipa.X_RECEIVER, IComponentIdentifier.class, false)
 		},
 
 		// Second parameter represents the parameter sets.
@@ -101,6 +104,15 @@ public class FIPAMessageType extends MessageType
 	}
 	
 	/**
+	 *  Get the identifier for fetching the resource identifier id.
+	 *  @return The resource identifier id.
+	 */
+	public String	getRealReceiverIdentifier()
+	{
+		return SFipa.X_RECEIVER;
+	}
+
+	/**
 	 *  Get the en/decode info (important) for a parameter/set.
 	 *  @param The name of the parameter/set.
 	 *  @return The en/decode infos.
@@ -116,7 +128,7 @@ public class FIPAMessageType extends MessageType
 	 *  @param The message.
 	 *  @return The simplified representation.
 	 */
-	public String	getSimplifiedRepresentation(Map msg)
+	public String	getSimplifiedRepresentation(Map<String, Object> msg)
 	{
 		StringBuffer	ret	= new StringBuffer();
 		if(msg.containsKey(SFipa.PERFORMATIVE))

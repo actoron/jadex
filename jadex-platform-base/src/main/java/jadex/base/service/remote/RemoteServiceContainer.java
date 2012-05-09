@@ -15,6 +15,7 @@ import jadex.bridge.service.search.TypeResultSelector;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.remote.IRemoteServiceManagementService;
+import jadex.commons.DebugException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;

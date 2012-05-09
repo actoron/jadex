@@ -8,7 +8,6 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
-import jadex.bridge.TimeoutResultListener;
 import jadex.bridge.modelinfo.UnparsedExpression;
 import jadex.bridge.service.BasicServiceContainer;
 import jadex.bridge.service.IService;
@@ -29,7 +28,6 @@ import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.collection.LRU;
 import jadex.commons.collection.WeakValueMap;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -1106,7 +1104,7 @@ public class RemoteReferenceModule
 				ret.setResult(null);
 			}
 		});
-		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, Timeout.DEFAULT_REMOTE, fut);
+		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), null, com, callid, Timeout.DEFAULT_REMOTE, fut);
 		
 		return ret;
 	}
@@ -1146,7 +1144,7 @@ public class RemoteReferenceModule
 				ret.setResult(null);
 			}
 		});
-		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), com, callid, Timeout.DEFAULT_REMOTE, fut);
+		rsms.sendMessage(rr.getRemoteManagementServiceIdentifier(), null, com, callid, Timeout.DEFAULT_REMOTE, fut);
 		return ret;
 	}
 	

@@ -881,7 +881,7 @@ void PrimaryPrefix() #void :
 	}
 	
 	// Parameter[-x] for preconditions.
-	| LOOKAHEAD(2)
+	| LOOKAHEAD(4)
 	( t=Identifier() "[" "-" lit=<INTEGER_LITERAL> "]"
 	) #ParameterNode()
 	{ ((ExpressionNode)jjtree.peekNode()).setText(t+"[-"+lit+"]");}

@@ -8,8 +8,6 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
-import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.bridge.service.types.remote.RemoteException;
@@ -18,14 +16,19 @@ import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.FutureTerminatedException;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ITerminableFuture;
+import jadex.commons.future.IntermediateExceptionDelegationResultListener;
+import jadex.commons.future.IntermediateFuture;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.Description;
 import jadex.micro.annotation.Result;
 import jadex.micro.annotation.Results;
+
+import java.util.Collection;
 
 /**
  *  The invoker agent tests if futures can be terminated
@@ -51,76 +54,67 @@ public class InvokerAgent
 	public void body()
 	{
 		final Testcase tc = new Testcase();
-		tc.setTestCount(1);
+		tc.setTestCount(4);
 		
-		final Future<TestReport> ret = new Future<TestReport>();
-		ret.addResultListener(agent.createResultListener(new IResultListener<TestReport>()
+		final Future<Void> ret = new Future<Void>();
+		ret.addResultListener(agent.createResultListener(new IResultListener<Void>()
 		{
-			public void resultAvailable(TestReport result)
+			public void resultAvailable(Void result)
 			{
-				System.out.println("tests finished: "+tc.isSucceeded());
-
+				System.out.println("tests finished: "+tc);
 				agent.setResultValue("testresults", tc);
 				agent.killAgent();				
 			}
 			public void exceptionOccurred(Exception exception)
 			{
+				tc.addReport(new TestReport("#0", "Unexpected exception", false, exception.toString()));
+				System.out.println("tests finished: "+tc);
 				agent.setResultValue("testresults", tc);
-				agent.killAgent();	
+				agent.killAgent();
 			}
 		}));
-			
-//		testLocal().addResultListener(agent.createResultListener(new DelegationResultListener<Void>(ret)
-//		{
-//			public void customResultAvailable(Void result)
-//			{
-//				System.out.println("tests finished");
-//			}
-//		}));
 		
-		testRemote(1, 1000).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+		testLocal(1, 100).addResultListener(new ExceptionDelegationResultListener<Collection<TestReport>, Void>(ret)
 		{
-			public void customResultAvailable(TestReport result)
+			public void customResultAvailable(Collection<TestReport> result)
 			{
-				tc.addReport(result);
-				ret.setResult(null);
+				for(TestReport rep: result)
+				{
+					tc.addReport(rep);
+				}
+				
+				testRemote(3, 100).addResultListener(new ExceptionDelegationResultListener<Collection<TestReport>, Void>(ret)
+				{
+					public void customResultAvailable(Collection<TestReport> result)
+					{
+						for(TestReport rep: result)
+						{
+							tc.addReport(rep);
+						}
+						
+						ret.setResult(null);
+					}
+				});
 			}
-		}));
-		
-//		testLocal(1, 100).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-//		{
-//			public void customResultAvailable(TestReport result)
-//			{
-//				tc.addReport(result);
-////				ret.setResult(null);
-//				testRemote(2, 100).addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
-//				{
-//					public void customResultAvailable(TestReport result)
-//					{
-//						tc.addReport(result);
-//						ret.setResult(null);
-//					}
-//				}));
-//			}
-//		}));
+		});
 	}
 	
 	/**
 	 *  Test if local intermediate results are correctly delivered
 	 *  (not as bunch when finished has been called). 
 	 */
-	protected IFuture<TestReport> testLocal(int testno, long delay)
+	protected IFuture<Collection<TestReport>> testLocal(int testno, long delay)
 	{
-		return performTest(agent.getServiceProvider(), agent.getComponentIdentifier().getRoot(), testno, delay);
+		return performTest(agent.getComponentIdentifier().getRoot(), testno, delay);
 	}
 	
 	/**
 	 *  Test if remote intermediate results are correctly delivered
 	 *  (not as bunch when finished has been called). 
 	 */
-	protected IFuture<TestReport> testRemote(final int testno, final long delay)
+	protected IFuture<Collection<TestReport>> testRemote(final int testno, final long delay)
 	{
-		final Future<TestReport> ret = new Future<TestReport>();
+		final Future<Collection<TestReport>> ret = new Future<Collection<TestReport>>();
 		
 		// Start platform
 		String url	= "new String[]{\"../jadex-applications-micro/target/classes\"}";	// Todo: support RID for all loaded models.
@@ -132,14 +126,14 @@ public class InvokerAgent
 //			"-usepass", "false",
 			"-simulation", "false"
 		}).addResultListener(agent.createResultListener(
-			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
+			new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 		{
 			public void customResultAvailable(final IExternalAccess platform)
 			{
-				performTest(platform.getServiceProvider(), platform.getComponentIdentifier(), testno, delay)
-					.addResultListener(agent.createResultListener(new DelegationResultListener<TestReport>(ret)
+				performTest(platform.getComponentIdentifier(), testno, delay)
+					.addResultListener(new DelegationResultListener<Collection<TestReport>>(ret)
 				{
-					public void customResultAvailable(final TestReport result)
+					public void customResultAvailable(final Collection<TestReport> result)
 					{
 						platform.killComponent();
 //							.addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, TestReport>(ret)
@@ -151,7 +145,7 @@ public class InvokerAgent
 //						});
 						ret.setResult(result);
 					}
-				}));
+				});
 			}
 		}));
 		
@@ -164,28 +158,13 @@ public class InvokerAgent
 	 *  - invoke the service
 	 *  - wait with intermediate listener for results 
 	 */
-	protected IFuture<TestReport> performTest(final IServiceProvider provider, final IComponentIdentifier root, final int testno, final long delay)
+	protected IIntermediateFuture<TestReport> performTest(final IComponentIdentifier root, final int testno, final long delay)
 	{
-		final Future<TestReport> ret = new Future<TestReport>();
+		final IntermediateFuture<TestReport> ret = new IntermediateFuture<TestReport>();
 
-		final Future<TestReport> res = new Future<TestReport>();
-		
-		final TestReport tr = new TestReport("#"+testno, "Tests if ternimating future works");
-		
-		ret.addResultListener(new DelegationResultListener<TestReport>(res)
-		{
-			public void exceptionOccurred(Exception exception)
-			{
-				tr.setReason(exception.getMessage());
-				super.resultAvailable(tr);
-			}
-		});
-		
 		// Start service agent
-		IFuture<IComponentManagementService> fut = SServiceProvider.getServiceUpwards(
-			provider, IComponentManagementService.class);
-		fut.addResultListener(agent.createResultListener(
-			new ExceptionDelegationResultListener<IComponentManagementService, TestReport>(ret)
+		agent.getServiceContainer().getService(IComponentManagementService.class, root)
+			.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Collection<TestReport>>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
@@ -193,53 +172,141 @@ public class InvokerAgent
 					new LocalResourceIdentifier(root, agent.getModel().getResourceIdentifier().getLocalIdentifier().getUrl()), null);
 				
 				cms.createComponent(null, "jadex/micro/testcases/terminate/TerminableProviderAgent.class", new CreationInfo(rid), null)
-					.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, TestReport>(ret)
+					.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Collection<TestReport>>(ret)
 				{	
 					public void customResultAvailable(final IComponentIdentifier cid)
 					{
-//						System.out.println("cid is: "+cid);
-						SServiceProvider.getService(agent.getServiceProvider(), cid, ITerminableService.class)
-							.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<ITerminableService, TestReport>(ret)
+						ret.addResultListener(new IResultListener<Collection<TestReport>>()
 						{
-							public void customResultAvailable(ITerminableService service)
+							public void resultAvailable(Collection<TestReport> result)
 							{
-								// Invoke service agent
-//								System.out.println("Invoking");
-								ITerminableFuture<String> fut = service.getResult(delay);
-								fut.addResultListener(agent.createResultListener(new IResultListener<String>()
+								cms.destroyComponent(cid);
+							}
+							public void exceptionOccurred(Exception exception)
+							{
+								cms.destroyComponent(cid);
+							}
+						});
+						
+						System.out.println("cid is: "+cid);
+						agent.getServiceContainer().getService(ITerminableService.class, cid)
+							.addResultListener(new ExceptionDelegationResultListener<ITerminableService, Collection<TestReport>>(ret)
+						{
+							public void customResultAvailable(final ITerminableService service)
+							{
+								testTerminate(testno, service, delay).addResultListener(
+									new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
 								{
-									public void resultAvailable(String result)
+									public void customResultAvailable(TestReport result)
 									{
-//										System.out.println("resultAvailable: "+result);
-										cms.destroyComponent(cid);
-										tr.setReason("Termination did not occur: "+result);
-										ret.setResult(tr);
-									}
-									public void exceptionOccurred(Exception exception)
-									{
-//										System.out.println("exceptionOccurred: "+exception);
-										cms.destroyComponent(cid);
-										if(exception instanceof FutureTerminatedException || 
-											(exception instanceof RemoteException && ((RemoteException)exception).getType().equals(FutureTerminatedException.class)))
+										ret.addIntermediateResult(result);
+										testTerminateAction(testno+1, service, delay).addResultListener(
+											new ExceptionDelegationResultListener<TestReport, Collection<TestReport>>(ret)
 										{
-											tr.setSucceeded(true);
-										}
-										else
-										{
-											tr.setFailed("Wrong exception occurred: "+exception);
-										}
-										ret.setResult(tr);
+											public void customResultAvailable(TestReport result)
+											{
+												ret.addIntermediateResult(result);
+												ret.setFinished();
+											}
+										});
 									}
-								}));
-								fut.terminate();
-//								System.out.println("Added listener");
-							}		
-						}));
+								});
+							}
+						});
 					}
 				}));
 			}	
-		}));
+		});
 		
-		return res;
+		return ret;
+	}
+	
+	/**
+	 *  Test terminating a future.
+	 */
+	protected IFuture<TestReport>	testTerminate(int testno, ITerminableService service, long delay)
+	{
+		final Future<Void> tmp = new Future<Void>();
+		ITerminableFuture<String> fut = service.getResult(delay);
+		fut.addResultListener(new IResultListener<String>()
+		{
+			public void resultAvailable(String result)
+			{
+				tmp.setException(new RuntimeException("Termination did not occur: "+result));
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				if(exception instanceof FutureTerminatedException || 
+					(exception instanceof RemoteException && ((RemoteException)exception).getType().equals(FutureTerminatedException.class)))
+				{
+					tmp.setResult(null);
+				}
+				else
+				{
+					tmp.setException(new RuntimeException("Wrong exception occurred: "+exception));
+				}
+			}
+		});
+		fut.terminate();
+
+		final Future<TestReport>	ret	= new Future<TestReport>();
+		final TestReport tr = new TestReport("#"+testno, "Tests if terminating future works");
+		tmp.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				tr.setSucceeded(true);
+				ret.setResult(tr);
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				tr.setFailed(exception.getMessage());
+				ret.setResult(tr);
+			}
+		});
+		return ret;
+	}
+
+	
+	/**
+	 *  Test if terminate action is called.
+	 */
+	protected IFuture<TestReport>	testTerminateAction(int testno, ITerminableService service, long delay)
+	{
+		final Future<Void> tmp = new Future<Void>();
+		
+		final ITerminableFuture<String> fut = service.getResult(delay);
+		service.terminateCalled().addResultListener(new IntermediateExceptionDelegationResultListener<Void, Void>(tmp)
+		{
+			public void intermediateResultAvailable(Void result)
+			{
+				fut.terminate();
+			}
+			public void customResultAvailable(Collection<Void> result)
+			{
+				tmp.setResult(null);
+			}
+			public void finished()
+			{
+				tmp.setResult(null);
+			}
+		});
+
+		final Future<TestReport>	ret	= new Future<TestReport>();
+		final TestReport tr = new TestReport("#"+testno, "Tests if terminating action of future is called");
+		tmp.addResultListener(new ExceptionDelegationResultListener<Void, TestReport>(ret)
+		{
+			public void customResultAvailable(Void result)
+			{
+				tr.setSucceeded(true);
+				ret.setResult(tr);
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				tr.setFailed(exception.getMessage());
+				ret.setResult(tr);
+			}
+		});
+		return ret;
 	}
 }

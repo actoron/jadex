@@ -36,6 +36,7 @@ public class EndStatePlan extends Plan
 		Map args = SCollection.createHashMap();
 		args.put("testagent", getComponentIdentifier());
 		create.getParameter("arguments").setValue(args);
+		create.getParameter("rid").setValue(getComponentDescription().getResourceIdentifier());
 		dispatchSubgoalAndWait(create);
 		IComponentIdentifier	worker	= (IComponentIdentifier)create.getParameter("componentidentifier").getValue();
 		
@@ -73,6 +74,7 @@ public class EndStatePlan extends Plan
 		report	= new TestReport("deregister", "Test if an agent can deregister on termination.");
 		create	= createGoal("cmscap.cms_create_component");
 		create.getParameter("type").setValue("/jadex/bdi/testcases/misc/EndStateDeregister.agent.xml");
+		create.getParameter("rid").setValue(getComponentDescription().getResourceIdentifier());
 		dispatchSubgoalAndWait(create);
 		IComponentIdentifier deregister	= (IComponentIdentifier)create.getParameter("componentidentifier").getValue();
 

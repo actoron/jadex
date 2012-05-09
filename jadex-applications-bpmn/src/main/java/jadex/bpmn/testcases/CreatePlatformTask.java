@@ -1,7 +1,5 @@
 package jadex.bpmn.testcases;
 
-import java.net.URLClassLoader;
-
 import jadex.base.Starter;
 import jadex.bpmn.annotation.Task;
 import jadex.bpmn.annotation.TaskParameter;
@@ -31,15 +29,14 @@ public class CreatePlatformTask implements ITask
 	public IFuture<Void> execute(final ITaskContext context, BpmnInterpreter process)
 	{
 		final Future<Void>	ret	= new Future<Void>();
-		String url	= "new String[]{\"../jadex-applications-bpmn/target/classes\"}";	// Todo: support RID for all loaded models.
-//		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
+		String url	= process.getModel().getResourceIdentifier().getLocalIdentifier().getUrl().toString();
 		
-		
-		Starter.createPlatform(new String[]{"-platformname", process.getComponentIdentifier().getPlatformPrefix()+"_*", "-libpath", url,
+		Starter.createPlatform(new String[]{"-platformname", process.getComponentIdentifier().getPlatformPrefix()+"_*",
+//			"-logging", "true",
+			"-libpath", "new String[]{\""+url+"\"}",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 			"-gui", "false"
 //			"-usepass", "false"//, "-simulation", "false"
-//			"-logging_level", "java.util.logging.Level.INFO"
 			})
 			.addResultListener(process.createResultListener(new ExceptionDelegationResultListener<IExternalAccess, Void>(ret)
 		{

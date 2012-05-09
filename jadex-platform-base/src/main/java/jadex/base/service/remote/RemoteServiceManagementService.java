@@ -240,7 +240,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						RemoteSearchCommand content = new RemoteSearchCommand(cid, manager, 
 							decider, selector, callid);
 						
-						sendMessage(rrms, content, callid, Timeout.DEFAULT_REMOTE, fut);
+						sendMessage(rrms, cid, content, callid, Timeout.DEFAULT_REMOTE, fut);
 					}
 				});
 				
@@ -346,7 +346,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						final String callid = SUtil.createUniqueId(component.getComponentIdentifier().getLocalName());
 						RemoteGetExternalAccessCommand content = new RemoteGetExternalAccessCommand(cid, callid);
 						
-						sendMessage(rrms, content, callid, Timeout.DEFAULT_REMOTE, fut);
+						sendMessage(rrms, cid, content, callid, Timeout.DEFAULT_REMOTE, fut);
 //					}
 //				});
 				
@@ -505,7 +505,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	 *  Send the request message of a remote method invocation.
 	 *  (Can safely be called from any thread).
 	 */
-	public void sendMessage(final IComponentIdentifier receiver, final Object content,
+	public void sendMessage(final IComponentIdentifier receiver, final IComponentIdentifier realrec, final Object content,
 		final String callid, final long to, final Future<Object> future)
 	{
 //		System.out.println("RMS sending: "+content+" "+receiver);
@@ -592,7 +592,7 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 														{
 															msg.put(SFipa.CONTENT, content);
 															
-															ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), null)
+															ms.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, ia.getComponentIdentifier(), ia.getModel().getResourceIdentifier(), realrec, null)
 																.addResultListener(new ExceptionDelegationResultListener<Void, Object>(future)
 															{
 																public void customResultAvailable(Void result)
@@ -1230,16 +1230,16 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 	protected static IFuture<IResourceIdentifier> getResourceIdentifier(IServiceProvider provider, final IComponentIdentifier sender)
 	{
 		final Future<IResourceIdentifier> ret = new Future<IResourceIdentifier>();
-		ret.addResultListener(new IResultListener<IResourceIdentifier>()
-		{
-			public void resultAvailable(IResourceIdentifier result)
-			{
-			}
-			public void exceptionOccurred(Exception exception)
-			{
-				exception.printStackTrace();
-			}
-		});
+//		ret.addResultListener(new IResultListener<IResourceIdentifier>()
+//		{
+//			public void resultAvailable(IResourceIdentifier result)
+//			{
+//			}
+//			public void exceptionOccurred(Exception exception)
+//			{
+//				exception.printStackTrace();
+//			}
+//		});
 		
 		if(sender!=null)
 		{
@@ -1256,7 +1256,9 @@ public class RemoteServiceManagementService extends BasicService implements IRem
 						};
 						public void exceptionOccurred(Exception exception)
 						{
-							super.exceptionOccurred(exception);
+							// Hack???
+							ret.setResult(null);
+//							super.exceptionOccurred(exception);
 						}
 					});
 				}

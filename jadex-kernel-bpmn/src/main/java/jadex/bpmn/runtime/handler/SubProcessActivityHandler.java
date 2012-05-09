@@ -224,6 +224,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 								thread.setParameterValue("$results", res);
 							}
 							res.put(result.getFirstEntity(), result.getSecondEntity());
+//							System.out.println("inter: "+instance.getComponentIdentifier()+" "+file+" "+thread.getParameterValue("$results"));
 							
 							List<MActivity> handlers = activity.getEventHandlers();
 							if(handlers!=null)
@@ -249,6 +250,7 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 
 						public void finished()
 						{
+//							System.out.println("end0: "+instance.getComponentIdentifier()+" "+file+" "+thread.getParameterValue("$results"));
 							updateParameters(thread);
 							
 							thread.setNonWaiting();
@@ -257,8 +259,6 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 						
 						public void resultAvailable(final Collection<Tuple2<String, Object>> results)
 						{
-//							System.out.println("end1: "+instance.getComponentIdentifier()+" "+file);
-							
 							// Store results in out parameters.
 							Map<String, Object> res = new HashMap<String, Object>();
 							if(results!=null)
@@ -270,6 +270,8 @@ public class SubProcessActivityHandler extends DefaultActivityHandler
 								}
 							}
 							thread.setParameterValue("$results", res);	// Hack???
+							
+//							System.out.println("end1: "+instance.getComponentIdentifier()+" "+file+" "+res);
 							
 							updateParameters(thread);
 							

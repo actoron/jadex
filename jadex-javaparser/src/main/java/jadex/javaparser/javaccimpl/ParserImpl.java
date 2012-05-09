@@ -1392,7 +1392,7 @@ TOKEN : /* OPERATORS * /
             }
                 ((ReflectNode)jjtree.peekNode()).setText(t);
                 ((ReflectNode)jjtree.peekNode()).setType(ReflectNode.STATIC_FIELD);
-          } else if (jj_2_19(2)) {
+          } else if (jj_2_19(4)) {
           ParameterNode jjtn004 = new ParameterNode(this, JJTPARAMETERNODE);
           boolean jjtc004 = true;
           jjtree.openNodeScope(jjtn004);

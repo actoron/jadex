@@ -1,6 +1,6 @@
 package jadex.bdi.examples.disastermanagement;
 
-import jadex.commons.future.IFuture;
+import jadex.commons.future.ITerminableFuture;
 import jadex.extension.envsupport.environment.ISpaceObject;
 
 /**
@@ -13,12 +13,6 @@ public interface ITreatVictimsService
 	 *  @param disaster The disaster.
 	 *  @return Future, null when done.
 	 */
-	public IFuture<Void> treatVictims(ISpaceObject disaster);
-
-	/**
-	 *  Abort treating victims.
-	 *  @return Future, null when done.
-	 */
-	public IFuture<Void> abort();
+	public ITerminableFuture<Void> treatVictims(ISpaceObject disaster);
 }
 
