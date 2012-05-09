@@ -962,7 +962,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				}
 				catch(Exception e)
 				{
-					System.err.println("Couldn't play notification sound: "+e);
+					System.err.println("Couldn't play notification sound '"+type+"': "+e);
 				}
 			}
 		}
