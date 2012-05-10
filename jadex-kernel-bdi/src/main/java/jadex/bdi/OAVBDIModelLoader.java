@@ -21,6 +21,7 @@ import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
+import jadex.commons.SReflect;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple;
 import jadex.commons.collection.IndexMap;
@@ -455,7 +456,11 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				String goalname = (String)state.getAttributeValue(val[0], OAVBDIMetaModel.modelelement_has_name);
 				goalnames.put((String)val[1], goalname);
 			}
-			info.addProvidedService(new ProvidedServiceInfo(null, key, new ProvidedServiceImplementation(), null));
+//			ProvidedServiceImplementation psi = new ProvidedServiceImplementation(null, 
+//				"jadex.bdi.runtime.interpreter.BDIInterpreter.createServiceImplementation($scope, "
+//				+SReflect.getClassName(key)+".class, "
+//				
+//			info.addProvidedService(new ProvidedServiceInfo(null, key, , null));
 		}
 		
 		// Build user defined plan conditions and add them to the rule base.
