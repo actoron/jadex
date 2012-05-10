@@ -91,6 +91,7 @@ public class OAVBDIXMLReader
 //		});
 
 		IPostProcessor tepost = new ClassPostProcessor(OAVBDIMetaModel.typedelement_has_classname, OAVBDIMetaModel.typedelement_has_class); 
+		IPostProcessor scpost = new ClassPostProcessor(OAVBDIMetaModel.goalpublish_has_classname, OAVBDIMetaModel.goalpublish_has_class); 
 //		IPostProcessor rspost = new ClassPostProcessor(OAVBDIMetaModel.requiredservice_has_classname, OAVBDIMetaModel.requiredservice_has_class); 
 //		IPostProcessor pspost = new ClassPostProcessor(OAVBDIMetaModel.providedservice_has_classname, OAVBDIMetaModel.providedservice_has_class); 
 //		IPostProcessor bopost = new ClassPostProcessor(OAVBDIMetaModel.body_has_classname, OAVBDIMetaModel.body_has_class); 
@@ -404,6 +405,12 @@ public class OAVBDIXMLReader
 //		
 //		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "property")), new ObjectInfo(OAVBDIMetaModel.expression_type, expost),
 //			new MappingInfo(ti_expression)));
+		
+		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "goalpublish")), new ObjectInfo(OAVBDIMetaModel.goalpublish_type, scpost), 
+			new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("class", OAVBDIMetaModel.goalpublish_has_classname)),
+				new AttributeInfo(new AccessInfo((String)null, OAVBDIMetaModel.goalpublish_has_class, AccessInfo.IGNORE_WRITE))
+			}), null, new OAVObjectReaderHandler()));	
 		
 		typeinfos.add(new TypeInfo(new XMLInfo(new QName(uri, "parameter")), new ObjectInfo(OAVBDIMetaModel.parameter_type, tepost), 
 			new MappingInfo(null, new AttributeInfo[]{

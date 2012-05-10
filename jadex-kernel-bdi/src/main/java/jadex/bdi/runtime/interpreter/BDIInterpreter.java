@@ -2072,10 +2072,10 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/**
 	 *  Create a wrapper service implementation based on 
 	 */
-	public static Object createServiceImplementation(IBDIInternalAccess agent, Class<?> type, String goalname)
+	public static Object createServiceImplementation(IBDIInternalAccess agent, Class<?> type, Map<String, String> goalnames)
 	{
 		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
-			new GoalDelegationHandler(agent, goalname));
+			new GoalDelegationHandler(agent, goalnames));
 	}
 	
 }

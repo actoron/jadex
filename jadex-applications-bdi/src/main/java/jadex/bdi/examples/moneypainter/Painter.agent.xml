@@ -26,6 +26,7 @@
 			<parameter name="result" class="String" direction="out">
 				<!-- <servicemapping ref="paintservice.result"/> -->
 			</parameter>
+			<goalpublish class="IPaintMoneyService" method="getoneeuro"/>
 		</achievegoal>
  	</goals>
 
@@ -47,11 +48,11 @@
 		</plan>
 	</plans>
 
-	<services>
+	<!-- <services>
 		<providedservice name="paintservice" class="IPaintMoneyService">
-			<!-- <implementation class="PaintMoneyService"/> -->
+			<!- - <implementation class="PaintMoneyService"/> - ->
 			<implementation>BDIInterpreter.createServiceImplementation($scope, IPaintMoneyService.class, "getoneeuro")</implementation>
 		</providedservice>
-	</services>
+	</services> -->
 </agent>
 

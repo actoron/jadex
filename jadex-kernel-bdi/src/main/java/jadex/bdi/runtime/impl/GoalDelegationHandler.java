@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  *  
@@ -32,7 +33,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 	protected IBDIInternalAccess agent;
 	
 	/** The goal name. */
-	protected String goalname;
+	protected Map<String, String> goalnames;
 	
 	//-------- constructors --------
 	
@@ -40,14 +41,15 @@ public class GoalDelegationHandler  implements InvocationHandler
 	 *  Create a new service wrapper invocation handler.
 	 *  @param agent The internal access of the agent.
 	 */
-	public GoalDelegationHandler(IBDIInternalAccess agent, String goalname)
+	public GoalDelegationHandler(IBDIInternalAccess agent, Map<String, String> goalnames)
 	{
 		if(agent==null)
 			throw new IllegalArgumentException("Agent must not null.");
-		if(goalname==null)
-			throw new IllegalArgumentException("Goal name must not null.");
+		if(goalnames==null)
+			throw new IllegalArgumentException("Goal names must not null.");
+		
 		this.agent = agent;
-		this.goalname = goalname;
+		this.goalnames = goalnames;
 	}
 	
 	//-------- methods --------
@@ -62,7 +64,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 	{
 		final Future<Object> ret = new Future<Object>();
 		
-		final IGoal goal = agent.getGoalbase().createGoal(goalname);
+		final IGoal goal = agent.getGoalbase().createGoal(goalnames.get(method.getName()));
 		
 		Class<?>[] mptypes = method.getParameterTypes();
 		

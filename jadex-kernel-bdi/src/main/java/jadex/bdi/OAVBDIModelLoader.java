@@ -16,6 +16,8 @@ import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.LocalResourceIdentifier;
 import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ModelInfo;
+import jadex.bridge.service.ProvidedServiceImplementation;
+import jadex.bridge.service.ProvidedServiceInfo;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
@@ -292,6 +294,8 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			}
 		}
 		
+		Map<Class<?>, List<Object[]>> pubs = new HashMap<Class<?>, List<Object[]>>();
+		
 		// Build user defined goal conditions and add them to the rule base.
 		Collection mgoals = state.getAttributeValues(mcapa, OAVBDIMetaModel.capability_has_goals);
 		if(mgoals!=null)
@@ -415,7 +419,43 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				
 				// Create rules for dynamic parameter set values.
 				createDynamicParameterSetValuesConditions(model, mgoal, rb, imports);
+				
+				Object publish = state.getAttributeValue(mgoal, OAVBDIMetaModel.goal_has_publish);
+				if(publish!=null)
+				{
+					Class<?> gpc = (Class<?>)state.getAttributeValue(publish, OAVBDIMetaModel.goalpublish_has_class);
+					String method = (String)state.getAttributeValue(publish, OAVBDIMetaModel.goalpublish_has_methodname);
+					List<Object[]> tmp = pubs.get(gpc);
+					if(tmp==null)
+					{
+						tmp = new ArrayList<Object[]>();
+						pubs.put(gpc, tmp);
+					}
+					tmp.add(new Object[]{mgoal, method});
+				}
 			}
+		}
+		
+		// Evaluate the published goals and create provided services for them
+		for(Iterator<Class<?>> it = pubs.keySet().iterator(); it.hasNext(); )
+		{
+			Class<?> key = it.next();
+			List<Object[]> vals = pubs.get(key);
+			Map<String, String> goalnames = new HashMap<String, String>();
+			for(Object[] val: vals)
+			{
+				if(goalnames.containsKey(val[1]))
+				{
+					Tuple se	= new Tuple(new Object[]{
+						new StackElement(new QName(model instanceof OAVAgentModel ? "agent" : "capability"), mcapa),
+						new StackElement(new QName("goals"), null),
+						new StackElement(new QName("goal"), val[0])});	// Todo: mcaparef no longer in state!=
+					model.addEntry(se, "Goal publish has error.");
+				}
+				String goalname = (String)state.getAttributeValue(val[0], OAVBDIMetaModel.modelelement_has_name);
+				goalnames.put((String)val[1], goalname);
+			}
+			info.addProvidedService(new ProvidedServiceInfo(null, key, new ProvidedServiceImplementation(), null));
 		}
 		
 		// Build user defined plan conditions and add them to the rule base.
