@@ -128,7 +128,7 @@ public class InvokerAgent
 		Starter.createPlatform(new String[]{"-libpath", url, "-platformname", agent.getComponentIdentifier().getPlatformPrefix()+"_*",
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 //			"-logging_level", "java.util.logging.Level.INFO",
-			"-gui", "false", "-simulation", "false"
+			"-gui", "false", "-simulation", "false", "-printpass", "false"
 		}).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, TestReport>(ret)
 		{
@@ -199,7 +199,7 @@ public class InvokerAgent
 						{	
 							public void customResultAvailable(final IComponentIdentifier cid)
 							{
-								System.out.println("cid is: "+cid);
+//								System.out.println("cid is: "+cid);
 								SServiceProvider.getService(agent.getServiceProvider(), cid, IIntermediateResultService.class)
 									.addResultListener(agent.createResultListener(new ExceptionDelegationResultListener<IIntermediateResultService, TestReport>(ret)
 								{
@@ -215,7 +215,7 @@ public class InvokerAgent
 											{
 												if(start[0]==null)
 													start[0] = clock.getTime();
-												System.out.println("intermediateResultAvailable: "+result);
+//												System.out.println("intermediateResultAvailable: "+result);
 											}
 											public void finished()
 											{
@@ -224,7 +224,7 @@ public class InvokerAgent
 												TestReport tr = new TestReport("#"+testno, "Tests if intermediate results work");
 												long expected = delay*(max-1);
 												// deviation can happen because receival of results is measured
-												System.out.println("Results did arrive in (needed/expected): ("+needed+" / "+expected+")");
+//												System.out.println("Results did arrive in (needed/expected): ("+needed+" / "+expected+")");
 												if(needed*1.1>=expected) // 10% deviation allowed
 												{
 													tr.setSucceeded(true);

@@ -21,7 +21,7 @@ public class Receiver2Agent
 	@AgentStreamArrived
 	public void streamArrvied(final IOutputConnection con)
 	{
-		System.out.println("received: "+con+" "+con.hashCode());
+//		System.out.println("received: "+con+" "+con.hashCode());
 		
 //		final Future<Void> ret = new Future<Void>();
 		final IComponentStep<Void> step = new IComponentStep<Void>()
@@ -53,7 +53,7 @@ public class Receiver2Agent
 					}
 					public void exceptionOccurred(Exception exception)
 					{
-						System.out.println("Write failed: "+exception);
+//						System.out.println("Write failed: "+exception);
 					}
 				});
 				return IFuture.DONE;

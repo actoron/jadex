@@ -61,7 +61,7 @@ public class ComponentTestSuite extends TestSuite
 			"-platformname", "testcases_*",
 			"-kernels", "\"all\"",	// Required for old hudson build, otherwise wrong bdi kernel is used as dependencies are not in correct order
 			"-simulation", "true",
-			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
+//			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
 //			"-logging_level", "java.util.logging.Level.INFO",
 			"-gui", "false",
 			"-awareness", "false",
@@ -106,17 +106,17 @@ public class ComponentTestSuite extends TestSuite
 		ILibraryService libsrv	= (ILibraryService)SServiceProvider.getService(rootcomp.getServiceProvider(), ILibraryService.class, RequiredServiceInfo.SCOPE_PLATFORM).get(ts);
 		
 		// Only works with x-rid hack or maven dependency service, because rms cannot use default classloader for decoding application messages.
-		final IResourceIdentifier	rid	= null;
-//		final IResourceIdentifier	rid;
-//		try
-//		{
-//			URL url = root.toURI().toURL();
-//			rid	= libsrv.addURL(url).get(ts);
-//		}
-//		catch(Exception e)
-//		{
-//			throw new RuntimeException(e);
-//		}
+//		final IResourceIdentifier	rid	= null;
+		final IResourceIdentifier	rid;
+		try
+		{
+			URL url = root.toURI().toURL();
+			rid	= libsrv.addURL(url).get(ts);
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 		
 		// Scan for test cases.
 		List<File>	todo	= new LinkedList<File>();

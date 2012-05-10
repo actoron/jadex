@@ -107,7 +107,7 @@ public abstract class TestAgent
 			"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false", "-awareness", "false",
 //			"-logging_level", "java.util.logging.Level.INFO",
 //			"-gui", "false", "-usepass", "false", "-simulation", "false"
-			"-gui", "false", "-simulation", "false"
+			"-gui", "false", "-simulation", "false", "-printpass", "false"
 		}).addResultListener(agent.createResultListener(
 			new DelegationResultListener<IExternalAccess>(ret)));
 		

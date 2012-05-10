@@ -44,12 +44,12 @@ public class IntermediateResultProviderAgent implements IIntermediateResultServi
 //		final int max = 5;
 //		final long delay = 200;
 		
-		System.out.println("start: "+System.currentTimeMillis());
+//		System.out.println("start: "+System.currentTimeMillis());
 		agent.waitFor(delay, new IComponentStep<Void>()
 		{
 			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				System.out.println("setting intermediate result: "+cnt[0]);//+" - "+System.currentTimeMillis());
+//				System.out.println("setting intermediate result: "+cnt[0]);//+" - "+System.currentTimeMillis());
 				ret.addIntermediateResult("step("+(cnt[0]++)+"/"+max+")");
 				if(cnt[0]==max)
 				{

@@ -61,14 +61,14 @@ public class InvokerAgent
 		{
 			public void resultAvailable(Void result)
 			{
-				System.out.println("tests finished: "+tc);
+//				System.out.println("tests finished: "+tc);
 				agent.setResultValue("testresults", tc);
 				agent.killAgent();				
 			}
 			public void exceptionOccurred(Exception exception)
 			{
 				tc.addReport(new TestReport("#0", "Unexpected exception", false, exception.toString()));
-				System.out.println("tests finished: "+tc);
+//				System.out.println("tests finished: "+tc);
 				agent.setResultValue("testresults", tc);
 				agent.killAgent();
 			}
@@ -124,7 +124,7 @@ public class InvokerAgent
 //			"-logging_level", "java.util.logging.Level.INFO",
 			"-gui", "false",
 //			"-usepass", "false",
-			"-simulation", "false"
+			"-simulation", "false", "-printpass", "false"
 		}).addResultListener(agent.createResultListener(
 			new ExceptionDelegationResultListener<IExternalAccess, Collection<TestReport>>(ret)
 		{
@@ -188,7 +188,7 @@ public class InvokerAgent
 							}
 						});
 						
-						System.out.println("cid is: "+cid);
+//						System.out.println("cid is: "+cid);
 						agent.getServiceContainer().getService(ITerminableService.class, cid)
 							.addResultListener(new ExceptionDelegationResultListener<ITerminableService, Collection<TestReport>>(ret)
 						{

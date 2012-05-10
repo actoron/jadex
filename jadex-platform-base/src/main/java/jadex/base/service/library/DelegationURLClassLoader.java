@@ -2,6 +2,7 @@ package jadex.base.service.library;
 
 import jadex.bridge.IResourceIdentifier;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 import java.io.IOException;
 import java.net.URL;
@@ -273,6 +274,6 @@ public class DelegationURLClassLoader extends URLClassLoader
 	 */
 	public String toString()
 	{
-		return SReflect.getInnerClassName(getClass())+"("+rid+")";
+		return SReflect.getInnerClassName(getClass())+"("+rid+", "+SUtil.arrayToString(delegates)+")";
 	}
 }

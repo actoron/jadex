@@ -87,26 +87,27 @@ public class ReceiverAgent
 				{
 					try
 					{
-						System.out.println("finished, size: "+cnt[0]);
+//						System.out.println("finished, size: "+cnt[0]);
 						fos.close();
 						agent.setResultValue("filesize", new Long(cnt[0]));
 						agent.killAgent();
 					}
 					catch(Exception e)
 					{
-						e.printStackTrace();
+						agent.killAgent();
+//						e.printStackTrace();
 					}
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-					System.out.println("ex:"+exception);
+//					System.out.println("ex:"+exception);
 					agent.killAgent();
 				}
 			}));
 		}
 		catch(Exception e)
 		{
-			e.printStackTrace();
+//			e.printStackTrace();
 			agent.killAgent();
 		}
 	}

@@ -63,7 +63,7 @@ public class UserAgent
 				{
 					public void resultAvailable(Void result)
 					{
-						System.out.println("countlis: "+agent.isComponentThread());
+//						System.out.println("countlis: "+agent.isComponentThread());
 						
 						agent.setResultValue("testresults", new Testcase(testcnt, reports.toArray(new TestReport[reports.size()])));
 						ret.setResult(null);

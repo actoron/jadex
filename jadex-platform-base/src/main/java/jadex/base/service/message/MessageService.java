@@ -1300,7 +1300,7 @@ public class MessageService extends BasicService implements IMessageService
 	/**
 	 *  Get the classloader for a resource identifier.
 	 */
-	protected IFuture<ClassLoader> getRIDClassLoader(Map msg, MessageType mt)
+	protected IFuture<ClassLoader> getRIDClassLoader(final Map msg, final MessageType mt)
 	{
 		final Future<ClassLoader> ret = new Future<ClassLoader>();
 		
@@ -1312,9 +1312,34 @@ public class MessageService extends BasicService implements IMessageService
 			SServiceProvider.getServiceUpwards(component.getServiceProvider(), ILibraryService.class)
 				.addResultListener(new ExceptionDelegationResultListener<ILibraryService, ClassLoader>(ret)
 			{
-				public void customResultAvailable(ILibraryService ls)
+				public void customResultAvailable(final ILibraryService ls)
 				{
-					ls.getClassLoader(rid).addResultListener(new DelegationResultListener<ClassLoader>(ret));
+					ls.getClassLoader(rid).addResultListener(new DelegationResultListener<ClassLoader>(ret)
+					{
+						public void customResultAvailable(ClassLoader result)
+						{
+							// Hack!!! Use current platform class loader for rms message, if no rid class loader available.
+							if(result==null)
+							{
+								Object	recs	= msg.get(mt.getReceiverIdentifier());
+								if((recs instanceof IComponentIdentifier[] && ((IComponentIdentifier[])recs).length==1
+									&& ((IComponentIdentifier[])recs)[0].getLocalName().equals("rms"))
+									|| (recs instanceof List && ((List<?>)recs).size()==1
+										&& ((IComponentIdentifier)((List<?>)recs).get(0)).getLocalName().equals("rms")))
+								{
+									ls.getClassLoader(null).addResultListener(new DelegationResultListener<ClassLoader>(ret));
+								}
+								else
+								{
+									super.customResultAvailable(result);
+								}
+							}
+							else
+							{
+								super.customResultAvailable(result);
+							}
+						}
+					});
 				}
 				public void exceptionOccurred(Exception exception)
 				{

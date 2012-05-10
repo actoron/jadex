@@ -36,7 +36,7 @@ public class StartScenario
 	{
 		final Future ret = new Future();
 		
-		String[] defargs = new String[]{"-platformname", "local", "-tcpport", "10000", "-niotcpport", "10001"};
+		String[] defargs = new String[]{"-platformname", "local", "-tcpport", "10000", "-niotcpport", "10001", "-printpass", "false"};
 		
 		Starter.createPlatform(createArguments(defargs, libpaths))
 			.addResultListener(new DefaultResultListener()
@@ -44,7 +44,7 @@ public class StartScenario
 			public void resultAvailable(Object result)
 			{
 				final IExternalAccess lplat = (IExternalAccess)result;
-				String[] defargs = new String[]{"-platformname", "remote", "-tcpport", "11000", "-niotcpport", "11001"};
+				String[] defargs = new String[]{"-platformname", "remote", "-tcpport", "11000", "-niotcpport", "11001", "-printpass", "false"};
 				
 				Starter.createPlatform(createArguments(defargs, libpaths))
 					.addResultListener(new DefaultResultListener()

@@ -7,7 +7,6 @@ import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.bridge.service.types.remote.ServiceOutputConnection;
-import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -90,22 +89,22 @@ public class StreamProviderAgent implements IStreamService
 		{
 			public void resultAvailable(Collection<byte[]> result)
 			{
-				System.out.println("Result: "+result);
+//				System.out.println("Result: "+result);
 				ret.setResult(new Long(size[0]));
 			}
 			public void intermediateResultAvailable(byte[] result)
 			{
 				size[0] += result.length;
-				System.out.println("Intermediate result: "+SUtil.arrayToString(result));
+//				System.out.println("Intermediate result: "+SUtil.arrayToString(result));
 			}
 			public void finished()
 			{
-				System.out.println("finished, size: "+size[0]);
+//				System.out.println("finished, size: "+size[0]);
 				ret.setResult(new Long(size[0]));
 			}
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("ex:"+exception);
+//				System.out.println("ex:"+exception);
 				ret.setException(exception);
 			}
 		});

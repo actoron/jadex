@@ -179,13 +179,13 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void resultAvailable(IInputConnection con)
 			{
-				System.out.println("received icon: "+con);
+//				System.out.println("received icon: "+con);
 				StreamProviderAgent.read(con).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("ex: "+exception);
+//				System.out.println("ex: "+exception);
 				tr.setFailed("Exception: "+exception.getMessage());
 				ret.setResult(tr);
 			}
@@ -206,13 +206,13 @@ public class StreamUserAgent extends TestAgent
 		{
 			public void resultAvailable(final IOutputConnection con)
 			{
-				System.out.println("received ocon: "+con);
+//				System.out.println("received ocon: "+con);
 				StreamProviderAgent.write(con, agent).addResultListener(new TestReportListener(tr, ret, StreamProviderAgent.getWriteLength()));
 			}
 			
 			public void exceptionOccurred(Exception exception)
 			{
-				System.out.println("ex: "+exception);
+//				System.out.println("ex: "+exception);
 				ret.setException(exception);
 			}
 		});
