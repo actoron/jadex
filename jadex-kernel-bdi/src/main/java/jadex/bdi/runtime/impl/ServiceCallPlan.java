@@ -58,12 +58,12 @@ public class ServiceCallPlan extends Plan
 //				Object	proxy	= services.getNextIntermediateResult(this);
 				Method[]	meths	= SReflect.getMethods(proxy.getClass(), method);	
 				Object[] myargs = createArguments(meths[0]);
-				System.out.println("invoking service, args: "+SUtil.arrayToString(myargs));
+//				System.out.println("invoking service, args: "+SUtil.arrayToString(myargs));
 				Object	res	= meths[0].invoke(proxy, myargs);
 				if(res instanceof IFuture<?>)
 				{
 					Object resu = ((IFuture<?>)res).get(this);
-					System.out.println("invoked, result: "+resu);
+//					System.out.println("invoked, result: "+resu);
 					// todo: set return value on parameter
 				}
 				success	= true;

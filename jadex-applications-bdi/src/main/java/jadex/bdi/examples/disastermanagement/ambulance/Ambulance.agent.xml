@@ -16,6 +16,7 @@
 		<import>java.util.logging.*</import>
 		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.bdi.runtime.interpreter.*</import>
 		<import>jadex.bdi.examples.disastermanagement.*</import>
 		<import>jadex.bdi.examples.disastermanagement.movement.*</import>
 	</imports>
@@ -67,6 +68,11 @@
 		<!-- Goal to treat one victim. -->
 		<achievegoal name="treat_victims">
 			<parameter name="disaster" class="ISpaceObject"/>
+			<dropcondition>
+				($goal).goal_has_lifecyclestate==OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION
+				&amp;&amp; $goalbase.getGoals(($goal).element_has_model.melement_has_name).length>1
+			</dropcondition>
+			<deliberation cardinality="1"/>
 		</achievegoal>
 	</goals>
 	

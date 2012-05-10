@@ -53,33 +53,30 @@ public class TreatVictimsService implements ITreatVictimsService
 			}
 		});
 		
-		IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("treat_victims");
-		if(goals.length>0)
+		final IGoal tv = (IGoal)agent.getGoalbase().createGoal("treat_victims");
+		tv.getParameter("disaster").setValue(disaster);
+		tv.addGoalListener(new IGoalListener()
 		{
-			ret.setExceptionIfUndone(new IllegalStateException("Can only handle one order at a time. Use abort() first."));
-		}
-		else
-		{
-			final IGoal tv = (IGoal)agent.getGoalbase().createGoal("treat_victims");
-			tv.getParameter("disaster").setValue(disaster);
-			tv.addGoalListener(new IGoalListener()
+			public void goalFinished(AgentEvent ae)
 			{
-				public void goalFinished(AgentEvent ae)
-				{
 //					System.out.println("tv fin: "+agent.getAgentName());
-					if(tv.isSucceeded())
-						ret.setResultIfUndone(null);
-					else
-						ret.setExceptionIfUndone(tv.getException());
-				}
-				
-				public void goalAdded(AgentEvent ae)
+				if(tv.isSucceeded())
 				{
+					ret.setResultIfUndone(null);
 				}
-			});
-//			System.out.println("tv start: "+agent.getAgentName());
-			agent.getGoalbase().dispatchTopLevelGoal(tv);
-		}
+				else
+				{
+					ret.setExceptionIfUndone(
+						tv.getException()!=null ? tv.getException() : new RuntimeException("aborted"));
+				}
+			}
+			
+			public void goalAdded(AgentEvent ae)
+			{
+			}
+		});
+//		System.out.println("tv start: "+agent.getAgentName());
+		agent.getGoalbase().dispatchTopLevelGoal(tv);
 		
 		return ret;
 	}
@@ -93,3 +90,5 @@ public class TreatVictimsService implements ITreatVictimsService
 		return "TreatVictimsService, "+agent.getComponentIdentifier();
 	}
 }
+
+	

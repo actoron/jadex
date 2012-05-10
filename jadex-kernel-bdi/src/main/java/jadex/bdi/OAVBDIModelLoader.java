@@ -1,5 +1,6 @@
 package jadex.bdi;
 
+import jadex.bdi.model.BDIErrorReportBuilder;
 import jadex.bdi.model.BDIParserHelper;
 import jadex.bdi.model.OAVAgentModel;
 import jadex.bdi.model.OAVBDIMetaModel;
@@ -238,6 +239,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 		else
 		{
 			// Todo: capability or agent?
+			mi	= mi!=null ? mi : new ModelInfo(null, null, null, new BDIErrorReportBuilder(name, name, entries, null, state).buildErrorReport(), null, null, false, name, null, null, null, null, null, null, imports, null);
 			ret	=  new OAVCapabilityModel(state, handle, mi, types, info.getLastModified(), entries);
 		}
 		

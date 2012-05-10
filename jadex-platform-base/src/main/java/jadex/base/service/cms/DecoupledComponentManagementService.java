@@ -439,16 +439,16 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 																			// Removed in resumeComponent()
 				//																initinfos.remove(cid);
 																			
-																			CMSComponentDescription padesc;
-																			InitInfo painfo = getParentInfo(cinfo);
-																			if(painfo!=null && painfo.getDescription()!=null)
-																			{
-																				padesc = (CMSComponentDescription)painfo.getDescription();
-																			}
-																			else
-																			{
-																				padesc = (CMSComponentDescription)getDescription(getParentIdentifier(cinfo));
-																			}
+																			CMSComponentDescription padesc	= (CMSComponentDescription)pad.getDescription();
+//																			InitInfo painfo = getParentInfo(cinfo);
+//																			if(painfo!=null && painfo.getDescription()!=null)
+//																			{
+//																				padesc = (CMSComponentDescription)painfo.getDescription();
+//																			}
+//																			else
+//																			{
+//																				padesc = (CMSComponentDescription)getDescription(getParentIdentifier(cinfo));
+//																			}
 																			padesc.addChild(cid);
 																			
 																			Boolean dae = ad.getDaemon();

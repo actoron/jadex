@@ -40,7 +40,7 @@
 	</beliefs>
 
 	<goals>
-		<achievegoal name="handle_disaster" recur="true" recurdelay="1000">
+		<achievegoal name="handle_disaster">
 			<parameter name="disaster" class="ISpaceObject">
 				<value>$disaster</value>
 			</parameter>
@@ -60,7 +60,7 @@
 			</targetcondition>
 		</achievegoal>
 		
-		<achievegoal name="clear_chemicals" exclude="never">
+		<achievegoal name="clear_chemicals" exclude="never" retrydelay="1000">
 			<parameter name="disaster" class="ISpaceObject"/>
 			<deliberation>
 				<inhibits ref="treat_victims">
@@ -69,11 +69,11 @@
 			</deliberation>
 		</achievegoal>
 		
-		<achievegoal name="extinguish_fires" exclude="never">
+		<achievegoal name="extinguish_fires" exclude="never" retrydelay="1000">
 			<parameter name="disaster" class="ISpaceObject"/>
 		</achievegoal>
 		
-		<achievegoal name="treat_victims" exclude="never">
+		<achievegoal name="treat_victims" exclude="never" retrydelay="1000">
 			<parameter name="disaster" class="ISpaceObject"/>
 		</achievegoal>
 	</goals>
@@ -92,16 +92,10 @@
 		
 		<!-- Plan for calling a clear chemicals service. -->
 		<plan name="clear_chemicals_service_call_plan">
-			<parameter name="service" class="String">
-				<value>"clearchemicalsservices"</value>
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="clear_chemicals.disaster"/>
 			</parameter>
-			<parameter name="method" class="String">
-				<value>"clearChemicals"</value>
-			</parameter>
-			<parameter name="args" class="Object[]">
-				<value>new Object[]{$goal.disaster}</value>
-			</parameter>
-			<body class="ServiceCallPlan"/>
+			<body service="clearchemicalsservices" method="clearChemicals"/>
 			<trigger>
 				<goal ref="clear_chemicals"/>
 			</trigger>
@@ -109,16 +103,10 @@
 		
 		<!-- Plan for calling a extinguish fire service. -->
 		<plan name="extinguis_fire_service_call_plan">
-			<parameter name="service" class="String">
-				<value>"extinguishfireservices"</value>
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="clear_chemicals.disaster"/>
 			</parameter>
-			<parameter name="method" class="String">
-				<value>"extinguishFire"</value>
-			</parameter>
-			<parameter name="args" class="Object[]">
-				<value>new Object[]{$goal.disaster}</value>
-			</parameter>
-			<body class="ServiceCallPlan"/>
+			<body service="extinguishfireservices" method="extinguishFire"/>
 			<trigger>
 				<goal ref="extinguish_fires"/>
 			</trigger>
@@ -126,16 +114,10 @@
 		
 		<!-- Plan for calling a treat victims service. -->
 		<plan name="treat_victims_service_call_plan">
-			<parameter name="service" class="String">
-				<value>"treatvictimservices"</value>
+			<parameter name="disaster" class="ISpaceObject">
+				<goalmapping ref="clear_chemicals.disaster"/>
 			</parameter>
-			<parameter name="method" class="String">
-				<value>"treatVictims"</value>
-			</parameter>
-			<parameter name="args" class="Object[]">
-				<value>new Object[]{$goal.disaster}</value>
-			</parameter>
-			<body class="ServiceCallPlan"/>
+			<body service="treatvictimservices" method="treatVictims"/>
 			<trigger>
 				<goal ref="treat_victims"/>
 			</trigger>

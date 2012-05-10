@@ -559,7 +559,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 										fut.setExceptionIfUndone(exception);
 										if(res instanceof ITerminableFuture<?>)
 										{
-											((ITerminableFuture)res).terminate();
+											((ITerminableFuture)fut).terminate(exception);
 										}
 									}
 								}
@@ -588,7 +588,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 										fut.setExceptionIfUndone(exception);
 										if(res instanceof ITerminableFuture<?>)
 										{
-											((ITerminableFuture)res).terminate();
+											((ITerminableFuture)fut).terminate(exception);
 										}
 									}
 								}
