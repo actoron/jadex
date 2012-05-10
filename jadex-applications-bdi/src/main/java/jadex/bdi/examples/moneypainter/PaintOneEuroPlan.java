@@ -36,6 +36,8 @@ public class PaintOneEuroPlan extends Plan
 //		System.out.println("end painting: ok, "+this);
 		System.out.println("painting end: "+getComponentIdentifier());
 		
+		getParameter("result").setValue(getComponentIdentifier().getName());
+		
 		getBeliefbase().getBelief("painter").setFact(null);
 //		getBeliefbase().getBelief("painting").setFact(Boolean.FALSE);
 	}

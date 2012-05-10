@@ -38,8 +38,8 @@ public class ServiceCallPlan extends Plan
 	
 	public void body()
 	{
-		try
-		{
+//		try
+//		{
 		boolean	success	= false;
 //		String	service	= (String)getParameter("service").getValue();
 //		String	method	= (String)getParameter("method").getValue();
@@ -58,11 +58,12 @@ public class ServiceCallPlan extends Plan
 //				Object	proxy	= services.getNextIntermediateResult(this);
 				Method[]	meths	= SReflect.getMethods(proxy.getClass(), method);	
 				Object[] myargs = createArguments(meths[0]);
+				System.out.println("invoking service, args: "+SUtil.arrayToString(myargs));
 				Object	res	= meths[0].invoke(proxy, myargs);
 				if(res instanceof IFuture<?>)
 				{
-					((IFuture<?>)res).get(this);
-					
+					Object resu = ((IFuture<?>)res).get(this);
+					System.out.println("invoked, result: "+resu);
 					// todo: set return value on parameter
 				}
 				success	= true;
@@ -75,11 +76,11 @@ public class ServiceCallPlan extends Plan
 		
 		if(!success)
 			fail();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+//		}
+//		catch(Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 	}
 	
 	/**
@@ -101,7 +102,8 @@ public class ServiceCallPlan extends Plan
 				IParameter p = it.next();
 				
 				IMParameter mp = (IMParameter)p.getModelElement();
-				if(OAVBDIMetaModel.PARAMETER_DIRECTION_IN.equals(mp.getDirection()))
+				if(OAVBDIMetaModel.PARAMETER_DIRECTION_IN.equals(mp.getDirection())
+					|| OAVBDIMetaModel.PARAMETER_DIRECTION_INOUT.equals(mp.getDirection()))
 				{
 					if(SReflect.isSupertype(mptypes[i], mp.getClazz()))
 					{

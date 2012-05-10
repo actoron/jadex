@@ -10,6 +10,7 @@ import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.clock.ITimer;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 
 
@@ -131,74 +132,96 @@ public class TimeoutResultListener<E> implements IResultListener<E>
 	protected synchronized void initTimer()
 	{
 		// Initialize timeout
+		final Object mon = this;
 		
-		SServiceProvider.getServiceUpwards(exta.getServiceProvider(), IClockService.class)
-			.addResultListener(new DefaultResultListener<IClockService>()
+		exta.scheduleStep(new IComponentStep<Void>()
 		{
-			public void resultAvailable(IClockService clock)
+			public IFuture<Void> execute(final IInternalAccess ia)
 			{
-				try
+				SServiceProvider.getServiceUpwards(exta.getServiceProvider(), IClockService.class)
+					.addResultListener(ia.createResultListener(new DefaultResultListener<IClockService>()
 				{
-					final Runnable notify = new Runnable()
+					public void resultAvailable(final IClockService clock)
 					{
-						public void run()
+						clock.isValid().addResultListener(ia.createResultListener(new DefaultResultListener<Boolean>()
 						{
-							boolean notify = false;
-							synchronized(TimeoutResultListener.this)
+							public void resultAvailable(Boolean valid)
 							{
-								if(!notified)
+								if(!valid.booleanValue())
 								{
-									notify = true;
-									notified = true;
+//									System.out.println("invalid clock");
+									return;
+								}
+								
+								try
+								{
+									final Runnable notify = new Runnable()
+									{
+										public void run()
+										{
+											boolean notify = false;
+											synchronized(TimeoutResultListener.this)
+											{
+												if(!notified)
+												{
+													notify = true;
+													notified = true;
+												}
+											}
+											if(notify)
+												listener.exceptionOccurred(new TimeoutException());
+										}
+									};
+									
+			//						synchronized(TimeoutResultListener.this)
+									synchronized(mon)
+									{
+										// Do not create new timer if already notified
+										if(timeout>0 && !notified)
+										{
+											if(realtime && !IClock.TYPE_SYSTEM.equals(clock.getClockType()))
+											{
+												Timer t = new Timer();
+												TimerTask tt = new TimerTask()
+												{
+													public void run()
+													{
+														notify.run();
+													}
+												};
+												timer = tt;
+												t.schedule(tt, timeout);
+											}
+											else
+											{
+												timer = clock.createTimer(timeout, new ITimedObject()
+												{
+													public void timeEventOccurred(long currenttime)
+													{
+														notify.run();
+													}
+												});
+											}
+										}
+									}
+								}
+								catch(Exception e)
+								{
+									e.printStackTrace();
+									// todo: should not happen
+									// causes null pointer exception on clock when clock is uninitialized
 								}
 							}
-							if(notify)
-								listener.exceptionOccurred(new TimeoutException());
-						}
-					};
-					
-					synchronized(TimeoutResultListener.this)
-					{
-						// Do not create new timer if already notified
-						if(timeout>0 && !notified)
-						{
-							if(realtime && !IClock.TYPE_SYSTEM.equals(clock.getClockType()))
-							{
-								Timer t = new Timer();
-								TimerTask tt = new TimerTask()
-								{
-									public void run()
-									{
-										notify.run();
-									}
-								};
-								timer = tt;
-								t.schedule(tt, timeout);
-							}
-							else
-							{
-								timer = clock.createTimer(timeout, new ITimedObject()
-								{
-									public void timeEventOccurred(long currenttime)
-									{
-										notify.run();
-									}
-								});
-							}
-						}
+						}));
 					}
-				}
-				catch(Exception e)
-				{
-					// todo: should not happen
-					// causes null pointer exception on clock when clock is uninitialized
-				}
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-//				exception.printStackTrace();
-//				System.out.println("Could not get clock service.");
+					public void exceptionOccurred(Exception exception)
+					{
+	//					exception.printStackTrace();
+	//					System.out.println("Could not get clock service.");
+					}
+				}));
+				
+				return IFuture.DONE;
 			}
 		});
 	}

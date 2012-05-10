@@ -132,10 +132,10 @@ public class GoalDelegationHandler  implements InvocationHandler
 			{
 				if(goal.isSucceeded())
 				{
-					Class<?> rt = SReflect.unwrapGenericType(method.getReturnType());
+					Class<?> rt = SReflect.unwrapGenericType(method.getGenericReturnType());
 					Object rval = null;
 					
-					if(!Void.class.equals(rt))
+					if(rt!=null && !Void.class.equals(rt))
 					{
 						boolean set = false;
 						
@@ -143,9 +143,10 @@ public class GoalDelegationHandler  implements InvocationHandler
 						for(int i=0; i<params.length; i++)
 						{
 							IMParameter mp = (IMParameter)params[i].getModelElement();
+							Class<?> mpclass = mp.getClazz();
 							String dir = ((IMParameter)params[i].getModelElement()).getDirection();
 							if((OAVBDIMetaModel.PARAMETER_DIRECTION_INOUT.equals(dir) || OAVBDIMetaModel.PARAMETER_DIRECTION_OUT.equals(dir)) 
-								&& SReflect.isSupertype(mp.getClazz(), rt))
+								&& SReflect.isSupertype(mpclass, rt))
 							{
 								rval = params[i].getValue();
 								set = true;
@@ -174,6 +175,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 							throw new RuntimeException("Could not map result.");
 					}
 					
+					System.out.println("Setting result of goal call: "+rval);
 					ret.setResult(rval);
 				}
 				else

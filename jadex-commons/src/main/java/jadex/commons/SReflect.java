@@ -104,7 +104,8 @@ public class SReflect
 	 */
 	public	static	Class	getWrappedType(Class clazz)
 	{
-		assert clazz!=null;
+		if(clazz==null)
+			throw new IllegalArgumentException("Clazz must not null");
 
 		// (jls) there are the following primitive types:
 		// byte, short, int, long, char, float, double, boolean
@@ -848,6 +849,9 @@ public class SReflect
 	 */
 	public static boolean	isSupertype(Class clazz1, Class clazz2)
 	{
+		if(clazz1==null || clazz2==null)
+			return false;
+		
 		// Map basic types.
 		//System.out.println("a: "+clazz1.getName()+" "+clazz1.hashCode());
 		//System.out.println("b: "+clazz2.getName()+" "+clazz2.hashCode());

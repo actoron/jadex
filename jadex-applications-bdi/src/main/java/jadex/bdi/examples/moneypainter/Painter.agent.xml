@@ -31,8 +31,12 @@
 
 	<plans>
 		<plan name="paintone">
-			<parameter name="name" class="String"/>
-			<parameter name="result" class="String" direction="out"/>
+			<parameter name="name" class="String">
+				<goalmapping ref="getoneeuro.name"/>
+			</parameter>
+			<parameter name="result" class="String" direction="out">
+				<goalmapping ref="getoneeuro.result"/>
+			</parameter>
 			<body class="PaintOneEuroPlan"/>
 			<trigger>
 				<goal ref="getoneeuro"/>

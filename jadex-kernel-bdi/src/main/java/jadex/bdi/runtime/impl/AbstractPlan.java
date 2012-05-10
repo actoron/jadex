@@ -791,23 +791,26 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	{
 		IParameter[] ret;
 		
-		Collection params = getState().getAttributeValues(getRPlan(), 
-			OAVBDIRuntimeModel.parameterelement_has_parameters);
+		Object mplan = getState().getAttributeValue(getRPlan(), 
+			OAVBDIRuntimeModel.element_has_model);
+		Collection params = getState().getAttributeValues(mplan, 
+			OAVBDIMetaModel.parameterelement_has_parameters);
 		if(params!=null)
 		{
 			ret = new IParameter[params.size()];
 			int i=0;
-			for(Iterator it=params.iterator(); it.hasNext(); i++)
+			for(Object param: params)
 			{
-				Object param = it.next();
-				String name = (String)getState().getAttributeValue(param, OAVBDIMetaModel.modelelement_has_name);
-				ret[i] = ParameterFlyweight.getParameterFlyweight(getState(), getScope(), param, name, getRPlan());
+				String name = (String)getState().getAttributeValue(param, 
+					OAVBDIMetaModel.modelelement_has_name);
+				ret[i++] = getParameter(name);
 			}
 		}
 		else
 		{
 			ret = new IParameter[0];
 		}
+		
 		return ret;
 	}
 
@@ -819,23 +822,26 @@ public abstract class AbstractPlan implements java.io.Serializable //, IPlan
 	{
 		IParameterSet[] ret;
 		
-		Collection paramsets = getState().getAttributeValues(getRPlan(), 
-			OAVBDIRuntimeModel.parameterelement_has_parametersets);
+		Object mplan = getState().getAttributeValue(getRPlan(), 
+			OAVBDIRuntimeModel.element_has_model);
+		Collection paramsets = getState().getAttributeValues(mplan, 
+			OAVBDIMetaModel.parameterelement_has_parametersets);
 		if(paramsets!=null)
 		{
 			ret = new IParameterSet[paramsets.size()];
 			int i=0;
-			for(Iterator it=paramsets.iterator(); it.hasNext(); i++)
+			for(Object paramset: paramsets)
 			{
-				Object paramset = it.next();
-				String name = (String)getState().getAttributeValue(paramset, OAVBDIMetaModel.modelelement_has_name);
-				ret[i] = ParameterSetFlyweight.getParameterSetFlyweight(getState(), getScope(), paramset, name, getRPlan());
+				String name = (String)getState().getAttributeValue(paramset, 
+					OAVBDIMetaModel.modelelement_has_name);
+				ret[i++] = getParameterSet(name);
 			}
 		}
 		else
 		{
 			ret = new IParameterSet[0];
 		}
+		
 		return ret;
 	}
 
