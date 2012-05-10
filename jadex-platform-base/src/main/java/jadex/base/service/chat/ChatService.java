@@ -84,20 +84,16 @@ public class ChatService implements IChatService, IChatGuiService
 	@ServiceStart
 	public IFuture<Void> start()
 	{
-		if(running)
-		{
-			return IFuture.DONE;
-		}
-		else
+		if(!running)
 		{
 			running	= true;
-			final Future<Void>	ret	= new Future<Void>();
 	
 			// Todo: load settings
 			this.nick	= SUtil.createUniqueId("user", 3);
 			this.transfers	= new LinkedHashMap<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>();
 			this.transfers2	= new LinkedHashMap<String, Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>>();
 			
+			// Search and post status in background for not delaying platform startup.
 			IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
 			chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
 			{
@@ -107,16 +103,17 @@ public class ChatService implements IChatService, IChatGuiService
 				}
 				public void finished()
 				{
-					ret.setResult(null);
+					// ignore...
 				}
 				public void exceptionOccurred(Exception exception)
 				{
-					ret.setResult(null);
+					// ignore...
 				}
 			});
 			
-			return ret;
 		}
+		
+		return IFuture.DONE;
 	}
 	
 	/**

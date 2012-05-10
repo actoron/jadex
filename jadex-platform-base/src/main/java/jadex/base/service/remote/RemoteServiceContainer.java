@@ -82,11 +82,11 @@ public class RemoteServiceContainer extends BasicServiceContainer
 				}
 				else
 				{
-					if(selector instanceof TypeResultSelector && ((TypeResultSelector) selector).getType().equals(IComponentManagementService.class))
-					{
-						System.out.println("remote search: "+componentid);
-						Thread.dumpStack();
-					}
+//					if(selector instanceof TypeResultSelector && ((TypeResultSelector) selector).getType().equals(IComponentManagementService.class))
+//					{
+//						System.out.println("remote search: "+componentid);
+//						Thread.dumpStack();
+//					}
 					// Hack! Use user search manager.
 					rms.getServiceProxies(componentid, SServiceProvider.sequentialmanager, decider, selector)
 						.addResultListener(new IResultListener()

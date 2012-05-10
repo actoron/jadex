@@ -26,8 +26,9 @@ public class MultiPlatformsTest extends TestCase
 		{
 			if(i%10==0)
 				System.out.println("Starting platform "+i);
-			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases_*",
+			futures.add(Starter.createPlatform(new String[]{"-platformname", "testcases_"+i,
 				"-gui", "false", "-printpass", "false",
+//				"-logging", "true",
 				"-saveonexit", "false", "-welcome", "false", "-autoshutdown", "false"}));
 		}
 		
@@ -37,7 +38,15 @@ public class MultiPlatformsTest extends TestCase
 		{
 			if(i%10==0)
 				System.out.println("Waiting for platform "+i);
-			platforms[i]	= futures.get(i).get(sus, timeout);
+//			try
+//			{
+				platforms[i]	= futures.get(i).get(sus, timeout);
+//			}
+//			catch(RuntimeException e)
+//			{
+//				System.out.println("failed: "+i);
+//				throw e;
+//			}
 		}
 		
 //		try
