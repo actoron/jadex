@@ -5,10 +5,12 @@ import jadex.bridge.IComponentInstance;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.RequiredServiceInfo;
+import jadex.bridge.service.component.interceptors.DecouplingInterceptor;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.factory.IComponentAdapter;
+import jadex.commons.DebugException;
 import jadex.commons.concurrent.IExecutable;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -48,6 +50,7 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 	 */
 	protected void	doWakeup()
 	{
+//		final Exception de	= new DebugException(""+DecouplingInterceptor.SIC.get());
 		getExecutionService().addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)
@@ -63,8 +66,10 @@ public class StandaloneComponentAdapter	extends AbstractComponentAdapter	impleme
 				}
 				catch(RuntimeException e)
 				{
-					logger.warning("Wakeup failed, execution service is shutting down: "+getComponentIdentifier());
-					e.printStackTrace();
+					// Happens, when execution service shutdown() is called and timer should be registered for result future, but service already terminated
+//					logger.warning("Wakeup failed, execution service is shutting down: "+getComponentIdentifier());
+//					e.printStackTrace();
+//					de.printStackTrace();
 				}
 			}
 		});

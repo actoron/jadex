@@ -39,10 +39,10 @@ public class Future<E> implements IFuture<E>
 	protected final String	CALLER_SUSPENDED	= "suspended";
 	
 	/** Debug flag. */
-	public static final boolean DEBUG = false;
+	public static boolean DEBUG = false;
 	
 	/** Disable Stack unfolding for easier debugging. */
-	public static final boolean NO_STACK_COMPACTION = false;
+	public static boolean NO_STACK_COMPACTION = false;
 	
 	/** The empty future. */
 	public static final IFuture<?>	EMPTY	= new Future<Object>(null);

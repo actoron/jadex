@@ -19,7 +19,6 @@ import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.bridge.service.types.factory.IComponentFactory;
 import jadex.commons.SReflect;
-import jadex.commons.SUtil;
 import jadex.commons.Tuple2;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -39,7 +38,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.UUID;
 
 /**
  *  Starter class for  
@@ -89,6 +87,12 @@ public class Starter
 	/** The realtime timeout flag. */
 	public static final String REALTIMETIMEOUT = "realtimetimeout";
 	
+	/** The debug futures flag. */
+	public static final String DEBUGFUTURES = "debugfutures";
+	
+	/** The stack compaction disable flag. */
+	public static final String NOSTACKCOMPACTION = "nostackcompaction";
+	
 	/** The reserved platform parameters. */
 	public static final Set<String> RESERVED;
 	
@@ -104,6 +108,8 @@ public class Starter
 		RESERVED.add(WELCOME);
 		RESERVED.add(COMPONENT);
 		RESERVED.add(PARAMETERCOPY);
+		RESERVED.add(DEBUGFUTURES);
+		RESERVED.add(NOSTACKCOMPACTION);
 	}
 	
 //	/** The shutdown in progress flag. */
@@ -216,10 +222,17 @@ public class Starter
 					}
 					compargs.put(key, val);
 				}
-				
-				if(COMPONENT.equals(key))
+				else if(COMPONENT.equals(key))
 				{
 					components.add((String)val);
+				}
+				else if(DEBUGFUTURES.equals(key) && "true".equals(val))
+				{
+					Future.DEBUG	= true;
+				}
+				else if(NOSTACKCOMPACTION.equals(key) && "true".equals(val))
+				{
+					Future.NO_STACK_COMPACTION	= true;
 				}
 				else
 				{
@@ -233,10 +246,10 @@ public class Starter
 				(String)cmdargs.get(CONFIGURATION_FILE): FALLBACK_PLATFORM_CONFIGURATION;
 			String cfclname = (String)cmdargs.get(COMPONENT_FACTORY)!=null? 
 				(String)cmdargs.get(COMPONENT_FACTORY): FALLBACK_COMPONENT_FACTORY;
-			Class<IComponentFactory> cfclass = SReflect.classForName(cfclname, cl);
+			Class<?> cfclass = SReflect.classForName(cfclname, cl);
 			// The providerid for this service is not important as it will be thrown away 
 			// after loading the first component model.
-			final IComponentFactory cfac = cfclass.getConstructor(new Class[]{String.class})
+			final IComponentFactory cfac = (IComponentFactory)cfclass.getConstructor(new Class[]{String.class})
 				.newInstance(new Object[]{"rootid"});
 			
 			compargs.put(COMPONENT_FACTORY, cfac);

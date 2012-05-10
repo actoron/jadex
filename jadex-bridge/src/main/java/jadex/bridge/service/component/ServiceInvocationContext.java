@@ -334,6 +334,14 @@ public class ServiceInvocationContext
 //		setResultStack(sic.getResultStack());
 //		
 //	}
+	
+	/**
+	 *  String representation.
+	 */
+	public String toString()
+	{
+		return "ServiceInvocationContext(method="+method+", caller="+caller+")";
+	}
 }
 
 

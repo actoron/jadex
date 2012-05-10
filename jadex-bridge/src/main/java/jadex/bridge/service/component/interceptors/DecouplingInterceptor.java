@@ -573,6 +573,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 						}
 						else
 						{
+//							SIC.set(sic);
 							fut.addResultListener(new TimeoutResultListener(to, ea, realtime, new IResultListener()
 							{
 								public void resultAvailable(Object result)
@@ -602,6 +603,8 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 		}
 	}
 
+//	public static ThreadLocal<ServiceInvocationContext>	SIC	= new ThreadLocal<ServiceInvocationContext>();
+	
 	/**
 	 *  Service invocation step.
 	 */

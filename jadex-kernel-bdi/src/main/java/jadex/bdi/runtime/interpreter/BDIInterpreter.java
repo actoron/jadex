@@ -1368,7 +1368,15 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		}
 		else
 		{
-			getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
+			if(getState().containsObject(ragent))
+			{
+				getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
+			}
+			else
+			{
+				// Happens when timeout listener should be added on cleanup.
+				ret.setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));				
+			}
 		}
 
 		return ret;		

@@ -2,7 +2,6 @@ package jadex.base.service.execution;
 
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.execution.IExecutionService;
 import jadex.bridge.service.types.threadpool.IThreadPoolService;

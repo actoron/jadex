@@ -657,18 +657,25 @@ public class MicroAgentInterpreter extends AbstractInterpreter
 //		System.out.println("ss: "+getAgentAdapter().getComponentIdentifier()+" "+Thread.currentThread()+" "+step);
 		if(adapter.isExternalThread())
 		{
-			adapter.invokeLater(new Runnable()
-			{			
-				public void run()
-				{
-					addStep(new Object[]{step, ret});
-				}
-				
-				public String toString()
-				{
-					return "invokeLater("+step+")";
-				}
-			});
+			try
+			{
+				adapter.invokeLater(new Runnable()
+				{			
+					public void run()
+					{
+						addStep(new Object[]{step, ret});
+					}
+					
+					public String toString()
+					{
+						return "invokeLater("+step+")";
+					}
+				});
+			}
+			catch(ComponentTerminatedException cte)
+			{
+				ret.setException(cte);
+			}
 		}
 		else
 		{

@@ -32,6 +32,8 @@ public class PlatformsTest extends TestCase
 	String[]	BASEARGS	= new String[]
     {
 //		"-logging_level", "java.util.logging.Level.INFO",
+		"-debugfutures", "true",
+		"-nostackcompaction", "true",
 		"-platformname", "testcases",
 		"-gui", "false",
 		"-saveonexit", "false",
@@ -58,7 +60,7 @@ public class PlatformsTest extends TestCase
 	 */
 	public void	testPlatforms()
 	{
-		long timeout = 10000;
+		long timeout = 1000000;
 		ISuspendable	sus	= 	new ThreadSuspendable();
 		long[] starttimes = new long[PLATFORMS.length/2+1];
 		long[] shutdowntimes = new long[PLATFORMS.length/2+1];

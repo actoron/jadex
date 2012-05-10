@@ -323,7 +323,7 @@ public class SReflect
 	 *  @param name The class name.
 	 *  @return The class.
 	 */
-	public static Class	classForName(String name, ClassLoader classloader)
+	public static Class<?>	classForName(String name, ClassLoader classloader)
 		throws ClassNotFoundException
 	{
 		Object	clazz	= classForName0(name, classloader);

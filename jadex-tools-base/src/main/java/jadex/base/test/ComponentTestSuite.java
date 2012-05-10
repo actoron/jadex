@@ -63,6 +63,8 @@ public class ComponentTestSuite extends TestSuite
 			"-simulation", "true",
 //			"-libpath", "new String[]{\""+root.toURI().toURL().toString()+"\"}",
 //			"-logging_level", "java.util.logging.Level.INFO",
+//			"-debugfutures", "true",
+//			"-nostackcompaction", "true",
 			"-gui", "false",
 			"-awareness", "false",
 			"-saveonexit", "false",

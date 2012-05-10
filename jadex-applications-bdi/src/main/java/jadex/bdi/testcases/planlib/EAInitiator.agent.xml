@@ -101,7 +101,8 @@
 	</plans>
 
 	<properties>
- 		<!-- <property name="logging.level">java.util.logging.Level.FINE</property> -->
+		<!-- Suppress event not handled warning for late not understood messages. -->
+ 		<property name="logging.level">java.util.logging.Level.SEVERE</property>
  		<property name="debugging">false</property>
 	</properties>
 
