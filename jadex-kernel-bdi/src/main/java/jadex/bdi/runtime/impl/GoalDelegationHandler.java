@@ -64,7 +64,12 @@ public class GoalDelegationHandler  implements InvocationHandler
 	{
 		final Future<Object> ret = new Future<Object>();
 		
-		final IGoal goal = agent.getGoalbase().createGoal(goalnames.get(method.getName()));
+		String goalname = goalnames.get(method.getName());
+		
+		if(goalname==null)
+			throw new RuntimeException("No method-goal mapping found: "+method.getName()+" "+goalnames);
+		
+		final IGoal goal = agent.getGoalbase().createGoal(goalname);
 		
 		Class<?>[] mptypes = method.getParameterTypes();
 		

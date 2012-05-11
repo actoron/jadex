@@ -26,7 +26,7 @@
 			<parameter name="result" class="String" direction="out">
 				<!-- <servicemapping ref="paintservice.result"/> -->
 			</parameter>
-			<goalpublish class="IPaintMoneyService" method="getoneeuro"/>
+			<goalpublish class="IPaintMoneyService" method="paintOneEuro"/>
 		</achievegoal>
  	</goals>
 

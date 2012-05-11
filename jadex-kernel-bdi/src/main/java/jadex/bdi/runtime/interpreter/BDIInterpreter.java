@@ -2072,10 +2072,18 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 	/**
 	 *  Create a wrapper service implementation based on 
 	 */
-	public static Object createServiceImplementation(IBDIInternalAccess agent, Class<?> type, Map<String, String> goalnames)
+//	public static Object createServiceImplementation(IBDIInternalAccess agent, Class<?> type, Map<String, String> goalnames)
+	public static Object createServiceImplementation(IBDIInternalAccess agent, Class<?> type, String[] methodnames, String[] goalnames)
 	{
+//		if(methodnames==null || methodnames.length==0)
+//			throw new IllegalArgumentException("At least one method-goal mapping must be given.");
+		Map<String, String> gn = new HashMap<String, String>();
+		for(int i=0; i<methodnames.length; i++)
+		{
+			gn.put(methodnames[i], goalnames[i]);
+		}
 		return Proxy.newProxyInstance(agent.getClassLoader(), new Class[]{type}, 
-			new GoalDelegationHandler(agent, goalnames));
+			new GoalDelegationHandler(agent, gn));
 	}
 	
 }

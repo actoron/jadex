@@ -19,6 +19,7 @@ import jadex.bridge.ResourceIdentifier;
 import jadex.bridge.modelinfo.ModelInfo;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.AbstractModelLoader;
 import jadex.commons.ICacheableModel;
 import jadex.commons.ResourceInfo;
@@ -61,6 +62,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -444,7 +446,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 		{
 			Class<?> key = it.next();
 			List<Object[]> vals = pubs.get(key);
-			Map<String, String> goalnames = new HashMap<String, String>();
+			Map<String, String> goalnames = new LinkedHashMap<String, String>();
 			for(Object[] val: vals)
 			{
 				if(goalnames.containsKey(val[1]))
@@ -458,11 +460,34 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				String goalname = (String)state.getAttributeValue(val[0], OAVBDIMetaModel.modelelement_has_name);
 				goalnames.put((String)val[1], goalname);
 			}
-//			ProvidedServiceImplementation psi = new ProvidedServiceImplementation(null, 
-//				"jadex.bdi.runtime.interpreter.BDIInterpreter.createServiceImplementation($scope, "
-//				+SReflect.getClassName(key)+".class, "
-//				
-//			info.addProvidedService(new ProvidedServiceInfo(null, key, , null));
+			System.out.println("found goal publish: "+key);
+			
+			StringBuffer buf = new StringBuffer();
+			buf.append("jadex.bdi.runtime.interpreter.BDIInterpreter.createServiceImplementation($scope, ");
+			buf.append(SReflect.getClassName(key)+".class, ");
+			buf.append("new String[]{");
+			for(Iterator<String> it2=goalnames.keySet().iterator(); it2.hasNext(); )
+			{
+				buf.append("\"").append(it2.next()).append("\"");
+				if(it2.hasNext())
+					buf.append(", ");
+			}
+			buf.append("}, ");
+			buf.append("new String[]{");
+			for(Iterator<String> it2=goalnames.keySet().iterator(); it2.hasNext(); )
+			{
+				buf.append("\"").append(goalnames.get(it2.next())).append("\"");
+				if(it2.hasNext())
+					buf.append(", ");
+			}
+			buf.append("}");
+			buf.append(")");
+			
+			System.out.println(buf.toString());
+			
+			ProvidedServiceImplementation psi = new ProvidedServiceImplementation(null, buf.toString(), 
+				BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
+			info.addProvidedService(new ProvidedServiceInfo(null, key, psi, null));
 		}
 		
 		// Build user defined plan conditions and add them to the rule base.
