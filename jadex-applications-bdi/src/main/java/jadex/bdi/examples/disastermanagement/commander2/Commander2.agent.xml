@@ -102,9 +102,9 @@
 		</plan>
 		
 		<!-- Plan for calling a extinguish fire service. -->
-		<plan name="extinguis_fire_service_call_plan">
+		<plan name="extinguish_fire_service_call_plan">
 			<parameter name="disaster" class="ISpaceObject">
-				<goalmapping ref="clear_chemicals.disaster"/>
+				<goalmapping ref="extinguish_fires.disaster"/>
 			</parameter>
 			<body service="extinguishfireservices" method="extinguishFire"/>
 			<trigger>
@@ -115,7 +115,7 @@
 		<!-- Plan for calling a treat victims service. -->
 		<plan name="treat_victims_service_call_plan">
 			<parameter name="disaster" class="ISpaceObject">
-				<goalmapping ref="clear_chemicals.disaster"/>
+				<goalmapping ref="treat_victims.disaster"/>
 			</parameter>
 			<body service="treatvictimservices" method="treatVictims"/>
 			<trigger>
@@ -127,6 +127,10 @@
 	<services>
 		<requiredservice name="treatvictimservices" class="ITreatVictimsService" multiple="true"/>
 		<requiredservice name="extinguishfireservices" class="IExtinguishFireService" multiple="true"/>
+<!-- 			<binding selector="BrigadeSelector"/>
+		</requiredservice> -->
 		<requiredservice name="clearchemicalsservices" class="IClearChemicalsService" multiple="true"/>
+<!-- 			<binding selector="BrigadeSelector"/>
+		</requiredservice> -->
 	</services>
 </agent>

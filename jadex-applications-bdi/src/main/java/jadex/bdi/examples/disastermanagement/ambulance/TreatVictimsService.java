@@ -34,6 +34,8 @@ public class TreatVictimsService implements ITreatVictimsService
 	 */
 	public ITerminableFuture<Void> treatVictims(final ISpaceObject disaster)
 	{
+		final IGoal tv = (IGoal)agent.getGoalbase().createGoal("treat_victims");
+		
 		final TerminableFuture<Void> ret	= new TerminableFuture<Void>(new TerminationCommand()
 		{
 			public boolean checkTermination(Exception reason)
@@ -44,22 +46,15 @@ public class TreatVictimsService implements ITreatVictimsService
 			
 			public void terminated(Exception reason)
 			{
-				IGoal[] goals = (IGoal[])agent.getGoalbase().getGoals("treat_victims");
-				for(int i=0; i<goals.length; i++)
-				{
-//					System.out.println("Dropping: "+goals[i]);
-					goals[i].drop();
-				}
+				tv.drop();
 			}
 		});
 		
-		final IGoal tv = (IGoal)agent.getGoalbase().createGoal("treat_victims");
 		tv.getParameter("disaster").setValue(disaster);
 		tv.addGoalListener(new IGoalListener()
 		{
 			public void goalFinished(AgentEvent ae)
 			{
-//					System.out.println("tv fin: "+agent.getAgentName());
 				if(tv.isSucceeded())
 				{
 					ret.setResultIfUndone(null);
@@ -75,7 +70,6 @@ public class TreatVictimsService implements ITreatVictimsService
 			{
 			}
 		});
-//		System.out.println("tv start: "+agent.getAgentName());
 		agent.getGoalbase().dispatchTopLevelGoal(tv);
 		
 		return ret;

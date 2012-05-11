@@ -17,6 +17,7 @@
 		<import>java.util.logging.*</import>
 		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.extension.envsupport.environment.*</import>
+		<import>jadex.bdi.runtime.interpreter.*</import>
 		<import>jadex.bdi.examples.disastermanagement.*</import>
 		<import>jadex.bdi.examples.disastermanagement.movement.*</import>
 	</imports>
@@ -68,17 +69,31 @@
 		<!-- Goal to extinguish fire. -->
 		<achievegoal name="extinguish_fire" exclude="when_failed">
 			<parameter name="disaster" class="ISpaceObject"/>
+			<dropcondition>
+				($goal).goal_has_lifecyclestate==OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION
+				&amp;&amp; $goalbase.getGoals(($goal).element_has_model.melement_has_name).length
+					+ $goalbase.getGoals("clear_chemicals").length>1
+			</dropcondition>
+			<deliberation cardinality="1"/>
 			<targetcondition>
 				$goal.disaster.fire==0
 			</targetcondition>
+			<goalpublish class="IExtinguishFireService" method="extinguishFire"/>
 		</achievegoal>
 
 		<!-- Goal to clear chemicals. -->
 		<achievegoal name="clear_chemicals" exclude="when_failed">
 			<parameter name="disaster" class="ISpaceObject"/>
+			<dropcondition>
+				($goal).goal_has_lifecyclestate==OAVBDIRuntimeModel.GOALLIFECYCLESTATE_OPTION
+				&amp;&amp; $goalbase.getGoals("extinguish_fire").length
+					+ $goalbase.getGoals(($goal).element_has_model.melement_has_name).length>1
+			</dropcondition>
+			<deliberation cardinality="1"/>
 			<targetcondition>
 				$goal.disaster.chemicals==0
 			</targetcondition>
+			<goalpublish class="IClearChemicalsService" method="clearChemicals"/>
 		</achievegoal>
 	</goals>
 	
@@ -121,15 +136,6 @@
 			</trigger>
 		</plan>
 	</plans>
-	
-	<services>
-		<providedservice class="IExtinguishFireService">
-			<implementation class="ExtinguishFireService"/>
-		</providedservice>
-		<providedservice class="IClearChemicalsService">
-			<implementation class="ClearChemicalsService"/>
-		</providedservice>
-	</services>
 	
 	<configurations>
 		<configuration name="do_nothing"/>

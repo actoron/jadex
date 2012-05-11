@@ -73,6 +73,9 @@
 				&amp;&amp; $goalbase.getGoals(($goal).element_has_model.melement_has_name).length>1
 			</dropcondition>
 			<deliberation cardinality="1"/>
+			<!--
+			<goalpublish class="IExtinguishFireService" method="extinguishFire"/>
+			 -->
 		</achievegoal>
 	</goals>
 	
