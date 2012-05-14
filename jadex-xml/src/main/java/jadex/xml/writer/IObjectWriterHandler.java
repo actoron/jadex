@@ -4,11 +4,11 @@ import jadex.xml.IContext;
 import jadex.xml.IPreProcessor;
 import jadex.xml.TypeInfo;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.xml.namespace.QName;
-/* $else $
+/* else[android]
 import javaxx.xml.namespace.QName;
-$endif $ */
+end[android] */
 
 
 /**

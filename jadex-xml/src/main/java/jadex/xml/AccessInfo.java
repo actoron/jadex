@@ -2,11 +2,11 @@ package jadex.xml;
 
 import jadex.xml.bean.BeanAccessInfo;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.xml.namespace.QName;
-/* $else $
+/* else[android]
 import javaxx.xml.namespace.QName;
-$endif $ */
+end[android] */
 
 /**
  *  Meta info for accessing (reading / writing) an element.

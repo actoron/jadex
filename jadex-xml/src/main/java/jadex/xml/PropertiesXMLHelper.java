@@ -16,11 +16,11 @@ import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.xml.namespace.QName;
-/* $else $
+/* else[android]
 import javaxx.xml.namespace.QName;
-$endif $ */
+end[android] */
 
 /**
  *  A simple static helper class for reading and writing jadex.commons.Properties.

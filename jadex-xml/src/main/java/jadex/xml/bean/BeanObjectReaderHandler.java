@@ -43,11 +43,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.xml.namespace.QName;
-/* $else $
+/* else[android]
 import javaxx.xml.namespace.QName;
-$endif $ */
+end[android] */
 
 
 /**

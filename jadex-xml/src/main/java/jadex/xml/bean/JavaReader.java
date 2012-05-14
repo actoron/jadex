@@ -5,9 +5,7 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
-/* $if !android $ */
 import jadex.commons.gui.SGUI;
-/* $endif $ */
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -47,14 +45,14 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLReporter;
-/* $else $
+/* else[android]
 import javaxx.xml.namespace.QName;
 import javaxx.xml.stream.XMLReporter;
-$endif $ */ 
+end[android] */ 
 
 
 /**
@@ -246,11 +244,11 @@ public class JavaReader
 			{
 				public Object convertString(String val, IContext context)
 				{
-					/* $if !android $ */
+					/* if_not[android] */
 					return Color.decode(val);
-					/* $else $
+					/* else[android]
 					return null;
-					$endif $ */
+					end[android]*/
 				}
 			};
 			
@@ -487,7 +485,7 @@ public class JavaReader
 				{
 					public Object createObject(IContext context, Map rawattributes) throws Exception
 					{
-						/* $if !android $ */
+						/* if_not[android] */
 						Image ret = null;
 						String encdata = (String)rawattributes.get("imgdata");
 						byte[] data = Base64.decode(encdata.getBytes());
@@ -505,9 +503,9 @@ public class JavaReader
 //							ret = ImageIO.read(new ByteArrayInputStream(data));
 //						}
 						return ret;
-						/* $else $
+						/* else[android]
 						return null;
-						$endif $ */
+						end[android]*/
 					}
 				}),
 				new MappingInfo(null, new AttributeInfo[]{

@@ -6,9 +6,7 @@ import jadex.commons.SReflect;
 import jadex.commons.Tuple;
 import jadex.commons.Tuple2;
 import jadex.commons.collection.MultiCollection;
-/* $if !android $ */
 import jadex.commons.gui.SGUI;
-/* $endif $ */
 import jadex.xml.AccessInfo;
 import jadex.xml.AttributeConverter;
 import jadex.xml.AttributeInfo;
@@ -24,10 +22,10 @@ import jadex.xml.reader.IObjectReaderHandler;
 import jadex.xml.writer.IObjectWriterHandler;
 import jadex.xml.writer.Writer;
 
-/* $if !android $ */
+/* if_not[android] */
 import java.awt.Color;
 import java.awt.Image;
-/* $endif $ */
+/* end[android] */
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.URL;
@@ -40,11 +38,11 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.xml.namespace.QName;
-/* $else $
+/* else[android]
 import javaxx.xml.namespace.QName;
-$endif $ */
+end[android] */
 
 /**
  * Java specific reader that supports collection classes and arrays.
@@ -59,9 +57,9 @@ public class JavaWriter extends Writer
 	/** The object handler. */
 	protected static IObjectWriterHandler handler;
 	
-	/* $if !android $ */
+	/* if_not[android] */
 	protected static final Color TRANSPARENT_WHITE = new Color( 255, 255, 255, 0); 
-	/* $endif $ */
+	/* end[android] */
 	
 	//-------- constructors --------
 	
@@ -197,20 +195,20 @@ public class JavaWriter extends Writer
 			{
 				public String convertObject(Object val, IContext context)
 				{
-					/* $if !android $ */
+					/* if_not[android] */
 					return ""+((Color)val).getRGB();
-					/* $else $
+					/* else[android]
 					return "";
-					$endif $ */
+					end[android] */
 				}
 			};
-			/* $if !android $ */
+			/* if_not[android] */
 			TypeInfo ti_color = new TypeInfo(null, new ObjectInfo(Color.class), new MappingInfo(null, null,
 				new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, coconv))));
-			/* $else $
+			/* else[android]
 			TypeInfo ti_color = new TypeInfo(null, new ObjectInfo(null), new MappingInfo(null, null,
 					new AttributeInfo(new AccessInfo((String)null, AccessInfo.THIS), new AttributeConverter(null, coconv))));
-			$endif $ */
+			end[android] */
 			typeinfos.add(ti_color);
 			
 			// java.util.Date
@@ -300,12 +298,12 @@ public class JavaWriter extends Writer
 				{
 					try
 					{
-						/* $if !android $ */
+						/* if_not[android] */
 						byte[] buf = SGUI.imageToStandardBytes((Image)val, "image/png");
 						return new String(Base64.encode(buf));	
-						/* $else $
+						/* else[android]
 						return "";
-						$endif $ */
+						end[android] */
 					}
 					catch(Exception e)
 					{
@@ -325,7 +323,7 @@ public class JavaWriter extends Writer
 				}
 			};
 			
-			/* $if !android $ */
+			/* if_not[android] */
 			TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName("typeinfo:java.awt.image", "Image")), 
 				new ObjectInfo(Image.class), new MappingInfo(null, new AttributeInfo[]{
 				new AttributeInfo(new AccessInfo("imgdata", AccessInfo.THIS), new AttributeConverter(null, imgconv)),
@@ -333,7 +331,7 @@ public class JavaWriter extends Writer
 				new AttributeInfo(new AccessInfo("classname", AccessInfo.THIS), new AttributeConverter(null, oclconv))},
 				null
 			));
-			/* $else $
+			/* else[android]
 			TypeInfo ti_image = new TypeInfo(new XMLInfo(new QName("typeinfo:java.awt.image", "Image")), 
 					new ObjectInfo(null), new MappingInfo(null, new AttributeInfo[]{
 					new AttributeInfo(new AccessInfo("imgdata", AccessInfo.THIS), new AttributeConverter(null, imgconv)),
@@ -341,7 +339,7 @@ public class JavaWriter extends Writer
 					new AttributeInfo(new AccessInfo("classname", null, null, null, new BeanAccessInfo(null, Object.class.getMethod("getClass", new Class[0]))))},
 					null
 				));
-			$endif $ */
+			end[android] */
 			typeinfos.add(ti_image);
 			
 			// java.lang.String

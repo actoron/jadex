@@ -10,15 +10,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamReader;
-/* $else $
+/* else[android]
 import javaxx.xml.namespace.QName;
 import javaxx.xml.stream.XMLReporter;
 import javaxx.xml.stream.XMLStreamReader;
-$endif $ */
+end[android] */
 
 /**
  *  Context for reader that stores all relevant information of the read process.

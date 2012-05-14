@@ -43,10 +43,10 @@ public class Traverser
 		processors.add(new CollectionProcessor());
 		processors.add(new IteratorProcessor());
 		processors.add(new EnumerationProcessor());
-		/* $if !android $ */
+		/* if_not[android]
 		processors.add(new ColorProcessor());
 		processors.add(new ImageProcessor());
-		/* $endif $ */
+		end[android] */
 		processors.add(new LogRecordProcessor());
 		processors.add(new DateProcessor());
 		processors.add(new UUIDProcessor());

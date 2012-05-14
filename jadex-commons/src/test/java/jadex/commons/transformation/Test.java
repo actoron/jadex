@@ -103,7 +103,7 @@ public abstract class Test extends TestCase
 				testVectorModel();
 				testClass();
 				testDate();
-				testColor();
+				
 				testArray();
 				testList();
 				testSet();
@@ -118,8 +118,10 @@ public abstract class Test extends TestCase
 				testBeanWithIncludedFields();
 				testAnonymousInnerClass();
 				testAnonymousInnerClassWithSimpleTypes();
-				
+				/* if_not[android]*/
+				testColor();
 				testImage();
+				/* end[android]*/
 				testTuple();
 				testTuple2();
 			}

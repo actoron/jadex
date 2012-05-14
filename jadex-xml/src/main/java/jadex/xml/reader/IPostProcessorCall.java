@@ -1,10 +1,10 @@
 package jadex.xml.reader;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.xml.stream.XMLStreamException;
-/* $else $
+/* else[android]
 import javaxx.xml.stream.XMLStreamException;
-$endif $ */
+end[android] */
 
 /**
  *  Interface used to schedule post processor calls.

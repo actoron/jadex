@@ -34,11 +34,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.xml.namespace.QName;
-/* $else $
+/* else[android]
 import javaxx.xml.namespace.QName;
-$endif $ */
+end[android] */
 
 /**
  *  Java bean version for fetching write info for an object. 

@@ -20,11 +20,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.xml.namespace.QName;
-/* $else $
+/* else[android]
 import javaxx.xml.namespace.QName;
-$endif $ */
+end[android] */
 
 /**
  *  Abstract base class for an object writer handler. Is object type agnostic and

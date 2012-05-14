@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
@@ -29,7 +29,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLReporter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-/* $else $
+/* else[android]
 import javaxx.xml.XMLConstants;
 import javaxx.xml.namespace.QName;
 import javaxx.xml.stream.Location;
@@ -37,7 +37,7 @@ import javaxx.xml.stream.XMLInputFactory;
 import javaxx.xml.stream.XMLReporter;
 import javaxx.xml.stream.XMLStreamException;
 import javaxx.xml.stream.XMLStreamReader;
-$endif $ */
+end[android] */
 
 /**
  *  Stax XML reader.

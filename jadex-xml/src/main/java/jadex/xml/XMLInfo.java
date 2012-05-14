@@ -4,11 +4,11 @@ import jadex.commons.IFilter;
 
 import java.util.StringTokenizer;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.xml.namespace.QName;
-/* $else $
+/* else[android]
 import javaxx.xml.namespace.QName;
-$endif $ */
+end[android] */
 
 /**
  *  Info for an xml element, i.e. identifying tag(path), filter etc. 

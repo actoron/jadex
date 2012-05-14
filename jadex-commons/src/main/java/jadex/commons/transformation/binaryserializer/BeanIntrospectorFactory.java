@@ -1,10 +1,10 @@
 package jadex.commons.transformation.binaryserializer;
 
-/* $if !android $ */
+/*if_not[android] */
 import jadex.commons.transformation.traverser.BeanDelegateReflectionIntrospector;
-/* $else $
+/* else[android]
 import jadex.commons.transformation.traverser.BeanReflectionIntrospector;
-$endif $ */
+end[android] */
 import jadex.commons.transformation.traverser.IBeanIntrospector;
 
 public class BeanIntrospectorFactory 
@@ -27,10 +27,10 @@ public class BeanIntrospectorFactory
 	{
 //		return new BeanReflectionIntrospector(lrusize);
 		
-		/* $if !android $ */
+		/*if_not[android] */
 		return new BeanDelegateReflectionIntrospector(lrusize);
-		/* $else $
+		/* else[android]
 		return new BeanReflectionIntrospector(lrusize);
-		$endif $ */
+		end[android] */
 	}
 }

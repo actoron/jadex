@@ -14,17 +14,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
-/* $else $
+/* else[android]
 import javaxx.xml.XMLConstants;
 import javaxx.xml.namespace.QName;
 import javaxx.xml.stream.XMLOutputFactory;
 import javaxx.xml.stream.XMLStreamWriter;
-$endif $ */
+end[android] */
 
 /**
  *  XML writer for conversion of objects to XML.

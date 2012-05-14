@@ -1,9 +1,9 @@
 package jadex.xml;
-/* $if !android $ */
+/* if_not[android] */
 import javax.xml.namespace.QName;
-/* $else $
+/* else[android]
 import javaxx.xml.namespace.QName;
-$endif $ */
+end[android] */
 
 /**
  *  Info object for subobjects, i.e. objects that are contained in another object.
