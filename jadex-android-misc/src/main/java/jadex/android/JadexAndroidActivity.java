@@ -267,7 +267,7 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 		message.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(), receiver);
 		IComponentIdentifier cid = getExternalPlatformAccess().getComponentIdentifier();
 		message.put(SFipa.FIPA_MESSAGE_TYPE.getSenderIdentifier(), cid);
-		return sendMessage(message, SFipa.FIPA_MESSAGE_TYPE);
+		return sendMessage(message, SFipa.FIPA_MESSAGE_TYPE, receiver);
 	}
 	
 	/**
@@ -276,7 +276,7 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 	 * @param type
 	 * @return Future<Void>
 	 */
-	protected Future<Void> sendMessage(final Map<String,Object> message, final MessageType type) {
+	protected Future<Void> sendMessage(final Map<String,Object> message, final MessageType type, final IComponentIdentifier receiver) {
 		checkIfJadexIsRunning("sendMessage");
 		
 		final Future<Void> ret = new Future<Void>();
@@ -285,7 +285,7 @@ public class JadexAndroidActivity extends ContextProvidingActivity {
 
 			@Override
 			public void resultAvailable(IMessageService ms) {
-				ms.sendMessage(message, type, getExternalPlatformAccess().getComponentIdentifier(), null, null)
+				ms.sendMessage(message, type, getExternalPlatformAccess().getComponentIdentifier(), null, receiver, null)
 						.addResultListener(new DelegationResultListener<Void>(ret));
 			}
 		});
