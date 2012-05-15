@@ -40,7 +40,7 @@ public class MethodInfo
 	public MethodInfo(String name, Class<?>[] parametertypes)
 	{
 		this.name = name;
-		this.parametertypes = parametertypes;
+		this.parametertypes = parametertypes.clone();
 	}
 
 	//-------- methods --------
@@ -78,7 +78,7 @@ public class MethodInfo
 	 */
 	public void setParameterTypes(Class<?>[] parametertypes)
 	{
-		this.parametertypes = parametertypes;
+		this.parametertypes = parametertypes.clone();
 	}
 	
 	/**

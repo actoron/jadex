@@ -23,8 +23,6 @@ package jadex.commons.gui.jtreetable;
 /**
  * An implementation of MergeSort, needs to be subclassed to
  * compare the terms.
- *
- * @author Scott Violet
  */
 public abstract class MergeSort extends Object {
     protected Object           toSort[];

@@ -52,7 +52,7 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	 */
 	public ComposedRemoteFilter(IRemoteFilter[] filters, int operator)
 	{
-		this.filters	= filters;
+		this.filters	= filters.clone();
 		this.operator	= operator;
 	}
 
@@ -168,7 +168,7 @@ public class  ComposedRemoteFilter implements IRemoteFilter, Serializable
 	 */
 	public void setFilters(IRemoteFilter[] filters)
 	{
-		this.filters = filters;
+		this.filters = filters.clone();
 	}
 	
 	/**

@@ -28,7 +28,7 @@ public class MultiStream extends OutputStream
 	 */
 	public MultiStream(OutputStream[] outs)
 	{
-		this.outs = outs;
+		this.outs = outs.clone();
 		this.disabled = SCollection.createHashSet();
 	}
 	
@@ -96,7 +96,7 @@ public class MultiStream extends OutputStream
 	 */
 	public void setOutputStreams(OutputStream[] outs)
 	{
-		this.outs = outs;
+		this.outs = outs.clone();
 	}
 	
 	/**

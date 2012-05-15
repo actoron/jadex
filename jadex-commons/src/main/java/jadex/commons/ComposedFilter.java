@@ -48,7 +48,7 @@ public class ComposedFilter implements IFilter,	Serializable
 	 */
 	public ComposedFilter(IFilter[] filters, int operator)
 	{
-		this.filters	= filters;
+		this.filters	= filters.clone();
 		this.operator	= operator;
 	}
 
@@ -113,7 +113,7 @@ public class ComposedFilter implements IFilter,	Serializable
 	 */
 	public void setFilters(IFilter[] filters)
 	{
-		this.filters = filters;
+		this.filters = filters.clone();
 	}
 	
 	/**
