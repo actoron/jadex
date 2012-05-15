@@ -31,8 +31,6 @@ public class ColorProcessor implements ITraverseProcessor
 	public Object process(Object object, Class<?> clazz, List<ITraverseProcessor> processors, 
 		Traverser traverser, Map<Object, Object> traversed, boolean clone, ClassLoader targetcl, Object context)
 	{
-		Color ret = new Color(((Color)object).getRGB());
-		System.out.println("color cloner: "+((Color)object).getRGB()+" "+ret.getRGB());
 		return clone? new Color(((Color)object).getRGB()): object;
 	}
 }
