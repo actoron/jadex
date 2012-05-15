@@ -2,6 +2,11 @@ package sodekovs.bikesharing.data;
 
 import java.sql.Timestamp;
 
+/**
+ * Help object for the generation of the real data based simulation data. Encapsulates the information about one rental action.
+ * 
+ * @author thomas
+ */
 public class Rental {
 
 	private String bikeId = null;

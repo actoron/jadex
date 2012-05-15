@@ -28,12 +28,11 @@ public class DatabaseConnection {
 				String dbUrl = "jdbc:mysql://141.22.64.3:3306/bicycle_rental";
 				String dbUser = "root";
 
+				// fetch the password from the console
 				Scanner s = new Scanner(System.in);
 				System.out.println("Please insert the password to connect to " + dbUrl + " as user " + dbUser + ":");
 
 				String dbPwd = s.nextLine();
-
-				// Version for local instance
 
 				Class.forName("com.mysql.jdbc.Driver").newInstance();
 				connection = DriverManager.getConnection(dbUrl, dbUser, dbPwd);
