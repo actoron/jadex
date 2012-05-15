@@ -26,11 +26,10 @@ import jadex.xml.reader.Reader;
 
 import java.awt.Color;
 import java.awt.Image;
-import java.awt.Toolkit;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,14 +44,8 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-/* if_not[android] */
-import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLReporter;
-/* else[android]
-import javaxx.xml.namespace.QName;
-import javaxx.xml.stream.XMLReporter;
-end[android] */ 
 
 
 /**
@@ -268,11 +261,23 @@ public class JavaReader
 			));
 			typeinfos.add(ti_class);
 			
+			// No special read info necessary.
+			TypeInfo ti_timestamp = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.sql", "Timestamp")}),
+				new ObjectInfo(new IBeanObjectCreator()
+				{
+					public Object createObject(IContext context, Map rawattributes) throws Exception
+					{
+						long time = Long.parseLong((String)rawattributes.get("time"));
+						return new Timestamp(time);
+					}
+				}), new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("time", null))}));
+			typeinfos.add(ti_timestamp);	
+
 			// java.util.Date
 			// No special read info necessary.
 			TypeInfo ti_date = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.util", "Date")}),
 				new ObjectInfo(Date.class), new MappingInfo(null, new AttributeInfo[]{new AttributeInfo(new AccessInfo("time", null))}));
-			typeinfos.add(ti_date);		
+			typeinfos.add(ti_date);	
 			
 			// java.lang.String
 			TypeInfo ti_string = new TypeInfo(new XMLInfo(new QName[]{new QName(SXML.PROTOCOL_TYPEINFO+"java.lang", "String")}),

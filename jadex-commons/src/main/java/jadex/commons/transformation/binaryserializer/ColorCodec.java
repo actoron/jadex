@@ -58,10 +58,10 @@ public class ColorCodec extends AbstractCodec
 		Color c = (Color) object;
 		
 		byte[] ccomps = new byte[4];
-		ccomps[0] = (byte) c.getRed();
-		ccomps[1] = (byte) c.getGreen();
-		ccomps[2] = (byte) c.getBlue();
-		ccomps[3] = (byte) c.getAlpha();
+		ccomps[0] = (byte)c.getRed();
+		ccomps[1] = (byte)c.getGreen();
+		ccomps[2] = (byte)c.getBlue();
+		ccomps[3] = (byte)c.getAlpha();
 		
 		ec.write(ccomps);
 		

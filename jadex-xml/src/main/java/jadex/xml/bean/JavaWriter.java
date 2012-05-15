@@ -29,6 +29,7 @@ import java.awt.Image;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -225,6 +226,21 @@ public class JavaWriter extends Writer
 				null
 			));
 			typeinfos.add(ti_date);
+			
+			// java.sql.Timestamp
+			// Ignores several redundant bean attributes for performance reasons.
+			TypeInfo ti_timestamp = new TypeInfo(null, new ObjectInfo(Timestamp.class), 
+				new MappingInfo(null, new AttributeInfo[]{
+				new AttributeInfo(new AccessInfo("time", null)),
+				new AttributeInfo(new AccessInfo("hours", null, AccessInfo.IGNORE_READWRITE)),
+				new AttributeInfo(new AccessInfo("minutes", null, AccessInfo.IGNORE_READWRITE)),
+				new AttributeInfo(new AccessInfo("seconds", null, AccessInfo.IGNORE_READWRITE)),
+				new AttributeInfo(new AccessInfo("month", null, AccessInfo.IGNORE_READWRITE)),
+				new AttributeInfo(new AccessInfo("year", null, AccessInfo.IGNORE_READWRITE)),
+				new AttributeInfo(new AccessInfo("date", null, AccessInfo.IGNORE_READWRITE))},
+				null
+			));
+			typeinfos.add(ti_timestamp);
 			
 			// java.lang.Class
 			IObjectStringConverter clconv = new IObjectStringConverter()

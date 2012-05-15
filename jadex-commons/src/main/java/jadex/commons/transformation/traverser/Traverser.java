@@ -47,6 +47,7 @@ public class Traverser
 		processors.add(new ColorProcessor());
 		processors.add(new ImageProcessor());
 		/* end[android] */
+		processors.add(new TimestampProcessor());
 		processors.add(new LogRecordProcessor());
 		processors.add(new DateProcessor());
 		processors.add(new UUIDProcessor());

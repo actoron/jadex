@@ -80,6 +80,7 @@ public class BinarySerializer
 		ENCODER_HANDLERS.add(new LogRecordCodec());
 		ENCODER_HANDLERS.add(new EnumCodec());
 		ENCODER_HANDLERS.add(new UUIDCodec());
+		ENCODER_HANDLERS.add(new TimestampCodec());
 		ENCODER_HANDLERS.add(new BeanCodec());
 	}
 	

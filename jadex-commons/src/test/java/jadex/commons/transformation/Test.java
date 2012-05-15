@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,7 +39,7 @@ public abstract class Test extends TestCase
 	 */
 	public void performTests()
 	{
-		performTests(1000);
+		performTests(1);
 	}
 	
 	/**
@@ -66,12 +67,15 @@ public abstract class Test extends TestCase
 			for(int i=0; i<cnt; i++)
 //			while(true)
 			{
-				testBean();
-				testUUID();
+				testTimestamp();
+
 				testEnum();
+
 				testByte();
 				testDouble();
 //				testBigData();
+				testSpecialCharacter();
+					
 				testByteArray();
 				testBByteArray();
 				testIntArray();
@@ -88,42 +92,45 @@ public abstract class Test extends TestCase
 				testBShortArray();
 				testBooleanArray();
 				testBBooleanArray();
+				testVectorModel();
 				testMultiCollection();
 				testEmptySet();
 				testEmptyList();
 				testEmptyMap();
-				testSpecialCharacter();
-				testSelfReferenceBean();
+				testArray();
+				testList();
+				testSet();
+				testMap();
 				testEmptyArray();
 				testArrayOrder();
 				testMultiArray();
 				testMultiArray2();
 				testMultiArrayAttribute();
 				testByteArrayAttribute();
-				testVectorModel();
+				
 				testClass();
 				testDate();
-				
-				testArray();
-				testList();
-				testSet();
-				testMap();
+				testUUID();
 				testInnerClass();
 				testURL();
 				testLoggingLevel();
 				testLogRecord();
 				testInetAddress();
+				testTuple();
+				testTuple2();
+				testTimestamp();
 				
+				testBean();
 				testBeanWithPublicFields();
 				testBeanWithIncludedFields();
 				testAnonymousInnerClass();
 				testAnonymousInnerClassWithSimpleTypes();
+				testSelfReferenceBean();
+			
 				/* if_not[android]*/
 				testColor();
 				testImage();
 				/* end[android]*/
-				testTuple();
-				testTuple2();
 			}
 			long dur = System.currentTimeMillis()-start;
 			
@@ -955,6 +962,15 @@ public abstract class Test extends TestCase
 		};
 		
 		doWriteAndRead(obj);
+	}
+	
+	/**
+	 *  Test reading / writing tuple2.
+	 */
+	public void	testTimestamp() throws Exception
+	{
+		Timestamp ts = new Timestamp(System.currentTimeMillis());
+		doWriteAndRead(ts);
 	}
 	
 	/**
