@@ -610,12 +610,15 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 									{
 										// Execute last step of platform directly
 										// No more ext entries after cleanup step allowed.
+										Thread oldct = componentthread;
+										componentthread	= Thread.currentThread();
 										ext_forbidden	= true;
 										if(ext_entries==null)
 											ext_entries	= new ArrayList();
 										ext_entries.add(laststep);
 										executeExternalEntries(true);
 										ext_forbidden	= true;
+										componentthread = oldct;
 //										laststep.run();
 									}
 								}

@@ -524,6 +524,9 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	 */
 	public IFuture<Void> addLibraryServiceListener(ILibraryServiceListener listener)
 	{
+		if(listener==null)
+			throw new IllegalArgumentException();
+			
 		listeners.add(listener);
 		return IFuture.DONE;
 	}

@@ -1,6 +1,7 @@
 package jadex.bridge.service.types.library;
 
 import jadex.bridge.IResourceIdentifier;
+import jadex.bridge.service.annotation.CheckNotNull;
 import jadex.bridge.service.annotation.Excluded;
 import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.annotation.Reference;
@@ -22,19 +23,19 @@ public interface ILibraryService
 	 *  Add a new resource identifier.
 	 *  @param rid The resource identifier.
 	 */
-	public IFuture<Void> addResourceIdentifier(IResourceIdentifier rid);
+	public IFuture<Void> addResourceIdentifier(@CheckNotNull IResourceIdentifier rid);
 	
 	/**
 	 *  Remove a resource identifier.
 	 *  @param url The resource identifier.
 	 */
-	public IFuture<Void> removeResourceIdentifier(IResourceIdentifier rid);
+	public IFuture<Void> removeResourceIdentifier(@CheckNotNull IResourceIdentifier rid);
 	
 	/**
 	 *  Remove a resource identifier.
 	 *  @param url The resource identifier.
 	 */
-	public IFuture<Void> removeResourceIdentifierCompletely(IResourceIdentifier rid);
+	public IFuture<Void> removeResourceIdentifierCompletely(@CheckNotNull IResourceIdentifier rid);
 	
 	/**
 	 *  Get all managed (directly added i.e. top-level) resource identifiers.
@@ -58,19 +59,19 @@ public interface ILibraryService
 	 *  Add a new url.
 	 *  @param url The url.
 	 */
-	public IFuture<IResourceIdentifier> addURL(URL url);
+	public IFuture<IResourceIdentifier> addURL(@CheckNotNull URL url);
 	
 	/**
 	 *  Remove a url.
 	 *  @param url The url.
 	 */
-	public IFuture<Void> removeURL(URL url);
+	public IFuture<Void> removeURL(@CheckNotNull URL url);
 	
 	/**
 	 *  Remove a url completely (all references).
 	 *  @param url The url.
 	 */
-	public IFuture<Void> removeURLCompletely(URL url);
+	public IFuture<Void> removeURLCompletely(@CheckNotNull URL url);
 	
 	/**
 	 *  Get other contained (but not directly managed) urls from parent classloaders.
@@ -106,13 +107,13 @@ public interface ILibraryService
      *  The listener is registered for changes in the loaded library states.
      *  @param listener The listener to be added.
      */
-    public IFuture<Void> addLibraryServiceListener(ILibraryServiceListener listener);
+    public IFuture<Void> addLibraryServiceListener(@CheckNotNull ILibraryServiceListener listener);
     
     /**
      *  Remove an Library Service listener.
      *  @param listener  The listener to be removed.
      */
-    public IFuture<Void> removeLibraryServiceListener(ILibraryServiceListener listener);
+    public IFuture<Void> removeLibraryServiceListener(@CheckNotNull ILibraryServiceListener listener);
 
 
 	/**
