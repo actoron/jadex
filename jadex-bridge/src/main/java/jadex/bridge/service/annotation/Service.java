@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *  Gui representation for a service.
+ *  Mark a class as implementing a service.
  *  Applicable to the type.
  */
 @Target(ElementType.TYPE)
@@ -16,5 +16,5 @@ public @interface Service
 	/**
 	 *  Supply the interface.
 	 */
-	public Class value() default Object.class;
+	public Class<?> value() default Object.class;
 }

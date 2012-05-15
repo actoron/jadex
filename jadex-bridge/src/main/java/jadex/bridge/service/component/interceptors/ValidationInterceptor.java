@@ -3,13 +3,15 @@ package jadex.bridge.service.component.interceptors;
 import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.ServiceInvalidException;
+import jadex.bridge.service.component.BasicServiceInvocationHandler;
+import jadex.bridge.service.component.ServiceInfo;
 import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
-import jadex.commons.future.IResultListener;
 
+import java.lang.reflect.Proxy;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -62,8 +64,23 @@ public class ValidationInterceptor extends AbstractApplicableInterceptor
 		else
 		{
 			// Call isValid() on proxy to execute full interceptor chain.
-			IService ser = (IService)sic.getProxy();
-			ser.isValid().addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
+//			IService ser = (IService)sic.getProxy();
+//			IFuture<Boolean>	valid	= ser.isValid();
+			
+			// Call isValid() directly for speed.
+			BasicServiceInvocationHandler	handler	= (BasicServiceInvocationHandler)Proxy.getInvocationHandler(sic.getProxy());
+			Object	service	= handler.getService();
+			IFuture<Boolean>	valid;
+			if(service instanceof IService)
+			{
+				valid	= ((IService)service).isValid();
+			}
+			else
+			{
+				valid	= ((ServiceInfo)service).getManagementService().isValid();
+			}
+			
+			valid.addResultListener(new ExceptionDelegationResultListener<Boolean, Void>(ret)
 			{
 				public void customResultAvailable(Boolean result)
 				{

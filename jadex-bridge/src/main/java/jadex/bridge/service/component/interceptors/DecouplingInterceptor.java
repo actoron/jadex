@@ -532,7 +532,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 				final Future<?> fut = FutureFunctionality.getDelegationFuture((IFuture<?>)res, func);
 				
 				// Add timeout handling for local case.
-				if(!sic.isRemoteCall())
+				if(!((IFuture<?>)res).isDone() && !sic.isRemoteCall())
 				{
 					long to = BasicServiceContainer.getMethodTimeout(
 						sic.getObject().getClass().getInterfaces(), method, sic.isRemoteCall());
@@ -586,7 +586,7 @@ public class DecouplingInterceptor extends AbstractMultiInterceptor
 									if(exception instanceof TimeoutException)
 									{
 										fut.setExceptionIfUndone(exception);
-										if(res instanceof ITerminableFuture<?>)
+										if(fut instanceof ITerminableFuture<?>)
 										{
 											((ITerminableFuture)fut).terminate(exception);
 										}
