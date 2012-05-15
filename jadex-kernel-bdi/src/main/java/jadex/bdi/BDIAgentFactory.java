@@ -46,12 +46,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-/* $if !android $ */
 import jadex.commons.gui.SGUI;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
-/* $endif $ */
 
 /**
  *  Factory for creating Jadex V2 BDI agents.
@@ -74,13 +72,13 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	/**
 	 * The image icons.
 	 */
-	/* $if !android $ */
+	/* if_not[android] */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"bdi_agent",	SGUI.makeIcon(BDIAgentFactory.class, "/jadex/bdi/images/bdi_agent.png"),
 		"bdi_capability",	SGUI.makeIcon(BDIAgentFactory.class, "/jadex/bdi/images/bdi_capability.png")
 	});
-	/* $endif $ */
+	/* end[android] */
 
 	//-------- attributes --------
 	
@@ -466,17 +464,17 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	/* $if !android $ */
+	/* if_not[android] */
 	public IFuture<Icon> getComponentTypeIcon(String type)
 	{
 		return new Future<Icon>(type.equals(FILETYPE_BDIAGENT) ? icons.getIcon("bdi_agent")
 			: type.equals(FILETYPE_BDICAPABILITY) ? icons.getIcon("bdi_capability") : null);
 	}
-	/* $else $
+	/* else[android]
 	public IFuture<Void> getComponentTypeIcon(String type) {
 		return new Future(null);
 	}
-	$endif $ */
+	end[android] */
 
 	/**
 	 *  Get the component type of a model.

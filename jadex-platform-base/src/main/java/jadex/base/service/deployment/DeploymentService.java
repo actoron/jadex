@@ -11,9 +11,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 
-/* if_not[android] */
 import java.awt.Desktop;
-/* $endif $*/
 import java.io.File;
 import java.io.FileOutputStream;
 

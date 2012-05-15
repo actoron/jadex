@@ -750,7 +750,7 @@ public abstract class OAVAbstractState	implements IOAVState
 			}
 		}
 		
-		/*//Todo: support check for substates.
+		/*Todo: support check for substates.
 		if(substates!=null)
 		{
 			for(int i=0; i<substates.length; i++)

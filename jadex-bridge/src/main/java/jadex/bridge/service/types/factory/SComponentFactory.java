@@ -21,9 +21,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-/* if_not[android] */
 import javax.swing.Icon;
-/* end[android] */
 
 
 /**

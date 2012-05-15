@@ -1,10 +1,6 @@
 package jadex.bdi.runtime;
 
-/* $if !android $ */
 import java.beans.PropertyChangeListener;
-/* $else $
-import javaa.beans.PropertyChangeListener;
-$endif $ */
 
 /**
  *  A condition that a plan can wait for.

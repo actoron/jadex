@@ -1,10 +1,6 @@
 package jadex.commons;
 
-/* $if !android $ */
 import java.beans.PropertyChangeListener;
-/* $else $
-import javaa.beans.PropertyChangeListener;
-$endif $ */
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;

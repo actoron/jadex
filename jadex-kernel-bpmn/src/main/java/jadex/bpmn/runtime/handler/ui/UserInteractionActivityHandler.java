@@ -1,4 +1,4 @@
-package jadex.bpmn.runtime.handler.basic;
+package jadex.bpmn.runtime.handler.ui;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.runtime.BpmnInterpreter;

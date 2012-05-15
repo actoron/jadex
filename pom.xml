@@ -741,9 +741,11 @@
 				<module>jadex-tools-base/android</module>
 				<module>jadex-kernel-base/android</module>
 				<module>jadex-kernel-micro/android</module>
-<!-- 				<module>jadex-android-bdi</module> -->
-<!-- 				<module>jadex-android-bpmn</module> -->
-<!-- 				<module>jadex-android-bdibpmn</module> -->
+				<module>jadex-kernel-bpmn/android</module>
+				<module>jadex-kernel-component/android</module>
+				<module>jadex-rules/android</module>
+				<module>jadex-kernel-bdi/android</module>
+				
 			</modules>
 		</profile>
 		

@@ -1,7 +1,8 @@
-package jadex.bpmn.tools;
+package jadex.bpmn.tools.ui;
 
 import jadex.bpmn.runtime.BpmnInterpreter;
 import jadex.bpmn.runtime.ProcessThread;
+import jadex.bpmn.tools.ProcessThreadInfo;
 import jadex.bridge.BulkComponentChangeEvent;
 import jadex.bridge.IComponentChangeEvent;
 import jadex.bridge.IComponentListener;

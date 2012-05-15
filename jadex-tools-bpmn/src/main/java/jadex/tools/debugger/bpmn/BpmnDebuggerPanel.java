@@ -1,7 +1,7 @@
 package jadex.tools.debugger.bpmn;
 
 import jadex.base.gui.plugin.IControlCenter;
-import jadex.bpmn.tools.ProcessViewPanel;
+import jadex.bpmn.tools.ui.ProcessViewPanel;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.commons.IBreakpointPanel;

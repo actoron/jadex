@@ -1,15 +1,9 @@
 package jadex.base.contentcodecs;
 
 import jadex.bridge.service.types.message.IContentCodec;
-/* if_not[android] */
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
-/* else[android]
-import javaa.beans.ExceptionListener;
-import javaa.beans.XMLDecoder;
-import javaa.beans.XMLEncoder;
-end[android] */
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Serializable;

@@ -128,6 +128,12 @@
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>munge-maven-plugin</artifactId>
 			</plugin>
+			
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>replacer</artifactId>
+			</plugin>
+			
 			<!-- Java 1.6 javax.xml.stream.* -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

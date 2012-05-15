@@ -129,11 +129,17 @@
 				<artifactId>munge-maven-plugin</artifactId>
 				<configuration>
 					<excludes>
-						jadex/base/gui/,
+						${munge-default-excludes},
 						jadex/base/PlatformApplet.java
 					</excludes>
 				</configuration>
 			</plugin>
+			
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>replacer</artifactId>
+			</plugin>
+			
 			<!-- Java 1.6 javax.xml.namespace.QName -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

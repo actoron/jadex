@@ -12,13 +12,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.future.ISuspendable;
 
-/* $if !android $ */
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-/* $else $
-import javaa.beans.PropertyChangeListener;
-import javaa.beans.PropertyChangeSupport;
-$endif $ */
 
 import java.util.Collection;
 

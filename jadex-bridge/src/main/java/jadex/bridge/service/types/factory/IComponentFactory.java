@@ -15,9 +15,7 @@ import jadex.commons.future.IIntermediateResultListener;
 
 import java.util.Map;
 
-/* if_not[android] */
 import javax.swing.Icon;
-/* end[android] */
 
 
 /**

@@ -121,10 +121,6 @@
 			<!-- Java 1.5 Thread Pool. -->
 			<!-- Java 1.6 javax.xml.stream.* -->
 			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>munge-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
 				<executions>
@@ -143,6 +139,17 @@
 					</execution>
 				</executions>
 			</plugin>
+			
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>munge-maven-plugin</artifactId>
+			</plugin>
+			
+			<plugin>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>replacer</artifactId>
+			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>

@@ -1,4 +1,4 @@
-package jadex.bpmn.tools;
+package jadex.bpmn.tools.ui;
 
 import jadex.bpmn.model.MActivity;
 import jadex.bpmn.model.MBpmnModel;

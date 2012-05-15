@@ -29,12 +29,10 @@ import jadex.commons.future.IIntermediateResultListener;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
-/* if_not[android] */
 import jadex.commons.gui.SGUI;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
-/* end[android] */
 
 /**
  *  Factory for creating micro agents.

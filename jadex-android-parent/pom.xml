@@ -14,19 +14,20 @@
 		<maven-antrun-plugin-version>1.6</maven-antrun-plugin-version>
 		<android-maven-plugin-version>3.1.1</android-maven-plugin-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<munge-default-excludes>**/.svn/,**/ui/,**/gui/,**/*.png</munge-default-excludes>
 	</properties>
 
 	<dependencies>
 		<!-- To get all android-related errors, uncomment the following dependency -->
 		<!-- and remove the JRE from eclipse build path. -->
-<!-- 		<dependency> -->
-<!-- 		<groupId>proprietary</groupId> -->
-<!-- 		<artifactId>android</artifactId> -->
-<!-- 		<version>2.2.1</version> -->
-<!-- 		<scope>system</scope> -->
-<!-- 		<systemPath>/home/julakali/android/sdk/platforms/android-8/android.jar</systemPath> -->
-<!-- 		<systemPath>/scratch/8kalinow/android-sdk-linux_x86/platforms/android-8/android.jar</systemPath> -->
-<!-- 		</dependency> -->
+		<!-- <dependency> -->
+		<!-- <groupId>proprietary</groupId> -->
+		<!-- <artifactId>android</artifactId> -->
+		<!-- <version>2.2.1</version> -->
+		<!-- <scope>system</scope> -->
+		<!-- <systemPath>/home/julakali/android/sdk/platforms/android-8/android.jar</systemPath> -->
+		<!-- <systemPath>/scratch/8kalinow/android-sdk-linux_x86/platforms/android-8/android.jar</systemPath> -->
+		<!-- </dependency> -->
 
 		<dependency>
 			<groupId>com.google.android</groupId>
@@ -54,7 +55,7 @@
 	<build>
 		<pluginManagement>
 			<plugins>
-			<plugin>
+				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
 					<version>1.0.0</version>
@@ -78,7 +79,28 @@
 									</pluginExecutionFilter>
 									<action>
 										<execute>
-										<runOnIncremental>false</runOnIncremental>
+											<runOnIncremental>false</runOnIncremental>
+										</execute>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											com.google.code.maven-replacer-plugin
+										</groupId>
+										<artifactId>
+											replacer
+										</artifactId>
+										<versionRange>
+											[1.5.0,)
+										</versionRange>
+										<goals>
+											<goal>replace</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute>
+											<runOnIncremental>false</runOnIncremental>
 										</execute>
 									</action>
 								</pluginExecution>
@@ -104,19 +126,41 @@
 						<sourceDirectory>${basedir}/../src/main/java</sourceDirectory>
 						<mungedDirectory>${project.build.directory}</mungedDirectory>
 						<symbols>android,android8</symbols>
+						<excludes>${munge-default-excludes}</excludes>
 					</configuration>
 				</plugin>
 
 				<plugin>
 					<groupId>com.google.code.maven-replacer-plugin</groupId>
-					<artifactId>maven-replacer-plugin</artifactId>
+					<artifactId>replacer</artifactId>
 					<version>1.5.0</version>
 					<executions>
 						<execution>
-							<phase>prepare-package</phase>
+							<phase>process-sources</phase>
 							<goals>
 								<goal>replace</goal>
 							</goals>
+							<configuration>
+								<filesToInclude>target/main/**/*.java</filesToInclude>
+								<replacements>
+									<replacement>
+										<token>import javax.swing.*;</token>
+										<value></value>
+									</replacement>
+									<replacement>
+										<token>import java.awt.*;</token>
+										<value></value>
+									</replacement>
+									<replacement>
+										<token>javax.xml</token>
+										<value>javaxx.xml</value>
+									</replacement>
+									<replacement>
+										<token>java.beans</token>
+										<value>javaa.beans</value>
+									</replacement>
+								</replacements>
+							</configuration>
 						</execution>
 					</executions>
 				</plugin>
@@ -218,8 +262,9 @@
 					</configuration>
 				</plugin>
 
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-				
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+
 			</plugins>
 		</pluginManagement>
 	</build>

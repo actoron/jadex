@@ -6,9 +6,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-/* if_not[android] */
 import javax.swing.filechooser.FileSystemView;
-/* end[android] */
 
 /**
  *  A file data represents a java.io.File that

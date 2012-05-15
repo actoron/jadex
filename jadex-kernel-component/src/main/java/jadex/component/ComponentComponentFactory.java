@@ -37,11 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/* $if !android $ */
 import jadex.commons.gui.SGUI;
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
-/* $endif $ */
 
 /**
  *  Factory for default contexts.
@@ -64,12 +62,12 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	/**
 	 * The image icons.
 	 */
-	/* $if !android $ */
+	/* if_not[android] */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"component", SGUI.makeIcon(ComponentComponentFactory.class, "/jadex/component/images/component.png")
 	});
-	/* $endif $ */
+	/* end[android] */
 	
 	//-------- attributes --------
 	
@@ -385,16 +383,16 @@ public class ComponentComponentFactory extends BasicService implements IComponen
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	/* $if !android $ */
+	/* if_not[android] */
 	public IFuture<Icon> getComponentTypeIcon(String type)
 	{
 		return new Future<Icon>(type.equals(FILETYPE_COMPONENT)? icons.getIcon("component"): null);
 	}
-	/* $else $
+	/* else[android]
 	public IFuture<Void> getComponentTypeIcon(String type) {
 		return new Future(null);
 	}
-	$endif $ */
+	end[android] */
 
 	/**
 	 *  Get the component type of a model.
