@@ -2,11 +2,7 @@ package jadex.rules.state;
 
 import jadex.commons.SReflect;
 
-/* $if !android $ */
 import java.beans.PropertyChangeListener;
-/* $else $
-import javaa.beans.PropertyChangeListener;
-$endif $ */
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

@@ -13,13 +13,8 @@ import jadex.rules.state.OAVJavaType;
 import jadex.rules.state.OAVObjectType;
 import jadex.rules.state.OAVTypeModel;
 
-/* $if !android $ */
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-/* $else $
-import javaa.beans.PropertyChangeEvent;
-import javaa.beans.PropertyChangeListener;
-$endif $ */
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
