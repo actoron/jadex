@@ -26,7 +26,9 @@
 			<parameter name="result" class="String" direction="out">
 				<!-- <servicemapping ref="paintservice.result"/> -->
 			</parameter>
-			<goalpublish class="IPaintMoneyService" method="paintOneEuro"/>
+			<goalpublish class="IPaintMoneyService" method="paintOneEuro">
+				<!-- <termination>$beliefbase.painter==null</termination> -->
+			</goalpublish>
 		</achievegoal>
  	</goals>
 

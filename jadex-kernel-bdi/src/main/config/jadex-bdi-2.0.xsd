@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Lars (RTL) -->
-<xs:schema	targetNamespace="http://jadex.sourceforge.net/jadex"
-			xmlns="http://jadex.sourceforge.net/jadex"
-			xmlns:jadex="http://jadex.sourceforge.net/jadex"
-			xmlns:xs="http://www.w3.org/2001/XMLSchema"
-			elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
-			
+<xs:schema targetNamespace="http://jadex.sourceforge.net/jadex" xmlns="http://jadex.sourceforge.net/jadex" xmlns:jadex="http://jadex.sourceforge.net/jadex" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 	<xs:redefine schemaLocation="http://jadex.sourceforge.net/jadex-component-2.0.xsd">
-		<!-- Hack!!! The following combined restriction/extension is actually not valid XSD but works for eclipse XML editor. -->
 		<xs:group name="comptypegroup">
 			<xs:all>
 				<xs:element name="imports" type="imports" minOccurs="0"/>
@@ -50,14 +44,12 @@
 				<xs:element name="events" type="MConfigEventbase" minOccurs="0"/>
 			</xs:all>
 		</xs:group>
+		<!-- Hack!!! The following combined restriction/extension is actually not valid XSD but works for eclipse XML editor. -->
 	</xs:redefine>
-	
 	<xs:element name="agent" type="componenttype">
 		<xs:annotation>
 			<xs:documentation>Defines a new agent type.</xs:documentation>
 		</xs:annotation>
-		
-		<!-- unique keys on type level -->
 		<xs:key name="agent_capability_name">
 			<xs:selector xpath="jadex:capabilities/jadex:capability"/>
 			<xs:field xpath="@name"/>
@@ -90,11 +82,10 @@
 			<xs:selector xpath="jadex:events/jadex:messageevent|jadex:events/jadex:messageeventref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
-		
-		<!-- key references in triggers / deliberation -->
-		<xs:keyref name="agent_belief_trigger" refer="agent_belief_name">	<!-- Both beliefs and belief sets allowed. -->
+		<xs:keyref name="agent_belief_trigger" refer="agent_belief_name">
 			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:factchanged"/>
 			<xs:field xpath="@ref"/>
+			<!-- Both beliefs and belief sets allowed. -->
 		</xs:keyref>
 		<xs:keyref name="agent_beliefset_trigger" refer="agent_beliefset_key">
 			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:factadded|jadex:plans/jadex:plan/jadex:trigger/jadex:factremoved"/>
@@ -116,8 +107,6 @@
 			<xs:selector xpath="jadex:goals/jadex:performgoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:achievegoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:querygoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:maintaingoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:metagoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:performgoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:achievegoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:querygoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:maintaingoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:metagoalref/jadex:deliberation/jadex:inhibits"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
-		
-		<!-- key references in configurations -->
 		<xs:keyref name="agent_capability_reference" refer="agent_capability_name">
 			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:capabilities/jadex:initialcapability"/>
 			<xs:field xpath="@ref"/>
@@ -146,8 +135,6 @@
 			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:messageevents/jadex:initialmessageevent|jadex:configurations/jadex:configuration/jadex:messageevents/jadex:endmessageevent"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
-		
-		<!-- copied from jadex-component.xsd, prefixed with 'agent_' to avoid name clashes. -->
 		<xs:key name="agent_component_name">
 			<xs:selector xpath="jadex:componenttypes/jadex:componenttype"/>
 			<xs:field xpath="@name"/>
@@ -180,12 +167,15 @@
 			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:requiredservice"/>
 			<xs:field xpath="@name"/>
 		</xs:keyref>
+		<!-- unique keys on type level -->
+		<!-- key references in triggers / deliberation -->
+		<!-- key references in configurations -->
+		<!-- copied from jadex-component.xsd, prefixed with 'agent_' to avoid name clashes. -->
 	</xs:element>
 	<xs:element name="capability" type="MCapability">
 		<xs:annotation>
 			<xs:documentation>Defines a new capability type.</xs:documentation>
 		</xs:annotation>
-		<!-- unique keys on type level -->
 		<xs:key name="capa_capability_name">
 			<xs:selector xpath="jadex:capabilities/jadex:capability"/>
 			<xs:field xpath="@name"/>
@@ -218,11 +208,10 @@
 			<xs:selector xpath="jadex:events/jadex:messageevent|jadex:events/jadex:messageeventref"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
-		
-		<!-- key references in triggers / deliberation -->
-		<xs:keyref name="capa_belief_trigger" refer="capa_belief_name">	<!-- Both beliefs and belief sets allowed. -->
+		<xs:keyref name="capa_belief_trigger" refer="capa_belief_name">
 			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:factchanged"/>
 			<xs:field xpath="@ref"/>
+			<!-- Both beliefs and belief sets allowed. -->
 		</xs:keyref>
 		<xs:keyref name="capa_beliefset_trigger" refer="capa_beliefset_key">
 			<xs:selector xpath="jadex:plans/jadex:plan/jadex:trigger/jadex:factadded|jadex:plans/jadex:plan/jadex:trigger/jadex:factremoved"/>
@@ -244,8 +233,6 @@
 			<xs:selector xpath="jadex:goals/jadex:performgoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:achievegoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:querygoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:maintaingoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:metagoal/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:performgoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:achievegoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:querygoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:maintaingoalref/jadex:deliberation/jadex:inhibits|jadex:goals/jadex:metagoalref/jadex:deliberation/jadex:inhibits"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
-		
-		<!-- key references in configurations -->
 		<xs:keyref name="capa_capability_reference" refer="capa_capability_name">
 			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:capabilities/jadex:initialcapability"/>
 			<xs:field xpath="@ref"/>
@@ -274,8 +261,6 @@
 			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:messageevents/jadex:initialmessageevent|jadex:configurations/jadex:configuration/jadex:messageevents/jadex:endmessageevent"/>
 			<xs:field xpath="@ref"/>
 		</xs:keyref>
-		
-		<!-- copied from jadex-component.xsd, prefixed with 'capa_' to avoid name clashes. -->
 		<xs:key name="capa_component_name">
 			<xs:selector xpath="jadex:componenttypes/jadex:componenttype"/>
 			<xs:field xpath="@name"/>
@@ -308,8 +293,11 @@
 			<xs:selector xpath="jadex:configurations/jadex:configuration/jadex:services/jadex:requiredservice"/>
 			<xs:field xpath="@name"/>
 		</xs:keyref>
+		<!-- unique keys on type level -->
+		<!-- key references in triggers / deliberation -->
+		<!-- key references in configurations -->
+		<!-- copied from jadex-component.xsd, prefixed with 'capa_' to avoid name clashes. -->
 	</xs:element>
-	
 	<xs:complexType name="MCapabilityBase">
 		<xs:annotation>
 			<xs:documentation>In the capabilities section arbitrary many capabilities can be declared. The functionality of a capability can be used within the agent resp. capability.</xs:documentation>
@@ -327,7 +315,6 @@
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	
 	<xs:complexType name="MCapability">
 		<xs:annotation>
 			<xs:documentation>Base type for a capability.</xs:documentation>
@@ -566,6 +553,7 @@
 							<xs:documentation>The goal deliberation setting for the easy deliberation strategy.</xs:documentation>
 						</xs:annotation>
 					</xs:element>
+					<xs:element name="publish" type="MPublish" minOccurs="0"/>
 				</xs:sequence>
 				<xs:attribute name="retry" type="xs:boolean" default="true">
 					<xs:annotation>
@@ -831,6 +819,8 @@
 		</xs:attribute>
 		<xs:attribute name="class" type="xs:string"/>
 		<xs:attribute name="impl" type="xs:string"/>
+		<xs:attribute name="service" type="xs:string"/>
+		<xs:attribute name="method" type="xs:string"/>
 	</xs:complexType>
 	<xs:complexType name="MTypedElement" abstract="true" mixed="true">
 		<xs:annotation>
@@ -2079,5 +2069,12 @@
 		<xs:annotation>
 			<xs:documentation>Base element without name.</xs:documentation>
 		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="MPublish">
+		<xs:annotation>
+			<xs:documentation>Goal delegation element. </xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="class" type="xs:string" use="required"/>
+		<xs:attribute name="method" type="xs:string" use="required"/>
 	</xs:complexType>
 </xs:schema>
