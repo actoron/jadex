@@ -506,11 +506,11 @@ public class SelectorThread implements Runnable
 //	 *  Class for cleaning output connections after 
 //	 *  max keep alive time has been reached.
 //	 */
-//	/* $if !android $ */
+/* if_not[android] */
 //	protected class Cleaner	implements	ActionListener
-//	/* $else $
+/* else[android]
 //	protected class Cleaner implements TimerListener
-//	$endif $ */
+//	end[android]*/
 //	{
 //		//-------- attributes --------
 //		
@@ -538,11 +538,11 @@ public class SelectorThread implements Runnable
 //		/**
 //		 *  Called when timepoint was reached.
 //		 */
-//		/* $if !android $ */
+/* if_not[android] */
 //	    public void actionPerformed(ActionEvent event)
 //	    /* $else    
 //	    public void actionPerformed()
-//	    $endif $ */
+/* end[android] */
 //		{
 //			Object	con;
 //			synchronized(connections)

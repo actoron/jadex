@@ -1,7 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<groupId>net.sourceforge.jadex</groupId>
 	<artifactId>jadex-android-javaparser</artifactId>
+	<version>2.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>jadex-android-javaparser</name>
 	<url>http://jadex.sourceforge.net</url>
@@ -116,7 +118,7 @@
 				<executions>
 					<execution>
 						<id>add-source</id>
-						<phase>generate-sources</phase>
+						<phase>process-sources</phase>
 						<goals>
 							<goal>add-source</goal>
 						</goals>

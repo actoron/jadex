@@ -91,10 +91,10 @@ public class NIOSelectorThread
 		// ANDROID: Selector.open() causes an exception in a 2.2
 		// emulator due to IPv6 addresses, see:
 		// http://code.google.com/p/android/issues/detail?id=9431
-		/* $if android && androidVersion < 9 $
+		/* if[android8]
 		java.lang.System.setProperty("java.net.preferIPv4Stack", "true");
 		java.lang.System.setProperty("java.net.preferIPv6Addresses", "false");
-		$endif $ */
+		end[android8]*/
 		
 		// Causes problem with maven too (only with Win firewall?)
 		// http://www.thatsjava.com/java-core-apis/28232/

@@ -11,7 +11,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.ITerminableIntermediateFuture;
 import jadex.commons.future.TerminableIntermediateFuture;
 
-/* $if !android $ */
+/* if_not[android] */
 import java.awt.Desktop;
 /* $endif $*/
 import java.io.File;
@@ -121,9 +121,9 @@ public class DeploymentService implements IDeploymentService
 		try
 		{
 			File file = new File(path);
-			/* $if !android $ */
+			/* if_not[android] */
 			Desktop.getDesktop().open(file);
-			/* $endif $ */
+			/* end[android] */
 			// exec produces strange exceptions?!
 //			Runtime.getRuntime().exec(path);
 			ret.setResult(null);

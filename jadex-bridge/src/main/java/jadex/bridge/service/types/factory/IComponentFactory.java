@@ -15,9 +15,9 @@ import jadex.commons.future.IIntermediateResultListener;
 
 import java.util.Map;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.swing.Icon;
-/* $endif $ */
+/* end[android] */
 
 
 /**
@@ -35,11 +35,11 @@ public interface IComponentFactory
 	/**
 	 *  Get a default icon for a component type.
 	 */
-	/* $if !android $ */
+	/* if_not[android] */
 	public @Reference(remote=false) IFuture<Icon> getComponentTypeIcon(String type);
-	/* $else $
+	/* else[android]
 	public IFuture<Void> getComponentTypeIcon(String type);
-	$endif $ */
+	end[android] */
 
 	//-------- cached --------
 	

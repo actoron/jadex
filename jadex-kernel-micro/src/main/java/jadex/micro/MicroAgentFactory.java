@@ -29,12 +29,12 @@ import jadex.commons.future.IIntermediateResultListener;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 
-/* $if !android $ */
+/* if_not[android] */
 import jadex.commons.gui.SGUI;
 
 import javax.swing.Icon;
 import javax.swing.UIDefaults;
-/* $endif $ */
+/* end[android] */
 
 /**
  *  Factory for creating micro agents.
@@ -51,12 +51,12 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	public static final String	FILETYPE_MICROAGENT	= "Micro Agent";
 	
 	/** The image icons. */
-	/* $if !android $ */
+	/* if_not[android] */
 	protected static final UIDefaults icons = new UIDefaults(new Object[]
 	{
 		"micro_agent",	SGUI.makeIcon(MicroAgentFactory.class, "/jadex/micro/images/micro_agent.png"),
 	});
-	/* $endif $ */
+	/* end[android] */
 
 	//-------- attributes --------
 	
@@ -357,16 +357,16 @@ public class MicroAgentFactory extends BasicService implements IComponentFactory
 	/**
 	 *  Get a default icon for a file type.
 	 */
-	/* $if !android $ */
+	/* if_not[android] */
 	public IFuture<Icon> getComponentTypeIcon(String type)
 	{
 		return new Future<Icon>(type.equals(FILETYPE_MICROAGENT) ? icons.getIcon("micro_agent") : null);
 	}
-	/* $else $
+	/* else[android]
 	public IFuture<Void> getComponentTypeIcon(String type) {
 		return new Future(null);
 	}
-	$endif $ */
+	end[android] */
 
 	/**
 	 *  Get the component type of a model.

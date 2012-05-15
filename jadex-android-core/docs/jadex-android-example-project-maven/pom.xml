@@ -11,19 +11,25 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-core</artifactId>
+			<artifactId>jadex-android-platform-base</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-kernel-micro</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-kernel-bpmn</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-misc</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-bpmn</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		

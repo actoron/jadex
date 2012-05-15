@@ -8,9 +8,6 @@ import jadex.commons.transformation.annotations.Classname;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 import java.net.URL;

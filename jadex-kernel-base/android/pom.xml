@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>jadex-android-bridge</artifactId>
 	<groupId>net.sourceforge.jadex</groupId>
-	<version>2.1-SNAPSHOT</version>
+	<artifactId>jadex-android-kernel-base</artifactId>
 	<packaging>jar</packaging>
-	<name>jadex-android-bridge</name>
+	<version>2.1-SNAPSHOT</version>
+	<name>jadex-android-kernel-base</name>
 	<url>http://jadex.sourceforge.net</url>
-
+	
 	<parent>
 		<groupId>net.sourceforge.jadex</groupId>
 		<artifactId>jadex-android-parent</artifactId>
@@ -15,10 +15,8 @@
 	</parent>
 
 	<description>
-		Jadex bridge is a base package for kernels and platforms,
-		i.e. it is used by both and provides commonly used 
-		interfaces and classes for active components and 
-		their management.  
+		The Jadex base kernel provides basic
+		support for all kinds of active components. 
 	</description>
 
 	<licenses>
@@ -81,17 +79,21 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	<!-- <parent> <groupId>net.sourceforge.jadex</groupId> <artifactId>jadex-settings</artifactId> 
-		<version>${jadexVersion}</version> <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath> 
-		</parent> -->
+	<!--
+		<parent> <groupId>net.sourceforge.jadex</groupId>
+		<artifactId>jadex-settings</artifactId>
+		<version>${jadexVersion}</version>
+		<relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
+		</parent>
+	-->
 
 	<properties>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-	</properties>
-	
+  	</properties>
+
 	<build>
-	<sourceDirectory>../src/main/java</sourceDirectory>
-	<testSourceDirectory>../src/test/java</testSourceDirectory>
+		<sourceDirectory>../src/main/java</sourceDirectory>
+		<testSourceDirectory>../src/test/java</testSourceDirectory>
 		<resources>
 			<resource>
 				<directory>../src/main/java</directory>
@@ -103,11 +105,6 @@
 		</resources>
 
 		<plugins>
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>munge-maven-plugin</artifactId>
-			</plugin>
-			
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
@@ -126,21 +123,26 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>munge-maven-plugin</artifactId>
+			</plugin>
+			<!-- Java 1.6 javax.xml.stream.* -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+        		<version>2.3.2</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1.2</version>
+        		<version>2.1.2</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -151,11 +153,11 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.8.1</version>
+		        <groupId>org.apache.maven.plugins</groupId>
+        		<artifactId>maven-javadoc-plugin</artifactId>
+        		<version>2.8.1</version>
 				<executions>
 					<execution>
 						<id>attach-javadoc</id>
@@ -165,7 +167,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+        	</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -183,8 +185,26 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<repositories>
+		<repository>
+			<id>maven2-repository.dev.java.net</id>
+			<name>Java.net Repository for Maven</name>
+			<url>http://download.java.net/maven/2/</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
 
 	<dependencies>
+		<!-- 
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		 -->
+
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-commons</artifactId>
@@ -197,7 +217,11 @@
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
 
-		<!-- <dependency> <groupId>stax</groupId> <artifactId>stax</artifactId> 
-			<version>1.2.0</version> </dependency> -->
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-bridge</artifactId>
+			<version>2.1-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
 </project>

@@ -59,10 +59,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-/* $if !android $ */
 import jadex.commons.gui.SGUI;
-/* $endif $ */
 
 
 /**
@@ -953,7 +950,6 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 																	
 																	activatedkernels.add(kernelmodel);
 																	
-																	/* $if !android $ */
 																	if (SGUI.HAS_GUI)
 																	{
 																		IResultListener typecounter = ia.createResultListener(new CounterResultListener(types.length, true, ia.createResultListener(new DelegationResultListener(ret)
@@ -985,7 +981,6 @@ public class MultiFactory implements IComponentFactory, IMultiKernelNotifierServ
 																			kernel.getComponentTypeIcon(types[i]).addResultListener(typecounter);
 																	}
 																	else
-																		/* $endif $ */
 																		ret.setResult(kernel);
 																}
 																else

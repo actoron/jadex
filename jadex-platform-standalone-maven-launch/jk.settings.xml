@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<p0:properties xmlns:p0="http://jadex.sourceforge.net/jadexconf" __ID="0">
+	<p0:properties __ID="1" type="StarterServicePanel">
+		<p0:properties __ID="2" type="mpanel">
+			<p0:property __ID="3" type="tree"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+<p0:TreeProperties xmlns:p0="typeinfo:jadex.base.gui.filetree" __ID="0">
+	<expandedNodes>
+		<p0:NodePath__1 __ID="1" __len="0"></p0:NodePath__1>
+	</expandedNodes>
+	<rootPathEntries>
+		<p1:String__1 xmlns:p1="typeinfo:java.lang" __ID="2" __len="0"></p1:String__1>
+	</rootPathEntries>
+</p0:TreeProperties>
+]]></p0:property>
+			<p0:properties __ID="4" type="mic">
+				<p0:property __ID="5" type="Component">true</p0:property>
+				<p0:property __ID="6" type="Micro Agent">true</p0:property>
+			</p0:properties>
+		</p0:properties>
+		<p0:properties __ID="7" type="spanel">
+			<p0:property __ID="8" type="startsuspended">false</p0:property>
+			<p0:property __ID="9" type="autogenerate">false</p0:property>
+			<p0:property __ID="10" type="number">1</p0:property>
+			<p0:property __ID="11" type="name"></p0:property>
+		</p0:properties>
+	</p0:properties>
+	<p0:properties __ID="12" type="securityservice">
+		<p0:property __ID="13" type="usepass">true</p0:property>
+		<p0:property __ID="14" type="password">fdbfe6cb-917</p0:property>
+		<p0:property __ID="15" type="passwords"><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+<p0:LinkedHashMap xmlns:p0="typeinfo:java.util" __ID="0"></p0:LinkedHashMap>
+]]></p0:property>
+	</p0:properties>
+	<p0:properties __ID="16" type="awa">
+		<p0:property __ID="17" type="fast">false</p0:property>
+		<p0:property __ID="18" type="autocreate">true</p0:property>
+		<p0:property __ID="19" type="autodelete">true</p0:property>
+	</p0:properties>
+	<p0:properties __ID="20" type="simulationservice">
+		<p0:property __ID="21" type="executing">true</p0:property>
+	</p0:properties>
+	<p0:properties __ID="22" type="clockservice">
+		<p0:property __ID="23" type="type">system</p0:property>
+		<p0:property __ID="24" type="delta">100</p0:property>
+		<p0:property __ID="25" type="dilation">1.0</p0:property>
+	</p0:properties>
+</p0:properties>

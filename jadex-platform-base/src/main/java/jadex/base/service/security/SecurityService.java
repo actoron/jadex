@@ -35,9 +35,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/* $if android $
+/* if[android]
 import android.util.Log;
-$endif $ */
+end[android]*/
 
 @Service
 public class SecurityService implements ISecurityService
@@ -168,11 +168,11 @@ public class SecurityService implements ISecurityService
 								{
 									if(printpass && (usepass==null || usepass.booleanValue()))
 									{
-										/* $if android $
+										/* if[android]
 										Log.i("jadex-android", "Generated platform password: "+password);
-										$else $ */
+										else[android] */
 										System.out.println("Generated platform password: "+password);
-										/* $endif $ */
+										/* end[android] */
 									}
 									settings.saveProperties().addResultListener(new DelegationResultListener<Void>(ret));
 								}
@@ -180,11 +180,11 @@ public class SecurityService implements ISecurityService
 								{
 									if(printpass && (usepass==null || usepass.booleanValue()))
 									{
-										/* $if android $
+										/* if[android]
 										Log.i("jadex-android", "Using stored platform password: "+password);
-										$else $ */
+										else[android] */
 										System.out.println("Using stored platform password: "+password);
-										/* $endif $ */
+										/* end[android] */
 									}
 									super.customResultAvailable(result);
 								}
@@ -262,11 +262,11 @@ public class SecurityService implements ISecurityService
 			
 			if(printpass && (usepass==null || usepass.booleanValue()))
 			{
-				/* $if android $
+				/* if[android]
 				Log.i("jadex-android", "Using stored platform password: "+password);
-				$else $ */
+				else[android] */
 				System.out.println("Using stored platform password: "+password);
-				/* $endif $ */
+				/* end[android] */
 			}
 		}
 		return ret;
@@ -301,11 +301,11 @@ public class SecurityService implements ISecurityService
 			ret	= IFuture.DONE;
 			if(printpass && (usepass==null || usepass.booleanValue()))
 			{
-				/* $if android $
+				/* if[android]
 				Log.i("jadex-android", "Using new platform password: "+password);
-				$else $ */
+				else[android] */
 				System.out.println("Using new platform password: "+password);
-				/* $endif $ */
+				/* end[android] */
 			}
 		}
 		return ret;

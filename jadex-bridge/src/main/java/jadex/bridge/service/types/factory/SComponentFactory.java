@@ -21,9 +21,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-/* $if !android $ */
+/* if_not[android] */
 import javax.swing.Icon;
-/* $endif $ */
+/* end[android] */
 
 
 /**
@@ -285,7 +285,7 @@ public class SComponentFactory
 	/**
 	 * Get a default icon for a file type.
 	 */
-	/* $if !android $ */
+	/* if_not[android] */
 	public static IFuture<Icon> getFileTypeIcon(IExternalAccess exta, final String type)
 	{
 		Future<Icon> ret = new Future<Icon>();
@@ -323,7 +323,7 @@ public class SComponentFactory
 		
 		return ret;
 	}
-	/* $endif $ */
+	/* end[android] */
 
 	/**
 	 * Get a default icon for a file type.

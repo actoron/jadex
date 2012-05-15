@@ -1521,11 +1521,11 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 //	{
 //		DelegationURLClassLoader[] delegates = (DelegationURLClassLoader[])classloaders.values().toArray(new DelegationURLClassLoader[classloaders.size()]);
 //		
-//		/* $if !android $ */
+/* if_not[android] */
 //		this.libcl = new DelegationURLClassLoader(ClassLoader.getSystemClassLoader(), delegates);
-//		/* $else $
+/* else[android]
 //		this.libcl = new DelegationClassLoader(LibraryService.class.getClassLoader(), urls);
-//		$endif $ */
+//		end[android]*/
 //		
 //		System.out.println("update global: "+delegates.length);
 //	}

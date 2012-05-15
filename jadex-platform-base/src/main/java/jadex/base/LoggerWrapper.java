@@ -927,11 +927,11 @@ public class LoggerWrapper extends Logger
 		// calling ClassLoader.
 		for(int ix = 0;; ix++)
 		{
-			/* $if !android $ */
+			/* if_not[android] */
 			Class clz = sun.reflect.Reflection.getCallerClass(ix);
-			/* $else $
+			/* else[android]
 			Class clz = this.getClass();
-			$endif $ */
+			end[android]*/
 			if(clz == null)
 			{
 				break;
