@@ -32,8 +32,8 @@ public class PlatformsTest extends TestCase
 	String[]	BASEARGS	= new String[]
     {
 //		"-logging_level", "java.util.logging.Level.INFO",
-		"-debugfutures", "true",
-		"-nostackcompaction", "true",
+//		"-debugfutures", "true",
+//		"-nostackcompaction", "true",
 		"-platformname", "testcases",
 		"-gui", "false",
 		"-saveonexit", "false",
