@@ -17,7 +17,9 @@ import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+/* if_not[android] */
 import java.net.InterfaceAddress;
+/* end[android */
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;
@@ -2234,7 +2236,7 @@ public class SUtil
 	public static short getNetworkPrefixLength(InetAddress iadr)
 	{
 		short ret = -1;
-		/* $if !android $ */
+		/* if_not[android] */
 		try
 		{
 			NetworkInterface ni = NetworkInterface.getByInetAddress(iadr);
@@ -2254,7 +2256,7 @@ public class SUtil
 		{
 //			e.printStackTrace();
 		}
-		/* $endif $ */
+		/* end[android] */
 		
 		return ret;
 	}

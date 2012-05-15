@@ -21,8 +21,6 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.naming.Binding;
-
 /**
  *  A plan executor for plans that run on their own thread
  *  and therefore may perform blocking wait operations.

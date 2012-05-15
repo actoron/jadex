@@ -17,7 +17,13 @@
 		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-kernel-micro</artifactId>
+			<artifactId>jadex-android-platform-standalone</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-kernel-component</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
