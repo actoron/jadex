@@ -1770,6 +1770,9 @@ public class AgentRules
 					ret.setResult(null);
 				}
 			}));
+			
+			// Set default belief values immediately, otherwise evaluation of dependent expressions fails.
+			FutureHelper.notifyStackedListeners();
 		}
 		else
 		{
