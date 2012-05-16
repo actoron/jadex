@@ -33,6 +33,7 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IMessageAdapter;
 import jadex.bridge.modelinfo.IModelInfo;
+import jadex.bridge.service.IInternalService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.ProvidedServiceImplementation;
 import jadex.bridge.service.ProvidedServiceInfo;
@@ -729,7 +730,6 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 				{
 					ProcessThread pt = (ProcessThread)it.next();
 					getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
-//							System.out.println("Cancelling: "+pt.getActivity()+" "+pt.getId());
 				}
 				
 				BpmnInterpreter.super.startEndSteps().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
@@ -1019,24 +1019,31 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	{
 		if(adapter.isExternalThread())
 		{
-			getComponentAdapter().invokeLater(new Runnable()
+			try
 			{
-				public void run()
+				getComponentAdapter().invokeLater(new Runnable()
 				{
-					if(isCurrentActivity(activity, thread))
+					public void run()
 					{
-//						System.out.println("Notify: "+activity+" "+thread+" "+event);
-						step(activity, BpmnInterpreter.this, thread, event);
-						thread.setNonWaiting();
-						if(thread.getThreadContext()!=null)
-							notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
+						if(isCurrentActivity(activity, thread))
+						{
+	//						System.out.println("Notify: "+activity+" "+thread+" "+event);
+							step(activity, BpmnInterpreter.this, thread, event);
+							thread.setNonWaiting();
+							if(thread.getThreadContext()!=null)
+								notifyListeners(createThreadEvent(IComponentChangeEvent.EVENT_TYPE_MODIFICATION, thread));
+						}
+						else
+						{
+							System.out.println("Nop, due to outdated notify: "+thread+" "+activity);
+						}
 					}
-					else
-					{
-						System.out.println("Nop, due to outdated notify: "+thread+" "+activity);
-					}
-				}
-			});
+				});
+			}
+			catch(ComponentTerminatedException cte)
+			{
+				// Ignore outdated events
+			}
 		}
 		else
 		{
@@ -1458,24 +1465,24 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 	 *  Init a service.
 	 *  Overriden to allow for service implementations as BPMN processes using signal events.
 	 */
-	protected IFuture initService(ProvidedServiceInfo info, IModelInfo model)
+	protected IFuture<Void> initService(ProvidedServiceInfo info, IModelInfo model)
 	{
-		IFuture	ret;
+		IFuture<Void>	ret;
 		ProvidedServiceImplementation	impl	= info.getImplementation();
 		
 		// Service implementation inside BPMN: find start events for service methods.
-		if(impl!=null && impl.getValue()==null && impl.getClazz().getType(getClassLoader())==null && info.getName()!=null)
+		if(impl!=null && impl.getValue()==null && impl.getClazz()==null && info.getName()!=null)
 		{
 			// Build map of potentially matching events: method name -> {list of matching signal event activities}
 			MultiCollection	events	= new MultiCollection();
-			List	starts	= this.model.getStartActivities(pool, lane);
+			List<MActivity>	starts	= this.model.getStartActivities(pool, lane);
 			for(int i=0; i<starts.size(); i++)
 			{
 				MActivity	act	= (MActivity)starts.get(i);
 				if(MBpmnModel.EVENT_START_MULTIPLE.equals(act.getActivityType())
 					&& info.getName().equals(act.getName()))
 				{
-					List	edges	= act.getOutgoingSequenceEdges();
+					List<MSequenceEdge>	edges	= act.getOutgoingSequenceEdges();
 					for(int k=0; k<edges.size(); k++)
 					{
 						MActivity	target	= ((MSequenceEdge)edges.get(k)).getTarget();
@@ -1493,9 +1500,9 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 			}
 
 			// Find matching events for each method.
-			Future	fut	= new Future();
+			final Future<Void>	fut	= new Future<Void>();
 			ret	= fut;
-			Class	type	= info.getType().getType(getClassLoader());
+			Class<?>	type	= info.getType().getType(getClassLoader());
 			Method[]	meths	= type.getMethods();
 			Map	methods	= new HashMap(); // method -> event.
 			for(int i=0; !fut.isDone() && i<meths.length; i++)
@@ -1525,8 +1532,15 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 
 //			System.out.println("Found mapping: "+methods);
 			// Todo: interceptors
-			ret	= addService(info.getName(), info.getType().getType(getClassLoader()), info.getImplementation().getProxytype(), null,
-				Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getType().getType(getClassLoader())}, new ProcessServiceInvocationHandler(this, methods)), null);
+			addService(info.getName(), info.getType().getType(getClassLoader()), info.getImplementation().getProxytype(), null,
+				Proxy.newProxyInstance(getClassLoader(), new Class[]{info.getType().getType(getClassLoader())}, new ProcessServiceInvocationHandler(this, methods)), null)
+				.addResultListener(new ExceptionDelegationResultListener<IInternalService, Void>(fut)
+			{
+				public void customResultAvailable(IInternalService result)
+				{
+					fut.setResult(null);
+				}
+			});
 		}
 		
 		// External service implementation

@@ -12,7 +12,6 @@
 	package="jadex.bdi.examples.ping">
 
 	<imports>
-		<import>jadex.bridge.fipa.*</import>
 		<import>jadex.bridge.*</import>
 	</imports>
 
@@ -23,7 +22,7 @@
 	<beliefs>
 		<belief name="ping_receiver" class="IComponentIdentifier" exported="true">
 			<fact>
-				$scope.getEventbase().createComponentIdentifier("Ping", $scope.getComponentIdentifier().getParentAccess())
+				new ComponentIdentifier("Ping", $scope.getComponentIdentifier().getParent())
 			</fact>
 		</belief>
 		<beliefref name="ping_delay" exported="true">

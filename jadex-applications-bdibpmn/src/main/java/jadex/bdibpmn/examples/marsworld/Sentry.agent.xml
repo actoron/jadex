@@ -51,7 +51,7 @@
 		</beliefref>
 		
 		<belief name="agrspace" class="AGRSpace">
-			<fact class="IFuture">$scope.getParent().getExtension("myagrspace")</fact>
+			<fact class="IFuture">$scope.getParentAccess().getExtension("myagrspace")</fact>
 		</belief>
 	</beliefs>
 

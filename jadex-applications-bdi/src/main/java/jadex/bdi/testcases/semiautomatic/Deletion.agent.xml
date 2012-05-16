@@ -17,7 +17,7 @@
 	</plans>
 	
 	<properties>
-		<property name="logging.level">java.util.logging.Level.INFO</property>
+   		<property name="logging.level">java.util.logging.Level.SEVERE</property>
 	</properties>
 
 	<configurations>

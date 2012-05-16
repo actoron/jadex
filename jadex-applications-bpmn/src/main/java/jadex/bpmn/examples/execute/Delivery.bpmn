@@ -73,7 +73,7 @@
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GITeM9VHEeC_1bBivy-cGg" key="1:0" value="content"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GITeNNVHEeC_1bBivy-cGg" key="1:1" value="&quot;Payment late!&quot;"/>
           <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GITeNdVHEeC_1bBivy-cGg" key="2:0" value="receivers"/>
-          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GITeNtVHEeC_1bBivy-cGg" key="2:1" value="$component.getParent().getComponentIdentifier()"/>
+          <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_GITeNtVHEeC_1bBivy-cGg" key="2:1" value="$component.getParentAccess().getComponentIdentifier()"/>
         </eAnnotations>
       </vertices>
     </vertices>
@@ -89,7 +89,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WSJPlNVHEeC_1bBivy-cGg" key="1:0" value="content"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WSJPldVHEeC_1bBivy-cGg" key="1:1" value="&quot;Please pay.&quot;"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WSJPltVHEeC_1bBivy-cGg" key="2:0" value="receivers"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WSJPl9VHEeC_1bBivy-cGg" key="2:1" value="$component.getParent().getComponentIdentifier()"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WSJPl9VHEeC_1bBivy-cGg" key="2:1" value="$component.getParentAccess().getComponentIdentifier()"/>
       </eAnnotations>
     </vertices>
     <sequenceEdges xmi:type="bpmn:SequenceEdge" xmi:id="_xre8sXLtEd-fEqakq96uUw" iD="_xre8sHLtEd-fEqakq96uUw"/>

@@ -2,6 +2,7 @@ package jadex.bdi.examples.puzzle;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
@@ -71,28 +72,35 @@ public class BoardGui extends JFrame
 			}
 		});
 		
-		agent.scheduleStep(new IComponentStep<Void>()
+		try
 		{
-			@Classname("dispose")
-			public IFuture<Void> execute(IInternalAccess ia)
+			agent.scheduleStep(new IComponentStep<Void>()
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new TerminationAdapter()
+				@Classname("dispose")
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					public void componentTerminated()
+					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+					bia.addComponentListener(new TerminationAdapter()
 					{
-						SwingUtilities.invokeLater(new Runnable()
+						public void componentTerminated()
 						{
-							public void run()
+							SwingUtilities.invokeLater(new Runnable()
 							{
-								BoardGui.this.dispose();
-							}
-						});
-					}
-				});
-				return IFuture.DONE;
-			}
-		});
+								public void run()
+								{
+									BoardGui.this.dispose();
+								}
+							});
+						}
+					});
+					return IFuture.DONE;
+				}
+			});
+		}
+		catch(ComponentTerminatedException cte)
+		{
+			dispose();
+		}
 		
 //		agent.addAgentListener(new IAgentListener()
 //		{

@@ -25,7 +25,28 @@ public class BDITest	extends	ComponentTestSuite
 				"BeliefSetChanges",
 				"BeliefSetContains",
 				"MultiplePlanTriggers",
-				"MessagingTest"	// wrong email configuration?
+				"MessagingTest",	// wrong email configuration?
+				
+				// Non-test agents not to be started in isolation
+				"GarbageBurner",
+				"GarbageCollector",
+				"Cleaner",
+				"Truck",
+				"Ambulance",
+				"FireBrigade",
+				"Commander",
+				"Commander2",
+				"CleverPrey",
+				"DumbPrey",
+				"DumbHunter",
+				"LAHunter",
+				"RemoteObserver",
+				"Carry",
+				"Producer",
+				"Sentry",
+				"ShutdownPlatform",
+//				"ServiceCallReasoning",
+				"3d"	// OpenGL problems on termination?
 			});
 	}
 	

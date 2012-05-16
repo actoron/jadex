@@ -169,7 +169,7 @@ public class MPool extends MAssociationTarget
 	 *  Get all start activities of the pool.
 	 *  @return A non-empty List of start activities or null, if none.
 	 */
-	public List getStartActivities()
+	public List<MActivity> getStartActivities()
 	{
 		return MBpmnModel.getStartActivities(activities);
 	}	

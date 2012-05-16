@@ -48,7 +48,7 @@ public class BDIReasoningInterceptor implements IServiceInvocationInterceptor
 		{
 			public void goalFinished(AgentEvent ae)
 			{
-				if(((Boolean)g.getParameter("execute").getValue()).booleanValue())
+				if(g.isSucceeded() && ((Boolean)g.getParameter("execute").getValue()).booleanValue())
 				{
 					sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
 				}

@@ -1,6 +1,9 @@
 package jadex.bdi.planlib;
 
+import jadex.bridge.ComponentTerminatedException;
+
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javax.swing.JFrame;
@@ -35,6 +38,18 @@ public class GuiCreator
 				{
 					Constructor con = frameclass.getConstructor(argclasses);
 					frame = (JFrame)con.newInstance(args);
+				}
+				catch(InvocationTargetException e)
+				{
+					if(!(e.getTargetException() instanceof ComponentTerminatedException))
+					{
+						throw e.getTargetException() instanceof RuntimeException
+							? (RuntimeException)e.getTargetException() : new RuntimeException(e.getTargetException());
+					}
+				}
+				catch(RuntimeException e)
+				{
+					throw e;
 				}
 				catch(Exception e)
 				{

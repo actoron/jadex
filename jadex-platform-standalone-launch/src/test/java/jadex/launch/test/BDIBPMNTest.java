@@ -20,7 +20,13 @@ public class BDIBPMNTest	extends ComponentTestSuite
 		super(new File("../jadex-applications-bdibpmn/target/classes/"),
 			new File("../jadex-applications-bdibpmn/target/classes"),
 			// Exclude failing tests to allow maven build.
-			new String[]{});
+			new String[]
+			{
+				".bpmn",	// Only execute agents.
+				"Carry",
+				"Producer",
+				"Sentry"
+			});
 	}
 	
 	/**

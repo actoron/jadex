@@ -21,7 +21,7 @@ public class MicroTest	extends ComponentTestSuite
 //		super(new File("../jadex-applications-micro/target/classes/jadex/micro/testcases/intermediate/InvokerAgent.class"),
 			new File("../jadex-applications-micro/target/classes"),
 			// Exclude failing tests to allow maven build.
-			new String[]{});
+			new String[]{}, 600000, true, false);
 	}
 	
 	/**

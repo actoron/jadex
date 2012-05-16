@@ -162,7 +162,6 @@ public class BpmnPlanExecutor implements IPlanExecutor, Serializable
 							ProcessThread	thread	= (ProcessThread)it.next();
 							if(thread.belongsTo(abortpool, null))
 							{
-								bodyinstance.getActivityHandler(thread.getActivity()).cancel(thread.getActivity(), bodyinstance, thread);
 								thread.getThreadContext().removeThread(thread);
 							}
 						}

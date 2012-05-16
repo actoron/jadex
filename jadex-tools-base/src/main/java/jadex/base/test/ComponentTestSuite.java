@@ -3,6 +3,7 @@ package jadex.base.test;
 import jadex.base.Starter;
 import jadex.base.test.impl.BrokenComponentTest;
 import jadex.base.test.impl.Cleanup;
+import jadex.base.test.impl.ComponentStartTest;
 import jadex.base.test.impl.ComponentTest;
 import jadex.bridge.IErrorReport;
 import jadex.bridge.IExternalAccess;
@@ -44,7 +45,7 @@ public class ComponentTestSuite extends TestSuite
 	 */
 	public ComponentTestSuite(File path, File root, String[] excludes) throws Exception
 	{
-		this(path, root, excludes, 600000);
+		this(path, root, excludes, 600000, true, true);
 	}
 	
 	/**
@@ -53,8 +54,10 @@ public class ComponentTestSuite extends TestSuite
 	 * @param root	The classpath root corresponding to the path.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
 	 * @param timeout	The test suite timeout (if tests are not completed, execution will be aborted). 
+	 * @param broken	Include broken components.
+	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(File path, File root, String[] excludes, long timeout) throws Exception
+	public ComponentTestSuite(File path, File root, String[] excludes, long timeout, boolean broken, boolean start) throws Exception
 	{
 		this(new String[]
 		{
@@ -71,7 +74,7 @@ public class ComponentTestSuite extends TestSuite
 			"-welcome", "false",
 			"-autoshutdown", "false",
 			"-printpass", "false"
-		}, path, root, excludes, timeout);
+		}, path, root, excludes, timeout, broken, start);
 	}
 	
 	/**
@@ -79,9 +82,11 @@ public class ComponentTestSuite extends TestSuite
 	 * @param args	The platform arguments.
 	 * @param path	The path to look for test cases in.
 	 * @param excludes	Files to exclude (if a pattern is contained in file path). 
-	 * @param timeout	The test suite timeout (if tests are not completed, execution will be aborted). 
+	 * @param timeout	The test suite timeout (if tests are not completed, execution will be aborted).
+	 * @param broken	Include broken components.
+	 * @param start	Try starting components, which are no test cases.
 	 */
-	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final long timeout) throws Exception
+	public ComponentTestSuite(String[] args, File path, File root, String[] excludes, final long timeout, final boolean broken, final boolean start) throws Exception
 	{
 		super(path.toString());
 		
@@ -170,7 +175,17 @@ public class ComponentTestSuite extends TestSuite
 								}
 								else if(model.getReport()!=null)
 								{
-									addTest(new BrokenComponentTest(abspath, model.getReport()));
+									if(broken)
+									{
+										addTest(new BrokenComponentTest(abspath, model.getReport()));
+									}
+								}
+								else
+								{
+									if(start)
+									{
+										addTest(new ComponentStartTest(cms, model));
+									}
 								}
 							}
 							catch(final RuntimeException e)

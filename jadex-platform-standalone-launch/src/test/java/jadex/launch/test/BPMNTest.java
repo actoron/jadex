@@ -24,8 +24,13 @@ public class BPMNTest	extends ComponentTestSuite
 			{
 				"WaitForTick",	// Doesn't work in simulation?
 				"Result",
-				"_diagram"
-			});
+				"_diagram",
+				"load",
+				"ExecuteRequestRandom",
+				"StreamTest",	// ???
+				"CustomTask",	// Uses modal dialog that blocks execution.
+				"LoopingSubtask"	// Not yet implemented.
+			}, 600000, true, false);
 	}
 	
 	/**

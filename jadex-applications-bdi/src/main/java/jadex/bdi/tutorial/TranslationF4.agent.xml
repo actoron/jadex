@@ -23,6 +23,8 @@
 		<import>jadex.commons.*</import>
 		<import>jadex.bridge.service.*</import>
 		<import>jadex.commons.future.*</import>
+		<import>jadex.bridge.service.search.*</import>
+		<import>jadex.bridge.service.types.df.*</import>
 	</imports>
 
 	<capabilities>
@@ -51,7 +53,7 @@
 
 	<properties>
  		<!-- Only log outputs >= level are printed. -->
-		<property name="logging.level">Level.INFO</property>
+		<!-- <property name="logging.level">Level.INFO</property> -->
  		<!-- The default parent handler prints out log messages on the console. -->
 		<property name="logging.useParentHandlers">true</property>
 		<!--<property name="debugging">true</property>-->

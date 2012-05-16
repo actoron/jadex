@@ -47,7 +47,7 @@
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_er_C9wRPEeCnwcpWvxOwkg" key="1:0" value="in"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_er_C-ARPEeCnwcpWvxOwkg" key="1:1" value="value"/>
         <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_er_C-QRPEeCnwcpWvxOwkg" key="1:2" value="Object"/>
-        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_er_C-gRPEeCnwcpWvxOwkg" key="1:3" value="&quot;Proposal from &quot;+$component.getParent().getComponentIdentifier().getLocalName()"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_er_C-gRPEeCnwcpWvxOwkg" key="1:3" value="&quot;Proposal from &quot;+$component.getParentAccess().getComponentIdentifier().getLocalName()"/>
       </eAnnotations>
     </vertices>
     <vertices xmi:type="bpmn:Activity" xmi:id="_ZHwPoVm8Ed-CVtZr0hfiVg" iD="_ZHwPoFm8Ed-CVtZr0hfiVg" outgoingEdges="_ZHwPqlm8Ed-CVtZr0hfiVg _cpWuKlm8Ed-CVtZr0hfiVg" incomingEdges="_aS2w2lm8Ed-CVtZr0hfiVg" activityType="GatewayDataBasedExclusive"/>

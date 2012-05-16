@@ -717,7 +717,7 @@ public class MBpmnModel extends MAnnotationElement implements ICacheableModel//,
 	 *  Get all start activities of the model.
 	 *  @return A non-empty List of start activities or null, if none.
 	 */
-	public List getStartActivities(String poolname, String lanename)
+	public List<MActivity> getStartActivities(String poolname, String lanename)
 	{
 		List ret	= null;
 		for(int i=0; pools!=null && i<pools.size(); i++)

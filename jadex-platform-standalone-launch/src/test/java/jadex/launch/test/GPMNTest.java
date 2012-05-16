@@ -20,7 +20,10 @@ public class GPMNTest	extends ComponentTestSuite
 		super(new File("../jadex-applications-gpmn/target/classes/"),
 			new File("../jadex-applications-gpmn/target/classes"),
 			// Exclude failing tests to allow maven build.
-			new String[]{});
+			new String[]
+			{
+				".bpmn"	// Only execute GPMN processes.
+			});
 	}
 	
 	/**

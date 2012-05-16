@@ -6,6 +6,7 @@ import jadex.bdi.examples.blackjack.gui.GUIImageLoader;
 import jadex.bdi.examples.blackjack.gui.GameStateFrame;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
@@ -116,23 +117,30 @@ public class DealerFrame extends GameStateFrame
 		{
 			public void run()
 			{
-				agent.scheduleStep(new IComponentStep<Void>()
+				try
 				{
-					@Classname("gamestate")
-					public IFuture<Void> execute(IInternalAccess ia)
+					agent.scheduleStep(new IComponentStep<Void>()
 					{
-						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-						final GameState gs = (GameState)bia.getBeliefbase().getBelief("gamestate").getFact();
-						SwingUtilities.invokeLater(new Runnable()
+						@Classname("gamestate")
+						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							public void run()
+							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+							final GameState gs = (GameState)bia.getBeliefbase().getBelief("gamestate").getFact();
+							SwingUtilities.invokeLater(new Runnable()
 							{
-								DealerFrame.this.setGameState(gs);
-							}
-						});
-						return IFuture.DONE;
-					}
-				});
+								public void run()
+								{
+									DealerFrame.this.setGameState(gs);
+								}
+							});
+							return IFuture.DONE;
+						}
+					});
+				}
+				catch(ComponentTerminatedException cte)
+				{
+					
+				}
 //				agent.getBeliefbase().getBeliefFact("gamestate").addResultListener(new SwingDefaultResultListener(DealerFrame.this)
 //				{
 //					public void customResultAvailable(Object source, Object result)

@@ -1029,7 +1029,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 				{
 					// Todo: need to kill children!? How to reproduce this case!?
 					logger.info("Terminating component structure adapter is null: "+cid.getName());
-					exitDestroy(cid, null, new RuntimeException("Component "+cid+" does not exist."), null);
+					exitDestroy(cid, null, new ComponentTerminatedException(cid, "Component does not exist."), null);
 				}
 				else
 				{
