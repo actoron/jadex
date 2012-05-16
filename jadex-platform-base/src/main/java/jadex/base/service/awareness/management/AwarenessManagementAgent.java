@@ -454,6 +454,11 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			{
 				ds.setDelay(delay);
 			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				getLogger().warning("Could not find discoveries: "+exception);
+			}
 		});
 	}
 	
@@ -471,6 +476,11 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			public void intermediateResultAvailable(IDiscoveryService ds)
 			{
 				ds.setFast(fast);
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				getLogger().warning("Could not find discoveries: "+exception);
 			}
 		});
 }
@@ -548,6 +558,11 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			{
 				ds.setIncludes(includes);
 			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				getLogger().warning("Could not find discoveries: "+exception);
+			}
 		});
 	}
 
@@ -568,6 +583,11 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			public void intermediateResultAvailable(IDiscoveryService ds)
 			{
 				ds.setExcludes(excludes);
+			}
+
+			public void exceptionOccurred(Exception exception)
+			{
+				getLogger().warning("Could not find discoveries: "+exception);
 			}
 		});
 	}

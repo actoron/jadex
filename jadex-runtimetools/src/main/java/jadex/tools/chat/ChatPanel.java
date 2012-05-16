@@ -644,6 +644,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			{
 				ret.setResult(null);
 			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				// ignore.
+			}
 		});
 		
 		return ret;
