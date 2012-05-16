@@ -6,6 +6,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
+import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.CreationInfo;
@@ -17,6 +18,7 @@ import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
 import jadex.commons.future.IResultListener;
+import jadex.commons.gui.SGUI;
 
 import java.awt.Rectangle;
 import java.util.Collection;
@@ -59,7 +61,7 @@ public class GenerateService implements IGenerateService
 	@ServiceStart
 	public void start()
 	{
-		this.panel = (GeneratePanel)GeneratePanel.createGui(agent.getExternalAccess())[1];
+		this.panel = (GeneratePanel)GeneratePanel.createGui(agent.getExternalAccess());
 		
 		this.manager	= new ServicePoolManager(agent, "calculateservices", new IServicePoolHandler()
 		{
@@ -177,6 +179,31 @@ public class GenerateService implements IGenerateService
 				return ret;
 			}
 		}, -1);
+	}
+	
+	/**
+	 *  Stop the service.
+	 */
+	@ServiceShutdown
+	public IFuture<Void>	shutdown()
+	{
+		final Future<Void>	ret	= new Future<Void>();
+		if(panel!=null)
+		{
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
+				{
+					SGUI.getWindowParent(panel).dispose();
+					ret.setResult(null);
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
+		return ret;
 	}
 	
 	//-------- methods --------

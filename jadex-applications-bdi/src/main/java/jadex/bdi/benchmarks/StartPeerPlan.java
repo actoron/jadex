@@ -166,7 +166,7 @@ public class StartPeerPlan extends Plan
 //		ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), lis, null);
 //		IComponentIdentifier aid = (IComponentIdentifier)lis.waitForResult();
 		
-		IFuture ret = ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(args), null);
+		IFuture ret = ces.createComponent(name, "/jadex/bdi/benchmarks/AgentCreation.agent.xml", new CreationInfo(null, args, getComponentDescription().getResourceIdentifier()), null);
 		IComponentIdentifier aid = (IComponentIdentifier)ret.get(this);
 		return aid;
 	}

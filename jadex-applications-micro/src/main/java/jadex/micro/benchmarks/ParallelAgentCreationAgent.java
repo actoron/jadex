@@ -175,7 +175,7 @@ public class ParallelAgentCreationAgent extends MicroAgent
 							
 							Map	args	= new HashMap();
 							args.put("num", new Integer(0));
-							CreationInfo	cinfo	= new CreationInfo(args);
+							CreationInfo	cinfo	= new CreationInfo(null, args, getComponentDescription().getResourceIdentifier());
 							for(int i=1; i<=num; i++)
 							{
 								cms.createComponent(createPeerName(i), ParallelAgentCreationAgent.this.getClass().getName()+".class", cinfo, killlis)

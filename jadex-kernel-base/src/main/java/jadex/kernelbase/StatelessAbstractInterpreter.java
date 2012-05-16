@@ -780,7 +780,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 						{
 							RequiredServiceInfo rsi = (RequiredServiceInfo)sermap.get(getBindings()[i].getName());
 							RequiredServiceInfo newrsi = new RequiredServiceInfo(rsi.getName(), rsi.getType().getType(getClassLoader()), rsi.isMultiple(), 
-								rsi.getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(getBindings()[i]));
+								rsi.getMultiplexType()==null? null: rsi.getMultiplexType().getType(getClassLoader()), new RequiredServiceBinding(getBindings()[i]));
 							sermap.put(rsi.getName(), newrsi);
 						}
 					}

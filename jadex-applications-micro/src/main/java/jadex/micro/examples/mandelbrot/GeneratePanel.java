@@ -175,10 +175,10 @@ public class GeneratePanel extends JPanel
 	/**
 	 *  Create a gui.
 	 */
-	public static Object[] createGui(final IExternalAccess agent)
+	public static GeneratePanel	createGui(final IExternalAccess agent)
 	{
 		final JFrame f = new JFrame();
-		JPanel gp = new GeneratePanel(agent);
+		GeneratePanel gp = new GeneratePanel(agent);
 		f.add(gp);
 		f.pack();
 		f.setLocation(SGUI.calculateMiddlePosition(f));
@@ -191,29 +191,6 @@ public class GeneratePanel extends JPanel
 			}
 		});
 		
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			@Classname("dispose")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				ia.addComponentListener(new TerminationAdapter()
-				{
-					public void componentTerminated()
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								f.dispose();
-							}
-						});
-					}
-				});
-				
-				return IFuture.DONE;
-			}
-		});		
-		
-		return new Object[]{f, gp};
+		return gp;
 	}
 }

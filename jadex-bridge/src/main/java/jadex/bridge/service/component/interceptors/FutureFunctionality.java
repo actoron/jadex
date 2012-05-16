@@ -253,7 +253,7 @@ public class FutureFunctionality
 		}
 		else
 		{
-			throw new IllegalArgumentException("Unknown source type: "+source.getClass());
+			throw new IllegalArgumentException("Unknown source type: "+(source!=null ? source.getClass() : null));
 		}
 	}
 }

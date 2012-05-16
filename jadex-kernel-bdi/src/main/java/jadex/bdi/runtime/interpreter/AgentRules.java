@@ -15,6 +15,7 @@ import jadex.commons.SUtil;
 import jadex.commons.collection.SCollection;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
+import jadex.commons.future.FutureHelper;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.javaparser.IParsedExpression;
@@ -2058,6 +2059,9 @@ public class AgentRules
 					super.customResultAvailable(null);
 				}
 			}));
+			
+			// Set default belief values immediately, otherwise evaluation of dependent expressions fails.
+			FutureHelper.notifyStackedListeners();
 		}
 		else
 		{
