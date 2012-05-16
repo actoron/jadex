@@ -101,6 +101,10 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	/** The library service */
 	protected ILibraryService libservice;
 	
+	/** The custom properties. */
+	// Must not be saved as service properties because e.g. the plan executor cannot be transferred remotely
+	protected Map<String, Object> myprops;
+	
 	//-------- constructors --------
 	
 	/**
@@ -109,7 +113,8 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	// Constructor used by ADF Checker. (hack?)
 	public BDIAgentFactory(String dummy)
 	{
-		super(new ComponentIdentifier(dummy), IComponentFactory.class, SUtil.createHashMap(
+		super(new ComponentIdentifier(dummy), IComponentFactory.class, null);
+		myprops = SUtil.createHashMap(
 			new String[]
 			{
 				"planexecutor_standard",
@@ -120,18 +125,21 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 				"dummy",
 				"dummy"
 			}
-		));
+		);
 		this.root	= new ComponentIdentifier(dummy);
-		loader	= new OAVBDIModelLoader(getPropertyMap(), root);
+//		loader	= new OAVBDIModelLoader(getPropertyMap(), root);
+		loader	= new OAVBDIModelLoader(myprops, root);
 	}
 	
 	/**
 	 *  Create a new agent factory.
 	 */
 	// Constructor used by GPMN factory.
-	public BDIAgentFactory(Map props, IInternalAccess component)
+	public BDIAgentFactory(Map<String, Object> props, IInternalAccess component)
 	{
-		super(component.getServiceContainer().getId(), IComponentFactory.class, props);
+//		super(component.getServiceContainer().getId(), IComponentFactory.class, props);
+		super(component.getServiceContainer().getId(), IComponentFactory.class, null);
+		this.myprops = props;
 		this.component	= component;
 	}
 	
@@ -175,7 +183,8 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 						public void customResultAvailable(Object result)
 						{
 							libservice = (ILibraryService) result;
-							loader	= new OAVBDIModelLoader(getPropertyMap(), root);
+//							loader	= new OAVBDIModelLoader(getPropertyMap(), root);
+							loader	= new OAVBDIModelLoader(myprops, root);
 							mtypes	= Collections.synchronizedMap(new WeakHashMap());
 							libservicelistener = new ILibraryServiceListener()
 							{
@@ -280,7 +289,8 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 						IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 						state.addSubstate(amodel.getState());
 						
-						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
+//						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
+						BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, myprops, copy, realtime, resultlistener, init);
 						ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
 					}
 					catch(Exception e)
@@ -309,7 +319,8 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 				IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 				state.addSubstate(amodel.getState());
 				
-				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
+//				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, init);
+				BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, myprops, copy, realtime, resultlistener, init);
 				ret.setResult(new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter()));
 			}
 			catch(Exception e)
@@ -342,7 +353,8 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 		IOAVState	state	= OAVStateFactory.createOAVState(tmodel); 
 		state.addSubstate(amodel.getState());
 		
-		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, ret);
+//		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, getPropertyMap(), copy, realtime, resultlistener, ret);
+		BDIInterpreter bdii = new BDIInterpreter(desc, factory, state, amodel, config, arguments, parent, bindings, myprops, copy, realtime, resultlistener, ret);
 		return new Tuple2<IComponentInstance, IComponentAdapter>(bdii, bdii.getAgentAdapter());
 	}
 	
@@ -498,7 +510,8 @@ public class BDIAgentFactory extends BasicService implements IDynamicBDIFactory,
 	public Map	getProperties(String type)
 	{
 		return FILETYPE_BDIAGENT.equals(type) || FILETYPE_BDICAPABILITY.equals(type)
-			? getPropertyMap() : null;
+			? myprops : null;
+//			? getPropertyMap() : null;
 	}
 
 	/**

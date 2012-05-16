@@ -479,7 +479,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 			buf.append("}");
 			buf.append(")");
 			
-			System.out.println(buf.toString());
+//			System.out.println("service creation expression: "+buf.toString());
 			
 			ProvidedServiceImplementation psi = new ProvidedServiceImplementation(null, buf.toString(), 
 				BasicServiceInvocationHandler.PROXYTYPE_DECOUPLED, null, null);
