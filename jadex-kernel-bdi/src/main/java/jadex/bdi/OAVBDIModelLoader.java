@@ -456,7 +456,7 @@ public class OAVBDIModelLoader	extends AbstractModelLoader
 				String goalname = (String)state.getAttributeValue(val[0], OAVBDIMetaModel.modelelement_has_name);
 				goalnames.put((String)val[1], goalname);
 			}
-			System.out.println("found goal publish: "+key);
+//			System.out.println("found goal publish: "+key);
 			
 			StringBuffer buf = new StringBuffer();
 			buf.append("jadex.bdi.runtime.interpreter.BDIInterpreter.createServiceImplementation($scope, ");

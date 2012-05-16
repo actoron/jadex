@@ -49,7 +49,7 @@ public class Tuple	implements Cloneable, java.io.Serializable
 	 */
 	public Tuple(Object[] entities)
 	{
-		this.entities	= entities;
+		this.entities	= entities;//.clone(); // does not work with clone?!
 	}
 
 	//-------- Accessors --------

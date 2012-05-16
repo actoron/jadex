@@ -1841,9 +1841,18 @@ public class MessageService extends BasicService implements IMessageService
 	
 //				System.out.println("bbbb: "+mycnt+" "+getComponent().getComponentIdentifier());
 			}
-			catch(Throwable e)
+//			catch(Throwable e)
+			catch(final Exception e)
 			{
-				e.printStackTrace();
+//				e.printStackTrace();
+				component.scheduleStep(new IComponentStep<Void>()
+				{
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						ia.getLogger().warning("Exception in stream: "+e.getMessage());
+						return IFuture.DONE;
+					}
+				});
 			}
 		}
 	}

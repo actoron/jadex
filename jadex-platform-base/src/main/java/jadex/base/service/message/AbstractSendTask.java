@@ -78,9 +78,9 @@ public abstract class AbstractSendTask implements ISendTask
 		for(int i=0; i<codecids.length; i++)
 			codecids[i] = codecs[i].getCodecId();
 		
-		this.receivers = receivers;
+		this.receivers = receivers.clone();
 		this.transports = new ArrayList<ITransport>(Arrays.asList(transports));
-		this.codecs	= codecs;
+		this.codecs	= codecs.clone();
 		this.future	= new Future<Void>();
 	}
 	

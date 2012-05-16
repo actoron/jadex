@@ -180,7 +180,7 @@ public class CodecFactory
 	 */
 	public void setDefaultCodecIds(byte[] codecids)
 	{
-		this.default_ids = codecids;
+		this.default_ids = codecids.clone();
 	}
 	
 	/**

@@ -223,10 +223,10 @@ public class ThreadPool implements IThreadPool
 						this.task.run();
 					}
 					catch(ThreadDeath e){}
-					catch(Throwable e)
-					{
-						e.printStackTrace();
-					}
+//					catch(Throwable e)
+//					{
+//						e.printStackTrace();
+//					}
 //					this.setName(oldname);
 				}
 				catch(IBlockingQueue.ClosedException e)

@@ -88,7 +88,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 		this.method = method;
 		this.methodname = method.getName();
 		this.parametertypes = method.getParameterTypes();
-		this.parametervalues = parametervalues;
+		this.parametervalues = parametervalues!=null? parametervalues.clone(): null;
 		this.callid = callid;
 		this.caller	= caller;
 //		System.out.println("rmi on client: "+callid+" "+methodname);
@@ -373,7 +373,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 */
 	public void setParameterTypes(Class[] parametertypes)
 	{
-		this.parametertypes = parametertypes;
+		this.parametertypes = parametertypes.clone();
 	}
 
 	/**
@@ -391,7 +391,7 @@ public class RemoteMethodInvocationCommand extends AbstractRemoteCommand
 	 */
 	public void setParameterValues(Object[] parametervalues)
 	{
-		this.parametervalues = parametervalues;
+		this.parametervalues = parametervalues.clone();
 	}
 
 	/**

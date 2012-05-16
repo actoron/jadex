@@ -124,12 +124,13 @@ public class RemoteResultCommand extends AbstractRemoteCommand
 //		if(call!=null)
 //			System.out.println("here");
 		
-		if(wci==null)
-		{
-			// NOP, ignore invocation results that arrive late.
-//			System.out.println("Unexpected result, no outstanding call for:" +callid);
-		}
-		else //if(!future.isDone())
+//		if(wci==null)
+//		{
+//			// NOP, ignore invocation results that arrive late.
+////			System.out.println("Unexpected result, no outstanding call for:" +callid);
+//		}
+//		else //if(!future.isDone())
+		if(wci!=null)
 		{
 			Future future = wci.getFuture();
 			if(exceptioninfo!=null)

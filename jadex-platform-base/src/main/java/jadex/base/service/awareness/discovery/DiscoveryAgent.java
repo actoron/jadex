@@ -265,7 +265,7 @@ public abstract class DiscoveryAgent
 	 */
 	public void setIncludes(String[] includes)
 	{
-		this.includes = includes;
+		this.includes = includes.clone();
 	}
 	
 	/**
@@ -283,7 +283,7 @@ public abstract class DiscoveryAgent
 	 */
 	public void setExcludes(String[] excludes)
 	{
-		this.excludes = excludes;
+		this.excludes = excludes.clone();
 	}
 
 	/**

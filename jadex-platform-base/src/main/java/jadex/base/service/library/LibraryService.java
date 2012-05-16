@@ -142,7 +142,7 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		this.listeners	= new LinkedHashSet<ILibraryServiceListener>();
 		this.ridsupport = new LinkedHashMap<IResourceIdentifier, Set<IResourceIdentifier>>();
 		this.managedrids = new LinkedHashMap<IResourceIdentifier, Integer>();
-		this.initurls = urls;
+		this.initurls = urls!=null? urls.clone(): urls;
 		this.baseloader = baseloader!=null? baseloader: getClass().getClassLoader();
 	}
 	

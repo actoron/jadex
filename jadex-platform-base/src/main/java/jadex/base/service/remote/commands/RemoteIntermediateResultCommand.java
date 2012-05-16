@@ -64,12 +64,13 @@ public class RemoteIntermediateResultCommand extends RemoteResultCommand
 //		if(call!=null)
 //			System.out.println("here");
 		
-		if(wci==null)
-		{
-			// NOP, ignore invocation results that arrive late.
-//			System.out.println("Unexpected result, no outstanding call for:" +callid);
-		}
-		else //if(!future.isDone())
+//		if(wci==null)
+//		{
+//			// NOP, ignore invocation results that arrive late.
+////			System.out.println("Unexpected result, no outstanding call for:" +callid);
+//		}
+//		else //if(!future.isDone())
+		if(wci!=null)
 		{
 			wci.refresh();
 			

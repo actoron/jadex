@@ -39,7 +39,7 @@ public abstract class AbstractModelLoader
 	 */
 	public AbstractModelLoader(String[] extensions, int cachesize)
 	{
-		this.extensions	= extensions;
+		this.extensions	= extensions.clone();
 		this.modelcache	= new LRU(cachesize);
 		this.registered	= new LinkedHashMap();
 	}

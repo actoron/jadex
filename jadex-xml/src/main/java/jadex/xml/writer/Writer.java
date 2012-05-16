@@ -143,6 +143,10 @@ public class Writer
 			return;
 		}
 		
+		if(object.getClass().getName().indexOf("JavaStandard")!=-1)
+			System.out.println("heeee");
+
+		
 //		if(tagname!=null)
 //			System.out.println("tagname: "+tagname);
 //		if(object.getClass().getName().indexOf("ComponentIdentifier")!=-1)

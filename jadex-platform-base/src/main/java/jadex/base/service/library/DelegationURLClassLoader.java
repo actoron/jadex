@@ -56,7 +56,7 @@ public class DelegationURLClassLoader extends URLClassLoader
 		end[android]*/
 		this.rid = rid;
 		this.basecl	= basecl;
-		this.delegates = delegates;
+		this.delegates = delegates.clone();
 //		System.out.println("d1 : "+url+" "+SUtil.arrayToString(delegates));
 	}
 

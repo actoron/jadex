@@ -441,11 +441,12 @@ public class RemoteReferenceModule
 			}
 			else if(!(SReflect.isSupertype(IFuture.class, rt)))
 			{
-				if(ar.length>0)
-				{
-//					System.out.println("Warning, service method is blocking: "+type+" "+methods[i].getName());
-				}
-				else
+//				if(ar.length>0)
+//				{
+////					System.out.println("Warning, service method is blocking: "+type+" "+methods[i].getName());
+//				}
+//				else
+				if(ar.length==0)
 				{
 					// Invoke method to get constant return value.
 					try
