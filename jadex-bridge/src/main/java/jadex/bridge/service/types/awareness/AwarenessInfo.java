@@ -62,8 +62,8 @@ public class AwarenessInfo
 		this.sender = sender;
 		this.state = state;
 		this.delay = delay;
-		this.includes	= includes;
-		this.excludes	= excludes;
+		this.includes	= includes!=null? includes.clone(): null;
+		this.excludes	= excludes!=null? excludes.clone(): null;
 		this.masterid = masterid;
 	}
 	
@@ -138,7 +138,7 @@ public class AwarenessInfo
 	 */
 	public void setIncludes(String[] includes)
 	{
-		this.includes	= includes;
+		this.includes	= includes!=null? includes.clone(): null;
 	}
 
 	/**
@@ -147,7 +147,7 @@ public class AwarenessInfo
 	 */
 	public void setExcludes(String[] excludes)
 	{
-		this.excludes	= excludes;
+		this.excludes	= excludes!=null? excludes.clone(): null;
 	}
 	
 	/**

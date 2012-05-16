@@ -149,7 +149,7 @@ public abstract class AbstractViewport implements IViewport
 		{
 			if(layers != null)
 			{
-				preLayers_ = layers;
+				preLayers_ = layers.clone();
 			}
 			else
 			{
@@ -169,7 +169,7 @@ public abstract class AbstractViewport implements IViewport
 		{
 			if(layers != null)
 			{
-				postLayers_ = layers;
+				postLayers_ = layers.clone();
 			}
 			else
 			{
