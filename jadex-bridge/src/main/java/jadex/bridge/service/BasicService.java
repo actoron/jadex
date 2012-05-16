@@ -37,7 +37,7 @@ public class BasicService implements IInternalService
 	protected IServiceIdentifier sid;
 	
 	/** The service properties. */
-	protected Map properties;
+	protected Map<String, Object> properties;
 	
 //	/** The publish info. */
 //	protected PublishInfo publishinfo;
@@ -54,7 +54,7 @@ public class BasicService implements IInternalService
 	 *  Create a new service.
 	 */
 	// todo: remove type!!!
-	public BasicService(IComponentIdentifier providerid, Class type, Map properties)
+	public BasicService(IComponentIdentifier providerid, Class<?> type, Map<String, Object> properties)
 	{
 //		if(!SReflect.isSupertype(type, getClass()))
 //			throw new RuntimeException("Service must implement provided interface: "+getClass().getName()+", "+type.getName());
@@ -153,7 +153,7 @@ public class BasicService implements IInternalService
 	 *  Set the properties.
 	 *  @param properties The properties to set.
 	 */
-	public void setPropertyMap(Map properties)
+	public void setPropertyMap(Map<String, Object> properties)
 	{
 		this.properties = properties;
 	}
@@ -261,7 +261,7 @@ public class BasicService implements IInternalService
 	 *  @return A service identifier.
 	 */
 	public static IServiceIdentifier createServiceIdentifier(IComponentIdentifier providerid, String servicename, 
-		Class servicetype, Class serviceimpl, IResourceIdentifier rid)
+		Class<?> servicetype, Class<?> serviceimpl, IResourceIdentifier rid)
 	{
 		return new ServiceIdentifier(providerid, servicetype, servicename!=null? servicename: generateServiceName(serviceimpl), rid);
 	}
