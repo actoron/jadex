@@ -2,6 +2,7 @@ package jadex.bdi.examples.shop;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
@@ -26,53 +27,48 @@ public class CustomerFrame extends JFrame
 	public CustomerFrame(final IBDIExternalAccess agent)
 	{
 		super(agent.getComponentIdentifier().getName());
-		add(new CustomerPanel(agent));
-		pack();
-		setLocation(SGUI.calculateMiddlePosition(this));
-		setVisible(true);
-		addWindowListener(new WindowAdapter()
-		{
-			public void windowClosing(WindowEvent e)
-			{
-//				agent.killAgent();
-				agent.killComponent();
-			}
-		});
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			@Classname("dispose")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new TerminationAdapter() 
-				{
-					public void componentTerminated() 
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								setVisible(false);
-								dispose();
-							}
-						});
-					}
-				});
-				return IFuture.DONE;
-			}
-		});
 		
-//		agent.addAgentListener(new IAgentListener() 
-//		{
-//			public void agentTerminating(AgentEvent ae) 
-//			{
-//				setVisible(false);
-//				dispose();
-//			}
-//			
-//			public void agentTerminated(AgentEvent ae) 
-//			{
-//			}
-//		});
+		try
+		{
+			add(new CustomerPanel(agent));
+			pack();
+			setLocation(SGUI.calculateMiddlePosition(this));
+			setVisible(true);
+			addWindowListener(new WindowAdapter()
+			{
+				public void windowClosing(WindowEvent e)
+				{
+	//				agent.killAgent();
+					agent.killComponent();
+				}
+			});
+			agent.scheduleStep(new IComponentStep<Void>()
+			{
+				@Classname("dispose")
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+					bia.addComponentListener(new TerminationAdapter() 
+					{
+						public void componentTerminated() 
+						{
+							SwingUtilities.invokeLater(new Runnable()
+							{
+								public void run()
+								{
+									setVisible(false);
+									dispose();
+								}
+							});
+						}
+					});
+					return IFuture.DONE;
+				}
+			});
+		}
+		catch(ComponentTerminatedException e)
+		{
+			dispose();
+		}
 	}
 }

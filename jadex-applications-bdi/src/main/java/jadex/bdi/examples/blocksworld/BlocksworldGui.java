@@ -61,14 +61,14 @@ public class BlocksworldGui	extends JFrame
 	public BlocksworldGui(final IBDIExternalAccess agent)
 	{
 		super();
-		initGui(agent);
-//		SwingUtilities.invokeLater(new Runnable()
-//		{
-//			public void run()
-//			{
-//				initGui(agent);
-//			}
-//		});
+		try
+		{
+			initGui(agent);
+		}
+		catch(ComponentTerminatedException e)
+		{
+			dispose();
+		}
 	}
 	
 	/**

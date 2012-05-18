@@ -2,6 +2,7 @@ package jadex.bdi.examples.alarmclock;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
@@ -88,286 +89,276 @@ public class ClockFrame extends JFrame
 	public ClockFrame(IBDIExternalAccess agent)
 	{
 		super("Jadex Clock");
-		this.agent = agent;
-		format = new SimpleDateFormat();
-
-		time = new JLabel("", JLabel.CENTER);
-
-		JPanel cp = new JPanel();
-		cp.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-		cp.add("Center", time);
-
-		setUndecorated(true);
-		getContentPane().add(cp, "Center");
-
-		// Add dragging support
-		final Point origin = new Point();
-		cp.addMouseListener(new MouseAdapter()
+		try
 		{
-			public void mousePressed(MouseEvent e)
+			this.agent = agent;
+			format = new SimpleDateFormat();
+	
+			time = new JLabel("", JLabel.CENTER);
+	
+			JPanel cp = new JPanel();
+			cp.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+			cp.add("Center", time);
+	
+			setUndecorated(true);
+			getContentPane().add(cp, "Center");
+	
+			// Add dragging support
+			final Point origin = new Point();
+			cp.addMouseListener(new MouseAdapter()
 			{
-				origin.x = e.getX();
-				origin.y = e.getY();
-			}
-		});
-		cp.addMouseMotionListener(new MouseMotionAdapter()
-		{
-			public void mouseDragged(MouseEvent e)
-			{
-				Point p = getLocation();
-				setLocation(p.x + e.getX() - origin.x, p.y + e.getY() - origin.y);
-			}
-		});
-
-		// Create the popup menu
-		final JPopupMenu jmenu = new JPopupMenu();
-//		add(menu);
-		JMenuItem alarms = new JMenuItem("Alarms");
-		JMenuItem options = new JMenuItem("Options");
-		JMenuItem exit = new JMenuItem("Exit");
-		jmenu.add(alarms);
-		jmenu.add(options);
-		jmenu.addSeparator();
-		jmenu.add(exit);
-		cp.addMouseListener(new MouseAdapter()
-		{
-			public void mousePressed(MouseEvent evt)
-			{
-				if(evt.isPopupTrigger())
-					jmenu.show(evt.getComponent(), evt.getX(), evt.getY());
-			}
-
-			public void mouseReleased(MouseEvent evt)
-			{
-				if(evt.isPopupTrigger())
-					jmenu.show(evt.getComponent(), evt.getX(), evt.getY());
-			}
-		});
-
-		ActionListener lalarms = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if(alarms_gui==null || !alarms_gui.isVisible())
+				public void mousePressed(MouseEvent e)
 				{
-					alarms_gui = new AlarmsGui(ClockFrame.this.agent);
-					alarms_gui.pack();
-					alarms_gui.setLocation(SGUI.calculateMiddlePosition(alarms_gui));
-					alarms_gui.setVisible(true);
+					origin.x = e.getX();
+					origin.y = e.getY();
 				}
-			}
-		};
-		ActionListener loptions = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
+			});
+			cp.addMouseMotionListener(new MouseMotionAdapter()
 			{
-				new OptionDialog(ClockFrame.this, ClockFrame.this.agent);
-			}
-		};
-		ActionListener lexit = new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if(alarms_gui!=null)
-					alarms_gui.dispose();
-				dispose();
-				
-				ClockFrame.this.agent.scheduleStep(new IComponentStep<Void>()
+				public void mouseDragged(MouseEvent e)
 				{
-					@Classname("settings")
-					public IFuture<Void> execute(IInternalAccess ia)
+					Point p = getLocation();
+					setLocation(p.x + e.getX() - origin.x, p.y + e.getY() - origin.y);
+				}
+			});
+	
+			// Create the popup menu
+			final JPopupMenu jmenu = new JPopupMenu();
+	//		add(menu);
+			JMenuItem alarms = new JMenuItem("Alarms");
+			JMenuItem options = new JMenuItem("Options");
+			JMenuItem exit = new JMenuItem("Exit");
+			jmenu.add(alarms);
+			jmenu.add(options);
+			jmenu.addSeparator();
+			jmenu.add(exit);
+			cp.addMouseListener(new MouseAdapter()
+			{
+				public void mousePressed(MouseEvent evt)
+				{
+					if(evt.isPopupTrigger())
+						jmenu.show(evt.getComponent(), evt.getX(), evt.getY());
+				}
+	
+				public void mouseReleased(MouseEvent evt)
+				{
+					if(evt.isPopupTrigger())
+						jmenu.show(evt.getComponent(), evt.getX(), evt.getY());
+				}
+			});
+	
+			ActionListener lalarms = new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					if(alarms_gui==null || !alarms_gui.isVisible())
 					{
-						IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-						final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
-						
-						if(sets.isAutosave())
+						alarms_gui = new AlarmsGui(ClockFrame.this.agent);
+						alarms_gui.pack();
+						alarms_gui.setLocation(SGUI.calculateMiddlePosition(alarms_gui));
+						alarms_gui.setVisible(true);
+					}
+				}
+			};
+			ActionListener loptions = new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					new OptionDialog(ClockFrame.this, ClockFrame.this.agent);
+				}
+			};
+			ActionListener lexit = new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					if(alarms_gui!=null)
+						alarms_gui.dispose();
+					dispose();
+					
+					ClockFrame.this.agent.scheduleStep(new IComponentStep<Void>()
+					{
+						@Classname("settings")
+						public IFuture<Void> execute(IInternalAccess ia)
+						{
+							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+							final Settings sets = (Settings)bia.getBeliefbase().getBelief("settings").getFact();
+							
+							if(sets.isAutosave())
+							{
+								try
+								{
+									sets.save();
+								}
+								catch(Exception ex)
+								{
+									SwingUtilities.invokeLater(new Runnable()
+									{
+										public void run()
+										{
+											JOptionPane.showMessageDialog(ClockFrame.this, "Cannot save settings. The file: \n"
+												+sets.getFilename()+"\n could not be written", "Settings error",
+												JOptionPane.ERROR_MESSAGE);
+										}
+									});
+								}
+							}
+							return IFuture.DONE;
+						}
+					});
+					
+	//				ClockFrame.this.agent.getBeliefbase().getBeliefFact("settings").addResultListener(new SwingDefaultResultListener(ClockFrame.this)
+	//				{
+	//					public void customResultAvailable(Object source, Object result)
+	//					{
+	//						Settings sets = (Settings)result;
+	//						if(sets.isAutosave())
+	//						{
+	//							try
+	//							{
+	//								sets.save();
+	//							}
+	//							catch(Exception ex)
+	//							{
+	//								JOptionPane.showMessageDialog(ClockFrame.this, "Cannot save settings. The file: \n"
+	//									+sets.getFilename()+"\n could not be written", "Settings error",
+	//									JOptionPane.ERROR_MESSAGE);
+	//							}
+	//						}
+	//					}
+	//				});
+					
+					ClockFrame.this.agent.killComponent(); // Use -autoshutdown to kill standalone platform as well
+					//IGoal kp = agent.createGoal("cms_shutdown_platform");
+					//agent.dispatchTopLevelGoal(kp);
+				}
+			};
+			
+			alarms.addActionListener(lalarms);
+			options.addActionListener(loptions);
+			exit.addActionListener(lexit);
+	
+			if(SystemTray.isSupported())
+			{
+				final PopupMenu menu = new PopupMenu();
+				MenuItem a = new MenuItem("Alarms");
+				MenuItem o = new MenuItem("Options");
+				MenuItem e = new MenuItem("Exit");
+				menu.add(a);
+				menu.add(o);
+				menu.addSeparator();
+				menu.add(e);
+				a.addActionListener(lalarms);
+				o.addActionListener(loptions);
+				e.addActionListener(lexit);
+				
+				tray = SystemTray.getSystemTray();
+			    ti = new TrayIcon(((ImageIcon)icons.getIcon("Clock")).getImage(), "Jadex - Alarm Clock", menu);
+				
+				try
+				{
+					tray.add(ti);
+			    
+					final MenuItem stt = new MenuItem("Send to tray");
+					final MenuItem rft = new MenuItem("Restore");
+					menu.add(stt);
+					
+					ActionListener lstt = new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
 						{
 							try
 							{
-								sets.save();
+								setVisible(false);
+								menu.remove(stt);
+								menu.add(rft);
+		//						tray.add(ti);
 							}
-							catch(Exception ex)
+							catch(Exception e2)
 							{
-								SwingUtilities.invokeLater(new Runnable()
+								e2.printStackTrace();
+							}
+						}
+					};
+					
+					stt.addActionListener(lstt);
+					
+					rft.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+		//					tray.remove(ti);
+							menu.remove(rft);
+							menu.add(stt);
+							setVisible(true);
+						}
+					});
+					/*ti.addActionListener(new ActionListener()
+					{
+						public void actionPerformed(ActionEvent e)
+						{
+							tray.removeTrayIcon(ti);
+							menu.remove(rft);
+							menu.add(stt);
+							ClockGui.this.setVisible(true);
+						}
+					});*/
+					
+					JMenuItem send = new JMenuItem("Send to tray");
+					jmenu.add(send);
+					send.addActionListener(lstt);
+					
+				}
+				catch(AWTException ex)
+				{
+					ex.printStackTrace();
+				}
+			}
+	
+			refresh(true);
+			timer = new Timer(1000, new ActionListener()
+			{
+				public void actionPerformed(ActionEvent e)
+				{
+					refresh(false);
+				}
+			});
+			timer.setRepeats(true);
+			timer.start();
+	
+			agent.scheduleStep(new IComponentStep<Void>()
+			{
+				@Classname("tray")
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+					bia.addComponentListener(new TerminationAdapter()
+					{
+						public void componentTerminated()
+						{
+							SwingUtilities.invokeLater(new Runnable()
+							{
+								public void run()
 								{
-									public void run()
-									{
-										JOptionPane.showMessageDialog(ClockFrame.this, "Cannot save settings. The file: \n"
-											+sets.getFilename()+"\n could not be written", "Settings error",
-											JOptionPane.ERROR_MESSAGE);
-									}
-								});
-							}
+									if(tray!=null)
+										tray.remove(ti);
+									timer.stop();
+									dispose();
+								}
+							});
 						}
-						return IFuture.DONE;
-					}
-				});
-				
-//				ClockFrame.this.agent.getBeliefbase().getBeliefFact("settings").addResultListener(new SwingDefaultResultListener(ClockFrame.this)
-//				{
-//					public void customResultAvailable(Object source, Object result)
-//					{
-//						Settings sets = (Settings)result;
-//						if(sets.isAutosave())
-//						{
-//							try
-//							{
-//								sets.save();
-//							}
-//							catch(Exception ex)
-//							{
-//								JOptionPane.showMessageDialog(ClockFrame.this, "Cannot save settings. The file: \n"
-//									+sets.getFilename()+"\n could not be written", "Settings error",
-//									JOptionPane.ERROR_MESSAGE);
-//							}
-//						}
-//					}
-//				});
-				
-				ClockFrame.this.agent.killComponent(); // Use -autoshutdown to kill standalone platform as well
-				//IGoal kp = agent.createGoal("cms_shutdown_platform");
-				//agent.dispatchTopLevelGoal(kp);
-			}
-		};
-		
-		alarms.addActionListener(lalarms);
-		options.addActionListener(loptions);
-		exit.addActionListener(lexit);
-
-		if(SystemTray.isSupported())
-		{
-			final PopupMenu menu = new PopupMenu();
-			MenuItem a = new MenuItem("Alarms");
-			MenuItem o = new MenuItem("Options");
-			MenuItem e = new MenuItem("Exit");
-			menu.add(a);
-			menu.add(o);
-			menu.addSeparator();
-			menu.add(e);
-			a.addActionListener(lalarms);
-			o.addActionListener(loptions);
-			e.addActionListener(lexit);
-			
-			tray = SystemTray.getSystemTray();
-		    ti = new TrayIcon(((ImageIcon)icons.getIcon("Clock")).getImage(), "Jadex - Alarm Clock", menu);
-			
-			try
-			{
-				tray.add(ti);
-		    
-				final MenuItem stt = new MenuItem("Send to tray");
-				final MenuItem rft = new MenuItem("Restore");
-				menu.add(stt);
-				
-				ActionListener lstt = new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						try
-						{
-							setVisible(false);
-							menu.remove(stt);
-							menu.add(rft);
-	//						tray.add(ti);
-						}
-						catch(Exception e2)
-						{
-							e2.printStackTrace();
-						}
-					}
-				};
-				
-				stt.addActionListener(lstt);
-				
-				rft.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-	//					tray.remove(ti);
-						menu.remove(rft);
-						menu.add(stt);
-						setVisible(true);
-					}
-				});
-				/*ti.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						tray.removeTrayIcon(ti);
-						menu.remove(rft);
-						menu.add(stt);
-						ClockGui.this.setVisible(true);
-					}
-				});*/
-				
-				JMenuItem send = new JMenuItem("Send to tray");
-				jmenu.add(send);
-				send.addActionListener(lstt);
-				
-			}
-			catch(AWTException ex)
-			{
-				ex.printStackTrace();
-			}
+					});
+					return IFuture.DONE;
+				}
+			});
 		}
-
-		refresh(true);
-		timer = new Timer(1000, new ActionListener()
+		catch(ComponentTerminatedException cte)
 		{
-			public void actionPerformed(ActionEvent e)
-			{
-				refresh(false);
-			}
-		});
-		timer.setRepeats(true);
-		timer.start();
-
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			@Classname("tray")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new TerminationAdapter()
-				{
-					public void componentTerminated()
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								if(tray!=null)
-									tray.remove(ti);
-								timer.stop();
-								dispose();
-							}
-						});
-					}
-				});
-				return IFuture.DONE;
-			}
-		});
-		
-//		agent.addAgentListener(new IAgentListener()
-//		{
-//			public void agentTerminating(AgentEvent ae)
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						if(tray!=null)
-//							tray.remove(ti);
-//						timer.stop();
-//						dispose();
-//					}
-//				});
-//			}
-//			
-//			public void agentTerminated(AgentEvent ae)
-//			{
-//			}
-//		});
+			if(tray!=null)
+				tray.remove(ti);
+			if(timer!=null)
+				timer.stop();
+			dispose();			
+		}
 	}
 	
 	//-------- methods --------

@@ -2,6 +2,7 @@ package jadex.bdi.examples.booktrading.common;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
@@ -31,57 +32,58 @@ public class Gui extends JFrame
 	{
 		super((GuiPanel.isBuyer(agent)? "Buyer: ": "Seller: ")+agent.getComponentIdentifier().getName());
 		
-		GuiPanel gp = new GuiPanel(agent);
-		agent.scheduleStep(new IComponentStep<Void>()
+		try
 		{
-			@Classname("dispose")
-			public IFuture<Void> execute(IInternalAccess ia)
+//			System.out.println("booktrading0: "+agent.getComponentIdentifier());
+			GuiPanel gp = new GuiPanel(agent);
+			
+			add(gp, BorderLayout.CENTER);
+			pack();
+			setLocation(SGUI.calculateMiddlePosition(this));
+			setVisible(true);
+			addWindowListener(new WindowAdapter()
 			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new TerminationAdapter()
+				public void windowClosing(WindowEvent e)
 				{
-					public void componentTerminated()
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								dispose();
-							}
-						});
-					}
-				});
-				return IFuture.DONE;
-			}
-		});
-//		agent.addAgentListener(new IAgentListener()
-//		{
-//			public void agentTerminating(AgentEvent ae)
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						dispose();
-//					}
-//				});
-//			}
-//			
-//			public void agentTerminated(AgentEvent ae)
-//			{
-//			}
-//		});
-//		gp.refresh();
-		add(gp, BorderLayout.CENTER);
-		pack();
-		setLocation(SGUI.calculateMiddlePosition(this));
-		setVisible(true);
-		addWindowListener(new WindowAdapter()
-		{
-			public void windowClosing(WindowEvent e)
+					agent.killComponent();
+				}
+			});
+			
+//			System.out.println("booktrading1: "+agent.getComponentIdentifier());
+			agent.scheduleStep(new IComponentStep<Void>()
 			{
-				agent.killComponent();
-			}
-		});
+				@Classname("dispose")
+				public IFuture<Void> execute(IInternalAccess ia)
+				{
+//					System.out.println("booktrading2: "+agent.getComponentIdentifier());
+					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+					bia.addComponentListener(new TerminationAdapter()
+					{
+						public void componentTerminated()
+						{
+//							System.out.println("booktrading3: "+agent.getComponentIdentifier());
+							SwingUtilities.invokeLater(new Runnable()
+							{
+								public void run()
+								{
+//									System.out.println("booktrading4: "+agent.getComponentIdentifier());
+									dispose();
+								}
+							});
+						}
+					});
+					return IFuture.DONE;
+				}
+			});
+		}
+		catch(ComponentTerminatedException e)
+		{
+//			System.out.println("booktrading5: "+agent.getComponentIdentifier());
+			dispose();
+		}
+//		catch(Throwable t)
+//		{
+//			System.out.println("booktrading6: "+t);
+//		}
 	}
 }

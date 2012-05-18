@@ -6,6 +6,7 @@ import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
+import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.annotations.Classname;
@@ -43,37 +44,37 @@ public class BoardGui extends JFrame
 	 */
 	public BoardGui(final IBDIExternalAccess agent, final IBoard board, boolean controls)
 	{
-		this.board = board;
-		final BoardPanel bp = new BoardPanel(board);
-		this.board.addPropertyChangeListener(new PropertyChangeListener()
-		{
-			public void propertyChange(PropertyChangeEvent evt)
-			{
-				bp.update(evt);
-			}
-		});
-
-		this.getContentPane().add("Center", bp);
-		if(controls)
-		{
-			final BoardControlPanel bcp = new BoardControlPanel(board, bp);
-			this.getContentPane().add("South", bcp);
-		}
-		this.setTitle("Puzzle Board");
-		this.setSize(400, 400);
-		this.setLocation(SGUI.calculateMiddlePosition(this));
-		this.setVisible(true);
-
-		addWindowListener(new WindowAdapter()
-		{
-			public void windowClosing(WindowEvent e)
-			{
-				agent.killComponent();
-			}
-		});
-		
 		try
 		{
+			this.board = board;
+			final BoardPanel bp = new BoardPanel(board);
+			this.board.addPropertyChangeListener(new PropertyChangeListener()
+			{
+				public void propertyChange(PropertyChangeEvent evt)
+				{
+					bp.update(evt);
+				}
+			});
+	
+			this.getContentPane().add("Center", bp);
+			if(controls)
+			{
+				final BoardControlPanel bcp = new BoardControlPanel(board, bp);
+				this.getContentPane().add("South", bcp);
+			}
+			this.setTitle("Puzzle Board");
+			this.setSize(400, 400);
+			this.setLocation(SGUI.calculateMiddlePosition(this));
+			this.setVisible(true);
+	
+			addWindowListener(new WindowAdapter()
+			{
+				public void windowClosing(WindowEvent e)
+				{
+					agent.killComponent();
+				}
+			});
+			
 			agent.scheduleStep(new IComponentStep<Void>()
 			{
 				@Classname("dispose")
@@ -97,27 +98,9 @@ public class BoardGui extends JFrame
 				}
 			});
 		}
-		catch(ComponentTerminatedException cte)
+		catch(ComponentTerminatedException e)
 		{
 			dispose();
 		}
-		
-//		agent.addAgentListener(new IAgentListener()
-//		{
-//			public void agentTerminating(AgentEvent ae)
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						BoardGui.this.dispose();
-//					}
-//				});
-//			}
-//			
-//			public void agentTerminated(AgentEvent ae)
-//			{
-//			}
-//		});
 	}
 }

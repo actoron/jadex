@@ -5,6 +5,7 @@ import jadex.bdi.runtime.IPlanExecutor;
 import jadex.bdi.runtime.impl.flyweights.CapabilityFlyweight;
 import jadex.bdi.runtime.impl.flyweights.ParameterFlyweight;
 import jadex.bridge.CheckedAction;
+import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.modelinfo.IArgument;
 import jadex.bridge.service.types.clock.ITimedObject;
@@ -3432,6 +3433,16 @@ public class AgentRules
 
 		// Cleanup interpreter resources
 		interpreter.cleanup();
+		
+		// Cancel scheduled actions.
+		Collection<?>	actions	= state.getAttributeValues(ragent, OAVBDIRuntimeModel.agent_has_actions);
+		if(actions!=null)
+		{
+			for(Object action: actions)
+			{
+				((Future)((Object[])action)[1]).setException(new ComponentTerminatedException(interpreter.getComponentIdentifier()));			
+			}
+		}
 		
 		// Get kill future.
 		Future<Void>	killfuture	= (Future<Void>)state.getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_killfuture);

@@ -53,118 +53,126 @@ public class DealerFrame extends GameStateFrame
 	public DealerFrame(final Dealer me, final IBDIExternalAccess agent)
 	{
 		super(null, null);
-		this.agent	= agent;
-		this.children	= new HashSet();
-
-		// Show Jadex version information.
-		String	title	= "Blackjack Dealer";
-			//+ Configuration.getConfiguration().getReleaseNumber()
-			//+ " (" + Configuration.getConfiguration().getReleaseDate() + ")";
-
-		//Create the 'Main'-Window and the contentPane
-		setTitle(title);
-		//setResizable(false);
-		addWindowListener(new WindowAdapter()
+		
+		try
 		{
-			public void windowClosing(WindowEvent e)
+			this.agent	= agent;
+			this.children	= new HashSet();
+	
+			// Show Jadex version information.
+			String	title	= "Blackjack Dealer";
+				//+ Configuration.getConfiguration().getReleaseNumber()
+				//+ " (" + Configuration.getConfiguration().getReleaseDate() + ")";
+	
+			//Create the 'Main'-Window and the contentPane
+			setTitle(title);
+			//setResizable(false);
+			addWindowListener(new WindowAdapter()
 			{
-				DealerFrame.this.agent.killComponent();
-			}
-		});
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			@Classname("dispose")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new TerminationAdapter()
+				public void windowClosing(WindowEvent e)
 				{
-					public void componentTerminated()
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								DealerFrame.this.dispose();
-							}
-						});
-					}
-				});
-				return IFuture.DONE;
-			}
-		});
-//		agent.addAgentListener(new IAgentListener()
-//		{
-//			public void agentTerminating(AgentEvent ae)
-//			{
-//				SwingUtilities.invokeLater(new Runnable()
-//				{
-//					public void run()
-//					{
-//						DealerFrame.this.dispose();
-//					}
-//				});
-//			}
-//			public void agentTerminated(AgentEvent ae)
-//			{
-//			}
-//		});
-
-		// set the icon to be displayed for the frame
-		setIconImage(GUIImageLoader.getImage("heart_small_d").getImage());
-
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
+					DealerFrame.this.agent.killComponent();
+				}
+			});
+			agent.scheduleStep(new IComponentStep<Void>()
 			{
-				try
+				@Classname("dispose")
+				public IFuture<Void> execute(IInternalAccess ia)
 				{
-					agent.scheduleStep(new IComponentStep<Void>()
+					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+					bia.addComponentListener(new TerminationAdapter()
 					{
-						@Classname("gamestate")
-						public IFuture<Void> execute(IInternalAccess ia)
+						public void componentTerminated()
 						{
-							IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-							final GameState gs = (GameState)bia.getBeliefbase().getBelief("gamestate").getFact();
 							SwingUtilities.invokeLater(new Runnable()
 							{
 								public void run()
 								{
-									DealerFrame.this.setGameState(gs);
+									DealerFrame.this.dispose();
 								}
 							});
-							return IFuture.DONE;
 						}
 					});
+					return IFuture.DONE;
 				}
-				catch(ComponentTerminatedException cte)
+			});
+	//		agent.addAgentListener(new IAgentListener()
+	//		{
+	//			public void agentTerminating(AgentEvent ae)
+	//			{
+	//				SwingUtilities.invokeLater(new Runnable()
+	//				{
+	//					public void run()
+	//					{
+	//						DealerFrame.this.dispose();
+	//					}
+	//				});
+	//			}
+	//			public void agentTerminated(AgentEvent ae)
+	//			{
+	//			}
+	//		});
+	
+			// set the icon to be displayed for the frame
+			setIconImage(GUIImageLoader.getImage("heart_small_d").getImage());
+	
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				public void run()
 				{
-					
+					try
+					{
+						agent.scheduleStep(new IComponentStep<Void>()
+						{
+							@Classname("gamestate")
+							public IFuture<Void> execute(IInternalAccess ia)
+							{
+								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+								final GameState gs = (GameState)bia.getBeliefbase().getBelief("gamestate").getFact();
+								SwingUtilities.invokeLater(new Runnable()
+								{
+									public void run()
+									{
+										DealerFrame.this.setGameState(gs);
+									}
+								});
+								return IFuture.DONE;
+							}
+						});
+					}
+					catch(ComponentTerminatedException cte)
+					{
+						
+					}
+	//				agent.getBeliefbase().getBeliefFact("gamestate").addResultListener(new SwingDefaultResultListener(DealerFrame.this)
+	//				{
+	//					public void customResultAvailable(Object source, Object result)
+	//					{
+	//						DealerFrame.this.setGameState((GameState)result);
+	//					}
+	//				});
 				}
-//				agent.getBeliefbase().getBeliefFact("gamestate").addResultListener(new SwingDefaultResultListener(DealerFrame.this)
-//				{
-//					public void customResultAvailable(Object source, Object result)
-//					{
-//						DealerFrame.this.setGameState((GameState)result);
-//					}
-//				});
-			}
-		});
-		setControlPanel(new DealerOptionPanel(agent, DealerFrame.this));
-
-		/*getContentPane().setLayout(new GridLayout(0, 2));
-
-		// initialise the JPanels for the Dealer and the progressBar
-		PlayerPanel	dealerPanel = new PlayerPanel(me);
-
-		// add these JPanels as the first-row to the contentPane
-		getContentPane().add(dealerPanel);
-		getContentPane().add(new DealerOptionPanel(agent, DealerFrame.this));*/
-
-		// display the gui on the screen
-		pack();
-		setLocation(SGUI.calculateMiddlePosition(DealerFrame.this));
-		setVisible(true);
+			});
+			setControlPanel(new DealerOptionPanel(agent, DealerFrame.this));
+	
+			/*getContentPane().setLayout(new GridLayout(0, 2));
+	
+			// initialise the JPanels for the Dealer and the progressBar
+			PlayerPanel	dealerPanel = new PlayerPanel(me);
+	
+			// add these JPanels as the first-row to the contentPane
+			getContentPane().add(dealerPanel);
+			getContentPane().add(new DealerOptionPanel(agent, DealerFrame.this));*/
+	
+			// display the gui on the screen
+			pack();
+			setLocation(SGUI.calculateMiddlePosition(DealerFrame.this));
+			setVisible(true);
+		}
+		catch(ComponentTerminatedException e)
+		{
+			dispose();
+		}
 	}
 
 	/**
