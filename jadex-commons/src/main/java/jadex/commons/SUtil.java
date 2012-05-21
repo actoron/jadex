@@ -19,7 +19,7 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 /* if_not[android] */
 import java.net.InterfaceAddress;
-/* end[android */
+/* end[android] */
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.NetworkInterface;

@@ -2,12 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.sourceforge.jadex</groupId>
-	<artifactId>jadex-android-platform-base</artifactId>
+	<artifactId>jadex-android-platform-standalone</artifactId>
 	<packaging>jar</packaging>
-	<name>jadex-android-platform-base</name>
+	<name>jadex-android-platform-standalone</name>
 	<version>2.1-SNAPSHOT</version>
 	<url>http://jadex.sourceforge.net</url>
-	
+
 	<parent>
 		<groupId>net.sourceforge.jadex</groupId>
 		<artifactId>jadex-android-parent</artifactId>
@@ -15,8 +15,11 @@
 	</parent>
 
 	<description>
-		The Jadex platform base package contains
-		functionality useful for constructing platforms.
+		The Jadex standalone platform is a lightweight
+		J2SE execution infrastructure. It includes
+		message transports for remote communication
+		and implementations for management
+		platform services. 
 	</description>
 
 	<licenses>
@@ -79,21 +82,16 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	<!--
-		<parent> <groupId>net.sourceforge.jadex</groupId>
-		<artifactId>jadex-settings</artifactId>
-		<version>${jadexVersion}</version>
-		<relativePath>../src/main/config/jadex-settings-pom.xml</relativePath>
-		</parent>
-	-->
+	<!-- <parent> <groupId>net.sourceforge.jadex</groupId> <artifactId>jadex-settings</artifactId> 
+		<version>${jadexVersion}</version> <relativePath>../src/main/config/jadex-settings-pom.xml</relativePath> 
+		</parent> -->
 
 	<properties>
 		<project.build.sourceEncoding>ISO-8859-1</project.build.sourceEncoding>
-  	</properties>
+	</properties>
 
 	<build>
 		<sourceDirectory>../src/main/java</sourceDirectory>
-<!-- 		<testSourceDirectory>../src/test/java</testSourceDirectory> -->
 		<resources>
 			<resource>
 				<directory>../src/main/java</directory>
@@ -105,7 +103,6 @@
 		</resources>
 
 		<plugins>
-			<!-- Java 1.6 javax.xml.namespace.QName -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
@@ -128,27 +125,42 @@
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>munge-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-android-sources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>munge</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<excludes>
+						${munge-default-excludes},
+					</excludes>
+				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>replacer</artifactId>
 			</plugin>
-			
+
+			<!-- XMLDecoder with classloader only in 1.5 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-        		<version>2.3.2</version>
+				<version>2.3.2</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.5</source>
+					<target>1.5</target>
 				</configuration>
 			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-        		<version>2.1.2</version>
+				<version>2.1.2</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -159,11 +171,11 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-        		<artifactId>maven-javadoc-plugin</artifactId>
-        		<version>2.8.1</version>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.8.1</version>
 				<executions>
 					<execution>
 						<id>attach-javadoc</id>
@@ -173,7 +185,7 @@
 						</goals>
 					</execution>
 				</executions>
-        	</plugin>
+			</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -198,43 +210,28 @@
 			<artifactId>jadex-android-commons</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
-
-		<dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-xml</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency>
-
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-bridge</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
-
-		<!-- <dependency>
-			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-nuggets</artifactId>
-			<version>2.1-SNAPSHOT</version>
-		</dependency> -->
-		
-		<!-- hack -> remove (because of remote micro agent) -->
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
-			<artifactId>jadex-android-kernel-base</artifactId>
+			<artifactId>jadex-android-platform-base</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>net.sourceforge.jadex</groupId>
 			<artifactId>jadex-android-kernel-micro</artifactId>
 			<version>2.1-SNAPSHOT</version>
 		</dependency>
-		
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>provided</scope>
+			<groupId>net.sourceforge.jadex</groupId>
+			<artifactId>jadex-android-kernel-base</artifactId>
+			<version>2.1-SNAPSHOT</version>
 		</dependency>
+		<!-- <dependency> <groupId>net.sourceforge.jadex</groupId> <artifactId>jadex-kernel-component</artifactId> 
+			<version>2.1-SNAPSHOT</version> </dependency> -->
+
 	</dependencies>
 </project>

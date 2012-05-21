@@ -20,14 +20,14 @@
 	<dependencies>
 		<!-- To get all android-related errors, uncomment the following dependency -->
 		<!-- and remove the JRE from eclipse build path. -->
-		<dependency>
-			<groupId>proprietary</groupId>
-			<artifactId>android</artifactId>
-			<version>2.2.1</version>
-			<scope>system</scope>
-			<systemPath>/home/julakali/android/android-sdk-linux_86/platforms/android-8/android.jar</systemPath>
-			<!-- <systemPath>/scratch/8kalinow/android-sdk-linux_x86/platforms/android-8/android.jar</systemPath> -->
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>proprietary</groupId> -->
+<!-- 			<artifactId>android</artifactId> -->
+<!-- 			<version>2.2.1</version> -->
+<!-- 			<scope>system</scope> -->
+<!-- 			<systemPath>/home/julakali/android/android-sdk-linux_86/platforms/android-8/android.jar</systemPath> -->
+<!-- 			<systemPath>/scratch/8kalinow/android-sdk-linux_x86/platforms/android-8/android.jar</systemPath> -->
+<!-- 		</dependency> -->
 
 		<dependency>
 			<groupId>com.google.android</groupId>

@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.xml.stream.XMLOutputFactory;
-
 import javaxx.xml.stream.EventFilter;
 import javaxx.xml.stream.StreamFilter;
 import javaxx.xml.stream.XMLEventReader;
