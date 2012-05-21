@@ -13,6 +13,62 @@
 
 	<moduleSets>
 		<moduleSet>
+			<excludes>
+				<exclude>
+					net.sourceforge.jadex:jadex-android-parent
+				</exclude>
+				<exclude>
+					net.sourceforge.jadex:jadex-android-antlr
+				</exclude>
+				<exclude>
+					net.sourceforge.jadex:jadex-android-beans
+				</exclude>
+				<exclude>
+					net.sourceforge.jadex:jadex-android-misc
+				</exclude>
+				<exclude>
+					net.sourceforge.jadex:jadex-android-stax-api
+				</exclude>
+				<exclude>
+					net.sourceforge.jadex:jadex-android-xmlpull
+				</exclude>
+			</excludes>
+			<sources>
+				<includeModuleDirectory>false</includeModuleDirectory>
+				<fileSets>
+					<fileSet>
+						<outputDirectory>sources/modules/${module.artifactId}</outputDirectory>
+						<includes>
+							<include>src/**</include>
+							<include>lib/**</include>
+							<include>docs/**</include>
+							<include>**/pom.xml</include>
+						</includes>
+					</fileSet>
+				</fileSets>
+			</sources>
+		</moduleSet>
+		<moduleSet>
+			<includes>
+				<include>
+					net.sourceforge.jadex:jadex-android-parent
+				</include>
+				<include>
+					net.sourceforge.jadex:jadex-android-antlr
+				</include>
+				<include>
+					net.sourceforge.jadex:jadex-android-beans
+				</include>
+				<include>
+					net.sourceforge.jadex:jadex-android-misc
+				</include>
+				<include>
+					net.sourceforge.jadex:jadex-android-stax-api
+				</include>
+				<include>
+					net.sourceforge.jadex:jadex-android-xmlpull
+				</include>
+			</includes>
 			<sources>
 				<includeModuleDirectory>false</includeModuleDirectory>
 				<fileSets>
@@ -22,7 +78,7 @@
 							<include>src/**</include>
 							<include>lib/**</include>
 							<include>docs/**</include>
-							<!-- <include>pom.xml</include> -->
+							<include>**/pom.xml</include>
 						</includes>
 					</fileSet>
 				</fileSets>
@@ -30,65 +86,20 @@
 		</moduleSet>
 	</moduleSets>
 
-	<!-- <fileSets> -->
-	<!-- <fileSet> -->
-	<!-- <directory>docs/jadex-android-example-project</directory> -->
-	<!-- <outputDirectory>sources/docs/jadex-android-example-project</outputDirectory> -->
-	<!-- </fileSet> -->
-	<!-- </fileSets> -->
-
+	<fileSets>
+		<fileSet>
+			<directory>docs/android/</directory>
+			<outputDirectory>sources/docs/android/</outputDirectory>
+		</fileSet>
+	</fileSets>
 
 	<files>
 		<file>
-			<source>jadex-android-core/docs/jadex-android-parent-standalone-pom.xml</source>
-			<outputDirectory>sources/jadex-android-parent/</outputDirectory>
+			<source>docs/android/jadex-android-standalone-project-pom.xml</source>
+			<outputDirectory>sources/</outputDirectory>
 			<destName>pom.xml</destName>
 		</file>
-		<file>
-			<source>jadex-android-core/docs/jadex-android-standalone-project-pom.xml</source>
-			<outputDirectory>sources</outputDirectory>
-			<destName>pom.xml</destName>
-		</file>
-		<file>
-			<source>jadex-android-core/pom.xml</source>
-			<outputDirectory>sources/jadex-android-core/</outputDirectory>
-			<destName>pom.xml</destName>
-		</file>
-		<file>
-			<source>jadex-android-beans/pom.xml</source>
-			<outputDirectory>sources/jadex-android-beans/</outputDirectory>
-			<destName>pom.xml</destName>
-		</file>
-		<file>
-			<source>jadex-android-woodstox/pom.xml</source>
-			<outputDirectory>sources/jadex-android-woodstox/</outputDirectory>
-			<destName>pom.xml</destName>
-		</file>
-		<file>
-			<source>jadex-android-misc/pom.xml</source>
-			<outputDirectory>sources/jadex-android-misc/</outputDirectory>
-			<destName>pom.xml</destName>
-		</file>
-		<file>
-			<source>jadex-android-antlr/pom.xml</source>
-			<outputDirectory>sources/jadex-android-antlr/</outputDirectory>
-			<destName>pom.xml</destName>
-		</file>
-		<file>
-			<source>jadex-android-bdi/pom.xml</source>
-			<outputDirectory>sources/jadex-android-bdi/</outputDirectory>
-			<destName>pom.xml</destName>
-		</file>
-		<file>
-			<source>jadex-android-bpmn/pom.xml</source>
-			<outputDirectory>sources/jadex-android-bpmn/</outputDirectory>
-			<destName>pom.xml</destName>
-		</file>
-		<file>
-			<source>jadex-android-bdibpmn/pom.xml</source>
-			<outputDirectory>sources/jadex-android-bdibpmn/</outputDirectory>
-			<destName>pom.xml</destName>
-		</file>
+
 		<file>
 			<source>src/main/assembly/dist-assembly-androidsrczip.xml</source>
 			<outputDirectory>sources/src/main/assembly</outputDirectory>

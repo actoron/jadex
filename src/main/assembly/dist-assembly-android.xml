@@ -50,10 +50,6 @@
 			<outputDirectory>/</outputDirectory>
 		</file>
 		<file>
-			<source>jadex-android-core/docs/jadex-android-howto.txt</source>
-			<outputDirectory>/</outputDirectory>
-		</file>
-		<file>
 			<source>target/jadex-android-example-projects.zip</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
