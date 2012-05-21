@@ -47,9 +47,11 @@ public interface IChatGuiService
 	 *  Post a message.
 	 *  Searches for available chat services and posts the message to all.
 	 *  @param text The text message.
+	 *  @param receivers The receivers the message should be sent to.
+	 *  @param self Flag if message should also be sent to service itself.
 	 *  @return The remote services, to which the message was successfully posted.
 	 */
-	public IIntermediateFuture<IChatService> message(String text, IComponentIdentifier[] receivers);
+	public IIntermediateFuture<IChatService> message(String text, IComponentIdentifier[] receivers, boolean self);
 	
 	/**
 	 *  Post a status change.

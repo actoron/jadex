@@ -50,6 +50,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.PropertyPermission;
 import java.util.Set;
 
 import javax.sound.sampled.AudioInputStream;
@@ -178,10 +179,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					public Component getTableCellRendererComponent(JTable table, Object value, boolean selected, boolean focus, int row, int column)
 					{
 						super.getTableCellRendererComponent(table, value, selected, focus, row, column);
-						IComponentIdentifier	cid	= (IComponentIdentifier)value;
-						this.setText(cid.getName());
-						this.setToolTipText("State: "+users.get(cid));
-						Icon	icon	= users.get(cid).getIcon();
+//						IComponentIdentifier	cid	= (IComponentIdentifier)value;
+						ChatUser cu = (ChatUser)value;
+						this.setText(cu.getNick()+" ["+cu.getComponentIdentifier()+"]");
+						this.setToolTipText("State: "+cu);
+						Icon	icon	= cu.getIcon();
 						this.setIcon(icon);
 						return this;
 					}
@@ -281,8 +283,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						StringBuffer buf = new StringBuffer("To: ");
 						for(int i=0; i<sels.length; i++)
 						{
-							IComponentIdentifier cid = (IComponentIdentifier)table.getModel().getValueAt(sels[i], 0);
-							buf.append(cid.getLocalName());
+							ChatUser cu = (ChatUser)table.getModel().getValueAt(sels[i], 0);
+							buf.append(cu.getNick());
 							if(i+1<sels.length)
 								buf.append(", ");
 						}
@@ -313,13 +315,13 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						try
 						{
 							JTable.DropLocation	droploc	= (JTable.DropLocation)support.getDropLocation();
-							IComponentIdentifier	cid	= (IComponentIdentifier)table.getModel().getValueAt(droploc.getRow(), 0);
+							ChatUser cu	= (ChatUser)table.getModel().getValueAt(droploc.getRow(), 0);
 							
 							List<File>	files	= (List<File>)support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 //							System.out.println("importData: "+files);
 							for(File file: files)
 							{
-								getService().sendFile(file.getAbsolutePath(), cid);
+								getService().sendFile(file.getAbsolutePath(), cu.getComponentIdentifier());
 							}
 							success	= true;
 						}
@@ -380,8 +382,26 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				table.addMouseListener(lis);
 				table.getTableHeader().addMouseListener(lis);
 				
+				PropertiesPanel pp = new PropertiesPanel();
+				final JTextField tfnick = pp.createTextField("Nickname", "unknown", true);
+				tfnick.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						getService().setNickName(tfnick.getText());
+					}
+				});
+				getService().getNickName().addResultListener(new SwingDefaultResultListener<String>()
+				{
+					public void customResultAvailable(String result)
+					{
+						tfnick.setText(result);
+					}
+				});
+				
 				JPanel	listpan	= new JPanel(new BorderLayout());
 				listpan.add(userpan, BorderLayout.CENTER);
+				listpan.add(pp, BorderLayout.SOUTH);
 
 				JPanel south = new JPanel(new BorderLayout());
 				final JTextField tf = new JTextField();
@@ -502,7 +522,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						if(ChatEvent.TYPE_MESSAGE.equals(ce.getType()))
 						{
-							addMessage(ce.getComponentIdentifier(), (String)ce.getValue());
+							addMessage(ce.getComponentIdentifier(), (String)ce.getValue(), ce.getNick());
 						}
 						else if(ChatEvent.TYPE_STATECHANGE.equals(ce.getType()))
 						{
@@ -609,9 +629,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		IComponentIdentifier[] recs = new IComponentIdentifier[sels.length];
 		for(int i=0; i<sels.length; i++)
 		{
-			recs[i] = (IComponentIdentifier)table.getModel().getValueAt(sels[i], 0);
+			recs[i] = ((ChatUser)table.getModel().getValueAt(sels[i], 0)).getComponentIdentifier();
 		}
-		getService().message(text, recs).addResultListener(new IntermediateDefaultResultListener<IChatService>()
+		getService().message(text, recs, true).addResultListener(new IntermediateDefaultResultListener<IChatService>()
 		{
 			public void intermediateResultAvailable(final IChatService chat)
 			{
@@ -724,7 +744,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/**
 	 *  Add a message to the text area.
 	 */
-	public void addMessage(final IComponentIdentifier cid, final String text)
+	public void addMessage(final IComponentIdentifier cid, final String text, final String nick)
 	{
 		SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DefaultResultListener<IClockService>()
@@ -737,7 +757,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						StringBuffer buf = new StringBuffer();
 						buf.append("[").append(df.format(new Date(clock.getTime()))).append(", ")
-							.append(cid.getName()).append("]: ").append(text).append(lf);
+							.append(nick).append("]: ").append(text).append(lf);
+//							.append(cid.getName()).append("]: ").append(text).append(lf);
 						chatarea.append(buf.toString());
 						
 						notifyChatEvent(NOTIFICATION_NEW_MSG, cid, text, false);
@@ -1175,28 +1196,34 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 		{
 			return columns.length;
 		}
+		
 		public String getColumnName(int i)
 		{
 			return columns[i];
 		}
+		
 		public Class<?> getColumnClass(int i)
 		{
 			return String.class;
 		}
+		
 		public int getRowCount()
 		{
 			return users.size();
 		}
+		
 		public Object getValueAt(int row, int column)
 		{
 			IComponentIdentifier[]	cids	= users.keySet().toArray(new IComponentIdentifier[users.size()]);
-			return cids[row];
+			ChatUser cu = users.get(cids[row]);
+			return cu;//cu.getNick()+" ["+cids[row].getName()+"]";
 		}
 		
 		public boolean isCellEditable(int row, int column)
 		{
 			return false;
 		}
+		
 		public void setValueAt(Object val, int row, int column)
 		{
 		}

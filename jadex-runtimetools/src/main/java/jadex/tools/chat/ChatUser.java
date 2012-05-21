@@ -3,6 +3,7 @@ package jadex.tools.chat;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.IService;
 import jadex.bridge.service.types.chat.IChatService;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 
 import javax.swing.Icon;
@@ -40,6 +41,9 @@ public class ChatUser
 	/** The receiving state (id). */
 	protected int receiving;
 	
+	/** The cached nickname. */
+	protected String nick;
+	
 	//-------- constructors --------
 	
 	/**
@@ -50,6 +54,7 @@ public class ChatUser
 		this.cid	= cid;
 		this.state	= IChatService.STATE_IDLE;
 		this.receiving	= -1;
+		this.nick = "unknown";
 	}
 
 	/**
@@ -59,6 +64,7 @@ public class ChatUser
 	{
 		this(((IService)chat).getServiceIdentifier().getProviderId());
 		this.chat	= chat;
+		getNick();
 	}
 	
 	//-------- methods --------
@@ -124,5 +130,37 @@ public class ChatUser
 	public String getState()
 	{
 		return state;
+	}
+
+	/**
+	 *  Get the nick.
+	 *  @return the nick.
+	 */
+	public String getNick()
+	{
+		if(chat!=null)
+		{
+			chat.getNickName().addResultListener(new IResultListener<String>()
+			{
+				public void resultAvailable(String result)
+				{
+					nick = result;
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			});
+		}
+		return nick;
+	}
+
+	/**
+	 *  Get the cid.
+	 *  @return the cid.
+	 */
+	public IComponentIdentifier getComponentIdentifier()
+	{
+		return cid;
 	}
 }

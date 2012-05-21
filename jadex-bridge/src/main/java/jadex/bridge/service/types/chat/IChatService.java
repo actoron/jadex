@@ -9,7 +9,8 @@ import jadex.commons.future.ITerminableIntermediateFuture;
 
 
 /**
- *  Service can receive chat messages.
+ *  Global chat service. Called to send messages,
+ *  send files and user status.
  */
 @Security(Security.UNRESTRICTED)
 public interface IChatService
