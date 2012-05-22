@@ -102,7 +102,8 @@ public class DefaultBDIVisionProcessor extends SimplePropertyObject implements I
 					{
 						public void exceptionOccurred(Exception exception)
 						{
-							exception.printStackTrace();
+							// Happens when component already removed
+//							exception.printStackTrace();
 						}
 						public void resultAvailable(Object result)
 						{
