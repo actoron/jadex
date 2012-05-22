@@ -215,8 +215,11 @@ public class ClockService extends BasicService implements IClockService, IProper
 	 */
 	public void removeChangeListener(IChangeListener listener)
 	{
-		this.listeners.remove(listener);
-		clock.removeChangeListener(listener);
+		if(!shutdowned)
+		{
+			this.listeners.remove(listener);
+			clock.removeChangeListener(listener);
+		}
 	}
 	
 	/**

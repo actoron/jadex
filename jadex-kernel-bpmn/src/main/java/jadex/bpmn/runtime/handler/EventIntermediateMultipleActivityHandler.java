@@ -61,6 +61,7 @@ public class EventIntermediateMultipleActivityHandler extends DefaultActivityHan
 	 */
 	public void cancel(MActivity activity, BpmnInterpreter instance, ProcessThread thread)
 	{
+//		System.out.println(instance.getComponentIdentifier()+" cancel called: "+activity+", "+thread);
 		List outgoing = activity.getOutgoingSequenceEdges();
 		Object[] waitinfos = (Object[])thread.getWaitInfo();
 		

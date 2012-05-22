@@ -2,11 +2,11 @@ package jadex.bdi.examples.booktrading.common;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -32,58 +32,60 @@ public class Gui extends JFrame
 	{
 		super((GuiPanel.isBuyer(agent)? "Buyer: ": "Seller: ")+agent.getComponentIdentifier().getName());
 		
-		try
-		{
 //			System.out.println("booktrading0: "+agent.getComponentIdentifier());
-			GuiPanel gp = new GuiPanel(agent);
-			
-			add(gp, BorderLayout.CENTER);
-			pack();
-			setLocation(SGUI.calculateMiddlePosition(this));
-			setVisible(true);
-			addWindowListener(new WindowAdapter()
-			{
-				public void windowClosing(WindowEvent e)
-				{
-					agent.killComponent();
-				}
-			});
-			
-//			System.out.println("booktrading1: "+agent.getComponentIdentifier());
-			agent.scheduleStep(new IComponentStep<Void>()
-			{
-				@Classname("dispose")
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-//					System.out.println("booktrading2: "+agent.getComponentIdentifier());
-					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-					bia.addComponentListener(new TerminationAdapter()
-					{
-						public void componentTerminated()
-						{
-//							System.out.println("booktrading3: "+agent.getComponentIdentifier());
-							SwingUtilities.invokeLater(new Runnable()
-							{
-								public void run()
-								{
-//									System.out.println("booktrading4: "+agent.getComponentIdentifier());
-									dispose();
-								}
-							});
-						}
-					});
-					return IFuture.DONE;
-				}
-			});
-		}
-		catch(ComponentTerminatedException e)
+		GuiPanel gp = new GuiPanel(agent);
+		
+		add(gp, BorderLayout.CENTER);
+		pack();
+		setLocation(SGUI.calculateMiddlePosition(this));
+		setVisible(true);
+		addWindowListener(new WindowAdapter()
 		{
-//			System.out.println("booktrading5: "+agent.getComponentIdentifier());
-			dispose();
-		}
-//		catch(Throwable t)
-//		{
-//			System.out.println("booktrading6: "+t);
-//		}
+			public void windowClosing(WindowEvent e)
+			{
+				agent.killComponent();
+			}
+		});
+		
+		// Dispose frame on exception.
+		IResultListener<Void>	dislis	= new IResultListener<Void>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+//				System.out.println("booktrading5: "+agent.getComponentIdentifier());
+				dispose();
+			}
+			public void resultAvailable(Void result)
+			{
+//				System.out.println("booktrading6: "+agent.getComponentIdentifier());
+			}
+		};
+		
+//		System.out.println("booktrading1: "+agent.getComponentIdentifier());
+		agent.scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("dispose")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+//				System.out.println("booktrading2: "+agent.getComponentIdentifier());
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.addComponentListener(new TerminationAdapter()
+				{
+					public void componentTerminated()
+					{
+//						System.out.println("booktrading3: "+agent.getComponentIdentifier());
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+//								System.out.println("booktrading4: "+agent.getComponentIdentifier());
+								dispose();
+							}
+						});
+					}
+				});
+				return IFuture.DONE;
+			}
+		}).addResultListener(dislis);
 	}
 }

@@ -2,10 +2,9 @@ package jadex.micro.examples.helpline;
 
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
+import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.CollectionResultListener;
 import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateFuture;
 import jadex.commons.future.IResultListener;
@@ -41,6 +40,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.AbstractTableModel;
@@ -348,7 +348,37 @@ public class HelplinePanel extends JPanel
 			}
 		});
 		
-		// todo: micro listener
+		// Dispose frame on exception.
+		IResultListener<Void>	dislis	= new IResultListener<Void>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				f.dispose();
+			}
+			public void resultAvailable(Void result)
+			{
+			}
+		};
+		agent.scheduleStep(new IComponentStep<Void>()
+		{
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				ia.addComponentListener(new TerminationAdapter()
+				{
+					public void componentTerminated()
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								f.dispose();	
+							}
+						});
+					}
+				});
+				return IFuture.DONE;
+			}
+		}).addResultListener(dislis);
 	}
 }
 

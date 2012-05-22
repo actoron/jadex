@@ -82,7 +82,7 @@ public class EventIntermediateTimerActivityHandler extends	AbstractEventIntermed
 	 */
 	public void cancel(final MActivity activity, BpmnInterpreter instance, final ProcessThread thread)
 	{
-//		System.out.println("cancel called: "+activity+", "+thread);
+//		System.out.println(instance.getComponentIdentifier()+" cancel called: "+activity+", "+thread);
 		((IFuture)thread.getWaitInfo()).addResultListener(new DefaultResultListener()
 		{
 			public void resultAvailable(Object result)

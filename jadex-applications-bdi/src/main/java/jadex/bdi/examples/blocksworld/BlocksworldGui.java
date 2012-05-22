@@ -4,11 +4,11 @@ import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IInternalEvent;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -61,14 +61,7 @@ public class BlocksworldGui	extends JFrame
 	public BlocksworldGui(final IBDIExternalAccess agent)
 	{
 		super();
-		try
-		{
-			initGui(agent);
-		}
-		catch(ComponentTerminatedException e)
-		{
-			dispose();
-		}
+		initGui(agent);
 	}
 	
 	/**
@@ -480,53 +473,38 @@ public class BlocksworldGui	extends JFrame
 							}
 						});
 						
-						try
+						agent.scheduleStep(new IComponentStep<Void>()
 						{
-							agent.scheduleStep(new IComponentStep<Void>()
+							@Classname("disp")
+							public IFuture<Void> execute(IInternalAccess ia)
 							{
-								@Classname("disp")
-								public IFuture<Void> execute(IInternalAccess ia)
+								IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+								bia.addComponentListener(new TerminationAdapter()
 								{
-									IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-									bia.addComponentListener(new TerminationAdapter()
+									public void componentTerminated()
 									{
-										public void componentTerminated()
+										SwingUtilities.invokeLater(new Runnable()
 										{
-											SwingUtilities.invokeLater(new Runnable()
+											public void run()
 											{
-												public void run()
-												{
-													BlocksworldGui.this.dispose();
-												}
-											});
-										}
-									});
-									return IFuture.DONE;
-								}
-							});
-						}
-						catch(ComponentTerminatedException cte)
+												BlocksworldGui.this.dispose();
+											}
+										});
+									}
+								});
+								return IFuture.DONE;
+							}
+						}).addResultListener(new IResultListener<Void>()
 						{
-							BlocksworldGui.this.dispose();							
-						}
-								
-//						agent.addAgentListener(new IAgentListener()
-//						{
-//							public void agentTerminating(AgentEvent ae)
-//							{
-//								SwingUtilities.invokeLater(new Runnable()
-//								{
-//									public void run()
-//									{
-//										BlocksworldGui.this.dispose();
-//									}
-//								});
-//							}
-//							
-//							public void agentTerminated(AgentEvent ae)
-//							{
-//							}
-//						});
+							public void resultAvailable(Void result)
+							{
+							}
+							
+							public void exceptionOccurred(Exception exception)
+							{
+								BlocksworldGui.this.dispose();
+							}
+						});
 					}
 				});
 				return IFuture.DONE;

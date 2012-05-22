@@ -53,6 +53,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.SwingUtilities;
+
 /**
  *  Abstract base class for environment space. 
  */
@@ -593,7 +595,13 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 								public IFuture componentRemoved(IComponentDescription desc, Map results)
 								{
 									((IComponentManagementService)result).removeComponentListener(getExternalAccess().getComponentIdentifier(), this);
-									oc.dispose();
+									SwingUtilities.invokeLater(new Runnable()
+									{
+										public void run()
+										{
+											oc.dispose();
+										}
+									});
 									return IFuture.DONE;
 								}
 								
@@ -2735,14 +2743,29 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	 *  Terminate the extension.
 	 *  Called once, when the extension is terminated.
 	 */
-	public IFuture terminate()
+	public IFuture<Void> terminate()
 	{
-		for(int i=0; i<observercenters.size(); i++)
+		final Future<Void>	ret	= new Future<Void>();
+		final ObserverCenter[]	ocs	= (ObserverCenter[])observercenters.toArray(new ObserverCenter[observercenters.size()]);
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			ObserverCenter oc = (ObserverCenter)observercenters.get(i);
-			oc.dispose();
-		}
-		return IFuture.DONE;
+			public void run()
+			{
+				try
+				{
+					for(int i=0; i<ocs.length; i++)
+					{
+						ocs[i].dispose();
+					}
+					ret.setResult(null);
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
+				}
+			}
+		});
+		return ret;
 	}
 	
 	/**

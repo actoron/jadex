@@ -12,7 +12,6 @@ import jadex.bdi.runtime.IBDIInternalAccess;
 import jadex.bdi.runtime.IGoal;
 import jadex.bdi.runtime.IGoalListener;
 import jadex.bridge.ComponentIdentifier;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
@@ -20,6 +19,7 @@ import jadex.bridge.TerminationAdapter;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.transformation.annotations.Classname;
@@ -96,203 +96,209 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 	{
 		super("Blackjack Manager");
 		
-		try
+		// set the icon to be displayed for the frame
+		ImageIcon icon = GUIImageLoader.getImage("heart_small_m");
+		this.setIconImage(icon.getImage());
+
+		this.agent = access;
+		this.addWindowListener(this);
+
+		// let this class completly handle the window-closing (see exit()-method)
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+		enableTimer = new Timer(2000, new ActionListener()
 		{
-			// set the icon to be displayed for the frame
-			ImageIcon icon = GUIImageLoader.getImage("heart_small_m");
-			this.setIconImage(icon.getImage());
-	
-			this.agent = access;
-			this.addWindowListener(this);
-	
-			// let this class completly handle the window-closing (see exit()-method)
-			this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-	
-			enableTimer = new Timer(2000, new ActionListener()
+			public void actionPerformed(ActionEvent evt)
 			{
-				public void actionPerformed(ActionEvent evt)
-				{
-					localDealerButton.setEnabled(true);
-					enableTimer.stop();
-				}
-			});
-	
-			Container cp = this.getContentPane();
-			cp.setBackground(Color.WHITE);
-			cp.setLayout(new BorderLayout());
-	
-			// init player panel
-			playerpan = new JPanel();
-			playerpan.setBorder(BorderFactory.createTitledBorder(" Player "));
-			playerpan.setBackground(Color.WHITE);
-	
-			// init dealer panel
-			dealerpan = new JPanel();
-			dealerpan.setBorder(BorderFactory.createTitledBorder(" Dealer "));
-			dealerpan.setBackground(Color.WHITE);
-			access.scheduleStep(new IComponentStep<Void>()
+				localDealerButton.setEnabled(true);
+				enableTimer.stop();
+			}
+		});
+
+		Container cp = this.getContentPane();
+		cp.setBackground(Color.WHITE);
+		cp.setLayout(new BorderLayout());
+
+		// init player panel
+		playerpan = new JPanel();
+		playerpan.setBorder(BorderFactory.createTitledBorder(" Player "));
+		playerpan.setBackground(Color.WHITE);
+
+		// init dealer panel
+		dealerpan = new JPanel();
+		dealerpan.setBorder(BorderFactory.createTitledBorder(" Dealer "));
+		dealerpan.setBackground(Color.WHITE);
+		access.scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("dealerpan")
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				@Classname("dealerpan")
-				public IFuture<Void> execute(IInternalAccess ia)
+				IFuture<IComponentManagementService>	cms	= ia.getServiceContainer().getRequiredService("cms");
+//				if(cms.isDone() && cms.get(null)==null)
+//					Thread.dumpStack();
+				cms.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(ManagerFrame.this)
 				{
-					IFuture<IComponentManagementService>	cms	= ia.getServiceContainer().getRequiredService("cms");
-	//				if(cms.isDone() && cms.get(null)==null)
-	//					Thread.dumpStack();
-					cms.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(ManagerFrame.this)
+					public void customResultAvailable(final IComponentManagementService ces)
 					{
-						public void customResultAvailable(final IComponentManagementService ces)
-						{
-	//						dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent(), null);
-							dealeraid = new ComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent());
-							dealertf.setText(dealeraid.getName());
-						}
-					});
-					return IFuture.DONE;
-				}
-			});
-			
-			dealertf = new JTextField(20);
-			dealertf.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent ae)
-				{
-					access.scheduleStep(new IComponentStep<Void>()
-					{
-						@Classname("dealertf")
-						public IFuture<Void> execute(IInternalAccess ia)
-						{
-							ia.getServiceContainer().getRequiredService("cms")
-								.addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
-							{
-								public void customResultAvailable(Object result)
-								{
-									final IComponentManagementService ces = (IComponentManagementService)result;
-	//								dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
-									dealeraid = new ComponentIdentifier(dealertf.getText());
-								}
-							});
-							return IFuture.DONE;
-						}
-					});
-				}
-			});
-			
-			final	CMSUpdateHandler	cmsuh	= new CMSUpdateHandler(access);
-			
-			final	ComponentSelectorDialog	csd	= new ComponentSelectorDialog(ManagerFrame.this, access, cmsuh, new ComponentIconCache(access));
-			JButton	dealerbut	= new JButton("...");
-			dealerbut.addActionListener(new ActionListener()
-			{
-				public void actionPerformed(ActionEvent e)
-				{
-					IComponentIdentifier	cid	= csd.selectAgent(dealeraid);
-					if(cid!=null)
-					{
-						dealeraid	= cid;
-						dealertf.setText(dealeraid!=null ? dealeraid.getName() : "");
+//						dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent(), null);
+						dealeraid = new ComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent());
+						dealertf.setText(dealeraid.getName());
 					}
-				}
-			});
-			
-			dealerpan.add(dealertf);
-			dealerpan.add(dealerbut);
-	
-			JPanel centerpan = new JPanel(new BorderLayout());
-			centerpan.add(playerpan, BorderLayout.CENTER);
-			centerpan.add(dealerpan, BorderLayout.SOUTH);
-	
-			JPanel buttonpan = new JPanel();
-			buttonpan.setBackground(Color.WHITE);
-			localDealerButton = new JButton("Start local Dealer");
-			localDealerButton.addActionListener(this);
-			exitButton = new JButton("Exit Blackjack");
-			exitButton.addActionListener(this);
-			buttonpan.add(localDealerButton);
-			buttonpan.add(exitButton);
-	
-			//cp.add(new JLabel(loadLogo()), BorderLayout.NORTH);
-			cp.add(new JLabel(GUIImageLoader.getImage("logo")), BorderLayout.NORTH);
-			cp.add(centerpan, BorderLayout.CENTER);
-			cp.add(buttonpan, BorderLayout.SOUTH);
-			this.setSize(480, 570);
-	
-			Toolkit toolkit = Toolkit.getDefaultToolkit();
-			Dimension dim = toolkit.getScreenSize();
-			this.setLocation((int)(dim.getWidth()/2-this.getWidth()/2),
-					(int)(dim.getHeight()/2-this.getHeight()/2));
-	
-			this.setLocation(SGUI.calculateMiddlePosition(this));
-			this.setVisible(true);
-	//		EventQueue.invokeLater(new Runnable()
-	//		{
-	//			/**
-	//			 * creates the Panel, where the player-information is shown.
-	//			 * This method handles some special cases, i.e. a player - once created - should
-	//			 * be shown as long as it is stopped, even if the dealer is killed,
-	//			 * so don't take a look too close at all these for-loops, most of them
-	//			 * are really just for gui-convenience purposes ;-)
-	//			 */
-	//			public void run()
-	//			{
-					// create new Player Panels with the properties as specified in the Manager.xml
-			
-			agent.scheduleStep(new IComponentStep<Void>()
-			{
-				@Classname("players")
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-					final Player[] players = (Player[])bia.getBeliefbase().getBeliefSet("players").getFacts();
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							JPanel playerDealerPanel = (JPanel)getContentPane().getComponent(1);
-							JPanel playerPanel = (JPanel)playerDealerPanel.getComponent(0);
-							playerPanel.setLayout(new GridLayout(players.length, 1, 0, 0));
-							playerPanel.setBackground(Color.WHITE);
-	
-							for(int i = 0; i<players.length; i++)
-							{
-								playerPanel.add(new ManagerPlayerPanel(i+1, players[i]));
-							}
-	
-							getContentPane().add(playerDealerPanel, 1);
-							getContentPane().validate();
-						}
-					});
-					return IFuture.DONE;
-				}
-			});
-	
-			agent.scheduleStep(new IComponentStep<Void>()
-			{
-				@Classname("dispose")
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-					bia.addComponentListener(new TerminationAdapter()
-					{
-						public void componentTerminated()
-						{
-							SwingUtilities.invokeLater(new Runnable()
-							{
-								public void run()
-								{
-									ManagerFrame.this.dispose();
-									cmsuh.dispose();
-								}
-							});
-						}
-					});
-					return IFuture.DONE;
-				}
-			});
-		}
-		catch(ComponentTerminatedException cte)
+				});
+				return IFuture.DONE;
+			}
+		});
+		
+		dealertf = new JTextField(20);
+		dealertf.addActionListener(new ActionListener()
 		{
-			dispose();			
-		}
+			public void actionPerformed(ActionEvent ae)
+			{
+				access.scheduleStep(new IComponentStep<Void>()
+				{
+					@Classname("dealertf")
+					public IFuture<Void> execute(IInternalAccess ia)
+					{
+						ia.getServiceContainer().getRequiredService("cms")
+							.addResultListener(new SwingDefaultResultListener(ManagerFrame.this)
+						{
+							public void customResultAvailable(Object result)
+							{
+								final IComponentManagementService ces = (IComponentManagementService)result;
+//								dealeraid = ces.createComponentIdentifier(dealertf.getText(), false, null);
+								dealeraid = new ComponentIdentifier(dealertf.getText());
+							}
+						});
+						return IFuture.DONE;
+					}
+				});
+			}
+		});
+		
+		final	CMSUpdateHandler	cmsuh	= new CMSUpdateHandler(access);
+		
+		final	ComponentSelectorDialog	csd	= new ComponentSelectorDialog(ManagerFrame.this, access, cmsuh, new ComponentIconCache(access));
+		JButton	dealerbut	= new JButton("...");
+		dealerbut.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				IComponentIdentifier	cid	= csd.selectAgent(dealeraid);
+				if(cid!=null)
+				{
+					dealeraid	= cid;
+					dealertf.setText(dealeraid!=null ? dealeraid.getName() : "");
+				}
+			}
+		});
+		
+		dealerpan.add(dealertf);
+		dealerpan.add(dealerbut);
+
+		JPanel centerpan = new JPanel(new BorderLayout());
+		centerpan.add(playerpan, BorderLayout.CENTER);
+		centerpan.add(dealerpan, BorderLayout.SOUTH);
+
+		JPanel buttonpan = new JPanel();
+		buttonpan.setBackground(Color.WHITE);
+		localDealerButton = new JButton("Start local Dealer");
+		localDealerButton.addActionListener(this);
+		exitButton = new JButton("Exit Blackjack");
+		exitButton.addActionListener(this);
+		buttonpan.add(localDealerButton);
+		buttonpan.add(exitButton);
+
+		//cp.add(new JLabel(loadLogo()), BorderLayout.NORTH);
+		cp.add(new JLabel(GUIImageLoader.getImage("logo")), BorderLayout.NORTH);
+		cp.add(centerpan, BorderLayout.CENTER);
+		cp.add(buttonpan, BorderLayout.SOUTH);
+		this.setSize(480, 570);
+
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Dimension dim = toolkit.getScreenSize();
+		this.setLocation((int)(dim.getWidth()/2-this.getWidth()/2),
+				(int)(dim.getHeight()/2-this.getHeight()/2));
+
+		this.setLocation(SGUI.calculateMiddlePosition(this));
+		this.setVisible(true);
+		
+		// Dispose frame on exception.
+		IResultListener<Void>	dislis	= new IResultListener<Void>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				dispose();
+			}
+			public void resultAvailable(Void result)
+			{
+			}
+		};
+		
+//		EventQueue.invokeLater(new Runnable()
+//		{
+//			/**
+//			 * creates the Panel, where the player-information is shown.
+//			 * This method handles some special cases, i.e. a player - once created - should
+//			 * be shown as long as it is stopped, even if the dealer is killed,
+//			 * so don't take a look too close at all these for-loops, most of them
+//			 * are really just for gui-convenience purposes ;-)
+//			 */
+//			public void run()
+//			{
+				// create new Player Panels with the properties as specified in the Manager.xml
+		
+		agent.scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("players")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				final Player[] players = (Player[])bia.getBeliefbase().getBeliefSet("players").getFacts();
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						JPanel playerDealerPanel = (JPanel)getContentPane().getComponent(1);
+						JPanel playerPanel = (JPanel)playerDealerPanel.getComponent(0);
+						playerPanel.setLayout(new GridLayout(players.length, 1, 0, 0));
+						playerPanel.setBackground(Color.WHITE);
+
+						for(int i = 0; i<players.length; i++)
+						{
+							playerPanel.add(new ManagerPlayerPanel(i+1, players[i]));
+						}
+
+						getContentPane().add(playerDealerPanel, 1);
+						getContentPane().validate();
+					}
+				});
+				return IFuture.DONE;
+			}
+		}).addResultListener(dislis);
+
+		agent.scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("dispose")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.addComponentListener(new TerminationAdapter()
+				{
+					public void componentTerminated()
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								ManagerFrame.this.dispose();
+								cmsuh.dispose();
+							}
+						});
+					}
+				});
+				return IFuture.DONE;
+			}
+		}).addResultListener(dislis);
 	}
 
 	/**

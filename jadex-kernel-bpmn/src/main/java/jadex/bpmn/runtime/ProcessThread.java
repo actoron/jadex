@@ -8,6 +8,7 @@ import jadex.bpmn.model.MPool;
 import jadex.bpmn.model.MSequenceEdge;
 import jadex.bpmn.model.MSubProcess;
 import jadex.bpmn.runtime.handler.SplitInfo;
+import jadex.bridge.ComponentIdentifier;
 import jadex.commons.IFilter;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
@@ -236,7 +237,7 @@ public class ProcessThread	implements ITaskContext
 		this.waiting = false;
 		this.waitinfo = null;
 		this.waitfilter = null;
-//		System.out.println("Thread: "+getId()+" "+waiting);
+//		System.out.println("Thread: "+ComponentIdentifier.LOCAL.get()+", "+getId()+" "+waiting);
 	}
 	
 	/**
@@ -267,6 +268,7 @@ public class ProcessThread	implements ITaskContext
 	public void setWaitInfo(Object waitinfo)
 	{
 		this.waitinfo = waitinfo;
+//		System.out.println("Thread waitinfo: "+ComponentIdentifier.LOCAL.get()+", "+getId()+" "+waitinfo);
 	}
 	
 	/**

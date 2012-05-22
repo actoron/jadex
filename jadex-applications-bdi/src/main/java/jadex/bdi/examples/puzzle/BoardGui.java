@@ -2,12 +2,11 @@ package jadex.bdi.examples.puzzle;
 
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
-import jadex.commons.SUtil;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -44,63 +43,67 @@ public class BoardGui extends JFrame
 	 */
 	public BoardGui(final IBDIExternalAccess agent, final IBoard board, boolean controls)
 	{
-		try
+		this.board = board;
+		final BoardPanel bp = new BoardPanel(board);
+		this.board.addPropertyChangeListener(new PropertyChangeListener()
 		{
-			this.board = board;
-			final BoardPanel bp = new BoardPanel(board);
-			this.board.addPropertyChangeListener(new PropertyChangeListener()
+			public void propertyChange(PropertyChangeEvent evt)
 			{
-				public void propertyChange(PropertyChangeEvent evt)
-				{
-					bp.update(evt);
-				}
-			});
-	
-			this.getContentPane().add("Center", bp);
-			if(controls)
-			{
-				final BoardControlPanel bcp = new BoardControlPanel(board, bp);
-				this.getContentPane().add("South", bcp);
+				bp.update(evt);
 			}
-			this.setTitle("Puzzle Board");
-			this.setSize(400, 400);
-			this.setLocation(SGUI.calculateMiddlePosition(this));
-			this.setVisible(true);
-	
-			addWindowListener(new WindowAdapter()
-			{
-				public void windowClosing(WindowEvent e)
-				{
-					agent.killComponent();
-				}
-			});
-			
-			agent.scheduleStep(new IComponentStep<Void>()
-			{
-				@Classname("dispose")
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-					bia.addComponentListener(new TerminationAdapter()
-					{
-						public void componentTerminated()
-						{
-							SwingUtilities.invokeLater(new Runnable()
-							{
-								public void run()
-								{
-									BoardGui.this.dispose();
-								}
-							});
-						}
-					});
-					return IFuture.DONE;
-				}
-			});
-		}
-		catch(ComponentTerminatedException e)
+		});
+
+		this.getContentPane().add("Center", bp);
+		if(controls)
 		{
-			dispose();
+			final BoardControlPanel bcp = new BoardControlPanel(board, bp);
+			this.getContentPane().add("South", bcp);
 		}
+		this.setTitle("Puzzle Board");
+		this.setSize(400, 400);
+		this.setLocation(SGUI.calculateMiddlePosition(this));
+		this.setVisible(true);
+
+		addWindowListener(new WindowAdapter()
+		{
+			public void windowClosing(WindowEvent e)
+			{
+				agent.killComponent();
+			}
+		});
+		// Dispose frame on exception.
+		IResultListener<Void>	dislis	= new IResultListener<Void>()
+		{
+			public void exceptionOccurred(Exception exception)
+			{
+				dispose();
+			}
+			public void resultAvailable(Void result)
+			{
+			}
+		};
+		
+		agent.scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("dispose")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.addComponentListener(new TerminationAdapter()
+				{
+					public void componentTerminated()
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								BoardGui.this.dispose();
+							}
+						});
+					}
+				});
+				return IFuture.DONE;
+			}
+		}).addResultListener(dislis);
 	}
 }

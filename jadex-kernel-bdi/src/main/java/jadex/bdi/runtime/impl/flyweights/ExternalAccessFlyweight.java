@@ -209,21 +209,28 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		
 		if(getInterpreter().getComponentAdapter().isExternalThread())
 		{
-			getInterpreter().getAgentAdapter().invokeLater(new Runnable()
+			try
 			{
-				public void run()
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable()
 				{
-					Object cs = getState().getAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_state);
-					if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
+					public void run()
 					{
-						getInterpreter().killComponent().addResultListener(new DelegationResultListener(ret));
+						Object cs = getState().getAttributeValue(getInterpreter().getAgent(), OAVBDIRuntimeModel.agent_has_state);
+						if(OAVBDIRuntimeModel.AGENTLIFECYCLESTATE_ALIVE.equals(cs))
+						{
+							getInterpreter().killComponent().addResultListener(new DelegationResultListener(ret));
+						}
+						else
+						{
+							ret.setException(new RuntimeException("Component not running: "+getComponentIdentifier().getName()));
+						}
 					}
-					else
-					{
-						ret.setException(new RuntimeException("Component not running: "+getComponentIdentifier().getName()));
-					}
-				}
-			});
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
 		}
 		else
 		{
@@ -255,26 +262,33 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		
 		if(!getInterpreter().isPlanThread())
 		{
-			getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+			try
 			{
-				public void run() 
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
 				{
-					StringTokenizer stok = new StringTokenizer(name, ".");
-					Object handle = getHandle();
-					while(stok.hasMoreTokens())
+					public void run() 
 					{
-						String subcapname = stok.nextToken();
-						Object subcapref = getState().getAttributeValue(handle, OAVBDIRuntimeModel.capability_has_subcapabilities, subcapname);
-						if(subcapref==null)
+						StringTokenizer stok = new StringTokenizer(name, ".");
+						Object handle = getHandle();
+						while(stok.hasMoreTokens())
 						{
-							ret.setException(new RuntimeException("Capability not found: "+subcapname));
-							return;
+							String subcapname = stok.nextToken();
+							Object subcapref = getState().getAttributeValue(handle, OAVBDIRuntimeModel.capability_has_subcapabilities, subcapname);
+							if(subcapref==null)
+							{
+								ret.setException(new RuntimeException("Capability not found: "+subcapname));
+								return;
+							}
+							handle = getState().getAttributeValue(subcapref, OAVBDIRuntimeModel.capabilityreference_has_capability);
 						}
-						handle = getState().getAttributeValue(subcapref, OAVBDIRuntimeModel.capabilityreference_has_capability);
+						ret.setResult(new ExternalAccessFlyweight(getState(), handle));
 					}
-					ret.setResult(new ExternalAccessFlyweight(getState(), handle));
-				}
-			});
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
 		}
 		else
 		{
@@ -307,26 +321,33 @@ public class ExternalAccessFlyweight extends ElementFlyweight implements IBDIExt
 		
 		if(!getInterpreter().isPlanThread())
 		{
-			getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
+			try
 			{
-				public void run() 
+				getInterpreter().getAgentAdapter().invokeLater(new Runnable() 
 				{
-					String[] res = SUtil.EMPTY_STRING_ARRAY;
-					Collection coll = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.capability_has_subcapabilities);
-					if(coll!=null)
+					public void run() 
 					{
-						res = new String[coll.size()];
-						int i=0;
-						for(Iterator it=coll.iterator(); it.hasNext(); i++)
+						String[] res = SUtil.EMPTY_STRING_ARRAY;
+						Collection coll = getState().getAttributeValues(getHandle(), OAVBDIRuntimeModel.capability_has_subcapabilities);
+						if(coll!=null)
 						{
-							Object cref = it.next();
-							String name = (String)getState().getAttributeValue(cref, OAVBDIRuntimeModel.capabilityreference_has_name);
-							res[i] = name;
+							res = new String[coll.size()];
+							int i=0;
+							for(Iterator it=coll.iterator(); it.hasNext(); i++)
+							{
+								Object cref = it.next();
+								String name = (String)getState().getAttributeValue(cref, OAVBDIRuntimeModel.capabilityreference_has_name);
+								res[i] = name;
+							}
 						}
+						ret.setResult(res);
 					}
-					ret.setResult(res);
-				}
-			});
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
 		}
 		else
 		{

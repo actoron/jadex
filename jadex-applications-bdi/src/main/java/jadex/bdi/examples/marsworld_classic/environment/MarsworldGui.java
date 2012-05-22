@@ -7,11 +7,11 @@ import jadex.bdi.examples.marsworld_classic.Location;
 import jadex.bdi.examples.marsworld_classic.Target;
 import jadex.bdi.runtime.IBDIExternalAccess;
 import jadex.bdi.runtime.IBDIInternalAccess;
-import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.TerminationAdapter;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.transformation.annotations.Classname;
 
@@ -86,236 +86,240 @@ public class MarsworldGui	extends JFrame
 	{
 		super("Mars Environment - Agents collecting ore from targets...");
 		
-		try
+//		// Read the images.
+//		this.images = new HashMap();
+//		images.put(Environment.SENTRY_AGENT+"_original", loadImage(SENTRY_AGENT_ICON_PATH));
+//		images.put(Environment.PRODUCTION_AGENT+"_original", loadImage(PRODUCTION_AGENT_ICON_PATH));
+//		images.put(Environment.CARRY_AGENT+"_original", loadImage(CARRY_AGENT_ICON_PATH));
+//
+//		images.put("homebase", loadImage(HOMEBASE_PATH));
+//		images.put("target", loadImage(TARGET_ICON_PATH));
+//		images.put("background", loadImage(BACKGROUND_ICON_PATH));
+
+		addWindowListener(new WindowAdapter()
 		{
-	
-	//		// Read the images.
-	//		this.images = new HashMap();
-	//		images.put(Environment.SENTRY_AGENT+"_original", loadImage(SENTRY_AGENT_ICON_PATH));
-	//		images.put(Environment.PRODUCTION_AGENT+"_original", loadImage(PRODUCTION_AGENT_ICON_PATH));
-	//		images.put(Environment.CARRY_AGENT+"_original", loadImage(CARRY_AGENT_ICON_PATH));
-	//
-	//		images.put("homebase", loadImage(HOMEBASE_PATH));
-	//		images.put("target", loadImage(TARGET_ICON_PATH));
-	//		images.put("background", loadImage(BACKGROUND_ICON_PATH));
-	
-			addWindowListener(new WindowAdapter()
+			public void windowClosing(WindowEvent e)
 			{
-				public void windowClosing(WindowEvent e)
-				{
-					agent.killComponent();
-				}
-			});
-			
-			agent.scheduleStep(new IComponentStep<Void>()
+				agent.killComponent();
+			}
+		});
+		
+		agent.scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("dispose")
+			public IFuture<Void> execute(IInternalAccess ia)
 			{
-				@Classname("dispose")
-				public IFuture<Void> execute(IInternalAccess ia)
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.addComponentListener(new TerminationAdapter()
 				{
-					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-					bia.addComponentListener(new TerminationAdapter()
+					public void componentTerminated()
 					{
-						public void componentTerminated()
+						SwingUtilities.invokeLater(new Runnable()
 						{
-							SwingUtilities.invokeLater(new Runnable()
+							public void run()
 							{
-								public void run()
-								{
-									MarsworldGui.this.timer.stop();
-									MarsworldGui.this.dispose();
-								}
-							});
-						}
-					});
-					return IFuture.DONE;
-				}
-			});
-			
-	//		agent.addAgentListener(new IAgentListener()
-	//		{
-	//			public void agentTerminating(AgentEvent ae)
-	//			{
-	//				SwingUtilities.invokeLater(new Runnable()
-	//				{
-	//					public void run()
-	//					{
-	//						MarsworldGui.this.timer.stop();
-	//						MarsworldGui.this.dispose();
-	//					}
-	//				});
-	//			}
-	//			
-	//			public void agentTerminated(AgentEvent ae)
-	//			{
-	//			}
-	//		});
-	
-			agent.scheduleStep(new IComponentStep<Void>()
+								MarsworldGui.this.timer.stop();
+								MarsworldGui.this.dispose();
+							}
+						});
+					}
+				});
+				return IFuture.DONE;
+			}
+		}).addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
 			{
-				@Classname("env")
-				public IFuture<Void> execute(IInternalAccess ia)
-				{
-					IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-					final Environment	env	= (Environment)bia.getBeliefbase().getBelief("environment").getFact();
+			}
 			
-					// On what thread?
-					map	= createMarsworldPanel(env);
-					
-					SwingUtilities.invokeLater(new Runnable()
-					{
-						public void run()
-						{
-							JLabel sentrylabel = new JLabel(": Sentry Agent", icons.getIcon("sentry"), JLabel.LEADING);
-							JLabel prodname = new JLabel(": Production Agent", icons.getIcon("production"), JLabel.LEADING);
-							JLabel carryname = new JLabel(": Carry Agent", icons.getIcon("carry"), JLabel.LEADING);
-							JLabel homename = new JLabel(": Homebase", icons.getIcon("homebase"), JLabel.LEADING);
-							JLabel targetname = new JLabel(": Target", icons.getIcon("target"), JLabel.LEADING);
-			
-							JTextPane helptext = new JTextPane();
-							helptext.setText("A group of robots is searching for ore on Mars...\n\n" +
-								"This example was inspired by the book " +
-								"'Multiagentsystems' written by Jaques Ferber.");
-							helptext.setEnabled(false);
-							helptext.setEditable(false);
-			
-							JPanel p1 = new JPanel();
-							p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
-							p1.add(homename);
-							p1.add(sentrylabel);
-							p1.add(prodname);
-							p1.add(carryname);
-							p1.add(targetname);
-							//p1.setBounds(513, 224, 148, 186);
-							p1.setBorder(BorderFactory.createTitledBorder(null, "Description",
-								TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null,null));
-			
-							JPanel p2 = new JPanel();
-							p2.setLayout(new GridBagLayout());
-							p2.add(helptext, new GridBagConstraints(0, 0, 1, 1, 1, 0,
-								GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
-							//p2.setBounds(515, 10, 143, 177);
-							p2.setBorder(BorderFactory.createTitledBorder(null, "Mars Robots",
-								TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-			
-			
-							Insets insets = new Insets(2, 4, 2, 4);
-							JPanel content = new JPanel();
-							content.setLayout(new GridBagLayout());
-							content.add(map, new GridBagConstraints(0, 0, 1, 3, 1, 1,
-								GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
-							content.add(p1, new GridBagConstraints(1, 0, 1, 1, 0, 0,
-								GridBagConstraints.CENTER, GridBagConstraints.NONE, insets, 0, 0));
-							content.add(p2, new GridBagConstraints(1, 1, 1, 1, 0, 0,
-								GridBagConstraints.CENTER, GridBagConstraints.NONE, insets, 0, 0));
-							content.add(new JPanel(), new GridBagConstraints(1, 2, 1, 1, 0, 1,
-								GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
-							content.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-							content.setEnabled(false);
-			
-							p2.setMinimumSize(new Dimension((int)p1.getMinimumSize().getWidth(), 160));
-							p2.setPreferredSize(new Dimension((int)p1.getPreferredSize().getWidth(),  160));
-			
-							setContentPane(content);
-							setSize(600, 450);
-							setLocation(SGUI.calculateMiddlePosition(MarsworldGui.this));
-							setVisible(true);
-							
-							// Continuously repaint the gui.
-							timer	= new Timer(100, new ActionListener()
-							{
-								public void actionPerformed(ActionEvent e)
-								{
-									MarsworldGui.this.map.repaint();
-								}
-							});
-							timer.start();
-						}
-					});
-					
-					return IFuture.DONE;
-				}
-			});
+			public void exceptionOccurred(Exception exception)
+			{
+				if(timer!=null)
+					timer.stop();
+				MarsworldGui.this.dispose();
+			}
+		});
+		
+//		agent.addAgentListener(new IAgentListener()
+//		{
+//			public void agentTerminating(AgentEvent ae)
+//			{
+//				SwingUtilities.invokeLater(new Runnable()
+//				{
+//					public void run()
+//					{
+//						MarsworldGui.this.timer.stop();
+//						MarsworldGui.this.dispose();
+//					}
+//				});
+//			}
+//			
+//			public void agentTerminated(AgentEvent ae)
+//			{
+//			}
+//		});
+
+		agent.scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("env")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				final Environment	env	= (Environment)bia.getBeliefbase().getBelief("environment").getFact();
+		
+				// On what thread?
+				map	= createMarsworldPanel(env);
 				
-			// Create the gui.
-	//		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new SwingDefaultResultListener(MarsworldGui.this)
-	//		{
-	//			public void customResultAvailable(Object source, Object result)
-	//			{
-	//				Environment	env	= (Environment)result;
-	//				
-	//				map	= createMarsworldPanel(env);
-	//
-	//				JLabel sentrylabel = new JLabel(": Sentry Agent", icons.getIcon("sentry"), JLabel.LEADING);
-	//				JLabel prodname = new JLabel(": Production Agent", icons.getIcon("production"), JLabel.LEADING);
-	//				JLabel carryname = new JLabel(": Carry Agent", icons.getIcon("carry"), JLabel.LEADING);
-	//				JLabel homename = new JLabel(": Homebase", icons.getIcon("homebase"), JLabel.LEADING);
-	//				JLabel targetname = new JLabel(": Target", icons.getIcon("target"), JLabel.LEADING);
-	//
-	//				JTextPane helptext = new JTextPane();
-	//				helptext.setText("A group of robots is searching for ore on Mars...\n\n" +
-	//					"This example was inspired by the book " +
-	//					"'Multiagentsystems' written by Jaques Ferber.");
-	//				helptext.setEnabled(false);
-	//				helptext.setEditable(false);
-	//
-	//				JPanel p1 = new JPanel();
-	//				p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
-	//				p1.add(homename);
-	//				p1.add(sentrylabel);
-	//				p1.add(prodname);
-	//				p1.add(carryname);
-	//				p1.add(targetname);
-	//				//p1.setBounds(513, 224, 148, 186);
-	//				p1.setBorder(BorderFactory.createTitledBorder(null, "Description",
-	//					TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null,null));
-	//
-	//				JPanel p2 = new JPanel();
-	//				p2.setLayout(new GridBagLayout());
-	//				p2.add(helptext, new GridBagConstraints(0, 0, 1, 1, 1, 0,
-	//					GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
-	//				//p2.setBounds(515, 10, 143, 177);
-	//				p2.setBorder(BorderFactory.createTitledBorder(null, "Mars Robots",
-	//					TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
-	//
-	//
-	//				Insets insets = new Insets(2, 4, 2, 4);
-	//				JPanel content = new JPanel();
-	//				content.setLayout(new GridBagLayout());
-	//				content.add(map, new GridBagConstraints(0, 0, 1, 3, 1, 1,
-	//					GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
-	//				content.add(p1, new GridBagConstraints(1, 0, 1, 1, 0, 0,
-	//					GridBagConstraints.CENTER, GridBagConstraints.NONE, insets, 0, 0));
-	//				content.add(p2, new GridBagConstraints(1, 1, 1, 1, 0, 0,
-	//					GridBagConstraints.CENTER, GridBagConstraints.NONE, insets, 0, 0));
-	//				content.add(new JPanel(), new GridBagConstraints(1, 2, 1, 1, 0, 1,
-	//					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
-	//				content.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-	//				content.setEnabled(false);
-	//
-	//				p2.setMinimumSize(new Dimension((int)p1.getMinimumSize().getWidth(), 160));
-	//				p2.setPreferredSize(new Dimension((int)p1.getPreferredSize().getWidth(),  160));
-	//
-	//				setContentPane(content);
-	//				setSize(600, 450);
-	//				setLocation(SGUI.calculateMiddlePosition(MarsworldGui.this));
-	//				setVisible(true);
-	//				
-	//				// Continuously repaint the gui.
-	//				timer	= new Timer(100, new ActionListener()
-	//				{
-	//					public void actionPerformed(ActionEvent e)
-	//					{
-	//						MarsworldGui.this.map.repaint();
-	//					}
-	//				});
-	//				timer.start();
-	//			}
-	//		});
-		}
-		catch(ComponentTerminatedException e)
-		{
-			dispose();
-		}
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						JLabel sentrylabel = new JLabel(": Sentry Agent", icons.getIcon("sentry"), JLabel.LEADING);
+						JLabel prodname = new JLabel(": Production Agent", icons.getIcon("production"), JLabel.LEADING);
+						JLabel carryname = new JLabel(": Carry Agent", icons.getIcon("carry"), JLabel.LEADING);
+						JLabel homename = new JLabel(": Homebase", icons.getIcon("homebase"), JLabel.LEADING);
+						JLabel targetname = new JLabel(": Target", icons.getIcon("target"), JLabel.LEADING);
+		
+						JTextPane helptext = new JTextPane();
+						helptext.setText("A group of robots is searching for ore on Mars...\n\n" +
+							"This example was inspired by the book " +
+							"'Multiagentsystems' written by Jaques Ferber.");
+						helptext.setEnabled(false);
+						helptext.setEditable(false);
+		
+						JPanel p1 = new JPanel();
+						p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
+						p1.add(homename);
+						p1.add(sentrylabel);
+						p1.add(prodname);
+						p1.add(carryname);
+						p1.add(targetname);
+						//p1.setBounds(513, 224, 148, 186);
+						p1.setBorder(BorderFactory.createTitledBorder(null, "Description",
+							TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null,null));
+		
+						JPanel p2 = new JPanel();
+						p2.setLayout(new GridBagLayout());
+						p2.add(helptext, new GridBagConstraints(0, 0, 1, 1, 1, 0,
+							GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+						//p2.setBounds(515, 10, 143, 177);
+						p2.setBorder(BorderFactory.createTitledBorder(null, "Mars Robots",
+							TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+		
+		
+						Insets insets = new Insets(2, 4, 2, 4);
+						JPanel content = new JPanel();
+						content.setLayout(new GridBagLayout());
+						content.add(map, new GridBagConstraints(0, 0, 1, 3, 1, 1,
+							GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
+						content.add(p1, new GridBagConstraints(1, 0, 1, 1, 0, 0,
+							GridBagConstraints.CENTER, GridBagConstraints.NONE, insets, 0, 0));
+						content.add(p2, new GridBagConstraints(1, 1, 1, 1, 0, 0,
+							GridBagConstraints.CENTER, GridBagConstraints.NONE, insets, 0, 0));
+						content.add(new JPanel(), new GridBagConstraints(1, 2, 1, 1, 0, 1,
+							GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
+						content.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+						content.setEnabled(false);
+		
+						p2.setMinimumSize(new Dimension((int)p1.getMinimumSize().getWidth(), 160));
+						p2.setPreferredSize(new Dimension((int)p1.getPreferredSize().getWidth(),  160));
+		
+						setContentPane(content);
+						setSize(600, 450);
+						setLocation(SGUI.calculateMiddlePosition(MarsworldGui.this));
+						setVisible(true);
+						
+						// Continuously repaint the gui.
+						timer	= new Timer(100, new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								MarsworldGui.this.map.repaint();
+							}
+						});
+						timer.start();
+					}
+				});
+				
+				return IFuture.DONE;
+			}
+		});
+			
+		// Create the gui.
+//		agent.getBeliefbase().getBeliefFact("environment").addResultListener(new SwingDefaultResultListener(MarsworldGui.this)
+//		{
+//			public void customResultAvailable(Object source, Object result)
+//			{
+//				Environment	env	= (Environment)result;
+//				
+//				map	= createMarsworldPanel(env);
+//
+//				JLabel sentrylabel = new JLabel(": Sentry Agent", icons.getIcon("sentry"), JLabel.LEADING);
+//				JLabel prodname = new JLabel(": Production Agent", icons.getIcon("production"), JLabel.LEADING);
+//				JLabel carryname = new JLabel(": Carry Agent", icons.getIcon("carry"), JLabel.LEADING);
+//				JLabel homename = new JLabel(": Homebase", icons.getIcon("homebase"), JLabel.LEADING);
+//				JLabel targetname = new JLabel(": Target", icons.getIcon("target"), JLabel.LEADING);
+//
+//				JTextPane helptext = new JTextPane();
+//				helptext.setText("A group of robots is searching for ore on Mars...\n\n" +
+//					"This example was inspired by the book " +
+//					"'Multiagentsystems' written by Jaques Ferber.");
+//				helptext.setEnabled(false);
+//				helptext.setEditable(false);
+//
+//				JPanel p1 = new JPanel();
+//				p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
+//				p1.add(homename);
+//				p1.add(sentrylabel);
+//				p1.add(prodname);
+//				p1.add(carryname);
+//				p1.add(targetname);
+//				//p1.setBounds(513, 224, 148, 186);
+//				p1.setBorder(BorderFactory.createTitledBorder(null, "Description",
+//					TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null,null));
+//
+//				JPanel p2 = new JPanel();
+//				p2.setLayout(new GridBagLayout());
+//				p2.add(helptext, new GridBagConstraints(0, 0, 1, 1, 1, 0,
+//					GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
+//				//p2.setBounds(515, 10, 143, 177);
+//				p2.setBorder(BorderFactory.createTitledBorder(null, "Mars Robots",
+//					TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, null));
+//
+//
+//				Insets insets = new Insets(2, 4, 2, 4);
+//				JPanel content = new JPanel();
+//				content.setLayout(new GridBagLayout());
+//				content.add(map, new GridBagConstraints(0, 0, 1, 3, 1, 1,
+//					GridBagConstraints.CENTER, GridBagConstraints.BOTH, insets, 0, 0));
+//				content.add(p1, new GridBagConstraints(1, 0, 1, 1, 0, 0,
+//					GridBagConstraints.CENTER, GridBagConstraints.NONE, insets, 0, 0));
+//				content.add(p2, new GridBagConstraints(1, 1, 1, 1, 0, 0,
+//					GridBagConstraints.CENTER, GridBagConstraints.NONE, insets, 0, 0));
+//				content.add(new JPanel(), new GridBagConstraints(1, 2, 1, 1, 0, 1,
+//					GridBagConstraints.CENTER, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
+//				content.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+//				content.setEnabled(false);
+//
+//				p2.setMinimumSize(new Dimension((int)p1.getMinimumSize().getWidth(), 160));
+//				p2.setPreferredSize(new Dimension((int)p1.getPreferredSize().getWidth(),  160));
+//
+//				setContentPane(content);
+//				setSize(600, 450);
+//				setLocation(SGUI.calculateMiddlePosition(MarsworldGui.this));
+//				setVisible(true);
+//				
+//				// Continuously repaint the gui.
+//				timer	= new Timer(100, new ActionListener()
+//				{
+//					public void actionPerformed(ActionEvent e)
+//					{
+//						MarsworldGui.this.map.repaint();
+//					}
+//				});
+//				timer.start();
+//			}
+//		});
 	}
 
 	//-------- methods --------

@@ -228,22 +228,29 @@ public class HttpRelayTransport implements ITransport
 		if(dead != olddead)
 		{
 			// Inform awareness manager (if any).
-			component.getServiceContainer().searchService(IRelayAwarenessService.class, Binding.SCOPE_PLATFORM)
-				.addResultListener(new IResultListener<IRelayAwarenessService>()
+			try
 			{
-				public void resultAvailable(IRelayAwarenessService ras)
+				component.getServiceContainer().searchService(IRelayAwarenessService.class, Binding.SCOPE_PLATFORM)
+					.addResultListener(new IResultListener<IRelayAwarenessService>()
 				{
-					if(dead)
-						ras.disconnected("relay-"+address);
-					else
-						ras.connected("relay-"+address);
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-					// No awa service -> ignore awa infos.
-				}
-			});
+					public void resultAvailable(IRelayAwarenessService ras)
+					{
+						if(dead)
+							ras.disconnected("relay-"+address);
+						else
+							ras.connected("relay-"+address);
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						// No awa service -> ignore awa infos.
+					}
+				});
+			}
+			catch(Exception e)
+			{
+				// Hack!!! shouldn't use (internal) component from external thread.
+			}
 		}
 	}
 	

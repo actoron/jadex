@@ -1334,37 +1334,44 @@ public class BDIInterpreter	extends StatelessAbstractInterpreter
 		if(getComponentAdapter().isExternalThread()
 			|| getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
 		{
-			adapter.invokeLater(new Runnable() 
+			try
 			{
-				public void run() 
+				adapter.invokeLater(new Runnable() 
 				{
-					// Todo: fix termination such that external entries are properly executed!?
-					if(state.containsObject(ragent))
+					public void run() 
 					{
-						if(getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
+						// Todo: fix termination such that external entries are properly executed!?
+						if(state.containsObject(ragent))
 						{
-							// Hack!!! During init phase execute directly as rule engine isn't running.
-							try
+							if(getState().getAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_state)==null)
 							{
-								((IComponentStep)step).execute(getInternalAccess())
-									.addResultListener(new DelegationResultListener(ret));
+								// Hack!!! During init phase execute directly as rule engine isn't running.
+								try
+								{
+									((IComponentStep)step).execute(getInternalAccess())
+										.addResultListener(new DelegationResultListener(ret));
+								}
+								catch(Exception e)
+								{
+									ret.setException(e);
+								}
 							}
-							catch(Exception e)
+							else
 							{
-								ret.setException(e);
+								getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
 							}
 						}
 						else
 						{
-							getState().addAttributeValue(ragent, OAVBDIRuntimeModel.agent_has_actions, new Object[]{step, ret, scope});
+							ret.setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));
 						}
 					}
-					else
-					{
-						ret.setException(new ComponentTerminatedException(getAgentAdapter().getComponentIdentifier()));
-					}
-				}
-			});
+				});
+			}
+			catch(Exception e)
+			{
+				ret.setException(e);
+			}
 		}
 		else
 		{

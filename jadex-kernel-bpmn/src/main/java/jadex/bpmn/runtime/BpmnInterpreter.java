@@ -725,11 +725,14 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		{
 			public void run()
 			{	
-				// Call cancel on all running threads.
+				// Call cancel on all threads with started activities (i.e. thread is waiting for end of activity).
 				for(Iterator it= getThreadContext().getAllThreads().iterator(); it.hasNext(); )
 				{
 					ProcessThread pt = (ProcessThread)it.next();
-					getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
+					if(pt.isWaiting())
+					{
+						getActivityHandler(pt.getActivity()).cancel(pt.getActivity(), BpmnInterpreter.this, pt);
+					}
 				}
 				
 				BpmnInterpreter.super.startEndSteps().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)));
@@ -1027,7 +1030,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 					{
 						if(isCurrentActivity(activity, thread))
 						{
-	//						System.out.println("Notify: "+activity+" "+thread+" "+event);
+//							System.out.println("Notify1: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
 							step(activity, BpmnInterpreter.this, thread, event);
 							thread.setNonWaiting();
 							if(thread.getThreadContext()!=null)
@@ -1049,7 +1052,7 @@ public class BpmnInterpreter extends AbstractInterpreter implements IInternalAcc
 		{
 			if(isCurrentActivity(activity, thread))
 			{
-//				System.out.println("Notify: "+activity+" "+thread+" "+event);
+//				System.out.println("Notify2: "+getComponentIdentifier()+", "+activity+" "+thread+" "+event);
 				step(activity, BpmnInterpreter.this, thread, event);
 				thread.setNonWaiting();
 				if(thread.getThreadContext()!=null)

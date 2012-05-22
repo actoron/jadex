@@ -44,7 +44,7 @@ public class PojoAddService implements IAddService
 	@ServiceStart
 	public IFuture start()
 	{
-		System.out.println("start");
+//		System.out.println("start");
 		return IFuture.DONE;
 	}
 	
@@ -54,7 +54,7 @@ public class PojoAddService implements IAddService
 	@ServiceShutdown
 	public IFuture shutdown()
 	{
-		System.out.println("shutdown");
+//		System.out.println("shutdown");
 		return IFuture.DONE;
 	}
 	

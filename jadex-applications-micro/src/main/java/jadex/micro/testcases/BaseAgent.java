@@ -32,6 +32,6 @@ import jadex.micro.annotation.Results;
 @Arguments(@Argument(name="arg1", defaultvalue="bval", clazz=String.class))
 @Results(@Result(name="res1", defaultvalue="bres", clazz=String.class))
 @Configurations({@Configuration(name="config1"), @Configuration(name="config2")})
-public class BaseAgent
+public abstract class BaseAgent
 {
 }

@@ -105,6 +105,9 @@ public class ObserverCenter
 	
 	protected IClockService clock;
 	
+	/** Flag to indicate that observer is disposed. */
+	protected boolean	disposed;
+
 	/** Creates an observer center.
 	 *  
 	 *  @param title title of the observer window
@@ -139,6 +142,8 @@ public class ObserverCenter
 		{
 			public void run()
 			{
+				if(disposed)
+					return;
 				mainwindow = new ObserverCenterWindow(title);
 				loadPlugins(cplugins);
 				
@@ -752,7 +757,7 @@ public class ObserverCenter
 			}
 		}
 		
-		public void actionPerformed(ActionEvent e)
+		public void actionPerformed(final ActionEvent event)
 		{
 			if(delay==-1)
 			{
@@ -764,6 +769,13 @@ public class ObserverCenter
 						vptimer.stop();
 						IClockService	clock	= (IClockService)result;
 						clock.addChangeListener(clocklistener);
+					}
+					public void customExceptionOccurred(Exception exception)
+					{
+						if(event!=null)	// Called internally with null -> ignore exception
+						{
+							super.customExceptionOccurred(exception);
+						}
 					}
 				});
 			}
@@ -778,6 +790,13 @@ public class ObserverCenter
 						IClockService	clock	= (IClockService)result;
 						clock.removeChangeListener(clocklistener);
 					}
+					public void customExceptionOccurred(Exception exception)
+					{
+						if(event!=null)	// Called internally with null -> ignore exception
+						{
+							super.customExceptionOccurred(exception);
+						}
+					}
 				});
 			}
 			else
@@ -791,6 +810,13 @@ public class ObserverCenter
 						clock.removeChangeListener(clocklistener);
 						vptimer.setDelay(delay);
 						vptimer.start();
+					}
+					public void customExceptionOccurred(Exception exception)
+					{
+						if(event!=null)	// Called internally with null -> ignore exception
+						{
+							super.customExceptionOccurred(exception);
+						}
 					}
 				});
 			}
@@ -847,6 +873,14 @@ public class ObserverCenter
 	 */
 	public void dispose()
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		if(disposed)
+		{
+			// might be called from space.terminate() and from component listener
+			return;
+		}
+		disposed	= true;
+		
 		if(plugintimer!=null)
 			plugintimer.stop();
 		
@@ -857,7 +891,7 @@ public class ObserverCenter
 				((Perspective2D) persp).getViewport().dispose();
 		}
 		
-		if(clocklistener != null)
+		if(clocklistener!=null)
 		{
 			clock.removeChangeListener(clocklistener);
 //			SServiceProvider.getService(space.getExternalAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
