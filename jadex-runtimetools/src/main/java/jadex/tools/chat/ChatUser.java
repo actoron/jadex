@@ -64,7 +64,21 @@ public class ChatUser
 	{
 		this(((IService)chat).getServiceIdentifier().getProviderId());
 		this.chat	= chat;
-		getNick();
+		
+//		if(chat!=null)
+//		{
+			chat.getNickName().addResultListener(new IResultListener<String>()
+			{
+				public void resultAvailable(String result)
+				{
+					nick = result;
+				}
+				
+				public void exceptionOccurred(Exception exception)
+				{
+				}
+			});
+//		}
 	}
 	
 	//-------- methods --------
@@ -138,21 +152,16 @@ public class ChatUser
 	 */
 	public String getNick()
 	{
-		if(chat!=null)
-		{
-			chat.getNickName().addResultListener(new IResultListener<String>()
-			{
-				public void resultAvailable(String result)
-				{
-					nick = result;
-				}
-				
-				public void exceptionOccurred(Exception exception)
-				{
-				}
-			});
-		}
 		return nick;
+	}
+	
+	/**
+	 *  Set the nick.
+	 *  @param nick The nick to set.
+	 */
+	public void setNick(String nick)
+	{
+		this.nick = nick;
 	}
 
 	/**

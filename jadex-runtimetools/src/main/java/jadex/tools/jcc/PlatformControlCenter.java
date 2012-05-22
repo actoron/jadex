@@ -12,6 +12,7 @@ import jadex.bridge.service.types.library.ILibraryService;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
@@ -43,6 +44,9 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/** The plugins (plugin->panel). */
 	protected Map<IControlCenterPlugin, JComponent>	plugins;
 
+	/** The plugin toolbar visibility. */
+	protected Map<IControlCenterPlugin, Boolean> toolbarvis;
+	
 	/** The global control center. */
 	protected ControlCenter	controlcenter;
 
@@ -65,6 +69,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		this.platformaccess = platformaccess;
 		this.controlcenter	= controlcenter;
 		this.plugins = new LinkedHashMap<IControlCenterPlugin, JComponent>();
+		this.toolbarvis = new LinkedHashMap<IControlCenterPlugin, Boolean>();
 		this.props	= new Properties();
 		this.pccpanel	= new PlatformControlCenterPanel(this);
 		
@@ -236,6 +241,42 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	//-------- methods called by platform control center panel --------
 	
 	/**
+	 *  Test if a plugin is visible in the toolbar.
+	 *  @param pl The plugin.
+	 *  @return True, if is visible.
+	 */
+	public boolean isPluginVisible(IControlCenterPlugin pl)
+	{
+		Boolean ret = toolbarvis.get(pl);
+		return ret!=null? ret.booleanValue(): true;
+	}
+	
+	/**
+	 *  Set the visible state of a plugin.
+	 */
+	public void setPluginVisible(IControlCenterPlugin pl, boolean vis)
+	{
+		toolbarvis.put(pl, vis);
+	}
+	
+	/**
+	 *  Get the toolbar plugins that are visible or not visible.
+	 */
+	public IControlCenterPlugin[] getToolbarPlugins(boolean vis)
+	{
+		List<IControlCenterPlugin> ret = new ArrayList<IControlCenterPlugin>();
+		for(Iterator<IControlCenterPlugin> it = toolbarvis.keySet().iterator(); it.hasNext(); )
+		{
+			IControlCenterPlugin pl = it.next();
+			if(isPluginVisible(pl)==vis)
+			{
+				ret.add(pl);
+			}
+		}
+		return ret.toArray(new IControlCenterPlugin[ret.size()]);
+	}
+	
+	/**
 	 *  Get the global control center.
 	 */
 	public ControlCenter	getControlCenter()
@@ -357,6 +398,23 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		
 		this.props	= props;
 		
+		Properties[] vis = props.getSubproperties("vis");
+		if(vis!=null && vis.length>0)
+		{
+			Property[] ps = vis[0].getProperties();
+			if(ps!=null)
+			{
+				for(int i=0; i<ps.length; i++)
+				{
+					IControlCenterPlugin plg = getPluginForName(ps[i].getName());
+					if(plg!=null)
+					{
+						toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
+					}
+				}
+			}
+		}
+			
 		Properties	ccprops	= props.getSubproperty("controlcenter");
 		if(ccprops==null)
 		{
@@ -396,8 +454,6 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	public IFuture<Properties> getProperties()
 	{
-		if(!SwingUtilities.isEventDispatchThread())
-			System.out.println("dreck");
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
 		final Future<Properties> ret	= new Future<Properties>();
@@ -408,6 +464,14 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		}
 		else
 		{
+			Properties vis = new Properties("vis", "vis", "vis");
+			for(Iterator<IControlCenterPlugin> it = toolbarvis.keySet().iterator(); it.hasNext(); )
+			{
+				IControlCenterPlugin plg = it.next();
+				vis.addProperty(new Property(plg.getName(), toolbarvis.get(plg).toString()));
+			}
+			props.addProperties(vis);
+			
 //			System.out.println("Fetching panel properties.");
 			pccpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)
 			{

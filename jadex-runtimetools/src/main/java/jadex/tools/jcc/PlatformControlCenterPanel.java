@@ -5,6 +5,7 @@ import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
+import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -23,9 +24,15 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -34,7 +41,9 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
@@ -135,57 +144,120 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	        for(int i=0; i<plugins.length; i++)
 	        {
 	            final IControlCenterPlugin plugin = plugins[i];
-	        	//final JToggleButton button = new JToggleButton(new PluginAction(plugins[i]));
-	        	final JButton button = new JButton(new PluginAction(plugins[i]));
-	        	Icon ic = plugin.getToolIcon(selplugin.getName().equals(plugins[i].getName()));
-	    	    if(ic!=null)
-	    	    	button.setIcon(ic);
-	    	    else
-	    	    	button.setText(plugins[i].getName());
-	    	    button.setText("A");
-	            button.putClientProperty("plugin", plugins[i]);
-	            button.setBorder(null);
-	            button.setText(null);
-	            button.setMinimumSize(BUTTON_DIM);
-	            button.setHorizontalAlignment(SwingConstants.CENTER);
-	            button.setVerticalAlignment(SwingConstants.CENTER);
-	            button.setToolTipText(plugins[i].getName());
-	            button.getModel().addItemListener(new ItemListener()
-	            {
-	            	public void itemStateChanged(ItemEvent e)
-	            	{
-	            		//System.out.println(plugin.getName()+" :"+button.isSelected());
-	            		button.setIcon(plugin.getToolIcon(button.isSelected()));
-	            	}
-	            });
-//	            if(plugins[i].getHelpID()!=null)
-//	            	SHelp.setupHelp(button, plugins[i].getHelpID());
-	            
-	            //bg.add(button);
-	     	    toolbar.add(button);
-	            toolcnt++;
+	            addPlugin(plugin, selplugin);
+//	        	//final JToggleButton button = new JToggleButton(new PluginAction(plugins[i]));
+//	        	final JButton button = new JButton(new PluginAction(plugins[i]));
+//	        	Icon ic = plugin.getToolIcon(selplugin.getName().equals(plugins[i].getName()));
+//	    	    if(ic!=null)
+//	    	    	button.setIcon(ic);
+//	    	    else
+//	    	    	button.setText(plugins[i].getName());
+//	    	    button.setText("A");
+//	            button.putClientProperty("plugin", plugins[i]);
+//	            button.setBorder(null);
+//	            button.setText(null);
+//	            button.setMinimumSize(BUTTON_DIM);
+//	            button.setHorizontalAlignment(SwingConstants.CENTER);
+//	            button.setVerticalAlignment(SwingConstants.CENTER);
+//	            button.setToolTipText(plugins[i].getName());
+//	            button.getModel().addItemListener(new ItemListener()
+//	            {
+//	            	public void itemStateChanged(ItemEvent e)
+//	            	{
+//	            		//System.out.println(plugin.getName()+" :"+button.isSelected());
+//	            		button.setIcon(plugin.getToolIcon(button.isSelected()));
+//	            	}
+//	            });
+//	            final JPopupMenu popup = new JPopupMenu();
+//	            popup.add(new JMenuItem(new AbstractAction("Hide tool") 
+//	            {
+//	                public void actionPerformed(ActionEvent e) 
+//	                {
+//	                	controlcenter.setPluginVisible(plugin, false);
+//	                	changeToolBar(null, null);
+//	                }
+//	            }));
+//	            button.addMouseListener(new MouseAdapter()
+//	            {
+//	                public void mousePressed(MouseEvent e) 
+//	                {
+//	                    popup.show(e.getComponent(), e.getX(), e.getY());
+//	                }
+//	            });
+//
+////	            if(plugins[i].getHelpID()!=null)
+////	            	SHelp.setupHelp(button, plugins[i].getHelpID());
+//	            
+//	            //bg.add(button);
+//	     	    toolbar.add(button);
+//	            toolcnt++;
 	        }
 	        toolbar.addSeparator();
 	        toolcnt++;
 	        toolbar.add(new JadexLogoButton(toolbar));
 	        toolcnt++;
+	        
+	        final JPopupMenu popup = new JPopupMenu();
+	        toolbar.addMouseListener(new MouseAdapter()
+            {
+                public void mousePressed(MouseEvent e) 
+                {
+                	popup.removeAll();
+                	IControlCenterPlugin[] pls = controlcenter.getToolbarPlugins(false);
+                	for(int i=0; i<pls.length; i++)
+                	{
+                		final IControlCenterPlugin pl = pls[i];
+                		popup.add(new JMenuItem(new AbstractAction("Show tool: "+pl.getName()) 
+        	            {
+        	                public void actionPerformed(ActionEvent e) 
+        	                {
+        	                	controlcenter.setPluginVisible(pl, true);
+        	                	changeToolBar(null, null);
+        	                }
+        	            }));
+                	}
+                    popup.show(e.getComponent(), e.getX(), e.getY());
+                }
+            });
+	        toolbar.add(popup);
 		}
 		else
 		{
-			while(toolbar.getComponentCount()>toolcnt)
+			if(selplugin!=null)
 			{
-//				Component	comp	= toolbar.getComponent(0);
-				toolbar.remove(0);
-				//if(lasttoolbar!=null)
-				//	lasttoolbar.add(comp);
+				while(toolbar.getComponentCount()>toolcnt)
+				{
+//					Component	comp	= toolbar.getComponent(0);
+					toolbar.remove(0);
+					//if(lasttoolbar!=null)
+					//	lasttoolbar.add(comp);
+				}
 			}
 		}
 
         for(int i=0; template!=null && i<template.length; i++)
+        {
             toolbar.add(template[i], i);
+        }
         //lasttoolbar	= template;
+
+        Set<IControlCenterPlugin> shown = new HashSet<IControlCenterPlugin>();
+        for(int i=0; i<toolbar.getComponentCount(); i++)
+        {
+        	JComponent comp = (JComponent)toolbar.getComponent(i);
+        	if(comp.getClientProperty("plugin")!=null)
+        	{
+        		IControlCenterPlugin pl = (IControlCenterPlugin)comp.getClientProperty("plugin");
+        		shown.add(pl);
+        	}
+        }
         
-        // Select plugins
+        // Make visble plugins
+        IControlCenterPlugin[] pls = controlcenter.getToolbarPlugins(true);
+        List<IControlCenterPlugin> toshow = SUtil.arrayToList(pls);
+        
+        
+        // Select plugins and remove invisible ones
         for(int i=0; i<toolbar.getComponentCount(); i++)
         {
         	JComponent comp = (JComponent)toolbar.getComponent(i);
@@ -194,9 +266,23 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         		IControlCenterPlugin pl = (IControlCenterPlugin)comp.getClientProperty("plugin");
         		((JButton)comp).setIcon(pl.getToolIcon(pl.equals(selplugin)));
         		//((JToggleButton)comp).setSelected(pluginname.equals(comp.getClientProperty("pluginname")));	
+        		if(!controlcenter.isPluginVisible(pl))
+        		{
+        			toolbar.remove(comp);
+        		}
+        		else
+        		{
+        			toshow.remove(pl);
+        		}
         	}
         }
 
+        for(Iterator<IControlCenterPlugin> it=toshow.iterator(); it.hasNext(); )
+        {
+        	IControlCenterPlugin pl = it.next();
+        	
+        }
+        
         toolbar.validate();
         toolbar.repaint();
         
@@ -209,6 +295,59 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         	((Window)root).pack();
         }
     }
+	
+	/**
+	 * 
+	 */
+	protected void addPlugin(final IControlCenterPlugin pl, IControlCenterPlugin selplugin)
+	{
+		final JButton button = new JButton(new PluginAction(pl));
+    	Icon ic = pl.getToolIcon(selplugin.getName().equals(pl.getName()));
+	    if(ic!=null)
+	    	button.setIcon(ic);
+	    else
+	    	button.setText(pl.getName());
+	    button.setText("A");
+        button.putClientProperty("plugin", pl);
+        button.setBorder(null);
+        button.setText(null);
+        button.setMinimumSize(BUTTON_DIM);
+        button.setHorizontalAlignment(SwingConstants.CENTER);
+        button.setVerticalAlignment(SwingConstants.CENTER);
+        button.setToolTipText(pl.getName());
+        button.getModel().addItemListener(new ItemListener()
+        {
+        	public void itemStateChanged(ItemEvent e)
+        	{
+        		//System.out.println(plugin.getName()+" :"+button.isSelected());
+        		button.setIcon(pl.getToolIcon(button.isSelected()));
+        	}
+        });
+        final JPopupMenu popup = new JPopupMenu();
+        popup.add(new JMenuItem(new AbstractAction("Hide tool") 
+        {
+            public void actionPerformed(ActionEvent e) 
+            {
+            	controlcenter.setPluginVisible(pl, false);
+            	changeToolBar(null, null);
+            }
+        }));
+        button.addMouseListener(new MouseAdapter()
+        {
+            public void mousePressed(MouseEvent e) 
+            {
+                popup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        });
+
+//        if(plugins[i].getHelpID()!=null)
+//        	SHelp.setupHelp(button, plugins[i].getHelpID());
+        
+        //bg.add(button);
+ 	    toolbar.add(button);
+        toolcnt++;
+	}
+	
 	
 	/**
 	 * This method may only be called from the swing thread

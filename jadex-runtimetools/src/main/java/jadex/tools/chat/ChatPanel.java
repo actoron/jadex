@@ -383,7 +383,20 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				table.getTableHeader().addMouseListener(lis);
 				
 				PropertiesPanel pp = new PropertiesPanel();
-				final JTextField tfnick = pp.createTextField("Nickname", "unknown", true);
+				final JTextField tfnick = new JTextField();
+				JButton bunick = new JButton("Set");
+				JPanel ppan = new JPanel(new BorderLayout());
+				ppan.add(tfnick, BorderLayout.CENTER);
+				ppan.add(bunick, BorderLayout.EAST);
+				pp.addComponent("Nickname: ", ppan);
+//				final JTextField tfnick = pp.createTextField("Nickname: ", "unknown", true);
+				bunick.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						getService().setNickName(tfnick.getText());
+					}
+				});
 				tfnick.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
@@ -526,7 +539,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						}
 						else if(ChatEvent.TYPE_STATECHANGE.equals(ce.getType()))
 						{
-							setUserState(ce.getComponentIdentifier(), (String)ce.getValue());
+							setUserState(ce.getComponentIdentifier(), (String)ce.getValue(), ce.getNick());
 						}
 						else if(ChatEvent.TYPE_FILE.equals(ce.getType()))
 						{
@@ -784,7 +797,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/**
 	 *  Add a user or change its state.
 	 */
-	public void	setUserState(final IComponentIdentifier cid, final String newstate)
+	public void	setUserState(final IComponentIdentifier cid, final String newstate, final String nickname)
 	{
 		// Called on component thread.
 		SwingUtilities.invokeLater(new Runnable()
@@ -805,7 +818,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				{
 					isnew	= true;
 				}
-				cu.setState(newstate);
+				if(newstate!=null)
+					cu.setState(newstate);
+				if(nickname!=null)
+					cu.setNick(nickname);
 				((DefaultTableModel)table.getModel()).fireTableDataChanged();
 				table.getParent().invalidate();
 				table.getParent().doLayout();

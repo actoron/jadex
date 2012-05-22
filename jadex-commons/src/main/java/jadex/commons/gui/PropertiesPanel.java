@@ -237,15 +237,22 @@ public class PropertiesPanel	extends	JPanel
 		remove(dummy);
 
 		gbc.weighty = weighty;
-		if(weighty>0)
-		{
-			gbc.fill = GridBagConstraints.BOTH;
-			adddummy = false;
-		}
+		
 		
 		gbc.weightx	= 0;
 		gbc.gridwidth	= 1;
+		gbc.fill = GridBagConstraints.BOTH;
 		add(new JLabel(name), gbc);
+		
+		if(weighty==0)
+		{
+			gbc.fill = GridBagConstraints.HORIZONTAL;
+		}
+		else
+		{
+			adddummy = false;
+		}
+		
 		gbc.weightx	= 1;
 		gbc.gridwidth	= GridBagConstraints.REMAINDER;
 		add(comp, gbc);

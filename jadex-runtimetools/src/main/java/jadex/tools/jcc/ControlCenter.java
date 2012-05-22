@@ -1,6 +1,5 @@
 package jadex.tools.jcc;
 
-import jadex.base.Starter;
 import jadex.base.gui.CMSUpdateHandler;
 import jadex.base.gui.componenttree.ComponentIconCache;
 import jadex.base.gui.plugin.SJCC;

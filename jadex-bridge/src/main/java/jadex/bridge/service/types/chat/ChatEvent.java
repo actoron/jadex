@@ -18,6 +18,7 @@ public class ChatEvent
 	/** Event type for a received file (value is file info, nick only available for initial file events). */
 	public static final String	TYPE_FILE	= "file";
 	
+	
 	//-------- attributes --------
 	
 	/** The event type. */

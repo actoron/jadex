@@ -1,5 +1,6 @@
 package jadex.base.service.chat;
 
+import jadex.base.service.simulation.SimulationService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
@@ -8,6 +9,7 @@ import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
 import jadex.bridge.service.IServiceIdentifier;
+import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
 import jadex.bridge.service.annotation.ServiceIdentifier;
@@ -20,6 +22,10 @@ import jadex.bridge.service.types.chat.IChatService;
 import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
+import jadex.bridge.service.types.settings.ISettingsService;
+import jadex.commons.IPropertiesProvider;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
 import jadex.commons.future.CollectionResultListener;
@@ -61,7 +67,7 @@ import java.util.Set;
  *  Chat service implementation.
  */
 @Service
-public class ChatService implements IChatService, IChatGuiService
+public class ChatService implements IChatService, IChatGuiService, IPropertiesProvider
 {
 	//-------- attributes --------
 	
@@ -94,36 +100,73 @@ public class ChatService implements IChatService, IChatGuiService
 	@ServiceStart
 	public IFuture<Void> start()
 	{
+		final Future<Void> ret = new Future<Void>();
+		
 		if(!running)
 		{
 			running	= true;
 	
-			// Todo: load settings
-			this.nick	= SUtil.createUniqueId("user", 3);
-			this.transfers	= new LinkedHashMap<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>();
-			this.transfers2	= new LinkedHashMap<String, Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>>();
-			
-			// Search and post status in background for not delaying platform startup.
-			IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
-			chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
+			SServiceProvider.getService(agent.getServiceContainer(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(agent.createResultListener(new IResultListener()
 			{
-				public void intermediateResultAvailable(IChatService chat)
+				public void resultAvailable(Object result)
 				{
-					chat.status(nick, STATE_IDLE);
+					ISettingsService	settings	= (ISettingsService)result;
+					settings.registerPropertiesProvider(agent.getComponentIdentifier().getLocalName(), ChatService.this)
+						.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
+					{
+						public void customResultAvailable(Object result)
+						{
+							proceed();
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+							super.exceptionOccurred(exception);
+						}
+					}));
 				}
-				public void finished()
-				{
-					// ignore...
-				}
+				
 				public void exceptionOccurred(Exception exception)
 				{
-					// ignore...
+					// No settings service: ignore.
+					proceed();
 				}
-			});
-			
+				
+				public void proceed()
+				{
+					if(nick==null)
+						nick	= SUtil.createUniqueId("user", 3);
+					transfers	= new LinkedHashMap<String, Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>>();
+					transfers2	= new LinkedHashMap<String, Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>>();
+					
+					// Search and post status in background for not delaying platform startup.
+					IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
+					chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
+					{
+						public void intermediateResultAvailable(IChatService chat)
+						{
+							chat.status(nick, STATE_IDLE);
+						}
+						public void finished()
+						{
+							// ignore...
+						}
+						public void exceptionOccurred(Exception exception)
+						{
+							// ignore...
+						}
+					});
+					
+					ret.setResult(null);
+				}
+			}));
+		}
+		else
+		{
+			ret.setResult(null);
 		}
 		
-		return IFuture.DONE;
+		return ret;
 	}
 	
 	/**
@@ -278,6 +321,8 @@ public class ChatService implements IChatService, IChatGuiService
 	public IFuture<Void>	setNickName(String nick)
 	{
 		this.nick	= nick;
+		// Publish new nickname
+		status(null);
 		return IFuture.DONE;
 	}
 	
@@ -830,7 +875,7 @@ public class ChatService implements IChatService, IChatGuiService
 	 *  @param cid	The component ID.
 	 *  @param value The event value.
 	 */
-	protected boolean	publishEvent(String type, String nick, IComponentIdentifier cid,	Object value)
+	protected boolean	publishEvent(String type, String nick, IComponentIdentifier cid, Object value)
 	{
 		boolean	ret	= false;
 		if(subscribers!=null)
@@ -1021,5 +1066,29 @@ public class ChatService implements IChatService, IChatGuiService
 			transfers2.remove(ti.getId());
 			publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
 		}
+	}
+	
+	//-------- IPropertiesProvider interface --------
+	
+	/**
+	 *  Update from given properties.
+	 */
+	public IFuture<Void> setProperties(Properties props)
+	{
+		String tmp = props.getStringProperty("nickname");
+		if(tmp!=null)
+			nick = tmp;
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Write current state into properties.
+	 */
+	public IFuture<Properties> getProperties()
+	{
+		Properties	props	= new Properties();
+		// Only save as executing when in normal mode.
+		props.addProperty(new Property("nickname", nick));
+		return new Future<Properties>(props);
 	}
 }
