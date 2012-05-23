@@ -650,6 +650,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 			console.setConsoleEnabled(consoleenabled);
 		}
 		
+		updateToolBar(null);
+		
 		return IFuture.DONE;
 	}
 	

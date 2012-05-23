@@ -472,6 +472,9 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	public IControlCenterPlugin getPluginForName(String name)
 	{
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
+	
+		if(name==null)
+			throw new IllegalArgumentException("Name must not null.");
 		
 		for(Iterator<Tuple2<IControlCenterPlugin, JComponent>> it=plugins.iterator(); it.hasNext();)
 		{
@@ -577,9 +580,10 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			{
 				for(int i=0; i<ps.length; i++)
 				{
-					IControlCenterPlugin plg = getPluginForName(ps[i].getName());
+					IControlCenterPlugin plg = getPluginForName(ps[i].getType());
 					if(plg!=null)
 					{
+//						System.out.println("vis: "+ps[i].getType()+" "+ps[i].getValue());
 						toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
 					}
 				}
@@ -635,13 +639,15 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		}
 		else
 		{
-			Properties vis = new Properties("vis", "vis", "vis");
+			Properties vis = new Properties();
 			for(Iterator<IControlCenterPlugin> it = toolbarvis.keySet().iterator(); it.hasNext(); )
 			{
 				IControlCenterPlugin plg = it.next();
+//				System.out.println("vis save: "+plg.getName()+" "+toolbarvis.get(plg));
 				vis.addProperty(new Property(plg.getName(), toolbarvis.get(plg).toString()));
 			}
-			props.addProperties(vis);
+			props.removeSubproperties("vis");
+			props.addSubproperties("vis", vis);
 			
 //			System.out.println("Fetching panel properties.");
 			pccpanel.getProperties().addResultListener(new SwingDelegationResultListener(ret)

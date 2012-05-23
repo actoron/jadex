@@ -69,8 +69,9 @@ public class Homebase extends LocationObject
 		return Math.max(0, starttime + missiontime - clock.getTime());
 	}
 
-	/** Getter for missiontime
-	 * @return Returns missiontime.
+	/** 
+	 *  Getter for missiontime.
+	 *  @return Returns missiontime.
 	 */
 	public long getMissiontime()
 	{
