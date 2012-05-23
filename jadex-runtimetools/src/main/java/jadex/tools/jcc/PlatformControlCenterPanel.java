@@ -137,7 +137,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 			JPanel tmp = new JPanel();
 			tmp.add(jlb);
 			tp.add(toolbar, BorderLayout.CENTER);
-			tp.add(tmp, BorderLayout.EAST);
+			tp.add(jlb, BorderLayout.EAST);
 			this.add(BorderLayout.NORTH, tp);
 	       
 			// Add standard entries (after gap).
