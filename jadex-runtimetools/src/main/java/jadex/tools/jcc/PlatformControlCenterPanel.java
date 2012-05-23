@@ -126,6 +126,9 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	protected void changeToolBar(IControlCenterPlugin selplugin)
 	{
  		// Setup the tool bar.
+		if(selplugin==null)
+			selplugin = currentperspective;
+			
 		if(toolbar==null)
 		{
 			toolbar	= new JToolBar("Main Toolbar");
@@ -225,6 +228,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         IControlCenterPlugin[] pls = controlcenter.getToolbarPlugins(true);
         List<IControlCenterPlugin> toshow = SUtil.arrayToList(pls);
         
+        boolean selectnew = false;
+        
         // Select plugin and remove invisible ones
         List<JComponent> torem = new ArrayList<JComponent>();
         for(int i=0; i<toolbar.getComponentCount(); i++)
@@ -239,6 +244,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         		if(!controlcenter.isPluginVisible(pl))
         		{
         			torem.add(comp);
+        			if(selplugin.equals(pl))
+        				selectnew = true;
         		}
         		else
         		{
@@ -255,6 +262,21 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         {
         	IControlCenterPlugin pl = it.next();
         	addPlugin(pl, null);
+        }
+        
+        // Just select first (if any) if selected plugin was removed 
+        if(selectnew)
+        {
+        	for(int i=0; i<toolbar.getComponentCount(); i++)
+        	{	
+        		JComponent comp = (JComponent)toolbar.getComponent(i);
+        		if(comp.getClientProperty("plugin")!=null)
+        		{
+        			IControlCenterPlugin pl = (IControlCenterPlugin)comp.getClientProperty("plugin");
+        			setPerspective(pl);
+        			break;
+        		}
+        	}
         }
         
         toolbar.validate();
@@ -586,6 +608,15 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	
 	//-------- toolbar actions --------
 	
+
+	/**
+	 *  Get the currentperspective.
+	 *  @return The currentperspective.
+	 */
+	public IControlCenterPlugin getCurrentPerspective()
+	{
+		return currentperspective;
+	}
 
 	/**
 	 *  Toolbar action for activating a plugin.
