@@ -14,6 +14,7 @@ import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
 import jadex.commons.SReflect;
+import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -23,6 +24,7 @@ import jadex.commons.gui.future.SwingDelegationResultListener;
 import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,8 +44,9 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	protected IExternalAccess	platformaccess;
 	
 	/** The plugins (plugin->panel). */
-	protected Map<IControlCenterPlugin, JComponent>	plugins;
-
+//	protected Map<IControlCenterPlugin, JComponent>	plugins;
+	protected List<Tuple2<IControlCenterPlugin, JComponent>> plugins;
+	
 	/** The plugin toolbar visibility. */
 	protected Map<IControlCenterPlugin, Boolean> toolbarvis;
 	
@@ -68,8 +71,9 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	{
 		this.platformaccess = platformaccess;
 		this.controlcenter	= controlcenter;
-		this.plugins = new LinkedHashMap<IControlCenterPlugin, JComponent>();
-		this.toolbarvis = new LinkedHashMap<IControlCenterPlugin, Boolean>();
+//		this.plugins = new LinkedHashMap<IControlCenterPlugin, JComponent>();
+		this.plugins = new ArrayList<Tuple2<IControlCenterPlugin, JComponent>>();
+		this.toolbarvis = new HashMap<IControlCenterPlugin, Boolean>();
 		this.props	= new Properties();
 		this.pccpanel	= new PlatformControlCenterPanel(this);
 		
@@ -96,7 +100,8 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 							{
 								Class plugin_class = SReflect.classForName(plugin_classes[i], cl);
 								final IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
-								plugins.put(p, null);
+//								plugins.put(p, null);
+								addPluginComponent(p, null);
 								
 								if(p.isLazy())
 								{
@@ -128,6 +133,163 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	}
 	
 	/**
+	 * 
+	 */
+	protected JComponent getPluginComponent(IControlCenterPlugin pl)
+	{
+		JComponent ret = null;
+		
+		for(Tuple2<IControlCenterPlugin, JComponent> tup: plugins)
+		{
+			if(tup.getFirstEntity().equals(pl))
+			{
+				ret = tup.getSecondEntity();
+				break;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected Tuple2<IControlCenterPlugin, JComponent> getPluginTuple(IControlCenterPlugin pl)
+	{
+		Tuple2<IControlCenterPlugin, JComponent> ret = null;
+		
+		for(Tuple2<IControlCenterPlugin, JComponent> tup: plugins)
+		{
+			if(tup.getFirstEntity().equals(pl))
+			{
+				ret = tup;
+				break;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void addPluginComponent(IControlCenterPlugin pl, JComponent comp)
+	{
+		// Remove old
+		int pos = -1;
+		for(int i=0; i<plugins.size(); i++)
+		{
+			Tuple2<IControlCenterPlugin, JComponent> tup = plugins.get(i);
+			if(tup.getFirstEntity().equals(pl))
+			{
+				plugins.remove(tup);
+				pos = i;
+				break;
+			}
+		}
+		Tuple2<IControlCenterPlugin, JComponent> tup = new Tuple2<IControlCenterPlugin, JComponent>(pl, comp);
+		// Keep old position
+		if(pos!=-1)
+		{
+			plugins.add(pos, tup);
+		}
+		else
+		{
+			plugins.add(tup);
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void removePluginComponent(IControlCenterPlugin pl)
+	{
+		// Remove old
+		for(int i=0; i<plugins.size(); i++)
+		{
+			Tuple2<IControlCenterPlugin, JComponent> tup = plugins.get(i);
+			if(tup.getFirstEntity().equals(pl))
+			{
+				plugins.remove(tup);
+				break;
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void moveLeftPlugin(IControlCenterPlugin pl)
+	{
+		// Remove old
+		int pos = -1;
+		IControlCenterPlugin[] pls = getToolbarPlugins(true);
+		Tuple2<IControlCenterPlugin, JComponent> last = null;
+		for(int i=0; i<pls.length; i++)
+		{
+			Tuple2<IControlCenterPlugin, JComponent> tup = getPluginTuple(pls[i]);
+			
+			if(tup.getFirstEntity().equals(pl))
+			{
+				if(last!=null)
+				{
+					int idx = getPluginIndex(last.getFirstEntity());
+					plugins.remove(tup);
+					plugins.add(idx, tup);
+				}
+				break;
+			}
+			
+			last = tup;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected void moveRightPlugin(IControlCenterPlugin pl)
+	{
+		// Remove old
+		int pos = -1;
+		IControlCenterPlugin[] pls = getToolbarPlugins(true);
+		Tuple2<IControlCenterPlugin, JComponent> last = null;
+		for(int i=0; i<pls.length; i++)
+		{
+			Tuple2<IControlCenterPlugin, JComponent> tup = getPluginTuple(pls[i]);
+			
+			if(tup.getFirstEntity().equals(pl))
+			{
+				if(i+1<pls.length)
+				{
+					int idx = getPluginIndex(pls[i+1]);
+					plugins.remove(tup);
+					plugins.add(idx, tup);
+					break;
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	protected int getPluginIndex(IControlCenterPlugin pl)
+	{
+		int ret = -1;
+		
+		for(int i=0; i<plugins.size(); i++)
+		{
+			if(plugins.get(i).getFirstEntity().equals(pl))
+			{
+				ret = i;
+				break;
+			}
+		}
+		
+		return ret;
+	}
+	
+	/**
 	 * Close all active plugins. Called when the JCC exits.
 	 */
 	public IFuture<Void>	dispose()
@@ -139,10 +301,11 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		// Close all plugins, which have a panel associated.
 		CounterResultListener<Void> lis = new CounterResultListener<Void>(plugins.size(), true,
 			new SwingDelegationResultListener<Void>(ret));
-		for(Iterator it=plugins.keySet().iterator(); it.hasNext();)
+		for(Iterator<Tuple2<IControlCenterPlugin, JComponent>> it=plugins.iterator(); it.hasNext();)
 		{
-			IControlCenterPlugin plugin = (IControlCenterPlugin)it.next();
-			if(plugins.get(plugin) != null)
+			Tuple2<IControlCenterPlugin, JComponent> tup = it.next();
+			IControlCenterPlugin plugin = (IControlCenterPlugin)tup.getFirstEntity();
+			if(tup.getSecondEntity() != null)
 			{
 				try
 				{
@@ -218,7 +381,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		{
 			for(int i=0; i<aplugins.length; i++)
 			{
-				if(plugins.get(aplugins[i])!=null)
+				if(getPluginComponent(aplugins[i])!=null)
 				{
 //					System.out.println("Pushing platform settings: "+aplugins[i].getName());
 					aplugins[i].pushPlatformSettings().addResultListener(crl);
@@ -265,12 +428,12 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	public IControlCenterPlugin[] getToolbarPlugins(boolean vis)
 	{
 		List<IControlCenterPlugin> ret = new ArrayList<IControlCenterPlugin>();
-		for(Iterator<IControlCenterPlugin> it = toolbarvis.keySet().iterator(); it.hasNext(); )
+		for(Iterator<Tuple2<IControlCenterPlugin, JComponent>> it = plugins.iterator(); it.hasNext(); )
 		{
-			IControlCenterPlugin pl = it.next();
-			if(isPluginVisible(pl)==vis)
+			Tuple2<IControlCenterPlugin, JComponent> tup = it.next();
+			if(isPluginVisible(tup.getFirstEntity())==vis)
 			{
-				ret.add(pl);
+				ret.add(tup.getFirstEntity());
 			}
 		}
 		return ret.toArray(new IControlCenterPlugin[ret.size()]);
@@ -291,8 +454,14 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	{
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 
-		
-		return (IControlCenterPlugin[])plugins.keySet().toArray(new IControlCenterPlugin[plugins.size()]);
+		IControlCenterPlugin[] ret = new IControlCenterPlugin[plugins.size()];
+		for(int i=0; i<ret.length; i++)
+		{
+			ret[i] = plugins.get(i).getFirstEntity();
+		}
+	
+		return ret;
+//		return (IControlCenterPlugin[])plugins.keySet().toArray(new IControlCenterPlugin[plugins.size()]);
 	}
 	
 	/**
@@ -304,9 +473,9 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	{
 		assert SwingUtilities.isEventDispatchThread();// ||  Starter.isShutdown();
 		
-		for(Iterator it=plugins.keySet().iterator(); it.hasNext();)
+		for(Iterator<Tuple2<IControlCenterPlugin, JComponent>> it=plugins.iterator(); it.hasNext();)
 		{
-			IControlCenterPlugin plugin = (IControlCenterPlugin)it.next();
+			IControlCenterPlugin plugin = (IControlCenterPlugin)it.next().getFirstEntity();
 			if(name.equals(plugin.getName()))
 				return plugin;
 		}
@@ -332,14 +501,15 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 //			}
 //		});
 		
-		if(plugins.get(plugin) == null)
+		if(getPluginComponent(plugin) == null)
 		{
 			initPlugin(plugin).addResultListener(new SwingDelegationResultListener<Void>(ret));
 		}
 		else
 		{
 			JComponent comp = plugin.getView();
-			plugins.put(plugin, comp);
+//			plugins.put(plugin, comp);
+			addPluginComponent(plugin, comp);
 			if(props.getSubproperty(plugin.getName())!=null)
 			{
 				plugin.setProperties(props.getSubproperty(plugin.getName()))
@@ -364,7 +534,8 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 				public void customResultAvailable(Void result)
 				{
 					JComponent comp = plugin.getView();
-					plugins.put(plugin, comp);
+//					plugins.put(plugin, comp);
+					addPluginComponent(plugin, comp);
 					if(props.getSubproperty(plugin.getName())!=null)
 					{
 						plugin.setProperties(props.getSubproperty(plugin.getName()))
@@ -426,11 +597,11 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			public void customResultAvailable(Object result)
 			{
 				// Consider only settings of plugins, which have a panel associated.
-				List	plugs	= new ArrayList();
-				for(Iterator it=plugins.keySet().iterator(); it.hasNext();)
+				List<IControlCenterPlugin>	plugs	= new ArrayList();
+				for(Iterator<Tuple2<IControlCenterPlugin, JComponent>> it=plugins.iterator(); it.hasNext();)
 				{
-					final IControlCenterPlugin	plugin	= (IControlCenterPlugin)it.next();
-					if(plugins.get(plugin)!=null && props.getSubproperty(plugin.getName())!=null)
+					final IControlCenterPlugin	plugin	= it.next().getFirstEntity();
+					if(getPluginComponent(plugin)!=null && props.getSubproperty(plugin.getName())!=null)
 					{
 						plugs.add(plugin);
 					}
@@ -482,10 +653,11 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 					
 					// Consider only settings of plugins, which have a panel associated.
 					List	plugs	= new ArrayList();
-					for(Iterator it=plugins.keySet().iterator(); it.hasNext();)
+					for(Iterator<Tuple2<IControlCenterPlugin, JComponent>> it=plugins.iterator(); it.hasNext();)
 					{
-						final IControlCenterPlugin	plugin	= (IControlCenterPlugin)it.next();
-						if(plugins.get(plugin)!=null)
+						Tuple2<IControlCenterPlugin, JComponent> tup = it.next();
+						final IControlCenterPlugin	plugin	= tup.getFirstEntity();
+						if(tup.getSecondEntity()!=null)
 						{
 							plugs.add(plugin);
 						}
@@ -544,9 +716,9 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	public void	showPlugin(String name)
 	{
 		IControlCenterPlugin	plugin	= null;
-		for(Iterator<IControlCenterPlugin> it=plugins.keySet().iterator(); plugin==null && it.hasNext(); )
+		for(Iterator<Tuple2<IControlCenterPlugin, JComponent>> it=plugins.iterator(); plugin==null && it.hasNext(); )
 		{
-			IControlCenterPlugin	next	= it.next();
+			IControlCenterPlugin	next	= it.next().getFirstEntity();
 			if(next.getName().equals(name))
 			{
 				plugin	= next;
