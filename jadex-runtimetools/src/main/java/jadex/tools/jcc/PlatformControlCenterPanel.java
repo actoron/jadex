@@ -122,9 +122,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 
 	/**
 	 *  Create a toolbar containing the given tools (if any).
-	 *  @param template Conta
 	 */
-	protected void changeToolBar(JComponent[] template, IControlCenterPlugin selplugin)
+	protected void changeToolBar(IControlCenterPlugin selplugin)
 	{
  		// Setup the tool bar.
 		if(toolbar==null)
@@ -146,8 +145,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	        IControlCenterPlugin[]	plugins	= controlcenter.getPlugins();
 	        for(int i=0; i<plugins.length; i++)
 	        {
-	            final IControlCenterPlugin plugin = plugins[i];
-	            addPlugin(plugin, selplugin);
+	            addPlugin(plugins[i], selplugin);
 	        }
 //	        toolbar.addSeparator();
 //	        toolbar.add(new JadexLogoButton(toolbar));
@@ -172,12 +170,12 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	                	for(int i=0; i<pls.length; i++)
 	                	{
 	                		final IControlCenterPlugin pl = pls[i];
-	                		popup.add(new JMenuItem(new AbstractAction("Show tool: "+pl.getName()) 
+	                		popup.add(new JMenuItem(new AbstractAction(pl.getName(), pl.getToolIcon(false)) 
 	        	            {
 	        	                public void actionPerformed(ActionEvent e) 
 	        	                {
 	        	                	controlcenter.setPluginVisible(pl, true);
-	        	                	changeToolBar(null, null);
+	        	                	changeToolBar(null);
 	        	                }
 	        	            }));
 	                	}
@@ -187,32 +185,30 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
             });
 	        toolbar.add(popup);
 		}
-		else
+		
+		// Remove leading tool specific buttons
+		if(selplugin!=null)
 		{
-			// Remove leading tool specific buttons
-			if(selplugin!=null)
+			List<JComponent> torem = new ArrayList<JComponent>();
+			for(int i=0; i<toolbar.getComponentCount(); i++)
 			{
-				List<JComponent> torem = new ArrayList<JComponent>();
-				for(int i=0; i<toolbar.getComponentCount(); i++)
-				{
-					JComponent comp	= (JComponent)toolbar.getComponent(i);
-					if(comp instanceof JButton && comp.getClientProperty("plugin")==null)
-		        	{
-						torem.add(comp);
-		        	}
-				}
-				for(JComponent com: torem)
-				{
-					toolbar.remove(com);
-				}
+				JComponent comp	= (JComponent)toolbar.getComponent(i);
+				if(comp instanceof JButton && comp.getClientProperty("plugin")==null)
+	        	{
+					torem.add(comp);
+	        	}
 			}
+			for(JComponent com: torem)
+			{
+				toolbar.remove(com);
+			}
+			
+			JComponent[] template = selplugin.getToolBar();
+	        for(int i=0; template!=null && i<template.length; i++)
+	        {
+	            toolbar.add(template[i], i);
+	        }
 		}
-
-        for(int i=0; template!=null && i<template.length; i++)
-        {
-            toolbar.add(template[i], i);
-        }
-        //lasttoolbar	= template;
 
         Set<IControlCenterPlugin> shown = new HashSet<IControlCenterPlugin>();
         for(int i=0; i<toolbar.getComponentCount(); i++)
@@ -229,18 +225,20 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         IControlCenterPlugin[] pls = controlcenter.getToolbarPlugins(true);
         List<IControlCenterPlugin> toshow = SUtil.arrayToList(pls);
         
-        // Select plugins and remove invisible ones
+        // Select plugin and remove invisible ones
+        List<JComponent> torem = new ArrayList<JComponent>();
         for(int i=0; i<toolbar.getComponentCount(); i++)
         {
         	JComponent comp = (JComponent)toolbar.getComponent(i);
         	if(comp.getClientProperty("plugin")!=null)
         	{
         		IControlCenterPlugin pl = (IControlCenterPlugin)comp.getClientProperty("plugin");
-        		((JButton)comp).setIcon(pl.getToolIcon(pl.equals(selplugin)));
+        		boolean sel = pl.equals(selplugin); 
+        		((JButton)comp).setIcon(pl.getToolIcon(sel));
         		//((JToggleButton)comp).setSelected(pluginname.equals(comp.getClientProperty("pluginname")));	
         		if(!controlcenter.isPluginVisible(pl))
         		{
-        			toolbar.remove(comp);
+        			torem.add(comp);
         		}
         		else
         		{
@@ -248,6 +246,10 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         		}
         	}
         }
+        for(JComponent com: torem)
+		{
+			toolbar.remove(com);
+		}
 
         for(Iterator<IControlCenterPlugin> it=toshow.iterator(); it.hasNext(); )
         {
@@ -301,7 +303,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
             public void actionPerformed(ActionEvent e) 
             {
             	controlcenter.setPluginVisible(pl, false);
-            	changeToolBar(null, null);
+            	changeToolBar(null);
             }
         }));
         button.addMouseListener(new MouseAdapter()
@@ -326,9 +328,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 //        if(plugins[i].getHelpID()!=null)
 //        	SHelp.setupHelp(button, plugins[i].getHelpID());
         
-        //bg.add(button);
  	    toolbar.add(button);
-//      toolcnt++;
 	}
 	
 	
@@ -372,10 +372,10 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 				{
 					// Get menu and toolbar before setting to avoid inconsistent state on error in plugin.
 					JMenu[] menu = plugin.getMenuBar();
-					JComponent[] tool = plugin.getToolBar();
+//					JComponent[] tool = plugin.getToolBar();
 					controlcenter.getControlCenter().getWindow().setJMenuBar(
 						controlcenter.getControlCenter().getWindow().createMenuBar(menu));
-					changeToolBar(tool, plugin);
+					changeToolBar(plugin);
 					
 					if(!Arrays.asList(content.getComponents()).contains(plugin.getView()))
 					{
@@ -413,8 +413,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 					else
 					{
 						controlcenter.getControlCenter().getWindow().setJMenuBar(
-								controlcenter.getControlCenter().getWindow().createMenuBar(null));
-						changeToolBar(null, plugin);
+							controlcenter.getControlCenter().getWindow().createMenuBar(null));
+						changeToolBar(plugin);
 						clayout.show(content, plugin.getName());
 						controlcenter.getControlCenter().getWindow().validate();
 						controlcenter.getControlCenter().getWindow().repaint();
