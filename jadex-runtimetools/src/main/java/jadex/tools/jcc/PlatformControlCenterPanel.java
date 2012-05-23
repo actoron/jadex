@@ -132,12 +132,12 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 		if(toolbar==null)
 		{
 			toolbar	= new JToolBar("Main Toolbar");
-			JButton jlb = new JadexLogoButton(toolbar);
 			JPanel tp = new JPanel(new BorderLayout());
-			JPanel tmp = new JPanel();
-			tmp.add(jlb);
+//			JButton jlb = new JadexLogoButton(toolbar);
+//			JPanel tmp = new JPanel();
+//			tmp.add(jlb);
 			tp.add(toolbar, BorderLayout.CENTER);
-			tp.add(jlb, BorderLayout.EAST);
+//			tp.add(jlb, BorderLayout.EAST);
 			this.add(BorderLayout.NORTH, tp);
 	       
 			// Add standard entries (after gap).
@@ -196,7 +196,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 			for(int i=0; i<toolbar.getComponentCount(); i++)
 			{
 				JComponent comp	= (JComponent)toolbar.getComponent(i);
-				if(comp instanceof JButton && comp.getClientProperty("plugin")==null)
+				if(comp instanceof JButton && !(comp instanceof JadexLogoButton) && comp.getClientProperty("plugin")==null)
 	        	{
 					torem.add(comp);
 	        	}
@@ -205,6 +205,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 			{
 				toolbar.remove(com);
 			}
+			
+//			toolbar.add(jlb, 0);
 			
 			JComponent[] template = selplugin.getToolBar();
 	        for(int i=0; template!=null && i<template.length; i++)
@@ -229,7 +231,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 		for(int i=0; i<toolbar.getComponentCount(); i++)
 		{
 			JComponent comp	= (JComponent)toolbar.getComponent(i);
-			if(comp instanceof JButton && comp.getClientProperty("plugin")!=null)
+			if(comp instanceof JButton && comp.getClientProperty("plugin")!=null || comp instanceof JadexLogoButton)
         	{
 				torem.add(comp);
         	}
@@ -310,6 +312,10 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         	}
         }
         
+		JButton jlb = new JadexLogoButton(toolbar);
+		toolbar.addSeparator();
+		toolbar.add(jlb);
+		
         toolbar.validate();
         toolbar.repaint();
         
