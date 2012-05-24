@@ -159,8 +159,8 @@ public class ViewportJMonkey extends AbstractViewport3d
 		{
 			public Object call()
 			{
-				_scale = _scaleApp / areaSize_.getXAsFloat();
-				_app.setSpaceSize(areaSize_.getXAsFloat(), _isGrid);
+				_scale = _scaleApp / (float)areaXDim_;
+				_app.setSpaceSize(areaXDim_, _isGrid);
 
 				if(_firstrun)
 				{
@@ -607,5 +607,8 @@ public class ViewportJMonkey extends AbstractViewport3d
 		_isGrid = isGrid;
 
 	}
+
+
+
 
 }

@@ -154,12 +154,6 @@ public class MonkeyApp extends SimpleApplication
 			}
 
 		};
-		
-
-														
-
-												
-
 
 		inputManager.addListener(actionListener, new String[]{"Random"});
 		inputManager.addListener(actionListener, new String[]{"Grid"});
@@ -175,7 +169,7 @@ public class MonkeyApp extends SimpleApplication
 	{
 
 		/** Configure cam to look at scene */
-		cam.setLocation(new Vector3f(_areaSize * 1.1f, _areaSize, _areaSize * 1.2f));
+		cam.setLocation(new Vector3f(_areaSize * 1.1f, _areaSize*0.6f, _areaSize * 1.2f));
 		cam.lookAt(new Vector3f(1, 2, 1), Vector3f.UNIT_Y);
 		flyCam.setEnabled(true);
 		flyCam.setMoveSpeed(20);
@@ -320,11 +314,11 @@ public class MonkeyApp extends SimpleApplication
 	
 	private boolean gridCreated =  false;
 
-	public void setSpaceSize(float scale, boolean isGrid)
+	public void setSpaceSize(double scale, boolean isGrid)
 	{
 		if(!gridCreated)
 		{
-			_spaceSize = scale;
+			_spaceSize = (float)scale;
 			// Create the Grid
 			_gridHandler = new monkeyApp_Grid(_areaSize, _spaceSize, assetManager, isGrid);
 			_gridNode = _gridHandler.getGrid();
