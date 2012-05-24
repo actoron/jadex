@@ -1,5 +1,6 @@
 package jadex.tools.jcc;
 
+import jadex.base.gui.ClassChooserPanel;
 import jadex.base.gui.JadexLogoButton;
 import jadex.base.gui.plugin.IControlCenterPlugin;
 import jadex.commons.IPropertiesProvider;
@@ -30,6 +31,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -180,62 +182,73 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         	            {
         	                public void actionPerformed(ActionEvent e) 
         	                {
-        	                	PropertiesPanel pp = new PropertiesPanel();
-        	            		JPanel fnp = new JPanel(new GridBagLayout());
-        	            		final JTextField tfpath = new JTextField(".", 15);
-        	            		JButton bupath = new JButton("...");
-        	            		bupath.addActionListener(new ActionListener()
-        	            		{
-        	            			public void actionPerformed(ActionEvent e)
-        	            			{
-        	            				JFileChooser ch = new JFileChooser(tfpath.getText());
-        	            				ch.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        	            				ch.setFileFilter(new FileFilter()
-										{
-											public String getDescription()
-											{
-												return "Plugin classes";
-											}
-											
-											public boolean accept(File f)
-											{
-												return f.isDirectory() || f.getName().endsWith(".class");
-											}
-										});
-        	            				if(JFileChooser.APPROVE_OPTION==ch.showOpenDialog(PlatformControlCenterPanel.this))
-        	            				{
-        	            					tfpath.setText(ch.getSelectedFile().getAbsolutePath());
-        	            				}
-        	            			}
-        	            		});
-        	            		bupath.setMargin(new Insets(0,0,0,0));
-        	            		fnp.add(tfpath, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.WEST, 
-        	            			GridBagConstraints.BOTH, new Insets(0,0,0,2),0,0));
-        	            		fnp.add(bupath, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.WEST, 
-        	            			GridBagConstraints.NONE, new Insets(0,2,0,0),0,0));
-        	            		pp.addComponent("Plugin class: ", fnp);
-        	            		
-        	            		int res	= JOptionPane.showOptionDialog(PlatformControlCenterPanel.this, pp, "", JOptionPane.YES_NO_CANCEL_OPTION,
-        	            			JOptionPane.QUESTION_MESSAGE, null, new Object[]{"OK", "Cancel"}, "OK");
-        	            		if(0==res)
-        	            		{
-        	            			final String clname = tfpath.getText();
-        	            			if(clname!=null && clname.length()>0)
-        	            			{
-        	            				// Hack, use global loader?
-        	            				controlcenter.libservice.getClassLoader(null)//controlcenter.getJCCAccess().getModel().getResourceIdentifier())
-	        	        					.addResultListener(new SwingDefaultResultListener<ClassLoader>(PlatformControlCenterPanel.this)
-	        	        				{
-	        	        					public void customResultAvailable(ClassLoader cl)
-	        	        					{
-	        	        						controlcenter.addPlugin(clname, cl);
-	        	        					}
-	        	        				});
-        	            			}
-        	            		}
-        	            		else if(1==res)
-        	            		{
-        	            		}
+        	                	controlcenter.libservice.getAllURLs()//controlcenter.getJCCAccess().getModel().getResourceIdentifier())
+	        						.addResultListener(new SwingDefaultResultListener<List<URL>>(PlatformControlCenterPanel.this)
+	        					{
+        							public void customResultAvailable(List<URL> urls)
+        							{
+        	       	                	ClassChooserPanel pp = new ClassChooserPanel("Plugin", IControlCenterPlugin.class, urls.toArray(new URL[urls.size()]));
+        	       	            		int res	= JOptionPane.showOptionDialog(PlatformControlCenterPanel.this, pp, "", JOptionPane.YES_NO_CANCEL_OPTION,
+	        	            			JOptionPane.QUESTION_MESSAGE, null, new Object[]{"OK", "Cancel"}, "OK");
+//    	        	            		if(0==res)
+//    	        	            		{
+//    	        	            			final String clname = tfpath.getText();
+//    	        	            			if(clname!=null && clname.length()>0)
+//    	        	            			{
+//    	        	            				// Hack, use global loader?
+//    	        	            				controlcenter.libservice.getClassLoader(null)//controlcenter.getJCCAccess().getModel().getResourceIdentifier())
+//    		        	        					.addResultListener(new SwingDefaultResultListener<ClassLoader>(PlatformControlCenterPanel.this)
+//    		        	        				{
+//    		        	        					public void customResultAvailable(ClassLoader cl)
+//    		        	        					{
+//    		        	        						controlcenter.addPlugin(clname, cl);
+//    		        	        					}
+//    		        	        				});
+//    	        	            			}
+//    	        	            		}
+//    	        	            		else if(1==res)
+//    	        	            		{
+//    	        	            		}
+        							}
+	        					});
+        	                	
+        	                	
+//        	                	PropertiesPanel pp = new PropertiesPanel();
+//        	            		JPanel fnp = new JPanel(new GridBagLayout());
+//        	            		final JTextField tfpath = new JTextField(".", 15);
+//        	            		JButton bupath = new JButton("...");
+//        	            		bupath.addActionListener(new ActionListener()
+//        	            		{
+//        	            			public void actionPerformed(ActionEvent e)
+//        	            			{
+//        	            				JFileChooser ch = new JFileChooser(tfpath.getText());
+//        	            				ch.setFileSelectionMode(JFileChooser.FILES_ONLY);
+//        	            				ch.setFileFilter(new FileFilter()
+//										{
+//											public String getDescription()
+//											{
+//												return "Plugin classes";
+//											}
+//											
+//											public boolean accept(File f)
+//											{
+//												return f.isDirectory() || f.getName().endsWith(".class");
+//											}
+//										});
+//        	            				if(JFileChooser.APPROVE_OPTION==ch.showOpenDialog(PlatformControlCenterPanel.this))
+//        	            				{
+//        	            					tfpath.setText(ch.getSelectedFile().getAbsolutePath());
+//        	            				}
+//        	            			}
+//        	            		});
+//        	            		bupath.setMargin(new Insets(0,0,0,0));
+//        	            		fnp.add(tfpath, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.WEST, 
+//        	            			GridBagConstraints.BOTH, new Insets(0,0,0,2),0,0));
+//        	            		fnp.add(bupath, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.WEST, 
+//        	            			GridBagConstraints.NONE, new Insets(0,2,0,0),0,0));
+//        	            		pp.addComponent("Plugin class: ", fnp);
+//        	            		
+        	     
         	                }
         	            }));
 	                	IControlCenterPlugin[] pls = controlcenter.getToolbarPlugins(false);
