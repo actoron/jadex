@@ -134,6 +134,10 @@ public class ClasspathPanel	extends JPanel
 
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public Class<?>[] scanForFactories()
 	{
 		List<Class<?>>	ret	= new ArrayList<Class<?>>();
@@ -160,6 +164,10 @@ public class ClasspathPanel	extends JPanel
 		return ret.toArray(new Class[ret.size()]);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public ClassLoader getClassLoader()
 	{
 		if(classloader==null)
@@ -174,6 +182,11 @@ public class ClasspathPanel	extends JPanel
 		return classloader;	
 	}
 
+	/**
+	 * 
+	 * @param extensions
+	 * @return
+	 */
 	public String[] scanForFiles(String[] extensions)
 	{
 		List<String>	ret	= new ArrayList<String>();

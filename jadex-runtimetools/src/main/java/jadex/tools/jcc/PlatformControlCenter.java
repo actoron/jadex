@@ -96,32 +96,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 					{
 						for(int i=0; i<plugin_classes.length; i++)
 						{
-							try
-							{
-								Class plugin_class = SReflect.classForName(plugin_classes[i], cl);
-								final IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
-//								plugins.put(p, null);
-								addPluginComponent(p, null);
-								
-								if(p.isLazy())
-								{
-									setStatusText("Plugin loaded successfully: "+ p.getName());									
-								}
-								else
-								{
-									initPlugin(p).addResultListener(new SwingDefaultResultListener<Void>(pccpanel)
-									{
-										public void customResultAvailable(Void result)
-										{
-											setStatusText("Plugin loaded successfully: "+ p.getName());
-										}
-									});
-								}
-							}
-							catch(Exception e)
-							{
-								setStatusText("Plugin error: "+plugin_classes[i]);
-							}
+							addPlugin(plugin_classes[i], cl);
 						}
 						ret.setResult(null);
 					}
@@ -130,6 +105,49 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		});
 		
 		return ret;
+	}
+	
+	/**
+	 * 
+	 */
+	protected void addPlugin(String clname, ClassLoader cl)
+	{
+		try
+		{
+			Class plugin_class = SReflect.classForName(clname, cl);
+			
+			for(Tuple2<IControlCenterPlugin, JComponent> tup: plugins)
+			{
+				if(tup.getFirstEntity().getClass().equals(plugin_class))
+				{
+					setStatusText("Plugin already loaded: "+cl);
+					return;
+				}
+			}
+			
+			final IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
+//			plugins.put(p, null);
+			addPluginComponent(p, null);
+			
+			if(p.isLazy())
+			{
+				setStatusText("Plugin loaded successfully: "+ p.getName());									
+			}
+			else
+			{
+				initPlugin(p).addResultListener(new SwingDefaultResultListener<Void>(pccpanel)
+				{
+					public void customResultAvailable(Void result)
+					{
+						setStatusText("Plugin loaded successfully: "+ p.getName());
+					}
+				});
+			}
+		}
+		catch(Exception e)
+		{
+			setStatusText("Plugin error: "+cl);
+		}
 	}
 	
 	/**
@@ -221,8 +239,6 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	protected void moveLeftPlugin(IControlCenterPlugin pl)
 	{
-		// Remove old
-		int pos = -1;
 		IControlCenterPlugin[] pls = getToolbarPlugins(true);
 		Tuple2<IControlCenterPlugin, JComponent> last = null;
 		for(int i=0; i<pls.length; i++)
@@ -237,6 +253,11 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 					plugins.remove(tup);
 					plugins.add(idx, tup);
 				}
+				else
+				{
+					plugins.remove(tup);
+					plugins.add(tup);
+				}
 				break;
 			}
 			
@@ -249,8 +270,6 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	 */
 	protected void moveRightPlugin(IControlCenterPlugin pl)
 	{
-		// Remove old
-		int pos = -1;
 		IControlCenterPlugin[] pls = getToolbarPlugins(true);
 		Tuple2<IControlCenterPlugin, JComponent> last = null;
 		for(int i=0; i<pls.length; i++)
@@ -264,8 +283,13 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 					int idx = getPluginIndex(pls[i+1]);
 					plugins.remove(tup);
 					plugins.add(idx, tup);
-					break;
 				}
+				else
+				{
+					plugins.remove(tup);
+					plugins.add(0, tup);
+				}
+				break;
 			}
 		}
 	}
@@ -653,7 +677,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			{
 				IControlCenterPlugin plg = it.next().getFirstEntity();
 //				System.out.println("vis save: "+plg.getName()+" "+toolbarvis.get(plg));
-				vis.addProperty(new Property(plg.getName(), toolbarvis.get(plg).toString()));
+				vis.addProperty(new Property(plg.getName(), ""+isPluginVisible(plg)));
 			}
 			props.removeSubproperties("vis");
 			props.addSubproperties("vis", vis);
