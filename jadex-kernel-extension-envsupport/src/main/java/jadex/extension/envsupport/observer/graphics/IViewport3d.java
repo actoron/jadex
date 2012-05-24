@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.List;
 
 
-import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
@@ -75,14 +74,14 @@ public interface IViewport3d
 	 * 
 	 * @return maximum area size.
 	 */
-	public IVector2 getAreaSize();
+	public IVector3 getAreaSize();
 	
 	/**
 	 * Sets the maximum displayable size.
 	 * 
 	 * @param areaSize maximum area size.
 	 */
-	public void setAreaSize(IVector2 vector);
+	public void setAreaSize(IVector3 vector);
 
 	/** 
 	 * Visuals that are handled as static´s

@@ -4,6 +4,7 @@ import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector2Int;
+import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 
@@ -24,13 +25,16 @@ public abstract class AbstractViewport3d implements IViewport3d
 
 	/** Size of the viewport without padding. */
 	//TODO: should be Vector3Double someday...
-	protected Vector2Double		size_;
+	protected Vector3Double		size_;
 	
 	/** Flag aspect ratio preservation. */
 	protected boolean			preserveAR_;
 	
 	/** Maximum displayable area */
-	protected IVector2		areaSize_;
+	protected IVector3		areaSize_;
+	
+	/**  */
+	protected double		areaXDim_;
 
 	/** Real size of the viewport including padding. */
 	protected Vector2Double		paddedSize_;
@@ -42,7 +46,7 @@ public abstract class AbstractViewport3d implements IViewport3d
 	protected Set<Object>				drawObjects_;
 	
 	/** Virtual Viewport position. */
-	protected IVector2			position_;
+	protected IVector3			position_;
 	
 	/** Pixel-corrected viewport position. */
 	protected IVector2			pixPosition_;
@@ -67,10 +71,10 @@ public abstract class AbstractViewport3d implements IViewport3d
 	{
 		rendering = false;
 		this.perspective = perspective;
-		size_ = new Vector2Double(1.0);
-		position_ = Vector2Double.ZERO.copy();
+		size_ = new Vector3Double(1.0);
+		position_ = Vector3Double.ZERO.copy();
 		preserveAR_ = true;
-		areaSize_ = new Vector2Double(1.0);
+		areaSize_ = new Vector3Double(1.0);
 		paddedSize_ = new Vector2Double(1.0);
 		drawObjects_ = Collections.synchronizedSet(new HashSet<Object>());
 		objectList_ = Collections.synchronizedList(new ArrayList<Object>());
@@ -123,7 +127,7 @@ public abstract class AbstractViewport3d implements IViewport3d
 	 * @return size of the display area, may be padded to preserve aspect
 	 *        ratio
 	 */
-	public IVector2 getSize()
+	public IVector3 getSize()
 	{
 		return size_;
 	}
@@ -135,25 +139,38 @@ public abstract class AbstractViewport3d implements IViewport3d
 	 * 
 	 * @return maximum area size.
 	 */
-	public IVector2 getAreaSize()
+	public IVector3 getAreaSize()
 	{
 		return areaSize_;
 	}
+	
+	/**
+	 * Gets the maximum displayable size.
+	 * 
+	 * @return maximum area size.
+	 */
+	public IVector3 getAreaSize3d()
+	{
+		return areaSize_;
+	}
+	
 	
 	/**
 	 * Sets the maximum displayable size.
 	 * 
 	 * @param areaSize maximum area size.
 	 */
-	public void setAreaSize(final IVector2 areaSize)
+	public void setAreaSize(final IVector3 areaSize)
 	{
 		EventQueue.invokeLater(new Runnable()
 		{
 			public void run()
 			{
 				areaSize_ = areaSize;
+				areaXDim_ = areaSize.getXAsDouble();
 			}
 		});
+		
 	}
 	
 	/**
@@ -173,52 +190,13 @@ public abstract class AbstractViewport3d implements IViewport3d
 	{
 		return new Vector2Double(canvas_.getWidth(), canvas_.getHeight());
 	}
-	
-	/**
-	 * Refreshes the size of the canvas.
-	 */
-	public void refreshCanvasSize()
-	{
-	}
-	
+
 	/**
 	 * Gets the position of the viewport.
 	 */
-	public IVector2 getPosition()
+	public IVector3 getPosition()
 	{
 		return position_.copy();
-	}
-	
-	/**
-	 * Returns the size of a pixel.
-	 * @retun size of a pixel
-	 */
-	public IVector2 getPixelSize()
-	{
-		Canvas canvas = canvas_;
-		if (canvas == null)
-			return Vector2Double.ZERO;
-		return paddedSize_.copy().divide(new Vector2Double(canvas.getWidth(), canvas.getHeight()));
-	}
-
-	/**
-	 * Sets the position of the viewport.
-	 */
-	public void setPosition(IVector2 pos)
-	{
-		position_ = pos;
-		IVector2 pixSize = getPixelSize();
-		pixPosition_ = position_.copy().divide(pixSize);
-		pixPosition_ = (new Vector2Double(new Vector2Int(pixPosition_))).multiply(pixSize);
-	}
-	
-	/**
-	 * Sets the maximum zoom.
-	 * @param zoomlimit the zoom limit
-	 */
-	public void setZoomLimit(double zoomlimit)
-	{
-		zoomLimit_ = zoomlimit;
 	}
 
 	/**

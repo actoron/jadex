@@ -477,16 +477,7 @@ public class MEnvSpaceType
 										
 					if(ret instanceof Perspective3D)
 					{
-						Perspective3D pers = (Perspective3D)ret;
-						Boolean invertx = (Boolean)getProperty(args, "invertxaxis");
-						pers.setInvertYAxis(invertx.booleanValue());
-						Boolean inverty = (Boolean)getProperty(args, "invertyaxis");
-						pers.setInvertYAxis(inverty.booleanValue());
-						
-						
-						String	placement	= (String)getProperty(args, "objectplacement");
-						if(OBJECTPLACEMENT_CENTER.equals(placement))
-							pers.setObjectShift(new Vector2Double(0.5));
+						Perspective3D pers = (Perspective3D)ret;				
 						
 						List drawables3d = (List)args.get("drawables3d");
 						if(drawables3d!=null)

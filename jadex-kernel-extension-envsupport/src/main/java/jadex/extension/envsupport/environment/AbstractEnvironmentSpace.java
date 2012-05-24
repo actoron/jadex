@@ -32,12 +32,16 @@ import jadex.extension.envsupport.MObjectTypeProperty;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.ComponentActionList.ActionEntry;
 import jadex.extension.envsupport.environment.space2d.Space2D;
+import jadex.extension.envsupport.environment.space3d.Space3D;
 import jadex.extension.envsupport.evaluation.DefaultDataProvider;
 import jadex.extension.envsupport.evaluation.IObjectSource;
 import jadex.extension.envsupport.evaluation.ITableDataConsumer;
 import jadex.extension.envsupport.evaluation.ITableDataProvider;
 import jadex.extension.envsupport.evaluation.SpaceObjectSource;
+import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector2Double;
+import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.gui.ObserverCenter;
 import jadex.extension.envsupport.observer.perspective.IPerspective;
 import jadex.javaparser.IParsedExpression;
@@ -145,6 +149,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	
 	/** The class loader. */
 	protected ClassLoader	classloader;
+	
 
 	//-------- constructors --------
 	
@@ -209,7 +214,13 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				Double width = config.getProperty("width")!=null? (Double)config.getProperty("width"): (Double)mspacetype.getProperty("width");
 				Double height = config.getProperty("height")!=null? (Double)config.getProperty("height"): (Double)mspacetype.getProperty("height");
 				((Space2D)this).setAreaSize(Vector2Double.getVector2(width, height));
-	//			System.out.println("areasize: "+width+" "+height);
+			}
+			if(this instanceof Space3D) // Hack?
+			{
+				Double width = config.getProperty("width")!=null? (Double)config.getProperty("width"): (Double)mspacetype.getProperty("width");
+				Double height = config.getProperty("height")!=null? (Double)config.getProperty("height"): (Double)mspacetype.getProperty("height");
+				Double depth = config.getProperty("depth")!=null? (Double)config.getProperty("depth"): (Double)mspacetype.getProperty("depth");
+				((Space3D)this).setAreaSize(Vector3Double.getVector3(width,depth, height));
 			}
 			
 			// Create space object types.
@@ -2775,4 +2786,13 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	{
 		return classloader;
 	}
+
+//	/**
+//	 * @return the _areaSize
+//	 */
+//	//TODO: good?
+//	public IVector3 getAreaSize3d()
+//	{
+//		return _areaSize;
+//	}
 }

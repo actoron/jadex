@@ -12,6 +12,7 @@ import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.observer.gui.plugin.IObserverCenterPlugin;
 import jadex.extension.envsupport.observer.gui.plugin.IntrospectorPlugin;
 import jadex.extension.envsupport.observer.gui.plugin.VisualsPlugin;
@@ -118,7 +119,7 @@ public class ObserverCenter
 	public ObserverCenter(final String title, final IEnvironmentSpace space, ClassLoader classloader, List plugins, boolean killonexit)
 	{
 		selectedObjectListeners = Collections.synchronizedList(new ArrayList());
-		this.space = (Space2D) space;
+		this.space = (AbstractEnvironmentSpace)space;
 		this.killonexit	= killonexit;
 		perspectives = Collections.synchronizedMap(new HashMap());
 		externaldataviews = Collections.synchronizedMap(new HashMap());
@@ -275,16 +276,16 @@ public class ObserverCenter
 		}
 	}
 	
-	//TODO:Move to Perspective!
-	/**
-	 * Returns the area size.
-	 * 
-	 * @return area size
-	 */
-	public IVector2 getAreaSize()
-	{
-		return ((Space2D)space).getAreaSize().copy();
-	}
+//	//TODO:Move to Perspective!
+//	/**
+//	 * Returns the area size.
+//	 * 
+//	 * @return area size
+//	 */
+//	public IVector3 getAreaSize()
+//	{
+//		return space.getAreaSize3d().copy();
+//	}
 	
 	/**
 	 * Adds an additional dataview.
@@ -442,21 +443,6 @@ public class ObserverCenter
 						}
 					}
 					
-				
-//				if (selp instanceof Perspective3D)
-//				{
-//					if(!selp.getName().equals(name))
-//					{
-//						
-//						((Perspective3D) selp).getViewport().pauseApp();
-//				        try {
-//				            Thread.sleep(1000);
-//				        } catch (InterruptedException ex) {
-//				        }
-//				        
-//					}
-//
-//				}
 			
 				IPerspective perspective = (IPerspective)perspectives.get(name);
 				perspective.setObserverCenter(this);

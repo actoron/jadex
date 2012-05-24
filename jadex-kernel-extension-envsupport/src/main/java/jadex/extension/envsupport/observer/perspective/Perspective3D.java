@@ -2,17 +2,16 @@ package jadex.extension.envsupport.observer.perspective;
 
 import jadex.commons.meta.TypedPropertyObject;
 import jadex.extension.envsupport.dataview.IDataView;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.space2d.*;
+import jadex.extension.envsupport.environment.space3d.*;
 import jadex.extension.envsupport.environment.SpaceObject;
-import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector1Double;
-import jadex.extension.envsupport.math.Vector2Double;
 import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.IViewport3d;
-import jadex.extension.envsupport.observer.graphics.IViewportListener;
-import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
 import jadex.extension.envsupport.observer.graphics.drawable3d.DrawableCombiner3d;
 import jadex.extension.envsupport.observer.graphics.drawable3d.Primitive3d;
 import jadex.extension.envsupport.observer.graphics.layer.Layer;
@@ -21,12 +20,9 @@ import jadex.extension.envsupport.observer.gui.SObjectInspector;
 import jadex.javaparser.IParsedExpression;
 import jadex.javaparser.SimpleValueFetcher;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -34,11 +30,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.JFrame;
 
 
 /**
@@ -61,8 +54,6 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	/** Selection cycle for stacked objects */
 	protected int								selectCycle;
 
-	/** The object shift */
-	protected IVector2							objectShift;
 
 	/** Maximum selection distance */
 	protected IVector1							selectorDistance;
@@ -91,9 +82,6 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	/** The marker drawable combiner */
 	protected DrawableCombiner3d				marker3d;
 
-	/** The maximum zoom */
-	protected double							zoomlimit;
-
 	/** The fetcher. */
 	protected SimpleValueFetcher				fetcher;
 
@@ -101,7 +89,6 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	private boolean								rendering;
 
 	private Primitive3d							_markerPrimitive;
-
 
 	boolean										wireframe;
 
@@ -117,7 +104,6 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 		this.visuals = Collections.synchronizedMap(new HashMap());
 
 
-		this.objectShift = new Vector2Double();
 		this.selectorDistance = new Vector1Double(1.0);
 		this.selectCycle = 0;
 		this.tryopengl = true;
@@ -267,7 +253,18 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 			viewport3d = createViewport(this, cl);
 
 			// TODO alles ok hier?
-			viewport3d.setAreaSize(obscenter.getAreaSize());
+			AbstractEnvironmentSpace space = obscenter.getSpace();
+			if(space instanceof Space2D)
+			{
+				IVector2 tmpsize = ((Space2D)space).getAreaSize();
+				IVector3 tmp3dsize = new Vector3Double(tmpsize.getXAsDouble(),(tmpsize.getXAsDouble()+tmpsize.getYAsDouble())/2,tmpsize.getYAsDouble());
+				viewport3d.setAreaSize(tmp3dsize);
+			}
+			else if(space instanceof Space3D)
+			{
+				viewport3d.setAreaSize(((Space3D)space).getAreaSize());
+			}
+			
 			boolean isGrid = obscenter.getSpace().getClass().getSimpleName().startsWith("Grid");
 			viewport3d.isGridSpace(isGrid);
 //			// viewport3d.addViewportListener(selectioncontroller);
@@ -325,27 +322,6 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	public void setInvertYAxis(boolean invert)
 	{
 		invertyaxis = invert;
-	}
-
-
-	/**
-	 * Gets the object shift.
-	 * 
-	 * @return the object shift
-	 */
-	public synchronized IVector2 getObjectShift()
-	{
-		return objectShift.copy();
-	}
-
-	/**
-	 * Sets the object shift.
-	 * 
-	 * @param shift the object shift
-	 */
-	public synchronized void setObjectShift(IVector2 shift)
-	{
-		objectShift = shift.copy();
 	}
 
 	/**

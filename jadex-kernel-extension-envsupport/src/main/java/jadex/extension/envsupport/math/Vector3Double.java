@@ -240,6 +240,8 @@ public class Vector3Double implements IVector3, Cloneable
 		}
 		return this;
 	}
+	
+
 
 	public IVector1 getLength()
 	{
@@ -460,17 +462,19 @@ public class Vector3Double implements IVector3, Cloneable
 	}
 
 	/**
-	 *  Get a vector for two doubles.
-	 *  @param a The first value.
-	 *  @param b The second value.
+	 *  Get a vector for three doubles.
+	 *  @param x The first value.
+	 *  @param y The second value.
+	*  @param z The second value
 	 *  @return The vector (null if at least one of args is null).
 	 */
-	public static IVector3 getVector3(Double a, Double b, Double c)
+	public static IVector3 getVector3(Double x, Double y, Double z)
 	{
 		IVector3 ret = null;
-		if(a!=null && b!=null && c!=null)
-			ret = a.doubleValue()==0 && b.doubleValue()==0 && c.doubleValue()==0? ZERO
-				: new Vector3Double(a.doubleValue(), b.doubleValue(), c.doubleValue());
+		if(x!=null && y!=null && z!=null)
+			ret = x.doubleValue()==0 && y.doubleValue()==0 && z.doubleValue()==0? ZERO: new Vector3Double(x.doubleValue(), y.doubleValue(), z.doubleValue());
+		else if (x!=null || y !=null|| z !=null)
+			ret = new Vector3Double(x == null? 0.0:x.doubleValue(), y == null? 0.0:y.doubleValue(),z == null? 0.0:z.doubleValue());
 		return ret;
 	}
 }

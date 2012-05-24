@@ -3,11 +3,8 @@ package jadex.extension.envsupport.environment.space3d;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.math.IVector1;
-import jadex.extension.envsupport.math.IVector2;
 import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector1Double;
-import jadex.extension.envsupport.math.Vector2Double;
-import jadex.extension.envsupport.math.Vector2Int;
 import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.math.Vector3Int;
 import jadex.commons.IFilter;
@@ -45,13 +42,13 @@ public abstract class Space3D extends AbstractEnvironmentSpace
 	//-------- constructors --------
 	
 	/**
-	 * Initializes the 2D-Space.
+	 * Initializes the 3D-Space.
 	 * @param spaceexecutor executor for the space
 	 * @param actionexecutor executor for component actions
 	 * @param areasize the size of the 2D area
 	 */
 	protected Space3D(IVector3 areasize)
-	{		
+	{	
 		this.areasize = areasize;
 	}
 	
@@ -116,6 +113,7 @@ public abstract class Space3D extends AbstractEnvironmentSpace
 	 */
 	public void setPosition(Object id, IVector3 pos)
 	{
+//		System.out.println("POS POS: " + pos.getXAsDouble() + " " + pos.getYAsDouble() + " " + pos.getZAsDouble());
 		synchronized(monitor)
 		{
 			ISpaceObject obj = getSpaceObject(id);
@@ -200,7 +198,7 @@ public abstract class Space3D extends AbstractEnvironmentSpace
 		IVector1 x2 = dx.copy().multiply(dx);
 		IVector1 y2 = dy.copy().multiply(dy);
 		IVector1 z2 = dz.copy().multiply(dz);
-		return (x2.add(y2).add(z2)).cbrt();
+		return (x2.add(y2).add(z2)).sqrt();
 	}
 	
 	/**
@@ -214,25 +212,27 @@ public abstract class Space3D extends AbstractEnvironmentSpace
 		{
 			IVector1 sizex = areasize.getX();
 			IVector1 sizey = areasize.getY();
-			IVector1 sizez = areasize.getY();
+			IVector1 sizez = areasize.getZ();
 			
 			if(BORDER_TORUS.equals(getBorderMode()))
 			{
 				IVector1 x = pos.getX().copy();
 				IVector1 y = pos.getY().copy();
-				IVector1 z = pos.getY().copy();
+				IVector1 z = pos.getZ().copy();
 				
 				while(x.less(Vector1Double.ZERO))
 					x.add(sizex);
 				while(y.less(Vector1Double.ZERO))
 					y.add(sizey);
-				while(y.less(Vector1Double.ZERO))
+				while(z.less(Vector1Double.ZERO))
 					z.add(sizez);
 				
 				x = x.copy().mod(sizex);
 				y = y.copy().mod(sizey);
 				z = z.copy().mod(sizez);
 				
+				//TODO: verstehen was hier passiert
+				ret = Vector3Double.getVector3(x.getAsDouble(), y.getAsDouble(), z.getAsDouble());
 				//ret = x.createVector2(y);
 			}
 			else if(BORDER_STRICT.equals(getBorderMode()))
@@ -271,7 +271,6 @@ public abstract class Space3D extends AbstractEnvironmentSpace
 			position.randomY(distance.getY(), position.getY());
 			position.randomZ(distance.getZ(), position.getZ());
 			
-//			System.out.println("position: "+position);
 			return position;
 		}
 	}

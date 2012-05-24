@@ -6,9 +6,8 @@ import jadex.extension.envsupport.environment.IEnvironmentSpace;
 import jadex.extension.envsupport.environment.IPerceptGenerator;
 import jadex.extension.envsupport.environment.ISpaceObject;
 import jadex.extension.envsupport.environment.PerceptType;
-import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector1;
-import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector1Double;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.SimplePropertyObject;
@@ -89,22 +88,22 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 	 */
 	public void dispatchEnvironmentEvent(EnvironmentEvent event)
 	{
-		Space2D	space = (Space2D)event.getSpace();
+		Space3D	space = (Space3D)event.getSpace();
 		IVector1 maxrange = getDefaultRange();
 		
-		IVector2 pos = (IVector2)event.getSpaceObject().getProperty(Space2D.PROPERTY_POSITION);
+		IVector3 pos = (IVector3)event.getSpaceObject().getProperty(Space3D.PROPERTY_POSITION);
 		IComponentDescription eventowner	= (IComponentDescription)event.getSpaceObject().getProperty(ISpaceObject.PROPERTY_OWNER);
 
-		if(EnvironmentEvent.OBJECT_PROPERTY_CHANGED.equals(event.getType()) && Space2D.PROPERTY_POSITION.equals(event.getProperty()))
+		if(EnvironmentEvent.OBJECT_PROPERTY_CHANGED.equals(event.getType()) && Space3D.PROPERTY_POSITION.equals(event.getProperty()))
 		{
-			IVector2 oldpos = (IVector2)event.getOldValue();
+			IVector3 oldpos = (IVector3)event.getOldValue();
 			ISpaceObject[] objects = pos==null? EMPTY_SPACEOBJECTS: (ISpaceObject[])space.getNearObjects(pos, maxrange).toArray(new ISpaceObject[0]);
 			ISpaceObject[] oldobjects = oldpos==null? EMPTY_SPACEOBJECTS: (ISpaceObject[])space.getNearObjects(oldpos, maxrange).toArray(new ISpaceObject[0]);
 			
 			// Objects, which are in current range, but maybe not previously seen.
 			for(int i=0; i<objects.length; i++)
 			{
-				IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
+				IVector3 objpos = (IVector3)objects[i].getProperty(Space3D.PROPERTY_POSITION);
 				IComponentDescription owner = (IComponentDescription)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 
 				// Create event for component that is seen by moving component.
@@ -148,7 +147,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 			for(int i=0; i<oldobjects.length; i++)
 			{
 				IComponentDescription owner = (IComponentDescription)oldobjects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
-				IVector2 objpos = (IVector2)oldobjects[i].getProperty(Space2D.PROPERTY_POSITION);
+				IVector3 objpos = (IVector3)oldobjects[i].getProperty(Space3D.PROPERTY_POSITION);
 
 				if(owner!=null)
 				{
@@ -183,7 +182,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 				for(int i=0; i<objects.length; i++)
 				{
 					IComponentDescription owner = (IComponentDescription)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
-					IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
+					IVector3 objpos = (IVector3)objects[i].getProperty(Space3D.PROPERTY_POSITION);
 					if(owner!=null)
 					{
 						if(!space.getDistance(pos, objpos).greater(getRange(objects[i])))
@@ -218,7 +217,7 @@ public class DefaultVisionGenerator extends SimplePropertyObject implements IPer
 					IComponentDescription owner = (IComponentDescription)objects[i].getProperty(ISpaceObject.PROPERTY_OWNER);
 					if(owner!=null)
 					{
-						IVector2 objpos = (IVector2)objects[i].getProperty(Space2D.PROPERTY_POSITION);
+						IVector3 objpos = (IVector3)objects[i].getProperty(Space3D.PROPERTY_POSITION);
 						if(!space.getDistance(pos, objpos).greater(getRange(objects[i])))
 						{
 							String percepttype = getPerceptType(space, owner.getLocalType(), event.getSpaceObject().getType(), DESTROYED);

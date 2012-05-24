@@ -1,10 +1,14 @@
 package jadex.extension.envsupport.observer.perspective;
 
 import jadex.extension.envsupport.dataview.IDataView;
+import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
+import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector1;
 import jadex.extension.envsupport.math.IVector2;
+import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.math.Vector1Double;
 import jadex.extension.envsupport.math.Vector2Double;
+import jadex.extension.envsupport.math.Vector3Double;
 import jadex.extension.envsupport.observer.graphics.IViewport;
 import jadex.extension.envsupport.observer.graphics.IViewportListener;
 import jadex.extension.envsupport.observer.graphics.drawable.DrawableCombiner;
@@ -305,7 +309,11 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 //			System.out.println("Persp: "+name+" opengl="+tryopengl);
 			ClassLoader	cl	= obscenter.getClassLoader();
 			viewport = createViewport(this, cl, bgColor, tryopengl);
-			viewport.setAreaSize(obscenter.getAreaSize());
+			AbstractEnvironmentSpace space = obscenter.getSpace();
+			if(space instanceof Space2D)
+			{
+				viewport.setAreaSize(((Space2D)space).getAreaSize().copy());
+			}
 			viewport.addViewportListener(selectioncontroller);
 			viewport.setZoomLimit(zoomlimit);
 		}
@@ -547,7 +555,13 @@ public class Perspective2D extends TypedPropertyObject implements IPerspective
 	 */
 	public void resetZoomAndPosition()
 	{
-		viewport.setAreaSize(obscenter.getAreaSize());
+//		viewport.setAreaSize(obscenter.getAreaSize());
+		AbstractEnvironmentSpace space = obscenter.getSpace();
+		if(space instanceof Space2D)
+		{
+			IVector2 tmpsize = ((Space2D)space).getAreaSize();
+			viewport.setAreaSize(tmpsize);
+		}
 	}
 	
 	/**
