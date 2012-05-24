@@ -14,6 +14,7 @@ import jadex.bridge.service.IService;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.IServiceProvider;
+import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Properties;
@@ -346,7 +347,19 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 									{
 										ClassLoader	cl	= (ClassLoader)result;
 										
-										final Object clid = service.getPropertyMap()!=null? service.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
+										Object clid = service.getPropertyMap()!=null? service.getPropertyMap().get(IAbstractViewerPanel.PROPERTY_VIEWERCLASS) : null;
+										
+										if (clid instanceof String[]) {
+											// use first gui class found
+											for (String classname : (String[])clid) {
+												Class clazz = SReflect.classForName0(classname, cl);
+												if (clazz != null){
+													clid = clazz;
+													break;
+												}
+											}
+										}
+										
 										final Class clazz = clid instanceof Class? (Class)clid: clid instanceof String? SReflect.classForName0((String)clid, cl): null;
 										
 										if(clid!=null)
@@ -405,7 +418,18 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 										{
 											public void customResultAvailable(ClassLoader cl)
 											{
-												final Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+												Object clid = exta.getModel().getProperty(IAbstractViewerPanel.PROPERTY_VIEWERCLASS, cl);
+												
+												if (clid instanceof String[]) {
+													// use first gui class found
+													for (String classname : (String[])clid) {
+														Class clazz = SReflect.classForName0(classname, cl);
+														if (clazz != null){
+															clid = clazz;
+															break;
+														}
+													}
+												}
 												
 												if(clid instanceof String)
 												{

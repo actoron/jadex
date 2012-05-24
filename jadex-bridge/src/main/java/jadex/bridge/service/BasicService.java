@@ -4,6 +4,7 @@ import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IResourceIdentifier;
 import jadex.bridge.service.annotation.GuiClass;
 import jadex.bridge.service.annotation.GuiClassName;
+import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.Timeout;
 import jadex.bridge.service.component.BasicServiceInvocationHandler;
 import jadex.commons.SReflect;
@@ -84,6 +85,18 @@ public class BasicService implements IInternalService
 				this.properties = new HashMap();
 			this.properties.put("componentviewer.viewerclass", guiclazz);
 //			System.out.println("found: "+guiclazz);
+		}
+		else if(guiclazz==null && type.isAnnotationPresent(GuiClassNames.class))
+		{
+			GuiClassNames anno = type.getAnnotation(GuiClassNames.class);
+			GuiClassName[] guis = anno.value();
+			String[] guiClasses = new String[guis.length];
+			for (int i = 0; i < guis.length; i++) {
+				guiClasses[i] = guis[i].value();
+			}
+			if(this.properties==null) 
+				this.properties = new HashMap();
+			this.properties.put("componentviewer.viewerclass", guiClasses);
 		}
 	}
 	

@@ -35,20 +35,20 @@ public class JadexPreferenceCategory extends PreferenceCategory implements
 	public JadexPreferenceCategory(Context context, String provider,
 			Map<String, ?> prefs) {
 		super(context, null);
-		this.provider = provider;
-		this.prefs = prefs;
-
-		if (CATEGORY_TITLES.containsKey(provider)) {
-			this.setTitle(CATEGORY_TITLES.get(provider));
-		} else {
-			this.setTitle(provider);
-		}
+//		this.provider = provider;
+//		this.prefs = prefs;
+//
+//		if (CATEGORY_TITLES.containsKey(provider)) {
+//			this.setTitle(CATEGORY_TITLES.get(provider));
+//		} else {
+//			this.setTitle(provider);
+//		}
 	}
 
 	@Override
 	protected void onAttachedToActivity() {
 		super.onAttachedToActivity();
-		createPreferenceHierarchy(prefs);
+		//createPreferenceHierarchy(prefs);
 	}
 
 	private void createPreferenceHierarchy(Map<String, ?> prefs2) {

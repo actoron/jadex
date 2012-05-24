@@ -6,6 +6,7 @@ import jadex.bridge.IComponentStep;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.GuiClassName;
+import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
 import jadex.bridge.service.types.awareness.DiscoveryInfo;
@@ -116,7 +117,7 @@ import java.util.TimerTask;
 //			@Component(name="registry", type="Registry")
 		})
 })
-@Properties(@NameValue(name="componentviewer.viewerclass", value="\"jadex.tools.awareness.AwarenessAgentPanel\""))
+@Properties(@NameValue(name="componentviewer.viewerclass", value="new String[]{\"jadex.tools.awareness.AwarenessAgentPanel\", \"jadex.android.controlcenter.settings.AwarenessSettingsScreen\"}"))
 @ProvidedServices(
 	@ProvidedService(type=IAwarenessManagementService.class, implementation=@Implementation(expression="$component"))
 )
@@ -127,7 +128,10 @@ import java.util.TimerTask;
 	@RequiredService(name="discoveries", type=IDiscoveryService.class, multiple=true, binding=@Binding(scope=RequiredServiceInfo.SCOPE_COMPONENT))
 })
 @Service(IAwarenessManagementService.class)
-//@GuiClassName("jadex.tools.android.awareness.AwaActivity", properties="settings")
+//@GuiClassNames({ 
+//	@GuiClassName("jadex.android.controlcenter.settings.AwarenessSettingsScreen"),
+//	@GuiClassName("jadex.tools.awareness.AwarenessAgentPanel") 
+//})
 public class AwarenessManagementAgent extends MicroAgent implements IPropertiesProvider, IAwarenessManagementService
 {
 	//-------- attributes --------
@@ -169,6 +173,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 */
 	public IFuture<Void>	agentCreated()
 	{
+		String[] test = new String[]{"test", "test2"};
 		initArguments();
 		
 		this.discovered = new LinkedHashMap<IComponentIdentifier, DiscoveryInfo>();

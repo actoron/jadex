@@ -2,6 +2,7 @@ package jadex.bridge.service.types.security;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.service.annotation.GuiClassName;
+import jadex.bridge.service.annotation.GuiClassNames;
 import jadex.commons.future.IFuture;
 
 import java.util.Map;
@@ -16,7 +17,10 @@ import java.util.Map;
  */
 // Safe to be allowed remotely, as it can only be called, when platform access is granted.
 // Putting method in service allows security settings to be administered using remote JCCs.
-@GuiClassName("jadex.tools.security.SecuritySettings")
+@GuiClassNames({
+	@GuiClassName("jadex.tools.security.SecuritySettings"),
+	@GuiClassName("jadex.android.controlcenter.settings.SecuritySettingsScreen")
+})
 public interface ISecurityService
 {
 	//-------- password management --------
