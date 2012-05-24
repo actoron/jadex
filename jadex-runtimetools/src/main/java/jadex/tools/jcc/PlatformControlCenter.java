@@ -578,6 +578,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			Property[] ps = vis[0].getProperties();
 			if(ps!=null)
 			{
+				List<Tuple2<IControlCenterPlugin, JComponent>> newpls = new ArrayList<Tuple2<IControlCenterPlugin, JComponent>>();
 				for(int i=0; i<ps.length; i++)
 				{
 					IControlCenterPlugin plg = getPluginForName(ps[i].getType());
@@ -585,8 +586,15 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 					{
 //						System.out.println("vis: "+ps[i].getType()+" "+ps[i].getValue());
 						toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
+						newpls.add(new Tuple2<IControlCenterPlugin, JComponent>(plg, getPluginComponent(plg)));
+					}
+					else
+					{
+						// todo: load plugin
 					}
 				}
+				plugins = newpls;
+				pccpanel.updateToolBar(null);
 			}
 		}
 			
@@ -640,9 +648,10 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		else
 		{
 			Properties vis = new Properties();
-			for(Iterator<IControlCenterPlugin> it = toolbarvis.keySet().iterator(); it.hasNext(); )
+//			for(Iterator<IControlCenterPlugin> it = toolbarvis.keySet().iterator(); it.hasNext(); )
+			for(Iterator<Tuple2<IControlCenterPlugin, JComponent>> it = plugins.iterator(); it.hasNext(); )
 			{
-				IControlCenterPlugin plg = it.next();
+				IControlCenterPlugin plg = it.next().getFirstEntity();
 //				System.out.println("vis save: "+plg.getName()+" "+toolbarvis.get(plg));
 				vis.addProperty(new Property(plg.getName(), toolbarvis.get(plg).toString()));
 			}

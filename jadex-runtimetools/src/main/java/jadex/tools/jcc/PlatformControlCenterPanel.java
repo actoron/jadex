@@ -357,30 +357,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         	}
         });
         final JPopupMenu popup = new JPopupMenu();
-        popup.add(new JMenuItem(new AbstractAction("Hide tool") 
-        {
-            public void actionPerformed(ActionEvent e) 
-            {
-            	controlcenter.setPluginVisible(pl, false);
-            	updateToolBar(null);
-            }
-        }));
-        popup.add(new JMenuItem(new AbstractAction("Move left") 
-        {
-            public void actionPerformed(ActionEvent e) 
-            {
-            	controlcenter.moveLeftPlugin(pl);
-            	updateToolBar(null);
-            }
-        }));
-        popup.add(new JMenuItem(new AbstractAction("Move right") 
-        {
-            public void actionPerformed(ActionEvent e) 
-            {
-            	controlcenter.moveRightPlugin(pl);
-            	updateToolBar(null);
-            }
-        }));
+       
         button.addMouseListener(new MouseAdapter()
         {
         	public void mousePressed(MouseEvent e)
@@ -395,6 +372,41 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
             {
             	if(e.isPopupTrigger())
             	{
+            		popup.removeAll();
+            		
+            		popup.add(new JMenuItem(new AbstractAction("Hide tool") 
+        	        {
+        	            public void actionPerformed(ActionEvent e) 
+        	            {
+        	            	controlcenter.setPluginVisible(pl, false);
+        	            	updateToolBar(null);
+        	            }
+        	        }));
+            		
+            		IControlCenterPlugin[] pls = controlcenter.getToolbarPlugins(true);
+        	        
+            		if(pls.length>0 && !pls[0].equals(pl))
+            		{
+	            		popup.add(new JMenuItem(new AbstractAction("Move left") 
+	        	        {
+	        	            public void actionPerformed(ActionEvent e) 
+	        	            {
+	        	            	controlcenter.moveLeftPlugin(pl);
+	        	            	updateToolBar(null);
+	        	            }
+	        	        }));
+            		}
+            		if(pls.length>0 && !pls[pls.length-1].equals(pl))
+            		{
+	        	        popup.add(new JMenuItem(new AbstractAction("Move right") 
+	        	        {
+	        	            public void actionPerformed(ActionEvent e) 
+	        	            {
+	        	            	controlcenter.moveRightPlugin(pl);
+	        	            	updateToolBar(null);
+	        	            }
+	        	        }));
+            		}
             		popup.show(e.getComponent(), e.getX(), e.getY());
             	}
             }
