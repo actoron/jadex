@@ -1,25 +1,18 @@
 package jadex.kernelbase;
 
 import jadex.bridge.IComponentListener;
-import jadex.bridge.IComponentStep;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.RemoteComponentListener;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.modelinfo.IModelInfo;
 import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.RequiredServiceBinding;
-import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.component.ComponentServiceContainer;
-import jadex.bridge.service.search.SServiceProvider;
-import jadex.bridge.service.types.clock.IClockService;
-import jadex.bridge.service.types.clock.ITimedObject;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.bridge.service.types.factory.IComponentAdapter;
 import jadex.bridge.service.types.factory.IComponentAdapterFactory;
 import jadex.commons.IValueFetcher;
 import jadex.commons.Tuple2;
-import jadex.commons.future.DelegationResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.IIntermediateResultListener;
@@ -61,8 +54,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	/** The component adapter. */
 	protected IComponentAdapter	adapter;
 	
-	/** The component creation time. */
-	protected long creationtime;
+//	/** The component creation time. */
+//	protected long creationtime;
 	
 	/** The value fetcher. */
 	protected IValueFetcher	fetcher;
@@ -112,7 +105,7 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 		if(factory != null)
 			this.adapter = factory.createComponentAdapter(desc, model, this, parent);
 		this.container = createServiceContainer();
-		this.creationtime = System.currentTimeMillis();
+//		this.creationtime = System.currentTimeMillis();
 //		this.arguments = arguments!=null? new HashMap(arguments): null; // clone arguments
 	}
 	
@@ -381,7 +374,8 @@ public abstract class AbstractInterpreter extends StatelessAbstractInterpreter
 	 */
 	public long getCreationTime()
 	{
-		return creationtime;
+//		return creationtime;
+		return getComponentAdapter().getDescription().getCreationTime();
 	}
 	
 	/**

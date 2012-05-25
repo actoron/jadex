@@ -22,6 +22,7 @@ import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.component.ComponentFactorySelector;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.search.ServiceNotFoundException;
+import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.CMSComponentDescription;
 import jadex.bridge.service.types.cms.CreationInfo;
 import jadex.bridge.service.types.cms.ICMSComponentListener;
@@ -135,6 +136,9 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	
 	/** The locked components. */
 	protected Map<IComponentIdentifier, LockEntry> lockentries;
+	
+	/** The time service. */
+	protected IClockService clockservice;
 	
     //-------- constructors --------
 
@@ -409,7 +413,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 																	Boolean daemon = cinfo.getDaemon()!=null? cinfo.getDaemon(): lmodel.getDaemon(cinfo.getConfiguration());
 																	Boolean autosd = cinfo.getAutoShutdown()!=null? cinfo.getAutoShutdown(): lmodel.getAutoShutdown(cinfo.getConfiguration());
 																	final CMSComponentDescription ad = new CMSComponentDescription(cid, type, master, daemon, autosd, 
-																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier());
+																		lmodel.getFullName(), cinfo.getLocalType(), lmodel.getResourceIdentifier(), clockservice.getTime());
 																	
 																	logger.info("Starting component: "+cid.getName());
 							//										System.err.println("Pre-Init: "+cid);
@@ -2331,19 +2335,28 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 									{
 										msgservice	= result;
 										
-										// add root adapter and register root component
-										if(root!=null)
+										SServiceProvider.getService(agent.getServiceContainer(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+											.addResultListener(new ExceptionDelegationResultListener<IClockService, Void>(ret)
 										{
-											msgservice.getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
+											public void customResultAvailable(IClockService result)
 											{
-												public void customResultAvailable(String[] addresses)
+												clockservice	= result;
+										
+												// add root adapter and register root component
+												if(root!=null)
 												{
-													((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(addresses);
-													adapters.put(root.getComponentIdentifier(), root);
-													ret.setResult(null);
+													msgservice.getAddresses().addResultListener(createResultListener(new ExceptionDelegationResultListener<String[], Void>(ret)
+													{
+														public void customResultAvailable(String[] addresses)
+														{
+															((ComponentIdentifier)root.getComponentIdentifier()).setAddresses(addresses);
+															adapters.put(root.getComponentIdentifier(), root);
+															ret.setResult(null);
+														}
+													}));
 												}
-											}));
-										}
+											}
+										});	
 									}
 								}));
 //							}

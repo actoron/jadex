@@ -56,6 +56,9 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	/** The local type name (from parent). */
 	protected String localtype;
 	
+	/** The creation time. */
+	protected long creationtime;
+	
 	//-------- constructors --------
 
 	/**
@@ -70,7 +73,8 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	 *  Create a new CESComponentDescription.
 	 */
 	public CMSComponentDescription(IComponentIdentifier cid, String type, Boolean master, 
-		Boolean daemon, Boolean autoshutdown, String modelname, String localtype, IResourceIdentifier rid)
+		Boolean daemon, Boolean autoshutdown, String modelname, String localtype, IResourceIdentifier rid,
+		long creationtime)
 	{
 //		System.out.println("created desc: "+cid+" "+hashCode());
 		setName(cid);
@@ -84,6 +88,7 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 		setModelName(modelname);
 		setLocalType(localtype);
 		setResourceIdentifier(rid);
+		setCreationTime(creationtime);
 	}
 
 	//-------- accessor methods --------
@@ -344,6 +349,24 @@ public class CMSComponentDescription implements IComponentDescription, Cloneable
 	public void setLocalType(String localtype)
 	{
 		this.localtype = localtype;
+	}
+	
+	/**
+	 *  Get the creation time.
+	 *  @return The creation time.
+	 */
+	public long getCreationTime()
+	{
+		return creationtime;
+	}
+	
+	/**
+	 *  Set the creationtime.
+	 *  @param creationtime The creationtime to set.
+	 */
+	public void setCreationTime(long creationtime)
+	{
+		this.creationtime = creationtime;
 	}
 
 	/**

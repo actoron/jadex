@@ -136,7 +136,7 @@ public class PropertiesPanel	extends	JPanel
 	{
 		JTextField	tf	= new JTextField(defvalue);
 		tf.setEditable(editable);
-		addComponent(name, tf, weighty);
+		addComponent(name, tf, weighty, -1);
 		return tf;
 	}
 	
@@ -157,7 +157,7 @@ public class PropertiesPanel	extends	JPanel
 		JCheckBox cb = new JCheckBox("", selected);
 		cb.setMargin(new Insets(0,0,0,0));
 		cb.setEnabled(enabled);
-		addComponent(name, cb, weighty);
+		addComponent(name, cb, weighty, -1);
 		return cb;
 	}
 	
@@ -176,8 +176,26 @@ public class PropertiesPanel	extends	JPanel
 	{
 		JComboBox cb = new JComboBox(values);
 		cb.setEditable(editable);
-		addComponent(name, cb, weighty);
+		addComponent(name, cb, weighty, -1);
 		return cb;
+	}
+	
+	/**
+	 *  Create a button and add it to the panel.
+	 */
+	public JButton createButton(String name, String text)
+	{
+		return createButton(name, text, 0);
+	}
+	
+	/**
+	 *  Create a button and add it to the panel.
+	 */
+	public JButton createButton(String name, String text, double weighty)
+	{
+		JButton b = new JButton(text);
+		addComponent(name, b, weighty, GridBagConstraints.NONE);
+		return b;
 	}
 	
 	/**
@@ -224,13 +242,21 @@ public class PropertiesPanel	extends	JPanel
 	 */
 	public void	addComponent(String name, JComponent comp)
 	{
-		addComponent(name, comp, 0);
+		addComponent(name, comp, 0, -1);
 	}
 	
 	/**
 	 *  Add a component
 	 */
 	public void	addComponent(String name, JComponent comp, double weighty)
+	{
+		addComponent(name, comp, weighty, -1);
+	}
+	
+	/**
+	 *  Add a component
+	 */
+	public void	addComponent(String name, JComponent comp, double weighty, int fill)
 	{
 		components.put(name, comp);
 
@@ -241,12 +267,13 @@ public class PropertiesPanel	extends	JPanel
 		
 		gbc.weightx	= 0;
 		gbc.gridwidth	= 1;
+		gbc.anchor = GridBagConstraints.EAST;
 		gbc.fill = GridBagConstraints.BOTH;
 		add(new JLabel(name), gbc);
 		
 		if(weighty==0)
 		{
-			gbc.fill = GridBagConstraints.HORIZONTAL;
+			gbc.fill = fill!=-1? fill: GridBagConstraints.HORIZONTAL;
 		}
 		else
 		{

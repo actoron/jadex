@@ -288,6 +288,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							if(i+1<sels.length)
 								buf.append(", ");
 						}
+						if(sels.length==0)
+						{
+							buf.append("all");
+						}
 						lto.setText(buf.toString());
 					}
 				});
@@ -383,6 +387,15 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				table.getTableHeader().addMouseListener(lis);
 				
 				PropertiesPanel pp = new PropertiesPanel();
+				JButton b = pp.createButton("Reset to all receivers: ", "Reset");
+				b.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						table.getSelectionModel().clearSelection();
+						lto.setText("To: all");
+					}
+				});
 				final JTextField tfnick = new JTextField();
 				JButton bunick = new JButton("Set");
 				JPanel ppan = new JPanel(new BorderLayout());
@@ -390,6 +403,10 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				ppan.add(bunick, BorderLayout.EAST);
 				pp.addComponent("Nickname: ", ppan);
 //				final JTextField tfnick = pp.createTextField("Nickname: ", "unknown", true);
+				
+				bunick.setPreferredSize(b.getPreferredSize());
+				bunick.setMinimumSize(b.getMinimumSize());
+				
 				bunick.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)

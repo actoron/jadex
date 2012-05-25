@@ -73,6 +73,12 @@ public interface IComponentDescription
 	 */
 	public String getState();
 
+	/**
+	 *  Get the creation time.
+	 *  @return The creation time.
+	 */
+	public long getCreationTime();
+	
 //	/**
 //	 *  Get the processing state of the component.
 //	 *  I.e. ready, running or blocked.
