@@ -26,6 +26,12 @@ public interface IFuture<E>
 	public boolean isDone();
 
 	/**
+	 *  Get the exception, if any.
+	 *  @return	The exception, if any, or null if the future is not yet done or succeeded without exception.
+	 */
+	public Exception	getException();
+
+	/**
 	 *  Get the result - blocking call.
 	 *  @return The future result.
 	 */

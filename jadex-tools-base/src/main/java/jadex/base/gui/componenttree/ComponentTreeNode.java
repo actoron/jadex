@@ -19,7 +19,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -148,7 +148,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		getModel().fireNodeChanged(ComponentTreeNode.this);
 		
 		cms.getComponentDescription(desc.getName())
-			.addResultListener(new SwingDefaultResultListener<IComponentDescription>()
+			.addResultListener(new SwingResultListener<IComponentDescription>()
 		{
 			public void customResultAvailable(IComponentDescription result)
 			{
@@ -295,7 +295,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 
 //		if(ComponentTreeNode.this.toString().indexOf("Hunter")!=-1)
 //			System.err.println("searchChildren queued: "+this);
-		cms.getChildrenDescriptions(cid).addResultListener(new SwingDefaultResultListener<IComponentDescription[]>()
+		cms.getChildrenDescriptions(cid).addResultListener(new SwingResultListener<IComponentDescription[]>()
 		{
 			public void customResultAvailable(final IComponentDescription[] achildren)
 			{
@@ -329,24 +329,24 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 		// Search services and only add container node when services are found.
 //		System.out.println("name: "+desc.getName());
 		
-		cms.getRootIdentifier().addResultListener(new SwingDefaultResultListener<IComponentIdentifier>()
+		cms.getRootIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>()
 		{
 			public void customResultAvailable(IComponentIdentifier root) 
 			{
 				cms.getExternalAccess(root)
-					.addResultListener(new SwingDefaultResultListener<IExternalAccess>()
+					.addResultListener(new SwingResultListener<IExternalAccess>()
 				{
 					public void customResultAvailable(final IExternalAccess rootea)
 					{
 						cms.getExternalAccess(cid)
-							.addResultListener(new SwingDefaultResultListener<IExternalAccess>()
+							.addResultListener(new SwingResultListener<IExternalAccess>()
 						{
 							public void customResultAvailable(final IExternalAccess ea)
 							{
 	//							System.out.println("search childs: "+ea);
 								
 								SRemoteGui.getServiceInfos(ea)
-									.addResultListener(new SwingDefaultResultListener<Object[]>()
+									.addResultListener(new SwingResultListener<Object[]>()
 								{
 									public void customResultAvailable(final Object[] res)
 									{
@@ -396,7 +396,7 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 											}
 											
 											final ServiceContainerNode	node	= scn;
-											ret.addResultListener(new SwingDefaultResultListener<List<ITreeNode>>()
+											ret.addResultListener(new SwingResultListener<List<ITreeNode>>()
 											{
 												public void customResultAvailable(List<ITreeNode> result)
 												{
@@ -429,9 +429,6 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 							
 							public void customExceptionOccurred(Exception exception)
 							{
-	//							System.out.println("exception in comp tree node: "+exception);
-	//							exception.printStackTrace();
-								
 								ready[1]	= true;
 								if(ready[0] &&  ready[1])
 								{
@@ -440,7 +437,23 @@ public class ComponentTreeNode	extends AbstractTreeNode implements IActiveCompon
 							}
 						});
 					}
+					public void customExceptionOccurred(Exception exception)
+					{
+						ready[1]	= true;
+						if(ready[0] &&  ready[1])
+						{
+							ret.setExceptionIfUndone(exception);
+						}
+					}
 				});
+			}
+			public void customExceptionOccurred(Exception exception)
+			{
+				ready[1]	= true;
+				if(ready[0] &&  ready[1])
+				{
+					ret.setExceptionIfUndone(exception);
+				}
 			}
 		});
 		

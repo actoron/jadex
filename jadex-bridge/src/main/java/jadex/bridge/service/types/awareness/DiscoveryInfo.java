@@ -2,6 +2,7 @@ package jadex.bridge.service.types.awareness;
 
 import jadex.bridge.IComponentIdentifier;
 import jadex.commons.SUtil;
+import jadex.commons.future.IFuture;
 
 /**
  *  Local information about discovered platforms.
@@ -19,7 +20,7 @@ public class DiscoveryInfo
 	public IComponentIdentifier cid;
 	
 	/** Component id of local proxy (if any). */
-	public IComponentIdentifier proxy;
+	public IFuture<IComponentIdentifier> proxy;
 	
 	/** Time when last awareness info was received. */
 	public long time;
@@ -42,7 +43,7 @@ public class DiscoveryInfo
 	/**
 	 *  Create a new discovery info.
 	 */
-	public DiscoveryInfo(IComponentIdentifier cid, IComponentIdentifier proxy, long time, long delay, boolean remoteexcluded)
+	public DiscoveryInfo(IComponentIdentifier cid, IFuture<IComponentIdentifier> proxy, long time, long delay, boolean remoteexcluded)
 	{
 		this.cid = cid;
 		this.proxy = proxy;
@@ -75,7 +76,7 @@ public class DiscoveryInfo
 	 *  Get the proxy.
 	 *  @return the proxy.
 	 */
-	public IComponentIdentifier getProxy()
+	public IFuture<IComponentIdentifier> getProxy()
 	{
 		return proxy;
 	}
@@ -84,7 +85,7 @@ public class DiscoveryInfo
 	 *  Set the proxy.
 	 *  @param proxy The proxy to set.
 	 */
-	public void setProxy(IComponentIdentifier proxy)
+	public void setProxy(IFuture<IComponentIdentifier> proxy)
 	{
 		this.proxy = proxy;
 	}

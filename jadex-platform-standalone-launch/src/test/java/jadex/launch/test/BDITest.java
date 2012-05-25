@@ -46,7 +46,8 @@ public class BDITest	extends	ComponentTestSuite
 				"Sentry",
 				"ShutdownPlatform",
 //				"ServiceCallReasoning",
-				"3d"	// OpenGL problems on termination?
+				"3d",	// OpenGL problems on termination?
+				"ErrorMessages"
 			});
 	}
 	

@@ -13,6 +13,7 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 import jadex.micro.annotation.Binding;
 
@@ -763,6 +764,7 @@ public class GuiPanel extends JPanel
 		private JTextField start = new JTextField(20);
 		private JTextField deadline = new JTextField(20);
 		private boolean aborted;
+		private Exception e;
 
 		InputDialog(final boolean buy)
 		{
@@ -775,9 +777,8 @@ public class GuiPanel extends JPanel
 				public IFuture<Void> execute(IInternalAccess ia)
 				{
 					ia.getServiceContainer().searchService(IClockService.class, Binding.SCOPE_PLATFORM)
-						.addResultListener(new SwingDefaultResultListener(GuiPanel.this)
+						.addResultListener(new SwingResultListener()
 					{
-						
 						public void customResultAvailable(Object result)
 						{
 							IClockService clock = (IClockService)result;
@@ -882,6 +883,11 @@ public class GuiPanel extends JPanel
 								}
 							});
 						}
+						
+						public void customExceptionOccurred(Exception exception)
+						{
+							e	= exception;
+						}
 					});
 					return IFuture.DONE;
 				}
@@ -891,12 +897,19 @@ public class GuiPanel extends JPanel
 
 		public boolean requestInput(long currenttime)
 		{
-			this.deadline.setText(dformat.format(new Date(currenttime + 300000)));
-			this.aborted = true;
-			this.pack();
-			this.setLocation(SGUI.calculateMiddlePosition(getFrame(), this));
-			this.setVisible(true);
-			return !aborted;
+			if(e!=null)
+			{
+				throw new RuntimeException(e);
+			}
+			else
+			{
+				this.deadline.setText(dformat.format(new Date(currenttime + 300000)));
+				this.aborted = true;
+				this.pack();
+				this.setLocation(SGUI.calculateMiddlePosition(getFrame(), this));
+				this.setVisible(true);
+				return !aborted;
+			}
 		}
 	}
 	

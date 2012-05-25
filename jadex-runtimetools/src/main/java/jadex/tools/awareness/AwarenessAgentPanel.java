@@ -945,7 +945,7 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			}
 			else if(column == 3)
 			{
-				value = dif.getProxy()!=null ? Boolean.TRUE : Boolean.FALSE;
+				value = dif.getProxy()!=null && dif.getProxy().isDone() && dif.getProxy().getException()==null ? Boolean.TRUE : Boolean.FALSE;
 			}
 			else if(column == 4)
 			{
@@ -959,8 +959,8 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 			DiscoveryInfo dif = (DiscoveryInfo)list.get(row);
 			final boolean	create	= ((Boolean)val).booleanValue();
 			final IComponentIdentifier	cid	= dif.getComponentIdentifier();
-			final IComponentIdentifier	proxy	= dif.getProxy();
-			if(create && proxy==null || !create && proxy!=null)
+			final IComponentIdentifier	proxy	=  dif.getProxy()!=null && dif.getProxy().isDone() && dif.getProxy().getException()==null ? dif.getProxy().get(null) : null;
+			if(create && dif.getProxy()==null || !create && proxy!=null)
 			{
 				// Ask user if platform should be added to excludes list.
 				boolean	proceed	= true;
@@ -1027,13 +1027,14 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 						@Classname("createDeleteProxy")
 						public IFuture<Void> execute(IInternalAccess ia)
 						{
-							AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
 							IFuture<Void>	ret;
-							if(create)
+							AwarenessManagementAgent agent = (AwarenessManagementAgent)ia;
+							DiscoveryInfo	dif	= agent.getDiscoveryInfo(cid);
+							if(create && dif!=null)
 							{
 								final Future<Void>	fut	= new Future<Void>();
 								ret	= fut;
-								agent.createProxy(cid).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(fut)
+								agent.createProxy(dif).addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(fut)
 								{
 									public void customResultAvailable(IComponentIdentifier result)
 									{
@@ -1041,9 +1042,13 @@ public class AwarenessAgentPanel implements IComponentViewerPanel
 									}
 								});
 							}
+							else if(dif!=null)
+							{
+								ret	= agent.deleteProxy(dif);
+							}
 							else
 							{
-								ret	= agent.deleteProxy(proxy);
+								ret	= IFuture.DONE;
 							}
 							return ret;
 						}

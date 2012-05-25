@@ -322,7 +322,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 			if(isIncluded(sender, getIncludes(), getExcludes())
 				&& !remoteexcluded && isAutoCreateProxy() && dif.getProxy()==null)
 			{
-				createProxy(sender);
+				createProxy(dif);
 				
 //					if(initial && fast && started && !killed)
 //					{
@@ -349,9 +349,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		else
 		{
 			discovered.remove(sender);
-			if(dif!=null && dif.getProxy()!=null)
+			if(dif!=null)
 			{
-				deleteProxy(dif.getProxy());
+				deleteProxy(dif);
 			}
 		}
 		
@@ -656,7 +656,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 					{
 						DiscoveryInfo dif = todel.get(i);
 						// Ignore deletion failures
-						deleteProxy(dif.getProxy());
+						deleteProxy(dif);
 					}
 				}
 				
@@ -675,10 +675,12 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 		{
 			public void resultAvailable(Object result)
 			{
-				if(dif.getProxy()!=null)
+				// Only need to check, when proxy already created
+				if(dif.getProxy()!=null && dif.getProxy().isDone() && dif.getProxy().getException()==null)
 				{
+					IComponentIdentifier	proxy	= dif.getProxy().get(null);
 					IComponentManagementService cms = (IComponentManagementService)result;
-					cms.getComponentDescription(dif.getProxy())
+					cms.getComponentDescription(proxy)
 						.addResultListener(new IResultListener<IComponentDescription>()
 					{
 						public void resultAvailable(IComponentDescription result)
@@ -711,19 +713,32 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	/**
 	 *  Create a proxy using given settings.
 	 */
-	public IFuture<IComponentIdentifier> createProxy(final IComponentIdentifier cid)
+	public IFuture<IComponentIdentifier> createProxy(final DiscoveryInfo dif)
 	{
 		final Map<String, Object>	args = new HashMap<String, Object>();
-		args.put("component", cid);
+		args.put("component", dif.getComponentIdentifier());
 		
 		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		dif.setProxy(ret);
+		ret.addResultListener(new IResultListener<IComponentIdentifier>()
+		{
+			public void resultAvailable(IComponentIdentifier result)
+			{
+				informListeners(dif);
+			}
+			public void exceptionOccurred(Exception exception)
+			{
+				dif.setProxy(null);
+				informListeners(dif);
+			}
+		});
 		
 		IFuture<IComponentManagementService>	cmsfut	= getServiceContainer().getRequiredService("cms");
 		cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
 		{
 			public void customResultAvailable(final IComponentManagementService cms)
 			{
-				if(cid.equals(root))
+				if(dif.getComponentIdentifier().equals(root))
 				{
 					ret.setException(new RuntimeException("Proxy for local components not allowed"));
 				}
@@ -731,18 +746,14 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				{
 					CreationInfo ci = new CreationInfo(args);
 					ci.setDaemon(true);
-					cms.createComponent(cid.getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
+					cms.createComponent(dif.getComponentIdentifier().getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
 						createResultListener(new DefaultResultListener<Collection<Tuple2<String, Object>>>(getLogger())
 					{
 						public void resultAvailable(Collection<Tuple2<String, Object>> result)
 						{
 //							System.out.println("Proxy killed: "+source);
-							DiscoveryInfo dif = getDiscoveryInfo(cid);
-							if(dif!=null)
-							{
-								dif.setProxy(null);
-								informListeners(dif);
-							}
+							dif.setProxy(null);
+							informListeners(dif);
 						}
 						
 						public void exceptionOccurred(Exception exception)
@@ -750,16 +761,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 							if(!(exception instanceof ComponentTerminatedException))
 								super.exceptionOccurred(exception);
 						}
-					})).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
-					{
-						public void customResultAvailable(IComponentIdentifier result)
-						{
-							DiscoveryInfo dif = getDiscoveryInfo(cid);
-							if(dif!=null)
-								dif.setProxy((IComponentIdentifier)result);
-							ret.setResult(result);
-						}
-					});
+					})).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 				}
 			}
 		});
@@ -770,31 +772,40 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	/**
 	 *  Delete a proxy.
 	 */
-	public IFuture<Void> deleteProxy(final IComponentIdentifier cid)
+	public IFuture<Void> deleteProxy(final DiscoveryInfo dif)
 	{
 		final Future<Void> ret = new Future<Void>();
 		
-		IFuture<IComponentManagementService>	cmsfut	= getServiceContainer().getRequiredService("cms");
-		cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
+		if(dif.getProxy()!=null)
 		{
-			public void customResultAvailable(IComponentManagementService cms)
+			dif.getProxy().addResultListener(new ExceptionDelegationResultListener<IComponentIdentifier, Void>(ret)
 			{
-//				System.out.println("awareness destroy: "+cid);
-				cms.destroyComponent(cid).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+				public void customResultAvailable(final IComponentIdentifier proxy)
 				{
-					public void customResultAvailable(Map<String, Object> result)
+					IFuture<IComponentManagementService>	cmsfut	= getServiceContainer().getRequiredService("cms");
+					cmsfut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, Void>(ret)
 					{
-						DiscoveryInfo	dif	= discovered.get(cid);
-						if(dif!=null)
+						public void customResultAvailable(IComponentManagementService cms)
 						{
-							dif.setProxy(null);
-							informListeners(dif);
+	//						System.out.println("awareness destroy: "+proxy);
+							cms.destroyComponent(proxy).addResultListener(new ExceptionDelegationResultListener<Map<String, Object>, Void>(ret)
+							{
+								public void customResultAvailable(Map<String, Object> result)
+								{
+									dif.setProxy(null);
+									informListeners(dif);
+									ret.setResult(null);
+								}
+							});
 						}
-						ret.setResult(null);
-					}
-				});
-			}
-		});
+					});
+				}
+			});
+		}
+		else
+		{
+			ret.setResult(null);
+		}
 		
 		return ret;
 	}

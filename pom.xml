@@ -293,6 +293,34 @@
 									</descriptors>
 								</configuration>
 							</execution>
+							<execution>
+								<id>sources-3d</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>sources-3d</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-3dsrczip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>make-assembly-3d</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>jadex-3d-addon-${project.version}</finalName>
+								    <descriptors>
+										<descriptor>src/main/assembly/dist-assembly-3d.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
 						</executions>
 					</plugin><!-- 
 					<plugin>
@@ -433,6 +461,110 @@
 				<module>jadex-platform-extension-webservice</module>
 				
 				<!-- <module>jadex-apleis</module> -->
+			</modules>
+		</profile>
+		
+		<profile>
+			<id>jadex-dist</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2.1</version>
+						<configuration>
+							<appendAssemblyId>false</appendAssemblyId>
+							<archiverConfig>
+								<duplicateBehavior>skip</duplicateBehavior>
+							</archiverConfig>
+						</configuration>
+						<executions>
+							<execution>
+								<id>jadex-example-project</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>jadex-example-project</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-exampleprojectzip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>sources</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<!-- .zip is appended automatically to the final name. -->
+									<finalName>sources</finalName>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly-srczip.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/main/assembly/dist-assembly.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<modules>
+				<module>jadex-commons</module>
+				<module>jadex-xml</module>
+				<module>jadex-javaparser</module>
+				<module>jadex-bridge</module>
+				<module>jadex-platform-base</module>
+				<module>jadex-nuggets</module>
+
+				<module>jadex-kernel-base</module>
+				<module>jadex-kernel-component</module>
+				<module>jadex-kernel-application</module>
+				<module>jadex-kernel-bdi</module>
+				<module>jadex-kernel-micro</module>
+				<module>jadex-kernel-bpmn</module>
+				<module>jadex-kernel-bdibpmn</module>
+				<module>jadex-kernel-gpmn</module>
+				<module>jadex-kernel-extension-envsupport</module>
+				<module>jadex-kernel-extension-envsupport-opengl</module>
+				<module>jadex-kernel-extension-agr</module>
+
+				<module>jadex-applib-bdi</module>
+				<module>jadex-applications-bdi</module>
+				<module>jadex-applications-micro</module>
+				<module>jadex-applications-bpmn</module>
+				<module>jadex-applications-bdibpmn</module>
+				<module>jadex-applications-gpmn</module>
+				<module>jadex-applications-web</module>
+				<module>jadex-applications-webservice</module>
+
+				<module>jadex-rules</module>
+				<module>jadex-rules-applications</module>
+				<module>jadex-rules-tools</module>
+
+				<module>jadex-tools-base</module>
+				<module>jadex-runtimetools</module>
+				<module>jadex-tools-bdi</module>
+				<module>jadex-tools-bpmn</module>
+				<module>jadex-tools-comanalyzer</module>
+				<module>jadex-platform-standalone</module>
+				<module>jadex-platform-standalone-launch</module>
+				<module>jadex-platform-relay-web</module>
+				<module>jadex-platform-extension-webservice</module>
 			</modules>
 		</profile>
 		

@@ -79,4 +79,18 @@ public class NotifierFrame extends JFrame implements IExternalNotifier
 		});
 	}
 	
+	
+	/**
+	 *  Cancel the wait action.
+	 */
+	public void cancel()
+	{
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				dispose();
+			}
+		});	
+	}
 }

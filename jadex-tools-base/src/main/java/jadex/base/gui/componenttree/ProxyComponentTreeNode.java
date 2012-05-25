@@ -15,8 +15,8 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.CombiIcon;
 import jadex.commons.gui.SGUI;
-import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.util.Collections;
@@ -73,7 +73,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 		this.state = STATE_UNCONNECTED;
 		
 		// Add CMS listener for remote proxy node.
-		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener<IComponentIdentifier>()
+		getRemoteComponentIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>()
 		{
 			public void customResultAvailable(IComponentIdentifier result)
 			{
@@ -129,7 +129,7 @@ public class ProxyComponentTreeNode extends ComponentTreeNode
 	{
 		busy	= true;
 		// Get remote component identifier before calling searchChildren
-		getRemoteComponentIdentifier().addResultListener(new SwingDefaultResultListener<IComponentIdentifier>()
+		getRemoteComponentIdentifier().addResultListener(new SwingResultListener<IComponentIdentifier>()
 		{
 			public void customResultAvailable(IComponentIdentifier result)
 			{

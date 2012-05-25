@@ -29,6 +29,7 @@ public class MicroTest	extends ComponentTestSuite
 			"ProtectedBodyAgent",
 			"BrokenInitAgent",
 			"BrokenInit.component.xml",
+			"CompositeCalculatorAgent",
 			
 			// Manual tests requiring interaction
 			"ExternalAccessInvokerAgent",
@@ -36,6 +37,8 @@ public class MicroTest	extends ComponentTestSuite
 			// Application sub agents
 			"messagequeue/User",
 			"messagequeue\\User",
+			"messagequeue/replicated/User",
+			"messagequeue\\replicated\\User",
 			
 			// Non-tests that don't stop until finished (why?)
 			"AgentCreationAgent",	

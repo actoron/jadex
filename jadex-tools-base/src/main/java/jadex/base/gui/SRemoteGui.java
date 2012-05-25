@@ -186,14 +186,15 @@ public class SRemoteGui
 			public IFuture<Tuple2<String, String>> execute(IInternalAccess ia)
 			{
 				final Future<Tuple2<String, String>>	ret	= new Future<Tuple2<String, String>>();
+				// Test, if model can be loaded.
 				SComponentFactory.loadModel(ia.getExternalAccess(), name, rid)
 					.addResultListener(ia.createResultListener(new ExceptionDelegationResultListener<IModelInfo, Tuple2<String, String>>(ret)
 				{
 					public void customResultAvailable(IModelInfo result)
 					{
-						ret.setResult(new Tuple2<String, String>(
-							SUtil.convertPathToRelative(name),
-							SUtil.convertPathToRelative(SUtil.convertURLToString(rid.getLocalIdentifier().getUrl()))));
+						String	model	= SUtil.convertPathToRelative(name);
+						String	ridurl	= SUtil.convertPathToRelative(rid.getLocalIdentifier().getUrl().toString());
+						ret.setResult(new Tuple2<String, String>(model, ridurl));
 					}
 					public void exceptionOccurred(Exception exception)
 					{

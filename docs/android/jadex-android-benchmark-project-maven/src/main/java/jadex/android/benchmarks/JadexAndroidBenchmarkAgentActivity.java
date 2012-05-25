@@ -179,7 +179,7 @@ public class JadexAndroidBenchmarkAgentActivity extends Activity
 				{
 					public void resultAvailable(IChatGuiService chat)
 					{
-						chat.message(msg.getText().toString(), new IComponentIdentifier[0], true)
+						chat.message(msg.getText().toString(), new IComponentIdentifier[0], false)
 							.addResultListener(new IResultListener<Collection<IChatService>>()
 						{
 							public void resultAvailable(Collection<IChatService> result)

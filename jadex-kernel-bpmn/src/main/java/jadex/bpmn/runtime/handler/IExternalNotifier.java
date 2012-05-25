@@ -13,4 +13,9 @@ public interface IExternalNotifier
 	 *  @param notifier The notifier.
 	 */
 	public void activateWait(Map properties, Notifier notifier);
+	
+	/**
+	 *  Cancel the wait action.
+	 */
+	public void cancel();
 }

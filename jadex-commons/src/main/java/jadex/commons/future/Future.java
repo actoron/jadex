@@ -128,6 +128,15 @@ public class Future<E> implements IFuture<E>
     	return resultavailable;
     }
 
+	/**
+	 *  Get the exception, if any.
+	 *  @return	The exception, if any, or null if the future is not yet done or succeeded without exception.
+	 */
+	public synchronized Exception	getException()
+	{
+		return exception;
+	}
+	
     /**
      *  Get the result - blocking call.
      *  @return The future result.

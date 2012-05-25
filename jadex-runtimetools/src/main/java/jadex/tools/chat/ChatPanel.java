@@ -41,7 +41,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,7 +50,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.PropertyPermission;
 import java.util.Set;
 
 import javax.sound.sampled.AudioInputStream;
@@ -321,11 +320,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 							JTable.DropLocation	droploc	= (JTable.DropLocation)support.getDropLocation();
 							ChatUser cu	= (ChatUser)table.getModel().getValueAt(droploc.getRow(), 0);
 							
-							List<File>	files	= (List<File>)support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+							List<?>	files	= (List<?>)support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 //							System.out.println("importData: "+files);
-							for(File file: files)
+							for(Object file: files)
 							{
-								getService().sendFile(file.getAbsolutePath(), cu.getComponentIdentifier());
+								getService().sendFile(((File)file).getAbsolutePath(), cu.getComponentIdentifier());
 							}
 							success	= true;
 						}
@@ -1014,8 +1013,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				try
 				{
 					Clip	clip	= AudioSystem.getClip();
-					InputStream	is	= getClass().getResourceAsStream(NOTIFICATION_SOUNDS.get(type));
-					AudioInputStream	ais	= AudioSystem.getAudioInputStream(is);
+//					InputStream	is	= getClass().getResourceAsStream(NOTIFICATION_SOUNDS.get(type));
+					URL	url	= this.getClass().getResource(NOTIFICATION_SOUNDS.get(type));
+					AudioInputStream	ais	= AudioSystem.getAudioInputStream(url); // (is);
 					clip.open(ais);
 					clip.start();
 				}

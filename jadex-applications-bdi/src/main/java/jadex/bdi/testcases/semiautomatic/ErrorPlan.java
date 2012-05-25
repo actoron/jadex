@@ -20,6 +20,5 @@ public class ErrorPlan extends Plan
 		IGoal	goal	= createGoal("testgoal");
 		dispatchTopLevelGoal(goal);
 		dispatchTopLevelGoal(goal);
-	
 	}
 }

@@ -7,21 +7,15 @@ import jadex.base.gui.componenttree.ComponentTreePanel;
 import jadex.base.gui.componenttree.IActiveComponentTreeNode;
 import jadex.base.gui.componenttree.ProvidedServiceInfoNode;
 import jadex.base.gui.plugin.AbstractJCCPlugin;
-import jadex.base.gui.plugin.IControlCenter;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.IService;
-import jadex.bridge.service.IServiceContainer;
 import jadex.bridge.service.IServiceIdentifier;
-import jadex.bridge.service.IServiceProvider;
-import jadex.bridge.service.annotation.GuiClassName;
 import jadex.bridge.service.search.SServiceProvider;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.Properties;
 import jadex.commons.SReflect;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.CombiIcon;
@@ -29,6 +23,7 @@ import jadex.commons.gui.ObjectCardLayout;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingDelegationResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -575,19 +570,19 @@ public class ComponentViewerPlugin extends AbstractJCCPlugin
 				{
 					// Unknown -> start search to find out asynchronously
 					SServiceProvider.getServiceUpwards(getJCC().getJCCAccess().getServiceProvider(), IComponentManagementService.class)
-						.addResultListener(new SwingDefaultResultListener()
+						.addResultListener(new SwingResultListener()
 					{
 						public void customResultAvailable(Object result)
 						{
 							final IComponentManagementService cms = (IComponentManagementService)result;
 							
-							cms.getExternalAccess(cid).addResultListener(new SwingDefaultResultListener()
+							cms.getExternalAccess(cid).addResultListener(new SwingResultListener()
 							{
 								public void customResultAvailable(Object result)
 								{
 									final IExternalAccess exta = (IExternalAccess)result;
 									getJCC().getClassLoader(exta.getModel().getResourceIdentifier())
-										.addResultListener(new SwingDefaultResultListener<ClassLoader>()
+										.addResultListener(new SwingResultListener<ClassLoader>()
 									{
 										public void customResultAvailable(ClassLoader cl)
 										{

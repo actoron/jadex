@@ -26,6 +26,7 @@ public abstract class SwingDefaultResultListener<E> extends DefaultResultListene
 	 */
 	public SwingDefaultResultListener()
 	{
+//		Thread.dumpStack();
 	}
 	
 	/**
@@ -35,6 +36,7 @@ public abstract class SwingDefaultResultListener<E> extends DefaultResultListene
 	public SwingDefaultResultListener(Component parent)
 	{
 		this.parent	= parent;
+//		Thread.dumpStack();
 	}
 	
 	/**
@@ -44,6 +46,7 @@ public abstract class SwingDefaultResultListener<E> extends DefaultResultListene
 	public SwingDefaultResultListener(Logger logger)
 	{
 		super(logger);
+//		Thread.dumpStack();
 	}
 	
 	//-------- methods --------

@@ -22,6 +22,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.BorderLayout;
@@ -136,13 +137,16 @@ public class ManagerFrame extends JFrame implements ActionListener, WindowListen
 				IFuture<IComponentManagementService>	cms	= ia.getServiceContainer().getRequiredService("cms");
 //				if(cms.isDone() && cms.get(null)==null)
 //					Thread.dumpStack();
-				cms.addResultListener(new SwingDefaultResultListener<IComponentManagementService>(ManagerFrame.this)
+				cms.addResultListener(new SwingResultListener<IComponentManagementService>()
 				{
 					public void customResultAvailable(final IComponentManagementService ces)
 					{
 //						dealeraid = ces.createComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent(), null);
 						dealeraid = new ComponentIdentifier(LOCAL_DEALER, access.getComponentIdentifier().getParent());
 						dealertf.setText(dealeraid.getName());
+					}
+					public void customExceptionOccurred(Exception exception)
+					{
 					}
 				});
 				return IFuture.DONE;

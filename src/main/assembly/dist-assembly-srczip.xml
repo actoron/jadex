@@ -13,7 +13,10 @@
 
 	<moduleSets>
 		<moduleSet>
-			<sources>
+			<excludes>
+				<exclude>*:*-jmonkey</exclude>
+			</excludes>
+		    <sources>
 				<includeModuleDirectory>false</includeModuleDirectory>
 				<fileSets>
 					<fileSet>
@@ -57,7 +60,11 @@
 			<source>src/main/assembly/dist-assembly-exampleprojectzip.xml</source>
 			<outputDirectory>sources/src/main/assembly</outputDirectory>
 		</file>
-		
+		<file>
+			<source>docs/readme-building.txt</source>
+			<outputDirectory>sources</outputDirectory>
+		</file>
+				
 		<!-- Copy files required for distribution build -->
 		<file>
 			<source>docs/junit-3.8.1.jar</source>
@@ -103,6 +110,13 @@
 			<source>docs/howtostart.txt</source>
 			<outputDirectory>sources/docs</outputDirectory>
 		</file>
+		<file>
+			<source>docs/xs3p.xsl</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
+		<file>
+			<source>docs/readme-building.txt</source>
+			<outputDirectory>sources/docs</outputDirectory>
+		</file>
 	</files>
-
 </assembly>

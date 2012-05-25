@@ -1711,7 +1711,14 @@ public class SUtil
 		// Special treatment for files in jar file -> just make jar file name relative and keep inner name 
 		if(absolute.startsWith("jar:file:") && absolute.indexOf("!")!=-1)
 		{
-			return "jar:file:" +absolute.substring(9, absolute.indexOf("!")) + absolute.substring(absolute.indexOf("!"));
+			try
+			{
+				return "jar:file:" +convertPathToRelative(URLDecoder.decode(absolute.substring(9, absolute.indexOf("!")), "UTF-8")) + absolute.substring(absolute.indexOf("!"));
+			}
+			catch(UnsupportedEncodingException e)
+			{
+				return "jar:file:" +convertPathToRelative(absolute.substring(9, absolute.indexOf("!"))) + absolute.substring(absolute.indexOf("!"));
+			}
 		}
 		
 		// Build path as list of files (directories).
