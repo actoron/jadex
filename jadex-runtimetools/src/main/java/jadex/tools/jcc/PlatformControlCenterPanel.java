@@ -147,8 +147,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 			this.add(BorderLayout.NORTH, tp);
 	       
 			// Add standard entries (after gap).
-	        toolbar.add(Box.createGlue());
-	        toolbar.addSeparator();
+//	        toolbar.add(Box.createGlue());
+//	        toolbar.addSeparator();
 	        
 	        //ButtonGroup bg = new ButtonGroup();
 //	        IControlCenterPlugin[]	plugins	= controlcenter.getPlugins();
@@ -259,32 +259,45 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	        toolbar.add(popup);
 		}
 		
+		toolbar.removeAll();
+		toolbar.add(Box.createGlue());
+		toolbar.addSeparator();
+		
 		// Remove leading tool specific buttons
+//		if(selplugin!=null)
+//		{
+//			List<JComponent> torem = new ArrayList<JComponent>();
+//			for(int i=0; i<toolbar.getComponentCount(); i++)
+//			{
+//				JComponent comp	= (JComponent)toolbar.getComponent(i);
+//				if(comp instanceof JButton && comp.getClientProperty("plugin")==null)
+//	        	{
+//					torem.add(comp);
+//	        	}
+//			}
+//			for(JComponent com: torem)
+//			{
+//				toolbar.remove(com);
+//			}
+//			
+////			toolbar.add(jlb, 0);
+//			
+//			JComponent[] template = selplugin.getToolBar();
+//	        for(int i=0; template!=null && i<template.length; i++)
+//	        {
+//	            toolbar.add(template[i], i);
+//	        }
+//		}
+
 		if(selplugin!=null)
 		{
-			List<JComponent> torem = new ArrayList<JComponent>();
-			for(int i=0; i<toolbar.getComponentCount(); i++)
-			{
-				JComponent comp	= (JComponent)toolbar.getComponent(i);
-				if(comp instanceof JButton && comp.getClientProperty("plugin")==null)
-	        	{
-					torem.add(comp);
-	        	}
-			}
-			for(JComponent com: torem)
-			{
-				toolbar.remove(com);
-			}
-			
-//			toolbar.add(jlb, 0);
-			
 			JComponent[] template = selplugin.getToolBar();
 	        for(int i=0; template!=null && i<template.length; i++)
 	        {
 	            toolbar.add(template[i], i);
 	        }
 		}
-
+		
         Set<IControlCenterPlugin> shown = new HashSet<IControlCenterPlugin>();
         for(int i=0; i<toolbar.getComponentCount(); i++)
         {
@@ -296,21 +309,21 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         	}
         }
         
-        // Remove all plugin buttons
-        List<JComponent> torem = new ArrayList<JComponent>();
-		for(int i=0; i<toolbar.getComponentCount(); i++)
-		{
-			JComponent comp	= (JComponent)toolbar.getComponent(i);
-			if((comp instanceof JButton && comp.getClientProperty("plugin")!=null) 
-				|| comp instanceof JadexLogoButton)
-        	{
-				torem.add(comp);
-        	}
-		}
-		for(JComponent com: torem)
-		{
-			toolbar.remove(com);
-		}
+//        // Remove all plugin buttons
+//        List<JComponent> torem = new ArrayList<JComponent>();
+//		for(int i=0; i<toolbar.getComponentCount(); i++)
+//		{
+//			JComponent comp	= (JComponent)toolbar.getComponent(i);
+//			if((comp instanceof JButton && comp.getClientProperty("plugin")!=null) 
+//				|| comp instanceof JadexLogoButton)
+//        	{
+//				torem.add(comp);
+//        	}
+//		}
+//		for(JComponent com: torem)
+//		{
+//			toolbar.remove(com);
+//		}
         
         // Make visble plugins
         IControlCenterPlugin[] pls = controlcenter.getToolbarPlugins(true);
@@ -374,6 +387,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 //		}
 //        if(cnt>1)
 //        	System.out.println("hhhhttt");
+        
+//        System.out.println("comps: "+toolbar.getComponentCount());
     }
 	
 	/**

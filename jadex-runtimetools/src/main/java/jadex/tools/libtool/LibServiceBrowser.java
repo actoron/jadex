@@ -137,7 +137,13 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 						try
 						{
 							URL url = files[i].toURI().toURL();
-							libservice.addURL(url);
+							libservice.addURL(url).addResultListener(new SwingDefaultResultListener<IResourceIdentifier>()
+							{
+								public void customResultAvailable(IResourceIdentifier result)
+								{
+									refresh();
+								}
+							});
 						}
 						catch(MalformedURLException ex)
 						{
@@ -158,7 +164,14 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 					classpaths.removeEntry(entries[sel[i]]);
 					try
 					{
-						libservice.removeURLCompletely(new URL(entries[sel[i]]));
+						libservice.removeURLCompletely(new URL(entries[sel[i]]))
+							.addResultListener(new SwingDefaultResultListener<Void>()
+						{
+							public void customResultAvailable(Void result)
+							{
+								refresh();
+							}
+						});
 					}
 					catch(Exception ex)
 					{
@@ -173,18 +186,7 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				libservice.getManagedResourceIdentifiers().addResultListener(new SwingDefaultResultListener<List<IResourceIdentifier>>(LibServiceBrowser.this)
-				{
-					public void customResultAvailable(List<IResourceIdentifier> result)
-					{
-						classpaths.removeEntries();
-//						List entries = (List)result;
-						for(int i=0; i<result.size(); i++)
-						{
-							classpaths.addEntry(result.get(i).toString());
-						}
-					}
-				});	
+				refresh();
 			}
 		});
 		classpaths.getModel().addTableModelListener(new TableModelListener()
@@ -286,6 +288,25 @@ public class LibServiceBrowser	extends	JTabbedPane	implements IServiceViewerPane
 		// Todo: remove listener, when tool is closed.
 		
 		return IFuture.DONE;
+	}
+	
+	/**
+	 * 
+	 */
+	public void refresh()
+	{
+		libservice.getManagedResourceIdentifiers().addResultListener(new SwingDefaultResultListener<List<IResourceIdentifier>>(LibServiceBrowser.this)
+		{
+			public void customResultAvailable(List<IResourceIdentifier> result)
+			{
+				classpaths.removeEntries();
+//						List entries = (List)result;
+				for(int i=0; i<result.size(); i++)
+				{
+					classpaths.addEntry(result.get(i).toString());
+				}
+			}
+		});	
 	}
 	
 	/**
