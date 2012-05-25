@@ -38,7 +38,7 @@ public interface IChatService
 	 *  @param nick The sender's nick name.
 	 *  @param text The text message.
 	 */
-	public IFuture<Void> message(String nick, String text);
+	public IFuture<Void> message(String nick, String text, boolean privatemessage);
 	
 	/**
 	 *  Post a status or nick name change.

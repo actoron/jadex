@@ -26,11 +26,13 @@ import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.commons.gui.future.SwingIntermediateDefaultResultListener;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.TexturePaint;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -68,8 +70,8 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.TransferHandler;
@@ -81,6 +83,10 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 /**
  *  Panel for displaying the chat.
@@ -129,7 +135,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	protected JPanel	panel;
 	
 	/** The text area. */
-	protected JTextArea chatarea;
+//	protected JTextArea chatarea;
+	protected JTextPane chatarea;
 	
 	/** The known chat users (cid->user state). */
 	protected Map<IComponentIdentifier, ChatUser>	users;
@@ -259,13 +266,13 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 
 				users	= new LinkedHashMap<IComponentIdentifier, ChatUser>();
 
-				chatarea = new JTextArea(10, 30)
+				chatarea = new JTextPane()
 				{
-					public void append(String text)
-					{
-						super.append(text);
-						this.setCaretPosition(getText().length());
-					}
+//					public void append(String text)
+//					{
+//						super.append(text);
+//						this.setCaretPosition(getText().length());
+//					}
 				};
 				chatarea.setEditable(false);
 				JScrollPane main = new JScrollPane(chatarea);
@@ -551,7 +558,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					{
 						if(ChatEvent.TYPE_MESSAGE.equals(ce.getType()))
 						{
-							addMessage(ce.getComponentIdentifier(), (String)ce.getValue(), ce.getNick());
+							addMessage(ce.getComponentIdentifier(), (String)ce.getValue(), ce.getNick(), ce.isPrivateMessage());
 						}
 						else if(ChatEvent.TYPE_STATECHANGE.equals(ce.getType()))
 						{
@@ -773,7 +780,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/**
 	 *  Add a message to the text area.
 	 */
-	public void addMessage(final IComponentIdentifier cid, final String text, final String nick)
+	public void addMessage(final IComponentIdentifier cid, final String text, final String nick, final boolean privatemessage)
 	{
 		SServiceProvider.getService(getJCC().getJCCAccess().getServiceProvider(), IClockService.class, RequiredServiceInfo.SCOPE_PLATFORM)
 			.addResultListener(new DefaultResultListener<IClockService>()
@@ -788,7 +795,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						buf.append("[").append(df.format(new Date(clock.getTime()))).append(", ")
 							.append(nick).append("]: ").append(text).append(lf);
 //							.append(cid.getName()).append("]: ").append(text).append(lf);
-						chatarea.append(buf.toString());
+						append(privatemessage? Color.RED: Color.BLACK, buf.toString(), chatarea);
+//						chatarea.append(Color.BLACK, buf.toString());
 						
 						notifyChatEvent(NOTIFICATION_NEW_MSG, cid, text, false);
 						
@@ -1043,6 +1051,48 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 
 		((FileTableModel)(fi.isDownload()?dtable:utable).getModel()).updateFile(fi);
 	}
+	
+	/**
+	 * 
+	 * @param c
+	 * @param s
+	 */
+	public static void append(Color c, String s, JTextPane p) 
+	{ 
+		p.setEditable(true);
+		
+		// better implementation--uses
+	                      // StyleContext
+	    StyleContext sc = StyleContext.getDefaultStyleContext();
+	    AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY,
+	        StyleConstants.Foreground, c);
+
+	    int len = p.getDocument().getLength(); // same value as
+	                       // getText().length();
+	    p.setCaretPosition(len); // place caret at the end (with no selection)
+	    p.setCharacterAttributes(aset, false);
+	    p.replaceSelection(s); // there is no selection, so inserts at caret
+	
+	    p.setEditable(false);
+	}
+	
+//	/**
+//	 * 
+//	 * @param c
+//	 * @param s
+//	 */
+//	public void append(Color c, String s, JTextPane p) 
+//	{ // naive implementation
+//	    // bad: instiantiates a new AttributeSet object on each call
+//	    SimpleAttributeSet aset = new SimpleAttributeSet();
+//	    StyleConstants.setForeground(aset, c);
+//
+//	    int len = p.getText().length();
+//	    p.setCaretPosition(len); // place caret at the end (with no selection)
+//	    p.setCharacterAttributes(aset, false);
+//	    p.replaceSelection(s); // there is no selection, so inserts at caret
+//	}
+
 	
 	//-------- helper classes --------
 	

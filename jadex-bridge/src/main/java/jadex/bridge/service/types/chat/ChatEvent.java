@@ -32,6 +32,9 @@ public class ChatEvent
 	
 	/** The event value (depends on type). */
 	protected Object	value;
+	
+	/** Flag for privat message. */
+	protected boolean privatemessage;
 
 	//-------- constructors --------
 	
@@ -46,12 +49,13 @@ public class ChatEvent
 	/**
 	 *  Create a new chat event.
 	 */
-	public ChatEvent(String type, String nick, IComponentIdentifier cid, Object value)
+	public ChatEvent(String type, String nick, IComponentIdentifier cid, Object value, boolean privatemessage)
 	{
 		this.type	= type;
 		this.nick	= nick;
 		this.cid	= cid;
 		this.value	= value;
+		this.privatemessage = privatemessage;
 	}
 	
 	//-------- accessors --------
@@ -119,6 +123,24 @@ public class ChatEvent
 	public void	setValue(Object value)
 	{
 		this.value	= value;
+	}
+
+	/**
+	 *  Get the privatemessage.
+	 *  @return the privatemessage.
+	 */
+	public boolean isPrivateMessage()
+	{
+		return privatemessage;
+	}
+
+	/**
+	 *  Set the privatemessage.
+	 *  @param privatemessage The privatemessage to set.
+	 */
+	public void setPrivateMessage(boolean privatemessage)
+	{
+		this.privatemessage = privatemessage;
 	}
 
 }

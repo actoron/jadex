@@ -224,9 +224,9 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 	 *  Post a message
 	 *  @param text The text message.
 	 */
-	public IFuture<Void>	message(String nick, String text)
+	public IFuture<Void>	message(String nick, String text, boolean privatemessage)
 	{
-		boolean	published	= publishEvent(ChatEvent.TYPE_MESSAGE, nick, IComponentIdentifier.CALLER.get(), text);
+		boolean	published	= publishEvent(ChatEvent.TYPE_MESSAGE, nick, IComponentIdentifier.CALLER.get(), text, privatemessage);
 		return published ? IFuture.DONE : new Future<Void>(new RuntimeException("No GUI, message was discarded."));
 	}
 
@@ -236,7 +236,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 	 */
 	public IFuture<Void>	status(String nick, String status)
 	{
-		publishEvent(ChatEvent.TYPE_STATECHANGE, nick, IComponentIdentifier.CALLER.get(), status);
+		publishEvent(ChatEvent.TYPE_STATECHANGE, nick, IComponentIdentifier.CALLER.get(), status, false);
 		return IFuture.DONE;
 	}
 	
@@ -262,7 +262,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 		
 		transfers.put(ti.getId(), new Tuple3<TransferInfo, TerminableIntermediateFuture<Long>, IInputConnection>(ti, ret, con));
 		
-		publishEvent(ChatEvent.TYPE_FILE, nick, sender, ti);
+		publishEvent(ChatEvent.TYPE_FILE, nick, sender, ti, false);
 		
 		return ret;
 	}
@@ -297,7 +297,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 					public IFuture<Void> execute(IInternalAccess ia)
 					{
 						ti.setState(TransferInfo.STATE_REJECTED);
-						publishEvent(ChatEvent.TYPE_FILE, nick, sender, ti);
+						publishEvent(ChatEvent.TYPE_FILE, nick, sender, ti, false);
 						transfers2.remove(ti.getId());
 						return IFuture.DONE;
 					}
@@ -307,7 +307,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 		
 		transfers2.put(ti.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(ti, ret, null));
 		
-		publishEvent(ChatEvent.TYPE_FILE, nick, sender, ti);
+		publishEvent(ChatEvent.TYPE_FILE, nick, sender, ti, false);
 
 		return ret;
 	}
@@ -404,7 +404,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 			
 			for(int i=0; i<receivers.length; i++)
 			{
-				sendTo(text, receivers[i]).addResultListener(new IResultListener<IChatService>()
+				sendTo(text, receivers[i], true).addResultListener(new IResultListener<IChatService>()
 				{
 					public void resultAvailable(IChatService result)
 					{
@@ -421,7 +421,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 			
 			if(self && !foundself)
 			{
-				sendTo(text, agent.getComponentIdentifier()).addResultListener(new IResultListener<IChatService>()
+				sendTo(text, agent.getComponentIdentifier(), true).addResultListener(new IResultListener<IChatService>()
 				{
 					public void resultAvailable(IChatService result)
 					{
@@ -447,7 +447,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 				public void intermediateResultAvailable(final IChatService chat)
 				{
 					cnt++;
-					chat.message(nick, text).addResultListener(new IResultListener<Void>()
+					chat.message(nick, text, false).addResultListener(new IResultListener<Void>()
 					{
 						public void resultAvailable(Void result)
 						{
@@ -486,7 +486,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 	/**
 	 * 
 	 */
-	protected IFuture<IChatService> sendTo(final String text, IComponentIdentifier rec)
+	protected IFuture<IChatService> sendTo(final String text, IComponentIdentifier rec, final boolean privatemessage)
 	{
 		final Future<IChatService> ret = new Future<IChatService>();
 		
@@ -496,7 +496,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 			public void customResultAvailable(final IChatService chat)
 			{
 //				ret.setResult(chat);
-				chat.message(nick, text).addResultListener(new ExceptionDelegationResultListener<Void, IChatService>(ret)
+				chat.message(nick, text, privatemessage).addResultListener(new ExceptionDelegationResultListener<Void, IChatService>(ret)
 				{
 					public void customResultAvailable(Void result)
 					{
@@ -649,7 +649,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 			if(TransferInfo.STATE_WAITING.equals(ti.getState()))
 			{
 				ti.setState(TransferInfo.STATE_REJECTED);
-				publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+				publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti, false);
 				tup.getSecondEntity().setException(new RuntimeException(TransferInfo.STATE_REJECTED));
 				transfers.remove(id);
 				ret	= IFuture.DONE;
@@ -670,7 +670,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 			if(TransferInfo.STATE_WAITING.equals(ti.getState()))
 			{
 				ti.setState(TransferInfo.STATE_REJECTED);
-				publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+				publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti, false);
 				((Future<IOutputConnection>) tup2.getSecondEntity()).setException(new RuntimeException(TransferInfo.STATE_REJECTED));
 				transfers2.remove(id);
 				ret	= IFuture.DONE;
@@ -708,7 +708,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 			if(TransferInfo.STATE_TRANSFERRING.equals(ti.getState()) || TransferInfo.STATE_WAITING.equals(ti.getState()))
 			{
 				ti.setState(TransferInfo.STATE_CANCELLING);
-				publishEvent(ChatEvent.TYPE_FILE, null, null, ti);
+				publishEvent(ChatEvent.TYPE_FILE, null, null, ti, false);
 				tup.getSecondEntity().terminate();
 				ret	= IFuture.DONE;
 			}
@@ -728,14 +728,14 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 			if(TransferInfo.STATE_WAITING.equals(ti.getState()))
 			{
 				ti.setState(TransferInfo.STATE_CANCELLING);
-				publishEvent(ChatEvent.TYPE_FILE, null, null, ti);
+				publishEvent(ChatEvent.TYPE_FILE, null, null, ti, false);
 				tup2.getSecondEntity().terminate();
 				ret	= IFuture.DONE;
 			}
 			else if(TransferInfo.STATE_TRANSFERRING.equals(ti.getState()))
 			{
 				ti.setState(TransferInfo.STATE_CANCELLING);
-				publishEvent(ChatEvent.TYPE_FILE, null, null, ti);
+				publishEvent(ChatEvent.TYPE_FILE, null, null, ti, false);
 				tup2.getThirdEntity().close();
 				ret	= IFuture.DONE;
 			}
@@ -831,7 +831,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 				fi.setState(TransferInfo.STATE_WAITING);
 				ITerminableFuture<IOutputConnection> fut = cs.startUpload(nick, file.getName(), size, fi.getId());
 				transfers2.put(fi.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(fi, fut, null));
-				publishEvent(ChatEvent.TYPE_FILE, null, cid, fi);
+				publishEvent(ChatEvent.TYPE_FILE, null, cid, fi, false);
 				fut.addResultListener(new ExceptionDelegationResultListener<IOutputConnection, Void>(ret)
 				{
 					public void customResultAvailable(IOutputConnection ocon)
@@ -856,7 +856,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 							fi.setState(TransferInfo.STATE_ERROR);
 						}
 						transfers2.remove(fi.getId());
-						publishEvent(ChatEvent.TYPE_FILE, null, cid, fi);
+						publishEvent(ChatEvent.TYPE_FILE, null, cid, fi, false);
 					}
 				});
 
@@ -875,12 +875,12 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 	 *  @param cid	The component ID.
 	 *  @param value The event value.
 	 */
-	protected boolean	publishEvent(String type, String nick, IComponentIdentifier cid, Object value)
+	protected boolean	publishEvent(String type, String nick, IComponentIdentifier cid, Object value, boolean privatemessage)
 	{
 		boolean	ret	= false;
 		if(subscribers!=null)
 		{
-			ChatEvent	ce	= new ChatEvent(type, nick, cid, value);
+			ChatEvent	ce	= new ChatEvent(type, nick, cid, value, privatemessage);
 			for(Iterator<SubscriptionIntermediateFuture<ChatEvent>> it=subscribers.iterator(); it.hasNext(); )
 			{
 				if(it.next().addIntermediateResultIfUndone(ce))
@@ -911,7 +911,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 		Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>	tup2	= transfers2.get(ti.getId());
 		if(tup2!=null)
 			transfers2.put(ti.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(ti, tup2.getSecondEntity(), con));
-		publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+		publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti, false);
 		
 		try
 		{
@@ -942,7 +942,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 					}
 					if(ti.update(filesize))
 					{
-						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti, false);
 					}
 				}
 				public void finished()
@@ -958,7 +958,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 					ti.setState(ti.getSize()==ti.getDone() ? TransferInfo.STATE_COMPLETED : TransferInfo.STATE_ABORTED);
 					transfers.remove(ti.getId());
 					transfers2.remove(ti.getId());
-					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti, false);
 				}
 				public void exceptionOccurred(Exception exception)
 				{
@@ -973,7 +973,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 					ti.setState(TransferInfo.STATE_CANCELLING.equals(ti.getState()) ? TransferInfo.STATE_ABORTED : TransferInfo.STATE_ERROR);
 					transfers.remove(ti.getId());
 					transfers2.remove(ti.getId());
-					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti, false);
 				}
 			});
 		}
@@ -982,7 +982,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 			ti.setState(TransferInfo.STATE_ERROR);
 			transfers.remove(ti.getId());
 			transfers2.remove(ti.getId());
-			publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+			publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti, false);
 			if(ret!=null)
 			{
 				ret.setExceptionIfUndone(new RuntimeException(TransferInfo.STATE_ERROR, e));
@@ -1002,7 +1002,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 		Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>	tup2	= transfers2.get(ti.getId());
 		if(tup2!=null)
 			transfers2.put(ti.getId(), new Tuple3<TransferInfo, ITerminableFuture<IOutputConnection>, IConnection>(ti, tup2.getSecondEntity(), ocon));
-		publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+		publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti, false);
 		
 		try
 		{
@@ -1024,7 +1024,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 					}
 					if(ti.update(filesize))
 					{
-						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+						publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti, false);
 					}
 				}
 				public void finished()
@@ -1040,7 +1040,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 					ti.setState(TransferInfo.STATE_COMPLETED);
 					transfers.remove(ti.getId());
 					transfers2.remove(ti.getId());
-					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);			
+					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti, false);			
 				}
 				public void exceptionOccurred(Exception exception)
 				{
@@ -1055,7 +1055,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 					ti.setState(TransferInfo.STATE_CANCELLING.equals(ti.getState()) ? TransferInfo.STATE_ABORTED : TransferInfo.STATE_ERROR);
 					transfers.remove(ti.getId());
 					transfers2.remove(ti.getId());
-					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+					publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti, false);
 				}
 			});
 		}
@@ -1064,7 +1064,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 			ti.setState(TransferInfo.STATE_ERROR);
 			transfers.remove(ti.getId());
 			transfers2.remove(ti.getId());
-			publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti);
+			publishEvent(ChatEvent.TYPE_FILE, null, ti.getOther(), ti, false);
 		}
 	}
 	
