@@ -126,43 +126,50 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 * 
 	 */
-	protected void addPlugin(Class<?> plclass)
+	protected void addPlugin(final Class<?> plclass)
 	{
-		try
+		SwingUtilities.invokeLater(new Runnable()
 		{
-			for(Tuple2<IControlCenterPlugin, JComponent> tup: plugins)
+			
+			public void run()
 			{
-				if(tup.getFirstEntity().getClass().equals(plclass))
+				try
 				{
-					setStatusText("Plugin already loaded: "+plclass);
-					return;
+					for(Tuple2<IControlCenterPlugin, JComponent> tup: plugins)
+					{
+						if(tup.getFirstEntity().getClass().equals(plclass))
+						{
+							setStatusText("Plugin already loaded: "+plclass);
+							return;
+						}
+					}
+					
+					final IControlCenterPlugin p = (IControlCenterPlugin)plclass.newInstance();
+//					plugins.put(p, null);
+					addPluginComponent(p, null);
+					
+					if(p.isLazy())
+					{
+						setStatusText("Plugin loaded successfully: "+ p.getName());									
+					}
+					else
+					{
+						initPlugin(p).addResultListener(new SwingDefaultResultListener<Void>(pccpanel)
+						{
+							public void customResultAvailable(Void result)
+							{
+								setStatusText("Plugin loaded successfully: "+ p.getName());
+							}
+						});
+					}
+					pccpanel.updateToolBar(null);
+				}
+				catch(Exception e)
+				{
+					setStatusText("Plugin error: "+plclass);
 				}
 			}
-			
-			final IControlCenterPlugin p = (IControlCenterPlugin)plclass.newInstance();
-//			plugins.put(p, null);
-			addPluginComponent(p, null);
-			
-			if(p.isLazy())
-			{
-				setStatusText("Plugin loaded successfully: "+ p.getName());									
-			}
-			else
-			{
-				initPlugin(p).addResultListener(new SwingDefaultResultListener<Void>(pccpanel)
-				{
-					public void customResultAvailable(Void result)
-					{
-						setStatusText("Plugin loaded successfully: "+ p.getName());
-					}
-				});
-			}
-			pccpanel.updateToolBar(null);
-		}
-		catch(Exception e)
-		{
-			setStatusText("Plugin error: "+plclass);
-		}
+		});
 	}
 	
 	/**

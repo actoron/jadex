@@ -129,6 +129,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	 */
 	protected void updateToolBar(IControlCenterPlugin selplugin)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
  		// Setup the tool bar.
 		if(selplugin==null)
 			selplugin = currentperspective;
@@ -264,7 +266,7 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 			for(int i=0; i<toolbar.getComponentCount(); i++)
 			{
 				JComponent comp	= (JComponent)toolbar.getComponent(i);
-				if(comp instanceof JButton && !(comp instanceof JadexLogoButton) && comp.getClientProperty("plugin")==null)
+				if(comp instanceof JButton && comp.getClientProperty("plugin")==null)
 	        	{
 					torem.add(comp);
 	        	}
@@ -299,7 +301,8 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 		for(int i=0; i<toolbar.getComponentCount(); i++)
 		{
 			JComponent comp	= (JComponent)toolbar.getComponent(i);
-			if(comp instanceof JButton && comp.getClientProperty("plugin")!=null || comp instanceof JadexLogoButton)
+			if((comp instanceof JButton && comp.getClientProperty("plugin")!=null) 
+				|| comp instanceof JadexLogoButton)
         	{
 				torem.add(comp);
         	}
@@ -317,54 +320,6 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         	addPlugin(pl, selplugin);
         }
         
-//        boolean selectnew = false;
-        
-        // Select plugin and remove invisible ones
-//      List<JComponent> torem = new ArrayList<JComponent>();
-//        for(int i=0; i<toolbar.getComponentCount(); i++)
-//        {
-//        	JComponent comp = (JComponent)toolbar.getComponent(i);
-//        	if(comp.getClientProperty("plugin")!=null)
-//        	{
-//        		IControlCenterPlugin pl = (IControlCenterPlugin)comp.getClientProperty("plugin");
-//        		boolean sel = pl.equals(selplugin); 
-//        		((JButton)comp).setIcon(pl.getToolIcon(sel));
-//        		//((JToggleButton)comp).setSelected(pluginname.equals(comp.getClientProperty("pluginname")));	
-//        		if(!controlcenter.isPluginVisible(pl))
-//        		{
-//        			torem.add(comp);
-//        			if(selplugin.equals(pl))
-//        				selectnew = true;
-//        		}
-//        		else
-//        		{
-//        			toshow.remove(pl);
-//        		}
-//        	}
-//        }
-//        for(JComponent com: torem)
-//		{
-//			toolbar.remove(com);
-//		}
-
-//        for(Iterator<IControlCenterPlugin> it=toshow.iterator(); it.hasNext(); )
-//        {
-//        	IControlCenterPlugin pl = it.next();
-//        	addPlugin(pl, null);
-//        }
-        
-//        // Check ordering of buttons, must correspond to plugins
-//        for(int i=0; i<pls.length; i++)
-//        {
-//        	
-//        	
-//        	JComponent comp = (JComponent)toolbar.getComponent(i);
-//        	if(comp.getClientProperty("plugin")!=null)
-//        	{
-//        		IControlCenterPlugin pl = (IControlCenterPlugin)comp.getClientProperty("plugin");
-//        	}
-//        }
-        
         // Just select first (if any) if selected plugin was removed 
         if(selplugin!=null && !SUtil.arrayToSet(pls).contains(selplugin))
         {
@@ -379,6 +334,18 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         		}
         	}
         }
+        
+//        int cnt = 0;
+//        for(int i=0; i<toolbar.getComponentCount(); i++)
+//		{
+//			JComponent comp	= (JComponent)toolbar.getComponent(i);
+//			if(comp instanceof JadexLogoButton)
+//			{
+//				cnt++;
+//			}
+//		}
+//        if(cnt>0)
+//        	System.out.println("hhhhttt");
         
 		JButton jlb = new JadexLogoButton(toolbar);
 		toolbar.addSeparator();
@@ -395,6 +362,18 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         {
         	((Window)root).pack();
         }
+        
+//        cnt = 0;
+//        for(int i=0; i<toolbar.getComponentCount(); i++)
+//		{
+//			JComponent comp	= (JComponent)toolbar.getComponent(i);
+//			if(comp instanceof JadexLogoButton)
+//			{
+//				cnt++;
+//			}
+//		}
+//        if(cnt>1)
+//        	System.out.println("hhhhttt");
     }
 	
 	/**
