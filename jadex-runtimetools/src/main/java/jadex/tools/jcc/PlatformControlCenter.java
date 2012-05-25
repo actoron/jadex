@@ -16,8 +16,6 @@ import jadex.commons.Property;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
-import jadex.commons.future.DefaultResultListener;
-import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -90,7 +88,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 				// todo: what about dynamic plugin loading?
 //				ClassLoader cl = controlcenter.getJCCAccess().getModel().getClassLoader();
 				libservice.getClassLoader(controlcenter.getJCCAccess().getModel().getResourceIdentifier())
-					.addResultListener(new ExceptionDelegationResultListener<ClassLoader, Void>(ret)
+					.addResultListener(new SwingExceptionDelegationResultListener<ClassLoader, Void>(ret)
 				{
 					public void customResultAvailable(ClassLoader cl)
 					{
@@ -110,15 +108,17 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 * 
 	 */
-	protected void addPlugin(final String clname, ClassLoader cl)
+	protected IControlCenterPlugin addPlugin(final String clname, ClassLoader cl)
 	{
+		assert SwingUtilities.isEventDispatchThread();
+		
 //		libservice.getClassLoader(controlcenter.getJCCAccess().getModel().getResourceIdentifier())
 //			.addResultListener(new DefaultResultListener<ClassLoader>()
 //		{
 //			public void resultAvailable(ClassLoader cl)
 //			{
 				Class plclass = SReflect.classForName0(clname, cl);
-				addPlugin(plclass);
+				return addPlugin(plclass);
 //			}
 //		});
 	}
@@ -126,50 +126,49 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 * 
 	 */
-	protected void addPlugin(final Class<?> plclass)
+	protected IControlCenterPlugin addPlugin(final Class<?> plclass)
 	{
-		SwingUtilities.invokeLater(new Runnable()
+		assert SwingUtilities.isEventDispatchThread();
+		
+		try
 		{
-			
-			public void run()
+			for(Tuple2<IControlCenterPlugin, JComponent> tup: plugins)
 			{
-				try
+				if(tup.getFirstEntity().getClass().equals(plclass))
 				{
-					for(Tuple2<IControlCenterPlugin, JComponent> tup: plugins)
-					{
-						if(tup.getFirstEntity().getClass().equals(plclass))
-						{
-							setStatusText("Plugin already loaded: "+plclass);
-							return;
-						}
-					}
-					
-					final IControlCenterPlugin p = (IControlCenterPlugin)plclass.newInstance();
-//					plugins.put(p, null);
-					addPluginComponent(p, null);
-					
-					if(p.isLazy())
-					{
-						setStatusText("Plugin loaded successfully: "+ p.getName());									
-					}
-					else
-					{
-						initPlugin(p).addResultListener(new SwingDefaultResultListener<Void>(pccpanel)
-						{
-							public void customResultAvailable(Void result)
-							{
-								setStatusText("Plugin loaded successfully: "+ p.getName());
-							}
-						});
-					}
-					pccpanel.updateToolBar(null);
-				}
-				catch(Exception e)
-				{
-					setStatusText("Plugin error: "+plclass);
+					setStatusText("Plugin already loaded: "+plclass);
+					return null;
 				}
 			}
-		});
+			
+			final IControlCenterPlugin p = (IControlCenterPlugin)plclass.newInstance();
+//			plugins.put(p, null);
+			addPluginComponent(p, null);
+			
+			if(p.isLazy())
+			{
+				setStatusText("Plugin loaded successfully: "+ p.getName());									
+			}
+			else
+			{
+				initPlugin(p).addResultListener(new SwingDefaultResultListener<Void>(pccpanel)
+				{
+					public void customResultAvailable(Void result)
+					{
+						setStatusText("Plugin loaded successfully: "+ p.getName());
+					}
+				});
+			}
+			pccpanel.updateToolBar(null);
+			
+			return p;
+		}
+		catch(Exception e)
+		{
+			setStatusText("Plugin error: "+plclass);
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -621,35 +620,38 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 		Properties[] vis = props.getSubproperties("vis");
 		if(vis!=null && vis.length>0)
 		{
-			Property[] ps = vis[0].getProperties();
+			final Property[] ps = vis[0].getProperties();
 			if(ps!=null)
 			{
-				List<Tuple2<IControlCenterPlugin, JComponent>> newpls = new ArrayList<Tuple2<IControlCenterPlugin, JComponent>>();
-				for(int i=0; i<ps.length; i++)
+				libservice.getClassLoader(controlcenter.getJCCAccess().getModel().getResourceIdentifier())
+					.addResultListener(new SwingDefaultResultListener<ClassLoader>()
 				{
-					IControlCenterPlugin plg = getPluginForName(ps[i].getType());
-					if(plg!=null)
+					public void customResultAvailable(ClassLoader cl)
 					{
-//						System.out.println("vis: "+ps[i].getType()+" "+ps[i].getValue());
-						toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
-						newpls.add(new Tuple2<IControlCenterPlugin, JComponent>(plg, getPluginComponent(plg)));
-					}
-					else
-					{
-						// Load plugin
-						final String clname = ps[i].getName();
-						libservice.getClassLoader(controlcenter.getJCCAccess().getModel().getResourceIdentifier())
-							.addResultListener(new DefaultResultListener<ClassLoader>()
+						List<Tuple2<IControlCenterPlugin, JComponent>> newpls = new ArrayList<Tuple2<IControlCenterPlugin, JComponent>>();
+						for(int i=0; i<ps.length; i++)
 						{
-							public void resultAvailable(ClassLoader cl)
+							IControlCenterPlugin plg = getPluginForName(ps[i].getType());
+							if(plg!=null)
 							{
-								addPlugin(clname, cl);
+		//						System.out.println("vis: "+ps[i].getType()+" "+ps[i].getValue());
+								toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
+								newpls.add(new Tuple2<IControlCenterPlugin, JComponent>(plg, getPluginComponent(plg)));
 							}
-						});
+							else
+							{
+								// Load plugin
+								plg = addPlugin(ps[i].getName(), cl);
+								if(plg!=null)
+								{
+									toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
+								}
+							}
+						}
+						plugins = newpls;
+						pccpanel.updateToolBar(null);
 					}
-				}
-				plugins = newpls;
-				pccpanel.updateToolBar(null);
+				});
 			}
 		}
 			
