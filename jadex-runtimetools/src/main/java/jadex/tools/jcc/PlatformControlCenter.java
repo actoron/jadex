@@ -16,6 +16,7 @@ import jadex.commons.Property;
 import jadex.commons.SReflect;
 import jadex.commons.Tuple2;
 import jadex.commons.future.CounterResultListener;
+import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -26,7 +27,6 @@ import jadex.commons.gui.future.SwingExceptionDelegationResultListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -110,22 +110,36 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 	/**
 	 * 
 	 */
-	protected void addPlugin(String clname, ClassLoader cl)
+	protected void addPlugin(final String clname, ClassLoader cl)
+	{
+//		libservice.getClassLoader(controlcenter.getJCCAccess().getModel().getResourceIdentifier())
+//			.addResultListener(new DefaultResultListener<ClassLoader>()
+//		{
+//			public void resultAvailable(ClassLoader cl)
+//			{
+				Class plclass = SReflect.classForName0(clname, cl);
+				addPlugin(plclass);
+//			}
+//		});
+	}
+	
+	/**
+	 * 
+	 */
+	protected void addPlugin(Class<?> plclass)
 	{
 		try
 		{
-			Class plugin_class = SReflect.classForName(clname, cl);
-			
 			for(Tuple2<IControlCenterPlugin, JComponent> tup: plugins)
 			{
-				if(tup.getFirstEntity().getClass().equals(plugin_class))
+				if(tup.getFirstEntity().getClass().equals(plclass))
 				{
-					setStatusText("Plugin already loaded: "+cl);
+					setStatusText("Plugin already loaded: "+plclass);
 					return;
 				}
 			}
 			
-			final IControlCenterPlugin p = (IControlCenterPlugin)plugin_class.newInstance();
+			final IControlCenterPlugin p = (IControlCenterPlugin)plclass.newInstance();
 //			plugins.put(p, null);
 			addPluginComponent(p, null);
 			
@@ -143,10 +157,11 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 					}
 				});
 			}
+			pccpanel.updateToolBar(null);
 		}
 		catch(Exception e)
 		{
-			setStatusText("Plugin error: "+cl);
+			setStatusText("Plugin error: "+plclass);
 		}
 	}
 	
@@ -614,7 +629,16 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 					}
 					else
 					{
-						// todo: load plugin
+						// Load plugin
+						final String clname = ps[i].getName();
+						libservice.getClassLoader(controlcenter.getJCCAccess().getModel().getResourceIdentifier())
+							.addResultListener(new DefaultResultListener<ClassLoader>()
+						{
+							public void resultAvailable(ClassLoader cl)
+							{
+								addPlugin(clname, cl);
+							}
+						});
 					}
 				}
 				plugins = newpls;
@@ -677,7 +701,7 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 			{
 				IControlCenterPlugin plg = it.next().getFirstEntity();
 //				System.out.println("vis save: "+plg.getName()+" "+toolbarvis.get(plg));
-				vis.addProperty(new Property(plg.getName(), ""+isPluginVisible(plg)));
+				vis.addProperty(new Property(plg.getClass().getName(), plg.getName(), ""+isPluginVisible(plg)));
 			}
 			props.removeSubproperties("vis");
 			props.addSubproperties("vis", vis);

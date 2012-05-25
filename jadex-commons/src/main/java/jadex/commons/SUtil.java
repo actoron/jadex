@@ -1341,6 +1341,57 @@ public class SUtil
 		return ret.toString();
 	}
 
+	/**
+	 * Find a package name from a path. Searches the most specific classpath and
+	 * uses the rest of the pathname as package name.
+	 * 
+	 * @param path The directory.
+	 * @return The package.
+	 */
+	public static String convertPathToPackage(String path, URL[] urls)
+	{
+		String ret = null;
+		File fpath = new File(path);
+		if(!fpath.isDirectory())
+			path = fpath.getParent();
+
+		java.util.List toks = SCollection.createArrayList();
+		StringTokenizer stok = new StringTokenizer(path, File.separator);
+		while(stok.hasMoreTokens())
+			toks.add(stok.nextToken());
+
+		int quality = 0;
+		for(int i = 0; i<urls.length; i++)
+		{
+			String cp = urls[i].getFile();
+			stok = new StringTokenizer(cp, "/!"); // Exclamation mark to support
+													// jar files.
+			int cplen = stok.countTokens();
+			if(cplen <= toks.size())
+			{
+				int j = 0;
+				for(; stok.hasMoreTokens(); j++)
+				{
+					if(!stok.nextToken().equals(toks.get(j)))
+						break;
+				}
+
+				if(j == cplen && cplen > quality)
+				{
+					ret = "";
+					for(int k = j; k < toks.size(); k++)
+					{
+						if(k > j && k < toks.size())
+							ret += ".";
+						ret += "" + toks.get(k);
+					}
+					quality = cplen;
+				}
+			}
+		}
+		return ret;
+	}
+	
 //	/**
 //	 * Find a package name from a path. Searches the most specific classpath and
 //	 * uses the rest of the pathname as package name.

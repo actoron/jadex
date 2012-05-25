@@ -339,7 +339,8 @@ public class RuleProfilerPlugin extends AbstractJCCPlugin	implements ICMSCompone
 	 */
 	public IFuture<Void> shutdown()
 	{
-		comptree.dispose();
+		if(comptree!=null)
+			comptree.dispose();
 		return IFuture.DONE;
 	}
 	

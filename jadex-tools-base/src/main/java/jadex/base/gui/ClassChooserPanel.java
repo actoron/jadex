@@ -1,12 +1,13 @@
 package jadex.base.gui;
 
+import jadex.commons.IFilter;
 import jadex.commons.SReflect;
+import jadex.commons.SUtil;
 
 import java.awt.BorderLayout;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -26,11 +27,11 @@ public class ClassChooserPanel	extends JPanel
 	/** The current class loader. */
 	protected URL[] urls;
 	
-	/** The name part. */
-	protected String namepart;
+	/** The file filter. */
+	protected IFilter filefilter;
 	
-	/** The class type. */
-	protected Class<?> type;
+	/** The class filter. */
+	protected IFilter classfilter;
 	
 	/** The current class loader. */
 	protected ClassLoader	classloader;
@@ -43,12 +44,14 @@ public class ClassChooserPanel	extends JPanel
 	/**
 	 *  Create a class path panel.
 	 */
-	public ClassChooserPanel(String suffix, Class<?> type, URL[] urls)
+	public ClassChooserPanel(IFilter filefilter, IFilter classfilter, URL[] urls, ClassLoader classloader)
 	{
 		super(new BorderLayout());
-		this.namepart = suffix;
-		this.type = type;
+		this.filefilter = filefilter;
+		this.classfilter = classfilter;
+		this.filefilter = filefilter;
 		this.urls = urls;
+		this.classloader = classloader;
 		
 		this.box = new JComboBox();
 		this.add(box, BorderLayout.CENTER);
@@ -75,15 +78,16 @@ public class ClassChooserPanel	extends JPanel
 	public Class<?>[] scanForClasses()
 	{
 		List<Class<?>>	ret	= new ArrayList<Class<?>>();
-		String[]	facs	= scanForFiles(new String[]{namepart});
+		String[] facs = scanForFiles(filefilter);
 		try
 		{
 			for(int i=0; i<facs.length; i++)
 			{
 				String	clname	= facs[i].substring(0, facs[i].length()-6).replace('/', '.');
-				System.out.println("Found candidate: "+clname);
+//				System.out.println("Found candidate: "+clname);
 				Class<?>	fac	= SReflect.findClass0(clname, null, getClassLoader());
-				if(fac!=null && !fac.isInterface() && SReflect.isSupertype(type, fac))
+				
+				if(fac!=null && classfilter.filter(fac))
 				{
 					ret.add(fac);
 				}
@@ -101,7 +105,7 @@ public class ClassChooserPanel	extends JPanel
 	 * @param extensions
 	 * @return
 	 */
-	public String[] scanForFiles(String[] extensions)
+	public String[] scanForFiles(IFilter filter)
 	{
 		List<String>	ret	= new ArrayList<String>();
 		try
@@ -116,19 +120,16 @@ public class ClassChooserPanel	extends JPanel
 					for(Enumeration<JarEntry> e=jar.entries(); e.hasMoreElements(); )
 					{
 						JarEntry	je	= e.nextElement();
-						for(int j=0; j<extensions.length; j++)
+						if(filter.filter(f))	
 						{
-							if(je.getName().endsWith(extensions[j]))
-							{
-								ret.add(je.getName());
-							}
+							ret.add(je.getName());
 						}
 					}
 					jar.close();
 				}
 				else if(f.isDirectory())
 				{
-					scanDir(f, extensions, ret, new ArrayList<String>());
+					scanDir(f, filter, ret, new ArrayList<String>());
 //					throw new UnsupportedOperationException("Currently only jar files supported: "+f);
 				}
 			}
@@ -144,7 +145,7 @@ public class ClassChooserPanel	extends JPanel
 	/**
 	 * 
 	 */
-	protected void scanDir(File file, String[] extensions, List<String> results, List<String> donedirs)
+	protected void scanDir(File file, IFilter filter, List<String> results, List<String> donedirs)
 	{
 		File[] files = file.listFiles(new FileFilter()
 		{
@@ -155,14 +156,11 @@ public class ClassChooserPanel	extends JPanel
 		});
 		for(File fi: files)
 		{
-			for(int j=0; j<extensions.length; j++)
+			if(fi.getName().endsWith(".class") && filter.filter(fi))
 			{
-//				if(fi.getName().indexOf("Plugin")!=-1)
-//					System.out.println("file: "+fi.getName());
-				if(fi.getName().endsWith(".class") && fi.getName().indexOf(extensions[j])!=-1)
-				{
-					results.add(fi.getAbsolutePath());
-				}
+				String fn = SUtil.convertPathToPackage(fi.getAbsolutePath(), urls);
+//				System.out.println("fn: "+fi.getName());
+				results.add(fn+"."+fi.getName());
 			}
 		}
 		
@@ -181,7 +179,7 @@ public class ClassChooserPanel	extends JPanel
 			{
 				if(!donedirs.contains(dir.getAbsolutePath()))
 				{
-					scanDir(dir, extensions, results, donedirs);
+					scanDir(dir, filter, results, donedirs);
 				}
 			}
 		}
@@ -193,41 +191,11 @@ public class ClassChooserPanel	extends JPanel
 	 */
 	public ClassLoader getClassLoader()
 	{
-		if(classloader==null)
-		{
-			classloader	= new URLClassLoader(urls, null);
-		}
+//		if(classloader==null)
+//		{
+//			classloader	= new URLClassLoader(urls, null);
+//		}
 		return classloader;	
 	}
 	
-//	/**
-//	 *  Get the settings as properties.
-//	 */
-//	public Properties	getProperties()
-//	{
-//		Properties	props	= new Properties();
-//		for(int i=0; i<model.getRowCount(); i++)
-//		{
-//			File	entry	= (File)model.getValueAt(i, 0);
-//			props.addProperty(new Property("ENTRY", entry.getAbsolutePath()));
-//		}
-//		return props;
-//	}
-
-	
-//	/**
-//	 *  Set the settings as properties.
-//	 */
-//	public void	setProperties(Properties props)
-//	{
-//		for(int i=model.getRowCount()-1; i>=0; i--)
-//		{
-//			model.removeRow(i);
-//		}
-//		Property[]	entries	= props.getProperties("ENTRY");
-//		for(int i=0; i<entries.length; i++)
-//		{
-//			model.addRow(new Object[]{new File(entries[i].getValue())});
-//		}
-//	}
 }

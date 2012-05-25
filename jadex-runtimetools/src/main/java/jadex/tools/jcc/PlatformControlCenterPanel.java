@@ -3,6 +3,7 @@ package jadex.tools.jcc;
 import jadex.base.gui.ClassChooserPanel;
 import jadex.base.gui.JadexLogoButton;
 import jadex.base.gui.plugin.IControlCenterPlugin;
+import jadex.commons.IFilter;
 import jadex.commons.IPropertiesProvider;
 import jadex.commons.Properties;
 import jadex.commons.Property;
@@ -10,7 +11,6 @@ import jadex.commons.SUtil;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.JSplitPanel;
-import jadex.commons.gui.PropertiesPanel;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.xml.bean.JavaReader;
 import jadex.xml.bean.JavaWriter;
@@ -20,17 +20,15 @@ import java.awt.CardLayout;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +43,6 @@ import javax.swing.Box;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -53,11 +50,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 
@@ -182,73 +177,64 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
         	            {
         	                public void actionPerformed(ActionEvent e) 
         	                {
-        	                	controlcenter.libservice.getAllURLs()//controlcenter.getJCCAccess().getModel().getResourceIdentifier())
-	        						.addResultListener(new SwingDefaultResultListener<List<URL>>(PlatformControlCenterPanel.this)
+        	                	controlcenter.libservice.getClassLoader(null)
+	        						.addResultListener(new SwingDefaultResultListener<ClassLoader>(PlatformControlCenterPanel.this)
 	        					{
-        							public void customResultAvailable(List<URL> urls)
+        							public void customResultAvailable(final ClassLoader cl)
         							{
-        	       	                	ClassChooserPanel pp = new ClassChooserPanel("Plugin", IControlCenterPlugin.class, urls.toArray(new URL[urls.size()]));
-        	       	            		int res	= JOptionPane.showOptionDialog(PlatformControlCenterPanel.this, pp, "", JOptionPane.YES_NO_CANCEL_OPTION,
-	        	            			JOptionPane.QUESTION_MESSAGE, null, new Object[]{"OK", "Cancel"}, "OK");
-//    	        	            		if(0==res)
-//    	        	            		{
-//    	        	            			final String clname = tfpath.getText();
-//    	        	            			if(clname!=null && clname.length()>0)
-//    	        	            			{
-//    	        	            				// Hack, use global loader?
-//    	        	            				controlcenter.libservice.getClassLoader(null)//controlcenter.getJCCAccess().getModel().getResourceIdentifier())
-//    		        	        					.addResultListener(new SwingDefaultResultListener<ClassLoader>(PlatformControlCenterPanel.this)
-//    		        	        				{
-//    		        	        					public void customResultAvailable(ClassLoader cl)
-//    		        	        					{
-//    		        	        						controlcenter.addPlugin(clname, cl);
-//    		        	        					}
-//    		        	        				});
-//    	        	            			}
-//    	        	            		}
-//    	        	            		else if(1==res)
-//    	        	            		{
-//    	        	            		}
-        							}
+		        	                	controlcenter.libservice.getAllURLs()//controlcenter.getJCCAccess().getModel().getResourceIdentifier())
+			        						.addResultListener(new SwingDefaultResultListener<List<URL>>(PlatformControlCenterPanel.this)
+			        					{
+		        							public void customResultAvailable(List<URL> urls)
+		        							{
+		        								IFilter ffil = new IFilter()
+												{
+													public boolean filter(Object obj)
+													{
+														File f = (File)obj;
+														String fn = f.getName();
+														return fn.indexOf("Plugin")!=-1 && 
+															fn.indexOf("$")==-1 && fn.indexOf("Panel")==-1;
+													}
+												};
+												IFilter cfil = new IFilter()
+												{
+													public boolean filter(Object obj)
+													{
+														Class<?> cl = (Class<?>)obj;
+														boolean ret = !(cl.isInterface() || Modifier.isAbstract(cl.getModifiers()));
+														
+														if(ret)
+														{
+															// Check if already used
+															IControlCenterPlugin[] pls = controlcenter.getPlugins();
+															for(IControlCenterPlugin pl: pls)
+															{
+																if(pl.getClass().equals(obj))
+																{
+																	ret = false;
+																	break;
+																}
+															}
+														}
+														return ret;
+													}
+												};
+		        	       	                	ClassChooserPanel pp = new ClassChooserPanel(ffil, cfil, urls.toArray(new URL[urls.size()]), cl);
+		        	       	            		int res	= JOptionPane.showOptionDialog(PlatformControlCenterPanel.this, pp, "", JOptionPane.YES_NO_CANCEL_OPTION,
+			        	            			JOptionPane.QUESTION_MESSAGE, null, new Object[]{"OK", "Cancel"}, "OK");
+		    	        	            		if(0==res)
+		    	        	            		{
+		    	        	            			Class<?> plcl = (Class<?>)pp.getSelectedElement();
+		    	        	            			if(plcl!=null)
+		    	        	            			{
+		    		        	        				controlcenter.addPlugin(plcl);
+		    	        	            			}
+		    	        	            		}
+		        							}
+			        					});
+		        					}
 	        					});
-        	                	
-        	                	
-//        	                	PropertiesPanel pp = new PropertiesPanel();
-//        	            		JPanel fnp = new JPanel(new GridBagLayout());
-//        	            		final JTextField tfpath = new JTextField(".", 15);
-//        	            		JButton bupath = new JButton("...");
-//        	            		bupath.addActionListener(new ActionListener()
-//        	            		{
-//        	            			public void actionPerformed(ActionEvent e)
-//        	            			{
-//        	            				JFileChooser ch = new JFileChooser(tfpath.getText());
-//        	            				ch.setFileSelectionMode(JFileChooser.FILES_ONLY);
-//        	            				ch.setFileFilter(new FileFilter()
-//										{
-//											public String getDescription()
-//											{
-//												return "Plugin classes";
-//											}
-//											
-//											public boolean accept(File f)
-//											{
-//												return f.isDirectory() || f.getName().endsWith(".class");
-//											}
-//										});
-//        	            				if(JFileChooser.APPROVE_OPTION==ch.showOpenDialog(PlatformControlCenterPanel.this))
-//        	            				{
-//        	            					tfpath.setText(ch.getSelectedFile().getAbsolutePath());
-//        	            				}
-//        	            			}
-//        	            		});
-//        	            		bupath.setMargin(new Insets(0,0,0,0));
-//        	            		fnp.add(tfpath, new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.WEST, 
-//        	            			GridBagConstraints.BOTH, new Insets(0,0,0,2),0,0));
-//        	            		fnp.add(bupath, new GridBagConstraints(1,0,1,1,0,0,GridBagConstraints.WEST, 
-//        	            			GridBagConstraints.NONE, new Insets(0,2,0,0),0,0));
-//        	            		pp.addComponent("Plugin class: ", fnp);
-//        	            		
-        	     
         	                }
         	            }));
 	                	IControlCenterPlugin[] pls = controlcenter.getToolbarPlugins(false);
@@ -416,88 +402,97 @@ public class PlatformControlCenterPanel extends JPanel	implements IPropertiesPro
 	 */
 	protected void addPlugin(final IControlCenterPlugin pl, IControlCenterPlugin selplugin)
 	{
-		final JButton button = new JButton(new PluginAction(pl));
-    	Icon ic = pl.getToolIcon(selplugin!=null? selplugin.getName().equals(pl.getName()): false);
-	    if(ic!=null)
-	    	button.setIcon(ic);
-	    else
-	    	button.setText(pl.getName());
-	    button.setText("A");
-        button.putClientProperty("plugin", pl);
-        button.setBorder(null);
-        button.setText(null);
-        button.setMinimumSize(BUTTON_DIM);
-        button.setHorizontalAlignment(SwingConstants.CENTER);
-        button.setVerticalAlignment(SwingConstants.CENTER);
-        button.setToolTipText(pl.getName());
-        button.getModel().addItemListener(new ItemListener()
-        {
-        	public void itemStateChanged(ItemEvent e)
-        	{
-        		//System.out.println(plugin.getName()+" :"+button.isSelected());
-        		button.setIcon(pl.getToolIcon(button.isSelected()));
-        	}
-        });
-        final JPopupMenu popup = new JPopupMenu();
-       
-        button.addMouseListener(new MouseAdapter()
-        {
-        	public void mousePressed(MouseEvent e)
-        	{
-        		mouseClicked(e);
-        	}
-        	public void mouseReleased(MouseEvent e)
-        	{
-        		mouseClicked(e);
-        	}
-            public void mouseClicked(MouseEvent e)
-            {
-            	if(e.isPopupTrigger())
-            	{
-            		popup.removeAll();
-            		
-            		popup.add(new JMenuItem(new AbstractAction("Hide tool") 
-        	        {
-        	            public void actionPerformed(ActionEvent e) 
-        	            {
-        	            	controlcenter.setPluginVisible(pl, false);
-        	            	updateToolBar(null);
-        	            }
-        	        }));
-            		
-            		IControlCenterPlugin[] pls = controlcenter.getToolbarPlugins(true);
-        	        
-//            		if(pls.length>0 && !pls[0].equals(pl))
-//            		{
-	            		popup.add(new JMenuItem(new AbstractAction("Move left") 
+		try
+		{
+			final JButton button = new JButton(new PluginAction(pl));
+	    	Icon ic = pl.getToolIcon(selplugin!=null? selplugin.getName().equals(pl.getName()): false);
+		    if(ic!=null)
+		    	button.setIcon(ic);
+		    else
+		    	button.setText(pl.getName());
+		    button.setText("A");
+	        button.putClientProperty("plugin", pl);
+	        button.setBorder(null);
+	        button.setText(null);
+	        button.setMinimumSize(BUTTON_DIM);
+	        button.setHorizontalAlignment(SwingConstants.CENTER);
+	        button.setVerticalAlignment(SwingConstants.CENTER);
+	        button.setToolTipText(pl.getName());
+	        button.getModel().addItemListener(new ItemListener()
+	        {
+	        	public void itemStateChanged(ItemEvent e)
+	        	{
+	        		//System.out.println(plugin.getName()+" :"+button.isSelected());
+	        		button.setIcon(pl.getToolIcon(button.isSelected()));
+	        	}
+	        });
+	        final JPopupMenu popup = new JPopupMenu();
+	       
+	        button.addMouseListener(new MouseAdapter()
+	        {
+	        	public void mousePressed(MouseEvent e)
+	        	{
+	        		mouseClicked(e);
+	        	}
+	        	public void mouseReleased(MouseEvent e)
+	        	{
+	        		mouseClicked(e);
+	        	}
+	            public void mouseClicked(MouseEvent e)
+	            {
+	            	if(e.isPopupTrigger())
+	            	{
+	            		popup.removeAll();
+	            		
+	            		popup.add(new JMenuItem(new AbstractAction("Hide tool") 
 	        	        {
 	        	            public void actionPerformed(ActionEvent e) 
 	        	            {
-	        	            	controlcenter.moveLeftPlugin(pl);
+	        	            	controlcenter.setPluginVisible(pl, false);
 	        	            	updateToolBar(null);
 	        	            }
 	        	        }));
-//            		}
-//            		if(pls.length>0 && !pls[pls.length-1].equals(pl))
-//            		{
-	        	        popup.add(new JMenuItem(new AbstractAction("Move right") 
-	        	        {
-	        	            public void actionPerformed(ActionEvent e) 
-	        	            {
-	        	            	controlcenter.moveRightPlugin(pl);
-	        	            	updateToolBar(null);
-	        	            }
-	        	        }));
-//            		}
-            		popup.show(e.getComponent(), e.getX(), e.getY());
-            	}
-            }
-        });
-
-//        if(plugins[i].getHelpID()!=null)
-//        	SHelp.setupHelp(button, plugins[i].getHelpID());
-        
- 	    toolbar.add(button);
+	            		
+	            		IControlCenterPlugin[] pls = controlcenter.getToolbarPlugins(true);
+	        	        
+	//            		if(pls.length>0 && !pls[0].equals(pl))
+	//            		{
+		            		popup.add(new JMenuItem(new AbstractAction("Move left") 
+		        	        {
+		        	            public void actionPerformed(ActionEvent e) 
+		        	            {
+		        	            	controlcenter.moveLeftPlugin(pl);
+		        	            	updateToolBar(null);
+		        	            }
+		        	        }));
+	//            		}
+	//            		if(pls.length>0 && !pls[pls.length-1].equals(pl))
+	//            		{
+		        	        popup.add(new JMenuItem(new AbstractAction("Move right") 
+		        	        {
+		        	            public void actionPerformed(ActionEvent e) 
+		        	            {
+		        	            	controlcenter.moveRightPlugin(pl);
+		        	            	updateToolBar(null);
+		        	            }
+		        	        }));
+	//            		}
+	            		popup.show(e.getComponent(), e.getX(), e.getY());
+	            	}
+	            }
+	        });
+	
+	//        if(plugins[i].getHelpID()!=null)
+	//        	SHelp.setupHelp(button, plugins[i].getHelpID());
+	        
+	        toolbar.add(button);
+		}
+		catch(Exception e)
+		{
+			controlcenter.removePluginComponent(pl);
+			controlcenter.setStatusText("Plugin error: "+e);
+			pl.shutdown();
+		}
 	}
 	
 	
