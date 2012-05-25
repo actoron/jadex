@@ -1,8 +1,6 @@
 package jadex.base.service.awareness.discovery;
 
 import jadex.base.service.message.MapSendTask;
-import jadex.base.service.message.transport.codecs.CodecFactory;
-import jadex.base.service.message.transport.codecs.GZIPCodec;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
@@ -35,10 +33,6 @@ import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
 import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
-
-import java.net.DatagramPacket;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;

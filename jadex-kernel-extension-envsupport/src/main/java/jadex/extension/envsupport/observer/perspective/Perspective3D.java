@@ -1,5 +1,6 @@
 package jadex.extension.envsupport.observer.perspective;
 
+import jadex.commons.gui.SGUI;
 import jadex.commons.meta.TypedPropertyObject;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
@@ -447,35 +448,16 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 
 			IViewport3d vp = (IViewport3d)con.newInstance(new Object[]{persp, cl});
 
-
 			viewport3d = vp;
 			vp.startApp();
-
-
 		}
-		catch(NoSuchMethodException e)
+//		catch(ClassNotFoundException cnfe)
+//		{
+//			SGUI.showError(obscenter, "3D Problem", "3D add-on not installed?", cnfe);
+//		}
+		catch(Exception e)
 		{
-			e.printStackTrace();
-		}
-		catch(ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		catch(IllegalArgumentException e)
-		{
-			e.printStackTrace();
-		}
-		catch(InstantiationException e)
-		{
-			e.printStackTrace();
-		}
-		catch(IllegalAccessException e)
-		{
-			e.printStackTrace();
-		}
-		catch(InvocationTargetException e)
-		{
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 
 		return viewport3d;

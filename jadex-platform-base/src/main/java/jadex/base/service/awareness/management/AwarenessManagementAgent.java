@@ -171,7 +171,7 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	 */
 	public IFuture<Void>	agentCreated()
 	{
-		String[] test = new String[]{"test", "test2"};
+//		String[] test = new String[]{"test", "test2"};
 		initArguments();
 		
 		this.discovered = new LinkedHashMap<IComponentIdentifier, DiscoveryInfo>();

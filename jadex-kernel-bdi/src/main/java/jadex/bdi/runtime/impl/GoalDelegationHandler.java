@@ -182,7 +182,7 @@ public class GoalDelegationHandler  implements InvocationHandler
 							throw new RuntimeException("Could not map result.");
 					}
 					
-					System.out.println("Setting result of goal call: "+rval);
+//					System.out.println("Setting result of goal call: "+rval);
 					ret.setResult(rval);
 				}
 				else

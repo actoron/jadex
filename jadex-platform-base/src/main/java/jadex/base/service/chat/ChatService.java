@@ -1,6 +1,5 @@
 package jadex.base.service.chat;
 
-import jadex.base.service.simulation.SimulationService;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
 import jadex.bridge.IConnection;
@@ -8,11 +7,9 @@ import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInputConnection;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.IOutputConnection;
-import jadex.bridge.service.IServiceIdentifier;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
 import jadex.bridge.service.annotation.ServiceComponent;
-import jadex.bridge.service.annotation.ServiceIdentifier;
 import jadex.bridge.service.annotation.ServiceShutdown;
 import jadex.bridge.service.annotation.ServiceStart;
 import jadex.bridge.service.search.SServiceProvider;
@@ -20,7 +17,6 @@ import jadex.bridge.service.types.chat.ChatEvent;
 import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
 import jadex.bridge.service.types.chat.TransferInfo;
-import jadex.bridge.service.types.message.IMessageService;
 import jadex.bridge.service.types.remote.ServiceInputConnection;
 import jadex.bridge.service.types.settings.ISettingsService;
 import jadex.commons.IPropertiesProvider;
@@ -29,7 +25,6 @@ import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.Tuple3;
 import jadex.commons.future.CollectionResultListener;
-import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
@@ -106,24 +101,19 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 		{
 			running	= true;
 	
-			SServiceProvider.getService(agent.getServiceContainer(), ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-				.addResultListener(agent.createResultListener(new IResultListener()
+			agent.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+				.addResultListener(new IResultListener<ISettingsService>()
 			{
-				public void resultAvailable(Object result)
+				public void resultAvailable(ISettingsService settings)
 				{
-					ISettingsService	settings	= (ISettingsService)result;
 					settings.registerPropertiesProvider(agent.getComponentIdentifier().getLocalName(), ChatService.this)
-						.addResultListener(agent.createResultListener(new DelegationResultListener(ret)
+						.addResultListener(new DelegationResultListener<Void>(ret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(Void result)
 						{
 							proceed();
 						}
-						public void exceptionOccurred(Exception exception)
-						{
-							super.exceptionOccurred(exception);
-						}
-					}));
+					});
 				}
 				
 				public void exceptionOccurred(Exception exception)
@@ -159,7 +149,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 					
 					ret.setResult(null);
 				}
-			}));
+			});
 		}
 		else
 		{
