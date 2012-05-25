@@ -49,7 +49,7 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	private Map<String, IComponentDescription> descriptionMapping = new HashMap<String, IComponentDescription>();
 
 	/** The Applications Internal Access */
-	private IInternalAccess applicatioInternalAccess;
+	private IInternalAccess applicationInternalAccess;
 
 	// -------- constructors --------
 
@@ -78,7 +78,7 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	public void initSpace(IInternalAccess ia, MEnvSpaceInstance config, IValueFetcher fetcher) {
 		super.initSpace(ia, config, fetcher);
 
-		this.applicatioInternalAccess = ia;
+		this.applicationInternalAccess = ia;
 
 		initSpaces();
 		initDeco4mas();
@@ -261,7 +261,7 @@ public class CoordinationSpace extends AbstractEnvironmentSpace {
 	/**
 	 * @return the applicatioInternalAccess
 	 */
-	public IInternalAccess getApplicatioInternalAccess() {
-		return applicatioInternalAccess;
+	public IInternalAccess getApplicationInternalAccess() {
+		return applicationInternalAccess;
 	}
 }

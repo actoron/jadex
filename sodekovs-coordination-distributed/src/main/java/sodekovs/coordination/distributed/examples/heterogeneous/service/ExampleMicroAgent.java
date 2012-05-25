@@ -1,12 +1,13 @@
 package sodekovs.coordination.distributed.examples.heterogeneous.service;
 
-import java.util.HashMap;
-
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;
 import jadex.commons.future.ThreadSuspendable;
 import jadex.micro.MicroAgent;
 import jadex.micro.annotation.Agent;
+
+import java.util.HashMap;
+
 import deco4mas.distributed.coordinate.environment.CoordinationSpace;
 import deco4mas.distributed.coordinate.interpreter.agent_state.CoordinationComponentStep;
 
@@ -18,16 +19,17 @@ import deco4mas.distributed.coordinate.interpreter.agent_state.CoordinationCompo
  */
 @Agent
 public class ExampleMicroAgent extends MicroAgent {
-
 	@Override
 	public IFuture<Void> agentCreated() {
-		System.out.println("ExampleMicroAgent created." + ExampleMicroAgent.this.getAgentName());
+		System.out.println("ExampleMicroAgent created ." + this.getAgentAdapter().getComponentIdentifier().getName());
 
 		return IFuture.DONE;
 	}
 
 	@Override
-	public IFuture<Void> executeBody() {
+	public IFuture<Void> agentKilled() {
+		System.out.println("ExampleMicroAgent killed. " + this.getAgentAdapter().getComponentIdentifier().getName());
+
 		return IFuture.DONE;
 	}
 
@@ -37,13 +39,14 @@ public class ExampleMicroAgent extends MicroAgent {
 
 		@Override
 		public IFuture<Void> execute(IInternalAccess ia) {
-			
-			//check CoordinationContext			
-			CoordinationSpace coordSpace = (CoordinationSpace) getParentAccess().getExtension("mycoordspace").get(new ThreadSuspendable());			
-			HashMap<String, Object> appArgs = (HashMap<String, Object>) coordSpace.getExternalAccess().getArguments().get(new ThreadSuspendable());		
+
+			// check CoordinationContext
+			CoordinationSpace coordSpace = (CoordinationSpace) getParentAccess().getExtension("mycoordspace").get(new ThreadSuspendable());
+			HashMap<String, Object> appArgs = (HashMap<String, Object>) coordSpace.getExternalAccess().getArguments().get(new ThreadSuspendable());
 			String coordinationContextID = (String) appArgs.get("CoordinationContextID");
-			
-			System.out.println("#ExampleMicroAgent " + ExampleMicroAgent.this.getAgentName() + " - I belong to CoordinationContext: "+ coordinationContextID+ "#  execute() in ReceiveHelloStep called with message:");
+
+			System.out.println("#ExampleMicroAgent " + ExampleMicroAgent.this.getAgentName() + " - I belong to CoordinationContext: " + coordinationContextID
+					+ "#  execute() in ReceiveHelloStep called with message:");
 			System.out.println("\t" + message);
 			return IFuture.DONE;
 		}

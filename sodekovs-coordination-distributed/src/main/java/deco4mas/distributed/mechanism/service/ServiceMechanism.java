@@ -33,7 +33,7 @@ public class ServiceMechanism extends CoordinationMechanism {
 		super(space);
 
 		// TODO Der Cast ist ein Hack bis Lars und Alex die Schnittstellen von Jadex anpassen
-		this.applicationInterpreter = (StatelessAbstractInterpreter) space.getApplicatioInternalAccess();
+		this.applicationInterpreter = (StatelessAbstractInterpreter) space.getApplicationInternalAccess();
 
 		// If it's a distributed application, then it has a contextID.
 		HashMap<String, Object> appArgs = (HashMap<String, Object>) this.applicationInterpreter.getArguments();

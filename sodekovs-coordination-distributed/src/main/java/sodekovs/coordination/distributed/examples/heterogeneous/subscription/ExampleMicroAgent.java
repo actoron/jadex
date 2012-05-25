@@ -1,4 +1,4 @@
-package sodekovs.coordination.distributed.examples.heterogeneous.pastry;
+package sodekovs.coordination.distributed.examples.heterogeneous.subscription;
 
 import jadex.bridge.IInternalAccess;
 import jadex.commons.future.IFuture;

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package deco4mas.distributed.mechanism.service;
 
 import jadex.commons.future.IFuture;
@@ -30,10 +27,11 @@ public interface ICoordinationService {
 	 * @param id
 	 */
 	public void setCoordinationContextID(String id);
-	
+
 	/**
 	 * Used for distributed case: denotes the context of a distributed application. In order to recognize, all instances of a distributed application have to use the same CoordinationCotextID, which
 	 * is defined in the *.application.xml.
+	 * 
 	 * @return
 	 */
 	public String getCoordinationContextID();
