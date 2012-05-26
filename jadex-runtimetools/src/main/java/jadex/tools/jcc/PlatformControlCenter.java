@@ -641,10 +641,13 @@ public class PlatformControlCenter	implements IControlCenter, IPropertiesProvide
 							else
 							{
 								// Load plugin
-								plg = addPlugin(ps[i].getName(), cl);
-								if(plg!=null)
+								if(ps[i].getName()!=null)
 								{
-									toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
+									plg = addPlugin(ps[i].getName(), cl);
+									if(plg!=null)
+									{
+										toolbarvis.put(plg, Boolean.valueOf(ps[i].getValue()).booleanValue());
+									}
 								}
 							}
 						}
