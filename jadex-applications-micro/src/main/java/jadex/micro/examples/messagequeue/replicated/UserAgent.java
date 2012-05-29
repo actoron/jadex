@@ -17,26 +17,28 @@ import jadex.micro.annotation.RequiredService;
 import jadex.micro.annotation.RequiredServices;
 import jadex.micro.examples.messagequeue.Event;
 
+
 /**
  * 
  */
 @Agent
 @RequiredServices(@RequiredService(name = "mq", type = IMessageQueueReplicableService.class, binding = @Binding(scope = Binding.SCOPE_APPLICATION)))
 @Arguments(@Argument(name = "topic", clazz = String.class, defaultvalue = "\"default_topic\""))
-public class UserAgent {
+public class UserAgent
+{
 	// -------- attributes --------
 
 	/** The agent. */
 	@Agent
-	protected MicroAgent agent;
+	protected MicroAgent						agent;
 
 	/** The message queue. */
 	@AgentService
-	protected IMessageQueueReplicableService mq;
+	protected IMessageQueueReplicableService	mq;
 
 	/** The topic argument. */
 	@AgentArgument
-	protected String topic;
+	protected String							topic;
 
 	// -------- methods --------
 
@@ -44,31 +46,46 @@ public class UserAgent {
 	 * The agent body.
 	 */
 	@AgentBody
-	public void body() {
+	public void body()
+	{
 		final ISubscriptionIntermediateFuture<Event> fut = mq.subscribe(topic);
-		fut.addResultListener(new IntermediateDefaultResultListener<Event>() {
-			public void intermediateResultAvailable(Event event) {
-				System.out.println("Received: " + agent.getComponentIdentifier() + " " + event);
+		fut.addResultListener(new IntermediateDefaultResultListener<Event>()
+		{
+			public void intermediateResultAvailable(Event event)
+			{
+				System.out.println("Received: "
+						+ agent.getComponentIdentifier() + " " + event);
 			}
 
-			public void exceptionOccurred(Exception exception) {
+			public void exceptionOccurred(Exception exception)
+			{
 				System.out.println("Ex: " + exception);
 			}
 		});
 
-		IComponentStep<Void> step = new IComponentStep<Void>() {
-			final int[] cnt = new int[1];
+		IComponentStep<Void> step = new IComponentStep<Void>()
+		{
+			final int[]	cnt	= new int[1];
 
-			public IFuture<Void> execute(IInternalAccess ia) {
-				if (!(cnt[0] % 2 == 0))
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				if(!(cnt[0] % 2 == 0))
+				{
 					// publish also remote
 					mq.publish(topic, new Event("some type", cnt[0]++, agent.getComponentIdentifier()), true);
+				}
 				else
+				{
 					// just publish local
-					mq.publish(topic, new Event("some type", cnt[0]++, agent.getComponentIdentifier()), false);
-				if (cnt[0] < 10) {
+					mq.publish(topic,new Event("some type", cnt[0]++, agent.getComponentIdentifier()), false);
+				}
+				
+				if(cnt[0] < 10)
+				{
 					agent.waitFor(1000, this);
-				} else {
+				}
+				else
+				{
 					fut.terminate();
 				}
 				return IFuture.DONE;

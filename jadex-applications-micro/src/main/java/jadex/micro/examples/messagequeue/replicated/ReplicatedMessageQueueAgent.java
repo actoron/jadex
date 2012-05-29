@@ -31,13 +31,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This agent represents a part of a distributed, replicable message queue. It offers a message queue service that is used by the local clients. Also it offers and uses a remote message queue service
- * where other remote services can subscribe to receive and distribute messages from local clients.
+ * This agent represents a part of a distributed, replicable message queue. It offers a 
+ * message queue service that is used by the local clients. Also it offers and uses a remote 
+ * message queue service where other remote services can subscribe to receive and distribute 
+ * messages from local clients.
  */
 @Agent
 @Service
 @ProvidedServices({ @ProvidedService(type = IMessageQueueReplicableService.class, implementation = @Implementation(expression = "$pojoagent")),
-		@ProvidedService(type = IMessageQueueReplicationService.class, implementation = @Implementation(expression = "$pojoagent")) })
+	@ProvidedService(type = IMessageQueueReplicationService.class, implementation = @Implementation(expression = "$pojoagent")) })
 @RequiredServices(@RequiredService(type = IMessageQueueReplicationService.class, multiple = true, binding = @Binding(scope = Binding.SCOPE_GLOBAL), name = "replication"))
 @Arguments(@Argument(name = "searchInterval", clazz = Integer.class, defaultvalue = "1000"))
 public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableService, IMessageQueueReplicationService {
@@ -47,65 +49,71 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	protected MicroAgent agent;
 
 	/** The map of local subscribers. */
-	protected Map<String, List<SubscriptionIntermediateFuture<Event>>> localSubscribers;
+	protected Map<String, List<SubscriptionIntermediateFuture<Event>>> localsubscribers;
 
 	/** The map of the replication subscribers. */
-	protected Map<String, List<SubscriptionIntermediateFuture<Event>>> replicationSubscribers;
+	protected Map<String, List<SubscriptionIntermediateFuture<Event>>> repsubscribers;
 
 	/** The map of {@link ReplicationSubscription}s */
-	protected Map<String, List<ReplicationSubscription>> replicationSubscriptions;
+	protected Map<String, List<ReplicationSubscription>> repsubscriptions;
 
 	/** The service id */
 	protected String id;
 
 	/** The search interval argument. */
 	@AgentArgument
-	protected Integer searchInterval;
+	protected Integer searchinterval;
 
 	/**
 	 * Called on agent creation.
 	 */
 	@AgentCreated
-	public void agentCreated() {
-		this.localSubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
-		this.replicationSubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
-		this.replicationSubscriptions = new HashMap<String, List<ReplicationSubscription>>();
+	public void agentCreated() 
+	{
+		this.localsubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
+		this.repsubscribers = new HashMap<String, List<SubscriptionIntermediateFuture<Event>>>();
+		this.repsubscriptions = new HashMap<String, List<ReplicationSubscription>>();
 		this.id = agent.getComponentIdentifier().getName();
 	}
 
 	@AgentBody
-	public void agentBody() {
+	public void agentBody() 
+	{
 		// Constantly searches for new occurring replication services
-		IComponentStep<Void> searchServicesStep = new IComponentStep<Void>() {
-
-			@Override
-			public IFuture<Void> execute(IInternalAccess ia) {
-				getOtherServices().addResultListener(new IntermediateDefaultResultListener<IMessageQueueReplicationService>() {
-
-					@Override
-					public void intermediateResultAvailable(IMessageQueueReplicationService result) {
+		IComponentStep<Void> searchServicesStep = new IComponentStep<Void>() 
+		{
+			public IFuture<Void> execute(IInternalAccess ia) 
+			{
+				getOtherServices().addResultListener(new IntermediateDefaultResultListener<IMessageQueueReplicationService>() 
+				{
+					public void intermediateResultAvailable(IMessageQueueReplicationService result) 
+					{
 						// check topic-wise if the found service is already subscripted
-						for (final String topic : replicationSubscriptions.keySet()) {
+						for(final String topic : repsubscriptions.keySet()) 
+						{
 							boolean present = false;
 
-							for (ReplicationSubscription replicationSubscription : replicationSubscriptions.get(topic)) {
-								if (replicationSubscription.getService().equals(result)) {
+							for(ReplicationSubscription repsub: repsubscriptions.get(topic)) 
+							{
+								if(repsub.getService().equals(result)) 
+								{
 									present = true;
 									break;
 								}
 							}
 
 							// if it is not and it is not the own service...
-							if (!present && !result.getId().equals(id)) {
+							if(!present && !result.getId().equals(id)) 
+							{
 								// subscribe...
 								ISubscriptionIntermediateFuture<Event> subscription = result.subscribeForReplication(topic);
 								ReplicationSubscription replicationSubscription = new ReplicationSubscription(result, subscription);
 								// and store the information for later termination if no local subscriber is interested in the topic anymore
-								replicationSubscriptions.get(topic).add(replicationSubscription);
-								subscription.addResultListener(new IntermediateDefaultResultListener<Event>() {
-
-									@Override
-									public void intermediateResultAvailable(Event result) {
+								repsubscriptions.get(topic).add(replicationSubscription);
+								subscription.addResultListener(new IntermediateDefaultResultListener<Event>() 
+								{
+									public void intermediateResultAvailable(Event result) 
+									{
 										// if remote event occur publish them to the local subscribers
 										publish(topic, result);
 									}
@@ -116,7 +124,7 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 				});
 
 				// repeat
-				agent.waitFor(searchInterval, this);
+				agent.waitFor(searchinterval, this);
 				return IFuture.DONE;
 			}
 		};
@@ -127,17 +135,18 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	/**
 	 * Subscribe to a specific topic. New events that fit to the topic are forwarded to all replication subscribers as intermediate results. A subscribe can unsubscribe by terminating the future.
 	 * 
-	 * @param topic
-	 *            The topic.
+	 * @param topic The topic.
 	 * @return The events.
 	 */
-	public ISubscriptionIntermediateFuture<Event> subscribeForReplication(String topic) {
+	public ISubscriptionIntermediateFuture<Event> subscribeForReplication(String topic) 
+	{
 		SubscriptionIntermediateFuture<Event> ret = new SubscriptionIntermediateFuture<Event>();
 
-		List<SubscriptionIntermediateFuture<Event>> subs = replicationSubscribers.get(topic);
-		if (subs == null) {
+		List<SubscriptionIntermediateFuture<Event>> subs = repsubscribers.get(topic);
+		if (subs == null) 
+		{
 			subs = new ArrayList<SubscriptionIntermediateFuture<Event>>();
-			replicationSubscribers.put(topic, subs);
+			repsubscribers.put(topic, subs);
 		}
 		subs.add(ret);
 
@@ -147,23 +156,25 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	/**
 	 * Replicates the given event and topic to all remote replication subscribers where they publish it to their local subscribers.
 	 * 
-	 * @param topic
-	 *            the given topic
-	 * @param event
-	 *            the given event
+	 * @param topic The given topic
+	 * @param event The given event
 	 */
-	private void replicate(String topic, Event event) {
-		List<SubscriptionIntermediateFuture<Event>> subs = replicationSubscribers.get(topic);
-		if (subs != null) {
-			for (Iterator<SubscriptionIntermediateFuture<Event>> it = subs.iterator(); it.hasNext();) {
+	private void replicate(String topic, Event event) 
+	{
+		List<SubscriptionIntermediateFuture<Event>> subs = repsubscribers.get(topic);
+		if (subs != null) 
+		{
+			for(Iterator<SubscriptionIntermediateFuture<Event>> it = subs.iterator(); it.hasNext();) 
+			{
 				SubscriptionIntermediateFuture<Event> sub = it.next();
-				if (!sub.addIntermediateResultIfUndone(event)) {
+				if (!sub.addIntermediateResultIfUndone(event)) 
+				{
 					System.out.println("Removed: " + sub);
 					it.remove();
 				}
 			}
-			if (subs.isEmpty())
-				replicationSubscribers.remove(topic);
+			if(subs.isEmpty())
+				repsubscribers.remove(topic);
 		}
 	}
 
@@ -171,17 +182,18 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	 * Subscribe to a specific topic. New events that fit to the topic are forwarded to all subscribers as intermediate results. A subscribe can unsubscribe by terminating the future. Every time when
 	 * someone subscribe for local messages the server also subscribe for the given topic by all the other remote services.
 	 * 
-	 * @param topic
-	 *            The topic.
+	 * @param topic The topic.
 	 * @return The events.
 	 */
-	public ISubscriptionIntermediateFuture<Event> subscribe(final String topic) {
+	public ISubscriptionIntermediateFuture<Event> subscribe(final String topic) 
+	{
 		SubscriptionIntermediateFuture<Event> ret = new SubscriptionIntermediateFuture<Event>();
 
-		List<SubscriptionIntermediateFuture<Event>> subs = localSubscribers.get(topic);
-		if (subs == null) {
+		List<SubscriptionIntermediateFuture<Event>> subs = localsubscribers.get(topic);
+		if(subs == null) 
+		{
 			subs = new ArrayList<SubscriptionIntermediateFuture<Event>>();
-			localSubscribers.put(topic, subs);
+			localsubscribers.put(topic, subs);
 		}
 		subs.add(ret);
 
@@ -197,40 +209,45 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	 * @param topic
 	 *            The given topic
 	 */
-	private void subscribeRemote(final String topic) {
-		getOtherServices().addResultListener(new IntermediateDefaultResultListener<IMessageQueueReplicationService>() {
-
-			@Override
-			public void intermediateResultAvailable(IMessageQueueReplicationService result) {
+	private void subscribeRemote(final String topic) 
+	{
+		getOtherServices().addResultListener(new IntermediateDefaultResultListener<IMessageQueueReplicationService>() 
+		{
+			public void intermediateResultAvailable(IMessageQueueReplicationService result) 
+			{
 				boolean present = false;
 
 				// check if there are already subscriptions for the given topic
-				if (replicationSubscriptions.containsKey(topic)) {
-					List<ReplicationSubscription> subscriptions = replicationSubscriptions.get(topic);
+				if (repsubscriptions.containsKey(topic)) {
+					List<ReplicationSubscription> subscriptions = repsubscriptions.get(topic);
 					// if so is there already a subscription at the found remote service?
-					for (ReplicationSubscription subscription : subscriptions) {
-						if (subscription.getService().equals(result)) {
+					for (ReplicationSubscription subscription : subscriptions) 
+					{
+						if (subscription.getService().equals(result)) 
+						{
 							present = true;
 							break;
 						}
 					}
-
-				} else {
+				} 
+				else 
+				{
 					List<ReplicationSubscription> subscriptions = new ArrayList<ReplicationSubscription>();
-					replicationSubscriptions.put(topic, subscriptions);
+					repsubscriptions.put(topic, subscriptions);
 				}
 
 				// if no subscription was found for the given service...
-				if (!present && !result.getId().equals(id)) {
+				if(!present && !result.getId().equals(id)) 
+				{
 					// subscribe...
 					ISubscriptionIntermediateFuture<Event> subscription = result.subscribeForReplication(topic);
 					ReplicationSubscription replicationSubscription = new ReplicationSubscription(result, subscription);
 					// and store the information for later termination if no local subscriber is interested in the topic anymore
-					replicationSubscriptions.get(topic).add(replicationSubscription);
-					subscription.addResultListener(new IntermediateDefaultResultListener<Event>() {
-
-						@Override
-						public void intermediateResultAvailable(Event result) {
+					repsubscriptions.get(topic).add(replicationSubscription);
+					subscription.addResultListener(new IntermediateDefaultResultListener<Event>() 
+					{
+						public void intermediateResultAvailable(Event result) 
+						{
 							// if remote event occur publish them to the local subscribers
 							publish(topic, result);
 						}
@@ -243,30 +260,30 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	/**
 	 * Publish a new event to the queue.
 	 * 
-	 * @param topic
-	 *            The topic.
-	 * @param event
-	 *            The event to publish.
-	 * @param replicate
-	 *            Should the event be replicated among all message queues?
+	 * @param topic The topic.
+	 * @param event The event to publish.
+	 * @param replicate Should the event be replicated among all message queues?
 	 */
-	public IFuture<Void> publish(String topic, Event event, Boolean replicate) {
-		List<SubscriptionIntermediateFuture<Event>> subs = localSubscribers.get(topic);
-		if (subs != null) {
-			for (Iterator<SubscriptionIntermediateFuture<Event>> it = subs.iterator(); it.hasNext();) {
+	public IFuture<Void> publish(String topic, Event event, Boolean replicate) 
+	{
+		List<SubscriptionIntermediateFuture<Event>> subs = localsubscribers.get(topic);
+		if(subs != null) 
+		{
+			for(Iterator<SubscriptionIntermediateFuture<Event>> it = subs.iterator(); it.hasNext();) 
+			{
 				SubscriptionIntermediateFuture<Event> sub = it.next();
-				if (!sub.addIntermediateResultIfUndone(event)) {
+				if(!sub.addIntermediateResultIfUndone(event)) 
+				{
 					System.out.println("Removed: " + sub);
 					it.remove();
 				}
 			}
-			if (subs.isEmpty())
+			if(subs.isEmpty())
 				removeTopic(topic);
 		}
 
-		if (replicate) {
+		if(replicate) 
 			replicate(topic, event);
-		}
 
 		return IFuture.DONE;
 	}
@@ -274,13 +291,14 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	/**
 	 * Removes a topic from the map of local subscribers and terminates all remote subscriptions for this topic.
 	 * 
-	 * @param topic
-	 *            The topic to be removed.
+	 * @param topic The topic to be removed.
 	 */
-	private void removeTopic(String topic) {
-		localSubscribers.remove(topic);
-		List<ReplicationSubscription> replicationSubscriptions = this.replicationSubscriptions.get(topic);
-		for (ReplicationSubscription replicationSubscription : replicationSubscriptions) {
+	private void removeTopic(String topic) 
+	{
+		localsubscribers.remove(topic);
+		List<ReplicationSubscription> replicationSubscriptions = this.repsubscriptions.get(topic);
+		for(ReplicationSubscription replicationSubscription : replicationSubscriptions) 
+		{
 			replicationSubscription.getSubscription().terminate();
 		}
 	}
@@ -290,7 +308,8 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	 * 
 	 * @return the other remote {@link IMessageQueueReplicationService}s
 	 */
-	private IIntermediateFuture<IMessageQueueReplicationService> getOtherServices() {
+	private IIntermediateFuture<IMessageQueueReplicationService> getOtherServices() 
+	{
 		IServiceContainer sc = this.agent.getServiceContainer();
 		IIntermediateFuture<IMessageQueueReplicationService> services = sc.getRequiredServices("replication");
 		return services;
@@ -299,12 +318,11 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	/**
 	 * Publish a new event to the queue.
 	 * 
-	 * @param topic
-	 *            The topic.
-	 * @param event
-	 *            The event to publish.
+	 * @param topic The topic.
+	 * @param event The event to publish.
 	 */
-	public IFuture<Void> publish(String topic, Event event) {
+	public IFuture<Void> publish(String topic, Event event) 
+	{
 		return publish(topic, event, false);
 	}
 
@@ -313,7 +331,8 @@ public class ReplicatedMessageQueueAgent implements IMessageQueueReplicableServi
 	 * 
 	 * @return the service Id.
 	 */
-	public String getId() {
+	public String getId() 
+	{
 		return this.id;
 	}
 }

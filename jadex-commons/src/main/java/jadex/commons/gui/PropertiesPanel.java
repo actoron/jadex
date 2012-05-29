@@ -194,7 +194,8 @@ public class PropertiesPanel	extends	JPanel
 	public JButton createButton(String name, String text, double weighty)
 	{
 		JButton b = new JButton(text);
-		addComponent(name, b, weighty, GridBagConstraints.NONE);
+//		addComponent(name, b, weighty, GridBagConstraints.NONE);
+		addComponent(name, b, weighty, GridBagConstraints.NONE, GridBagConstraints.WEST);
 		return b;
 	}
 	
@@ -258,6 +259,14 @@ public class PropertiesPanel	extends	JPanel
 	 */
 	public void	addComponent(String name, JComponent comp, double weighty, int fill)
 	{
+		addComponent(name, comp, weighty, fill, -1);
+	}
+	
+	/**
+	 *  Add a component
+	 */
+	public void	addComponent(String name, JComponent comp, double weighty, int fill, int anchor)
+	{
 		components.put(name, comp);
 
 		remove(dummy);
@@ -267,7 +276,7 @@ public class PropertiesPanel	extends	JPanel
 		
 		gbc.weightx	= 0;
 		gbc.gridwidth	= 1;
-		gbc.anchor = GridBagConstraints.EAST;
+		gbc.anchor = anchor!=-1? anchor: GridBagConstraints.EAST;
 		gbc.fill = GridBagConstraints.BOTH;
 		add(new JLabel(name), gbc);
 		

@@ -11,6 +11,8 @@ import jadex.bridge.service.types.chat.IChatGuiService;
 import jadex.bridge.service.types.chat.IChatService;
 import jadex.bridge.service.types.chat.TransferInfo;
 import jadex.bridge.service.types.clock.IClockService;
+import jadex.commons.Properties;
+import jadex.commons.Property;
 import jadex.commons.SUtil;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
@@ -32,12 +34,13 @@ import java.awt.Desktop;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.TexturePaint;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -59,6 +62,8 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -80,6 +85,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -102,19 +108,25 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public static final DateFormat	df	= new SimpleDateFormat("HH:mm:ss");
 	
 	/** The notification sound for a newly online user. */
-	public static final String	NOTIFICATION_NEW_USER	= "newuser";
+	public static final String	NOTIFICATION_NEW_USER	= "new user";
 	
 	/** The notification sound for a new message. */
-	public static final String	NOTIFICATION_NEW_MSG	= "newmsg";
+	public static final String	NOTIFICATION_NEW_MSG	= "new msg";
 	
 	/** The notification sound for an incoming file request. */
-	public static final String	NOTIFICATION_NEW_FILE	= "newfile";
+	public static final String	NOTIFICATION_NEW_FILE	= "new file";
 	
 	/** The notification sound for a successfully completed file. */
-	public static final String	NOTIFICATION_FILE_COMPLETE	= "filecomplete";
+	public static final String	NOTIFICATION_FILE_COMPLETE	= "file complete";
 	
 	/** The notification sound for an aborted or failed file transfer. */
-	public static final String	NOTIFICATION_FILE_ABORT	= "fileabort";
+	public static final String	NOTIFICATION_FILE_ABORT	= "file abort";
+	
+	/** The sound flag. */
+	protected boolean sound;
+	
+	/** The custom notification sounds. */
+	protected Map<String, String> notificationsounds;
 	
 	/** The default notification sounds. */
 	protected static Map<String, String>	NOTIFICATION_SOUNDS;
@@ -163,7 +175,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	protected JTabbedPane	tpane;
 	
 	/** Registration at the service. */
-	ISubscriptionIntermediateFuture<ChatEvent>	subscription;
+	protected ISubscriptionIntermediateFuture<ChatEvent> subscription;
 	
 	//-------- constructors --------
 	
@@ -175,6 +187,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public IFuture<Void> init(IControlCenter jcc, IService service)
 	{
+		this.sound = true;
+		this.notificationsounds = new HashMap<String, String>();
 		final Future<Void>	ret	= new Future<Void>();
 		super.init(jcc, service).addResultListener(new DelegationResultListener<Void>(ret)
 		{
@@ -393,15 +407,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				table.getTableHeader().addMouseListener(lis);
 				
 				PropertiesPanel pp = new PropertiesPanel();
-				JButton b = pp.createButton("Reset to all receivers: ", "Reset");
-				b.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						table.getSelectionModel().clearSelection();
-						lto.setText("To: all");
-					}
-				});
+				
 				final JTextField tfnick = new JTextField();
 				JButton bunick = new JButton("Set");
 				JPanel ppan = new JPanel(new BorderLayout());
@@ -409,10 +415,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				ppan.add(bunick, BorderLayout.EAST);
 				pp.addComponent("Nickname: ", ppan);
 //				final JTextField tfnick = pp.createTextField("Nickname: ", "unknown", true);
-				
-				bunick.setPreferredSize(b.getPreferredSize());
-				bunick.setMinimumSize(b.getMinimumSize());
-				
+//				bunick.setPreferredSize(b.getPreferredSize());
+//				bunick.setMinimumSize(b.getMinimumSize());
 				bunick.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent e)
@@ -427,6 +431,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						getService().setNickName(tfnick.getText());
 					}
 				});
+				
 				getService().getNickName().addResultListener(new SwingDefaultResultListener<String>()
 				{
 					public void customResultAvailable(String result)
@@ -434,6 +439,102 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						tfnick.setText(result);
 					}
 				});
+				
+				
+				final JComboBox jcom = new JComboBox(new String[]{NOTIFICATION_FILE_ABORT, 
+					NOTIFICATION_FILE_COMPLETE, NOTIFICATION_NEW_FILE, NOTIFICATION_NEW_MSG, NOTIFICATION_NEW_USER});
+				final JTextField jtxt = new JTextField();
+				jtxt.setEditable(false);
+				
+				
+				jtxt.setText(getNotificationSound((String)jcom.getSelectedItem()));
+				
+				final JButton jbut = new JButton("...");
+				final JFileChooser jfil = new JFileChooser(".");
+				jfil.setFileFilter(new FileFilter()
+				{
+					public String getDescription()
+					{
+						return "*.wav";
+					}
+					
+					public boolean accept(File f)
+					{
+						return f.isDirectory() || f.getName().endsWith(".wav");
+					}
+				});
+				jcom.addItemListener(new ItemListener()
+				{
+					public void itemStateChanged(ItemEvent e)
+					{
+						String sel = (String)jcom.getSelectedItem();
+						if(sel!=null)
+						{
+							jtxt.setText(getNotificationSound(sel));
+						}
+						else
+						{
+							jtxt.setText("");
+						}
+					}
+				});
+				jbut.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						try
+						{
+							jfil.showOpenDialog(panel);
+							File sel = jfil.getSelectedFile();
+							if(sel!=null)
+							{
+								String txt = SUtil.convertPathToRelative(sel.getAbsolutePath());
+								notificationsounds.put((String)jcom.getSelectedItem(), txt);
+								jtxt.setText(txt);
+							}
+						}
+						catch(Exception ex)
+						{
+							ex.printStackTrace();
+						}
+					}
+				});
+				JPanel pan = new JPanel(new BorderLayout());
+				pan.add(jcom, BorderLayout.CENTER);
+				pan.add(jbut, BorderLayout.EAST);
+//				pan.add(jbut, BorderLayout.EAST);
+				pp.addComponent("Sound files: ", pan);
+				pp.addFullLineComponent("t", jtxt);
+				
+				final JCheckBox cb = pp.createCheckBox("Sound enabled: ", sound, true, 0);
+				cb.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						sound = cb.isSelected();
+					}
+				});
+				
+				JButton rsb = pp.createButton("Reset sounds: ", "Reset");
+				rsb.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						notificationsounds.clear();
+						jtxt.setText(getNotificationSound((String)jcom.getSelectedItem()));
+					}
+				});
+				
+				JButton b = pp.createButton("Reset receivers: ", "Reset");
+				b.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						table.getSelectionModel().clearSelection();
+						lto.setText("To: all");
+					}
+				});
+				
 				
 				JPanel	listpan	= new JPanel(new BorderLayout());
 				listpan.add(userpan, BorderLayout.CENTER);
@@ -1016,13 +1117,21 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				});
 			}
 			
-			if(!quiet)
+			if(!quiet && sound)
 			{
 				try
 				{
 					Clip	clip	= AudioSystem.getClip();
 //					InputStream	is	= getClass().getResourceAsStream(NOTIFICATION_SOUNDS.get(type));
-					URL	url	= this.getClass().getResource(NOTIFICATION_SOUNDS.get(type));
+					String filename = getNotificationSound(type);
+					URL	url	= this.getClass().getResource(filename);
+					if(url==null)
+					{
+						File f = new File(filename);
+						if(f.exists())
+							url = f.toURI().toURL();
+					}
+					// Cannot use stream due to jar starter bug.
 					AudioInputStream	ais	= AudioSystem.getAudioInputStream(url); // (is);
 					clip.open(ais);
 					clip.start();
@@ -1486,5 +1595,59 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				});
 			}
 		}
+	}
+	
+	/**
+	 *  Get the notification sound.
+	 */
+	public String getNotificationSound(String type)
+	{
+		String ret = notificationsounds.get(type);
+		if(ret==null)
+			ret = NOTIFICATION_SOUNDS.get(type);
+		return ret;
+	}
+	
+	/**
+	 *  Update from given properties.
+	 */
+	public IFuture<Void> setProperties(Properties props)
+	{
+		String snd = props.getStringProperty("sound");
+		if(snd!=null)
+			sound = Boolean.parseBoolean(snd);
+			
+		snd = props.getStringProperty(NOTIFICATION_FILE_ABORT);
+		if(snd!=null)
+			notificationsounds.put(NOTIFICATION_FILE_ABORT, snd);
+		snd = props.getStringProperty(NOTIFICATION_FILE_COMPLETE);
+		if(snd!=null)
+			notificationsounds.put(NOTIFICATION_FILE_COMPLETE, snd);
+		snd = props.getStringProperty(NOTIFICATION_NEW_FILE);
+		if(snd!=null)
+			notificationsounds.put(NOTIFICATION_NEW_FILE, snd);
+		snd = props.getStringProperty(NOTIFICATION_NEW_MSG);
+		if(snd!=null)
+			notificationsounds.put(NOTIFICATION_NEW_MSG, snd);
+		snd = props.getStringProperty(NOTIFICATION_NEW_USER);
+		if(snd!=null)
+			notificationsounds.put(NOTIFICATION_NEW_USER, snd);
+		
+		return IFuture.DONE;
+	}
+	
+	/**
+	 *  Write current state into properties.
+	 */
+	public IFuture<Properties> getProperties()
+	{
+		Properties	props	= new Properties();
+		props.addProperty(new Property("sound", ""+sound));
+		for(String key: notificationsounds.keySet())
+		{
+			props.addProperty(new Property(key, notificationsounds.get(key)));
+		}
+		
+		return new Future<Properties>(props);
 	}
 }
