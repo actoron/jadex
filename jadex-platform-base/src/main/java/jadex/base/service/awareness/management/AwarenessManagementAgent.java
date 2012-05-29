@@ -1,8 +1,10 @@
 package jadex.base.service.awareness.management;
 
+import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
 import jadex.bridge.IComponentIdentifier;
 import jadex.bridge.IComponentStep;
+import jadex.bridge.IExternalAccess;
 import jadex.bridge.IInternalAccess;
 import jadex.bridge.service.RequiredServiceInfo;
 import jadex.bridge.service.annotation.Service;
@@ -163,6 +165,9 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	
 	/** The excludes list. */
 	protected List<String>	excludes;
+	
+	/** The platforms creation future. */
+	protected Future<IComponentIdentifier> pcreatefut;
 	
 	//-------- methods --------
 	
@@ -711,6 +716,67 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 	}
 	
 	/**
+	 *  Get the proxy holder component.
+	 *  (Creates it if it does not exist).
+	 */
+	protected IFuture<IComponentIdentifier> getProxyHolder()
+	{
+		final Future<IComponentIdentifier> ret = new Future<IComponentIdentifier>();
+		
+		final ComponentIdentifier cid = new ComponentIdentifier("platforms", getComponentIdentifier().getRoot());
+		
+		IFuture<IComponentManagementService> fut = getServiceContainer().getRequiredService("cms");
+		fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(ret)
+		{
+			public void customResultAvailable(final IComponentManagementService cms)
+			{
+				cms.getExternalAccess(cid).addResultListener(new IResultListener<IExternalAccess>()
+				{
+					public void resultAvailable(IExternalAccess exta)
+					{
+						ret.setResult(exta.getComponentIdentifier());
+					}
+					
+					public void exceptionOccurred(Exception exception)
+					{
+						createProxyHolder().addResultListener((new DelegationResultListener<IComponentIdentifier>(ret)));
+					}
+				});
+			}
+		});
+		
+		return ret;
+	}
+	
+	/**
+	 *  Create the platform proxy holder component.
+	 *  (Can be called multiple times).
+	 */
+	protected IFuture<IComponentIdentifier> createProxyHolder()
+	{
+		if(pcreatefut!=null)
+		{
+			return pcreatefut;
+		}
+		else
+		{
+			pcreatefut = new Future<IComponentIdentifier>();
+		
+			IFuture<IComponentManagementService> fut = getServiceContainer().getRequiredService("cms");
+			fut.addResultListener(new ExceptionDelegationResultListener<IComponentManagementService, IComponentIdentifier>(pcreatefut)
+			{
+				public void customResultAvailable(IComponentManagementService cms)
+				{
+					cms.createComponent("platforms", "jadex/base/service/awareness/RemotePlatformAgent.class", new CreationInfo(getComponentIdentifier().getRoot()), null)
+						.addResultListener(new DelegationResultListener<IComponentIdentifier>(pcreatefut));
+				}
+			});
+		}
+		
+		return pcreatefut;
+	}
+	
+	/**
 	 *  Create a proxy using given settings.
 	 */
 	public IFuture<IComponentIdentifier> createProxy(final DiscoveryInfo dif)
@@ -744,24 +810,31 @@ public class AwarenessManagementAgent extends MicroAgent implements IPropertiesP
 				}
 				else
 				{
-					CreationInfo ci = new CreationInfo(args);
-					ci.setDaemon(true);
-					cms.createComponent(dif.getComponentIdentifier().getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
-						createResultListener(new DefaultResultListener<Collection<Tuple2<String, Object>>>(getLogger())
+					getProxyHolder().addResultListener(new DelegationResultListener<IComponentIdentifier>(ret)
 					{
-						public void resultAvailable(Collection<Tuple2<String, Object>> result)
+						public void customResultAvailable(IComponentIdentifier parent)
 						{
-//							System.out.println("Proxy killed: "+source);
-							dif.setProxy(null);
-							informListeners(dif);
+							CreationInfo ci = new CreationInfo(args);
+							ci.setDaemon(true);
+							ci.setParent(parent);
+							cms.createComponent(dif.getComponentIdentifier().getLocalName(), "jadex/base/service/remote/ProxyAgent.class", ci, 
+								createResultListener(new DefaultResultListener<Collection<Tuple2<String, Object>>>(getLogger())
+							{
+								public void resultAvailable(Collection<Tuple2<String, Object>> result)
+								{
+//									System.out.println("Proxy killed: "+source);
+									dif.setProxy(null);
+									informListeners(dif);
+								}
+								
+								public void exceptionOccurred(Exception exception)
+								{
+									if(!(exception instanceof ComponentTerminatedException))
+										super.exceptionOccurred(exception);
+								}
+							})).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
 						}
-						
-						public void exceptionOccurred(Exception exception)
-						{
-							if(!(exception instanceof ComponentTerminatedException))
-								super.exceptionOccurred(exception);
-						}
-					})).addResultListener(new DelegationResultListener<IComponentIdentifier>(ret));
+					});
 				}
 			}
 		});
