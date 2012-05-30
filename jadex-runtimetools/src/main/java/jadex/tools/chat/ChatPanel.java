@@ -73,6 +73,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -124,6 +125,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	
 	/** The sound flag. */
 	protected boolean sound;
+	
+	/** The autorefresh flag. */
+	protected boolean autorefresh;
 	
 	/** The custom notification sounds. */
 	protected Map<String, String> notificationsounds;
@@ -177,6 +181,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	/** Registration at the service. */
 	protected ISubscriptionIntermediateFuture<ChatEvent> subscription;
 	
+	/** The timer. */
+	protected Timer timer;
+	
 	//-------- constructors --------
 	
 	/**
@@ -188,6 +195,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public IFuture<Void> init(IControlCenter jcc, IService service)
 	{
 		this.sound = true;
+		this.autorefresh = true;
 		this.notificationsounds = new HashMap<String, String>();
 		final Future<Void>	ret	= new Future<Void>();
 		super.init(jcc, service).addResultListener(new DelegationResultListener<Void>(ret)
@@ -504,7 +512,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				pan.add(jbut, BorderLayout.EAST);
 //				pan.add(jbut, BorderLayout.EAST);
 				pp.addComponent("Sound files: ", pan);
-				pp.addFullLineComponent("t", jtxt);
+				pp.addFullLineComponent("sf", jtxt);
 				
 				final JCheckBox cb = pp.createCheckBox("Sound enabled: ", sound, true, 0);
 				cb.addActionListener(new ActionListener()
@@ -512,6 +520,15 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 					public void actionPerformed(ActionEvent e)
 					{
 						sound = cb.isSelected();
+					}
+				});
+				
+				final JCheckBox cbar = pp.createCheckBox("Users auto refresh: ", autorefresh, true, 0);
+				cbar.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent e)
+					{
+						autorefresh = cbar.isSelected();
 					}
 				});
 				
@@ -536,9 +553,11 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 				});
 				
 				
-				JPanel	listpan	= new JPanel(new BorderLayout());
-				listpan.add(userpan, BorderLayout.CENTER);
-				listpan.add(pp, BorderLayout.SOUTH);
+				JSplitPanel	listpan	= new JSplitPanel(JSplitPane.VERTICAL_SPLIT, userpan, pp);
+				listpan.setDividerLocation(0.6);
+				listpan.setOneTouchExpandable(true);
+//				listpan.add(userpan, BorderLayout.CENTER);
+//				listpan.add(pp, BorderLayout.SOUTH);
 
 				JPanel south = new JPanel(new BorderLayout());
 				final JTextField tf = new JTextField();
@@ -726,6 +745,48 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 			}
 		});
 		
+		timer = new Timer(5000, new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(autorefresh)
+				{
+//					System.out.println("refresh");
+					
+					getService().findUsers().addResultListener(new SwingIntermediateDefaultResultListener<IChatService>()
+					{
+						public void customIntermediateResultAvailable(IChatService chat)
+						{
+							final IComponentIdentifier cid = ((IService)chat).getServiceIdentifier().getProviderId();
+							if(deadusers!=null)
+								deadusers.remove(cid);
+							ChatUser	cu	= users.get(cid);
+							if(cu==null)
+							{
+								chat.getNickName().addResultListener(new SwingDefaultResultListener<String>()
+								{
+									public void customResultAvailable(String nick)
+									{
+										ChatUser cu	= new ChatUser(cid);
+										cu.setNick(nick);
+										users.put(cid, cu);
+										((DefaultTableModel)table.getModel()).fireTableDataChanged();
+										table.getParent().invalidate();
+										table.getParent().doLayout();
+										table.repaint();
+									}
+								});
+							}
+						}
+						public void customExceptionOccurred(Exception exception)
+						{
+						}
+					});
+				}
+			}
+		});
+		timer.start();
+		
 		return ret;
 	}
 	
@@ -743,11 +804,12 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public IFuture<Void> shutdown()
 	{
 		Future<Void>	ret	= new Future<Void>();
+		timer.stop();
 		super.shutdown().addResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{
-				subscription.terminate();				
+				subscription.terminate();
 			}
 		});
 		return ret;
@@ -1613,6 +1675,9 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	 */
 	public IFuture<Void> setProperties(Properties props)
 	{
+		String ar = props.getStringProperty("autorefresh");
+		if(ar!=null)
+			autorefresh = Boolean.parseBoolean(ar);
 		String snd = props.getStringProperty("sound");
 		if(snd!=null)
 			sound = Boolean.parseBoolean(snd);
@@ -1642,6 +1707,7 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 	public IFuture<Properties> getProperties()
 	{
 		Properties	props	= new Properties();
+		props.addProperty(new Property("autorefresh", ""+autorefresh));
 		props.addProperty(new Property("sound", ""+sound));
 		for(String key: notificationsounds.keySet())
 		{
