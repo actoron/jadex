@@ -385,8 +385,8 @@ public class ChatPanel extends AbstractServiceViewerPanel<IChatGuiService>
 						{
 							int row = table.rowAtPoint(e.getPoint());
 							table.setRowSelectionInterval(row, row);
-							IComponentIdentifier cid = (IComponentIdentifier)((UserTableModel)table.getModel()).getValueAt(row, 0);
-							createMenu(cid).show(e.getComponent(), e.getX(), e.getY());
+							ChatUser cu = (ChatUser)((UserTableModel)table.getModel()).getValueAt(row, 0);
+							createMenu(cu.getComponentIdentifier()).show(e.getComponent(), e.getX(), e.getY());
 						}
 					}
 					
