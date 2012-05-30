@@ -60,8 +60,12 @@ public class ComponentStartTest implements	Test
 			IComponentIdentifier	cid	= cms.createComponent(null, comp.getFilename(), new CreationInfo(comp.getResourceIdentifier()), null).get(new ThreadSuspendable(), 30000);
 			try
 			{
-//				System.out.println("killing: "+comp.getFilename());
-				cms.destroyComponent(cid).get(new ThreadSuspendable(), 30000);
+//				if(comp.getFilename().indexOf("Heatbugs")!=-1)
+//				{
+//					System.out.println("killing: "+comp.getFilename());
+//					SyncExecutionService.DEBUG	= true;
+//				}
+				cms.destroyComponent(cid).get(new ThreadSuspendable(), 3000000);
 //				System.out.println("killed: "+comp.getFilename());
 			}
 			catch(ComponentTerminatedException cte)

@@ -349,10 +349,10 @@ public class ServicePoolManager
 				{
 					creating	= false;
 					// Service creation not supported -> ignore.
-					if(!(exception instanceof ComponentTerminatedException))
-					{
-						exception.printStackTrace();
-					}
+//					if(!(exception instanceof ComponentTerminatedException))
+//					{
+//						exception.printStackTrace();
+//					}
 				}
 			}));
 		}

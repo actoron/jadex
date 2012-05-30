@@ -25,6 +25,8 @@ import java.util.Set;
  */
 public class SyncExecutionService extends BasicService implements IExecutionService
 {
+//	public static boolean DEBUG;
+	
 	//-------- attributes --------
 	
 	/** The queue of tasks to be executed. */
@@ -89,13 +91,15 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 		if(shutdown)
 			return;
 
-//		System.out.println("execute called: "+task);
+//		if(DEBUG)
+//			System.out.println("execute called: "+task+", "+this.task);
 		boolean	added;
 		synchronized(this)
 		{
 //			new RuntimeException().printStackTrace(System.out);
 			added = queue.add(task);
-//			System.out.println("Task added: "+queue);
+//			if(DEBUG)
+//				System.out.println("Task added: "+queue+", "+this.task);
 		}
 		
 		// On change, wake up the main executor for executing tasks
@@ -205,7 +209,8 @@ public class SyncExecutionService extends BasicService implements IExecutionServ
 								{
 									try
 									{
-//										System.out.println("Executing task: "+task);
+//										if(DEBUG)
+//											System.out.println("Executing task: "+task);
 										again = task.execute();
 									}
 									catch(Exception e)

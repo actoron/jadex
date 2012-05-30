@@ -176,7 +176,13 @@ public class ObserverCenter
 				{
 					public void changeOccurred(jadex.commons.ChangeEvent event)
 					{
-						updateDisplay();
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								updateDisplay();
+							}
+						});
 					}
 				};
 

@@ -943,6 +943,10 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 	 */
 	public IFuture<Map<String, Object>> destroyComponent(final IComponentIdentifier cid)
 	{
+//		if(getDescription(cid)!=null && "Application".equals(getDescription(cid).getType()))
+//			System.out.println("destroy: "+cid.getName());
+//		else if(getDescription(cid)==null) 
+//			System.out.println("destroy: null");
 //		if(cid.getParent()==null)
 //		{
 //			System.out.println("Platform kill called:_"+cid.getName());
@@ -978,6 +982,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 		{
 			destroyComponent(cid, ret);
 		}
+//		else if("Application".equals(getDescription(cid).getType()))
+//			System.out.println("no destroy: "+contains+", "+locked);
 		
 		return ret;
 	}
@@ -1014,12 +1020,16 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 				ad	= infos.getAdapter();
 				if(ad==null || ad.getException()!=null)
 				{
+//					if("Application".equals(getDescription(cid).getType()))
+//						System.out.println("init future exception: "+cid.getName());
 					infos.getInitFuture().setException(ad.getException());
 				}
 				
 				// Component terminated from outside: wait for init to complete, will be removed as cleanup future is registered (cfs).
 				else
 				{
+//					if("Application".equals(getDescription(cid).getType()))
+//						System.out.println("Queued component termination during init: "+cid.getName());
 					logger.info("Queued component termination during init: "+cid.getName());
 				}
 			}
@@ -1031,6 +1041,9 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 				// Kill subcomponents
 				if(adapter==null)
 				{
+//					if("Application".equals(getDescription(cid).getType()))
+//						System.out.println("Terminating component structure adapter is null: "+cid.getName());
+//					
 					// Todo: need to kill children!? How to reproduce this case!?
 					logger.info("Terminating component structure adapter is null: "+cid.getName());
 					exitDestroy(cid, null, new ComponentTerminatedException(cid, "Component does not exist."), null);
@@ -1039,7 +1052,7 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 				{
 //					if("Application".equals(getDescription(cid).getType()))
 //						System.out.println("Terminating component structure: "+cid.getName());
-					
+//					
 					logger.info("Terminating component structure: "+cid.getName());
 					final CMSComponentDescription	desc = (CMSComponentDescription)adapter.getDescription();
 					IComponentIdentifier[] achildren = desc.getChildren();
