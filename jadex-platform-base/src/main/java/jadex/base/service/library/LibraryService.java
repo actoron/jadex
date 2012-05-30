@@ -1043,31 +1043,11 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 	@ServiceStart
 	public IFuture<Void>	startService()
 	{
-		final Future<Void>	ret	= new Future<Void>();
+		final Future<Void>	urlsdone	= new Future<Void>();
 		if(initurls!=null)
 		{
-			CounterResultListener<IResourceIdentifier> lis = new CounterResultListener<IResourceIdentifier>(initurls.length,
-				new DelegationResultListener<Void>(ret)
-			{
-				public void customResultAvailable(Void result) 
-				{
-					component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
-						.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
-					{
-						public void customResultAvailable(ISettingsService settings)
-						{
-							settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
-								.addResultListener(new DelegationResultListener<Void>(ret));
-						}
-						public void exceptionOccurred(Exception exception)
-						{
-							// No settings service: ignore
-							ret.setResult(null);
-//								ret.setResult(getServiceIdentifier());
-						}
-					});
-				}
-			});
+			CounterResultListener<IResourceIdentifier> lis = new CounterResultListener<IResourceIdentifier>(
+				initurls.length, new DelegationResultListener<Void>(urlsdone));
 			for(int i=0; i<initurls.length; i++)
 			{
 				addURL(SUtil.toURL(initurls[i])).addResultListener(lis);
@@ -1075,8 +1055,30 @@ public class LibraryService	implements ILibraryService, IPropertiesProvider
 		}
 		else
 		{
-			ret.setResult(null);
+			urlsdone.setResult(null);
 		}
+		
+		final Future<Void>	ret	= new Future<Void>();
+		urlsdone.addResultListener(new DelegationResultListener<Void>(ret)
+		{
+			public void customResultAvailable(Void result) 
+			{
+				component.getServiceContainer().searchService(ISettingsService.class, RequiredServiceInfo.SCOPE_PLATFORM)
+					.addResultListener(new ExceptionDelegationResultListener<ISettingsService, Void>(ret)
+				{
+					public void customResultAvailable(ISettingsService settings)
+					{
+						settings.registerPropertiesProvider(LIBRARY_SERVICE, LibraryService.this)
+							.addResultListener(new DelegationResultListener<Void>(ret));
+					}
+					public void exceptionOccurred(Exception exception)
+					{
+						// No settings service: ignore
+						ret.setResult(null);
+					}
+				});
+			}
+		});
 		return ret;
 	}
 

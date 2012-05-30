@@ -182,9 +182,7 @@ public class ChatService implements IChatService, IChatGuiService, IPropertiesPr
 				}
 			}
 			
-			// Todo: required services don't work in service shutdown!?
-			IIntermediateFuture<IChatService>	chatfut	= SServiceProvider.getServices(agent.getServiceContainer(), IChatService.class, Binding.SCOPE_GLOBAL);
-	//		IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
+			IIntermediateFuture<IChatService>	chatfut	= agent.getServiceContainer().getRequiredServices("chatservices");
 			chatfut.addResultListener(new IntermediateDefaultResultListener<IChatService>()
 			{
 				public void intermediateResultAvailable(IChatService chat)

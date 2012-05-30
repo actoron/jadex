@@ -174,6 +174,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 	 */
 	public IFuture<Void> cleanupComponent()
 	{
+//		System.out.println("cleanup: "+getComponentIdentifier());
 		assert !getComponentAdapter().isExternalThread();
 		
 		final Future<Void> ret = new Future<Void>();

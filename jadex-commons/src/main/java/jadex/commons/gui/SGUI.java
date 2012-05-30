@@ -307,23 +307,23 @@ public class SGUI
 //		Thread.dumpStack();
 		
 		final String	text;
-//		String	exmsg	= exception==null ? null : exception.getMessage();
-		if(errormessage==null)// && exmsg==null)
+		String	exmsg	= exception==null ? null : exception.getMessage();
+		if(errormessage==null && exmsg==null)
 		{
 			text	= errortitle;
 		}
-		else //if(errormessage!=null && exmsg==null)
+		else if(errormessage!=null && exmsg==null)
 		{
 			text	= errormessage;
 		}
-//		else if(errormessage==null && exmsg!=null)
-//		{
-//			text	= exmsg;
-//		}
-//		else// if(errormessage!=null && exmsg!=null)
-//		{
-//			text = errormessage + "\n" + exmsg;
-//		}
+		else if(errormessage==null && exmsg!=null)
+		{
+			text	= exmsg;
+		}
+		else// if(errormessage!=null && exmsg!=null)
+		{
+			text = errormessage + "\n" + exmsg;
+		}
 		Object	message	= SUtil.wrapText(text);
 		if(exception!=null)
 		{

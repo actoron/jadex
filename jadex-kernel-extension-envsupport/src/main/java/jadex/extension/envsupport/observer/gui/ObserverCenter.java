@@ -6,13 +6,13 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IChangeListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.Future;
+import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
 import jadex.extension.envsupport.dataview.IDataView;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
 import jadex.extension.envsupport.environment.IEnvironmentSpace;
-import jadex.extension.envsupport.environment.space2d.Space2D;
 import jadex.extension.envsupport.math.IVector2;
-import jadex.extension.envsupport.math.IVector3;
 import jadex.extension.envsupport.observer.gui.plugin.IObserverCenterPlugin;
 import jadex.extension.envsupport.observer.gui.plugin.IntrospectorPlugin;
 import jadex.extension.envsupport.observer.gui.plugin.VisualsPlugin;
@@ -357,18 +357,28 @@ public class ObserverCenter
 	 * @param name name of the perspective
 	 * @param perspective the perspective
 	 */
-	public void addPerspective(final String name, final IPerspective perspective)
+	public IFuture<Void>	addPerspective(final String name, final IPerspective perspective)
 	{
+		final Future<Void>	ret	= new Future<Void>();
+		
 		if(SwingUtilities.isEventDispatchThread())
 		{
 			synchronized(perspectives)
 			{
-				perspective.setObserverCenter(this);
-				perspective.setName(name);
-				perspectives.put(name, perspective);
-				if(perspectives.size() == 1)
+				try
 				{
-					setSelectedPerspective(name);
+					perspective.setObserverCenter(this);
+					perspective.setName(name);
+					perspectives.put(name, perspective);
+					if(perspectives.size() == 1)
+					{
+						setSelectedPerspective(name);
+					}
+					ret.setResult(null);
+				}
+				catch(Exception e)
+				{
+					ret.setException(e);
 				}
 			}
 		}
@@ -380,18 +390,27 @@ public class ObserverCenter
 				{
 					synchronized(perspectives)
 					{
-						perspective.setObserverCenter(ObserverCenter.this);
-						perspective.setName(name);
-						perspectives.put(name, perspective);
-						if (perspectives.size() == 1)
+						try
 						{
-							setSelectedPerspective(name);
+							perspective.setObserverCenter(ObserverCenter.this);
+							perspective.setName(name);
+							perspectives.put(name, perspective);
+							if(perspectives.size() == 1)
+							{
+								setSelectedPerspective(name);
+							}
+							ret.setResult(null);
+						}
+						catch(Exception e)
+						{
+							ret.setException(e);
 						}
 					}
 				}
 			});
 		}
 		
+		return ret;
 	}
 	
 	/**

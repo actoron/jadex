@@ -188,7 +188,11 @@ public class NightlyBuildsPlugin implements XWikiPluginInterface
 				if(stok.hasMoreTokens())
 				{
 					String	tok2	= stok.nextToken();
-					if(Character.isDigit(tok2.charAt(0)))
+					boolean	digits	= true;
+					for(int i=0; digits && i<tok2.length(); i++)
+						digits	= Character.isDigit(tok2.charAt(i));
+					
+					if(digits)
 					{
 						break;
 					}

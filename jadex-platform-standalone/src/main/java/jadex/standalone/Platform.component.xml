@@ -152,7 +152,7 @@
 		<argument name="niotcpport" class="int">8765</argument>
 		<!-- Flag if relay transport is enabled. -->
 		<argument name="relaytransport" class="boolean">true</argument>
-		<!-- Address for relay transport. -->
+		<!-- Address(es) for relay transport (one or more addresses separated by commas). -->
 		<argument name="relayaddress" class="String">jadex.base.service.message.transport.httprelaymtp.SRelay.DEFAULT_ADDRESS</argument>
 		
 		<!-- The file name(s) of extension component(s) to load (separated by comma). -->

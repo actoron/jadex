@@ -66,6 +66,32 @@ public class ServiceInvocationContext
 		
 		this.caller = IComponentIdentifier.LOCAL.get();
 	}
+	
+	/**
+	 *  Create a copied context.
+	 */
+	public ServiceInvocationContext(ServiceInvocationContext context)
+	{
+		this.platform = context.platform;
+		this.proxy = context.proxy;
+		this.object = new ArrayList(context.object);
+		this.method = new ArrayList(context.method);
+		this.arguments = new ArrayList(context.arguments);
+		this.result = new ArrayList(context.result);
+		
+		this.used = new ArrayList(context.used);
+		this.interceptors = context.interceptors;
+		
+		this.caller = context.caller;
+	}
+	
+	/**
+	 *  Clone a service invocation context.
+	 */
+	public ServiceInvocationContext	clone()
+	{
+		return new ServiceInvocationContext(this); 
+	}
 
 	//-------- methods --------
 	

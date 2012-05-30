@@ -8,7 +8,7 @@ import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.commons.IValueFetcher;
 import jadex.commons.SReflect;
 import jadex.commons.collection.MultiCollection;
-import jadex.commons.future.DelegationResultListener;
+import jadex.commons.future.ExceptionDelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.extension.envsupport.environment.AbstractEnvironmentSpace;
@@ -53,9 +53,17 @@ public class MEnvSpaceInstance	implements IExtensionInfo
 				try
 				{
 					Class<AbstractEnvironmentSpace>	clazz	= SReflect.findClass(spacetype.getClassName(), access.getModel().getAllImports(), ia.getClassLoader());
-					AbstractEnvironmentSpace	space	= clazz.newInstance();
-					space.init(ia, MEnvSpaceInstance.this, fetcher);
-					ret	= new Future<IExtensionInstance>(space);
+					final AbstractEnvironmentSpace	space	= clazz.newInstance();
+					final Future<IExtensionInstance>	fut	= new Future<IExtensionInstance>();
+					ret	= fut;
+					space.init(ia, MEnvSpaceInstance.this, fetcher)
+						.addResultListener(new ExceptionDelegationResultListener<Void, IExtensionInstance>(fut)
+					{
+						public void customResultAvailable(Void result)
+						{
+							fut.setResult(space);
+						}
+					});
 				}
 				catch(Exception e)
 				{

@@ -555,20 +555,29 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 	{
 		assert killfuture==null;
 		
+//		if("Application".equals(desc.getType()))
+//			System.out.println("killComponent: "+getComponentIdentifier());
+		
 		killfuture = new Future<Void>();
 		
 		if(IComponentDescription.STATE_TERMINATED.equals(desc.getState()))
 		{
+//			if("Application".equals(desc.getType()))
+//				System.out.println("killComponent0: "+getComponentIdentifier());
 			killfuture.setException(new ComponentTerminatedException(desc.getName()));
 		}
 		else
 		{
 			if(exception==null)
 			{
+//				if("Application".equals(desc.getType()))
+//					System.out.println("killComponent1: "+getComponentIdentifier());
 				invokeLater(new Runnable()
 				{
 					public void run()
 					{
+//						if("Application".equals(desc.getType()))
+//							System.out.println("killComponent2: "+getComponentIdentifier());
 						component.cleanupComponent()
 							.addResultListener(new IResultListener<Void>()
 						{
@@ -638,6 +647,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 			}
 			else
 			{
+//				if("Application".equals(desc.getType()))
+//					System.out.println("killComponent3: "+getComponentIdentifier());
 				killfuture.setResult(null);
 //				listener.resultAvailable(this, getComponentIdentifier());
 			}

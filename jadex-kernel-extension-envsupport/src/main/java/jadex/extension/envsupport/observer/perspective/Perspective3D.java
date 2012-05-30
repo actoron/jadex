@@ -352,7 +352,7 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	 */
 	public void refresh()
 	{
-		if(!rendering)
+		if(viewport3d!=null && !rendering)
 		{
 			rendering = true;
 			EventQueue.invokeLater(new Runnable()
@@ -451,10 +451,10 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 			viewport3d = vp;
 			vp.startApp();
 		}
-//		catch(ClassNotFoundException cnfe)
-//		{
-//			SGUI.showError(obscenter, "3D Problem", "3D add-on not installed?", cnfe);
-//		}
+		catch(ClassNotFoundException cnfe)
+		{
+			throw new RuntimeException("Cannot create 3D viewport. 3D add-on not installed?", cnfe);
+		}
 		catch(Exception e)
 		{
 			throw new RuntimeException(e);
@@ -532,8 +532,8 @@ public class Perspective3D extends TypedPropertyObject implements IPerspective
 	@Override
 	public void shutdown()
 	{
-		viewport3d.stopApp();
-
+		if(viewport3d!=null)
+			viewport3d.stopApp();
 	}
 
 	/**

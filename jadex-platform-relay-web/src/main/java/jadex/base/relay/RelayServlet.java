@@ -135,6 +135,10 @@ public class RelayServlet extends HttpServlet
 					request.setAttribute("platforms", StatsDB.getDB().getAllPlatformInfos());
 					view	= "/WEB-INF/jsp/csv.jsp";
 				}
+				else if("/servers".equals(request.getServletPath()))
+				{
+					view	= "/WEB-INF/jsp/servers.jsp";
+				}
 				else
 				{
 					// Fetch array to avoid concurrency problems

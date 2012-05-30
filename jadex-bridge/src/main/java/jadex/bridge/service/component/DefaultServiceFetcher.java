@@ -666,7 +666,14 @@ public class DefaultServiceFetcher implements IRequiredServiceFetcher
 		}
 		else
 		{
-			ret.setException(new ServiceNotFoundException("name="+info.getName()+", interface="+info.getType().getTypeName()+", no component creation possible"));
+			ret.setException(new ServiceNotFoundException("name="+info.getName()+", interface="+info.getType().getTypeName()+", no component creation possible")
+			{
+				public void printStackTrace()
+				{
+					Thread.dumpStack();
+					super.printStackTrace();
+				}
+			});
 		}
 		
 		return ret;

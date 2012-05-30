@@ -10,7 +10,9 @@ import jadex.bridge.service.component.ServiceInvocationContext;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
+import jadex.commons.future.IResultListener;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
@@ -100,11 +102,10 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 	 *  Invoke double methods.
 	 *  The boolean 'firstorig' determines if basicservice method is called first.
 	 */
-	protected IFuture invokeDoubleMethod(final ServiceInvocationContext sic, final ServiceInfo si, Method m, Class annotation, boolean firstorig)
+	protected IFuture<Void> invokeDoubleMethod(final ServiceInvocationContext sic, final ServiceInfo si, Method m, Class<? extends Annotation> annotation, boolean firstorig)
 	{
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
-		final Method origmethod = sic.getMethod();
 		Method[] methods = si.getDomainService().getClass().getMethods();
 		boolean found = false;
 		
@@ -112,31 +113,73 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		{
 			if(methods[i].isAnnotationPresent(annotation))
 			{
+				final ServiceInvocationContext	domainsic	= sic.clone();
+				domainsic.setMethod(methods[i]);
+				domainsic.setObject(si.getDomainService());
+				sic.setObject(si.getManagementService());
+				
 				if(firstorig)
 				{
-					final Method domainmethod = methods[i];
-					sic.setObject(si.getManagementService());
-					sic.invoke().addResultListener(new DelegationResultListener(ret)
+					sic.invoke().addResultListener(new DelegationResultListener<Void>(ret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(Void result)
 						{
-							sic.setMethod(domainmethod);
-							sic.setObject(si.getDomainService());
-							sic.invoke().addResultListener(new DelegationResultListener(ret));
+							// Mgmt method is always future<void>
+							IResultListener<Object>	lis	= new IResultListener<Object>()
+							{
+								public void resultAvailable(Object result)
+								{
+									domainsic.invoke().addResultListener(new DelegationResultListener<Void>(ret)
+									{
+										public void customResultAvailable(Void result)
+										{
+											// If domain result is future, replace finished mgmt result with potentially not yet finished domain future.
+											if(domainsic.getResult() instanceof IFuture<?>)
+											{
+												sic.setResult(domainsic.getResult());
+											}
+											super.customResultAvailable(result);
+										}
+									});
+								}
+								public void exceptionOccurred(Exception exception)
+								{
+									// Invocation finished, exception available in result future. 
+									ret.setResult(null);
+								}
+							};
+							((IFuture)sic.getResult()).addResultListener(lis);
 						}
 					});
 				}
 				else
 				{
-					sic.setMethod(methods[i]);
-					sic.setObject(si.getDomainService());
-					sic.invoke().addResultListener(new DelegationResultListener(ret)
+					domainsic.invoke().addResultListener(new DelegationResultListener<Void>(ret)
 					{
-						public void customResultAvailable(Object result)
+						public void customResultAvailable(Void result)
 						{
-							sic.setMethod(origmethod);
-							sic.setObject(si.getManagementService());
-							sic.invoke().addResultListener(new DelegationResultListener(ret));
+							// Domain method may be void or future<void>
+							if(domainsic.getResult() instanceof IFuture<?>)
+							{
+								IResultListener<Object>	lis	= new IResultListener<Object>()
+								{
+									public void resultAvailable(Object result)
+									{
+										sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+									}
+									public void exceptionOccurred(Exception exception)
+									{
+										// Make exception available in result future.
+										sic.setResult(new Future<Void>(exception));
+										ret.setResult(null);
+									}
+								};
+								((IFuture)domainsic.getResult()).addResultListener(lis);
+							}
+							else
+							{
+								sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
+							}
 						}
 					});
 				}
@@ -148,7 +191,7 @@ public class ResolveInterceptor extends AbstractApplicableInterceptor
 		if(!found)
 		{
 			sic.setObject(si.getManagementService());
-			sic.invoke().addResultListener(new DelegationResultListener(ret));
+			sic.invoke().addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		
 		return ret;

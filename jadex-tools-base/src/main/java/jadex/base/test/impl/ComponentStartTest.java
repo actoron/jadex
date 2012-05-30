@@ -56,10 +56,13 @@ public class ComponentStartTest implements	Test
 		// Start the component.
 		try
 		{
+//			System.out.println("starting: "+comp.getFilename());
 			IComponentIdentifier	cid	= cms.createComponent(null, comp.getFilename(), new CreationInfo(comp.getResourceIdentifier()), null).get(new ThreadSuspendable(), 30000);
 			try
 			{
+//				System.out.println("killing: "+comp.getFilename());
 				cms.destroyComponent(cid).get(new ThreadSuspendable(), 30000);
+//				System.out.println("killed: "+comp.getFilename());
 			}
 			catch(ComponentTerminatedException cte)
 			{				

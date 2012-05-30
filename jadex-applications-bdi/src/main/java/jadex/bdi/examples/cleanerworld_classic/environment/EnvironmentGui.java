@@ -75,6 +75,11 @@ public class EnvironmentGui	extends JFrame
 		"background", SGUI.makeIcon(EnvironmentGui.class, "/jadex/bdi/examples/cleanerworld_classic/images/background.png"),
 		"background_night", SGUI.makeIcon(EnvironmentGui.class, "/jadex/bdi/examples/cleanerworld_classic/images/background_night.png")
 	});
+	
+	//-------- attributes --------
+	
+	/** The repaint timer. */
+	protected Timer	timer;
 
 	//-------- constructors --------
 
@@ -100,6 +105,8 @@ public class EnvironmentGui	extends JFrame
 						{
 							public void run()
 							{
+								if(timer!=null)
+									timer.stop();
 								EnvironmentGui.this.dispose();
 							}
 						});
@@ -484,7 +491,7 @@ public class EnvironmentGui	extends JFrame
 
 						
 						
-						Timer	timer	= new Timer(50, new ActionListener()
+						timer	= new Timer(50, new ActionListener()
 						{
 							public void actionPerformed(ActionEvent e)
 							{

@@ -38,7 +38,7 @@ import java.util.Map;
  */
 @Agent
 @Service
-@ProvidedServices({ @ProvidedService(type = IMessageQueueReplicableService.class, implementation = @Implementation(expression = "$pojoagent")),
+@ProvidedServices({@ProvidedService(type = IMessageQueueReplicableService.class, implementation = @Implementation(expression = "$pojoagent")),
 	@ProvidedService(type = IMessageQueueReplicationService.class, implementation = @Implementation(expression = "$pojoagent")) })
 @RequiredServices(@RequiredService(type = IMessageQueueReplicationService.class, multiple = true, binding = @Binding(scope = Binding.SCOPE_GLOBAL), name = "replication"))
 @Arguments(@Argument(name = "searchinterval", clazz = Integer.class, defaultvalue = "1000"))

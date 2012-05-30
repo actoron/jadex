@@ -42,10 +42,7 @@ public class MicroTest	extends ComponentTestSuite
 			
 			// Non-tests that don't stop until finished (why?)
 			"AgentCreationAgent",	
-			"PojoAgentCreationAgent",
-			
-			// Broken due to resolve interceptor
-			"mandelbrot"
+			"PojoAgentCreationAgent"
 		});
 //		}, 600000, true, false);
 	}

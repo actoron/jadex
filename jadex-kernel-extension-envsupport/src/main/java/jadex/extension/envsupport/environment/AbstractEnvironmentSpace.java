@@ -18,6 +18,7 @@ import jadex.commons.IFilter;
 import jadex.commons.IPropertyObject;
 import jadex.commons.IValueFetcher;
 import jadex.commons.collection.MultiCollection;
+import jadex.commons.future.CounterResultListener;
 import jadex.commons.future.DefaultResultListener;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
@@ -191,8 +192,10 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	/**
 	 *  Create a space.
 	 */
-	public void	initSpace(final IInternalAccess ia, MEnvSpaceInstance config, IValueFetcher pfetcher)
+	public IFuture<Void>	initSpace(final IInternalAccess ia, MEnvSpaceInstance config, IValueFetcher pfetcher)
 	{
+		final Future<Void>	ret	= new Future<Void>();
+		
 		try
 		{
 			this.classloader	= ia.getClassLoader();
@@ -568,9 +571,12 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				}
 			}
 			
+			Future<Void>	ocsdone	= new Future<Void>();
 			List observers = config.getPropertyList("observers");
 			if(observers!=null)
 			{
+				CounterResultListener<Void>	crl1	= new CounterResultListener<Void>(observers.size(), new DelegationResultListener<Void>(ocsdone));
+				
 				for(int i=0; i<observers.size(); i++)
 				{				
 					Map observer = (Map)observers.get(i);
@@ -628,8 +634,12 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 							});
 						}
 					});
+					
+					Future<Void>	ocdone	= new Future<Void>();
+					ocdone.addResultListener(crl1);
 	
 					List perspectives = mspacetype.getPropertyList("perspectives");
+					CounterResultListener<Void>	crl2	= new CounterResultListener<Void>(perspectives.size(), new DelegationResultListener<Void>(ocdone));
 					for(int j=0; j<perspectives.size(); j++)
 					{
 						Map sourcepers = (Map)perspectives.get(j);
@@ -643,7 +653,8 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 							List props = (List)sourcepers.get("properties");
 							MEnvSpaceType.setProperties(persp, props, fetcher);
 							
-							oc.addPerspective((String)MEnvSpaceType.getProperty(sourcepers, "name"), persp);
+							oc.addPerspective((String)MEnvSpaceType.getProperty(sourcepers, "name"), persp)
+								.addResultListener(crl2);
 						}
 						catch(Exception e)
 						{
@@ -653,35 +664,72 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 					}
 				}
 			}
-			
-			// Create the environment executor.
-			Map mse = (Map)MEnvSpaceType.getProperty(mspacetype.getProperties(), "spaceexecutor");
-			if(mse!=null)
+			else
 			{
-				IParsedExpression exp = (IParsedExpression)MEnvSpaceType.getProperty(mse, "expression");
-				ISpaceExecutor exe = null;
-				if(exp!=null)
-				{
-					exe = (ISpaceExecutor)exp.getValue(fetcher);	// Executor starts itself
-				}
-				else
-				{
-					exe = (ISpaceExecutor)((Class)MEnvSpaceType.getProperty(mse, "clazz")).newInstance();
-					List props = (List)mse.get("properties");
-					MEnvSpaceType.setProperties(exe, props, fetcher);
-				}
-				if(exe!=null)
-					exe.start();
+				ocsdone.setResult(null);
 			}
+			
+			ocsdone.addResultListener(new DelegationResultListener<Void>(ret)
+			{
+				public void customResultAvailable(Void result)
+				{
+					Map mse = (Map)MEnvSpaceType.getProperty(mspacetype.getProperties(), "spaceexecutor");
+					if(mse!=null)
+					{
+						IParsedExpression exp = (IParsedExpression)MEnvSpaceType.getProperty(mse, "expression");
+						ISpaceExecutor exe = null;
+						if(exp!=null)
+						{
+							exe = (ISpaceExecutor)exp.getValue(fetcher);	// Executor starts itself
+						}
+						else
+						{
+							try
+							{
+								exe = (ISpaceExecutor)((Class)MEnvSpaceType.getProperty(mse, "clazz")).newInstance();
+								List props = (List)mse.get("properties");
+								MEnvSpaceType.setProperties(exe, props, fetcher);
+							}
+							catch(Exception e)
+							{
+								ret.setException(e);
+							}
+						}
+						if(exe!=null)
+							exe.start();
+					}
+					ret.setResultIfUndone(result);
+				}
+			});
 		}
 		catch(Exception e)
 		{
-			for(int i=0; observercenters!=null && i<observercenters.size(); i++)
-			{
-				((ObserverCenter)observercenters.get(i)).dispose();
-			}
-			throw new RuntimeException(e);
+			ret.setException(e);
 		}
+
+		// In case of errors dispose observer centers if any.
+		ret.addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+			}
+
+			public void exceptionOccurred(Exception exception)
+			{
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						for(int i=0; observercenters!=null && i<observercenters.size(); i++)
+						{
+							((ObserverCenter)observercenters.get(i)).dispose();
+						}
+					}
+				});
+			}
+		});
+		
+		return ret;
 	}
 	
 //	/**
@@ -2710,44 +2758,50 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	 *  Initialize the extension.
 	 *  Called once, when the extension is created.
 	 */
-	public void	init(IInternalAccess ia, final MEnvSpaceInstance config, final IValueFetcher fetcher)
+	public IFuture<Void>	init(final IInternalAccess ia, final MEnvSpaceInstance config, final IValueFetcher fetcher)
 	{
-//		System.out.println("init space: "+ia);
-		
 //		space = (ISpace)getClazz().newInstance();
 
-		initSpace(ia, config, fetcher);
+		Future<Void>	ret	= new Future<Void>();
 		
-		ia.addComponentListener(new IComponentListener()
+		initSpace(ia, config, fetcher).addResultListener(ia.createResultListener(new DelegationResultListener<Void>(ret)
 		{
-			IFilter filter = new IFilter()
+			public void customResultAvailable(Void result)
 			{
-				public boolean filter(Object obj)
+				ia.addComponentListener(new IComponentListener()
 				{
-					IComponentChangeEvent event = (IComponentChangeEvent)obj;
-					return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
-				}
-			};
-			public IFilter getFilter()
-			{
-				return filter;
+					IFilter filter = new IFilter()
+					{
+						public boolean filter(Object obj)
+						{
+							IComponentChangeEvent event = (IComponentChangeEvent)obj;
+							return event.getSourceCategory().equals(StatelessAbstractInterpreter.TYPE_COMPONENT);
+						}
+					};
+					public IFilter getFilter()
+					{
+						return filter;
+					}
+					
+					public IFuture eventOccured(IComponentChangeEvent cce)
+					{
+						if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
+						{
+//									System.out.println("add: "+cce.getDetails());
+							componentAdded((IComponentDescription)cce.getDetails());
+						}
+						else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
+						{
+//									System.out.println("rem: "+cce.getComponent());
+							componentRemoved((IComponentDescription)cce.getDetails());
+						}
+						return IFuture.DONE;
+					}
+				});
+				super.customResultAvailable(result);
 			}
-			
-			public IFuture eventOccured(IComponentChangeEvent cce)
-			{
-				if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
-				{
-//							System.out.println("add: "+cce.getDetails());
-					componentAdded((IComponentDescription)cce.getDetails());
-				}
-				else if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_DISPOSAL))
-				{
-//							System.out.println("rem: "+cce.getComponent());
-					componentRemoved((IComponentDescription)cce.getDetails());
-				}
-				return IFuture.DONE;
-			}
-		});
+		}));	
+		return ret;
 	}
 	
 	/**
@@ -2756,6 +2810,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	 */
 	public IFuture<Void> terminate()
 	{
+//		System.out.println("terminate space: "+exta.getComponentIdentifier());
 		final Future<Void>	ret	= new Future<Void>();
 		final ObserverCenter[]	ocs	= (ObserverCenter[])observercenters.toArray(new ObserverCenter[observercenters.size()]);
 		SwingUtilities.invokeLater(new Runnable()
@@ -2776,6 +2831,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 				}
 			}
 		});
+//		System.out.println("terminate space finished: "+ret.isDone());
 		return ret;
 	}
 	

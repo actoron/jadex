@@ -49,6 +49,15 @@ public class CleanerGui	extends JFrame
 			}
 		});		
 		
+		final Timer	timer	= new Timer(50, new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				map.invalidate();
+				map.repaint();
+			}
+		});
+		
 		agent.scheduleStep(new IComponentStep<Void>()
 		{
 			@Classname("dispose")
@@ -63,6 +72,7 @@ public class CleanerGui	extends JFrame
 						{
 							public void run()
 							{
+								timer.stop();
 								dispose();
 							}
 						});
@@ -72,14 +82,6 @@ public class CleanerGui	extends JFrame
 			}
 		});
 		
-		Timer	timer	= new Timer(50, new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				map.invalidate();
-				map.repaint();
-			}
-		});
 		timer.start();
 	}		
 }

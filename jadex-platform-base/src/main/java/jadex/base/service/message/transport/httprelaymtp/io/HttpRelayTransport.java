@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -113,8 +114,8 @@ public class HttpRelayTransport implements ITransport
 	/** The thread pool. */
 	protected IThreadPoolService	threadpool;
 	
-	/** The relay server address. */
-	protected String	address;
+	/** The default relay server lookup addresses. */
+	protected String	defaddresses;
 	
 	/** The receiver process. */
 	protected HttpReceiver	receiver;
@@ -136,23 +137,28 @@ public class HttpRelayTransport implements ITransport
 	/**
 	 *  Create a new relay transport.
 	 */
-	public HttpRelayTransport(IInternalAccess component, String address)
+	public HttpRelayTransport(IInternalAccess component, String defaddresses)
 	{
 		this.component	= component;
-		this.address	= address;
+		this.defaddresses	= defaddresses;
 		this.addresses	= Collections.synchronizedMap(new HashMap<String, Long>());	// Todo: cleanup unused addresses!?
 		this.workers	= new HashMap<String, Integer>();
 		this.readyqueue	= new HashMap<String, Collection<ISendTask>>();
 		this.sendqueue	= new HashMap<String, List<Tuple2<ISendTask, Future<Void>>>>();
 		
-		boolean	found	= false;
-		for(int i=0; !found && i<getServiceSchemas().length; i++)
+		StringTokenizer	stok	= new StringTokenizer(defaddresses, ",");
+		while(stok.hasMoreTokens())
 		{
-			found	= address.startsWith(getServiceSchemas()[i]);
-		}
-		if(!found)
-		{
-			throw new RuntimeException("Address does not match supported service schemes: "+address+", "+SUtil.arrayToString(getServiceSchemas()));
+			String	adr	= stok.nextToken().trim();
+			boolean	found	= false;
+			for(int i=0; !found && i<getServiceSchemas().length; i++)
+			{
+				found	= adr.startsWith(getServiceSchemas()[i]);
+			}
+			if(!found)
+			{
+				throw new RuntimeException("Address does not match supported service schemes: "+adr+", "+SUtil.arrayToString(getServiceSchemas()));
+			}
 		}
 	}
 	
@@ -170,8 +176,8 @@ public class HttpRelayTransport implements ITransport
 			public void customResultAvailable(IThreadPoolService tps)
 			{
 				threadpool	= tps;
-				// Create the receiver (starts automatically).
-				receiver	= new HttpReceiver(HttpRelayTransport.this, component.getExternalAccess(), address.substring(6));	// strip 'relay-' prefix.
+				receiver	= new HttpReceiver(HttpRelayTransport.this, component.getExternalAccess(), defaddresses, threadpool);
+				receiver.start();
 				ret.setResult(null);
 			}
 		});
@@ -369,7 +375,7 @@ public class HttpRelayTransport implements ITransport
 	 */
 	public String[] getAddresses()
 	{
-		return new String[]{address};
+		return receiver.getAddresses();
 	}
 	
 	/**

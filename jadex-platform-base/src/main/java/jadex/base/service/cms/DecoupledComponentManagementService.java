@@ -1037,6 +1037,9 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 				}
 				else
 				{
+//					if("Application".equals(getDescription(cid).getType()))
+//						System.out.println("Terminating component structure: "+cid.getName());
+					
 					logger.info("Terminating component structure: "+cid.getName());
 					final CMSComponentDescription	desc = (CMSComponentDescription)adapter.getDescription();
 					IComponentIdentifier[] achildren = desc.getChildren();
