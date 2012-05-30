@@ -633,6 +633,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			{
 				public void exceptionOccurred(final Exception exception)
 				{
+					System.out.println("error state: "+getComponentDescription().getState());
 					terminateExtensions().addResultListener(new DelegationResultListener<Void>(iret)
 					{
 						public void customResultAvailable(Void result)
