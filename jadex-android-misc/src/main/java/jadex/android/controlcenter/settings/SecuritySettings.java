@@ -9,11 +9,11 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceScreen;
 
-public class SecuritySettingsScreen extends AServiceSettings {
+public class SecuritySettings extends AServiceSettings {
 
 	private ISecurityService secService;
 
-	public SecuritySettingsScreen(IService secservice) {
+	public SecuritySettings(IService secservice) {
 		super(secservice);
 		this.secService = (ISecurityService) service;
 	}

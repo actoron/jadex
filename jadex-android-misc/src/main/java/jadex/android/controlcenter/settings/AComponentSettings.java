@@ -13,8 +13,8 @@ public abstract class AComponentSettings {
 	
 	protected abstract void createPreferenceHierarchy(PreferenceScreen screen);
 
-	public void setPreferenceRoot(PreferenceScreen screen) {
-		screen.setTitle(extAcc.getComponentIdentifier().getLocalName());
+	public void setPreferenceScreen(PreferenceScreen screen) {
+		screen.setTitle(extAcc.getModel().getName());
 		createPreferenceHierarchy(screen);
 	}
 

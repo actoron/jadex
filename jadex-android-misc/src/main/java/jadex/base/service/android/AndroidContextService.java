@@ -2,8 +2,8 @@ package jadex.base.service.android;
 
 import jadex.android.JadexAndroidContext;
 import jadex.android.JadexAndroidContext.AndroidContextChangeListener;
-import jadex.android.JadexAndroidContextNotFoundError;
-import jadex.android.WrongEventClassException;
+import jadex.android.exception.JadexAndroidContextNotFoundError;
+import jadex.android.exception.WrongEventClassException;
 import jadex.bridge.service.BasicService;
 import jadex.bridge.service.IServiceProvider;
 import jadex.bridge.service.types.android.IAndroidContextService;

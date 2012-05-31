@@ -1,4 +1,4 @@
-package jadex.android;
+package jadex.android.exception;
 
 /**
  * This exception is thrown if an event could not be delivered because receiver

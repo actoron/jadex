@@ -19,7 +19,7 @@ import java.util.Map;
 // Putting method in service allows security settings to be administered using remote JCCs.
 @GuiClassNames({
 	@GuiClassName("jadex.tools.security.SecuritySettings"),
-	@GuiClassName("jadex.android.controlcenter.settings.SecuritySettingsScreen")
+	@GuiClassName("jadex.android.controlcenter.settings.SecuritySettings")
 })
 public interface ISecurityService
 {

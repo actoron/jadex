@@ -1,4 +1,4 @@
-package jadex.android;
+package jadex.android.exception;
 
 public class JadexAndroidException extends Exception {
 

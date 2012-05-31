@@ -1,4 +1,4 @@
-package jadex.android;
+package jadex.android.exception;
 
 /**
  * This Error is thrown when a method is called that requires a running Jadex

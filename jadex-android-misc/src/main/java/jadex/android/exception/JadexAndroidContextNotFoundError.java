@@ -1,4 +1,4 @@
-package jadex.android;
+package jadex.android.exception;
 
 /**
  * This Error is thrown if no Android Context could be found.

@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.preference.EditTextPreference;
 import android.preference.PreferenceManager;
+import android.text.InputType;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 public class JadexStringPreference extends EditTextPreference implements OnClickListener {
 
@@ -36,6 +38,7 @@ public class JadexStringPreference extends EditTextPreference implements OnClick
 				.setNegativeButton(super.getNegativeButtonText(), this);
 
 		View contentView = onCreateDialogView();
+		
 		if (contentView != null) {
 			onBindDialogView(contentView);
 			mBuilder.setView(contentView);
@@ -73,7 +76,7 @@ public class JadexStringPreference extends EditTextPreference implements OnClick
 		String text = (String) value;
 		setText(text);
 	}
-
+	
 	@Override
 	public void onClick(View v) {
 		showDialog();

@@ -1,5 +1,7 @@
 package jadex.android;
 
+import jadex.android.exception.JadexAndroidError;
+import jadex.android.exception.JadexAndroidPlatformNotStartedError;
 import jadex.base.Starter;
 import jadex.base.service.message.MessageService;
 import jadex.bridge.ComponentIdentifier;

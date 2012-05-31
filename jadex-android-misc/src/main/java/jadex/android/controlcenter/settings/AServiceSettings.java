@@ -14,7 +14,7 @@ public abstract class AServiceSettings {
 	protected abstract void createPreferenceHierarchy(PreferenceScreen screen);
 
 	public void setPreferenceRoot(PreferenceScreen screen) {
-		screen.setTitle(service.getServiceIdentifier().getServiceName());
+		screen.setTitle(service.getServiceIdentifier().getServiceType().getType().getSimpleName());
 		createPreferenceHierarchy(screen);
 	}
 

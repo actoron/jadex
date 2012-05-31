@@ -1,4 +1,4 @@
-package jadex.android;
+package jadex.android.exception;
 
 /**
  * General Jadex Android Runtime Error

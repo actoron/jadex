@@ -1,5 +1,6 @@
 package jadex.android;
 
+import jadex.android.exception.WrongEventClassException;
 import jadex.bridge.IExternalAccess;
 import jadex.bridge.service.types.android.IJadexAndroidEvent;
 
