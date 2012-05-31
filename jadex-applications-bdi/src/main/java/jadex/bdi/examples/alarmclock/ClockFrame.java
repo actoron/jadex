@@ -10,6 +10,7 @@ import jadex.commons.future.IFuture;
 import jadex.commons.future.IResultListener;
 import jadex.commons.gui.SGUI;
 import jadex.commons.gui.future.SwingDefaultResultListener;
+import jadex.commons.gui.future.SwingResultListener;
 import jadex.commons.transformation.annotations.Classname;
 
 import java.awt.AWTException;
@@ -82,6 +83,9 @@ public class ClockFrame extends JFrame
 	/** The tray icon. */
 	// Needs Java 1.6
 	protected TrayIcon ti;
+	
+	/** Flag to indicate shutdown. */
+	protected boolean	shutdown;
 	
 	/**
 	 *  Create a new clock frame.
@@ -169,10 +173,6 @@ public class ClockFrame extends JFrame
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if(alarms_gui!=null)
-					alarms_gui.dispose();
-				dispose();
-				
 				ClockFrame.this.agent.scheduleStep(new IComponentStep<Void>()
 				{
 					@Classname("settings")
@@ -324,17 +324,20 @@ public class ClockFrame extends JFrame
 		timer.start();
 		
 		// Dispose frame on exception.
-		IResultListener<Void>	dislis	= new IResultListener<Void>()
+		final IResultListener<Void>	dislis	= new SwingResultListener<Void>()
 		{
-			public void exceptionOccurred(Exception exception)
+			public void customExceptionOccurred(Exception exception)
 			{
+				shutdown	= true;
+				if(alarms_gui!=null)
+					alarms_gui.dispose();
 				if(tray!=null)
 					tray.remove(ti);
 				if(timer!=null)
 					timer.stop();
-				dispose();			
+				dispose();
 			}
-			public void resultAvailable(Void result)
+			public void customResultAvailable(Void result)
 			{
 			}
 		};
@@ -349,16 +352,7 @@ public class ClockFrame extends JFrame
 				{
 					public void componentTerminated()
 					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								if(tray!=null)
-									tray.remove(ti);
-								timer.stop();
-								dispose();
-							}
-						});
+						dislis.exceptionOccurred(null);
 					}
 				});
 				return IFuture.DONE;
@@ -389,29 +383,32 @@ public class ClockFrame extends JFrame
 					{
 						public void customResultAvailable(Object result)
 						{
-							IClockService cs = (IClockService)result;
-							Date current = new Date(cs.getTime());
-							
-							if(sets.isAMPM()!=last_ampm || sets.getFontsize()!=last_fontsize || init)
+							if(!shutdown)
 							{
-								if(sets.isAMPM())
-									format.applyPattern("hh:mm:ss a");
+								IClockService cs = (IClockService)result;
+								Date current = new Date(cs.getTime());
+								
+								if(sets.isAMPM()!=last_ampm || sets.getFontsize()!=last_fontsize || init)
+								{
+									if(sets.isAMPM())
+										format.applyPattern("hh:mm:ss a");
+									else
+										format.applyPattern("HH:mm:ss");
+									time.setFont(time.getFont().deriveFont((float)sets.getFontsize()));
+									time.setText(format.format(current));
+									pack();
+									setLocation(SGUI.calculateMiddlePosition(ClockFrame.this));
+									setVisible(true);
+									last_ampm = sets.isAMPM();
+									last_fontsize = sets.getFontsize();
+								}
 								else
-									format.applyPattern("HH:mm:ss");
-								time.setFont(time.getFont().deriveFont((float)sets.getFontsize()));
-								time.setText(format.format(current));
-								pack();
-								setLocation(SGUI.calculateMiddlePosition(ClockFrame.this));
-								setVisible(true);
-								last_ampm = sets.isAMPM();
-								last_fontsize = sets.getFontsize();
+								{
+									time.setText(format.format(current));
+								}
+								if(ti!=null)
+									ti.setToolTip(format.format(current));
 							}
-							else
-							{
-								time.setText(format.format(current));
-							}
-							if(ti!=null)
-								ti.setToolTip(format.format(current));
 						}
 					});
 					return IFuture.DONE;

@@ -73,39 +73,6 @@ public class DealerFrame extends GameStateFrame
 				DealerFrame.this.agent.killComponent();
 			}
 		});
-		agent.scheduleStep(new IComponentStep<Void>()
-		{
-			@Classname("dispose")
-			public IFuture<Void> execute(IInternalAccess ia)
-			{
-				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
-				bia.addComponentListener(new TerminationAdapter()
-				{
-					public void componentTerminated()
-					{
-						SwingUtilities.invokeLater(new Runnable()
-						{
-							public void run()
-							{
-								DealerFrame.this.dispose();
-							}
-						});
-					}
-				});
-				return IFuture.DONE;
-			}
-		}).addResultListener(new IResultListener<Void>()
-		{
-			public void resultAvailable(Void result)
-			{
-			}
-			
-			public void exceptionOccurred(Exception exception)
-			{
-				DealerFrame.this.dispose();
-			}
-		});
-	
 		// set the icon to be displayed for the frame
 		setIconImage(GUIImageLoader.getImage("heart_small_d").getImage());
 
@@ -161,6 +128,39 @@ public class DealerFrame extends GameStateFrame
 		pack();
 		setLocation(SGUI.calculateMiddlePosition(DealerFrame.this));
 		setVisible(true);
+		
+		agent.scheduleStep(new IComponentStep<Void>()
+		{
+			@Classname("dispose")
+			public IFuture<Void> execute(IInternalAccess ia)
+			{
+				IBDIInternalAccess bia = (IBDIInternalAccess)ia;
+				bia.addComponentListener(new TerminationAdapter()
+				{
+					public void componentTerminated()
+					{
+						SwingUtilities.invokeLater(new Runnable()
+						{
+							public void run()
+							{
+								DealerFrame.this.dispose();
+							}
+						});
+					}
+				});
+				return IFuture.DONE;
+			}
+		}).addResultListener(new IResultListener<Void>()
+		{
+			public void resultAvailable(Void result)
+			{
+			}
+			
+			public void exceptionOccurred(Exception exception)
+			{
+				DealerFrame.this.dispose();
+			}
+		});
 	}
 
 	/**
