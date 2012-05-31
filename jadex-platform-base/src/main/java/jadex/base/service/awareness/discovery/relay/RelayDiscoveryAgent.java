@@ -3,8 +3,6 @@ package jadex.base.service.awareness.discovery.relay;
 import jadex.base.service.awareness.discovery.DiscoveryAgent;
 import jadex.base.service.awareness.discovery.ReceiveHandler;
 import jadex.base.service.awareness.discovery.SendHandler;
-import jadex.base.service.message.transport.codecs.GZIPCodec;
-import jadex.base.service.message.transport.codecs.JadexXMLCodec;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.ComponentIdentifier;
 import jadex.bridge.ComponentTerminatedException;
@@ -22,8 +20,6 @@ import jadex.commons.future.IResultListener;
 import jadex.micro.annotation.Agent;
 import jadex.micro.annotation.AgentBody;
 import jadex.micro.annotation.AgentKilled;
-import jadex.micro.annotation.Argument;
-import jadex.micro.annotation.Arguments;
 import jadex.micro.annotation.Implementation;
 import jadex.micro.annotation.ProvidedService;
 import jadex.micro.annotation.ProvidedServices;
@@ -38,10 +34,6 @@ import java.util.Map;
  * Control the discovery mechanism of the relay transport.
  */
 @Agent
-@Arguments(
-{
-	@Argument(name="binarymessages", clazz=boolean.class, defaultvalue="false", description="Set if the agent should send binary messages as default.")
-})
 @ProvidedServices(@ProvidedService(type=IRelayAwarenessService.class,
 	implementation=@Implementation(expression="$component.getPojoAgent()")))
 @Service
@@ -159,13 +151,9 @@ public class RelayDiscoveryAgent extends DiscoveryAgent	implements IRelayAwarene
 										Map<String, Object> msg = new HashMap<String, Object>();
 										msg.put(SFipa.FIPA_MESSAGE_TYPE.getReceiverIdentifier(), receivers);
 										msg.put(SFipa.CONTENT, awainfo);
-										
-										// TODO: Binary/XML branch
-										//if g
-										msg.put(SFipa.LANGUAGE, SFipa.JADEX_XML);	// Todo: remove need for nested codecs!?
-										
-										// Use fixed codecs to avoid complex codec handling in servlet
-										agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE, new byte[]{JadexXMLCodec.CODEC_ID, GZIPCodec.CODEC_ID})
+										// Send content object without inner codec.
+										msg.put(SFipa.LANGUAGE, SFipa.JADEX_RAW);
+										agent.sendMessage(msg, SFipa.FIPA_MESSAGE_TYPE)
 											.addResultListener(new DelegationResultListener<Void>(fut));
 									}
 								});

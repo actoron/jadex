@@ -15,7 +15,8 @@ public class SRelay
 	public static final int[]	DEFAULT_PORTS	= new int[]{80, 443};
 	
 	/** Default relay address(es). */
-	public static final String	DEFAULT_ADDRESS	= "relay-http://relay.activecomponents.org/,relay-http://relay1.activecomponents.org/jadex-platform-relay-web,relay-http://jadex.informatik.uni-hamburg.de/relay/";
+	public static final String	DEFAULT_ADDRESS	= "relay-http://relay.activecomponents.org/, relay-http://relay1.activecomponents.org/jadex-platform-relay-web, relay-http://jadex.informatik.uni-hamburg.de/relay/";
+//	public static final String	DEFAULT_ADDRESS	= "relay-http://relay1.activecomponents.org/jadex-platform-relay-web";
 	
 	/** The default message type (followed by arbitrary message content from some sender). */
 	public static final byte	MSGTYPE_DEFAULT	= 1;

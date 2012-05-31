@@ -192,6 +192,7 @@ public class SFipa
 	public static final String FIPA_SL  = "fipa-sl";
 	public static final String JAVA_XML = "java-xml"; //JavaXMLContentCodec.JAVA_XML; // Hack!!! avoid dependency
 	public static final String JADEX_XML = "jadex-xml"; //JadexXMLContentCodec.JADEX_XML; // Hack!!! avoid dependency
+	public static final String JADEX_RAW = "jadex-raw"; // Use object as content. Might break state isolation when sending local messages!
 	public static final String JADEX_BINARY = "jadex-binary"; //JadexBinaryContentCodec.JADEX_BINARY; // Hack!!! avoid dependency
 	public static final String NUGGETS_XML = "nuggets-xml"; //NuggetsXMLContentCodec.NUGGETS_XML; // Hack!!! avoid dependency
 	//public static final String XSTREAM_XML = "xstream-xml"; //todo

@@ -469,7 +469,7 @@ public class MessageService extends BasicService implements IMessageService
 					|| name.equals(type.getResourceIdIdentifier())))
 			{	
 				// HACK!!!
-				if(SFipa.FIPA_MESSAGE_TYPE.equals(type))
+				if(SFipa.FIPA_MESSAGE_TYPE.equals(type) && !msgcopy.containsKey(SFipa.LANGUAGE))
 				{
 					Properties props = new Properties();
 					props.put(SFipa.LANGUAGE, deflanguage);
@@ -489,7 +489,7 @@ public class MessageService extends BasicService implements IMessageService
 				{
 					msgcopy.put(name, codec.encode(value, cl, getContentCodecInfo(comp.getComponentIdentifier())));
 				}
-				else
+				else if(!SFipa.JADEX_RAW.equals(msgcopy.get(SFipa.LANGUAGE)))
 				{
 					ret.setException(new ContentException("No content codec found for: "+name+", "+msgcopy));
 					return;

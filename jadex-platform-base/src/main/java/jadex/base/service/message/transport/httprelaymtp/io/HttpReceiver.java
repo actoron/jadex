@@ -336,7 +336,7 @@ public class HttpReceiver
 		log(Level.INFO, "Relay transport fetching server addresses from: "+defaddresses);
 		
 		final Future<String>	ret	= new Future<String>();
-		StringTokenizer	stok	= new StringTokenizer(defaddresses, ",");
+		StringTokenizer	stok	= new StringTokenizer(defaddresses, ", ");
 		final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(stok.countTokens(), true,
 			new ExceptionDelegationResultListener<Void, String>(ret)
 		{
@@ -391,13 +391,13 @@ public class HttpReceiver
 	{
 		log(Level.INFO, "Relay transport selecting server from: "+curadrs);
 		final Future<String>	ret	= new Future<String>();
-		StringTokenizer	stok	= new StringTokenizer(curadrs, ",");
+		StringTokenizer	stok	= new StringTokenizer(curadrs, ", ");
 		List<String>	adrs	= new LinkedList<String>();
 		Random	rnd	= new Random();
 		while(stok.hasMoreTokens())
 		{
 			// Insert addresses randomly to distribute load across servers.
-			adrs.add(rnd.nextInt(adrs.size()+1), stok.nextToken().trim().substring(6));	// strip 'relay-' prefix.
+			adrs.add(rnd.nextInt(adrs.size()+1), stok.nextToken().trim());
 		}
 		
 		final CounterResultListener<Void>	crl	= new CounterResultListener<Void>(adrs.size(), true,
@@ -422,7 +422,7 @@ public class HttpReceiver
 						URLConnection	con	= null;
 						try
 						{
-							URL	url	= new URL(adr+(adr.endsWith("/") ? "ping" : "/ping"));
+							URL	url	= new URL(adr.substring(6)+(adr.endsWith("/") ? "ping" : "/ping")); // strip 'relay-' prefix.
 							con	= url.openConnection();
 							cons.add((HttpURLConnection)con);
 							if(((HttpURLConnection)con).getResponseCode()==200)
@@ -479,7 +479,7 @@ public class HttpReceiver
 						try
 						{
 							String	xmlid	= HttpReceiver.this.access.getComponentIdentifier().getRoot().getName();
-							URL	url	= new URL(adr+"?id="+URLEncoder.encode(xmlid, "UTF-8"));
+							URL	url	= new URL(adr.substring(6)+"?id="+URLEncoder.encode(xmlid, "UTF-8")); // strip 'relay-' prefix.
 							con	= (HttpURLConnection)url.openConnection();
 							cons.add(con);
 							con.setUseCaches(false);

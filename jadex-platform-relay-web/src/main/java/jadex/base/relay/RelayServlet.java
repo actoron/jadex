@@ -1,17 +1,17 @@
 package jadex.base.relay;
 
+import jadex.base.service.message.MapSendTask;
 import jadex.base.service.message.transport.MessageEnvelope;
-import jadex.base.service.message.transport.codecs.GZIPCodec;
+import jadex.base.service.message.transport.codecs.CodecFactory;
 import jadex.base.service.message.transport.httprelaymtp.SRelay;
 import jadex.bridge.fipa.SFipa;
 import jadex.bridge.service.types.awareness.AwarenessInfo;
+import jadex.bridge.service.types.message.ICodec;
 import jadex.commons.SUtil;
 import jadex.commons.collection.ArrayBlockingQueue;
 import jadex.commons.collection.IBlockingQueue;
 import jadex.commons.concurrent.TimeoutException;
 import jadex.commons.future.ThreadSuspendable;
-import jadex.xml.bean.JavaReader;
-import jadex.xml.bean.JavaWriter;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -47,6 +47,12 @@ public class RelayServlet extends HttpServlet
 	/** Info about connected platforms.*/
 	protected Map<Object, PlatformInfo>	platforms;
 	
+	/** The available codecs for awareness infos (cached for speed). */
+	protected Map<Byte, ICodec>	codecs;
+	
+	/** The default codecs for awareness infos (cached for speed). */
+	protected ICodec[]	defcodecs;
+	
 	/** Counter for open GET connections (for testing). */
 	protected int	opencnt1	= 0;
 	/** Counter for open POST connections (for testing). */
@@ -65,6 +71,9 @@ public class RelayServlet extends HttpServlet
 	{
 		map	= Collections.synchronizedMap(new HashMap<String, IBlockingQueue<Message>>());
 		platforms	= Collections.synchronizedMap(new LinkedHashMap<Object, PlatformInfo>());
+		CodecFactory	cfac	= new CodecFactory();
+		codecs	= cfac.getAllCodecs();
+		defcodecs	= cfac.getDefaultCodecs();
 	}
 	
 	/**
@@ -152,12 +161,6 @@ public class RelayServlet extends HttpServlet
 			// Handle platform connection.
 			else
 			{
-				if(id.startsWith("<?xml"))
-				{
-					// Compatibility to older version.
-					id	= JavaReader.objectFromXML(id, getClass().getClassLoader()).toString();
-				}
-				
 				synchronized(this)
 				{
 					opencnt1++;
@@ -306,15 +309,11 @@ public class RelayServlet extends HttpServlet
 			// Read total message length.
 			byte[]	len	= readData(in, 4);
 			int	length	= SUtil.bytesToInt(len);
-
-			// Read prolog (1 byte codec length + 1 byte xml codec id + 1 byte gzip codec id)
-			readData(in, 4);
 			
 			// Read message and extract awareness info content.
-			byte[] buffer = readData(in, length-4);
-			buffer	= GZIPCodec.decodeBytes(buffer, getClass().getClassLoader());
-			MessageEnvelope	msg	= (MessageEnvelope)JavaReader.objectFromByteArray(buffer, getClass().getClassLoader());
-			AwarenessInfo	info	= (AwarenessInfo)JavaReader.objectFromByteArray((byte[])msg.getMessage().get(SFipa.CONTENT), getClass().getClassLoader());
+			byte[] buffer = readData(in, length-1);
+			MessageEnvelope	msg	= (MessageEnvelope)MapSendTask.decodeMessage(buffer, codecs, getClass().getClassLoader());
+			AwarenessInfo	info	= (AwarenessInfo)msg.getMessage().get(SFipa.CONTENT);
 			sendAwarenessInfos(info);
 		}
 		else
@@ -373,12 +372,9 @@ public class RelayServlet extends HttpServlet
 			platform.setAwarenessInfo(awainfo);
 		}
 		
-		if(platform!=null ||  AwarenessInfo.STATE_OFFLINE.equals(awainfo.getState()))
+		if(platform!=null || AwarenessInfo.STATE_OFFLINE.equals(awainfo.getState()))
 		{
-			byte[]	data	= GZIPCodec.encodeBytes(JavaWriter.objectToByteArray(awainfo, getClass().getClassLoader()), getClass().getClassLoader());
-			byte[]	info	= new byte[data.length+4];
-			System.arraycopy(SUtil.intToBytes(data.length), 0, info, 0, 4);
-			System.arraycopy(data, 0, info, 4, data.length);
+			byte[]	info	= MapSendTask.encodeMessage(awainfo, defcodecs, getClass().getClassLoader());
 			
 			Map.Entry<String, IBlockingQueue<Message>>[]	entries	= map.entrySet().toArray(new Map.Entry[0]);
 			for(int i=0; i<entries.length; i++)
@@ -400,10 +396,7 @@ public class RelayServlet extends HttpServlet
 					// Send other awareness infos to newly connected platform.
 					if(initial)
 					{
-						byte[]	data2	= GZIPCodec.encodeBytes(JavaWriter.objectToByteArray(awainfo2, getClass().getClassLoader()), getClass().getClassLoader());
-						byte[]	info2	= new byte[data2.length+4];
-						System.arraycopy(SUtil.intToBytes(data2.length), 0, info2, 0, 4);
-						System.arraycopy(data2, 0, info2, 4, data2.length);
+						byte[]	info2	= MapSendTask.encodeMessage(awainfo2, defcodecs, getClass().getClassLoader());
 						
 						try
 						{
@@ -431,20 +424,6 @@ public class RelayServlet extends HttpServlet
 		int	length	= SUtil.bytesToInt(len);
 		byte[] buffer = readData(in, length);
 		return new String(buffer, "UTF-8");
-	}
-	
-	/**
-	 * 	Read an object from the given stream.
-	 *  @param in	The input stream.
-	 *  @return The object.
-	 *  @throws	IOException when the stream is closed.
-	 */
-	public static Object	readObject(InputStream in) throws IOException
-	{
-		byte[]	len	= readData(in, 4);
-		int	length	= SUtil.bytesToInt(len);
-		byte[] buffer = readData(in, length);
-		return JavaReader.objectFromByteArray(buffer, RelayServlet.class.getClassLoader());
 	}
 	
 	/**
