@@ -633,9 +633,9 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 			{
 				public void exceptionOccurred(final Exception exception)
 				{
-					Thread.dumpStack();
-					exception.printStackTrace();
-					System.err.println("error state: "+getComponentIdentifier()+", "+getComponentDescription().getState()+", "+getComponentAdapter().isExternalThread());
+//					Thread.dumpStack();
+//					exception.printStackTrace();
+//					System.err.println("error state: "+getComponentIdentifier()+", "+getComponentDescription().getState()+", "+getComponentAdapter().isExternalThread());
 					terminateExtensions().addResultListener(new DelegationResultListener<Void>(iret)
 					{
 						public void customResultAvailable(Void result)
@@ -1026,36 +1026,51 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 		{
 			ConfigurationInfo conf = model.getConfiguration(config);
 			final IExtensionInfo[] exts = conf.getExtensions();
-			IResultListener	rl	= new ExceptionDelegationResultListener<IExtensionInstance, Void>(ret)
+			if(exts.length>0)
 			{
-				int	i=0;
-				public void customResultAvailable(IExtensionInstance result)
-				{
-					if(i>0)
-					{
-						addExtension(exts[i-1].getName(), result);
-					}
-					
-					if(i<exts.length)
-					{
-						i++;
-						exts[i-1].createInstance(getExternalAccess(), getFetcher())
-							.addResultListener(createResultListener(this));
-					}
-					else
-					{
-						ret.setResult(null);
-					}
-				}
-			};
-			
-			rl.resultAvailable(null);
+				initExtension(exts, 0).addResultListener(new DelegationResultListener<Void>(ret));
+			}
+			else
+			{
+				ret.setResult(null);
+			}
 		}
 		else
 		{
 			ret.setResult(null);
 		}
 		
+		return ret;
+	}
+	
+	/**
+	 *  Init an extension and continue with next.
+	 */
+	public IFuture<Void> initExtension(final IExtensionInfo[] exts, final int i)
+	{
+		final Future<Void> ret = new Future<Void>();
+		exts[i].createInstance(getExternalAccess(), getFetcher())
+			.addResultListener(createResultListener(new ExceptionDelegationResultListener<IExtensionInstance, Void>(ret)
+		{
+			public void customResultAvailable(IExtensionInstance ext)
+			{
+				addExtension(exts[i].getName(), ext);
+				ext.init().addResultListener(createResultListener(new DelegationResultListener<Void>(ret)
+				{
+					public void customResultAvailable(Void result)
+					{
+						if(i<exts.length-1)
+						{
+							initExtension(exts, i+1).addResultListener(new DelegationResultListener<Void>(ret));
+						}
+						else
+						{
+							super.customResultAvailable(result);
+						}
+					}
+				}));
+			}
+		}));
 		return ret;
 	}
 	

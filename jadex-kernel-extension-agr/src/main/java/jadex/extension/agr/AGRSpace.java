@@ -8,7 +8,6 @@ import jadex.bridge.IInternalAccess;
 import jadex.bridge.modelinfo.IExtensionInstance;
 import jadex.bridge.service.types.cms.IComponentDescription;
 import jadex.commons.IFilter;
-import jadex.commons.IValueFetcher;
 import jadex.commons.future.DelegationResultListener;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
@@ -26,7 +25,21 @@ public class AGRSpace	implements IExtensionInstance
 	//-------- attributes --------
 	
 	/** The groups. */
-	protected Map groups;
+	protected Map<String, Group> groups;
+	
+	/** The external access. */
+	protected IExternalAccess exta;
+	
+	/** The config. */
+	protected MAGRSpaceInstance	config;
+	
+	//-------- constructors --------
+	
+	public AGRSpace(IExternalAccess exta, MAGRSpaceInstance config)
+	{
+		this.exta	= exta;
+		this.config	= config;
+	}
 	
 	//-------- methods --------
 	
@@ -37,7 +50,7 @@ public class AGRSpace	implements IExtensionInstance
 	public synchronized	void addGroup(Group group)
 	{
 		if(groups==null)
-			groups	= new HashMap();
+			groups	= new HashMap<String, Group>();
 		
 		groups.put(group.getName(), group);
 	}
@@ -60,9 +73,9 @@ public class AGRSpace	implements IExtensionInstance
 	{
 		if(groups!=null)
 		{
-			for(Iterator it=groups.values().iterator(); it.hasNext(); )
+			for(Iterator<Group> it=groups.values().iterator(); it.hasNext(); )
 			{
-				Group	group	= (Group)it.next();
+				Group	group	= it.next();
 				String type = desc.getLocalType();
 				String[]	roles	= group.getRolesForType(type);
 				for(int r=0; roles!=null && r<roles.length; r++)
@@ -86,11 +99,11 @@ public class AGRSpace	implements IExtensionInstance
 	 *  Initialize the extension.
 	 *  Called once, when the extension is created.
 	 */
-	public IFuture init(IExternalAccess exta, MAGRSpaceInstance config, IValueFetcher fetcher)
+	public IFuture<Void> init()
 	{
 //		this.application = application;
 		
-		final Future ret = new Future();
+		final Future<Void> ret = new Future<Void>();
 		
 //		System.out.println("init space: "+ia);
 		
@@ -130,7 +143,7 @@ public class AGRSpace	implements IExtensionInstance
 							return filter;
 						}
 						
-						public IFuture eventOccured(IComponentChangeEvent cce)
+						public IFuture<Void> eventOccured(IComponentChangeEvent cce)
 						{
 							if(cce.getEventType().equals(IComponentChangeEvent.EVENT_TYPE_CREATION))
 							{
@@ -147,13 +160,7 @@ public class AGRSpace	implements IExtensionInstance
 					});
 					return IFuture.DONE;
 				}
-			}).addResultListener(new DelegationResultListener(ret)
-			{
-				public void customResultAvailable(Object result)
-				{
-					ret.setResult(AGRSpace.this);
-				}
-			});
+			}).addResultListener(new DelegationResultListener<Void>(ret));
 		}
 		catch(Exception e)
 		{
@@ -168,7 +175,7 @@ public class AGRSpace	implements IExtensionInstance
 	 *  Initialize the extension.
 	 *  Called once, when the extension is terminate.
 	 */
-	public IFuture terminate()
+	public IFuture<Void> terminate()
 	{
 		return IFuture.DONE;
 	}

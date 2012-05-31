@@ -970,6 +970,8 @@ public abstract class AbstractComponentAdapter implements IComponentAdapter, IEx
 				public void resultAvailable(IComponentManagementService cms)
 				{
 //					cms.setComponentException(cid, e);
+//					System.err.println("fatal error -> destroy: "+getComponentIdentifier());
+//					e.printStackTrace();
 					cms.destroyComponent(desc.getName());
 				}
 				

@@ -1,6 +1,8 @@
 package jadex.commons.future;
 
 
+import jadex.commons.DebugException;
+
 import java.util.logging.Logger;
 
 /**
@@ -30,7 +32,7 @@ public abstract class DefaultResultListener<E> implements IResultListener<E>
 	{
 		this.logger = Logger.getLogger("default-result-listener");
 		if(Future.DEBUG)
-			exception = new RuntimeException();
+			exception = new DebugException();
 	}
 	
 	/**

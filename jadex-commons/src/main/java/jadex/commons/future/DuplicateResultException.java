@@ -27,7 +27,7 @@ public class DuplicateResultException	extends RuntimeException
 	protected int	type;
 	
 	/** The future. */
-	protected IFuture	future;
+	protected IFuture<?>	future;
 	
 	/** The first result. */
 	protected Object	first;
@@ -40,7 +40,7 @@ public class DuplicateResultException	extends RuntimeException
 	/**
 	 *  Create a duplicate result exception.
 	 */
-	public DuplicateResultException(int type, IFuture future, Object first, Object second)
+	public DuplicateResultException(int type, IFuture<?> future, Object first, Object second)
 	{
 		this.type	= type;
 		this.future	= future;
@@ -58,7 +58,7 @@ public class DuplicateResultException	extends RuntimeException
 	/**
 	 *  Get the future.
 	 */
-	public IFuture	getFuture()
+	public IFuture<?>	getFuture()
 	{
 		return future;
 	}
@@ -80,13 +80,13 @@ public class DuplicateResultException	extends RuntimeException
 	public void printStackTrace()
 	{
 		System.err.println("Future: "+future);
-		if(future instanceof Future && ((Future)future).creation!=null)
+		if(future instanceof Future && ((Future<?>)future).creation!=null)
 		{
-			((Future)future).creation.printStackTrace();
+			((Future<?>)future).creation.printStackTrace();
 		}
-		if(future instanceof Future && ((Future)future).first!=null)
+		if(future instanceof Future && ((Future<?>)future).first!=null)
 		{
-			((Future)future).first.printStackTrace();
+			((Future<?>)future).first.printStackTrace();
 		}
 		super.printStackTrace();
 	}

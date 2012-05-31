@@ -151,6 +151,10 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	/** The class loader. */
 	protected ClassLoader	classloader;
 	
+	protected IInternalAccess ia;
+	protected MEnvSpaceInstance config;
+	protected IValueFetcher pfetcher;
+	
 
 	//-------- constructors --------
 	
@@ -189,10 +193,17 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 		this.observercenters = new ArrayList();
 	}
 	
+	public void	setInitData(IInternalAccess ia, MEnvSpaceInstance config, IValueFetcher pfetcher)
+	{
+		this.ia	= ia;
+		this.config	= config;
+		this.pfetcher	= pfetcher;
+	}
+	
 	/**
 	 *  Create a space.
 	 */
-	public IFuture<Void>	initSpace(final IInternalAccess ia, MEnvSpaceInstance config, IValueFetcher pfetcher)
+	public IFuture<Void>	initSpace()
 	{
 		final Future<Void>	ret	= new Future<Void>();
 		
@@ -658,8 +669,7 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 						}
 						catch(Exception e)
 						{
-							System.out.println("Exception while creating perspective: "+sourcepers);
-							e.printStackTrace();
+							crl2.exceptionOccurred(e);
 						}
 					}
 				}
@@ -2758,13 +2768,13 @@ public abstract class AbstractEnvironmentSpace	extends SynchronizedPropertyObjec
 	 *  Initialize the extension.
 	 *  Called once, when the extension is created.
 	 */
-	public IFuture<Void>	init(final IInternalAccess ia, final MEnvSpaceInstance config, final IValueFetcher fetcher)
+	public IFuture<Void>	init()
 	{
 //		space = (ISpace)getClazz().newInstance();
 
 		Future<Void>	ret	= new Future<Void>();
 		
-		initSpace(ia, config, fetcher).addResultListener(ia.createResultListener(new DelegationResultListener<Void>(ret)
+		initSpace().addResultListener(ia.createResultListener(new DelegationResultListener<Void>(ret)
 		{
 			public void customResultAvailable(Void result)
 			{

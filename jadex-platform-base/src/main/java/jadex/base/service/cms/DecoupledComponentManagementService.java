@@ -553,8 +553,8 @@ public abstract class DecoupledComponentManagementService implements IComponentM
 																		public void exceptionOccurred(final Exception exception)
 																		{
 																			logger.info("Starting component failed: "+cid+", "+exception);
-																			System.err.println("Starting component failed: "+cid+", "+exception);
-																			exception.printStackTrace();
+//																			System.err.println("Starting component failed: "+cid+", "+exception);
+//																			exception.printStackTrace();
 			//																System.out.println("Ex: "+cid+" "+exception);
 																			final Runnable	cleanup	= new Runnable()
 																			{

@@ -53,17 +53,9 @@ public class MEnvSpaceInstance	implements IExtensionInfo
 				try
 				{
 					Class<AbstractEnvironmentSpace>	clazz	= SReflect.findClass(spacetype.getClassName(), access.getModel().getAllImports(), ia.getClassLoader());
-					final AbstractEnvironmentSpace	space	= clazz.newInstance();
-					final Future<IExtensionInstance>	fut	= new Future<IExtensionInstance>();
-					ret	= fut;
-					space.init(ia, MEnvSpaceInstance.this, fetcher)
-						.addResultListener(new ExceptionDelegationResultListener<Void, IExtensionInstance>(fut)
-					{
-						public void customResultAvailable(Void result)
-						{
-							fut.setResult(space);
-						}
-					});
+					AbstractEnvironmentSpace	space	= clazz.newInstance();
+					space.setInitData(ia, MEnvSpaceInstance.this, fetcher);
+					ret	= new Future<IExtensionInstance>(space);					
 				}
 				catch(Exception e)
 				{

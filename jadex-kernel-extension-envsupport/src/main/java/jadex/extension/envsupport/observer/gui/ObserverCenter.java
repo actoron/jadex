@@ -6,6 +6,7 @@ import jadex.bridge.service.types.clock.IClockService;
 import jadex.bridge.service.types.cms.IComponentManagementService;
 import jadex.commons.IChangeListener;
 import jadex.commons.future.DefaultResultListener;
+import jadex.commons.future.DuplicateResultException;
 import jadex.commons.future.Future;
 import jadex.commons.future.IFuture;
 import jadex.commons.gui.future.SwingDefaultResultListener;
@@ -369,6 +370,7 @@ public class ObserverCenter
 		
 		if(SwingUtilities.isEventDispatchThread())
 		{
+			Exception e	= null;
 			synchronized(perspectives)
 			{
 				try
@@ -380,12 +382,19 @@ public class ObserverCenter
 					{
 						setSelectedPerspective(name);
 					}
-					ret.setResult(null);
 				}
-				catch(Exception e)
+				catch(Exception ex)
 				{
-					ret.setException(e);
+					e	= ex;
 				}
+			}
+			if(e!=null)
+			{
+				ret.setException(e);
+			}
+			else
+			{
+				ret.setResult(null);
 			}
 		}
 		else
@@ -394,6 +403,7 @@ public class ObserverCenter
 			{
 				public void run() 
 				{
+					Exception e	= null;
 					synchronized(perspectives)
 					{
 						try
@@ -405,12 +415,19 @@ public class ObserverCenter
 							{
 								setSelectedPerspective(name);
 							}
-							ret.setResult(null);
 						}
-						catch(Exception e)
+						catch(Exception ex)
 						{
-							ret.setException(e);
+							e	= ex;
 						}
+					}
+					if(e!=null)
+					{
+						ret.setException(e);
+					}
+					else
+					{
+						ret.setResult(null);
 					}
 				}
 			});
