@@ -635,7 +635,7 @@ public abstract class StatelessAbstractInterpreter implements IComponentInstance
 				{
 					Thread.dumpStack();
 					exception.printStackTrace();
-					System.out.println("error state: "+getComponentIdentifier()+", "+getComponentDescription().getState()+", "+getComponentAdapter().isExternalThread());
+					System.err.println("error state: "+getComponentIdentifier()+", "+getComponentDescription().getState()+", "+getComponentAdapter().isExternalThread());
 					terminateExtensions().addResultListener(new DelegationResultListener<Void>(iret)
 					{
 						public void customResultAvailable(Void result)
